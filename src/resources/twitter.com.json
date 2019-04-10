@@ -1,0 +1,27 @@
+{
+    "success": true,
+    "message": "Here is an error message when 'success' equal false",
+    "total": 2,
+    "data": [
+        {
+            "id": "1",
+            "name": "WalletConnect Dapplet Caller",
+            "description": "This plugin injects buttons, calling WalletConnect with Dapplet, into each tweet.",
+            "version": "0.0.1",
+            "icons": {
+                "128": "/resources/injectors/twitter-wc-dapplet/icons/icon-128.png"
+            },
+            "author": "Alexander Sakhaev"
+        },
+        {
+            "id": "2",
+            "name": "WalletConnect Dapplet Caller (2)",
+            "description": "This plugin injects buttons, calling WalletConnect with Dapplet, into each tweet.",
+            "version": "0.0.1",
+            "icons": {
+                "128": "/resources/injectors/twitter-wc-dapplet/icons/icon-128.png"
+            },
+            "author": "Alexander Sakhaev"
+        }
+    ]
+}
