@@ -1,12 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Button from '@material-ui/core/Button';
-import InjectorList from './components/InjectorList'
+import Index from './pages/index'
 
-function App() {
-  return (
-    <InjectorList/>
-  );
-}
-
-ReactDOM.render(<App />, document.querySelector('#app'));
+ReactDOM.render(<Index/>, document.querySelector('#app'));
