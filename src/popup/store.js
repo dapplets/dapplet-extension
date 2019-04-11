@@ -1,4 +1,4 @@
 const store = {
-    currentUrl: null
+    currentHostname: null
 };
 export default store;

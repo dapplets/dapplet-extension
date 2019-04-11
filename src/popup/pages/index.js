@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import InjectorList from '../components/InjectorList'
+import Header from '../components/Header'
 import Store from '../store'
 
 class Index extends Component {
@@ -7,7 +8,7 @@ class Index extends Component {
     render() {
         return (
             <React.Fragment>
-                <div>{Store.currentUrl}</div>
+                <Header />
                 <InjectorList />
             </React.Fragment>
         )

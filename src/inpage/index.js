@@ -37,10 +37,24 @@ const WidgetInjector = {
 
     init: async function () {
         var backgroundFunctions = await initBGFunctions(chrome);
-        const { getActiveInjectorsByHostname } = backgroundFunctions;
+        const { getActiveInjectorsByHostname, getSuspendityByHostname, getSuspendityEverywhere } = backgroundFunctions;
         var me = this;
         
         const hostname = window.location.hostname;
+
+
+        const isBlockedEverywhere = await getSuspendityEverywhere();
+        const isBlockedHostname = await getSuspendityByHostname(hostname);
+
+        if (isBlockedEverywhere) {
+            console.warn('Injecting is suspended globally at every website.');
+            return;
+        }
+
+        if (isBlockedHostname) {
+            console.warn('Current hostname is suspended for injecting.');
+            return;
+        }
 
         const activeInjectors = await getActiveInjectorsByHostname(hostname);
 

@@ -12,8 +12,6 @@ import Typography from "@material-ui/core/Typography";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import store from "../store";
 import Badge from "@material-ui/core/Badge";
-import Icon from "@material-ui/core/Icon";
-import Tooltip from "@material-ui/core/Tooltip";
 
 const styles = theme => ({
   root: {
