@@ -7,7 +7,7 @@
             "id": "1",
             "name": "WalletConnect Dapplet Caller",
             "description": "This plugin injects buttons, calling WalletConnect with Dapplet, into each tweet.",
-            "version": "0.0.1",
+            "version": "0.0.2",
             "icons": {
                 "128": "/resources/injectors/twitter-wc-dapplet/icons/icon-128.png"
             },
