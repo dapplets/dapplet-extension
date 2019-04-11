@@ -23,10 +23,21 @@ try {
   console.error(ex);
 }
 
+/* Extension Messaging Functions */
+
+/**
+ * Returns connection status of WalletConnect
+ * @returns {boolean} Is connected?
+ */
 const checkConnection = () => {
   return walletConnector.connected;
 };
 
+/**
+ * Returns URI of WalletConnect's session
+ * @async
+ * @returns {Promise<string>} Promise represents session URI
+ */
 const generateUri = async () => {
   await walletConnector.killSession();
   await walletConnector.createSession();
@@ -34,6 +45,13 @@ const generateUri = async () => {
   return uri;
 };
 
+/**
+ * Runs Dapplet inside paired wallet and returns transaction result
+ * @async
+ * @param {string} dappletId Dapplet ID
+ * @param {object} metaTx Metadata
+ * @returns {Promise<object>} Promise represents transaction result
+ */
 const loadDapplet = async (dappletId, metaTx) => {
   try {
     const result = await walletConnector.loadDapplet(dappletId, metaTx);
@@ -43,6 +61,11 @@ const loadDapplet = async (dappletId, metaTx) => {
   }
 };
 
+/**
+ * Returns pairing result.
+ * @async
+ * @returns {Promise<object>} Promise object represents the result of WalletConnect pairing
+ */
 const waitPairing = () => {
   var promise = new Promise(function(resolve, reject) {
     walletConnector.on("connect", (error, payload) => {
@@ -57,12 +80,23 @@ const waitPairing = () => {
   return promise;
 };
 
-// TODO implement it
+/**
+ * Returns activated injectors by passed hostname
+ * @async
+ * @param {string} hostname 
+ * @returns {Promise<Array<object>>} Promise represents array of objects with manifests of injectors
+ */
 const getActiveInjectorsByHostname = async hostname => {
   var injectors = (await Storage.getLocal("injectors/" + hostname)) || {};
   return Object.values(injectors);
 };
 
+/**
+ * Returns all injectors by passed hostname with isActive and hasUpdated statuses
+ * @async
+ * @param {string} hostname 
+ * @returns {Promise<Array<object>>} Promise represents array of injector's manifests
+ */
 const getInjectorsByHostname = async hostname => {
   var activeInjectors = (await Storage.getLocal("injectors/" + hostname)) || {};
   var externalInjectors = [];
@@ -126,6 +160,14 @@ const getInjectorsByHostname = async hostname => {
   return externalInjectors;
 };
 
+/**
+ * Adds or remove injector to (from) activated list by passed hostname
+ * @async
+ * @param {object} injector Manifest of injector
+ * @param {string} hostname 
+ * @param {boolean} isActive Add or remove?
+ * @returns {Promise<void>}
+ */
 const setActiveInjector = async (injector, hostname, isActive) => {
   if (!injector || !injector.id) {
     throw "invalid injector";
@@ -156,3 +198,4 @@ chrome.runtime.onMessage.addListener(
     setActiveInjector
   })
 );
+
