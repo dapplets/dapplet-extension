@@ -59,7 +59,8 @@ const waitPairing = () => {
 
 // TODO implement it
 const getActiveInjectorsByHostname = async hostname => {
-  return [];
+  var injectors = (await Storage.getLocal("injectors/" + hostname)) || {};
+  return Object.values(injectors);
 };
 
 const getInjectorsByHostname = async hostname => {

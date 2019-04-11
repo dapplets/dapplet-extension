@@ -11,17 +11,8 @@
             "icons": {
                 "128": "/resources/injectors/twitter-wc-dapplet/icons/icon-128.png"
             },
-            "author": "Alexander Sakhaev"
-        },
-        {
-            "id": "2",
-            "name": "WalletConnect Dapplet Caller (2)",
-            "description": "This plugin injects buttons, calling WalletConnect with Dapplet, into each tweet.",
-            "version": "0.0.1",
-            "icons": {
-                "128": "/resources/injectors/twitter-wc-dapplet/icons/icon-128.png"
-            },
-            "author": "Alexander Sakhaev"
+            "author": "Alexander Sakhaev",
+            "url": "https://skillunion.github.io/dapplet-static/widgets/1.js"
         }
     ]
 }

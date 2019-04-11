@@ -36,28 +36,26 @@ const WidgetInjector = {
     },
 
     init: async function () {
+        var backgroundFunctions = await initBGFunctions(chrome);
+        const { getActiveInjectorsByHostname } = backgroundFunctions;
         var me = this;
+        
+        const hostname = window.location.hostname;
 
-        const widgetListUrl = 'https://skillunion.github.io/dapplet-static/domains/' + window.location.hostname + '.json';
-        const widgetListResponse = await fetch(widgetListUrl)
+        const activeInjectors = await getActiveInjectorsByHostname(hostname);
 
-        if (!widgetListResponse.ok) {
-            console.warn('Widget Injector: Widget list loading error');
+        if (activeInjectors == null || activeInjectors == null || activeInjectors.length == 0) {
+            console.warn('Injector: Available injectors not found');
             return;
         }
 
-        const widgetListParsed = await widgetListResponse.json()
+        console.log('Found active injectors for ' + hostname, activeInjectors);
 
-        if (widgetListParsed == null || widgetListParsed.widgets == null || widgetListParsed.widgets.length == 0) {
-            console.warn('Widget Injector: Available widgets not found');
-            return;
-        }
+        for (var i = 0; i < activeInjectors.length; i++) {
+            var injectorInfo = activeInjectors[i];
+            if (!injectorInfo.url) continue;
 
-        for (var i = 0; i < widgetListParsed.widgets.length; i++) {
-            var widgetInfo = widgetListParsed.widgets[i];
-            if (!widgetInfo.url) return;
-
-            const widgetResponse = await fetch(widgetInfo.url);
+            const widgetResponse = await fetch(injectorInfo.url);
             const widgetText = await widgetResponse.text();
             // TODO: Check hash
             const widget = eval(widgetText);
