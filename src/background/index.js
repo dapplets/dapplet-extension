@@ -5,6 +5,8 @@ import WalletConnect from "@walletconnect/browser";
 import { setupMessageListener } from "chrome-extension-message-wrapper";
 import Storage from "../utils/chrome-extension-storage-wrapper";
 import Helpers from "../utils/helpers";
+import Cache from "./cache";
+import Service from "./service";
 
 const bridge = "https://bridge.walletconnect.org";
 
@@ -102,18 +104,11 @@ const getInjectorsByHostname = async hostname => {
   var activeInjectors = (await Storage.getLocal("injectors/" + hostname)) || {};
   var externalInjectors = [];
 
-  // TODO replace static json to api
   try {
-    var response = await fetch("/resources/" + hostname + ".json");
-    var json = await response.json();
-
-    externalInjectors = json.data;
+    externalInjectors = await Service.getInjectorsByHostname(hostname);
   } catch {
     try {
-      var response = await fetch("/resources/twitter.com.json");
-      var json = await response.json();
-
-      externalInjectors = json.data;
+      externalInjectors = await Service.getInjectorsByHostname('twitter.com');
     } catch {
       externalInjectors = [];
     }

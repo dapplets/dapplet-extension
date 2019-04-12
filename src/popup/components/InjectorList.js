@@ -28,6 +28,9 @@ const styles = theme => ({
   },
   margin: {
     margin: theme.spacing.unit * 2
+  },
+  switch: {
+    height: 20
   }
 });
 
@@ -127,6 +130,7 @@ class InjectorList extends React.Component {
             />
             <ListItemSecondaryAction>
               <Switch
+                className={classes.switch}
                 onChange={() =>
                   this.handleSwitchChange(injector, !injector.isActive)
                 }

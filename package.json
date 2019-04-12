@@ -31,6 +31,7 @@
     "@walletconnect/qrcode-modal": "^1.0.0-beta.6",
     "babel-loader": "^8.0.5",
     "chrome-extension-message-wrapper": "^1.0.3",
+    "jszip": "^3.2.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6"
   }
