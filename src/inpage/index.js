@@ -37,7 +37,7 @@ const WidgetInjector = {
 
     init: async function () {
         var backgroundFunctions = await initBGFunctions(chrome);
-        const { getActiveInjectorsByHostname, getSuspendityByHostname, getSuspendityEverywhere } = backgroundFunctions;
+        const { getActiveInjectorsByHostname, getSuspendityByHostname, getSuspendityEverywhere, getInjectorScriptByUrl } = backgroundFunctions;
         var me = this;
         
         const hostname = window.location.hostname;
@@ -69,8 +69,7 @@ const WidgetInjector = {
             var injectorInfo = activeInjectors[i];
             if (!injectorInfo.url) continue;
 
-            const widgetResponse = await fetch(injectorInfo.url);
-            const widgetText = await widgetResponse.text();
+            const widgetText = await getInjectorScriptByUrl(injectorInfo.url);
             // TODO: Check hash
             const widget = eval(widgetText);
             me._widgets.push(widget);

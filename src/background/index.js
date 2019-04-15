@@ -83,6 +83,10 @@ const waitPairing = () => {
   return promise;
 };
 
+const getInjectorScriptByUrl = async url => {
+  return await Cache.getScriptByUrl(url);
+};
+
 /**
  * Returns activated injectors by passed hostname
  * @async
@@ -266,7 +270,8 @@ chrome.runtime.onMessage.addListener(
     getSuspendityByHostname,
     getSuspendityEverywhere,
     resumeEverywhere,
-    resumeByHostname
+    resumeByHostname,
+    getInjectorScriptByUrl
   })
 );
 
