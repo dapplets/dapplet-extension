@@ -20,6 +20,7 @@ $/
 ```
 
 - `build` - Build bundles
+- `dist` - Releases
 - `src` - Main projects (the product code)
 - `src\backgorund` - Background service of extension. It works globally in browser
 - `src\inpage` - These scripts are running in the context of each viewing webpage
