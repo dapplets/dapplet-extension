@@ -1,18 +1,21 @@
 class Api {
   // contract
-  static async getLastInjectorsByHostname(hostname) {
-    switch (hostname) {
-      case "twitter.com":
-        return [
-          "/resources/injectors/twitter-wc-dapplet.zip",
-          "/resources/injectors/twitter-wc-dapplet-1.zip",
-          "/resources/injectors/twitter-wc-dapplet-2.zip",
-          "/resources/injectors/twitter-wc-dapplet-3.zip",
-          "/resources/injectors/twitter-wc-dapplet-4.zip"
-        ];
-      default:
-        return [];
-    }
+  static getLastInjectorsByHostname(hostname) {
+    return new Promise(function(resolve, reject) {
+      chrome.runtime.getPackageDirectoryEntry(function(de) {
+        de.getDirectory("resources/injectors/" + hostname + "/", {}, function(
+          deHostname
+        ) {
+          const reader = deHostname.createReader();
+          reader.readEntries(function(files) {
+            const urls = files.map(
+              x => "/resources/injectors/" + hostname + "/" + x.name
+            );
+            resolve(urls);
+          });
+        });
+      });
+    });
   }
 
   // swarm | ipfs

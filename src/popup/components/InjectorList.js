@@ -46,7 +46,7 @@ class InjectorList extends React.Component {
     const { getInjectorsByHostname } = backgroundFunctions;
 
     var injectors = await getInjectorsByHostname(store.currentHostname);
-
+    
     this.setState({
       injectors: injectors,
       totalCount: injectors.length

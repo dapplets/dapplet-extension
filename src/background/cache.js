@@ -3,6 +3,14 @@ import JSZip from "jszip";
 import Api from "./api";
 
 class Cache {
+
+  static async getBase64FromPackage(url, path) {
+    const zipBuffer = await this.getFileByUrl(url);
+    const zip = await JSZip.loadAsync(zipBuffer);
+    const base64 = await zip.file(path).async("base64");
+    return base64;
+  }
+
   static async getScriptByUrl(url) {
     const buffer = await this.getFileByUrl(url);
     const zip = await JSZip.loadAsync(buffer);
@@ -17,7 +25,8 @@ class Cache {
     const buffer = await this.getFileByUrl(url);
     const zip = await JSZip.loadAsync(buffer);
     const json = await zip.file("manifest.json").async("string");
-    const manifest = JSON.parse(json);
+    let manifest = JSON.parse(json);
+    manifest.url = url;
     return manifest;
   }
 
