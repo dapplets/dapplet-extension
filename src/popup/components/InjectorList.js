@@ -18,8 +18,8 @@ class InjectorList extends React.Component {
     var backgroundFunctions = await initBGFunctions(chrome);
     const { getInjectorsByHostname } = backgroundFunctions;
 
-    var injectors = await getInjectorsByHostname(store.currentHostname);
-
+    var injectors = await getInjectorsByHostname(store.currentHostname) || [];
+    
     this.setState({
       injectors: injectors,
       totalCount: injectors.length
@@ -50,63 +50,72 @@ class InjectorList extends React.Component {
 
   render() {
     const { injectors, totalCount } = this.state;
-
     return (
-      <List divided relaxed style={{ width: 350 }}>
-        {injectors.map(injector => (
-          <List.Item key={injector.id} style={{ overflow: "hidden" }}>
-            <List.Content style={{ width: 45, float: "left" }}>
-              <div>
-                <Image
-                  size="mini"
-                  avatar
-                  alt={injector.description}
-                  src={injector.icons["128"]}
-                />
-              </div>
-            </List.Content>
-            {injector.hasUpdate ? (
-              <List.Content style={{ float: "right", width: 60 }}>
-                <Button primary size="mini" style={{ padding: 5, width: 55 }}>
-                  Update
-                </Button>
-                <Button
-                  size="mini"
-                  style={{ padding: 5, marginTop: 5, width: 55 }}
+      <React.Fragment>
+        {(injectors.length > 0) ? (
+          <List divided relaxed style={{ width: 350 }}>
+            {injectors.map(injector => (
+              <List.Item key={injector.id} style={{ overflow: "hidden" }}>
+                <List.Content style={{ width: 45, float: "left" }}>
+                  <div>
+                    <Image
+                      size="mini"
+                      avatar
+                      alt={injector.description}
+                      src={injector.icons["128"]}
+                    />
+                  </div>
+                </List.Content>
+                {injector.hasUpdate ? (
+                  <List.Content style={{ float: "right", width: 60 }}>
+                    <Button
+                      primary
+                      size="mini"
+                      style={{ padding: 5, width: 55 }}
+                    >
+                      Update
+                    </Button>
+                    <Button
+                      size="mini"
+                      style={{ padding: 5, marginTop: 5, width: 55 }}
+                    >
+                      Skip
+                    </Button>
+                  </List.Content>
+                ) : (
+                  <List.Content style={{ float: "right", width: 60 }}>
+                    <Checkbox
+                      toggle
+                      style={{ marginTop: 5 }}
+                      onChange={() =>
+                        this.handleSwitchChange(injector, !injector.isActive)
+                      }
+                      checked={injector.isActive}
+                    />
+                  </List.Content>
+                )}
+                <List.Content
+                  style={{
+                    marginLeft: 45,
+                    marginRight: injector.hasUpdate ? 60 : 60
+                  }}
                 >
-                  Skip
-                </Button>
-              </List.Content>
-            ) : (
-              <List.Content style={{ float: "right", width: 60 }}>
-                <Checkbox
-                  toggle
-                  style={{ marginTop: 5 }}
-                  onChange={() =>
-                    this.handleSwitchChange(injector, !injector.isActive)
-                  }
-                  checked={injector.isActive}
-                />
-              </List.Content>
-            )}
-            <List.Content
-              style={{
-                marginLeft: 45,
-                marginRight: injector.hasUpdate ? 60 : 60
-              }}
-            >
-              <List.Header>{injector.name}</List.Header>
-              <List.Description style={{ color: "#666" }}>
-                {injector.description}
-                <br />
-                Author: {injector.author}
-                <br />
-                Version: {injector.version}
-              </List.Description>
-            </List.Content>
-          </List.Item>
-        ))}
-      </List>
+                  <List.Header>{injector.name}</List.Header>
+                  <List.Description style={{ color: "#666" }}>
+                    {injector.description}
+                    <br />
+                    Author: {injector.author}
+                    <br />
+                    Version: {injector.version}
+                  </List.Description>
+                </List.Content>
+              </List.Item>
+            ))}
+          </List>
+        ) : (
+          <div>No available injectors for current site.</div>
+        )}
+      </React.Fragment>
     );
   }
 }
