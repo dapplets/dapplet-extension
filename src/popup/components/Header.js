@@ -33,7 +33,7 @@ class Header extends React.Component {
     });
   }
 
-  async resumeByHostname() {
+  async resumeByHostnameButtonClick() {
     var backgroundFunctions = await initBGFunctions(chrome);
     const { resumeByHostname } = backgroundFunctions;
     await resumeByHostname(store.currentHostname);
@@ -43,7 +43,7 @@ class Header extends React.Component {
     });
   }
 
-  async resumeEverywhere() {
+  async resumeEverywhereButtonClick() {
     var backgroundFunctions = await initBGFunctions(chrome);
     const { resumeEverywhere } = backgroundFunctions;
     await resumeEverywhere();
@@ -59,22 +59,32 @@ class Header extends React.Component {
     return (
       <React.Fragment>
         {isHostnameSuspended && (
-          <div>
+          <div style={{ overflow: "hidden" }}>
             ⚠️ Injectors are suspended at this site.
             <Button
               size="mini"
               positive
-              onClick={() => this.resumeByHostname()}
-              style={{padding: 5, width: 55, float: 'right'}}
+              onClick={() => this.resumeByHostnameButtonClick()}
+              style={{ padding: 5, width: 55, float: "right" }}
             >
               Resume
             </Button>
           </div>
         )}
         {isEverywhereSuspended && (
-          <div>⚠️ Injectors are suspended everywhere.</div>
+          <div style={{ overflow: "hidden", marginTop: 4 }}>
+            ⚠️ Injectors are suspended everywhere.
+            <Button
+              size="mini"
+              positive
+              onClick={() => this.resumeEverywhereButtonClick()}
+              style={{ padding: 5, width: 55, float: "right" }}
+            >
+              Resume
+            </Button>
+          </div>
         )}
-        {(isHostnameSuspended || isEverywhereSuspended) && (<Divider />)}        
+        {(isHostnameSuspended || isEverywhereSuspended) && <Divider />}
       </React.Fragment>
     );
   }
