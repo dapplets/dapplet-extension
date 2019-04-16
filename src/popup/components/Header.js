@@ -1,8 +1,8 @@
 import React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import store from "../store";
-import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
+
+import { Button, Divider } from "semantic-ui-react";
 
 class Header extends React.Component {
   constructor(props) {
@@ -62,19 +62,19 @@ class Header extends React.Component {
           <div>
             ⚠️ Injectors are suspended at this site.
             <Button
-              size="small"
-              color="primary"
-              variant="contained"
+              size="mini"
+              positive
               onClick={() => this.resumeByHostname()}
+              style={{padding: 5, width: 55, float: 'right'}}
             >
-              Resume {this.state.hostname}
+              Resume
             </Button>
           </div>
         )}
         {isEverywhereSuspended && (
           <div>⚠️ Injectors are suspended everywhere.</div>
         )}
-        <Divider light />
+        {(isHostnameSuspended || isEverywhereSuspended) && (<Divider />)}        
       </React.Fragment>
     );
   }

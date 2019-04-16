@@ -5,7 +5,8 @@ var webpack = require("webpack"),
     CleanWebpackPlugin = require("clean-webpack-plugin"),
     CopyWebpackPlugin = require("copy-webpack-plugin"),
     HtmlWebpackPlugin = require("html-webpack-plugin"),
-    WriteFilePlugin = require("write-file-webpack-plugin");
+    WriteFilePlugin = require("write-file-webpack-plugin"),
+    ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 // load the secrets
 var alias = {};
@@ -38,11 +39,6 @@ var options = {
         exclude: /node_modules/
       },
       {
-        test: /\.css$/,
-        loader: "style-loader!css-loader",
-        exclude: /node_modules/
-      },
-      {
         test: new RegExp('\.(' + fileExtensions.join('|') + ')$'),
         loader: "file-loader?name=[name].[ext]",
         exclude: /node_modules/
@@ -51,6 +47,36 @@ var options = {
         test: /\.html$/,
         loader: "html-loader",
         exclude: /node_modules/
+      },
+      {
+        test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
+        use: {
+          loader: 'url-loader',
+          options: {
+            limit: 100000,
+          },
+        },
+      },
+      {
+        test: /\.css$/,
+        include: /node_modules/,
+        use: ExtractTextPlugin.extract({
+          fallback: "style-loader",
+          use: [
+            {
+              loader: 'css-loader',
+            },
+            {
+              loader: 'postcss-loader',
+              options: {
+                ident: 'postcss',
+                plugins: [
+                  require('cssnano')()
+                ]
+              }
+            },
+          ],
+        })
       }
     ]
   },
@@ -92,7 +118,8 @@ var options = {
     new CopyWebpackPlugin([{
       from: "src/resources",
       to: "resources"
-    }])
+    }]),
+    new ExtractTextPlugin("styles.css")
   ],
   chromeExtensionBoilerplate: {
     notHotReload: ["inpage"]

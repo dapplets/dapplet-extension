@@ -1,35 +1,8 @@
 import React from "react";
-import { withStyles } from "@material-ui/core/styles";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListSubheader from "@material-ui/core/ListSubheader";
-import ListItemAvatar from "@material-ui/core/ListItemAvatar";
-import Avatar from "@material-ui/core/Avatar";
-import Switch from "@material-ui/core/Switch";
-import Typography from "@material-ui/core/Typography";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import store from "../store";
-import Badge from "@material-ui/core/Badge";
 
-const styles = theme => ({
-  root: {
-    width: "100%",
-    maxWidth: 360,
-    backgroundColor: theme.palette.background.paper
-  },
-  inline: {
-    display: "inline"
-  },
-  injectorName: {
-    marginInlineEnd: "8px",
-    float: "left"
-  },
-  margin: {
-    margin: theme.spacing.unit * 2
-  }
-});
+import { Button, Image, List, Checkbox, Grid, Label } from "semantic-ui-react";
 
 class InjectorList extends React.Component {
   constructor(props) {
@@ -46,7 +19,7 @@ class InjectorList extends React.Component {
     const { getInjectorsByHostname } = backgroundFunctions;
 
     var injectors = await getInjectorsByHostname(store.currentHostname);
-    
+
     this.setState({
       injectors: injectors,
       totalCount: injectors.length
@@ -77,67 +50,65 @@ class InjectorList extends React.Component {
 
   render() {
     const { injectors, totalCount } = this.state;
-    const { classes } = this.props;
 
     return (
-      <List
-        subheader={
-          <ListSubheader>Found {totalCount} injector(s).</ListSubheader>
-        }
-      >
+      <List divided relaxed style={{ width: 350 }}>
         {injectors.map(injector => (
-          <ListItem key={injector.id} divider>
-            {injector.hasUpdate ? (
-              <Badge badgeContent={"UPD"} color="secondary">
-                <ListItemAvatar>
-                  <Avatar
-                    alt={injector.description}
-                    src={injector.icons["128"]}
-                  />
-                </ListItemAvatar>
-              </Badge>
-            ) : (
-              <ListItemAvatar>
-                <Avatar
+          <List.Item key={injector.id} style={{ overflow: "hidden" }}>
+            <List.Content style={{ width: 45, float: "left" }}>
+              <div>
+                <Image
+                  size="mini"
+                  avatar
                   alt={injector.description}
                   src={injector.icons["128"]}
                 />
-              </ListItemAvatar>
+              </div>
+            </List.Content>
+            {injector.hasUpdate ? (
+              <List.Content style={{ float: "right", width: 60 }}>
+                <Button primary size="mini" style={{ padding: 5, width: 55 }}>
+                  Update
+                </Button>
+                <Button
+                  size="mini"
+                  style={{ padding: 5, marginTop: 5, width: 55 }}
+                >
+                  Skip
+                </Button>
+              </List.Content>
+            ) : (
+              <List.Content style={{ float: "right", width: 60 }}>
+                <Checkbox
+                  toggle
+                  style={{ marginTop: 5 }}
+                  onChange={() =>
+                    this.handleSwitchChange(injector, !injector.isActive)
+                  }
+                  checked={injector.isActive}
+                />
+              </List.Content>
             )}
-            <ListItemText
-              primary={
-                <React.Fragment>
-                  <div className={classes.injectorName}>{injector.name}</div>
-                  <Typography
-                    component="span"
-                    className={classes.inline}
-                    variant="caption"
-                  >
-                    {injector.version}
-                  </Typography>
-                </React.Fragment>
-              }
-              secondary={
-                <React.Fragment>
-                  {injector.description}
-                  <br />
-                  Author: {injector.author}
-                </React.Fragment>
-              }
-            />
-            <ListItemSecondaryAction>
-              <Switch
-                onChange={() =>
-                  this.handleSwitchChange(injector, !injector.isActive)
-                }
-                checked={injector.isActive}
-              />
-            </ListItemSecondaryAction>
-          </ListItem>
+            <List.Content
+              style={{
+                marginLeft: 45,
+                marginRight: injector.hasUpdate ? 60 : 60
+              }}
+            >
+              <List.Header>{injector.name}</List.Header>
+              <List.Description style={{ color: "#666" }}>
+                {injector.description}
+                <br />
+                Author: {injector.author}
+                <br />
+                Version: {injector.version}
+              </List.Description>
+            </List.Content>
+          </List.Item>
         ))}
       </List>
     );
   }
 }
 
-export default withStyles(styles)(InjectorList);
+export default InjectorList;

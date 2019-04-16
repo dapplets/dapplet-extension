@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import Index from './pages/index'
 import store from "./store.js";
 import Helpers from "../utils/helpers";
+import 'semantic-ui-css/semantic.min.css'
 
 async function startApp(tabs) {
     var currentTab = tabs[0]; // there will be only one in this array
