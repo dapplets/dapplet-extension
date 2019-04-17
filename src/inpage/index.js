@@ -16,21 +16,31 @@ const WidgetInjector = {
 
         console.log('connected', connected);
 
+        console.log(0);
         if (!connected) {
+            console.log(1);
             var uri = await generateUri();
+            console.log(2);
             console.log('uri', uri);
+            console.log(3);
             WalletConnectQRCodeModal.open(uri);
+            console.log(4);
             var result = await waitPairing();
+            console.log(5);
             console.log('result', result);
+            console.log(6);
             WalletConnectQRCodeModal.close();
+            console.log(7);
 
             if (!result) {
                 alert('Wallet paring failed');
                 return;
             }
         }
+        console.log(8);
 
         var dappletResult = await loadDapplet(dappletId, metadata);
+        console.log(9);
         console.log('dappletResult', dappletResult);
         return dappletResult;
     },
