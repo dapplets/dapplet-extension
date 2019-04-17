@@ -4,6 +4,7 @@ import { setupMessageListener } from "chrome-extension-message-wrapper";
 import * as WalletConnectService from "./services/walletConnectService";
 import * as InjectorService from "./services/injectorService";
 import * as SuspendService from "./services/suspendService";
+import * as NotificationService from "./services/notificationService";
 
 chrome.runtime.onMessage.addListener(
   setupMessageListener({
@@ -11,6 +12,9 @@ chrome.runtime.onMessage.addListener(
     generateUri: WalletConnectService.generateUri,
     checkConnection: WalletConnectService.checkConnection,
     waitPairing: WalletConnectService.waitPairing,
+    disconnect: WalletConnectService.disconnect,
+    getAccounts: WalletConnectService.getAccounts,
+    getChainId: WalletConnectService.getChainId,
     getInjectorScriptByUrl: InjectorService.getInjectorScriptByUrl,
     getActiveInjectorsByHostname: InjectorService.getActiveInjectorsByHostname,
     getInjectorsByHostname: InjectorService.getInjectorsByHostname,
@@ -20,7 +24,9 @@ chrome.runtime.onMessage.addListener(
     suspendByHostname: SuspendService.suspendByHostname,
     suspendEverywhere: SuspendService.suspendEverywhere,
     resumeByHostname: SuspendService.resumeByHostname,
-    resumeEverywhere: SuspendService.resumeEverywhere
+    resumeEverywhere: SuspendService.resumeEverywhere,
+    transactionCreated: NotificationService.transactionCreated,
+    transactionRejected: NotificationService.transactionRejected
   })
 );
 
@@ -37,4 +43,16 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   SuspendService.changeIcon();
   SuspendService.updateContextMenus();
+});
+
+chrome.notifications.onClicked.addListener(function(notificationId) {
+  if (
+    notificationId &&
+    notificationId.length > 2 &&
+    notificationId[0] == "0" &&
+    notificationId[1] == "x"
+  ) {
+    var url = "https://rinkeby.etherscan.io/tx/" + notificationId;
+    chrome.tabs.create({ url: url });
+  }
 });

@@ -15,7 +15,7 @@ try {
     console.log("wallet disconnected, localstorage cleaned"); // tslint:disable-line
   });
 } catch (ex) {
-  console.error('WalletConnect initialization error', ex);
+  console.error("WalletConnect initialization error", ex);
 }
 
 /**
@@ -34,13 +34,20 @@ const loadDapplet = async (dappletId, metaTx) => {
   }
 };
 
+const disconnect = () => {
+  walletConnector.killSession();
+  localStorage.clear();
+  walletConnector = null;
+  walletConnector = new WalletConnect({ bridge });
+};
+
 /**
  * Returns URI of WalletConnect's session
  * @async
  * @returns {Promise<string>} Promise represents session URI
  */
 const generateUri = async () => {
-  await walletConnector.killSession();
+  disconnect();
   await walletConnector.createSession();
   const uri = walletConnector.uri;
   return uri;
@@ -51,7 +58,7 @@ const generateUri = async () => {
  * @returns {boolean} Is connected?
  */
 const checkConnection = () => {
-  console.log('walletConnector', walletConnector);
+  console.log("walletConnector", walletConnector);
   return walletConnector.connected;
 };
 
@@ -74,9 +81,20 @@ const waitPairing = () => {
   return promise;
 };
 
-export  { 
-  loadDapplet, 
-  generateUri, 
-  checkConnection, 
-  waitPairing
+const getAccounts = () => {
+  return walletConnector.accounts;
+};
+
+const getChainId = () => {
+  return walletConnector.chainId;
+};
+
+export {
+  loadDapplet,
+  generateUri,
+  checkConnection,
+  waitPairing,
+  disconnect,
+  getAccounts,
+  getChainId
 };
