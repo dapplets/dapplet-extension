@@ -26,50 +26,60 @@ const updateContextMenus = () => {
 
       const suspendityByHostname = await getSuspendityByHostname(hostname);
 
-      if (suspendityByHostname) {
-        chrome.contextMenus.create({
-          id: "SUSPEND_HOSTNAME",
-          title: "Resume on this site",
-          contexts: ["browser_action"],
-          onclick: async function(info, tab) {
-            await resumeByHostname(hostname);
-            updateContextMenus();
-          }
-        });
-      } else {
-        chrome.contextMenus.create({
-          id: "SUSPEND_HOSTNAME",
-          title: "Suspend on this site",
-          contexts: ["browser_action"],
-          onclick: async function(info, tab) {
-            await suspendByHostname(hostname);
-            updateContextMenus();
-          }
-        });
+      try {
+        if (suspendityByHostname) {
+          chrome.contextMenus.create({
+            id: "SUSPEND_HOSTNAME",
+            title: "Resume on this site",
+            contexts: ["browser_action"],
+            onclick: async function(info, tab) {
+              await resumeByHostname(hostname);
+              updateContextMenus();
+            }
+          });
+        } else {
+          chrome.contextMenus.create({
+            id: "SUSPEND_HOSTNAME",
+            title: "Suspend on this site",
+            contexts: ["browser_action"],
+            onclick: async function(info, tab) {
+              await suspendByHostname(hostname);
+              updateContextMenus();
+            }
+          });
+        }
+      } catch (ex) {
+        // TODO: fix the error of context menu
+        console.warn("TODO: fix the error of context menu", ex);
       }
 
       const suspendityEverywhere = await getSuspendityEverywhere();
 
-      if (suspendityEverywhere) {
-        chrome.contextMenus.create({
-          id: "SUSPEND_EVERYWHERE",
-          title: "Resume on all sites",
-          contexts: ["browser_action"],
-          onclick: async function(info, tab) {
-            await resumeEverywhere();
-            updateContextMenus();
-          }
-        });
-      } else {
-        chrome.contextMenus.create({
-          id: "SUSPEND_EVERYWHERE",
-          title: "Suspend on all sites",
-          contexts: ["browser_action"],
-          onclick: async function(info, tab) {
-            await suspendEverywhere();
-            updateContextMenus();
-          }
-        });
+      try {
+        if (suspendityEverywhere) {
+          chrome.contextMenus.create({
+            id: "SUSPEND_EVERYWHERE",
+            title: "Resume on all sites",
+            contexts: ["browser_action"],
+            onclick: async function(info, tab) {
+              await resumeEverywhere();
+              updateContextMenus();
+            }
+          });
+        } else {
+          chrome.contextMenus.create({
+            id: "SUSPEND_EVERYWHERE",
+            title: "Suspend on all sites",
+            contexts: ["browser_action"],
+            onclick: async function(info, tab) {
+              await suspendEverywhere();
+              updateContextMenus();
+            }
+          });
+        }
+      } catch (ex) {
+        // TODO: fix the error of context menu
+        console.warn("TODO: fix the error of context menu", ex);
       }
     });
   });
