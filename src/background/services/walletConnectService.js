@@ -1,4 +1,4 @@
-import WalletConnect from "@walletconnect/browser";
+import WalletConnect from "@dapplet-base/walletconnect-browser";
 
 const bridge = "https://bridge.walletconnect.org";
 
@@ -15,7 +15,7 @@ try {
     console.log("wallet disconnected, localstorage cleaned"); // tslint:disable-line
   });
 } catch (ex) {
-  console.error(ex);
+  console.error('WalletConnect initialization error', ex);
 }
 
 /**
@@ -51,6 +51,7 @@ const generateUri = async () => {
  * @returns {boolean} Is connected?
  */
 const checkConnection = () => {
+  console.log('walletConnector', walletConnector);
   return walletConnector.connected;
 };
 
