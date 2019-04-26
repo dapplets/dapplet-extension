@@ -1,10 +1,20 @@
-import React from "react";
+import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import store from "../store";
 
 import { Button, Divider } from "semantic-ui-react";
 
-class Header extends React.Component {
+interface IHeaderProps {
+
+}
+
+interface IHeaderState {
+  isHostnameSuspended: boolean;
+  isEverywhereSuspended: boolean;
+  hostname?: string;
+}
+
+class Header extends React.Component<IHeaderProps, IHeaderState> {
   constructor(props) {
     super(props);
 

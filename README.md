@@ -31,27 +31,12 @@ $/
 - `src\manifest.json` - The manifest of Chrome extension
 - `utils` - Utils for project building 
 
-### Installing
+### Building
 
-Install all dependencies
-
-```
-yarn
-```
-
-Start dev server
-
-```
-yarn start
-```
-
-## Deployment
-
-Build production version
-
-```
-yarn build
-```
+1.  Clone repo
+2.  `yarn`
+3.  `yarn dev` to compile once or `yarn watch` to run the dev task in watch mode
+4.  `yarn build` to build a production (minified) version
 
 ## Built With
 

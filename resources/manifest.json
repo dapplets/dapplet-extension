@@ -1,17 +1,18 @@
 {
   "name": "Dapplet Extension",
-  "version": "0.0.1",
-  "description": "Adds widgets to Legacy web-sites.",
-  "options_page": "options.html",
+  "version": "0.0.3",
+  "description": "Adds controls to legacy web sites.",
   "background": {
     "page": "background.html"
   },
   "browser_action": {
     "default_popup": "popup.html",
-    "default_icon": "resources/img/icon-34.png"
+    "default_icon": "icon16.png"
   },
   "icons": {
-    "128": "resources/img/icon-128.png"
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
   },
   "manifest_version": 2,
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
@@ -22,14 +23,14 @@
         "https://*/*"
       ],
       "js": [
-        "inpage.bundle.js"
+      	"inpage.js"
       ],
       "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [
-    "resources/*"
-  ],
+  	"examples/*"
+   ],
   "permissions": [
     "tabs",
     "storage",

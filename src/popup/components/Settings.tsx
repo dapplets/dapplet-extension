@@ -1,9 +1,19 @@
-import React from "react";
+import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 
 import { List, Button } from "semantic-ui-react";
 
-class Settings extends React.Component {
+interface ISettingsProps {
+
+}
+
+interface ISettingsState {
+  isConnected: boolean;
+  chainId: any; // TODO: what kind of type?
+  accounts: any[];
+}
+
+class Settings extends React.Component<ISettingsProps, ISettingsState> {
   constructor(props) {
     super(props);
 

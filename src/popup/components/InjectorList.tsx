@@ -1,10 +1,19 @@
-import React from "react";
+import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import store from "../store";
 
 import { Button, Image, List, Checkbox, Grid, Label } from "semantic-ui-react";
 
-class InjectorList extends React.Component {
+interface IInjectorListProps {
+
+}
+
+interface IInjectorListState {
+  injectors: any[];
+  totalCount: number;
+}
+
+class InjectorList extends React.Component<IInjectorListProps, IInjectorListState> {
   constructor(props) {
     super(props);
 
@@ -20,6 +29,7 @@ class InjectorList extends React.Component {
 
     var injectors = await getInjectorsByHostname(store.currentHostname) || [];
     
+    // TODO: loader spinner
     this.setState({
       injectors: injectors,
       totalCount: injectors.length

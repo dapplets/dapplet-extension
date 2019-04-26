@@ -10,8 +10,8 @@ const changeIcon = () => {
 
     const isSuspeded = suspendityByHostname || suspendityEverywhere;
     const path = isSuspeded
-      ? "/resources/img/icon-grayed-34.png"
-      : "/resources/img/icon-34.png";
+      ? "/icon-grayed16.png"
+      : "/icon16.png";
 
     chrome.browserAction.setIcon({ path: path });
   });

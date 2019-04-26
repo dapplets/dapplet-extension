@@ -1,12 +1,12 @@
-import React, { Component } from "react";
+import * as React from "react";
 import InjectorList from "../components/InjectorList";
 import Header from "../components/Header";
 import Settings from "../components/Settings";
-import Store from "../store";
+import './Popup.scss';
 
 import { Tab } from "semantic-ui-react";
 
-class Index extends Component {
+class Popup extends React.Component {
   render() {
     const panes = [
       {
@@ -29,11 +29,13 @@ class Index extends Component {
 
     return (
       <React.Fragment>
-        <Header />
-        <Tab menu={{ secondary: true, pointing: true }} panes={panes} />
+        <div className="popupContainer">
+          <Header />
+          <Tab menu={{ secondary: true, pointing: true }} panes={panes} />
+        </div>
       </React.Fragment>
     );
   }
 }
 
-export default Index;
+export default Popup;
