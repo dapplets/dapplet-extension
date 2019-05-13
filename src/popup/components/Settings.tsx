@@ -1,7 +1,7 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 
-import { List, Button } from "semantic-ui-react";
+import { List, Button, Form } from "semantic-ui-react";
 
 interface ISettingsProps {
 
@@ -46,6 +46,10 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     await this.componentDidMount();
   }
 
+  async saveButtonClick() {
+
+  }
+
   render() {
     const { isConnected, chainId, accounts } = this.state;
 
@@ -77,6 +81,15 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             Disconnect wallet
           </Button>
         )}
+        <Form>
+          <Form.Field>
+            <label>Debug Injector URL</label>
+            <input placeholder='http://localhost:8080/main.user.js' />
+          </Form.Field>
+          <Button onClick={() => this.saveButtonClick()}>
+            Save
+          </Button>
+        </Form>
       </React.Fragment>
     );
   }

@@ -1,11 +1,10 @@
 const path = require("path");
-const CleanWebpackPlugin = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: {
     popup: path.join(__dirname, "src/popup/index.tsx"),
-    background: path.join(__dirname, "src/background/index.js"),
+    background: path.join(__dirname, "src/background/index.ts"),
     inpage: path.join(__dirname, "src/inpage/index.js")
   },
   output: {
@@ -63,7 +62,6 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js"]
   },
   plugins: [
-    new CleanWebpackPlugin(),
     new CopyWebpackPlugin(["resources", {
       from: "src/background/index.html",
       to: "background.html"

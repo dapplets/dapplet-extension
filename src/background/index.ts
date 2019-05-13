@@ -3,6 +3,8 @@ import * as WalletConnectService from "./services/walletConnectService";
 import * as InjectorService from "./services/injectorService";
 import * as SuspendService from "./services/suspendService";
 import * as NotificationService from "./services/notificationService";
+import BaseRepository from "./repositories/BaseRepository"
+import Example from "./models/Example"
 
 chrome.runtime.onMessage.addListener(
   setupMessageListener({
@@ -54,3 +56,11 @@ chrome.notifications.onClicked.addListener(function(notificationId) {
     chrome.tabs.create({ url: url });
   }
 });
+
+
+// const repo = new BaseRepository(Example);
+// console.log('repo', repo);
+// let example = new Example();
+// example.name = 'hello';
+
+// repo.create(example);
