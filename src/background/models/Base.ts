@@ -1,6 +1,4 @@
-export default class Base 
+export default abstract class Base 
 {
-    public static getName() {
-        return "hello";
-    }
+    id: string = null;
 }

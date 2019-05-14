@@ -3701,6 +3701,11 @@ signal-exit@^3.0.0:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
   integrity sha1-tf3AjxKH6hF4Yo5BXiUTK3NkbG0=
 
+simple-mapper@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/simple-mapper/-/simple-mapper-2.2.0.tgz#fcb148c0e568bf635237fdce05b150aac8251323"
+  integrity sha512-M7cl6cotzZFF/tsdmgJiX1/cenDac94+KecVpgR9ncqtInXM3rapH5O43YIYXdDIy7oJAt5JAcAb+IAm1VdBkQ==
+
 slash@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-1.0.0.tgz#c41f2f6c39fc16d1cd17ad4b5d896114ae470d55"
