@@ -7,6 +7,29 @@ export default abstract class BaseRepository<T extends Base> {
 
     public constructor(private _TConstructor: new (...args: any[]) => T) { }
 
+    async getAll(filter?: (item: T) => boolean): Promise<T[]> {
+        return new Promise((resolve, reject) => {
+            try {
+                chrome.storage.local.get(null, result => {
+                    const items: T[] = [];
+
+                    for (const key in result) {
+                        if (key.indexOf(this._TConstructor.name + ':') == 0) {
+                            const item = this._mapper.map(this._TConstructor, result[key]);
+                            if (filter == undefined || filter(item)) {
+                                items.push(item);
+                            }
+                        }
+                    }
+
+                    resolve(items);
+                });
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+
     async getById(id: string): Promise<T> {
         return new Promise((resolve, reject) => {
             try {
@@ -32,12 +55,12 @@ export default abstract class BaseRepository<T extends Base> {
     async create(item: T): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
-                if (!item.id) {
+                if (!item.getId()) {
                     reject("ID must be specified"); // ToDo. Where is ID generated?
                     return;
                 }
 
-                const key = this._TConstructor.name + ':' + item.id;
+                const key = this._TConstructor.name + ':' + item.getId();
 
                 chrome.storage.local.get(key, result => {
                     if (!!result[key]) {
@@ -58,34 +81,23 @@ export default abstract class BaseRepository<T extends Base> {
         });
     }
 
-    async update(id: string, item: T): Promise<void> {
+    async update(item: T): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
-                const key = this._TConstructor.name + ':' + id;
+                const key = this._TConstructor.name + ':' + item.getId();
 
-                chrome.storage.local.get(key, result => {
-                    if (!!result[key]) {
-                        reject(`Item [${key}] doesn't exist`); // ToDo. Is it allowed to edit nonexistent item?
-                        return;
-                    }
-
-                    try {
-                        const result = { [key]: item };
-                        chrome.storage.local.set(result, () => resolve);
-                    } catch (e) {
-                        reject(e);
-                    }
-                });
+                const result = { [key]: item };
+                chrome.storage.local.set(result, () => resolve);
             } catch (e) {
                 reject(e);
             }
         });
     }
 
-    async delete(id: string): Promise<void> {
+    async delete(item: T): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
-                const key = this._TConstructor.name + ':' + id;
+                const key = this._TConstructor.name + ':' + item.getId();
 
                 chrome.storage.local.get(key, result => {
                     if (!!result[key]) {
@@ -98,7 +110,7 @@ export default abstract class BaseRepository<T extends Base> {
                     } catch (e) {
                         reject(e);
                     }
-                });                
+                });
             } catch (e) {
                 reject(e);
             }
@@ -109,12 +121,12 @@ export default abstract class BaseRepository<T extends Base> {
         return new Promise((resolve, reject) => {
             try {
                 chrome.storage.local.get(null, result => {
-                    const keys : string[] = [];
+                    const keys: string[] = [];
 
                     for (const key in result) {
                         if (key.indexOf(this._TConstructor.name + ':') == 0) {
                             keys.push(key);
-                        }                        
+                        }
                     }
 
                     if (keys.length > 0) {
@@ -122,7 +134,7 @@ export default abstract class BaseRepository<T extends Base> {
                     } else {
                         resolve();
                     }
-                });                
+                });
             } catch (e) {
                 reject(e);
             }

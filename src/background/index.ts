@@ -1,30 +1,30 @@
 import { setupMessageListener } from "chrome-extension-message-wrapper";
 import * as WalletConnectService from "./services/walletConnectService";
-import * as InjectorService from "./services/injectorService";
+import * as InjectorService from "./services/FeatureService";
 import * as SuspendService from "./services/suspendService";
 import * as NotificationService from "./services/notificationService";
 
 chrome.runtime.onMessage.addListener(
   setupMessageListener({
-    loadDapplet: WalletConnectService.loadDapplet,
-    generateUri: WalletConnectService.generateUri,
-    checkConnection: WalletConnectService.checkConnection,
-    waitPairing: WalletConnectService.waitPairing,
-    disconnect: WalletConnectService.disconnect,
-    getAccounts: WalletConnectService.getAccounts,
-    getChainId: WalletConnectService.getChainId,
-    getInjectorScriptByUrl: InjectorService.getInjectorScriptByUrl,
-    getActiveInjectorsByHostname: InjectorService.getActiveInjectorsByHostname,
-    getInjectorsByHostname: InjectorService.getInjectorsByHostname,
-    setActiveInjector: InjectorService.setActiveInjector,
-    getSuspendityByHostname: SuspendService.getSuspendityByHostname,
-    getSuspendityEverywhere: SuspendService.getSuspendityEverywhere,
-    suspendByHostname: SuspendService.suspendByHostname,
-    suspendEverywhere: SuspendService.suspendEverywhere,
-    resumeByHostname: SuspendService.resumeByHostname,
-    resumeEverywhere: SuspendService.resumeEverywhere,
-    transactionCreated: NotificationService.transactionCreated,
-    transactionRejected: NotificationService.transactionRejected
+    // loadDapplet: WalletConnectService.loadDapplet,
+    // generateUri: WalletConnectService.generateUri,
+    // checkConnection: WalletConnectService.checkConnection,
+    // waitPairing: WalletConnectService.waitPairing,
+    // disconnect: WalletConnectService.disconnect,
+    // getAccounts: WalletConnectService.getAccounts,
+    // getChainId: WalletConnectService.getChainId,
+    // getInjectorScriptByUrl: InjectorService.getInjectorScriptByUrl,
+    // getActiveInjectorsByHostname: InjectorService.getActiveInjectorsByHostname,
+    // getInjectorsByHostname: InjectorService.getInjectorsByHostname,
+    // setActiveInjector: InjectorService.setActiveInjector,
+    // getSuspendityByHostname: SuspendService.getSuspendityByHostname,
+    // getSuspendityEverywhere: SuspendService.getSuspendityEverywhere,
+    // suspendByHostname: SuspendService.suspendByHostname,
+    // suspendEverywhere: SuspendService.suspendEverywhere,
+    // resumeByHostname: SuspendService.resumeByHostname,
+    // resumeEverywhere: SuspendService.resumeEverywhere,
+    // transactionCreated: NotificationService.transactionCreated,
+    // transactionRejected: NotificationService.transactionRejected
   })
 );
 

@@ -1,6 +1,6 @@
 export default class DappletRegistry {
 
-    async getLastInjectorsByHostname(hostname: string): Promise<string[]> {
+    async getFeaturesByHostname(hostname: string): Promise<{ family: string, feature: string }[]> {
         return new Promise(function (resolve, reject) {
             chrome.runtime.getPackageDirectoryEntry(function (de) {
                 de.getDirectory("examples/injectors/" + hostname + "/", {}, function (
@@ -8,10 +8,10 @@ export default class DappletRegistry {
                 ) {
                     const reader = deHostname.createReader();
                     reader.readEntries(function (files) {
-                        const urls = files.map(
+                        const id = files.map(
                             x => "/examples/injectors/" + hostname + "/" + x.name
                         );
-                        resolve(urls);
+                        resolve(id);
                     }, reject);
                 }, reject);
             });
@@ -19,10 +19,18 @@ export default class DappletRegistry {
     }
 
     // swarm | ipfs
-    async getInjectorByUrl(url: string): Promise<ArrayBuffer> {
-        const response = await fetch(url);
+    async getFeatureFileById(id: string): Promise<ArrayBuffer> {
+        const response = await fetch(id);
         if (!response.ok) throw new Error("Can not load remote injector");
         const buffer = await response.arrayBuffer();
         return buffer;
-    };
+    }
+
+    // swarm | ipfs
+    async getAdapterFileById(id: string): Promise<ArrayBuffer> {
+        const response = await fetch(id);
+        if (!response.ok) throw new Error("Can not load remote injector");
+        const buffer = await response.arrayBuffer();
+        return buffer;
+    }
 }
