@@ -3,7 +3,7 @@ import Base from './Base';
 export default class SiteConfig extends Base {
     getId = () => this.hostname;
 
-    hostname: string;
+    hostname: string = null;
     featureFamilies: {
         [key: string]: {
             currentFeatureId: string;
@@ -11,7 +11,7 @@ export default class SiteConfig extends Base {
             isActive: boolean;
             isNew: boolean;
         };
-    };
-    paused: boolean;
-    lastSync: Date;
+    } = {};
+    paused: boolean = null;
+    lastSync: Date = null;
 }
