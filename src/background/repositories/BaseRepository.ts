@@ -3,7 +3,7 @@ import Base from '../models/Base';
 
 export default abstract class BaseRepository<T extends Base> {
 
-    private _mapper = new MapperService();
+    private _mapperService = new MapperService();
 
     public constructor(private _TConstructor: new (...args: any[]) => T) { }
 
@@ -15,7 +15,7 @@ export default abstract class BaseRepository<T extends Base> {
 
                     for (const key in result) {
                         if (key.indexOf(this._TConstructor.name + ':') == 0) {
-                            const item = this._mapper.map(this._TConstructor, result[key]);
+                            const item = this._mapperService.map(this._TConstructor, result[key]);
                             if (filter == undefined || filter(item)) {
                                 items.push(item);
                             }
@@ -43,7 +43,7 @@ export default abstract class BaseRepository<T extends Base> {
                         return;
                     }
 
-                    const item = this._mapper.map(this._TConstructor, value);
+                    const item = this._mapperService.map(this._TConstructor, value);
                     resolve(item);
                 });
             } catch (e) {
@@ -70,7 +70,7 @@ export default abstract class BaseRepository<T extends Base> {
 
                     try {
                         const result = { [key]: item };
-                        chrome.storage.local.set(result, () => resolve);
+                        chrome.storage.local.set(result, () => resolve());
                     } catch (e) {
                         reject(e);
                     }
@@ -87,7 +87,7 @@ export default abstract class BaseRepository<T extends Base> {
                 const key = this._TConstructor.name + ':' + item.getId();
 
                 const result = { [key]: item };
-                chrome.storage.local.set(result, () => resolve);
+                chrome.storage.local.set(result, () => resolve());
             } catch (e) {
                 reject(e);
             }
@@ -106,7 +106,7 @@ export default abstract class BaseRepository<T extends Base> {
                     }
 
                     try {
-                        chrome.storage.local.remove(key, () => resolve);
+                        chrome.storage.local.remove(key, () => resolve());
                     } catch (e) {
                         reject(e);
                     }
@@ -130,7 +130,7 @@ export default abstract class BaseRepository<T extends Base> {
                     }
 
                     if (keys.length > 0) {
-                        chrome.storage.local.remove(keys, () => resolve);
+                        chrome.storage.local.remove(keys, () => resolve());
                     } else {
                         resolve();
                     }
