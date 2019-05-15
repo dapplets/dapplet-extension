@@ -1,5 +1,9 @@
 import Storage from "../../utils/chrome-extension-storage-wrapper";
 import Helpers from "../../utils/helpers";
+import SiteConfigRepository from "../repositories/SiteConfigRepository";
+import SiteConfig from "../models/SiteConfig";
+
+const _siteConfigRepository = new SiteConfigRepository();
 
 const changeIcon = () => {
   chrome.tabs.query({ active: true }, async function(tab) {
@@ -92,7 +96,18 @@ const updateContextMenus = () => {
  * @returns {Promise<void>}
  */
 const suspendByHostname = async hostname => {
-  await Storage.setLocal("suspendedHostnames/" + hostname, true);
+  // TODO: move this logic to config service
+  var config = await _siteConfigRepository.getById(hostname);
+  if (!config) {
+    config = new SiteConfig();
+    config.hostname = hostname;
+    config.paused = true;
+    await _siteConfigRepository.create(config);
+  } else {
+    config.paused = true;
+    await _siteConfigRepository.update(config);
+  }
+
   changeIcon();
   updateContextMenus();
   console.log("Injecting is suspended at the " + hostname);
@@ -105,7 +120,18 @@ const suspendByHostname = async hostname => {
  * @returns {Promise<void>}
  */
 const resumeByHostname = async hostname => {
-  await Storage.removeLocal("suspendedHostnames/" + hostname);
+  // TODO: move this logic to config service
+  var config = await _siteConfigRepository.getById(hostname);
+  if (!config) {
+    config = new SiteConfig();
+    config.hostname = hostname;
+    config.paused = false;
+    await _siteConfigRepository.create(config);
+  } else {
+    config.paused = false;
+    await _siteConfigRepository.update(config);
+  }
+
   changeIcon();
   updateContextMenus();
   console.log("Injecting is resumed at the " + hostname);
@@ -118,8 +144,8 @@ const resumeByHostname = async hostname => {
  * @returns {Promise<boolean>}
  */
 const getSuspendityByHostname = async hostname => {
-  var value = await Storage.getLocal("suspendedHostnames/" + hostname);
-  return !!value;
+  var config = await _siteConfigRepository.getById(hostname);
+  return (!config) ? false : config.paused;
 };
 
 /**

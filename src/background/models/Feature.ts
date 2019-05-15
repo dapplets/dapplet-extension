@@ -11,7 +11,4 @@ export default class Feature extends Base {
     version: string = null;
     icon: string = null;
     adapterId: string = null;
-    
-    //hasUpdate: boolean = null;
-    //isActive: boolean = null;
 }

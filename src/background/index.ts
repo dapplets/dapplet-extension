@@ -1,30 +1,36 @@
 import { setupMessageListener } from "chrome-extension-message-wrapper";
 import * as WalletConnectService from "./services/walletConnectService";
-import * as InjectorService from "./services/FeatureService";
 import * as SuspendService from "./services/suspendService";
 import * as NotificationService from "./services/notificationService";
+import FeatureService from './services/FeatureService';
+
+const featureService = new FeatureService();
 
 chrome.runtime.onMessage.addListener(
   setupMessageListener({
-    // loadDapplet: WalletConnectService.loadDapplet,
-    // generateUri: WalletConnectService.generateUri,
-    // checkConnection: WalletConnectService.checkConnection,
-    // waitPairing: WalletConnectService.waitPairing,
-    // disconnect: WalletConnectService.disconnect,
-    // getAccounts: WalletConnectService.getAccounts,
-    // getChainId: WalletConnectService.getChainId,
-    // getInjectorScriptByUrl: InjectorService.getInjectorScriptByUrl,
-    // getActiveInjectorsByHostname: InjectorService.getActiveInjectorsByHostname,
-    // getInjectorsByHostname: InjectorService.getInjectorsByHostname,
-    // setActiveInjector: InjectorService.setActiveInjector,
-    // getSuspendityByHostname: SuspendService.getSuspendityByHostname,
-    // getSuspendityEverywhere: SuspendService.getSuspendityEverywhere,
-    // suspendByHostname: SuspendService.suspendByHostname,
-    // suspendEverywhere: SuspendService.suspendEverywhere,
-    // resumeByHostname: SuspendService.resumeByHostname,
-    // resumeEverywhere: SuspendService.resumeEverywhere,
-    // transactionCreated: NotificationService.transactionCreated,
-    // transactionRejected: NotificationService.transactionRejected
+    loadDapplet: WalletConnectService.loadDapplet,
+    generateUri: WalletConnectService.generateUri,
+    checkConnection: WalletConnectService.checkConnection,
+    waitPairing: WalletConnectService.waitPairing,
+    disconnect: WalletConnectService.disconnect,
+    getAccounts: WalletConnectService.getAccounts,
+    getChainId: WalletConnectService.getChainId,
+    getSuspendityByHostname: SuspendService.getSuspendityByHostname,
+    getSuspendityEverywhere: SuspendService.getSuspendityEverywhere,
+    suspendByHostname: SuspendService.suspendByHostname,
+    suspendEverywhere: SuspendService.suspendEverywhere,
+    resumeByHostname: SuspendService.resumeByHostname,
+    resumeEverywhere: SuspendService.resumeEverywhere,
+    transactionCreated: NotificationService.transactionCreated,
+    transactionRejected: NotificationService.transactionRejected,
+
+    getFeatureScriptById: (id) => featureService.getFeatureScriptById(id),
+    getAdapterScriptById: (id) => featureService.getAdapterScriptById(id),
+    getActiveFeatureIdsByHostname: (hostname) => featureService.getActiveFeatureIdsByHostname(hostname),
+    getFeaturesByHostname: (hostname) => featureService.getFeaturesByHostname(hostname),
+    syncFeaturesByHostname: (hostname) => featureService.syncFeaturesByHostname(hostname),
+    activateFeature: (id, hostname) => featureService.activateFeature(id, hostname),
+    deactivateFeature: (id, hostname) => featureService.deactivateFeature(id, hostname)  
   })
 );
 

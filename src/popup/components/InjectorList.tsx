@@ -25,9 +25,9 @@ class InjectorList extends React.Component<IInjectorListProps, IInjectorListStat
 
   async componentDidMount() {
     var backgroundFunctions = await initBGFunctions(chrome);
-    const { getInjectorsByHostname } = backgroundFunctions;
+    const { getFeaturesByHostname } = backgroundFunctions;
 
-    var injectors = await getInjectorsByHostname(store.currentHostname) || [];
+    var injectors = await getFeaturesByHostname(store.currentHostname) || [];
     
     // TODO: loader spinner
     this.setState({
@@ -38,9 +38,13 @@ class InjectorList extends React.Component<IInjectorListProps, IInjectorListStat
 
   async handleSwitchChange(injector, value) {
     var backgroundFunctions = await initBGFunctions(chrome);
-    const { setActiveInjector } = backgroundFunctions;
+    const { activateFeature, deactivateFeature } = backgroundFunctions;
 
-    await setActiveInjector(injector, store.currentHostname, value);
+    if (value) {
+      await activateFeature(injector.id, store.currentHostname);
+    } else {
+      await deactivateFeature(injector.id, store.currentHostname);
+    }
 
     this.setState(state => {
       const injectors = state.injectors.map(item => {
@@ -72,7 +76,7 @@ class InjectorList extends React.Component<IInjectorListProps, IInjectorListStat
                       size="mini"
                       avatar
                       alt={injector.description}
-                      src={injector.icons["128"]}
+                      src={injector.icon}
                     />
                   </div>
                 </List.Content>
