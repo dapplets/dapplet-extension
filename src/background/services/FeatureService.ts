@@ -2,18 +2,18 @@ import File from '../models/File';
 import FeatureDTO from '../dto/FeatureDTO';
 import DappletRegistry from '../api/DappletRegistry';
 import FileRepository from '../repositories/FileRepository';
-import FeatureRepository from '../repositories/FeatureRepository';
+import ManifestRepository from '../repositories/ManifestRepository';
 import SiteConfigRepository from '../repositories/SiteConfigRepository';
 import SiteConfig from '../models/SiteConfig';
 import UserScriptHelper from '../utils/UserScriptHelper';
-import Feature from '../models/Feature';
+import Manifest from '../models/Manifest';
 import { MapperService } from 'simple-mapper';
 
 export default class FeatureService {
 
     private _dappletRegistry = new DappletRegistry();
     private _fileRepository = new FileRepository();
-    private _featureRepository = new FeatureRepository();
+    private _manifestRepository = new ManifestRepository();
     private _siteConfigRepository = new SiteConfigRepository();
     private _mapperService = new MapperService();
 
@@ -22,7 +22,7 @@ export default class FeatureService {
     }
 
     async getScriptById(id: string): Promise<string> {
-        const manifest = await this._featureRepository.getById(id);
+        const manifest = await this._manifestRepository.getById(id);
         
         if (manifest && manifest.isDev === true) {
             // TODO: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
@@ -62,23 +62,23 @@ export default class FeatureService {
         for (const featureFamilyId in siteConfig.featureFamilies) {
             const featureConfig = siteConfig.featureFamilies[featureFamilyId];
 
-            const feature = await this._featureRepository.getById(featureConfig.currentFeatureId);
-            if (isOnlyDev === true && feature.isDev !== true) continue;
+            const featureManifest = await this._manifestRepository.getById(featureConfig.currentFeatureId);
+            if (isOnlyDev === true && featureManifest.isDev !== true) continue;
 
             const dto = new FeatureDTO();
 
             dto.id = featureConfig.currentFeatureId;
             dto.featureFamilyId = featureFamilyId;
-            dto.name = feature.name;
-            dto.description = feature.description;
-            dto.author = feature.author;
-            dto.version = feature.version;
-            dto.icon = feature.icon;
+            dto.name = featureManifest.name;
+            dto.description = featureManifest.description;
+            dto.author = featureManifest.author;
+            dto.version = featureManifest.version;
+            dto.icon = featureManifest.icon;
             dto.lastFeatureId = featureConfig.lastFeatureId;
             dto.isNew = featureConfig.isNew;
             dto.isActive = featureConfig.isActive;
-            dto.isDev = feature.isDev;
-            dto.devUrl = feature.devUrl;
+            dto.isDev = featureManifest.isDev;
+            dto.devUrl = featureManifest.devUrl;
 
             featuresDto.push(dto);
         }
@@ -171,18 +171,18 @@ export default class FeatureService {
             metadata[key] = userscript.meta[key][0];
         }
 
-        const feature = this._mapperService.map(Feature, metadata);
-        feature.id = id;
-        await this._featureRepository.create(feature);
+        const featureManifest = this._mapperService.map(Manifest, metadata);
+        featureManifest.id = id;
+        await this._manifestRepository.create(featureManifest);
     }
 
     async activateFeature(id, hostname): Promise<void> {
-        const feature = await this._featureRepository.getById(id);
+        const featureManifest = await this._manifestRepository.getById(id);
         const config = await this._siteConfigRepository.getById(hostname);
 
         // TODO: null checking
 
-        config.featureFamilies[feature.featureFamilyId].isActive = true;
+        config.featureFamilies[featureManifest.familyId].isActive = true;
 
         await this._siteConfigRepository.update(config);
 
@@ -191,12 +191,12 @@ export default class FeatureService {
     }
 
     async deactivateFeature(id, hostname): Promise<void> {
-        const feature = await this._featureRepository.getById(id);
+        const featureManifest = await this._manifestRepository.getById(id);
         const config = await this._siteConfigRepository.getById(hostname);
 
         // TODO: null checking
 
-        config.featureFamilies[feature.featureFamilyId].isActive = false;
+        config.featureFamilies[featureManifest.familyId].isActive = false;
 
         await this._siteConfigRepository.update(config);
 
@@ -204,8 +204,9 @@ export default class FeatureService {
         // TODO: fire deactivate event to inpage module
     }
 
-    async addDevFeature(id, url, hostname): Promise<void> {
-        const response = await fetch(url);
+    async addDevScript(id, url, hostname): Promise<void> {
+        // TODO: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
+        const response = await fetch(url + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
         if (!response.ok) throw new Error("Can not load remote injector");
         const text = await response.text();
         const userscript = UserScriptHelper.extractMetablock(text);
@@ -215,50 +216,52 @@ export default class FeatureService {
             metadata[key] = userscript.meta[key][0];
         }
 
-        const feature = this._mapperService.map(Feature, metadata);
+        const manifest = this._mapperService.map(Manifest, metadata);
 
-        if (!feature.featureFamilyId) throw new Error("Family ID is needed");
+        if (!manifest.familyId) throw new Error("Family ID is needed");
 
-        feature.id = id;
-        feature.devUrl = url;
-        feature.isDev = true;
+        manifest.id = id;
+        manifest.devUrl = url;
+        manifest.isDev = true;
 
-        let siteConfig = await this._siteConfigRepository.getById(hostname);
-        let isNewConfig: boolean = false;
-        if (!siteConfig) {
-            siteConfig = new SiteConfig();
-            siteConfig.hostname = hostname;
-            siteConfig.paused = false;
-            siteConfig.featureFamilies = {};
-            isNewConfig = true;
-        }
+        if (manifest.type === 'feature') {
+            let siteConfig = await this._siteConfigRepository.getById(hostname);
+            let isNewConfig: boolean = false;
+            if (!siteConfig) {
+                siteConfig = new SiteConfig();
+                siteConfig.hostname = hostname;
+                siteConfig.paused = false;
+                siteConfig.featureFamilies = {};
+                isNewConfig = true;
+            }
+    
+            siteConfig.featureFamilies[manifest.familyId] = {
+                currentFeatureId: id,
+                lastFeatureId: id,
+                isActive: false,
+                isNew: false
+            };
+    
+            if (isNewConfig) {
+                await this._siteConfigRepository.create(siteConfig);
+            } else {
+                await this._siteConfigRepository.update(siteConfig);
+            }
+        }        
 
-        siteConfig.featureFamilies[feature.featureFamilyId] = {
-            currentFeatureId: id,
-            lastFeatureId: id,
-            isActive: false,
-            isNew: false
-        };
-
-        await this._featureRepository.create(feature);
-
-        if (isNewConfig) {
-            await this._siteConfigRepository.create(siteConfig);
-        } else {
-            await this._siteConfigRepository.update(siteConfig);
-        }
+        await this._manifestRepository.create(manifest);        
     }
 
-    async deleteDevFeature(id, hostname): Promise<void> {
-        const metadata = await this._featureRepository.getById(id);
-        if (!metadata) throw new Error('Dev feature metadata is not found.');
+    async deleteDevScript(id, hostname): Promise<void> {
+        const featureManifest = await this._manifestRepository.getById(id);
+        if (!featureManifest) throw new Error('Dev feature metadata is not found.');
 
         let siteConfig = await this._siteConfigRepository.getById(hostname);
         if (siteConfig) {
-            delete siteConfig.featureFamilies[metadata.featureFamilyId];
+            delete siteConfig.featureFamilies[featureManifest.familyId];
             await this._siteConfigRepository.update(siteConfig);
         }
 
-        await this._featureRepository.delete(metadata);
+        await this._manifestRepository.delete(featureManifest);
     }
 }

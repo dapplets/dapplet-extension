@@ -1,6 +1,6 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { List, Button, Form, Icon, Input, Divider } from "semantic-ui-react";
+import { List, Button, Form, Icon, Input, Divider, Dropdown } from "semantic-ui-react";
 import store from "../store";
 
 interface IDevProps {
@@ -37,19 +37,19 @@ class Dev extends React.Component<IDevProps, IDevState> {
 
     handleAdd = async () => {
         const backgroundFunctions = await initBGFunctions(chrome);
-        const { addDevFeature } = backgroundFunctions;
+        const { addDevScript } = backgroundFunctions;
 
         const { scriptId, scriptUrl } = this.state;
 
-        await addDevFeature(scriptId, scriptUrl, store.currentHostname);
+        await addDevScript(scriptId, scriptUrl, store.currentHostname);
         await this.componentDidMount();
     }
 
     handleDelete = async (id) => {
         const backgroundFunctions = await initBGFunctions(chrome);
-        const { deleteDevFeature } = backgroundFunctions;
+        const { deleteDevScript } = backgroundFunctions;
 
-        await deleteDevFeature(id, store.currentHostname);
+        await deleteDevScript(id, store.currentHostname);
         await this.componentDidMount();
     }
 

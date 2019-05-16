@@ -1,10 +1,11 @@
 import Base from './Base';
 
-export default class Feature extends Base {
+export default class Manifest extends Base {
     getId = () => this.id;
     
     id: string = null;
-    featureFamilyId: string = null;
+    type: string = null;
+    familyId: string = null;
     name: string = null;
     description: string = null;
     author: string = null;

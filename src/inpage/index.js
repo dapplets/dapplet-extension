@@ -117,7 +117,7 @@ const WidgetInjector = {
       );
       const adapterId =
         (Feature && Feature.REQUIRES && Feature.REQUIRES.adapter) || null;
-      const canLoadFeature = false;
+      let canLoadFeature = false;
 
       // feature requires adapter and adapter is not yet loaded
       if (
@@ -137,10 +137,12 @@ const WidgetInjector = {
           class: Adapter,
           instance: new Adapter()
         });
+        canLoadFeature = true;
       } else {
         canLoadFeature = true;
       }
 
+      // TODO: fix canLoadFeature
       if (canLoadFeature) {
         me._features.push({
           id: featureId,
