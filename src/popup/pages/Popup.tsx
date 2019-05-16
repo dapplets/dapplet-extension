@@ -2,6 +2,7 @@ import * as React from "react";
 import InjectorList from "../components/InjectorList";
 import Header from "../components/Header";
 import Settings from "../components/Settings";
+import Dev from "../components/Dev";
 import './Popup.scss';
 
 import { Tab } from "semantic-ui-react";
@@ -22,6 +23,14 @@ class Popup extends React.Component {
         render: () => (
           <Tab.Pane attached={false}>
             <Settings />
+          </Tab.Pane>
+        )
+      },
+      {
+        menuItem: "Dev",
+        render: () => (
+          <Tab.Pane attached={false}>
+            <Dev />
           </Tab.Pane>
         )
       }

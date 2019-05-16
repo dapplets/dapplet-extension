@@ -11,4 +11,6 @@ export default class Feature extends Base {
     version: string = null;
     icon: string = null;
     adapterId: string = null;
+    isDev?: boolean = null; // only for dev scripts
+    devUrl?: string = null; // only for dev scripts
 }

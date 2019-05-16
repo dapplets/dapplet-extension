@@ -24,13 +24,15 @@ chrome.runtime.onMessage.addListener(
     transactionCreated: NotificationService.transactionCreated,
     transactionRejected: NotificationService.transactionRejected,
 
-    getFeatureScriptById: (id) => featureService.getFeatureScriptById(id),
-    getAdapterScriptById: (id) => featureService.getAdapterScriptById(id),
+    getFeatureScriptById: (id) => featureService.getScriptById(id),
+    getAdapterScriptById: (id) => featureService.getScriptById(id),
     getActiveFeatureIdsByHostname: (hostname) => featureService.getActiveFeatureIdsByHostname(hostname),
-    getFeaturesByHostname: (hostname) => featureService.getFeaturesByHostname(hostname),
+    getFeaturesByHostname: (hostname, isOnlyDev?: boolean) => featureService.getFeaturesByHostname(hostname, isOnlyDev),
     syncFeaturesByHostname: (hostname) => featureService.syncFeaturesByHostname(hostname),
     activateFeature: (id, hostname) => featureService.activateFeature(id, hostname),
-    deactivateFeature: (id, hostname) => featureService.deactivateFeature(id, hostname)  
+    deactivateFeature: (id, hostname) => featureService.deactivateFeature(id, hostname),
+    addDevFeature: (id, url, hostname) => featureService.addDevFeature(id, url, hostname),
+    deleteDevFeature: (id, hostname) => featureService.deleteDevFeature(id, hostname)
   })
 );
 

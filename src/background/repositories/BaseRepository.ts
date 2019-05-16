@@ -93,24 +93,20 @@ export default abstract class BaseRepository<T extends Base> {
             }
         });
     }
-
     async delete(item: T): Promise<void> {
+        this.deleteById(item.getId());
+    }
+
+    async deleteById(id: string): Promise<void>  {
         return new Promise((resolve, reject) => {
             try {
-                const key = this._TConstructor.name + ':' + item.getId();
+                const key = this._TConstructor.name + ':' + id;
 
-                chrome.storage.local.get(key, result => {
-                    if (!!result[key]) {
-                        reject(`Item [${key}] doesn't exist`); // ToDo. Is it allowed to delete nonexistent item?
-                        return;
-                    }
-
-                    try {
-                        chrome.storage.local.remove(key, () => resolve());
-                    } catch (e) {
-                        reject(e);
-                    }
-                });
+                try {
+                    chrome.storage.local.remove(key, () => resolve());
+                } catch (e) {
+                    reject(e);
+                }
             } catch (e) {
                 reject(e);
             }

@@ -9,4 +9,6 @@ export default class FeatureDTO {
     lastFeatureId: string = null;
     isNew: boolean = null;
     isActive: boolean = null;
+    isDev?: boolean = null; // only for dev scripts
+    devUrl?: string = null; // only for dev scripts
 }

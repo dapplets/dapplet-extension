@@ -1,15 +1,14 @@
 import WalletConnectQRCodeModal from "@walletconnect/qrcode-modal";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 
-
 class Core {
-    openOverlay(id, ctx) {
-        console.log('openOverlay', { id, ctx });
-    }
+  openOverlay(id, ctx) {
+    console.log("openOverlay", { id, ctx });
+  }
 
-    sendWalletConnectTx(tx) {
-        console.log('sendWalletConnectTx', { tx });
-    }
+  sendWalletConnectTx(tx) {
+    console.log("sendWalletConnectTx", { tx });
+  }
 }
 
 /**
@@ -106,28 +105,50 @@ const WidgetInjector = {
     console.log("Found active features for " + hostname, activeFeatureIds);
 
     for (const featureId of activeFeatureIds) {
-        const featureText = await getFeatureScriptById(featureId);
-        // TODO: Check hash
-        // TODO: Isolate eval here
-        const Feature = eval('(function(){ ' + featureText + ' return Feature; })();');
-        const adapterId = Feature && Feature.REQUIRES && Feature.REQUIRES.adapter || null;
-        me._features.push({ 
-            id: featureId, 
-            adapterId: adapterId,
-            class: Feature,
-            instance: new Feature()
-        });
+      const featureText = await getFeatureScriptById(featureId);
+      if (!featureText) {
+        console.warn("Cannot load feature #" + featureId);
+        continue;
+      }
+      // TODO: Check hash
+      // TODO: Isolate eval here
+      const Feature = eval(
+        "(function(){ " + featureText + " return Feature; })();"
+      );
+      const adapterId =
+        (Feature && Feature.REQUIRES && Feature.REQUIRES.adapter) || null;
+      const canLoadFeature = false;
 
-        // feature requires adapter and adapter is not yet loaded
-        if (adapterId && me._adapters.filter(a => a.id == adapterId).length == 0) {
-            const adapterText = await getAdapterScriptById(adapterId);
-            const Adapter = eval('(function(){ ' + adapterText + ' return ContentAdapter; })();');
-            me._adapters.push({ 
-                id: adapterId, 
-                class: Adapter,
-                instance: new Adapter()
-            });
-        }        
+      // feature requires adapter and adapter is not yet loaded
+      if (
+        adapterId &&
+        me._adapters.filter(a => a.id == adapterId).length == 0
+      ) {
+        const adapterText = await getAdapterScriptById(adapterId);
+        if (!adapterText) {
+          console.warn(`Cannot load adapter #${adapterId}. I'm skipping loading of feature #${featureId}`);
+          continue;
+        }
+        const Adapter = eval(
+          "(function(){ " + adapterText + " return ContentAdapter; })();"
+        );
+        me._adapters.push({
+          id: adapterId,
+          class: Adapter,
+          instance: new Adapter()
+        });
+      } else {
+        canLoadFeature = true;
+      }
+
+      if (canLoadFeature) {
+        me._features.push({
+          id: featureId,
+          adapterId: adapterId,
+          class: Feature,
+          instance: new Feature()
+        });
+      }
     }
 
     if (me._features.length == 0) {
@@ -135,19 +156,27 @@ const WidgetInjector = {
       return;
     }
 
-    console.log("Dapplet Injector: %s feature(s) was loaded", me._features.length);
-    console.log("Dapplet Injector: %s adapter(s) was loaded", me._adapters.length);
+    console.log(
+      "Dapplet Injector: %s feature(s) was loaded",
+      me._features.length
+    );
+    console.log(
+      "Dapplet Injector: %s adapter(s) was loaded",
+      me._adapters.length
+    );
 
     const core = new Core();
 
     for (const adapterInfo of me._adapters) {
-        adapterInfo.instance.init(core, document);
-        console.log('Dapplet Injector: Adapter %s inited', adapterInfo.id);
+      adapterInfo.instance.init(core, document);
+      console.log("Dapplet Injector: Adapter %s inited", adapterInfo.id);
 
-        for (const featureInfo of me._features.filter(f => f.adapterId == adapterInfo.id)) {
-            adapterInfo.instance.registerFeature(featureInfo.instance);
-            console.log('Dapplet Injector: Feature %s registered', featureInfo.id);
-        }        
+      for (const featureInfo of me._features.filter(
+        f => f.adapterId == adapterInfo.id
+      )) {
+        adapterInfo.instance.registerFeature(featureInfo.instance);
+        console.log("Dapplet Injector: Feature %s registered", featureInfo.id);
+      }
     }
   }
 };

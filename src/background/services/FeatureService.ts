@@ -21,45 +21,51 @@ export default class FeatureService {
         console.log('FeatureService', this);
     }
 
-    async getFeatureScriptById(id: string): Promise<string> {
-        let file = await this._fileRepository.getById(id);
+    async getScriptById(id: string): Promise<string> {
+        const manifest = await this._featureRepository.getById(id);
+        
+        if (manifest && manifest.isDev === true) {
+            // TODO: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
+            const response = await fetch(manifest.devUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
+            if (!response.ok) throw new Error("Can not load remote injector");
+            const text = await response.text();
+            return text;
+        } else {
+            // TODO: get Feature
+            let file = await this._fileRepository.getById(id);
 
-        if (!file) {
-            const buffer = await this._dappletRegistry.getFeatureFileById(id);
-            file = new File();
-            file.id = id;
-            file.setData(buffer);
-            await this._fileRepository.create(file);
+            if (!file) {
+                const buffer = await this._dappletRegistry.getScriptById(id);
+                file = new File();
+                file.id = id;
+                file.setData(buffer);
+                await this._fileRepository.create(file);
+            }
+            
+            return file.data; // ToDo ??? 
         }
-
-        return file.data; // ToDo ??? 
     }
 
-    async getAdapterScriptById(id: string): Promise<string> {
-        let file = await this._fileRepository.getById(id);
+    async getFeaturesByHostname(hostname: string, isOnlyDev?: boolean): Promise<FeatureDTO[]> {
+        let siteConfig = await this._siteConfigRepository.getById(hostname);
 
-        if (!file) {
-            const buffer = await this._dappletRegistry.getAdapterFileById(id);
-            file = new File();
-            file.id = id;
-            file.setData(buffer);
-            await this._fileRepository.create(file);
+        const featuresDto: FeatureDTO[] = [];
+
+        if (!siteConfig) {
+            await this.syncFeaturesByHostname(hostname);
+            siteConfig = await this._siteConfigRepository.getById(hostname);
+            if (!siteConfig) return [];
         }
 
-        return file.data; // ToDo ??? 
-    }
-
-    async getFeaturesByHostname(hostname: string): Promise<FeatureDTO[]> {
-        const siteConfig = await this._siteConfigRepository.getById(hostname);
-
-        const featuresDto : FeatureDTO[] = [];
-
-        if (!siteConfig) return featuresDto;
+        // TODO: Sync if old?
 
         for (const featureFamilyId in siteConfig.featureFamilies) {
             const featureConfig = siteConfig.featureFamilies[featureFamilyId];
-            const dto = new FeatureDTO(); 
+
             const feature = await this._featureRepository.getById(featureConfig.currentFeatureId);
+            if (isOnlyDev === true && feature.isDev !== true) continue;
+
+            const dto = new FeatureDTO();
 
             dto.id = featureConfig.currentFeatureId;
             dto.featureFamilyId = featureFamilyId;
@@ -70,7 +76,9 @@ export default class FeatureService {
             dto.icon = feature.icon;
             dto.lastFeatureId = featureConfig.lastFeatureId;
             dto.isNew = featureConfig.isNew;
-            dto.isActive = featureConfig.isActive;            
+            dto.isActive = featureConfig.isActive;
+            dto.isDev = feature.isDev;
+            dto.devUrl = feature.devUrl;
 
             featuresDto.push(dto);
         }
@@ -80,9 +88,11 @@ export default class FeatureService {
 
     async syncFeaturesByHostname(hostname: string): Promise<void> {
         const remoteFeatures = await this._dappletRegistry.getFeaturesByHostname(hostname);
+        if (remoteFeatures.length == 0) return;
+
         let siteConfig = await this._siteConfigRepository.getById(hostname);
 
-        let isNewConfig : boolean = false;
+        let isNewConfig: boolean = false;
         if (!siteConfig) {
             siteConfig = new SiteConfig();
             siteConfig.hostname = hostname;
@@ -92,7 +102,7 @@ export default class FeatureService {
         }
 
         for (const remote of remoteFeatures) {
-            let isFound : boolean = false;
+            let isFound: boolean = false;
             for (let featureFamilyId in siteConfig.featureFamilies) {
                 if (remote.family == featureFamilyId) {
                     // Update is available
@@ -124,7 +134,7 @@ export default class FeatureService {
                 await this._syncFeatureMetadataById(remote.feature);
             }
         }
-        
+
         siteConfig.lastSync = new Date();
 
         if (isNewConfig) {
@@ -134,9 +144,11 @@ export default class FeatureService {
         }
     }
 
-    async getActiveFeatureIdsByHostname(hostname: string) : Promise<string[]> {
+    async getActiveFeatureIdsByHostname(hostname: string): Promise<string[]> {
         const siteConfig = await this._siteConfigRepository.getById(hostname);
-        const activeFeatures : string[] = [];
+        if (!siteConfig) return [];
+
+        const activeFeatures: string[] = [];
 
         for (const featureFamilyId in siteConfig.featureFamilies) {
             if (siteConfig.featureFamilies[featureFamilyId].isActive) {
@@ -147,8 +159,8 @@ export default class FeatureService {
         return activeFeatures;
     }
 
-    private async _syncFeatureMetadataById(id: string) : Promise<void> {
-        const buffer = await this._dappletRegistry.getFeatureFileById(id);
+    private async _syncFeatureMetadataById(id: string): Promise<void> {
+        const buffer = await this._dappletRegistry.getScriptById(id);
         const file = new File();
         file.id = id;
         file.setData(buffer);
@@ -164,7 +176,7 @@ export default class FeatureService {
         await this._featureRepository.create(feature);
     }
 
-    async activateFeature(id, hostname) : Promise<void> {
+    async activateFeature(id, hostname): Promise<void> {
         const feature = await this._featureRepository.getById(id);
         const config = await this._siteConfigRepository.getById(hostname);
 
@@ -178,7 +190,7 @@ export default class FeatureService {
         // TODO: fire activate event to inpage module
     }
 
-    async deactivateFeature(id, hostname) : Promise<void> {
+    async deactivateFeature(id, hostname): Promise<void> {
         const feature = await this._featureRepository.getById(id);
         const config = await this._siteConfigRepository.getById(hostname);
 
@@ -190,5 +202,63 @@ export default class FeatureService {
 
         // TODO: remove file from storage
         // TODO: fire deactivate event to inpage module
+    }
+
+    async addDevFeature(id, url, hostname): Promise<void> {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Can not load remote injector");
+        const text = await response.text();
+        const userscript = UserScriptHelper.extractMetablock(text);
+
+        const metadata = {};
+        for (const key in userscript.meta) {
+            metadata[key] = userscript.meta[key][0];
+        }
+
+        const feature = this._mapperService.map(Feature, metadata);
+
+        if (!feature.featureFamilyId) throw new Error("Family ID is needed");
+
+        feature.id = id;
+        feature.devUrl = url;
+        feature.isDev = true;
+
+        let siteConfig = await this._siteConfigRepository.getById(hostname);
+        let isNewConfig: boolean = false;
+        if (!siteConfig) {
+            siteConfig = new SiteConfig();
+            siteConfig.hostname = hostname;
+            siteConfig.paused = false;
+            siteConfig.featureFamilies = {};
+            isNewConfig = true;
+        }
+
+        siteConfig.featureFamilies[feature.featureFamilyId] = {
+            currentFeatureId: id,
+            lastFeatureId: id,
+            isActive: false,
+            isNew: false
+        };
+
+        await this._featureRepository.create(feature);
+
+        if (isNewConfig) {
+            await this._siteConfigRepository.create(siteConfig);
+        } else {
+            await this._siteConfigRepository.update(siteConfig);
+        }
+    }
+
+    async deleteDevFeature(id, hostname): Promise<void> {
+        const metadata = await this._featureRepository.getById(id);
+        if (!metadata) throw new Error('Dev feature metadata is not found.');
+
+        let siteConfig = await this._siteConfigRepository.getById(hostname);
+        if (siteConfig) {
+            delete siteConfig.featureFamilies[metadata.featureFamilyId];
+            await this._siteConfigRepository.update(siteConfig);
+        }
+
+        await this._featureRepository.delete(metadata);
     }
 }
