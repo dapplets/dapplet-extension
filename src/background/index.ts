@@ -27,12 +27,13 @@ chrome.runtime.onMessage.addListener(
     getFeatureScriptById: (id) => featureService.getScriptById(id),
     getAdapterScriptById: (id) => featureService.getScriptById(id),
     getActiveFeatureIdsByHostname: (hostname) => featureService.getActiveFeatureIdsByHostname(hostname),
-    getFeaturesByHostname: (hostname, isOnlyDev?: boolean) => featureService.getFeaturesByHostname(hostname, isOnlyDev),
+    getFeaturesByHostname: (hostname) => featureService.getFeaturesByHostname(hostname),
     syncFeaturesByHostname: (hostname) => featureService.syncFeaturesByHostname(hostname),
     activateFeature: (id, hostname) => featureService.activateFeature(id, hostname),
     deactivateFeature: (id, hostname) => featureService.deactivateFeature(id, hostname),
     addDevScript: (id, url, hostname) => featureService.addDevScript(id, url, hostname),
-    deleteDevScript: (id, hostname) => featureService.deleteDevScript(id, hostname)
+    deleteDevScript: (id, hostname) => featureService.deleteDevScript(id, hostname),
+    getDevScriptsByHostname: (hostname) => featureService.getDevScriptsByHostname(hostname)
   })
 );
 

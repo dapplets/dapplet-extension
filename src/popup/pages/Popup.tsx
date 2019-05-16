@@ -1,5 +1,5 @@
 import * as React from "react";
-import InjectorList from "../components/InjectorList";
+import FeatureList from "../components/FeatureList";
 import Header from "../components/Header";
 import Settings from "../components/Settings";
 import Dev from "../components/Dev";
@@ -11,27 +11,21 @@ class Popup extends React.Component {
   render() {
     const panes = [
       {
-        menuItem: "Injectors",
+        menuItem: "Features",
         render: () => (
-          <Tab.Pane attached={false}>
-            <InjectorList />
-          </Tab.Pane>
+          <Tab.Pane attached={false} as={FeatureList}/>
         )
       },
       {
         menuItem: "Settings",
         render: () => (
-          <Tab.Pane attached={false}>
-            <Settings />
-          </Tab.Pane>
+          <Tab.Pane attached={false} as={Settings}/>
         )
       },
       {
         menuItem: "Dev",
         render: () => (
-          <Tab.Pane attached={false}>
-            <Dev />
-          </Tab.Pane>
+          <Tab.Pane attached={false} as={Dev}/>
         )
       }
     ];

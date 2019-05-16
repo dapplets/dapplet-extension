@@ -1,7 +1,7 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 
-import { List, Button, Form } from "semantic-ui-react";
+import { List, Button, Segment } from "semantic-ui-react";
 
 interface ISettingsProps {
 
@@ -51,32 +51,34 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
 
     return (
       <React.Fragment>
-        <List>
-          <List.Item>
-            <List.Header>Wallet Connection</List.Header>
-            <List.Description>
-              {isConnected ? "Connected" : "Disconnected"}
-            </List.Description>
-          </List.Item>
+        <Segment>
+          <List>
+            <List.Item>
+              <List.Header>Wallet Connection</List.Header>
+              <List.Description>
+                {isConnected ? "Connected" : "Disconnected"}
+              </List.Description>
+            </List.Item>
 
+            {isConnected && (
+              <React.Fragment>
+                <List.Item>
+                  <List.Header>Chain ID</List.Header>
+                  <List.Description>{chainId}</List.Description>
+                </List.Item>
+                <List.Item>
+                  <List.Header>Accounts</List.Header>
+                  <List.Description>{accounts.join(", ")}</List.Description>
+                </List.Item>
+              </React.Fragment>
+            )}
+          </List>
           {isConnected && (
-            <React.Fragment>
-              <List.Item>
-                <List.Header>Chain ID</List.Header>
-                <List.Description>{chainId}</List.Description>
-              </List.Item>
-              <List.Item>
-                <List.Header>Accounts</List.Header>
-                <List.Description>{accounts.join(", ")}</List.Description>
-              </List.Item>
-            </React.Fragment>
-          )}
-        </List>
-        {isConnected && (
-          <Button onClick={() => this.disconnectButtonClick()}>
-            Disconnect wallet
+            <Button onClick={() => this.disconnectButtonClick()}>
+              Disconnect wallet
           </Button>
-        )}
+          )}
+        </Segment>
       </React.Fragment>
     );
   }

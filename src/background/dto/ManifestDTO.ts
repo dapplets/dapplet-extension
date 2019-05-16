@@ -1,6 +1,7 @@
-export default class FeatureDTO {    
+export default class ManifestDTO {    
     id: string = null;
-    featureFamilyId: string = null;
+    type: string = null;
+    familyId: string = null;
     name: string = null;
     description: string = null;
     author: string = null;

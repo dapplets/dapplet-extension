@@ -1,5 +1,5 @@
 import File from '../models/File';
-import FeatureDTO from '../dto/FeatureDTO';
+import ManifestDTO from '../dto/ManifestDTO';
 import DappletRegistry from '../api/DappletRegistry';
 import FileRepository from '../repositories/FileRepository';
 import ManifestRepository from '../repositories/ManifestRepository';
@@ -46,10 +46,10 @@ export default class FeatureService {
         }
     }
 
-    async getFeaturesByHostname(hostname: string, isOnlyDev?: boolean): Promise<FeatureDTO[]> {
+    async getFeaturesByHostname(hostname: string): Promise<ManifestDTO[]> {
         let siteConfig = await this._siteConfigRepository.getById(hostname);
 
-        const featuresDto: FeatureDTO[] = [];
+        const featuresDto: ManifestDTO[] = [];
 
         if (!siteConfig) {
             await this.syncFeaturesByHostname(hostname);
@@ -63,12 +63,11 @@ export default class FeatureService {
             const featureConfig = siteConfig.featureFamilies[featureFamilyId];
 
             const featureManifest = await this._manifestRepository.getById(featureConfig.currentFeatureId);
-            if (isOnlyDev === true && featureManifest.isDev !== true) continue;
 
-            const dto = new FeatureDTO();
+            const dto = new ManifestDTO();
 
             dto.id = featureConfig.currentFeatureId;
-            dto.featureFamilyId = featureFamilyId;
+            dto.familyId = featureFamilyId;
             dto.name = featureManifest.name;
             dto.description = featureManifest.description;
             dto.author = featureManifest.author;
@@ -202,6 +201,33 @@ export default class FeatureService {
 
         // TODO: remove file from storage
         // TODO: fire deactivate event to inpage module
+    }
+
+    async getDevScriptsByHostname(hostname) : Promise<ManifestDTO[]> {
+        const siteConfig = await this._siteConfigRepository.getById(hostname);
+        const featureFamilies = siteConfig && siteConfig.featureFamilies;
+        const manifests = await this._manifestRepository.getAll(m => m.isDev === true);
+        const dtos = manifests.map(m => {
+            const dto = new ManifestDTO();
+
+            dto.id = m.id;
+            dto.familyId = m.familyId;
+            dto.name = m.name;
+            dto.description = m.description;
+            dto.author = m.author;
+            dto.version = m.version;
+            dto.icon = m.icon;
+            dto.lastFeatureId = featureFamilies && featureFamilies[m.familyId] && featureFamilies[m.familyId].lastFeatureId || null;
+            dto.isNew = featureFamilies && featureFamilies[m.familyId] && featureFamilies[m.familyId].isNew || null;
+            dto.isActive = featureFamilies && featureFamilies[m.familyId] && featureFamilies[m.familyId].isActive || null;
+            dto.isDev = m.isDev;
+            dto.devUrl = m.devUrl;
+            dto.type = m.type;
+
+            return dto;
+        });
+
+        return dtos;
     }
 
     async addDevScript(id, url, hostname): Promise<void> {
