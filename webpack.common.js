@@ -5,7 +5,7 @@ module.exports = {
   entry: {
     popup: path.join(__dirname, "src/popup/index.tsx"),
     background: path.join(__dirname, "src/background/index.ts"),
-    inpage: path.join(__dirname, "src/inpage/index.js")
+    inpage: path.join(__dirname, "src/inpage/index.ts")
   },
   output: {
     path: path.join(__dirname, "build"),

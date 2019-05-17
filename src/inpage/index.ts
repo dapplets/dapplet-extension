@@ -40,7 +40,7 @@ const WidgetInjector = {
       console.log(2);
       console.log("uri", uri);
       console.log(3);
-      WalletConnectQRCodeModal.open(uri);
+      WalletConnectQRCodeModal.open(uri, {});
       console.log(4);
       var result = await waitPairing();
       console.log(5);
@@ -79,6 +79,12 @@ const WidgetInjector = {
       getAdapterScriptById
     } = backgroundFunctions;
     var me = this;
+
+    
+    var Require = (id: string) : Function => {
+      console.log('-- !decorator factory invoked! --', id);
+      return function (constructor: Function) { };
+    }
 
     const hostname = window.location.hostname;
 
