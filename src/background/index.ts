@@ -4,6 +4,7 @@ import * as SuspendService from "./services/suspendService";
 import * as NotificationService from "./services/notificationService";
 import FeatureService from './services/FeatureService';
 
+// ToDo: It's look like Singleton. Is it right?
 const featureService = new FeatureService();
 
 chrome.runtime.onMessage.addListener(
@@ -37,6 +38,7 @@ chrome.runtime.onMessage.addListener(
   })
 );
 
+// ToDo: These lines are repeated many time
 SuspendService.changeIcon();
 SuspendService.updateContextMenus();
 

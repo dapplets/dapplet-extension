@@ -17,21 +17,17 @@ export default class FeatureService {
     private _siteConfigRepository = new SiteConfigRepository();
     private _mapperService = new MapperService();
 
-    constructor() {
-        console.log('FeatureService', this);
-    }
-
     async getScriptById(id: string): Promise<string> {
         const manifest = await this._manifestRepository.getById(id);
         
         if (manifest && manifest.isDev === true) {
-            // TODO: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
+            // ToDo: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
             const response = await fetch(manifest.devUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
             if (!response.ok) throw new Error("Can not load remote injector");
             const text = await response.text();
             return text;
         } else {
-            // TODO: get Feature
+            // ToDo: get Feature
             let file = await this._fileRepository.getById(id);
 
             if (!file) {
@@ -42,7 +38,7 @@ export default class FeatureService {
                 await this._fileRepository.create(file);
             }
             
-            return file.data; // ToDo ??? 
+            return file.data; // ToDo: ??? 
         }
     }
 
@@ -57,7 +53,7 @@ export default class FeatureService {
             if (!siteConfig) return [];
         }
 
-        // TODO: Sync if old?
+        // ToDo: Sync if old?
 
         for (const featureFamilyId in siteConfig.featureFamilies) {
             const featureConfig = siteConfig.featureFamilies[featureFamilyId];
@@ -185,22 +181,22 @@ export default class FeatureService {
 
         await this._siteConfigRepository.update(config);
 
-        // TODO: save file to storage
-        // TODO: fire activate event to inpage module
+        // ToDo: save file to storage
+        // ToDo: fire activate event to inpage module
     }
 
     async deactivateFeature(id, hostname): Promise<void> {
         const featureManifest = await this._manifestRepository.getById(id);
         const config = await this._siteConfigRepository.getById(hostname);
 
-        // TODO: null checking
+        // ToDo: null checking
 
         config.featureFamilies[featureManifest.familyId].isActive = false;
 
         await this._siteConfigRepository.update(config);
 
-        // TODO: remove file from storage
-        // TODO: fire deactivate event to inpage module
+        // ToDo: remove file from storage
+        // ToDo: fire deactivate event to inpage module
     }
 
     async getDevScriptsByHostname(hostname) : Promise<ManifestDTO[]> {
@@ -231,7 +227,7 @@ export default class FeatureService {
     }
 
     async addDevScript(id, url, hostname): Promise<void> {
-        // TODO: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
+        // ToDo: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
         const response = await fetch(url + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
         if (!response.ok) throw new Error("Can not load remote injector");
         const text = await response.text();

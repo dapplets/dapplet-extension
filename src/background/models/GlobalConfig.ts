@@ -1,5 +1,6 @@
 import Base from './Base';
 
+// ToDo: Unused model?
 export default class SiteConfig extends Base {
     getId = () => this.hostname;
 

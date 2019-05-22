@@ -13,5 +13,5 @@ export default class SiteConfig extends Base {
         };
     } = {};
     paused: boolean = null;
-    lastSync: Date = null;
+    lastSync: Date = null; // ToDo: Date isn't serializing to JSON. Need to fix this bug
 }

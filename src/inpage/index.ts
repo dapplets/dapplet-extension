@@ -2,10 +2,12 @@ import WalletConnectQRCodeModal from "@walletconnect/qrcode-modal";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 
 class Core {
+  // ToDo: implement
   openOverlay(id, ctx) {
     console.log("openOverlay", { id, ctx });
   }
 
+  // ToDo: implement
   sendWalletConnectTx(tx) {
     console.log("sendWalletConnectTx", { tx });
   }
@@ -18,6 +20,7 @@ const WidgetInjector = {
   _features: [],
   _adapters: [],
 
+  // ToDo: move to core
   pushTransaction: async function(dappletId, metadata) {
     var backgroundFunctions = await initBGFunctions(chrome);
     const {
@@ -31,6 +34,7 @@ const WidgetInjector = {
 
     var connected = await checkConnection();
 
+    // ToDo: we shouldn't call console.log() directly, because need an opportunity to disable logging (only for dev)
     console.log("connected", connected);
 
     console.log(0);
@@ -80,7 +84,7 @@ const WidgetInjector = {
     } = backgroundFunctions;
     var me = this;
 
-    
+    // ToDo: implement
     var Require = (id: string) : Function => {
       console.log('-- !decorator factory invoked! --', id);
       return function (constructor: Function) { };
@@ -88,6 +92,7 @@ const WidgetInjector = {
 
     const hostname = window.location.hostname;
 
+    // ToDo: merge into one checking
     const isBlockedEverywhere = await getSuspendityEverywhere();
     const isBlockedHostname = await getSuspendityByHostname(hostname);
 
@@ -116,8 +121,8 @@ const WidgetInjector = {
         console.warn("Cannot load feature #" + featureId);
         continue;
       }
-      // TODO: Check hash
-      // TODO: Isolate eval here
+      // ToDo: Check hash? Is it slow?
+      // ToDo: Isolate eval here
       const Feature = eval(
         "(function(){ " + featureText + " return Feature; })();"
       );
@@ -176,6 +181,7 @@ const WidgetInjector = {
     const core = new Core();
 
     for (const adapterInfo of me._adapters) {
+      // ToDo: should we pass core as global variable instead init()?
       adapterInfo.instance.init(core, document);
       console.log("Dapplet Injector: Adapter %s inited", adapterInfo.id);
 

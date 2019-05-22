@@ -11,7 +11,7 @@ export default class Manifest extends Base {
     author: string = null;
     version: string = null;
     icon: string = null;
-    adapterId: string = null;
+    adapterId: string = null; // ToDo: unused?
     isDev?: boolean = null; // only for dev scripts
     devUrl?: string = null; // only for dev scripts
 }

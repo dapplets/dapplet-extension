@@ -6,6 +6,7 @@ export default class File extends Base {
     id: string = null;
     data: string = null;
 
+    // ToDo: Perhaps it isn't used. Need to check
     getData(): ArrayBuffer {
         var buf = new ArrayBuffer(this.data.length);
         var bufView = new Uint8Array(buf);

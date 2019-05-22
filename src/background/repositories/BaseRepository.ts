@@ -56,7 +56,7 @@ export default abstract class BaseRepository<T extends Base> {
         return new Promise((resolve, reject) => {
             try {
                 if (!item.getId()) {
-                    reject("ID must be specified"); // ToDo. Where is ID generated?
+                    reject("ID must be specified"); // ToDo: Where is ID generated?
                     return;
                 }
 
@@ -64,7 +64,7 @@ export default abstract class BaseRepository<T extends Base> {
 
                 chrome.storage.local.get(key, result => {
                     if (!!result[key]) {
-                        reject(`Item [${key}] already exists`); // ToDo. Is it allowed to replace the object?
+                        reject(`Item [${key}] already exists`); // ToDo: Is it allowed to replace the object?
                         return;
                     }
 

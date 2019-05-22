@@ -82,7 +82,7 @@ const updateContextMenus = () => {
           });
         }
       } catch (ex) {
-        // TODO: fix the error of context menu
+        // ToDo: fix the error of context menu
         console.warn("TODO: fix the error of context menu", ex);
       }
     });
@@ -120,7 +120,7 @@ const suspendByHostname = async hostname => {
  * @returns {Promise<void>}
  */
 const resumeByHostname = async hostname => {
-  // TODO: move this logic to config service
+  // TODO: move this logic to config service?
   var config = await _siteConfigRepository.getById(hostname);
   if (!config) {
     config = new SiteConfig();

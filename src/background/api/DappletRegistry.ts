@@ -1,9 +1,6 @@
 export default class DappletRegistry {
 
-    constructor() {
-        console.log('DappletRegistry', this);
-    }
-
+    // ToDo: Load features from blockchain
     async getFeaturesByHostname(hostname: string): Promise<{ family: string, feature: string }[]> {
         const response = await fetch('/examples/registry.json');
         const json = await response.json();
@@ -14,7 +11,7 @@ export default class DappletRegistry {
         }
     }
 
-    // swarm | ipfs
+    // ToDo: Load scripts from swarm || ipfs
     async getScriptById(id: string): Promise<ArrayBuffer> {
         const response = await fetch('/examples/' + id + '.js');
         if (!response.ok) throw new Error("Can not load remote injector");
