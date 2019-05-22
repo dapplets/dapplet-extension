@@ -1,3 +1,4 @@
+// ToDo: remove this helper, because it's implemented inside BaseRepository
 class Storage {
   // When Chrome is offline, Chrome stores the data locally.
   // The next time the browser is online, Chrome syncs the data.

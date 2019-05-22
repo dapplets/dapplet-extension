@@ -81,7 +81,7 @@ class FeatureList extends React.Component<IInjectorListProps, IInjectorListState
                       />
                     </div>
                   </List.Content>
-                  {injector.hasUpdate ? (
+                  {injector.hasUpdate ? ( // ToDo: hasUpdate isn't implemented in DTO
                     <List.Content style={{ float: "right", width: 60 }}>
                       <Button
                         primary

@@ -154,6 +154,7 @@ const getSuspendityByHostname = async hostname => {
  * @returns {Promise<void>}
  */
 const suspendEverywhere = async () => {
+  // ToDo: work with storage via repository
   await Storage.setLocal("suspended", true);
   changeIcon();
   updateContextMenus();
@@ -166,6 +167,7 @@ const suspendEverywhere = async () => {
  * @returns {Promise<void>}
  */
 const resumeEverywhere = async () => {
+  // ToDo: work with storage via repository
   await Storage.setLocal("suspended", false);
   changeIcon();
   updateContextMenus();
@@ -178,6 +180,7 @@ const resumeEverywhere = async () => {
  * @returns {Promise<boolean>}
  */
 const getSuspendityEverywhere = async () => {
+  // ToDo: work with storage via repository
   var value = await Storage.getLocal("suspended");
   return !!value;
 };
