@@ -13,7 +13,11 @@ export default class Injector {
             return async (target, propertyKey: string, descriptor: PropertyDescriptor) => {
                 const dep = { target, propertyKey, id };
                 dependencies.push(dep);
-                console.log('dependency pushed#1', dep);
+                console.log('dependency pushed#1 - v1', dep);
+                Object.defineProperty(target, propertyKey, {
+                    writable: true,
+                });
+                target[propertyKey] = new (await loadClass(id))();
             };
         }
 
@@ -29,8 +33,8 @@ export default class Injector {
         async function loadClass(userScriptId: string): Promise<any> {
             const userScriptText = await getScriptById(userScriptId);
             const clazz = eval("(function(){ " + userScriptText + " return Feature; })();");
-            const obj = new clazz();
-            
+            //const obj = new clazz();
+            return clazz;
         }
 
         const loadingIds = await getActiveFeatureIdsByHostname(hostname);
