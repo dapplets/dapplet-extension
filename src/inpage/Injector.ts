@@ -10,6 +10,7 @@ export default class Injector {
         let dependencies: { target?: any, propertyKey?: any, id: string, clazz?: any }[] = [];
 
         function Load(id: string): Function {
+            console.log("decorator called ID:", id)
             return async (target, propertyKey: string, descriptor: PropertyDescriptor) => {
                 const dep = { target, propertyKey, id };
                 dependencies.push(dep);
@@ -17,7 +18,9 @@ export default class Injector {
                 Object.defineProperty(target, propertyKey, {
                     writable: true,
                 });
-                target[propertyKey] = new (await loadClass(id))();
+                target[propertyKey] = await getOrNewObject(id);
+                console.log('*******> dependency INJECTED - v1', target, propertyKey,target[propertyKey]);
+
             };
         }
 
@@ -31,15 +34,37 @@ export default class Injector {
         const hostname = window.location.hostname;
 
         async function loadClass(userScriptId: string): Promise<any> {
+            console.log('*** START loading class', userScriptId, requrseLevel);
             const userScriptText = await getScriptById(userScriptId);
+            console.log('*** before eval class', userScriptId, requrseLevel);
             const clazz = eval("(function(){ " + userScriptText + " return Feature; })();");
+            console.log('*** END loading class', userScriptId), requrseLevel;
             //const obj = new clazz();
             return clazz;
         }
 
+        let objectCache: {[key:string]:string} = {};
+        let requrseLevel = 0;
+        let marker = 1000; // mark group of execution points belonging together.
+        async function getOrNewObject(id:string): Promise<any>{
+            //return objectCache[id] || (objectCache[id] = new (await loadClass(id)));  
+            if (!objectCache[id]) {
+                let M = marker++;
+                console.log("********* starting loading class for new instance > ", id, M, requrseLevel++);
+                let clazz = await loadClass(id);
+                console.log("********* class loaded. creating new instance > ", id, M, requrseLevel);
+                objectCache[id] = new clazz(); 
+                let obj:any = objectCache[id];
+                console.log("********* created instance> ", id, objectCache[id], obj.library, --requrseLevel);
+            }
+            return objectCache[id];
+        }
+
+        console.log("=START================");
         const loadingIds = await getActiveFeatureIdsByHostname(hostname);
         for (const userScriptId of loadingIds) {
-            const dep = { id: userScriptId };
+            let clazz = await loadClass(userScriptId);
+            const dep = { id: userScriptId; clazz: clazz };
             dependencies.push(dep);
             console.log('dependency pushed#2', dep);
         }
@@ -48,8 +73,7 @@ export default class Injector {
         const loadedDeps = [];
         for (const dep of dependencies) {
             console.log('dep.id', dep.id, dependencies);
-            let clazz = await loadClass(dep.id);
-            let obj = objects[dep.id] || (objects[dep.id] = new clazz());
+            let obj = await getOrNewObject(dep.id);
             if (dep.target) {
                 dep.target[dep.propertyKey] = obj;
             }
@@ -59,6 +83,8 @@ export default class Injector {
         for (const featureId of loadingIds) {
             objects[featureId].activate();
         }
+
+        console.log("objectCache>", objectCache)
 
 
         // for (const featureId of activeFeatureIds) {
