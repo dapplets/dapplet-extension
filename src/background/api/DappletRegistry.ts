@@ -13,9 +13,13 @@ export default class DappletRegistry {
 
     // ToDo: Load scripts from swarm || ipfs
     async getScriptById(id: string): Promise<ArrayBuffer> {
-        const response = await fetch('/examples/' + id + '.js');
-        if (!response.ok) throw new Error("Can not load remote injector");
-        const buffer = await response.arrayBuffer();
-        return buffer;
+        try {
+            const response = await fetch('/examples/' + id + '.js');
+            if (!response.ok) return null;
+            const buffer = await response.arrayBuffer();
+            return buffer;
+        } catch {
+            return null;
+        }
     }
 }

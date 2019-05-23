@@ -25,8 +25,7 @@ chrome.runtime.onMessage.addListener(
     transactionCreated: NotificationService.transactionCreated,
     transactionRejected: NotificationService.transactionRejected,
 
-    getFeatureScriptById: (id) => featureService.getScriptById(id),
-    getAdapterScriptById: (id) => featureService.getScriptById(id),
+    getScriptById: (id) => featureService.getScriptById(id),
     getActiveFeatureIdsByHostname: (hostname) => featureService.getActiveFeatureIdsByHostname(hostname),
     getFeaturesByHostname: (hostname) => featureService.getFeaturesByHostname(hostname),
     syncFeaturesByHostname: (hostname) => featureService.syncFeaturesByHostname(hostname),
