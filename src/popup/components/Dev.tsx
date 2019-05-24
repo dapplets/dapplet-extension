@@ -9,8 +9,7 @@ interface IDevProps {
 
 interface IDevState {
     scripts: any[];
-    scriptId: any;
-    scriptUrl: any;
+    configUrl: any;
 }
 
 class Dev extends React.Component<IDevProps, IDevState> {
@@ -19,8 +18,7 @@ class Dev extends React.Component<IDevProps, IDevState> {
 
         this.state = {
             scripts: [],
-            scriptId: '',
-            scriptUrl: ''
+            configUrl: ''
         };
     }
 
@@ -35,26 +33,37 @@ class Dev extends React.Component<IDevProps, IDevState> {
         });
     }
 
-    handleAdd = async () => {
-        const backgroundFunctions = await initBGFunctions(chrome);
-        const { addDevScript } = backgroundFunctions;
+    handleSubmit = async () => {
+        const { configUrl } = this.state;
 
-        const { scriptId, scriptUrl } = this.state;
+        if (configUrl) {
+            await this.handleSetConfig();
+        } else {
+            await this.handleClearConfig();
+        }
 
-        await addDevScript(scriptId, scriptUrl, store.currentHostname);
+        this.setState({
+            configUrl: ''
+        })
+
         await this.componentDidMount();
     }
 
-    handleDelete = async (id) => {
+    handleSetConfig = async () => {
         const backgroundFunctions = await initBGFunctions(chrome);
-        const { deleteDevScript } = backgroundFunctions;
+        const { setDevConfig } = backgroundFunctions;
+        const { configUrl } = this.state;
+        await setDevConfig(configUrl, store.currentHostname);
+    }
 
-        await deleteDevScript(id, store.currentHostname);
-        await this.componentDidMount();
+    handleClearConfig = async () => {
+        const backgroundFunctions = await initBGFunctions(chrome);
+        const { clearDevConfig } = backgroundFunctions;
+        await clearDevConfig(store.currentHostname);
     }
 
     render() {
-        const { scripts, scriptId, scriptUrl } = this.state;
+        const { scripts, configUrl } = this.state;
 
         return (
             <React.Fragment>
@@ -65,25 +74,18 @@ class Dev extends React.Component<IDevProps, IDevState> {
                     </Message>
                 ) : null}
                 <Segment>
-                    <Form onSubmit={this.handleAdd}>
+                    <Form onSubmit={this.handleSubmit}>
                         <Form.Input
-                            placeholder='Script ID'
+                            placeholder='Dev Config URL'
                             size='mini'
-                            value={scriptId}
-                            onChange={(e, { value }) => this.setState({ scriptId: value })}
-                        />
-                        <Form.Input
-                            placeholder='Script URL'
-                            size='mini'
-                            value={scriptUrl}
-                            onChange={(e, { value }) => this.setState({ scriptUrl: value })}
+                            value={configUrl}
+                            onChange={(e, { value }) => this.setState({ configUrl: value })}
                             action={(
                                 <Button
-                                    content='Add'
+                                    content={configUrl ? 'Set' : 'Clear'}
                                     size='mini'
-                                    color='teal'
+                                    color={configUrl ? 'teal' : 'red'}
                                     type='submit'
-                                    disabled={!scriptUrl || !scriptId}
                                 />
                             )}
                         />
@@ -97,11 +99,6 @@ class Dev extends React.Component<IDevProps, IDevState> {
                                 <List.Content>
                                     <List.Header as='a' href={script.devUrl}>{script.id}</List.Header>
                                     <List.Description>{script.type}</List.Description>
-                                </List.Content>
-                                <List.Content floated='right'>
-                                    <Button icon size='mini' negative onClick={() => this.handleDelete(script.id)}>
-                                        <Icon name='delete' />
-                                    </Button>
                                 </List.Content>
                             </List.Item>
                         ))}

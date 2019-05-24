@@ -19,7 +19,7 @@ export default class FeatureService {
 
     async getScriptById(id: string): Promise<string> {
         const manifest = await this._manifestRepository.getById(id);
-        
+
         if (manifest && manifest.isDev === true) {
             // ToDo: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
             const response = await fetch(manifest.devUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
@@ -37,7 +37,7 @@ export default class FeatureService {
                 file.setData(buffer);
                 await this._fileRepository.create(file);
             }
-            
+
             return file.data; // ToDo: ??? 
         }
     }
@@ -199,7 +199,7 @@ export default class FeatureService {
         // ToDo: fire deactivate event to inpage module
     }
 
-    async getDevScriptsByHostname(hostname) : Promise<ManifestDTO[]> {
+    async getDevScriptsByHostname(hostname): Promise<ManifestDTO[]> {
         const siteConfig = await this._siteConfigRepository.getById(hostname);
         const featureFamilies = siteConfig && siteConfig.featureFamilies;
         const manifests = await this._manifestRepository.getAll(m => m.isDev === true);
@@ -256,22 +256,22 @@ export default class FeatureService {
                 siteConfig.featureFamilies = {};
                 isNewConfig = true;
             }
-    
+
             siteConfig.featureFamilies[manifest.familyId] = {
                 currentFeatureId: id,
                 lastFeatureId: id,
                 isActive: false,
                 isNew: false
             };
-    
+
             if (isNewConfig) {
                 await this._siteConfigRepository.create(siteConfig);
             } else {
                 await this._siteConfigRepository.update(siteConfig);
             }
-        }        
+        }
 
-        await this._manifestRepository.create(manifest);        
+        await this._manifestRepository.create(manifest);
     }
 
     async deleteDevScript(id, hostname): Promise<void> {
@@ -285,5 +285,34 @@ export default class FeatureService {
         }
 
         await this._manifestRepository.delete(featureManifest);
+    }
+
+    async setDevConfig(configUrl: string, hostname: string) {
+        await this.clearDevConfig(hostname);
+
+        const response = await fetch(configUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
+        if (!response.ok) {
+            console.error("Cannot load dev config");
+            return;
+        }
+        const text = await response.text();
+
+        const config: { hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } } = JSON.parse(text);
+
+        for (const id of config.hostnames[hostname]) {
+            const scriptUrl = configUrl.substring(0, configUrl.lastIndexOf('/')) + '/' + config.scripts[id];
+            if (!scriptUrl) {
+                console.error(`Cannot find URL of Script with ID ${id}`);
+                return;
+            }
+            await this.addDevScript(id, scriptUrl, hostname);
+        }
+    }
+
+    async clearDevConfig(hostname: string) {
+        const manifests = await this.getDevScriptsByHostname(hostname);
+        for (const manifest of manifests) {
+            await this.deleteDevScript(manifest.id, hostname);
+        }
     }
 }

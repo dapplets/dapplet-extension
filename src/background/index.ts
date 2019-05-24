@@ -31,9 +31,12 @@ chrome.runtime.onMessage.addListener(
     syncFeaturesByHostname: (hostname) => featureService.syncFeaturesByHostname(hostname),
     activateFeature: (id, hostname) => featureService.activateFeature(id, hostname),
     deactivateFeature: (id, hostname) => featureService.deactivateFeature(id, hostname),
-    addDevScript: (id, url, hostname) => featureService.addDevScript(id, url, hostname),
-    deleteDevScript: (id, hostname) => featureService.deleteDevScript(id, hostname),
-    getDevScriptsByHostname: (hostname) => featureService.getDevScriptsByHostname(hostname)
+    //addDevScript: (id, url, hostname) => featureService.addDevScript(id, url, hostname),
+    //deleteDevScript: (id, hostname) => featureService.deleteDevScript(id, hostname),
+    getDevScriptsByHostname: (hostname) => featureService.getDevScriptsByHostname(hostname),
+
+    setDevConfig: (url, hostname) => featureService.setDevConfig(url, hostname),
+    clearDevConfig: (hostname) => featureService.clearDevConfig(hostname)
   })
 );
 
