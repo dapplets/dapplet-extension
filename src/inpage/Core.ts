@@ -2,7 +2,7 @@ import WalletConnectQRCodeModal from "@walletconnect/qrcode-modal";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 
 export default class Core {
-    // ToDo: implement
+    // ToDo: implement 
     openOverlay(id, ctx) {
         console.log("openOverlay core", { id, ctx });
     }
