@@ -29,7 +29,8 @@ const loadDapplet = async (dappletId, metaTx) => {
   try {
     const result = await walletConnector.loadDapplet(dappletId, metaTx);
     return result;
-  } catch {
+  } catch(ex){
+    console.error('loadDapplet', ex);
     return null;
   }
 };
