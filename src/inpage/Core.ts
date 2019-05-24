@@ -4,15 +4,15 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 export default class Core {
     // ToDo: implement
     openOverlay(id, ctx) {
-        console.log("openOverlay", { id, ctx });
+        console.log("openOverlay core", { id, ctx });
     }
 
     // ToDo: implement
-    sendWalletConnectTx(tx) {
-        console.log("sendWalletConnectTx", { tx });
+    sendWalletConnectTx(dappletId, metadata) {
+        console.log("sendWalletConnectTx core", { dappletId, metadata });
     }
 
-    async pushTransaction(dappletId, metadata) {
+    async pushTransaction(dappletId, metadata) : Promise<any> {
         var backgroundFunctions = await initBGFunctions(chrome);
         const {
           loadDapplet,
