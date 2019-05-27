@@ -1,18 +1,9 @@
 import Base from './Base';
 
-// ToDo: Unused model?
-export default class SiteConfig extends Base {
-    getId = () => this.hostname;
+export default class GlobalConfig extends Base {
+    getId = () => this.id;
 
-    hostname: string = null;
-    featureFamilies: {
-        [key: string]: {
-            currentFeatureId: string;
-            lastFeatureId: string;
-            isActive: boolean;
-            isNew: boolean;
-        };
-    } = {};
-    paused: boolean = null;
-    lastSync: Date = null;
+    id: string = 'default';
+
+    devConfigUrl: string = null;
 }

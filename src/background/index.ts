@@ -3,9 +3,11 @@ import * as WalletConnectService from "./services/walletConnectService";
 import * as SuspendService from "./services/suspendService";
 import * as NotificationService from "./services/notificationService";
 import FeatureService from './services/FeatureService';
+import GlobalConfigService from './services/GlobalConfigService';
 
 // ToDo: It's look like Singleton. Is it right?
 const featureService = new FeatureService();
+const globalConfigService = new GlobalConfigService();
 
 chrome.runtime.onMessage.addListener(
   setupMessageListener({
@@ -35,8 +37,8 @@ chrome.runtime.onMessage.addListener(
     //deleteDevScript: (id, hostname) => featureService.deleteDevScript(id, hostname),
     getDevScriptsByHostname: (hostname) => featureService.getDevScriptsByHostname(hostname),
 
-    setDevConfig: (url, hostname) => featureService.setDevConfig(url, hostname),
-    clearDevConfig: (hostname) => featureService.clearDevConfig(hostname)
+    getGlobalConfig: () => globalConfigService.get(),
+    setGlobalConfig: (config) => globalConfigService.set(config)
   })
 );
 
@@ -67,3 +69,4 @@ chrome.notifications.onClicked.addListener(function(notificationId) {
     chrome.tabs.create({ url: url });
   }
 });
+

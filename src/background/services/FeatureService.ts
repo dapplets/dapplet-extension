@@ -8,6 +8,8 @@ import SiteConfig from '../models/SiteConfig';
 import UserScriptHelper from '../utils/UserScriptHelper';
 import Manifest from '../models/Manifest';
 import { MapperService } from 'simple-mapper';
+import GlobalConfig from '../models/GlobalConfig';
+import GlobalConfigService from './GlobalConfigService';
 
 export default class FeatureService {
 
@@ -16,41 +18,60 @@ export default class FeatureService {
     private _manifestRepository = new ManifestRepository();
     private _siteConfigRepository = new SiteConfigRepository();
     private _mapperService = new MapperService();
+    private _globalConfigService = new GlobalConfigService();
 
     async getScriptById(id: string): Promise<string> {
-        const manifest = await this._manifestRepository.getById(id);
-
-        if (manifest && manifest.isDev === true) {
-            // ToDo: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
-            const response = await fetch(manifest.devUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
-            if (!response.ok) throw new Error("Can not load remote injector");
-            const text = await response.text();
-            return text;
-        } else {
-            // ToDo: get Feature
-            let file = await this._fileRepository.getById(id);
-
-            if (!file) {
-                const buffer = await this._dappletRegistry.getScriptById(id);
-                file = new File();
-                file.id = id;
-                file.setData(buffer);
-                await this._fileRepository.create(file);
+        const { devConfigUrl } = await this._globalConfigService.get();
+        
+        // DEVELOPMENT ====================================================
+        if (devConfigUrl) {
+            const response = await fetch(devConfigUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
+            if (!response.ok) {
+                console.error("Cannot load dev config");
+                return;
             }
+            const text = await response.text();
+    
+            const config: { hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } } = JSON.parse(text);
 
-            return file.data; // ToDo: ??? 
+            if (config.scripts[id]) {
+                const url = config.scripts[id];
+                const rootUrl = devConfigUrl.substring(0, devConfigUrl.lastIndexOf('/'));
+                // ToDo: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
+                const response = await fetch(rootUrl + '/' + url + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
+                if (!response.ok) throw new Error("Can not load remote injector");
+                const text = await response.text();
+                return text;
+            }
         }
+
+        // PRODUCTION ====================================================
+        // ToDo: get Feature
+        let file = await this._fileRepository.getById(id);
+
+        if (!file) {
+            const buffer = await this._dappletRegistry.getScriptById(id);
+            file = new File();
+            file.id = id;
+            file.setData(buffer);
+            await this._fileRepository.create(file);
+        }
+
+        return file.data; // ToDo: ??? 
     }
 
     async getFeaturesByHostname(hostname: string): Promise<ManifestDTO[]> {
         let siteConfig = await this._siteConfigRepository.getById(hostname);
 
-        const featuresDto: ManifestDTO[] = [];
+        let featuresDto: ManifestDTO[] = [];
+
+        const devFeatures = await this.getDevScriptsByHostname(hostname);
+        featuresDto = featuresDto.concat(devFeatures);
 
         if (!siteConfig) {
             await this.syncFeaturesByHostname(hostname);
             siteConfig = await this._siteConfigRepository.getById(hostname);
-            if (!siteConfig) return [];
+            if (!siteConfig) return featuresDto;
         }
 
         // ToDo: Sync if old?
@@ -140,10 +161,14 @@ export default class FeatureService {
     }
 
     async getActiveFeatureIdsByHostname(hostname: string): Promise<string[]> {
-        const siteConfig = await this._siteConfigRepository.getById(hostname);
-        if (!siteConfig) return [];
+        let activeFeatures: string[] = [];
 
-        const activeFeatures: string[] = [];
+        const featuresDto = await this.getDevScriptsByHostname(hostname);
+        activeFeatures = featuresDto.map(f => f.id);
+
+        const siteConfig = await this._siteConfigRepository.getById(hostname);
+        if (!siteConfig) return activeFeatures;
+
 
         for (const featureFamilyId in siteConfig.featureFamilies) {
             if (siteConfig.featureFamilies[featureFamilyId].isActive) {
@@ -200,97 +225,10 @@ export default class FeatureService {
     }
 
     async getDevScriptsByHostname(hostname): Promise<ManifestDTO[]> {
-        const siteConfig = await this._siteConfigRepository.getById(hostname);
-        const featureFamilies = siteConfig && siteConfig.featureFamilies;
-        const manifests = await this._manifestRepository.getAll(m => m.isDev === true);
-        const dtos = manifests.map(m => {
-            const dto = new ManifestDTO();
+        const { devConfigUrl } = await this._globalConfigService.get();
+        if (!devConfigUrl) return [];
 
-            dto.id = m.id;
-            dto.familyId = m.familyId;
-            dto.name = m.name;
-            dto.description = m.description;
-            dto.author = m.author;
-            dto.version = m.version;
-            dto.icon = m.icon;
-            dto.lastFeatureId = featureFamilies && featureFamilies[m.familyId] && featureFamilies[m.familyId].lastFeatureId || null;
-            dto.isNew = featureFamilies && featureFamilies[m.familyId] && featureFamilies[m.familyId].isNew || null;
-            dto.isActive = featureFamilies && featureFamilies[m.familyId] && featureFamilies[m.familyId].isActive || null;
-            dto.isDev = m.isDev;
-            dto.devUrl = m.devUrl;
-            dto.type = m.type;
-
-            return dto;
-        });
-
-        return dtos;
-    }
-
-    async addDevScript(id, url, hostname): Promise<void> {
-        // ToDo: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
-        const response = await fetch(url + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
-        if (!response.ok) throw new Error("Can not load remote injector");
-        const text = await response.text();
-        const userscript = UserScriptHelper.extractMetablock(text);
-
-        const metadata = {};
-        for (const key in userscript.meta) {
-            metadata[key] = userscript.meta[key][0];
-        }
-
-        const manifest = this._mapperService.map(Manifest, metadata);
-
-        if (!manifest.familyId) throw new Error("Family ID is needed");
-
-        manifest.id = id;
-        manifest.devUrl = url;
-        manifest.isDev = true;
-
-        if (manifest.type === 'feature') {
-            let siteConfig = await this._siteConfigRepository.getById(hostname);
-            let isNewConfig: boolean = false;
-            if (!siteConfig) {
-                siteConfig = new SiteConfig();
-                siteConfig.hostname = hostname;
-                siteConfig.paused = false;
-                siteConfig.featureFamilies = {};
-                isNewConfig = true;
-            }
-
-            siteConfig.featureFamilies[manifest.familyId] = {
-                currentFeatureId: id,
-                lastFeatureId: id,
-                isActive: false,
-                isNew: false
-            };
-
-            if (isNewConfig) {
-                await this._siteConfigRepository.create(siteConfig);
-            } else {
-                await this._siteConfigRepository.update(siteConfig);
-            }
-        }
-
-        await this._manifestRepository.create(manifest);
-    }
-
-    async deleteDevScript(id, hostname): Promise<void> {
-        const featureManifest = await this._manifestRepository.getById(id);
-        if (!featureManifest) throw new Error('Dev feature metadata is not found.');
-
-        let siteConfig = await this._siteConfigRepository.getById(hostname);
-        if (siteConfig) {
-            delete siteConfig.featureFamilies[featureManifest.familyId];
-            await this._siteConfigRepository.update(siteConfig);
-        }
-
-        await this._manifestRepository.delete(featureManifest);
-    }
-
-    async setDevConfig(configUrl: string, hostname: string) {
-        await this.clearDevConfig(hostname);
-
-        const response = await fetch(configUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
+        const response = await fetch(devConfigUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
         if (!response.ok) {
             console.error("Cannot load dev config");
             return;
@@ -299,20 +237,53 @@ export default class FeatureService {
 
         const config: { hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } } = JSON.parse(text);
 
-        for (const id of config.hostnames[hostname]) {
-            const scriptUrl = configUrl.substring(0, configUrl.lastIndexOf('/')) + '/' + config.scripts[id];
-            if (!scriptUrl) {
-                console.error(`Cannot find URL of Script with ID ${id}`);
-                return;
+        if (!config.hostnames[hostname] || !config.hostnames[hostname].length) return [];
+
+        const scripts = config.hostnames[hostname].map(id => ({ id: id, url: config.scripts[id] }));
+
+        const rootUrl = devConfigUrl.substring(0, devConfigUrl.lastIndexOf('/'));
+
+        const dtos: ManifestDTO[] = [];
+
+        for (const script of scripts) {
+            const response = await fetch(rootUrl + '/' + script.url + '?_dc=' + (new Date).getTime());
+            if (!response.ok) throw new Error("Can not load remote injector");
+            const text = await response.text();
+            const userscript = UserScriptHelper.extractMetablock(text);
+
+            const metadata = {};
+            for (const key in userscript.meta) {
+                metadata[key] = userscript.meta[key][0];
             }
-            await this.addDevScript(id, scriptUrl, hostname);
+
+            const dto = this._mapperService.map(ManifestDTO, metadata);
+
+            dto.id = script.id;
+            dto.devUrl = rootUrl + '/' + script.url;
+            dto.isDev = true;
+            dto.lastFeatureId = script.id;
+            dto.isNew = false;
+            dto.isActive = true;
+
+            dtos.push(dto);
         }
+
+        return dtos;
     }
 
-    async clearDevConfig(hostname: string) {
-        const manifests = await this.getDevScriptsByHostname(hostname);
-        for (const manifest of manifests) {
-            await this.deleteDevScript(manifest.id, hostname);
+    private async _getDevConfig(): Promise<{ hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } }> {
+        const { devConfigUrl } = await this._globalConfigService.get();
+        if (!devConfigUrl) return { hostnames: {}, scripts: {} };
+
+        const response = await fetch(devConfigUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
+        if (!response.ok) {
+            console.error("Cannot load dev config");
+            return;
         }
+        const text = await response.text();
+
+        const config: { hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } } = JSON.parse(text);
+        
+        return config;
     }
 }

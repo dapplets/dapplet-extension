@@ -10,7 +10,8 @@ interface IInjectorListProps {
 
 interface IInjectorListState {
   injectors: any[];
-  totalCount: number;
+
+  isLoading: boolean;
 }
 
 class FeatureList extends React.Component<IInjectorListProps, IInjectorListState> {
@@ -19,7 +20,7 @@ class FeatureList extends React.Component<IInjectorListProps, IInjectorListState
 
     this.state = {
       injectors: [],
-      totalCount: 0
+      isLoading: true
     };
   }
 
@@ -32,7 +33,7 @@ class FeatureList extends React.Component<IInjectorListProps, IInjectorListState
     // TODO: loader spinner
     this.setState({
       injectors: injectors,
-      totalCount: injectors.length
+      isLoading: false
     });
   }
 
@@ -63,10 +64,10 @@ class FeatureList extends React.Component<IInjectorListProps, IInjectorListState
   }
 
   render() {
-    const { injectors, totalCount } = this.state;
+    const { injectors, isLoading } = this.state;
     return (
       <React.Fragment>
-        <Segment>
+        <Segment loading={isLoading}>
           {(injectors.length > 0) ? (
             <List divided relaxed style={{ width: 350 }}>
               {injectors.map(injector => (
@@ -106,6 +107,7 @@ class FeatureList extends React.Component<IInjectorListProps, IInjectorListState
                             this.handleSwitchChange(injector, !injector.isActive)
                           }
                           checked={injector.isActive}
+                          disabled={injector.isDev}
                         />
                       </List.Content>
                     )}

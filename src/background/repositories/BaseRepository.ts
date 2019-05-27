@@ -84,9 +84,10 @@ export default abstract class BaseRepository<T extends Base> {
     async update(item: T): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
-                const key = this._TConstructor.name + ':' + item.getId();
+                const mappedItem = this._mapperService.map(this._TConstructor, item);
+                const key = this._TConstructor.name + ':' + mappedItem.getId();
 
-                const result = { [key]: item };
+                const result = { [key]: mappedItem };
                 chrome.storage.local.set(result, () => resolve());
             } catch (e) {
                 reject(e);
