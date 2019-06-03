@@ -41,8 +41,9 @@ export default class Injector {
 
         for (let i = 0; i < modules.length; i++) {
             const userScriptText = await getScriptById(modules[i].id);
-            const getClassFromModule = new Function('Load', 'Core', userScriptText + ' return Feature;');
-            modules[i].clazz = getClassFromModule(loadDecorator, core);
+            const getClassFromModule = new Function('Load', 'Core', 'return ' + userScriptText);
+            const moduleFunction : Function = getClassFromModule(loadDecorator, core);
+            modules[i].clazz = this.getLastModule(moduleFunction).default;
         }
 
         for (let i = modules.length - 1; i >= 0; i--) {
@@ -50,5 +51,17 @@ export default class Injector {
         }
 
         featureIds.forEach(id => modules.find(m => m.id == id).instance.activate());
+    }
+
+    private getLastModule(func: Function): any {
+        // ToDo: Here is a black magic!
+        let module = null;
+        for (let i = 10; i >= 0; i--) {
+            try {
+                module = func(i);
+                if (module) break;
+            } catch { }
+        }
+        return module;
     }
 }
