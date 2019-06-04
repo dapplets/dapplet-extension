@@ -6,4 +6,6 @@ export default class GlobalConfig extends Base {
     id: string = 'default';
 
     devConfigUrl: string = null;
+
+    suspended: boolean = false;
 }

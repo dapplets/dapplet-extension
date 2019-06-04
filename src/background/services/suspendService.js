@@ -2,8 +2,10 @@ import Storage from "../../utils/chrome-extension-storage-wrapper";
 import Helpers from "../../utils/helpers";
 import SiteConfigRepository from "../repositories/SiteConfigRepository";
 import SiteConfig from "../models/SiteConfig";
+import GlobalConfigService from "./GlobalConfigService";
 
 const _siteConfigRepository = new SiteConfigRepository();
+const _globalConfigService = new GlobalConfigService();
 
 const changeIcon = () => {
   chrome.tabs.query({ active: true }, async function(tab) {
@@ -154,8 +156,10 @@ const getSuspendityByHostname = async hostname => {
  * @returns {Promise<void>}
  */
 const suspendEverywhere = async () => {
-  // ToDo: work with storage via repository
-  await Storage.setLocal("suspended", true);
+  const config = await _globalConfigService.get();
+  config.suspended = true;
+  await _globalConfigService.set(config);
+
   changeIcon();
   updateContextMenus();
   console.log("Injecting is suspended everywhere");
@@ -167,8 +171,10 @@ const suspendEverywhere = async () => {
  * @returns {Promise<void>}
  */
 const resumeEverywhere = async () => {
-  // ToDo: work with storage via repository
-  await Storage.setLocal("suspended", false);
+  const config = await _globalConfigService.get();
+  config.suspended = false;
+  await _globalConfigService.set(config);
+
   changeIcon();
   updateContextMenus();
   console.log("Injecting is resumed everywhere");
@@ -180,9 +186,8 @@ const resumeEverywhere = async () => {
  * @returns {Promise<boolean>}
  */
 const getSuspendityEverywhere = async () => {
-  // ToDo: work with storage via repository
-  var value = await Storage.getLocal("suspended");
-  return !!value;
+  const { suspended } = await _globalConfigService.get();
+  return suspended;
 };
 
 export {

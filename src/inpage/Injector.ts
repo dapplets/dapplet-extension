@@ -5,6 +5,17 @@ export default class Injector {
 
     async init() {
 
+        const {
+            getActiveFeatureIdsByHostname,
+            getScriptById
+        } = await initBGFunctions(chrome);
+
+        const hostname = window.location.hostname;
+
+        const featureIds: string[] = await getActiveFeatureIdsByHostname(hostname);
+
+        if (!featureIds.length) return;
+
         const core = new Core();
 
         const modules: { id: string, clazz?: any, instance?: any }[] = [];
@@ -25,15 +36,6 @@ export default class Injector {
                 return descriptor;
             };
         }
-
-        const {
-            getActiveFeatureIdsByHostname,
-            getScriptById
-        } = await initBGFunctions(chrome);
-
-        const hostname = window.location.hostname;
-
-        const featureIds: string[] = await getActiveFeatureIdsByHostname(hostname);
 
         for (const id of featureIds) {
             modules.push({ id: id });

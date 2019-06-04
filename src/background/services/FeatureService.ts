@@ -22,7 +22,7 @@ export default class FeatureService {
 
     async getScriptById(id: string): Promise<string> {
         const { devConfigUrl } = await this._globalConfigService.get();
-        
+
         // DEVELOPMENT ====================================================
         if (devConfigUrl) {
             const response = await fetch(devConfigUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
@@ -31,7 +31,7 @@ export default class FeatureService {
                 return;
             }
             const text = await response.text();
-    
+
             const config: { hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } } = JSON.parse(text);
 
             if (config.scripts[id]) {
@@ -161,14 +161,16 @@ export default class FeatureService {
     }
 
     async getActiveFeatureIdsByHostname(hostname: string): Promise<string[]> {
-        let activeFeatures: string[] = [];
+        
+        const { suspended } = await this._globalConfigService.get();
+        if (suspended) return [];
 
+        let activeFeatures: string[] = [];
         const featuresDto = await this.getDevScriptsByHostname(hostname);
         activeFeatures = featuresDto.map(f => f.id);
 
         const siteConfig = await this._siteConfigRepository.getById(hostname);
-        if (!siteConfig) return activeFeatures;
-
+        if (!siteConfig || siteConfig.paused) return activeFeatures;
 
         for (const featureFamilyId in siteConfig.featureFamilies) {
             if (siteConfig.featureFamilies[featureFamilyId].isActive) {
@@ -283,7 +285,7 @@ export default class FeatureService {
         const text = await response.text();
 
         const config: { hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } } = JSON.parse(text);
-        
+
         return config;
     }
 }
