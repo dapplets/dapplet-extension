@@ -38,7 +38,9 @@ chrome.runtime.onMessage.addListener(
     getDevScriptsByHostname: (hostname) => featureService.getDevScriptsByHostname(hostname),
 
     getGlobalConfig: () => globalConfigService.get(),
-    setGlobalConfig: (config) => globalConfigService.set(config)
+    setGlobalConfig: (config) => globalConfigService.set(config),
+
+    getActiveScriptsByHostname: (hostname) => featureService.getActiveScriptsByHostname(hostname)
   })
 );
 

@@ -84,7 +84,8 @@ class Dev extends React.Component<IDevProps, IDevState> {
                                 <List.Item key={script.id}>
                                     <Image avatar src={script.icon || '/icon48.png'} />
                                     <List.Content>
-                                        <List.Header>{script.id}</List.Header>
+                                        <List.Header>{script.familyId}</List.Header>
+                                        <List.Description>{script.version}</List.Description>
                                     </List.Content>
                                 </List.Item>
                             ))}

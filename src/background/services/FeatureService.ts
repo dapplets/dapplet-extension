@@ -10,6 +10,10 @@ import Manifest from '../models/Manifest';
 import { MapperService } from 'simple-mapper';
 import GlobalConfig from '../models/GlobalConfig';
 import GlobalConfigService from './GlobalConfigService';
+import DependencyResolver from '../utils/DependencyResolver';
+import NameResolver from '../utils/NameResolver';
+import ScriptLoader from '../utils/ScriptLoader';
+
 
 export default class FeatureService {
 
@@ -19,31 +23,34 @@ export default class FeatureService {
     private _siteConfigRepository = new SiteConfigRepository();
     private _mapperService = new MapperService();
     private _globalConfigService = new GlobalConfigService();
+    private _dependencyResolver = new DependencyResolver();
+    private _nameResolver = new NameResolver();
+    private _scriptLoader = new ScriptLoader();
 
     async getScriptById(id: string): Promise<string> {
-        const { devConfigUrl } = await this._globalConfigService.get();
+        // const { devConfigUrl } = await this._globalConfigService.get();
 
-        // DEVELOPMENT ====================================================
-        if (devConfigUrl) {
-            const response = await fetch(devConfigUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
-            if (!response.ok) {
-                console.error("Cannot load dev config");
-                return;
-            }
-            const text = await response.text();
+        // // DEVELOPMENT ====================================================
+        // if (devConfigUrl) {
+        //     const response = await fetch(devConfigUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
+        //     if (!response.ok) {
+        //         console.error("Cannot load dev config");
+        //         return;
+        //     }
+        //     const text = await response.text();
 
-            const config: { hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } } = JSON.parse(text);
+        //     const config: { hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } } = JSON.parse(text);
 
-            if (config.scripts[id]) {
-                const url = config.scripts[id];
-                const rootUrl = devConfigUrl.substring(0, devConfigUrl.lastIndexOf('/'));
-                // ToDo: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
-                const response = await fetch(rootUrl + '/' + url + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
-                if (!response.ok) throw new Error("Can not load remote injector");
-                const text = await response.text();
-                return text;
-            }
-        }
+        //     if (config.scripts[id]) {
+        //         const url = config.scripts[id];
+        //         const rootUrl = devConfigUrl.substring(0, devConfigUrl.lastIndexOf('/'));
+        //         // ToDo: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
+        //         const response = await fetch(rootUrl + '/' + url + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
+        //         if (!response.ok) throw new Error("Can not load remote injector");
+        //         const text = await response.text();
+        //         return text;
+        //     }
+        // }
 
         // PRODUCTION ====================================================
         // ToDo: get Feature
@@ -161,7 +168,7 @@ export default class FeatureService {
     }
 
     async getActiveFeatureIdsByHostname(hostname: string): Promise<string[]> {
-        
+
         const { suspended } = await this._globalConfigService.get();
         if (suspended) return [];
 
@@ -227,6 +234,49 @@ export default class FeatureService {
     }
 
     async getDevScriptsByHostname(hostname): Promise<ManifestDTO[]> {
+
+        const activeFeatures = await this._getActiveDevFeaturesByHostname(hostname);
+        
+        const dtos: ManifestDTO[] = [];
+
+        for (const feature of activeFeatures) {
+            const uri = await this._nameResolver.resolve(feature.name, feature.version);
+            const script = await this._scriptLoader.load(uri);
+            const userscript = UserScriptHelper.extractMetablock(script);
+
+            const metadata = {};
+            for (const key in userscript.meta) {
+                metadata[key] = userscript.meta[key][0];
+            }
+
+            const dto = this._mapperService.map(ManifestDTO, metadata);
+
+            dto.id = feature.name + '@' + feature.version;
+            dto.devUrl = uri;
+            dto.isDev = true;
+            dto.lastFeatureId = feature.name + '@' + feature.version;
+            dto.isNew = false;
+            dto.isActive = true;
+            dto.familyId = feature.name;
+            dto.version = feature.version;
+
+            dtos.push(dto);
+        }
+
+        return dtos;
+    }
+
+    public async getActiveScriptsByHostname(hostname: string): Promise<string[]> {
+
+        const activeFeatures = await this._getActiveDevFeaturesByHostname(hostname);
+        const modules = await this._dependencyResolver.resolve(activeFeatures);
+        const uris = await Promise.all(modules.map(({name, version}) => this._nameResolver.resolve(name, version)));
+        const scripts = await Promise.all(uris.map(uri => this._scriptLoader.load(uri)));
+
+        return scripts;
+    }
+
+    private async _getActiveDevFeaturesByHostname(hostname: string): Promise<{ name: string, version: string }[]> {
         const { devConfigUrl } = await this._globalConfigService.get();
         if (!devConfigUrl) return [];
 
@@ -237,55 +287,17 @@ export default class FeatureService {
         }
         const text = await response.text();
 
-        const config: { hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } } = JSON.parse(text);
+        const config: { hostnames: { [key: string]: { [key: string]: string } }, scripts: { [key: string]: { [key: string]: string } } } = JSON.parse(text);
 
-        if (!config.hostnames[hostname] || !config.hostnames[hostname].length) return [];
+        if (!config.hostnames[hostname]) return [];
 
-        const scripts = config.hostnames[hostname].map(id => ({ id: id, url: config.scripts[id] }));
+        const scripts: { name: string, version: string }[] = [];
 
-        const rootUrl = devConfigUrl.substring(0, devConfigUrl.lastIndexOf('/'));
-
-        const dtos: ManifestDTO[] = [];
-
-        for (const script of scripts) {
-            const response = await fetch(rootUrl + '/' + script.url + '?_dc=' + (new Date).getTime());
-            if (!response.ok) throw new Error("Can not load remote injector");
-            const text = await response.text();
-            const userscript = UserScriptHelper.extractMetablock(text);
-
-            const metadata = {};
-            for (const key in userscript.meta) {
-                metadata[key] = userscript.meta[key][0];
-            }
-
-            const dto = this._mapperService.map(ManifestDTO, metadata);
-
-            dto.id = script.id;
-            dto.devUrl = rootUrl + '/' + script.url;
-            dto.isDev = true;
-            dto.lastFeatureId = script.id;
-            dto.isNew = false;
-            dto.isActive = true;
-
-            dtos.push(dto);
+        for (const name in config.hostnames[hostname]) {
+            const version = config.hostnames[hostname][name];
+            scripts.push({ name: name, version });
         }
 
-        return dtos;
-    }
-
-    private async _getDevConfig(): Promise<{ hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } }> {
-        const { devConfigUrl } = await this._globalConfigService.get();
-        if (!devConfigUrl) return { hostnames: {}, scripts: {} };
-
-        const response = await fetch(devConfigUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
-        if (!response.ok) {
-            console.error("Cannot load dev config");
-            return;
-        }
-        const text = await response.text();
-
-        const config: { hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } } = JSON.parse(text);
-
-        return config;
+        return scripts;
     }
 }

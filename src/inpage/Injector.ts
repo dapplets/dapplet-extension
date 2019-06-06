@@ -6,64 +6,58 @@ export default class Injector {
     async init() {
 
         const {
-            getActiveFeatureIdsByHostname,
-            getScriptById
+            getActiveScriptsByHostname
         } = await initBGFunctions(chrome);
 
         const hostname = window.location.hostname;
 
-        const featureIds: string[] = await getActiveFeatureIdsByHostname(hostname);
+        const scripts: string[] = await getActiveScriptsByHostname(hostname);
 
-        if (!featureIds.length) return;
+        if (!scripts.length) return;
 
         const core = new Core();
 
-        const modules: { id: string, clazz?: any, instance?: any }[] = [];
-        const links: { target: any, propertyKey: any, id: string }[] = [];
+        const modules: { name: string, version: string, clazz: any, instance: any, isFeature: boolean }[] = [];
 
-        function loadDecorator(id: string): Function {
-            return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
-                links.push({ target, propertyKey, id });
+        for (const script of scripts) {
+            const execScript = new Function('PublicName', 'Load', 'Core', script);
 
-                if (!modules.find(x => x.id == id)) {
-                    modules.push({ id: id });
+            const publicName = function (name: string, version: string, isFeature?: boolean): Function {
+                return (target: Function) => {
+                    if (!modules.find(m => m.name == name && m.version == version)) {
+                        modules.push({
+                            name: name,
+                            version: version,
+                            clazz: target,
+                            instance: null,
+                            isFeature: !!isFeature
+                        })
+                    }
                 }
+            }
 
-                descriptor = descriptor || {};
-                descriptor.get = function (this: any): any {
-                    return modules.find(m => m.id === id).instance;
-                }
-                return descriptor;
-            };
-        }
+            const loadDecorator = function (name: string, version: string): Function {
+                return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
+                    // if (!modules.find(m => m.name == name && m.version == version)) {
+                    //     modules.push({ id: id });
+                    // }
 
-        for (const id of featureIds) {
-            modules.push({ id: id });
+                    descriptor = descriptor || {};
+                    descriptor.get = function (this: any): any {
+                        return modules.find(m => m.name == name && m.version == version).instance;
+                    }
+                    return descriptor;
+                };
+            }
+
+            const result = execScript(publicName, loadDecorator, core);
         }
 
         for (let i = 0; i < modules.length; i++) {
-            const userScriptText = await getScriptById(modules[i].id);
-            const getClassFromModule = new Function('Load', 'Core', 'return ' + userScriptText);
-            const moduleFunction : Function = getClassFromModule(loadDecorator, core);
-            modules[i].clazz = this.getLastModule(moduleFunction).default;
-        }
-
-        for (let i = modules.length - 1; i >= 0; i--) {
             modules[i].instance = new modules[i].clazz();
         }
 
-        featureIds.forEach(id => modules.find(m => m.id == id).instance.activate());
-    }
-
-    private getLastModule(func: Function): any {
-        // ToDo: Here is a black magic!
-        let module = null;
-        for (let i = 10; i >= 0; i--) {
-            try {
-                module = func(i);
-                if (module) break;
-            } catch { }
-        }
-        return module;
+        // feature activation
+        modules.filter(m => m.isFeature === true).map(m => m.instance.activate());
     }
 }
