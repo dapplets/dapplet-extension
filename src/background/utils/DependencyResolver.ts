@@ -2,8 +2,11 @@ import NameResolver from '../utils/NameResolver';
 import ScriptLoader from '../utils/ScriptLoader';
 
 export default class DependencyResolver {
-    private _nameResolver = new NameResolver();
-    private _scriptLoader = new ScriptLoader();
+
+    constructor(private _nameResolver: NameResolver, private _scriptLoader: ScriptLoader) {
+
+    }
+    
 
     public async resolve(modules: { name: string, version: string }[]): Promise<{ name: string, version: string }[]> {
 

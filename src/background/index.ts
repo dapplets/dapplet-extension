@@ -5,12 +5,12 @@ import * as NotificationService from "./services/notificationService";
 import FeatureService from './services/FeatureService';
 import GlobalConfigService from './services/GlobalConfigService';
 
-// ToDo: It's look like Singleton. Is it right?
-const featureService = new FeatureService();
-const globalConfigService = new GlobalConfigService();
-
+// ToDo: Fix dublication of new FeatureService(), new GlobalConfigService() etc.
+// ToDo: It looks like facade and requires a refactoring probably.
+// ToDo: Think about WalletConnectService, SuspendService etc, which looks like singletons.
 chrome.runtime.onMessage.addListener(
   setupMessageListener({
+    // WalletConnectService
     loadDapplet: WalletConnectService.loadDapplet,
     generateUri: WalletConnectService.generateUri,
     checkConnection: WalletConnectService.checkConnection,
@@ -18,29 +18,32 @@ chrome.runtime.onMessage.addListener(
     disconnect: WalletConnectService.disconnect,
     getAccounts: WalletConnectService.getAccounts,
     getChainId: WalletConnectService.getChainId,
+
+    // SuspendService
     getSuspendityByHostname: SuspendService.getSuspendityByHostname,
     getSuspendityEverywhere: SuspendService.getSuspendityEverywhere,
     suspendByHostname: SuspendService.suspendByHostname,
     suspendEverywhere: SuspendService.suspendEverywhere,
     resumeByHostname: SuspendService.resumeByHostname,
     resumeEverywhere: SuspendService.resumeEverywhere,
+
+    // NotificationService
     transactionCreated: NotificationService.transactionCreated,
     transactionRejected: NotificationService.transactionRejected,
 
-    getScriptById: (id) => featureService.getScriptById(id),
-    getActiveFeatureIdsByHostname: (hostname) => featureService.getActiveFeatureIdsByHostname(hostname),
-    getFeaturesByHostname: (hostname) => featureService.getFeaturesByHostname(hostname),
-    syncFeaturesByHostname: (hostname) => featureService.syncFeaturesByHostname(hostname),
-    activateFeature: (id, hostname) => featureService.activateFeature(id, hostname),
-    deactivateFeature: (id, hostname) => featureService.deactivateFeature(id, hostname),
-    //addDevScript: (id, url, hostname) => featureService.addDevScript(id, url, hostname),
-    //deleteDevScript: (id, hostname) => featureService.deleteDevScript(id, hostname),
-    getDevScriptsByHostname: (hostname) => featureService.getDevScriptsByHostname(hostname),
+    // FeatureService
+    getScriptById: (id) => (new FeatureService()).getScriptById(id),
+    getActiveFeatureIdsByHostname: (hostname) => (new FeatureService()).getActiveFeatureIdsByHostname(hostname),
+    getFeaturesByHostname: (hostname) => (new FeatureService()).getFeaturesByHostname(hostname),
+    syncFeaturesByHostname: (hostname) => (new FeatureService()).syncFeaturesByHostname(hostname),
+    activateFeature: (id, hostname) => (new FeatureService()).activateFeature(id, hostname),
+    deactivateFeature: (id, hostname) => (new FeatureService()).deactivateFeature(id, hostname),
+    getDevScriptsByHostname: (hostname) => (new FeatureService()).getDevScriptsByHostname(hostname),
+    getActiveScriptsByHostname: (hostname) => (new FeatureService()).getActiveScriptsByHostname(hostname),
 
-    getGlobalConfig: () => globalConfigService.get(),
-    setGlobalConfig: (config) => globalConfigService.set(config),
-
-    getActiveScriptsByHostname: (hostname) => featureService.getActiveScriptsByHostname(hostname)
+    // GlobalConfigService
+    getGlobalConfig: () => (new GlobalConfigService()).get(),
+    setGlobalConfig: (config) => (new GlobalConfigService()).set(config)
   })
 );
 

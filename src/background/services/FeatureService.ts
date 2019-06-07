@@ -23,9 +23,9 @@ export default class FeatureService {
     private _siteConfigRepository = new SiteConfigRepository();
     private _mapperService = new MapperService();
     private _globalConfigService = new GlobalConfigService();
-    private _dependencyResolver = new DependencyResolver();
     private _nameResolver = new NameResolver();
     private _scriptLoader = new ScriptLoader();
+    private _dependencyResolver = new DependencyResolver(this._nameResolver, this._scriptLoader);
 
     async getScriptById(id: string): Promise<string> {
         // const { devConfigUrl } = await this._globalConfigService.get();
@@ -236,7 +236,7 @@ export default class FeatureService {
     async getDevScriptsByHostname(hostname): Promise<ManifestDTO[]> {
 
         const activeFeatures = await this._getActiveDevFeaturesByHostname(hostname);
-        
+
         const dtos: ManifestDTO[] = [];
 
         for (const feature of activeFeatures) {
@@ -270,7 +270,7 @@ export default class FeatureService {
 
         const activeFeatures = await this._getActiveDevFeaturesByHostname(hostname);
         const modules = await this._dependencyResolver.resolve(activeFeatures);
-        const uris = await Promise.all(modules.map(({name, version}) => this._nameResolver.resolve(name, version)));
+        const uris = await Promise.all(modules.map(({ name, version }) => this._nameResolver.resolve(name, version)));
         const scripts = await Promise.all(uris.map(uri => this._scriptLoader.load(uri)));
 
         return scripts;
