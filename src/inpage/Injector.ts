@@ -1,10 +1,10 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { WebSocketProxyClient } from "../utils/chrome-extension-websocket-wrapper";
 import Core from './Core'
 
 export default class Injector {
 
     async init() {
-
         const {
             getActiveScriptsByHostname
         } = await initBGFunctions(chrome);
@@ -20,7 +20,7 @@ export default class Injector {
         const modules: { name: string, version: string, clazz: any, instance: any, isFeature: boolean }[] = [];
 
         for (const script of scripts) {
-            const execScript = new Function('PublicName', 'Load', 'Core', script);
+            const execScript = new Function('PublicName', 'Load', 'Core', 'WebSocketProxyClient', script);
 
             const publicName = function (name: string, version: string, isFeature?: boolean): Function {
                 return (target: Function) => {
@@ -50,7 +50,7 @@ export default class Injector {
                 };
             }
 
-            const result = execScript(publicName, loadDecorator, core);
+            const result = execScript(publicName, loadDecorator, core, WebSocketProxyClient);
         }
 
         for (let i = 0; i < modules.length; i++) {
