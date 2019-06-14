@@ -3,24 +3,27 @@
 cloud ExternalAPI
 cloud Ethereum
 
-node DOM
+package "pkg: web-page" {
+    node DOM
+}
+
 database "InBrowser\nStorage" as Storage
 
-package "dapplet-extension" {
+package "pkg: dapplet-extension" {
     [Background]
     [Inpage]
     [Popup]
     [Options]
 
-    Background <..> Inpage : 4 scripts of modules
-    Background <..> Popup : 3 feature list
+    Background <..> Inpage : (9) scripts of modules
+    Background <..> Popup : (3) feature list
     Background <..> Options
 
-    Background <-> Storage : 2 settings, cache
-    Ethereum -down-> Background : 1 modules
-    ExternalAPI -down-> Background : 6 augmentation data
+    Background <-> Storage : (2) settings, cache
+    Ethereum -down-> Background : (1) modules
+    ExternalAPI -down-> Background : (6) augmentation data
 
-    Inpage <-left-> DOM : 5 widgets
+    Inpage <-down-> DOM : (5) widgets
 }
 
 @enduml
