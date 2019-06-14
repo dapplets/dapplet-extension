@@ -1,0 +1,26 @@
+@startuml "dapplet-extension"
+
+cloud ExternalAPI
+cloud Ethereum
+
+node DOM
+database "InBrowser\nStorage" as Storage
+
+package "dapplet-extension" {
+    [Background]
+    [Inpage]
+    [Popup]
+    [Options]
+
+    Background <..> Inpage : 4 scripts of modules
+    Background <..> Popup : 3 feature list
+    Background <..> Options
+
+    Background <-> Storage : 2 settings, cache
+    Ethereum -down-> Background : 1 modules
+    ExternalAPI -down-> Background : 6 augmentation data
+
+    Inpage <-left-> DOM : 5 widgets
+}
+
+@enduml
