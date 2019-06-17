@@ -1,19 +1,19 @@
 @startuml "typescript-examples"
 
-node DOM
+package "pkg: web-page" {
+    node DOM
+}
 
-package "typescript-examples" {
+package "pkg: typescript-examples" {
     [common-lib]
     [twitter-adapter]
     [twitter-feature-1]
     [twitter-feature-2]
 
+    [twitter-feature-1] ..> [twitter-adapter]
+    [twitter-feature-2] ..> [twitter-adapter]
+    [twitter-adapter] ..> [common-lib]
     [twitter-adapter] ..left.. DOM
-
-    [twitter-feature-1] <..> [twitter-adapter]
-    [twitter-feature-2] <..> [twitter-adapter]
-
-    [twitter-adapter] <..> [common-lib]
 }
 
 @enduml
