@@ -19,37 +19,32 @@ export default class Injector {
 
         const modules: { name: string, version: string, clazz: any, instance: any, isFeature: boolean }[] = [];
 
-        for (const script of scripts) {
-            const execScript = new Function('PublicName', 'Load', 'Core', 'WebSocketProxyClient', script);
-
-            const publicName = function (name: string, version: string, isFeature?: boolean): Function {
-                return (target: Function) => {
-                    if (!modules.find(m => m.name == name && m.version == version)) {
-                        modules.push({
-                            name: name,
-                            version: version,
-                            clazz: target,
-                            instance: null,
-                            isFeature: !!isFeature
-                        })
-                    }
+        const publicName = function (name: string, version: string, isFeature?: boolean): Function {
+            return (target: Function) => {
+                if (!modules.find(m => m.name == name && m.version == version)) {
+                    modules.push({
+                        name: name,
+                        version: version,
+                        clazz: target,
+                        instance: null,
+                        isFeature: !!isFeature
+                    })
                 }
             }
+        }
 
-            const loadDecorator = function (name: string, version: string): Function {
-                return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
-                    // if (!modules.find(m => m.name == name && m.version == version)) {
-                    //     modules.push({ id: id });
-                    // }
+        const loadDecorator = function (name: string, version: string): Function {
+            return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
+                descriptor = descriptor || {};
+                descriptor.get = function (this: any): any {
+                    return modules.find(m => m.name == name && m.version == version).instance;
+                }
+                return descriptor;
+            };
+        }
 
-                    descriptor = descriptor || {};
-                    descriptor.get = function (this: any): any {
-                        return modules.find(m => m.name == name && m.version == version).instance;
-                    }
-                    return descriptor;
-                };
-            }
-
+        for (const script of scripts) {
+            const execScript = new Function('PublicName', 'Load', 'Core', 'WebSocketProxyClient', script);
             const result = execScript(publicName, loadDecorator, core, WebSocketProxyClient);
         }
 
