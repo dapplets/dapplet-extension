@@ -1,6 +1,7 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { WebSocketProxyClient } from "../utils/chrome-extension-websocket-wrapper";
-import Core from './Core'
+import Core from './Core';
+import { maxSatisfying } from 'semver';
 
 export default class Injector {
 
@@ -37,7 +38,18 @@ export default class Injector {
             return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
                 descriptor = descriptor || {};
                 descriptor.get = function (this: any): any {
-                    return modules.find(m => m.name == name && m.version == version).instance;
+                    // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
+                    const versions = modules.filter(m => m.name == name).map(m => m.version);
+
+                    // ToDo: Should be moved to the background? 
+                    // ToDo: Fetch prefix from global settings.
+                    // ToDo: Replace '>=' to '^'
+                    const prefix = '>='; // https://devhints.io/semver
+                    const range = prefix + version;
+
+                    const maxVer = maxSatisfying(versions, range);
+
+                    return modules.find(m => m.name == name && m.version == maxVer).instance;
                 }
                 return descriptor;
             };

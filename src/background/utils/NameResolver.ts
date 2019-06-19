@@ -10,7 +10,24 @@ export default class NameResolver {
         return await this._resolveByDevConfig(name, version);
     }
 
+    public async getVersionsByName(name: string) : Promise<string[]> {
+        await this._cacheDevConfig();
+        const versions = Object.keys(this._devConfig.scripts[name]);
+        return versions;
+    }
+
+
     private async _resolveByDevConfig(name: string, version: string): Promise<string> {
+        await this._cacheDevConfig();
+
+        if (!this._devConfig.scripts[name] || !this._devConfig.scripts[name][version]) return null;
+
+        const uri = this._rootUrl + '/' + this._devConfig.scripts[name][version];
+
+        return uri;
+    }
+
+    private async _cacheDevConfig() {
         if (this._devConfig == null || this._rootUrl == null) {
             const { devConfigUrl } = await this._globalConfigService.get();
             if (!devConfigUrl) return null;
@@ -26,11 +43,5 @@ export default class NameResolver {
 
             this._devConfig = JSON.parse(text);
         }
-
-        if (!this._devConfig.scripts[name] || !this._devConfig.scripts[name][version]) return null;
-
-        const uri = this._rootUrl + '/' + this._devConfig.scripts[name][version];
-
-        return uri;
     }
 }

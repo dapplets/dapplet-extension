@@ -1,12 +1,13 @@
 import NameResolver from '../utils/NameResolver';
 import ScriptLoader from '../utils/ScriptLoader';
+import { maxSatisfying } from 'semver';
 
 export default class DependencyResolver {
 
     constructor(private _nameResolver: NameResolver, private _scriptLoader: ScriptLoader) {
 
     }
-    
+
 
     public async resolve(modules: { name: string, version: string }[]): Promise<{ name: string, version: string }[]> {
 
@@ -20,7 +21,8 @@ export default class DependencyResolver {
         for (let i = 0; i < dependencies.length; i++) {
             const parent = dependencies[i];
             const moduleDeps = await this._getChildDependencies(parent.name, parent.version);
-            for (const dep of moduleDeps) {
+            const optimizedDeps = await Promise.all(moduleDeps.map(d => this._optimizeDependency(d.name, d.version)));
+            for (const dep of optimizedDeps) {
                 if (!dependencies.find(d => d.name == dep.name && d.version == dep.version)) {
                     dependencies.push(dep);
                 }
@@ -64,5 +66,24 @@ export default class DependencyResolver {
         }
 
         return dependencies;
+    }
+
+    private async _optimizeDependency(name: string, version: string): Promise<{ name: string, version: string }> {
+        // ToDo: Fetch prefix from global settings.
+        // ToDo: Replace '>=' to '^'
+        const prefix = '>='; // https://devhints.io/semver
+        const range = prefix + version;
+
+        const allVersions = await this._nameResolver.getVersionsByName(name);
+        const optimizedVersion = maxSatisfying(allVersions, range);
+
+        if (version != optimizedVersion) {
+            console.warn(`[Dependency Optimizer] Package "${name}" version has been upgraded from ${version} to ${optimizedVersion}.`);
+        }
+
+        return {
+            name: name,
+            version: optimizedVersion
+        };
     }
 }

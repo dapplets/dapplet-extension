@@ -267,7 +267,6 @@ export default class FeatureService {
     }
 
     public async getActiveScriptsByHostname(hostname: string): Promise<string[]> {
-
         const activeFeatures = await this._getActiveDevFeaturesByHostname(hostname);
         const modules = await this._dependencyResolver.resolve(activeFeatures);
         const uris = await Promise.all(modules.map(({ name, version }) => this._nameResolver.resolve(name, version)));
