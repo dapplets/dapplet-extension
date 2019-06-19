@@ -28,7 +28,7 @@ export default class Injector {
                         version: version,
                         clazz: target,
                         instance: null,
-                        isFeature: !!isFeature
+                        isFeature: !!isFeature // ToDo: remove isFeature parameter
                     })
                 }
             }
