@@ -61,10 +61,8 @@ export default class Injector {
         }
 
         for (let i = 0; i < modules.length; i++) {
+            // feature initialization
             modules[i].instance = new modules[i].clazz();
         }
-
-        // feature activation
-        modules.filter(m => m.isFeature === true).map(m => m.instance.activate());
     }
 }
