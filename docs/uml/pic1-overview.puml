@@ -1,0 +1,52 @@
+@startuml "dapplet-extension"
+
+cloud ExternalAPI
+cloud Ethereum
+
+
+package "pkg: legacy web page" as webpage {
+    [Overlay]
+    frame "injected" {
+        [Site Adapter] as Adapter
+        [Feature]
+        Feature "1..*" -down-> Adapter : configures 
+        Feature --> Overlay : opens
+    }
+    () buttons "1..*" <-up- Adapter : (5) inject
+}
+actor User as User1 
+actor User as User2
+actor User as User3
+User1 .right.> buttons : click
+User2 .left.> Overlay : use
+
+
+package "pkg: dapplet-platform" as platform {
+    database "Object\nStorage" as Storage
+    [Audit/QualityAssurance]
+    [Platform Management]
+}
+
+package "pkg: dapplet-extension" as plugin {
+    [Background Services] as Background
+    [Popup]
+    [Feature Injector] as InpageInjector
+    [Options]
+    Background <-- InpageInjector : (9) load Features \n with deps
+    Background <-- Popup : (3) get list of\nFeatures
+    InpageInjector --> injected : injects
+
+    Background <-> Options : (2) settings
+    Ethereum -down-> Background : (1) modules
+    ExternalAPI -down-> Background : (6) augmentation data
+
+    buttons ..> Feature
+}
+
+User3 .up.> Popup : activate\nFeatures
+' Alignment Helper
+webpage -[hidden]- plugin
+plugin -[hidden]right- platform
+
+
+@enduml
