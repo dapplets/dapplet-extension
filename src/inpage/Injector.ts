@@ -16,7 +16,6 @@ export default class Injector {
 
         if (!scripts.length) return;
 
-        const core = new Core();
 
         const modules: { name: string, version: string, clazz: any, instance: any, isFeature: boolean }[] = [];
 
@@ -56,6 +55,7 @@ export default class Injector {
         }
 
         for (const script of scripts) {
+            const core = new Core();
             const execScript = new Function('PublicName', 'Load', 'Core', 'WebSocketProxyClient', script);
             const result = execScript(publicName, loadDecorator, core, WebSocketProxyClient);
         }
