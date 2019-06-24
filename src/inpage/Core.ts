@@ -1,6 +1,6 @@
 import WalletConnectQRCodeModal from "@walletconnect/qrcode-modal";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { WebSocketProxyClient } from "../utils/chrome-extension-websocket-wrapper";
+import { Connection } from './Connection';
 
 export default class Core {
     // ToDo: implement 
@@ -61,45 +61,7 @@ export default class Core {
         return dappletResult;
     }
 
-    private _ws: WebSocketProxyClient = null;
-
-    private _callbacks: {
-        [event: string]: Function[]
-    } = {};
-
-    public connectServer(url: string) {
-        this._ws = new WebSocketProxyClient(url);
-        this._ws.onopen = () => {
-            console.log('WebSocket connection OPEN');
-        };
-        this._ws.onclose = () => {
-            console.log('WebSocket connection CLOSED');
-        };
-        this._ws.onmessage = (msg) => {
-            const message: {
-                [serviceId: string]: {
-                    [id: string]: any,
-                    error?: string
-                }
-            } = JSON.parse(msg);
-
-            message && Object.keys(message).forEach((key) => {
-                let callbacks = this._callbacks[key];
-
-                if (callbacks) {
-                    for (let callback of callbacks) {
-                        callback.call({}, message[key]);
-                    }
-                }
-            });
-        };
-    }
-
-    public subscribe(serviceId: string, handler: (message: string) => void): void {
-        if (!this._callbacks[serviceId]) {
-            this._callbacks[serviceId] = [];
-        }
-
-        this._callbacks[serviceId].push(handler);
+    public connect(url: string) : Connection {
+        return new Connection(url);
     }
 }
