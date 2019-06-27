@@ -5,10 +5,14 @@ export class Connection {
         [id: string]: Function[]
     } = {};
 
+    private _listenableIds : string[] = [];
+
     constructor(url: string) {
         this._ws = new WebSocket(url);
         this._ws.onopen = () => {
-            console.log('WebSocket connection OPEN');
+            console.log('WebSocket connection OPENED');
+            this._listenableIds.forEach(id => this._sendNewId(id));
+            this._listenableIds = [];
         };
         this._ws.onclose = () => {
             console.log('WebSocket connection CLOSED');
@@ -36,6 +40,15 @@ export class Connection {
 
         this._callbacks[id].push(handler);
 
+        if (this._ws.readyState != this._ws.OPEN) {
+            this._listenableIds.push(id);
+            console.log('queued ' + id);
+        } else {
+            this._sendNewId(id);
+        }
+    }
+
+    private _sendNewId(id: string) {
         this._ws.send(id);
     }
 }
