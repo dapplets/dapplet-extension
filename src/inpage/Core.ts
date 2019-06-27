@@ -3,9 +3,63 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Connection } from './Connection';
 
 export default class Core {
+
+    private _isOverlayAttached: boolean = false;
+
     // ToDo: implement 
-    public openOverlay(id, ctx) {
-        console.log("openOverlay core", { id, ctx });
+    public openOverlay(url: string, messageHandler?: Function) {
+        this._isOverlayAttached = true;
+
+        let panel = document.createElement("div");
+        panel.classList.add('overlay-frame', 'overlay-outer');
+
+        let bucketBar = document.createElement("div");
+        bucketBar.classList.add('overlay-bucket-bar');
+
+        let toolBar = document.createElement("div");
+        toolBar.classList.add('overlay-toolbar');
+
+        let ul = document.createElement('ul');
+
+        let li = document.createElement('li');
+
+        let button = document.createElement('button');
+        button.title = "Toggle or Resize Sidebar";
+        button.classList.add('overlay-frame-button', 'overlay-frame-button--sidebar_toggle');
+        button.innerText = '⇄';
+        button.onclick = function () {
+            if (panel.classList.contains('overlay-collapsed')) {
+                panel.classList.remove('overlay-collapsed');
+            } else {
+                panel.classList.add('overlay-collapsed');
+            }
+        }
+
+        let frame = document.createElement("iframe");
+        frame.classList.add('h-sidebar-iframe');
+        frame.src = url;
+        frame.allowFullscreen = true;
+        frame.id = 'the_iframe';
+
+        li.appendChild(button);
+        ul.appendChild(li);
+        toolBar.appendChild(ul);
+        panel.appendChild(bucketBar);
+        panel.appendChild(toolBar);
+        panel.appendChild(frame);
+
+        document.body.appendChild(panel);
+
+        if (messageHandler) {
+            window.addEventListener('message', function (e) {
+                messageHandler(e.data);
+            }, false);
+        }
+    }
+
+    public sendMessageToOverlay(msg: string) {
+        const frame = document.getElementById('the_iframe') as HTMLIFrameElement;
+        frame.contentWindow.postMessage(msg, '*');
     }
 
     // ToDo: implement
