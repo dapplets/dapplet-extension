@@ -1,0 +1,69 @@
+@startuml "dapplet-extension"
+skinparam componentStyle uml2
+skinparam defaultFontSize 16
+skinparam legendFontSize 20
+
+legend top left
+Implementation scheme
+(simplified)
+end legend
+
+cloud Ethereum
+database "BusinessCase\nCustom Server" as BusinessCase #lightgreen
+
+package "web page" as Webpage {
+    [Overlay] #lightgreen
+    frame "injected modules" as injected {
+        [Site Adapter] as Adapter #cyan
+        [Feature] #lightgreen
+        Feature "1..&#8734;" -down-> Adapter : (6) use 
+        Feature -down-> Overlay : opens
+    }
+    interface buttons #cyan
+    buttons "1..&#8734;" <-up- Adapter : (7) inject
+}
+actor User
+actor User as User1 
+actor Auditor
+actor "Feature\nDeveloper" as FeatureDev #lightgreen
+actor "Adapter\nDeveloper" as AdapterDev #cyan
+
+User .up.> buttons : click
+User .left.> Overlay : use
+
+cloud "decentralized\nstorage for\nmodules and\nsettings" as Storage
+
+package "pkg: Browser Extension" as Plugin {
+    [Background Services] as Background
+    [Popup]
+    [Feature Injector] as InpageInjector
+    [<<User Personal Page>>\nDashbord, Module Editor\nand Control Center] as PersonalPage
+    Background <-> PersonalPage : (2) settings\nand new modules
+    Background <-- Popup : (3) get list of\nFeatures
+    Background <-- InpageInjector : (4) load Features \n with deps
+    InpageInjector --> injected : (5) injects
+
+    BusinessCase -down-> Feature : (8) widget live data
+    BusinessCase -down-> Overlay : (9) overlay data
+
+    buttons ..> Feature : send\nevent
+}
+
+Background <-up-> Storage : (1) load modules\n and settings
+
+[Wallet with\nDapplet Support] as Wallet 
+Wallet <-(0)- Feature : <<WalletConnect>>\n metadata or Tx
+Ethereum <-left- Wallet
+User1 .up.> Wallet : sign Tx
+
+User .up.> Popup : activate\nFeatures
+AdapterDev .> Adapter : develop
+Auditor .left.> Storage : audit modules\nand settings
+FeatureDev .> BusinessCase: develop
+
+' Alignment Helper
+Webpage -[hidden]- Plugin
+AdapterDev -[hidden]left- Webpage
+
+
+@enduml
