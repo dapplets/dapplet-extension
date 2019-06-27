@@ -1,22 +1,21 @@
-import { WebSocketProxyClient } from "../utils/chrome-extension-websocket-wrapper";
-
 export class Connection {
-    private _ws: WebSocketProxyClient = null;
+    private _ws: WebSocket = null;
 
     private _callbacks: {
         [id: string]: Function[]
     } = {};
 
     constructor(url: string) {
-        this._ws = new WebSocketProxyClient(url);
+        this._ws = new WebSocket(url);
         this._ws.onopen = () => {
             console.log('WebSocket connection OPEN');
         };
         this._ws.onclose = () => {
             console.log('WebSocket connection CLOSED');
         };
-        this._ws.onmessage = (msg) => {
-            const message: { [id: string]: any } = JSON.parse(msg);
+        this._ws.onmessage = (e) => {
+            
+            const message: { [id: string]: any } = JSON.parse(e.data);
 
             message && Object.keys(message).forEach((id) => {
                 let callbacks = this._callbacks[id];
