@@ -8,7 +8,7 @@ legend top left
 Website, Adapter, Feature
 end legend
 
-interface "Feature Service" as Service #cyan
+component "external Service,\nOverlay or Wallet\n" as Service #cyan
 package "web page" as Webpage {
     [DOM]
     [Widget]
@@ -19,19 +19,18 @@ package "web page" as Webpage {
         interface "Widget\nFactory" as widgetFactory #cyan
         interface "Insertion\nPoint" as insertionPoint #cyan
         
-        Adapter -left-> DOM
-        Adapter <-right-- Feature : use
+        Adapter "  &#8734;" -left-> "1  " DOM : \nparse
+        Adapter "  1" <-right-- "  &#8734;" Feature : use
         Adapter "1" --> "&#8734;" widgetFactory : define
         Adapter "1" --down-> "&#8734;" insertionPoint : define 
         insertionPoint "1" *-right-> "&#8734;" widgetFactory : contain
         Context "1" <- "&#8734;" insertionPoint
-        Feature ---> widgetFactory : configure
+        Feature "1" ---> "&#8734;" widgetFactory : configure
         widgetFactory --> "&#8734;" Widget : create
         Context "1" <-- "1" Widget : use
         DOM "1" <-- "&#8734;" Context
         
-        Feature "1" -> "&#8734;" Service 
-        Widget "&#8734;" <. "1" Service : live data update
+        Widget "&#8734;" <. "1" Service : live data updates
         Widget "1" -> "&#8734;" Service : send data, subscribe
     }
 }
