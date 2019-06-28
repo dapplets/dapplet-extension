@@ -38,7 +38,7 @@ export default class DependencyResolver {
         const uri = await this._nameResolver.resolve(name, version);
         const script = await this._scriptLoader.load(uri);
 
-        const execScript = new Function('Load', 'PublicName', 'WebSocketProxyClient', script);
+        const execScript = new Function('Load', 'PublicName', script);
 
         const dependencies: { name: string, version: string }[] = [];
 
@@ -58,7 +58,7 @@ export default class DependencyResolver {
             }
         }
 
-        const result = execScript(loadDecorator, publicNameDecorator, null);
+        const result = execScript(loadDecorator, publicNameDecorator);
 
         if (!publicName || publicName.name != name || publicName.version != version) {
             console.error('Invalid PublicName');

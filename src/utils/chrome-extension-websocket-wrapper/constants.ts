@@ -1,1 +1,0 @@
-export const MESSAGE_BUS_NAME = "WSPROXY";

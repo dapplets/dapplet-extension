@@ -1,5 +1,4 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { WebSocketProxyClient } from "../utils/chrome-extension-websocket-wrapper";
 import Core from './Core';
 import { maxSatisfying } from 'semver';
 
@@ -56,8 +55,8 @@ export default class Injector {
 
         for (const script of scripts) {
             const core = new Core();
-            const execScript = new Function('PublicName', 'Load', 'Core', 'WebSocketProxyClient', script);
-            const result = execScript(publicName, loadDecorator, core, WebSocketProxyClient);
+            const execScript = new Function('PublicName', 'Load', 'Core', script);
+            const result = execScript(publicName, loadDecorator, core);
         }
 
         for (let i = 0; i < modules.length; i++) {

@@ -1,0 +1,62 @@
+@startuml "dapplet-extension"
+scale 800*1200
+skinparam componentStyle uml2
+
+database "BusinessCase\nCustom Server" as BusinessCase #Cyan
+
+package "web page" as Webpage {
+    [Overlay] #Cyan
+    frame "injected" {
+        [Site Adapter] as Adapter #lightgreen
+        [Feature] #Cyan
+        Feature "1..&#8734;" -down-> Adapter : configures 
+        Feature -> Overlay : opens
+    }
+    interface buttons #lightgreen
+    buttons "1..&#8734;" <-up- Adapter : (5) inject
+}
+actor User
+actor Auditor
+actor StakeHolder
+actor "Business\nDeveloper" as BusDev #Cyan
+actor "Adapter\nDeveloper" as AdapterDev #lightgreen
+
+User .up.> buttons : click
+User .left.> Overlay : use
+
+database "Decentralized Storage\nfor Objects and Settings" as Storage
+
+package "pkg: Dapplet Platform" as Platform {
+    [Audit/QualityAssurance] as AuditQA
+    [Platform Management] as DappletDAO
+}
+
+package "pkg: Browser Extension" as Plugin {
+    [Background Services] as Background
+    [Popup]
+    [Feature Injector] as InpageInjector
+    [Options]
+    Background <-- InpageInjector : (9) load Features \n with deps
+    Background <-- Popup : (3) get list of\nFeatures
+    InpageInjector .> injected : injects
+
+    Background <-> Options : (2) settings
+    BusinessCase .down.> Feature : (6) widget augmentation
+    BusinessCase .down.> Overlay : (6) augmentation data
+
+    buttons ..> Feature
+}
+
+Platform -up-> Storage
+Plugin -up-> Storage
+User .up.> Popup : activate\nFeatures
+Auditor .up.> AuditQA : Feature Audit
+StakeHolder ..> DappletDAO
+AdapterDev .> Adapter : create
+' Alignment Helper
+Webpage -[hidden]- Plugin
+Plugin -[hidden]- Platform
+DappletDAO -down-> AuditQA : parameterize
+BusDev -down-> BusinessCase: develop
+
+@enduml
