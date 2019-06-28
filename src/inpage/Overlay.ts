@@ -43,6 +43,8 @@ export class Overlay {
         document.body.appendChild(panel);
 
         window.addEventListener('message', (e) => {
+            if (e.source != frame.contentWindow) return; // Listen messages from only our frame
+
             let callbacks = this._callbacks;
 
             if (callbacks) {
