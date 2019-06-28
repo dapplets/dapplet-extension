@@ -25,12 +25,11 @@
       "js": [
       	"inpage.js"
       ],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "css" : ["styles/overlay.css"]
     }
   ],
-  "web_accessible_resources": [
-  	"examples/*"
-   ],
+  "web_accessible_resources": [],
   "permissions": [
     "tabs",
     "storage",

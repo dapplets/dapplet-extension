@@ -1,11 +1,16 @@
 import WalletConnectQRCodeModal from "@walletconnect/qrcode-modal";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Connection } from './Connection';
+import { Overlay } from "./Overlay";
 
 export default class Core {
-    // ToDo: implement 
-    public openOverlay(id, ctx) {
-        console.log("openOverlay core", { id, ctx });
+
+    public connect(url: string) : Connection {
+        return new Connection(url);
+    }
+
+    public overlay(url: string) {
+        return new Overlay(url);
     }
 
     // ToDo: implement
@@ -59,9 +64,5 @@ export default class Core {
         }
 
         return dappletResult;
-    }
-
-    public connect(url: string) : Connection {
-        return new Connection(url);
     }
 }
