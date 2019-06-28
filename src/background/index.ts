@@ -4,7 +4,6 @@ import * as SuspendService from "./services/suspendService";
 import * as NotificationService from "./services/notificationService";
 import FeatureService from './services/FeatureService';
 import GlobalConfigService from './services/GlobalConfigService';
-import { WebSocketProxy } from "../utils/chrome-extension-websocket-wrapper";
 
 // ToDo: Fix dublication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -47,11 +46,6 @@ chrome.runtime.onMessage.addListener(
     setGlobalConfig: (config) => (new GlobalConfigService()).set(config)
   })
 );
-
-// WebSocket proxy
-// ToDo: Perhaps a separate class WebSocketProxy is redundant
-const wsproxy = new WebSocketProxy();
-chrome.runtime.onConnect.addListener(wsproxy.createConnectListener());
 
 // ToDo: These lines are repeated many time
 SuspendService.changeIcon();
