@@ -18,7 +18,7 @@ export default class Injector {
 
         const modules: { name: string, version: string, clazz: any, instance: any, isFeature: boolean }[] = [];
 
-        const publicName = function (name: string, version: string, isFeature?: boolean): Function {
+        const moduleDecorator = function (name: string, version: string, isFeature?: boolean): Function {
             return (target: Function) => {
                 if (!modules.find(m => m.name == name && m.version == version)) {
                     modules.push({
@@ -55,8 +55,8 @@ export default class Injector {
 
         for (const script of scripts) {
             const core = new Core();
-            const execScript = new Function('PublicName', 'Load', 'Core', script);
-            const result = execScript(publicName, loadDecorator, core);
+            const execScript = new Function('Module', 'Load', 'Core', script);
+            const result = execScript(moduleDecorator, loadDecorator, core);
         }
 
         for (let i = 0; i < modules.length; i++) {
