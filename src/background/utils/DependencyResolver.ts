@@ -33,12 +33,14 @@ export default class DependencyResolver {
         return dependencies.reverse();
     }
 
+    //ToDo: rework the _getChildDependencies and move it into Inpage
     private async _getChildDependencies(name: string, version: string): Promise<{ name: string, version: string }[]> {
 
         const uri = await this._nameResolver.resolve(name, version);
         const script = await this._scriptLoader.load(uri);
 
-        const execScript = new Function('Load', 'Module', script);
+        //const execScript = new Function('Load', 'Module', script);
+        const execScript = new Function('Load', 'Feature', 'Resolver','Adapter','Module', script);
 
         const dependencies: { name: string, version: string }[] = [];
 
@@ -58,7 +60,9 @@ export default class DependencyResolver {
             }
         }
 
-        const result = execScript(loadDecorator, moduleDecorator);
+        //ToDo: this code is a nasty refactoring hack. it should be eliminated completely 
+        const result = execScript(loadDecorator, moduleDecorator, moduleDecorator, moduleDecorator, moduleDecorator);
+        //const result = execScript(loadDecorator, moduleDecorator);
 
         if (!publicName || publicName.name != name || publicName.version != version) {
             console.error('Invalid public name for module');
