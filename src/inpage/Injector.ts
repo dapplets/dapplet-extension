@@ -16,9 +16,27 @@ export default class Injector {
         if (!scripts.length) return;
 
 
-        const modules: { name: string, version: string, clazz: any, instance: any, isFeature: boolean }[] = [];
+        const modules: { name: string, version: string, clazz: any, instance: any, type: ModuleTypes }[] = [];
 
-        const publicName = function (name: string, version: string, isFeature?: boolean): Function {
+        const enum ModuleTypes {OTHER, FEATURE, ADAPTER, RESOLVER}
+
+        const featureDecorator = function (name: string, version: string): Function {
+            return _moduleDecorator(name, version, ModuleTypes.FEATURE) 
+        }
+
+        const adapterDecorator = function (name: string, version: string): Function {
+            return _moduleDecorator(name, version, ModuleTypes.ADAPTER) 
+        }
+
+        const resolverDecorator = function (name: string, version: string): Function {
+            return _moduleDecorator(name, version, ModuleTypes.RESOLVER) 
+        }
+
+        const moduleDecorator = function (name: string, version: string, moduleType: ModuleTypes): Function {
+            return _moduleDecorator(name, version, ModuleTypes.OTHER)         
+        }
+        
+        const _moduleDecorator = function (name: string, version: string, moduleType: ModuleTypes): Function {
             return (target: Function) => {
                 if (!modules.find(m => m.name == name && m.version == version)) {
                     modules.push({
@@ -26,7 +44,7 @@ export default class Injector {
                         version: version,
                         clazz: target,
                         instance: null,
-                        isFeature: !!isFeature // ToDo: remove isFeature parameter
+                        type: moduleType
                     })
                 }
             }
@@ -55,8 +73,8 @@ export default class Injector {
 
         for (const script of scripts) {
             const core = new Core();
-            const execScript = new Function('PublicName', 'Load', 'Core', script);
-            const result = execScript(publicName, loadDecorator, core);
+            const execScript = new Function('Feature', 'Resolver','Adapter','Module', 'Load', 'Core', script);
+            const result = execScript(featureDecorator, resolverDecorator, adapterDecorator, moduleDecorator, loadDecorator, core);
         }
 
         for (let i = 0; i < modules.length; i++) {
