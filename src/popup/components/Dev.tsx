@@ -33,7 +33,7 @@ class Dev extends React.Component<IDevProps, IDevState> {
 
         this.setState({
             scripts: scripts,
-            configUrl: config.devConfigUrl,
+            configUrl: config.devConfigUrl || 'https://localhost:8080/index.json',
             isLoading: false
         });
     }
@@ -62,7 +62,7 @@ class Dev extends React.Component<IDevProps, IDevState> {
                         <Form.Input
                             placeholder='Type URL to index.json'
                             size='mini'
-                            value={configUrl||'https://localhost:8080/index.json'}
+                            value={configUrl}
                             label='Dev Config URL'
                             onChange={(e, { value }) => this.setState({ configUrl: value })}
                             action={(
