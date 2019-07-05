@@ -1,16 +1,26 @@
 import WalletConnectQRCodeModal from "@walletconnect/qrcode-modal";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Connection } from './Connection';
-import { Overlay } from "./Overlay";
+import { OverlayManager } from "./overlayManager";
+import { Overlay } from "./overlay";
 
 export default class Core {
 
-    public connect(url: string) : Connection {
+    public overlayManager = new OverlayManager();
+
+    public connect(url: string): Connection {
         return new Connection(url);
     }
 
-    public overlay(url: string) {
-        return new Overlay(url);
+    public overlay(url: string, title: string) {
+        const overlay = new Overlay(this.overlayManager, url, title);
+        const me = {
+            open: () => (overlay.open(), me),
+            close: () => (overlay.close(), me),
+            subscribe: (handler) => (overlay.subscribe(handler), me),
+            publish: (msg) => (overlay.publish(msg), me)
+        };
+        return me;
     }
 
     // ToDo: implement

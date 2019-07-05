@@ -71,8 +71,9 @@ export default class Injector {
             };
         }
 
+        const core = new Core(); // ToDo: is it global for all modules?
+
         for (const script of scripts) {
-            const core = new Core();
             const execScript = new Function('Feature', 'Resolver','Adapter','Module', 'Load', 'Core', script);
             const result = execScript(featureDecorator, resolverDecorator, adapterDecorator, moduleDecorator, loadDecorator, core);
         }

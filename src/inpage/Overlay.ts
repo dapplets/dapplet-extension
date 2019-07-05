@@ -1,49 +1,16 @@
+import { OverlayManager } from './overlayManager';
+
 export class Overlay {
-
     private _callbacks: Function[] = [];
-    public isOpened: boolean = false;
-    private _frame: HTMLIFrameElement = null;
-    private _panel: HTMLDivElement = null;
+    public frame: HTMLIFrameElement = null;
 
-
-    constructor(url: string) {
-
-        let panel = document.createElement("div");
-        panel.classList.add('overlay-frame', 'overlay-outer', 'overlay-collapsed');
-
-        let bucketBar = document.createElement("div");
-        bucketBar.classList.add('overlay-bucket-bar');
-
-        let toolBar = document.createElement("div");
-        toolBar.classList.add('overlay-toolbar');
-
-        let ul = document.createElement('ul');
-
-        let li = document.createElement('li');
-
-        let button = document.createElement('button');
-        button.title = "Toggle or Resize Sidebar";
-        button.classList.add('overlay-frame-button', 'overlay-frame-button--sidebar_toggle');
-        button.innerText = '⇄';
-        button.onclick = () => this.toggle();
-
-        let frame = document.createElement("iframe");
-        frame.classList.add('h-sidebar-iframe');
-        frame.src = url;
-        frame.allowFullscreen = true;
-        //frame.id = 'the_iframe';
-
-        li.appendChild(button);
-        ul.appendChild(li);
-        toolBar.appendChild(ul);
-        panel.appendChild(bucketBar);
-        panel.appendChild(toolBar);
-        panel.appendChild(frame);
-
-        document.body.appendChild(panel);
+    constructor(private manager: OverlayManager, uri: string, public title: string) {
+        this.frame = document.createElement('iframe');
+        this.frame.src = uri;
+        this.frame.allowFullscreen = true;
 
         window.addEventListener('message', (e) => {
-            if (e.source != frame.contentWindow) return; // Listen messages from only our frame
+            if (e.source != this.frame.contentWindow) return; // Listen messages from only our frame
 
             let callbacks = this._callbacks;
 
@@ -54,35 +21,24 @@ export class Overlay {
             }
 
         }, false);
-
-        this._panel = panel;
-        this._frame = frame;
     }
+    
+    // показать пользователю
+    public open() {
+        this.manager.register(this);
+        this.manager.activate(this);
+        this.manager.open();
+    }
+    
+    public close() {
+        this.manager.unregister(this);
+    }
+    
+    public publish(msg: string) {
+        this.frame.contentWindow.postMessage(msg, '*');
+    }    
 
     public subscribe(handler: (message: any) => void) {
         this._callbacks.push(handler);
-    }
-
-
-    public publish(msg: string) {
-        this._frame.contentWindow.postMessage(msg, '*');
-    }
-
-    public open() {
-        this._panel.classList.remove('overlay-collapsed');
-        this.isOpened = true;
-    }
-
-    public close() {
-        this._panel.classList.add('overlay-collapsed');
-        this.isOpened = false;     
-    }
-
-    public toggle() {
-        if (this.isOpened) {
-            this.close();
-        } else {
-            this.open();
-        }
     }
 }
