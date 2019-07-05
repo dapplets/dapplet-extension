@@ -63,20 +63,32 @@ export class OverlayManager {
         this._contentList = contentList;
     }
 
+    /**
+     * Expands the panel.
+     */
     public open() {
         this._panel.classList.remove('overlay-collapsed');
         this.isOpened = true;
     }
 
+    /**
+     * Collapses the panel.
+     */
     public close() {
         this._panel.classList.add('overlay-collapsed');
         this.isOpened = false;
     }
 
+    /**
+     * Shows the panel.
+     */
     public show() {
         this._panel.classList.remove('overlay-hidden');
     }
 
+    /**
+     * Hides the panel.
+     */
     public hide() {
         this._panel.classList.add('overlay-hidden');
     }
