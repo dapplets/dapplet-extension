@@ -11,8 +11,19 @@ interface ISelectWalletProps {
 
 interface ISelectWalletState {
     svgPath: string;
-    isPairing: boolean;
+    isPaired: boolean;
     error: string;
+    wallet?: {
+        accounts?: string[],
+        chainId?: number,
+        peerId?: string,
+        peerMeta?: {
+            description?: string,
+            icons?: string[],
+            name?: string,
+            url?: string
+        }
+    }
 }
 
 export class WalletConnectPairing extends React.Component<ISelectWalletProps, ISelectWalletState> {
@@ -21,7 +32,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
 
         this.state = {
             svgPath: null,
-            isPairing: true,
+            isPaired: false,
             error: null
         };
     }
@@ -31,38 +42,56 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
         const { generateUri, waitPairing } = backgroundFunctions;
         var uri = await generateUri();
         const svgPath = svgObject(uri, { type: 'svg' });
-        console.log({svgPath});
+        console.log({ svgPath });
         this.setState({ svgPath: svgPath.path });
 
         const result = await waitPairing();
 
         if (result) {
+            const wallet = result.params[0];
+            if (wallet) {
+                this.setState({ wallet });
+            }
+
             this.setState({
-                isPairing: false
+                isPaired: true
             });
+            window.parent.postMessage('paired', '*');
         } else {
             this.setState({
-                isPairing: false,
+                isPaired: true,
                 error: 'Wallet paring failed'
             });
+            window.parent.postMessage('error', '*');
         }
+
     }
 
     render() {
-        const { svgPath, isPairing, error } = this.state;
+        const { svgPath, isPaired, error, wallet } = this.state;
 
         return (
             <Container text>
-                <Header as='h2'>WalletConnect Pairing</Header>
-                {isPairing ? (
+                {!isPaired ? (
                     <React.Fragment>
+                        <Header as='h2'>WalletConnect Pairing</Header>
                         <p>Scan QR code with a WalletConnect-compatible wallet</p>
-                        {svgPath ? (<svg viewBox="1 1 54 54"><path d={svgPath}/></svg>) : null}
+                        {svgPath ? (<svg viewBox="1 1 53 53"><path d={svgPath} /></svg>) : null}
                         <Button><Link to="/">Back</Link></Button>
                     </React.Fragment>
                 ) : (
                     <React.Fragment>
-                        <p>{error}</p>
+                        {!error ? (
+                            <div>
+                                <Header as='h2'>Wallet connected</Header>
+                                <p>Account: {wallet.accounts[0]}</p>
+                                <p>Chain ID: {wallet.chainId}</p>
+                                <p>Peer ID: {wallet.peerId}</p>
+                                <p>Peer Description: {wallet.peerMeta.description}</p>
+                                <p>Peer Name: {wallet.peerMeta.name}</p>
+                                <p>Peer URL: {wallet.peerMeta.url}</p>
+                            </div>
+                        ) : (<p>{error}</p>)}
                     </React.Fragment>
                 )}
             </Container>

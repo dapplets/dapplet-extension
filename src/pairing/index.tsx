@@ -39,7 +39,6 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         const { isConnected } = this.state;
 
         return (
-
             <HashRouter>
                 {isConnected ? "Wallet connected already" : (
                     <Switch>

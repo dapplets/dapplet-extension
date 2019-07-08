@@ -82,7 +82,7 @@ const waitPairing = () => {
                 reject(error);
             }
 
-            resolve(true);
+            resolve(payload);
         });
     });
 
