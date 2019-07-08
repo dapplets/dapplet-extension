@@ -29,7 +29,9 @@
       "css" : ["styles/overlay.css"]
     }
   ],
-  "web_accessible_resources": [],
+  "web_accessible_resources": [
+    "pairing.html"
+  ],
   "permissions": [
     "tabs",
     "storage",

@@ -5,7 +5,8 @@ module.exports = {
   entry: {
     popup: path.join(__dirname, "src/popup/index.tsx"),
     background: path.join(__dirname, "src/background/index.ts"),
-    inpage: path.join(__dirname, "src/inpage/index.ts")
+    inpage: path.join(__dirname, "src/inpage/index.ts"),
+    pairing: path.join(__dirname, "src/pairing/index.tsx")
   },
   output: {
     path: path.join(__dirname, "build"),
@@ -71,6 +72,9 @@ module.exports = {
     }, {
       from: "src/options/index.html",
       to: "options.html"
+    }, {
+      from: "src/pairing/index.html",
+      to: "pairing.html"
     }]),
   ]
 };
