@@ -58,6 +58,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
                     <React.Fragment>
                         <p>Scan QR code with a WalletConnect-compatible wallet</p>
                         {svgPath ? (<svg viewBox="1 1 54 54"><path d={svgPath}/></svg>) : null}
+                        <Button><Link to="/">Back</Link></Button>
                     </React.Fragment>
                 ) : (
                     <React.Fragment>
