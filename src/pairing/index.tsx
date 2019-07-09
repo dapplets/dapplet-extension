@@ -3,7 +3,6 @@ import * as ReactDOM from 'react-dom';
 import 'semantic-ui-css/semantic.min.css'
 import { SelectWallet } from "./components/selectWallet";
 import './index.scss';
-import { Tab } from "semantic-ui-react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
 import { WalletConnectPairing } from "./components/walletConnectPairing";

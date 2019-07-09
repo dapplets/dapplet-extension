@@ -12,12 +12,13 @@ export default class Core {
     }
 
     public overlay(url: string, title: string) {
-        const overlay = new Overlay(this.overlayManager, url, title);
+        const ov = new Overlay(this.overlayManager, url, title);
         const me = {
-            open: () => (overlay.open(), me),
-            close: () => (overlay.close(), me),
-            subscribe: (handler) => (overlay.subscribe(handler), me),
-            publish: (msg) => (overlay.publish(msg), me)
+            open: () => (ov.open(), me),
+            close: () => (ov.close(), me),
+            subscribe: (topic: string, handler: Function) => (ov.subscribe(topic, handler), me),
+            unsubscribe: (topic: string) => (ov.unsubscribe(topic), me),
+            publish: (topic: string, ...args: any) => (ov.publish(topic, ...args), me)
         };
         return me;
     }
@@ -42,14 +43,8 @@ export default class Core {
                     const overlay = me.overlay(pairingUrl, 'Wallet');
                     overlay.open();
                     // ToDo: add timeout?
-                    overlay.subscribe((msg) => {
-                        console.log('msg', msg);
-                        if (msg == 'paired') {
-                            resolve();
-                        } else {
-                            reject();
-                        }
-                    });
+                    overlay.subscribe('paired', () => resolve());
+                    overlay.subscribe('error', () => reject());
                 });
             };
 

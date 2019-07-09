@@ -5,6 +5,7 @@ import { List, Button, Segment } from "semantic-ui-react";
 import { Container, Header } from 'semantic-ui-react'
 import { svgObject } from "qr-image";
 import { Link } from "react-router-dom";
+import { Bus } from '../bus';
 
 interface ISelectWalletProps {
 }
@@ -27,9 +28,11 @@ interface ISelectWalletState {
 }
 
 export class WalletConnectPairing extends React.Component<ISelectWalletProps, ISelectWalletState> {
+    private bus: Bus = null;
+
     constructor(props) {
         super(props);
-
+        this.bus = new Bus();
         this.state = {
             svgPath: null,
             isPaired: false,
@@ -56,13 +59,13 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
             this.setState({
                 isPaired: true
             });
-            window.parent.postMessage('paired', '*');
+            this.bus.publish('paired');
         } else {
             this.setState({
                 isPaired: true,
                 error: 'Wallet paring failed'
             });
-            window.parent.postMessage('error', '*');
+            this.bus.publish('error');
         }
 
     }
