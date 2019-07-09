@@ -77,7 +77,8 @@
     width: 30px;
     padding: 0;
     font-size: 16px;
-    margin-bottom: 5px
+    margin-bottom: 5px;
+    cursor: pointer;
 }
 
 .overlay-frame .overlay-frame-button:active {
@@ -174,6 +175,7 @@
 .pageNav__contentItem>* {
     height: 100%;
     width: 100%;
+    border: none;
 }
 
 .tabItem__closeBtn {
