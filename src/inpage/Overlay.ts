@@ -4,7 +4,15 @@ export class Overlay {
     private _callbacks: {
         [topic: string]: Function[]
     } = {};
+
     public frame: HTMLIFrameElement = null;
+
+    private _queue: {
+        topic: string,
+        args: any[]
+    }[] = [];
+
+    private _isQueueProcessing: boolean = false;
 
     constructor(private manager: OverlayManager, uri: string, public title: string) {
         this.frame = document.createElement('iframe');
@@ -12,18 +20,32 @@ export class Overlay {
         this.frame.allowFullscreen = true;
 
         window.addEventListener('message', (e) => {
-            try {
-                if (e.source != this.frame.contentWindow) return; // Listen messages from only our frame
-                if (!e.data) return;
-                const { topic, args } = JSON.parse(e.data);
+            if (e.source != this.frame.contentWindow) return; // Listen messages from only our frame
+            if (!e.data) return;
 
-                let callbacks = this._callbacks[topic] || [];
+            const { topic, args } = JSON.parse(e.data);
+            if (!topic || !args) return;
 
-                for (const callback of callbacks) {
-                    callback.apply({}, args);
-                }
-            } catch (ex) { }
+            this._queue.push({ topic, args });
+            this.processQueue();
         }, false);
+    }
+
+    async processQueue() {
+        if (this._isQueueProcessing) return;
+
+        this._isQueueProcessing = true;
+
+        while (this._queue.length > 0) {
+            const { topic, args } = this._queue.shift();
+            const callbacks = this._callbacks[topic] || [];
+
+            for (const callback of callbacks) {
+                await callback.bind({}, ...args)(); // ToDo: Think about execution order. Sync is now.
+            }
+        }
+
+        this._isQueueProcessing = false;
     }
 
     /**
