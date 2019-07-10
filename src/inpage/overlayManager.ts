@@ -5,9 +5,10 @@ const TabItemClass = 'pageNav__tabItem';
 const ContentItemClass = 'pageNav__contentItem';
 const ActiveTabHeaderClass = 'pageNav__tabItem--active';
 const ActiveTabContentClass = 'pageNav__contentItem--active';
+const CollapsedOverlayClass = 'overlay-collapsed';
+const HiddenOverlayClass = 'overlay-hidden';
 
 export class OverlayManager {
-    public isOpened: boolean = false;
     private _panel: HTMLDivElement = null;
     private _tabList: HTMLDivElement = null;
     private _contentList: HTMLDivElement = null;
@@ -22,7 +23,7 @@ export class OverlayManager {
     constructor() {
         // Side panel
         const panel = document.createElement("div");
-        panel.classList.add('overlay-frame', 'overlay-outer', 'overlay-collapsed', 'overlay-hidden');
+        panel.classList.add('overlay-frame', 'overlay-outer', CollapsedOverlayClass, HiddenOverlayClass);
         document.body.appendChild(panel);
         this._panel = panel;
 
@@ -67,38 +68,32 @@ export class OverlayManager {
      * Expands the panel.
      */
     public open() {
-        this._panel.classList.remove('overlay-collapsed');
-        this.isOpened = true;
+        this._panel.classList.remove(CollapsedOverlayClass);
     }
 
     /**
      * Collapses the panel.
      */
     public close() {
-        this._panel.classList.add('overlay-collapsed');
-        this.isOpened = false;
+        this._panel.classList.add(CollapsedOverlayClass);
     }
 
     /**
      * Shows the panel.
      */
     public show() {
-        this._panel.classList.remove('overlay-hidden');
+        this._panel.classList.remove(HiddenOverlayClass);
     }
 
     /**
      * Hides the panel.
      */
     public hide() {
-        this._panel.classList.add('overlay-hidden');
+        this._panel.classList.add(HiddenOverlayClass);
     }
 
     public toggle() {
-        if (this.isOpened) {
-            this.close();
-        } else {
-            this.open();
-        }
+        this._panel.classList.toggle(CollapsedOverlayClass);
     }
 
     public register(overlay: Overlay) {
