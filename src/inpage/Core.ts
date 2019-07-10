@@ -1,7 +1,7 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Connection } from './Connection';
 import { OverlayManager } from "./overlayManager";
-import { Overlay } from "./overlay";
+import { Overlay, SubscribeOptions } from "./overlay";
 
 export default class Core {
 
@@ -16,7 +16,7 @@ export default class Core {
         const me = {
             open: (callback?: Function) => (ov.open(callback), me),
             close: () => (ov.close(), me),
-            subscribe: (topic: string, handler: Function) => (ov.subscribe(topic, handler), me),
+            subscribe: (topic: string, handler: Function, threading?: SubscribeOptions) => (ov.subscribe(topic, handler, threading), me),
             unsubscribe: (topic: string) => (ov.unsubscribe(topic), me),
             publish: (topic: string, ...args: any) => (ov.publish(topic, ...args), me)
         };

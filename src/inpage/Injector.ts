@@ -1,6 +1,7 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import Core from './Core';
 import { maxSatisfying } from 'semver';
+import { SubscribeOptions } from './overlay';
 
 export default class Injector {
 
@@ -74,8 +75,8 @@ export default class Injector {
         const core = new Core(); // ToDo: is it global for all modules?
 
         for (const script of scripts) {
-            const execScript = new Function('Feature', 'Resolver','Adapter','Module', 'Load', 'Core', script);
-            const result = execScript(featureDecorator, resolverDecorator, adapterDecorator, moduleDecorator, loadDecorator, core);
+            const execScript = new Function('Feature', 'Resolver','Adapter','Module', 'Load', 'Core', 'SubscribeOptions', script);
+            const result = execScript(featureDecorator, resolverDecorator, adapterDecorator, moduleDecorator, loadDecorator, core, SubscribeOptions);
         }
 
         for (let i = 0; i < modules.length; i++) {
