@@ -1,6 +1,8 @@
 import { OverlayManager } from './overlayManager';
 
 export class Overlay {
+
+    private _manager: OverlayManager = null;
     private _callbacks: {
         [topic: string]: Function[]
     } = {};
@@ -13,11 +15,16 @@ export class Overlay {
     }[] = [];
 
     private _isQueueProcessing: boolean = false;
+    private _isFrameLoaded: boolean = false;
 
-    constructor(private manager: OverlayManager, uri: string, public title: string) {
+    constructor(manager: OverlayManager, uri: string, public title: string) {
+        this._manager = manager;
         this.frame = document.createElement('iframe');
         this.frame.src = uri;
         this.frame.allowFullscreen = true;
+        this.frame.addEventListener('load', () => {
+            this._isFrameLoaded = true;
+        });
 
         window.addEventListener('message', (e) => {
             if (e.source != this.frame.contentWindow) return; // Listen messages from only our frame
@@ -51,17 +58,29 @@ export class Overlay {
     /**
      * Opens tab. If it doesn't exist, then adds tab to the panel.
      */
-    public open() {
-        this.manager.register(this);
-        this.manager.activate(this);
-        this.manager.open();
+    public open(callback?: Function) {
+        this._manager.register(this);
+        this._manager.activate(this);
+        this._manager.open();
+
+        if (!callback || typeof callback !== 'function') return;
+
+        if (this._isFrameLoaded) {
+            callback.apply({});
+        } else {
+            const loadHandler = () => {
+                callback.apply({});
+                this.frame.removeEventListener('load', loadHandler);
+            }
+            this.frame.addEventListener('load', loadHandler);
+        }
     }
 
     /**
      * Removes tab from the panel.
      */
     public close() {
-        this.manager.unregister(this);
+        this._manager.unregister(this);
     }
 
     public publish(topic: string, ...args: any) {

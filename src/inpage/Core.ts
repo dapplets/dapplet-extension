@@ -14,7 +14,7 @@ export default class Core {
     public overlay(url: string, title: string) {
         const ov = new Overlay(this.overlayManager, url, title);
         const me = {
-            open: () => (ov.open(), me),
+            open: (callback?: Function) => (ov.open(callback), me),
             close: () => (ov.close(), me),
             subscribe: (topic: string, handler: Function) => (ov.subscribe(topic, handler), me),
             unsubscribe: (topic: string) => (ov.unsubscribe(topic), me),
