@@ -28,31 +28,6 @@ export default class FeatureService {
     private _dependencyResolver = new DependencyResolver(this._nameResolver, this._scriptLoader);
 
     async getScriptById(id: string): Promise<string> {
-        // const { devConfigUrl } = await this._globalConfigService.get();
-
-        // // DEVELOPMENT ====================================================
-        // if (devConfigUrl) {
-        //     const response = await fetch(devConfigUrl + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
-        //     if (!response.ok) {
-        //         console.error("Cannot load dev config");
-        //         return;
-        //     }
-        //     const text = await response.text();
-
-        //     const config: { hostnames: { [key: string]: string[] }, scripts: { [key: string]: string } } = JSON.parse(text);
-
-        //     if (config.scripts[id]) {
-        //         const url = config.scripts[id];
-        //         const rootUrl = devConfigUrl.substring(0, devConfigUrl.lastIndexOf('/'));
-        //         // ToDo: cache prevent like [here](https://stackoverflow.com/questions/29246444/fetch-how-do-you-make-a-non-cached-request)
-        //         const response = await fetch(rootUrl + '/' + url + '?_dc=' + (new Date).getTime()); // _dc is for cache preventing
-        //         if (!response.ok) throw new Error("Can not load remote injector");
-        //         const text = await response.text();
-        //         return text;
-        //     }
-        // }
-
-        // PRODUCTION ====================================================
         // ToDo: get Feature
         let file = await this._fileRepository.getById(id);
 

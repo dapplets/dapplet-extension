@@ -62,8 +62,7 @@ export default class DependencyResolver {
 
         //ToDo: this code is a nasty refactoring hack. it should be eliminated completely 
         const result = execScript(loadDecorator, moduleDecorator, moduleDecorator, moduleDecorator, moduleDecorator);
-        //const result = execScript(loadDecorator, moduleDecorator);
-
+        
         if (!publicName || publicName.name != name || publicName.version != version) {
             console.error('Invalid public name for module');
             return [];

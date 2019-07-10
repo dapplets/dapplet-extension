@@ -8,6 +8,7 @@ const ActiveTabContentClass = 'pageNav__contentItem--active';
 const CollapsedOverlayClass = 'overlay-collapsed';
 const HiddenOverlayClass = 'overlay-hidden';
 
+
 export class OverlayManager {
     private _panel: HTMLDivElement = null;
     private _tabList: HTMLDivElement = null;
