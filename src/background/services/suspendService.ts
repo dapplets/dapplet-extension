@@ -1,4 +1,3 @@
-import Storage from "../../utils/chrome-extension-storage-wrapper";
 import Helpers from "../../utils/helpers";
 import SiteConfigRepository from "../repositories/SiteConfigRepository";
 import SiteConfig from "../models/SiteConfig";
