@@ -18,7 +18,6 @@ chrome.runtime.onMessage.addListener(
     disconnect: WalletConnectService.disconnect,
     getAccounts: WalletConnectService.getAccounts,
     getChainId: WalletConnectService.getChainId,
-    sendWalletConnectTx: WalletConnectService.sendWalletConnectTx,
 
     // SuspendService
     getSuspendityByHostname: SuspendService.getSuspendityByHostname,
