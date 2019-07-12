@@ -2,5 +2,9 @@
     "plantuml.diagramsRoot": "docs/uml",
     "plantuml.exportOutDir": "docs/images",
     "plantuml.exportFormat": "png",
-    "plantuml.exportSubFolder": false
+    "plantuml.exportSubFolder": false,
+    "json.schemas": [{
+        "fileMatch": ["/resources/manifest.json"],
+        "url": "http://json.schemastore.org/chrome-manifest"
+    }]
 }
