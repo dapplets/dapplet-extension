@@ -117,7 +117,7 @@ class FeatureList extends React.Component<IInjectorListProps, IInjectorListState
                       marginRight: injector.hasUpdate ? 60 : 60
                     }}
                   >
-                    <List.Header>{injector.name}</List.Header>
+                    <List.Header>{injector.title}</List.Header>
                     <List.Description style={{ color: "#666" }}>
                       {injector.description}
                       <br />

@@ -2,7 +2,7 @@
 import GlobalConfigService from '../services/GlobalConfigService';
 
 export default class NameResolver {
-    private _devConfig: { hostnames: { [key: string]: { [key: string]: string } }, scripts: { [key: string]: { [key: string]: string } } } = null;
+    private _devConfig: { hostnames: { [key: string]: { [key: string]: string } }, modules: { [key: string]: { [key: string]: string } } } = null;
     private _rootUrl: string = null;
     private _globalConfigService = new GlobalConfigService();
 
@@ -12,7 +12,7 @@ export default class NameResolver {
 
     public async getVersionsByName(name: string) : Promise<string[]> {
         await this._cacheDevConfig();
-        const versions = Object.keys(this._devConfig.scripts[name]);
+        const versions = Object.keys(this._devConfig.modules[name]);
         return versions;
     }
 
@@ -20,9 +20,9 @@ export default class NameResolver {
     private async _resolveByDevConfig(name: string, version: string): Promise<string> {
         await this._cacheDevConfig();
 
-        if (!this._devConfig.scripts[name] || !this._devConfig.scripts[name][version]) return null;
+        if (!this._devConfig.modules[name] || !this._devConfig.modules[name][version]) return null;
 
-        const uri = this._rootUrl + '/' + this._devConfig.scripts[name][version];
+        const uri = this._rootUrl + '/' + this._devConfig.modules[name][version];
 
         return uri;
     }

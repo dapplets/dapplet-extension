@@ -11,7 +11,8 @@ export default class ManifestDTO {
     isNew: boolean = null; // ToDo: Unused yet. Mark label "NEW" in popup list
     isActive: boolean = null;
     isDev?: boolean = null; // only for dev scripts
-    devUrl?: string = null; // only for dev scripts
+    dist: string = null;
+    title?: string = null;
 
     // ToDo: Add "hasUpdate", which are used in FeatureList.tsx
 }

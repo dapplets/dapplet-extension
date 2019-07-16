@@ -19,24 +19,24 @@ export default class Injector {
 
         const modules: { name: string, version: string, clazz: any, instance: any, type: ModuleTypes }[] = [];
 
-        const enum ModuleTypes {OTHER, FEATURE, ADAPTER, RESOLVER}
+        const enum ModuleTypes { OTHER, FEATURE, ADAPTER, RESOLVER }
 
         const featureDecorator = function (name: string, version: string): Function {
-            return _moduleDecorator(name, version, ModuleTypes.FEATURE) 
+            return _moduleDecorator(name, version, ModuleTypes.FEATURE)
         }
 
         const adapterDecorator = function (name: string, version: string): Function {
-            return _moduleDecorator(name, version, ModuleTypes.ADAPTER) 
+            return _moduleDecorator(name, version, ModuleTypes.ADAPTER)
         }
 
         const resolverDecorator = function (name: string, version: string): Function {
-            return _moduleDecorator(name, version, ModuleTypes.RESOLVER) 
+            return _moduleDecorator(name, version, ModuleTypes.RESOLVER)
         }
 
         const moduleDecorator = function (name: string, version: string, moduleType: ModuleTypes): Function {
-            return _moduleDecorator(name, version, ModuleTypes.OTHER)         
+            return _moduleDecorator(name, version, ModuleTypes.OTHER)
         }
-        
+
         const _moduleDecorator = function (name: string, version: string, moduleType: ModuleTypes): Function {
             return (target: Function) => {
                 if (!modules.find(m => m.name == name && m.version == version)) {
@@ -75,7 +75,7 @@ export default class Injector {
         const core = new Core(); // ToDo: is it global for all modules?
 
         for (const script of scripts) {
-            const execScript = new Function('Feature', 'Resolver','Adapter','Module', 'Load', 'Core', 'SubscribeOptions', script);
+            const execScript = new Function('Feature', 'Resolver', 'Adapter', 'Module', 'Load', 'Core', 'SubscribeOptions', script);
             const result = execScript(featureDecorator, resolverDecorator, adapterDecorator, moduleDecorator, loadDecorator, core, SubscribeOptions);
         }
 

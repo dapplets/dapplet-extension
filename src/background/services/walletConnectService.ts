@@ -65,7 +65,6 @@ const generateUri = async () => {
  * @returns {boolean} Is connected?
  */
 const checkConnection = () => {
-    console.log("walletConnector", walletConnector);
     return walletConnector.connected;
 };
 

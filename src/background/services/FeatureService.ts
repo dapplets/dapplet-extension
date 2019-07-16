@@ -5,14 +5,13 @@ import FileRepository from '../repositories/FileRepository';
 import ManifestRepository from '../repositories/ManifestRepository';
 import SiteConfigRepository from '../repositories/SiteConfigRepository';
 import SiteConfig from '../models/SiteConfig';
-import UserScriptHelper from '../utils/UserScriptHelper';
 import Manifest from '../models/Manifest';
 import { MapperService } from 'simple-mapper';
 import GlobalConfig from '../models/GlobalConfig';
 import GlobalConfigService from './GlobalConfigService';
 import DependencyResolver from '../utils/DependencyResolver';
 import NameResolver from '../utils/NameResolver';
-import ScriptLoader from '../utils/ScriptLoader';
+import ResourceLoader from '../utils/ResourceLoader';
 
 
 export default class FeatureService {
@@ -24,8 +23,8 @@ export default class FeatureService {
     private _mapperService = new MapperService();
     private _globalConfigService = new GlobalConfigService();
     private _nameResolver = new NameResolver();
-    private _scriptLoader = new ScriptLoader();
-    private _dependencyResolver = new DependencyResolver(this._nameResolver, this._scriptLoader);
+    private _resourceLoader = new ResourceLoader();
+    private _dependencyResolver = new DependencyResolver(this._nameResolver, this._resourceLoader);
 
     async getScriptById(id: string): Promise<string> {
         // ToDo: get Feature
@@ -43,13 +42,12 @@ export default class FeatureService {
     }
 
     async getFeaturesByHostname(hostname: string): Promise<ManifestDTO[]> {
-        let siteConfig = await this._siteConfigRepository.getById(hostname);
-
         let featuresDto: ManifestDTO[] = [];
 
         const devFeatures = await this.getDevScriptsByHostname(hostname);
         featuresDto = featuresDto.concat(devFeatures);
 
+        let siteConfig = await this._siteConfigRepository.getById(hostname);
         if (!siteConfig) {
             await this.syncFeaturesByHostname(hostname);
             siteConfig = await this._siteConfigRepository.getById(hostname);
@@ -76,7 +74,7 @@ export default class FeatureService {
             dto.isNew = featureConfig.isNew;
             dto.isActive = featureConfig.isActive;
             dto.isDev = featureManifest.isDev;
-            dto.devUrl = featureManifest.devUrl;
+            dto.dist = featureManifest.dist;
 
             featuresDto.push(dto);
         }
@@ -168,12 +166,13 @@ export default class FeatureService {
         const file = new File();
         file.id = id;
         file.setData(buffer);
-        const userscript = UserScriptHelper.extractMetablock(file.data);
+        // ToDo: fix it
+        //const userscript = UserScriptHelper.extractMetablock(file.data);
 
         const metadata = {};
-        for (const key in userscript.meta) {
-            metadata[key] = userscript.meta[key][0];
-        }
+        // for (const key in userscript.meta) {
+        //     metadata[key] = userscript.meta[key][0];
+        // }
 
         const featureManifest = this._mapperService.map(Manifest, metadata);
         featureManifest.id = id;
@@ -215,19 +214,14 @@ export default class FeatureService {
         const dtos: ManifestDTO[] = [];
 
         for (const feature of activeFeatures) {
-            const uri = await this._nameResolver.resolve(feature.name, feature.version);
-            const script = await this._scriptLoader.load(uri);
-            const userscript = UserScriptHelper.extractMetablock(script);
+            const manifestUri = await this._nameResolver.resolve(feature.name, feature.version);
+            const manifestJson = await this._resourceLoader.load(manifestUri);
+            const manifest = JSON.parse(manifestJson);
 
-            const metadata = {};
-            for (const key in userscript.meta) {
-                metadata[key] = userscript.meta[key][0];
-            }
-
-            const dto = this._mapperService.map(ManifestDTO, metadata);
+            const dto = this._mapperService.map(ManifestDTO, manifest);
 
             dto.id = feature.name + '@' + feature.version;
-            dto.devUrl = uri;
+            dto.dist = new URL(dto.dist, manifestUri).href;
             dto.isDev = true;
             dto.lastFeatureId = feature.name + '@' + feature.version;
             dto.isNew = false;
@@ -244,8 +238,15 @@ export default class FeatureService {
     public async getActiveScriptsByHostname(hostname: string): Promise<string[]> {
         const activeFeatures = await this._getActiveDevFeaturesByHostname(hostname);
         const modules = await this._dependencyResolver.resolve(activeFeatures);
-        const uris = await Promise.all(modules.map(({ name, version }) => this._nameResolver.resolve(name, version)));
-        const scripts = await Promise.all(uris.map(uri => this._scriptLoader.load(uri)));
+        const manifestUris = await Promise.all(modules.map(({ name, version }) => this._nameResolver.resolve(name, version)));
+
+        const scripts = await Promise.all(manifestUris.map(async (manifestUri) => {
+            const mainfestJson = await this._resourceLoader.load(manifestUri);
+            const manifest = this._mapperService.map(Manifest, JSON.parse(mainfestJson));
+            const scriptUri = new URL(manifest.dist, manifestUri).href;
+            const script = await this._resourceLoader.load(scriptUri);
+            return script;
+        }));
 
         return scripts;
     }
@@ -261,17 +262,17 @@ export default class FeatureService {
         }
         const text = await response.text();
 
-        const config: { hostnames: { [key: string]: { [key: string]: string } }, scripts: { [key: string]: { [key: string]: string } } } = JSON.parse(text);
+        const config: { hostnames: { [key: string]: { [key: string]: string } }, modules: { [key: string]: { [key: string]: string } } } = JSON.parse(text);
 
         if (!config.hostnames[hostname]) return [];
 
-        const scripts: { name: string, version: string }[] = [];
+        const modules: { name: string, version: string }[] = [];
 
         for (const name in config.hostnames[hostname]) {
             const version = config.hostnames[hostname][name];
-            scripts.push({ name: name, version });
+            modules.push({ name: name, version });
         }
 
-        return scripts;
+        return modules;
     }
 }

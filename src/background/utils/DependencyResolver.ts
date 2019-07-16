@@ -1,10 +1,10 @@
 import NameResolver from '../utils/NameResolver';
-import ScriptLoader from '../utils/ScriptLoader';
+import ResourceLoader from './ResourceLoader';
 import { maxSatisfying } from 'semver';
 
 export default class DependencyResolver {
 
-    constructor(private _nameResolver: NameResolver, private _scriptLoader: ScriptLoader) {
+    constructor(private _nameResolver: NameResolver, private _resourceLoader: ResourceLoader) {
 
     }
 
@@ -36,11 +36,14 @@ export default class DependencyResolver {
     //ToDo: rework the _getChildDependencies and move it into Inpage
     private async _getChildDependencies(name: string, version: string): Promise<{ name: string, version: string }[]> {
 
-        const uri = await this._nameResolver.resolve(name, version);
-        const script = await this._scriptLoader.load(uri);
+        const manifestUri = await this._nameResolver.resolve(name, version);
+        const manifestJson = await this._resourceLoader.load(manifestUri);
+        const manifest = JSON.parse(manifestJson);
+        const scriptUri = new URL(manifest.dist, manifestUri).href;
+        const script = await this._resourceLoader.load(scriptUri);
 
         //const execScript = new Function('Load', 'Module', script);
-        const execScript = new Function('Load', 'Feature', 'Resolver','Adapter','Module', script);
+        const execScript = new Function('Load', 'Feature', 'Resolver', 'Adapter', 'Module', script);
 
         const dependencies: { name: string, version: string }[] = [];
 
@@ -62,9 +65,13 @@ export default class DependencyResolver {
 
         //ToDo: this code is a nasty refactoring hack. it should be eliminated completely 
         const result = execScript(loadDecorator, moduleDecorator, moduleDecorator, moduleDecorator, moduleDecorator);
-        
-        if (!publicName || publicName.name != name || publicName.version != version) {
-            console.error('Invalid public name for module');
+
+        if (!publicName) {
+            console.error(`Public name for module not found (no decorator). Requested: ${name}@${version}.`);
+            return [];
+        }
+        else if (publicName.name != name || publicName.version != version) {
+            console.error(`Invalid public name for module. Requested: ${name}@${version}. Recieved: ${publicName.name}@${publicName.version}.`);
             return [];
         }
 
