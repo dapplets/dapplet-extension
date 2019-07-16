@@ -13,7 +13,6 @@ import DependencyResolver from '../utils/DependencyResolver';
 import NameResolver from '../utils/NameResolver';
 import ResourceLoader from '../utils/ResourceLoader';
 
-
 export default class FeatureService {
 
     private _dappletRegistry = new DappletRegistry();
@@ -235,20 +234,27 @@ export default class FeatureService {
         return dtos;
     }
 
-    public async getActiveScriptsByHostname(hostname: string): Promise<string[]> {
-        const activeFeatures = await this._getActiveDevFeaturesByHostname(hostname);
-        const modules = await this._dependencyResolver.resolve(activeFeatures);
-        const manifestUris = await Promise.all(modules.map(({ name, version }) => this._nameResolver.resolve(name, version)));
 
-        const scripts = await Promise.all(manifestUris.map(async (manifestUri) => {
+    public async getActiveModulesByHostname(hostname: string) {
+        const activeFeaturesNames = await this._getActiveDevFeaturesByHostname(hostname);
+        const activeFeatures = await this._dependencyResolver.resolve(activeFeaturesNames);
+        const manifestUris = await Promise.all(activeFeatures.map(({ name, version }) => this._nameResolver.resolve(name, version)));
+
+
+        const modules = await Promise.all(manifestUris.map(async (manifestUri) => {
             const mainfestJson = await this._resourceLoader.load(manifestUri);
             const manifest = this._mapperService.map(Manifest, JSON.parse(mainfestJson));
             const scriptUri = new URL(manifest.dist, manifestUri).href;
             const script = await this._resourceLoader.load(scriptUri);
-            return script;
+            return {
+                name: manifest.name,
+                version: manifest.version,
+                script: script,
+                type: manifest.type
+            };
         }));
 
-        return scripts;
+        return modules;
     }
 
     private async _getActiveDevFeaturesByHostname(hostname: string): Promise<{ name: string, version: string }[]> {

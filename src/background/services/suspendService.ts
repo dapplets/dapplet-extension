@@ -1,4 +1,4 @@
-import Helpers from "../../utils/helpers";
+import Helpers from "../../common/helpers";
 import SiteConfigRepository from "../repositories/SiteConfigRepository";
 import SiteConfig from "../models/SiteConfig";
 import GlobalConfigService from "./GlobalConfigService";

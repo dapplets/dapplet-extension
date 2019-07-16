@@ -2,61 +2,34 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import Core from './Core';
 import { maxSatisfying } from 'semver';
 import { SubscribeOptions } from './overlay';
+import { ModuleTypes } from '../common/constants'; 
 
 export default class Injector {
 
     async init() {
         const {
-            getActiveScriptsByHostname
+            getActiveModulesByHostname
         } = await initBGFunctions(chrome);
 
         const hostname = window.location.hostname;
 
-        const scripts: string[] = await getActiveScriptsByHostname(hostname);
+        const modules: {
+            name: string,
+            version: string,
+            script: string,
+            type: ModuleTypes
+        }[] = await getActiveModulesByHostname(hostname);
 
-        if (!scripts.length) return;
+        if (!modules.length) return;
 
-
-        const modules: { name: string, version: string, clazz: any, instance: any, type: ModuleTypes }[] = [];
-
-        const enum ModuleTypes { OTHER, FEATURE, ADAPTER, RESOLVER }
-
-        const featureDecorator = function (name: string, version: string): Function {
-            return _moduleDecorator(name, version, ModuleTypes.FEATURE)
-        }
-
-        const adapterDecorator = function (name: string, version: string): Function {
-            return _moduleDecorator(name, version, ModuleTypes.ADAPTER)
-        }
-
-        const resolverDecorator = function (name: string, version: string): Function {
-            return _moduleDecorator(name, version, ModuleTypes.RESOLVER)
-        }
-
-        const moduleDecorator = function (name: string, version: string, moduleType: ModuleTypes): Function {
-            return _moduleDecorator(name, version, ModuleTypes.OTHER)
-        }
-
-        const _moduleDecorator = function (name: string, version: string, moduleType: ModuleTypes): Function {
-            return (target: Function) => {
-                if (!modules.find(m => m.name == name && m.version == version)) {
-                    modules.push({
-                        name: name,
-                        version: version,
-                        clazz: target,
-                        instance: null,
-                        type: moduleType
-                    })
-                }
-            }
-        }
+        const registry: { name: string, version: string, clazz: any, instance: any, type: ModuleTypes }[] = [];
 
         const loadDecorator = function (name: string, version: string): Function {
             return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
                 descriptor = descriptor || {};
                 descriptor.get = function (this: any): any {
                     // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
-                    const versions = modules.filter(m => m.name == name).map(m => m.version);
+                    const versions = registry.filter(m => m.name == name).map(m => m.version);
 
                     // ToDo: Should be moved to the background? 
                     // ToDo: Fetch prefix from global settings.
@@ -66,7 +39,7 @@ export default class Injector {
 
                     const maxVer = maxSatisfying(versions, range);
 
-                    return modules.find(m => m.name == name && m.version == maxVer).instance;
+                    return registry.find(m => m.name == name && m.version == maxVer).instance;
                 }
                 return descriptor;
             };
@@ -74,14 +47,27 @@ export default class Injector {
 
         const core = new Core(); // ToDo: is it global for all modules?
 
-        for (const script of scripts) {
-            const execScript = new Function('Feature', 'Resolver', 'Adapter', 'Module', 'Load', 'Core', 'SubscribeOptions', script);
-            const result = execScript(featureDecorator, resolverDecorator, adapterDecorator, moduleDecorator, loadDecorator, core, SubscribeOptions);
+        for (const module of modules) {
+            const execScript = new Function('Load', 'Core', 'SubscribeOptions', 'Module', module.script);
+
+            const result = execScript(loadDecorator, core, SubscribeOptions, () => (target: Function) => {
+                if (!registry.find(m => m.name == module.name && m.version == module.version)) {
+                    registry.push({
+                        name: module.name,
+                        version: module.version,
+                        clazz: target,
+                        instance: null,
+                        type: module.type
+                    })
+                }                
+            });
         }
 
-        for (let i = 0; i < modules.length; i++) {
+        for (let i = 0; i < registry.length; i++) {
             // feature initialization
-            modules[i].instance = new modules[i].clazz();
+            registry[i].instance = new registry[i].clazz();
         }
+
+        console.log('registry',registry);
     }
 }

@@ -1,10 +1,11 @@
 import Base from './Base';
+import { ModuleTypes } from '../../common/constants'; 
 
 export default class Manifest extends Base {
     getId = () => this.id;
     
     id: string = null;
-    type: string = null;
+    type: ModuleTypes = null;
     familyId: string = null; // ToDo: delete
     name: string = null;
     description: string = null;

@@ -1,6 +1,8 @@
+import { ModuleTypes } from '../../common/constants'; 
+
 export default class ManifestDTO {    
     id: string = null;
-    type: string = null;
+    type: ModuleTypes = null;
     familyId: string = null;
     name: string = null;
     description: string = null;

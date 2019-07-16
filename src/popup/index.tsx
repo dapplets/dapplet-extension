@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import Popup from './pages/Popup'
 import store from "./store.js";
-import Helpers from "../utils/helpers";
+import Helpers from "../common/helpers";
 import 'semantic-ui-css/semantic.min.css'
 
 async function startApp(tabs) {

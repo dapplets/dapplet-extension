@@ -39,11 +39,16 @@ export default class DependencyResolver {
         const manifestUri = await this._nameResolver.resolve(name, version);
         const manifestJson = await this._resourceLoader.load(manifestUri);
         const manifest = JSON.parse(manifestJson);
+
+        if (manifest.name != name || manifest.version != version) {
+            console.error(`Invalid public name for module. Requested: ${name}@${version}. Recieved: ${manifest.name}@${manifest.version}.`);
+            return [];
+        }
+
         const scriptUri = new URL(manifest.dist, manifestUri).href;
         const script = await this._resourceLoader.load(scriptUri);
 
-        //const execScript = new Function('Load', 'Module', script);
-        const execScript = new Function('Load', 'Feature', 'Resolver', 'Adapter', 'Module', script);
+        const execScript = new Function('Load', 'Module', script);
 
         const dependencies: { name: string, version: string }[] = [];
 
@@ -54,26 +59,8 @@ export default class DependencyResolver {
             };
         }
 
-        let publicName: { name: string, version: string } = null;
-
-        function moduleDecorator(name: string, version: string): Function {
-            publicName = { name, version };
-            return (target: Function) => {
-                return;
-            }
-        }
-
         //ToDo: this code is a nasty refactoring hack. it should be eliminated completely 
-        const result = execScript(loadDecorator, moduleDecorator, moduleDecorator, moduleDecorator, moduleDecorator);
-
-        if (!publicName) {
-            console.error(`Public name for module not found (no decorator). Requested: ${name}@${version}.`);
-            return [];
-        }
-        else if (publicName.name != name || publicName.version != version) {
-            console.error(`Invalid public name for module. Requested: ${name}@${version}. Recieved: ${publicName.name}@${publicName.version}.`);
-            return [];
-        }
+        const result = execScript(loadDecorator, () => {});
 
         return dependencies;
     }
