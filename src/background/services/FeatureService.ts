@@ -243,14 +243,15 @@ export default class FeatureService {
 
         const modules = await Promise.all(manifestUris.map(async (manifestUri) => {
             const mainfestJson = await this._resourceLoader.load(manifestUri);
-            const manifest = this._mapperService.map(Manifest, JSON.parse(mainfestJson));
+            const manifest = JSON.parse(mainfestJson);
             const scriptUri = new URL(manifest.dist, manifestUri).href;
             const script = await this._resourceLoader.load(scriptUri);
             return {
                 name: manifest.name,
                 version: manifest.version,
                 script: script,
-                type: manifest.type
+                type: manifest.type,
+                manifest: manifest
             };
         }));
 

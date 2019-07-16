@@ -45,22 +45,12 @@ export default class DependencyResolver {
             return [];
         }
 
-        const scriptUri = new URL(manifest.dist, manifestUri).href;
-        const script = await this._resourceLoader.load(scriptUri);
+        if (!manifest.dependencies) return [];
 
-        const execScript = new Function('Load', 'Module', script);
-
-        const dependencies: { name: string, version: string }[] = [];
-
-        function loadDecorator(name: string, version: string): Function {
-            dependencies.push({ name, version });
-            return (target, propertyKey: string, descriptor: PropertyDescriptor) => {
-                return;
-            };
-        }
-
-        //ToDo: this code is a nasty refactoring hack. it should be eliminated completely 
-        const result = execScript(loadDecorator, () => {});
+        const dependencies = Object.getOwnPropertyNames(manifest.dependencies).map(n => ({
+            name: n,
+            version: manifest.dependencies[n]
+        }));
 
         return dependencies;
     }
