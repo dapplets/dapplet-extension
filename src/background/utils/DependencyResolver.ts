@@ -9,21 +9,22 @@ export default class DependencyResolver {
     }
 
 
-    public async resolve(modules: { name: string, version: string }[]): Promise<{ name: string, version: string }[]> {
+    public async resolve(modules: { name: string, version: string, branch?: string }[]): Promise<{ name: string, version: string, branch: string }[]> {
 
         // ToDo: Add dependency optimizer
         // Search for the following topics: 
         // 1. Topological Sorting
         // 2. Dependency Resolution Algorithm
 
-        let dependencies = [...modules];
+        let dependencies = [...modules.map(({ name, version, branch }) => ({ name, version, branch: !branch ? "default" : branch }))];
 
         for (let i = 0; i < dependencies.length; i++) {
             const parent = dependencies[i];
-            const moduleDeps = await this._getChildDependencies(parent.name, parent.version);
-            const optimizedDeps = await Promise.all(moduleDeps.map(d => this._optimizeDependency(d.name, d.version)));
+
+            const moduleDeps = await this.getChildDependencies(parent.name, parent.version, parent.branch);
+            const optimizedDeps = await Promise.all(moduleDeps.map(d => this._optimizeDependency(d.name, d.version, d.branch)));
             for (const dep of optimizedDeps) {
-                if (!dependencies.find(d => d.name == dep.name && d.version == dep.version)) {
+                if (!dependencies.find(d => d.name == dep.name && d.version == dep.version && d.branch == dep.branch)) {
                     dependencies.push(dep);
                 }
             }
@@ -34,14 +35,14 @@ export default class DependencyResolver {
     }
 
     //ToDo: rework the _getChildDependencies and move it into Inpage
-    private async _getChildDependencies(name: string, version: string): Promise<{ name: string, version: string }[]> {
+    public async getChildDependencies(name: string, version: string, branch: string = "default"): Promise<{ name: string, version: string, branch: string }[]> {
 
-        const manifestUri = await this._nameResolver.resolve(name, version);
+        const manifestUri = await this._nameResolver.resolve(name, version, branch);
         const manifestJson = await this._resourceLoader.load(manifestUri);
         const manifest = JSON.parse(manifestJson);
 
-        if (manifest.name != name || manifest.version != version) {
-            console.error(`Invalid public name for module. Requested: ${name}@${version}. Recieved: ${manifest.name}@${manifest.version}.`);
+        if (manifest.name != name || manifest.version != version || manifest.branch != branch) {
+            console.error(`Invalid public name for module. Requested: ${name}#${branch}@${version}. Recieved: ${manifest.name}#${manifest.branch}@${manifest.version}.`);
             return [];
         }
 
@@ -49,19 +50,20 @@ export default class DependencyResolver {
 
         const dependencies = Object.getOwnPropertyNames(manifest.dependencies).map(n => ({
             name: n,
+            branch: "default", // ToDo: should we store branch name inside manifest's dependencies?
             version: manifest.dependencies[n]
         }));
 
         return dependencies;
     }
 
-    private async _optimizeDependency(name: string, version: string): Promise<{ name: string, version: string }> {
+    private async _optimizeDependency(name: string, version: string, branch: string = "default"): Promise<{ name: string, version: string, branch: string }> {
         // ToDo: Fetch prefix from global settings.
         // ToDo: Replace '>=' to '^'
         const prefix = '>='; // https://devhints.io/semver
         const range = prefix + version;
 
-        const allVersions = await this._nameResolver.getVersionsByName(name);
+        const allVersions = await this._nameResolver.getVersionsByName(name, branch);
         const optimizedVersion = maxSatisfying(allVersions, range);
 
         if (version != optimizedVersion) {
@@ -70,6 +72,7 @@ export default class DependencyResolver {
 
         return {
             name: name,
+            branch: branch,
             version: optimizedVersion
         };
     }

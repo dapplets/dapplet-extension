@@ -5,6 +5,7 @@ export default class ManifestDTO {
     type: ModuleTypes = null;
     familyId: string = null;
     name: string = null;
+    branch: string = null;
     description: string = null;
     author: string = null;
     version: string = null;

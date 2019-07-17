@@ -6,23 +6,23 @@ export default class NameResolver {
     private _rootUrl: string = null;
     private _globalConfigService = new GlobalConfigService();
 
-    public async resolve(name: string, version: string): Promise<string> {
-        return await this._resolveByDevConfig(name, version);
+    public async resolve(name: string, version: string, branch: string = "default"): Promise<string> {
+        return await this._resolveByDevConfig(name, version, branch);
     }
 
-    public async getVersionsByName(name: string) : Promise<string[]> {
+    public async getVersionsByName(name: string, branch: string = "default") : Promise<string[]> {
         await this._cacheDevConfig();
-        const versions = Object.keys(this._devConfig.modules[name]);
+        const versions = Object.keys(this._devConfig.modules[name][branch]);
         return versions;
     }
 
 
-    private async _resolveByDevConfig(name: string, version: string): Promise<string> {
+    private async _resolveByDevConfig(name: string, version: string, branch: string = "default"): Promise<string> {
         await this._cacheDevConfig();
 
-        if (!this._devConfig.modules[name] || !this._devConfig.modules[name][version]) return null;
+        if (!this._devConfig.modules[name] || !this._devConfig.modules[name][branch] || !this._devConfig.modules[name][branch][version]) return null;
 
-        const uri = this._rootUrl + '/' + this._devConfig.modules[name][version];
+        const uri = this._rootUrl + '/' + this._devConfig.modules[name][branch][version];
 
         return uri;
     }

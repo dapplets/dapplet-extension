@@ -8,6 +8,7 @@ export default class Manifest extends Base {
     type: ModuleTypes = null;
     familyId: string = null; // ToDo: delete
     name: string = null;
+    branch: string = null;
     description: string = null;
     author: string = null;
     version: string = null;

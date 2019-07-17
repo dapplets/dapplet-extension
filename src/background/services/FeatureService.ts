@@ -238,27 +238,35 @@ export default class FeatureService {
     public async getActiveModulesByHostname(hostname: string) {
         const activeFeaturesNames = await this._getActiveDevFeaturesByHostname(hostname);
         const activeFeatures = await this._dependencyResolver.resolve(activeFeaturesNames);
-        const manifestUris = await Promise.all(activeFeatures.map(({ name, version }) => this._nameResolver.resolve(name, version)));
+        const loadedModules = await this._loadModules(activeFeatures);
+        return loadedModules;
+    }
+    
+    public async getChildDependencies(name: string, branch: string, version: string) {
+        console.log('getChildDependencies', {name, branch, version});
+        const activeFeatures = await this._dependencyResolver.resolve([{name, branch, version}]);
+        const loadedModules = await this._loadModules(activeFeatures);
+        return loadedModules;
+    }
 
+    public async _loadModules(modules: { name: string, branch: string, version: string }[]) {
+        const manifestUris = await Promise.all(modules.map(({ name, version, branch }) => this._nameResolver.resolve(name, version, branch)));
 
-        const modules = await Promise.all(manifestUris.map(async (manifestUri) => {
+        const loadedModules = await Promise.all(manifestUris.map(async (manifestUri) => {
             const mainfestJson = await this._resourceLoader.load(manifestUri);
             const manifest = JSON.parse(mainfestJson);
             const scriptUri = new URL(manifest.dist, manifestUri).href;
             const script = await this._resourceLoader.load(scriptUri);
             return {
-                name: manifest.name,
-                version: manifest.version,
                 script: script,
-                type: manifest.type,
                 manifest: manifest
             };
         }));
 
-        return modules;
+        return loadedModules;
     }
 
-    private async _getActiveDevFeaturesByHostname(hostname: string): Promise<{ name: string, version: string }[]> {
+    private async _getActiveDevFeaturesByHostname(hostname: string): Promise<{ name: string, version: string, branch: string }[]> {
         const { devConfigUrl } = await this._globalConfigService.get();
         if (!devConfigUrl) return [];
 
@@ -273,11 +281,11 @@ export default class FeatureService {
 
         if (!config.hostnames[hostname]) return [];
 
-        const modules: { name: string, version: string }[] = [];
+        const modules: { name: string, version: string, branch: string }[] = [];
 
         for (const name in config.hostnames[hostname]) {
             const version = config.hostnames[hostname][name];
-            modules.push({ name: name, version });
+            modules.push({ name, version, branch: "default" });
         }
 
         return modules;

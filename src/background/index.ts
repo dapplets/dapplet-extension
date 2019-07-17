@@ -40,6 +40,7 @@ chrome.runtime.onMessage.addListener(
     deactivateFeature: (id, hostname) => (new FeatureService()).deactivateFeature(id, hostname),
     getDevScriptsByHostname: (hostname) => (new FeatureService()).getDevScriptsByHostname(hostname),
     getActiveModulesByHostname: (hostname) => (new FeatureService()).getActiveModulesByHostname(hostname),
+    getChildDependencies: (name, branch, version) => (new FeatureService()).getChildDependencies(name, branch, version),
 
     // GlobalConfigService
     getGlobalConfig: () => (new GlobalConfigService()).get(),

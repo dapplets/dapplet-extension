@@ -8,17 +8,23 @@ export default class Injector {
 
     async init() {
         const {
-            getActiveModulesByHostname
+            getActiveModulesByHostname,
+            getChildDependencies
         } = await initBGFunctions(chrome);
 
         const hostname = window.location.hostname;
 
         const modules: {
-            name: string,
-            version: string,
             script: string,
-            type: ModuleTypes,
-            manifest: any
+            manifest: {
+                name: string,
+                branch: string,
+                version: string,
+                type: ModuleTypes,
+                dependencies: {
+                    [name: string]: string
+                }
+            }
         }[] = await getActiveModulesByHostname(hostname);
 
         console.log('modules', modules);
@@ -29,42 +35,61 @@ export default class Injector {
 
         const core = new Core(); // ToDo: is it global for all modules?
 
-        for (const module of modules) {
-            const execScript = new Function('Core', 'SubscribeOptions', 'Load', 'Injectable', module.script);
-
-            const loadDecorator = (name: string) => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
-                descriptor = descriptor || {};
-                descriptor.get = function (this: any): any {
-                    // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
-                    const versions = registry.filter(m => m.name == name).map(m => m.version);
-
-                    // ToDo: Should be moved to the background? 
-                    // ToDo: Fetch prefix from global settings.
-                    // ToDo: Replace '>=' to '^'
-                    const prefix = '>='; // https://devhints.io/semver
-                    const range = prefix + module.manifest.dependencies[name];
-
-                    const maxVer = maxSatisfying(versions, range);
-
-                    return registry.find(m => m.name == name && m.version == maxVer).instance;
+        const processModules = async (modules) => {
+            for (const module of modules) {
+                const execScript = new Function('Core', 'SubscribeOptions', 'Load', 'Injectable', module.script);
+    
+                if (module.manifest.type == ModuleTypes.Resolver) {
+                    let branch = null;
+                    const loadDecorator = () => { };
+                    const injectableDecorator = (constructor) => {
+                        const resolver = new constructor();
+                        branch = resolver.getBranch();
+                    };
+    
+                    execScript(core, SubscribeOptions, loadDecorator, injectableDecorator);
+    
+                    console.log('branch', branch);
+                    const missingDependencies = await getChildDependencies(module.manifest.name, branch, module.manifest.version);
+                    await processModules(missingDependencies);
+                } else {
+                    const injectableDecorator = (constructor: Function) => {
+                        if (!registry.find(m => m.name == module.manifest.name && m.version == module.manifest.version)) {
+                            registry.push({
+                                name: module.manifest.name,
+                                version: module.manifest.version,
+                                clazz: constructor,
+                                instance: null,
+                                type: module.manifest.type
+                            });
+                        }
+                    };
+    
+                    const loadDecorator = (name: string) => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
+                        descriptor = descriptor || {};
+                        descriptor.get = function (this: any): any {
+                            // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
+                            const versions = registry.filter(m => m.name == name).map(m => m.version);
+    
+                            // ToDo: Should be moved to the background? 
+                            // ToDo: Fetch prefix from global settings.
+                            // ToDo: Replace '>=' to '^'
+                            const prefix = '>='; // https://devhints.io/semver
+                            const range = prefix + module.manifest.dependencies[name];
+    
+                            const maxVer = maxSatisfying(versions, range);
+    
+                            return registry.find(m => m.name == name && m.version == maxVer).instance;
+                        }
+                        return descriptor;
+                    };
+    
+                    execScript(core, SubscribeOptions, loadDecorator, injectableDecorator);
                 }
-                return descriptor;
-            };
-
-            const injectableDecorator = (constructor: Function) => {
-                if (!registry.find(m => m.name == module.name && m.version == module.version)) {
-                    registry.push({
-                        name: module.name,
-                        version: module.version,
-                        clazz: constructor,
-                        instance: null,
-                        type: module.type
-                    });
-                }
-            };
-
-            const result = execScript(core, SubscribeOptions, loadDecorator, injectableDecorator);
+            }
         }
+
+        await processModules(modules);
 
         for (let i = 0; i < registry.length; i++) {
             // feature initialization
