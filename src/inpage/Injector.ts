@@ -30,7 +30,7 @@ export default class Injector {
         const core = new Core(); // ToDo: is it global for all modules?
 
         for (const module of modules) {
-            const execScript = new Function('Core', 'SubscribeOptions', 'Load', 'Module', module.script);
+            const execScript = new Function('Core', 'SubscribeOptions', 'Load', 'Injectable', module.script);
 
             const loadDecorator = (name: string) => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
                 descriptor = descriptor || {};
@@ -51,19 +51,19 @@ export default class Injector {
                 return descriptor;
             };
 
-            const moduleDecorator = () => (target: Function) => {
+            const injectableDecorator = (constructor: Function) => {
                 if (!registry.find(m => m.name == module.name && m.version == module.version)) {
                     registry.push({
                         name: module.name,
                         version: module.version,
-                        clazz: target,
+                        clazz: constructor,
                         instance: null,
                         type: module.type
-                    })
+                    });
                 }
             };
 
-            const result = execScript(core, SubscribeOptions, loadDecorator, moduleDecorator);
+            const result = execScript(core, SubscribeOptions, loadDecorator, injectableDecorator);
         }
 
         for (let i = 0; i < registry.length; i++) {
