@@ -16,4 +16,10 @@ export default class Manifest extends Base {
     isDev?: boolean = null; // only for dev scripts
     dist: string = null;
     title?: string = null;
+
+    dependencies: {
+        [name: string]: string | {
+            [branch: string]: string
+        }
+    }
 }

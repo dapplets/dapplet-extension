@@ -2,6 +2,7 @@ import NameResolver from '../utils/NameResolver';
 import ResourceLoader from './ResourceLoader';
 import { maxSatisfying } from 'semver';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
+import Manifest from '../models/Manifest';
 
 export default class DependencyResolver {
 
@@ -22,7 +23,7 @@ export default class DependencyResolver {
         for (let i = 0; i < dependencies.length; i++) {
             const parent = dependencies[i];
 
-            const moduleDeps = await this.getChildDependencies(parent.name, parent.version, parent.branch);
+            const moduleDeps = await this._getChildDependencies(parent.name, parent.version, parent.branch);
             const optimizedDeps = await Promise.all(moduleDeps.map(d => this._optimizeDependency(d.name, d.version, d.branch)));
             for (const dep of optimizedDeps) {
                 if (!dependencies.find(d => d.name == dep.name && d.version == dep.version && d.branch == dep.branch)) {
@@ -36,11 +37,11 @@ export default class DependencyResolver {
     }
 
     //ToDo: rework the _getChildDependencies and move it into Inpage
-    public async getChildDependencies(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME): Promise<{ name: string, version: string, branch: string }[]> {
+    private async _getChildDependencies(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME): Promise<{ name: string, branch: string, version: string }[]> {
 
         const manifestUri = await this._nameResolver.resolve(name, version, branch);
         const manifestJson = await this._resourceLoader.load(manifestUri);
-        const manifest = JSON.parse(manifestJson);
+        const manifest: Manifest = JSON.parse(manifestJson);
 
         if (manifest.name != name || manifest.version != version || manifest.branch != branch) {
             console.error(`Invalid public name for module. Requested: ${name}#${branch}@${version}. Recieved: ${manifest.name}#${manifest.branch}@${manifest.version}.`);
@@ -49,11 +50,32 @@ export default class DependencyResolver {
 
         if (!manifest.dependencies) return [];
 
-        const dependencies = Object.getOwnPropertyNames(manifest.dependencies).map(n => ({
-            name: n,
-            branch: DEFAULT_BRANCH_NAME, // ToDo: should we store branch name inside manifest's dependencies?
-            version: manifest.dependencies[n]
-        }));
+        const dependencies: { name: string, branch: string, version: string }[] = [];
+
+        Object.getOwnPropertyNames(manifest.dependencies).forEach(name => {
+            const dependency = manifest.dependencies[name];
+
+            if (typeof dependency === "string") { // only version is specified
+                dependencies.push({
+                    name: name,
+                    branch: DEFAULT_BRANCH_NAME,
+                    version: dependency
+                });
+            } else if (typeof dependency === "object") { // branch is specified
+                if (!dependency[DEFAULT_BRANCH_NAME]) {
+                    console.error(`Default branch version is not specified.`);
+                    return;
+                }
+
+                dependencies.push({
+                    name: name,
+                    branch: DEFAULT_BRANCH_NAME,
+                    version: dependency[DEFAULT_BRANCH_NAME]
+                });                
+            } else {
+                console.error(`Invalid dependencies in manifest.`);
+            }
+        });
 
         return dependencies;
     }

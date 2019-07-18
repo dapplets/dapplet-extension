@@ -2,7 +2,7 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import Core from './Core';
 import { maxSatisfying } from 'semver';
 import { SubscribeOptions } from './overlay';
-import { ModuleTypes } from '../common/constants';
+import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
 
 export default class Injector {
 
@@ -41,6 +41,7 @@ export default class Injector {
     
                 if (module.manifest.type == ModuleTypes.Resolver) {
                     let branch = null;
+                    // ToDo: add dependency support for resolver
                     const loadDecorator = () => { };
                     const injectableDecorator = (constructor) => {
                         const resolver = new constructor();
@@ -49,7 +50,7 @@ export default class Injector {
     
                     execScript(core, SubscribeOptions, loadDecorator, injectableDecorator);
     
-                    console.log('branch', branch);
+                    console.log(`Resolver of "${module.manifest.name}" defined the "${branch}" branch`);
                     const missingDependencies = await getChildDependencies(module.manifest.name, branch, module.manifest.version);
                     await processModules(missingDependencies);
                 } else {
@@ -70,12 +71,13 @@ export default class Injector {
                         descriptor.get = function (this: any): any {
                             // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
                             const versions = registry.filter(m => m.name == name).map(m => m.version);
+                            const dependency = module.manifest.dependencies[name];
     
                             // ToDo: Should be moved to the background? 
                             // ToDo: Fetch prefix from global settings.
                             // ToDo: Replace '>=' to '^'
                             const prefix = '>='; // https://devhints.io/semver
-                            const range = prefix + module.manifest.dependencies[name];
+                            const range = prefix + (typeof dependency === "string" ? dependency : dependency[DEFAULT_BRANCH_NAME]);
     
                             const maxVer = maxSatisfying(versions, range);
     

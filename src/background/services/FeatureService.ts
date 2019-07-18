@@ -244,7 +244,6 @@ export default class FeatureService {
     }
     
     public async getChildDependencies(name: string, branch: string, version: string) {
-        console.log('getChildDependencies', {name, branch, version});
         const activeFeatures = await this._dependencyResolver.resolve([{name, branch, version}]);
         const loadedModules = await this._loadModules(activeFeatures);
         return loadedModules;
