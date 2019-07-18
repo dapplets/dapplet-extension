@@ -4,3 +4,5 @@ export const enum ModuleTypes {
     Adapter = "ADAPTER",
     Resolver = "RESOLVER"
 }
+
+export const DEFAULT_BRANCH_NAME = "default";

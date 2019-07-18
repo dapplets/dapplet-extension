@@ -1,23 +1,24 @@
 
 import GlobalConfigService from '../services/GlobalConfigService';
+import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 
 export default class NameResolver {
     private _devConfig: { hostnames: { [key: string]: { [key: string]: string } }, modules: { [key: string]: { [key: string]: string } } } = null;
     private _rootUrl: string = null;
     private _globalConfigService = new GlobalConfigService();
 
-    public async resolve(name: string, version: string, branch: string = "default"): Promise<string> {
+    public async resolve(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME): Promise<string> {
         return await this._resolveByDevConfig(name, version, branch);
     }
 
-    public async getVersionsByName(name: string, branch: string = "default") : Promise<string[]> {
+    public async getVersionsByName(name: string, branch: string = DEFAULT_BRANCH_NAME) : Promise<string[]> {
         await this._cacheDevConfig();
         const versions = Object.keys(this._devConfig.modules[name][branch]);
         return versions;
     }
 
 
-    private async _resolveByDevConfig(name: string, version: string, branch: string = "default"): Promise<string> {
+    private async _resolveByDevConfig(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME): Promise<string> {
         await this._cacheDevConfig();
 
         if (!this._devConfig.modules[name] || !this._devConfig.modules[name][branch] || !this._devConfig.modules[name][branch][version]) return null;

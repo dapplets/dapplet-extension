@@ -12,6 +12,7 @@ import GlobalConfigService from './GlobalConfigService';
 import DependencyResolver from '../utils/DependencyResolver';
 import NameResolver from '../utils/NameResolver';
 import ResourceLoader from '../utils/ResourceLoader';
+import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 
 export default class FeatureService {
 
@@ -285,7 +286,7 @@ export default class FeatureService {
 
         for (const name in config.hostnames[hostname]) {
             const version = config.hostnames[hostname][name];
-            modules.push({ name, version, branch: "default" });
+            modules.push({ name, version, branch: DEFAULT_BRANCH_NAME });
         }
 
         return modules;

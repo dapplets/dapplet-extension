@@ -1,6 +1,7 @@
 import NameResolver from '../utils/NameResolver';
 import ResourceLoader from './ResourceLoader';
 import { maxSatisfying } from 'semver';
+import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 
 export default class DependencyResolver {
 
@@ -16,7 +17,7 @@ export default class DependencyResolver {
         // 1. Topological Sorting
         // 2. Dependency Resolution Algorithm
 
-        let dependencies = [...modules.map(({ name, version, branch }) => ({ name, version, branch: !branch ? "default" : branch }))];
+        let dependencies = [...modules.map(({ name, version, branch }) => ({ name, version, branch: !branch ? DEFAULT_BRANCH_NAME : branch }))];
 
         for (let i = 0; i < dependencies.length; i++) {
             const parent = dependencies[i];
@@ -35,7 +36,7 @@ export default class DependencyResolver {
     }
 
     //ToDo: rework the _getChildDependencies and move it into Inpage
-    public async getChildDependencies(name: string, version: string, branch: string = "default"): Promise<{ name: string, version: string, branch: string }[]> {
+    public async getChildDependencies(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME): Promise<{ name: string, version: string, branch: string }[]> {
 
         const manifestUri = await this._nameResolver.resolve(name, version, branch);
         const manifestJson = await this._resourceLoader.load(manifestUri);
@@ -50,14 +51,14 @@ export default class DependencyResolver {
 
         const dependencies = Object.getOwnPropertyNames(manifest.dependencies).map(n => ({
             name: n,
-            branch: "default", // ToDo: should we store branch name inside manifest's dependencies?
+            branch: DEFAULT_BRANCH_NAME, // ToDo: should we store branch name inside manifest's dependencies?
             version: manifest.dependencies[n]
         }));
 
         return dependencies;
     }
 
-    private async _optimizeDependency(name: string, version: string, branch: string = "default"): Promise<{ name: string, version: string, branch: string }> {
+    private async _optimizeDependency(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME): Promise<{ name: string, version: string, branch: string }> {
         // ToDo: Fetch prefix from global settings.
         // ToDo: Replace '>=' to '^'
         const prefix = '>='; // https://devhints.io/semver
