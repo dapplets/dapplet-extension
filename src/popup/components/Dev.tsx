@@ -8,7 +8,7 @@ interface IDevProps {
 }
 
 interface IDevState {
-    scripts: any[];
+    features: any[];
     configUrl: any;
     isLoading: boolean;
 }
@@ -18,7 +18,7 @@ class Dev extends React.Component<IDevProps, IDevState> {
         super(props);
 
         this.state = {
-            scripts: [],
+            features: [],
             configUrl: '',
             isLoading: true
         };
@@ -26,13 +26,13 @@ class Dev extends React.Component<IDevProps, IDevState> {
 
     async componentDidMount() {
         const backgroundFunctions = await initBGFunctions(chrome);
-        const { getDevScriptsByHostname, getGlobalConfig } = backgroundFunctions;
+        const { getFeaturesByHostname, getGlobalConfig } = backgroundFunctions;
 
-        const scripts = await getDevScriptsByHostname(store.currentHostname) || [];
+        const features = await getFeaturesByHostname(store.currentHostname) || [];
         const config = await getGlobalConfig();
 
         this.setState({
-            scripts: scripts,
+            features: features.filter(f => f.isDev == true),
             configUrl: config.devConfigUrl || 'https://localhost:8080/index.json',
             isLoading: false
         });
@@ -52,7 +52,7 @@ class Dev extends React.Component<IDevProps, IDevState> {
     }
 
     render() {
-        const { scripts, configUrl, isLoading } = this.state;
+        const { features: scripts, configUrl, isLoading } = this.state;
 
         return (
             <React.Fragment>

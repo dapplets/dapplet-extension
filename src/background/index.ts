@@ -32,15 +32,11 @@ chrome.runtime.onMessage.addListener(
     transactionRejected: NotificationService.transactionRejected,
 
     // FeatureService
-    getScriptById: (id) => (new FeatureService()).getScriptById(id),
-    getActiveFeatureIdsByHostname: (hostname) => (new FeatureService()).getActiveFeatureIdsByHostname(hostname),
     getFeaturesByHostname: (hostname) => (new FeatureService()).getFeaturesByHostname(hostname),
-    syncFeaturesByHostname: (hostname) => (new FeatureService()).syncFeaturesByHostname(hostname),
     activateFeature: (id, hostname) => (new FeatureService()).activateFeature(id, hostname),
     deactivateFeature: (id, hostname) => (new FeatureService()).deactivateFeature(id, hostname),
-    getDevScriptsByHostname: (hostname) => (new FeatureService()).getDevScriptsByHostname(hostname),
     getActiveModulesByHostname: (hostname) => (new FeatureService()).getActiveModulesByHostname(hostname),
-    getChildDependencies: (name, branch, version) => (new FeatureService()).getChildDependencies(name, branch, version),
+    getChildDependencies: (modules) => (new FeatureService()).getChildDependencies(modules),
 
     // GlobalConfigService
     getGlobalConfig: () => (new GlobalConfigService()).get(),
