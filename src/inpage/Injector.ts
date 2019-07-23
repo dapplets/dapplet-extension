@@ -42,13 +42,13 @@ export default class Injector {
                 if (module.manifest.type == ModuleTypes.Resolver) {
                     let branch = null;
                     // ToDo: add dependency support for resolver
-                    const loadDecorator = () => { };
+                    const injectDecorator = () => { };
                     const injectableDecorator = (constructor) => {
                         const resolver = new constructor();
                         branch = resolver.getBranch();
                     };
     
-                    execScript(core, SubscribeOptions, loadDecorator, injectableDecorator);
+                    execScript(core, SubscribeOptions, injectDecorator, injectableDecorator);
     
                     console.log(`Resolver of "${module.manifest.name}" defined the "${branch}" branch`);
                     const missingDependencies = await getChildDependencies(module.manifest.name, branch, module.manifest.version);
