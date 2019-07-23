@@ -8,6 +8,9 @@ import GlobalConfigService from './services/GlobalConfigService';
 // ToDo: Fix dublication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
 // ToDo: Think about WalletConnectService, SuspendService etc, which looks like singletons.
+
+const featureService = new FeatureService();
+
 chrome.runtime.onMessage.addListener(
   setupMessageListener({
     // WalletConnectService
@@ -32,11 +35,11 @@ chrome.runtime.onMessage.addListener(
     transactionRejected: NotificationService.transactionRejected,
 
     // FeatureService
-    getFeaturesByHostname: (hostname) => (new FeatureService()).getFeaturesByHostname(hostname),
-    activateFeature: (id, hostname) => (new FeatureService()).activateFeature(id, hostname),
-    deactivateFeature: (id, hostname) => (new FeatureService()).deactivateFeature(id, hostname),
-    getActiveModulesByHostname: (hostname) => (new FeatureService()).getActiveModulesByHostname(hostname),
-    getChildDependencies: (modules) => (new FeatureService()).getChildDependencies(modules),
+    getFeaturesByHostname: (hostname) => featureService.getFeaturesByHostname(hostname),
+    activateFeature: (id, hostname) => featureService.activateFeature(id, hostname),
+    deactivateFeature: (id, hostname) => featureService.deactivateFeature(id, hostname),
+    getActiveModulesByHostname: (hostname) => featureService.getActiveModulesByHostname(hostname),
+    getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
 
     // GlobalConfigService
     getGlobalConfig: () => (new GlobalConfigService()).get(),

@@ -138,13 +138,13 @@ export default class FeatureService {
     // #region Methods for Inpage
     public async getActiveModulesByHostname(hostname: string) {
         const activeFeaturesNames = await this._getActiveDevFeaturesByHostname(hostname);
-        const loadedModules = await this.getChildDependencies(activeFeaturesNames);
+        const loadedModules = await this.getModulesWithDeps(activeFeaturesNames);
         return loadedModules;
     }
 
-    public async getChildDependencies(modules: {name: string, branch: string, version: string}[]) {
-        const activeFeatures = await this._dependencyResolver.resolve(modules);
-        const loadedModules = await this._loadModules(activeFeatures);
+    public async getModulesWithDeps(modules: {name: string, branch: string, version: string}[]) {
+        const modulesWithDeps = await this._dependencyResolver.resolve(modules);
+        const loadedModules = await this._loadModules(modulesWithDeps);
         return loadedModules;
     }
 
@@ -169,6 +169,7 @@ export default class FeatureService {
         return loadedModules;
     }
 
+    // ToDo: 
     private async _getActiveDevFeaturesByHostname(hostname: string): Promise<{ name: string, version: string, branch: string }[]> {
         const { devConfigUrl } = await this._globalConfigService.get();
         if (!devConfigUrl) return [];

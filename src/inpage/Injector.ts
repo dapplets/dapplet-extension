@@ -9,7 +9,7 @@ export default class Injector {
     async init() {
         const {
             getActiveModulesByHostname,
-            getChildDependencies
+            getModulesWithDeps
         } = await initBGFunctions(chrome);
 
         const hostname = window.location.hostname;
@@ -37,21 +37,21 @@ export default class Injector {
 
         const processModules = async (modules) => {
             for (const module of modules) {
-                const execScript = new Function('Core', 'SubscribeOptions', 'Load', 'Injectable', module.script);
-
+                const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', module.script);
+    
                 if (module.manifest.type == ModuleTypes.Resolver) {
                     let branch = null;
                     // ToDo: add dependency support for resolver
-                    const loadDecorator = () => { };
+                    const injectDecorator = () => { };
                     const injectableDecorator = (constructor) => {
                         const resolver = new constructor();
                         branch = resolver.getBranch();
                     };
-
-                    execScript(core, SubscribeOptions, loadDecorator, injectableDecorator);
-
+    
+                    execScript(core, SubscribeOptions, injectDecorator, injectableDecorator);
+    
                     console.log(`Resolver of "${module.manifest.name}" defined the "${branch}" branch`);
-                    const missingDependencies = await getChildDependencies([{ name: module.manifest.name, branch, version: module.manifest.version }]);
+                    const missingDependencies = await getModulesWithDeps([{ name: module.manifest.name, branch, version: module.manifest.version }]);
                     await processModules(missingDependencies);
                 } else {
                     const injectableDecorator = (constructor: Function) => {
@@ -65,8 +65,8 @@ export default class Injector {
                             });
                         }
                     };
-
-                    const loadDecorator = (name: string) => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
+    
+                    const injectDecorator = (name: string) => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
                         descriptor = descriptor || {};
                         descriptor.get = function (this: any): any {
                             // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
@@ -85,8 +85,8 @@ export default class Injector {
                         }
                         return descriptor;
                     };
-
-                    execScript(core, SubscribeOptions, loadDecorator, injectableDecorator);
+    
+                    execScript(core, SubscribeOptions, injectDecorator, injectableDecorator);
                 }
             }
         }
