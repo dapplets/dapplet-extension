@@ -10,6 +10,7 @@ import GlobalConfigService from './services/GlobalConfigService';
 // ToDo: Think about WalletConnectService, SuspendService etc, which looks like singletons.
 
 const featureService = new FeatureService();
+const globalConfigService = new GlobalConfigService();
 
 chrome.runtime.onMessage.addListener(
   setupMessageListener({
@@ -36,14 +37,14 @@ chrome.runtime.onMessage.addListener(
 
     // FeatureService
     getFeaturesByHostname: (hostname) => featureService.getFeaturesByHostname(hostname),
-    activateFeature: (id, hostname) => featureService.activateFeature(id, hostname),
-    deactivateFeature: (id, hostname) => featureService.deactivateFeature(id, hostname),
+    activateFeature: (name, version, hostname) => featureService.activateFeature(name, version, hostname),
+    deactivateFeature: (name, version, hostname) => featureService.deactivateFeature(name, version, hostname),
     getActiveModulesByHostname: (hostname) => featureService.getActiveModulesByHostname(hostname),
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
 
     // GlobalConfigService
-    getGlobalConfig: () => (new GlobalConfigService()).get(),
-    setGlobalConfig: (config) => (new GlobalConfigService()).set(config)
+    getGlobalConfig: () => globalConfigService.get(),
+    setGlobalConfig: (config) => globalConfigService.set(config)
   })
 );
 

@@ -42,9 +42,9 @@ class FeatureList extends React.Component<IInjectorListProps, IInjectorListState
     const { activateFeature, deactivateFeature } = backgroundFunctions;
 
     if (value) {
-      await activateFeature(injector.id, store.currentHostname);
+      await activateFeature(injector.name, injector.version, store.currentHostname);
     } else {
-      await deactivateFeature(injector.id, store.currentHostname);
+      await deactivateFeature(injector.name, injector.version, store.currentHostname);
     }
 
     this.setState(state => {
@@ -71,7 +71,7 @@ class FeatureList extends React.Component<IInjectorListProps, IInjectorListState
           {(injectors.length > 0) ? (
             <List divided relaxed style={{ width: 350 }}>
               {injectors.map(injector => (
-                <List.Item key={injector.id} style={{ overflow: "hidden" }}>
+                <List.Item key={injector.name} style={{ overflow: "hidden" }}>
                   <List.Content style={{ width: 45, float: "left" }}>
                     <div>
                       <Image
@@ -107,7 +107,7 @@ class FeatureList extends React.Component<IInjectorListProps, IInjectorListState
                             this.handleSwitchChange(injector, !injector.isActive)
                           }
                           checked={injector.isActive}
-                          disabled={injector.isDev}
+                          // disabled={injector.isDev}
                         />
                       </List.Content>
                     )}

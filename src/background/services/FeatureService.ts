@@ -39,53 +39,53 @@ export default class FeatureService {
         return featuresDto;
     }
 
-    async activateFeature(id, hostname): Promise<void> {
-        const featureManifest = await this._manifestRepository.getById(id);
+    async activateFeature(name, version, hostname): Promise<void> {
         const config = await this._siteConfigRepository.getById(hostname);
 
-        // TODO: null checking
-
-        config.featureFamilies[featureManifest.familyId].isActive = true;
+        config.activeFeatures[name] = {
+            version,
+            isActive: true
+        };
 
         await this._siteConfigRepository.update(config);
 
-        // ToDo: save file to storage
         // ToDo: fire activate event to inpage module
     }
 
-    async deactivateFeature(id, hostname): Promise<void> {
-        const featureManifest = await this._manifestRepository.getById(id);
+    async deactivateFeature(name, version, hostname): Promise<void> {
         const config = await this._siteConfigRepository.getById(hostname);
 
-        // ToDo: null checking
-
-        config.featureFamilies[featureManifest.familyId].isActive = false;
+        config.activeFeatures[name] = {
+            version,
+            isActive: false
+        };
 
         await this._siteConfigRepository.update(config);
 
-        // ToDo: remove file from storage
         // ToDo: fire deactivate event to inpage module
     }
 
     async getDevFeaturesByHostname(hostname): Promise<ManifestDTO[]> {
 
-        const activeFeatures = await this._getActiveDevFeaturesByHostname(hostname);
+        const features = await this._getFeaturesFromDevConfig(hostname);
+
+        const config = await this._siteConfigRepository.getById(hostname);
 
         const dtos: ManifestDTO[] = [];
 
-        for (const feature of activeFeatures) {
+        for (const feature of features) {
             const manifestUri = await this._nameResolver.resolve(feature.name, feature.version);
             const manifestJson = await this._resourceLoader.load(manifestUri);
             const manifest = JSON.parse(manifestJson);
 
             const dto = this._mapperService.map(ManifestDTO, manifest);
 
-            dto.id = feature.name + '@' + feature.version;
+            dto.id = feature.name + '@' + feature.version; // ToDo: remove
             dto.dist = new URL(dto.dist, manifestUri).href;
             dto.isDev = true;
-            dto.lastFeatureId = feature.name + '@' + feature.version;
+            dto.lastFeatureId = feature.name + '@' + feature.version; // ToDo: remove?
             dto.isNew = false;
-            dto.isActive = true;
+            dto.isActive = config.activeFeatures[feature.name] && config.activeFeatures[feature.name].isActive;
             dto.familyId = feature.name;
             dto.version = feature.version;
 
@@ -137,8 +137,9 @@ export default class FeatureService {
 
     // #region Methods for Inpage
     public async getActiveModulesByHostname(hostname: string) {
-        const activeFeaturesNames = await this._getActiveDevFeaturesByHostname(hostname);
-        const loadedModules = await this.getModulesWithDeps(activeFeaturesNames);
+        const featureNames = await this.getFeaturesByHostname(hostname);
+        const activeFeatureNames = featureNames.filter(f => f.isActive === true);
+        const loadedModules = await this.getModulesWithDeps(activeFeatureNames);
         return loadedModules;
     }
 
@@ -170,7 +171,7 @@ export default class FeatureService {
     }
 
     // ToDo: 
-    private async _getActiveDevFeaturesByHostname(hostname: string): Promise<{ name: string, version: string, branch: string }[]> {
+    private async _getFeaturesFromDevConfig(hostname: string): Promise<{ name: string, version: string, branch: string }[]> {
         const { devConfigUrl } = await this._globalConfigService.get();
         if (!devConfigUrl) return [];
 
