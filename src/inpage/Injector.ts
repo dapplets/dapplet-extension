@@ -37,7 +37,7 @@ export default class Injector {
 
         const processModules = async (modules) => {
             for (const module of modules) {
-                const execScript = new Function('Core', 'SubscribeOptions', 'Load', 'Injectable', module.script);
+                const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', module.script);
     
                 if (module.manifest.type == ModuleTypes.Resolver) {
                     let branch = null;
@@ -66,7 +66,7 @@ export default class Injector {
                         }
                     };
     
-                    const loadDecorator = (name: string) => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
+                    const injectDecorator = (name: string) => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
                         descriptor = descriptor || {};
                         descriptor.get = function (this: any): any {
                             // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
@@ -86,7 +86,7 @@ export default class Injector {
                         return descriptor;
                     };
     
-                    execScript(core, SubscribeOptions, loadDecorator, injectableDecorator);
+                    execScript(core, SubscribeOptions, injectDecorator, injectableDecorator);
                 }
             }
         }
