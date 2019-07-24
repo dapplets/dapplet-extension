@@ -42,7 +42,6 @@
     "semver": "^6.2.0",
     "simple-mapper": "^2.2.0"
   },
-  "main": "webpack.common.js",
   "directories": {
     "doc": "docs"
   },
