@@ -8,6 +8,10 @@ import GlobalConfigService from './services/GlobalConfigService';
 // ToDo: Fix dublication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
 // ToDo: Think about WalletConnectService, SuspendService etc, which looks like singletons.
+
+const featureService = new FeatureService();
+const globalConfigService = new GlobalConfigService();
+
 chrome.runtime.onMessage.addListener(
   setupMessageListener({
     // WalletConnectService
@@ -32,19 +36,15 @@ chrome.runtime.onMessage.addListener(
     transactionRejected: NotificationService.transactionRejected,
 
     // FeatureService
-    getScriptById: (id) => (new FeatureService()).getScriptById(id),
-    getActiveFeatureIdsByHostname: (hostname) => (new FeatureService()).getActiveFeatureIdsByHostname(hostname),
-    getFeaturesByHostname: (hostname) => (new FeatureService()).getFeaturesByHostname(hostname),
-    syncFeaturesByHostname: (hostname) => (new FeatureService()).syncFeaturesByHostname(hostname),
-    activateFeature: (id, hostname) => (new FeatureService()).activateFeature(id, hostname),
-    deactivateFeature: (id, hostname) => (new FeatureService()).deactivateFeature(id, hostname),
-    getDevScriptsByHostname: (hostname) => (new FeatureService()).getDevScriptsByHostname(hostname),
-    getActiveModulesByHostname: (hostname) => (new FeatureService()).getActiveModulesByHostname(hostname),
-    getChildDependencies: (name, branch, version) => (new FeatureService()).getChildDependencies(name, branch, version),
+    getFeaturesByHostname: (hostname) => featureService.getFeaturesByHostname(hostname),
+    activateFeature: (name, version, hostname) => featureService.activateFeature(name, version, hostname),
+    deactivateFeature: (name, version, hostname) => featureService.deactivateFeature(name, version, hostname),
+    getActiveModulesByHostname: (hostname) => featureService.getActiveModulesByHostname(hostname),
+    getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
 
     // GlobalConfigService
-    getGlobalConfig: () => (new GlobalConfigService()).get(),
-    setGlobalConfig: (config) => (new GlobalConfigService()).set(config)
+    getGlobalConfig: () => globalConfigService.get(),
+    setGlobalConfig: (config) => globalConfigService.set(config)
   })
 );
 

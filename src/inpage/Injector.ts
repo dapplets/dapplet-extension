@@ -9,7 +9,7 @@ export default class Injector {
     async init() {
         const {
             getActiveModulesByHostname,
-            getChildDependencies
+            getModulesWithDeps
         } = await initBGFunctions(chrome);
 
         const hostname = window.location.hostname;
@@ -51,7 +51,7 @@ export default class Injector {
                     execScript(core, SubscribeOptions, injectDecorator, injectableDecorator);
     
                     console.log(`Resolver of "${module.manifest.name}" defined the "${branch}" branch`);
-                    const missingDependencies = await getChildDependencies(module.manifest.name, branch, module.manifest.version);
+                    const missingDependencies = await getModulesWithDeps([{ name: module.manifest.name, branch, version: module.manifest.version }]);
                     await processModules(missingDependencies);
                 } else {
                     const injectableDecorator = (constructor: Function) => {
@@ -72,15 +72,15 @@ export default class Injector {
                             // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
                             const versions = registry.filter(m => m.name == name).map(m => m.version);
                             const dependency = module.manifest.dependencies[name];
-    
+
                             // ToDo: Should be moved to the background? 
                             // ToDo: Fetch prefix from global settings.
                             // ToDo: Replace '>=' to '^'
                             const prefix = '>='; // https://devhints.io/semver
                             const range = prefix + (typeof dependency === "string" ? dependency : dependency[DEFAULT_BRANCH_NAME]);
-    
+
                             const maxVer = maxSatisfying(versions, range);
-    
+
                             return registry.find(m => m.name == name && m.version == maxVer).instance;
                         }
                         return descriptor;
