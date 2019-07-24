@@ -35,8 +35,7 @@ $/
 
 1.  Clone repo
 2.  `npm install`
-3.  `npm run watch` to run the dev task in watch mode or `npm run dev` to compile once
-4.  `npm run build` to build a production (minified) version
+3.  `npm start` to run the dev task in watch mode or `npm run dev` to compile once or `npm run build` to build a production (minified) version
 
 ## Built With
 
