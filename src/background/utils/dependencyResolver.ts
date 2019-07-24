@@ -1,8 +1,8 @@
-import NameResolver from '../utils/NameResolver';
-import ResourceLoader from './ResourceLoader';
+import NameResolver from './nameResolver';
+import ResourceLoader from './resourceLoader';
 import { maxSatisfying } from 'semver';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
-import Manifest from '../models/Manifest';
+import Manifest from '../models/manifest';
 
 export default class DependencyResolver {
 

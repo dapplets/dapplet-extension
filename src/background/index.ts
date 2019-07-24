@@ -2,8 +2,8 @@ import { setupMessageListener } from "chrome-extension-message-wrapper";
 import * as WalletConnectService from "./services/walletConnectService";
 import * as SuspendService from "./services/suspendService";
 import * as NotificationService from "./services/notificationService";
-import FeatureService from './services/FeatureService';
-import GlobalConfigService from './services/GlobalConfigService';
+import FeatureService from './services/featureService';
+import GlobalConfigService from './services/globalConfigService';
 
 // ToDo: Fix dublication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.

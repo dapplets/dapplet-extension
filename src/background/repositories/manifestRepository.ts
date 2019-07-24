@@ -1,5 +1,5 @@
-import BaseRepository from './BaseRepository'
-import Manifest from '../models/Manifest'
+import BaseRepository from './baseRepository'
+import Manifest from '../models/manifest'
 
 export default class ManifestRepository extends BaseRepository<Manifest> { 
     constructor() {

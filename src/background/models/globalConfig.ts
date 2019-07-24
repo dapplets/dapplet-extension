@@ -1,4 +1,4 @@
-import Base from './Base';
+import Base from './base';
 
 export default class GlobalConfig extends Base {
     getId = () => this.id;

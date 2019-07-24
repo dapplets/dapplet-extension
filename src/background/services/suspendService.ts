@@ -1,7 +1,7 @@
 import Helpers from "../../common/helpers";
-import SiteConfigRepository from "../repositories/SiteConfigRepository";
-import SiteConfig from "../models/SiteConfig";
-import GlobalConfigService from "./GlobalConfigService";
+import SiteConfigRepository from "../repositories/siteConfigRepository";
+import SiteConfig from "../models/siteConfig";
+import GlobalConfigService from "./globalConfigService";
 
 const _siteConfigRepository = new SiteConfigRepository();
 const _globalConfigService = new GlobalConfigService();

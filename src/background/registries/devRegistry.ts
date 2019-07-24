@@ -1,5 +1,5 @@
 import { Registry } from './registry';
-import GlobalConfigService from '../services/GlobalConfigService';
+import GlobalConfigService from '../services/globalConfigService';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 
 export class DevRegistry implements Registry {

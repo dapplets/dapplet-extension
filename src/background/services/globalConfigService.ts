@@ -1,5 +1,5 @@
-import GlobalConfigRepository from '../repositories/GlobalConfigRepository';
-import GlobalConfig from '../models/GlobalConfig';
+import GlobalConfigRepository from '../repositories/globalConfigRepository';
+import GlobalConfig from '../models/globalConfig';
 
 export default class GlobalConfigService {
     private _globalConfigRepository = new GlobalConfigRepository();

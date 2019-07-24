@@ -1,15 +1,15 @@
-import File from '../models/File';
-import ManifestDTO from '../dto/ManifestDTO';
-import DappletRegistry from '../api/DappletRegistry';
-import ManifestRepository from '../repositories/ManifestRepository';
-import SiteConfigRepository from '../repositories/SiteConfigRepository';
-import SiteConfig from '../models/SiteConfig';
-import Manifest from '../models/Manifest';
+import File from '../models/file';
+import ManifestDTO from '../dto/manifestDTO';
+import DappletRegistry from '../api/dappletRegistry';
+import ManifestRepository from '../repositories/manifestRepository';
+import SiteConfigRepository from '../repositories/siteConfigRepository';
+import SiteConfig from '../models/siteConfig';
+import Manifest from '../models/manifest';
 import { MapperService } from 'simple-mapper';
-import GlobalConfigService from './GlobalConfigService';
-import DependencyResolver from '../utils/DependencyResolver';
-import NameResolver from '../utils/NameResolver';
-import ResourceLoader from '../utils/ResourceLoader';
+import GlobalConfigService from './globalConfigService';
+import DependencyResolver from '../utils/dependencyResolver';
+import NameResolver from '../utils/nameResolver';
+import ResourceLoader from '../utils/resourceLoader';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 
 export default class FeatureService {

@@ -1,7 +1,7 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import Core from './Core';
+import Core from './core';
 import { maxSatisfying } from 'semver';
-import { SubscribeOptions } from './Overlay';
+import { SubscribeOptions } from './overlay';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
 
 export default class Injector {

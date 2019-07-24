@@ -1,7 +1,7 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { Connection } from './Connection';
+import { Connection } from './connection';
 import { OverlayManager } from "./overlayManager";
-import { Overlay, SubscribeOptions } from "./Overlay";
+import { Overlay, SubscribeOptions } from "./overlay";
 
 export default class Core {
 

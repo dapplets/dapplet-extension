@@ -1,4 +1,4 @@
-import { Overlay } from './Overlay';
+import { Overlay } from './overlay';
 
 // ToDo: clean class names
 const TabItemClass = 'pageNav__tabItem';

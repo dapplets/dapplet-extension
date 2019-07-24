@@ -1,9 +1,9 @@
 import * as React from "react";
-import FeatureList from "../components/FeatureList";
-import Header from "../components/Header";
-import Settings from "../components/Settings";
-import Dev from "../components/Dev";
-import './Popup.scss';
+import FeatureList from "../components/featureList";
+import Header from "../components/header";
+import Settings from "../components/settings";
+import Dev from "../components/dev";
+import './popup.scss';
 
 import { Tab } from "semantic-ui-react";
 

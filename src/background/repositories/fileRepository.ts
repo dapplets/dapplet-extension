@@ -1,5 +1,5 @@
-import BaseRepository from './BaseRepository'
-import File from '../models/File'
+import BaseRepository from './baseRepository'
+import File from '../models/file'
 
 export default class FileRepository extends BaseRepository<File> { 
     constructor() {
