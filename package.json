@@ -1,6 +1,6 @@
 {
   "name": "dapplet-extension",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Adds controls to legacy web sites.",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
@@ -41,5 +41,24 @@
     "semantic-ui-react": "^0.87.3",
     "semver": "^6.2.0",
     "simple-mapper": "^2.2.0"
-  }
+  },
+  "main": "webpack.common.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dapplets/dapplet-extension.git"
+  },
+  "keywords": [
+    "dapplets",
+    "extension",
+    "ethereum"
+  ],
+  "author": "Dapplets Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dapplets/dapplet-extension/issues"
+  },
+  "homepage": "https://github.com/dapplets/dapplet-extension#readme"
 }
