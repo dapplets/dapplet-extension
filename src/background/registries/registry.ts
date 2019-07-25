@@ -5,5 +5,5 @@ export interface Registry {
 
     // ToDo: add params limit: number, settings: any
     // no more than 100, order
-    getActiveFeatures(hostname: string): Promise<{ [name: string]: string[] }> // returns name + branches
+    getFeatures(hostname: string): Promise<{ [name: string]: string[] }> // returns name + branches
 }

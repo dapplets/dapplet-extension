@@ -49,7 +49,7 @@ class FeatureList extends React.Component<IInjectorListProps, IInjectorListState
 
     this.setState(state => {
       const injectors = state.injectors.map(item => {
-        if (item.id == injector.id) {
+        if (item.name == injector.name) {
           item.isActive = value;
           return item;
         } else {

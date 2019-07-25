@@ -27,9 +27,7 @@ export default class Injector {
             }
         }[] = await getActiveModulesByHostname(hostname);
 
-        console.log('modules', modules);
-
-        if (!modules.length) return;
+        if (!modules || !modules.length) return;
 
         const registry: { name: string, version: string, clazz: any, instance: any, type: ModuleTypes }[] = [];
 

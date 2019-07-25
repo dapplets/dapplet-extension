@@ -1,15 +1,12 @@
-import NameResolver from './nameResolver';
-import ResourceLoader from './resourceLoader';
+import { Storage } from '../storages/storage';
+import { Registry } from '../registries/registry';
 import { maxSatisfying } from 'semver';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 import Manifest from '../models/manifest';
 
 export default class DependencyResolver {
 
-    constructor(private _nameResolver: NameResolver, private _resourceLoader: ResourceLoader) {
-
-    }
-
+    constructor(private _registry: Registry, private _storage: Storage) { }
 
     public async resolve(modules: { name: string, version: string, branch?: string }[]): Promise<{ name: string, version: string, branch: string }[]> {
 
@@ -22,9 +19,9 @@ export default class DependencyResolver {
 
         for (let i = 0; i < dependencies.length; i++) {
             const parent = dependencies[i];
-
             const moduleDeps = await this._getChildDependencies(parent.name, parent.version, parent.branch);
             const optimizedDeps = await Promise.all(moduleDeps.map(d => this._optimizeDependency(d.name, d.version, d.branch)));
+
             for (const dep of optimizedDeps) {
                 if (!dependencies.find(d => d.name == dep.name && d.version == dep.version && d.branch == dep.branch)) {
                     dependencies.push(dep);
@@ -39,8 +36,9 @@ export default class DependencyResolver {
     //ToDo: rework the _getChildDependencies and move it into Inpage
     private async _getChildDependencies(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME): Promise<{ name: string, branch: string, version: string }[]> {
 
-        const manifestUri = await this._nameResolver.resolve(name, version, branch);
-        const manifestJson = await this._resourceLoader.load(manifestUri);
+        const manifestUri = await this._registry.resolveToUri(name, branch, version);
+        const manifestBufferArray = await this._storage.getResource(manifestUri[0]);
+        const manifestJson = String.fromCharCode.apply(null, new Uint8Array(manifestBufferArray));
         const manifest: Manifest = JSON.parse(manifestJson);
 
         if (manifest.name != name || manifest.version != version || manifest.branch != branch) {
@@ -71,7 +69,7 @@ export default class DependencyResolver {
                     name: name,
                     branch: DEFAULT_BRANCH_NAME,
                     version: dependency[DEFAULT_BRANCH_NAME]
-                });                
+                });
             } else {
                 console.error(`Invalid dependencies in manifest.`);
             }
@@ -86,7 +84,7 @@ export default class DependencyResolver {
         const prefix = '>='; // https://devhints.io/semver
         const range = prefix + version;
 
-        const allVersions = await this._nameResolver.getVersionsByName(name, branch);
+        const allVersions = await this._registry.getVersions(name, branch);
         const optimizedVersion = maxSatisfying(allVersions, range);
 
         if (version != optimizedVersion) {
