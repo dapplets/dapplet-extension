@@ -8,7 +8,7 @@ export default class ModuleManager {
 
     constructor(private _registry: Registry, private _storage: Storage) { }
 
-    public async resolve(modules: { name: string, version: string, branch?: string }[]): Promise<{ name: string, version: string, branch: string }[]> {
+    public async resolveDependencies(modules: { name: string, version: string, branch?: string }[]): Promise<{ name: string, version: string, branch: string }[]> {
 
         // ToDo: Add dependency optimizer
         // Search for the following topics: 

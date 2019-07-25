@@ -64,7 +64,7 @@ export default class FeatureService {
     }
 
     public async getModulesWithDeps(modules: { name: string, branch: string, version: string }[]) {
-        const modulesWithDeps = await this._moduleManager.resolve(modules);
+        const modulesWithDeps = await this._moduleManager.resolveDependencies(modules);
         const promises = modulesWithDeps.map(m => this._moduleManager.loadModule(m.name, m.branch, m.version));
         const loadedModules = await Promise.all(promises);
         return loadedModules;
