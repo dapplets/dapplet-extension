@@ -6,16 +6,6 @@ export default class SiteConfig extends Base {
 
     hostname: string = null;
 
-    // ToDo: remove featureFamilies
-    featureFamilies: {
-        [key: string]: {
-            currentFeatureId: string;
-            lastFeatureId: string;
-            isActive: boolean;
-            isNew: boolean;
-        };
-    } = {};
-
     activeFeatures: {
         [name: string]: {
             version: string;
@@ -24,6 +14,4 @@ export default class SiteConfig extends Base {
     } = {};
 
     paused: boolean = null;
-
-    lastSync: Date = null; // ToDo: Date isn't serializing to JSON. Need to fix this bug
 }

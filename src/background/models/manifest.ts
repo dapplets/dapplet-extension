@@ -1,21 +1,18 @@
 import Base from './base';
-import { ModuleTypes } from '../../common/constants'; 
+import { ModuleTypes } from '../../common/constants';
 
 export default class Manifest extends Base {
-    getId = () => this.id;
-    
-    id: string = null; // ToDo: remove
-    type: ModuleTypes = null;
-    familyId: string = null; // ToDo: delete
+    getId = () => `${this.name}#${this.branch}@${this.version}`;
+
     name: string = null;
     branch: string = null;
+    version: string = null;
+    type: ModuleTypes = null;
+    title: string = null;
     description: string = null;
     author: string = null;
-    version: string = null;
     icon: string = null;
-    isDev?: boolean = null; // only for dev scripts
     dist: string = null;
-    title?: string = null;
 
     dependencies: {
         [name: string]: string | {

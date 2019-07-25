@@ -4,22 +4,22 @@ import store from "../store";
 
 import { Button, Image, List, Checkbox, Segment } from "semantic-ui-react";
 
-interface IInjectorListProps {
+interface IFeaturesListProps {
 
 }
 
-interface IInjectorListState {
-  injectors: any[];
+interface IFeaturesListState {
+  features: any[];
 
   isLoading: boolean;
 }
 
-class FeatureList extends React.Component<IInjectorListProps, IInjectorListState> {
+class FeatureList extends React.Component<IFeaturesListProps, IFeaturesListState> {
   constructor(props) {
     super(props);
 
     this.state = {
-      injectors: [],
+      features: [],
       isLoading: true
     };
   }
@@ -28,61 +28,57 @@ class FeatureList extends React.Component<IInjectorListProps, IInjectorListState
     var backgroundFunctions = await initBGFunctions(chrome);
     const { getFeaturesByHostname } = backgroundFunctions;
 
-    var injectors = await getFeaturesByHostname(store.currentHostname) || [];
+    var features = await getFeaturesByHostname(store.currentHostname) || [];
 
     // TODO: loader spinner
     this.setState({
-      injectors: injectors,
+      features,
       isLoading: false
     });
   }
 
-  async handleSwitchChange(injector, value) {
+  async handleSwitchChange({ name, version }, value) {
     var backgroundFunctions = await initBGFunctions(chrome);
     const { activateFeature, deactivateFeature } = backgroundFunctions;
 
     if (value) {
-      await activateFeature(injector.name, injector.version, store.currentHostname);
+      await activateFeature(name, version, store.currentHostname);
     } else {
-      await deactivateFeature(injector.name, injector.version, store.currentHostname);
+      await deactivateFeature(name, version, store.currentHostname);
     }
 
     this.setState(state => {
-      const injectors = state.injectors.map(item => {
-        if (item.name == injector.name) {
-          item.isActive = value;
-          return item;
-        } else {
-          return item;
+      const features = state.features.map(feature => {
+        if (feature.name == name) {
+          feature.isActive = value;
         }
+        return feature;
       });
 
-      return {
-        injectors
-      };
+      return { features };
     });
   }
 
   render() {
-    const { injectors, isLoading } = this.state;
+    const { features, isLoading } = this.state;
     return (
       <React.Fragment>
         <Segment loading={isLoading}>
-          {(injectors.length > 0) ? (
+          {(features.length > 0) ? (
             <List divided relaxed style={{ width: 350 }}>
-              {injectors.map(injector => (
-                <List.Item key={injector.name} style={{ overflow: "hidden" }}>
+              {features.map(f => (
+                <List.Item key={f.name} style={{ overflow: "hidden" }}>
                   <List.Content style={{ width: 45, float: "left" }}>
                     <div>
                       <Image
                         size="mini"
                         avatar
-                        alt={injector.description}
-                        src={injector.icon}
+                        alt={f.description}
+                        src={f.icon}
                       />
                     </div>
                   </List.Content>
-                  {injector.hasUpdate ? ( // ToDo: hasUpdate isn't implemented in DTO
+                  {f.hasUpdate ? ( // ToDo: hasUpdate isn't implemented in DTO
                     <List.Content style={{ float: "right", width: 60 }}>
                       <Button
                         primary
@@ -104,33 +100,32 @@ class FeatureList extends React.Component<IInjectorListProps, IInjectorListState
                           toggle
                           style={{ marginTop: 5 }}
                           onChange={() =>
-                            this.handleSwitchChange(injector, !injector.isActive)
+                            this.handleSwitchChange(f, !f.isActive)
                           }
-                          checked={injector.isActive}
-                          // disabled={injector.isDev}
+                          checked={f.isActive}
                         />
                       </List.Content>
                     )}
                   <List.Content
                     style={{
                       marginLeft: 45,
-                      marginRight: injector.hasUpdate ? 60 : 60
+                      marginRight: f.hasUpdate ? 60 : 60
                     }}
                   >
-                    <List.Header>{injector.title}</List.Header>
+                    <List.Header>{f.title}</List.Header>
                     <List.Description style={{ color: "#666" }}>
-                      {injector.description}
+                      {f.description}
                       <br />
-                      Author: {injector.author}
+                      Author: {f.author}
                       <br />
-                      Version: {injector.version}
+                      Version: {f.version}
                     </List.Description>
                   </List.Content>
                 </List.Item>
               ))}
             </List>
           ) : (
-              <div>No available injectors for current site.</div>
+              <div>No available features for current site.</div>
             )}
         </Segment>
       </React.Fragment>

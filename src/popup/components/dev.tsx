@@ -81,10 +81,10 @@ class Dev extends React.Component<IDevProps, IDevState> {
                     {scripts.length > 0 ?
                         (<List divided verticalAlign='middle'>
                             {scripts.map(script => (
-                                <List.Item key={script.id}>
+                                <List.Item key={script.name}>
                                     <Image avatar src={script.icon || '/icon48.png'} />
                                     <List.Content>
-                                        <List.Header>{script.familyId}</List.Header>
+                                        <List.Header>{script.name}</List.Header>
                                         <List.Description>{script.version}</List.Description>
                                     </List.Content>
                                 </List.Item>
