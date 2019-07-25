@@ -4,7 +4,7 @@ import { maxSatisfying } from 'semver';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 import Manifest from '../models/manifest';
 
-export default class DependencyResolver {
+export default class ModuleManager {
 
     constructor(private _registry: Registry, private _storage: Storage) { }
 
@@ -33,13 +33,29 @@ export default class DependencyResolver {
         return dependencies.reverse();
     }
 
+    public async loadModule(name: string, branch: string, version: string): Promise<{ script: string, manifest: Manifest }> {
+        const manifest = await this.loadManifest(name, branch, version);
+        console.log('manifest.dist', manifest.dist);
+        const resource = await this._storage.getResource(manifest.dist);
+        const script = String.fromCharCode.apply(null, new Uint8Array(resource));
+
+        return { script, manifest };
+    }
+
+    public async loadManifest(name: string, branch: string, version: string): Promise<Manifest> {
+        const manifestUris = await this._registry.resolveToUri(name, branch, version);
+        const manfiestUri = manifestUris[0]; // ToDo: select uri
+        const manifestBufferArray = await this._storage.getResource(manfiestUri);
+        const manifestJson = String.fromCharCode.apply(null, new Uint8Array(manifestBufferArray));
+        const manifest: Manifest = JSON.parse(manifestJson);
+        manifest.dist = new URL(manifest.dist, manfiestUri).href; // ToDo: fix it?
+        return manifest;
+    }
+
     //ToDo: rework the _getChildDependencies and move it into Inpage
     private async _getChildDependencies(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME): Promise<{ name: string, branch: string, version: string }[]> {
 
-        const manifestUri = await this._registry.resolveToUri(name, branch, version);
-        const manifestBufferArray = await this._storage.getResource(manifestUri[0]);
-        const manifestJson = String.fromCharCode.apply(null, new Uint8Array(manifestBufferArray));
-        const manifest: Manifest = JSON.parse(manifestJson);
+        const manifest = await this.loadManifest(name, branch, version);
 
         if (manifest.name != name || manifest.version != version || manifest.branch != branch) {
             console.error(`Invalid public name for module. Requested: ${name}#${branch}@${version}. Recieved: ${manifest.name}#${manifest.branch}@${manifest.version}.`);
