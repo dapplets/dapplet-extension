@@ -1,6 +1,4 @@
 import WalletConnect from "@dapplet-base/walletconnect-browser";
-import { svgObject } from "qr-image";
-import * as NotificationService from './notificationService';
 
 const bridge = "https://bridge.walletconnect.org";
 

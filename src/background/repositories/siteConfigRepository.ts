@@ -1,6 +1,5 @@
 import BaseRepository from './baseRepository'
 import SiteConfig from '../models/siteConfig'
-import { basename } from 'path';
 
 export default class SiteConfigRepository extends BaseRepository<SiteConfig> { 
     constructor() {

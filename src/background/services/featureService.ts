@@ -6,16 +6,11 @@ import { RegistryManager } from '../registries/registryManager';
 import { StorageManager } from '../storages/storageManager';
 
 export default class FeatureService {
-
-    // #region Properties
     private _siteConfigRepository = new SiteConfigRepository();
     private _registryManager = new RegistryManager();
     private _storageManager = new StorageManager();
     private _dependencyResolver = new DependencyResolver(this._registryManager, this._storageManager);
 
-    // #endregion
-
-    // #region Methods for Popup
     async getFeaturesByHostname(hostname: string): Promise<ManifestDTO[]> {
         let featuresDto: ManifestDTO[] = [];
 
@@ -67,9 +62,6 @@ export default class FeatureService {
         // ToDo: fire deactivate event to inpage module
     }
 
-    // #endregion
-
-    // #region Methods for Inpage
     public async getActiveModulesByHostname(hostname: string) {
         const featureNames = await this.getFeaturesByHostname(hostname);
         const activeFeatureNames = featureNames.filter(f => f.isActive === true);
@@ -83,11 +75,7 @@ export default class FeatureService {
         return loadedModules;
     }
 
-    // #endregion
-
-    // #region Private methods
-
-    public async _loadModules(modules: { name: string, branch: string, version: string }[]) {
+    private async _loadModules(modules: { name: string, branch: string, version: string }[]) {
         const manifestUris = await Promise.all(modules.map(({ name, version, branch }) => this._registryManager.resolveToUri(name, branch, version)));
 
         const loadedModules = await Promise.all(manifestUris.map(async (manifestUri) => {
@@ -105,6 +93,4 @@ export default class FeatureService {
 
         return loadedModules;
     }
-
-    // #endregion
 }
