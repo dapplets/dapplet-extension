@@ -24,16 +24,11 @@ export class DevRegistry implements Registry {
         await this._cacheDevConfig();
         const { modules } = this._devConfig;
 
-        console.log('resolveToUri/0', { name, branch, version });
-        console.log('resolveToUri/1', modules);
-
         if (!modules || !modules[name] || !modules[name][branch] || !modules[name][branch][version]) {
-            console.log('resolveToUri/2 not found');
             return [];
         };
 
         const uri = new URL(this._devConfig.modules[name][branch][version], this._rootUrl).href;
-        console.log('uri/3', uri);
 
         return [uri];
     }
