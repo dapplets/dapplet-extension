@@ -35,7 +35,6 @@ export default class ModuleManager {
 
     public async loadModule(name: string, branch: string, version: string): Promise<{ script: string, manifest: Manifest }> {
         const manifest = await this.loadManifest(name, branch, version);
-        console.log('manifest.dist', manifest.dist);
         const resource = await this._storage.getResource(manifest.dist);
         const script = String.fromCharCode.apply(null, new Uint8Array(resource));
 
