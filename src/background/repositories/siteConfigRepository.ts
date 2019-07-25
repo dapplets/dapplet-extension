@@ -14,8 +14,6 @@ export default class SiteConfigRepository extends BaseRepository<SiteConfig> {
             config.hostname = id;
             config.activeFeatures = {};
             config.paused = false;
-            await super.create(config);
-            config = await super.getById(id);
         }
 
         return config;
