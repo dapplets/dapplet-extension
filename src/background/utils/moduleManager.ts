@@ -1,4 +1,4 @@
-import { Storage } from '../storages/storage';
+import { Storage } from '../moduleStorages/storage';
 import { Registry } from '../registries/registry';
 import { maxSatisfying } from 'semver';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';

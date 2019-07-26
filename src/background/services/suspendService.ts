@@ -1,9 +1,9 @@
 import Helpers from "../../common/helpers";
-import SiteConfigRepository from "../repositories/siteConfigRepository";
+import SiteConfigBrowserStorage from "../browserStorages/siteConfigBrowserStorage";
 import SiteConfig from "../models/siteConfig";
 import GlobalConfigService from "./globalConfigService";
 
-const _siteConfigRepository = new SiteConfigRepository();
+const _siteConfigRepository = new SiteConfigBrowserStorage();
 const _globalConfigService = new GlobalConfigService();
 
 const changeIcon = () => {

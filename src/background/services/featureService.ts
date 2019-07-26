@@ -1,13 +1,13 @@
 import ManifestDTO from '../dto/manifestDTO';
-import SiteConfigRepository from '../repositories/siteConfigRepository';
+import SiteConfigBrowserStorage from '../browserStorages/siteConfigBrowserStorage';
 import ModuleManager from '../utils/moduleManager';
-import { RegistryManager } from '../registries/registryManager';
-import { StorageManager } from '../storages/storageManager';
+import { RegistryAggregator } from '../registries/registryAggregator';
+import { StorageAggregator } from '../moduleStorages/moduleStorage';
 
 export default class FeatureService {
-    private _siteConfigRepository = new SiteConfigRepository();
-    private _registryManager = new RegistryManager();
-    private _storageManager = new StorageManager();
+    private _siteConfigRepository = new SiteConfigBrowserStorage();
+    private _registryManager = new RegistryAggregator();
+    private _storageManager = new StorageAggregator();
     private _moduleManager = new ModuleManager(this._registryManager, this._storageManager);
 
     async getFeaturesByHostname(hostname: string): Promise<ManifestDTO[]> {

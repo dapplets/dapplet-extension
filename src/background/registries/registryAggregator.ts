@@ -2,7 +2,7 @@ import { Registry } from './registry';
 import { DevRegistry } from './devRegistry';
 import GlobalConfigService from '../services/globalConfigService';
 
-export class RegistryManager implements Registry {
+export class RegistryAggregator implements Registry {
     private _registries: Registry[] = [];
 
     async getVersions(name: string, branch: string): Promise<string[]> {

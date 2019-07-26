@@ -1,7 +1,7 @@
 import { MapperService } from 'simple-mapper'; // ToDo like [here](https://www.npmjs.com/package/simple-mapper)
 import Base from '../models/base';
 
-export default abstract class BaseRepository<T extends Base> {
+export default abstract class BaseBrowserStorage<T extends Base> {
 
     private _mapperService = new MapperService();
 

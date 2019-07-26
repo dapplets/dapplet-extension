@@ -1,6 +1,6 @@
-import { Storage } from './storage';
+import { Storage as ModuleStorage } from './storage';
 
-export class HttpStorage implements Storage {
+export class HttpModuleStorage implements ModuleStorage {
     public async getResource(uri: string): Promise<ArrayBuffer> {
         const response = await fetch(uri, { cache: 'no-store' });
 
