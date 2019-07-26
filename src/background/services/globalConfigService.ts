@@ -1,8 +1,8 @@
-import GlobalConfigRepository from '../repositories/globalConfigRepository';
+import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserStorage';
 import GlobalConfig from '../models/globalConfig';
 
 export default class GlobalConfigService {
-    private _globalConfigRepository = new GlobalConfigRepository();
+    private _globalConfigRepository = new GlobalConfigBrowserStorage();
     private _configId: string = 'default';
 
     async get(): Promise<GlobalConfig> {

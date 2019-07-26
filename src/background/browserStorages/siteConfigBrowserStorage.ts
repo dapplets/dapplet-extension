@@ -1,7 +1,7 @@
-import BaseRepository from './baseRepository'
+import BaseBrowserStorage from './baseBrowserStorage'
 import SiteConfig from '../models/siteConfig'
 
-export default class SiteConfigRepository extends BaseRepository<SiteConfig> { 
+export default class SiteConfigBrowserStorage extends BaseBrowserStorage<SiteConfig> { 
     constructor() {
         super(SiteConfig);
     }
