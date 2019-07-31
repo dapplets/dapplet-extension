@@ -1,5 +1,6 @@
 import { Registry } from './registry';
 import { DevRegistry } from './devRegistry';
+import { TestRegistry } from './testRegistry';
 import GlobalConfigService from '../services/globalConfigService';
 
 export class RegistryAggregator implements Registry {
@@ -60,7 +61,14 @@ export class RegistryAggregator implements Registry {
         const { devConfigUrl } = await globalConfigService.get();
 
         // Add Dev Registry
-        if (devConfigUrl) this._registries.push(new DevRegistry(devConfigUrl));
+        if (devConfigUrl) {
+            if (devConfigUrl.indexOf("localhost") != -1) {
+                this._registries.push(new DevRegistry(devConfigUrl));
+            } else {
+                // Add Public Test Registry
+                this._registries.push(new TestRegistry(devConfigUrl));
+            }
+        }
 
         // ToDo: Add Prod Registry
     }
