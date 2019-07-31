@@ -62,6 +62,7 @@ export class RegistryAggregator implements Registry {
 
         // Add Dev Registry
         if (devConfigUrl) {
+            // ToDo: fix it
             if (devConfigUrl.indexOf("localhost") != -1) {
                 this._registries.push(new DevRegistry(devConfigUrl));
             } else {
