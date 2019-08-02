@@ -1,8 +1,8 @@
-import WalletConnect from "@dapplet-base/walletconnect-browser";
+import WalletConnect from "@walletconnect/browser";
 
 const bridge = "https://bridge.walletconnect.org";
 
-var walletConnector;
+var walletConnector: WalletConnect;
 
 try {
     walletConnector = new WalletConnect({
@@ -28,8 +28,18 @@ try {
  * @returns {Promise<object>} Promise represents transaction result
  */
 const loadDapplet = async (dappletId, metaTx) => {
+    const request = {
+        id: 1337,
+        jsonrpc: "2.0",
+        method: "wallet_loadDapplet",
+        params: [
+            dappletId,
+            metaTx
+        ]
+    };
+
     try {
-        const result = await walletConnector.loadDapplet(dappletId, metaTx);
+        const result = await walletConnector.sendCustomRequest(request);
         return result;
     } catch (ex) {
         console.error('loadDapplet', ex);
