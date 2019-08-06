@@ -1,4 +1,8 @@
 import WalletConnect from "@walletconnect/browser";
+import * as ethers from "ethers";
+import { DappletConfig } from "../types/dappletConfig";
+import { ctxToTxMeta as ctxToData } from "../utils/dappletFunctions";
+import { promiseTimeout } from "../utils/promiseTimeout";
 
 const bridge = "https://bridge.walletconnect.org";
 
@@ -24,28 +28,56 @@ try {
  * Runs Dapplet inside paired wallet and returns transaction result
  * @async
  * @param {string} dappletId Dapplet ID
- * @param {object} metaTx Metadata
+ * @param {object} ctx Metadata
  * @returns {Promise<object>} Promise represents transaction result
  */
-const loadDapplet = async (dappletId, metaTx) => {
+const loadDapplet = async (dappletId, ctx) => {
     const request = {
-        id: 1337,
+        //id: 1337, // ToDo: generate it
         jsonrpc: "2.0",
         method: "wallet_loadDapplet",
         params: [
             dappletId,
-            metaTx
+            ctx
         ]
     };
 
-    try {
+    // ToDo: fix it
+    const isDappletCompatibleWallet = await checkDappletCompatibility();
+
+    if (isDappletCompatibleWallet) {
+        console.log("Wallet is Dapplet compatible. Sending Dapplet transaction...");
         const result = await walletConnector.sendCustomRequest(request);
         return result;
-    } catch (ex) {
-        console.error('loadDapplet', ex);
-        return null;
+    } else {
+        console.log("Wallet is Dapplet incompatible. Creating classic transaction...");
+        const response = await fetch(`https://dapplets.github.io/dapplet-examples/${dappletId}.json`);
+        const dappletConfig: DappletConfig = await response.json();
+        const data = ctxToData(ctx, dappletConfig);
+        console.log("Sending classic transaction...");
+        const result = await walletConnector.sendTransaction({
+            from: walletConnector.accounts[0],
+            to: dappletConfig.to,
+            data: dappletConfig.signature + data.substring(2)
+        });
+        return result;
     }
 };
+
+const checkDappletCompatibility = async (): Promise<boolean> => {
+    const request = {
+        //id: 1337, // ToDo: generate it
+        jsonrpc: "2.0",
+        method: "wallet_checkDappletCompatibility"
+    };
+
+    try {
+        const result = await promiseTimeout(1000, walletConnector.sendCustomRequest(request));
+        return !!result;
+    } catch {
+        return false;
+    }
+}
 
 const disconnect = () => {
     walletConnector.killSession();

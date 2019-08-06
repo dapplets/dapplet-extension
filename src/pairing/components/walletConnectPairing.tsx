@@ -19,7 +19,6 @@ interface ISelectWalletState {
         chainId?: number,
         peerId?: string,
         peerMeta?: {
-            description?: string,
             icons?: string[],
             name?: string,
             url?: string
@@ -54,6 +53,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
             const wallet = result.params[0];
             if (wallet) {
                 this.setState({ wallet });
+                console.log({ wallet });
             }
 
             this.setState({
@@ -83,20 +83,19 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
                         <Button><Link to="/">Back</Link></Button>
                     </React.Fragment>
                 ) : (
-                    <React.Fragment>
-                        {!error ? (
-                            <div>
-                                <Header as='h2'>Wallet connected</Header>
-                                <p>Account: {wallet.accounts[0]}</p>
-                                <p>Chain ID: {wallet.chainId}</p>
-                                <p>Peer ID: {wallet.peerId}</p>
-                                <p>Peer Description: {wallet.peerMeta.description}</p>
-                                <p>Peer Name: {wallet.peerMeta.name}</p>
-                                <p>Peer URL: {wallet.peerMeta.url}</p>
-                            </div>
-                        ) : (<p>{error}</p>)}
-                    </React.Fragment>
-                )}
+                        <React.Fragment>
+                            {!error ? (
+                                <div>
+                                    <Header as='h2'>Wallet connected</Header>
+                                    <p>Account: {wallet.accounts[0]}</p>
+                                    <p>Chain ID: {wallet.chainId}</p>
+                                    <p>Peer ID: {wallet.peerId}</p>
+                                    <p>Peer Name: {wallet.peerMeta && wallet.peerMeta.name}</p>
+                                    <p>Peer URL: {wallet.peerMeta && wallet.peerMeta.url}</p>
+                                </div>
+                            ) : (<p>{error}</p>)}
+                        </React.Fragment>
+                    )}
             </Container>
         );
     }
