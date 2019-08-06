@@ -45,22 +45,26 @@ const loadDapplet = async (dappletId, ctx) => {
     // ToDo: fix it
     const isDappletCompatibleWallet = await checkDappletCompatibility();
 
-    if (isDappletCompatibleWallet) {
-        console.log("Wallet is Dapplet compatible. Sending Dapplet transaction...");
-        const result = await walletConnector.sendCustomRequest(request);
-        return result;
-    } else {
-        console.log("Wallet is Dapplet incompatible. Creating classic transaction...");
-        const response = await fetch(`https://dapplets.github.io/dapplet-examples/${dappletId}.json`);
-        const dappletConfig: DappletConfig = await response.json();
-        const data = ctxToData(ctx, dappletConfig);
-        console.log("Sending classic transaction...");
-        const result = await walletConnector.sendTransaction({
-            from: walletConnector.accounts[0],
-            to: dappletConfig.to,
-            data: dappletConfig.signature + data.substring(2)
-        });
-        return result;
+    try {
+        if (isDappletCompatibleWallet) {
+            console.log("Wallet is Dapplet compatible. Sending Dapplet transaction...");
+            const result = await walletConnector.sendCustomRequest(request);
+            return result;
+        } else {
+            console.log("Wallet is Dapplet incompatible. Creating classic transaction...");
+            const response = await fetch(`https://dapplets.github.io/dapplet-examples/${dappletId}.json`);
+            const dappletConfig: DappletConfig = await response.json();
+            const data = ctxToData(ctx, dappletConfig);
+            console.log("Sending classic transaction...");
+            const result = await walletConnector.sendTransaction({
+                from: walletConnector.accounts[0],
+                to: dappletConfig.to,
+                data: dappletConfig.signature + data.substring(2)
+            });
+            return result;
+        }
+    } catch {
+        return null;
     }
 };
 
