@@ -38,6 +38,7 @@ export class RegistryAggregator implements Registry {
         const features: { [name: string]: string[]; } = {};
 
         for (const registry of this._registries) {
+            // ToDo: an error can be thown
             const registryFeatures = await registry.getFeatures(hostname);
             for (const name in registryFeatures) {
                 // ToDo: filter features by version rules

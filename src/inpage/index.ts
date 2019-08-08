@@ -1,4 +1,3 @@
-import Injector from './injector'
+import { init } from './injector'
 
-const injector = new Injector();
-injector.init();
+init().catch((err) => console.error("[Dapplet Extension] " + err));

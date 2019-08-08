@@ -14,8 +14,8 @@ export default class FeatureService {
         let featuresDto: ManifestDTO[] = [];
 
         const config = await this._siteConfigRepository.getById(hostname);
-
         const featuresBranches = await this._registryManager.getFeatures(hostname);
+
         for (const name in featuresBranches) {
             const branch = featuresBranches[name][0]; // ToDo: select branch
             const versions = await this._registryManager.getVersions(name, branch);
@@ -64,6 +64,7 @@ export default class FeatureService {
     }
 
     public async getModulesWithDeps(modules: { name: string, branch: string, version: string }[]) {
+        if (modules.length === 0) return [];
         const modulesWithDeps = await this._moduleManager.resolveDependencies(modules);
         const promises = modulesWithDeps.map(m => this._moduleManager.loadModule(m.name, m.branch, m.version));
         const loadedModules = await Promise.all(promises);
