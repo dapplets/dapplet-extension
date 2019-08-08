@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@walletconnect/browser": "^1.0.0-beta.32",
-    "chrome-extension-message-wrapper": "^1.0.3",
+    "chrome-extension-message-wrapper": "github:dapplets/chrome-extension-message-wrapper#error-handler",
     "ethers": "^4.0.33",
     "qr-image": "^3.2.0",
     "react": "^16.8.6",

@@ -2,7 +2,7 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import store from "../store";
 
-import { Button, Image, List, Checkbox, Segment } from "semantic-ui-react";
+import { Button, Image, List, Checkbox, Segment, Message } from "semantic-ui-react";
 
 interface IFeaturesListProps {
 
@@ -10,8 +10,8 @@ interface IFeaturesListProps {
 
 interface IFeaturesListState {
   features: any[];
-
   isLoading: boolean;
+  error: string;
 }
 
 class FeatureList extends React.Component<IFeaturesListProps, IFeaturesListState> {
@@ -20,7 +20,8 @@ class FeatureList extends React.Component<IFeaturesListProps, IFeaturesListState
 
     this.state = {
       features: [],
-      isLoading: true
+      isLoading: true,
+      error: null
     };
   }
 
@@ -28,13 +29,19 @@ class FeatureList extends React.Component<IFeaturesListProps, IFeaturesListState
     var backgroundFunctions = await initBGFunctions(chrome);
     const { getFeaturesByHostname } = backgroundFunctions;
 
-    var features = await getFeaturesByHostname(store.currentHostname) || [];
-
-    // TODO: loader spinner
-    this.setState({
-      features,
-      isLoading: false
-    });
+    try {
+      const features = await getFeaturesByHostname(store.currentHostname) || [];
+      this.setState({
+        features,
+        isLoading: false,
+        error: null
+      });
+    } catch {
+      this.setState({
+        error: "The registry is not available.",
+        isLoading: false
+      });
+    }
   }
 
   async handleSwitchChange({ name, version }, value) {
@@ -60,11 +67,11 @@ class FeatureList extends React.Component<IFeaturesListProps, IFeaturesListState
   }
 
   render() {
-    const { features, isLoading } = this.state;
+    const { features, isLoading, error } = this.state;
     return (
       <React.Fragment>
         <Segment loading={isLoading}>
-          {(features.length > 0) ? (
+          {(!error) ? ((features.length > 0) ? (
             <List divided relaxed style={{ width: 350 }}>
               {features.map(f => (
                 <List.Item key={f.name} style={{ overflow: "hidden" }}>
@@ -124,9 +131,7 @@ class FeatureList extends React.Component<IFeaturesListProps, IFeaturesListState
                 </List.Item>
               ))}
             </List>
-          ) : (
-              <div>No available features for current site.</div>
-            )}
+          ) : (<div>No available features for current site.</div>)) : (<Message floating negative>{error}</Message>)}
         </Segment>
       </React.Fragment>
     );

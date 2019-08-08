@@ -11,6 +11,8 @@ interface IDevState {
     features: any[];
     configUrl: any;
     isLoading: boolean;
+    error: string;
+    connected: boolean;
 }
 
 class Dev extends React.Component<IDevProps, IDevState> {
@@ -20,7 +22,9 @@ class Dev extends React.Component<IDevProps, IDevState> {
         this.state = {
             features: [],
             configUrl: '',
-            isLoading: true
+            isLoading: true,
+            error: null,
+            connected: false
         };
     }
 
@@ -28,14 +32,23 @@ class Dev extends React.Component<IDevProps, IDevState> {
         const backgroundFunctions = await initBGFunctions(chrome);
         const { getFeaturesByHostname, getGlobalConfig } = backgroundFunctions;
 
-        const features = await getFeaturesByHostname(store.currentHostname) || [];
-        const config = await getGlobalConfig();
+        try {
+            const features = await getFeaturesByHostname(store.currentHostname) || [];
+            const config = await getGlobalConfig();
 
-        this.setState({
-            features: features.filter(f => f.isDev == true),
-            configUrl: config.devConfigUrl || 'https://localhost:8080/index.json',
-            isLoading: false
-        });
+            this.setState({
+                features: features.filter(f => f.isDev == true),
+                configUrl: config.devConfigUrl,
+                isLoading: false,
+                connected: !!config.devConfigUrl
+            });
+        } catch {
+            this.setState({
+                isLoading: false,
+                error: "The registry is not available.",
+                connected: false
+            });
+        }
     }
 
     handleSubmit = async () => {
@@ -43,6 +56,8 @@ class Dev extends React.Component<IDevProps, IDevState> {
         const { getGlobalConfig, setGlobalConfig } = backgroundFunctions;
 
         const { configUrl } = this.state;
+
+        this.setState({ isLoading: true });
 
         const config = await getGlobalConfig();
         config.devConfigUrl = configUrl;
@@ -52,7 +67,7 @@ class Dev extends React.Component<IDevProps, IDevState> {
     }
 
     render() {
-        const { features: scripts, configUrl, isLoading } = this.state;
+        const { configUrl, isLoading, error, connected } = this.state;
 
         return (
             <React.Fragment>
@@ -78,22 +93,12 @@ class Dev extends React.Component<IDevProps, IDevState> {
                         />
                     </Form>
 
-                    {scripts.length > 0 ?
-                        (<List divided verticalAlign='middle'>
-                            {scripts.map(script => (
-                                <List.Item key={script.name}>
-                                    <Image avatar src={script.icon || '/icon48.png'} />
-                                    <List.Content>
-                                        <List.Header>{script.name}</List.Header>
-                                        <List.Description>{script.version}</List.Description>
-                                    </List.Content>
-                                </List.Item>
-                            ))}
-                        </List>) :
-                        (<Message>
-                            <Message.Header>No dev features found</Message.Header>
-                            <p>Add script ID to {store.currentHostname} section of JSON configuration file</p>
-                        </Message>)}
+                    {(!isLoading) && (
+                        (error) ? (<Message floating negative>{error}</Message>) : (
+                            (connected) ? (<Message floating success>Connected to the registry successfully.</Message>) :
+                                (<Message floating warning>Enter the URL address of the registry.</Message>)
+                        )
+                    )}
                 </Segment>
 
             </React.Fragment>
