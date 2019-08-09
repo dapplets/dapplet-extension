@@ -1,5 +1,6 @@
 import { MapperService } from 'simple-mapper'; // ToDo like [here](https://www.npmjs.com/package/simple-mapper)
 import Base from '../models/base';
+import * as extension from 'extensionizer';
 
 export default abstract class BaseBrowserStorage<T extends Base> {
 
@@ -10,7 +11,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
     async getAll(filter?: (item: T) => boolean): Promise<T[]> {
         return new Promise((resolve, reject) => {
             try {
-                chrome.storage.local.get(null, result => {
+                extension.storage.local.get(null, result => {
                     const items: T[] = [];
 
                     for (const key in result) {
@@ -34,7 +35,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
         return new Promise((resolve, reject) => {
             try {
                 const key = this._TConstructor.name + ':' + id;
-                chrome.storage.local.get(key, result => {
+                extension.storage.local.get(key, result => {
                     const value = result[key];
 
                     // not found
@@ -62,7 +63,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
 
                 const key = this._TConstructor.name + ':' + item.getId();
 
-                chrome.storage.local.get(key, result => {
+                extension.storage.local.get(key, result => {
                     if (!!result[key]) {
                         reject(`Item [${key}] already exists`); // ToDo: Is it allowed to replace the object?
                         return;
@@ -70,7 +71,8 @@ export default abstract class BaseBrowserStorage<T extends Base> {
 
                     try {
                         const result = { [key]: item };
-                        chrome.storage.local.set(result, () => resolve());
+                        const clone = JSON.parse(JSON.stringify(result));
+                        extension.storage.local.set(clone, () => resolve());
                     } catch (e) {
                         reject(e);
                     }
@@ -88,7 +90,8 @@ export default abstract class BaseBrowserStorage<T extends Base> {
                 const key = this._TConstructor.name + ':' + mappedItem.getId();
 
                 const result = { [key]: mappedItem };
-                chrome.storage.local.set(result, () => resolve());
+                const clone = JSON.parse(JSON.stringify(result));
+                extension.storage.local.set(clone, () => resolve());
             } catch (e) {
                 reject(e);
             }
@@ -104,7 +107,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
                 const key = this._TConstructor.name + ':' + id;
 
                 try {
-                    chrome.storage.local.remove(key, () => resolve());
+                    extension.storage.local.remove(key, () => resolve());
                 } catch (e) {
                     reject(e);
                 }
@@ -117,7 +120,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
     async deleteAll(): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
-                chrome.storage.local.get(null, result => {
+                extension.storage.local.get(null, result => {
                     const keys: string[] = [];
 
                     for (const key in result) {
@@ -127,7 +130,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
                     }
 
                     if (keys.length > 0) {
-                        chrome.storage.local.remove(keys, () => resolve());
+                        extension.storage.local.remove(keys, () => resolve());
                     } else {
                         resolve();
                     }

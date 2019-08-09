@@ -3,12 +3,13 @@ import Core from './core';
 import { maxSatisfying } from 'semver';
 import { SubscribeOptions } from './overlay';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
+import * as extension from 'extensionizer';
 
 export async function init() {
     const {
         getActiveModulesByHostname,
         getModulesWithDeps
-    } = await initBGFunctions(chrome);
+    } = await initBGFunctions(extension);
 
     const hostname = window.location.hostname;
 

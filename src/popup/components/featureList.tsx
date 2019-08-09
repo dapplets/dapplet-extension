@@ -1,6 +1,7 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import store from "../store";
+import * as extension from 'extensionizer';
 
 import { Button, Image, List, Checkbox, Segment, Message } from "semantic-ui-react";
 
@@ -26,7 +27,7 @@ class FeatureList extends React.Component<IFeaturesListProps, IFeaturesListState
   }
 
   async componentDidMount() {
-    var backgroundFunctions = await initBGFunctions(chrome);
+    var backgroundFunctions = await initBGFunctions(extension);
     const { getFeaturesByHostname } = backgroundFunctions;
 
     try {
@@ -45,7 +46,7 @@ class FeatureList extends React.Component<IFeaturesListProps, IFeaturesListState
   }
 
   async handleSwitchChange({ name, version }, value) {
-    var backgroundFunctions = await initBGFunctions(chrome);
+    var backgroundFunctions = await initBGFunctions(extension);
     const { activateFeature, deactivateFeature } = backgroundFunctions;
 
     if (value) {

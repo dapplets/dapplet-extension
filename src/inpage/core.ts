@@ -2,6 +2,7 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Connection } from './connection';
 import { OverlayManager } from "./overlayManager";
 import { Overlay, SubscribeOptions } from "./overlay";
+import * as extension from 'extensionizer';
 
 export default class Core {
 
@@ -24,7 +25,7 @@ export default class Core {
     }
 
     public async sendWalletConnectTx(dappletId, metadata): Promise<any> {
-        const backgroundFunctions = await initBGFunctions(chrome);
+        const backgroundFunctions = await initBGFunctions(extension);
         const {
             loadDapplet,
             transactionCreated,
@@ -39,7 +40,7 @@ export default class Core {
         if (!isConnected) {
             const pairWallet = function (): Promise<void> {
                 return new Promise<void>((resolve, reject) => {
-                    const pairingUrl = chrome.extension.getURL('pairing.html');
+                    const pairingUrl = extension.extension.getURL('pairing.html');
                     const overlay = me.overlay(pairingUrl, 'Wallet');
                     overlay.open();
                     // ToDo: add timeout?

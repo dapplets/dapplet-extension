@@ -1,6 +1,7 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import store from "../store";
+import * as extension from 'extensionizer';
 
 import { Button, Divider } from "semantic-ui-react";
 
@@ -26,7 +27,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
   }
 
   async componentDidMount() {
-    var backgroundFunctions = await initBGFunctions(chrome);
+    var backgroundFunctions = await initBGFunctions(extension);
     const {
       getSuspendityByHostname,
       getSuspendityEverywhere
@@ -44,7 +45,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
   }
 
   async resumeByHostnameButtonClick() {
-    var backgroundFunctions = await initBGFunctions(chrome);
+    var backgroundFunctions = await initBGFunctions(extension);
     const { resumeByHostname } = backgroundFunctions;
     await resumeByHostname(store.currentHostname);
 
@@ -54,7 +55,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
   }
 
   async resumeEverywhereButtonClick() {
-    var backgroundFunctions = await initBGFunctions(chrome);
+    var backgroundFunctions = await initBGFunctions(extension);
     const { resumeEverywhere } = backgroundFunctions;
     await resumeEverywhere();
 

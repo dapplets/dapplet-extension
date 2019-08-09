@@ -26,9 +26,9 @@ $/
 - `src` - Main projects (the product code)
 - `src\backgorund` - Background service of extension. It works globally in browser
 - `src\inpage` - These scripts are running in the context of each viewing webpage
-- `src\options` - The settings page. It's available in chrome's settings => extensions => Injector Extension => options
+- `src\options` - The settings page. It's available in browser's settings => extensions => Injector Extension => options
 - `src\popup` - The popup window that is displayed when extension icon is clicked
-- `src\manifest.json` - The manifest of Chrome extension
+- `src\manifest.json` - The manifest of browser extension
 - `utils` - Utils for project building 
 
 ### Building

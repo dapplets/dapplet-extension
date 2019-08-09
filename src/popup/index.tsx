@@ -3,7 +3,8 @@ import * as ReactDOM from 'react-dom';
 import Popup from './pages/popup'
 import store from "./store.js";
 import Helpers from "../common/helpers";
-import 'semantic-ui-css/semantic.min.css'
+import 'semantic-ui-css/semantic.min.css';
+import * as extension from 'extensionizer';
 
 async function startApp(tabs) {
     var currentTab = tabs[0]; // there will be only one in this array
@@ -14,7 +15,7 @@ async function startApp(tabs) {
     ReactDOM.render(<Popup />, document.querySelector('#app'));
 }
 
-chrome.tabs.query({
+extension.tabs.query({
     active: true,
     currentWindow: true
 }, startApp);

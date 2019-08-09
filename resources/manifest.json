@@ -2,8 +2,10 @@
   "name": "Dapplet Extension",
   "version": "0.0.3",
   "description": "Adds controls to legacy web sites.",
+  "author": "Dapplets Team",
   "background": {
-    "page": "background.html"
+    "page": "background.html",
+    "persistent": true
   },
   "browser_action": {
     "default_popup": "popup.html",

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
+import * as extension from 'extensionizer';
 
 import { List, Button, Segment } from "semantic-ui-react";
 import { Container, Header } from 'semantic-ui-react'
@@ -40,7 +41,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
     }
 
     async componentDidMount() {
-        const backgroundFunctions = await initBGFunctions(chrome);
+        const backgroundFunctions = await initBGFunctions(extension);
         const { generateUri, waitPairing } = backgroundFunctions;
         var uri = await generateUri();
         console.log("New pairing URI generated", uri);

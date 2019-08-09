@@ -2,6 +2,7 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { List, Button, Form, Segment, Image, Message } from "semantic-ui-react";
 import store from "../store";
+import * as extension from 'extensionizer';
 
 interface IDevProps {
 
@@ -29,7 +30,7 @@ class Dev extends React.Component<IDevProps, IDevState> {
     }
 
     async componentDidMount() {
-        const backgroundFunctions = await initBGFunctions(chrome);
+        const backgroundFunctions = await initBGFunctions(extension);
         const { getFeaturesByHostname, getGlobalConfig } = backgroundFunctions;
 
         try {
@@ -52,7 +53,7 @@ class Dev extends React.Component<IDevProps, IDevState> {
     }
 
     handleSubmit = async () => {
-        const backgroundFunctions = await initBGFunctions(chrome);
+        const backgroundFunctions = await initBGFunctions(extension);
         const { getGlobalConfig, setGlobalConfig } = backgroundFunctions;
 
         const { configUrl } = this.state;

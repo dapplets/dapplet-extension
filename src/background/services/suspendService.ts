@@ -2,12 +2,13 @@ import Helpers from "../../common/helpers";
 import SiteConfigBrowserStorage from "../browserStorages/siteConfigBrowserStorage";
 import SiteConfig from "../models/siteConfig";
 import GlobalConfigService from "./globalConfigService";
+import * as extension from 'extensionizer';
 
 const _siteConfigRepository = new SiteConfigBrowserStorage();
 const _globalConfigService = new GlobalConfigService();
 
 const changeIcon = () => {
-    chrome.tabs.query({ active: true }, async function (tab) {
+    extension.tabs.query({ active: true }, async function (tab) {
         const url = tab[0].url;
         const hostname = Helpers.getHostName(url);
         const suspendityByHostname = await getSuspendityByHostname(hostname);
@@ -18,14 +19,14 @@ const changeIcon = () => {
             ? "/icon-grayed16.png"
             : "/icon16.png";
 
-        chrome.browserAction.setIcon({ path: path });
+        extension.browserAction.setIcon({ path: path });
     });
 };
 
 // TODO Errors are thrown sometimes because context menu duplication
 const updateContextMenus = () => {
-    chrome.contextMenus.removeAll(function () {
-        chrome.tabs.query({ active: true }, async function (tab) {
+    extension.contextMenus.removeAll(function () {
+        extension.tabs.query({ active: true }, async function (tab) {
             const url = tab[0].url;
             const hostname = Helpers.getHostName(url);
 
@@ -33,7 +34,7 @@ const updateContextMenus = () => {
 
             try {
                 if (suspendityByHostname) {
-                    chrome.contextMenus.create({
+                    extension.contextMenus.create({
                         id: "SUSPEND_HOSTNAME",
                         title: "Resume on this site",
                         contexts: ["browser_action"],
@@ -43,7 +44,7 @@ const updateContextMenus = () => {
                         }
                     });
                 } else {
-                    chrome.contextMenus.create({
+                    extension.contextMenus.create({
                         id: "SUSPEND_HOSTNAME",
                         title: "Suspend on this site",
                         contexts: ["browser_action"],
@@ -62,7 +63,7 @@ const updateContextMenus = () => {
 
             try {
                 if (suspendityEverywhere) {
-                    chrome.contextMenus.create({
+                    extension.contextMenus.create({
                         id: "SUSPEND_EVERYWHERE",
                         title: "Resume on all sites",
                         contexts: ["browser_action"],
@@ -72,7 +73,7 @@ const updateContextMenus = () => {
                         }
                     });
                 } else {
-                    chrome.contextMenus.create({
+                    extension.contextMenus.create({
                         id: "SUSPEND_EVERYWHERE",
                         title: "Suspend on all sites",
                         contexts: ["browser_action"],

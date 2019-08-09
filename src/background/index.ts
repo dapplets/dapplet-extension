@@ -4,6 +4,7 @@ import * as SuspendService from "./services/suspendService";
 import * as NotificationService from "./services/notificationService";
 import FeatureService from './services/featureService';
 import GlobalConfigService from './services/globalConfigService';
+import * as extension from 'extensionizer';
 
 // ToDo: Fix dublication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -12,7 +13,7 @@ import GlobalConfigService from './services/globalConfigService';
 const featureService = new FeatureService();
 const globalConfigService = new GlobalConfigService();
 
-chrome.runtime.onMessage.addListener(
+extension.runtime.onMessage.addListener(
   setupMessageListener({
     // WalletConnectService
     loadDapplet: WalletConnectService.loadDapplet,
@@ -53,18 +54,18 @@ SuspendService.changeIcon();
 SuspendService.updateContextMenus();
 
 //listen for new tab to be activated
-chrome.tabs.onActivated.addListener(function(activeInfo) {
+extension.tabs.onActivated.addListener(function(activeInfo) {
   SuspendService.changeIcon();
   SuspendService.updateContextMenus();
 });
 
 //listen for current tab to be changed
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+extension.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   SuspendService.changeIcon();
   SuspendService.updateContextMenus();
 });
 
-chrome.notifications.onClicked.addListener(function(notificationId) {
+extension.notifications.onClicked.addListener(function(notificationId) {
   if (
     notificationId &&
     notificationId.length > 2 &&
@@ -72,6 +73,6 @@ chrome.notifications.onClicked.addListener(function(notificationId) {
     notificationId[1] == "x"
   ) {
     var url = "https://rinkeby.etherscan.io/tx/" + notificationId;
-    chrome.tabs.create({ url: url });
+    extension.tabs.create({ url: url });
   }
 });

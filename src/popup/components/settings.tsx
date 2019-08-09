@@ -1,5 +1,6 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
+import * as extension from 'extensionizer';
 
 import { List, Button, Segment } from "semantic-ui-react";
 
@@ -25,7 +26,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
   }
 
   async componentDidMount() {
-    var backgroundFunctions = await initBGFunctions(chrome);
+    var backgroundFunctions = await initBGFunctions(extension);
     const { checkConnection, getChainId, getAccounts } = backgroundFunctions;
 
     var isConnected = await checkConnection();
@@ -40,7 +41,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
   }
 
   async disconnectButtonClick() {
-    var backgroundFunctions = await initBGFunctions(chrome);
+    var backgroundFunctions = await initBGFunctions(extension);
     const { disconnect } = backgroundFunctions;
     await disconnect();
     await this.componentDidMount();

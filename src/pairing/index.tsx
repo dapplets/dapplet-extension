@@ -6,6 +6,7 @@ import './index.scss';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
 import { WalletConnectPairing } from "./components/walletConnectPairing";
+import * as extension from 'extensionizer';
 
 interface IIndexProps {
 }
@@ -24,7 +25,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     }
 
     async componentDidMount() {
-        var backgroundFunctions = await initBGFunctions(chrome);
+        var backgroundFunctions = await initBGFunctions(extension);
         const { checkConnection } = backgroundFunctions;
 
         var isConnected = await checkConnection();

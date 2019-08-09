@@ -1,3 +1,5 @@
+import * as extension from 'extensionizer';
+
 const generateGuid = () => {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
         var r = (Math.random() * 16) | 0,
@@ -8,7 +10,7 @@ const generateGuid = () => {
 
 const transactionCreated = async transactionId => {
     return new Promise(function (resolve, reject) {
-        chrome.notifications.create(
+        extension.notifications.create(
             transactionId,
             {
                 type: "basic",
@@ -23,7 +25,7 @@ const transactionCreated = async transactionId => {
 
 const transactionRejected = async () => {
     return new Promise(function (resolve, reject) {
-        chrome.notifications.create(
+        extension.notifications.create(
             generateGuid(),
             {
                 type: "basic",
