@@ -53,21 +53,18 @@ export class RegistryAggregator implements Registry {
     }
 
     private async _initRegistries() {
-        // Do not initilize registries twice
-        if (this._registries.length > 0) return;
+        this._registries = [];
 
         const globalConfigService = new GlobalConfigService();
 
         // ToDo: fetch LocalConfig
         const { devConfigUrl } = await globalConfigService.get();
 
-        // Add Dev Registry
         if (devConfigUrl) {
             // ToDo: fix it
             if (devConfigUrl.indexOf("localhost:8080") != -1) {
                 this._registries.push(new DevRegistry(devConfigUrl));
             } else {
-                // Add Public Test Registry
                 this._registries.push(new TestRegistry(devConfigUrl));
             }
         }
