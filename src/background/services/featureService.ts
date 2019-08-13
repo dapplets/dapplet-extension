@@ -6,19 +6,19 @@ import { StorageAggregator } from '../moduleStorages/moduleStorage';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
-    private _registryManager = new RegistryAggregator();
-    private _storageManager = new StorageAggregator();
-    private _moduleManager = new ModuleManager(this._registryManager, this._storageManager);
+    private _registryAggregator = new RegistryAggregator();
+    private _storageAggregator = new StorageAggregator();
+    private _moduleManager = new ModuleManager(this._registryAggregator, this._storageAggregator);
 
     async getFeaturesByHostname(hostname: string): Promise<ManifestDTO[]> {
         let featuresDto: ManifestDTO[] = [];
 
         const config = await this._siteConfigRepository.getById(hostname);
-        const featuresBranches = await this._registryManager.getFeatures(hostname);
+        const featuresBranches = await this._registryAggregator.getFeatures(hostname);
 
         for (const name in featuresBranches) {
             const branch = featuresBranches[name][0]; // ToDo: select branch
-            const versions = await this._registryManager.getVersions(name, branch);
+            const versions = await this._registryAggregator.getVersions(name, branch);
             const lastVersion = versions[versions.length - 1]; // ToDo: select version
             const dto: ManifestDTO = await this._moduleManager.loadManifest(name, branch, lastVersion) as any;
 
