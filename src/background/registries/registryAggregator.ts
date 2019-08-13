@@ -64,7 +64,7 @@ export class RegistryAggregator implements Registry {
         // Add Dev Registry
         if (devConfigUrl) {
             // ToDo: fix it
-            if (devConfigUrl.indexOf("localhost") != -1) {
+            if (devConfigUrl.indexOf("localhost:8080") != -1) {
                 this._registries.push(new DevRegistry(devConfigUrl));
             } else {
                 // Add Public Test Registry
