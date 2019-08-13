@@ -54,18 +54,18 @@ SuspendService.changeIcon();
 SuspendService.updateContextMenus();
 
 //listen for new tab to be activated
-extension.tabs.onActivated.addListener(function(activeInfo) {
+extension.tabs.onActivated.addListener(function (activeInfo) {
   SuspendService.changeIcon();
   SuspendService.updateContextMenus();
 });
 
 //listen for current tab to be changed
-extension.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+extension.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   SuspendService.changeIcon();
   SuspendService.updateContextMenus();
 });
 
-extension.notifications.onClicked.addListener(function(notificationId) {
+extension.notifications.onClicked.addListener(function (notificationId) {
   if (
     notificationId &&
     notificationId.length > 2 &&
