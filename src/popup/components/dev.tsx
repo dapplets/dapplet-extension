@@ -10,7 +10,7 @@ interface IDevProps {
 
 interface IDevState {
     features: any[];
-    configUrl: any;
+    registryUrl: any;
     isLoading: boolean;
     error: string;
     connected: boolean;
@@ -22,7 +22,7 @@ class Dev extends React.Component<IDevProps, IDevState> {
 
         this.state = {
             features: [],
-            configUrl: '',
+            registryUrl: '',
             isLoading: true,
             error: null,
             connected: false
@@ -39,9 +39,9 @@ class Dev extends React.Component<IDevProps, IDevState> {
 
             this.setState({
                 features: features.filter(f => f.isDev == true),
-                configUrl: config.devConfigUrl,
+                registryUrl: config.registryUrl,
                 isLoading: false,
-                connected: !!config.devConfigUrl
+                connected: !!config.registryUrl
             });
         } catch {
             this.setState({
@@ -56,19 +56,19 @@ class Dev extends React.Component<IDevProps, IDevState> {
         const backgroundFunctions = await initBGFunctions(extension);
         const { getGlobalConfig, setGlobalConfig } = backgroundFunctions;
 
-        const { configUrl } = this.state;
+        const { registryUrl } = this.state;
 
         this.setState({ isLoading: true });
 
         const config = await getGlobalConfig();
-        config.devConfigUrl = configUrl;
+        config.registryUrl = registryUrl;
         await setGlobalConfig(config);
 
         await this.componentDidMount();
     }
 
     render() {
-        const { configUrl, isLoading, error, connected } = this.state;
+        const { registryUrl, isLoading, error, connected } = this.state;
 
         return (
             <React.Fragment>
@@ -78,9 +78,9 @@ class Dev extends React.Component<IDevProps, IDevState> {
                         <Form.Input
                             placeholder='Type URL to index.json'
                             size='mini'
-                            value={configUrl}
-                            label='Dev Config URL'
-                            onChange={(e, { value }) => this.setState({ configUrl: value })}
+                            value={registryUrl}
+                            label='Registry URL'
+                            onChange={(e, { value }) => this.setState({ registryUrl: value })}
                             action={(
                                 <React.Fragment>
                                     <Button

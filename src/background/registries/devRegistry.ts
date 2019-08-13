@@ -3,8 +3,8 @@ import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 
 export class DevRegistry implements Registry {
 
-    constructor(public devConfigUrl: string) {
-        if (!devConfigUrl) throw new Error("Config Url is required");
+    constructor(public registryUrl: string) {
+        if (!registryUrl) throw new Error("Config Url is required");
     }
 
     private _devConfig: {
@@ -52,9 +52,9 @@ export class DevRegistry implements Registry {
 
     private async _cacheDevConfig() {
         if (this._devConfig == null || this._rootUrl == null) {
-            this._rootUrl = new URL(this.devConfigUrl).origin;
+            this._rootUrl = new URL(this.registryUrl).origin;
 
-            const response = await fetch(this.devConfigUrl, { cache: 'no-store' });
+            const response = await fetch(this.registryUrl, { cache: 'no-store' });
             if (!response.ok) {
                 throw new Error("Cannot load dev config");
             }

@@ -20,7 +20,7 @@ export default class GlobalConfigService {
     async resetConfig(): Promise<void> {
         const config = new GlobalConfig();
         config.id = this._configId;
-        config.devConfigUrl = "https://test.dapplets.org/dapplet-base";
+        config.registryUrl = "https://test.dapplets.org/dapplet-base";
         
         await this._globalConfigRepository.deleteById(this._configId);
         await this._globalConfigRepository.create(config);
