@@ -1,7 +1,7 @@
 import WalletConnect from "@walletconnect/browser";
 import * as ethers from "ethers";
 import { DappletConfig } from "../types/dappletConfig";
-import { ctxToTxMeta as ctxToData } from "../utils/dappletFunctions";
+import { getTxBuilder } from "../utils/dapplets";
 import { promiseTimeout } from "../utils/promiseTimeout";
 
 const bridge = "https://bridge.walletconnect.org";
@@ -28,17 +28,17 @@ try {
  * Runs Dapplet inside paired wallet and returns transaction result
  * @async
  * @param {string} dappletId Dapplet ID
- * @param {object} ctx Metadata
+ * @param {object} txMeta Metadata
  * @returns {Promise<object>} Promise represents transaction result
  */
-const loadDapplet = async (dappletId, ctx) => {
+const loadDapplet = async (dappletId, txMeta) => {
     const request = {
         //id: 1337, // ToDo: generate it
         jsonrpc: "2.0",
         method: "wallet_loadDapplet",
         params: [
             dappletId,
-            ctx
+            txMeta
         ]
     };
 
@@ -54,14 +54,23 @@ const loadDapplet = async (dappletId, ctx) => {
             console.log("Wallet is Dapplet incompatible. Creating classic transaction...");
             const response = await fetch(`https://dapplets.github.io/dapplet-examples/${dappletId}.json`);
             const dappletConfig: DappletConfig = await response.json();
-            const data = ctxToData(ctx, dappletConfig);
-            console.log("Sending classic transaction...");
-            const result = await walletConnector.sendTransaction({
-                from: walletConnector.accounts[0],
-                to: dappletConfig.to,
-                data: dappletConfig.signature + data.substring(2)
-            });
-            return result;
+
+            for (const txName in dappletConfig.transactions) {
+                if (txName) {
+                    const tx = dappletConfig.transactions[txName];
+                    const builder = getTxBuilder(tx["@type"]);
+                    if (builder) {
+                        const builtTx = builder(tx, txMeta);
+                        console.log("Sending classic transaction...");
+                        const result = await walletConnector.sendTransaction({
+                            from: walletConnector.accounts[0],
+                            to: builtTx.to,
+                            data: builtTx.data
+                        });
+                        return result;
+                    }
+                }
+            }
         }
     } catch {
         return null;
