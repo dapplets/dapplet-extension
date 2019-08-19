@@ -42,6 +42,7 @@ extension.runtime.onMessage.addListener(
     deactivateFeature: (name, version, hostname) => featureService.deactivateFeature(name, version, hostname),
     getActiveModulesByHostname: (hostname) => featureService.getActiveModulesByHostname(hostname),
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
+    optimizeDependency: (name, branch, version) => featureService.optimizeDependency(name, branch, version),
 
     // GlobalConfigService
     getGlobalConfig: () => globalConfigService.get(),

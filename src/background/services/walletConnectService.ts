@@ -79,7 +79,6 @@ const loadDapplet = async (dappletId, txMeta) => {
 
 const checkDappletCompatibility = async (): Promise<boolean> => {
     const request = {
-        //id: 1337, // ToDo: generate it
         jsonrpc: "2.0",
         method: "wallet_checkDappletCompatibility"
     };

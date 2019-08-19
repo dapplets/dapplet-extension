@@ -70,4 +70,9 @@ export default class FeatureService {
         const loadedModules = await Promise.all(promises);
         return loadedModules;
     }
+
+    public async optimizeDependency(name: string, branch: string, version: string) {
+        // ToDo: fix this hack
+        return await this._moduleManager.optimizeDependency(name, version, branch);
+    };
 }

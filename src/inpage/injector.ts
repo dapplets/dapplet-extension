@@ -8,7 +8,8 @@ import * as extension from 'extensionizer';
 export async function init() {
     const {
         getActiveModulesByHostname,
-        getModulesWithDeps
+        getModulesWithDeps,
+        optimizeDependency
     } = await initBGFunctions(extension);
 
     const hostname = window.location.hostname;
@@ -48,7 +49,10 @@ export async function init() {
                 execScript(core, SubscribeOptions, injectDecorator, injectableDecorator);
 
                 console.log(`Resolver of "${module.manifest.name}" defined the "${branch}" branch`);
-                const missingDependencies = await getModulesWithDeps([{ name: module.manifest.name, branch, version: module.manifest.version }]);
+                console.log('not optimized', { name: module.manifest.name, branch, version: module.manifest.version });
+                const optimizedBranch = await optimizeDependency(module.manifest.name, branch, module.manifest.version);
+                console.log('optimized', optimizedBranch);
+                const missingDependencies = await getModulesWithDeps([optimizedBranch]);
                 await processModules(missingDependencies);
             } else {
                 const injectableDecorator = (constructor: Function) => {

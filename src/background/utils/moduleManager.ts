@@ -20,7 +20,7 @@ export default class ModuleManager {
         for (let i = 0; i < dependencies.length; i++) {
             const parent = dependencies[i];
             const moduleDeps = await this._getChildDependencies(parent.name, parent.version, parent.branch);
-            const optimizedDeps = await Promise.all(moduleDeps.map(d => this._optimizeDependency(d.name, d.version, d.branch)));
+            const optimizedDeps = await Promise.all(moduleDeps.map(d => this.optimizeDependency(d.name, d.version, d.branch)));
 
             for (const dep of optimizedDeps) {
                 if (!dependencies.find(d => d.name == dep.name && d.version == dep.version && d.branch == dep.branch)) {
@@ -93,7 +93,7 @@ export default class ModuleManager {
         return dependencies;
     }
 
-    private async _optimizeDependency(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME): Promise<{ name: string, version: string, branch: string }> {
+    public async optimizeDependency(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME): Promise<{ name: string, version: string, branch: string }> {
         // ToDo: Fetch prefix from global settings.
         // ToDo: Replace '>=' to '^'
         const prefix = '>='; // https://devhints.io/semver
