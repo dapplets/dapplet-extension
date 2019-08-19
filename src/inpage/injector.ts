@@ -49,9 +49,7 @@ export async function init() {
                 execScript(core, SubscribeOptions, injectDecorator, injectableDecorator);
 
                 console.log(`Resolver of "${module.manifest.name}" defined the "${branch}" branch`);
-                console.log('not optimized', { name: module.manifest.name, branch, version: module.manifest.version });
                 const optimizedBranch = await optimizeDependency(module.manifest.name, branch, module.manifest.version);
-                console.log('optimized', optimizedBranch);
                 const missingDependencies = await getModulesWithDeps([optimizedBranch]);
                 await processModules(missingDependencies);
             } else {
