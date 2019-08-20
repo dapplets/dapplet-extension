@@ -103,7 +103,7 @@ export default class ModuleManager {
         const optimizedVersion = maxSatisfying(allVersions, range);
 
         if (version != optimizedVersion) {
-            console.warn(`[Dependency Optimizer] Package "${name}" version has been upgraded from ${version} to ${optimizedVersion}.`);
+            console.warn(`[Dependency Optimizer] Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`);
         }
 
         return {
