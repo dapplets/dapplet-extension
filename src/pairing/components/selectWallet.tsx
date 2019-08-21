@@ -1,8 +1,7 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 
-import { List, Button, Segment } from "semantic-ui-react";
-import { Container, Header } from 'semantic-ui-react'
+import { Container, Header, Button } from 'semantic-ui-react'
 import { Link } from "react-router-dom";
 
 interface ISelectWalletProps {

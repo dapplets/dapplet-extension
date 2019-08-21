@@ -6,7 +6,7 @@ import { List, Button, Segment } from "semantic-ui-react";
 import { Container, Header } from 'semantic-ui-react'
 import { svgObject } from "qr-image";
 import { Link } from "react-router-dom";
-import { Bus } from '../bus';
+import { Bus } from '../../common/bus';
 
 interface ISelectWalletProps {
 }

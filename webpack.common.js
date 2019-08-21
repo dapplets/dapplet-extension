@@ -6,7 +6,8 @@ module.exports = {
     popup: path.join(__dirname, "src/popup/index.tsx"),
     background: path.join(__dirname, "src/background/index.ts"),
     inpage: path.join(__dirname, "src/inpage/index.ts"),
-    pairing: path.join(__dirname, "src/pairing/index.tsx")
+    pairing: path.join(__dirname, "src/pairing/index.tsx"),
+    dapplet: path.join(__dirname, "src/dapplet/index.tsx")
   },
   output: {
     path: path.join(__dirname, "build"),
@@ -75,6 +76,9 @@ module.exports = {
     }, {
       from: "src/pairing/index.html",
       to: "pairing.html"
+    }, {
+      from: "src/dapplet/index.html",
+      to: "dapplet.html"
     }]),
   ]
 };

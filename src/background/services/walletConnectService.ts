@@ -42,40 +42,31 @@ const loadDapplet = async (dappletId, txMeta) => {
         ]
     };
 
-    // ToDo: fix it
-    const isDappletCompatibleWallet = await checkDappletCompatibility();
+    const result = await walletConnector.sendCustomRequest(request);
+    return result;
+};
 
-    try {
-        if (isDappletCompatibleWallet) {
-            console.log("Wallet is Dapplet compatible. Sending Dapplet transaction...");
-            const result = await walletConnector.sendCustomRequest(request);
-            return result;
-        } else {
-            console.log("Wallet is Dapplet incompatible. Creating classic transaction...");
-            const response = await fetch(`https://dapplets.github.io/dapplet-examples/${dappletId}.json`);
-            const dappletConfig: DappletConfig = await response.json();
+const sendLegacyTransaction = async (dappletId: string, txMeta: any) => {
+    const response = await fetch(`https://dapplets.github.io/dapplet-examples/${dappletId}.json`);
+    const dappletConfig: DappletConfig = await response.json();
 
-            for (const txName in dappletConfig.transactions) {
-                if (txName) {
-                    const tx = dappletConfig.transactions[txName];
-                    const builder = getTxBuilder(tx["@type"]);
-                    if (builder) {
-                        const builtTx = builder(tx, txMeta);
-                        console.log("Sending classic transaction...");
-                        const result = await walletConnector.sendTransaction({
-                            from: walletConnector.accounts[0],
-                            to: builtTx.to,
-                            data: builtTx.data
-                        });
-                        return result;
-                    }
-                }
+    for (const txName in dappletConfig.transactions) {
+        if (txName) {
+            const tx = dappletConfig.transactions[txName];
+            const builder = getTxBuilder(tx["@type"]);
+            if (builder) {
+                const builtTx = builder(tx, txMeta);
+                console.log("Sending classic transaction...");
+                const result = await walletConnector.sendTransaction({
+                    from: walletConnector.accounts[0],
+                    to: builtTx.to,
+                    data: builtTx.data
+                });
+                return result;
             }
         }
-    } catch {
-        return null;
     }
-};
+}
 
 const checkDappletCompatibility = async (): Promise<boolean> => {
     const request = {
@@ -154,5 +145,7 @@ export {
     waitPairing,
     disconnect,
     getAccounts,
-    getChainId
+    getChainId,
+    checkDappletCompatibility,
+    sendLegacyTransaction
 };

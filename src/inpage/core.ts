@@ -30,7 +30,9 @@ export default class Core {
             loadDapplet,
             transactionCreated,
             transactionRejected,
-            checkConnection
+            checkConnection,
+            checkDappletCompatibility,
+            sendLegacyTransaction
         } = backgroundFunctions;
 
         const isConnected = await checkConnection();
@@ -52,13 +54,47 @@ export default class Core {
             await pairWallet();
         }
 
-        const dappletResult = await loadDapplet(dappletId, metadata);
-        if (dappletResult) {
-            transactionCreated(dappletResult);
-        } else {
-            transactionRejected();
-        }
+        const isDappletCompatibleWallet = await checkDappletCompatibility();
 
-        return dappletResult;
+        try {
+            let dappletResult = null;
+            if (isDappletCompatibleWallet) {
+                console.log("Wallet is Dapplet compatible. Sending Dapplet transaction...");
+                dappletResult = await loadDapplet(dappletId, metadata);
+            } else {
+                console.log("Wallet is Dapplet incompatible. Showing dapplet view...");
+
+                const waitApproving = function (): Promise<void> {
+                    return new Promise<void>((resolve, reject) => {
+                        const pairingUrl = extension.extension.getURL('dapplet.html');
+                        const overlay = me.overlay(pairingUrl, 'Dapplet');
+                        overlay.open(() => overlay.publish('txmeta', dappletId, metadata));
+                        // ToDo: add timeout?
+                        overlay.subscribe('approved', () => { 
+                            resolve();
+                            overlay.close();
+                        });
+                        overlay.subscribe('error', () => { 
+                            reject();
+                            overlay.close();
+                        });
+                    });
+                };
+    
+                await waitApproving();
+                dappletResult = await sendLegacyTransaction(dappletId, metadata);
+            }
+
+            if (dappletResult) {
+                transactionCreated(dappletResult);
+            } else {
+                transactionRejected();
+            }
+
+            return dappletResult;
+
+        } catch {
+            return null;
+        }
     }
 }

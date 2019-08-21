@@ -32,7 +32,8 @@
     }
   ],
   "web_accessible_resources": [
-    "pairing.html"
+    "pairing.html",
+    "dapplet.html"
   ],
   "permissions": [
     "tabs",
