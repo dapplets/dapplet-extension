@@ -60,7 +60,8 @@ const sendLegacyTransaction = async (dappletId: string, txMeta: any) => {
                 const result = await walletConnector.sendTransaction({
                     from: walletConnector.accounts[0],
                     to: builtTx.to,
-                    data: builtTx.data
+                    data: builtTx.data,
+                    value: builtTx.value
                 });
                 return result;
             }
