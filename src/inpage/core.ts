@@ -56,7 +56,7 @@ export default class Core {
 
         const isDappletCompatibleWallet = await checkDappletCompatibility();
 
-        try {
+        // try {
             let dappletResult = null;
             if (isDappletCompatibleWallet) {
                 console.log("Wallet is Dapplet compatible. Sending Dapplet transaction...");
@@ -93,8 +93,9 @@ export default class Core {
 
             return dappletResult;
 
-        } catch {
-            return null;
-        }
+        // } catch (err) {
+        //     console.error(err);
+        //     return null;
+        // }
     }
 }
