@@ -33,12 +33,25 @@ try {
  */
 const loadDapplet = async (dappletId, txMeta) => {
     const request = {
-        //id: 1337, // ToDo: generate it
         jsonrpc: "2.0",
         method: "wallet_loadDapplet",
         params: [
             dappletId,
             txMeta
+        ]
+    };
+
+    const result = await walletConnector.sendCustomRequest(request);
+    return result;
+};
+
+const loadDappletFrames = async (dappletId, txMeta) => {
+    const request = {
+        jsonrpc: "2.0",
+        method: "wallet_loadDappletFrames",
+        params: [
+            [dappletId, txMeta],
+            ["2"]
         ]
     };
 
@@ -73,6 +86,20 @@ const checkDappletCompatibility = async (): Promise<boolean> => {
     const request = {
         jsonrpc: "2.0",
         method: "wallet_checkDappletCompatibility"
+    };
+
+    try {
+        const result = await promiseTimeout(1000, walletConnector.sendCustomRequest(request));
+        return !!result;
+    } catch {
+        return false;
+    }
+}
+
+const checkDappletFramesCompatibility = async (): Promise<boolean> => {
+    const request = {
+        jsonrpc: "2.0",
+        method: "wallet_checkDappletFramesCompatibility"
     };
 
     try {
@@ -141,6 +168,7 @@ const getChainId = () => {
 
 export {
     loadDapplet,
+    loadDappletFrames,
     generateUri,
     checkConnection,
     waitPairing,
@@ -148,5 +176,6 @@ export {
     getAccounts,
     getChainId,
     checkDappletCompatibility,
+    checkDappletFramesCompatibility,
     sendLegacyTransaction
 };

@@ -28,10 +28,12 @@ export default class Core {
         const backgroundFunctions = await initBGFunctions(extension);
         const {
             loadDapplet,
+            loadDappletFrames,
             transactionCreated,
             transactionRejected,
             checkConnection,
             checkDappletCompatibility,
+            checkDappletFramesCompatibility,
             sendLegacyTransaction
         } = backgroundFunctions;
 
@@ -54,48 +56,43 @@ export default class Core {
             await pairWallet();
         }
 
-        const isDappletCompatibleWallet = await checkDappletCompatibility();
+        let dappletResult = null;
+        if (await checkDappletFramesCompatibility()) {
+            console.log("Wallet is Dapplet Frames compatible. Sending Dapplet Frames transaction...");
+            dappletResult = await loadDappletFrames(dappletId, metadata);
+        } else if (await checkDappletCompatibility()) {
+            console.log("Wallet is Dapplet compatible. Sending Dapplet transaction...");
+            dappletResult = await loadDapplet(dappletId, metadata);
+        } else {
+            console.log("Wallet is Dapplet incompatible. Showing dapplet view...");
 
-        // try {
-            let dappletResult = null;
-            if (isDappletCompatibleWallet) {
-                console.log("Wallet is Dapplet compatible. Sending Dapplet transaction...");
-                dappletResult = await loadDapplet(dappletId, metadata);
-            } else {
-                console.log("Wallet is Dapplet incompatible. Showing dapplet view...");
-
-                const waitApproving = function (): Promise<void> {
-                    return new Promise<void>((resolve, reject) => {
-                        const pairingUrl = extension.extension.getURL('dapplet.html');
-                        const overlay = me.overlay(pairingUrl, 'Dapplet');
-                        overlay.open(() => overlay.publish('txmeta', dappletId, metadata));
-                        // ToDo: add timeout?
-                        overlay.subscribe('approved', () => { 
-                            resolve();
-                            overlay.close();
-                        });
-                        overlay.subscribe('error', () => { 
-                            reject();
-                            overlay.close();
-                        });
+            const waitApproving = function (): Promise<void> {
+                return new Promise<void>((resolve, reject) => {
+                    const pairingUrl = extension.extension.getURL('dapplet.html');
+                    const overlay = me.overlay(pairingUrl, 'Dapplet');
+                    overlay.open(() => overlay.publish('txmeta', dappletId, metadata));
+                    // ToDo: add timeout?
+                    overlay.subscribe('approved', () => {
+                        resolve();
+                        overlay.close();
                     });
-                };
-    
-                await waitApproving();
-                dappletResult = await sendLegacyTransaction(dappletId, metadata);
-            }
+                    overlay.subscribe('error', () => {
+                        reject();
+                        overlay.close();
+                    });
+                });
+            };
 
-            if (dappletResult) {
-                transactionCreated(dappletResult);
-            } else {
-                transactionRejected();
-            }
+            await waitApproving();
+            dappletResult = await sendLegacyTransaction(dappletId, metadata);
+        }
 
-            return dappletResult;
+        if (dappletResult) {
+            transactionCreated(dappletResult);
+        } else {
+            transactionRejected();
+        }
 
-        // } catch (err) {
-        //     console.error(err);
-        //     return null;
-        // }
+        return dappletResult;
     }
 }
