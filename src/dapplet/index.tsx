@@ -80,6 +80,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     <Container text>
                         <Header as='h2'>Dapplet</Header>
                         <p>Your wallet doesn't support Dapplet transactions.<br/>It might look like this:</p>
+                        {/* {x.map(a=><SDapplet dangerouslySetInnerHTML={{ __html: a.renderedDapplet }} />)} */}
                         <SDapplet dangerouslySetInnerHTML={{ __html: renderedDapplet }} />
                         <div>
                             <Button primary onClick={() => this._bus.publish('approved')}>Continue</Button>

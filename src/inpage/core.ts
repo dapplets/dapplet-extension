@@ -70,6 +70,7 @@ export default class Core {
                 return new Promise<void>((resolve, reject) => {
                     const pairingUrl = extension.extension.getURL('dapplet.html');
                     const overlay = me.overlay(pairingUrl, 'Dapplet');
+                    // ToDo: implement multiframe
                     overlay.open(() => overlay.publish('txmeta', dappletId, metadata));
                     // ToDo: add timeout?
                     overlay.subscribe('approved', () => {
