@@ -35,6 +35,9 @@ function builderTxSolidity(tx: any, data: any) {
         const chain = arg.split(":").splice(1);
 
         for (const fnName of chain) {
+            if (fnName === "bigNumberify" && typeof value === "number") {
+                value = value.toString();
+            }
             value = ethers.utils[fnName](value);
         }
 
@@ -50,7 +53,7 @@ function builderTxSolidity(tx: any, data: any) {
     return {
         to: tx.to,
         data: fnSignature + valuesData.substring(2),
-        value: tx.value || 0
+        value: tx.value || "0x"
     };
 }
 
