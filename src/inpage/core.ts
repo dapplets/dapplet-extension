@@ -3,6 +3,7 @@ import { Connection } from './connection';
 import { OverlayManager } from "./overlayManager";
 import { Overlay, SubscribeOptions } from "./overlay";
 import * as extension from 'extensionizer';
+import { DappletCompatibility } from "../background/models/globalConfig";
 
 export default class Core {
 
@@ -32,8 +33,7 @@ export default class Core {
             transactionCreated,
             transactionRejected,
             checkConnection,
-            checkDappletCompatibility,
-            checkDappletFramesCompatibility,
+            getGlobalConfig,
             sendLegacyTransaction
         } = backgroundFunctions;
 
@@ -57,10 +57,13 @@ export default class Core {
         }
 
         let dappletResult = null;
-        if (await checkDappletFramesCompatibility()) {
+
+        const { dappletCompatibility } = await getGlobalConfig();
+
+        if (dappletCompatibility == DappletCompatibility.FRAMES_COMPATIBLE) {
             console.log("Wallet is Dapplet Frames compatible. Sending Dapplet Frames transaction...");
             dappletResult = await loadDappletFrames(dappletId, metadata);
-        } else if (await checkDappletCompatibility()) {
+        } else if (dappletCompatibility == DappletCompatibility.LEGACY_COMPATIBLE) {
             console.log("Wallet is Dapplet compatible. Sending Dapplet transaction...");
             dappletResult = await loadDapplet(dappletId, metadata);
         } else {

@@ -1,6 +1,12 @@
 import Base from './base';
 
-export default class GlobalConfig extends Base {
+export enum DappletCompatibility {
+    INCOMPTAIBLE = 0,
+    LEGACY_COMPATIBLE = 1,
+    FRAMES_COMPATIBLE = 2
+}
+
+export class GlobalConfig extends Base {
     getId = () => this.id;
 
     id: string = 'default';
@@ -8,4 +14,6 @@ export default class GlobalConfig extends Base {
     registryUrl: string = null;
 
     suspended: boolean = false;
+
+    dappletCompatibility: DappletCompatibility = null;
 }

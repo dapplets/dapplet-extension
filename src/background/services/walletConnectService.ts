@@ -1,12 +1,14 @@
 import WalletConnect from "@walletconnect/browser";
-import * as ethers from "ethers";
 import { DappletConfig } from "../types/dappletConfig";
 import { getTxBuilder } from "../utils/dapplets";
 import { promiseTimeout } from "../utils/promiseTimeout";
+import GlobalConfigService from "./globalConfigService";
+import { DappletCompatibility } from "../models/globalConfig";
 
 const bridge = "https://bridge.walletconnect.org";
 
 var walletConnector: WalletConnect;
+const _globalConfigService = new GlobalConfigService();
 
 try {
     walletConnector = new WalletConnect({
@@ -82,7 +84,7 @@ const sendLegacyTransaction = async (dappletId: string, txMeta: any) => {
     }
 }
 
-const checkDappletCompatibility = async (): Promise<boolean> => {
+const _checkDappletCompatibility = async (): Promise<boolean> => {
     const request = {
         jsonrpc: "2.0",
         method: "wallet_checkDappletCompatibility"
@@ -96,7 +98,7 @@ const checkDappletCompatibility = async (): Promise<boolean> => {
     }
 }
 
-const checkDappletFramesCompatibility = async (): Promise<boolean> => {
+const _checkDappletFramesCompatibility = async (): Promise<boolean> => {
     const request = {
         jsonrpc: "2.0",
         method: "wallet_checkDappletFramesCompatibility"
@@ -117,6 +119,7 @@ const disconnect = () => {
     walletConnector = new WalletConnect({
         bridge
     });
+    // ToDo: clear globalconfig.dappletCompatibility
 };
 
 /**
@@ -144,7 +147,26 @@ const checkConnection = () => {
  * @async
  * @returns {Promise<object>} Promise object represents the result of WalletConnect pairing
  */
-const waitPairing = () => {
+const waitPairing = async () => {
+    const result: any = await _waitWCPairing();
+
+    const config = await _globalConfigService.get();
+    
+    if (result) {
+        if (await _checkDappletFramesCompatibility()) {
+            config.dappletCompatibility = DappletCompatibility.FRAMES_COMPATIBLE;
+        } else if (await _checkDappletCompatibility()) {
+            config.dappletCompatibility = DappletCompatibility.LEGACY_COMPATIBLE;
+        } else {
+            config.dappletCompatibility = DappletCompatibility.INCOMPTAIBLE;
+        }
+        await _globalConfigService.set(config);
+    }
+
+    return result;
+};
+
+const _waitWCPairing = () => {
     var promise = new Promise(function (resolve, reject) {
         walletConnector.on("connect", (error, payload) => {
             if (error) {
@@ -175,7 +197,5 @@ export {
     disconnect,
     getAccounts,
     getChainId,
-    checkDappletCompatibility,
-    checkDappletFramesCompatibility,
     sendLegacyTransaction
 };

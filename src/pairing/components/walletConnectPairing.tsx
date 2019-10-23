@@ -25,6 +25,7 @@ interface ISelectWalletState {
             url?: string
         }
     }
+    dappletCompatibility: number;
 }
 
 export class WalletConnectPairing extends React.Component<ISelectWalletProps, ISelectWalletState> {
@@ -36,13 +37,14 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
         this.state = {
             svgPath: null,
             isPaired: false,
-            error: null
+            error: null,
+            dappletCompatibility: null
         };
     }
 
     async componentDidMount() {
         const backgroundFunctions = await initBGFunctions(extension);
-        const { generateUri, waitPairing } = backgroundFunctions;
+        const { generateUri, waitPairing, getGlobalConfig } = backgroundFunctions;
         var uri = await generateUri();
         console.log("New pairing URI generated", uri);
         const svgPath = svgObject(uri, { type: 'svg' });
@@ -57,8 +59,12 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
                 console.log({ wallet });
             }
 
+            const config = await getGlobalConfig();
+            const dappletCompatibility = config.dappletCompatibility;
+
             this.setState({
-                isPaired: true
+                isPaired: true,
+                dappletCompatibility
             });
             this.bus.publish('paired');
         } else {
@@ -72,7 +78,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
     }
 
     render() {
-        const { svgPath, isPaired, error, wallet } = this.state;
+        const { svgPath, isPaired, error, wallet, dappletCompatibility } = this.state;
 
         return (
             <Container text>
@@ -93,6 +99,11 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
                                     <p>Peer ID: {wallet.peerId}</p>
                                     <p>Peer Name: {wallet.peerMeta && wallet.peerMeta.name}</p>
                                     <p>Peer URL: {wallet.peerMeta && wallet.peerMeta.url}</p>
+                                    <p>Dapplet Compatibility: {{
+                                        0: "NONE",
+                                        1: "PARTIAL",
+                                        2: "FULL"
+                                    }[dappletCompatibility]}</p>
                                 </div>
                             ) : (<p>{error}</p>)}
                         </React.Fragment>

@@ -23,8 +23,6 @@ extension.runtime.onMessage.addListener(
     disconnect: WalletConnectService.disconnect,
     getAccounts: WalletConnectService.getAccounts,
     getChainId: WalletConnectService.getChainId,
-    checkDappletCompatibility: WalletConnectService.checkDappletCompatibility,
-    checkDappletFramesCompatibility: WalletConnectService.checkDappletFramesCompatibility,
     loadDappletFrames: WalletConnectService.loadDappletFrames,
     sendLegacyTransaction: WalletConnectService.sendLegacyTransaction,
 

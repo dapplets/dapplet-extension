@@ -1,5 +1,5 @@
 import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserStorage';
-import GlobalConfig from '../models/globalConfig';
+import { GlobalConfig } from '../models/globalConfig';
 
 export default class GlobalConfigService {
     private _globalConfigRepository = new GlobalConfigBrowserStorage();
