@@ -5,7 +5,7 @@ import * as extension from 'extensionizer';
 import { List, Button, Segment } from "semantic-ui-react";
 import { Container, Header } from 'semantic-ui-react'
 import { svgObject } from "qr-image";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
 
 interface ISelectWalletProps {
@@ -26,6 +26,7 @@ interface ISelectWalletState {
         }
     }
     dappletCompatibility: number;
+    toBack: boolean;
 }
 
 export class WalletConnectPairing extends React.Component<ISelectWalletProps, ISelectWalletState> {
@@ -38,7 +39,8 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
             svgPath: null,
             isPaired: false,
             error: null,
-            dappletCompatibility: null
+            dappletCompatibility: null,
+            toBack: false
         };
     }
 
@@ -77,8 +79,18 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
 
     }
 
+    async disconnect() {
+        const { disconnect } = await initBGFunctions(extension);
+        await disconnect();
+        this.setState({ toBack: true });
+    }
+
     render() {
-        const { svgPath, isPaired, error, wallet, dappletCompatibility } = this.state;
+        const { svgPath, isPaired, error, wallet, dappletCompatibility, toBack } = this.state;
+
+        if (toBack === true) {
+            return <Redirect to='/' />
+        }
 
         return (
             <Container text>
@@ -104,6 +116,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
                                         1: "PARTIAL",
                                         2: "FULL"
                                     }[dappletCompatibility]}</p>
+                                    <Button onClick={() => this.disconnect()}>Disconnect</Button>
                                 </div>
                             ) : (<p>{error}</p>)}
                         </React.Fragment>
