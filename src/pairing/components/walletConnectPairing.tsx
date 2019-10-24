@@ -7,6 +7,7 @@ import { Container, Header } from 'semantic-ui-react'
 import { svgObject } from "qr-image";
 import { Link, Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
+import { DappletCompatibility } from '../../common/constants';
 
 interface ISelectWalletProps {
 }
@@ -85,6 +86,10 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
         this.setState({ toBack: true });
     }
 
+    async continue() {
+        this.bus.publish('ready');
+    }
+
     render() {
         const { svgPath, isPaired, error, wallet, dappletCompatibility, toBack } = this.state;
 
@@ -108,15 +113,15 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
                                     <Header as='h2'>Wallet connected</Header>
                                     <p>Account: {wallet.accounts[0]}</p>
                                     <p>Chain ID: {wallet.chainId}</p>
-                                    <p>Peer ID: {wallet.peerId}</p>
                                     <p>Peer Name: {wallet.peerMeta && wallet.peerMeta.name}</p>
                                     <p>Peer URL: {wallet.peerMeta && wallet.peerMeta.url}</p>
                                     <p>Dapplet Compatibility: {{
-                                        0: "NONE",
-                                        1: "PARTIAL",
-                                        2: "FULL"
+                                        [DappletCompatibility.INCOMPTAIBLE]: "NONE",
+                                        [DappletCompatibility.LEGACY_COMPATIBLE]: "PARTIAL",
+                                        [DappletCompatibility.FRAMES_COMPATIBLE]: "FULL"
                                     }[dappletCompatibility]}</p>
                                     <Button onClick={() => this.disconnect()}>Disconnect</Button>
+                                    <Button onClick={() => this.continue()}>Continue</Button>
                                 </div>
                             ) : (<p>{error}</p>)}
                         </React.Fragment>

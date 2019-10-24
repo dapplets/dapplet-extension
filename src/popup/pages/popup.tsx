@@ -1,7 +1,7 @@
 import * as React from "react";
 import FeatureList from "../components/featureList";
 import Header from "../components/header";
-import Settings from "../components/settings";
+import Wallets from "../components/wallets";
 import Dev from "../components/dev";
 import './popup.scss';
 
@@ -17,9 +17,9 @@ class Popup extends React.Component {
         )
       },
       {
-        menuItem: "Settings",
+        menuItem: "Wallets",
         render: () => (
-          <Tab.Pane attached={false} as={Settings}/>
+          <Tab.Pane attached={false} as={Wallets}/>
         )
       },
       {

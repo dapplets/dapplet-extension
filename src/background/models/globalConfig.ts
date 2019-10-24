@@ -1,10 +1,5 @@
 import Base from './base';
-
-export enum DappletCompatibility {
-    INCOMPTAIBLE = 0,
-    LEGACY_COMPATIBLE = 1,
-    FRAMES_COMPATIBLE = 2
-}
+import { DappletCompatibility } from '../../common/constants';
 
 export class GlobalConfig extends Base {
     getId = () => this.id;

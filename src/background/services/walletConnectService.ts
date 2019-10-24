@@ -3,7 +3,7 @@ import { DappletConfig } from "../types/dappletConfig";
 import { getTxBuilder } from "../utils/dapplets";
 import { promiseTimeout } from "../utils/promiseTimeout";
 import GlobalConfigService from "./globalConfigService";
-import { DappletCompatibility } from "../models/globalConfig";
+import { DappletCompatibility } from '../../common/constants';
 
 const bridge = "https://bridge.walletconnect.org";
 

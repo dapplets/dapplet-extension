@@ -33,6 +33,12 @@ export async function init() {
 
     const core = new Core(); // ToDo: is it global for all modules?
 
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message === "OPEN_PAIRING_OVERLAY") {
+            core.waitPairingOverlay().finally(() => sendResponse());
+        }
+    });
+
     const processModules = async (modules) => {
         for (const module of modules) {
             const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', module.script);

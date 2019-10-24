@@ -3,7 +3,7 @@ import { Connection } from './connection';
 import { OverlayManager } from "./overlayManager";
 import { Overlay, SubscribeOptions } from "./overlay";
 import * as extension from 'extensionizer';
-import { DappletCompatibility } from "../background/models/globalConfig";
+import { DappletCompatibility } from '../common/constants';
 
 export default class Core {
 
@@ -25,6 +25,21 @@ export default class Core {
         return me;
     }
 
+    public waitPairingOverlay(): Promise<void> {
+        const me = this;
+        return new Promise<void>((resolve, reject) => {
+            const pairingUrl = extension.extension.getURL('pairing.html');
+            const overlay = me.overlay(pairingUrl, 'Wallet');
+            overlay.open();
+            // ToDo: add timeout?
+            overlay.subscribe('ready', () => {
+                overlay.close();
+                resolve();
+            }); // 'paired' - when paired, 'ready' - when user clicked on the continue button
+            overlay.subscribe('error', () => reject());
+        });
+    }
+
     public async sendWalletConnectTx(dappletId, metadata): Promise<any> {
         const backgroundFunctions = await initBGFunctions(extension);
         const {
@@ -41,20 +56,7 @@ export default class Core {
 
         const me = this;
 
-        if (!isConnected) {
-            const pairWallet = function (): Promise<void> {
-                return new Promise<void>((resolve, reject) => {
-                    const pairingUrl = extension.extension.getURL('pairing.html');
-                    const overlay = me.overlay(pairingUrl, 'Wallet');
-                    overlay.open();
-                    // ToDo: add timeout?
-                    overlay.subscribe('paired', () => resolve());
-                    overlay.subscribe('error', () => reject());
-                });
-            };
-
-            await pairWallet();
-        }
+        if (!isConnected) await this.waitPairingOverlay();
 
         let dappletResult = null;
 
