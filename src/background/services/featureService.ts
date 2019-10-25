@@ -22,7 +22,7 @@ export default class FeatureService {
             const lastVersion = versions[versions.length - 1]; // ToDo: select version
             const dto: ManifestDTO = await this._moduleManager.loadManifest(name, branch, lastVersion) as any;
 
-            dto.isActive = config.activeFeatures[name] && config.activeFeatures[name].isActive;
+            dto.isActive = config.activeFeatures[name]?.isActive || false;
 
             featuresDto.push(dto);
         }

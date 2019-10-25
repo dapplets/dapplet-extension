@@ -110,15 +110,15 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
                             {!error ? (
                                 <div>
                                     <Header as='h2'>Wallet connected</Header>
-                                    <p>Account: {wallet.accounts[0]}</p>
-                                    <p>Chain ID: {wallet.chainId}</p>
-                                    <p>Peer Name: {wallet.peerMeta && wallet.peerMeta.name}</p>
-                                    <p>Peer URL: {wallet.peerMeta && wallet.peerMeta.url}</p>
-                                    <p>Dapplet Compatibility: {walletInfo && walletInfo.compatible ? "Yes": "No"}</p>
-                                    <p>Dapplet Protocol Version: {walletInfo && walletInfo.protocolVersion || "UNKNOWN"}</p>
-                                    <p>Dapplet Engine Version: {walletInfo && walletInfo.engineVersion || "UNKNOWN"}</p>
-                                    <p>Device Manufacturer: {walletInfo && walletInfo.device && walletInfo.device.manufacturer || "UNKNOWN"}</p>
-                                    <p>Device Model: {walletInfo && walletInfo.device && walletInfo.device.model || "UNKNOWN"}</p>
+                                    <p>Account: {wallet?.accounts[0]}</p>
+                                    <p>Chain ID: {wallet?.chainId}</p>
+                                    <p>Peer Name: {wallet?.peerMeta?.name}</p>
+                                    <p>Peer URL: {wallet?.peerMeta?.url}</p>
+                                    <p>Dapplet Compatibility: {walletInfo?.compatible ? "Yes": "No"}</p>
+                                    <p>Dapplet Protocol Version: {walletInfo?.protocolVersion || "UNKNOWN"}</p>
+                                    <p>Dapplet Engine Version: {walletInfo?.engineVersion || "UNKNOWN"}</p>
+                                    <p>Device Manufacturer: {walletInfo?.device?.manufacturer || "UNKNOWN"}</p>
+                                    <p>Device Model: {walletInfo?.device?.model || "UNKNOWN"}</p>
                                     <Button onClick={() => this.disconnect()}>Disconnect</Button>
                                     <Button onClick={() => this.continue()}>Continue</Button>
                                 </div>

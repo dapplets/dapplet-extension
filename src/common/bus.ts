@@ -44,7 +44,7 @@ export class Bus {
         }
         this._callbacks[topic].push(handler);
 
-        while (this._queue[topic] && this._queue[topic].length > 0) {
+        while (this._queue[topic]?.length > 0) {
             const args = this._queue[topic].shift();
             handler.apply({}, ...args);
         }

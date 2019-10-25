@@ -89,17 +89,17 @@ const _getWalletInfo = async (): Promise<WalletInfo> => {
         method: "wallet_checkDappletFramesCompatibility",
         transform: (data): WalletInfo => ({
             compatible: true,
-            protocolVersion: data && data.protocolVersion || "0.2.0",
-            engineVersion: data && data.protocolVersion || "0.2.0",
-            device: data && data.device || null
+            protocolVersion: data?.protocolVersion || "0.2.0",
+            engineVersion: data?.protocolVersion || "0.2.0",
+            device: data?.device
         })
     }, {
         method: "wallet_checkDappletCompatibility",
         transform: (data): WalletInfo => ({
             compatible: true,
-            protocolVersion: data && data.protocolVersion || "0.1.0",
-            engineVersion: data && data.protocolVersion || "0.1.0",
-            device: data && data.device || null
+            protocolVersion: data?.protocolVersion || "0.1.0",
+            engineVersion: data?.protocolVersion || "0.1.0",
+            device: data?.device
         })
     }];
 

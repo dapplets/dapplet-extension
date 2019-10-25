@@ -86,19 +86,19 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
                 </List.Item>
                 <List.Item>
                   <List.Header>Dapplet Compatibility</List.Header>
-                  <List.Description>{walletInfo && walletInfo.compatible ? "Yes" : "No"}</List.Description>
+                  <List.Description>{walletInfo?.compatible ? "Yes" : "No"}</List.Description>
                 </List.Item>
                 <List.Item>
                   <List.Header>Device</List.Header>
-                  <List.Description>{walletInfo && walletInfo.device && walletInfo.device.manufacturer} {walletInfo && walletInfo.device && walletInfo.device.model}</List.Description>
+                  <List.Description>{walletInfo?.device?.manufacturer} {walletInfo?.device?.model}</List.Description>
                 </List.Item>
                 <List.Item>
                   <List.Header>Dapplet Protocol Version</List.Header>
-                  <List.Description>{walletInfo && walletInfo.protocolVersion}</List.Description>
+                  <List.Description>{walletInfo?.protocolVersion}</List.Description>
                 </List.Item>
                 <List.Item>
                   <List.Header>Dapplet Engine Version</List.Header>
-                  <List.Description>{walletInfo && walletInfo.engineVersion}</List.Description>
+                  <List.Description>{walletInfo?.engineVersion}</List.Description>
                 </List.Item>
               </React.Fragment>
             )}
