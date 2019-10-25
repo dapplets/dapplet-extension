@@ -33,12 +33,21 @@
   ],
   "web_accessible_resources": [
     "pairing.html",
-    "dapplet.html"
+    "dapplet.html",
+    "popup.html"
   ],
   "permissions": [
     "tabs",
     "storage",
     "contextMenus",
     "notifications"
-  ]
+  ],
+  "commands": {
+    "toggle-overlay": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      },
+      "description": "Toggle overlay"
+    }
+  }
 }

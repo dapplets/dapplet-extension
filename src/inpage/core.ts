@@ -8,6 +8,7 @@ import { WalletInfo } from '../common/constants';
 export default class Core {
 
     public overlayManager = new OverlayManager();
+    private _popupOverlay = null;
 
     public connect(url: string): Connection {
         return new Connection(url);
@@ -38,6 +39,17 @@ export default class Core {
             }); // 'paired' - when paired, 'ready' - when user clicked on the continue button
             overlay.subscribe('error', () => reject());
         });
+    }
+
+    public togglePopupOverlay() {
+        if (!this._popupOverlay) {
+            const pairingUrl = extension.extension.getURL('popup.html');
+            this._popupOverlay = this.overlay(pairingUrl, 'Dapplets');
+            this._popupOverlay.open();
+        } else {
+            this._popupOverlay.close();
+            this._popupOverlay = null;
+        }
     }
 
     public async sendWalletConnectTx(dappletId, metadata): Promise<any> {

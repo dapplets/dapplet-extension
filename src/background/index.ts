@@ -79,3 +79,12 @@ extension.notifications.onClicked.addListener(function (notificationId) {
     extension.tabs.create({ url: url });
   }
 });
+
+chrome.commands.onCommand.addListener(cmd => {
+  if (cmd === "toggle-overlay") {
+    chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+      var activeTab = tabs[0];
+      chrome.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY");
+    });
+  }
+});

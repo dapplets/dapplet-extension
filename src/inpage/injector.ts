@@ -6,6 +6,17 @@ import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
 import * as extension from 'extensionizer';
 
 export async function init() {
+    const core = new Core(); // ToDo: is it global for all modules?
+
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message === "OPEN_PAIRING_OVERLAY") {
+            core.waitPairingOverlay().finally(() => sendResponse());
+        } else if (message === "TOGGLE_OVERLAY") {
+            core.togglePopupOverlay();
+            sendResponse();
+        }
+    });
+
     const {
         getActiveModulesByHostname,
         getModulesWithDeps,
@@ -30,14 +41,6 @@ export async function init() {
     if (!modules || !modules.length) return;
 
     const registry: { name: string, version: string, clazz: any, instance: any, type: ModuleTypes }[] = [];
-
-    const core = new Core(); // ToDo: is it global for all modules?
-
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        if (message === "OPEN_PAIRING_OVERLAY") {
-            core.waitPairingOverlay().finally(() => sendResponse());
-        }
-    });
 
     const processModules = async (modules) => {
         for (const module of modules) {
