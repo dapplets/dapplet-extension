@@ -115,6 +115,8 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
                                     <p>Peer Name: {wallet.peerMeta && wallet.peerMeta.name}</p>
                                     <p>Peer URL: {wallet.peerMeta && wallet.peerMeta.url}</p>
                                     <p>Dapplet Compatibility: {walletInfo && walletInfo.compatible ? "Yes": "No"}</p>
+                                    <p>Dapplet Protocol Version: {walletInfo && walletInfo.protocolVersion || "UNKNOWN"}</p>
+                                    <p>Dapplet Engine Version: {walletInfo && walletInfo.engineVersion || "UNKNOWN"}</p>
                                     <p>Device Manufacturer: {walletInfo && walletInfo.device && walletInfo.device.manufacturer || "UNKNOWN"}</p>
                                     <p>Device Model: {walletInfo && walletInfo.device && walletInfo.device.model || "UNKNOWN"}</p>
                                     <Button onClick={() => this.disconnect()}>Disconnect</Button>

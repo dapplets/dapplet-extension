@@ -92,6 +92,14 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
                   <List.Header>Device</List.Header>
                   <List.Description>{walletInfo && walletInfo.device && walletInfo.device.manufacturer} {walletInfo && walletInfo.device && walletInfo.device.model}</List.Description>
                 </List.Item>
+                <List.Item>
+                  <List.Header>Dapplet Protocol Version</List.Header>
+                  <List.Description>{walletInfo && walletInfo.protocolVersion}</List.Description>
+                </List.Item>
+                <List.Item>
+                  <List.Header>Dapplet Engine Version</List.Header>
+                  <List.Description>{walletInfo && walletInfo.engineVersion}</List.Description>
+                </List.Item>
               </React.Fragment>
             )}
           </List>
