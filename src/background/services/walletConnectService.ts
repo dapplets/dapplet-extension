@@ -3,7 +3,7 @@ import { DappletConfig } from "../types/dappletConfig";
 import { getTxBuilder } from "../utils/dapplets";
 import { promiseTimeout } from "../utils/promiseTimeout";
 import GlobalConfigService from "./globalConfigService";
-import { DappletCompatibility } from '../../common/constants';
+import { WalletInfo } from '../../common/constants';
 
 const bridge = "https://bridge.walletconnect.org";
 
@@ -84,33 +84,46 @@ const sendLegacyTransaction = async (dappletId: string, txMeta: any) => {
     }
 }
 
-const _checkDappletCompatibility = async (): Promise<boolean> => {
-    const request = {
-        jsonrpc: "2.0",
-        method: "wallet_checkDappletCompatibility"
-    };
+const _getWalletInfo = async (): Promise<WalletInfo> => {
+    const requests = [{
+        method: "wallet_checkDappletFramesCompatibility",
+        transform: (data): WalletInfo => ({
+            compatible: true,
+            protocolVersion: data && data.protocolVersion || "0.1.0",
+            engineVersion: data && data.protocolVersion || "0.1.0",
+            device: data && data.device || null
+        })
+    }, {
+        method: "wallet_checkDappletCompatibility",
+        transform: (data): WalletInfo => ({
+            compatible: true,
+            protocolVersion: data && data.protocolVersion || "0.2.0",
+            engineVersion: data && data.protocolVersion || "0.2.0",
+            device: data && data.device || null
+        })
+    }];
 
-    try {
-        const result = await promiseTimeout(1000, walletConnector.sendCustomRequest(request));
-        return !!result;
-    } catch {
-        return false;
+    for (const request of requests) {
+        try {
+            const result = await promiseTimeout(1000, walletConnector.sendCustomRequest({
+                jsonrpc: "2.0",
+                method: request.method
+            }));
+
+            if (!result) continue;
+
+            return request.transform(result);
+        } catch {}
+    }
+
+    return {
+        compatible: false,
+        protocolVersion: null,
+        engineVersion: null,
+        device: null
     }
 }
 
-const _checkDappletFramesCompatibility = async (): Promise<boolean> => {
-    const request = {
-        jsonrpc: "2.0",
-        method: "wallet_checkDappletFramesCompatibility"
-    };
-
-    try {
-        const result = await promiseTimeout(1000, walletConnector.sendCustomRequest(request));
-        return !!result;
-    } catch {
-        return false;
-    }
-}
 
 const disconnect = () => {
     walletConnector.killSession();
@@ -149,17 +162,10 @@ const checkConnection = () => {
  */
 const waitPairing = async () => {
     const result: any = await _waitWCPairing();
-
-    const config = await _globalConfigService.get();
     
     if (result) {
-        if (await _checkDappletFramesCompatibility()) {
-            config.dappletCompatibility = DappletCompatibility.FRAMES_COMPATIBLE;
-        } else if (await _checkDappletCompatibility()) {
-            config.dappletCompatibility = DappletCompatibility.LEGACY_COMPATIBLE;
-        } else {
-            config.dappletCompatibility = DappletCompatibility.INCOMPTAIBLE;
-        }
+        const config = await _globalConfigService.get();
+        config.walletInfo = await _getWalletInfo();
         await _globalConfigService.set(config);
     }
 

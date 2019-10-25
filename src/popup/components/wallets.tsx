@@ -3,6 +3,7 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as extension from 'extensionizer';
 
 import { List, Button, Segment } from "semantic-ui-react";
+import { WalletInfo } from "../../common/constants";
 
 interface IWalletsProps {
 
@@ -12,6 +13,7 @@ interface IWalletsState {
   isConnected: boolean;
   chainId: any; // TODO: what kind of type?
   accounts: any[];
+  walletInfo: WalletInfo;
 }
 
 class Wallets extends React.Component<IWalletsProps, IWalletsState> {
@@ -21,22 +23,25 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
     this.state = {
       isConnected: false,
       chainId: null,
-      accounts: []
+      accounts: [],
+      walletInfo: null
     };
   }
 
   async componentDidMount() {
     var backgroundFunctions = await initBGFunctions(extension);
-    const { checkConnection, getChainId, getAccounts } = backgroundFunctions;
+    const { checkConnection, getChainId, getAccounts, getGlobalConfig } = backgroundFunctions;
 
-    var isConnected = await checkConnection();
-    var chainId = await getChainId();
-    var accounts = await getAccounts();
+    const isConnected = await checkConnection();
+    const chainId = await getChainId();
+    const accounts = await getAccounts();
+    const { walletInfo } = await getGlobalConfig();
 
     this.setState({
       isConnected,
       chainId,
-      accounts
+      accounts,
+      walletInfo
     });
   }
 
@@ -56,7 +61,7 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
   }
 
   render() {
-    const { isConnected, chainId, accounts } = this.state;
+    const { isConnected, chainId, accounts, walletInfo } = this.state;
 
     return (
       <React.Fragment>
@@ -78,6 +83,14 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
                 <List.Item>
                   <List.Header>Accounts</List.Header>
                   <List.Description>{accounts.join(", ")}</List.Description>
+                </List.Item>
+                <List.Item>
+                  <List.Header>Dapplet Compatibility</List.Header>
+                  <List.Description>{walletInfo && walletInfo.compatible ? "Yes" : "No"}</List.Description>
+                </List.Item>
+                <List.Item>
+                  <List.Header>Device</List.Header>
+                  <List.Description>{walletInfo && walletInfo.device && walletInfo.device.manufacturer} {walletInfo && walletInfo.device && walletInfo.device.model}</List.Description>
                 </List.Item>
               </React.Fragment>
             )}

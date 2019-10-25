@@ -7,7 +7,7 @@ import { Container, Header } from 'semantic-ui-react'
 import { svgObject } from "qr-image";
 import { Link, Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
-import { DappletCompatibility } from '../../common/constants';
+import { WalletInfo } from '../../common/constants';
 
 interface ISelectWalletProps {
 }
@@ -26,7 +26,7 @@ interface ISelectWalletState {
             url?: string
         }
     }
-    dappletCompatibility: number;
+    walletInfo: WalletInfo;
     toBack: boolean;
 }
 
@@ -40,7 +40,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
             svgPath: null,
             isPaired: false,
             error: null,
-            dappletCompatibility: null,
+            walletInfo: null,
             toBack: false
         };
     }
@@ -63,11 +63,10 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
             }
 
             const config = await getGlobalConfig();
-            const dappletCompatibility = config.dappletCompatibility;
 
             this.setState({
                 isPaired: true,
-                dappletCompatibility
+                walletInfo: config.walletInfo
             });
             this.bus.publish('paired');
         } else {
@@ -91,7 +90,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
     }
 
     render() {
-        const { svgPath, isPaired, error, wallet, dappletCompatibility, toBack } = this.state;
+        const { svgPath, isPaired, error, wallet, walletInfo, toBack } = this.state;
 
         if (toBack === true) {
             return <Redirect to='/' />
@@ -115,11 +114,9 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
                                     <p>Chain ID: {wallet.chainId}</p>
                                     <p>Peer Name: {wallet.peerMeta && wallet.peerMeta.name}</p>
                                     <p>Peer URL: {wallet.peerMeta && wallet.peerMeta.url}</p>
-                                    <p>Dapplet Compatibility: {{
-                                        [DappletCompatibility.INCOMPTAIBLE]: "NONE",
-                                        [DappletCompatibility.LEGACY_COMPATIBLE]: "PARTIAL",
-                                        [DappletCompatibility.FRAMES_COMPATIBLE]: "FULL"
-                                    }[dappletCompatibility]}</p>
+                                    <p>Dapplet Compatibility: {walletInfo && walletInfo.compatible ? "Yes": "No"}</p>
+                                    <p>Device Manufacturer: {walletInfo && walletInfo.device && walletInfo.device.manufacturer || "UNKNOWN"}</p>
+                                    <p>Device Model: {walletInfo && walletInfo.device && walletInfo.device.model || "UNKNOWN"}</p>
                                     <Button onClick={() => this.disconnect()}>Disconnect</Button>
                                     <Button onClick={() => this.continue()}>Continue</Button>
                                 </div>

@@ -5,10 +5,14 @@ export const enum ModuleTypes {
     Resolver = "RESOLVER"
 }
 
-export enum DappletCompatibility {
-    INCOMPTAIBLE = 0,
-    LEGACY_COMPATIBLE = 1,
-    FRAMES_COMPATIBLE = 2
+export type WalletInfo = {
+    compatible: boolean,
+    protocolVersion: string,
+    engineVersion: string,
+    device: {
+        manufacturer: string,
+        model: string
+    }
 }
 
 export const DEFAULT_BRANCH_NAME = "default";

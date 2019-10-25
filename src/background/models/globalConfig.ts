@@ -1,5 +1,5 @@
 import Base from './base';
-import { DappletCompatibility } from '../../common/constants';
+import { WalletInfo } from '../../common/constants';
 
 export class GlobalConfig extends Base {
     getId = () => this.id;
@@ -10,5 +10,5 @@ export class GlobalConfig extends Base {
 
     suspended: boolean = false;
 
-    dappletCompatibility: DappletCompatibility = null;
+    walletInfo: WalletInfo = null;
 }
