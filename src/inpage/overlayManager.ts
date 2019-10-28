@@ -63,6 +63,7 @@ export class OverlayManager {
         contentList.classList.add('pageNav__contentList');
         nav.appendChild(contentList);
         this._contentList = contentList;
+
     }
 
     /**
@@ -98,9 +99,9 @@ export class OverlayManager {
     }
 
     public register(overlay: Overlay) {
+        overlay.registered = true;
         if (this._tabsRegistry.filter(t => t.overlay === overlay).length > 0) return;
-        
-        console.log('register overlay ' + overlay.title);
+
         const tabItem = document.createElement('div');
         tabItem.classList.add(TabItemClass);
         tabItem.innerText = overlay.title;
@@ -135,12 +136,13 @@ export class OverlayManager {
 
     public unregister(overlay: Overlay) {
         console.log('unregister overlay ' + overlay.title);
+        overlay.registered = false;
         const tab = this._tabsRegistry.filter(t => t.overlay === overlay)[0];
         if (!tab) return;
 
         this._tabList.removeChild(tab.tabItem);
         this._contentList.removeChild(tab.contentItem);
-
+        
         this._tabsRegistry = this._tabsRegistry.filter(t => t.overlay !== overlay);
 
         if (this._activeOverlay === overlay) {
@@ -157,7 +159,7 @@ export class OverlayManager {
     public activate(overlay: Overlay) {
         console.log('activate overlay ' + overlay.title);
         if (this._activeOverlay == overlay) return;
-        
+
         if (this._activeOverlay) {
             this.deactivate(this._activeOverlay);
         }

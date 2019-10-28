@@ -3,12 +3,35 @@ import { Connection } from './connection';
 import { OverlayManager } from "./overlayManager";
 import { Overlay, SubscribeOptions } from "./overlay";
 import * as extension from 'extensionizer';
-import { WalletInfo } from '../common/constants';
+import { Swiper } from "./swiper";
 
 export default class Core {
 
     public overlayManager = new OverlayManager();
-    private _popupOverlay = null;
+    private _popupOverlay: Overlay = null;
+
+    constructor() {
+        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+            if (message === "OPEN_PAIRING_OVERLAY") {
+                this.waitPairingOverlay().finally(() => sendResponse());
+            } else if (message === "TOGGLE_OVERLAY") {
+                this._togglePopupOverlay();
+                sendResponse();
+            }
+        });
+
+        const swiper = new Swiper(document.body);
+        swiper.on("left", () => {
+            if (this._popupOverlay == null) {
+                this._togglePopupOverlay()
+            } else {
+                this._popupOverlay.open()
+            }
+        });
+        swiper.on("right", () => {
+            this.overlayManager.close();
+        });
+    }
 
     public connect(url: string): Connection {
         return new Connection(url);
@@ -41,15 +64,14 @@ export default class Core {
         });
     }
 
-    public togglePopupOverlay() {
-        if (!this._popupOverlay) {
+    public _togglePopupOverlay() {
+        if (!this._popupOverlay?.registered) {
             const pairingUrl = extension.extension.getURL('popup.html');
-            this._popupOverlay = this.overlay(pairingUrl, 'Dapplets');
+            this._popupOverlay = new Overlay(this.overlayManager, pairingUrl, 'Dapplets');
             this._popupOverlay.open();
         } else {
-            this._popupOverlay.close();
-            this._popupOverlay = null;
-        }
+            this.overlayManager.toggle();
+        }        
     }
 
     public async sendWalletConnectTx(dappletId, metadata): Promise<any> {

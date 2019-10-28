@@ -26,6 +26,8 @@ export class Overlay {
     private _isQueueProcessing: boolean = false;
     private _isFrameLoaded: boolean = false;
 
+    public registered: boolean = false;
+
     constructor(manager: OverlayManager, uri: string, public title: string) {
         this._manager = manager;
         this.frame = document.createElement('iframe');
