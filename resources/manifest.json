@@ -27,7 +27,7 @@
       "js": [
       	"inpage.js"
       ],
-      "run_at": "document_end",
+      "run_at": "document_start",
       "css" : ["styles/overlay.css"]
     }
   ],
