@@ -15,7 +15,6 @@ export class Swiper {
     };
 
     constructor(el: HTMLElement) {
-        console.log("swiper init");
         el.addEventListener('touchstart', (event) => {
             if (event.changedTouches.length != this._config.touches) return;
             this._touchStartX = event.changedTouches[0].screenX;
