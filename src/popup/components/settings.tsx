@@ -4,11 +4,11 @@ import { List, Button, Form, Segment, Image, Message } from "semantic-ui-react";
 import store from "../store";
 import * as extension from 'extensionizer';
 
-interface IDevProps {
+interface ISettingsProps {
 
 }
 
-interface IDevState {
+interface ISettingsState {
     features: any[];
     registryUrl: any;
     isLoading: boolean;
@@ -16,7 +16,7 @@ interface IDevState {
     connected: boolean;
 }
 
-class Dev extends React.Component<IDevProps, IDevState> {
+class Settings extends React.Component<ISettingsProps, ISettingsState> {
     constructor(props) {
         super(props);
 
@@ -72,7 +72,7 @@ class Dev extends React.Component<IDevProps, IDevState> {
 
         return (
             <React.Fragment>
-                <Segment loading={isLoading}>
+                <Segment loading={isLoading} className="internalTab">
 
                     <Form onSubmit={this.handleSubmit}>
                         <Form.Input
@@ -107,4 +107,4 @@ class Dev extends React.Component<IDevProps, IDevState> {
     }
 }
 
-export default Dev;
+export default Settings;

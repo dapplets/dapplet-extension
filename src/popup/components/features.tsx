@@ -5,17 +5,17 @@ import * as extension from 'extensionizer';
 
 import { Button, Image, List, Checkbox, Segment, Message } from "semantic-ui-react";
 
-interface IFeaturesListProps {
+interface IFeaturesProps {
 
 }
 
-interface IFeaturesListState {
+interface IFeaturesState {
   features: any[];
   isLoading: boolean;
   error: string;
 }
 
-class FeatureList extends React.Component<IFeaturesListProps, IFeaturesListState> {
+class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
   constructor(props) {
     super(props);
 
@@ -27,7 +27,7 @@ class FeatureList extends React.Component<IFeaturesListProps, IFeaturesListState
   }
 
   async componentDidMount() {
-    var backgroundFunctions = await initBGFunctions(extension);
+    const backgroundFunctions = await initBGFunctions(extension);
     const { getFeaturesByHostname } = backgroundFunctions;
 
     try {
@@ -46,7 +46,7 @@ class FeatureList extends React.Component<IFeaturesListProps, IFeaturesListState
   }
 
   async handleSwitchChange({ name, version }, value) {
-    var backgroundFunctions = await initBGFunctions(extension);
+    const backgroundFunctions = await initBGFunctions(extension);
     const { activateFeature, deactivateFeature } = backgroundFunctions;
 
     if (value) {
@@ -71,7 +71,7 @@ class FeatureList extends React.Component<IFeaturesListProps, IFeaturesListState
     const { features, isLoading, error } = this.state;
     return (
       <React.Fragment>
-        <Segment loading={isLoading}>
+        <Segment loading={isLoading} className="internalTab">
           {(!error) ? ((features.length > 0) ? (
             <List divided relaxed style={{ width: 350 }}>
               {features.map(f => (

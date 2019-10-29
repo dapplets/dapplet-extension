@@ -65,7 +65,7 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
 
     return (
       <React.Fragment>
-        <Segment>
+        <Segment className="internalTab">
           <List>
             <List.Item>
               <List.Header>Wallet Connection</List.Header>

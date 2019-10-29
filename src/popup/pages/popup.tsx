@@ -1,8 +1,9 @@
 import * as React from "react";
-import FeatureList from "../components/featureList";
+import Features from "../components/features";
 import Header from "../components/header";
 import Wallets from "../components/wallets";
-import Dev from "../components/dev";
+import Settings from "../components/settings";
+import Events from "../components/events";
 import './popup.scss';
 
 import { Tab } from "semantic-ui-react";
@@ -13,19 +14,25 @@ class Popup extends React.Component {
       {
         menuItem: "Features",
         render: () => (
-          <Tab.Pane attached={false} as={FeatureList}/>
+          <Tab.Pane attached={false} as={Features} />
+        )
+      },
+      {
+        menuItem: "Events",
+        render: () => (
+          <Tab.Pane attached={false} as={Events} />
         )
       },
       {
         menuItem: "Wallets",
         render: () => (
-          <Tab.Pane attached={false} as={Wallets}/>
+          <Tab.Pane attached={false} as={Wallets} />
         )
       },
       {
-        menuItem: "Dev",
+        menuItem: "Settings",
         render: () => (
-          <Tab.Pane attached={false} as={Dev}/>
+          <Tab.Pane attached={false} as={Settings} />
         )
       }
     ];

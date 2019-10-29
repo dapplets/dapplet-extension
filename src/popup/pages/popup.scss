@@ -4,8 +4,14 @@ $background-color: #BADA55;
 // Chrome applies an 8px margin by default (gross).
 body {
     margin: 0px;
+    max-height: 600px;
 }
 
 .popupContainer {
     padding: 10px;
+}
+
+.internalTab {
+    max-height: 524px;
+    overflow: auto;
 }

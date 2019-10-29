@@ -4,6 +4,7 @@ import * as SuspendService from "./services/suspendService";
 import * as NotificationService from "./services/notificationService";
 import FeatureService from './services/featureService';
 import GlobalConfigService from './services/globalConfigService';
+import * as EventService from './services/eventService';
 import * as extension from 'extensionizer';
 
 // ToDo: Fix dublication of new FeatureService(), new GlobalConfigService() etc.
@@ -48,7 +49,9 @@ extension.runtime.onMessage.addListener(
 
     // GlobalConfigService
     getGlobalConfig: () => globalConfigService.get(),
-    setGlobalConfig: (config) => globalConfigService.set(config)
+    setGlobalConfig: (config) => globalConfigService.set(config),
+
+    getEvents: EventService.getEvents
   })
 );
 
