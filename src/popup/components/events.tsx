@@ -2,7 +2,7 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import store from "../store";
 import * as extension from 'extensionizer';
-import { Event } from '../../common/types';
+import { Event } from '../../common/models/event';
 
 import { Button, Image, List, Checkbox, Segment, Message } from "semantic-ui-react";
 

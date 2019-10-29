@@ -1,4 +1,4 @@
-import Base from './base';
+import Base from '../../common/models/base';
 import { WalletInfo } from '../../common/constants';
 
 export class GlobalConfig extends Base {

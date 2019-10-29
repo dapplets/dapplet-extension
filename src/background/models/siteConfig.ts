@@ -1,4 +1,4 @@
-import Base from './base';
+import Base from '../../common/models/base';
 
 // ToDo: It should be UserConfig
 export default class SiteConfig extends Base {

@@ -1,4 +1,4 @@
-import Base from './base';
+import Base from '../../common/models/base';
 
 export default class File extends Base {
     getId = () => this.id;

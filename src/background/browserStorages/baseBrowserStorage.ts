@@ -1,5 +1,5 @@
 import { MapperService } from 'simple-mapper'; // ToDo like [here](https://www.npmjs.com/package/simple-mapper)
-import Base from '../models/base';
+import Base from '../../common/models/base';
 import * as extension from 'extensionizer';
 
 export default abstract class BaseBrowserStorage<T extends Base> {

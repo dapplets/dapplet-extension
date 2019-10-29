@@ -1,4 +1,4 @@
-import Base from './base';
+import Base from '../../common/models/base';
 import { ModuleTypes } from '../../common/constants';
 
 export default class Manifest extends Base {
