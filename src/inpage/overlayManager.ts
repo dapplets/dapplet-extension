@@ -10,7 +10,7 @@ const HiddenOverlayClass = 'overlay-hidden';
 
 
 export class OverlayManager {
-    private _panel: HTMLDivElement = null;
+    private _panel: HTMLElement = null;
     private _tabList: HTMLDivElement = null;
     private _contentList: HTMLDivElement = null;
     private _activeOverlay: Overlay = null;
@@ -23,7 +23,7 @@ export class OverlayManager {
 
     constructor() {
         // Side panel
-        const panel = document.createElement("div");
+        const panel = document.createElement("dapplets-overlay-manager");
         panel.classList.add('overlay-frame', 'overlay-outer', CollapsedOverlayClass, HiddenOverlayClass);
         document.body.appendChild(panel);
         this._panel = panel;
