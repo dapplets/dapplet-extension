@@ -7,7 +7,7 @@ const transactionCreated = async transactionId => {
             transactionId,
             {
                 type: "basic",
-                iconUrl: "icon128.png",
+                iconUrl: "icons/icon128.png",
                 title: "Transaction created",
                 message: "Сlick to check the status on Etherscan"
             },
@@ -22,7 +22,7 @@ const transactionRejected = async () => {
             generateGuid(),
             {
                 type: "basic",
-                iconUrl: "icon128.png",
+                iconUrl: "icons/icon128.png",
                 title: "Transaction rejected",
                 message: "Try again if you didn't reject it"
             },

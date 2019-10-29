@@ -16,8 +16,8 @@ const changeIcon = () => {
 
         const isSuspeded = suspendityByHostname || suspendityEverywhere;
         const path = isSuspeded
-            ? "/icon-grayed16.png"
-            : "/icon16.png";
+            ? "/icons/icon-grayed16.png"
+            : "/icons/icon16.png";
 
         extension.browserAction.setIcon({ path: path });
     });
