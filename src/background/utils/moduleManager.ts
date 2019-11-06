@@ -47,7 +47,6 @@ export default class ModuleManager {
         const manifestBufferArray = await this._storage.getResource(manfiestUri);
         const manifestJson = String.fromCharCode.apply(null, new Uint8Array(manifestBufferArray));
         const manifest: Manifest = JSON.parse(manifestJson);
-        manifest.dist = new URL(manifest.dist, manfiestUri).href; // ToDo: fix it?
         return manifest;
     }
 

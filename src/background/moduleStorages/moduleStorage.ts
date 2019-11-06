@@ -1,5 +1,6 @@
 import { Storage } from './storage';
 import { HttpModuleStorage } from './httpModuleStorage';
+import { SwarmModuleStorage } from './swarmModuleStorage';
 
 export class StorageAggregator implements Storage {
 
@@ -13,9 +14,10 @@ export class StorageAggregator implements Storage {
     private _chooseStorage(protocol: string): Storage {
         switch (protocol) {
             case "http:":
-                return new HttpModuleStorage();
             case "https:":
                 return new HttpModuleStorage();
+            case "bzz:":
+                return new SwarmModuleStorage();
             default:
                 throw new Error("Unsupported protocol");
         }

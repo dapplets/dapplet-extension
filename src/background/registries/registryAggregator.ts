@@ -2,6 +2,7 @@ import { Registry } from './registry';
 import { DevRegistry } from './devRegistry';
 import { TestRegistry } from './testRegistry';
 import GlobalConfigService from '../services/globalConfigService';
+import { gt } from 'semver';
 
 export class RegistryAggregator implements Registry {
     private _registries: Registry[] = [];
@@ -16,7 +17,7 @@ export class RegistryAggregator implements Registry {
             registryVersions.forEach(v => !versions.includes(v) && versions.push(v));
         }
 
-        return versions;
+        return versions.sort((a, b) => gt(a, b) ? 1 : -1);;
     }
 
     async resolveToUri(name: string, branch: string, version: string): Promise<string[]> {
