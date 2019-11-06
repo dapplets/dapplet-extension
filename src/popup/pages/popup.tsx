@@ -6,7 +6,7 @@ import Settings from "../components/settings";
 import Events from "../components/events";
 import './popup.scss';
 
-import { Tab } from "semantic-ui-react";
+import { Tab, Menu, Label } from "semantic-ui-react";
 
 class Popup extends React.Component {
   render() {
@@ -18,7 +18,11 @@ class Popup extends React.Component {
         )
       },
       {
-        menuItem: "Events",
+        menuItem: (
+          <Menu.Item key='messages'>
+            Events<Label color='red'  circular size='mini'>15</Label>
+          </Menu.Item>
+        ),
         render: () => (
           <Tab.Pane attached={false} as={Events} />
         )
