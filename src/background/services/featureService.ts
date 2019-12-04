@@ -40,7 +40,10 @@ export default class FeatureService {
 
         await this._siteConfigRepository.update(config);
 
-        // ToDo: fire activate event to inpage module
+        chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+            var activeTab = tabs[0];
+            chrome.tabs.sendMessage(activeTab.id, "FEATURE_ACTIVATED");
+        });
     }
 
     async deactivateFeature(name, version, hostname): Promise<void> {
@@ -53,7 +56,10 @@ export default class FeatureService {
 
         await this._siteConfigRepository.update(config);
 
-        // ToDo: fire deactivate event to inpage module
+        chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+            var activeTab = tabs[0];
+            chrome.tabs.sendMessage(activeTab.id, "FEATURE_DEACTIVATED");
+        });
     }
 
     public async getActiveModulesByHostname(hostname: string) {
