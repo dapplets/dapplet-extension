@@ -42,7 +42,10 @@ export default class FeatureService {
 
         chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
             var activeTab = tabs[0];
-            chrome.tabs.sendMessage(activeTab.id, "FEATURE_ACTIVATED");
+            chrome.tabs.sendMessage(activeTab.id, {
+                type: "FEATURE_ACTIVATED",
+                payload: { name, version, branch: "default" } // ToDo: fix branch
+            });
         });
     }
 
@@ -58,15 +61,22 @@ export default class FeatureService {
 
         chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
             var activeTab = tabs[0];
-            chrome.tabs.sendMessage(activeTab.id, "FEATURE_DEACTIVATED");
+            chrome.tabs.sendMessage(activeTab.id, {
+                type: "FEATURE_DEACTIVATED",
+                payload: { name, version, branch: "default" } // ToDo: fix branch
+            });
         });
     }
 
     public async getActiveModulesByHostname(hostname: string) {
         const featureNames = await this.getFeaturesByHostname(hostname);
-        const activeFeatureNames = featureNames.filter(f => f.isActive === true);
-        const loadedModules = await this.getModulesWithDeps(activeFeatureNames);
-        return loadedModules;
+        const activeModules = featureNames.filter(f => f.isActive === true)
+            .map(m => ({ 
+                name: m.name, 
+                branch: m.branch, 
+                version: m.version 
+            }));
+        return activeModules;
     }
 
     public async getModulesWithDeps(modules: { name: string, branch: string, version: string }[]) {
