@@ -4,6 +4,7 @@ import { OverlayManager } from "./overlayManager";
 import { Overlay, SubscribeOptions } from "./overlay";
 import * as extension from 'extensionizer';
 import { Swiper } from "./swiper";
+import * as GlobalEventBus from './globalEventBus';
 
 export default class Core {
 
@@ -36,6 +37,9 @@ export default class Core {
     public connect(url: string): Connection {
         return new Connection(url);
     }
+
+    public publish = (topic: string, data: any) => GlobalEventBus.publish(topic, data)
+    public subscribe = (topic: string, func: Function) => GlobalEventBus.subscribe(topic, func)
 
     public overlay(url: string, title: string) {
         const ov = new Overlay(this.overlayManager, url, title);

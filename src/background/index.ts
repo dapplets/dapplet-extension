@@ -6,6 +6,7 @@ import FeatureService from './services/featureService';
 import GlobalConfigService from './services/globalConfigService';
 import * as EventService from './services/eventService';
 import * as extension from 'extensionizer';
+import { GlobalEventBusService } from "./services/globalEventBusService";
 
 // ToDo: Fix dublication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -13,6 +14,7 @@ import * as extension from 'extensionizer';
 
 const featureService = new FeatureService();
 const globalConfigService = new GlobalConfigService();
+const globalEventBusService = new GlobalEventBusService();
 
 extension.runtime.onMessage.addListener(
   setupMessageListener({
@@ -89,5 +91,24 @@ chrome.commands.onCommand.addListener(cmd => {
       var activeTab = tabs[0];
       chrome.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY");
     });
+  }
+});
+
+
+// chrome.tabs.query({}, tabs => tabs.forEach(t => chrome.tabs.sendMessage(t.id, message)));
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (!request) return
+
+  if (request.type === "EVENTBUS_PUBLISH") {
+    const { topic, data } = request.payload
+    globalEventBusService.publish(topic, data)
+  }
+
+  if (request.type === "EVENTBUS_SUBSCRIBE") {
+    globalEventBusService.subscribe(
+      request.payload.topic,
+      (topic, data) => chrome.tabs.sendMessage(sender.tab.id, { topic, data })
+    )
   }
 });
