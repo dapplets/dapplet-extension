@@ -47,6 +47,12 @@ export default class ModuleManager {
         const manifestBufferArray = await this._storage.getResource(manfiestUri);
         const manifestJson = String.fromCharCode.apply(null, new Uint8Array(manifestBufferArray));
         const manifest: Manifest = JSON.parse(manifestJson);
+        
+        // convert a relative URL to absolute
+        if (!(/^(?:[a-z]+:)?\/\//i.test(manifest.dist))) {
+            manifest.dist = new URL(manifest.dist, manfiestUri).href;
+        }
+
         return manifest;
     }
 
