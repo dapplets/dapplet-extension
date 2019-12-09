@@ -107,6 +107,8 @@ export default class ModuleManager {
         const allVersions = await this._registry.getVersions(name, branch);
         const optimizedVersion = maxSatisfying(allVersions, range);
 
+        // ToDo: catch null in optimizedVersion
+
         if (version != optimizedVersion) {
             console.warn(`[Dependency Optimizer] Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`);
         }
