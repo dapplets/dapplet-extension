@@ -4,15 +4,14 @@ import { maxSatisfying } from 'semver';
 import { SubscribeOptions } from './overlay';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
 import * as extension from 'extensionizer';
+import { IResolver, IContentAdapter, IFeature } from '@dapplets/dapplet-extension-types';
+import Manifest from "../background/models/manifest";
 
 export class Injector {
-    private registry: { 
-        name: string, 
-        branch: string,
-        version: string, 
-        clazz: any, 
-        instance: any, 
-        type: ModuleTypes 
+    private registry: {
+        manifest: Manifest,
+        clazz: any,
+        instance?: any
     }[] = [];
 
     constructor(public core: Core) { }
@@ -29,12 +28,32 @@ export class Injector {
         const { getModulesWithDeps } = await initBGFunctions(extension);
         const loadedModules = await getModulesWithDeps(modules);
         await this._processModules(loadedModules);
+
+        // module initialization
         for (let i = 0; i < this.registry.length; i++) {
-            // feature initialization
-            if (!this.registry[i].instance) {
-                this.registry[i].instance = new this.registry[i].clazz();
+            if (this.registry[i].instance) continue;
+            this.registry[i].instance = new this.registry[i].clazz();
+        }
+
+        // feature attaching
+        for (let i = 0; i < this.registry.length; i++) {
+            if (this.registry[i].manifest.type === ModuleTypes.Feature) {
+                const feature: IFeature = this.registry[i].instance;
+                feature.activate();
             }
         }
+    }
+
+    public async unloadModules(modules: { name: string, branch: string, version: string }[]) {
+        modules.map(m => this.registry.find(r => 
+            m.name === r.manifest.name && 
+            m.branch === r.manifest.branch && 
+            m.version === r.manifest.version
+        )).forEach(m => {
+            if (!m) return;
+            m.instance.deactivate();
+            this.registry = this.registry.filter(r => r !== m);
+        });
     }
 
     private async _processModules(modules) {
@@ -42,15 +61,15 @@ export class Injector {
 
         for (const { manifest, script } of modules) {
             // Module is loaded already
-            if (this.registry.find(m => m.name == manifest.name && m.branch == manifest.branch && m.version == manifest.version)) continue;
+            if (this.registry.find(m => m.manifest.name == manifest.name && m.manifest.branch == manifest.branch && m.manifest.version == manifest.version)) continue;
 
             const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
             if (manifest.type == ModuleTypes.Resolver) {
-                let branch = null;
+                let branch: string = null;
                 // ToDo: add dependency support for resolver
                 const injectDecorator = () => { };
                 const injectableDecorator = (constructor) => {
-                    const resolver = new constructor();
+                    const resolver: IResolver = new constructor();
                     branch = resolver.getBranch();
                 };
 
@@ -64,14 +83,11 @@ export class Injector {
             } else {
                 // ToDo: describe it
                 const injectableDecorator = (constructor: Function) => {
-                    if (!this.registry.find(m => m.name == manifest.name && m.branch == manifest.branch && m.version == manifest.version)) {
+                    if (!this.registry.find(m => m.manifest.name == manifest.name && m.manifest.branch == manifest.branch && m.manifest.version == manifest.version)) {
                         this.registry.push({
-                            name: manifest.name,
-                            version: manifest.version,
-                            branch: manifest.branch,
+                            manifest: manifest,
                             clazz: constructor,
-                            instance: null,
-                            type: manifest.type
+                            instance: null
                         });
                     }
                 };
@@ -81,7 +97,7 @@ export class Injector {
                     descriptor = descriptor || {};
                     descriptor.get = () => {
                         // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
-                        const versions = this.registry.filter(m => m.name == name).map(m => m.version);
+                        const versions = this.registry.filter(m => m.manifest.name == name).map(m => m.manifest.version);
                         const dependency = manifest.dependencies[name];
 
                         // ToDo: Should be moved to the background? 
@@ -92,7 +108,7 @@ export class Injector {
 
                         const maxVer = maxSatisfying(versions, range);
 
-                        return this.registry.find(m => m.name == name && m.version == maxVer).instance;
+                        return this.registry.find(m => m.manifest.name == name && m.manifest.version == maxVer).instance;
                     }
                     return descriptor;
                 };

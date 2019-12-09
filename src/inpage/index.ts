@@ -15,6 +15,7 @@ var observer = new MutationObserver(() => {
                 injector.loadModules([feature]);
             } else if (message.type === "FEATURE_DEACTIVATED") {
                 console.log(`The feature ${feature.name}#${feature.branch}@${feature.version} was deactivated.`, );
+                injector.unloadModules([feature]);
             }
         });
         observer.disconnect();
