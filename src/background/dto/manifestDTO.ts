@@ -11,6 +11,7 @@ export default class ManifestDTO {
     icon: string = null;
     isActive: boolean = null;
     dist: string = null;
+    order: number = null;
 
     // ToDo: Add "hasUpdate", which are used in FeatureList.tsx
 }

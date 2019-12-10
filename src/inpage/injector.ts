@@ -11,23 +11,31 @@ export class Injector {
     private registry: {
         manifest: Manifest,
         clazz: any,
-        instance?: any
+        instance?: any,
+        order: number
     }[] = [];
 
     constructor(public core: Core) { }
 
     public async loadActiveModules() {
         const { getActiveModulesByHostname } = await initBGFunctions(extension);
-
+ 
         const modules = await getActiveModulesByHostname(window.location.hostname);
         await this.loadModules(modules);
     }
 
-    public async loadModules(modules: { name: string, branch: string, version: string }[]) {
+    public async loadModules(modules: { name: string, branch: string, version: string, order: number }[]) {
         if (!modules || !modules.length) return;
         const { getModulesWithDeps } = await initBGFunctions(extension);
-        const loadedModules = await getModulesWithDeps(modules);
-        await this._processModules(loadedModules);
+        const loadedModules: { manifest: Manifest, script: string }[] = await getModulesWithDeps(modules);
+        const orderedModules = loadedModules.map((l) => ({ 
+            ...l, 
+            order: modules.find(m => m.name === l.manifest.name && 
+                m.branch === l.manifest.branch && 
+                m.version === l.manifest.version)?.order 
+        }));
+
+        await this._processModules(orderedModules);
 
         // module initialization
         for (let i = 0; i < this.registry.length; i++) {
@@ -39,15 +47,15 @@ export class Injector {
         for (let i = 0; i < this.registry.length; i++) {
             if (this.registry[i].manifest.type === ModuleTypes.Feature) {
                 const feature: IFeature = this.registry[i].instance;
-                feature.activate();
+                feature.activate(this.registry[i].order);
             }
         }
     }
 
     public async unloadModules(modules: { name: string, branch: string, version: string }[]) {
-        modules.map(m => this.registry.find(r => 
-            m.name === r.manifest.name && 
-            m.branch === r.manifest.branch && 
+        modules.map(m => this.registry.find(r =>
+            m.name === r.manifest.name &&
+            m.branch === r.manifest.branch &&
             m.version === r.manifest.version
         )).forEach(m => {
             if (!m) return;
@@ -56,10 +64,10 @@ export class Injector {
         });
     }
 
-    private async _processModules(modules) {
+    private async _processModules(modules: { manifest: Manifest, script: string, order: number }[]) {
         const { optimizeDependency, getModulesWithDeps } = await initBGFunctions(extension);
 
-        for (const { manifest, script } of modules) {
+        for (const { manifest, script, order } of modules) {
             // Module is loaded already
             if (this.registry.find(m => m.manifest.name == manifest.name && m.manifest.branch == manifest.branch && m.manifest.version == manifest.version)) continue;
 
@@ -87,7 +95,8 @@ export class Injector {
                         this.registry.push({
                             manifest: manifest,
                             clazz: constructor,
-                            instance: null
+                            instance: null,
+                            order: order
                         });
                     }
                 };

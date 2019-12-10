@@ -11,18 +11,21 @@ export default class FeatureService {
     private _moduleManager = new ModuleManager(this._registryAggregator, this._storageAggregator);
 
     async getFeaturesByHostname(hostname: string): Promise<ManifestDTO[]> {
-        let featuresDto: ManifestDTO[] = [];
+        const featuresDto: ManifestDTO[] = [];
 
         const config = await this._siteConfigRepository.getById(hostname);
         const featuresBranches = await this._registryAggregator.getFeatures(hostname);
 
-        for (const name in featuresBranches) {
+        const names = Object.getOwnPropertyNames(featuresBranches);
+        for (let i = 0; i < names.length; i++) {
+            const name = names[i];
             const branch = featuresBranches[name][0]; // ToDo: select branch
             const versions = await this._registryAggregator.getVersions(name, branch);
             const lastVersion = versions[versions.length - 1]; // ToDo: select version
             const dto: ManifestDTO = await this._moduleManager.loadManifest(name, branch, lastVersion) as any;
 
             dto.isActive = config.activeFeatures[name]?.isActive || false;
+            dto.order = i;
 
             featuresDto.push(dto);
         }
@@ -32,10 +35,13 @@ export default class FeatureService {
 
     async activateFeature(name, version, hostname): Promise<void> {
         const config = await this._siteConfigRepository.getById(hostname);
+        const featuresBranches = await this._registryAggregator.getFeatures(hostname);
+        const order = Object.getOwnPropertyNames(featuresBranches).findIndex(f => f === name);
 
         config.activeFeatures[name] = {
             version,
             isActive: true
+            // ToDo: get a order from the config
         };
 
         await this._siteConfigRepository.update(config);
@@ -44,7 +50,7 @@ export default class FeatureService {
             var activeTab = tabs[0];
             chrome.tabs.sendMessage(activeTab.id, {
                 type: "FEATURE_ACTIVATED",
-                payload: { name, version, branch: "default" } // ToDo: fix branch
+                payload: { name, version, branch: "default", order } // ToDo: fix branch
             });
         });
     }
@@ -71,10 +77,11 @@ export default class FeatureService {
     public async getActiveModulesByHostname(hostname: string) {
         const featureNames = await this.getFeaturesByHostname(hostname);
         const activeModules = featureNames.filter(f => f.isActive === true)
-            .map(m => ({ 
-                name: m.name, 
-                branch: m.branch, 
-                version: m.version 
+            .map(m => ({
+                name: m.name,
+                branch: m.branch,
+                version: m.version,
+                order: m.order
             }));
         return activeModules;
     }
