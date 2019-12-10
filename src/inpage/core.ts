@@ -12,7 +12,7 @@ export default class Core {
     private _popupOverlay: Overlay = null;
 
     constructor() {
-        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (message === "OPEN_PAIRING_OVERLAY") {
                 this.waitPairingOverlay().finally(() => sendResponse());
             } else if (message === "TOGGLE_OVERLAY") {

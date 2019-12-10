@@ -53,9 +53,9 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
   }
 
   async connectWallet() {
-    chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+    extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
       var activeTab = tabs[0];
-      chrome.tabs.sendMessage(activeTab.id, "OPEN_PAIRING_OVERLAY");
+      extension.tabs.sendMessage(activeTab.id, "OPEN_PAIRING_OVERLAY");
       window.close();
     });
   }

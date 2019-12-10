@@ -1,12 +1,13 @@
 import { Injector } from './injector'
 import Core from './core';
+import * as extension from 'extensionizer';
 
 var observer = new MutationObserver(() => {
     if (document.body) {
         const core = new Core(); // ToDo: is it global for all modules?
         const injector = new Injector(core);
         injector.loadActiveModules();
-        chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (!message || !message.type || !message.payload) return;
             const feature = message.payload
 

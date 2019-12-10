@@ -3,6 +3,7 @@ import SiteConfigBrowserStorage from '../browserStorages/siteConfigBrowserStorag
 import ModuleManager from '../utils/moduleManager';
 import { RegistryAggregator } from '../registries/registryAggregator';
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
+import * as extension from 'extensionizer';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
@@ -46,9 +47,9 @@ export default class FeatureService {
 
         await this._siteConfigRepository.update(config);
 
-        chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
             var activeTab = tabs[0];
-            chrome.tabs.sendMessage(activeTab.id, {
+            extension.tabs.sendMessage(activeTab.id, {
                 type: "FEATURE_ACTIVATED",
                 payload: { name, version, branch: "default", order } // ToDo: fix branch
             });
@@ -65,9 +66,9 @@ export default class FeatureService {
 
         await this._siteConfigRepository.update(config);
 
-        chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
             var activeTab = tabs[0];
-            chrome.tabs.sendMessage(activeTab.id, {
+            extension.tabs.sendMessage(activeTab.id, {
                 type: "FEATURE_DEACTIVATED",
                 payload: { name, version, branch: "default" } // ToDo: fix branch
             });

@@ -85,19 +85,19 @@ extension.notifications.onClicked.addListener(function (notificationId) {
   }
 });
 
-chrome.commands.onCommand.addListener(cmd => {
+extension.commands.onCommand.addListener(cmd => {
   if (cmd === "toggle-overlay") {
-    chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+    extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
       var activeTab = tabs[0];
-      chrome.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY");
+      extension.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY");
     });
   }
 });
 
 
-// chrome.tabs.query({}, tabs => tabs.forEach(t => chrome.tabs.sendMessage(t.id, message)));
+// extension.tabs.query({}, tabs => tabs.forEach(t => extension.tabs.sendMessage(t.id, message)));
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+extension.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (!request) return
 
   if (request.type === "EVENTBUS_PUBLISH") {
@@ -108,7 +108,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.type === "EVENTBUS_SUBSCRIBE") {
     globalEventBusService.subscribe(
       request.payload.topic,
-      (topic, data) => chrome.tabs.sendMessage(sender.tab.id, { topic, data })
+      (topic, data) => extension.tabs.sendMessage(sender.tab.id, { topic, data })
     )
   }
 });
