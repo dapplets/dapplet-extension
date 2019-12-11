@@ -139,4 +139,12 @@ export default class Core {
 
         return dappletResult;
     }
+
+    public contextsStarted(contextIds: string[], parentContext: string) {
+        console.log('contextsStarted', { contextIds, parentContext });
+    }
+
+    public contextsFinished(contextIds: string[], parentContext: string) {
+        console.log('contextsFinished', { contextIds, parentContext });
+    }
 }
