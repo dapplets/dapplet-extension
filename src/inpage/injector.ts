@@ -72,6 +72,7 @@ export class Injector {
             // Module is loaded already
             if (this.registry.find(m => m.manifest.name == manifest.name && m.manifest.branch == manifest.branch && m.manifest.version == manifest.version)) continue;
 
+            // ToDo: elemenate the boilerplate
             const coreWrapper = {
                 overlayManager: core.overlayManager,
                 connect: core.connect,
@@ -80,8 +81,8 @@ export class Injector {
                 overlay: core.overlay,
                 waitPairingOverlay: core.waitPairingOverlay,
                 sendWalletConnectTx: core.sendWalletConnectTx,
-                contextsStarted: (contextIds: string[], parentContext: string) => core.contextsStarted(contextIds, manifest.name + (parentContext ? `/${parentContext}` : "")),
-                contextsFinished: (contextIds: string[], parentContext: string) => core.contextsFinished(contextIds, manifest.name + (parentContext ? `/${parentContext}` : "")),
+                contextStarted: (contextIds: string[], parentContext: string) => core.contextStarted(contextIds, manifest.name + (parentContext ? `/${parentContext}` : "")),
+                contextFinished: (contextIds: string[], parentContext: string) => core.contextFinished(contextIds, manifest.name + (parentContext ? `/${parentContext}` : "")),
             };
 
             const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
