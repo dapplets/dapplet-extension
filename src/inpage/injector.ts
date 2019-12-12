@@ -72,6 +72,18 @@ export class Injector {
             // Module is loaded already
             if (this.registry.find(m => m.manifest.name == manifest.name && m.manifest.branch == manifest.branch && m.manifest.version == manifest.version)) continue;
 
+            const coreWrapper = {
+                overlayManager: core.overlayManager,
+                connect: core.connect,
+                publish: core.publish,
+                subscribe: core.subscribe,
+                overlay: core.overlay,
+                waitPairingOverlay: core.waitPairingOverlay,
+                sendWalletConnectTx: core.sendWalletConnectTx,
+                contextsStarted: (contextIds: string[], parentContext: string) => core.contextsStarted(contextIds, manifest.name + (parentContext ? `/${parentContext}` : "")),
+                contextsFinished: (contextIds: string[], parentContext: string) => core.contextsFinished(contextIds, manifest.name + (parentContext ? `/${parentContext}` : "")),
+            };
+
             const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
             if (manifest.type == ModuleTypes.Resolver) {
                 let branch: string = null;
@@ -80,18 +92,6 @@ export class Injector {
                 const injectableDecorator = (constructor) => {
                     const resolver: IResolver = new constructor();
                     branch = resolver.getBranch();
-                };
-
-                const coreWrapper = {
-                    overlayManager: core.overlayManager,
-                    connect: core.connect,
-                    publish: core.publish,
-                    subscribe: core.subscribe,
-                    overlay: core.overlay,
-                    waitPairingOverlay: core.waitPairingOverlay,
-                    sendWalletConnectTx: core.sendWalletConnectTx,
-                    contextsStarted: (contextIds: string[], parentContext: string) => core.contextsStarted(contextIds, manifest.name + parentContext ? `/${parentContext}` : ""),
-                    contextsFinished: (contextIds: string[], parentContext: string) => core.contextsFinished(contextIds, manifest.name + parentContext ? `/${parentContext}` : ""),
                 };
 
                 // ToDo: do not exec resolver twice (when second feature is activated)
@@ -135,7 +135,7 @@ export class Injector {
                     return descriptor;
                 };
 
-                execScript(this.core, SubscribeOptions, injectDecorator, injectableDecorator);
+                execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
             }
         }
     }
