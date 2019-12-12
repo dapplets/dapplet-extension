@@ -6,13 +6,15 @@ import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
 import * as extension from 'extensionizer';
 import { IResolver, IContentAdapter, IFeature } from '@dapplets/dapplet-extension-types';
 import Manifest from "../background/models/manifest";
+import ManifestDTO from "../background/dto/manifestDTO";
 
 export class Injector {
     private registry: {
         manifest: Manifest,
         clazz: any,
         instance?: any,
-        order: number
+        order: number,
+        contextIds: string[]
     }[] = [];
 
     constructor(public core: Core) { }
@@ -21,19 +23,23 @@ export class Injector {
         const { getActiveModulesByHostname } = await initBGFunctions(extension);
 
         const modules = await getActiveModulesByHostname(window.location.hostname);
-        await this.loadModules(modules);
+        await this.loadModules(modules.map(m => ({ ...m, contextIds: [window.location.hostname] })));
     }
 
-    public async loadModules(modules: { name: string, branch: string, version: string, order: number }[]) {
+    public async loadModules(modules: { name: string, branch: string, version: string, order: number, contextIds: string[] }[]) {
         if (!modules || !modules.length) return;
         const { getModulesWithDeps } = await initBGFunctions(extension);
         const loadedModules: { manifest: Manifest, script: string }[] = await getModulesWithDeps(modules);
-        const orderedModules = loadedModules.map((l) => ({
-            ...l,
-            order: modules.find(m => m.name === l.manifest.name &&
+        const orderedModules = loadedModules.map((l) => {
+            const m = modules.find(m => m.name === l.manifest.name &&
                 m.branch === l.manifest.branch &&
-                m.version === l.manifest.version)?.order
-        }));
+                m.version === l.manifest.version);
+            return ({
+                ...l,
+                order: m?.order,
+                contextIds: m?.contextIds || [window.location.hostname]
+            })
+        });
 
         await this._processModules(orderedModules);
 
@@ -41,6 +47,8 @@ export class Injector {
         for (let i = 0; i < this.registry.length; i++) {
             if (this.registry[i].instance) continue;
             this.registry[i].instance = new this.registry[i].clazz();
+            const m = this.registry[i];
+            console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} was loaded.`);
         }
 
         // feature attaching
@@ -60,17 +68,28 @@ export class Injector {
         )).forEach(m => {
             if (!m) return;
             m.instance.deactivate();
+            console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} was unloaded.`);
             this.registry = this.registry.filter(r => r !== m);
         });
     }
 
-    private async _processModules(modules: { manifest: Manifest, script: string, order: number }[]) {
+    private async _processModules(modules: { manifest: Manifest, script: string, order: number, contextIds: string[] }[]) {
         const { optimizeDependency, getModulesWithDeps } = await initBGFunctions(extension);
         const { core } = this;
 
-        for (const { manifest, script, order } of modules) {
+        for (const { manifest, script, order, contextIds } of modules) {
             // Module is loaded already
-            if (this.registry.find(m => m.manifest.name == manifest.name && m.manifest.branch == manifest.branch && m.manifest.version == manifest.version)) continue;
+            const registeredModule = this.registry.find(m => m.manifest.name == manifest.name && m.manifest.branch == manifest.branch && m.manifest.version == manifest.version);
+            if (registeredModule) {
+                if (contextIds) {
+                    if (registeredModule.contextIds) {
+                        registeredModule.contextIds.push(...contextIds);
+                    } else {
+                        registeredModule.contextIds = [...contextIds];
+                    }
+                }
+                continue;
+            }
 
             // ToDo: elemenate the boilerplate
             const coreWrapper = {
@@ -81,8 +100,8 @@ export class Injector {
                 overlay: core.overlay,
                 waitPairingOverlay: core.waitPairingOverlay,
                 sendWalletConnectTx: core.sendWalletConnectTx,
-                contextStarted: (contextIds: string[], parentContext: string) => core.contextStarted(contextIds, manifest.name + (parentContext ? `/${parentContext}` : "")),
-                contextFinished: (contextIds: string[], parentContext: string) => core.contextFinished(contextIds, manifest.name + (parentContext ? `/${parentContext}` : "")),
+                contextStarted: (contextIds: any[], parentContext: string) => this._contextStarted(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : "")),
+                contextFinished: (contextIds: any[], parentContext: string) => this._contextFinished(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : "")),
             };
 
             const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
@@ -110,7 +129,8 @@ export class Injector {
                             manifest: manifest,
                             clazz: constructor,
                             instance: null,
-                            order: order
+                            order: order,
+                            contextIds: contextIds
                         });
                     }
                 };
@@ -138,6 +158,50 @@ export class Injector {
 
                 execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
             }
+        }
+    }
+
+    private async _contextStarted(contextIds: any[], parentContext: string) {
+        const { getFeaturesByHostname } = await initBGFunctions(extension);
+        const concatedContextIds = contextIds.map(({ id }) => parentContext + '/' + id);
+        const manifestsDuplicated: ManifestDTO[][] = await Promise.all(concatedContextIds.map(id => getFeaturesByHostname(id)));
+        const featuresForLoading = [];
+
+        for (let i = 0; i < manifestsDuplicated.length; i++) {
+            const contextId = concatedContextIds[i];
+            const manifests = manifestsDuplicated[i];
+
+            for (const { name, branch, version } of manifests) {
+                const registeredManifest = featuresForLoading.find(f => f.name === name && f.branch === branch && f.version === version);
+                if (!registeredManifest) {
+                    featuresForLoading.push({ name, branch, version, order: 999, contextIds: [contextId] }); // ToDo: fix order
+                } else {
+                    registeredManifest.contextIds.push(contextId);
+                }
+            }
+        }
+
+        featuresForLoading.forEach(f => console.log(`The module ${f.name}#${f.branch}@${f.version} was found for the contexts: ${f.contextIds.join(', ')}`));
+
+        await this.loadModules(featuresForLoading);
+    }
+
+    private async _contextFinished(contextIds: any[], parentContext: string) {
+        const concatedContextIds = contextIds.map(({ id }) => parentContext + '/' + id);
+        this.registry.forEach(m => {
+            if (m.contextIds) {
+                m.contextIds = m.contextIds.filter(id => concatedContextIds.indexOf(id) === -1);
+            }
+        });
+
+        const modulesForDeactivation = this.registry.filter(r => r.contextIds?.length === 0 && r.instance).map(({ manifest }) => ({
+            name: manifest.name,
+            branch: manifest.branch,
+            version: manifest.version
+        }));
+
+        if (modulesForDeactivation.length > 0) {
+            this.unloadModules(modulesForDeactivation);
         }
     }
 }
