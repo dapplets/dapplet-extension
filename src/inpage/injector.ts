@@ -19,7 +19,7 @@ export class Injector {
 
     public async loadActiveModules() {
         const { getActiveModulesByHostname } = await initBGFunctions(extension);
- 
+
         const modules = await getActiveModulesByHostname(window.location.hostname);
         await this.loadModules(modules);
     }
@@ -28,11 +28,11 @@ export class Injector {
         if (!modules || !modules.length) return;
         const { getModulesWithDeps } = await initBGFunctions(extension);
         const loadedModules: { manifest: Manifest, script: string }[] = await getModulesWithDeps(modules);
-        const orderedModules = loadedModules.map((l) => ({ 
-            ...l, 
-            order: modules.find(m => m.name === l.manifest.name && 
-                m.branch === l.manifest.branch && 
-                m.version === l.manifest.version)?.order 
+        const orderedModules = loadedModules.map((l) => ({
+            ...l,
+            order: modules.find(m => m.name === l.manifest.name &&
+                m.branch === l.manifest.branch &&
+                m.version === l.manifest.version)?.order
         }));
 
         await this._processModules(orderedModules);
@@ -66,6 +66,7 @@ export class Injector {
 
     private async _processModules(modules: { manifest: Manifest, script: string, order: number }[]) {
         const { optimizeDependency, getModulesWithDeps } = await initBGFunctions(extension);
+        const { core } = this;
 
         for (const { manifest, script, order } of modules) {
             // Module is loaded already
@@ -81,8 +82,20 @@ export class Injector {
                     branch = resolver.getBranch();
                 };
 
+                const coreWrapper = {
+                    overlayManager: core.overlayManager,
+                    connect: core.connect,
+                    publish: core.publish,
+                    subscribe: core.subscribe,
+                    overlay: core.overlay,
+                    waitPairingOverlay: core.waitPairingOverlay,
+                    sendWalletConnectTx: core.sendWalletConnectTx,
+                    contextsStarted: (contextIds: string[], parentContext: string) => core.contextsStarted(contextIds, manifest.name + parentContext ? `/${parentContext}` : ""),
+                    contextsFinished: (contextIds: string[], parentContext: string) => core.contextsFinished(contextIds, manifest.name + parentContext ? `/${parentContext}` : ""),
+                };
+
                 // ToDo: do not exec resolver twice (when second feature is activated)
-                execScript(this.core, SubscribeOptions, injectDecorator, injectableDecorator);
+                execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
 
                 console.log(`Resolver of "${manifest.name}" defined the "${branch}" branch`);
                 const optimizedBranch = await optimizeDependency(manifest.name, branch, manifest.version);
