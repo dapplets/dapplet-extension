@@ -55,7 +55,13 @@ export class Injector {
         for (let i = 0; i < this.registry.length; i++) {
             if (this.registry[i].manifest.type === ModuleTypes.Feature) {
                 const feature: IFeature = this.registry[i].instance;
-                feature.activate(this.registry[i].order);
+                feature.orderIndex = this.registry[i].order;
+                // ToDo: fix context ids adding
+                feature.contextIds = this.registry[i].contextIds.map(id => {
+                    const [headContextId, ...tailContextId] = id.split('/'); // ToDo: check head?
+                    return tailContextId.join('/');
+                }).filter(id => !!id);
+                feature.activate();
             }
         }
     }
