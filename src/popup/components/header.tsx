@@ -22,7 +22,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
     this.state = {
       isHostnameSuspended: false,
       isEverywhereSuspended: false,
-      hostname: store.currentHostname
+      hostname: store.currentContextIds[0]
     };
   }
 
@@ -34,7 +34,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
     } = backgroundFunctions;
 
     var isHostnameSuspended = await getSuspendityByHostname(
-      store.currentHostname
+      store.currentContextIds[0]
     );
     var isEverywhereSuspended = await getSuspendityEverywhere();
 
@@ -47,7 +47,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
   async resumeByHostnameButtonClick() {
     var backgroundFunctions = await initBGFunctions(extension);
     const { resumeByHostname } = backgroundFunctions;
-    await resumeByHostname(store.currentHostname);
+    await resumeByHostname(store.currentContextIds[0]);
 
     this.setState({
       isHostnameSuspended: false

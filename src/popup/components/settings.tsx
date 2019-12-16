@@ -1,7 +1,6 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { List, Button, Form, Segment, Image, Message } from "semantic-ui-react";
-import store from "../store";
 import * as extension from 'extensionizer';
 
 interface ISettingsProps {
@@ -9,7 +8,6 @@ interface ISettingsProps {
 }
 
 interface ISettingsState {
-    features: any[];
     registryUrl: any;
     isLoading: boolean;
     error: string;
@@ -21,7 +19,6 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         super(props);
 
         this.state = {
-            features: [],
             registryUrl: '',
             isLoading: true,
             error: null,
@@ -31,14 +28,12 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
 
     async componentDidMount() {
         const backgroundFunctions = await initBGFunctions(extension);
-        const { getFeaturesByHostname, getGlobalConfig } = backgroundFunctions;
+        const { getGlobalConfig } = backgroundFunctions;
 
         try {
-            const features = await getFeaturesByHostname(store.currentHostname) || [];
             const config = await getGlobalConfig();
 
             this.setState({
-                features: features.filter(f => f.isDev == true),
                 registryUrl: config.registryUrl,
                 isLoading: false,
                 connected: !!config.registryUrl

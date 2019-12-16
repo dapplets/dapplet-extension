@@ -1,4 +1,4 @@
-import Helpers from "../../common/helpers";
+import * as Helpers from "../../common/helpers";
 import SiteConfigBrowserStorage from "../browserStorages/siteConfigBrowserStorage";
 import SiteConfig from "../models/siteConfig";
 import GlobalConfigService from "./globalConfigService";

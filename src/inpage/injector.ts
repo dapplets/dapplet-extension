@@ -9,6 +9,8 @@ import Manifest from "../background/models/manifest";
 import ManifestDTO from "../background/dto/manifestDTO";
 
 export class Injector {
+    public availableContextIds: string[] = [window.location.hostname];
+
     private registry: {
         manifest: Manifest,
         clazz: any,
@@ -170,6 +172,7 @@ export class Injector {
     private async _contextStarted(contextIds: any[], parentContext: string) {
         const { getFeaturesByHostname } = await initBGFunctions(extension);
         const concatedContextIds = contextIds.map(({ id }) => parentContext + '/' + id);
+        this._addContextIds(concatedContextIds);
         const manifestsDuplicated: ManifestDTO[][] = await Promise.all(concatedContextIds.map(id => getFeaturesByHostname(id)));
         const featuresForLoading = [];
 
@@ -194,6 +197,7 @@ export class Injector {
 
     private async _contextFinished(contextIds: any[], parentContext: string) {
         const concatedContextIds = contextIds.map(({ id }) => parentContext + '/' + id);
+        this._removeContextIds(concatedContextIds);
         this.registry.forEach(m => {
             if (m.contextIds) {
                 m.contextIds = m.contextIds.filter(id => concatedContextIds.indexOf(id) === -1);
@@ -209,5 +213,20 @@ export class Injector {
         if (modulesForDeactivation.length > 0) {
             this.unloadModules(modulesForDeactivation);
         }
+    }
+
+    private _addContextIds(contextIds: any[]) {
+        contextIds.forEach(id => {
+            if (this.availableContextIds.indexOf(id) === -1) {
+                this.availableContextIds.push(id);
+            }
+        });
+    }
+
+    private _removeContextIds(contextIds: any[]) {
+        contextIds.forEach(id => {
+            const index = this.availableContextIds.indexOf(id);
+            if (index > -1) this.availableContextIds.splice(index, 1);
+        });
     }
 }

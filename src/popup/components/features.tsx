@@ -28,10 +28,10 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
 
   async componentDidMount() {
     const backgroundFunctions = await initBGFunctions(extension);
-    const { getFeaturesByHostname } = backgroundFunctions;
+    const getFeaturesByHostname: (id: string) => Promise<any[]> = backgroundFunctions.getFeaturesByHostname;
 
     try {
-      const features = await getFeaturesByHostname(store.currentHostname) || [];
+      const features = (await Promise.all(store.currentContextIds.map(id => getFeaturesByHostname(id)))).reduce((acc, val) => acc.concat(val), []);
       this.setState({
         features,
         isLoading: false,
@@ -50,9 +50,9 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
     const { activateFeature, deactivateFeature } = backgroundFunctions;
 
     if (value) {
-      await activateFeature(name, version, store.currentHostname);
+      await activateFeature(name, version, store.currentContextIds[0]);
     } else {
-      await deactivateFeature(name, version, store.currentHostname);
+      await deactivateFeature(name, version, store.currentContextIds[0]);
     }
 
     this.setState(state => {
