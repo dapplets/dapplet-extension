@@ -33,14 +33,14 @@ export class RegistryAggregator implements Registry {
         return uris;
     }
 
-    async getFeatures(hostname: string): Promise<{ [name: string]: string[]; }> {
+    async getFeatures(hostnames: string[]): Promise<{ [name: string]: string[]; }> {
         await this._initRegistries();
 
         const features: { [name: string]: string[]; } = {};
 
         for (const registry of this._registries) {
             // ToDo: an error can be thown
-            const registryFeatures = await registry.getFeatures(hostname);
+            const registryFeatures = await registry.getFeatures(hostnames);
             for (const name in registryFeatures) {
                 // ToDo: filter features by version rules
                 // ToDo: upgrade features here?

@@ -11,11 +11,12 @@ export default class FeatureService {
     private _storageAggregator = new StorageAggregator();
     private _moduleManager = new ModuleManager(this._registryAggregator, this._storageAggregator);
 
-    async getFeaturesByHostname(hostname: string): Promise<ManifestDTO[]> {
+    async getFeaturesByHostnames(hostnames: string[]): Promise<ManifestDTO[]> {
+        if (!hostnames || hostnames.length === 0) return [];
+        
         const featuresDto: ManifestDTO[] = [];
 
-        const config = await this._siteConfigRepository.getById(hostname);
-        const featuresBranches = await this._registryAggregator.getFeatures(hostname);
+        const featuresBranches = await this._registryAggregator.getFeatures(hostnames);
 
         const names = Object.getOwnPropertyNames(featuresBranches);
         for (let i = 0; i < names.length; i++) {
@@ -25,6 +26,7 @@ export default class FeatureService {
             const lastVersion = versions[versions.length - 1]; // ToDo: select version
             const dto: ManifestDTO = await this._moduleManager.loadManifest(name, branch, lastVersion) as any;
 
+            const config = await this._siteConfigRepository.getById(hostnames[0]); // ToDo: which contextId should we compare?
             dto.isActive = config.activeFeatures[name]?.isActive || false;
             dto.order = i;
 
@@ -36,7 +38,7 @@ export default class FeatureService {
 
     async activateFeature(name, version, hostname): Promise<void> {
         const config = await this._siteConfigRepository.getById(hostname);
-        const featuresBranches = await this._registryAggregator.getFeatures(hostname);
+        const featuresBranches = await this._registryAggregator.getFeatures([hostname]);
         const order = Object.getOwnPropertyNames(featuresBranches).findIndex(f => f === name);
 
         config.activeFeatures[name] = {
@@ -75,8 +77,8 @@ export default class FeatureService {
         });
     }
 
-    public async getActiveModulesByHostname(hostname: string) {
-        const featureNames = await this.getFeaturesByHostname(hostname);
+    public async getActiveModulesByHostnames(hostnames: string[]) {
+        const featureNames = await this.getFeaturesByHostnames(hostnames);
         const activeModules = featureNames.filter(f => f.isActive === true)
             .map(m => ({
                 name: m.name,

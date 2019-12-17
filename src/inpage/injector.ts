@@ -22,9 +22,9 @@ export class Injector {
     constructor(public core: Core) { }
 
     public async loadActiveModules() {
-        const { getActiveModulesByHostname } = await initBGFunctions(extension);
+        const { getActiveModulesByHostnames } = await initBGFunctions(extension);
 
-        const modules = await getActiveModulesByHostname(window.location.hostname);
+        const modules = await getActiveModulesByHostnames([window.location.hostname]);
         await this.loadModules(modules.map(m => ({ ...m, contextIds: [window.location.hostname] })));
     }
 
@@ -170,25 +170,18 @@ export class Injector {
     }
 
     private async _contextStarted(contextIds: any[], parentContext: string) {
-        const { getFeaturesByHostname } = await initBGFunctions(extension);
+        const { getFeaturesByHostnames } = await initBGFunctions(extension);
         const concatedContextIds = contextIds.map(({ id }) => parentContext + '/' + id);
         this._addContextIds(concatedContextIds);
-        const manifestsDuplicated: ManifestDTO[][] = await Promise.all(concatedContextIds.map(id => getFeaturesByHostname(id)));
-        const featuresForLoading = [];
 
-        for (let i = 0; i < manifestsDuplicated.length; i++) {
-            const contextId = concatedContextIds[i];
-            const manifests = manifestsDuplicated[i];
-
-            for (const { name, branch, version } of manifests) {
-                const registeredManifest = featuresForLoading.find(f => f.name === name && f.branch === branch && f.version === version);
-                if (!registeredManifest) {
-                    featuresForLoading.push({ name, branch, version, order: 999, contextIds: [contextId] }); // ToDo: fix order
-                } else {
-                    registeredManifest.contextIds.push(contextId);
-                }
-            }
-        }
+        const manifests: ManifestDTO[] = await getFeaturesByHostnames(concatedContextIds);
+        const featuresForLoading = manifests.map(m => ({
+            name: m.name, 
+            branch: m.branch, 
+            version: m.version, 
+            order: 999, // ToDo: fix order
+            contextIds: concatedContextIds // ToDo: the bug of dynamic feature deactivation
+        }));
 
         featuresForLoading.forEach(f => console.log(`The module ${f.name}#${f.branch}@${f.version} was found for the contexts: ${f.contextIds.join(', ')}`));
 

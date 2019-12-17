@@ -27,11 +27,10 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
   }
 
   async componentDidMount() {
-    const backgroundFunctions = await initBGFunctions(extension);
-    const getFeaturesByHostname: (id: string) => Promise<any[]> = backgroundFunctions.getFeaturesByHostname;
+    const { getFeaturesByHostnames } = await initBGFunctions(extension);
 
     try {
-      const features = (await Promise.all(store.currentContextIds.map(id => getFeaturesByHostname(id)))).reduce((acc, val) => acc.concat(val), []);
+      const features = await getFeaturesByHostnames(store.currentContextIds);
       this.setState({
         features,
         isLoading: false,

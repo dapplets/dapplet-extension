@@ -42,10 +42,10 @@ extension.runtime.onMessage.addListener(
     transactionRejected: NotificationService.transactionRejected,
 
     // FeatureService
-    getFeaturesByHostname: (hostname) => featureService.getFeaturesByHostname(hostname),
+    getFeaturesByHostnames: (hostnames) => featureService.getFeaturesByHostnames(hostnames),
     activateFeature: (name, version, hostname) => featureService.activateFeature(name, version, hostname),
     deactivateFeature: (name, version, hostname) => featureService.deactivateFeature(name, version, hostname),
-    getActiveModulesByHostname: (hostname) => featureService.getActiveModulesByHostname(hostname),
+    getActiveModulesByHostnames: (hostnames) => featureService.getActiveModulesByHostnames(hostnames),
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
     optimizeDependency: (name, branch, version) => featureService.optimizeDependency(name, branch, version),
 

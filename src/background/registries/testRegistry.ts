@@ -21,8 +21,8 @@ export class TestRegistry implements Registry {
         return uris;
     }
 
-    public async getFeatures(hostname: string): Promise<{ [name: string]: string[]; }> {
-        const response = await fetch(`${this.endpointUrl}/registry/get-features?hostname=${hostname}`);
+    public async getFeatures(hostnames: string[]): Promise<{ [name: string]: string[]; }> {
+        const response = await fetch(`${this.endpointUrl}/registry/get-features?${hostnames.map(h => `hostname=${h}`).join('&')}`);
         const json = await response.json();
         const features = json.data;
         return features;
