@@ -12,6 +12,6 @@ export default class ManifestDTO {
     isActive: boolean = null;
     dist: string = null;
     order: number = null;
-
+    hostnames: string[] = [];
     // ToDo: Add "hasUpdate", which are used in FeatureList.tsx
 }

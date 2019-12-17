@@ -13,24 +13,34 @@ export default class FeatureService {
 
     async getFeaturesByHostnames(hostnames: string[]): Promise<ManifestDTO[]> {
         if (!hostnames || hostnames.length === 0) return [];
-        
+
         const featuresDto: ManifestDTO[] = [];
 
-        const featuresBranches = await this._registryAggregator.getFeatures(hostnames);
+        const featuresHostnames = await this._registryAggregator.getFeatures(hostnames);
 
-        const names = Object.getOwnPropertyNames(featuresBranches);
-        for (let i = 0; i < names.length; i++) {
-            const name = names[i];
-            const branch = featuresBranches[name][0]; // ToDo: select branch
-            const versions = await this._registryAggregator.getVersions(name, branch);
-            const lastVersion = versions[versions.length - 1]; // ToDo: select version
-            const dto: ManifestDTO = await this._moduleManager.loadManifest(name, branch, lastVersion) as any;
+        for (const hostname in featuresHostnames) {
+            const featuresBranches = featuresHostnames[hostname];
+            const names = Object.getOwnPropertyNames(featuresBranches);
+            for (let i = 0; i < names.length; i++) {
+                const name = names[i];
+                const branch = featuresBranches[name][0]; // ToDo: select branch
+                const versions = await this._registryAggregator.getVersions(name, branch);
+                const lastVersion = versions[versions.length - 1]; // ToDo: select version
 
-            const config = await this._siteConfigRepository.getById(hostnames[0]); // ToDo: which contextId should we compare?
-            dto.isActive = config.activeFeatures[name]?.isActive || false;
-            dto.order = i;
-
-            featuresDto.push(dto);
+                const feature = featuresDto.find(f => f.name === name && f.branch === branch && f.version === lastVersion);
+                if (!feature) {
+                    const dto: ManifestDTO = await this._moduleManager.loadManifest(name, branch, lastVersion) as any;
+                    const config = await this._siteConfigRepository.getById(hostname); // ToDo: which contextId should we compare?
+                    dto.isActive = config.activeFeatures[name]?.isActive || false;
+                    dto.order = i;
+                    if (!dto.hostnames) dto.hostnames = [];
+                    dto.hostnames.push(hostname);
+                    featuresDto.push(dto);
+                } else {
+                    if (!feature.hostnames) feature.hostnames = [];
+                    feature.hostnames.push(hostname);
+                }
+            }
         }
 
         return featuresDto;

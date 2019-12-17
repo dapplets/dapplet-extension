@@ -180,7 +180,7 @@ export class Injector {
             branch: m.branch, 
             version: m.version, 
             order: 999, // ToDo: fix order
-            contextIds: concatedContextIds // ToDo: the bug of dynamic feature deactivation
+            contextIds: m.hostnames // ToDo: the bug of dynamic feature deactivation
         }));
 
         featuresForLoading.forEach(f => console.log(`The module ${f.name}#${f.branch}@${f.version} was found for the contexts: ${f.contextIds.join(', ')}`));

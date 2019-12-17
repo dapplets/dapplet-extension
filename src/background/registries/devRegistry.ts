@@ -33,25 +33,26 @@ export class DevRegistry implements Registry {
         return [uri];
     }
 
-    public async getFeatures(hostnames: string[]): Promise<{ [name: string]: string[]; }> {
+    public async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
         await this._cacheDevConfig();
 
         if (!this._devConfig.hostnames) {
             return {};
         }
 
-        let activeFeatures = {};
+        const featureHostnames = {};
 
         for (const hostname of hostnames) {
+            featureHostnames[hostname] = {};
             if (this._devConfig.hostnames[hostname]) {
                 Object.keys(this._devConfig.hostnames[hostname]).forEach(name => {
                     // ToDo: add parsing of other branches
-                    activeFeatures[name] = [DEFAULT_BRANCH_NAME];
+                    featureHostnames[hostname][name] = [DEFAULT_BRANCH_NAME];
                 });
             }
         }
 
-        return activeFeatures;
+        return featureHostnames;
     }
 
     private async _cacheDevConfig() {
