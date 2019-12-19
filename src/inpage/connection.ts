@@ -42,10 +42,17 @@ export class Connection {
 
         if (this._ws.readyState != this._ws.OPEN) {
             this._listenableIds.push(id);
-            console.log('queued ' + id);
         } else {
             this._sendNewId(id);
         }
+
+        return {
+            close: () => {
+                console.log('id closed', id);
+                delete this._callbacks[id];
+                // ToDo: publish unsubscribe to server
+            }
+        };
     }
 
     private _sendNewId(id: string) {
