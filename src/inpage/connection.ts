@@ -48,7 +48,6 @@ export class Connection {
 
         return {
             close: () => {
-                console.log('id closed', id);
                 delete this._callbacks[id];
                 // ToDo: publish unsubscribe to server
             }
