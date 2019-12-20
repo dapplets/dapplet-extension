@@ -75,10 +75,10 @@ export default class Core {
             this._popupOverlay.open();
         } else {
             this.overlayManager.toggle();
-        }        
+        }
     }
 
-    public async sendWalletConnectTx(dappletId, metadata): Promise<any> {
+    public async sendWalletConnectTx(dappletId, metadata, callback: (e: { type: string, data?: any }) => void): Promise<any> {
         const backgroundFunctions = await initBGFunctions(extension);
         const {
             loadDapplet,
@@ -94,7 +94,10 @@ export default class Core {
 
         const me = this;
 
-        if (!isConnected) await this.waitPairingOverlay();
+        if (!isConnected) {
+            await this.waitPairingOverlay();
+            callback({ type: "PAIRED" });
+        }
 
         let dappletResult = null;
 
@@ -133,8 +136,10 @@ export default class Core {
 
         if (dappletResult) {
             transactionCreated(dappletResult);
+            callback({ type: "CREATED", data: dappletResult });
         } else {
             transactionRejected();
+            callback({ type: "REJECTED" });
         }
 
         return dappletResult;
