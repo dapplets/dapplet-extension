@@ -95,6 +95,7 @@ export default class Core {
         const me = this;
 
         if (!isConnected) {
+            callback({ type: "PAIRING" });
             await this.waitPairingOverlay();
             callback({ type: "PAIRED" });
         }
