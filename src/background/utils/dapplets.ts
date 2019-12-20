@@ -53,7 +53,7 @@ function builderTxSolidity(tx: any, data: any) {
     return {
         to: tx.to,
         data: fnSignature + valuesData.substring(2),
-        value: tx.value || "0x"
+        value: tx.value || 0
     };
 }
 
