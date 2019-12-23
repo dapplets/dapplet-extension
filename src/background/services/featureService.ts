@@ -49,7 +49,7 @@ export default class FeatureService {
     async activateFeature(name, version, hostname): Promise<void> {
         const config = await this._siteConfigRepository.getById(hostname);
         const featuresBranches = await this._registryAggregator.getFeatures([hostname]);
-        const order = Object.getOwnPropertyNames(featuresBranches).findIndex(f => f === name);
+        const order = Object.getOwnPropertyNames(featuresBranches[hostname]).findIndex(f => f === name);
 
         config.activeFeatures[name] = {
             version,
