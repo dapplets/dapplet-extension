@@ -8,14 +8,18 @@ export class Connection {
     private _listenableIds : string[] = [];
 
     constructor(url: string) {
+        this._createConnection(url);
+    }
+
+    private _createConnection(url: string) {
         this._ws = new WebSocket(url);
         this._ws.onopen = () => {
             console.log('WebSocket connection OPENED');
-            this._listenableIds.forEach(id => this._sendNewId(id));
-            this._listenableIds = [];
+            this._listenableIds.forEach(id => this._ws.send(id));
         };
         this._ws.onclose = () => {
             console.log('WebSocket connection CLOSED');
+            this._createConnection(url);
         };
         this._ws.onmessage = (e) => {
             
@@ -40,10 +44,10 @@ export class Connection {
 
         this._callbacks[id].push(handler);
 
-        if (this._ws.readyState != this._ws.OPEN) {
-            this._listenableIds.push(id);
-        } else {
-            this._sendNewId(id);
+        this._listenableIds.push(id);
+
+        if (this._ws.readyState === this._ws.OPEN) {
+            this._ws.send(id);
         }
 
         return {
@@ -52,9 +56,5 @@ export class Connection {
                 // ToDo: publish unsubscribe to server
             }
         };
-    }
-
-    private _sendNewId(id: string) {
-        this._ws.send(id);
     }
 }
