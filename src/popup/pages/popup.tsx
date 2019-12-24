@@ -8,13 +8,18 @@ import './popup.scss';
 
 import { Tab, Menu, Label } from "semantic-ui-react";
 
-class Popup extends React.Component {
+interface IPopupProps { 
+  contextIds: string[];
+}
+interface IPopupState { }
+
+class Popup extends React.Component<IPopupProps, IPopupState> {
   render() {
     const panes = [
       {
         menuItem: "Features",
         render: () => (
-          <Tab.Pane attached={false} as={Features} />
+          <Tab.Pane attached={false} as={() => <Features contextIds={this.props.contextIds}/>} />
         )
       },
       {
@@ -44,7 +49,7 @@ class Popup extends React.Component {
     return (
       <React.Fragment>
         <div className="popupContainer">
-          <Header />
+          <Header contextIds={this.props.contextIds}/>
           <Tab menu={{ secondary: true, pointing: true }} panes={panes} />
         </div>
       </React.Fragment>

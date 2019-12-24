@@ -1,6 +1,6 @@
 import * as extension from 'extensionizer';
 
-export const getCurrentContextIds = () => new Promise((res, rej) => {
+export const getCurrentContextIds = (): Promise<string[]> => new Promise((res, rej) => {
     extension.tabs.query({
         active: true,
         currentWindow: true

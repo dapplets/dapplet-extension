@@ -7,7 +7,7 @@ import { Event } from '../../common/models/event';
 import { List, Segment } from "semantic-ui-react";
 
 interface IEventsProps {
-
+    
 }
 
 interface IEventsState {

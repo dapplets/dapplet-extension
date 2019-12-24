@@ -4,10 +4,9 @@ import * as extension from 'extensionizer';
 
 import { Button, Image, List, Checkbox, Segment, Message, Popup } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
-import { getCurrentContextIds } from '../helpers';
 
 interface IFeaturesProps {
-
+  contextIds: string[];
 }
 
 interface IFeaturesState {
@@ -31,8 +30,7 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
     const { getFeaturesByHostnames } = await initBGFunctions(extension);
 
     try {
-      const contextIds = await getCurrentContextIds();
-      const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
+      const features: ManifestDTO[] = await getFeaturesByHostnames(this.props.contextIds);
       this.setState({
         features,
         isLoading: false,

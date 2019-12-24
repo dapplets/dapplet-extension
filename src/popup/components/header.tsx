@@ -3,10 +3,9 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as extension from 'extensionizer';
 
 import { Button, Divider } from "semantic-ui-react";
-import { getCurrentContextIds } from '../helpers';
 
 interface IHeaderProps {
-
+  contextIds: string[];
 }
 
 interface IHeaderState {
@@ -33,9 +32,8 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
       getSuspendityEverywhere
     } = backgroundFunctions;
 
-    const contextIds = await getCurrentContextIds();
     var isHostnameSuspended = await getSuspendityByHostname(
-      contextIds[0]
+      this.props.contextIds[0]
     );
     var isEverywhereSuspended = await getSuspendityEverywhere();
 
@@ -48,8 +46,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
   async resumeByHostnameButtonClick() {
     var backgroundFunctions = await initBGFunctions(extension);
     const { resumeByHostname } = backgroundFunctions;
-    const contextIds = await getCurrentContextIds();
-    await resumeByHostname(contextIds[0]);
+    await resumeByHostname(this.props.contextIds[0]);
 
     this.setState({
       isHostnameSuspended: false
