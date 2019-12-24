@@ -1,7 +1,8 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { List, Button, Form, Segment, Image, Message } from "semantic-ui-react";
 import * as extension from 'extensionizer';
+
+import { Button, Form, Segment, Message } from "semantic-ui-react";
 
 interface ISettingsProps {
 

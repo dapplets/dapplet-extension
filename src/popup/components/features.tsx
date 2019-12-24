@@ -1,10 +1,10 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import store from "../store";
 import * as extension from 'extensionizer';
 
 import { Button, Image, List, Checkbox, Segment, Message, Popup } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
+import { getCurrentContextIds } from '../helpers';
 
 interface IFeaturesProps {
 
@@ -31,7 +31,8 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
     const { getFeaturesByHostnames } = await initBGFunctions(extension);
 
     try {
-      const features: ManifestDTO[] = await getFeaturesByHostnames(store.currentContextIds);
+      const contextIds = await getCurrentContextIds();
+      const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
       this.setState({
         features,
         isLoading: false,
