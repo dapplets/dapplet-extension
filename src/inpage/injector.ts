@@ -170,11 +170,11 @@ export class Injector {
     }
 
     private async _contextStarted(contextIds: any[], parentContext: string) {
-        const { getFeaturesByHostnames } = await initBGFunctions(extension);
+        const { getActiveModulesByHostnames } = await initBGFunctions(extension);
         const concatedContextIds = contextIds.map(({ id }) => parentContext + '/' + id);
         this._addContextIds(concatedContextIds);
 
-        const manifests: ManifestDTO[] = await getFeaturesByHostnames(concatedContextIds);
+        const manifests: {name: string, branch: string, version: string, order: number, hostnames: string[] }[] = await getActiveModulesByHostnames(concatedContextIds);
         const featuresForLoading = manifests.map(m => ({
             name: m.name, 
             branch: m.branch, 

@@ -3,14 +3,15 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import store from "../store";
 import * as extension from 'extensionizer';
 
-import { Button, Image, List, Checkbox, Segment, Message } from "semantic-ui-react";
+import { Button, Image, List, Checkbox, Segment, Message, Popup } from "semantic-ui-react";
+import ManifestDTO from "../../background/dto/manifestDTO";
 
 interface IFeaturesProps {
 
 }
 
 interface IFeaturesState {
-  features: any[];
+  features: ManifestDTO[];
   isLoading: boolean;
   error: string;
 }
@@ -30,7 +31,7 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
     const { getFeaturesByHostnames } = await initBGFunctions(extension);
 
     try {
-      const features = await getFeaturesByHostnames(store.currentContextIds);
+      const features: ManifestDTO[] = await getFeaturesByHostnames(store.currentContextIds);
       this.setState({
         features,
         isLoading: false,
@@ -44,14 +45,14 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
     }
   }
 
-  async handleSwitchChange({ name, version }, value) {
+  async handleSwitchChange({ name, version, hostnames }, value) {
     const backgroundFunctions = await initBGFunctions(extension);
     const { activateFeature, deactivateFeature } = backgroundFunctions;
 
     if (value) {
-      await activateFeature(name, version, store.currentContextIds[0]);
+      await activateFeature(name, version, hostnames);
     } else {
-      await deactivateFeature(name, version, store.currentContextIds[0]);
+      await deactivateFeature(name, version, hostnames);
     }
 
     this.setState(state => {
@@ -77,15 +78,19 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
                 <List.Item key={f.name} style={{ overflow: "hidden" }}>
                   <List.Content style={{ width: 45, float: "left" }}>
                     <div>
-                      <Image
-                        size="mini"
-                        avatar
-                        alt={f.description}
-                        src={f.icon}
-                      />
+                      <Popup
+                        content={<List>{f.hostnames?.map(h => <List.Item>{h}</List.Item>)}</List>}
+                        header="Related Context IDs"
+                        trigger={<Image
+                          size="mini"
+                          avatar
+                          alt={f.description}
+                          src={f.icon}
+                        />}
+                      />                      
                     </div>
                   </List.Content>
-                  {f.hasUpdate ? ( // ToDo: hasUpdate isn't implemented in DTO
+                  {false ? ( // ToDo: hasUpdate isn't implemented in DTO
                     <List.Content style={{ float: "right", width: 60 }}>
                       <Button
                         primary
@@ -116,7 +121,7 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
                   <List.Content
                     style={{
                       marginLeft: 45,
-                      marginRight: f.hasUpdate ? 60 : 60
+                      marginRight: 60
                     }}
                   >
                     <List.Header>{f.title}</List.Header>

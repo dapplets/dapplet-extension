@@ -46,55 +46,53 @@ export default class FeatureService {
         return featuresDto;
     }
 
-    async activateFeature(name, version, hostname): Promise<void> {
-        const config = await this._siteConfigRepository.getById(hostname);
-        const featuresBranches = await this._registryAggregator.getFeatures([hostname]);
-        const order = Object.getOwnPropertyNames(featuresBranches[hostname]).findIndex(f => f === name);
+    private async _setFeatureActive(name: string, version: string, hostnames: string[], isActive: boolean) {
+        const featuresHostnames = await this._registryAggregator.getFeatures(hostnames);
 
-        config.activeFeatures[name] = {
-            version,
-            isActive: true
-            // ToDo: get a order from the config
-        };
+        for (const hostname in featuresHostnames) {
+            const config = await this._siteConfigRepository.getById(hostname);
+            config.activeFeatures[name] = {
+                version,
+                isActive: true
+                // ToDo: get a order from the config
+            };
 
-        await this._siteConfigRepository.update(config);
+            await this._siteConfigRepository.update(config);
 
-        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-            var activeTab = tabs[0];
-            extension.tabs.sendMessage(activeTab.id, {
-                type: "FEATURE_ACTIVATED",
-                payload: { name, version, branch: "default", order } // ToDo: fix branch
+            const order = Object.getOwnPropertyNames(featuresHostnames[hostname]).findIndex(f => f === name);
+            extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+                var activeTab = tabs[0];
+                extension.tabs.sendMessage(activeTab.id, {
+                    type: isActive ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
+                    payload: {
+                        name,
+                        version,
+                        branch: "default", // ToDo: fix branch
+                        order,
+                        contextIds: hostnames
+                    }
+                });
             });
-        });
+        }
     }
 
-    async deactivateFeature(name, version, hostname): Promise<void> {
-        const config = await this._siteConfigRepository.getById(hostname);
-
-        config.activeFeatures[name] = {
-            version,
-            isActive: false
-        };
-
-        await this._siteConfigRepository.update(config);
-
-        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-            var activeTab = tabs[0];
-            extension.tabs.sendMessage(activeTab.id, {
-                type: "FEATURE_DEACTIVATED",
-                payload: { name, version, branch: "default" } // ToDo: fix branch
-            });
-        });
+    async activateFeature(name: string, version: string, hostnames: string[]): Promise<void> {
+        return await this._setFeatureActive(name, version, hostnames, true);
     }
 
-    public async getActiveModulesByHostnames(hostnames: string[]) {
+    async deactivateFeature(name: string, version: string, hostnames: string[]): Promise<void> {
+        return await this._setFeatureActive(name, version, hostnames, false);
+    }
+
+    public async getActiveModulesByHostnames(hostnames: string[]): Promise<{ name: string, branch: string, version: string, order: number, hostnames: string[] }[]> {
         const featureNames = await this.getFeaturesByHostnames(hostnames);
         const activeModules = featureNames.filter(f => f.isActive === true)
             .map(m => ({
                 name: m.name,
                 branch: m.branch,
                 version: m.version,
-                order: m.order
+                order: m.order,
+                hostnames: m.hostnames
             }));
         return activeModules;
     }
