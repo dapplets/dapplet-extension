@@ -5,7 +5,7 @@ export class Connection {
         [id: string]: Function[]
     } = {};
 
-    private _listenableIds : string[] = [];
+    private _listenableIds: string[] = [];
 
     constructor(url: string) {
         this._createConnection(url);
@@ -22,7 +22,7 @@ export class Connection {
             this._createConnection(url);
         };
         this._ws.onmessage = (e) => {
-            
+
             const message: { [id: string]: any } = JSON.parse(e.data);
 
             message && Object.keys(message).forEach((id) => {
@@ -44,7 +44,9 @@ export class Connection {
 
         this._callbacks[id].push(handler);
 
-        this._listenableIds.push(id);
+        if (this._listenableIds.indexOf(id) === -1) {
+            this._listenableIds.push(id);
+        }
 
         if (this._ws.readyState === this._ws.OPEN) {
             this._ws.send(id);
@@ -53,6 +55,7 @@ export class Connection {
         return {
             close: () => {
                 delete this._callbacks[id];
+                this._listenableIds = this._listenableIds.filter(f => f !== id);
                 // ToDo: publish unsubscribe to server
             }
         };
