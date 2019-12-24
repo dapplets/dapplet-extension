@@ -94,9 +94,6 @@ extension.commands.onCommand.addListener(cmd => {
   }
 });
 
-
-// extension.tabs.query({}, tabs => tabs.forEach(t => extension.tabs.sendMessage(t.id, message)));
-
 extension.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (!request) return
 
@@ -110,5 +107,26 @@ extension.runtime.onMessage.addListener(function (request, sender, sendResponse)
       request.payload.topic,
       (topic, data) => extension.tabs.sendMessage(sender.tab.id, { topic, data })
     )
+  }
+});
+
+extension.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+  if (!message || !message.type) return;
+
+  if (message.type === "CONTEXT_STARTED" || message.type === "CONTEXT_FINISHED") {
+    const manifests = await featureService.getActiveModulesByHostnames(message.payload.contextIds);
+
+    for (const m of manifests) {
+      extension.tabs.sendMessage(sender.tab.id, {
+        type: message.type === "CONTEXT_STARTED" ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
+        payload: {
+          name: m.name,
+          version: m.version,
+          branch: m.branch, // ToDo: fix branch
+          order: m.order,
+          contextIds: m.hostnames  // ToDo: remove this map after renaming of hostnames to contextIds
+        }
+      });
+    }
   }
 });

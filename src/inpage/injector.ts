@@ -9,7 +9,7 @@ import Manifest from "../background/models/manifest";
 import ManifestDTO from "../background/dto/manifestDTO";
 
 export class Injector {
-    public availableContextIds: string[] = [window.location.hostname];
+    public availableContextIds: string[] = [];
 
     private registry: {
         manifest: Manifest,
@@ -19,13 +19,8 @@ export class Injector {
         contextIds: string[]
     }[] = [];
 
-    constructor(public core: Core) { }
-
-    public async loadActiveModules() {
-        const { getActiveModulesByHostnames } = await initBGFunctions(extension);
-
-        const modules = await getActiveModulesByHostnames([window.location.hostname]);
-        await this.loadModules(modules.map(m => ({ ...m, contextIds: [window.location.hostname] })));
+    constructor(public core: Core) {
+        this._setContextActivivty([window.location.hostname], undefined, true);
     }
 
     public async loadModules(modules: { name: string, branch: string, version: string, order: number, contextIds: string[] }[]) {
@@ -108,8 +103,8 @@ export class Injector {
                 overlay: core.overlay,
                 waitPairingOverlay: core.waitPairingOverlay,
                 sendWalletConnectTx: core.sendWalletConnectTx,
-                contextStarted: (contextIds: any[], parentContext: string) => this._contextStarted(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : "")),
-                contextFinished: (contextIds: any[], parentContext: string) => this._contextFinished(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : "")),
+                contextStarted: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), true),
+                contextFinished: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), false),
             };
 
             const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
@@ -169,57 +164,25 @@ export class Injector {
         }
     }
 
-    private async _contextStarted(contextIds: any[], parentContext: string) {
-        const { getActiveModulesByHostnames } = await initBGFunctions(extension);
-        const concatedContextIds = contextIds.map(({ id }) => parentContext + '/' + id);
-        this._addContextIds(concatedContextIds);
+    private async _setContextActivivty(contextIds: any[], parentContext: string, isActive: boolean) {
+        contextIds = parentContext ? contextIds.map(({ id }) => parentContext + '/' + id) : contextIds;
 
-        const manifests: {name: string, branch: string, version: string, order: number, hostnames: string[] }[] = await getActiveModulesByHostnames(concatedContextIds);
-        const featuresForLoading = manifests.map(m => ({
-            name: m.name, 
-            branch: m.branch, 
-            version: m.version, 
-            order: 999, // ToDo: fix order
-            contextIds: m.hostnames // ToDo: the bug of dynamic feature deactivation
-        }));
-
-        featuresForLoading.forEach(f => console.log(`The module ${f.name}#${f.branch}@${f.version} was found for the contexts: ${f.contextIds.join(', ')}`));
-
-        await this.loadModules(featuresForLoading);
-    }
-
-    private async _contextFinished(contextIds: any[], parentContext: string) {
-        const concatedContextIds = contextIds.map(({ id }) => parentContext + '/' + id);
-        this._removeContextIds(concatedContextIds);
-        this.registry.forEach(m => {
-            if (m.contextIds) {
-                m.contextIds = m.contextIds.filter(id => concatedContextIds.indexOf(id) === -1);
-            }
-        });
-
-        const modulesForDeactivation = this.registry.filter(r => r.contextIds?.length === 0 && r.instance).map(({ manifest }) => ({
-            name: manifest.name,
-            branch: manifest.branch,
-            version: manifest.version
-        }));
-
-        if (modulesForDeactivation.length > 0) {
-            this.unloadModules(modulesForDeactivation);
+        if (isActive) {
+            contextIds.forEach(id => {
+                if (this.availableContextIds.indexOf(id) === -1) {
+                    this.availableContextIds.push(id);
+                }
+            });
+        } else {
+            contextIds.forEach(id => {
+                const index = this.availableContextIds.indexOf(id);
+                if (index > -1) this.availableContextIds.splice(index, 1);
+            });
         }
-    }
 
-    private _addContextIds(contextIds: any[]) {
-        contextIds.forEach(id => {
-            if (this.availableContextIds.indexOf(id) === -1) {
-                this.availableContextIds.push(id);
-            }
-        });
-    }
-
-    private _removeContextIds(contextIds: any[]) {
-        contextIds.forEach(id => {
-            const index = this.availableContextIds.indexOf(id);
-            if (index > -1) this.availableContextIds.splice(index, 1);
+        extension.extension.sendMessage({
+            type: isActive ? "CONTEXT_STARTED" : "CONTEXT_FINISHED",
+            payload: { contextIds }
         });
     }
 }
