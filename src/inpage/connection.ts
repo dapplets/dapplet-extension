@@ -56,6 +56,7 @@ export class Connection {
             close: () => {
                 delete this._callbacks[id];
                 this._listenableIds = this._listenableIds.filter(f => f !== id);
+                this._ws.send(JSON.stringify({ method: "unsubscribe", params: [id] }));
                 // ToDo: publish unsubscribe to server
             }
         };
