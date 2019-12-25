@@ -36,7 +36,7 @@ export default class ModuleManager {
     public async loadModule(name: string, branch: string, version: string): Promise<{ script: string, manifest: Manifest }> {
         const manifest = await this.loadManifest(name, branch, version);
         const resource = await this._storage.getResource(manifest.dist);
-        const script = String.fromCharCode.apply(null, new Uint8Array(resource));
+        const script = new TextDecoder("utf-8").decode(new Uint8Array(resource));
 
         return { script, manifest };
     }
@@ -45,7 +45,7 @@ export default class ModuleManager {
         const manifestUris = await this._registry.resolveToUri(name, branch, version);
         const manfiestUri = manifestUris[0]; // ToDo: select uri
         const manifestBufferArray = await this._storage.getResource(manfiestUri);
-        const manifestJson = String.fromCharCode.apply(null, new Uint8Array(manifestBufferArray));
+        const manifestJson = new TextDecoder("utf-8").decode(new Uint8Array(manifestBufferArray));
         const manifest: Manifest = JSON.parse(manifestJson);
         
         // convert a relative URL to absolute
