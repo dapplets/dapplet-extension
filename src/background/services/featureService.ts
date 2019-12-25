@@ -53,7 +53,7 @@ export default class FeatureService {
             const config = await this._siteConfigRepository.getById(hostname);
             config.activeFeatures[name] = {
                 version,
-                isActive: true
+                isActive
                 // ToDo: get a order from the config
             };
 
