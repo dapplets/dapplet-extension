@@ -9,7 +9,7 @@ const transactionCreated = async transactionId => {
                 type: "basic",
                 iconUrl: "icons/icon128.png",
                 title: "Transaction created",
-                message: "Сlick to check the status on Etherscan"
+                message: "Click to check the status on Etherscan"
             },
             resolve
         );
