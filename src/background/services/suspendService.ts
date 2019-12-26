@@ -8,8 +8,8 @@ const _siteConfigRepository = new SiteConfigBrowserStorage();
 const _globalConfigService = new GlobalConfigService();
 
 const changeIcon = () => {
-    extension.tabs.query({ active: true }, async function (tab) {
-        const url = tab[0].url;
+    extension.tabs.query({ active: true }, async function ([tab]) {
+        const url = tab.url || tab.pendingUrl;
         const hostname = Helpers.getHostName(url);
         const suspendityByHostname = await getSuspendityByHostname(hostname);
         const suspendityEverywhere = await getSuspendityEverywhere();
@@ -26,8 +26,8 @@ const changeIcon = () => {
 // TODO Errors are thrown sometimes because context menu duplication
 const updateContextMenus = () => {
     extension.contextMenus.removeAll(function () {
-        extension.tabs.query({ active: true }, async function (tab) {
-            const url = tab[0].url;
+        extension.tabs.query({ active: true }, async function ([tab]) {
+            const url = tab.url || tab.pendingUrl;
             const hostname = Helpers.getHostName(url);
 
             const suspendityByHostname = await getSuspendityByHostname(hostname);
