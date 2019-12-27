@@ -77,7 +77,7 @@ export class Injector {
     }
 
     private async _processModules(modules: { manifest: Manifest, script: string, order: number, contextIds: string[] }[]) {
-        const { optimizeDependency, getModulesWithDeps } = await initBGFunctions(extension);
+        const { optimizeDependency, getModulesWithDeps, addEvent } = await initBGFunctions(extension);
         const { core } = this;
 
         for (const { manifest, script, order, contextIds } of modules) {
@@ -120,7 +120,7 @@ export class Injector {
                 // ToDo: do not exec resolver twice (when second feature is activated)
                 execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
 
-                console.log(`Resolver of "${manifest.name}" defined the "${branch}" branch`);
+                addEvent('Branch resolving', `Resolver of "${manifest.name}" defined the "${branch}" branch`);
                 const optimizedBranch = await optimizeDependency(manifest.name, branch, manifest.version);
                 const missingDependencies = await getModulesWithDeps([optimizedBranch]);
                 await this._processModules(missingDependencies);
