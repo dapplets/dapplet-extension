@@ -2,7 +2,7 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as extension from 'extensionizer';
 
-import { Button, Form, Segment, Message } from "semantic-ui-react";
+import { Button, Form, Segment, Message, Dropdown } from "semantic-ui-react";
 
 interface ISettingsProps {
 
@@ -14,6 +14,16 @@ interface ISettingsState {
     error: string;
     connected: boolean;
 }
+
+const OPTIONS = [{
+    key: 'https://test.dapplets.org/dapplet-base',
+    text: 'https://test.dapplets.org/dapplet-base',
+    value: 'https://test.dapplets.org/dapplet-base'
+}, {
+    key: 'https://localhost:8080/index.json',
+    text: 'https://localhost:8080/index.json',
+    value: 'https://localhost:8080/index.json'
+}];
 
 class Settings extends React.Component<ISettingsProps, ISettingsState> {
     constructor(props) {
@@ -70,23 +80,17 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             <React.Fragment>
                 <Segment loading={isLoading} className="internalTab">
 
-                    <Form onSubmit={this.handleSubmit}>
-                        <Form.Input
+                    <Form>
+                        <Dropdown
+                            onChange={(e, { value }) => { this.setState({ registryUrl: value }); this.handleSubmit(); }}
+                            label='Registry URL'
+                            value={registryUrl}
                             placeholder='Type URL to index.json'
                             size='mini'
-                            value={registryUrl}
-                            label='Registry URL'
-                            onChange={(e, { value }) => this.setState({ registryUrl: value })}
-                            action={(
-                                <React.Fragment>
-                                    <Button
-                                        content='Set'
-                                        size='mini'
-                                        color='teal'
-                                        type='submit'
-                                    />
-                                </React.Fragment>
-                            )}
+                            fluid
+                            selection
+                            options={OPTIONS}
+                            defaultValue='https://test.dapplets.org/dapplet-base'
                         />
                     </Form>
 
