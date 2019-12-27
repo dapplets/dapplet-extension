@@ -3,17 +3,19 @@ import { generateGuid } from '../../common/utils';
 import EventBrowserStorage from '../browserStorages/eventBrowserStorage';
 
 export async function getEvents(): Promise<Event[]> {
-    //const eventBrowserStorage = new EventBrowserStorage();
-    const events: Event[] = []; // await eventBrowserStorage.getAll();
-
-    for (let i = 0; i < 100; i++) {
-        const e = new Event();
-        e.id = generateGuid();
-        e.title = "Title of test event #" + (i + 1);
-        e.description = "Here is description";
-        e.created = new Date();
-        events.push(e);
-    }
-
+    const eventBrowserStorage = new EventBrowserStorage();
+    const events: Event[] = await eventBrowserStorage.getAll();
     return events;
+}
+
+export async function addEvent(title: string, description: string): Promise<void> {
+    const eventBrowserStorage = new EventBrowserStorage();
+
+    const event = new Event();
+    event.id = generateGuid(); // ToDo: autoincrement?
+    event.title = title;
+    event.description = description;
+    event.created = new Date();
+
+    await eventBrowserStorage.create(event);
 }

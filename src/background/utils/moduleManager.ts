@@ -3,6 +3,7 @@ import { Registry } from '../registries/registry';
 import { maxSatisfying } from 'semver';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 import Manifest from '../models/manifest';
+import { addEvent } from '../services/eventService';
 
 export default class ModuleManager {
 
@@ -47,7 +48,7 @@ export default class ModuleManager {
         const manifestBufferArray = await this._storage.getResource(manfiestUri);
         const manifestJson = new TextDecoder("utf-8").decode(new Uint8Array(manifestBufferArray));
         const manifest: Manifest = JSON.parse(manifestJson);
-        
+
         // convert a relative URL to absolute
         if (!(/^(?:[a-z]+:)?\/\//i.test(manifest.dist))) {
             manifest.dist = new URL(manifest.dist, manfiestUri).href;
@@ -110,7 +111,7 @@ export default class ModuleManager {
         // ToDo: catch null in optimizedVersion
 
         if (version != optimizedVersion) {
-            console.warn(`[Dependency Optimizer] Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`);
+            addEvent('Dependency Optimizer', `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`);
         }
 
         return {
