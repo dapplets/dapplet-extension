@@ -1,13 +1,12 @@
 import * as React from "react";
 import * as extension from 'extensionizer';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { List, Segment, Label } from "semantic-ui-react";
 
 import { Event } from '../../common/models/event';
 
-import { List, Segment } from "semantic-ui-react";
-
 interface IEventsProps {
-    
+
 }
 
 interface IEventsState {
@@ -25,9 +24,10 @@ class Events extends React.Component<IEventsProps, IEventsState> {
 
     async componentDidMount() {
         const backgroundFunctions = await initBGFunctions(extension);
-        const { getEvents } = backgroundFunctions;
+        const { getEvents, setRead } = backgroundFunctions;
         const events: Event[] = await getEvents();
         this.setState({ events });
+        setRead(events.map(e => e.id));
     }
 
     render() {
@@ -39,7 +39,7 @@ class Events extends React.Component<IEventsProps, IEventsState> {
                         {events.map(e => (
                             <List.Item key={e.id}>
                                 <List.Content>
-                                    <List.Header>{e.title}</List.Header>
+                                    <List.Header>{e.isRead === false ? (<Label circular color='blue' empty />) : null} {e.title}</List.Header>
                                     <List.Description>{e.description}</List.Description>
                                 </List.Content>
                             </List.Item>
