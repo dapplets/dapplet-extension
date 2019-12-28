@@ -100,6 +100,8 @@ export default class Core {
             callback({ type: "PAIRED" });
         }
 
+        callback({ type: "PENDING" });
+
         let dappletResult = null;
 
         const { walletInfo } = await getGlobalConfig();
