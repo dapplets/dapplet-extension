@@ -11,4 +11,6 @@ export class GlobalConfig extends Base {
     suspended: boolean = false;
 
     walletInfo: WalletInfo = null;
+
+    registries: string[] = [];
 }

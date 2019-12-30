@@ -13,6 +13,7 @@ interface ISettingsState {
     isLoading: boolean;
     error: string;
     connected: boolean;
+    registries: string[];
 }
 
 const OPTIONS = [{
@@ -33,7 +34,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             registryUrl: '',
             isLoading: true,
             error: null,
-            connected: false
+            connected: false,
+            registries: []
         };
     }
 
@@ -47,7 +49,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             this.setState({
                 registryUrl: config.registryUrl,
                 isLoading: false,
-                connected: !!config.registryUrl
+                connected: !!config.registryUrl,
+                registries: config.registries
             });
         } catch {
             this.setState({
@@ -58,41 +61,56 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         }
     }
 
-    handleSubmit = async () => {
+    async setNewUrl(url: string) {
+        this.setState({ isLoading: true, registryUrl: url });
+
         const backgroundFunctions = await initBGFunctions(extension);
         const { getGlobalConfig, setGlobalConfig } = backgroundFunctions;
 
-        const { registryUrl } = this.state;
+        const config = await getGlobalConfig();
+        config.registryUrl = url;
+        await setGlobalConfig(config);
 
+        await this.componentDidMount();
+    }
+
+    async addNewUrl(url: string) {
         this.setState({ isLoading: true });
 
+        const backgroundFunctions = await initBGFunctions(extension);
+        const { getGlobalConfig, setGlobalConfig } = backgroundFunctions;
         const config = await getGlobalConfig();
-        config.registryUrl = registryUrl;
+
+        if (!config.registries) config.registries = [];
+        config.registries.push(url);
+
         await setGlobalConfig(config);
 
         await this.componentDidMount();
     }
 
     render() {
-        const { registryUrl, isLoading, error, connected } = this.state;
+        const { registryUrl, isLoading, error, connected, registries } = this.state;
 
         return (
             <React.Fragment>
-                <Segment loading={isLoading} className="internalTab">
+                <Segment loading={isLoading} className="internalTabSettings">
 
-                    <Form>
-                        <Dropdown
-                            onChange={(e, { value }) => { this.setState({ registryUrl: value }); this.handleSubmit(); }}
-                            label='Registry URL'
-                            value={registryUrl}
-                            placeholder='Type URL to index.json'
-                            size='mini'
-                            fluid
-                            selection
-                            options={OPTIONS}
-                            defaultValue='https://test.dapplets.org/dapplet-base'
-                        />
-                    </Form>
+                    <p><b>Registry URL</b></p>
+                    <Dropdown
+                        options={registries.map(r => ({ key: r, text: r, value: r }))}
+                        placeholder='Type URL to Registry'
+                        search
+                        selection
+                        fluid
+                        allowAdditions
+                        value={registryUrl}
+                        key={registryUrl}
+                        text={registryUrl}
+                        onAddItem={(e, { value }) => this.addNewUrl(value as string)}
+                        onChange={(e, { value }) => this.setNewUrl(value as string)}
+                        size='mini'
+                    />
 
                     {(!isLoading) && (
                         (error) ? (<Message floating negative>{error}</Message>) : (

@@ -8,7 +8,7 @@ import * as EventService from './services/eventService';
 import * as extension from 'extensionizer';
 import { GlobalEventBusService } from "./services/globalEventBusService";
 
-// ToDo: Fix dublication of new FeatureService(), new GlobalConfigService() etc.
+// ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
 // ToDo: Think about WalletConnectService, SuspendService etc, which looks like singletons.
 
