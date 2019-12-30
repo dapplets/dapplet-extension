@@ -1,4 +1,4 @@
-export class Connection {
+export class WSConnection {
     private _ws: WebSocket = null;
 
     private _callbacks: {

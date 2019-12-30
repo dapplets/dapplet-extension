@@ -1,10 +1,12 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { Connection } from './connection';
+import { WSConnection } from './wsConnection';
 import { OverlayManager } from "./overlayManager";
 import { Overlay, SubscribeOptions } from "./overlay";
 import * as extension from 'extensionizer';
 import { Swiper } from "./swiper";
 import * as GlobalEventBus from './globalEventBus';
+import { OverlayConnConfig, OverlayConnection } from "./connections/overlayConnection";
+import { WalletConnConfig, WalletConnection } from "./connections/walletConnection";
 
 export default class Core {
 
@@ -34,14 +36,15 @@ export default class Core {
         });
     }
 
-    public connect(url: string): Connection {
-        return new Connection(url);
+    public connect(url: string): WSConnection {
+        return new WSConnection(url);
     }
 
     public publish = (topic: string, data: any) => GlobalEventBus.publish(topic, data)
     public subscribe = (topic: string, func: Function) => GlobalEventBus.subscribe(topic, func)
 
-    public overlay(url: string, title: string) {
+    public legacyOverlay(url: string, title: string) {
+        //ToDo: create a tab on 1st message sent
         const ov = new Overlay(this.overlayManager, url, title);
         const me = {
             open: (callback?: Function) => (ov.open(callback), me),
@@ -146,5 +149,13 @@ export default class Core {
         }
 
         return dappletResult;
+    }
+
+    public overlay(cfg: OverlayConnConfig) {
+        return new OverlayConnection(cfg);
+    }
+
+    public wallet(cfg: WalletConnConfig) {
+        return new WalletConnection(cfg)
     }
 }
