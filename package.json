@@ -4,12 +4,13 @@
   "description": "Adds controls to legacy web sites.",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
+    "build:types": "tsc -d --emitDeclarationOnly",
     "dev": "webpack --config webpack.dev.js",
     "start": "webpack -w --config webpack.dev.js",
     "lint": "tslint 'src/**/*.{ts, tsx}'"
   },
   "devDependencies": {
-    "@dapplets/dapplet-extension-types": "^0.3.11",
+    "@dapplets/dapplet-extension-types": "^0.3.12",
     "@types/chrome": "^0.0.91",
     "@types/qr-image": "^3.2.1",
     "@types/react": "^16.9.15",
