@@ -5,8 +5,8 @@ import { Overlay, SubscribeOptions } from "./overlay";
 import * as extension from 'extensionizer';
 import { Swiper } from "./swiper";
 import * as GlobalEventBus from './globalEventBus';
-import { OverlayConnConfig, OverlayConnection } from "./connections/overlayConnection";
-import { WalletConnConfig, WalletConnection } from "./connections/walletConnection";
+import { OverlayConnConfig, OverlayConnection } from "./subscriptions/overlayConnection";
+import { WalletConnConfig, WalletConnection } from "./subscriptions/walletConnection";
 
 export default class Core {
 
@@ -60,7 +60,7 @@ export default class Core {
         const me = this;
         return new Promise<void>((resolve, reject) => {
             const pairingUrl = extension.extension.getURL('pairing.html');
-            const overlay = me.overlay(pairingUrl, 'Wallet');
+            const overlay = me.legacyOverlay(pairingUrl, 'Wallet');
             overlay.open();
             // ToDo: add timeout?
             overlay.subscribe('ready', () => {
@@ -121,7 +121,7 @@ export default class Core {
             const waitApproving = function (): Promise<void> {
                 return new Promise<void>((resolve, reject) => {
                     const pairingUrl = extension.extension.getURL('dapplet.html');
-                    const overlay = me.overlay(pairingUrl, 'Dapplet');
+                    const overlay = me.legacyOverlay(pairingUrl, 'Dapplet');
                     // ToDo: implement multiframe
                     overlay.open(() => overlay.publish('txmeta', dappletId, metadata));
                     // ToDo: add timeout?
@@ -152,7 +152,7 @@ export default class Core {
     }
 
     public overlay(cfg: OverlayConnConfig) {
-        return new OverlayConnection(cfg);
+        return new OverlayConnection(cfg, this.overlayManager);
     }
 
     public wallet(cfg: WalletConnConfig) {

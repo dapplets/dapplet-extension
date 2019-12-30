@@ -100,11 +100,13 @@ export class Injector {
                 connect: core.connect,
                 publish: core.publish,
                 subscribe: core.subscribe,
-                overlay: core.overlay,
+                legacyOverlay: core.legacyOverlay,
                 waitPairingOverlay: core.waitPairingOverlay,
                 sendWalletConnectTx: core.sendWalletConnectTx,
                 contextStarted: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), true),
                 contextFinished: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), false),
+                overlay: core.overlay,
+                wallet: core.wallet
             };
 
             const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
