@@ -21,6 +21,10 @@ export default class GlobalConfigService {
         const config = new GlobalConfig();
         config.id = this._configId;
         config.registryUrl = "https://test.dapplets.org/dapplet-base";
+        config.registries = [
+            "https://test.dapplets.org/dapplet-base",
+            "https://localhost:8080/index.json"
+        ];
         
         await this._globalConfigRepository.deleteById(this._configId);
         await this._globalConfigRepository.create(config);
