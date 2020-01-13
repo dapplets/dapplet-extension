@@ -4,7 +4,7 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "rootDir": "src",
-        "outDir": "dist/js",
+        "outDir": "lib",
         "sourceMap": true,
         "jsx": "react",
         "lib": ["es2015", "dom"],

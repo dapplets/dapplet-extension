@@ -1,4 +1,8 @@
-export class WSConnection {
+export interface IWSConnection {
+    subscribe(id: string, handler: (message: any) => void): { close: () => void }
+}
+
+export class WSConnection implements IWSConnection {
     private _ws: WebSocket = null;
 
     private _callbacks: {

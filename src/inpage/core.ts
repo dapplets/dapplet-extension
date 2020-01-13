@@ -158,4 +158,8 @@ export default class Core {
     public wallet(cfg: WalletConnConfig) {
         return new WalletConnection(cfg)
     }
+
+    // ToDo: remove it or implement!
+    contextStarted(contextIds: any[], parentContext?: string): void { }
+    contextFinished(contextIds: any[], parentContext?: string): void { }
 }

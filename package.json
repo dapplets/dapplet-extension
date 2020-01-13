@@ -1,16 +1,17 @@
 {
-  "name": "dapplet-extension",
+  "name": "@dapplets/dapplet-extension",
   "version": "0.1.1",
   "description": "Adds controls to legacy web sites.",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "build:types": "tsc -d --emitDeclarationOnly",
     "dev": "webpack --config webpack.dev.js",
     "start": "webpack -w --config webpack.dev.js",
-    "lint": "tslint 'src/**/*.{ts, tsx}'"
+    "lint": "tslint 'src/**/*.{ts, tsx}'",
+    "publish": "npm publish --access public"
   },
   "devDependencies": {
-    "@dapplets/dapplet-extension-types": "^0.3.12",
     "@types/chrome": "^0.0.91",
     "@types/qr-image": "^3.2.1",
     "@types/react": "^16.9.15",
@@ -64,5 +65,8 @@
   "bugs": {
     "url": "https://github.com/dapplets/dapplet-extension/issues"
   },
-  "homepage": "https://github.com/dapplets/dapplet-extension#readme"
+  "homepage": "https://github.com/dapplets/dapplet-extension#readme",
+  "files": [
+    "lib/**/*"
+  ]
 }

@@ -4,7 +4,7 @@ import { maxSatisfying } from 'semver';
 import { SubscribeOptions } from './overlay';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
 import * as extension from 'extensionizer';
-import { IResolver, IContentAdapter, IFeature } from '@dapplets/dapplet-extension-types';
+import { IResolver, IContentAdapter, IFeature } from './types';
 import Manifest from "../background/models/manifest";
 import ManifestDTO from "../background/dto/manifestDTO";
 

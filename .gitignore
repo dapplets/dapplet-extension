@@ -3,3 +3,4 @@ build
 secrets.*.js
 .vscode
 dist
+lib
