@@ -1,12 +1,10 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { WSConnection } from './wsConnection';
 import { OverlayManager } from "./overlayManager";
 import { Overlay, SubscribeOptions } from "./overlay";
 import * as extension from 'extensionizer';
 import { Swiper } from "./swiper";
 import * as GlobalEventBus from './globalEventBus';
-import { OverlayConnConfig, OverlayConnection } from "./subscriptions/overlayConnection";
-import { WalletConnConfig, WalletConnection } from "./subscriptions/walletConnection";
+import { EventDef, Connection } from "./subscriptions/connection";
 
 export default class Core {
 
@@ -36,38 +34,26 @@ export default class Core {
         });
     }
 
-    public connect(url: string): WSConnection {
-        return new WSConnection(url);
-    }
-
     public publish = (topic: string, data: any) => GlobalEventBus.publish(topic, data)
     public subscribe = (topic: string, func: Function) => GlobalEventBus.subscribe(topic, func)
-
-    public legacyOverlay(url: string, title: string) {
-        //ToDo: create a tab on 1st message sent
-        const ov = new Overlay(this.overlayManager, url, title);
-        const me = {
-            open: (callback?: Function) => (ov.open(callback), me),
-            close: () => (ov.close(), me),
-            subscribe: (topic: string, handler: Function, threading?: SubscribeOptions) => (ov.subscribe(topic, handler, threading), me),
-            unsubscribe: (topic: string) => (ov.unsubscribe(topic), me),
-            publish: (topic: string, ...args: any) => (ov.publish(topic, ...args), me)
-        };
-        return me;
-    }
 
     public waitPairingOverlay(): Promise<void> {
         const me = this;
         return new Promise<void>((resolve, reject) => {
             const pairingUrl = extension.extension.getURL('pairing.html');
-            const overlay = me.legacyOverlay(pairingUrl, 'Wallet');
+            const overlay = new Overlay(this.overlayManager, pairingUrl, 'Wallet');
             overlay.open();
             // ToDo: add timeout?
-            overlay.subscribe('ready', () => {
-                overlay.close();
-                resolve();
-            }); // 'paired' - when paired, 'ready' - when user clicked on the continue button
-            overlay.subscribe('error', () => reject());
+            overlay.onmessage = (topic, message) => {
+                if (topic === 'ready') {
+                    overlay.close();
+                    resolve();
+                }
+
+                if (topic === 'error') {
+                    reject();
+                }
+            }
         });
     }
 
@@ -81,7 +67,7 @@ export default class Core {
         }
     }
 
-    public async sendWalletConnectTx(dappletId, metadata, callback: (e: { type: string, data?: any }) => void): Promise<any> {
+    private async _sendWalletConnectTx(dappletId, metadata, callback: (e: { type: string, data?: any }) => void): Promise<any> {
         const backgroundFunctions = await initBGFunctions(extension);
         const {
             loadDapplet,
@@ -121,18 +107,21 @@ export default class Core {
             const waitApproving = function (): Promise<void> {
                 return new Promise<void>((resolve, reject) => {
                     const pairingUrl = extension.extension.getURL('dapplet.html');
-                    const overlay = me.legacyOverlay(pairingUrl, 'Dapplet');
+                    const overlay = new Overlay(me.overlayManager, pairingUrl, 'Dapplet');
                     // ToDo: implement multiframe
-                    overlay.open(() => overlay.publish('txmeta', dappletId, metadata));
+                    overlay.open(() => overlay.send('txmeta', [dappletId, metadata]));
                     // ToDo: add timeout?
-                    overlay.subscribe('approved', () => {
-                        resolve();
-                        overlay.close();
-                    });
-                    overlay.subscribe('error', () => {
-                        reject();
-                        overlay.close();
-                    });
+                    overlay.onmessage = (topic, message) => {
+                        if (topic === 'approved') {
+                            resolve();
+                            overlay.close();
+                        }
+
+                        if (topic === 'error') {
+                            reject();
+                            overlay.close();
+                        }
+                    };
                 });
             };
 
@@ -151,12 +140,65 @@ export default class Core {
         return dappletResult;
     }
 
-    public overlay(cfg: OverlayConnConfig) {
-        return new OverlayConnection(cfg, this.overlayManager);
+    public connect<P>(cfg: { url: string }, eventDef?: EventDef<any>): P & Connection<P> {
+        const _listenableIds: string[] = [];
+        const _ws = new WebSocket(cfg.url);
+        _ws.onopen = () => {
+            console.log('WebSocket connection OPENED');
+            _listenableIds.forEach(id => _ws.send(id));
+        };
+        _ws.onclose = () => {
+            console.log('WebSocket connection CLOSED');
+            //_createWSConnection(url);
+        };
+
+        const sender = (subject: string, message: any) => {
+            _ws.send(JSON.stringify({
+                subject, message
+            }));
+        };
+
+        const conn = Connection.create<P>(sender, eventDef);
+
+        _ws.onmessage = (e) => {
+            const message: { [id: string]: any } = JSON.parse(e.data);
+            message && Object.keys(message).forEach((id) => {
+                conn.onMessage(id, message);
+            });
+        };
+
+        return conn;
     }
 
-    public wallet(cfg: WalletConnConfig) {
-        return new WalletConnection(cfg)
+    public wallet<P>(conf: { dappletId: string }, eventDef?: EventDef<any>): P & Connection<P> {
+        const me = this;
+        const conn = Connection.create<P>(sender, eventDef);
+
+        function sender(subject: string, message: any) {
+            me._sendWalletConnectTx(conf.dappletId, subject, (e: { type: string, data?: any }) => { // ToDo: fix it
+                conn.onMessage(e.type, e.data);
+            });
+        }
+
+        return conn;
+    }
+
+    public overlay<P>(cfg: { url: string, title: string }, eventDef?: EventDef<any>): P & Connection<P> {
+        const _overlay = new Overlay(this.overlayManager, cfg.url, cfg.title);
+
+        const sender = (subject: string, message: any) => {
+            _overlay.open(() => {
+                _overlay.send(subject, message);
+            });
+        };
+
+        const conn = Connection.create<P>(sender, eventDef);
+
+        _overlay.onmessage = (topic: string, message: any) => {
+            conn.onMessage(topic, message);
+        }
+
+        return conn;
     }
 
     // ToDo: remove it or implement!

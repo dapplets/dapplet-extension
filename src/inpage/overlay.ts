@@ -9,24 +9,20 @@ export enum SubscribeOptions {
 export class Overlay {
 
     private _manager: OverlayManager = null;
-    private _callbacks: {
-        [topic: string]: {
-            fn: Function,
-            threading: SubscribeOptions
-        }[]
-    } = {};
 
     public frame: HTMLIFrameElement = null;
 
     private _queue: {
         topic: string,
-        args: any[]
+        message: any
     }[] = [];
 
     private _isQueueProcessing: boolean = false;
     private _isFrameLoaded: boolean = false;
 
     public registered: boolean = false;
+
+    public onmessage: (topic: string, message: any) => void = null;
 
     constructor(manager: OverlayManager, uri: string, public title: string) {
         this._manager = manager;
@@ -41,33 +37,26 @@ export class Overlay {
             if (e.source != this.frame.contentWindow) return; // Listen messages from only our frame
             if (!e.data) return;
 
-            const { topic, args } = JSON.parse(e.data);
-            if (!topic || !args) return;
+            const { topic, message, args } = JSON.parse(e.data);
+            if (!topic) return;
 
-            // Callbacks that must be executed in the first order in a crowd (MULTI_THREAD)
-            const topicCallbacks = this._callbacks[topic] || [];
-            const multiThreadCallbacks = topicCallbacks.filter(f => f.threading == SubscribeOptions.MULTI_THREAD);
-            multiThreadCallbacks.forEach(c => setTimeout(c.fn.bind({}, ...args), 0)); // parallel execution
-
-            // Callbacks that must be executed consistently (SINGLE_THREAD)
-            this._queue.push({ topic, args });
+            this._queue.push({
+                topic: topic,
+                message: message || args
+            });
             this.processQueue();
         }, false);
     }
 
     async processQueue() {
         if (this._isQueueProcessing) return;
+        if (!this.onmessage) return;
 
         this._isQueueProcessing = true;
 
         while (this._queue.length > 0) {
-            const { topic, args } = this._queue.shift();
-            const topicCallbacks = this._callbacks[topic] || [];
-            const callbacks = topicCallbacks.filter(f => f.threading == SubscribeOptions.SINGLE_THREAD);
-
-            for (const callback of callbacks) {
-                await callback.fn.bind({}, ...args)(); // ToDo: Think about execution order. Sync is now.
-            }
+            const { topic, message } = this._queue.shift();
+            this.onmessage.bind({}, [topic, message]);
         }
 
         this._isQueueProcessing = false;
@@ -101,22 +90,8 @@ export class Overlay {
         this._manager.unregister(this);
     }
 
-    public publish(topic: string, ...args: any) {
-        const msg = JSON.stringify({ topic, args });
+    public send(topic: string, message: any) {
+        const msg = JSON.stringify({ topic, message: [message] }); // ToDo: fix args
         this.frame.contentWindow.postMessage(msg, '*');
-    }
-
-    public subscribe(topic: string, handler: Function, threading: SubscribeOptions = SubscribeOptions.SINGLE_THREAD) {
-        if (!this._callbacks[topic]) {
-            this._callbacks[topic] = [];
-        }
-        this._callbacks[topic].push({
-            fn: handler,
-            threading: threading
-        });
-    }
-
-    public unsubscribe(topic: string) {
-        this._callbacks[topic] = [];
     }
 }
