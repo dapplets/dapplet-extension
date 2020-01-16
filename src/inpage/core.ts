@@ -4,7 +4,7 @@ import { Overlay, SubscribeOptions } from "./overlay";
 import * as extension from 'extensionizer';
 import { Swiper } from "./swiper";
 import * as GlobalEventBus from './globalEventBus';
-import { EventDef, Connection } from "./subscriptions/connection";
+import { AutoProperties, EventDef, Connection } from "./subscriptions/connection";
 
 export default class Core {
 
@@ -140,39 +140,41 @@ export default class Core {
         return dappletResult;
     }
 
-    public connect<P>(cfg: { url: string }, eventDef?: EventDef<any>): P & Connection<P> {
-        const _listenableIds: string[] = [];
+    public connect<M>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
         const _ws = new WebSocket(cfg.url);
+        let _queue: any[] = [];
         _ws.onopen = () => {
             console.log('WebSocket connection OPENED');
-            _listenableIds.forEach(id => _ws.send(id));
+            _queue.forEach(msg => _ws.send(msg));
+            _queue = [];
         };
         _ws.onclose = () => {
             console.log('WebSocket connection CLOSED');
-            //_createWSConnection(url);
         };
 
-        const sender = (subject: string, message: any) => {
-            _ws.send(JSON.stringify({
-                subject, message
-            }));
+        const sender = (subject: string, message: any) => { // ToDo: send message prop
+            if (_ws.readyState == WebSocket.OPEN) {
+                _ws.send(subject);
+            } else {
+                _queue.push(subject);
+            }
         };
 
-        const conn = Connection.create<P>(sender, eventDef);
+        const conn = Connection.create<M>(sender, eventDef);
 
         _ws.onmessage = (e) => {
             const message: { [id: string]: any } = JSON.parse(e.data);
             message && Object.keys(message).forEach((id) => {
-                conn.onMessage(id, message);
+                conn.onMessage(id, message[id]);
             });
         };
 
         return conn;
     }
 
-    public wallet<P>(conf: { dappletId: string }, eventDef?: EventDef<any>): P & Connection<P> {
+    public wallet<M>(conf: { dappletId: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
         const me = this;
-        const conn = Connection.create<P>(sender, eventDef);
+        const conn = Connection.create<M>(sender, eventDef);
 
         function sender(subject: string, message: any) {
             me._sendWalletConnectTx(conf.dappletId, subject, (e: { type: string, data?: any }) => { // ToDo: fix it
@@ -183,7 +185,7 @@ export default class Core {
         return conn;
     }
 
-    public overlay<P>(cfg: { url: string, title: string }, eventDef?: EventDef<any>): P & Connection<P> {
+    public overlay<M>(cfg: { url: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
         const _overlay = new Overlay(this.overlayManager, cfg.url, cfg.title);
 
         const sender = (subject: string, message: any) => {
@@ -192,7 +194,7 @@ export default class Core {
             });
         };
 
-        const conn = Connection.create<P>(sender, eventDef);
+        const conn = Connection.create<M>(sender, eventDef);
 
         _overlay.onmessage = (topic: string, message: any) => {
             conn.onMessage(topic, message);

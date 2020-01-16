@@ -7,14 +7,15 @@ type AutoProperty = {
     name: string
     set: (value: any) => void
 }
-type AutoProperties<T extends Key> = { [key in T]: keyof AutoProperty }
+export type AutoProperties<M> = { [key in keyof M]: AutoProperty }
+type Listener = { f?: MsgFilter, h?: EventHandler, p?: AutoProperty[] }
 
-const PROP: symbol = Symbol('auto_property')
-const ANY_EVENT: any = Symbol('any_event')
+const PROP = 'auto_property'
+const ANY_EVENT = 'any_event'
 const TYPE_FILTER = (type: string) => (op: any, msg: any) => msg.type === type
 
-export class Connection<P> {
-    public listeners: { f?: MsgFilter, h: EventHandler }[] = []
+export class Connection {
+    public listeners: Listener[] = []
     private autoProperties = new Map<number, AutoProperty>()
 
     constructor(
@@ -27,26 +28,38 @@ export class Connection<P> {
         return this
     }
 
-    //ToDo: fix type clash: string is part of MsgFilter too
+    receive(buf: any): this {
+        // make connection dependend work
+        //let { op, msg } = parseMessage(buf) 
+        let op, msg
+        this.onMessage(op, msg)
+        return this
+    }
+
     listen(h: EventHandler): this
-    listen(f: MsgFilter, h: MsgHandler): this
-    listen(f: MsgFilter, h: EventHandler): this
-    listen(filterOrHander: MsgFilter | EventHandler, h?: EventHandler | MsgHandler): this {
+    listen(f: MsgFilter, ap?: AutoProperty[]): this
+    listen(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): this
+    listen(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): this
+    listen(filterOrHander: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): this {
         if (typeof filterOrHander === 'object') { //is an EventHandler
             this.listeners.push({ f: undefined, h: filterOrHander })
         } else {
-            let _h = typeof h == 'function' ? { [ANY_EVENT]: h } : h!
-            this.listeners.push({ f: filterOrHander, h: _h })
+            let _h, _p
+            if (evtOrMsgOrAP instanceof Array) {
+                this.listeners.push({ f: filterOrHander, h: undefined, p: evtOrMsgOrAP })
+            } else if (typeof evtOrMsgOrAP == 'function') {
+                let h = { [ANY_EVENT]: evtOrMsgOrAP }
+                this.listeners.push({ f: filterOrHander, h: h, p: ap })
+            } else {
+                this.listeners.push({ f: filterOrHander, h: evtOrMsgOrAP!, p: ap })
+            }
         }
         return this
     }
 
     //connection with AutoProperty support added by proxy
-    static create<P>(
-        _send: (op: any, msg: any) => void,
-        eventsDef?: EventDef<any>
-    ): P & Connection<P> {
-        return new Proxy(new Connection<P>(_send, eventsDef), {
+    static create<M>(_send: (op: any, msg: any) => void, eventsDef?: EventDef<any>): AutoProperties<M> & Connection {
+        return new Proxy(new Connection(_send, eventsDef), {
             get(conn: any, name, receiver) {
                 let idx: number = 0
                 return name in conn ? conn[name] : ({
@@ -94,14 +107,21 @@ export class Connection<P> {
             typeof f === 'string' ? this.topicMatch(op, f) : f(op, msg)
         this.listeners.forEach((listener) => {
             if (!listener.f || isTopicMatch(op, msg, listener.f)) {
-                for (let eventId of Object.keys(listener.h)) {
-                    let cond = this.eventDef ? this.eventDef[eventId] : eventId
-                    //ToDo: extract msg.type default
-                    if (typeof cond === 'function' ? cond(op, msg) : msg.type == cond) {
-                        listener.h[eventId](op, msg)
+                if (listener.h) {
+                    for (let eventId of Object.keys(listener.h)) {
+                        let cond = this.eventDef ? this.eventDef[eventId] : eventId
+                        //ToDo: extract msg.type default
+                        if (typeof cond === 'function' ? cond(op, msg) : msg.type == cond) {
+                            listener.h[eventId](op, msg)
+                        }
                     }
+                    listener.h[ANY_EVENT]?.(op, msg)
                 }
-                listener.h[ANY_EVENT]?.(op, msg)
+                //push values to autoProperties
+                for (let ap of listener.p || []) {
+                    console.log(ap)
+                    ap && msg[ap.name] && ap.set(msg[ap.name])
+                }
             }
         })
         //push values to autoProperties
