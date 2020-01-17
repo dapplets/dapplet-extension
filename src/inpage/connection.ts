@@ -7,16 +7,33 @@ type AutoProperty = {
     name: string
     set: (value: any) => void
 }
+class AutoPropertyConf {
+    public idx = 0
+    constructor(public name: Key, public conn: Connection) { }
+}
+
 export type AutoProperties<M> = { [key in keyof M]: AutoProperty }
 type Listener = { f?: MsgFilter, h?: EventHandler, p?: AutoProperty[] }
 
-const PROP = 'auto_property'
-const ANY_EVENT = 'any_event'
+const ANY_EVENT: any = Symbol('any_event')
 const TYPE_FILTER = (type: string) => (op: any, msg: any) => msg.type === type
 
-export class Connection {
-    public listeners: Listener[] = []
+export interface IConnection {
+    readonly listeners: Map<number, Listener>;
+    send(op: any, msg: any): this;
+    listen(h: EventHandler): this;
+    listen(f: MsgFilter, ap?: AutoProperty[]): this;
+    listen(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): this;
+    listen(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): this;
+    addAutoProperties(f: MsgFilter, ap: AutoProperty[]): number;
+    topicMatch(topic: string, pattern: string): boolean;
+    onMessage(op: any, msg: any): void;
+}
+
+export class Connection implements IConnection {
     private autoProperties = new Map<number, AutoProperty>()
+    public readonly listeners = new Map<number, Listener>()
+    private nn = 0 //a numeric handle counter to address listeners and autopropertes
 
     constructor(
         private _send: (op: any, msg: any) => void,
@@ -28,30 +45,21 @@ export class Connection {
         return this
     }
 
-    receive(buf: any): this {
-        // make connection dependend work
-        //let { op, msg } = parseMessage(buf) 
-        let op, msg
-        this.onMessage(op, msg)
-        return this
-    }
-
     listen(h: EventHandler): this
     listen(f: MsgFilter, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): this
     listen(filterOrHander: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): this {
         if (typeof filterOrHander === 'object') { //is an EventHandler
-            this.listeners.push({ f: undefined, h: filterOrHander })
+            this.listeners.set(++this.nn, { f: undefined, h: filterOrHander })
         } else {
-            let _h, _p
             if (evtOrMsgOrAP instanceof Array) {
-                this.listeners.push({ f: filterOrHander, h: undefined, p: evtOrMsgOrAP })
+                this.listeners.set(++this.nn, { f: filterOrHander, h: undefined, p: evtOrMsgOrAP })
             } else if (typeof evtOrMsgOrAP == 'function') {
                 let h = { [ANY_EVENT]: evtOrMsgOrAP }
-                this.listeners.push({ f: filterOrHander, h: h, p: ap })
+                this.listeners.set(++this.nn, { f: filterOrHander, h: h, p: ap })
             } else {
-                this.listeners.push({ f: filterOrHander, h: evtOrMsgOrAP!, p: ap })
+                this.listeners.set(++this.nn, { f: filterOrHander, h: evtOrMsgOrAP!, p: ap })
             }
         }
         return this
@@ -62,29 +70,30 @@ export class Connection {
         return new Proxy(new Connection(_send, eventsDef), {
             get(conn: any, name, receiver) {
                 let idx: number = 0
-                return name in conn ? conn[name] : ({
-                    [PROP]: Object.defineProperty({
-                        conn: conn,
-                        name: name,
-                        idx: 0
-                    }, 'set', {
+                return name in conn ? conn[name] :
+                    Object.defineProperty(
+                        new AutoPropertyConf(name, conn),
+                        'set', {
                         // if setter set, activate autoProp
                         set: function (setter) {
                             if (idx > 0) conn.autoProperties.delete(idx)
-                            if (setter) idx = conn.addAutoProperty(name, setter)
+                            if (setter) idx = conn.addAutoProperty({ name: name, set: setter })
                             else idx = 0
                             return true
                         }
                     })
-                })
             }
         })
     }
 
-    private apNum = 0
-    private addAutoProperty(name: string, setter: (v: any) => void): number {
-        this.autoProperties.set(++this.apNum, { name: name, set: setter })
-        return this.apNum
+    private addAutoProperty(ap: AutoProperty): number {
+        this.autoProperties.set(++this.nn, ap)
+        return this.nn
+    }
+
+    public addAutoProperties(f: MsgFilter, ap: AutoProperty[]): number {
+        this.listeners.set(++this.nn, { f: f, h: undefined, p: ap })
+        return this.nn
     }
 
     topicMatch(topic: string, pattern: string): boolean {
@@ -119,7 +128,6 @@ export class Connection {
                 }
                 //push values to autoProperties
                 for (let ap of listener.p || []) {
-                    console.log(ap)
                     ap && msg[ap.name] && ap.set(msg[ap.name])
                 }
             }

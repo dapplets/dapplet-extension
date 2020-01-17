@@ -1,5 +1,6 @@
 import Core from './inpage/core';
 import { IContentAdapter, IFeature, IResolver } from './inpage/types';
+import { IConnection } from './inpage/connection';
 
 declare global {
     export function Injectable(constructor: Function);
@@ -10,5 +11,6 @@ declare global {
 export {
     IContentAdapter,
     IFeature,
-    IResolver
+    IResolver,
+    IConnection
 }

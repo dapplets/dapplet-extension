@@ -4,7 +4,7 @@ import { Overlay, SubscribeOptions } from "./overlay";
 import * as extension from 'extensionizer';
 import { Swiper } from "./swiper";
 import * as GlobalEventBus from './globalEventBus';
-import { AutoProperties, EventDef, Connection } from "./subscriptions/connection";
+import { AutoProperties, EventDef, Connection } from "./connection";
 
 export default class Core {
 
