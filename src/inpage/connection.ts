@@ -22,30 +22,30 @@ const ANY_EVENT: any = Symbol('any_event')
 const TYPE_FILTER = (type: string) => (op: any, msg: any) => msg.type === type
 
 export interface IConnection {
-    readonly listeners: Map<number, Listener>;
+    readonly listeners: Map<Key, Listener>;
     send(op: any, msg: any): Promise<any>;
-    subscribe(topic: string, message?: any): number;
+    subscribe(topic: string, message?: any): Key
     listen(h: EventHandler): this;
     listen(f: MsgFilter, ap?: AutoProperty[]): this;
     listen(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): this;
     listen(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): this;
-    listener(h: EventHandler): number;
-    listener(f: MsgFilter, ap?: AutoProperty[]): number;
-    listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): number;
-    listener(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): number;
+    listener(h: EventHandler): Key
+    listener(f: MsgFilter, ap?: AutoProperty[]): Key
+    listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): Key
+    listener(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): Key
     unsubscribe(nn: number): void;
-    addAutoProperties(f: MsgFilter, ap: AutoProperty[]): number;
+    addAutoProperties(f: MsgFilter, ap: AutoProperty[]): Key
     topicMatch(topic: string, pattern: string): boolean;
     onMessage(op: any, msg: any): void;
-    get(key: any): number;
+    get(key: any): Key
     set(key: any, value: any): void;
 }
 
 export class Connection implements IConnection {
     private _ctxNNmap = new WeakMap<any, number>();
-    private _nnSubscriptionMap = new Map<number, any>();
-    private autoProperties = new Map<number, AutoProperty>()
-    public readonly listeners = new Map<number, Listener>()
+    private _nnSubscriptionMap = new Map<Key, any>();
+    private autoProperties = new Map<Key, AutoProperty>()
+    public readonly listeners = new Map<Key, Listener>()
     private nn = 0 //a numeric handle counter to address listeners and autopropertes
 
     constructor(
@@ -59,7 +59,7 @@ export class Connection implements IConnection {
         return this._bus.exec(op, msg);
     }
 
-    subscribe(topic: string, message?: any): number {
+    subscribe(topic: string, message?: any): Key {
         const nn = this.listener(topic); // topic === tweetInfo
         const subscription = this._bus.subscribe(topic, [message], (result) => {
             this.onMessage(topic, result, nn);
@@ -78,11 +78,11 @@ export class Connection implements IConnection {
     }
 
     // call, when new context was created.
-    listener(h: EventHandler): number
-    listener(f: MsgFilter, ap?: AutoProperty[]): number
-    listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): number
-    listener(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): number
-    listener(filterOrHander: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): number {
+    listener(h: EventHandler): Key
+    listener(f: MsgFilter, ap?: AutoProperty[]): Key
+    listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): Key
+    listener(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): Key
+    listener(filterOrHander: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): Key {
         if (typeof filterOrHander === 'object') { //is an EventHandler
             this.listeners.set(++this.nn, { f: undefined, h: filterOrHander })
         } else {
@@ -152,7 +152,7 @@ export class Connection implements IConnection {
         return true
     }
 
-    onMessage(op: any, msg: any, nn?: number): void {
+    onMessage(op: any, msg: any, nn?: Key): void {
         const isTopicMatch = (op: any, msg: any, f: MsgFilter) =>
             typeof f === 'string' ? this.topicMatch(op, f) : f(op, msg)
 
