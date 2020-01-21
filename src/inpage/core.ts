@@ -5,6 +5,7 @@ import * as extension from 'extensionizer';
 import { Swiper } from "./swiper";
 import * as GlobalEventBus from './globalEventBus';
 import { AutoProperties, EventDef, Connection } from "./connection";
+import { PubSubRpc } from "./pubSubRpc";
 
 export default class Core {
 
@@ -141,40 +142,14 @@ export default class Core {
     }
 
     public connect<M>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
-        const _ws = new WebSocket(cfg.url);
-        let _queue: any[] = [];
-        _ws.onopen = () => {
-            console.log('WebSocket connection OPENED');
-            _queue.forEach(msg => _ws.send(msg));
-            _queue = [];
-        };
-        _ws.onclose = () => {
-            console.log('WebSocket connection CLOSED');
-        };
-
-        const sender = (subject: string, message: any) => { // ToDo: send message prop
-            if (_ws.readyState == WebSocket.OPEN) {
-                _ws.send(subject);
-            } else {
-                _queue.push(subject);
-            }
-        };
-
-        const conn = Connection.create<M>(sender, eventDef);
-
-        _ws.onmessage = (e) => {
-            const message: { [id: string]: any } = JSON.parse(e.data);
-            message && Object.keys(message).forEach((id) => {
-                conn.onMessage(id, message[id]);
-            });
-        };
-
+        const rpc = new PubSubRpc(cfg.url);
+        const conn = Connection.create<M>(rpc, eventDef);
         return conn;
     }
 
     public wallet<M>(conf: { dappletId: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
         const me = this;
-        const conn = Connection.create<M>(sender, eventDef);
+        const conn = Connection.create<M>(null, eventDef);
 
         function sender(subject: string, message: any) {
             me._sendWalletConnectTx(conf.dappletId, subject, (e: { type: string, data?: any }) => { // ToDo: fix it
@@ -194,7 +169,7 @@ export default class Core {
             });
         };
 
-        const conn = Connection.create<M>(sender, eventDef);
+        const conn = Connection.create<M>(null, eventDef);
 
         _overlay.onmessage = (topic: string, message: any) => {
             conn.onMessage(topic, message);

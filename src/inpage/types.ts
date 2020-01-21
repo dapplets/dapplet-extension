@@ -19,3 +19,14 @@ export interface IFeature extends IModule {
 export interface IResolver extends IModule {
     getBranch(): string;
 }
+
+export interface IPubSub {
+    subscribe(topic: string, args: any[], handler: (result: any) => void): {
+        unsubscribe: () => void;
+    };
+    exec(method: string, params: any[]): Promise<any>;
+    notify(method: string, params: any[]): void;
+    on(method: string, handler: (params: any | any[]) => any): {
+        off: () => void;
+    };
+}
