@@ -53,6 +53,7 @@ export interface IConnection {
 
 export class Connection implements IConnection {
     private _ctxNNmap = new WeakMap<any, number>()
+    private _ctxListenerMap = new WeakMap<any, Listener>()
     private _nnSubscriptionMap = new Map<Key, any>()
     private autoProperties = new Map<Key, AutoProperty>()
     public readonly listeners = new Map<Key, Listener>()
@@ -84,9 +85,11 @@ export class Connection implements IConnection {
             listenerId = this.listener((op) => op === subscriptionId);
             let listener = this.listeners.get(listenerId)
             e.context.connToListenerMap.set(this, listener)      // a WeakMap
+            this._ctxListenerMap.set(e.context, listener);
         } else if (e.operation == 'destroy') {
             this.listeners.delete(listenerId)
             e.context.connToListenerMap.delete(this)      // maybe unnecessary
+            this._ctxListenerMap.delete(e.context);
         } else
             throw Error()
 
@@ -148,7 +151,21 @@ export class Connection implements IConnection {
 
                 const autoProperty = {
                     conn: target,
-                    name: prop
+                    name: prop,
+                    lastValue: undefined,
+                    activate: (context: any, setter: (value: any) => void) => {
+                        const listener = target._ctxListenerMap.get(context);
+                        listener.p.push({
+                            name: prop, set: (value: any) => {
+                                autoProperty.lastValue = value;
+                                setter(value);
+                            }
+                        });
+                    },
+                    deactivate: (context: any) => {
+                        const listener = target._ctxListenerMap.get(context);
+                        console.log('ToDo: need to implement deactivation'); // ToDo: need to implement deactivation
+                    }
                 }
 
                 return autoProperty
