@@ -52,7 +52,7 @@ export interface IConnection {
 }
 
 export class Connection implements IConnection {
-    private _ctxNNmap = new WeakMap<any, number>()
+    private _ctxNNmap = new WeakMap<any, number>() // ToDo: remove
     private _ctxListenerMap = new WeakMap<any, Listener>()
     private _nnSubscriptionMap = new Map<Key, any>()
     private autoProperties = new Map<Key, AutoProperty>()
@@ -79,16 +79,16 @@ export class Connection implements IConnection {
         let subscriptionId = undefined;
 
         if (e.operation == 'create') {
-            if (!e.context.connToListenerMap)
+            if (!e.context.connToListenerMap) // ToDo: remove
                 e.context.connToListenerMap = new WeakMap<Connection, Listener>()
 
             listenerId = this.listener((op) => op === subscriptionId);
             let listener = this.listeners.get(listenerId)
-            e.context.connToListenerMap.set(this, listener)      // a WeakMap
+            e.context.connToListenerMap.set(this, listener) // ToDo: remove      // a WeakMap
             this._ctxListenerMap.set(e.context, listener);
         } else if (e.operation == 'destroy') {
             this.listeners.delete(listenerId)
-            e.context.connToListenerMap.delete(this)      // maybe unnecessary
+            e.context.connToListenerMap.delete(this) // ToDo: remove      // maybe unnecessary
             this._ctxListenerMap.delete(e.context);
         } else
             throw Error()
@@ -99,6 +99,7 @@ export class Connection implements IConnection {
             .then(id => subscriptionId = id)
     }
 
+    // ToDo: remove
     subscribe(topic: string, message?: any): Key {
         const nn = this.listener(topic); // topic === tweetInfo
         const subscription = this._bus.subscribe(topic, [message], (result) => {
@@ -157,7 +158,7 @@ export class Connection implements IConnection {
                         const listener = target._ctxListenerMap.get(context);
                         listener.p.push({
                             name: prop, set: (value: any) => {
-                                autoProperty.lastValue = value;
+                                autoProperty.lastValue = value; // ToDo: bug! it seems, that it overrides foreign autoprops
                                 setter(value);
                             }
                         });
@@ -233,10 +234,12 @@ export class Connection implements IConnection {
         }
     }
 
+    // ToDo: remove
     get(key: any): number {
         return this._ctxNNmap.get(key)
     }
 
+    // ToDo: remove
     set(key: any, value: any): void {
         this._ctxNNmap.set(key, value)
     }
