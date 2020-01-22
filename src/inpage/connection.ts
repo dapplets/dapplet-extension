@@ -7,23 +7,33 @@ export type EventDef<T extends Key> = { [key in T]: MsgFilter }
 type MsgHandler = ((op: string, msg: any) => void)
 type EventHandler = { [key in Key]: MsgHandler[] | MsgHandler }
 export type AutoProperty = {
+    conn: IConnection
     name: string
-    set: (ctx: any, setter: (value: any) => void) => void
+    set: (setter: (value: any) => void) => void
 }
-// class AutoPropertyConf {
-//     public idx = 0
-//     constructor(public name: Key, public conn: Connection) { }
-// }
+class AutoPropertyConf {
+    public idx = 0
+    constructor(public name: Key, public conn: Connection) { }
+}
 
 export type AutoProperties<M> = { [key in keyof M]: AutoProperty }
-type Listener = { f?: MsgFilter, h?: EventHandler, p?: AutoProperty[] }
+type Listener = { f?: MsgFilter, h?: EventHandler, p: AutoProperty[] }
 
 const ANY_EVENT: any = Symbol('any_event')
 const TYPE_FILTER = (type: string) => (op: any, msg: any) => msg.type === type
 
+type EventType = {
+    operation: string, // 'create'
+    // maybe better data structure or naming?
+    contextType: string, // 'tweet'
+    contextId: string,  // '123123123' tweet Id  
+    context: any           // this is the Context; for example parsed TWEET objext
+}
+
 export interface IConnection {
     readonly listeners: Map<Key, Listener>
     send(op: any, msg: any): Promise<any>
+    sendAndListen(e: EventType): void
     subscribe(topic: string, message?: any): Key
     listen(h: EventHandler): this
     listen(f: MsgFilter, ap?: AutoProperty[]): this
@@ -50,13 +60,40 @@ export class Connection implements IConnection {
 
     constructor(
         private _bus?: IPubSub,
-        private eventDef?: EventDef<any>        
-    ) {}
+        private eventDef?: EventDef<any>
+    ) {
+        this._bus?.on("subscription", ({ subscription, result }) => {
+            this.onMessage(subscription, result);
+        })
+    }
 
     // op - operation, subject
     // msg - payload
     send(op: any, msg: any) { // should return promise
         return this._bus.exec(op, msg)
+    }
+
+    sendAndListen = (e: EventType) => {
+        let listenerId: any
+        let subscriptionId = undefined;
+
+        if (e.operation == 'create') {
+            if (!e.context.connToListenerMap)
+                e.context.connToListenerMap = new WeakMap<Connection, Listener>()
+
+            listenerId = this.listener((op) => op === subscriptionId);
+            let listener = this.listeners.get(listenerId)
+            e.context.connToListenerMap.set(this, listener)      // a WeakMap
+        } else if (e.operation == 'destroy') {
+            this.listeners.delete(listenerId)
+            e.context.connToListenerMap.delete(this)      // maybe unnecessary
+        } else
+            throw Error()
+
+        //message to server to switch the subscription on/off
+        //exact format is to be adjusted
+        this.send("subscribe", [e.operation + "_" + e.contextType, { id: e.contextId }])
+            .then(id => subscriptionId = id)
     }
 
     subscribe(topic: string, message?: any): Key {
@@ -84,15 +121,15 @@ export class Connection implements IConnection {
     listener(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): Key
     listener(filterOrHander: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): Key {
         if (typeof filterOrHander === 'object') { //is an EventHandler
-            this.listeners.set(++this.nn, { f: undefined, h: filterOrHander })
+            this.listeners.set(++this.nn, { f: undefined, h: filterOrHander, p: [] })
         } else {
             if (evtOrMsgOrAP instanceof Array) {
-                this.listeners.set(++this.nn, { f: filterOrHander, h: undefined, p: evtOrMsgOrAP })
+                this.listeners.set(++this.nn, { f: filterOrHander, h: undefined, p: evtOrMsgOrAP || [] })
             } else if (typeof evtOrMsgOrAP == 'function') {
                 let h = { [ANY_EVENT]: evtOrMsgOrAP }
-                this.listeners.set(++this.nn, { f: filterOrHander, h: h, p: ap })
+                this.listeners.set(++this.nn, { f: filterOrHander, h: h, p: ap || [] })
             } else {
-                this.listeners.set(++this.nn, { f: filterOrHander, h: evtOrMsgOrAP!, p: ap })
+                this.listeners.set(++this.nn, { f: filterOrHander, h: evtOrMsgOrAP!, p: ap || [] })
             }
         }
         return this.nn
@@ -105,21 +142,13 @@ export class Connection implements IConnection {
 
     //connection with AutoProperty support added by proxy
     static create<M>(_bus: IPubSub, eventsDef?: EventDef<any>): AutoProperties<M> & Connection {
-        const conn = new Connection(_bus, eventsDef)
-        return new Proxy(conn, {
-            get(target: any, prop, receiver) {
-                //let idx: number = 0
-
+        return new Proxy(new Connection(_bus, eventsDef), {
+            get(target: any, prop: string, receiver) {
                 if (prop in target) return target[prop]
 
-                const autoProperty: AutoProperty = {
-                    name: prop as string,
-                    set: (ctx: any, setter: (value: any) => void) => {
-                        const nn = target.get(ctx)
-                        const listener = target.listeners.get(nn)
-                        if (!listener.h) listener.h = { [ANY_EVENT]: [] }
-                        listener.h[ANY_EVENT].push((op, msg) => setter(msg[prop]))
-                    }
+                const autoProperty = {
+                    conn: target,
+                    name: prop
                 }
 
                 return autoProperty
@@ -164,15 +193,7 @@ export class Connection implements IConnection {
                     for (let eventId of [...Object.keys(listener.h), ANY_EVENT]) {
                         let cond = this.eventDef ? this.eventDef[eventId] : eventId
                         //ToDo: extract msg.type default
-                        if (typeof cond === 'function' ? cond(op, msg) : msg.type == cond) {
-                            const handlers = listener.h[eventId]
-                            if (Array.isArray(handlers)) {
-                                handlers.forEach(h => h(op, msg))
-                            } else {
-                                handlers(op, msg)
-                            }
-                        }
-                        if (eventId === ANY_EVENT) {
+                        if ((typeof cond === 'function' ? cond(op, msg) : msg.type == cond) || eventId === ANY_EVENT) {
                             const handlers = listener.h[eventId]
                             if (Array.isArray(handlers)) {
                                 handlers.forEach(h => h(op, msg))
@@ -183,15 +204,16 @@ export class Connection implements IConnection {
                     }
                 }
                 //push values to autoProperties
-                // for (let ap of listener.p || []) {
-                //     ap && msg[ap.name] && ap.set(msg[ap.name])
-                // }
+                for (let ap of listener.p || []) {
+                    ap && msg[ap.name] !== undefined && ap.set(msg[ap.name])
+                }
             }
         })
+        // ToDo: is it necessary?
         //push values to autoProperties
-        // for (let ap of this.autoProperties.values()) {
-        //     ap && msg[ap.name] && ap.set(msg[ap.name])
-        // }
+        for (let ap of this.autoProperties.values()) {
+            ap && msg[ap.name] && ap.set(msg[ap.name])
+        }
     }
 
     get(key: any): number {
