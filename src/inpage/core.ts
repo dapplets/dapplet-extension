@@ -6,6 +6,7 @@ import { Swiper } from "./swiper";
 import * as GlobalEventBus from './globalEventBus';
 import { AutoProperties, EventDef, Connection } from "./connection";
 import { WsJsonRpc } from "./wsJsonRpc";
+import { IPubSub } from "./types";
 
 export default class Core {
 
@@ -148,8 +149,25 @@ export default class Core {
     }
 
     public wallet<M>(conf: { dappletId: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
+        const transport: IPubSub = {
+            exec: (method: string, params: any[]) => {
+                return new Promise((resolve, reject) => {
+                    resolve(null);
+                });
+            },
+            notify: (method: string, params: any[]) => {
+
+            },
+            onMessage: (handler: (topic: string, message: any) => void) => {
+                return {
+                    off: () => { }
+                }
+            }
+        }
+
         const me = this;
-        const conn = Connection.create<M>(null, eventDef);
+
+        const conn = Connection.create<M>(transport, eventDef);
 
         function sender(subject: string, message: any) {
             me._sendWalletConnectTx(conf.dappletId, subject, (e: { type: string, data?: any }) => { // ToDo: fix it
@@ -169,7 +187,23 @@ export default class Core {
             });
         };
 
-        const conn = Connection.create<M>(null, eventDef);
+        const transport: IPubSub = {
+            exec: (method: string, params: any[]) => {
+                return new Promise((resolve, reject) => {
+                    resolve(null);
+                });
+            },
+            notify: (method: string, params: any[]) => {
+
+            },
+            onMessage: (handler: (topic: string, message: any) => void) => {
+                return {
+                    off: () => { }
+                }
+            }
+        }
+
+        const conn = Connection.create<M>(transport, eventDef);
 
         _overlay.onmessage = (topic: string, message: any) => {
             conn.onMessage(topic, message);

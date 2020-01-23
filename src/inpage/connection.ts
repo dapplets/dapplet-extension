@@ -44,6 +44,7 @@ export interface IConnection {
     addAutoProperties(f: MsgFilter, ap: AutoProperty[]): Key
     topicMatch(topic: string, pattern: string): boolean
     onMessage(op: any, msg: any): void
+    subscribe(topic: string, message: any, h: MsgHandler | EventHandler): this
 }
 
 export class Connection implements IConnection {
@@ -56,8 +57,8 @@ export class Connection implements IConnection {
         private _bus?: IPubSub,
         private eventDef?: EventDef<any>
     ) {
-        this._bus?.on("subscription", ({ subscription, result }) => {
-            this.onMessage(subscription, result);
+        this._bus?.onMessage((operation, message) => {
+            this.onMessage(operation, message);
         })
     }
 
@@ -88,8 +89,15 @@ export class Connection implements IConnection {
 
         //message to server to switch the subscription on/off
         //exact format is to be adjusted
-        this.send("subscribe", [e.operation + "_" + e.contextType, { id: e.contextId }])
-            .then(id => subscriptionId = id)
+        this.send(e.operation + "_" + e.contextType, { id: e.contextId })
+            .then(id => subscriptionId = id);
+    }
+
+    subscribe(topic: string, message: any, h: MsgHandler | EventHandler): this {
+        this.send(topic, message).then(subId => {
+            this.listen(subId, h as any);
+        });
+        return this;
     }
 
     listen(h: EventHandler): this
@@ -135,7 +143,8 @@ export class Connection implements IConnection {
                     activate: (context: any, setter: (value: any) => void) => {
                         const listener = target._ctxListenerMap.get(context);
                         listener.p.push({
-                            name: prop, set: (value: any) => {
+                            name: prop, 
+                            set: (value: any) => {
                                 autoProperty.lastValue = value; // ToDo: bug! it seems, that it overrides foreign autoprops
                                 setter(value);
                             }

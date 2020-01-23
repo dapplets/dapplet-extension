@@ -10,11 +10,14 @@ export class WsJsonRpc implements IPubSub {
         this._connect();
     }
 
-    public exec(method: string, params: any[]): Promise<any> {
+    public exec(topic: string, message: any): Promise<any> {
         return new Promise((resolve, reject) => {
             const id = ++this._msgCount;
             this._send(JSON.stringify({
-                jsonrpc: "2.0", id, method, params
+                jsonrpc: "2.0",
+                id,
+                method: topic,
+                params: [message]
             }));
             const listener = (ev: MessageEvent) => {
                 const rpc = JSON.parse(ev.data);
@@ -33,39 +36,18 @@ export class WsJsonRpc implements IPubSub {
     }
 
     // ToDo: do we need this method?
-    public notify(method: string, params: any[]): void {
+    public notify(topic: string, message: any): void {
         this._send(JSON.stringify({
-            jsonrpc: "2.0", method, params
+            jsonrpc: "2.0", 
+            method: topic,
+            params: [message]
         }));
     }
 
-    public on(method: string, handler: (params: any | any[]) => any): { off: () => void } {
+    public onMessage(handler: (topic: string, message: any) => void) {
         const listener = (ev: MessageEvent) => {
             const rpc = JSON.parse(ev.data);
-
-            if (rpc.method === method) {
-                try {
-                    const result = handler(rpc.params);
-                    if (rpc.id) {
-                        this._send(JSON.stringify({
-                            jsonrpc: "2.0",
-                            id: rpc.id,
-                            result: result
-                        }));
-                    }
-                } catch (err) {
-                    if (rpc.id) {
-                        this._send(JSON.stringify({
-                            jsonrpc: "2.0",
-                            id: rpc.id,
-                            error: {
-                                // ToDo: add error code
-                                message: err.message
-                            }
-                        }));
-                    }
-                }
-            }
+            if (rpc.method) handler(rpc.method, rpc.params[0]);
         }
 
         this._ws.addEventListener('message', listener);

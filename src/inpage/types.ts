@@ -21,9 +21,12 @@ export interface IResolver extends IModule {
 }
 
 export interface IPubSub {
-    exec(method: string, params: any[]): Promise<any>;
-    notify(method: string, params: any[]): void;
-    on(method: string, handler: (params: any | any[]) => any): {
-        off: () => void;
+    exec(topic: string, message: any): Promise<any>;
+    notify(topic: string, message: any): void;
+    // on(method: string, handler: (params: any | any[]) => any): {
+    //     off: () => void;
+    // };
+    onMessage(handler: (operation: string, message: any) => any): {
+        off: () => void
     };
 }
