@@ -148,7 +148,7 @@ export default class Core {
         return conn;
     }
 
-    public wallet<M>(cfg: { }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
+    public wallet<M>(cfg?: { }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
         const me = this;
         const transport = {
             _txCount: 0,
