@@ -1,4 +1,5 @@
 import { OverlayManager } from './overlayManager';
+import { IPubSub } from './types';
 
 export enum SubscribeOptions {
     SINGLE_THREAD,
@@ -6,22 +7,13 @@ export enum SubscribeOptions {
 }
 
 
-export class Overlay {
-
+export class Overlay implements IPubSub {
     private _manager: OverlayManager = null;
-
-    public frame: HTMLIFrameElement = null;
-
-    private _queue: {
-        topic: string,
-        message: any
-    }[] = [];
-
-    private _isQueueProcessing: boolean = false;
+    private _queue: any[] = [];
     private _isFrameLoaded: boolean = false;
-
+    private _msgCount: number = 0;
+    public frame: HTMLIFrameElement = null;
     public registered: boolean = false;
-
     public onmessage: (topic: string, message: any) => void = null;
 
     constructor(manager: OverlayManager, uri: string, public title: string) {
@@ -30,36 +22,12 @@ export class Overlay {
         this.frame.src = uri;
         this.frame.allowFullscreen = true;
         this.frame.addEventListener('load', () => {
-            this._isFrameLoaded = true;
+            //setTimeout(() => {
+                this._isFrameLoaded = true;
+                this._queue.forEach(msg => this._send(msg));
+                this._queue = [];
+            //}, 1000);
         });
-
-        window.addEventListener('message', (e) => {
-            if (e.source != this.frame.contentWindow) return; // Listen messages from only our frame
-            if (!e.data) return;
-
-            const { topic, message, args } = JSON.parse(e.data);
-            if (!topic) return;
-
-            this._queue.push({
-                topic: topic,
-                message: message || args
-            });
-            this.processQueue();
-        }, false);
-    }
-
-    async processQueue() {
-        if (this._isQueueProcessing) return;
-        if (!this.onmessage) return;
-
-        this._isQueueProcessing = true;
-
-        while (this._queue.length > 0) {
-            const { topic, message } = this._queue.shift();
-            this.onmessage.bind({}, [topic, message]);
-        }
-
-        this._isQueueProcessing = false;
     }
 
     /**
@@ -91,7 +59,60 @@ export class Overlay {
     }
 
     public send(topic: string, message: any) {
-        const msg = JSON.stringify({ topic, message: [message] }); // ToDo: fix args
-        this.frame.contentWindow.postMessage(msg, '*');
+        // const msg = JSON.stringify({ topic, message: [message] }); // ToDo: fix args
+        // this.frame.contentWindow.postMessage(msg, '*');
+    }
+
+    private _send(data: any) {
+        if (!this._isFrameLoaded) {
+            this._queue.push(data);
+            this.open();
+        } else {
+            this.frame.contentWindow.postMessage(data, '*');
+        }
+    }
+
+    public exec(topic: string, message: any) {
+        return new Promise((resolve, reject) => {
+            const id = ++this._msgCount;
+            const data = JSON.stringify({
+                id,
+                topic,
+                message
+            });
+            this._send(data);
+
+            const listener = (e: MessageEvent) => {
+                if (e.source != this.frame.contentWindow) return; // Listen messages from only our frame
+                if (!e.data) return;
+
+                const data = JSON.parse(e.data);
+
+                if (!data.topic && data.id === id) {
+                    window.removeEventListener('message', listener);
+                    if (!data.error) {
+                        resolve(data.result);
+                    } else {
+                        reject(data.error);
+                    }
+                }
+            }
+            window.addEventListener('message', listener, false);
+        });
+    }
+
+    public onMessage(handler: (topic: string, message: any) => void) {
+        const listener = (e: MessageEvent) => {
+            if (e.source != this.frame.contentWindow) return; // Listen messages from only our frame
+            if (!e.data) return;
+            const { topic, message } = JSON.parse(e.data);
+            if (topic !== undefined) handler(topic, message);
+        }
+
+        window.addEventListener('message', listener);
+
+        return {
+            off: () => window.removeEventListener('message', listener)
+        };
     }
 }

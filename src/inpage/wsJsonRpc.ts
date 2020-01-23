@@ -19,8 +19,8 @@ export class WsJsonRpc implements IPubSub {
                 method: topic,
                 params: [message]
             }));
-            const listener = (ev: MessageEvent) => {
-                const rpc = JSON.parse(ev.data);
+            const listener = (e: MessageEvent) => {
+                const rpc = JSON.parse(e.data);
 
                 if (!rpc.method && rpc.id === id) {
                     this._ws.removeEventListener('message', listener);
@@ -36,17 +36,17 @@ export class WsJsonRpc implements IPubSub {
     }
 
     // ToDo: do we need this method?
-    public notify(topic: string, message: any): void {
-        this._send(JSON.stringify({
-            jsonrpc: "2.0", 
-            method: topic,
-            params: [message]
-        }));
-    }
+    // public notify(topic: string, message: any): void {
+    //     this._send(JSON.stringify({
+    //         jsonrpc: "2.0", 
+    //         method: topic,
+    //         params: [message]
+    //     }));
+    // }
 
     public onMessage(handler: (topic: string, message: any) => void) {
-        const listener = (ev: MessageEvent) => {
-            const rpc = JSON.parse(ev.data);
+        const listener = (e: MessageEvent) => {
+            const rpc = JSON.parse(e.data);
             if (rpc.method) handler(rpc.method, rpc.params[0]);
         }
 

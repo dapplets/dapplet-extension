@@ -155,9 +155,6 @@ export default class Core {
                     resolve(null);
                 });
             },
-            notify: (method: string, params: any[]) => {
-
-            },
             onMessage: (handler: (topic: string, message: any) => void) => {
                 return {
                     off: () => { }
@@ -180,35 +177,7 @@ export default class Core {
 
     public overlay<M>(cfg: { url: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
         const _overlay = new Overlay(this.overlayManager, cfg.url, cfg.title);
-
-        const sender = (subject: string, message: any) => {
-            _overlay.open(() => {
-                _overlay.send(subject, message);
-            });
-        };
-
-        const transport: IPubSub = {
-            exec: (method: string, params: any[]) => {
-                return new Promise((resolve, reject) => {
-                    resolve(null);
-                });
-            },
-            notify: (method: string, params: any[]) => {
-
-            },
-            onMessage: (handler: (topic: string, message: any) => void) => {
-                return {
-                    off: () => { }
-                }
-            }
-        }
-
-        const conn = Connection.create<M>(transport, eventDef);
-
-        _overlay.onmessage = (topic: string, message: any) => {
-            conn.onMessage(topic, message);
-        }
-
+        const conn = Connection.create<M>(_overlay, eventDef);
         return conn;
     }
 

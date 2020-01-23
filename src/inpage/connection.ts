@@ -143,7 +143,7 @@ export class Connection implements IConnection {
                     activate: (context: any, setter: (value: any) => void) => {
                         const listener = target._ctxListenerMap.get(context);
                         listener.p.push({
-                            name: prop, 
+                            name: prop,
                             set: (value: any) => {
                                 autoProperty.lastValue = value; // ToDo: bug! it seems, that it overrides foreign autoprops
                                 setter(value);
@@ -187,6 +187,7 @@ export class Connection implements IConnection {
     }
 
     onMessage(op: any, msg: any, nn?: Key): void {
+        console.log('connection -> onMessage: op, msg', op, msg);
         const isTopicMatch = (op: any, msg: any, f: MsgFilter) =>
             typeof f === 'string' ? this.topicMatch(op, f) : f(op, msg)
 
