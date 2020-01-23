@@ -1,4 +1,3 @@
-import { PubSubRpc } from "./pubSubRpc"
 import { IPubSub } from "./types"
 
 type Key = string | number | symbol
@@ -34,7 +33,6 @@ export interface IConnection {
     readonly listeners: Map<Key, Listener>
     send(op: any, msg: any): Promise<any>
     sendAndListen(e: EventType): void
-    subscribe(topic: string, message?: any): Key
     listen(h: EventHandler): this
     listen(f: MsgFilter, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): this
@@ -43,18 +41,13 @@ export interface IConnection {
     listener(f: MsgFilter, ap?: AutoProperty[]): Key
     listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): Key
     listener(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): Key
-    unsubscribe(nn: number): void
     addAutoProperties(f: MsgFilter, ap: AutoProperty[]): Key
     topicMatch(topic: string, pattern: string): boolean
     onMessage(op: any, msg: any): void
-    get(key: any): Key
-    set(key: any, value: any): void
 }
 
 export class Connection implements IConnection {
-    private _ctxNNmap = new WeakMap<any, number>() // ToDo: remove
     private _ctxListenerMap = new WeakMap<any, Listener>()
-    private _nnSubscriptionMap = new Map<Key, any>()
     private autoProperties = new Map<Key, AutoProperty>()
     public readonly listeners = new Map<Key, Listener>()
     private nn = 0 //a numeric handle counter to address listeners and autopropertes
@@ -99,16 +92,6 @@ export class Connection implements IConnection {
             .then(id => subscriptionId = id)
     }
 
-    // ToDo: remove
-    subscribe(topic: string, message?: any): Key {
-        const nn = this.listener(topic); // topic === tweetInfo
-        const subscription = this._bus.subscribe(topic, [message], (result) => {
-            this.onMessage(topic, result, nn)
-        })
-        this._nnSubscriptionMap.set(nn, subscription)
-        return nn
-    }
-
     listen(h: EventHandler): this
     listen(f: MsgFilter, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): this
@@ -137,11 +120,6 @@ export class Connection implements IConnection {
             }
         }
         return this.nn
-    }
-
-    unsubscribe(nn: number) {
-        this.listeners.delete(nn)
-        this._nnSubscriptionMap.get(nn).unsubscribe()
     }
 
     //connection with AutoProperty support added by proxy
@@ -232,15 +210,5 @@ export class Connection implements IConnection {
         for (let ap of this.autoProperties.values()) {
             ap && msg[ap.name] && ap.set(msg[ap.name])
         }
-    }
-
-    // ToDo: remove
-    get(key: any): number {
-        return this._ctxNNmap.get(key)
-    }
-
-    // ToDo: remove
-    set(key: any, value: any): void {
-        this._ctxNNmap.set(key, value)
     }
 }

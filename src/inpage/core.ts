@@ -5,7 +5,7 @@ import * as extension from 'extensionizer';
 import { Swiper } from "./swiper";
 import * as GlobalEventBus from './globalEventBus';
 import { AutoProperties, EventDef, Connection } from "./connection";
-import { PubSubRpc } from "./pubSubRpc";
+import { WsJsonRpc } from "./wsJsonRpc";
 
 export default class Core {
 
@@ -142,7 +142,7 @@ export default class Core {
     }
 
     public connect<M>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
-        const rpc = new PubSubRpc(cfg.url);
+        const rpc = new WsJsonRpc(cfg.url);
         const conn = Connection.create<M>(rpc, eventDef);
         return conn;
     }

@@ -1,4 +1,6 @@
-export class WsJsonRpc {
+import { IPubSub } from "./types";
+
+export class WsJsonRpc implements IPubSub {
     private _queue: any[] = [];
     private _ws: WebSocket;
 
