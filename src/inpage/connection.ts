@@ -31,7 +31,8 @@ type EventType = {
 
 export interface IConnection {
     readonly listeners: Map<Key, Listener>
-    send(op: any, msg: any): Promise<any>
+    send(op: any, msg?: any): Promise<any>
+    sendAndListen(topic: string, message: any, h: MsgHandler | EventHandler): void
     sendAndListen(e: EventType): void
     listen(h: EventHandler): this
     listen(f: MsgFilter, ap?: AutoProperty[]): this
@@ -44,7 +45,6 @@ export interface IConnection {
     addAutoProperties(f: MsgFilter, ap: AutoProperty[]): Key
     topicMatch(topic: string, pattern: string): boolean
     onMessage(op: any, msg: any): void
-    subscribe(topic: string, message: any, h: MsgHandler | EventHandler): this
 }
 
 export class Connection implements IConnection {
@@ -64,42 +64,42 @@ export class Connection implements IConnection {
 
     // op - operation, subject
     // msg - payload
-    send(op: any, msg: any) { // should return promise
+    send(op: any, msg?: any) { // should return promise
         return this._bus.exec(op, msg)
     }
 
-    sendAndListen = (e: EventType) => {
-        let listenerId: any
-        let subscriptionId = undefined;
+    sendAndListen = (eventOrTopic: EventType | string, message?: any, h?: MsgHandler | EventHandler) => {
+        if (typeof eventOrTopic === 'string') {
+            const topic = eventOrTopic;
+            this.send(topic, message).then(subId => this.listen(subId, h as any));
+            return this;
+        } else {
+            const e = eventOrTopic;
+            let listenerId: any
+            let subscriptionId = undefined;
 
-        if (e.operation == 'create') {
-            if (!e.context.connToListenerMap) // ToDo: remove
-                e.context.connToListenerMap = new WeakMap<Connection, Listener>()
+            if (e.operation == 'create') {
+                if (!e.context.connToListenerMap) // ToDo: remove
+                    e.context.connToListenerMap = new WeakMap<Connection, Listener>()
 
-            listenerId = this.listener((op) => op === subscriptionId);
-            let listener = this.listeners.get(listenerId)
-            e.context.connToListenerMap.set(this, listener) // ToDo: remove      // a WeakMap
-            this._ctxListenerMap.set(e.context, listener);
-        } else if (e.operation == 'destroy') {
-            this.listeners.delete(listenerId)
-            e.context.connToListenerMap.delete(this) // ToDo: remove      // maybe unnecessary
-            this._ctxListenerMap.delete(e.context);
-        } else
-            throw Error()
+                listenerId = this.listener((op) => op === subscriptionId);
+                let listener = this.listeners.get(listenerId)
+                e.context.connToListenerMap.set(this, listener) // ToDo: remove      // a WeakMap
+                this._ctxListenerMap.set(e.context, listener);
+            } else if (e.operation == 'destroy') {
+                this.listeners.delete(listenerId)
+                e.context.connToListenerMap.delete(this) // ToDo: remove      // maybe unnecessary
+                this._ctxListenerMap.delete(e.context);
+            } else
+                throw Error()
 
-        //message to server to switch the subscription on/off
-        //exact format is to be adjusted
-        this.send(e.operation + "_" + e.contextType, { id: e.contextId })
-            .then(id => subscriptionId = id);
+            //message to server to switch the subscription on/off
+            //exact format is to be adjusted
+            this.send(e.operation + "_" + e.contextType, { id: e.contextId })
+                .then(id => subscriptionId = id);
+        }
     }
-
-    subscribe(topic: string, message: any, h: MsgHandler | EventHandler): this {
-        this.send(topic, message).then(subId => {
-            this.listen(subId, h as any);
-        });
-        return this;
-    }
-
+    
     listen(h: EventHandler): this
     listen(f: MsgFilter, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): this
