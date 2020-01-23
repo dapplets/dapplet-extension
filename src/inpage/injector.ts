@@ -97,14 +97,14 @@ export class Injector {
             // ToDo: elemenate the boilerplate
             const coreWrapper = {
                 overlayManager: core.overlayManager,
-                connect: core.connect,
                 publish: core.publish,
                 subscribe: core.subscribe,
                 waitPairingOverlay: core.waitPairingOverlay,
                 contextStarted: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), true),
                 contextFinished: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), false),
-                overlay: core.overlay,
-                wallet: core.wallet
+                connect: core.connect.bind(core),
+                overlay: core.overlay.bind(core),
+                wallet: core.wallet.bind(core)
             };
 
             const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);

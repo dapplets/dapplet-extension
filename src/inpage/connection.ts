@@ -187,38 +187,43 @@ export class Connection implements IConnection {
     }
 
     onMessage(op: any, msg: any, nn?: Key): void {
-        console.log('connection -> onMessage: op, msg', op, msg);
-        const isTopicMatch = (op: any, msg: any, f: MsgFilter) =>
-            typeof f === 'string' ? this.topicMatch(op, f) : f(op, msg)
+        try {
+            console.log('connection -> onMessage: op, msg', op, msg);
+            const isTopicMatch = (op: any, msg: any, f: MsgFilter) =>
+                typeof f === 'string' ? this.topicMatch(op, f) : f(op, msg)
 
-        const listeners = nn ? [this.listeners.get(nn)] : this.listeners
+            const listeners = nn ? [this.listeners.get(nn)] : this.listeners
 
-        listeners.forEach((listener) => {
-            if (!listener.f || isTopicMatch(op, msg, listener.f)) {
-                if (listener.h) {
-                    for (let eventId of [...Object.keys(listener.h), ANY_EVENT]) {
-                        let cond = this.eventDef ? this.eventDef[eventId] : eventId
-                        //ToDo: extract msg.type default
-                        if ((typeof cond === 'function' ? cond(op, msg) : msg.type == cond) || eventId === ANY_EVENT) {
-                            const handlers = listener.h[eventId]
-                            if (Array.isArray(handlers)) {
-                                handlers.forEach(h => h(op, msg))
-                            } else {
-                                handlers(op, msg)
+            listeners.forEach((listener) => {
+                if (!listener.f || isTopicMatch(op, msg, listener.f)) {
+                    if (listener.h) {
+                        for (let eventId of [...Object.keys(listener.h), ANY_EVENT]) {
+                            let cond = this.eventDef ? this.eventDef[eventId] : eventId
+                            //ToDo: extract msg.type default
+                            if ((typeof cond === 'function' ? cond(op, msg) : msg.type == cond) || eventId === ANY_EVENT) {
+                                const handlers = listener.h[eventId]
+                                console.log('handlers', handlers);
+                                if (Array.isArray(handlers)) {
+                                    handlers.forEach(h => h(op, msg))
+                                } else {
+                                    handlers(op, msg)
+                                }
                             }
                         }
                     }
+                    //push values to autoProperties
+                    for (let ap of listener.p || []) {
+                        ap && msg[ap.name] !== undefined && ap.set(msg[ap.name])
+                    }
                 }
-                //push values to autoProperties
-                for (let ap of listener.p || []) {
-                    ap && msg[ap.name] !== undefined && ap.set(msg[ap.name])
-                }
+            })
+            // ToDo: is it necessary?
+            //push values to autoProperties
+            for (let ap of this.autoProperties.values()) {
+                ap && msg[ap.name] && ap.set(msg[ap.name])
             }
-        })
-        // ToDo: is it necessary?
-        //push values to autoProperties
-        for (let ap of this.autoProperties.values()) {
-            ap && msg[ap.name] && ap.set(msg[ap.name])
+        } catch (err) {
+            console.error(err);
         }
     }
 }

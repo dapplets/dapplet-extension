@@ -113,7 +113,7 @@ export default class Core {
                     // ToDo: implement multiframe
                     overlay.open(() => overlay.send('txmeta', [dappletId, metadata]));
                     // ToDo: add timeout?
-                    overlay.onmessage = (topic, message) => {
+                    overlay.onMessage((topic, message) => {
                         if (topic === 'approved') {
                             resolve();
                             overlay.close();
@@ -123,7 +123,7 @@ export default class Core {
                             reject();
                             overlay.close();
                         }
-                    };
+                    });
                 });
             };
 
@@ -148,30 +148,25 @@ export default class Core {
         return conn;
     }
 
-    public wallet<M>(conf: { dappletId: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
-        const transport: IPubSub = {
-            exec: (method: string, params: any[]) => {
-                return new Promise((resolve, reject) => {
-                    resolve(null);
-                });
+    public wallet<M>(cfg: { }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
+        const me = this;
+        const transport = {
+            _txCount: 0,
+            _handler: null,
+            exec: (dappletId: string, ctx: any) => {
+                const id = ++transport._txCount;
+                me._sendWalletConnectTx(dappletId, ctx, (e) => transport._handler(id, e));
+                return new Promise((resolve, reject) => resolve(id));
             },
             onMessage: (handler: (topic: string, message: any) => void) => {
+                transport._handler = handler;
                 return {
-                    off: () => { }
+                    off: () => transport._handler = null
                 }
             }
         }
 
-        const me = this;
-
         const conn = Connection.create<M>(transport, eventDef);
-
-        function sender(subject: string, message: any) {
-            me._sendWalletConnectTx(conf.dappletId, subject, (e: { type: string, data?: any }) => { // ToDo: fix it
-                conn.onMessage(e.type, e.data);
-            });
-        }
-
         return conn;
     }
 
