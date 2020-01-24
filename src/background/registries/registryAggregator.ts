@@ -17,7 +17,7 @@ export class RegistryAggregator implements Registry {
             registryVersions.forEach(v => !versions.includes(v) && versions.push(v));
         }
 
-        return versions.sort((a, b) => gt(a, b) ? 1 : -1);;
+        return versions.sort((a, b) => gt(a, b) ? 1 : -1);
     }
 
     async resolveToUri(name: string, branch: string, version: string): Promise<string[]> {
