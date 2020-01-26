@@ -16,7 +16,7 @@ class AutoPropertyConf {
 }
 
 export type AutoProperties<M> = { [key in keyof M]: AutoProperty }
-type Listener = { f?: MsgFilter, h?: EventHandler, p: AutoProperty[] }
+export type Listener = { f?: MsgFilter, h?: EventHandler, p: AutoProperty[] }
 
 const ANY_EVENT: any = Symbol('any_event')
 const TYPE_FILTER = (type: string) => (op: any, msg: any) => msg.type === type
