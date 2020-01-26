@@ -30,7 +30,7 @@ type EventType = {
 }
 
 export interface IConnection {
-    readonly listeners: Map<Key, Listener>
+    readonly listeners: Set<Listener>
     send(op: any, msg?: any): Promise<any>
     sendAndListen(topic: string, message: any, h: MsgHandler | EventHandler): void
     sendAndListen(e: EventType): void
@@ -38,11 +38,11 @@ export interface IConnection {
     listen(f: MsgFilter, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): this
-    listener(h: EventHandler): Key
-    listener(f: MsgFilter, ap?: AutoProperty[]): Key
-    listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): Key
-    listener(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): Key
-    addAutoProperties(f: MsgFilter, ap: AutoProperty[]): Key
+    listener(h: EventHandler): Listener
+    listener(f: MsgFilter, ap?: AutoProperty[]): Listener
+    listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): Listener
+    listener(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): Listener
+    //addAutoProperties(f: MsgFilter, ap: AutoProperty[]): Key
     topicMatch(topic: string, pattern: string): boolean
     onMessage(op: any, msg: any): void
 }
@@ -50,8 +50,7 @@ export interface IConnection {
 export class Connection implements IConnection {
     private _ctxListenerMap = new WeakMap<any, Listener>()
     private autoProperties = new Map<Key, AutoProperty>()
-    public readonly listeners = new Map<Key, Listener>()
-    private nn = 0 //a numeric handle counter to address listeners and autopropertes
+    public readonly listeners = new Set<Listener>()
 
     constructor(
         private _bus?: IPubSub,
@@ -82,8 +81,7 @@ export class Connection implements IConnection {
                 if (!e.context.connToListenerMap) // ToDo: remove
                     e.context.connToListenerMap = new WeakMap<Connection, Listener>()
 
-                listenerId = this.listener((op) => op === subscriptionId);
-                let listener = this.listeners.get(listenerId)
+                let listener = this.listener((op) => op === subscriptionId);
                 e.context.connToListenerMap.set(this, listener) // ToDo: remove      // a WeakMap
                 this._ctxListenerMap.set(e.context, listener);
             } else if (e.operation == 'destroy') {
@@ -110,24 +108,26 @@ export class Connection implements IConnection {
     }
 
     // call, when new context was created.
-    listener(h: EventHandler): Key
-    listener(f: MsgFilter, ap?: AutoProperty[]): Key
-    listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): Key
-    listener(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): Key
-    listener(filterOrHander: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): Key {
+    listener(h: EventHandler): Listener
+    listener(f: MsgFilter, ap?: AutoProperty[]): Listener
+    listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): Listener
+    listener(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): Listener
+    listener(filterOrHander: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): Listener {
+        let listener:Listener
         if (typeof filterOrHander === 'object') { //is an EventHandler
-            this.listeners.set(++this.nn, { f: undefined, h: filterOrHander, p: [] })
+            listener = { f: undefined, h: filterOrHander, p: [] }
         } else {
             if (evtOrMsgOrAP instanceof Array) {
-                this.listeners.set(++this.nn, { f: filterOrHander, h: undefined, p: evtOrMsgOrAP || [] })
+                listener = { f: filterOrHander, h: undefined, p: evtOrMsgOrAP || [] }
             } else if (typeof evtOrMsgOrAP == 'function') {
                 let h = { [ANY_EVENT]: evtOrMsgOrAP }
-                this.listeners.set(++this.nn, { f: filterOrHander, h: h, p: ap || [] })
+                listener = { f: filterOrHander, h: h, p: ap || [] }
             } else {
-                this.listeners.set(++this.nn, { f: filterOrHander, h: evtOrMsgOrAP!, p: ap || [] })
+                listener = { f: filterOrHander, h: evtOrMsgOrAP!, p: ap || [] }
             }
         }
-        return this.nn
+        this.listeners.add(listener)
+        return listener
     }
 
     //connection with AutoProperty support added by proxy
@@ -161,16 +161,6 @@ export class Connection implements IConnection {
         })
     }
 
-    private addAutoProperty(ap: AutoProperty): number {
-        this.autoProperties.set(++this.nn, ap)
-        return this.nn
-    }
-
-    public addAutoProperties(f: MsgFilter, ap: AutoProperty[]): number {
-        this.listeners.set(++this.nn, { f: f, h: undefined, p: ap })
-        return this.nn
-    }
-
     topicMatch(topic: string, pattern: string): boolean {
         if (!pattern || pattern == topic) return true
         else if (!topic) return false
@@ -186,15 +176,13 @@ export class Connection implements IConnection {
         return true
     }
 
-    onMessage(op: any, msg: any, nn?: Key): void {
+    onMessage(op: any, msg: any): void {
         try {
             console.log('connection -> onMessage: op, msg', op, msg);
             const isTopicMatch = (op: any, msg: any, f: MsgFilter) =>
                 typeof f === 'string' ? this.topicMatch(op, f) : f(op, msg)
 
-            const listeners = nn ? [this.listeners.get(nn)] : this.listeners
-
-            listeners.forEach((listener) => {
+            this.listeners.forEach((listener) => {
                 if (!listener.f || isTopicMatch(op, msg, listener.f)) {
                     if (listener.h) {
                         for (let eventId of [...Object.keys(listener.h), ANY_EVENT]) {
