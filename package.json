@@ -1,6 +1,6 @@
 {
   "name": "@dapplets/dapplet-extension",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Adds controls to legacy web sites.",
   "types": "./lib/index.d.ts",
   "scripts": {
@@ -34,9 +34,7 @@
     "url-loader": "^3.0.0",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
-    "webpack-merge": "^4.2.2"
-  },
-  "dependencies": {
+    "webpack-merge": "^4.2.2",
     "@walletconnect/browser": "^1.0.0-beta.46",
     "chrome-extension-message-wrapper": "github:dapplets/chrome-extension-message-wrapper#error-handler",
     "ethers": "^4.0.43",
@@ -51,6 +49,7 @@
     "simple-mapper": "^2.2.0",
     "styled-components": "^5.0.0"
   },
+  "dependencies": {},
   "directories": {
     "doc": "docs"
   },
