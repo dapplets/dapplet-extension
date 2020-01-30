@@ -145,7 +145,8 @@ export class Injector {
                         // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
                         const versions = this.registry.filter(m => m.manifest.name == name).map(m => m.manifest.version);
                         const dependency = manifest.dependencies[name];
-
+                        
+                        // ToDo: check `dependency` for undefined
                         // ToDo: Should be moved to the background? 
                         // ToDo: Fetch prefix from global settings.
                         // ToDo: Replace '>=' to '^'
