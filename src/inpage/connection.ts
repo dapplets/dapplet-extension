@@ -47,7 +47,8 @@ export interface IConnection {
 }
 
 export class Connection implements IConnection {
-    private autoProperties = new Map<Key, AutoProperty>()
+    public readonly listenerLifecycle = new WeakMap<any, Listener>()
+    private autoProperties = new Map<Key, AutoProperty>()  //ToDo: remove this?
     public readonly listeners = new Set<Listener>()
 
     constructor(
@@ -69,14 +70,12 @@ export class Connection implements IConnection {
         let listener 
         let subscriptionId = undefined;
         if (e.operation == 'create') {
-            if (!e.context.connToListenerMap) // ToDo: maybe move WeakMap from Context to Connection class
-                e.context.connToListenerMap = new WeakMap<Connection, Listener>()
             listener = this.listener((op) => op === subscriptionId);
-            e.context.connToListenerMap.set(this, listener) // ToDo: remove      // a WeakMap
+            this.listenerLifecycle.set(e.context, listener)
         } else if (e.operation == 'destroy') {
             //assumption: one listener per connection in context
-            listener = e.context.connToListenerMap.delete(this) // ToDo: remove      // maybe unnecessary
-            this.listeners.delete(listener) //ToDo: how to cleanup?
+            listener = this.listenerLifecycle.delete(e.context)
+            this.listeners.delete(listener)
         } else {
             throw Error()
         }
