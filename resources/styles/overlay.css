@@ -152,7 +152,7 @@
     background: #ececec;
     z-index: 2;
     min-width: 80px;
-    max-width: 100px;
+    max-width: 150px;
 }
 
 .pageNav__tabItem--active {

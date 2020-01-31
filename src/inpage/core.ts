@@ -17,7 +17,10 @@ export default class Core {
         extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (message === "OPEN_PAIRING_OVERLAY") {
                 this.waitPairingOverlay().finally(() => sendResponse());
-            } else if (message === "TOGGLE_OVERLAY") {
+            } else if (message === "OPEN_DEPLOY_OVERLAY") {
+                this.waitDeployOverlay().finally(() => sendResponse());
+            }
+            else if (message === "TOGGLE_OVERLAY") {
                 this._togglePopupOverlay();
                 sendResponse();
             }
@@ -44,6 +47,26 @@ export default class Core {
         return new Promise<void>((resolve, reject) => {
             const pairingUrl = extension.extension.getURL('pairing.html');
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'Wallet');
+            overlay.open();
+            // ToDo: add timeout?
+            overlay.onmessage = (topic, message) => {
+                if (topic === 'ready') {
+                    overlay.close();
+                    resolve();
+                }
+
+                if (topic === 'error') {
+                    reject();
+                }
+            }
+        });
+    }
+
+    public waitDeployOverlay(): Promise<void> {
+        const me = this;
+        return new Promise<void>((resolve, reject) => {
+            const pairingUrl = extension.extension.getURL('deploy.html');
+            const overlay = new Overlay(this.overlayManager, pairingUrl, 'Deploy');
             overlay.open();
             // ToDo: add timeout?
             overlay.onmessage = (topic, message) => {

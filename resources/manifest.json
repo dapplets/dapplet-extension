@@ -34,7 +34,8 @@
   "web_accessible_resources": [
     "pairing.html",
     "dapplet.html",
-    "popup.html"
+    "popup.html",
+    "deploy.html"
   ],
   "permissions": [
     "tabs",

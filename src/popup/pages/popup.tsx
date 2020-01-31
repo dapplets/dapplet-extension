@@ -7,6 +7,7 @@ import Features from "../components/features";
 import Header from "../components/header";
 import Wallets from "../components/wallets";
 import Settings from "../components/settings";
+import Developer from "../components/developer";
 import Events from "../components/events";
 import './popup.scss';
 
@@ -64,6 +65,12 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
         menuItem: "Settings",
         render: () => (
           <Tab.Pane attached={false} as={Settings} />
+        )
+      },
+      {
+        menuItem: "Developer",
+        render: () => (
+          <Tab.Pane attached={false} as={Developer} />
         )
       }
     ];

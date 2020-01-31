@@ -48,6 +48,7 @@ extension.runtime.onMessage.addListener(
     getActiveModulesByHostnames: (hostnames) => featureService.getActiveModulesByHostnames(hostnames),
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
     optimizeDependency: (name, branch, version) => featureService.optimizeDependency(name, branch, version),
+    getAllDevModules: () => featureService.getAllDevModules(),
 
     // GlobalConfigService
     getGlobalConfig: () => globalConfigService.get(),
@@ -56,7 +57,13 @@ extension.runtime.onMessage.addListener(
     getEvents: EventService.getEvents,
     addEvent: EventService.addEvent,
     setRead: EventService.setRead,
-    getNewEventsCount: EventService.getNewEventsCount
+    getNewEventsCount: EventService.getNewEventsCount,
+
+    addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
+    removeRegistry: (url) => globalConfigService.removeRegistry(url),
+    getRegistries: () => globalConfigService.getRegistries(),
+    getIntro: () => globalConfigService.getIntro(),
+    setIntro: (intro) => globalConfigService.setIntro(intro)
   })
 );
 

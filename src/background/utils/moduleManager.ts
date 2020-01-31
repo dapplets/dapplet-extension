@@ -4,10 +4,13 @@ import { maxSatisfying } from 'semver';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 import Manifest from '../models/manifest';
 import { addEvent } from '../services/eventService';
+import { RegistryAggregator } from '../registries/registryAggregator';
+import { StorageAggregator } from '../moduleStorages/moduleStorage';
 
 export default class ModuleManager {
 
-    constructor(private _registry: Registry, private _storage: Storage) { }
+    private _registry: Registry = new RegistryAggregator();
+    private _storage: Storage = new StorageAggregator();
 
     public async resolveDependencies(modules: { name: string, version: string, branch?: string }[]): Promise<{ name: string, version: string, branch: string }[]> {
 
@@ -119,5 +122,32 @@ export default class ModuleManager {
             branch: branch,
             version: optimizedVersion
         };
+    }
+
+    public async getFeaturesByHostnames(hostnames: string[]): Promise<{ [hostname: string]: Manifest[] }> {
+        if (!hostnames || hostnames.length === 0) return {};
+        const hostnameFeatures = await this._registry.getFeatures(hostnames); // result.hostname.featureName[branchIndex]
+        const hostnameManifests: { [hostname: string]: Manifest[] } = {};
+
+        for (const hostname in hostnameFeatures) {
+            hostnameManifests[hostname] = [];
+            const features = hostnameFeatures[hostname];
+            for (const name in features) {
+                const branches = features[name];
+                const branch = branches[0]; // ToDo: select branch
+                const versions = await this._registry.getVersions(name, branch);
+                const lastVersion = versions[versions.length - 1]; // ToDo: select version
+                const manifest = await this.loadManifest(name, branch, lastVersion);
+                hostnameManifests[hostname].push(manifest);
+            }
+        }
+
+        return hostnameManifests;
+    }
+
+    public async getAllDevModules(): Promise<Manifest[]> {
+        const modules = await this._registry.getAllDevModules();
+        const manifests = await Promise.all(modules.map(m => this.loadManifest(m.name, m.branch, m.version)));
+        return manifests;
     }
 }

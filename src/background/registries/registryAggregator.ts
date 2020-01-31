@@ -39,21 +39,24 @@ export class RegistryAggregator implements Registry {
         return Object.assign({}, ...features);
     }
 
+    public async getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]> {
+        await this._initRegistries();
+        const modules = await Promise.all(this._registries.map(r => r.getAllDevModules()));
+        console.log(modules);
+        return modules.reduce((a,b) => a.concat(b));
+    }
+
     private async _initRegistries() {
         this._registries = [];
 
         const globalConfigService = new GlobalConfigService();
 
         // ToDo: fetch LocalConfig
-        const { registryUrl } = await globalConfigService.get();
+        const registries = await globalConfigService.getRegistries();
 
-        if (registryUrl) {
-            // ToDo: fix it
-            if (registryUrl.indexOf("localhost:8080") != -1) {
-                this._registries.push(new DevRegistry(registryUrl));
-            } else {
-                this._registries.push(new TestRegistry(registryUrl));
-            }
+        if (registries && registries.length) {
+            this._registries = registries.sort((a, b) => (a.isDev === false) ? 1 : -1)
+                .map(r => r.isDev ? new DevRegistry(r.url) : new TestRegistry(r.url));
         }
 
         // ToDo: Add Prod Registry
