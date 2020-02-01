@@ -75,7 +75,7 @@ export class Connection implements IConnection {
                 console.log("DESTROY LISTEER for Context", e.contextId, listener, me.listeners.size)
                 if (listener.extId !== undefined) {
                     console.log('send destroy listener')
-                    me.send("destroy_" + e.contextType, listener.extId)
+                    me.send('unsubscribe', listener.extId)
                 }
                 unsubscribe(e.topic, handler)
                 me.listeners.delete(listener)
@@ -87,7 +87,7 @@ export class Connection implements IConnection {
         me.listenerLifecycle.set(e.context, listener)
         //message to server to switch the subscription on/off
         //exact format is to be adjusted
-        this.send("create_" + e.contextType, { id: e.contextId })
+        this.send('subscribe', { id: e.contextId, type: e.contextType })
             .then(id => listener.f = listener.extId = id );
         console.log("CREATE LISTEER for Context", e.contextId, listener)
         return listener    
