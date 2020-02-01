@@ -1,5 +1,5 @@
 import { IPubSub } from "./types"
-
+import { subscribe, unsubscribe, publish } from './inpage-pubsub'
 type Key = string | number | symbol
 type MsgFilter = string | ((op: any, msg: any) => boolean)
 export type EventDef<T extends Key> = { [key in T]: MsgFilter }
@@ -16,13 +16,14 @@ type AutoPropertyConf = {
 }
 
 export type AutoProperties<M> = { [key in keyof M]: AutoProperty }
-export type Listener = { f?: MsgFilter, h?: EventHandler, p: AutoProperty[] }
+export type Listener = { f?: MsgFilter, h?: EventHandler, p: AutoProperty[] , extId?:string }
 
 const ANY_EVENT: any = Symbol('any_event')
 const TYPE_FILTER = (type: string) => (op: any, msg: any) => msg.type === type
 
 type EventType = {
     operation: string, // 'create'
+    topic: string,     // connects events together. maybe contextId or just random. 
     // maybe better data structure or naming?
     contextType: string, // 'tweet'
     contextId: string,  // '123123123' tweet Id  
@@ -67,22 +68,28 @@ export class Connection implements IConnection {
     }
 
     bind(e: EventType): Listener {
-        let listener 
-        let subscriptionId = undefined;
-        if (e.operation == 'create') {
-            listener = this.listener((op) => op === subscriptionId);
-            this.listenerLifecycle.set(e.context, listener)
-        } else if (e.operation == 'destroy') {
-            //assumption: one listener per connection in context
-            listener = this.listenerLifecycle.delete(e.context)
-            this.listeners.delete(listener)
-        } else {
-            throw Error()
+        let me = this
+        let listener:Listener = me.listener()
+        let handler = (evt:any) => {
+            if (evt.data.operation == 'destroy') {
+                console.log("DESTROY LISTEER for Context", e.contextId, listener, me.listeners.size)
+                if (listener.extId !== undefined) {
+                    console.log('send destroy listener')
+                    me.send("destroy_" + e.contextType, listener.extId)
+                }
+                unsubscribe(e.topic, handler)
+                me.listeners.delete(listener)
+                me.listenerLifecycle.delete(e.context)
+                console.log("DESTROY-ED LISTEER for Context", e.contextId, listener, me.listeners.size)
+            }
         }
+        subscribe(e.topic, handler)
+        me.listenerLifecycle.set(e.context, listener)
         //message to server to switch the subscription on/off
         //exact format is to be adjusted
-        this.send(e.operation + "_" + e.contextType, { id: e.contextId })
-            .then(id => listener.f = id);
+        this.send("create_" + e.contextType, { id: e.contextId })
+            .then(id => listener.f = listener.extId = id );
+        console.log("CREATE LISTEER for Context", e.contextId, listener)
         return listener    
     }
     
@@ -107,13 +114,16 @@ export class Connection implements IConnection {
     }
 
     // call, when new context was created.
+    listener(): Listener
     listener(h: EventHandler): Listener
     listener(f: MsgFilter, ap?: AutoProperty[]): Listener
     listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): Listener
     listener(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): Listener
-    listener(filterOrHander: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): Listener {
+    listener(filterOrHander?: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): Listener {
         let listener:Listener
-        if (typeof filterOrHander === 'object') { //is an EventHandler
+        if (filterOrHander === undefined) {
+            listener = { f: undefined,      h: undefined, p: [] }
+        } else if (typeof filterOrHander === 'object') { //is an EventHandler
             listener = { f: undefined,      h: filterOrHander, p: [] }
         } else if (evtOrMsgOrAP instanceof Array) {
             listener = { f: filterOrHander, h: undefined,      p: evtOrMsgOrAP || [] }
