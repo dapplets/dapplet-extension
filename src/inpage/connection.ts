@@ -10,13 +10,13 @@ export type AutoProperty = {
     set: (setter: (value: any) => void) => void
 }
 
-type AutoPropertyConf = {
+export type AutoPropertyConf = {
     name: string
     conn: Connection
 }
 
 export type AutoProperties<M> = { [key in keyof M]: AutoProperty }
-export type Listener = { f?: MsgFilter, h?: EventHandler, p: AutoProperty[] , extId?:string }
+export type Listener = { f?: MsgFilter, h?: EventHandler, p: AutoProperty[] }
 
 const ANY_EVENT: any = Symbol('any_event')
 const TYPE_FILTER = (type: string) => (op: any, msg: any) => msg.type === type
@@ -33,7 +33,8 @@ type EventType = {
 export interface IConnection {
     readonly listeners: Set<Listener>
     send(op: any, msg?: any): Promise<any>
-    bind(e: EventType): Listener
+    //bind(e: EventType): Listener
+    addAutoProperty(apConfig:AutoPropertyConf, setter: (v:any)=>void, ctx?: any):AutoProperty
     sendAndListen(topic: string, message: any, h: MsgHandler | EventHandler): this
     listen(h: EventHandler): this
     listen(f: MsgFilter, ap?: AutoProperty[]): this
@@ -48,8 +49,8 @@ export interface IConnection {
 }
 
 export class Connection implements IConnection {
-    public readonly listenerLifecycle = new WeakMap<any, Listener>()
-    private autoProperties = new Map<Key, AutoProperty>()  //ToDo: remove this?
+    private readonly listenerContextMap = new WeakMap<any, Listener>()
+    private autoProperties = new Map<Key, AutoProperty>()  //ToDo: connection-wide autoproperties. Remove or not?
     public readonly listeners = new Set<Listener>()
 
     constructor(
@@ -67,32 +68,45 @@ export class Connection implements IConnection {
         return this._bus.exec(op, msg)
     }
 
-    bind(e: EventType): Listener {
-        let me = this
-        let listener:Listener = me.listener()
-        let handler = (evt:any) => {
-            if (evt.data.operation == 'destroy') {
-                console.log("DESTROY LISTEER for Context", e.contextId, listener, me.listeners.size)
-                if (listener.extId !== undefined) {
-                    console.log('send destroy listener')
-                    me.send('unsubscribe', listener.extId)
+    private subscribeOnceForContext(ctx:any): Listener {
+        let listener = this.listenerContextMap.get(ctx)
+        if (!listener) {
+            const me = this
+            listener = me.listener()
+            const handler = (evt:any) => {
+                if (evt.data.operation == 'destroy') {
+                    const subId = typeof listener.f === 'string' ? listener.f : undefined  
+                    if (subId !== undefined) {
+                        me.send('unsubscribe', subId)
+                    }
+                    unsubscribe(ctx.id, handler)
+                    me.listeners.delete(listener)
+                    me.listenerContextMap.delete(ctx)
                 }
-                unsubscribe(e.topic, handler)
-                me.listeners.delete(listener)
-                me.listenerLifecycle.delete(e.context)
-                console.log("DESTROY-ED LISTEER for Context", e.contextId, listener, me.listeners.size)
             }
+            //note: multiple handlers of many conns for the same topic (context) are possible.
+            subscribe(ctx.id, handler)
+            me.listenerContextMap.set(ctx, listener)
+            //message to server to switch the subscription on/off
+            //exact format is to be adjusted
+            this.send('subscribe', { id: ctx.id, type: ctx.contextType })
+                .then(id => listener.f = id );
         }
-        subscribe(e.topic, handler)
-        me.listenerLifecycle.set(e.context, listener)
-        //message to server to switch the subscription on/off
-        //exact format is to be adjusted
-        this.send('subscribe', { id: e.contextId, type: e.contextType })
-            .then(id => listener.f = listener.extId = id );
-        console.log("CREATE LISTEER for Context", e.contextId, listener)
-        return listener    
+        return listener
     }
-    
+
+    addAutoProperty(apConfig:AutoPropertyConf, setter: (v:any)=>void, ctx?: any) {
+        let listener = this.subscribeOnceForContext(ctx)
+        let ap = {
+            conn: apConfig.conn,
+            name: apConfig.name,
+            value: undefined,
+            set: (v:any) => { ap.value = v; setter(v) }
+        }
+        listener.p.push(ap)
+        return ap;
+    }
+
     sendAndListen(topic: string, message: any, h: MsgHandler | EventHandler, ap?: AutoProperty[]): this {
         //Decision Choice 1: 
         // create listener first and setup the filter for given subscription id later
@@ -132,7 +146,6 @@ export class Connection implements IConnection {
         } else {
             listener = { f: filterOrHander, h: evtOrMsgOrAP!,  p: ap || [] }
         }
-        console.log('listener>', listener)
         this.listeners.add(listener)
         return listener
     }
@@ -167,7 +180,6 @@ export class Connection implements IConnection {
 
     onMessage(op: any, msg: any): void {
         try {
-            console.log('connection -> onMessage: op, msg', op, msg);
             const isTopicMatch = (op: any, msg: any, f: MsgFilter) =>
                 typeof f === 'string' ? this.topicMatch(op, f) : f(op, msg)
 
@@ -179,7 +191,6 @@ export class Connection implements IConnection {
                             //ToDo: extract msg.type default
                             if ((typeof cond === 'function' ? cond(op, msg) : msg.type == cond) || eventId === ANY_EVENT) {
                                 const handlers = listener.h[eventId]
-                                console.log('handlers', handlers);
                                 if (Array.isArray(handlers)) {
                                     handlers.forEach(h => h(op, msg))
                                 } else {
