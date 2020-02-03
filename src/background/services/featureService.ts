@@ -18,7 +18,7 @@ export default class FeatureService {
                 if (!dto) {
                     const dto: ManifestDTO = manifest as any;
                     const config = await this._siteConfigRepository.getById(hostname); // ToDo: which contextId should we compare?
-                    dto.isActive = config.activeFeatures[name]?.isActive || false;
+                    dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
                     dto.order = i++;
                     if (!dto.hostnames) dto.hostnames = [];
                     dto.hostnames.push(hostname);
