@@ -53,6 +53,8 @@ extension.runtime.onMessage.addListener(
     // GlobalConfigService
     getGlobalConfig: () => globalConfigService.get(),
     setGlobalConfig: (config) => globalConfigService.set(config),
+    getDevMode: () => globalConfigService.getDevMode(),
+    setDevMode: (isActive) => globalConfigService.setDevMode(isActive),
 
     getEvents: EventService.getEvents,
     addEvent: EventService.addEvent,

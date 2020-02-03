@@ -15,4 +15,6 @@ export class GlobalConfig extends Base {
     intro = {
         popupDeveloperWelcome: true
     };
+
+    devMode: boolean = false;
 }

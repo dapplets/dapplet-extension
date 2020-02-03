@@ -24,6 +24,7 @@ export default class GlobalConfigService {
             url: "https://test.dapplets.org/dapplet-base",
             isDev: false
         }];
+        config.devMode = false;
 
         await this._globalConfigRepository.deleteById(this._configId);
         await this._globalConfigRepository.create(config);
@@ -48,9 +49,7 @@ export default class GlobalConfigService {
     }
 
     async removeRegistry(url: string) {
-        const config = await this.get();
-        config.registries = config.registries.filter(r => r.url !== url);
-        await this.set(config);
+        this.updateConfig(c => c.registries = c.registries.filter(r => r.url !== url));
     }
 
     async getIntro() {
@@ -59,8 +58,21 @@ export default class GlobalConfigService {
     }
 
     async setIntro(intro: any) {
+        this.updateConfig(c => Object.entries(intro).forEach(([key, value]) => c.intro[key] = value));
+    }
+
+    async getDevMode() {
         const config = await this.get();
-        Object.entries(intro).forEach(([key, value]) => config.intro[key] = value);
+        return config.devMode;
+    }
+
+    async setDevMode(isActive: boolean) {
+        this.updateConfig(c => c.devMode = isActive);
+    }
+
+    async updateConfig(callback: (config: GlobalConfig) => void) {
+        const config = await this.get();
+        callback(config);
         await this.set(config);
     }
 }

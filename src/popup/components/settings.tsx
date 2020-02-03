@@ -15,6 +15,7 @@ interface ISettingsState {
     registries: { url: string, isDev: boolean }[];
     registryInput: string;
     registryInputError: string;
+    devMode: boolean;
 }
 
 const OPTIONS = [{
@@ -37,11 +38,13 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             registries: [],
             registryInput: '',
             registryInputError: null,
+            devMode: false
         };
     }
 
     async componentDidMount() {
-        this.loadRegistries();
+        await Promise.all([this.loadRegistries(), this.loadDevMode()]);
+        this.setState({ isLoading: false });
     }
 
     async loadRegistries() {
@@ -49,9 +52,20 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         const registries = await getRegistries();
 
         this.setState({
-            isLoading: false,
             registries: registries.filter(r => r.isDev === false)
         });
+    }
+
+    async loadDevMode() {
+        const { getDevMode } = await initBGFunctions(extension);
+        const devMode = await getDevMode();
+        this.setState({ devMode });
+    }
+
+    async setDevMode(isActive: boolean) {
+        const { setDevMode } = await initBGFunctions(extension);
+        await setDevMode(isActive);
+        this.loadDevMode();
     }
 
     async addRegistry(url: string) {
@@ -74,7 +88,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     }
 
     render() {
-        const { isLoading, registries, registryInput, registryInputError } = this.state;
+        const { isLoading, registries, registryInput, registryInputError, devMode } = this.state;
 
         return (
             <React.Fragment>
@@ -113,7 +127,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                     </List>
 
                     <Header as='h4'>Advanced</Header>
-                    <Checkbox toggle label='Development Mode' />
+                    <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} />
                 </Segment>
 
             </React.Fragment>
