@@ -35,14 +35,28 @@ export class RegistryAggregator implements Registry {
 
     async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
         await this._initRegistries();
-        const features = await Promise.all(this._registries.map(r => r.getFeatures(hostnames)));
-        return Object.assign({}, ...features);
+        const regFeatures = await Promise.all(this._registries.map(r => r.getFeatures(hostnames)));
+        const merge: { [hostname: string]: { [name: string]: string[]; } } = {};
+
+        // Deep merging of regFeatures
+        for (const f of regFeatures) {
+            for (const hostname in f) {
+                if (!merge[hostname]) merge[hostname] = {};
+                for (const name in f[hostname]) {
+                    if (!merge[hostname][name]) merge[hostname][name] = [];
+                    for (const branch of f[hostname][name]) {
+                        merge[hostname][name].push(branch);
+                    }
+                }
+            }
+        }
+
+        return merge;
     }
 
     public async getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]> {
         await this._initRegistries();
         const modules = await Promise.all(this._registries.map(r => r.getAllDevModules()));
-        console.log(modules);
         return modules.reduce((a,b) => a.concat(b));
     }
 

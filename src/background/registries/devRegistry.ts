@@ -16,7 +16,9 @@ export class DevRegistry implements Registry {
 
     public async getVersions(name: string, branch: string): Promise<string[]> {
         await this._cacheDevConfig();
-        const versions = Object.keys(this._devConfig.modules[name][branch]);
+        const branches = this._devConfig.modules[name];
+        if (!branches || !branches[branch]) return [];
+        const versions = Object.keys(branches[branch]);
         return versions;
     }
 
