@@ -21,6 +21,7 @@ export class Injector {
 
     constructor(public core: Core) {
         this._setContextActivivty([window.location.hostname], undefined, true);
+        window.exports = {}; // for CommonJS modules compatibility
     }
 
     public async loadModules(modules: { name: string, branch: string, version: string, order: number, contextIds: string[] }[]) {
