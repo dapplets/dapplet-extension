@@ -46,7 +46,7 @@ export default class FeatureService {
 
             await this._siteConfigRepository.update(config);
 
-            const order = Object.getOwnPropertyNames(hostnamesManfiests[hostname]).findIndex(f => f === name); // ToDo: fix order
+            const order = hostnamesManfiests[hostname].findIndex(f => f.name === name); // ToDo: fix order
             extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
                 var activeTab = tabs[0];
                 extension.tabs.sendMessage(activeTab.id, {
