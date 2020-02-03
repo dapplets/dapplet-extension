@@ -55,13 +55,6 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
   async handleSwitchChange({ name, version, hostnames }, value) {
     const backgroundFunctions = await initBGFunctions(extension);
     const { activateFeature, deactivateFeature } = backgroundFunctions;
-
-    if (value) {
-      await activateFeature(name, version, hostnames);
-    } else {
-      await deactivateFeature(name, version, hostnames);
-    }
-
     this.setState(state => {
       const features = state.features.map(feature => {
         if (feature.name == name) {
@@ -72,6 +65,22 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
 
       return { features };
     });
+
+    if (value) {
+      await activateFeature(name, version, hostnames);
+    } else {
+      await deactivateFeature(name, version, hostnames);
+    }
+  }
+
+  refreshContextPage() {
+    extension.tabs.query({
+      active: true,
+      currentWindow: true
+    }, ([{ id, url }]) => {
+      chrome.tabs.update(id, { url });
+      window.close();
+    });
   }
 
   render() {
@@ -81,7 +90,7 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
         <Segment loading={isLoading} className="internalTab">
           {!isNoInpage ?
             (!error) ? ((features.length > 0) ? (
-              <List divided relaxed style={{ width: 350 }}>
+              <List divided relaxed>
                 {features.map(f => (
                   <List.Item key={f.name} style={{ overflow: "hidden" }}>
                     <List.Content style={{ width: 45, float: "left" }}>
@@ -145,7 +154,19 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
                 ))}
               </List>
             ) : (<div>No available features for current site.</div>)) : (<Message floating negative>{error}</Message>)
-            : (<div>No connection with context webpage. <br/> Please refresh it.</div>)}
+            : (<div>
+              No connection with context webpage.
+              <br />
+              Please refresh it.
+              <br />
+              <Button
+                compact
+                size='tiny'
+                color='blue'
+                content='Refresh'
+                onClick={() => this.refreshContextPage()}
+              />
+            </div>)}
         </Segment>
       </React.Fragment>
     );

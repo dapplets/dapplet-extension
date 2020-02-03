@@ -1,55 +1,42 @@
 import ManifestDTO from '../dto/manifestDTO';
 import SiteConfigBrowserStorage from '../browserStorages/siteConfigBrowserStorage';
 import ModuleManager from '../utils/moduleManager';
-import { RegistryAggregator } from '../registries/registryAggregator';
-import { StorageAggregator } from '../moduleStorages/moduleStorage';
 import * as extension from 'extensionizer';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
-    private _registryAggregator = new RegistryAggregator();
-    private _storageAggregator = new StorageAggregator();
-    private _moduleManager = new ModuleManager(this._registryAggregator, this._storageAggregator);
+    private _moduleManager = new ModuleManager();
 
     async getFeaturesByHostnames(hostnames: string[]): Promise<ManifestDTO[]> {
-        if (!hostnames || hostnames.length === 0) return [];
+        const hostnamesManfiests = await this._moduleManager.getFeaturesByHostnames(hostnames);
+        const dtos: ManifestDTO[] = [];
 
-        const featuresDto: ManifestDTO[] = [];
-
-        const featuresHostnames = await this._registryAggregator.getFeatures(hostnames);
-
-        for (const hostname in featuresHostnames) {
-            const featuresBranches = featuresHostnames[hostname];
-            const names = Object.getOwnPropertyNames(featuresBranches);
-            for (let i = 0; i < names.length; i++) {
-                const name = names[i];
-                const branch = featuresBranches[name][0]; // ToDo: select branch
-                const versions = await this._registryAggregator.getVersions(name, branch);
-                const lastVersion = versions[versions.length - 1]; // ToDo: select version
-
-                const feature = featuresDto.find(f => f.name === name && f.branch === branch && f.version === lastVersion);
-                if (!feature) {
-                    const dto: ManifestDTO = await this._moduleManager.loadManifest(name, branch, lastVersion) as any;
+        for (const [hostname, manifests] of Object.entries(hostnamesManfiests)) {
+            let i = 0;
+            for (const manifest of manifests) {
+                const dto = dtos.find(f => f.name === manifest.name && f.branch === manifest.branch && f.version === manifest.version);
+                if (!dto) {
+                    const dto: ManifestDTO = manifest as any;
                     const config = await this._siteConfigRepository.getById(hostname); // ToDo: which contextId should we compare?
-                    dto.isActive = config.activeFeatures[name]?.isActive || false;
-                    dto.order = i;
+                    dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
+                    dto.order = i++;
                     if (!dto.hostnames) dto.hostnames = [];
                     dto.hostnames.push(hostname);
-                    featuresDto.push(dto);
+                    dtos.push(dto);
                 } else {
-                    if (!feature.hostnames) feature.hostnames = [];
-                    feature.hostnames.push(hostname);
+                    if (!dto.hostnames) dto.hostnames = [];
+                    dto.hostnames.push(hostname);
                 }
             }
         }
 
-        return featuresDto;
+        return dtos;
     }
 
     private async _setFeatureActive(name: string, version: string, hostnames: string[], isActive: boolean) {
-        const featuresHostnames = await this._registryAggregator.getFeatures(hostnames);
+        const hostnamesManfiests = await this._moduleManager.getFeaturesByHostnames(hostnames);
 
-        for (const hostname in featuresHostnames) {
+        for (const hostname in hostnamesManfiests) {
             const config = await this._siteConfigRepository.getById(hostname);
             config.activeFeatures[name] = {
                 version,
@@ -59,7 +46,7 @@ export default class FeatureService {
 
             await this._siteConfigRepository.update(config);
 
-            const order = Object.getOwnPropertyNames(featuresHostnames[hostname]).findIndex(f => f === name);
+            const order = hostnamesManfiests[hostname].findIndex(f => f.name === name); // ToDo: fix order
             extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
                 var activeTab = tabs[0];
                 extension.tabs.sendMessage(activeTab.id, {
@@ -109,4 +96,8 @@ export default class FeatureService {
         // ToDo: fix this hack
         return await this._moduleManager.optimizeDependency(name, version, branch);
     };
+
+    public async getAllDevModules() {
+        return await this._moduleManager.getAllDevModules();
+    }
 }

@@ -27,4 +27,8 @@ export class TestRegistry implements Registry {
         const features = json.data;
         return features;
     }
+
+    public async getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]> {
+        return Promise.resolve([]);
+    }
 }

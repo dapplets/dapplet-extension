@@ -4,7 +4,7 @@ import { maxSatisfying } from 'semver';
 import { SubscribeOptions } from './overlay';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
 import * as extension from 'extensionizer';
-import { IResolver, IContentAdapter, IFeature } from '@dapplets/dapplet-extension-types';
+import { IResolver, IContentAdapter, IFeature } from './types';
 import Manifest from "../background/models/manifest";
 import ManifestDTO from "../background/dto/manifestDTO";
 
@@ -21,6 +21,7 @@ export class Injector {
 
     constructor(public core: Core) {
         this._setContextActivivty([window.location.hostname], undefined, true);
+        window.exports = {}; // for CommonJS modules compatibility
     }
 
     public async loadModules(modules: { name: string, branch: string, version: string, order: number, contextIds: string[] }[]) {
@@ -97,14 +98,14 @@ export class Injector {
             // ToDo: elemenate the boilerplate
             const coreWrapper = {
                 overlayManager: core.overlayManager,
-                connect: core.connect,
                 publish: core.publish,
                 subscribe: core.subscribe,
-                overlay: core.overlay,
                 waitPairingOverlay: core.waitPairingOverlay,
-                sendWalletConnectTx: core.sendWalletConnectTx,
                 contextStarted: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), true),
                 contextFinished: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), false),
+                connect: core.connect.bind(core),
+                overlay: core.overlay.bind(core),
+                wallet: core.wallet.bind(core)
             };
 
             const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
@@ -145,7 +146,8 @@ export class Injector {
                         // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
                         const versions = this.registry.filter(m => m.manifest.name == name).map(m => m.manifest.version);
                         const dependency = manifest.dependencies[name];
-
+                        
+                        // ToDo: check `dependency` for undefined
                         // ToDo: Should be moved to the background? 
                         // ToDo: Fetch prefix from global settings.
                         // ToDo: Replace '>=' to '^'

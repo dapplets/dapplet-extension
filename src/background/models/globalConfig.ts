@@ -6,11 +6,15 @@ export class GlobalConfig extends Base {
 
     id: string = 'default';
 
-    registryUrl: string = null;
-
     suspended: boolean = false;
 
     walletInfo: WalletInfo = null;
 
-    registries: string[] = [];
+    registries: { url: string, isDev: boolean }[] = [];
+
+    intro = {
+        popupDeveloperWelcome: true
+    };
+
+    devMode: boolean = false;
 }

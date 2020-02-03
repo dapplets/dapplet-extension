@@ -17,7 +17,7 @@ export class RegistryAggregator implements Registry {
             registryVersions.forEach(v => !versions.includes(v) && versions.push(v));
         }
 
-        return versions.sort((a, b) => gt(a, b) ? 1 : -1);;
+        return versions.sort((a, b) => gt(a, b) ? 1 : -1);
     }
 
     async resolveToUri(name: string, branch: string, version: string): Promise<string[]> {
@@ -35,8 +35,29 @@ export class RegistryAggregator implements Registry {
 
     async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
         await this._initRegistries();
-        const features = await Promise.all(this._registries.map(r => r.getFeatures(hostnames)));
-        return Object.assign({}, ...features);
+        const regFeatures = await Promise.all(this._registries.map(r => r.getFeatures(hostnames)));
+        const merge: { [hostname: string]: { [name: string]: string[]; } } = {};
+
+        // Deep merging of regFeatures
+        for (const f of regFeatures) {
+            for (const hostname in f) {
+                if (!merge[hostname]) merge[hostname] = {};
+                for (const name in f[hostname]) {
+                    if (!merge[hostname][name]) merge[hostname][name] = [];
+                    for (const branch of f[hostname][name]) {
+                        merge[hostname][name].push(branch);
+                    }
+                }
+            }
+        }
+
+        return merge;
+    }
+
+    public async getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]> {
+        await this._initRegistries();
+        const modules = await Promise.all(this._registries.map(r => r.getAllDevModules()));
+        return modules.reduce((a,b) => a.concat(b));
     }
 
     private async _initRegistries() {
@@ -45,15 +66,11 @@ export class RegistryAggregator implements Registry {
         const globalConfigService = new GlobalConfigService();
 
         // ToDo: fetch LocalConfig
-        const { registryUrl } = await globalConfigService.get();
+        const registries = await globalConfigService.getRegistries();
 
-        if (registryUrl) {
-            // ToDo: fix it
-            if (registryUrl.indexOf("localhost:8080") != -1) {
-                this._registries.push(new DevRegistry(registryUrl));
-            } else {
-                this._registries.push(new TestRegistry(registryUrl));
-            }
+        if (registries && registries.length) {
+            this._registries = registries.sort((a, b) => (a.isDev === false) ? 1 : -1)
+                .map(r => r.isDev ? new DevRegistry(r.url) : new TestRegistry(r.url));
         }
 
         // ToDo: Add Prod Registry

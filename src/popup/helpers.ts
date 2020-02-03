@@ -6,3 +6,12 @@ export const getCurrentContextIds = (): Promise<string[]> => new Promise((res, r
         currentWindow: true
     }, ([currentTab]) => extension.tabs.sendMessage(currentTab.id, { "type": "CURRENT_CONTEXT_IDS" }, res));
 });
+
+export const isValidUrl = (string: string) => {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}

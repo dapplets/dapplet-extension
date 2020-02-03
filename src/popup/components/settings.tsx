@@ -1,19 +1,21 @@
 import * as React from "react";
-import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as extension from 'extensionizer';
+import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { Segment, List, Label, Input, Checkbox, Icon, Header } from "semantic-ui-react";
 
-import { Button, Form, Segment, Message, Dropdown } from "semantic-ui-react";
+import { isValidUrl } from '../helpers';
 
 interface ISettingsProps {
 
 }
 
 interface ISettingsState {
-    registryUrl: any;
     isLoading: boolean;
-    error: string;
     connected: boolean;
-    registries: string[];
+    registries: { url: string, isDev: boolean }[];
+    registryInput: string;
+    registryInputError: string;
+    devMode: boolean;
 }
 
 const OPTIONS = [{
@@ -31,93 +33,101 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         super(props);
 
         this.state = {
-            registryUrl: '',
             isLoading: true,
-            error: null,
             connected: false,
-            registries: []
+            registries: [],
+            registryInput: '',
+            registryInputError: null,
+            devMode: false
         };
     }
 
     async componentDidMount() {
-        const backgroundFunctions = await initBGFunctions(extension);
-        const { getGlobalConfig } = backgroundFunctions;
+        await Promise.all([this.loadRegistries(), this.loadDevMode()]);
+        this.setState({ isLoading: false });
+    }
+
+    async loadRegistries() {
+        const { getRegistries } = await initBGFunctions(extension);
+        const registries = await getRegistries();
+
+        this.setState({
+            registries: registries.filter(r => r.isDev === false)
+        });
+    }
+
+    async loadDevMode() {
+        const { getDevMode } = await initBGFunctions(extension);
+        const devMode = await getDevMode();
+        this.setState({ devMode });
+    }
+
+    async setDevMode(isActive: boolean) {
+        const { setDevMode } = await initBGFunctions(extension);
+        await setDevMode(isActive);
+        this.loadDevMode();
+    }
+
+    async addRegistry(url: string) {
+        const { addRegistry } = await initBGFunctions(extension);
 
         try {
-            const config = await getGlobalConfig();
-
-            this.setState({
-                registryUrl: config.registryUrl,
-                isLoading: false,
-                connected: !!config.registryUrl,
-                registries: config.registries
-            });
-        } catch {
-            this.setState({
-                isLoading: false,
-                error: "The registry is not available.",
-                connected: false
-            });
+            await addRegistry(url, false);
+            this.setState({ registryInput: '' });
+        } catch (msg) {
+            this.setState({ registryInputError: msg });
         }
+
+        this.loadRegistries();
     }
 
-    async setNewUrl(url: string) {
-        this.setState({ isLoading: true, registryUrl: url });
-
-        const backgroundFunctions = await initBGFunctions(extension);
-        const { getGlobalConfig, setGlobalConfig } = backgroundFunctions;
-
-        const config = await getGlobalConfig();
-        config.registryUrl = url;
-        await setGlobalConfig(config);
-
-        await this.componentDidMount();
-    }
-
-    async addNewUrl(url: string) {
-        this.setState({ isLoading: true });
-
-        const backgroundFunctions = await initBGFunctions(extension);
-        const { getGlobalConfig, setGlobalConfig } = backgroundFunctions;
-        const config = await getGlobalConfig();
-
-        if (!config.registries) config.registries = [];
-        config.registries.push(url);
-
-        await setGlobalConfig(config);
-
-        await this.componentDidMount();
+    async removeRegistry(url: string) {
+        const { removeRegistry } = await initBGFunctions(extension);
+        await removeRegistry(url);
+        this.loadRegistries();
     }
 
     render() {
-        const { registryUrl, isLoading, error, connected, registries } = this.state;
+        const { isLoading, registries, registryInput, registryInputError, devMode } = this.state;
 
         return (
             <React.Fragment>
                 <Segment loading={isLoading} className="internalTabSettings">
 
-                    <p><b>Registry URL</b></p>
-                    <Dropdown
-                        options={registries.map(r => ({ key: r, text: r, value: r }))}
-                        placeholder='Type URL to Registry'
-                        search
-                        selection
-                        fluid
-                        allowAdditions
-                        value={registryUrl}
-                        key={registryUrl}
-                        text={registryUrl}
-                        onAddItem={(e, { value }) => this.addNewUrl(value as string)}
-                        onChange={(e, { value }) => this.setNewUrl(value as string)}
+                    <Header as='h4'>Public Registries</Header>
+                    <Input
                         size='mini'
+                        icon='code'
+                        iconPosition='left'
+                        action={{
+                            content: 'Add',
+                            size: 'mini',
+                            onClick: () => this.addRegistry(registryInput),
+                            disabled: !(isValidUrl(registryInput) && !registries.find(r => r.url === registryInput)),
+                            color: 'blue'
+                        }}
+                        fluid
+                        placeholder='Public Registry URL...'
+                        value={registryInput}
+                        onChange={(e) => this.setState({ registryInput: e.target.value, registryInputError: null })}
+                        error={!!registryInputError}
                     />
 
-                    {(!isLoading) && (
-                        (error) ? (<Message floating negative>{error}</Message>) : (
-                            (connected) ? (<Message floating success>Connected to the registry successfully.</Message>) :
-                                (<Message floating warning>Enter the URL address of the registry.</Message>)
-                        )
-                    )}
+                    {(registryInputError) ? <Label basic color='red' pointing>{registryInputError}</Label> : null}
+
+                    <List divided relaxed size='small'>
+                        {registries.map((r, i) => (
+                            <List.Item key={i}>
+                                <List.Content floated='right'>
+                                    <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
+                                </List.Content>
+                                <List.Content>{r.url}</List.Content>
+                            </List.Item>
+                        ))}
+                    </List>
+
+                    <Header as='h4'>Advanced</Header>
+                    <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} />
                 </Segment>
 
             </React.Fragment>

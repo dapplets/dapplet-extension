@@ -16,7 +16,9 @@ export class DevRegistry implements Registry {
 
     public async getVersions(name: string, branch: string): Promise<string[]> {
         await this._cacheDevConfig();
-        const versions = Object.keys(this._devConfig.modules[name][branch]);
+        const branches = this._devConfig.modules[name];
+        if (!branches || !branches[branch]) return [];
+        const versions = Object.keys(branches[branch]);
         return versions;
     }
 
@@ -53,6 +55,22 @@ export class DevRegistry implements Registry {
         }
 
         return featureHostnames;
+    }
+
+    public async getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]> {
+        await this._cacheDevConfig();
+
+        const modules = [];
+
+        for (const name in this._devConfig.modules) {
+            for (const branch in this._devConfig.modules[name]) {
+                const versions = Object.keys(this._devConfig.modules[name][branch]);
+                const lastVersion = versions[versions.length - 1]; // ToDo: is it correct?
+                modules.push({ name, branch, version: lastVersion });
+            }
+        }
+
+        return modules;
     }
 
     private async _cacheDevConfig() {
