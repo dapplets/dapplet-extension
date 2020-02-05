@@ -1,28 +1,30 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { OverlayManager } from "./overlayManager";
-import { Overlay, SubscribeOptions } from "./overlay";
 import * as extension from 'extensionizer';
-import { Swiper } from "./swiper";
+
 import * as GlobalEventBus from './globalEventBus';
+import { Overlay } from "./overlay";
+import { Swiper } from "./swiper";
 import { AutoProperties, EventDef, Connection } from "./connection";
 import { WsJsonRpc } from "./wsJsonRpc";
-import { IPubSub } from "./types";
+import { OverlayManager } from "./overlayManager";
 
 export default class Core {
-
     public overlayManager = new OverlayManager();
     private _popupOverlay: Overlay = null;
 
     constructor() {
         extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
-            if (message === "OPEN_PAIRING_OVERLAY") {
-                this.waitPairingOverlay().finally(() => sendResponse());
-            } else if (message === "OPEN_DEPLOY_OVERLAY") {
-                this.waitDeployOverlay().finally(() => sendResponse());
-            }
-            else if (message === "TOGGLE_OVERLAY") {
-                this._togglePopupOverlay();
-                sendResponse();
+            if (typeof message === 'string') {
+                if (message === "OPEN_PAIRING_OVERLAY") {
+                    this.waitPairingOverlay().finally(() => sendResponse());
+                } else if (message === "TOGGLE_OVERLAY") {
+                    this._togglePopupOverlay();
+                    sendResponse();
+                }
+            } else if (typeof message === 'object' && message.type !== undefined) {
+                if (message.type === 'OPEN_DEPLOY_OVERLAY') {
+                    this.waitDeployOverlay(message.payload).finally(() => sendResponse());
+                }
             }
         });
 
@@ -62,12 +64,12 @@ export default class Core {
         });
     }
 
-    public waitDeployOverlay(): Promise<void> {
+    public waitDeployOverlay(payload: any): Promise<void> {
         const me = this;
         return new Promise<void>((resolve, reject) => {
             const pairingUrl = extension.extension.getURL('deploy.html');
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'Deploy');
-            overlay.open();
+            overlay.open(() => overlay.send('data', [payload]));
             // ToDo: add timeout?
             overlay.onmessage = (topic, message) => {
                 if (topic === 'ready') {
@@ -171,7 +173,7 @@ export default class Core {
         return conn;
     }
 
-    public wallet<M>(cfg?: { }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
+    public wallet<M>(cfg?: {}, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
         const me = this;
         const transport = {
             _txCount: 0,

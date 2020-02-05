@@ -49,6 +49,7 @@ extension.runtime.onMessage.addListener(
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
     optimizeDependency: (name, branch, version) => featureService.optimizeDependency(name, branch, version),
     getAllDevModules: () => featureService.getAllDevModules(),
+    deployModule: (manifest, targetStorage, targetRegistry, registryKey) => featureService.deployModule(manifest, targetStorage, targetRegistry, registryKey),
 
     // GlobalConfigService
     getGlobalConfig: () => globalConfigService.get(),

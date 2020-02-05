@@ -6,9 +6,7 @@ import { Button, Segment, Message, List, Label, Input, Icon, Image, Header } fro
 import { isValidUrl } from '../helpers';
 import Manifest from "../../background/models/manifest";
 
-interface IDeveloperProps {
-
-}
+interface IDeveloperProps { }
 
 interface IDeveloperState {
     isLoading: boolean;
@@ -88,10 +86,15 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
         this.loadRegistries();
     }
 
-    async deployModule() {
+    async deployModule(moduleManifest: Manifest) {
         extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
             var activeTab = tabs[0];
-            extension.tabs.sendMessage(activeTab.id, "OPEN_DEPLOY_OVERLAY");
+            extension.tabs.sendMessage(activeTab.id, {
+                type: "OPEN_DEPLOY_OVERLAY",
+                payload: {
+                    manifest: moduleManifest
+                }
+            });
             window.close();
         });
     }
@@ -151,7 +154,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                                     {m.branch} v{m.version}
                                 </List.Content>
                                 <List.Content floated='right'>
-                                    <Button size='mini' compact color='blue' onClick={() => this.deployModule()}>Deploy</Button>
+                                    <Button size='mini' compact color='blue' onClick={() => this.deployModule(m)}>Deploy</Button>
                                 </List.Content>
                             </List.Item>
                         ))}
