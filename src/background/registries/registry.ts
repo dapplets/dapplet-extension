@@ -1,4 +1,7 @@
-export interface Registry {    
+export interface Registry {
+    isAvailable: boolean;
+    url: string;
+    
     getVersions(name: string, branch: string): Promise<string[]>;
 
     resolveToUri(name: string, branch: string, version: string): Promise<string[]>;

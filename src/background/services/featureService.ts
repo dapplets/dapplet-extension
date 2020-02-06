@@ -4,9 +4,11 @@ import ModuleManager from '../utils/moduleManager';
 import * as extension from 'extensionizer';
 import Manifest from '../models/manifest';
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
+import GlobalConfigService from './globalConfigService';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
+    private _globalConfigService = new GlobalConfigService();
     private _moduleManager = new ModuleManager();
     private _storageAggregator = new StorageAggregator();
 
@@ -127,6 +129,17 @@ export default class FeatureService {
             manifestUrl: manifestUrl,
             scriptUrl: distUrl
         };
+    }
+
+    async getRegistries() {
+        const configRegistries = await this._globalConfigService.getRegistries();
+        const runtimeRegistries = this._moduleManager.registryAggregator.registries;
+        const result = configRegistries.map(c => ({
+            isAvailable: runtimeRegistries.find(r => r.url === c.url)?.isAvailable || false,
+            ...c
+        }));
+
+        return result;
     }
 }
 

@@ -10,7 +10,7 @@ interface IDeveloperProps { }
 
 interface IDeveloperState {
     isLoading: boolean;
-    registries: { url: string, isDev: boolean }[];
+    registries: { url: string, isDev: boolean, isAvailable: boolean }[];
     registryInput: string;
     registryInputError: string;
     intro: {
@@ -135,6 +135,9 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                     <List divided relaxed size='small'>
                         {registries.map((r, i) => (
                             <List.Item key={i}>
+                                <List.Content floated='left'>
+                                    <Label circular color={(r.isAvailable) ? 'green' : 'red'} empty />
+                                </List.Content>
                                 <List.Content floated='right'>
                                     <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
                                 </List.Content>

@@ -50,6 +50,7 @@ extension.runtime.onMessage.addListener(
     optimizeDependency: (name, branch, version) => featureService.optimizeDependency(name, branch, version),
     getAllDevModules: () => featureService.getAllDevModules(),
     deployModule: (manifest, targetStorage, targetRegistry, registryKey) => featureService.deployModule(manifest, targetStorage, targetRegistry, registryKey),
+    getRegistries: () => featureService.getRegistries(),
 
     // GlobalConfigService
     getGlobalConfig: () => globalConfigService.get(),
@@ -64,7 +65,6 @@ extension.runtime.onMessage.addListener(
 
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),
-    getRegistries: () => globalConfigService.getRegistries(),
     getIntro: () => globalConfigService.getIntro(),
     setIntro: (intro) => globalConfigService.setIntro(intro)
   })

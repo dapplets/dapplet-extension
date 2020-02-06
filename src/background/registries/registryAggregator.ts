@@ -5,13 +5,14 @@ import GlobalConfigService from '../services/globalConfigService';
 import { gt, compare } from 'semver';
 import { mergeDedupe } from '../../common/helpers';
 
-export class RegistryAggregator implements Registry {
-    private _registries: Registry[] = [];
+export class RegistryAggregator {
+    public isAvailable: boolean = true;
+    public registries: Registry[] = [];
 
     async getVersions(name: string, branch: string): Promise<string[]> {
         await this._initRegistries();
 
-        const versionsWithErrors = await Promise.all(this._registries.map(r => r.getVersions(name, branch).catch(Error)));
+        const versionsWithErrors = await Promise.all(this.registries.map(r => r.getVersions(name, branch).catch(Error)));
         const versionsNoErrors = versionsWithErrors.filter(x => !(x instanceof Error)) as string[][];
         const versionsNotSorted = mergeDedupe(versionsNoErrors);
         const versionsAsc = versionsNotSorted.sort(compare); // ASC sorting by semver
@@ -22,7 +23,7 @@ export class RegistryAggregator implements Registry {
     async resolveToUri(name: string, branch: string, version: string): Promise<string[]> {
         await this._initRegistries();
 
-        const uriWithErrors = await Promise.all(this._registries.map(r => r.resolveToUri(name, branch, version).catch(Error)));
+        const uriWithErrors = await Promise.all(this.registries.map(r => r.resolveToUri(name, branch, version).catch(Error)));
         const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error)) as string[][];
         const uris = mergeDedupe(uriNoErrors);
 
@@ -31,7 +32,7 @@ export class RegistryAggregator implements Registry {
 
     async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
         await this._initRegistries();
-        const regFeatures = await Promise.all(this._registries.map(r => r.getFeatures(hostnames).catch(Error)));
+        const regFeatures = await Promise.all(this.registries.map(r => r.getFeatures(hostnames).catch(Error)));
         const validRegFeatures = regFeatures.filter(result => !(result instanceof Error));
         const merge: { [hostname: string]: { [name: string]: string[]; } } = {};
 
@@ -53,7 +54,7 @@ export class RegistryAggregator implements Registry {
 
     public async getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]> {
         await this._initRegistries();
-        const modules = await Promise.all(this._registries.map(r => r.getAllDevModules().catch((e) => e)));
+        const modules = await Promise.all(this.registries.map(r => r.getAllDevModules().catch((e) => e)));
         const validModules = modules.filter(result => !(result instanceof Error));
         return validModules.reduce((a, b) => a.concat(b));
     }
@@ -65,9 +66,9 @@ export class RegistryAggregator implements Registry {
         const registries = await globalConfigService.getRegistries();
         
         // ToDo: optimize comparison
-        if (registries.length !== this._registries.length) {
+        if (registries.length !== this.registries.length) {
             // ToDo: Dev registries are priority
-            this._registries = registries.sort((a, b) => (a.isDev === false) ? 1 : -1)
+            this.registries = registries.sort((a, b) => (a.isDev === false) ? 1 : -1)
                 .map(r => r.isDev ? new DevRegistry(r.url) : new TestRegistry(r.url));
         }
 

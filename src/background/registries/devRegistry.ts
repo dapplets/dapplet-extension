@@ -11,9 +11,9 @@ export class DevRegistry implements Registry {
         modules: { [name: string]: { [branch: string]: string } }
     } = null;
 
-    constructor(public registryUrl: string) {
-        if (!registryUrl) throw new Error("Config Url is required");
-        this._rootUrl = new URL(this.registryUrl).origin;
+    constructor(public url: string) {
+        if (!url) throw new Error("Config Url is required");
+        this._rootUrl = new URL(this.url).origin;
         console.log('DEV REGISTRY CREATED');
     }
 
@@ -79,7 +79,7 @@ export class DevRegistry implements Registry {
     private async _cacheDevConfig() {
         if (this.isAvailable && !this._devConfig) {
             try {
-                const response = await fetch(this.registryUrl, { cache: 'no-store' });
+                const response = await fetch(this.url, { cache: 'no-store' });
                 if (!response.ok) throw new Error(response.statusText);
                 this._devConfig = await response.json();
             } catch (err) {

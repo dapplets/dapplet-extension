@@ -1,5 +1,3 @@
-import { Storage } from '../moduleStorages/storage';
-import { Registry } from '../registries/registry';
 import { maxSatisfying, rcompare } from 'semver';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 import Manifest from '../models/manifest';
@@ -9,8 +7,8 @@ import { StorageAggregator } from '../moduleStorages/moduleStorage';
 
 export default class ModuleManager {
 
-    private _registry: Registry = new RegistryAggregator();
-    private _storage: Storage = new StorageAggregator();
+    public registryAggregator = new RegistryAggregator();
+    private _storage = new StorageAggregator();
 
     public async resolveDependencies(modules: { name: string, version: string, branch?: string }[]): Promise<{ name: string, version: string, branch: string }[]> {
 
@@ -46,7 +44,7 @@ export default class ModuleManager {
     }
 
     public async loadManifest(name: string, branch: string, version: string): Promise<Manifest> {
-        const manifestUris = await this._registry.resolveToUri(name, branch, version);
+        const manifestUris = await this.registryAggregator.resolveToUri(name, branch, version);
         const manfiestUri = manifestUris[0]; // ToDo: select uri
         const manifestBufferArray = await this._storage.getResource(manfiestUri);
         const manifestJson = new TextDecoder("utf-8").decode(new Uint8Array(manifestBufferArray));
@@ -108,7 +106,7 @@ export default class ModuleManager {
         const prefix = '>='; // https://devhints.io/semver
         const range = prefix + version;
 
-        const allVersions = await this._registry.getVersions(name, branch);
+        const allVersions = await this.registryAggregator.getVersions(name, branch);
         const optimizedVersion = maxSatisfying(allVersions, range);
 
         // ToDo: catch null in optimizedVersion
@@ -126,7 +124,7 @@ export default class ModuleManager {
 
     public async getFeaturesByHostnames(hostnames: string[]): Promise<{ [hostname: string]: Manifest[] }> {
         if (!hostnames || hostnames.length === 0) return {};
-        const hostnameFeatures = await this._registry.getFeatures(hostnames); // result.hostname.featureName[branchIndex]
+        const hostnameFeatures = await this.registryAggregator.getFeatures(hostnames); // result.hostname.featureName[branchIndex]
         const hostnameManifests: { [hostname: string]: Manifest[] } = {};
 
         for (const hostname in hostnameFeatures) {
@@ -135,7 +133,7 @@ export default class ModuleManager {
             for (const name in features) {
                 const branches = features[name];
                 const branch = branches[0]; // ToDo: select branch
-                const versions = await this._registry.getVersions(name, branch);
+                const versions = await this.registryAggregator.getVersions(name, branch);
                 const lastVersion = versions.sort(rcompare)[0]; // DESC sorting by semver // ToDo: select version
                 const manifest = await this.loadManifest(name, branch, lastVersion);
                 hostnameManifests[hostname].push(manifest);
@@ -146,7 +144,7 @@ export default class ModuleManager {
     }
 
     public async getAllDevModules(): Promise<Manifest[]> {
-        const modules = await this._registry.getAllDevModules();
+        const modules = await this.registryAggregator.getAllDevModules();
         const manifests = await Promise.all(modules.map(m => this.loadManifest(m.name, m.branch, m.version)));
         return manifests;
     }
