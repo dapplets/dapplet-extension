@@ -14,7 +14,6 @@ export class DevRegistry implements Registry {
     constructor(public url: string) {
         if (!url) throw new Error("Config Url is required");
         this._rootUrl = new URL(this.url).origin;
-        console.log('DEV REGISTRY CREATED');
     }
 
     public async getVersions(name: string, branch: string): Promise<string[]> {
