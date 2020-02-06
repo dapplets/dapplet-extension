@@ -1,6 +1,6 @@
 import { Storage } from '../moduleStorages/storage';
 import { Registry } from '../registries/registry';
-import { maxSatisfying } from 'semver';
+import { maxSatisfying, rcompare } from 'semver';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 import Manifest from '../models/manifest';
 import { addEvent } from '../services/eventService';
@@ -136,7 +136,7 @@ export default class ModuleManager {
                 const branches = features[name];
                 const branch = branches[0]; // ToDo: select branch
                 const versions = await this._registry.getVersions(name, branch);
-                const lastVersion = versions[versions.length - 1]; // ToDo: select version
+                const lastVersion = versions.sort(rcompare)[0]; // DESC sorting by semver // ToDo: select version
                 const manifest = await this.loadManifest(name, branch, lastVersion);
                 hostnameManifests[hostname].push(manifest);
             }

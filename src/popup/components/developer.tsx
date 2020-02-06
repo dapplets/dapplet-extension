@@ -145,7 +145,6 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
 
                     <Header as='h4'>Modules</Header>
                     <List divided relaxed verticalAlign='middle' size='small'>
-
                         {modules.map((m, i) => (
                             <List.Item key={i}>
                                 <Image avatar src={m.icon || '/no-logo.png'} />
