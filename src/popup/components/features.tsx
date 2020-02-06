@@ -16,7 +16,9 @@ interface IFeaturesState {
   isNoInpage: boolean;
 }
 
-class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
+class Features extends React.Component<IFeaturesProps, IFeaturesState> {
+  private _isMounted: boolean = false;
+
   constructor(props) {
     super(props);
 
@@ -29,6 +31,7 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
   }
 
   async componentDidMount() {
+    this._isMounted = true;
     const { contextIds } = this.props;
     if (contextIds === undefined) {
       this.setState({ isNoInpage: true, isLoading: false });
@@ -39,16 +42,20 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
 
     try {
       const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
-      this.setState({
-        features,
-        isLoading: false,
-        error: null
-      });
+      if (this._isMounted) {
+        this.setState({
+          features,
+          isLoading: false,
+          error: null
+        });
+      }
     } catch {
-      this.setState({
-        error: "The registry is not available.",
-        isLoading: false
-      });
+      if (this._isMounted) {
+        this.setState({
+          error: "The registry is not available.",
+          isLoading: false
+        });
+      }
     }
   }
 
@@ -73,6 +80,10 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
     }
   }
 
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
   refreshContextPage() {
     extension.tabs.query({
       active: true,
@@ -91,62 +102,28 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
           {!isNoInpage ?
             (!error) ? ((features.length > 0) ? (
               <List divided relaxed>
-                {features.map(f => (
-                  <List.Item key={f.name} style={{ overflow: "hidden" }}>
+                {features.map((f, i) => (
+                  <List.Item key={i} style={{ overflow: "hidden" }}>
                     <List.Content style={{ width: 45, float: "left" }}>
-                      <div>
-                        <Popup
-                          content={<List>{f.hostnames?.map(h => <List.Item>{h}</List.Item>)}</List>}
-                          header="Related Context IDs"
-                          trigger={<Image
-                            size="mini"
-                            avatar
-                            alt={f.description}
-                            src={f.icon}
-                          />}
-                        />
-                      </div>
+                      <Popup
+                        content={<List>{f.hostnames?.map((h, j) => <List.Item key={j}>{h}</List.Item>)}</List>}
+                        header="Related Context IDs"
+                        trigger={<Image size="mini" avatar alt={f.description} src={f.icon} />}
+                      />
                     </List.Content>
-                    {false ? ( // ToDo: hasUpdate isn't implemented in DTO
-                      <List.Content style={{ float: "right", width: 60 }}>
-                        <Button
-                          primary
-                          size="mini"
-                          style={{ padding: 5, width: 55 }}
-                        >
-                          Update
-                    </Button>
-                        <Button
-                          size="mini"
-                          style={{ padding: 5, marginTop: 5, width: 55 }}
-                        >
-                          Skip
-                    </Button>
-                      </List.Content>
-                    ) : (
-                        <List.Content style={{ float: "right", width: 60 }}>
-                          <Checkbox
-                            toggle
-                            style={{ marginTop: 5 }}
-                            onChange={() =>
-                              this.handleSwitchChange(f, !f.isActive)
-                            }
-                            checked={f.isActive}
-                          />
-                        </List.Content>
-                      )}
-                    <List.Content
-                      style={{
-                        marginLeft: 45,
-                        marginRight: 60
-                      }}
-                    >
+                    <List.Content style={{ float: "right", width: 60 }}>
+                      <Checkbox
+                        toggle
+                        style={{ marginTop: 5 }}
+                        onChange={() => this.handleSwitchChange(f, !f.isActive)}
+                        checked={f.isActive}
+                      />
+                    </List.Content>
+                    <List.Content style={{ marginLeft: 45, marginRight: 60 }} >
                       <List.Header>{f.title}</List.Header>
                       <List.Description style={{ color: "#666" }}>
-                        {f.description}
-                        <br />
-                        Author: {f.author}
-                        <br />
+                        {f.description}<br />
+                        Author: {f.author}<br />
                         Version: {f.version}
                       </List.Description>
                     </List.Content>
@@ -173,4 +150,4 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
   }
 }
 
-export default FeatureList;
+export default Features;
