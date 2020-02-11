@@ -13,24 +13,32 @@ export default class FeatureService {
     private _storageAggregator = new StorageAggregator();
 
     async getFeaturesByHostnames(hostnames: string[]): Promise<ManifestDTO[]> {
-        const hostnamesManfiests = await this._moduleManager.getFeaturesByHostnames(hostnames);
+        const regHostnamesManfiests = await this._moduleManager.getFeaturesByHostnamesWithRegistries(hostnames);
         const dtos: ManifestDTO[] = [];
 
-        for (const [hostname, manifests] of Object.entries(hostnamesManfiests)) {
-            let i = 0;
-            for (const manifest of manifests) {
-                const dto = dtos.find(f => f.name === manifest.name && f.branch === manifest.branch && f.version === manifest.version);
-                if (!dto) {
-                    const dto: ManifestDTO = manifest as any;
-                    const config = await this._siteConfigRepository.getById(hostname); // ToDo: which contextId should we compare?
-                    dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
-                    dto.order = i++;
-                    if (!dto.hostnames) dto.hostnames = [];
-                    dto.hostnames.push(hostname);
-                    dtos.push(dto);
-                } else {
-                    if (!dto.hostnames) dto.hostnames = [];
-                    dto.hostnames.push(hostname);
+        const configRegistries = await this._globalConfigService.getRegistries();
+
+        for (const [registryUrl, hostnamesManfiests] of Object.entries(regHostnamesManfiests)) {
+            for (const [hostname, manifests] of Object.entries(hostnamesManfiests)) {
+                let i = 0;
+                for (const manifest of manifests) {
+                    const dto = dtos.find(f => f.name === manifest.name && f.branch === manifest.branch && f.version === manifest.version);
+                    if (!dto) {
+                        const dto: ManifestDTO = manifest as any;
+                        const config = await this._siteConfigRepository.getById(hostname); // ToDo: which contextId should we compare?
+                        dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
+                        dto.order = i++;
+                        dto.sourceRegistry = {
+                            url: registryUrl,
+                            isDev: configRegistries.find(r => r.url === registryUrl).isDev
+                        };
+                        if (!dto.hostnames) dto.hostnames = [];
+                        dto.hostnames.push(hostname);
+                        dtos.push(dto);
+                    } else {
+                        if (!dto.hostnames) dto.hostnames = [];
+                        dto.hostnames.push(hostname);
+                    }
                 }
             }
         }

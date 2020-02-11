@@ -13,5 +13,9 @@ export default class ManifestDTO {
     dist: string = null;
     order: number = null;
     hostnames: string[] = [];
+    sourceRegistry: {
+        url: string;
+        isDev: boolean;
+    } = null;
     // ToDo: Add "hasUpdate", which are used in Features.tsx
 }

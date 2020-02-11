@@ -52,6 +52,32 @@ export class RegistryAggregator {
         return merge;
     }
 
+    
+    async getFeaturesWithRegistries(hostnames: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: { [name: string]: string[]; } } }> {
+        await this._initRegistries();
+        const regFeatures = await Promise.all(this.registries.map(r => r.getFeatures(hostnames).then(f => ({ [r.url]: f })).catch(Error)));
+        const validRegFeatures = regFeatures.filter(result => !(result instanceof Error));
+        const merge: { [registryUrl: string]: { [hostname: string]: { [name: string]: string[]; } } } = {};
+
+        // Deep merging of regFeatures
+        for (const f of validRegFeatures) {
+            for (const registryUrl in f) {
+                if (!merge[registryUrl]) merge[registryUrl] = {};
+                for (const hostname in f[registryUrl]) {
+                    if (!merge[registryUrl][hostname]) merge[registryUrl][hostname] = {};
+                    for (const name in f[registryUrl][hostname]) {
+                        if (!merge[registryUrl][hostname][name]) merge[registryUrl][hostname][name] = [];
+                        for (const branch of f[registryUrl][hostname][name]) {
+                            merge[registryUrl][hostname][name].push(branch);
+                        }
+                    }
+                }
+            }
+        }
+
+        return merge;
+    }
+
     public async getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]> {
         await this._initRegistries();
         const modules = await Promise.all(this.registries.map(r => r.getAllDevModules().catch((e) => e)));

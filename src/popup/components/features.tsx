@@ -2,7 +2,7 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as extension from 'extensionizer';
 
-import { Button, Image, List, Checkbox, Segment, Message, Popup } from "semantic-ui-react";
+import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Divider } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
 
 interface IFeaturesProps {
@@ -48,6 +48,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
           isLoading: false,
           error: null
         });
+        console.log('features', features);
       }
     } catch {
       if (this._isMounted) {
@@ -120,7 +121,10 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                       />
                     </List.Content>
                     <List.Content style={{ marginLeft: 45, marginRight: 60 }} >
-                      <List.Header>{f.title}</List.Header>
+                      <List.Header>
+                        {f.title}
+                        {(f.sourceRegistry.isDev) ? (<Label style={{ marginLeft: 5 }} horizontal size='mini' color='teal'>DEV</Label>) : null}
+                      </List.Header>
                       <List.Description style={{ color: "#666" }}>
                         {f.description}<br />
                         Author: {f.author}<br />

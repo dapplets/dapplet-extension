@@ -143,6 +143,31 @@ export default class ModuleManager {
         return hostnameManifests;
     }
 
+    // ToDo: refactor it
+    public async getFeaturesByHostnamesWithRegistries(hostnames: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: Manifest[] } }> {
+        if (!hostnames || hostnames.length === 0) return {};
+        const hostnameFeatures = await this.registryAggregator.getFeaturesWithRegistries(hostnames); // result.hostname.featureName[branchIndex]
+        const hostnameManifests: { [registryUrl: string]: { [hostname: string]: Manifest[] } } = {};
+
+        for (const registryUrl in hostnameFeatures) {
+            hostnameManifests[registryUrl] = {};
+            for (const hostname in hostnameFeatures[registryUrl]) {
+                hostnameManifests[registryUrl][hostname] = [];
+                const features = hostnameFeatures[registryUrl][hostname];
+                for (const name in features) {
+                    const branches = features[name];
+                    const branch = branches[0]; // ToDo: select branch
+                    const versions = await this.registryAggregator.getVersions(name, branch);
+                    const lastVersion = versions.sort(rcompare)[0]; // DESC sorting by semver // ToDo: select version
+                    const manifest = await this.loadManifest(name, branch, lastVersion);
+                    hostnameManifests[registryUrl][hostname].push(manifest);
+                }
+            }
+        }
+
+        return hostnameManifests;
+    }
+
     public async getAllDevModules(): Promise<Manifest[]> {
         const modules = await this.registryAggregator.getAllDevModules();
         const manifests = await Promise.all(modules.map(m => this.loadManifest(m.name, m.branch, m.version)));
