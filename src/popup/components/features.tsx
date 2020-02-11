@@ -106,11 +106,13 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                 {features.map((f, i) => (
                   <List.Item key={i} style={{ overflow: "hidden" }}>
                     <List.Content style={{ width: 45, float: "left" }}>
-                      <Popup
-                        content={<List>{f.hostnames?.map((h, j) => <List.Item key={j}>{h}</List.Item>)}</List>}
-                        header="Related Context IDs"
-                        trigger={<Image size="mini" avatar alt={f.description} src={f.icon} />}
-                      />
+                      <Popup trigger={<Image size="mini" avatar alt={f.description} src={f.icon} />}>
+                        <h4>Related Context IDs</h4>
+                        <List>{f.hostnames?.map((h, j) => <List.Item key={j}>{h}</List.Item>)}</List>
+
+                        <h4>Source registry</h4>
+                        <List>{f.sourceRegistry.url}</List>
+                      </Popup>
                     </List.Content>
                     <List.Content style={{ float: "right", width: 60 }}>
                       <Checkbox
