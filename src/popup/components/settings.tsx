@@ -119,7 +119,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                         {registries.map((r, i) => (
                             <List.Item key={i}>
                                 <List.Content floated='left'>
-                                    <Label circular color={(r.isAvailable) ? 'green' : 'red'} empty />
+                                    <Label size='mini' horizontal color={(r.isAvailable) ? 'green' : 'red'}>{(r.isAvailable) ? 'ONLINE' : 'OFFLINE'}</Label>
                                 </List.Content>
                                 <List.Content floated='right'>
                                     <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
