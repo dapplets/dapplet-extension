@@ -6,7 +6,8 @@ import { Segment, List, Label, Input, Checkbox, Icon, Header } from "semantic-ui
 import { isValidUrl } from '../helpers';
 
 interface ISettingsProps {
-
+    devMode: boolean;
+    updateTabs: () => Promise<void>;
 }
 
 interface ISettingsState {
@@ -38,7 +39,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             registries: [],
             registryInput: '',
             registryInputError: null,
-            devMode: false
+            devMode: props.devMode
         };
     }
 
@@ -66,6 +67,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         const { setDevMode } = await initBGFunctions(extension);
         await setDevMode(isActive);
         this.loadDevMode();
+        this.props.updateTabs();
     }
 
     async addRegistry(url: string) {
