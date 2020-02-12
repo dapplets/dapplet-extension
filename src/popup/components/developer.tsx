@@ -147,20 +147,22 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                     </List>
 
                     <Header as='h4'>Modules</Header>
-                    {(modules.length > 0) ? <List divided relaxed verticalAlign='middle' size='small'>
-                        {modules.map((m, i) => (
-                            <List.Item key={i}>
-                                <Image avatar src={m.icon || '/no-logo.png'} />
-                                <List.Content>
-                                    <List.Header>{m.name}</List.Header>
-                                    {m.branch} v{m.version}
-                                </List.Content>
-                                <List.Content floated='right'>
-                                    <Button size='mini' compact color='blue' onClick={() => this.deployModule(m)}>Deploy</Button>
-                                </List.Content>
-                            </List.Item>
-                        ))}
-                    </List> : (<div>No available development modules.</div>)}
+                    <div style={{ maxHeight: 300, overflowY: 'scroll' }}>
+                        {(modules.length > 0) ? <List divided relaxed verticalAlign='middle' size='small'>
+                            {modules.map((m, i) => (
+                                <List.Item key={i}>
+                                    <Image avatar src={m.icon || '/no-logo.png'} />
+                                    <List.Content>
+                                        <List.Header>{m.name}</List.Header>
+                                        {m.branch} v{m.version}
+                                    </List.Content>
+                                    <List.Content floated='right'>
+                                        <Button size='mini' compact color='blue' onClick={() => this.deployModule(m)}>Deploy</Button>
+                                    </List.Content>
+                                </List.Item>
+                            ))}
+                        </List> : (<div>No available development modules.</div>)}
+                    </div>
                 </Segment>
 
             </React.Fragment>
