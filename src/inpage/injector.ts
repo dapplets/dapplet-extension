@@ -182,7 +182,7 @@ export class Injector {
             });
         }
 
-        extension.extension.sendMessage({
+        extension.runtime.sendMessage({
             type: isActive ? "CONTEXT_STARTED" : "CONTEXT_FINISHED",
             payload: { contextIds }
         });

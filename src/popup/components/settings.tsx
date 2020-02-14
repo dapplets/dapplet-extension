@@ -67,7 +67,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         const { setDevMode } = await initBGFunctions(extension);
         await setDevMode(isActive);
         this.loadDevMode();
-        this.props.updateTabs();
+        await this.props.updateTabs();
     }
 
     async addRegistry(url: string) {
