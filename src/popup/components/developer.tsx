@@ -2,6 +2,7 @@ import * as React from "react";
 import * as extension from 'extensionizer';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Button, Segment, Message, List, Label, Input, Icon, Image, Header } from "semantic-ui-react";
+import NOLOGO_PNG from '../../common/resources/no-logo.png';
 
 import { isValidUrl } from '../helpers';
 import Manifest from "../../background/models/manifest";
@@ -151,7 +152,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                         {(modules.length > 0) ? <List divided relaxed verticalAlign='middle' size='small'>
                             {modules.map((m, i) => (
                                 <List.Item key={i}>
-                                    <Image avatar src={m.icon || '/no-logo.png'} />
+                                    <Image avatar src={m.icon || NOLOGO_PNG} />
                                     <List.Content>
                                         <List.Header>{m.name}</List.Header>
                                         {m.branch} v{m.version}

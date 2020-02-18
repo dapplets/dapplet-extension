@@ -2,8 +2,9 @@ import * as extension from 'extensionizer';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Button, Form, Message, Image, Card } from 'semantic-ui-react'
-import 'semantic-ui-css/semantic.min.css'
+import { Button, Form, Message, Image, Card } from 'semantic-ui-react';
+import 'semantic-ui-css/semantic.min.css';
+import NOLOGO_PNG from '../common/resources/no-logo.png';
 
 import './index.scss';
 import { Bus } from '../common/bus';
@@ -112,7 +113,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             floated='right'
                             size='mini'
                             circular
-                            src={manifest.icon || '/no-logo.png'}
+                            src={manifest.icon || NOLOGO_PNG}
                         />
                         <Card.Header>{manifest.title}</Card.Header>
                         <Card.Meta>{manifest.type}</Card.Meta>
