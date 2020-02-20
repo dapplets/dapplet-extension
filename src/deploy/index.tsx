@@ -3,7 +3,7 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Button, Form, Message, Image, Card } from 'semantic-ui-react';
-import 'semantic-ui-css/semantic.min.css';
+//import 'semantic-ui-css/semantic.min.css';
 import NOLOGO_PNG from '../common/resources/no-logo.png';
 
 import './index.scss';
