@@ -48,7 +48,6 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
           isLoading: false,
           error: null
         });
-        console.log('features', features);
       }
     } catch {
       if (this._isMounted) {

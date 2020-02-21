@@ -7,8 +7,6 @@ import Popup from './pages/popup';
 
 (async function() {
     // ToDo: update contextIds
-    console.log('contextids start');
     const contextIds = await getCurrentContextIds();
-    console.log('contextids', contextIds);
     ReactDOM.render(<Popup contextIds={contextIds} />, document.querySelector('#app'));
 })();
