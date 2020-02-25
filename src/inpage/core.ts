@@ -179,9 +179,9 @@ export default class Core {
             _txCount: 0,
             _handler: null,
             exec: (dappletId: string, ctx: any) => {
-                const id = ++transport._txCount;
+                const id = (++transport._txCount).toString();
                 me._sendWalletConnectTx(dappletId, ctx, (e) => transport._handler(id, e));
-                return new Promise((resolve, reject) => resolve(id));
+                return Promise.resolve(id);
             },
             onMessage: (handler: (topic: string, message: any) => void) => {
                 transport._handler = handler;
