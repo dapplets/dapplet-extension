@@ -111,12 +111,12 @@ export default class Core {
         const me = this;
 
         if (!isConnected) {
-            callback({ type: "PAIRING" });
+            callback({ type: "pairing" });
             await this.waitPairingOverlay();
-            callback({ type: "PAIRED" });
+            callback({ type: "paired" });
         }
 
-        callback({ type: "PENDING" });
+        callback({ type: "pending" });
 
         let dappletResult = null;
 
@@ -158,10 +158,10 @@ export default class Core {
 
         if (dappletResult) {
             transactionCreated(dappletResult);
-            callback({ type: "CREATED", data: dappletResult });
+            callback({ type: "created", data: dappletResult });
         } else {
             transactionRejected();
-            callback({ type: "REJECTED" });
+            callback({ type: "rejected" });
         }
 
         return dappletResult;

@@ -186,11 +186,12 @@ export class Connection implements IConnection {
                     if (listener.h) {
                         for (let eventId of [...Object.keys(listener.h), ANY_EVENT]) {
                             let cond = this.eventDef ? this.eventDef[eventId] : eventId
+                            
                             //ToDo: extract msg.type default
                             if ((typeof cond === 'function' ? cond(op, msg) : msg.type == cond) || eventId === ANY_EVENT) {
-                                console.log('listener.h', listener.h);
                                 const handlers = listener.h[eventId]
-                                console.log('handlers', handlers);
+                                if (!handlers) continue
+                                
                                 if (Array.isArray(handlers)) {
                                     handlers.forEach(h => h(op, msg))
                                 } else {
