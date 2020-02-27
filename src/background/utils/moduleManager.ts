@@ -4,6 +4,7 @@ import Manifest from '../models/manifest';
 import { addEvent } from '../services/eventService';
 import { RegistryAggregator } from '../registries/registryAggregator';
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
+import { areModulesEqual } from '../../common/helpers';
 
 export default class ModuleManager {
 
@@ -25,7 +26,7 @@ export default class ModuleManager {
             const optimizedDeps = await Promise.all(moduleDeps.map(d => this.optimizeDependency(d.name, d.version, d.branch)));
 
             for (const dep of optimizedDeps) {
-                if (!dependencies.find(d => d.name == dep.name && d.version == dep.version && d.branch == dep.branch)) {
+                if (!dependencies.find(d => areModulesEqual(d, dep))) {
                     dependencies.push(dep);
                 }
             }

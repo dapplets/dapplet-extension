@@ -5,6 +5,7 @@ import * as extension from 'extensionizer';
 import Manifest from '../models/manifest';
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
 import GlobalConfigService from './globalConfigService';
+import { areModulesEqual } from '../../common/helpers';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
@@ -18,11 +19,12 @@ export default class FeatureService {
 
         const configRegistries = await this._globalConfigService.getRegistries();
 
+        let i = 0;
+
         for (const [registryUrl, hostnamesManfiests] of Object.entries(regHostnamesManfiests)) {
             for (const [hostname, manifests] of Object.entries(hostnamesManfiests)) {
-                let i = 0;
                 for (const manifest of manifests) {
-                    const dto = dtos.find(f => f.name === manifest.name && f.branch === manifest.branch && f.version === manifest.version);
+                    const dto = dtos.find(f => areModulesEqual(f, manifest));
                     if (!dto) {
                         const dto: ManifestDTO = manifest as any;
                         const config = await this._siteConfigRepository.getById(hostname); // ToDo: which contextId should we compare?
