@@ -77,7 +77,7 @@ export class DevRegistry implements Registry {
     }
 
     private async _cacheDevConfig() {
-        if (this.isAvailable && !this._devConfig) {
+        //if (this.isAvailable && !this._devConfig) {
             try {
                 const response = await fetch(this.url, { cache: 'no-store' });
                 if (!response.ok) throw new Error(response.statusText);
@@ -88,6 +88,6 @@ export class DevRegistry implements Registry {
                 this.isAvailable = false;
                 this.error = err.message;
             }
-        }
+        //}
     }
 }

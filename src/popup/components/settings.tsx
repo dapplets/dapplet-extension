@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as extension from 'extensionizer';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { Segment, List, Label, Input, Checkbox, Icon, Header } from "semantic-ui-react";
+import { Popup, Segment, List, Label, Input, Checkbox, Icon, Header } from "semantic-ui-react";
 
 import { isValidUrl } from '../helpers';
 
@@ -13,7 +13,7 @@ interface ISettingsProps {
 interface ISettingsState {
     isLoading: boolean;
     connected: boolean;
-    registries: { url: string, isDev: boolean, isAvailable: boolean }[];
+    registries: { url: string, isDev: boolean, isAvailable: boolean, error: string }[];
     registryInput: string;
     registryInputError: string;
     devMode: boolean;
@@ -121,12 +121,16 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                         {registries.map((r, i) => (
                             <List.Item key={i}>
                                 <List.Content floated='left'>
-                                    <Label size='mini' horizontal color={(r.isAvailable) ? 'green' : 'red'}>{(r.isAvailable) ? 'ONLINE' : 'OFFLINE'}</Label>
+                                    <Popup
+                                        trigger={<Label size='mini' horizontal color={(r.isAvailable) ? 'green' : 'red'}>{(r.isAvailable) ? 'ONLINE' : (r.error) ? 'ERROR' : 'OFFLINE'}</Label>}
+                                        content={r.error || 'Ready'}
+                                        size='mini'
+                                    />
                                 </List.Content>
                                 <List.Content floated='right'>
                                     <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
                                 </List.Content>
-                                <List.Content>{r.url}</List.Content>
+                                <List.Content><a style={{color:'#000'}} onClick={() => window.open(r.url, '_blank')}>{r.url}</a></List.Content>
                             </List.Item>
                         ))}
                     </List>

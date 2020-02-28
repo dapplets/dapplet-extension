@@ -160,8 +160,12 @@ export default class ModuleManager {
                     const branch = branches[0]; // ToDo: select branch
                     const versions = await this.registryAggregator.getVersions(name, branch);
                     const lastVersion = versions.sort(rcompare)[0]; // DESC sorting by semver // ToDo: select version
-                    const manifest = await this.loadManifest(name, branch, lastVersion);
-                    hostnameManifests[registryUrl][hostname].push(manifest);
+                    try {
+                        const manifest = await this.loadManifest(name, branch, lastVersion);
+                        hostnameManifests[registryUrl][hostname].push(manifest);
+                    } catch (err) {
+                        // ToDo: catch it
+                    }
                 }
             }
         }
@@ -171,7 +175,8 @@ export default class ModuleManager {
 
     public async getAllDevModules(): Promise<Manifest[]> {
         const modules = await this.registryAggregator.getAllDevModules();
-        const manifests = await Promise.all(modules.map(m => this.loadManifest(m.name, m.branch, m.version)));
-        return manifests;
+        const manifestsWithErrors = await Promise.all(modules.map(m => this.loadManifest(m.name, m.branch, m.version).catch(Error)));
+        const manifestsNoErrors = manifestsWithErrors.filter(x => !(x instanceof Error)) as Manifest[];
+        return manifestsNoErrors;
     }
 }

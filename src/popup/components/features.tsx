@@ -38,24 +38,22 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
       return;
     }
 
-    const { getFeaturesByHostnames } = await initBGFunctions(extension);
+    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(extension);
 
-    try {
-      const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
-      if (this._isMounted) {
-        this.setState({
-          features,
-          isLoading: false,
-          error: null
-        });
-      }
-    } catch {
-      if (this._isMounted) {
-        this.setState({
-          error: "The registry is not available.",
-          isLoading: false
-        });
-      }
+    const registries = await getRegistries();
+    const regsWithErrors = registries.filter(r => !!r.error).length;
+    if (regsWithErrors > 0) {
+      this.setState({
+        error: `There are registries with connection problems. Please check the settings.`
+      });
+    }
+
+    const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
+    if (this._isMounted) {
+      this.setState({
+        features,
+        isLoading: false
+      });
     }
   }
 
@@ -99,8 +97,10 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
     return (
       <React.Fragment>
         <Segment loading={isLoading} className="internalTab">
+          {(error) ? (<Message floating warning>{error}</Message>) : null}
+
           {!isNoInpage ?
-            (!error) ? ((features.length > 0) ? (
+            (features.length > 0) ? (
               <List divided relaxed>
                 {features.map((f, i) => (
                   <List.Item key={i} style={{ overflow: "hidden" }}>
@@ -135,7 +135,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                   </List.Item>
                 ))}
               </List>
-            ) : (<div>No available features for current site.</div>)) : (<Message floating negative>{error}</Message>)
+            ) : (<div>No available features for current site.</div>)
             : (<div>
               No connection with context webpage.
               <br />
