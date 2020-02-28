@@ -82,7 +82,9 @@ export class RegistryAggregator {
         await this._initRegistries();
         const modules = await Promise.all(this.registries.map(r => r.getAllDevModules().catch((e) => e)));
         const validModules = modules.filter(result => !(result instanceof Error));
-        return validModules.reduce((a, b) => a.concat(b));
+        if (!validModules || validModules.length === 0) return [];
+        const reduced = validModules.reduce((a, b) => a.concat(b));
+        return reduced;
     }
 
     private async _initRegistries() {

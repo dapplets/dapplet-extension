@@ -5,6 +5,7 @@ export class DevRegistry implements Registry {
 
     private _rootUrl: string;
     public isAvailable: boolean = true;
+    public error: string = null;
 
     private _devConfig: {
         hostnames: { [hostname: string]: { [name: string]: string } },
@@ -81,8 +82,11 @@ export class DevRegistry implements Registry {
                 const response = await fetch(this.url, { cache: 'no-store' });
                 if (!response.ok) throw new Error(response.statusText);
                 this._devConfig = await response.json();
+                this.isAvailable = true;
+                this.error = null;
             } catch (err) {
                 this.isAvailable = false;
+                this.error = err.message;
             }
         }
     }

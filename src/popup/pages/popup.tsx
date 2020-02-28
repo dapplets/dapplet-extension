@@ -87,7 +87,7 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
     return (
       <React.Fragment>
         <div className="popupContainer">
-          <Header contextIds={this.props.contextIds} />
+          {(this.props.contextIds) ? <Header contextIds={this.props.contextIds} /> : null}
           <Tab menu={{ secondary: true, pointing: true }} panes={panes} />
         </div>
       </React.Fragment>

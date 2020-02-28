@@ -144,10 +144,14 @@ export default class FeatureService {
     async getRegistries() {
         const configRegistries = await this._globalConfigService.getRegistries();
         const runtimeRegistries = this._moduleManager.registryAggregator.registries;
-        const result = configRegistries.map(c => ({
-            isAvailable: runtimeRegistries.find(r => r.url === c.url)?.isAvailable || false,
-            ...c
-        }));
+        const result = configRegistries.map(c => {
+            const reg = runtimeRegistries.find(r => r.url === c.url);
+            return {
+                isAvailable: reg?.isAvailable || false,
+                error: reg?.error,
+                ...c
+            }
+        });
 
         return result;
     }

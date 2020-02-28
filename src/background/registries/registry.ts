@@ -1,5 +1,6 @@
 export interface Registry {
     isAvailable: boolean;
+    error: string;
     url: string;
     
     getVersions(name: string, branch: string): Promise<string[]>;

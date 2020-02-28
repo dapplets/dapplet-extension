@@ -2,6 +2,7 @@ import { Registry } from './registry';
 
 export class TestRegistry implements Registry {
     public isAvailable: boolean = true;
+    public error: string = null;
 
     constructor(public url: string) {
         // example: https://test.dapplets.org/api/registry/dapplet-base
@@ -15,9 +16,11 @@ export class TestRegistry implements Registry {
             const json = await response.json();
             const versions = json.data;
             this.isAvailable = true;
+            this.error = null;
             return versions;
         } catch (err) {
             this.isAvailable = false;
+            this.error = err.message;
             throw err;
         }
     }
@@ -29,9 +32,11 @@ export class TestRegistry implements Registry {
             const json = await response.json();
             const uris = json.data;
             this.isAvailable = true;
+            this.error = null;
             return uris;
         } catch (err) {
             this.isAvailable = false;
+            this.error = err.message;
             throw err;
         }
     }
@@ -43,9 +48,11 @@ export class TestRegistry implements Registry {
             const json = await response.json();
             const features = json.data;
             this.isAvailable = true;
+            this.error = null;
             return features;
         } catch (err) {
             this.isAvailable = false;
+            this.error = err.message;
             throw err;
         }
     }

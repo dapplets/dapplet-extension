@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as extension from 'extensionizer';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { Button, Segment, Message, List, Label, Input, Icon, Image, Header } from "semantic-ui-react";
+import { Popup, Button, Segment, Message, List, Label, Input, Icon, Image, Header } from "semantic-ui-react";
 import NOLOGO_PNG from '../../common/resources/no-logo.png';
 
 import { isValidUrl } from '../helpers';
@@ -11,7 +11,12 @@ interface IDeveloperProps { }
 
 interface IDeveloperState {
     isLoading: boolean;
-    registries: { url: string, isDev: boolean, isAvailable: boolean }[];
+    registries: {
+        url: string,
+        isDev: boolean,
+        isAvailable: boolean,
+        error: string
+    }[];
     registryInput: string;
     registryInputError: string;
     intro: {
@@ -44,16 +49,15 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
 
     async loadRegistries() {
         const { getRegistries, getAllDevModules } = await initBGFunctions(extension);
-        const registries = await getRegistries();
 
+        const modules = await getAllDevModules();
+        this.setState({ modules });
+
+        const registries = await getRegistries();
         this.setState({
             isLoading: false,
             registries: registries.filter(r => r.isDev === true)
         });
-
-        const modules = await getAllDevModules();
-
-        this.setState({ modules });
     }
 
     async loadIntro() {
@@ -69,6 +73,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
     }
 
     async addRegistry(url: string) {
+        this.setState({ isLoading: true });
         const { addRegistry } = await initBGFunctions(extension);
 
         try {
@@ -82,6 +87,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
     }
 
     async removeRegistry(url: string) {
+        this.setState({ isLoading: true });
         const { removeRegistry } = await initBGFunctions(extension);
         await removeRegistry(url);
         this.loadRegistries();
@@ -137,12 +143,16 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                         {registries.map((r, i) => (
                             <List.Item key={i}>
                                 <List.Content floated='left'>
-                                    <Label size='mini' horizontal color={(r.isAvailable) ? 'green' : 'red'}>{(r.isAvailable) ? 'ONLINE' : 'OFFLINE'}</Label>
+                                    <Popup
+                                        trigger={<Label size='mini' horizontal color={(r.isAvailable) ? 'green' : 'red'}>{(r.isAvailable) ? 'ONLINE' : (r.error) ? 'ERROR' : 'OFFLINE'}</Label>}
+                                        content={r.error || 'Ready'}
+                                        size='mini'
+                                    />
                                 </List.Content>
                                 <List.Content floated='right'>
                                     <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
                                 </List.Content>
-                                <List.Content>{r.url}</List.Content>
+                                <List.Content><a style={{color:'#000'}} onClick={() => window.open(r.url, '_blank')}>{r.url}</a></List.Content>
                             </List.Item>
                         ))}
                     </List>
