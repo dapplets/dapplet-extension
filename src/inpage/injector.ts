@@ -96,8 +96,6 @@ export class Injector {
             // ToDo: elemenate the boilerplate
             const coreWrapper = {
                 overlayManager: core.overlayManager,
-                publish: core.publish,
-                subscribe: core.subscribe,
                 waitPairingOverlay: core.waitPairingOverlay,
                 contextStarted: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), true),
                 contextFinished: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), false),

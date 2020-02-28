@@ -6,7 +6,6 @@ import FeatureService from './services/featureService';
 import GlobalConfigService from './services/globalConfigService';
 import * as EventService from './services/eventService';
 import * as extension from 'extensionizer';
-import { GlobalEventBusService } from "./services/globalEventBusService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -14,7 +13,6 @@ import { GlobalEventBusService } from "./services/globalEventBusService";
 
 const featureService = new FeatureService();
 const globalConfigService = new GlobalConfigService();
-const globalEventBusService = new GlobalEventBusService();
 
 extension.runtime.onMessage.addListener(
   setupMessageListener({
@@ -105,22 +103,6 @@ extension.commands.onCommand.addListener(cmd => {
       var activeTab = tabs[0];
       extension.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY");
     });
-  }
-});
-
-extension.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (!request) return
-
-  if (request.type === "EVENTBUS_PUBLISH") {
-    const { topic, data } = request.payload
-    globalEventBusService.publish(topic, data)
-  }
-
-  if (request.type === "EVENTBUS_SUBSCRIBE") {
-    globalEventBusService.subscribe(
-      request.payload.topic,
-      (topic, data) => extension.tabs.sendMessage(sender.tab.id, { topic, data })
-    )
   }
 });
 

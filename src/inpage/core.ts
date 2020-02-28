@@ -1,7 +1,6 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as extension from 'extensionizer';
 
-import * as GlobalEventBus from './globalEventBus';
 import { Overlay } from "./overlay";
 import { Swiper } from "./swiper";
 import { AutoProperties, EventDef, Connection } from "./connection";
@@ -40,9 +39,6 @@ export default class Core {
             this.overlayManager.close();
         });
     }
-
-    public publish = (topic: string, data: any) => GlobalEventBus.publish(topic, data)
-    public subscribe = (topic: string, func: Function) => GlobalEventBus.subscribe(topic, func)
 
     public waitPairingOverlay(): Promise<void> {
         const me = this;
