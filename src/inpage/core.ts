@@ -94,11 +94,11 @@ export default class Core {
         }
     }
 
-    private async _sendWalletConnectTx(dappletId, metadata, callback: (e: { type: string, data?: any }) => void): Promise<any> {
+    private async _sendWalletConnectTx(sowaId, metadata, callback: (e: { type: string, data?: any }) => void): Promise<any> {
         const backgroundFunctions = await initBGFunctions(extension);
         const {
-            loadDapplet,
-            loadDappletFrames,
+            loadSowa,
+            loadSowaFrames,
             transactionCreated,
             transactionRejected,
             checkConnection,
@@ -123,20 +123,20 @@ export default class Core {
         const { walletInfo } = await getGlobalConfig();
 
         if (walletInfo.protocolVersion === "0.2.0") {
-            console.log("Wallet is Dapplet Frames compatible. Sending Dapplet Frames transaction...");
-            dappletResult = await loadDappletFrames(dappletId, metadata);
+            console.log("Wallet is SOWA Frames compatible. Sending SOWA Frames transaction...");
+            dappletResult = await loadSowaFrames(sowaId, metadata);
         } else if (walletInfo.protocolVersion === "0.1.0") {
-            console.log("Wallet is Dapplet compatible. Sending Dapplet transaction...");
-            dappletResult = await loadDapplet(dappletId, metadata);
+            console.log("Wallet is SOWA compatible. Sending SOWA transaction...");
+            dappletResult = await loadSowa(sowaId, metadata);
         } else {
-            console.log("Wallet is Dapplet incompatible. Showing dapplet view...");
+            console.log("Wallet is SOWA incompatible. Showing SOWA view...");
 
             const waitApproving = function (): Promise<void> {
                 return new Promise<void>((resolve, reject) => {
-                    const pairingUrl = extension.extension.getURL('dapplet.html');
-                    const overlay = new Overlay(me.overlayManager, pairingUrl, 'Dapplet');
+                    const pairingUrl = extension.extension.getURL('sowa.html');
+                    const overlay = new Overlay(me.overlayManager, pairingUrl, 'SOWA');
                     // ToDo: implement multiframe
-                    overlay.open(() => overlay.send('txmeta', [dappletId, metadata]));
+                    overlay.open(() => overlay.send('txmeta', [sowaId, metadata]));
                     // ToDo: add timeout?
                     overlay.onMessage((topic, message) => {
                         if (topic === 'approved') {
@@ -153,7 +153,7 @@ export default class Core {
             };
 
             await waitApproving();
-            dappletResult = await sendLegacyTransaction(dappletId, metadata);
+            dappletResult = await sendLegacyTransaction(sowaId, metadata);
         }
 
         if (dappletResult) {
@@ -178,9 +178,9 @@ export default class Core {
         const transport = {
             _txCount: 0,
             _handler: null,
-            exec: (dappletId: string, ctx: any) => {
+            exec: (sowaId: string, ctx: any) => {
                 const id = (++transport._txCount).toString();
-                me._sendWalletConnectTx(dappletId, ctx, (e) => transport._handler(id, e));
+                me._sendWalletConnectTx(sowaId, ctx, (e) => transport._handler(id, e));
                 return Promise.resolve(id);
             },
             onMessage: (handler: (topic: string, message: any) => void) => {

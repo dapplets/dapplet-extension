@@ -29,16 +29,16 @@ try {
 /**
  * Runs Dapplet inside paired wallet and returns transaction result
  * @async
- * @param {string} dappletId Dapplet ID
+ * @param {string} sowaId Dapplet ID
  * @param {object} txMeta Metadata
  * @returns {Promise<object>} Promise represents transaction result
  */
-const loadDapplet = async (dappletId, txMeta) => {
+const loadSowa = async (sowaId, txMeta) => {
     const request = {
         jsonrpc: "2.0",
         method: "wallet_loadDapplet",
         params: [
-            dappletId,
+            sowaId,
             txMeta
         ]
     };
@@ -47,12 +47,12 @@ const loadDapplet = async (dappletId, txMeta) => {
     return result;
 };
 
-const loadDappletFrames = async (dappletId, txMeta) => {
+const loadSowaFrames = async (sowaId, txMeta) => {
     const request = {
         jsonrpc: "2.0",
         method: "wallet_loadDappletFrames",
         params: [
-            [dappletId, txMeta],
+            [sowaId, txMeta],
             ["2"]
         ]
     };
@@ -61,8 +61,8 @@ const loadDappletFrames = async (dappletId, txMeta) => {
     return result;
 };
 
-const sendLegacyTransaction = async (dappletId: string, txMeta: any) => {
-    const response = await fetch(`https://dapplets.github.io/dapplet-examples/${dappletId}.json`);
+const sendLegacyTransaction = async (sowaId: string, txMeta: any) => {
+    const response = await fetch(`https://dapplets.github.io/dapplet-examples/${sowaId}.json`);
     const dappletConfig: DappletConfig = await response.json();
 
     for (const txName in dappletConfig.transactions) {
@@ -195,8 +195,8 @@ const getChainId = () => {
 };
 
 export {
-    loadDapplet,
-    loadDappletFrames,
+    loadSowa,
+    loadSowaFrames,
     generateUri,
     checkConnection,
     waitPairing,

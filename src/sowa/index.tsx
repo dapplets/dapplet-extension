@@ -25,7 +25,7 @@ interface IIndexProps {
 
 interface IIndexState {
     isLoading: boolean;
-    dappletId: string;
+    sowaId: string;
     txMeta: any;
     renderedDapplet: string;
 }
@@ -38,16 +38,16 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
         this.state = {
             isLoading: true,
-            dappletId: null,
+            sowaId: null,
             txMeta: null,
             renderedDapplet: null
         };
 
         this._bus = new Bus();
-        this._bus.subscribe('txmeta', async (dappletId, txMeta) => {
-            const dappletConfig = await apiFetchDapplet(dappletId);
+        this._bus.subscribe('txmeta', async (sowaId, txMeta) => {
+            const dappletConfig = await apiFetchDapplet(sowaId);
 
-            let html = "Compatible Dapplet view is not found.";
+            let html = "Compatible SOWA view is not found.";
 
             for (const view of dappletConfig.views) {
                 if (!view["@type"]) {
@@ -64,7 +64,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
             this.setState({
                 isLoading: false,
-                dappletId,
+                sowaId,
                 txMeta,
                 renderedDapplet: html
             });
@@ -79,7 +79,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                 {isLoading ? 'Loading...' : (<div>
                     <Container text>
                         <Header as='h2'>Dapplet</Header>
-                        <p>Your wallet doesn't support Dapplet transactions.<br/>It might look like this:</p>
+                        <p>Your wallet doesn't support SOWA transactions.<br/>It might look like this:</p>
                         {/* {x.map(a=><SDapplet dangerouslySetInnerHTML={{ __html: a.renderedDapplet }} />)} */}
                         <SDapplet dangerouslySetInnerHTML={{ __html: renderedDapplet }} />
                         <div>

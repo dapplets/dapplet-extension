@@ -19,14 +19,14 @@ const globalEventBusService = new GlobalEventBusService();
 extension.runtime.onMessage.addListener(
   setupMessageListener({
     // WalletConnectService
-    loadDapplet: WalletConnectService.loadDapplet,
+    loadSowa: WalletConnectService.loadSowa,
     generateUri: WalletConnectService.generateUri,
     checkConnection: WalletConnectService.checkConnection,
     waitPairing: WalletConnectService.waitPairing,
     disconnect: WalletConnectService.disconnect,
     getAccounts: WalletConnectService.getAccounts,
     getChainId: WalletConnectService.getChainId,
-    loadDappletFrames: WalletConnectService.loadDappletFrames,
+    loadSowaFrames: WalletConnectService.loadSowaFrames,
     sendLegacyTransaction: WalletConnectService.sendLegacyTransaction,
 
     // SuspendService

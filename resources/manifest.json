@@ -32,7 +32,7 @@
   ],
   "web_accessible_resources": [
     "pairing.html",
-    "dapplet.html",
+    "sowa.html",
     "popup.html",
     "deploy.html"
   ],
