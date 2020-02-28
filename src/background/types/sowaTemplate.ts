@@ -1,4 +1,4 @@
-export type DappletConfig = {
+export type SowaTemplate = {
     "@context": {
         [type: string]: string
     }

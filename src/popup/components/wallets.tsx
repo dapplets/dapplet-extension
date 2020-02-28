@@ -85,7 +85,7 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
                   <List.Description>{accounts.join(", ")}</List.Description>
                 </List.Item>
                 <List.Item>
-                  <List.Header>Dapplet Compatibility</List.Header>
+                  <List.Header>SOWA Compatibility</List.Header>
                   <List.Description>{walletInfo?.compatible ? "Yes" : "No"}</List.Description>
                 </List.Item>
                 <List.Item>
@@ -93,11 +93,11 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
                   <List.Description>{walletInfo?.device?.manufacturer} {walletInfo?.device?.model}</List.Description>
                 </List.Item>
                 <List.Item>
-                  <List.Header>Dapplet Protocol Version</List.Header>
+                  <List.Header>SOWA Protocol Version</List.Header>
                   <List.Description>{walletInfo?.protocolVersion}</List.Description>
                 </List.Item>
                 <List.Item>
-                  <List.Header>Dapplet Engine Version</List.Header>
+                  <List.Header>SOWA Engine Version</List.Header>
                   <List.Description>{walletInfo?.engineVersion}</List.Description>
                 </List.Item>
               </React.Fragment>

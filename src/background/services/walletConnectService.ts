@@ -1,6 +1,6 @@
 import WalletConnect from "@walletconnect/browser";
-import { DappletConfig } from "../types/dappletConfig";
-import { getTxBuilder } from "../utils/dapplets";
+import { SowaTemplate } from "../types/sowaTemplate";
+import { getTxBuilder } from "../../common/sowa";
 import { promiseTimeout } from "../utils/promiseTimeout";
 import GlobalConfigService from "./globalConfigService";
 import { WalletInfo } from '../../common/constants';
@@ -27,9 +27,9 @@ try {
 }
 
 /**
- * Runs Dapplet inside paired wallet and returns transaction result
+ * Runs SOWA tx inside paired wallet and returns transaction result
  * @async
- * @param {string} sowaId Dapplet ID
+ * @param {string} sowaId SOWA Template ID
  * @param {object} txMeta Metadata
  * @returns {Promise<object>} Promise represents transaction result
  */
@@ -62,12 +62,11 @@ const loadSowaFrames = async (sowaId, txMeta) => {
 };
 
 const sendLegacyTransaction = async (sowaId: string, txMeta: any) => {
-    const response = await fetch(`https://dapplets.github.io/dapplet-examples/${sowaId}.json`);
-    const dappletConfig: DappletConfig = await response.json();
+    const sowaTemplate = await getSowaTemplate(sowaId);
 
-    for (const txName in dappletConfig.transactions) {
+    for (const txName in sowaTemplate.transactions) {
         if (txName) {
-            const tx = dappletConfig.transactions[txName];
+            const tx = sowaTemplate.transactions[txName];
             const builder = getTxBuilder(tx["@type"]);
             if (builder) {
                 const builtTx = builder(tx, txMeta);
@@ -194,6 +193,12 @@ const getChainId = () => {
     return walletConnector.chainId;
 };
 
+const getSowaTemplate = async (sowaId: string) => {
+    const response = await fetch(`https://dapplets.github.io/dapplet-examples/${sowaId}.json`);
+    const dappletConfig: SowaTemplate = await response.json();
+    return dappletConfig;
+}
+
 export {
     loadSowa,
     loadSowaFrames,
@@ -203,5 +208,6 @@ export {
     disconnect,
     getAccounts,
     getChainId,
-    sendLegacyTransaction
+    sendLegacyTransaction,
+    getSowaTemplate
 };

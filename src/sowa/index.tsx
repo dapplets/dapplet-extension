@@ -1,14 +1,15 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as extension from 'extensionizer';
+import { initBGFunctions } from "chrome-extension-message-wrapper";
 //import 'semantic-ui-css/semantic.min.css'
 import './index.scss';
 import { Bus } from '../common/bus';
 import styled from "styled-components";
-import { apiFetchDapplet } from './api';
-import { getRenderer } from './helpers';
+import { getRenderer } from '../common/sowa';
 import { Container, Header, Button } from 'semantic-ui-react'
 
-const SDapplet = styled.div`
+const SSowaView = styled.div`
   width: 100%;
   padding: 20px 20px;
   margin: 0 0 15px 0;
@@ -27,7 +28,7 @@ interface IIndexState {
     isLoading: boolean;
     sowaId: string;
     txMeta: any;
-    renderedDapplet: string;
+    renderedSowaView: string;
 }
 
 class Index extends React.Component<IIndexProps, IIndexState> {
@@ -40,12 +41,13 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             isLoading: true,
             sowaId: null,
             txMeta: null,
-            renderedDapplet: null
+            renderedSowaView: null
         };
 
         this._bus = new Bus();
         this._bus.subscribe('txmeta', async (sowaId, txMeta) => {
-            const dappletConfig = await apiFetchDapplet(sowaId);
+            const { getSowaTemplate } = await initBGFunctions(extension);
+            const dappletConfig = await getSowaTemplate(sowaId);
 
             let html = "Compatible SOWA view is not found.";
 
@@ -66,22 +68,22 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                 isLoading: false,
                 sowaId,
                 txMeta,
-                renderedDapplet: html
+                renderedSowaView: html
             });
         });
     }
 
     render() {
-        const { isLoading, renderedDapplet } = this.state;
+        const { isLoading, renderedSowaView } = this.state;
 
         return (
             <React.Fragment>
                 {isLoading ? 'Loading...' : (<div>
                     <Container text>
-                        <Header as='h2'>Dapplet</Header>
+                        <Header as='h2'>SOWA Transaction</Header>
                         <p>Your wallet doesn't support SOWA transactions.<br/>It might look like this:</p>
-                        {/* {x.map(a=><SDapplet dangerouslySetInnerHTML={{ __html: a.renderedDapplet }} />)} */}
-                        <SDapplet dangerouslySetInnerHTML={{ __html: renderedDapplet }} />
+                        {/* {x.map(a=><SSowaView dangerouslySetInnerHTML={{ __html: a.renderedSowaView }} />)} */}
+                        <SSowaView dangerouslySetInnerHTML={{ __html: renderedSowaView }} />
                         <div>
                             <Button primary onClick={() => this._bus.publish('approved')}>Continue</Button>
                             <Button basic onClick={() => this._bus.publish('error')}>Reject</Button>
