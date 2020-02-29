@@ -47,7 +47,7 @@ export default class Core {
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'Wallet');
             overlay.open();
             // ToDo: add timeout?
-            overlay.onmessage = (topic, message) => {
+            overlay.onMessage((topic, message) => {
                 if (topic === 'ready') {
                     overlay.close();
                     resolve();
@@ -56,7 +56,7 @@ export default class Core {
                 if (topic === 'error') {
                     reject();
                 }
-            }
+            });
         });
     }
 
@@ -67,7 +67,7 @@ export default class Core {
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'Deploy');
             overlay.open(() => overlay.send('data', [payload]));
             // ToDo: add timeout?
-            overlay.onmessage = (topic, message) => {
+            overlay.onMessage((topic, message) => {
                 if (topic === 'ready') {
                     overlay.close();
                     resolve();
@@ -76,7 +76,7 @@ export default class Core {
                 if (topic === 'error') {
                     reject();
                 }
-            }
+            });
         });
     }
 
