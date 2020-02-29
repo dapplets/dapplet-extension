@@ -148,8 +148,12 @@ export default class Core {
                 });
             };
 
-            await waitApproving();
-            dappletResult = await sendLegacyTransaction(sowaId, metadata);
+            try {
+                await waitApproving();
+                dappletResult = await sendLegacyTransaction(sowaId, metadata);
+            } catch (err) {
+
+            }
         }
 
         if (dappletResult) {

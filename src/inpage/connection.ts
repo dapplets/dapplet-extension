@@ -179,7 +179,7 @@ export class Connection implements IConnection {
     onMessage(op: any, msg: any): void {
         try {
             const isTopicMatch = (op: any, msg: any, f: MsgFilter) =>
-                typeof f === 'string' ? this.topicMatch(op, f) : f(op, msg)
+                typeof f === 'function' ? f(op, msg) : this.topicMatch(op, f);
 
             this.listeners.forEach((listener) => {
                 if (!listener.f || isTopicMatch(op, msg, listener.f)) {

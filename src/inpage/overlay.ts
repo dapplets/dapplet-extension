@@ -74,7 +74,7 @@ export class Overlay implements IPubSub {
 
     public exec(topic: string, message: any) {
         return new Promise((resolve, reject) => {
-            const id = ++this._msgCount;
+            const id = (++this._msgCount).toString();
             const data = JSON.stringify({
                 id,
                 topic,
@@ -103,10 +103,10 @@ export class Overlay implements IPubSub {
 
     public onMessage(handler: (topic: string, message: any) => void) {
         const listener = (e: MessageEvent) => {
-            if (e.source != this.frame.contentWindow) return; // Listen messages from only our frame
+            if (e.source !== this.frame.contentWindow) return; // Listen messages from only our frame
             if (!e.data) return;
-            const { topic, message } = JSON.parse(e.data);
-            if (topic !== undefined) handler(topic, message);
+            const data = JSON.parse(e.data);
+            if (data.topic !== undefined)  handler(data.topic, data.message);
         }
 
         window.addEventListener('message', listener);
