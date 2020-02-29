@@ -10,7 +10,7 @@
     "start": "webpack -w --config webpack.dev.js",
     "lint": "tslint 'src/**/*.{ts, tsx}'",
     "publish": "npm publish --access public",
-    "prepublish": "npm run build && npm run build:types"
+    "prepublishOnly": "npm run build && npm run build:types"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.92",
