@@ -75,7 +75,7 @@
     "build/inpage.js",
     "build/popup.js",
     "build/pairing.js",
-    "build/dapplet.js",
+    "build/sowa.js",
     "build/deploy.js"
   ]
 }
