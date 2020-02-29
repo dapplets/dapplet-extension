@@ -1,6 +1,6 @@
 {
   "name": "@dapplets/dapplet-extension",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Adds controls to legacy web sites.",
   "types": "./lib/index.d.ts",
   "scripts": {
