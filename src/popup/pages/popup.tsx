@@ -16,6 +16,7 @@ interface IPopupProps {
 }
 interface IPopupState {
   newEventsCount: number;
+  devMode: boolean;
 }
 
 class Popup extends React.Component<IPopupProps, IPopupState> {
@@ -23,20 +24,25 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
     super(props);
 
     this.state = {
-      newEventsCount: 0
+      newEventsCount: 0,
+      devMode: false
     };
   }
 
   async componentDidMount() {
-    const backgroundFunctions = await initBGFunctions(extension);
-    const { getNewEventsCount } = backgroundFunctions;
+    await this.updateTabs();
+  }
+
+  async updateTabs() {
+    const { getNewEventsCount, getDevMode } = await initBGFunctions(extension);
     const newEventsCount: number = await getNewEventsCount();
-    this.setState({ newEventsCount });
+    const devMode = await getDevMode();
+    this.setState({ newEventsCount, devMode });
   }
 
   render() {
     const { contextIds } = this.props;
-    const { newEventsCount } = this.state;
+    const { newEventsCount, devMode } = this.state;
 
     const panes = [
       {
@@ -64,21 +70,24 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
       {
         menuItem: "Settings",
         render: () => (
-          <Tab.Pane attached={false} as={Settings} />
-        )
-      },
-      {
-        menuItem: "Developer",
-        render: () => (
-          <Tab.Pane attached={false} as={Developer} />
+          <Tab.Pane attached={false} as={() => <Settings devMode={devMode} updateTabs={() => this.updateTabs()} />} />
         )
       }
     ];
 
+    if (devMode) {
+      panes.push({
+        menuItem: "Developer",
+        render: () => (
+          <Tab.Pane attached={false} as={Developer} />
+        )
+      });
+    }
+
     return (
       <React.Fragment>
         <div className="popupContainer">
-          <Header contextIds={this.props.contextIds} />
+          {(this.props.contextIds) ? <Header contextIds={this.props.contextIds} /> : null}
           <Tab menu={{ secondary: true, pointing: true }} panes={panes} />
         </div>
       </React.Fragment>

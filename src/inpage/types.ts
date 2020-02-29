@@ -3,8 +3,6 @@ export interface IModule { }
 export interface IContentAdapter extends IModule {
     attachFeature(feature: IFeature): void;
     detachFeature(feature: IFeature): void;
-    onContextCreated(handler: (ctx?: any, type?: string) => void): void;
-    onContextDestroyed(handler: (ctx?: any, type?: string) => void): void;
 }
 
 export interface IFeature extends IModule {

@@ -6,7 +6,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
 
     private _mapperService = new MapperService();
 
-    public constructor(private _TConstructor: new (...args: any[]) => T) { }
+    public constructor(private _TConstructor: new (...args: any[]) => T, private _storageName: string) { }
 
     async getAll(filter?: (item: T) => boolean): Promise<T[]> {
         return new Promise((resolve, reject) => {
@@ -15,7 +15,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
                     const items: T[] = [];
 
                     for (const key in result) {
-                        if (key.indexOf(this._TConstructor.name + ':') == 0) {
+                        if (key.indexOf(this._storageName + ':') == 0) {
                             const item = this._mapperService.map(this._TConstructor, result[key]);
                             if (filter == undefined || filter(item)) {
                                 items.push(item);
@@ -34,7 +34,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
     async getById(id: string): Promise<T> {
         return new Promise((resolve, reject) => {
             try {
-                const key = this._TConstructor.name + ':' + id;
+                const key = this._storageName + ':' + id;
                 extension.storage.local.get(key, result => {
                     const value = result[key];
 
@@ -61,7 +61,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
                     return;
                 }
 
-                const key = this._TConstructor.name + ':' + item.getId();
+                const key = this._storageName + ':' + item.getId();
 
                 extension.storage.local.get(key, result => {
                     if (!!result[key]) {
@@ -87,7 +87,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
         return new Promise((resolve, reject) => {
             try {
                 const mappedItem = this._mapperService.map(this._TConstructor, item);
-                const key = this._TConstructor.name + ':' + mappedItem.getId();
+                const key = this._storageName + ':' + mappedItem.getId();
 
                 const result = { [key]: mappedItem };
                 const clone = JSON.parse(JSON.stringify(result));
@@ -104,7 +104,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
     async deleteById(id: string): Promise<void>  {
         return new Promise((resolve, reject) => {
             try {
-                const key = this._TConstructor.name + ':' + id;
+                const key = this._storageName + ':' + id;
 
                 try {
                     extension.storage.local.remove(key, () => resolve());
@@ -124,7 +124,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
                     const keys: string[] = [];
 
                     for (const key in result) {
-                        if (key.indexOf(this._TConstructor.name + ':') == 0) {
+                        if (key.indexOf(this._storageName + ':') == 0) {
                             keys.push(key);
                         }
                     }

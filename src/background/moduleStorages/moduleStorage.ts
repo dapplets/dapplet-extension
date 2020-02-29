@@ -2,7 +2,7 @@ import { Storage } from './storage';
 import { HttpModuleStorage } from './httpModuleStorage';
 import { SwarmModuleStorage } from './swarmModuleStorage';
 
-export class StorageAggregator implements Storage {
+export class StorageAggregator {
 
     async getResource(uri: string): Promise<ArrayBuffer> {
         const protocol = new URL(uri).protocol;

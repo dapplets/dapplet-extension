@@ -1,28 +1,29 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { OverlayManager } from "./overlayManager";
-import { Overlay, SubscribeOptions } from "./overlay";
 import * as extension from 'extensionizer';
+
+import { Overlay } from "./overlay";
 import { Swiper } from "./swiper";
-import * as GlobalEventBus from './globalEventBus';
 import { AutoProperties, EventDef, Connection } from "./connection";
 import { WsJsonRpc } from "./wsJsonRpc";
-import { IPubSub } from "./types";
+import { OverlayManager } from "./overlayManager";
 
 export default class Core {
-
     public overlayManager = new OverlayManager();
     private _popupOverlay: Overlay = null;
 
     constructor() {
         extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
-            if (message === "OPEN_PAIRING_OVERLAY") {
-                this.waitPairingOverlay().finally(() => sendResponse());
-            } else if (message === "OPEN_DEPLOY_OVERLAY") {
-                this.waitDeployOverlay().finally(() => sendResponse());
-            }
-            else if (message === "TOGGLE_OVERLAY") {
-                this._togglePopupOverlay();
-                sendResponse();
+            if (typeof message === 'string') {
+                if (message === "OPEN_PAIRING_OVERLAY") {
+                    this.waitPairingOverlay().finally(() => sendResponse());
+                } else if (message === "TOGGLE_OVERLAY") {
+                    this._togglePopupOverlay();
+                    sendResponse();
+                }
+            } else if (typeof message === 'object' && message.type !== undefined) {
+                if (message.type === 'OPEN_DEPLOY_OVERLAY') {
+                    this.waitDeployOverlay(message.payload).finally(() => sendResponse());
+                }
             }
         });
 
@@ -39,9 +40,6 @@ export default class Core {
         });
     }
 
-    public publish = (topic: string, data: any) => GlobalEventBus.publish(topic, data)
-    public subscribe = (topic: string, func: Function) => GlobalEventBus.subscribe(topic, func)
-
     public waitPairingOverlay(): Promise<void> {
         const me = this;
         return new Promise<void>((resolve, reject) => {
@@ -49,7 +47,7 @@ export default class Core {
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'Wallet');
             overlay.open();
             // ToDo: add timeout?
-            overlay.onmessage = (topic, message) => {
+            overlay.onMessage((topic, message) => {
                 if (topic === 'ready') {
                     overlay.close();
                     resolve();
@@ -58,18 +56,18 @@ export default class Core {
                 if (topic === 'error') {
                     reject();
                 }
-            }
+            });
         });
     }
 
-    public waitDeployOverlay(): Promise<void> {
+    public waitDeployOverlay(payload: any): Promise<void> {
         const me = this;
         return new Promise<void>((resolve, reject) => {
             const pairingUrl = extension.extension.getURL('deploy.html');
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'Deploy');
-            overlay.open();
+            overlay.open(() => overlay.send('data', [payload]));
             // ToDo: add timeout?
-            overlay.onmessage = (topic, message) => {
+            overlay.onMessage((topic, message) => {
                 if (topic === 'ready') {
                     overlay.close();
                     resolve();
@@ -78,7 +76,7 @@ export default class Core {
                 if (topic === 'error') {
                     reject();
                 }
-            }
+            });
         });
     }
 
@@ -92,11 +90,11 @@ export default class Core {
         }
     }
 
-    private async _sendWalletConnectTx(dappletId, metadata, callback: (e: { type: string, data?: any }) => void): Promise<any> {
+    private async _sendWalletConnectTx(sowaId, metadata, callback: (e: { type: string, data?: any }) => void): Promise<any> {
         const backgroundFunctions = await initBGFunctions(extension);
         const {
-            loadDapplet,
-            loadDappletFrames,
+            loadSowa,
+            loadSowaFrames,
             transactionCreated,
             transactionRejected,
             checkConnection,
@@ -109,32 +107,32 @@ export default class Core {
         const me = this;
 
         if (!isConnected) {
-            callback({ type: "PAIRING" });
+            callback({ type: "pairing" });
             await this.waitPairingOverlay();
-            callback({ type: "PAIRED" });
+            callback({ type: "paired" });
         }
 
-        callback({ type: "PENDING" });
+        callback({ type: "pending" });
 
         let dappletResult = null;
 
         const { walletInfo } = await getGlobalConfig();
 
         if (walletInfo.protocolVersion === "0.2.0") {
-            console.log("Wallet is Dapplet Frames compatible. Sending Dapplet Frames transaction...");
-            dappletResult = await loadDappletFrames(dappletId, metadata);
+            console.log("Wallet is SOWA Frames compatible. Sending SOWA Frames transaction...");
+            dappletResult = await loadSowaFrames(sowaId, metadata);
         } else if (walletInfo.protocolVersion === "0.1.0") {
-            console.log("Wallet is Dapplet compatible. Sending Dapplet transaction...");
-            dappletResult = await loadDapplet(dappletId, metadata);
+            console.log("Wallet is SOWA compatible. Sending SOWA transaction...");
+            dappletResult = await loadSowa(sowaId, metadata);
         } else {
-            console.log("Wallet is Dapplet incompatible. Showing dapplet view...");
+            console.log("Wallet is SOWA incompatible. Showing SOWA view...");
 
             const waitApproving = function (): Promise<void> {
                 return new Promise<void>((resolve, reject) => {
-                    const pairingUrl = extension.extension.getURL('dapplet.html');
-                    const overlay = new Overlay(me.overlayManager, pairingUrl, 'Dapplet');
+                    const pairingUrl = extension.extension.getURL('sowa.html');
+                    const overlay = new Overlay(me.overlayManager, pairingUrl, 'SOWA');
                     // ToDo: implement multiframe
-                    overlay.open(() => overlay.send('txmeta', [dappletId, metadata]));
+                    overlay.open(() => overlay.send('txmeta', [sowaId, metadata]));
                     // ToDo: add timeout?
                     overlay.onMessage((topic, message) => {
                         if (topic === 'approved') {
@@ -150,16 +148,20 @@ export default class Core {
                 });
             };
 
-            await waitApproving();
-            dappletResult = await sendLegacyTransaction(dappletId, metadata);
+            try {
+                await waitApproving();
+                dappletResult = await sendLegacyTransaction(sowaId, metadata);
+            } catch (err) {
+
+            }
         }
 
         if (dappletResult) {
             transactionCreated(dappletResult);
-            callback({ type: "CREATED", data: dappletResult });
+            callback({ type: "created", data: dappletResult });
         } else {
             transactionRejected();
-            callback({ type: "REJECTED" });
+            callback({ type: "rejected" });
         }
 
         return dappletResult;
@@ -171,15 +173,15 @@ export default class Core {
         return conn;
     }
 
-    public wallet<M>(cfg?: { }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
+    public wallet<M>(cfg?: {}, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
         const me = this;
         const transport = {
             _txCount: 0,
             _handler: null,
-            exec: (dappletId: string, ctx: any) => {
-                const id = ++transport._txCount;
-                me._sendWalletConnectTx(dappletId, ctx, (e) => transport._handler(id, e));
-                return new Promise((resolve, reject) => resolve(id));
+            exec: (sowaId: string, ctx: any) => {
+                const id = (++transport._txCount).toString();
+                me._sendWalletConnectTx(sowaId, ctx, (e) => transport._handler(id, e));
+                return Promise.resolve(id);
             },
             onMessage: (handler: (topic: string, message: any) => void) => {
                 transport._handler = handler;

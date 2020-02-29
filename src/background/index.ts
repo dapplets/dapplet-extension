@@ -6,7 +6,6 @@ import FeatureService from './services/featureService';
 import GlobalConfigService from './services/globalConfigService';
 import * as EventService from './services/eventService';
 import * as extension from 'extensionizer';
-import { GlobalEventBusService } from "./services/globalEventBusService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -14,20 +13,20 @@ import { GlobalEventBusService } from "./services/globalEventBusService";
 
 const featureService = new FeatureService();
 const globalConfigService = new GlobalConfigService();
-const globalEventBusService = new GlobalEventBusService();
 
 extension.runtime.onMessage.addListener(
   setupMessageListener({
     // WalletConnectService
-    loadDapplet: WalletConnectService.loadDapplet,
+    loadSowa: WalletConnectService.loadSowa,
     generateUri: WalletConnectService.generateUri,
     checkConnection: WalletConnectService.checkConnection,
     waitPairing: WalletConnectService.waitPairing,
     disconnect: WalletConnectService.disconnect,
     getAccounts: WalletConnectService.getAccounts,
     getChainId: WalletConnectService.getChainId,
-    loadDappletFrames: WalletConnectService.loadDappletFrames,
+    loadSowaFrames: WalletConnectService.loadSowaFrames,
     sendLegacyTransaction: WalletConnectService.sendLegacyTransaction,
+    getSowaTemplate: WalletConnectService.getSowaTemplate,
 
     // SuspendService
     getSuspendityByHostname: SuspendService.getSuspendityByHostname,
@@ -49,6 +48,8 @@ extension.runtime.onMessage.addListener(
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
     optimizeDependency: (name, branch, version) => featureService.optimizeDependency(name, branch, version),
     getAllDevModules: () => featureService.getAllDevModules(),
+    deployModule: (manifest, targetStorage, targetRegistry, registryKey) => featureService.deployModule(manifest, targetStorage, targetRegistry, registryKey),
+    getRegistries: () => featureService.getRegistries(),
 
     // GlobalConfigService
     getGlobalConfig: () => globalConfigService.get(),
@@ -63,7 +64,6 @@ extension.runtime.onMessage.addListener(
 
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),
-    getRegistries: () => globalConfigService.getRegistries(),
     getIntro: () => globalConfigService.getIntro(),
     setIntro: (intro) => globalConfigService.setIntro(intro)
   })
@@ -103,22 +103,6 @@ extension.commands.onCommand.addListener(cmd => {
       var activeTab = tabs[0];
       extension.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY");
     });
-  }
-});
-
-extension.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (!request) return
-
-  if (request.type === "EVENTBUS_PUBLISH") {
-    const { topic, data } = request.payload
-    globalEventBusService.publish(topic, data)
-  }
-
-  if (request.type === "EVENTBUS_SUBSCRIBE") {
-    globalEventBusService.subscribe(
-      request.payload.topic,
-      (topic, data) => extension.tabs.sendMessage(sender.tab.id, { topic, data })
-    )
   }
 });
 

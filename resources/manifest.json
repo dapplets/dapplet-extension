@@ -27,13 +27,12 @@
       "js": [
       	"inpage.js"
       ],
-      "run_at": "document_start",
-      "css" : ["styles/overlay.css"]
+      "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     "pairing.html",
-    "dapplet.html",
+    "sowa.html",
     "popup.html",
     "deploy.html"
   ],

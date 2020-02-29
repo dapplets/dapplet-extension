@@ -1,16 +1,15 @@
-import { Storage } from '../moduleStorages/storage';
-import { Registry } from '../registries/registry';
-import { maxSatisfying } from 'semver';
+import { maxSatisfying, rcompare } from 'semver';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 import Manifest from '../models/manifest';
 import { addEvent } from '../services/eventService';
 import { RegistryAggregator } from '../registries/registryAggregator';
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
+import { areModulesEqual } from '../../common/helpers';
 
 export default class ModuleManager {
 
-    private _registry: Registry = new RegistryAggregator();
-    private _storage: Storage = new StorageAggregator();
+    public registryAggregator = new RegistryAggregator();
+    private _storage = new StorageAggregator();
 
     public async resolveDependencies(modules: { name: string, version: string, branch?: string }[]): Promise<{ name: string, version: string, branch: string }[]> {
 
@@ -27,7 +26,7 @@ export default class ModuleManager {
             const optimizedDeps = await Promise.all(moduleDeps.map(d => this.optimizeDependency(d.name, d.version, d.branch)));
 
             for (const dep of optimizedDeps) {
-                if (!dependencies.find(d => d.name == dep.name && d.version == dep.version && d.branch == dep.branch)) {
+                if (!dependencies.find(d => areModulesEqual(d, dep))) {
                     dependencies.push(dep);
                 }
             }
@@ -46,7 +45,7 @@ export default class ModuleManager {
     }
 
     public async loadManifest(name: string, branch: string, version: string): Promise<Manifest> {
-        const manifestUris = await this._registry.resolveToUri(name, branch, version);
+        const manifestUris = await this.registryAggregator.resolveToUri(name, branch, version);
         const manfiestUri = manifestUris[0]; // ToDo: select uri
         const manifestBufferArray = await this._storage.getResource(manfiestUri);
         const manifestJson = new TextDecoder("utf-8").decode(new Uint8Array(manifestBufferArray));
@@ -108,7 +107,7 @@ export default class ModuleManager {
         const prefix = '>='; // https://devhints.io/semver
         const range = prefix + version;
 
-        const allVersions = await this._registry.getVersions(name, branch);
+        const allVersions = await this.registryAggregator.getVersions(name, branch);
         const optimizedVersion = maxSatisfying(allVersions, range);
 
         // ToDo: catch null in optimizedVersion
@@ -126,7 +125,7 @@ export default class ModuleManager {
 
     public async getFeaturesByHostnames(hostnames: string[]): Promise<{ [hostname: string]: Manifest[] }> {
         if (!hostnames || hostnames.length === 0) return {};
-        const hostnameFeatures = await this._registry.getFeatures(hostnames); // result.hostname.featureName[branchIndex]
+        const hostnameFeatures = await this.registryAggregator.getFeatures(hostnames); // result.hostname.featureName[branchIndex]
         const hostnameManifests: { [hostname: string]: Manifest[] } = {};
 
         for (const hostname in hostnameFeatures) {
@@ -135,8 +134,8 @@ export default class ModuleManager {
             for (const name in features) {
                 const branches = features[name];
                 const branch = branches[0]; // ToDo: select branch
-                const versions = await this._registry.getVersions(name, branch);
-                const lastVersion = versions[versions.length - 1]; // ToDo: select version
+                const versions = await this.registryAggregator.getVersions(name, branch);
+                const lastVersion = versions.sort(rcompare)[0]; // DESC sorting by semver // ToDo: select version
                 const manifest = await this.loadManifest(name, branch, lastVersion);
                 hostnameManifests[hostname].push(manifest);
             }
@@ -145,9 +144,39 @@ export default class ModuleManager {
         return hostnameManifests;
     }
 
+    // ToDo: refactor it
+    public async getFeaturesByHostnamesWithRegistries(hostnames: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: Manifest[] } }> {
+        if (!hostnames || hostnames.length === 0) return {};
+        const hostnameFeatures = await this.registryAggregator.getFeaturesWithRegistries(hostnames); // result.hostname.featureName[branchIndex]
+        const hostnameManifests: { [registryUrl: string]: { [hostname: string]: Manifest[] } } = {};
+
+        for (const registryUrl in hostnameFeatures) {
+            hostnameManifests[registryUrl] = {};
+            for (const hostname in hostnameFeatures[registryUrl]) {
+                hostnameManifests[registryUrl][hostname] = [];
+                const features = hostnameFeatures[registryUrl][hostname];
+                for (const name in features) {
+                    const branches = features[name];
+                    const branch = branches[0]; // ToDo: select branch
+                    const versions = await this.registryAggregator.getVersions(name, branch);
+                    const lastVersion = versions.sort(rcompare)[0]; // DESC sorting by semver // ToDo: select version
+                    try {
+                        const manifest = await this.loadManifest(name, branch, lastVersion);
+                        hostnameManifests[registryUrl][hostname].push(manifest);
+                    } catch (err) {
+                        // ToDo: catch it
+                    }
+                }
+            }
+        }
+
+        return hostnameManifests;
+    }
+
     public async getAllDevModules(): Promise<Manifest[]> {
-        const modules = await this._registry.getAllDevModules();
-        const manifests = await Promise.all(modules.map(m => this.loadManifest(m.name, m.branch, m.version)));
-        return manifests;
+        const modules = await this.registryAggregator.getAllDevModules();
+        const manifestsWithErrors = await Promise.all(modules.map(m => this.loadManifest(m.name, m.branch, m.version).catch(Error)));
+        const manifestsNoErrors = manifestsWithErrors.filter(x => !(x instanceof Error)) as Manifest[];
+        return manifestsNoErrors;
     }
 }

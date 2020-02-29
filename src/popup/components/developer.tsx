@@ -1,18 +1,22 @@
 import * as React from "react";
 import * as extension from 'extensionizer';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { Button, Segment, Message, List, Label, Input, Icon, Image, Header } from "semantic-ui-react";
+import { Popup, Button, Segment, Message, List, Label, Input, Icon, Image, Header } from "semantic-ui-react";
+import NOLOGO_PNG from '../../common/resources/no-logo.png';
 
 import { isValidUrl } from '../helpers';
 import Manifest from "../../background/models/manifest";
 
-interface IDeveloperProps {
-
-}
+interface IDeveloperProps { }
 
 interface IDeveloperState {
     isLoading: boolean;
-    registries: { url: string, isDev: boolean }[];
+    registries: {
+        url: string,
+        isDev: boolean,
+        isAvailable: boolean,
+        error: string
+    }[];
     registryInput: string;
     registryInputError: string;
     intro: {
@@ -45,16 +49,15 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
 
     async loadRegistries() {
         const { getRegistries, getAllDevModules } = await initBGFunctions(extension);
-        const registries = await getRegistries();
 
+        const modules = await getAllDevModules();
+        this.setState({ modules });
+
+        const registries = await getRegistries();
         this.setState({
             isLoading: false,
             registries: registries.filter(r => r.isDev === true)
         });
-
-        const modules = await getAllDevModules();
-
-        this.setState({ modules });
     }
 
     async loadIntro() {
@@ -70,6 +73,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
     }
 
     async addRegistry(url: string) {
+        this.setState({ isLoading: true });
         const { addRegistry } = await initBGFunctions(extension);
 
         try {
@@ -83,15 +87,21 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
     }
 
     async removeRegistry(url: string) {
+        this.setState({ isLoading: true });
         const { removeRegistry } = await initBGFunctions(extension);
         await removeRegistry(url);
         this.loadRegistries();
     }
 
-    async deployModule() {
+    async deployModule(moduleManifest: Manifest) {
         extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
             var activeTab = tabs[0];
-            extension.tabs.sendMessage(activeTab.id, "OPEN_DEPLOY_OVERLAY");
+            extension.tabs.sendMessage(activeTab.id, {
+                type: "OPEN_DEPLOY_OVERLAY",
+                payload: {
+                    manifest: moduleManifest
+                }
+            });
             window.close();
         });
     }
@@ -132,30 +142,38 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                     <List divided relaxed size='small'>
                         {registries.map((r, i) => (
                             <List.Item key={i}>
+                                <List.Content floated='left'>
+                                    <Popup
+                                        trigger={<Label size='mini' horizontal color={(r.isAvailable) ? 'green' : 'red'}>{(r.isAvailable) ? 'ONLINE' : (r.error) ? 'ERROR' : 'OFFLINE'}</Label>}
+                                        content={r.error || 'Ready'}
+                                        size='mini'
+                                    />
+                                </List.Content>
                                 <List.Content floated='right'>
                                     <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
                                 </List.Content>
-                                <List.Content>{r.url}</List.Content>
+                                <List.Content><a style={{color:'#000'}} onClick={() => window.open(r.url, '_blank')}>{r.url}</a></List.Content>
                             </List.Item>
                         ))}
                     </List>
 
                     <Header as='h4'>Modules</Header>
-                    <List divided relaxed verticalAlign='middle' size='small'>
-
-                        {modules.map((m, i) => (
-                            <List.Item key={i}>
-                                <Image avatar src={m.icon || '/no-logo.png'} />
-                                <List.Content>
-                                    <List.Header>{m.name}</List.Header>
-                                    {m.branch} v{m.version}
-                                </List.Content>
-                                <List.Content floated='right'>
-                                    <Button size='mini' compact color='blue' onClick={() => this.deployModule()}>Deploy</Button>
-                                </List.Content>
-                            </List.Item>
-                        ))}
-                    </List>
+                    <div style={{ maxHeight: 300, overflowY: 'scroll' }}>
+                        {(modules.length > 0) ? <List divided relaxed verticalAlign='middle' size='small'>
+                            {modules.map((m, i) => (
+                                <List.Item key={i}>
+                                    <Image avatar src={m.icon || NOLOGO_PNG} />
+                                    <List.Content>
+                                        <List.Header>{m.name}</List.Header>
+                                        {m.branch} v{m.version}
+                                    </List.Content>
+                                    <List.Content floated='right'>
+                                        <Button size='mini' compact color='blue' onClick={() => this.deployModule(m)}>Deploy</Button>
+                                    </List.Content>
+                                </List.Item>
+                            ))}
+                        </List> : (<div>No available development modules.</div>)}
+                    </div>
                 </Segment>
 
             </React.Fragment>

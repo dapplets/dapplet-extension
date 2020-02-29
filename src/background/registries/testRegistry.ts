@@ -1,31 +1,60 @@
 import { Registry } from './registry';
 
 export class TestRegistry implements Registry {
-    constructor(public endpointUrl: string) {
+    public isAvailable: boolean = true;
+    public error: string = null;
+
+    constructor(public url: string) {
         // example: https://test.dapplets.org/api/registry/dapplet-base
-        if (!endpointUrl) throw new Error("Endpoint Url is required");
+        if (!url) throw new Error("Endpoint Url is required");
     }
 
     public async getVersions(name: string, branch: string): Promise<string[]> {
-        const response = await fetch(`${this.endpointUrl}/registry/get-versions?name=${name}&branch=${branch}`);
-        const json = await response.json();
-        const versions = json.data;
-        // ToDo: SORT
-        return versions;
+        try {
+            const response = await fetch(`${this.url}/registry/get-versions?name=${name}&branch=${branch}`);
+            if (!response.ok) throw Error(response.statusText);
+            const json = await response.json();
+            const versions = json.data;
+            this.isAvailable = true;
+            this.error = null;
+            return versions;
+        } catch (err) {
+            this.isAvailable = false;
+            this.error = err.message;
+            throw err;
+        }
     }
 
     public async resolveToUri(name: string, branch: string, version: string): Promise<string[]> {
-        const response = await fetch(`${this.endpointUrl}/registry/resolve-to-uri?name=${name}&branch=${branch}&version=${version}`);
-        const json = await response.json();
-        const uris = json.data;
-        return uris;
+        try {
+            const response = await fetch(`${this.url}/registry/resolve-to-uri?name=${name}&branch=${branch}&version=${version}`);
+            if (!response.ok) throw Error(response.statusText);
+            const json = await response.json();
+            const uris = json.data;
+            this.isAvailable = true;
+            this.error = null;
+            return uris;
+        } catch (err) {
+            this.isAvailable = false;
+            this.error = err.message;
+            throw err;
+        }
     }
 
     public async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
-        const response = await fetch(`${this.endpointUrl}/registry/get-features?${hostnames.map(h => `hostname=${h}`).join('&')}`);
-        const json = await response.json();
-        const features = json.data;
-        return features;
+        try {
+            const response = await fetch(`${this.url}/registry/get-features?${hostnames.map(h => `hostname=${h}`).join('&')}`);
+            if (!response.ok) throw Error(response.statusText);
+            const json = await response.json();
+            const features = json.data;
+            this.isAvailable = true;
+            this.error = null;
+            return features;
+        } catch (err) {
+            this.isAvailable = false;
+            this.error = err.message;
+            throw err;
+        }
     }
 
     public async getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]> {

@@ -3,16 +3,19 @@ import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 
 export class DevRegistry implements Registry {
 
-    constructor(public registryUrl: string) {
-        if (!registryUrl) throw new Error("Config Url is required");
-    }
+    private _rootUrl: string;
+    public isAvailable: boolean = true;
+    public error: string = null;
 
     private _devConfig: {
         hostnames: { [hostname: string]: { [name: string]: string } },
         modules: { [name: string]: { [branch: string]: string } }
     } = null;
 
-    private _rootUrl: string = null;
+    constructor(public url: string) {
+        if (!url) throw new Error("Config Url is required");
+        this._rootUrl = new URL(this.url).origin;
+    }
 
     public async getVersions(name: string, branch: string): Promise<string[]> {
         await this._cacheDevConfig();
@@ -74,16 +77,17 @@ export class DevRegistry implements Registry {
     }
 
     private async _cacheDevConfig() {
-        if (this._devConfig == null || this._rootUrl == null) {
-            this._rootUrl = new URL(this.registryUrl).origin;
-
-            const response = await fetch(this.registryUrl, { cache: 'no-store' });
-            if (!response.ok) {
-                throw new Error("Cannot load dev config");
+        //if (this.isAvailable && !this._devConfig) {
+            try {
+                const response = await fetch(this.url, { cache: 'no-store' });
+                if (!response.ok) throw new Error(response.statusText);
+                this._devConfig = await response.json();
+                this.isAvailable = true;
+                this.error = null;
+            } catch (err) {
+                this.isAvailable = false;
+                this.error = err.message;
             }
-            const text = await response.text();
-
-            this._devConfig = JSON.parse(text);
-        }
+        //}
     }
 }

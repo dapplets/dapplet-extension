@@ -7,6 +7,7 @@ import * as extension from 'extensionizer';
 import { IResolver, IContentAdapter, IFeature } from './types';
 import Manifest from "../background/models/manifest";
 import ManifestDTO from "../background/dto/manifestDTO";
+import { areModulesEqual } from "../common/helpers";
 
 export class Injector {
     public availableContextIds: string[] = [];
@@ -29,9 +30,7 @@ export class Injector {
         const { getModulesWithDeps } = await initBGFunctions(extension);
         const loadedModules: { manifest: Manifest, script: string }[] = await getModulesWithDeps(modules);
         const orderedModules = loadedModules.map((l) => {
-            const m = modules.find(m => m.name === l.manifest.name &&
-                m.branch === l.manifest.branch &&
-                m.version === l.manifest.version);
+            const m = modules.find(m => areModulesEqual(m, l.manifest));
             return ({
                 ...l,
                 order: m?.order,
@@ -51,7 +50,10 @@ export class Injector {
 
         // feature attaching
         for (let i = 0; i < this.registry.length; i++) {
-            if (this.registry[i].manifest.type === ModuleTypes.Feature) {
+            const isFeature = this.registry[i].manifest.type === ModuleTypes.Feature;
+            const isNeedToActivate = !!modules.find(m => areModulesEqual(m, this.registry[i].manifest));
+
+            if (isFeature && isNeedToActivate) {
                 const feature: IFeature = this.registry[i].instance;
                 feature.orderIndex = this.registry[i].order;
                 // ToDo: fix context ids adding
@@ -65,11 +67,7 @@ export class Injector {
     }
 
     public async unloadModules(modules: { name: string, branch: string, version: string }[]) {
-        modules.map(m => this.registry.find(r =>
-            m.name === r.manifest.name &&
-            m.branch === r.manifest.branch &&
-            m.version === r.manifest.version
-        )).forEach(m => {
+        modules.map(m => this.registry.find(r => areModulesEqual(m, r.manifest))).forEach(m => {
             if (!m) return;
             m.instance.deactivate();
             console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} was unloaded.`);
@@ -83,7 +81,7 @@ export class Injector {
 
         for (const { manifest, script, order, contextIds } of modules) {
             // Module is loaded already
-            const registeredModule = this.registry.find(m => m.manifest.name == manifest.name && m.manifest.branch == manifest.branch && m.manifest.version == manifest.version);
+            const registeredModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
             if (registeredModule) {
                 if (contextIds) {
                     if (registeredModule.contextIds) {
@@ -98,8 +96,6 @@ export class Injector {
             // ToDo: elemenate the boilerplate
             const coreWrapper = {
                 overlayManager: core.overlayManager,
-                publish: core.publish,
-                subscribe: core.subscribe,
                 waitPairingOverlay: core.waitPairingOverlay,
                 contextStarted: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), true),
                 contextFinished: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), false),
@@ -128,7 +124,7 @@ export class Injector {
             } else {
                 // ToDo: describe it
                 const injectableDecorator = (constructor: Function) => {
-                    if (!this.registry.find(m => m.manifest.name == manifest.name && m.manifest.branch == manifest.branch && m.manifest.version == manifest.version)) {
+                    if (!this.registry.find(m => areModulesEqual(m.manifest, manifest))) {
                         this.registry.push({
                             manifest: manifest,
                             clazz: constructor,
@@ -146,7 +142,7 @@ export class Injector {
                         // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
                         const versions = this.registry.filter(m => m.manifest.name == name).map(m => m.manifest.version);
                         const dependency = manifest.dependencies[name];
-                        
+
                         // ToDo: check `dependency` for undefined
                         // ToDo: Should be moved to the background? 
                         // ToDo: Fetch prefix from global settings.
@@ -182,7 +178,7 @@ export class Injector {
             });
         }
 
-        extension.extension.sendMessage({
+        extension.runtime.sendMessage({
             type: isActive ? "CONTEXT_STARTED" : "CONTEXT_FINISHED",
             payload: { contextIds }
         });

@@ -7,7 +7,7 @@ module.exports = {
     background: path.join(__dirname, "src/background/index.ts"),
     inpage: path.join(__dirname, "src/inpage/index.ts"),
     pairing: path.join(__dirname, "src/pairing/index.tsx"),
-    dapplet: path.join(__dirname, "src/dapplet/index.tsx"),
+    sowa: path.join(__dirname, "src/sowa/index.tsx"),
     deploy: path.join(__dirname, "src/deploy/index.tsx")
   },
   output: {
@@ -78,8 +78,8 @@ module.exports = {
       from: "src/pairing/index.html",
       to: "pairing.html"
     }, {
-      from: "src/dapplet/index.html",
-      to: "dapplet.html"
+      from: "src/sowa/index.html",
+      to: "sowa.html"
     }, {
       from: "src/deploy/index.html",
       to: "deploy.html"

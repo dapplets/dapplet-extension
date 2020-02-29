@@ -1,6 +1,6 @@
 {
   "name": "@dapplets/dapplet-extension",
-  "version": "0.1.6",
+  "version": "0.1.14",
   "description": "Adds controls to legacy web sites.",
   "types": "./lib/index.d.ts",
   "scripts": {
@@ -9,7 +9,8 @@
     "dev": "webpack --config webpack.dev.js",
     "start": "webpack -w --config webpack.dev.js",
     "lint": "tslint 'src/**/*.{ts, tsx}'",
-    "publish": "npm publish --access public"
+    "publish": "npm publish --access public",
+    "prepublishOnly": "npm run build && npm run build:types"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.92",
@@ -69,6 +70,12 @@
   },
   "homepage": "https://github.com/dapplets/dapplet-extension#readme",
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "build/background.js",
+    "build/inpage.js",
+    "build/popup.js",
+    "build/pairing.js",
+    "build/sowa.js",
+    "build/deploy.js"
   ]
 }

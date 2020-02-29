@@ -1,6 +1,6 @@
 import WalletConnect from "@walletconnect/browser";
-import { DappletConfig } from "../types/dappletConfig";
-import { getTxBuilder } from "../utils/dapplets";
+import { SowaTemplate } from "../types/sowaTemplate";
+import { getTxBuilder } from "../../common/sowa";
 import { promiseTimeout } from "../utils/promiseTimeout";
 import GlobalConfigService from "./globalConfigService";
 import { WalletInfo } from '../../common/constants';
@@ -27,18 +27,18 @@ try {
 }
 
 /**
- * Runs Dapplet inside paired wallet and returns transaction result
+ * Runs SOWA tx inside paired wallet and returns transaction result
  * @async
- * @param {string} dappletId Dapplet ID
+ * @param {string} sowaId SOWA Template ID
  * @param {object} txMeta Metadata
  * @returns {Promise<object>} Promise represents transaction result
  */
-const loadDapplet = async (dappletId, txMeta) => {
+const loadSowa = async (sowaId, txMeta) => {
     const request = {
         jsonrpc: "2.0",
         method: "wallet_loadDapplet",
         params: [
-            dappletId,
+            sowaId,
             txMeta
         ]
     };
@@ -47,12 +47,12 @@ const loadDapplet = async (dappletId, txMeta) => {
     return result;
 };
 
-const loadDappletFrames = async (dappletId, txMeta) => {
+const loadSowaFrames = async (sowaId, txMeta) => {
     const request = {
         jsonrpc: "2.0",
         method: "wallet_loadDappletFrames",
         params: [
-            [dappletId, txMeta],
+            [sowaId, txMeta],
             ["2"]
         ]
     };
@@ -61,13 +61,12 @@ const loadDappletFrames = async (dappletId, txMeta) => {
     return result;
 };
 
-const sendLegacyTransaction = async (dappletId: string, txMeta: any) => {
-    const response = await fetch(`https://dapplets.github.io/dapplet-examples/${dappletId}.json`);
-    const dappletConfig: DappletConfig = await response.json();
+const sendLegacyTransaction = async (sowaId: string, txMeta: any) => {
+    const sowaTemplate = await getSowaTemplate(sowaId);
 
-    for (const txName in dappletConfig.transactions) {
+    for (const txName in sowaTemplate.transactions) {
         if (txName) {
-            const tx = dappletConfig.transactions[txName];
+            const tx = sowaTemplate.transactions[txName];
             const builder = getTxBuilder(tx["@type"]);
             if (builder) {
                 const builtTx = builder(tx, txMeta);
@@ -194,14 +193,21 @@ const getChainId = () => {
     return walletConnector.chainId;
 };
 
+const getSowaTemplate = async (sowaId: string) => {
+    const response = await fetch(`https://dapplets.github.io/dapplet-examples/${sowaId}.json`);
+    const dappletConfig: SowaTemplate = await response.json();
+    return dappletConfig;
+}
+
 export {
-    loadDapplet,
-    loadDappletFrames,
+    loadSowa,
+    loadSowaFrames,
     generateUri,
     checkConnection,
     waitPairing,
     disconnect,
     getAccounts,
     getChainId,
-    sendLegacyTransaction
+    sendLegacyTransaction,
+    getSowaTemplate
 };

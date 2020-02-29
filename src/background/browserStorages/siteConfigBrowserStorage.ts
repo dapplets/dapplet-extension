@@ -3,7 +3,7 @@ import SiteConfig from '../models/siteConfig'
 
 export default class SiteConfigBrowserStorage extends BaseBrowserStorage<SiteConfig> { 
     constructor() {
-        super(SiteConfig);
+        super(SiteConfig, 'SiteConfig');
     }
 
     async getById(id: string): Promise<SiteConfig> {

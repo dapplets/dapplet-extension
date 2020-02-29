@@ -2,7 +2,7 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as extension from 'extensionizer';
 
-import { Button, Image, List, Checkbox, Segment, Message, Popup } from "semantic-ui-react";
+import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Divider } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
 
 interface IFeaturesProps {
@@ -16,7 +16,9 @@ interface IFeaturesState {
   isNoInpage: boolean;
 }
 
-class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
+class Features extends React.Component<IFeaturesProps, IFeaturesState> {
+  private _isMounted: boolean = false;
+
   constructor(props) {
     super(props);
 
@@ -29,24 +31,27 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
   }
 
   async componentDidMount() {
+    this._isMounted = true;
     const { contextIds } = this.props;
     if (contextIds === undefined) {
       this.setState({ isNoInpage: true, isLoading: false });
       return;
     }
 
-    const { getFeaturesByHostnames } = await initBGFunctions(extension);
+    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(extension);
 
-    try {
-      const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
+    const registries = await getRegistries();
+    const regsWithErrors = registries.filter(r => !!r.error).length;
+    if (regsWithErrors > 0) {
+      this.setState({
+        error: `There are registries with connection problems. Please check the settings.`
+      });
+    }
+
+    const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
+    if (this._isMounted) {
       this.setState({
         features,
-        isLoading: false,
-        error: null
-      });
-    } catch {
-      this.setState({
-        error: "The registry is not available.",
         isLoading: false
       });
     }
@@ -73,6 +78,10 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
     }
   }
 
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
   refreshContextPage() {
     extension.tabs.query({
       active: true,
@@ -88,72 +97,45 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
     return (
       <React.Fragment>
         <Segment loading={isLoading} className="internalTab">
+          {(error) ? (<Message floating warning>{error}</Message>) : null}
+
           {!isNoInpage ?
-            (!error) ? ((features.length > 0) ? (
+            (features.length > 0) ? (
               <List divided relaxed>
-                {features.map(f => (
-                  <List.Item key={f.name} style={{ overflow: "hidden" }}>
+                {features.map((f, i) => (
+                  <List.Item key={i} style={{ overflow: "hidden" }}>
                     <List.Content style={{ width: 45, float: "left" }}>
-                      <div>
-                        <Popup
-                          content={<List>{f.hostnames?.map(h => <List.Item>{h}</List.Item>)}</List>}
-                          header="Related Context IDs"
-                          trigger={<Image
-                            size="mini"
-                            avatar
-                            alt={f.description}
-                            src={f.icon}
-                          />}
-                        />
-                      </div>
+                      <Popup trigger={<Image size="mini" avatar alt={f.description} src={f.icon} />}>
+                        <h4>Related Context IDs</h4>
+                        <List>{f.hostnames?.map((h, j) => <List.Item key={j}>{h}</List.Item>)}</List>
+
+                        <h4>Source registry</h4>
+                        <List>{f.sourceRegistry.url}</List>
+                      </Popup>
                     </List.Content>
-                    {false ? ( // ToDo: hasUpdate isn't implemented in DTO
-                      <List.Content style={{ float: "right", width: 60 }}>
-                        <Button
-                          primary
-                          size="mini"
-                          style={{ padding: 5, width: 55 }}
-                        >
-                          Update
-                    </Button>
-                        <Button
-                          size="mini"
-                          style={{ padding: 5, marginTop: 5, width: 55 }}
-                        >
-                          Skip
-                    </Button>
-                      </List.Content>
-                    ) : (
-                        <List.Content style={{ float: "right", width: 60 }}>
-                          <Checkbox
-                            toggle
-                            style={{ marginTop: 5 }}
-                            onChange={() =>
-                              this.handleSwitchChange(f, !f.isActive)
-                            }
-                            checked={f.isActive}
-                          />
-                        </List.Content>
-                      )}
-                    <List.Content
-                      style={{
-                        marginLeft: 45,
-                        marginRight: 60
-                      }}
-                    >
-                      <List.Header>{f.title}</List.Header>
+                    <List.Content style={{ float: "right", width: 60 }}>
+                      <Checkbox
+                        toggle
+                        style={{ marginTop: 5 }}
+                        onChange={() => this.handleSwitchChange(f, !f.isActive)}
+                        checked={f.isActive}
+                      />
+                    </List.Content>
+                    <List.Content style={{ marginLeft: 45, marginRight: 60 }} >
+                      <List.Header>
+                        {f.title}
+                        {(f.sourceRegistry.isDev) ? (<Label style={{ marginLeft: 5 }} horizontal size='mini' color='teal'>DEV</Label>) : null}
+                      </List.Header>
                       <List.Description style={{ color: "#666" }}>
-                        {f.description}
-                        <br />
-                        Author: {f.author}
-                        <br />
+                        {f.description}<br />
+                        Author: {f.author}<br />
                         Version: {f.version}
                       </List.Description>
                     </List.Content>
                   </List.Item>
                 ))}
               </List>
-            ) : (<div>No available features for current site.</div>)) : (<Message floating negative>{error}</Message>)
+            ) : (<div>No available features for current site.</div>)
             : (<div>
               No connection with context webpage.
               <br />
@@ -173,4 +155,4 @@ class FeatureList extends React.Component<IFeaturesProps, IFeaturesState> {
   }
 }
 
-export default FeatureList;
+export default Features;
