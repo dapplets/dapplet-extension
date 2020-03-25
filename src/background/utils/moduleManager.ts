@@ -47,7 +47,9 @@ export default class ModuleManager {
     public async loadManifest(name: string, branch: string, version: string): Promise<Manifest> {
         const manifestUris = await this.registryAggregator.resolveToUri(name, branch, version);
         const manfiestUri = manifestUris[0]; // ToDo: select uri
+        // ToDo: try to load a manifest from each uris
         const manifestBufferArray = await this._storage.getResource(manfiestUri);
+        // ToDo: check hash
         const manifestJson = new TextDecoder("utf-8").decode(new Uint8Array(manifestBufferArray));
         const manifest: Manifest = JSON.parse(manifestJson);
 
