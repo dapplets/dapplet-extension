@@ -142,7 +142,7 @@ export class OverlayManager {
 
         this._tabList.removeChild(tab.tabItem);
         this._contentList.removeChild(tab.contentItem);
-        
+
         this._tabsRegistry = this._tabsRegistry.filter(t => t.overlay !== overlay);
 
         if (this._activeOverlay === overlay) {
@@ -154,6 +154,10 @@ export class OverlayManager {
         if (this._tabsRegistry.length == 0) {
             this.hide();
         }
+    }
+
+    public unregisterAll() {
+        this._tabsRegistry.forEach(({ overlay }) => this.unregister(overlay));
     }
 
     public activate(overlay: Overlay) {

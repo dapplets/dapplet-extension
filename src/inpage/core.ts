@@ -12,12 +12,26 @@ export default class Core {
     private _popupOverlay: Overlay = null;
 
     constructor() {
+        const closeOverlay = () => {
+            if (this._popupOverlay == null) {
+                this._togglePopupOverlay()
+            } else {
+                this._popupOverlay.open()
+            }
+        }
+
         extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (typeof message === 'string') {
                 if (message === "OPEN_PAIRING_OVERLAY") {
                     this.waitPairingOverlay().finally(() => sendResponse());
                 } else if (message === "TOGGLE_OVERLAY") {
                     this._togglePopupOverlay();
+                    sendResponse();
+                } else if (message === "OPEN_OVERLAY") { // used by pure jslib
+                    closeOverlay();
+                    sendResponse();
+                } else if (message === "CLOSE_OVERLAY") { // used by pure jslib
+                    this.overlayManager && this.overlayManager.unregisterAll();
                     sendResponse();
                 }
             } else if (typeof message === 'object' && message.type !== undefined) {
@@ -28,16 +42,8 @@ export default class Core {
         });
 
         const swiper = new Swiper(document.body);
-        swiper.on("left", () => {
-            if (this._popupOverlay == null) {
-                this._togglePopupOverlay()
-            } else {
-                this._popupOverlay.open()
-            }
-        });
-        swiper.on("right", () => {
-            this.overlayManager.close();
-        });
+        swiper.on("left", () => closeOverlay());
+        swiper.on("right", () => this.overlayManager.close());
     }
 
     public waitPairingOverlay(): Promise<void> {
