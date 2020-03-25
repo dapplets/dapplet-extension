@@ -9,7 +9,6 @@
     "dev": "webpack --config webpack.dev.js",
     "start": "webpack -w --config webpack.dev.js",
     "lint": "tslint 'src/**/*.{ts, tsx}'",
-    "publish": "npm publish --access public",
     "prepublishOnly": "npm run build && npm run build:types"
   },
   "devDependencies": {
