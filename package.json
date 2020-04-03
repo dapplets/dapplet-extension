@@ -9,7 +9,8 @@
     "dev": "webpack --config webpack.dev.js",
     "start": "webpack -w --config webpack.dev.js",
     "lint": "tslint 'src/**/*.{ts, tsx}'",
-    "prepublishOnly": "npm run build && npm run build:types"
+    "prepublishOnly": "npm run build && npm run build:types",
+    "test": "echo \"Error: no test specified\""
   },
   "devDependencies": {
     "@types/chrome": "^0.0.92",
