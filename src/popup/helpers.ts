@@ -7,11 +7,11 @@ export const getCurrentContextIds = (): Promise<string[]> => new Promise((res, r
     }, ([currentTab]) => extension.tabs.sendMessage(currentTab.id, { "type": "CURRENT_CONTEXT_IDS" }, res));
 });
 
-export const isValidUrl = (string: string) => {
+export const isValidUrl = (input: string) => {
     try {
-        new URL(string);
+        new URL(input);
         return true;
     } catch (_) {
-        return false;
+        return input.indexOf('0x') !== -1 ? true : false;
     }
 }

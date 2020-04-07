@@ -1,6 +1,7 @@
 import { Registry } from './registry';
 import { DevRegistry } from './devRegistry';
 import { TestRegistry } from './testRegistry';
+import { EthRegistry } from './ethRegistry';
 import GlobalConfigService from '../services/globalConfigService';
 import { gt, compare } from 'semver';
 import { mergeDedupe } from '../../common/helpers';
@@ -52,7 +53,7 @@ export class RegistryAggregator {
         return merge;
     }
 
-    
+
     async getFeaturesWithRegistries(hostnames: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: { [name: string]: string[]; } } }> {
         await this._initRegistries();
         const regFeatures = await Promise.all(this.registries.map(r => r.getFeatures(hostnames).then(f => ({ [r.url]: f })).catch(Error)));
@@ -92,12 +93,12 @@ export class RegistryAggregator {
 
         // ToDo: fetch LocalConfig
         const registries = await globalConfigService.getRegistries();
-        
+
         // ToDo: optimize comparison
         if (registries.length !== this.registries.length) {
             // ToDo: Dev registries are priority
             this.registries = registries.sort((a, b) => (a.isDev === false) ? 1 : -1)
-                .map(r => r.isDev ? new DevRegistry(r.url) : new TestRegistry(r.url));
+                .map(r => r.isDev ? new DevRegistry(r.url) : ((r.url.indexOf('0x') != -1) ? new EthRegistry(r.url) : new TestRegistry(r.url)));
         }
 
         // ToDo: Add Prod Registry

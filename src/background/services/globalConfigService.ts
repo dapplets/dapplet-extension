@@ -39,12 +39,19 @@ export default class GlobalConfigService {
         const config = await this.get();
         if (config.registries.find(r => r.url === url)) return;
 
-        const response = await fetch(url);
-        if (response.ok || !isDev) { // ToDo: check prod registry correctly
+        const isEthAddress = url.indexOf('0x') !== -1;
+
+        if (!isEthAddress) {
+            const response = await fetch(url);
+            if (response.ok || !isDev) { // ToDo: check prod registry correctly
+                config.registries.push({ url, isDev });
+                await this.set(config);
+            } else {
+                throw Error('The registry is not available.');
+            }
+        } else {
             config.registries.push({ url, isDev });
             await this.set(config);
-        } else {
-            throw Error('The registry is not available.');
         }
     }
 
