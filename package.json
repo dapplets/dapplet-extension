@@ -2,9 +2,11 @@
   "name": "@dapplets/dapplet-extension",
   "version": "0.1.15",
   "description": "Adds controls to legacy web sites.",
+  "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "build": "webpack --config webpack.prod.js && tsc -d --emitDeclarationOnly",
+    "build": "webpack --config webpack.prod.js",
+    "build:jslib": "npm run build && webpack --config webpack.jslib.js && tsc -d --emitDeclarationOnly",
     "dev": "webpack --config webpack.dev.js",
     "start": "webpack -w --config webpack.dev.js",
     "lint": "tslint 'src/**/*.{ts, tsx}'",
@@ -32,8 +34,8 @@
     "tslint-react": "^4.2.0",
     "typescript": "^3.7.5",
     "url-loader": "^3.0.0",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10",
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11",
     "webpack-merge": "^4.2.2",
     "@walletconnect/browser": "^1.0.0-beta.46",
     "chrome-extension-message-wrapper": "github:dapplets/chrome-extension-message-wrapper#error-handler",
@@ -47,7 +49,8 @@
     "semantic-ui-react": "^0.88.2",
     "semver": "^6.3.0",
     "simple-mapper": "^2.2.0",
-    "styled-components": "^5.0.0"
+    "styled-components": "^5.0.0",
+    "raw-loader": "^4.0.0"
   },
   "dependencies": {},
   "directories": {
@@ -69,12 +72,6 @@
   },
   "homepage": "https://github.com/dapplets/dapplet-extension#readme",
   "files": [
-    "lib/**/*",
-    "build/background.js",
-    "build/inpage.js",
-    "build/popup.js",
-    "build/pairing.js",
-    "build/sowa.js",
-    "build/deploy.js"
+    "lib/**/*"
   ]
 }
