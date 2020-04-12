@@ -5,7 +5,7 @@
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "build": "webpack --config webpack.prod.js",
+    "build:extension": "webpack --config webpack.prod.js",
     "build:jslib": "npm run build && webpack --config webpack.jslib.js && tsc -d --emitDeclarationOnly",
     "dev": "webpack --config webpack.dev.js",
     "start": "webpack -w --config webpack.dev.js",
