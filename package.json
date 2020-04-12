@@ -6,7 +6,8 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "build:extension": "webpack --config webpack.prod.js",
-    "build:jslib": "npm run build && webpack --config webpack.jslib.js && tsc -d --emitDeclarationOnly",
+    "build:jslib": "webpack --config webpack.jslib.js && tsc -d --emitDeclarationOnly",
+    "build": "npm run build:extension && npm run build:jslib",
     "dev": "webpack --config webpack.dev.js",
     "start": "webpack -w --config webpack.dev.js",
     "lint": "tslint 'src/**/*.{ts, tsx}'",
@@ -14,20 +15,37 @@
     "clean": "rm -rf ./build && rm -rf ./lib"
   },
   "devDependencies": {
+    "@semantic-release/exec": "^5.0.0",
+    "@semantic-release/git": "^9.0.0",
     "@types/chrome": "^0.0.92",
     "@types/qr-image": "^3.2.1",
     "@types/react": "^16.9.19",
     "@types/react-dom": "^16.9.5",
     "@types/semver": "^6.2.0",
+    "@walletconnect/browser": "^1.0.0-beta.46",
+    "chrome-extension-message-wrapper": "github:dapplets/chrome-extension-message-wrapper#error-handler",
     "copy-webpack-plugin": "^5.1.1",
     "css-loader": "^3.4.2",
+    "ethers": "^4.0.43",
+    "extensionizer": "^1.0.1",
     "fibers": "^4.0.2",
     "file-loader": "^5.0.2",
     "node-sass": "^4.13.1",
+    "qr-image": "^3.2.0",
+    "raw-loader": "^4.0.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-router-dom": "^5.1.2",
     "resolve-url-loader": "^3.1.1",
     "sass": "^1.3.0",
     "sass-loader": "^8.0.2",
+    "semantic-release": "^17.0.4",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.88.2",
+    "semver": "^6.3.0",
+    "simple-mapper": "^2.2.0",
     "style-loader": "^1.1.3",
+    "styled-components": "^5.0.0",
     "ts-loader": "^6.2.1",
     "tslint": "^5.11.0",
     "tslint-config-airbnb": "^5.11.2",
@@ -36,21 +54,7 @@
     "url-loader": "^3.0.0",
     "webpack": "^4.41.6",
     "webpack-cli": "^3.3.11",
-    "webpack-merge": "^4.2.2",
-    "@walletconnect/browser": "^1.0.0-beta.46",
-    "chrome-extension-message-wrapper": "github:dapplets/chrome-extension-message-wrapper#error-handler",
-    "ethers": "^4.0.43",
-    "extensionizer": "^1.0.1",
-    "qr-image": "^3.2.0",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "react-router-dom": "^5.1.2",
-    "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^0.88.2",
-    "semver": "^6.3.0",
-    "simple-mapper": "^2.2.0",
-    "styled-components": "^5.0.0",
-    "raw-loader": "^4.0.0"
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {},
   "directories": {
@@ -73,5 +77,44 @@
   "homepage": "https://github.com/dapplets/dapplet-extension#readme",
   "files": [
     "lib/**/*"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "package.json",
+            "package-lock.json"
+          ]
+        }
+      ],
+      [
+        "@semantic-release/exec",
+        {
+          "publishCmd": "npm run build:extension"
+        }
+      ],
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            {
+              "path": "build/**",
+              "label": "Browser Extension"
+            },
+            {
+              "path": "jslib/index.min.js",
+              "label": "Pure JSLib for browser"
+            }
+          ]
+        }
+      ]
+    ]
+  }
 }
