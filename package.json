@@ -4,13 +4,12 @@
   "description": "Adds controls to legacy web sites.",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "build": "webpack --config webpack.prod.js",
-    "build:types": "tsc -d --emitDeclarationOnly",
+    "build": "webpack --config webpack.prod.js && tsc -d --emitDeclarationOnly",
     "dev": "webpack --config webpack.dev.js",
     "start": "webpack -w --config webpack.dev.js",
     "lint": "tslint 'src/**/*.{ts, tsx}'",
-    "prepublishOnly": "npm run build && npm run build:types",
-    "test": "echo \"Error: no test specified\""
+    "test": "echo \"Error: no test specified\"",
+    "clean": "rm -rf ./build && rm -rf ./lib"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.92",

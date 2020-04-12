@@ -1,5 +1,17 @@
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const package = require('./package.json');
+
+function modifyManifest(buffer) {
+  const manifest = JSON.parse(buffer.toString());
+
+  manifest.version = package.version;
+  manifest.description = package.description;
+  manifest.author = package.author;  
+
+  manifest_JSON = JSON.stringify(manifest, null, 2);
+  return manifest_JSON;
+}
 
 module.exports = {
   entry: {
@@ -48,16 +60,16 @@ module.exports = {
         test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
         loader: "url-loader",
         options: {
-            limit: 10000,
-            name: "static/[name].[hash:8].[ext]",
+          limit: 10000,
+          name: "static/[name].[hash:8].[ext]",
         },
       },
       {
-          test: [/\.eot$/, /\.ttf$/, /\.svg$/, /\.woff$/, /\.woff2$/],
-          loader: "file-loader",
-          options: {
-              name: "static/[name].[hash:8].[ext]",
-          },
+        test: [/\.eot$/, /\.ttf$/, /\.svg$/, /\.woff$/, /\.woff2$/],
+        loader: "file-loader",
+        options: {
+          name: "static/[name].[hash:8].[ext]",
+        },
       }
     ]
   },
@@ -65,24 +77,30 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js"]
   },
   plugins: [
-    new CopyWebpackPlugin(["resources", {
-      from: "src/background/index.html",
-      to: "background.html"
-    }, {
-      from: "src/popup/index.html",
-      to: "popup.html"
-    }, {
-      from: "src/options/index.html",
-      to: "options.html"
-    }, {
-      from: "src/pairing/index.html",
-      to: "pairing.html"
-    }, {
-      from: "src/sowa/index.html",
-      to: "sowa.html"
-    }, {
-      from: "src/deploy/index.html",
-      to: "deploy.html"
-    }]),
+    new CopyWebpackPlugin(["resources",
+      {
+        from: "manifest.json",
+        to: "manifest.json",
+        transform: (content, path) => modifyManifest(content)
+      },
+      {
+        from: "src/background/index.html",
+        to: "background.html"
+      }, {
+        from: "src/popup/index.html",
+        to: "popup.html"
+      }, {
+        from: "src/options/index.html",
+        to: "options.html"
+      }, {
+        from: "src/pairing/index.html",
+        to: "pairing.html"
+      }, {
+        from: "src/sowa/index.html",
+        to: "sowa.html"
+      }, {
+        from: "src/deploy/index.html",
+        to: "deploy.html"
+      }]),
   ]
 };
