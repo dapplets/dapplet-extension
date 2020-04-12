@@ -1,8 +1,5 @@
 name: CD
-on:
-  push:
-    branches:
-      - master
+on: push
 jobs:
   release:
     name: Release
