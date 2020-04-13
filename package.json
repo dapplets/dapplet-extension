@@ -2,7 +2,7 @@
   "name": "@dapplets/dapplet-extension",
   "version": "0.1.15",
   "description": "Adds controls to legacy web sites.",
-  "main": "./lib/index.js",
+  "main": "./lib/index.min.js",
   "types": "./lib/index.d.ts",
   "scripts": {
     "build:extension": "webpack --config webpack.prod.js",
@@ -97,7 +97,7 @@
       [
         "@semantic-release/exec",
         {
-          "publishCmd": "npm run build:extension"
+          "publishCmd": "npm run build:extension && zip -r build/dapplet-extension.zip build"
         }
       ],
       [
@@ -105,7 +105,7 @@
         {
           "assets": [
             {
-              "path": "build/**",
+              "path": "build/dapplet-extension.zip",
               "label": "Browser Extension"
             },
             {
