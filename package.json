@@ -98,7 +98,7 @@
       [
         "@semantic-release/exec",
         {
-          "publishCmd": "npm run build:extension && zip -r build/dapplet-extension.zip build"
+          "publishCmd": "npm run build:extension && cd build && zip -r dapplet-extension.zip *"
         }
       ],
       [
@@ -107,11 +107,11 @@
           "assets": [
             {
               "path": "build/dapplet-extension.zip",
-              "label": "Browser Extension"
+              "label": "Browser Extension (zip)"
             },
             {
-              "path": "jslib/index.min.js",
-              "label": "Pure JSLib for browser"
+              "path": "lib/index.min.js",
+              "label": "Pure JSLib for browser (js)"
             }
           ]
         }
