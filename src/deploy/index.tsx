@@ -42,6 +42,11 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             registryKey: '',
             registryOptions: [
                 {
+                    key: '0x062511bbdb5f63fd3b081cd1bfe061329a76b603',
+                    text: '0x062511bbdb5f63fd3b081cd1bfe061329a76b603',
+                    value: '0x062511bbdb5f63fd3b081cd1bfe061329a76b603'
+                },
+                {
                     key: 'https://test.dapplets.org/dapplet-base',
                     text: 'https://test.dapplets.org/dapplet-base',
                     value: 'https://test.dapplets.org/dapplet-base'
@@ -172,6 +177,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         onChange={(e) => this.setState({
                             registryKey: e.target.value
                         })}
+                        disabled={targetRegistry === '0x062511bbdb5f63fd3b081cd1bfe061329a76b603'}
                     />
 
                     <Button submit="true" primary disabled={loading || deployed}>Deploy</Button>

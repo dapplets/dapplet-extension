@@ -4,7 +4,7 @@ import { TestRegistry } from './testRegistry';
 import { EthRegistry } from './ethRegistry';
 import GlobalConfigService from '../services/globalConfigService';
 import { gt, compare } from 'semver';
-import { mergeDedupe } from '../../common/helpers';
+import { mergeDedupe, typeOfUri, UriTypes } from '../../common/helpers';
 
 export class RegistryAggregator {
     public isAvailable: boolean = true;
@@ -98,9 +98,13 @@ export class RegistryAggregator {
         if (registries.length !== this.registries.length) {
             // ToDo: Dev registries are priority
             this.registries = registries.sort((a, b) => (a.isDev === false) ? 1 : -1)
-                .map(r => r.isDev ? new DevRegistry(r.url) : ((r.url.indexOf('0x') != -1) ? new EthRegistry(r.url) : new TestRegistry(r.url)));
-        }
+                .map(r => {
+                    const uriType = typeOfUri(r.url);
 
-        // ToDo: Add Prod Registry
+                    if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
+                    if (uriType === UriTypes.Http && !r.isDev) return new TestRegistry(r.url);
+                    if (uriType === UriTypes.Ethereum) return new EthRegistry(r.url);
+                });
+        }
     }
 }

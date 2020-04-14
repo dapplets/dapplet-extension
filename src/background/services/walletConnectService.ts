@@ -199,6 +199,12 @@ const getSowaTemplate = async (sowaId: string) => {
     return dappletConfig;
 }
 
+const sendTransaction = async (txData: any) => {
+    txData.from = walletConnector.accounts[0];
+    const result = await walletConnector.sendTransaction(txData);
+    return result;
+}
+
 export {
     loadSowa,
     loadSowaFrames,
@@ -209,5 +215,6 @@ export {
     getAccounts,
     getChainId,
     sendLegacyTransaction,
-    getSowaTemplate
+    getSowaTemplate,
+    sendTransaction
 };
