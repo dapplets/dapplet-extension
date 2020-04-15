@@ -60,4 +60,13 @@ export class TestRegistry implements Registry {
     public async getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]> {
         return Promise.resolve([]);
     }
+
+    public async addModule(name: string, branch: string, version: string, uri: string, key: string): Promise<void> {
+        const response = await fetch(`${this.url}/registry/add-module?uri=${encodeURIComponent(uri)}&key=${key}`, {
+            method: 'POST'
+        });
+
+        const json = await response.json();
+        if (!json.success) throw new Error(json.message || "Error in addModuleToRegistry");
+    }
 }

@@ -12,4 +12,6 @@ export interface Registry {
     getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> // returns name + branches
 
     getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]>;
+    
+    addModule(name: string, branch: string, version: string, uri: string, key?: string): Promise<void>;
 }

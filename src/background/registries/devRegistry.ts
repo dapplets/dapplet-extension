@@ -90,4 +90,8 @@ export class DevRegistry implements Registry {
             }
         //}
     }
+
+    public async addModule(name: string, branch: string, version: string, uri: string): Promise<void> {
+        throw new Error("Development Registry doesn't support a module deployment.");
+    }
 }

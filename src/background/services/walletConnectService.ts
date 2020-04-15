@@ -216,5 +216,6 @@ export {
     getChainId,
     sendLegacyTransaction,
     getSowaTemplate,
-    sendTransaction
+    sendTransaction,
+    walletConnector
 };

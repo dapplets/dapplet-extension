@@ -107,4 +107,8 @@ export class RegistryAggregator {
                 });
         }
     }
+
+    public getRegistryByUri(uri: string): Registry {
+        return this.registries.find(f => f.url === uri);
+    } 
 }

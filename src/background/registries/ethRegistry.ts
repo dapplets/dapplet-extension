@@ -1,6 +1,7 @@
 import { Registry } from './registry';
 import abi from './ethRegistryAbi';
 import * as ethers from "ethers";
+import { WalletConnectSigner } from '../utils/walletConnectSigner';
 
 export class EthRegistry implements Registry {
     public isAvailable: boolean = true;
@@ -12,11 +13,8 @@ export class EthRegistry implements Registry {
         // example: https://test.dapplets.org/api/registry/dapplet-base
         if (!url) throw new Error("Endpoint Url is required");
 
-        // ToDo: remove API key
-        let provider = new ethers.providers.JsonRpcProvider('https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992');
-        let contract = new ethers.Contract(url, abi, provider);
-
-        this._contract = contract;
+        const signer = new WalletConnectSigner();
+        this._contract = new ethers.Contract(url, abi, signer);
     }
 
     public async getVersions(name: string, branch: string): Promise<string[]> {
@@ -76,5 +74,9 @@ export class EthRegistry implements Registry {
 
     public async getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]> {
         return Promise.resolve([]);
+    }
+
+    public async addModule(name: string, branch: string, version: string, uri: string): Promise<void> {
+        await this._contract.addModule(name, branch, version, uri);
     }
 }

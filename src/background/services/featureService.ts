@@ -6,8 +6,6 @@ import Manifest from '../models/manifest';
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
 import GlobalConfigService from './globalConfigService';
 import { areModulesEqual, typeOfUri, UriTypes } from '../../common/helpers';
-import { sendTransaction } from './walletConnectService';
-import { ethers } from 'ethers';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
@@ -137,7 +135,9 @@ export default class FeatureService {
         const manifestUrl = (targetStorage === 'test-registry') ? await saveToTestRegistry(manifestBlob, targetRegistry) : await saveToSwarm(manifestBlob);
 
         // Register manifest in Registry
-        await addModuleToRegistry(manifestUrl, targetRegistry, registryKey, defaultManifest);
+        const registry = this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry);
+        if (!registry) throw new Error("No registry with this url exists in config.");    
+        await registry.addModule(defaultManifest.name, defaultManifest.branch, defaultManifest.version, manifestUrl, registryKey);
 
         return {
             manifestUrl: manifestUrl,
@@ -147,9 +147,8 @@ export default class FeatureService {
 
     async getRegistries() {
         const configRegistries = await this._globalConfigService.getRegistries();
-        const runtimeRegistries = this._moduleManager.registryAggregator.registries;
         const result = configRegistries.map(c => {
-            const reg = runtimeRegistries.find(r => r.url === c.url);
+            const reg = this._moduleManager.registryAggregator.getRegistryByUri(c.url);
             return {
                 isAvailable: reg?.isAvailable || false,
                 error: reg?.error,
@@ -186,28 +185,4 @@ async function saveToSwarm(blob: Blob) {
     if (text.length !== 64) throw new Error("Swarm gateway returned invalid hash.");
     const url = "bzz://" + text;
     return url;
-}
-
-async function addModuleToRegistry(manifestUrl: string, targetRegistry: string, registryKey: string, manifest: Manifest) {
-    console.log('tr', targetRegistry);
-    if (typeOfUri(targetRegistry) === UriTypes.Http) {
-        const response = await fetch(`${targetRegistry}/registry/add-module?uri=${encodeURIComponent(manifestUrl)}&key=${registryKey}`, {
-            method: 'POST'
-        });
-
-        const json = await response.json();
-        if (!json.success) throw new Error(json.message || "Error in addModuleToRegistry");
-        return;
-    } else if (typeOfUri(targetRegistry) === UriTypes.Ethereum) {
-        const fnSignature = ethers.utils.hexDataSlice(ethers.utils.id('addModule(string,string,string,string)'), 0, 4);
-        const valuesData = ethers.utils.defaultAbiCoder.encode(['string', 'string', 'string', 'string'], [manifest.name, manifest.branch, manifest.version, manifestUrl]);
-        
-        const result = await sendTransaction({
-            to: targetRegistry, 
-            data: fnSignature + valuesData.substring(2),
-            value: 0
-        });
-    } else {
-        throw new Error("Unknown type of Registry");
-    }
 }
