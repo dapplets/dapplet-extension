@@ -23,7 +23,10 @@ export default class Core {
         extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (typeof message === 'string') {
                 if (message === "OPEN_PAIRING_OVERLAY") {
-                    this.waitPairingOverlay().finally(() => sendResponse());
+                    this.waitPairingOverlay()
+                        .then(() => sendResponse([null, 'ready']))
+                        .catch(() => sendResponse(['error']));
+                    return true; // return true from the event listener to indicate you wish to send a response asynchronously 
                 } else if (message === "TOGGLE_OVERLAY") {
                     this._togglePopupOverlay();
                     sendResponse();
@@ -96,6 +99,30 @@ export default class Core {
         }
     }
 
+    private async _approveSowaTransaction(sowaId, metadata): Promise<void> {
+        const me = this;
+
+        return new Promise<void>((resolve, reject) => {
+            const pairingUrl = extension.extension.getURL('sowa.html');
+            const overlay = new Overlay(me.overlayManager, pairingUrl, 'SOWA');
+            // ToDo: implement multiframe
+            overlay.open(() => overlay.send('txmeta', [sowaId, metadata]));
+            // ToDo: add timeout?
+            overlay.onMessage((topic, message) => {
+                if (topic === 'approved') {
+                    resolve();
+                    overlay.close();
+                }
+
+                if (topic === 'error') {
+                    reject();
+                    overlay.close();
+                }
+            });
+        });
+    }
+
+    // ToDo: use sendSowaTransaction method from background
     private async _sendWalletConnectTx(sowaId, metadata, callback: (e: { type: string, data?: any }) => void): Promise<any> {
         const backgroundFunctions = await initBGFunctions(extension);
         const {
@@ -110,7 +137,6 @@ export default class Core {
 
         const isConnected = await checkConnection();
 
-        const me = this;
 
         if (!isConnected) {
             callback({ type: "pairing" });
@@ -133,32 +159,10 @@ export default class Core {
         } else {
             console.log("Wallet is SOWA incompatible. Showing SOWA view...");
 
-            const waitApproving = function (): Promise<void> {
-                return new Promise<void>((resolve, reject) => {
-                    const pairingUrl = extension.extension.getURL('sowa.html');
-                    const overlay = new Overlay(me.overlayManager, pairingUrl, 'SOWA');
-                    // ToDo: implement multiframe
-                    overlay.open(() => overlay.send('txmeta', [sowaId, metadata]));
-                    // ToDo: add timeout?
-                    overlay.onMessage((topic, message) => {
-                        if (topic === 'approved') {
-                            resolve();
-                            overlay.close();
-                        }
-
-                        if (topic === 'error') {
-                            reject();
-                            overlay.close();
-                        }
-                    });
-                });
-            };
-
             try {
-                await waitApproving();
+                await this._approveSowaTransaction(sowaId, metadata);
                 dappletResult = await sendLegacyTransaction(sowaId, metadata);
             } catch (err) {
-
             }
         }
 
