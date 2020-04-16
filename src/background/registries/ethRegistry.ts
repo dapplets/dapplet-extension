@@ -22,7 +22,6 @@ export class EthRegistry implements Registry {
             const versions = await this._contract.getVersions(name, branch);
             this.isAvailable = true;
             this.error = null;
-            console.log('getVersions', versions);
             return versions;
         } catch (err) {
             this.isAvailable = false;
@@ -36,7 +35,6 @@ export class EthRegistry implements Registry {
             const uris = await this._contract.resolveToUri(name, branch, version);
             this.isAvailable = true;
             this.error = null;
-            console.log('resolveToUri', uris);
             return uris;
         } catch (err) {
             this.isAvailable = false;
@@ -49,7 +47,7 @@ export class EthRegistry implements Registry {
         try {
             const modules: string[2][] = await this._contract.getModules(hostnames[0]);
 
-            const result = { };
+            const result = {};
 
             for (const m of modules) {
                 if (!result[m[0]]) {
@@ -63,7 +61,6 @@ export class EthRegistry implements Registry {
 
             this.isAvailable = true;
             this.error = null;
-            console.log('getFeatures', result2);
             return result2;
         } catch (err) {
             this.isAvailable = false;
