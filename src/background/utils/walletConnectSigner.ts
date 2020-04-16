@@ -1,11 +1,12 @@
 import * as ethers from "ethers";
-import { walletConnector } from '../services/walletConnectService';
+import { walletConnector, sendTransaction } from '../services/walletConnectService';
 
 export class WalletConnectSigner extends ethers.Signer {
     public provider = new ethers.providers.JsonRpcProvider('https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992');
 
     getAddress(): Promise<string> {
-        return Promise.resolve(walletConnector.accounts[0]);
+        // ToDo: why does ethers.js call getAddress() when read operation is?
+        return Promise.resolve(walletConnector.accounts[0] || '0x0000000000000000000000000000000000000000');
     }
 
     signMessage(message: ethers.utils.Arrayish): Promise<string> {
@@ -16,7 +17,7 @@ export class WalletConnectSigner extends ethers.Signer {
     async sendTransaction(transaction: ethers.providers.TransactionRequest): Promise<ethers.providers.TransactionResponse> {
         transaction.from = walletConnector.accounts[0];
         const tx = await ethers.utils.resolveProperties(transaction);
-        const txHash = await walletConnector.sendTransaction(tx as any);
+        const txHash = await sendTransaction(tx as any);
         return await this.provider.getTransaction(txHash);
     }
 }
