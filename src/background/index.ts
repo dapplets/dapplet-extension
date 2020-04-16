@@ -28,6 +28,7 @@ extension.runtime.onMessage.addListener(
     sendLegacyTransaction: WalletConnectService.sendLegacyTransaction,
     getSowaTemplate: WalletConnectService.getSowaTemplate,
     pairWalletViaOverlay: WalletConnectService.pairWalletViaOverlay,
+    sendSowaTransaction: WalletConnectService.sendSowaTransaction,
 
     // SuspendService
     getSuspendityByHostname: SuspendService.getSuspendityByHostname,

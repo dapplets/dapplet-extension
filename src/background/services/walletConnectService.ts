@@ -5,6 +5,7 @@ import { promiseTimeout } from "../utils/promiseTimeout";
 import GlobalConfigService from "./globalConfigService";
 import { WalletInfo } from '../../common/constants';
 import * as extension from 'extensionizer';
+import { transactionCreated, transactionRejected } from "./notificationService";
 
 const bridge = "https://bridge.walletconnect.org";
 
@@ -223,6 +224,64 @@ const pairWalletViaOverlay = async (): Promise<void> => {
     });
 }
 
+const sendSowaTransaction = async (sowaId, metadata, callback: (e: { type: string, data?: any }) => void): Promise<any> => {
+    const isConnected = checkConnection();
+
+    if (!isConnected) {
+        callback({ type: "pairing" });
+        await pairWalletViaOverlay();
+        callback({ type: "paired" });
+    }
+
+    callback({ type: "pending" });
+
+    let dappletResult = null;
+
+    const { walletInfo } = await _globalConfigService.get();
+
+    if (walletInfo.protocolVersion === "0.2.0") {
+        console.log("Wallet is SOWA Frames compatible. Sending SOWA Frames transaction...");
+        dappletResult = await loadSowaFrames(sowaId, metadata);
+    } else if (walletInfo.protocolVersion === "0.1.0") {
+        console.log("Wallet is SOWA compatible. Sending SOWA transaction...");
+        dappletResult = await loadSowa(sowaId, metadata);
+    } else {
+        console.log("Wallet is SOWA incompatible. Showing SOWA view...");
+
+        try {
+            await approveSowaTxViaOverlay();
+            dappletResult = await sendLegacyTransaction(sowaId, metadata);
+        } catch (err) {
+
+        }
+    }
+
+    if (dappletResult) {
+        transactionCreated(dappletResult);
+        callback({ type: "created", data: dappletResult });
+    } else {
+        transactionRejected();
+        callback({ type: "rejected" });
+    }
+
+    return dappletResult;
+}
+
+const approveSowaTxViaOverlay = async (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+            var activeTab = tabs[0];
+            extension.tabs.sendMessage(activeTab.id, "APPROVE_SOWA_TRANSACTION", ([error, result]) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+    });
+}
+
 export {
     loadSowa,
     loadSowaFrames,
@@ -236,5 +295,6 @@ export {
     sendLegacyTransaction,
     getSowaTemplate,
     sendTransaction,
-    walletConnector
+    walletConnector,
+    sendSowaTransaction
 };
