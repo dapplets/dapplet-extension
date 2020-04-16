@@ -40,6 +40,12 @@ export default class Core {
             } else if (typeof message === 'object' && message.type !== undefined) {
                 if (message.type === 'OPEN_DEPLOY_OVERLAY') {
                     this.waitDeployOverlay(message.payload).finally(() => sendResponse());
+                    return true;
+                } else if (message.type === 'APPROVE_SOWA_TRANSACTION') {
+                    this._approveSowaTransaction(message.payload.sowaId, message.payload.metadata)
+                        .then(() => sendResponse([null, 'approved']))
+                        .catch(() => sendResponse(['error']));
+                    return true;
                 }
             }
         });

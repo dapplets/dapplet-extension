@@ -4,6 +4,7 @@ import { getTxBuilder } from "../../common/sowa";
 import { promiseTimeout } from "../utils/promiseTimeout";
 import GlobalConfigService from "./globalConfigService";
 import { WalletInfo } from '../../common/constants';
+import * as extension from 'extensionizer';
 
 const bridge = "https://bridge.walletconnect.org";
 
@@ -112,7 +113,7 @@ const _getWalletInfo = async (): Promise<WalletInfo> => {
             if (!result) continue;
 
             return request.transform(result);
-        } catch {}
+        } catch { }
     }
 
     return {
@@ -161,7 +162,7 @@ const checkConnection = () => {
  */
 const waitPairing = async () => {
     const result: any = await _waitWCPairing();
-    
+
     if (result) {
         const config = await _globalConfigService.get();
         config.walletInfo = await _getWalletInfo();
@@ -199,10 +200,27 @@ const getSowaTemplate = async (sowaId: string) => {
     return dappletConfig;
 }
 
-const sendTransaction = async (txData: any) => {
-    txData.from = walletConnector.accounts[0];
-    const result = await walletConnector.sendTransaction(txData);
-    return result;
+const sendTransaction = async (tx: any): Promise<any> => {
+    const isConnected = checkConnection();
+    if (!isConnected) {
+        await pairWalletViaOverlay();
+    }
+    return await walletConnector.sendTransaction(tx);
+}
+
+const pairWalletViaOverlay = async (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+            var activeTab = tabs[0];
+            extension.tabs.sendMessage(activeTab.id, "OPEN_PAIRING_OVERLAY", ([error, result]) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+    });
 }
 
 export {
@@ -214,6 +232,7 @@ export {
     disconnect,
     getAccounts,
     getChainId,
+    pairWalletViaOverlay,
     sendLegacyTransaction,
     getSowaTemplate,
     sendTransaction,

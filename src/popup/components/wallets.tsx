@@ -46,18 +46,15 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
   }
 
   async disconnectButtonClick() {
-    var backgroundFunctions = await initBGFunctions(extension);
-    const { disconnect } = backgroundFunctions;
+    const { disconnect } = await initBGFunctions(extension);
     await disconnect();
     await this.componentDidMount();
   }
 
   async connectWallet() {
-    extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-      var activeTab = tabs[0];
-      extension.tabs.sendMessage(activeTab.id, "OPEN_PAIRING_OVERLAY");
-      window.close();
-    });
+    const { pairWalletViaOverlay } = await initBGFunctions(extension);
+    pairWalletViaOverlay();
+    window.close();
   }
 
   render() {
