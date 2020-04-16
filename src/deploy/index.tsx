@@ -36,7 +36,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.state = {
             manifest: null,
             loading: true,
-            targetRegistry: 'https://test.dapplets.org/dapplet-base',
+            targetRegistry: null,
             targetStorage: 'swarm',
             message: null,
             registryKey: '',
@@ -57,6 +57,17 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
         this.bus.subscribe('data', ({ manifest }) => {
             this.setState({ manifest, loading: false });
+        });
+    }
+
+    async componentDidMount() {
+        const { getRegistries } = await initBGFunctions(extension);
+        const registries = await getRegistries();
+        this.setState({ 
+            registryOptions: registries.map(r => ({
+                key: r.url, text: r.url, value: r.url
+            })),
+            targetRegistry: registries[0]?.url || null
         });
     }
 
@@ -170,14 +181,13 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     />
 
                     <Form.Input
-                        required
+                        //required
                         label="Access Key"
                         placeholder="Access Key"
                         value={registryKey}
                         onChange={(e) => this.setState({
                             registryKey: e.target.value
                         })}
-                        disabled={targetRegistry === '0x062511bbdb5f63fd3b081cd1bfe061329a76b603'}
                     />
 
                     <Button submit="true" primary disabled={loading || deployed}>Deploy</Button>
