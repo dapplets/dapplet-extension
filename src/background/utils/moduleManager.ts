@@ -138,6 +138,7 @@ export default class ModuleManager {
                 const branch = branches[0]; // ToDo: select branch
                 const versions = await this.registryAggregator.getVersions(name, branch);
                 const lastVersion = versions.sort(rcompare)[0]; // DESC sorting by semver // ToDo: select version
+                if (!lastVersion) continue;
                 const manifest = await this.loadManifest(name, branch, lastVersion);
                 hostnameManifests[hostname].push(manifest);
             }
@@ -162,6 +163,7 @@ export default class ModuleManager {
                     const branch = branches[0]; // ToDo: select branch
                     const versions = await this.registryAggregator.getVersions(name, branch);
                     const lastVersion = versions.sort(rcompare)[0]; // DESC sorting by semver // ToDo: select version
+                    if (!lastVersion) continue;
                     try {
                         const manifest = await this.loadManifest(name, branch, lastVersion);
                         hostnameManifests[registryUrl][hostname].push(manifest);

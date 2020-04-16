@@ -45,19 +45,15 @@ export class EthRegistry implements Registry {
 
     public async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
         try {
-            const modules: string[2][] = await this._contract.getModules(hostnames[0]);
-
+            const modules: string[] = await this._contract.getModules(hostnames[0]);
             const result = {};
-
             for (const m of modules) {
-                if (!result[m[0]]) {
-                    result[m[0]] = [];
-                }
-
-                result[m[0]].push(m[1]);
+                result[m] = ['default'];
             }
 
-            const result2 = { [hostnames[0]]: result };
+            const result2 = {
+                [hostnames[0]]: result
+            };
 
             this.isAvailable = true;
             this.error = null;

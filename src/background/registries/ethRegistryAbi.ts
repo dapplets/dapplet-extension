@@ -1,5 +1,36 @@
 export default [
     {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "indexed": true,
+                "internalType": "string",
+                "name": "branch",
+                "type": "string"
+            },
+            {
+                "indexed": true,
+                "internalType": "string",
+                "name": "version",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "uri",
+                "type": "string"
+            }
+        ],
+        "name": "ModuleAdded",
+        "type": "event"
+    },
+    {
         "constant": true,
         "inputs": [
             {
@@ -68,9 +99,9 @@ export default [
         "name": "getModules",
         "outputs": [
             {
-                "internalType": "string[2][]",
+                "internalType": "string[]",
                 "name": "",
-                "type": "string[2][]"
+                "type": "string[]"
             }
         ],
         "payable": false,
@@ -111,13 +142,45 @@ export default [
         "constant": false,
         "inputs": [
             {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-            },
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "branch",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "version",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "uri",
+                        "type": "string"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.AddModuleInput[]",
+                "name": "modules",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "addModules",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
             {
                 "internalType": "string",
-                "name": "branch",
+                "name": "name",
                 "type": "string"
             },
             {
@@ -136,13 +199,35 @@ export default [
         "constant": false,
         "inputs": [
             {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-            },
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "location",
+                        "type": "string"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.AddLocationInput[]",
+                "name": "locations",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "addLocations",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
             {
                 "internalType": "string",
-                "name": "branch",
+                "name": "name",
                 "type": "string"
             },
             {
@@ -155,6 +240,32 @@ export default [
         "outputs": [],
         "payable": false,
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "a",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "b",
+                "type": "string"
+            }
+        ],
+        "name": "areEqual",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "pure",
         "type": "function"
     }
 ]
