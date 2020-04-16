@@ -70,6 +70,16 @@ export class EthRegistry implements Registry {
     }
 
     public async addModule(name: string, branch: string, version: string, uri: string): Promise<void> {
-        await this._contract.addModule(name, branch, version, uri);
+        const tx = await this._contract.addModule(name, branch, version, uri);
+
+        await new Promise((resolve, reject) => {
+            this._contract.on("ModuleAdded", (name, branch, verison, uri, event) => {
+                if (event.transactionHash === tx.hash) {
+                    resolve();
+                }
+            });
+        });
+
+        // await tx.wait();
     }
 }
