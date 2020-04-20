@@ -3,19 +3,19 @@ export default [
         "anonymous": false,
         "inputs": [
             {
-                "indexed": true,
+                "indexed": false,
                 "internalType": "string",
                 "name": "name",
                 "type": "string"
             },
             {
-                "indexed": true,
+                "indexed": false,
                 "internalType": "string",
                 "name": "branch",
                 "type": "string"
             },
             {
-                "indexed": true,
+                "indexed": false,
                 "internalType": "string",
                 "name": "version",
                 "type": "string"
