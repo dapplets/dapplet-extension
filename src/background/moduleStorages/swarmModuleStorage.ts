@@ -15,6 +15,7 @@ export class SwarmModuleStorage implements ModuleStorage {
         const buffer = await response.arrayBuffer();
         const keccak = ethers.utils.keccak256(new Uint8Array(buffer)).substring(2);
         
+        // ToDo: move this checking to moduleStorage.ts
         if (!!expectedHash) {
             if (keccak !== expectedHash) {
                 console.error(`Hash is not valid. URL: ${uri}, expected: ${expectedHash}, recieved: ${keccak}`);
