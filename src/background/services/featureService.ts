@@ -7,6 +7,7 @@ import { StorageAggregator } from '../moduleStorages/moduleStorage';
 import GlobalConfigService from './globalConfigService';
 import { areModulesEqual, typeOfUri, UriTypes } from '../../common/helpers';
 import * as ethers from 'ethers';
+import { HashUris } from '../registries/registry';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
@@ -123,7 +124,7 @@ export default class FeatureService {
         // ToDo: check everething before publishing
 
         // Dist file publishing
-        const dist = await this._storageAggregator.getResource(defaultManifest.dist);
+        const dist = await this._storageAggregator.getResource(defaultManifest.dist as HashUris);
         const distBlob = new Blob([dist], { type: "text/javascript" });
         const distUrl = (targetStorage === 'test-registry') ? await saveToTestRegistry(distBlob, targetRegistry) : await saveToSwarm(distBlob);
 
@@ -132,25 +133,26 @@ export default class FeatureService {
         const distHash = ethers.utils.keccak256(new Uint8Array(distBuffer)).substring(2);
 
         // Manifest editing
-        defaultManifest.dist = distUrl + '#' + distHash;
+        defaultManifest.dist = distHash;
 
         // Manifest publishing
         const manifestString = JSON.stringify(defaultManifest);
         const manifestBlob = new Blob([manifestString], { type: "application/json" });
         const manifestUrl = (targetStorage === 'test-registry') ? await saveToTestRegistry(manifestBlob, targetRegistry) : await saveToSwarm(manifestBlob);
-        
+
         // Manifest hashing
         const manifestBuffer = await (manifestBlob as any).arrayBuffer();
         const manifestHash = ethers.utils.keccak256(new Uint8Array(manifestBuffer)).substring(2);
 
         // Register manifest in Registry
         const registry = this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry);
-        if (!registry) throw new Error("No registry with this url exists in config.");    
-        await registry.addModule(defaultManifest.name, defaultManifest.branch, defaultManifest.version, manifestUrl + '#' + manifestHash, registryKey);
+        if (!registry) throw new Error("No registry with this url exists in config.");
+        const hashUris = [{ hash: manifestHash, uris: [manifestUrl] }, { hash: distHash, uris: [distUrl] }];
+        await registry.addModuleWithObjects(defaultManifest.name, defaultManifest.branch, defaultManifest.version, hashUris, registryKey);
 
         return {
-            manifestUrl: manifestUrl + '#' + manifestHash,
-            scriptUrl: distUrl + '#' + distHash
+            manifestUrl: manifestUrl,
+            scriptUrl: distUrl
         };
     }
 

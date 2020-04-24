@@ -1,4 +1,4 @@
-import { Registry } from './registry';
+import { Registry, HashUris } from './registry';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
 
 export class DevRegistry implements Registry {
@@ -25,17 +25,20 @@ export class DevRegistry implements Registry {
         return versions;
     }
 
-    public async resolveToUri(name: string, branch: string, version: string): Promise<string[]> {
+    public async resolveToUris(name: string, branch: string, version: string): Promise<HashUris> {
         await this._cacheDevConfig();
         const { modules } = this._devConfig;
 
         if (!modules || !modules[name] || !modules[name][branch] || !modules[name][branch][version]) {
-            return [];
+            return null;
         };
 
         const uri = new URL(this._devConfig.modules[name][branch][version], this._rootUrl).href;
 
-        return [uri];
+        return {
+            hash: null, // ToDo: implement hash
+            uris: [uri]
+        };
     }
 
     public async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
@@ -91,7 +94,11 @@ export class DevRegistry implements Registry {
         //}
     }
 
-    public async addModule(name: string, branch: string, version: string, uri: string): Promise<void> {
+    public async addModuleWithObjects(name: string, branch: string, version: string, hashUris: HashUris[]): Promise<void> {
         throw new Error("Development Registry doesn't support a module deployment.");
+    }
+
+    public async hashToUris(hash: string): Promise<HashUris> {
+        throw Error('ToDo: TestRegistry.hashToUris is not implemented.');
     }
 }

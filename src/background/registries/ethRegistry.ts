@@ -1,4 +1,4 @@
-import { Registry } from './registry';
+import { Registry, HashUris } from './registry';
 import abi from './ethRegistryAbi';
 import * as ethers from "ethers";
 import { WalletConnectSigner } from '../utils/walletConnectSigner';
@@ -30,12 +30,12 @@ export class EthRegistry implements Registry {
         }
     }
 
-    public async resolveToUri(name: string, branch: string, version: string): Promise<string[]> {
+    public async resolveToUris(name: string, branch: string, version: string): Promise<HashUris> {
         try {
-            const uris = await this._contract.resolveToUri(name, branch, version);
+            const [hash, uris] = await this._contract.resolveToUris(name, branch, version);
             this.isAvailable = true;
             this.error = null;
-            return uris;
+            return { hash, uris };
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
@@ -57,6 +57,7 @@ export class EthRegistry implements Registry {
 
             this.isAvailable = true;
             this.error = null;
+            
             return result2;
         } catch (err) {
             this.isAvailable = false;
@@ -69,11 +70,12 @@ export class EthRegistry implements Registry {
         return Promise.resolve([]);
     }
 
-    public async addModule(name: string, branch: string, version: string, uri: string): Promise<void> {
-        const tx = await this._contract.addModule(name, branch, version, uri);
+    public async addModuleWithObjects(name: string, branch: string, version: string, hashUris: HashUris[]): Promise<void> {
+        const hashUrisSingle = hashUris.map(x => ({ hash: '0x' + x.hash, uri: x.uris[0] }));
+        const tx = await this._contract.addModuleWithObjects(name, branch, version, hashUrisSingle);
 
         await new Promise((resolve, reject) => {
-            this._contract.on("ModuleAdded", (name, branch, verison, uri, event) => {
+            this._contract.on("ModuleAdded", (name, branch, verison, manifestHash, event) => {
                 if (event.transactionHash === tx.hash) {
                     resolve();
                 }
@@ -81,5 +83,18 @@ export class EthRegistry implements Registry {
         });
 
         // await tx.wait();
+    }
+
+    public async hashToUris(hash: string): Promise<HashUris> {
+        try {
+            const uris = await this._contract.hashToUris('0x' + hash);
+            this.isAvailable = true;
+            this.error = null;
+            return { hash, uris };
+        } catch (err) {
+            this.isAvailable = false;
+            this.error = err.message;
+            throw err;
+        }
     }
 }

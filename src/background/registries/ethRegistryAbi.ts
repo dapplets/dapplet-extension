@@ -22,16 +22,80 @@ export default [
             },
             {
                 "indexed": false,
-                "internalType": "string",
-                "name": "uri",
-                "type": "string"
+                "internalType": "bytes32",
+                "name": "manifestHash",
+                "type": "bytes32"
             }
         ],
         "name": "ModuleAdded",
         "type": "event"
     },
     {
-        "constant": true,
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "name": "infoByName",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "modulesByLocation",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "name": "urisByHash",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
         "inputs": [
             {
                 "internalType": "string",
@@ -52,12 +116,11 @@ export default [
                 "type": "string[]"
             }
         ],
-        "payable": false,
         "stateMutability": "view",
-        "type": "function"
+        "type": "function",
+        "constant": true
     },
     {
-        "constant": true,
         "inputs": [
             {
                 "internalType": "string",
@@ -75,41 +138,24 @@ export default [
                 "type": "string"
             }
         ],
-        "name": "resolveToUri",
+        "name": "resolveToUris",
         "outputs": [
             {
+                "internalType": "bytes32",
+                "name": "hash",
+                "type": "bytes32"
+            },
+            {
                 "internalType": "string[]",
-                "name": "",
+                "name": "uris",
                 "type": "string[]"
             }
         ],
-        "payable": false,
         "stateMutability": "view",
-        "type": "function"
+        "type": "function",
+        "constant": true
     },
     {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "location",
-                "type": "string"
-            }
-        ],
-        "name": "getModules",
-        "outputs": [
-            {
-                "internalType": "string[]",
-                "name": "",
-                "type": "string[]"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": false,
         "inputs": [
             {
                 "internalType": "string",
@@ -127,19 +173,29 @@ export default [
                 "type": "string"
             },
             {
-                "internalType": "string",
-                "name": "uri",
-                "type": "string"
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "hash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "uri",
+                        "type": "string"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.HashUri[]",
+                "name": "hashUris",
+                "type": "tuple[]"
             }
         ],
-        "name": "addModule",
+        "name": "addModuleWithObjects",
         "outputs": [],
-        "payable": false,
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "constant": false,
         "inputs": [
             {
                 "components": [
@@ -159,24 +215,34 @@ export default [
                         "type": "string"
                     },
                     {
-                        "internalType": "string",
-                        "name": "uri",
-                        "type": "string"
+                        "components": [
+                            {
+                                "internalType": "bytes32",
+                                "name": "hash",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "uri",
+                                "type": "string"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.HashUri[]",
+                        "name": "hashUris",
+                        "type": "tuple[]"
                     }
                 ],
-                "internalType": "struct DappletRegistry.AddModuleInput[]",
-                "name": "modules",
+                "internalType": "struct DappletRegistry.AddModulesWithObjectsInput[]",
+                "name": "input",
                 "type": "tuple[]"
             }
         ],
-        "name": "addModules",
+        "name": "addModulesWithObjects",
         "outputs": [],
-        "payable": false,
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "constant": false,
         "inputs": [
             {
                 "internalType": "string",
@@ -185,18 +251,26 @@ export default [
             },
             {
                 "internalType": "string",
-                "name": "location",
+                "name": "branch",
                 "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "version",
+                "type": "string"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "manifestHash",
+                "type": "bytes32"
             }
         ],
-        "name": "addLocation",
+        "name": "addModule",
         "outputs": [],
-        "payable": false,
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "constant": false,
         "inputs": [
             {
                 "components": [
@@ -207,27 +281,55 @@ export default [
                     },
                     {
                         "internalType": "string",
-                        "name": "location",
+                        "name": "branch",
                         "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "version",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "manifestHash",
+                        "type": "bytes32"
                     }
                 ],
-                "internalType": "struct DappletRegistry.AddLocationInput[]",
-                "name": "locations",
+                "internalType": "struct DappletRegistry.AddModulesInput[]",
+                "name": "input",
                 "type": "tuple[]"
             }
         ],
-        "name": "addLocations",
+        "name": "addModules",
         "outputs": [],
-        "payable": false,
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "constant": false,
         "inputs": [
             {
                 "internalType": "string",
-                "name": "name",
+                "name": "location",
+                "type": "string"
+            }
+        ],
+        "name": "getModules",
+        "outputs": [
+            {
+                "internalType": "string[]",
+                "name": "",
+                "type": "string[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "moduleName",
                 "type": "string"
             },
             {
@@ -236,14 +338,121 @@ export default [
                 "type": "string"
             }
         ],
-        "name": "removeLocation",
+        "name": "addLocation",
         "outputs": [],
-        "payable": false,
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "constant": true,
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "moduleName",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "location",
+                        "type": "string"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.AddLocationsInput[]",
+                "name": "input",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "addLocations",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "location",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "moduleNameIndex",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "moduleName",
+                "type": "string"
+            }
+        ],
+        "name": "removeLocation",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "hash",
+                "type": "bytes32"
+            }
+        ],
+        "name": "hashToUris",
+        "outputs": [
+            {
+                "internalType": "string[]",
+                "name": "",
+                "type": "string[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "hash",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "string",
+                "name": "uri",
+                "type": "string"
+            }
+        ],
+        "name": "addHashUri",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "hash",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint256",
+                "name": "uriIndex",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "uri",
+                "type": "string"
+            }
+        ],
+        "name": "removeHashUri",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "string",
@@ -264,8 +473,8 @@ export default [
                 "type": "bool"
             }
         ],
-        "payable": false,
         "stateMutability": "pure",
-        "type": "function"
+        "type": "function",
+        "constant": true
     }
 ]

@@ -40,18 +40,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             targetStorage: 'swarm',
             message: null,
             registryKey: '',
-            registryOptions: [
-                {
-                    key: '0x062511bbdb5f63fd3b081cd1bfe061329a76b603',
-                    text: '0x062511bbdb5f63fd3b081cd1bfe061329a76b603',
-                    value: '0x062511bbdb5f63fd3b081cd1bfe061329a76b603'
-                },
-                {
-                    key: 'https://test.dapplets.org/dapplet-base',
-                    text: 'https://test.dapplets.org/dapplet-base',
-                    value: 'https://test.dapplets.org/dapplet-base'
-                }
-            ],
+            registryOptions: [],
             deployed: false
         };
 

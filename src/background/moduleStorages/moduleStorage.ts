@@ -1,22 +1,48 @@
 import { Storage } from './storage';
 import { HttpModuleStorage } from './httpModuleStorage';
 import { SwarmModuleStorage } from './swarmModuleStorage';
+import { HashUris } from '../registries/registry';
+import { ethers } from 'ethers';
 
 export class StorageAggregator {
 
-    async getResource(uri: string): Promise<ArrayBuffer> {
-        const protocol = new URL(uri).protocol;
-        const storage: Storage = this._chooseStorage(protocol);
-        const resource = await storage.getResource(uri);
-        return resource;
+    async getResource(hashUris: HashUris | string): Promise<ArrayBuffer> {
+        if (typeof hashUris === 'string') {
+            hashUris = {
+                hash: null,
+                uris: [hashUris]
+            }
+        }
+
+        for (const uri of hashUris.uris) {
+            const protocol = uri.substr(0, uri.indexOf('://'));
+            const storage = this._chooseStorage(protocol);
+            const buffer = await storage.getResource(uri);
+            const hash = ethers.utils.keccak256(new Uint8Array(buffer));
+            if (hashUris.hash !== null) {
+                if (hash.replace('0x', '') !== hashUris.hash.replace('0x', '')) {
+                    console.error(`Hash is not valid. URL: ${uri}, expected: ${hashUris.hash}, recieved: ${hash}`);
+                } else {
+                    console.log(`Successful hash checking. URL: ${uri}, expected: ${hashUris.hash}, recieved: ${hash}`);
+                    return buffer;
+                }
+            } else {
+                console.warn(`Skiped hash checking. URL: ${uri}`);
+                return buffer;
+            }
+        }
+
+        console.log('hashUris', hashUris);
+
+        throw Error("Can not fetch resource");
     }
 
     private _chooseStorage(protocol: string): Storage {
         switch (protocol) {
-            case "http:":
-            case "https:":
+            case "http":
+            case "https":
                 return new HttpModuleStorage();
-            case "bzz:":
+            case "bzz":
                 return new SwarmModuleStorage();
             default:
                 throw new Error("Unsupported protocol");

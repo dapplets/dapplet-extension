@@ -1,4 +1,4 @@
-import { Registry } from './registry';
+import { Registry, HashUris } from './registry';
 
 export class TestRegistry implements Registry {
     public isAvailable: boolean = true;
@@ -25,7 +25,7 @@ export class TestRegistry implements Registry {
         }
     }
 
-    public async resolveToUri(name: string, branch: string, version: string): Promise<string[]> {
+    public async resolveToUris(name: string, branch: string, version: string): Promise<HashUris> {
         try {
             const response = await fetch(`${this.url}/registry/resolve-to-uri?name=${name}&branch=${branch}&version=${version}`);
             if (!response.ok) throw Error(response.statusText);
@@ -33,7 +33,10 @@ export class TestRegistry implements Registry {
             const uris = json.data;
             this.isAvailable = true;
             this.error = null;
-            return uris;
+            return {
+                hash: null,
+                uris
+            };
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
@@ -61,12 +64,17 @@ export class TestRegistry implements Registry {
         return Promise.resolve([]);
     }
 
-    public async addModule(name: string, branch: string, version: string, uri: string, key: string): Promise<void> {
-        const response = await fetch(`${this.url}/registry/add-module?uri=${encodeURIComponent(uri)}&key=${key}`, {
+    public async addModuleWithObjects(name: string, branch: string, version: string, hashUris: HashUris[], key: string): Promise<void> {
+        throw Error('ToDo: fix hashUris');
+        const response = await fetch(`${this.url}/registry/add-module?uri=${encodeURIComponent('')}&key=${key}`, {
             method: 'POST'
         });
 
         const json = await response.json();
         if (!json.success) throw new Error(json.message || "Error in addModuleToRegistry");
+    }
+
+    public async hashToUris(hash: string): Promise<HashUris> {
+        throw Error('ToDo: TestRegistry.hashToUris is not implemented.');
     }
 }

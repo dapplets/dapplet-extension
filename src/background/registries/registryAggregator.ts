@@ -1,4 +1,4 @@
-import { Registry } from './registry';
+import { Registry, HashUris } from './registry';
 import { DevRegistry } from './devRegistry';
 import { TestRegistry } from './testRegistry';
 import { EthRegistry } from './ethRegistry';
@@ -21,14 +21,17 @@ export class RegistryAggregator {
         return versionsAsc;
     }
 
-    async resolveToUri(name: string, branch: string, version: string): Promise<string[]> {
+    async resolveToUris(name: string, branch: string, version: string): Promise<HashUris> {
         await this._initRegistries();
 
-        const uriWithErrors = await Promise.all(this.registries.map(r => r.resolveToUri(name, branch, version).catch(Error)));
-        const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error)) as string[][];
-        const uris = mergeDedupe(uriNoErrors);
+        const uriWithErrors = await Promise.all(this.registries.map(r => r.resolveToUris(name, branch, version).catch(Error)));
+        const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error)) as HashUris[];
+        const uris = mergeDedupe(uriNoErrors.map(x => x.uris));
 
-        return uris;
+        return {
+            hash: uriNoErrors[0]?.hash || null, // ToDo: fix it
+            uris
+        };
     }
 
     async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
@@ -86,6 +89,19 @@ export class RegistryAggregator {
         if (!validModules || validModules.length === 0) return [];
         const reduced = validModules.reduce((a, b) => a.concat(b));
         return reduced;
+    }
+
+    public async hashToUris(hash: string): Promise<HashUris> {
+        await this._initRegistries();
+
+        const uriWithErrors = await Promise.all(this.registries.map(r => r.hashToUris(hash).catch(Error)));
+        const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error)) as HashUris[];
+        const uris = mergeDedupe(uriNoErrors.map(x => x.uris));
+
+        return {
+            hash,
+            uris
+        };
     }
 
     private async _initRegistries() {
