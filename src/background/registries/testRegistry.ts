@@ -14,6 +14,7 @@ export class TestRegistry implements Registry {
             const response = await fetch(`${this.url}/registry/get-versions?name=${name}&branch=${branch}`);
             if (!response.ok) throw Error(response.statusText);
             const json = await response.json();
+            if (!json.success) throw Error(json.message);
             const versions = json.data;
             this.isAvailable = true;
             this.error = null;
@@ -30,12 +31,12 @@ export class TestRegistry implements Registry {
             const response = await fetch(`${this.url}/registry/resolve-to-uri?name=${name}&branch=${branch}&version=${version}`);
             if (!response.ok) throw Error(response.statusText);
             const json = await response.json();
-            const uris = json.data;
+            if (!json.success) throw Error(json.message);
             this.isAvailable = true;
             this.error = null;
             return {
-                hash: null,
-                uris
+                hash: json.data.hash,
+                uris: json.data.uris
             };
         } catch (err) {
             this.isAvailable = false;
@@ -49,6 +50,7 @@ export class TestRegistry implements Registry {
             const response = await fetch(`${this.url}/registry/get-features?${hostnames.map(h => `hostname=${h}`).join('&')}`);
             if (!response.ok) throw Error(response.statusText);
             const json = await response.json();
+            if (!json.success) throw Error(json.message);
             const features = json.data;
             this.isAvailable = true;
             this.error = null;
@@ -65,16 +67,32 @@ export class TestRegistry implements Registry {
     }
 
     public async addModuleWithObjects(name: string, branch: string, version: string, hashUris: HashUris[], key: string): Promise<void> {
-        throw Error('ToDo: fix hashUris');
-        const response = await fetch(`${this.url}/registry/add-module?uri=${encodeURIComponent('')}&key=${key}`, {
+        const hashUrisSingle = hashUris.map(x => ({ hash: x.hash, uri: x.uris[0] }));
+        const response = await fetch(`${this.url}/registry/add-module-with-objects?name=${name}&branch=${branch}&version=${version}&hashUris=${JSON.stringify(hashUrisSingle)}&key=${key}`, {
             method: 'POST'
         });
 
+        if (!response.ok) throw Error(response.statusText);
         const json = await response.json();
-        if (!json.success) throw new Error(json.message || "Error in addModuleToRegistry");
+        if (!json.success) throw Error(json.message);
     }
 
     public async hashToUris(hash: string): Promise<HashUris> {
-        throw Error('ToDo: TestRegistry.hashToUris is not implemented.');
+        try {
+            const response = await fetch(`${this.url}/registry/hash-to-uris?hash=${name}`);
+            if (!response.ok) throw Error(response.statusText);
+            const json = await response.json();
+            if (!json.success) throw Error(json.message);
+            this.isAvailable = true;
+            this.error = null;
+            return {
+                hash: hash,
+                uris: json.data.uris
+            };
+        } catch (err) {
+            this.isAvailable = false;
+            this.error = err.message;
+            throw err;
+        }
     }
 }
