@@ -17,3 +17,5 @@ declare module "*.svg" {
     const value: any;
     export default value;
 }
+
+declare var EXTENSION_VERSION: string;

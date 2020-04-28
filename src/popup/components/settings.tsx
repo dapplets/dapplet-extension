@@ -137,6 +137,11 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
 
                     <Header as='h4'>Advanced</Header>
                     <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} />
+
+                    <Header as='h4'>About</Header>
+                    <div>
+                        <a href='#' onClick={() => window.open(`https://github.com/dapplets/dapplet-extension/releases/tag/v${EXTENSION_VERSION}`, '_blank')}>v{EXTENSION_VERSION}</a>
+                    </div>
                 </Segment>
 
             </React.Fragment>

@@ -1,6 +1,7 @@
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const package = require('./package.json');
+const webpack = require("webpack");
 
 function modifyManifest(buffer) {
   const manifest = JSON.parse(buffer.toString());
@@ -102,5 +103,8 @@ module.exports = {
         from: "src/deploy/index.html",
         to: "deploy.html"
       }]),
+      new webpack.DefinePlugin({
+        EXTENSION_VERSION: JSON.stringify(package.version)
+      })
   ]
 };
