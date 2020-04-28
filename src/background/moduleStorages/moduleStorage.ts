@@ -32,8 +32,6 @@ export class StorageAggregator {
             }
         }
 
-        console.log('hashUris', hashUris);
-
         throw Error("Can not fetch resource");
     }
 

@@ -36,7 +36,7 @@ export class TestRegistry implements Registry {
             this.error = null;
             return {
                 hash: json.data.hash,
-                uris: json.data.uris
+                uris: json.data.uris.map(u => (u.indexOf('://') === -1) ? `${this.url}/storage/${u}` : u)
             };
         } catch (err) {
             this.isAvailable = false;
@@ -79,7 +79,7 @@ export class TestRegistry implements Registry {
 
     public async hashToUris(hash: string): Promise<HashUris> {
         try {
-            const response = await fetch(`${this.url}/registry/hash-to-uris?hash=${name}`);
+            const response = await fetch(`${this.url}/registry/hash-to-uris?hash=${hash}`);
             if (!response.ok) throw Error(response.statusText);
             const json = await response.json();
             if (!json.success) throw Error(json.message);
@@ -87,7 +87,7 @@ export class TestRegistry implements Registry {
             this.error = null;
             return {
                 hash: hash,
-                uris: json.data.uris
+                uris: json.data.map(u => (u.indexOf('://') === -1) ? `${this.url}/storage/${u}` : u)
             };
         } catch (err) {
             this.isAvailable = false;
