@@ -101,4 +101,20 @@ export class DevRegistry implements Registry {
     public async hashToUris(hash: string): Promise<HashUris> {
         throw Error('ToDo: TestRegistry.hashToUris is not implemented.');
     }
+
+    public async getOwnership(moduleName: string): Promise<string> {
+        return null;
+    }
+
+    public async transferOwnership(moduleName: string, address: string): Promise<void> {
+        return;
+    }
+
+    public async addLocation(moduleName: string, location: string) {
+        return;
+    }
+
+    public async removeLocation(moduleName: string, location: string) {
+        return;
+    }
 }

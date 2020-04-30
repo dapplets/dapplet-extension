@@ -97,4 +97,26 @@ export class EthRegistry implements Registry {
             throw err;
         }
     }
+
+    public async getOwnership(moduleName: string) {
+        const owner = await this._contract.infoByName(moduleName);
+        return owner;
+    }
+
+    public async transferOwnership(moduleName: string, address: string) {
+        const tx = await this._contract.transferOwnership(moduleName, address);
+        await tx.wait();
+    }
+
+    public async addLocation(moduleName: string, location: string) {
+        const tx = await this._contract.addLocation(moduleName, location);
+        await tx.wait();
+    }
+
+    public async removeLocation(moduleName: string, location: string) {
+        const modules: string[] = await this._contract.getModules(location);
+        const moduleNameIndex = modules.indexOf(moduleName);
+        const tx = await this._contract.removeLocation(location, moduleNameIndex, moduleName);
+        await tx.wait();
+    }
 }

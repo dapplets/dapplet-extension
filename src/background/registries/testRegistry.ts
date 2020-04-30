@@ -95,4 +95,20 @@ export class TestRegistry implements Registry {
             throw err;
         }
     }
+
+    public async getOwnership(moduleName: string): Promise<string> {
+        return null;
+    }
+
+    public async transferOwnership(moduleName: string, address: string): Promise<void> {
+        return;
+    }
+
+    public async addLocation(moduleName: string, location: string) {
+        return;
+    }
+
+    public async removeLocation(moduleName: string, location: string) {
+        return;
+    }
 }

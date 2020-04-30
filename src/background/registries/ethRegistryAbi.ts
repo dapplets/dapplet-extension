@@ -309,6 +309,24 @@ export default [
         "inputs": [
             {
                 "internalType": "string",
+                "name": "moduleName",
+                "type": "string"
+            },
+            {
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
                 "name": "location",
                 "type": "string"
             }
@@ -425,6 +443,31 @@ export default [
             }
         ],
         "name": "addHashUri",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "hash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "uri",
+                        "type": "string"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.AddHashUrisInput[]",
+                "name": "input",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "addHashUris",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

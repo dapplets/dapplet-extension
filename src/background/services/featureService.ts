@@ -169,6 +169,27 @@ export default class FeatureService {
 
         return result;
     }
+
+    public async getOwnership(registryUri: string, moduleName: string) {
+        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        const owner = await registry.getOwnership(moduleName);
+        return owner;
+    }
+
+    public async transferOwnership(registryUri: string, moduleName: string, address: string) {
+        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        await registry.transferOwnership(moduleName, address);
+    }
+
+    public async addLocation(registryUri: string, moduleName: string, location: string) {
+        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        await registry.addLocation(moduleName, location);
+    }
+
+    public async removeLocation(registryUri: string, moduleName: string, location: string) {
+        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        await registry.removeLocation(moduleName, location);
+    }
 }
 
 async function saveToTestRegistry(blob: Blob, registryUrl: string) {

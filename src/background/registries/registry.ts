@@ -21,4 +21,12 @@ export interface Registry {
     addModuleWithObjects(name: string, branch: string, version: string, hashUris: HashUris[], key?: string): Promise<void>;
 
     hashToUris(hash: string): Promise<HashUris>;
+
+    getOwnership(moduleName: string): Promise<string>;
+
+    transferOwnership(moduleName: string, address: string): Promise<void>;
+
+    addLocation(moduleName: string, location: string): Promise<void>;
+
+    removeLocation(moduleName: string, location: string): Promise<void>;
 }

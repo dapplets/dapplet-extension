@@ -130,7 +130,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                                 <List.Content floated='right'>
                                     <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
                                 </List.Content>
-                                <List.Content><a style={{color:'#000'}} onClick={() => window.open(r.url, '_blank')}>{r.url}</a></List.Content>
+                                <List.Content><a style={{color:'#000'}} onClick={() => window.open(`https://rinkeby.etherscan.io/address/${r.url}`, '_blank')}>{r.url}</a></List.Content>
                             </List.Item>
                         ))}
                     </List>
