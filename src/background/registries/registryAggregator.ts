@@ -25,7 +25,7 @@ export class RegistryAggregator {
         await this._initRegistries();
 
         const uriWithErrors = await Promise.all(this.registries.map(r => r.resolveToUris(name, branch, version).catch(Error)));
-        const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error)) as HashUris[];
+        const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error) && x !== null && x !== undefined) as HashUris[];
         const uris = mergeDedupe(uriNoErrors.map(x => x.uris));
 
         return {

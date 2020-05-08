@@ -46,11 +46,14 @@ export default class ModuleManager {
 
     public async loadManifest(name: string, branch: string, version: string): Promise<Manifest> {
         const manifestHashUris = await this.registryAggregator.resolveToUris(name, branch, version);
+
         // ToDo: try to load a manifest from each uris
         const manifestBufferArray = await this._storage.getResource(manifestHashUris);
+
         // ToDo: check hash
         const manifestJson = new TextDecoder("utf-8").decode(new Uint8Array(manifestBufferArray));
         const manifest: Manifest = JSON.parse(manifestJson);
+        // ToDo: validate manifest
 
         if (typeof manifest.dist === 'string') {
             if (manifest.dist.length === 64 || manifest.dist.length === 64 + 2) { // is it hash?
@@ -154,6 +157,7 @@ export default class ModuleManager {
     public async getFeaturesByHostnamesWithRegistries(hostnames: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: Manifest[] } }> {
         if (!hostnames || hostnames.length === 0) return {};
         const hostnameFeatures = await this.registryAggregator.getFeaturesWithRegistries(hostnames); // result.hostname.featureName[branchIndex]
+        
         const hostnameManifests: { [registryUrl: string]: { [hostname: string]: Manifest[] } } = {};
 
         for (const registryUrl in hostnameFeatures) {
@@ -167,12 +171,8 @@ export default class ModuleManager {
                     const versions = await this.registryAggregator.getVersions(name, branch);
                     const lastVersion = versions.sort(rcompare)[0]; // DESC sorting by semver // ToDo: select version
                     if (!lastVersion) continue;
-                    try {
-                        const manifest = await this.loadManifest(name, branch, lastVersion);
-                        hostnameManifests[registryUrl][hostname].push(manifest);
-                    } catch (err) {
-                        // ToDo: catch it
-                    }
+                    const manifest = await this.loadManifest(name, branch, lastVersion);
+                    hostnameManifests[registryUrl][hostname].push(manifest);
                 }
             }
         }
