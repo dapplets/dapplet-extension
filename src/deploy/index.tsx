@@ -73,11 +73,12 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     async componentDidMount() {
         const { getRegistries } = await initBGFunctions(extension);
         const registries = await getRegistries();
+        const prodRegistries = registries.filter(r => !r.isDev);
         this.setState({
-            registryOptions: registries.map(r => ({
+            registryOptions: prodRegistries.map(r => ({
                 key: r.url, text: r.url, value: r.url
             })),
-            targetRegistry: registries[0]?.url || null
+            targetRegistry: prodRegistries[0]?.url || null
         });
         await this._updateOwnership();
     }
@@ -312,7 +313,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         })}
                     />
 
-                    <Form.Input
+                    {/* <Form.Input
                         //required
                         label="Access Key"
                         placeholder="Access Key"
@@ -320,7 +321,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         onChange={(e) => this.setState({
                             registryKey: e.target.value
                         })}
-                    />
+                    /> */}
 
                     <Button submit="true" primary disabled={loading || deployed || (owner !== null && owner !== currentAccount)}>Deploy</Button>
                 </Form>
