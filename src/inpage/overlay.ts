@@ -55,6 +55,7 @@ export class Overlay implements IPubSub {
      * Removes tab from the panel.
      */
     public close() {
+        this._isFrameLoaded = false;
         this._manager.unregister(this);
     }
 

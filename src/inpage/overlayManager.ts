@@ -118,7 +118,8 @@ export class OverlayManager {
         closeBtn.addEventListener('click', (ev) => {
             ev.cancelBubble = true;
             ev.stopPropagation();
-            this.unregister(overlay);
+            //this.unregister(overlay);
+            overlay.close();
         });
         tabItem.appendChild(closeBtn);
 
