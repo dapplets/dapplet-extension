@@ -138,7 +138,8 @@ export default class Core {
             transactionRejected,
             checkConnection,
             getGlobalConfig,
-            sendLegacyTransaction
+            sendLegacyTransaction,
+            sendCustomRequest
         } = backgroundFunctions;
 
         const isConnected = await checkConnection();
@@ -156,31 +157,39 @@ export default class Core {
 
         const { walletInfo } = await getGlobalConfig();
 
-        if (walletInfo.protocolVersion === "0.2.0") {
-            console.log("Wallet is SOWA Frames compatible. Sending SOWA Frames transaction...");
-            dappletResult = await loadSowaFrames(sowaId, metadata);
-        } else if (walletInfo.protocolVersion === "0.1.0") {
-            console.log("Wallet is SOWA compatible. Sending SOWA transaction...");
-            dappletResult = await loadSowa(sowaId, metadata);
-        } else {
-            console.log("Wallet is SOWA incompatible. Showing SOWA view...");
+        const compatibleJsonRpc = ['personal_sign'];
 
-            try {
-                await this._approveSowaTransaction(sowaId, metadata);
-                dappletResult = await sendLegacyTransaction(sowaId, metadata);
-            } catch (err) {
+        if (compatibleJsonRpc.includes(sowaId)) {
+            const result = await sendCustomRequest(sowaId, metadata);
+            callback({ type: "signed", data: result });
+            return result;
+        } else {
+            if (walletInfo.protocolVersion === "0.2.0") {
+                console.log("Wallet is SOWA Frames compatible. Sending SOWA Frames transaction...");
+                dappletResult = await loadSowaFrames(sowaId, metadata);
+            } else if (walletInfo.protocolVersion === "0.1.0") {
+                console.log("Wallet is SOWA compatible. Sending SOWA transaction...");
+                dappletResult = await loadSowa(sowaId, metadata);
+            } else {
+                console.log("Wallet is SOWA incompatible. Showing SOWA view...");
+    
+                try {
+                    await this._approveSowaTransaction(sowaId, metadata);
+                    dappletResult = await sendLegacyTransaction(sowaId, metadata);
+                } catch (err) {
+                }
             }
-        }
+    
+            if (dappletResult) {
+                transactionCreated(dappletResult);
+                callback({ type: "created", data: dappletResult });
+            } else {
+                transactionRejected();
+                callback({ type: "rejected" });
+            }
 
-        if (dappletResult) {
-            transactionCreated(dappletResult);
-            callback({ type: "created", data: dappletResult });
-        } else {
-            transactionRejected();
-            callback({ type: "rejected" });
-        }
-
-        return dappletResult;
+            return dappletResult;
+        }        
     }
 
     public connect<M>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {

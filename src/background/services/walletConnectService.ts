@@ -28,6 +28,16 @@ try {
     console.error("WalletConnect initialization error", ex);
 }
 
+const sendCustomRequest = async (method: string, params: any) => {
+    const result = await walletConnector.sendCustomRequest({
+        jsonrpc: "2.0",
+        method: method,
+        params: [params, walletConnector.accounts[0]]
+    });
+
+    return result;
+};
+
 /**
  * Runs SOWA tx inside paired wallet and returns transaction result
  * @async
@@ -296,5 +306,6 @@ export {
     getSowaTemplate,
     sendTransaction,
     walletConnector,
-    sendSowaTransaction
+    sendSowaTransaction,
+    sendCustomRequest
 };
