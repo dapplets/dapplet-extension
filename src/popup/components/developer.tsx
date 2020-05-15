@@ -113,12 +113,12 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
             <React.Fragment>
                 {(intro.popupDeveloperWelcome) ? (<Message info onDismiss={() => this.closeWelcomeIntro()}>
                     <Message.Header>Welcome to Development Mode!</Message.Header>
-                    <p>Here you can connect to development servers to debug your modules, publish them to the public registry and sign using a paired wallet.</p>
+                    <p>Here you can connect to development servers to debug modules, publish them to public registries using your wallet.</p>
                 </Message>) : null}
 
                 <Segment loading={isLoading} className="internalTabDeveloper">
 
-                    <Header as='h4'>Registries</Header>
+                    <Header as='h4'>Development Servers</Header>
                     <Input
                         size='mini'
                         icon='code'

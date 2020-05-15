@@ -109,7 +109,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             color: 'blue'
                         }}
                         fluid
-                        placeholder='Public Registry URL...'
+                        placeholder='URL, ENS or 0x address...'
                         value={registryInput}
                         onChange={(e) => this.setState({ registryInput: e.target.value, registryInputError: null })}
                         error={!!registryInputError}

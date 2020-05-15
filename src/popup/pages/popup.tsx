@@ -46,7 +46,7 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
 
     const panes = [
       {
-        menuItem: "Features",
+        menuItem: "Dapplets",
         render: () => (
           <Tab.Pane attached={false} as={() => <Features contextIds={contextIds} />} />
         )
