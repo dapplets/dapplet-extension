@@ -32,7 +32,7 @@ const sendCustomRequest = async (method: string, params: any) => {
     const result = await walletConnector.sendCustomRequest({
         jsonrpc: "2.0",
         method: method,
-        params: [params, walletConnector.accounts[0]]
+        params: params
     });
 
     return result;

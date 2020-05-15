@@ -157,11 +157,11 @@ export default class Core {
 
         const { walletInfo } = await getGlobalConfig();
 
-        const compatibleJsonRpc = ['personal_sign'];
+        const compatibleJsonRpc = ['personal_sign', 'eth_accounts'];
 
         if (compatibleJsonRpc.includes(sowaId)) {
             const result = await sendCustomRequest(sowaId, metadata);
-            callback({ type: "signed", data: result });
+            callback({ type: "result", data: result });
             return result;
         } else {
             if (walletInfo.protocolVersion === "0.2.0") {
