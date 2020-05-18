@@ -157,7 +157,7 @@ export default class Core {
 
         const { walletInfo } = await getGlobalConfig();
 
-        const compatibleJsonRpc = ['personal_sign', 'eth_accounts'];
+        const compatibleJsonRpc = ['personal_sign', 'eth_accounts', 'eth_sendTransaction'];
 
         if (compatibleJsonRpc.includes(sowaId)) {
             const result = await sendCustomRequest(sowaId, metadata);
