@@ -19,16 +19,6 @@ interface ISettingsState {
     devMode: boolean;
 }
 
-const OPTIONS = [{
-    key: 'https://test.dapplets.org/dapplet-base',
-    text: 'https://test.dapplets.org/dapplet-base',
-    value: 'https://test.dapplets.org/dapplet-base'
-}, {
-    key: 'https://localhost:8080/index.json',
-    text: 'https://localhost:8080/index.json',
-    value: 'https://localhost:8080/index.json'
-}];
-
 class Settings extends React.Component<ISettingsProps, ISettingsState> {
     constructor(props) {
         super(props);
