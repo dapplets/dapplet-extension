@@ -7,6 +7,8 @@ import * as extension from 'extensionizer';
 const _siteConfigRepository = new SiteConfigBrowserStorage();
 const _globalConfigService = new GlobalConfigService();
 
+let lastExtensionIcon = null;
+
 const changeIcon = () => {
     extension.tabs.query({ active: true }, async function ([tab]) {
         const url = tab.url || tab.pendingUrl;
@@ -19,7 +21,10 @@ const changeIcon = () => {
             ? "/icons/icon-grayed16.png"
             : "/icons/icon16.png";
 
-        extension.browserAction.setIcon({ path: path });
+        if (lastExtensionIcon != path) {
+            lastExtensionIcon = path;
+            extension.browserAction.setIcon({ path: path });
+        }
     });
 };
 
