@@ -15,8 +15,8 @@ export default class FeatureService {
     private _moduleManager = new ModuleManager();
     private _storageAggregator = new StorageAggregator();
 
-    async getFeaturesByHostnames(hostnames: string[]): Promise<ManifestDTO[]> {
-        const regHostnamesManfiests = await this._moduleManager.getFeaturesByHostnamesWithRegistries(hostnames);
+    async getFeaturesByHostnames(hostnames: string[], replaceUri = false): Promise<ManifestDTO[]> {
+        const regHostnamesManfiests = await this._moduleManager.getFeaturesByHostnamesWithRegistries(hostnames, replaceUri);
         const dtos: ManifestDTO[] = [];
 
         const configRegistries = await this._globalConfigService.getRegistries();
@@ -89,7 +89,7 @@ export default class FeatureService {
     }
 
     public async getActiveModulesByHostnames(hostnames: string[]): Promise<{ name: string, branch: string, version: string, order: number, hostnames: string[] }[]> {
-        const featureNames = await this.getFeaturesByHostnames(hostnames);
+        const featureNames = await this.getFeaturesByHostnames(hostnames, true);
         const activeModules = featureNames.filter(f => f.isActive === true)
             .map(m => ({
                 name: m.name,

@@ -27,7 +27,7 @@
     "chrome-extension-message-wrapper": "github:dapplets/chrome-extension-message-wrapper#error-handler",
     "copy-webpack-plugin": "^5.1.1",
     "css-loader": "^3.5.3",
-    "ethers": "^4.0.47",
+    "ethers": "^5.0.0-beta.188",
     "extensionizer": "^1.0.1",
     "fibers": "^5.0.0",
     "file-loader": "^6.0.0",

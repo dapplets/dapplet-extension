@@ -17,6 +17,7 @@ interface IPopupProps {
 interface IPopupState {
   newEventsCount: number;
   devMode: boolean;
+  loading: boolean;
 }
 
 class Popup extends React.Component<IPopupProps, IPopupState> {
@@ -25,7 +26,8 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
 
     this.state = {
       newEventsCount: 0,
-      devMode: false
+      devMode: false,
+      loading: true
     };
   }
 
@@ -37,12 +39,15 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
     const { getNewEventsCount, getDevMode } = await initBGFunctions(extension);
     const newEventsCount: number = await getNewEventsCount();
     const devMode = await getDevMode();
-    this.setState({ newEventsCount, devMode });
+    this.setState({ newEventsCount, devMode, loading: false });
   }
 
   render() {
     const { contextIds } = this.props;
-    const { newEventsCount, devMode } = this.state;
+    const { newEventsCount, devMode, loading } = this.state;
+
+    // If don't return null, it will be rendered twice
+    if (loading) return null;
 
     const panes = [
       {

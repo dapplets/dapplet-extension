@@ -23,7 +23,7 @@ export class StorageAggregator {
                 if (hash.replace('0x', '') !== hashUris.hash.replace('0x', '')) {
                     console.error(`Hash is not valid. URL: ${uri}, expected: ${hashUris.hash}, recieved: ${hash}`);
                 } else {
-                    console.log(`Successful hash checking. URL: ${uri}, expected: ${hashUris.hash}, recieved: ${hash}`);
+                    //console.log(`Successful hash checking. URL: ${uri}, expected: ${hashUris.hash}, recieved: ${hash}`);
                     return buffer;
                 }
             } else {

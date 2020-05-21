@@ -47,7 +47,6 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
         error: `There are registries with connection problems. Please check the settings.`
       });
     }
-
     const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
     if (this._isMounted) {
       this.setState({

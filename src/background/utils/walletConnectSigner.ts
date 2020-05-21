@@ -3,14 +3,22 @@ import { walletConnector, sendTransaction } from '../services/walletConnectServi
 
 export class WalletConnectSigner extends ethers.Signer {
     public provider = new ethers.providers.JsonRpcProvider('https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992');
+    //public provider = new ethers.providers.WebSocketProvider('wss://rinkeby.infura.io/ws/v3/eda881d858ae4a25b2dfbbd0b4629992', 'rinkeby');
+
+    connect(provider: ethers.ethers.providers.Provider): ethers.ethers.Signer {
+        throw new Error("Method not implemented.");
+    }
 
     getAddress(): Promise<string> {
         // ToDo: why does ethers.js call getAddress() when read operation is?
         return Promise.resolve(walletConnector.accounts[0] || '0x0000000000000000000000000000000000000000');
     }
 
-    signMessage(message: ethers.utils.Arrayish): Promise<string> {
-        //let dataToSign: Uint8Array = ethers.utils.hashMessage(message);;
+    async signMessage(message: ethers.utils.BytesLike): Promise<string> {
+        throw new Error("Method not implemented.");
+    }    
+
+    async signTransaction(transaction: ethers.providers.TransactionRequest): Promise<string> {
         throw new Error("Method not implemented.");
     }
 
