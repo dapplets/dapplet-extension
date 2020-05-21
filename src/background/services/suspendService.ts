@@ -37,60 +37,46 @@ const updateContextMenus = () => {
 
             const suspendityByHostname = await getSuspendityByHostname(hostname);
 
-            try {
-                if (suspendityByHostname) {
-                    extension.contextMenus.create({
-                        id: "SUSPEND_HOSTNAME",
-                        title: "Resume on this site",
-                        contexts: ["browser_action"],
-                        onclick: async function (info, tab) {
-                            await resumeByHostname(hostname);
-                            updateContextMenus();
-                        }
-                    });
-                } else {
-                    extension.contextMenus.create({
-                        id: "SUSPEND_HOSTNAME",
-                        title: "Suspend on this site",
-                        contexts: ["browser_action"],
-                        onclick: async function (info, tab) {
-                            await suspendByHostname(hostname);
-                            updateContextMenus();
-                        }
-                    });
-                }
-            } catch (ex) {
-                // TODO: fix the error of context menu
-                console.warn("TODO: fix the error of context menu", ex);
+            if (suspendityByHostname) {
+                extension.contextMenus.create({
+                    title: "Resume on this site",
+                    contexts: ["browser_action"],
+                    onclick: async function (info, tab) {
+                        await resumeByHostname(hostname);
+                        updateContextMenus();
+                    }
+                });
+            } else {
+                extension.contextMenus.create({
+                    title: "Suspend on this site",
+                    contexts: ["browser_action"],
+                    onclick: async function (info, tab) {
+                        await suspendByHostname(hostname);
+                        updateContextMenus();
+                    }
+                });
             }
 
             const suspendityEverywhere = await getSuspendityEverywhere();
 
-            try {
-                if (suspendityEverywhere) {
-                    extension.contextMenus.create({
-                        id: "SUSPEND_EVERYWHERE",
-                        title: "Resume on all sites",
-                        contexts: ["browser_action"],
-                        onclick: async function (info, tab) {
-                            await resumeEverywhere();
-                            updateContextMenus();
-                        }
-                    });
-                } else {
-                    extension.contextMenus.create({
-                        id: "SUSPEND_EVERYWHERE",
-                        title: "Suspend on all sites",
-                        contexts: ["browser_action"],
-                        onclick: async function (info, tab) {
-                            await suspendEverywhere();
-                            updateContextMenus();
-                        }
-                    });
-                }
-            } catch (ex) {
-                // ToDo: fix the error of context menu
-                console.warn("TODO: fix the error of context menu", ex);
+            if (suspendityEverywhere) {
+                extension.contextMenus.create({
+                    title: "Resume on all sites",
+                    contexts: ["browser_action"],
+                    onclick: async function (info, tab) {
+                        await resumeEverywhere();
+                        updateContextMenus();
+                    }
+                });
+            } else {
+                extension.contextMenus.create({
+                    title: "Suspend on all sites",
+                    contexts: ["browser_action"],
+                    onclick: async function (info, tab) {
+                        await suspendEverywhere();
+                        updateContextMenus();
+                    }
+                });
             }
         });
     });
