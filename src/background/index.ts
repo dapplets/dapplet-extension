@@ -120,17 +120,15 @@ extension.runtime.onMessage.addListener(async (message, sender, sendResponse) =>
   if (message.type === "CONTEXT_STARTED" || message.type === "CONTEXT_FINISHED") {
     const manifests = await featureService.getActiveModulesByHostnames(message.payload.contextIds);
 
-    for (const m of manifests) {
-      extension.tabs.sendMessage(sender.tab.id, {
-        type: message.type === "CONTEXT_STARTED" ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
-        payload: {
-          name: m.name,
-          version: m.version,
-          branch: m.branch, // ToDo: fix branch
-          order: m.order,
-          contextIds: m.hostnames  // ToDo: remove this map after renaming of hostnames to contextIds
-        }
-      });
-    }
+    extension.tabs.sendMessage(sender.tab.id, {
+      type: message.type === "CONTEXT_STARTED" ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
+      payload: manifests.map(m => ({
+        name: m.name,
+        version: m.version,
+        branch: m.branch, // ToDo: fix branch
+        order: m.order,
+        contextIds: m.hostnames  // ToDo: remove this map after renaming of hostnames to contextIds
+      }))
+    });
   }
 });

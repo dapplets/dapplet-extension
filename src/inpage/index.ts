@@ -9,13 +9,13 @@ extension.runtime.onMessage.addListener(async (message, sender, sendResponse) =>
     if (!message || !message.type) return;
 
     if (message.type === "FEATURE_ACTIVATED") {
-        const feature = message.payload
-        console.log(`The feature ${feature.name}#${feature.branch}@${feature.version} was activated.`);
-        await injector.loadModules([feature]);
+        const features = message.payload
+        features.forEach(f => console.log(`The feature ${f.name}#${f.branch}@${f.version} was activated.`));
+        await injector.loadModules(features);
     } else if (message.type === "FEATURE_DEACTIVATED") {
-        const feature = message.payload
-        console.log(`The feature ${feature.name}#${feature.branch}@${feature.version} was deactivated.`);
-        await injector.unloadModules([feature]);
+        const features = message.payload
+        features.forEach(f => console.log(`The feature ${f.name}#${f.branch}@${f.version} was deactivated.`));
+        await injector.unloadModules(features);
     } else if (message.type === "CURRENT_CONTEXT_IDS") {
         sendResponse(injector.availableContextIds);
     }

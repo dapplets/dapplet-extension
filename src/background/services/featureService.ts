@@ -68,13 +68,13 @@ export default class FeatureService {
                 var activeTab = tabs[0];
                 extension.tabs.sendMessage(activeTab.id, {
                     type: isActive ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
-                    payload: {
+                    payload: [{
                         name,
                         version,
                         branch: "default", // ToDo: fix branch
                         order,
                         contextIds: hostnames
-                    }
+                    }]
                 });
             });
         }
