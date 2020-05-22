@@ -10,6 +10,7 @@ export default class SiteConfig extends Base {
         [name: string]: {
             version: string;
             isActive: boolean;
+            order: number;
         }
     } = {};
 

@@ -45,8 +45,8 @@ extension.runtime.onMessage.addListener(
 
     // FeatureService
     getFeaturesByHostnames: (hostnames) => featureService.getFeaturesByHostnames(hostnames),
-    activateFeature: (name, version, hostnames) => featureService.activateFeature(name, version, hostnames),
-    deactivateFeature: (name, version, hostnames) => featureService.deactivateFeature(name, version, hostnames),
+    activateFeature: (name, version, hostnames, order) => featureService.activateFeature(name, version, hostnames, order),
+    deactivateFeature: (name, version, hostnames, order) => featureService.deactivateFeature(name, version, hostnames, order),
     getActiveModulesByHostnames: (hostnames) => featureService.getActiveModulesByHostnames(hostnames),
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
     optimizeDependency: (name, branch, version) => featureService.optimizeDependency(name, branch, version),

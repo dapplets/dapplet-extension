@@ -50,20 +50,17 @@ export default class FeatureService {
         return dtos;
     }
 
-    private async _setFeatureActive(name: string, version: string, hostnames: string[], isActive: boolean) {
-        const hostnamesManfiests = await this._moduleManager.getFeaturesByHostnames(hostnames);
-
-        for (const hostname in hostnamesManfiests) {
+    private async _setFeatureActive(name: string, version: string, hostnames: string[], isActive: boolean, order: number) {
+        for (const hostname of hostnames) {
             const config = await this._siteConfigRepository.getById(hostname);
             config.activeFeatures[name] = {
                 version,
-                isActive
-                // ToDo: get a order from the config
+                isActive,
+                order
             };
 
             await this._siteConfigRepository.update(config);
 
-            const order = hostnamesManfiests[hostname].findIndex(f => f.name === name); // ToDo: fix order
             extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
                 var activeTab = tabs[0];
                 extension.tabs.sendMessage(activeTab.id, {
@@ -80,25 +77,40 @@ export default class FeatureService {
         }
     }
 
-    async activateFeature(name: string, version: string, hostnames: string[]): Promise<void> {
-        return await this._setFeatureActive(name, version, hostnames, true);
+    async activateFeature(name: string, version: string, hostnames: string[], order: number): Promise<void> {
+        return await this._setFeatureActive(name, version, hostnames, true, order);
     }
 
-    async deactivateFeature(name: string, version: string, hostnames: string[]): Promise<void> {
-        return await this._setFeatureActive(name, version, hostnames, false);
+    async deactivateFeature(name: string, version: string, hostnames: string[], order: number): Promise<void> {
+        return await this._setFeatureActive(name, version, hostnames, false, order);
     }
 
-    public async getActiveModulesByHostnames(hostnames: string[]): Promise<{ name: string, branch: string, version: string, order: number, hostnames: string[] }[]> {
-        const featureNames = await this.getFeaturesByHostnames(hostnames, true);
-        const activeModules = featureNames.filter(f => f.isActive === true)
-            .map(m => ({
-                name: m.name,
-                branch: m.branch,
-                version: m.version,
-                order: m.order,
-                hostnames: m.hostnames
-            }));
-        return activeModules;
+    public async getActiveModulesByHostnames(hostnames: string[]) {
+        const configs = await Promise.all(hostnames.map(h => this._siteConfigRepository.getById(h)));
+        const modules: { name: string, branch: string, version: string, order: number, hostnames: string[] }[] = [];
+
+        let i = 0;
+        for (const config of configs) {
+            for (const name in config.activeFeatures) {
+                const branch = 'default';
+                const version = config.activeFeatures[name].version;
+                const index = modules.findIndex(m => m.name === name && m.branch === branch && m.version === version);
+
+                if (index !== -1) {
+                    modules[index].hostnames.push(config.hostname);
+                } else {
+                    modules.push({
+                        name,
+                        branch, // ToDo: is it correct?
+                        version,
+                        order: i++,
+                        hostnames: [config.hostname]
+                    });
+                }
+            }
+        }
+
+        return modules;
     }
 
     public async getModulesWithDeps(modules: { name: string, branch: string, version: string }[]) {

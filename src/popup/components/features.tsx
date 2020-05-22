@@ -56,7 +56,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
     }
   }
 
-  async handleSwitchChange({ name, version, hostnames }, value) {
+  async handleSwitchChange({ name, version, hostnames }, value, order) {
     const backgroundFunctions = await initBGFunctions(extension);
     const { activateFeature, deactivateFeature } = backgroundFunctions;
     this.setState(state => {
@@ -71,9 +71,9 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
     });
 
     if (value) {
-      await activateFeature(name, version, hostnames);
+      await activateFeature(name, version, hostnames, order);
     } else {
-      await deactivateFeature(name, version, hostnames);
+      await deactivateFeature(name, version, hostnames, order);
     }
   }
 
@@ -116,7 +116,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                       <Checkbox
                         toggle
                         style={{ marginTop: 5 }}
-                        onChange={() => this.handleSwitchChange(f, !f.isActive)}
+                        onChange={() => this.handleSwitchChange(f, !f.isActive, i)}
                         checked={f.isActive}
                       />
                     </List.Content>
