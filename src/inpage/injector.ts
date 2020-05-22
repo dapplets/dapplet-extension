@@ -151,7 +151,7 @@ export class Injector {
                         const range = prefix + (typeof dependency === "string" ? dependency : dependency[DEFAULT_BRANCH_NAME]);
 
                         const maxVer = maxSatisfying(versions, range);
-
+                        
                         return this.registry.find(m => m.manifest.name == name && m.manifest.version == maxVer).instance;
                     }
                     return descriptor;

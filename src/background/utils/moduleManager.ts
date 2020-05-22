@@ -11,37 +11,40 @@ export default class ModuleManager {
     public registryAggregator = new RegistryAggregator();
     private _storage = new StorageAggregator();
 
-    public async resolveDependencies(modules: { name: string, version: string, branch?: string }[]): Promise<{ name: string, version: string, branch: string }[]> {
+    public async resolveDependencies(modules: { name: string, version: string, branch?: string }[]) {
 
         // ToDo: Add dependency optimizer
         // Search for the following topics: 
         // 1. Topological Sorting
         // 2. Dependency Resolution Algorithm
 
-        let dependencies = [...modules.map(({ name, version, branch }) => ({ name, version, branch: !branch ? DEFAULT_BRANCH_NAME : branch }))];
+        let dependencies: { name: string, branch: string, version: string, manifest: Manifest }[] = 
+            modules.map(({ name, version, branch }) => ({ name, version, branch: !branch ? DEFAULT_BRANCH_NAME : branch, manifest: null }));
 
-        for (let i = 0; i < dependencies.length; i++) {
-            const parent = dependencies[i];
-            const moduleDeps = await this._getChildDependencies(parent.name, parent.version, parent.branch);
-            const optimizedDeps = await Promise.all(moduleDeps.map(d => this.optimizeDependency(d.name, d.version, d.branch)));
+        const resolve = async (parent: { name: string, branch: string, version: string, manifest: Manifest }) => {
+            const moduleDeps = await this._getChildDependenciesAndManifest(parent.name, parent.version, parent.branch);
+            parent.manifest = moduleDeps.manifest;
+            const optimizedDeps = await Promise.all(moduleDeps.dependencies.map(d => this.optimizeDependency(d.name, d.version, d.branch)));
 
             for (const dep of optimizedDeps) {
                 if (!dependencies.find(d => areModulesEqual(d, dep))) {
-                    dependencies.push(dep);
+                    const depToPush = { ...dep, manifest: null };
+                    dependencies.push(depToPush);
+                    await resolve(depToPush);
                 }
             }
         }
 
+        await Promise.all(dependencies.map(d => resolve(d)));
+        
         // reverse() - the lowest script in the hierarchy should be loaded first
         return dependencies.reverse();
     }
 
-    public async loadModule(name: string, branch: string, version: string): Promise<{ script: string, manifest: Manifest }> {
-        const manifest = await this.loadManifest(name, branch, version, true);
-        const resource = await this._storage.getResource(manifest.dist);
+    public async loadScript(url: string) {
+        const resource = await this._storage.getResource(url);
         const script = new TextDecoder("utf-8").decode(new Uint8Array(resource));
-
-        return { script, manifest };
+        return script;
     }
 
     public async loadManifest(name: string, branch: string, version: string, replaceUri: boolean): Promise<Manifest> {
@@ -68,16 +71,16 @@ export default class ModuleManager {
     }
 
     //ToDo: rework the _getChildDependencies and move it into Inpage
-    private async _getChildDependencies(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME): Promise<{ name: string, branch: string, version: string }[]> {
+    private async _getChildDependenciesAndManifest(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME) {
 
         const manifest = await this.loadManifest(name, branch, version, true);
 
         if (manifest.name != name || manifest.version != version || manifest.branch != branch) {
             console.error(`Invalid public name for module. Requested: ${name}#${branch}@${version}. Recieved: ${manifest.name}#${manifest.branch}@${manifest.version}.`);
-            return [];
+            return { manifest, dependencies: [] };
         }
 
-        if (!manifest.dependencies) return [];
+        if (!manifest.dependencies) return { manifest, dependencies: [] };
 
         const dependencies: { name: string, branch: string, version: string }[] = [];
 
@@ -106,7 +109,7 @@ export default class ModuleManager {
             }
         });
 
-        return dependencies;
+        return { manifest, dependencies };
     }
 
     public async optimizeDependency(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME): Promise<{ name: string, version: string, branch: string }> {
