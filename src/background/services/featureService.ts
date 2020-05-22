@@ -92,6 +92,8 @@ export default class FeatureService {
         let i = 0;
         for (const config of configs) {
             for (const name in config.activeFeatures) {
+                if (config.activeFeatures[name].isActive !== true) continue;
+                
                 const branch = 'default';
                 const version = config.activeFeatures[name].version;
                 const index = modules.findIndex(m => m.name === name && m.branch === branch && m.version === version);
