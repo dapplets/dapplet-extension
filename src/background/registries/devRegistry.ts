@@ -30,7 +30,10 @@ export class DevRegistry implements Registry {
         const { modules } = this._devConfig;
 
         if (!modules || !modules[name] || !modules[name][branch] || !modules[name][branch][version]) {
-            return null;
+            return {
+                hash: null, // ToDo: implement hash
+                uris: []
+            };
         };
 
         const uri = new URL(this._devConfig.modules[name][branch][version], this._rootUrl).href;

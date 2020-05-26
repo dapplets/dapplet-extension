@@ -22,23 +22,27 @@ export default class ModuleManager {
             modules.map(({ name, version, branch }) => ({ name, version, branch: !branch ? DEFAULT_BRANCH_NAME : branch, manifest: null }));
 
         const resolve = async (parent: { name: string, branch: string, version: string, manifest: Manifest }) => {
-            const moduleDeps = await this._getChildDependenciesAndManifest(parent.name, parent.version, parent.branch);
-            parent.manifest = moduleDeps.manifest;
-            const optimizedDeps = await Promise.all(moduleDeps.dependencies.map(d => this.optimizeDependency(d.name, d.version, d.branch)));
+            try {
+                const moduleDeps = await this._getChildDependenciesAndManifest(parent.name, parent.version, parent.branch);
+                parent.manifest = moduleDeps.manifest;
+                const optimizedDeps = await Promise.all(moduleDeps.dependencies.map(d => this.optimizeDependency(d.name, d.version, d.branch)));
 
-            for (const dep of optimizedDeps) {
-                if (!dependencies.find(d => areModulesEqual(d, dep))) {
-                    const depToPush = { ...dep, manifest: null };
-                    dependencies.push(depToPush);
-                    await resolve(depToPush);
+                for (const dep of optimizedDeps) {
+                    if (!dependencies.find(d => areModulesEqual(d, dep))) {
+                        const depToPush = { ...dep, manifest: null };
+                        dependencies.push(depToPush);
+                        await resolve(depToPush);
+                    }
                 }
+            } catch (err) {
+                console.error(err);
             }
         }
 
         await Promise.all(dependencies.map(d => resolve(d)));
         
         // reverse() - the lowest script in the hierarchy should be loaded first
-        return dependencies.reverse();
+        return dependencies.reverse().filter(d => !!d.manifest);
     }
 
     public async loadScript(url: string) {
@@ -49,6 +53,10 @@ export default class ModuleManager {
 
     public async loadManifest(name: string, branch: string, version: string, replaceUri: boolean): Promise<Manifest> {
         const manifestHashUris = await this.registryAggregator.resolveToUris(name, branch, version);
+        
+        if (!manifestHashUris || !manifestHashUris.uris || manifestHashUris.uris.length === 0) {
+            throw new Error(`Could not find the manifest URI of the ${name}#${branch}@${version} module`);
+        }
 
         // ToDo: try to load a manifest from each uris
         const manifestBufferArray = await this._storage.getResource(manifestHashUris);
