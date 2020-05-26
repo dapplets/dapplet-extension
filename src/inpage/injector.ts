@@ -1,6 +1,6 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import Core from './core';
-import { maxSatisfying } from 'semver';
+import { maxSatisfying, valid } from 'semver';
 import { SubscribeOptions } from './overlay';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
 import * as extension from 'extensionizer';
@@ -143,7 +143,16 @@ export class Injector {
                         const versions = this.registry.filter(m => m.manifest.name == name).map(m => m.manifest.version);
                         const dependency = manifest.dependencies[name];
 
-                        // ToDo: check `dependency` for undefined
+                        if (dependency === undefined) {
+                            console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`);
+                            return null;
+                        }
+
+                        if (valid(dependency as string) !== null) {
+                            console.error(`Invalid semver version of module "${name}" in the manifest of "${manifest.name}"`);
+                            return null;
+                        }
+
                         // ToDo: Should be moved to the background? 
                         // ToDo: Fetch prefix from global settings.
                         // ToDo: Replace '>=' to '^'
