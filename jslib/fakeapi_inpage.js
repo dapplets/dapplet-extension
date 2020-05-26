@@ -2,6 +2,7 @@ import popup_script from '!raw-loader!../build/popup.js'
 import deploy_script from '!raw-loader!../build/deploy.js'
 import pairing_script from '!raw-loader!../build/pairing.js'
 import sowa_script from '!raw-loader!../build/sowa.js'
+import starter_script from '!raw-loader!../build/starter.js'
 
 import fakeapi_frame_script from '!raw-loader!./fakeapi_frame.js'
 
@@ -51,6 +52,8 @@ browser.extension.getURL = function (url) {
         script = pairing_script;
     } else if (url === 'sowa.html') {
         script = sowa_script;
+    } else if (url === 'starter.html') {
+        script = starter_script;
     }
 
     if (script === null) return;

@@ -34,7 +34,8 @@
     "pairing.html",
     "sowa.html",
     "popup.html",
-    "deploy.html"
+    "deploy.html",
+    "starter.html"
   ],
   "permissions": [
     "tabs",

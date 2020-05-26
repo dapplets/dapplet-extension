@@ -21,7 +21,8 @@ module.exports = {
     inpage: path.join(__dirname, "src/inpage/index.ts"),
     pairing: path.join(__dirname, "src/pairing/index.tsx"),
     sowa: path.join(__dirname, "src/sowa/index.tsx"),
-    deploy: path.join(__dirname, "src/deploy/index.tsx")
+    deploy: path.join(__dirname, "src/deploy/index.tsx"),
+    starter: path.join(__dirname, "src/starter/index.tsx")
   },
   output: {
     path: path.join(__dirname, "build"),
@@ -102,6 +103,9 @@ module.exports = {
       }, {
         from: "src/deploy/index.html",
         to: "deploy.html"
+      }, {
+        from: "src/starter/index.html",
+        to: "starter.html"
       }]),
       new webpack.DefinePlugin({
         EXTENSION_VERSION: JSON.stringify(package.version)
