@@ -18,7 +18,6 @@ export class EthRegistry implements Registry {
     }
 
     public async getVersions(name: string, branch: string): Promise<string[]> {
-        console.log('getVersions', { name, branch });
         try {
             const versions = await this._contract.getVersions(name, branch);
             this.isAvailable = true;
@@ -32,7 +31,6 @@ export class EthRegistry implements Registry {
     }
 
     public async resolveToUris(name: string, branch: string, version: string): Promise<HashUris> {
-        console.log('resolveToUri', { name, branch, version });
         try {
             const [hash, uris] = await this._contract.resolveToUris(name, branch, version);
             this.isAvailable = true;
@@ -46,7 +44,6 @@ export class EthRegistry implements Registry {
     }
 
     public async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
-        console.log('getFeatures', { hostnames });
         try {
             const modules: string[] = await this._contract.getModules(hostnames[0]);
             const result = {};
@@ -89,7 +86,6 @@ export class EthRegistry implements Registry {
     }
 
     public async hashToUris(hash: string): Promise<HashUris> {
-        console.log('hashToUris', { hash });
         try {
             const uris = await this._contract.hashToUris('0x' + hash);
             this.isAvailable = true;
