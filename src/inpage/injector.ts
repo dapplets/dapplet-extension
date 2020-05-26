@@ -148,8 +148,8 @@ export class Injector {
                             return null;
                         }
 
-                        if (valid(dependency as string) !== null) {
-                            console.error(`Invalid semver version of module "${name}" in the manifest of "${manifest.name}"`);
+                        if (valid(dependency as string) === null) {
+                            console.error(`Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`);
                             return null;
                         }
 
