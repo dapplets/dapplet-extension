@@ -72,7 +72,10 @@ extension.runtime.onMessage.addListener(
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),
     getIntro: () => globalConfigService.getIntro(),
-    setIntro: (intro) => globalConfigService.setIntro(intro)
+    setIntro: (intro) => globalConfigService.setIntro(intro),
+    getTrustedUsers: () => globalConfigService.getTrustedUsers(),
+    addTrustedUser: (account) => globalConfigService.addTrustedUser(account),
+    removeTrustedUser: (account) => globalConfigService.removeTrustedUser(account)
   })
 );
 

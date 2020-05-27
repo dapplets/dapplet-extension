@@ -17,4 +17,6 @@ export class GlobalConfig extends Base {
     };
 
     devMode: boolean = false;
+
+    trustedUsers: { account: string }[] = [];
 }

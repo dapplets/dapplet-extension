@@ -16,6 +16,9 @@ interface ISettingsState {
     registries: { url: string, isDev: boolean, isAvailable: boolean, error: string }[];
     registryInput: string;
     registryInputError: string;
+    trustedUsers: { account: string }[];
+    trustedUserInput: string;
+    trustedUserInputError: string;
     devMode: boolean;
 }
 
@@ -29,12 +32,15 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             registries: [],
             registryInput: '',
             registryInputError: null,
+            trustedUsers: [],
+            trustedUserInput: '',
+            trustedUserInputError: null,
             devMode: props.devMode
         };
     }
 
     async componentDidMount() {
-        await Promise.all([this.loadRegistries(), this.loadDevMode()]);
+        await Promise.all([this.loadRegistries(), this.loadDevMode(), this.loadTrustedUsers()]);
         this.setState({ isLoading: false });
     }
 
@@ -45,6 +51,12 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         this.setState({
             registries: registries.filter(r => r.isDev === false)
         });
+    }
+
+    async loadTrustedUsers() {
+        const { getTrustedUsers } = await initBGFunctions(extension);
+        const trustedUsers = await getTrustedUsers();
+        this.setState({ trustedUsers });
     }
 
     async loadDevMode() {
@@ -79,8 +91,27 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         this.loadRegistries();
     }
 
+    async addTrustedUser(account: string) {
+        const { addTrustedUser } = await initBGFunctions(extension);
+
+        try {
+            await addTrustedUser(account);
+            this.setState({ trustedUserInput: '' });
+        } catch (msg) {
+            this.setState({ trustedUserInputError: msg });
+        }
+
+        this.loadTrustedUsers();
+    }
+
+    async removeTrustedUser(account: string) {
+        const { removeTrustedUser } = await initBGFunctions(extension);
+        await removeTrustedUser(account);
+        this.loadTrustedUsers();
+    }
+
     render() {
-        const { isLoading, registries, registryInput, registryInputError, devMode } = this.state;
+        const { isLoading, registries, registryInput, registryInputError, trustedUsers, trustedUserInput, trustedUserInputError, devMode } = this.state;
 
         return (
             <React.Fragment>
@@ -99,7 +130,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             color: 'blue'
                         }}
                         fluid
-                        placeholder='URL, ENS or 0x address...'
+                        placeholder='ENS or 0x address...'
                         value={registryInput}
                         onChange={(e) => this.setState({ registryInput: e.target.value, registryInputError: null })}
                         error={!!registryInputError}
@@ -121,6 +152,39 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                                     <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
                                 </List.Content>
                                 <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => window.open(`https://rinkeby.etherscan.io/address/${r.url}`, '_blank')}>{r.url}</a></List.Content>
+                            </List.Item>
+                        ))}
+                    </List>
+
+
+                    <Header as='h4'>Trusted Users</Header>
+                    <Input
+                        size='mini'
+                        icon='ethereum'
+                        iconPosition='left'
+                        action={{
+                            content: 'Add',
+                            size: 'mini',
+                            onClick: () => this.addTrustedUser(trustedUserInput),
+                            disabled: !(isValidUrl(trustedUserInput) && !registries.find(r => r.url === trustedUserInput)),
+                            color: 'blue'
+                        }}
+                        fluid
+                        placeholder='ENS or 0x address...'
+                        value={trustedUserInput}
+                        onChange={(e) => this.setState({ trustedUserInput: e.target.value, trustedUserInputError: null })}
+                        error={!!trustedUserInputError}
+                    />
+
+                    {(trustedUserInputError) ? <Label basic color='red' pointing>{trustedUserInputError}</Label> : null}
+
+                    <List divided relaxed size='small'>
+                        {trustedUsers.map((user, i) => (
+                            <List.Item key={i}>
+                                <List.Content floated='right'>
+                                    <Icon link color='red' name='close' onClick={() => this.removeTrustedUser(user.account)} />
+                                </List.Content>
+                                <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => window.open(`https://rinkeby.etherscan.io/address/${user.account}`, '_blank')}>{user.account}</a></List.Content>
                             </List.Item>
                         ))}
                     </List>

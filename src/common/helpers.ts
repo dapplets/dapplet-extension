@@ -62,6 +62,7 @@ export function typeOfUri(uri: string): UriTypes {
     return UriTypes.Ipfs
   }
 
+  // ToDo: add Ethereum address validator
   if (uriLower.indexOf('0x') === 0 && uriLower.length === 42) {
     return UriTypes.Ethereum;
   }

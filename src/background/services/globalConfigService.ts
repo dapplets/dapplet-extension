@@ -25,6 +25,9 @@ export default class GlobalConfigService {
             isDev: false
         }];
         config.devMode = false;
+        config.trustedUsers = [{
+            account: "0x692a4d7b7be2dc1623155e90b197a82d114a74f3"
+        }];
 
         await this._globalConfigRepository.deleteById(this._configId);
         await this._globalConfigRepository.create(config);
@@ -39,6 +42,7 @@ export default class GlobalConfigService {
         const config = await this.get();
         if (config.registries.find(r => r.url === url)) return;
 
+        // ToDo: add Ethereum address validator
         const isEthAddress = url.indexOf('0x') !== -1;
 
         if (!isEthAddress) {
@@ -81,5 +85,29 @@ export default class GlobalConfigService {
         const config = await this.get();
         callback(config);
         await this.set(config);
+    }
+
+    async getTrustedUsers() {
+        const config = await this.get();
+        return config.trustedUsers;
+    }
+
+    async addTrustedUser(account: string) {
+        const config = await this.get();
+        if (config.trustedUsers.find(r => r.account === account)) return;
+
+        // ToDo: add Ethereum address validator
+        const isEthAddress = account.indexOf('0x') !== -1;
+
+        if (!isEthAddress) {
+            throw Error('User account must be valid Ethereum address');
+        } else {
+            config.trustedUsers.push({ account: account });
+            await this.set(config);
+        }
+    }
+
+    async removeTrustedUser(account: string) {
+        this.updateConfig(c => c.trustedUsers = c.trustedUsers.filter(r => r.account !== account));
     }
 }
