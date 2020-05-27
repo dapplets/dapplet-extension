@@ -205,7 +205,7 @@ export default class ModuleManager {
 
     public async getAllDevModules(): Promise<Manifest[]> {
         const modules = await this.registryAggregator.getAllDevModules();
-        const manifestsWithErrors = await Promise.all(modules.map(m => this.loadManifest(m.name, m.branch, m.version, false).catch(Error)));
+        const manifestsWithErrors = await Promise.all(modules.map(m => this.loadManifest(m.name, m.branch, m.version, true).catch(Error)));
         const manifestsNoErrors = manifestsWithErrors.filter(x => !(x instanceof Error)) as Manifest[];
         return manifestsNoErrors;
     }
