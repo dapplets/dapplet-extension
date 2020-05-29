@@ -52,29 +52,7 @@ export default class ModuleManager {
     }
 
     public async loadManifest(name: string, branch: string, version: string, replaceUri: boolean): Promise<Manifest> {
-        const manifestHashUris = await this.registryAggregator.resolveToUris(name, branch, version);
-        
-        if (!manifestHashUris || !manifestHashUris.uris || manifestHashUris.uris.length === 0) {
-            throw new Error(`Could not find the manifest URI of the ${name}#${branch}@${version} module`);
-        }
-
-        // ToDo: try to load a manifest from each uris
-        const manifestBufferArray = await this._storage.getResource(manifestHashUris);
-
-        // ToDo: check hash
-        const manifestJson = new TextDecoder("utf-8").decode(new Uint8Array(manifestBufferArray));
-        const manifest: Manifest = JSON.parse(manifestJson);
-        // ToDo: validate manifest
-
-        if (replaceUri && typeof manifest.dist === 'string') {
-            if (manifest.dist.length === 64 || manifest.dist.length === 64 + 2) { // is it hash?
-                manifest.dist = await this.registryAggregator.hashToUris(manifest.dist);
-            } else if (!(/^(?:[a-z]+:)?\/\//i.test(manifest.dist))) {
-                // convert a relative URL to absolute
-                manifest.dist = new URL(manifest.dist, manifestHashUris.uris[0]).href;
-            }
-        }
-
+        const manifest = await this.registryAggregator.resolveToManifest(name, branch, version);
         return manifest;
     }
 

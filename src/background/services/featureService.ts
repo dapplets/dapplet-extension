@@ -93,7 +93,7 @@ export default class FeatureService {
         for (const config of configs) {
             for (const name in config.activeFeatures) {
                 if (config.activeFeatures[name].isActive !== true) continue;
-                
+
                 const branch = 'default';
                 const version = config.activeFeatures[name].version;
                 const index = modules.findIndex(m => m.name === name && m.branch === branch && m.version === version);
@@ -118,7 +118,7 @@ export default class FeatureService {
     public async getModulesWithDeps(modules: { name: string, branch: string, version: string }[]) {
         if (modules.length === 0) return [];
         const modulesWithDeps = await this._moduleManager.resolveDependencies(modules);
-        const loadedModules = await Promise.all(modulesWithDeps.map(m => 
+        const loadedModules = await Promise.all(modulesWithDeps.map(m =>
             this._moduleManager.loadScript(m.manifest.dist as string)
                 .then(s => ({ script: s, manifest: m.manifest }))
         ));
@@ -135,41 +135,37 @@ export default class FeatureService {
     }
 
     // ToDo: move to another service?
-    public async deployModule(defaultManifest: Manifest, targetStorage: 'swarm' | 'test-registry', targetRegistry: string, registryKey: string): Promise<{ scriptUrl: string, manifestUrl: string }> {
+    public async deployModule(defaultManifest: Manifest, targetStorage: 'swarm' | 'test-registry', targetRegistry: string, registryKey: string): Promise<{ scriptUrl: string }> {
+        try {
+            // ToDo: check everething before publishing
 
-        // ToDo: check everething before publishing
+            // Dist file publishing
+            const dist = await this._storageAggregator.getResource(defaultManifest.dist as HashUris);
+            const distBlob = new Blob([dist], { type: "text/javascript" });
+            const distUrl = (targetStorage === 'test-registry') ? await saveToTestRegistry(distBlob, targetRegistry) : await saveToSwarm(distBlob);
 
-        // Dist file publishing
-        const dist = await this._storageAggregator.getResource(defaultManifest.dist as HashUris);
-        const distBlob = new Blob([dist], { type: "text/javascript" });
-        const distUrl = (targetStorage === 'test-registry') ? await saveToTestRegistry(distBlob, targetRegistry) : await saveToSwarm(distBlob);
+            // Dist file  hashing
+            const distBuffer = await (distBlob as any).arrayBuffer();
+            const distHash = ethers.utils.keccak256(new Uint8Array(distBuffer));
 
-        // Dist file  hashing
-        const distBuffer = await (distBlob as any).arrayBuffer();
-        const distHash = ethers.utils.keccak256(new Uint8Array(distBuffer)).substring(2);
+            // Manifest editing
+            defaultManifest.dist = {
+                hash: distHash,
+                uris: [distUrl]
+            };
 
-        // Manifest editing
-        defaultManifest.dist = distHash;
+            // Register manifest in Registry
+            const registry = this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry);
+            if (!registry) throw new Error("No registry with this url exists in config.");
+            await registry.addModule(defaultManifest.name, defaultManifest.branch, defaultManifest.version, defaultManifest);
 
-        // Manifest publishing
-        const manifestString = JSON.stringify(defaultManifest);
-        const manifestBlob = new Blob([manifestString], { type: "application/json" });
-        const manifestUrl = (targetStorage === 'test-registry') ? await saveToTestRegistry(manifestBlob, targetRegistry) : await saveToSwarm(manifestBlob);
-
-        // Manifest hashing
-        const manifestBuffer = await (manifestBlob as any).arrayBuffer();
-        const manifestHash = ethers.utils.keccak256(new Uint8Array(manifestBuffer)).substring(2);
-
-        // Register manifest in Registry
-        const registry = this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry);
-        if (!registry) throw new Error("No registry with this url exists in config.");
-        const hashUris = [{ hash: manifestHash, uris: [manifestUrl] }, { hash: distHash, uris: [distUrl] }];
-        await registry.addModuleWithObjects(defaultManifest.name, defaultManifest.branch, defaultManifest.version, hashUris, registryKey);
-
-        return {
-            manifestUrl: manifestUrl,
-            scriptUrl: distUrl
-        };
+            return {
+                scriptUrl: distUrl
+            };
+        } catch (err) {
+            console.error(err);
+            throw err;
+        }
     }
 
     async getRegistries() {

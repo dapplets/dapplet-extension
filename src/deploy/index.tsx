@@ -128,7 +128,6 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     type: 'positive',
                     header: 'Module was deployed',
                     message: [
-                        `Manifest URL: ${result.manifestUrl}`,
                         `Script URL:  ${result.scriptUrl}`
                     ]
                 },
@@ -170,7 +169,15 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     {message.message.map((m, i) => <p key={i} style={{ overflowWrap: 'break-word' }}>{m}</p>)}
                 </Message>) : null}
 
-                {(owner !== null && owner !== currentAccount) ? (
+                {(!currentAccount && !!owner) ? (
+                    <Message
+                        error
+                        header='Wallet is not paired'
+                        content={<React.Fragment>You can not deploy a module without wallet pairing.<br />Change account to {owner}</React.Fragment>}
+                    />
+                ) : null}
+
+                {(!!owner && !!currentAccount && owner.toLowerCase() !== currentAccount.toLowerCase()) ? (
                     <Message
                         error
                         header='Action Forbidden'
@@ -304,7 +311,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         label='Target Storage'
                         options={[
                             { key: 'swarm', text: 'Swarm', value: 'swarm' },
-                            { key: 'test-registry', text: 'Test Registry', value: 'test-registry' }
+                            //{ key: 'test-registry', text: 'Test Registry', value: 'test-registry' }
                         ]}
                         placeholder='Target Storage'
                         value={targetStorage}
@@ -323,7 +330,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         })}
                     /> */}
 
-                    <Button submit="true" primary disabled={loading || deployed || (owner !== null && owner !== currentAccount)}>Deploy</Button>
+                    <Button submit="true" primary disabled={loading || deployed || !currentAccount || (!!owner && !!currentAccount && owner.toLowerCase() !== currentAccount.toLowerCase())}>Deploy</Button>
                 </Form>
             </React.Fragment>
         );

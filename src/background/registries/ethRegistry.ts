@@ -2,6 +2,7 @@ import { Registry, HashUris } from './registry';
 import abi from './ethRegistryAbi';
 import * as ethers from "ethers";
 import { WalletConnectSigner } from '../utils/walletConnectSigner';
+import Manifest from '../models/manifest';
 
 export class EthRegistry implements Registry {
     public isAvailable: boolean = true;
@@ -30,12 +31,27 @@ export class EthRegistry implements Registry {
         }
     }
 
-    public async resolveToUris(name: string, branch: string, version: string): Promise<HashUris> {
+    public async resolveToManifest(name: string, branch: string, version: string): Promise<Manifest> {
         try {
-            const [hash, uris] = await this._contract.resolveToUris(name, branch, version);
+            const m = await this._contract.resolveToManifest(name, branch, version);
+
+            const manifest = new Manifest();
+            manifest.name = name;
+            manifest.branch = branch;
+            manifest.version = version;
+            manifest.title = m.title;
+            manifest.description = m.description;
+            manifest.icon = m.icon;
+            manifest.type = m.mod_type;
+            manifest.dist = {
+                hash: m.distHash,
+                uris: m.distUris
+            }
+            manifest.dependencies = Object.fromEntries(m.dependencies);
+
             this.isAvailable = true;
             this.error = null;
-            return { hash, uris };
+            return manifest;
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
@@ -70,9 +86,19 @@ export class EthRegistry implements Registry {
         return Promise.resolve([]);
     }
 
-    public async addModuleWithObjects(name: string, branch: string, version: string, hashUris: HashUris[]): Promise<void> {
-        const hashUrisSingle = hashUris.map(x => ({ hash: '0x' + x.hash, uri: x.uris[0] }));
-        const tx = await this._contract.addModuleWithObjects(name, branch, version, hashUrisSingle);
+    public async addModule(name: string, branch: string, version: string, manifest: Manifest): Promise<void> {
+        const manifestForContract = {
+            initialized: true,
+            title: manifest.title,
+            description: manifest.description,
+            icon: manifest.icon || '',
+            mod_type: manifest.type,
+            author: manifest.author,
+            distHash: (manifest.dist as HashUris).hash, // hash of bundle
+            distUris: (manifest.dist as HashUris).uris,
+            dependencies: Object.entries(manifest.dependencies)
+        };
+        const tx = await this._contract.addModule(name, branch, version, manifestForContract);
 
         await new Promise((resolve, reject) => {
             this._contract.on("ModuleAdded", (name, branch, verison, manifestHash, event) => {

@@ -21,10 +21,57 @@ export default [
                 "type": "string"
             },
             {
+                "components": [
+                    {
+                        "internalType": "bool",
+                        "name": "initialized",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "icon",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "mod_type",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "author",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "distHash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "string[]",
+                        "name": "distUris",
+                        "type": "string[]"
+                    },
+                    {
+                        "internalType": "string[2][]",
+                        "name": "dependencies",
+                        "type": "string[2][]"
+                    }
+                ],
                 "indexed": false,
-                "internalType": "bytes32",
-                "name": "manifestHash",
-                "type": "bytes32"
+                "internalType": "struct DappletRegistry.Manifest",
+                "name": "manifest",
+                "type": "tuple"
             }
         ],
         "name": "ModuleAdded",
@@ -78,26 +125,6 @@ export default [
     {
         "inputs": [
             {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
-            }
-        ],
-        "name": "urisByHash",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function",
-        "constant": true
-    },
-    {
-        "inputs": [
-            {
                 "internalType": "string",
                 "name": "name",
                 "type": "string"
@@ -138,17 +165,59 @@ export default [
                 "type": "string"
             }
         ],
-        "name": "resolveToUris",
+        "name": "resolveToManifest",
         "outputs": [
             {
-                "internalType": "bytes32",
-                "name": "hash",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "string[]",
-                "name": "uris",
-                "type": "string[]"
+                "components": [
+                    {
+                        "internalType": "bool",
+                        "name": "initialized",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "icon",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "mod_type",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "author",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "distHash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "string[]",
+                        "name": "distUris",
+                        "type": "string[]"
+                    },
+                    {
+                        "internalType": "string[2][]",
+                        "name": "dependencies",
+                        "type": "string[2][]"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.Manifest",
+                "name": "",
+                "type": "tuple"
             }
         ],
         "stateMutability": "view",
@@ -175,94 +244,54 @@ export default [
             {
                 "components": [
                     {
+                        "internalType": "bool",
+                        "name": "initialized",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "icon",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "mod_type",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "author",
+                        "type": "string"
+                    },
+                    {
                         "internalType": "bytes32",
-                        "name": "hash",
+                        "name": "distHash",
                         "type": "bytes32"
                     },
                     {
-                        "internalType": "string",
-                        "name": "uri",
-                        "type": "string"
+                        "internalType": "string[]",
+                        "name": "distUris",
+                        "type": "string[]"
+                    },
+                    {
+                        "internalType": "string[2][]",
+                        "name": "dependencies",
+                        "type": "string[2][]"
                     }
                 ],
-                "internalType": "struct DappletRegistry.HashUri[]",
-                "name": "hashUris",
-                "type": "tuple[]"
-            }
-        ],
-        "name": "addModuleWithObjects",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "string",
-                        "name": "name",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "branch",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "version",
-                        "type": "string"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "bytes32",
-                                "name": "hash",
-                                "type": "bytes32"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "uri",
-                                "type": "string"
-                            }
-                        ],
-                        "internalType": "struct DappletRegistry.HashUri[]",
-                        "name": "hashUris",
-                        "type": "tuple[]"
-                    }
-                ],
-                "internalType": "struct DappletRegistry.AddModulesWithObjectsInput[]",
-                "name": "input",
-                "type": "tuple[]"
-            }
-        ],
-        "name": "addModulesWithObjects",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "branch",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "version",
-                "type": "string"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "manifestHash",
-                "type": "bytes32"
+                "internalType": "struct DappletRegistry.Manifest",
+                "name": "manifest",
+                "type": "tuple"
             }
         ],
         "name": "addModule",
@@ -290,9 +319,56 @@ export default [
                         "type": "string"
                     },
                     {
-                        "internalType": "bytes32",
-                        "name": "manifestHash",
-                        "type": "bytes32"
+                        "components": [
+                            {
+                                "internalType": "bool",
+                                "name": "initialized",
+                                "type": "bool"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "title",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "description",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "icon",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "mod_type",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "author",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "bytes32",
+                                "name": "distHash",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "string[]",
+                                "name": "distUris",
+                                "type": "string[]"
+                            },
+                            {
+                                "internalType": "string[2][]",
+                                "name": "dependencies",
+                                "type": "string[2][]"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.Manifest",
+                        "name": "manifest",
+                        "type": "tuple"
                     }
                 ],
                 "internalType": "struct DappletRegistry.AddModulesInput[]",
@@ -412,37 +488,27 @@ export default [
     {
         "inputs": [
             {
-                "internalType": "bytes32",
-                "name": "hash",
-                "type": "bytes32"
-            }
-        ],
-        "name": "hashToUris",
-        "outputs": [
-            {
-                "internalType": "string[]",
-                "name": "",
-                "type": "string[]"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function",
-        "constant": true
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "hash",
-                "type": "bytes32"
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
             },
             {
                 "internalType": "string",
-                "name": "uri",
+                "name": "branch",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "version",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "distUri",
                 "type": "string"
             }
         ],
-        "name": "addHashUri",
+        "name": "addDistUri",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -452,13 +518,23 @@ export default [
             {
                 "components": [
                     {
-                        "internalType": "bytes32",
-                        "name": "hash",
-                        "type": "bytes32"
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
                     },
                     {
                         "internalType": "string",
-                        "name": "uri",
+                        "name": "branch",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "version",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "distUri",
                         "type": "string"
                     }
                 ],
@@ -467,7 +543,7 @@ export default [
                 "type": "tuple[]"
             }
         ],
-        "name": "addHashUris",
+        "name": "addDistUris",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -475,18 +551,23 @@ export default [
     {
         "inputs": [
             {
-                "internalType": "bytes32",
-                "name": "hash",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "uint256",
-                "name": "uriIndex",
-                "type": "uint256"
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
             },
             {
                 "internalType": "string",
-                "name": "uri",
+                "name": "branch",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "version",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "distUri",
                 "type": "string"
             }
         ],
@@ -520,4 +601,4 @@ export default [
         "type": "function",
         "constant": true
     }
-]
+];

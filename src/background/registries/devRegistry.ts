@@ -1,5 +1,6 @@
 import { Registry, HashUris } from './registry';
 import { DEFAULT_BRANCH_NAME } from '../../common/constants';
+import Manifest from '../models/manifest';
 
 export class DevRegistry implements Registry {
 
@@ -25,23 +26,24 @@ export class DevRegistry implements Registry {
         return versions;
     }
 
-    public async resolveToUris(name: string, branch: string, version: string): Promise<HashUris> {
+    public async resolveToManifest(name: string, branch: string, version: string): Promise<Manifest> {
         await this._cacheDevConfig();
         const { modules } = this._devConfig;
 
         if (!modules || !modules[name] || !modules[name][branch] || !modules[name][branch][version]) {
-            return {
-                hash: null, // ToDo: implement hash
-                uris: []
-            };
+            return null;
         };
 
-        const uri = new URL(this._devConfig.modules[name][branch][version], this._rootUrl).href;
+        const manifestUri = new URL(this._devConfig.modules[name][branch][version], this._rootUrl).href;
+        const response = await fetch(manifestUri);
+        const manifest = await response.json() as Manifest;
+        const distUri = new URL(manifest.dist as string, manifestUri).href;
+        manifest.dist = {
+            hash: null,
+            uris: [distUri]
+        }
 
-        return {
-            hash: null, // ToDo: implement hash
-            uris: [uri]
-        };
+        return manifest;
     }
 
     public async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
@@ -97,7 +99,7 @@ export class DevRegistry implements Registry {
         //}
     }
 
-    public async addModuleWithObjects(name: string, branch: string, version: string, hashUris: HashUris[]): Promise<void> {
+    public async addModule(name: string, branch: string, version: string, manifest: Manifest): Promise<void> {
         throw new Error("Development Registry doesn't support a module deployment.");
     }
 

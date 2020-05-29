@@ -1,10 +1,11 @@
 import { Registry, HashUris } from './registry';
 import { DevRegistry } from './devRegistry';
-import { TestRegistry } from './testRegistry';
+//import { TestRegistry } from './testRegistry';
 import { EthRegistry } from './ethRegistry';
 import GlobalConfigService from '../services/globalConfigService';
 import { gt, compare } from 'semver';
 import { mergeDedupe, typeOfUri, UriTypes } from '../../common/helpers';
+import Manifest from '../models/manifest';
 
 export class RegistryAggregator {
     public isAvailable: boolean = true;
@@ -21,17 +22,30 @@ export class RegistryAggregator {
         return versionsAsc;
     }
 
-    async resolveToUris(name: string, branch: string, version: string): Promise<HashUris> {
+    async resolveToManifest(name: string, branch: string, version: string): Promise<Manifest> {
         await this._initRegistries();
 
-        const uriWithErrors = await Promise.all(this.registries.map(r => r.resolveToUris(name, branch, version).catch(Error)));
-        const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error) && x !== null && x !== undefined) as HashUris[];
-        const uris = mergeDedupe(uriNoErrors.map(x => x.uris));
+        const uriWithErrors = await Promise.all(this.registries.map(r => r.resolveToManifest(name, branch, version).catch(Error)));
+        const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error) && x !== null && x !== undefined) as Manifest[];
+        
+        if (uriNoErrors.length === 0) {
+            if (uriWithErrors.length === 0) {
+                throw new Error(`Could not find the manifest URI of the ${name}#${branch}@${version} module`);
+            } else {
+                uriWithErrors.forEach(e => {
+                    throw e;
+                });
+            }
+        }
 
-        return {
-            hash: uriNoErrors[0]?.hash || null, // ToDo: fix it
-            uris
-        };
+        return uriNoErrors[0];
+
+        //const uris = mergeDedupe(uriNoErrors);
+        
+        // return {
+        //     hash: uriNoErrors[0]?.hash || null, // ToDo: fix it
+        //     uris
+        // };
     }
 
     async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
@@ -118,7 +132,7 @@ export class RegistryAggregator {
                     const uriType = typeOfUri(r.url);
 
                     if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
-                    if (uriType === UriTypes.Http && !r.isDev) return new TestRegistry(r.url);
+                    //if (uriType === UriTypes.Http && !r.isDev) return new TestRegistry(r.url);
                     if (uriType === UriTypes.Ethereum) return new EthRegistry(r.url);
                 });
         }

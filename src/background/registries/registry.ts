@@ -1,3 +1,5 @@
+import Manifest from "../models/manifest";
+
 export type HashUris = {
     hash: string;
     uris: string[];
@@ -10,7 +12,7 @@ export interface Registry {
 
     getVersions(name: string, branch: string): Promise<string[]>;
 
-    resolveToUris(name: string, branch: string, version: string): Promise<HashUris>;
+    resolveToManifest(name: string, branch: string, version: string): Promise<Manifest>;
 
     // ToDo: add params limit: number, settings: any
     // no more than 100, order
@@ -18,7 +20,7 @@ export interface Registry {
 
     getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]>;
 
-    addModuleWithObjects(name: string, branch: string, version: string, hashUris: HashUris[], key?: string): Promise<void>;
+    addModule(name: string, branch: string, version: string, manifest: Manifest): Promise<void>;
 
     hashToUris(hash: string): Promise<HashUris>;
 
