@@ -38,10 +38,15 @@ export class DevRegistry implements Registry {
         const response = await fetch(manifestUri);
         const manifest = await response.json() as Manifest;
         const distUri = new URL(manifest.dist as string, manifestUri).href;
+        const iconUri = new URL(manifest.icon as string, manifestUri).href;
         manifest.dist = {
             hash: null,
             uris: [distUri]
-        }
+        };
+        manifest.icon = {
+            hash: null,
+            uris: [iconUri]
+        };
 
         return manifest;
     }

@@ -12,7 +12,7 @@ export default class Manifest extends Base {
     title: string = null;
     description: string = null;
     author: string = null;
-    icon: string = null;
+    icon: HashUris | string = null;
     dist: HashUris | string = null;
 
     dependencies: {

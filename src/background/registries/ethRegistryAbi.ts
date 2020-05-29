@@ -39,11 +39,6 @@ export default [
                     },
                     {
                         "internalType": "string",
-                        "name": "icon",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
                         "name": "mod_type",
                         "type": "string"
                     },
@@ -60,6 +55,16 @@ export default [
                     {
                         "internalType": "string[]",
                         "name": "distUris",
+                        "type": "string[]"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "iconHash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "string[]",
+                        "name": "iconUris",
                         "type": "string[]"
                     },
                     {
@@ -186,11 +191,6 @@ export default [
                     },
                     {
                         "internalType": "string",
-                        "name": "icon",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
                         "name": "mod_type",
                         "type": "string"
                     },
@@ -207,6 +207,16 @@ export default [
                     {
                         "internalType": "string[]",
                         "name": "distUris",
+                        "type": "string[]"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "iconHash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "string[]",
+                        "name": "iconUris",
                         "type": "string[]"
                     },
                     {
@@ -260,11 +270,6 @@ export default [
                     },
                     {
                         "internalType": "string",
-                        "name": "icon",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
                         "name": "mod_type",
                         "type": "string"
                     },
@@ -281,6 +286,16 @@ export default [
                     {
                         "internalType": "string[]",
                         "name": "distUris",
+                        "type": "string[]"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "iconHash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "string[]",
+                        "name": "iconUris",
                         "type": "string[]"
                     },
                     {
@@ -337,11 +352,6 @@ export default [
                             },
                             {
                                 "internalType": "string",
-                                "name": "icon",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
                                 "name": "mod_type",
                                 "type": "string"
                             },
@@ -358,6 +368,16 @@ export default [
                             {
                                 "internalType": "string[]",
                                 "name": "distUris",
+                                "type": "string[]"
+                            },
+                            {
+                                "internalType": "bytes32",
+                                "name": "iconHash",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "string[]",
+                                "name": "iconUris",
                                 "type": "string[]"
                             },
                             {
@@ -601,4 +621,4 @@ export default [
         "type": "function",
         "constant": true
     }
-];
+]

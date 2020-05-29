@@ -8,7 +8,10 @@ export default class ManifestDTO {
     title: string = null;
     description: string = null;
     author: string = null;
-    icon: string = null;
+    icon: {
+        hash: string;
+        uris: string[];
+    } = null;
     isActive: boolean = null;
     dist: string = null;
     order: number = null;

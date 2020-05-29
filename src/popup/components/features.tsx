@@ -104,7 +104,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                 {features.map((f, i) => (
                   <List.Item key={i} style={{ overflow: "hidden" }}>
                     <List.Content style={{ width: 45, float: "left" }}>
-                      <Popup trigger={<Image size="mini" avatar alt={f.description} src={f.icon} />}>
+                      <Popup trigger={<Image size="mini" avatar alt={f.description} src={(f.icon?.uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + f.icon?.uris?.[0] : f.icon?.uris?.[0]} />}>
                         <h4>Related Context IDs</h4>
                         <List>{f.hostnames?.map((h, j) => <List.Item key={j}>{h}</List.Item>)}</List>
 

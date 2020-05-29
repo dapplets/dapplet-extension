@@ -41,7 +41,10 @@ export class EthRegistry implements Registry {
             manifest.version = version;
             manifest.title = m.title;
             manifest.description = m.description;
-            manifest.icon = m.icon;
+            manifest.icon = {
+                hash: m.iconHash,
+                uris: m.iconUris
+            };
             manifest.type = m.mod_type;
             manifest.dist = {
                 hash: m.distHash,
@@ -91,7 +94,8 @@ export class EthRegistry implements Registry {
             initialized: true,
             title: manifest.title,
             description: manifest.description,
-            icon: manifest.icon || '',
+            iconHash: manifest.icon ? (manifest.icon as HashUris).hash : '0x0000000000000000000000000000000000000000000000000000000000000000',
+            iconUris: manifest.icon ? (manifest.icon as HashUris).uris : [],
             mod_type: manifest.type,
             author: manifest.author,
             distHash: (manifest.dist as HashUris).hash, // hash of bundle
