@@ -9,6 +9,7 @@ import NOLOGO_PNG from '../common/resources/no-logo.png';
 import './index.scss';
 import { Bus } from '../common/bus';
 import Manifest from '../background/models/manifest';
+import { HashUris } from '../background/registries/registry';
 
 interface IIndexProps { }
 
@@ -149,7 +150,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     render() {
         const {
-            manifest, loading, targetRegistry,
+            manifest: m, loading, targetRegistry,
             targetStorage, deployed,
             message, registryKey, registryOptions,
             owner, currentAccount, newOwner, editLocation: newLocation,
@@ -185,20 +186,20 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     />
                 ) : null}
 
-                {(manifest) ? (<Card fluid>
+                {(m) ? (<Card fluid>
                     <Card.Content>
                         <Image
                             floated='right'
                             size='mini'
                             circular
-                            src={manifest.icon || NOLOGO_PNG}
+                            src={(m.icon && (m.icon as HashUris).uris.length > 0) ? (((m.icon as HashUris).uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + (m.icon as HashUris).uris?.[0] : (m.icon as HashUris).uris?.[0]) : NOLOGO_PNG}
                         />
-                        <Card.Header>{manifest.title}</Card.Header>
-                        <Card.Meta>{manifest.type}</Card.Meta>
+                        <Card.Header>{m.title}</Card.Header>
+                        <Card.Meta>{m.type}</Card.Meta>
                         <Card.Description>
-                            {manifest.description}<br />
-                            {manifest.author}<br />
-                            <strong>{manifest.name}#{manifest.branch}@{manifest.version}</strong><br />
+                            {m.description}<br />
+                            {m.author}<br />
+                            <strong>{m.name}#{m.branch}@{m.version}</strong><br />
                             Owner: <a href='#' onClick={() => window.open(`https://rinkeby.etherscan.io/address/${owner}`, '_blank')}>{owner}</a>
                         </Card.Description>
                     </Card.Content>

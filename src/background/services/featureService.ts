@@ -154,6 +154,23 @@ export default class FeatureService {
                 uris: [distUrl]
             };
 
+            if (defaultManifest.icon) {
+                // Icon file publishing
+                const icon = await this._storageAggregator.getResource(defaultManifest.dist as HashUris);
+                const iconBlob = new Blob([icon], { type: "text/javascript" });
+                const iconUrl = (targetStorage === 'test-registry') ? await saveToTestRegistry(iconBlob, targetRegistry) : await saveToSwarm(iconBlob);
+
+                // Icon file  hashing
+                const iconBuffer = await (iconBlob as any).arrayBuffer();
+                const iconHash = ethers.utils.keccak256(new Uint8Array(iconBuffer));
+
+                // Manifest editing
+                defaultManifest.icon = {
+                    hash: iconHash,
+                    uris: [iconUrl]
+                };
+            }
+
             // Register manifest in Registry
             const registry = this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry);
             if (!registry) throw new Error("No registry with this url exists in config.");
