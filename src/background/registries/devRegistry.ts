@@ -38,15 +38,17 @@ export class DevRegistry implements Registry {
         const response = await fetch(manifestUri);
         const manifest = await response.json() as Manifest;
         const distUri = new URL(manifest.dist as string, manifestUri).href;
-        const iconUri = new URL(manifest.icon as string, manifestUri).href;
         manifest.dist = {
             hash: null,
             uris: [distUri]
         };
-        manifest.icon = {
-            hash: null,
-            uris: [iconUri]
-        };
+        if (manifest.icon) {
+            const iconUri = new URL(manifest.icon as string, manifestUri).href;
+            manifest.icon = {
+                hash: null,
+                uris: [iconUri]
+            };
+        }
 
         return manifest;
     }
@@ -91,16 +93,16 @@ export class DevRegistry implements Registry {
 
     private async _cacheDevConfig() {
         //if (this.isAvailable && !this._devConfig) {
-            try {
-                const response = await fetch(this.url, { cache: 'no-store' });
-                if (!response.ok) throw new Error(response.statusText);
-                this._devConfig = await response.json();
-                this.isAvailable = true;
-                this.error = null;
-            } catch (err) {
-                this.isAvailable = false;
-                this.error = err.message;
-            }
+        try {
+            const response = await fetch(this.url, { cache: 'no-store' });
+            if (!response.ok) throw new Error(response.statusText);
+            this._devConfig = await response.json();
+            this.isAvailable = true;
+            this.error = null;
+        } catch (err) {
+            this.isAvailable = false;
+            this.error = err.message;
+        }
         //}
     }
 
