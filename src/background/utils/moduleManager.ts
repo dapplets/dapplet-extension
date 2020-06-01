@@ -18,13 +18,16 @@ export default class ModuleManager {
         // 1. Topological Sorting
         // 2. Dependency Resolution Algorithm
 
-        let dependencies: { name: string, branch: string, version: string, manifest: Manifest }[] = 
+        let dependencies: { name: string, branch: string, version: string, manifest: Manifest }[] =
             modules.map(({ name, version, branch }) => ({ name, version, branch: !branch ? DEFAULT_BRANCH_NAME : branch, manifest: null }));
 
         const resolve = async (parent: { name: string, branch: string, version: string, manifest: Manifest }) => {
             try {
                 const moduleDeps = await this._getChildDependenciesAndManifest(parent.name, parent.version, parent.branch);
                 parent.manifest = moduleDeps.manifest;
+
+                if (!moduleDeps.manifest || !moduleDeps.dependencies) return;
+
                 const optimizedDeps = await Promise.all(moduleDeps.dependencies.map(d => this.optimizeDependency(d.name, d.version, d.branch)));
 
                 for (const dep of optimizedDeps) {
@@ -40,7 +43,7 @@ export default class ModuleManager {
         }
 
         await Promise.all(dependencies.map(d => resolve(d)));
-        
+
         // reverse() - the lowest script in the hierarchy should be loaded first
         return dependencies.reverse().filter(d => !!d.manifest);
     }
@@ -145,32 +148,29 @@ export default class ModuleManager {
     // ToDo: refactor it
     public async getFeaturesByHostnamesWithRegistries(hostnames: string[], replaceUri: boolean): Promise<{ [registryUrl: string]: { [hostname: string]: Manifest[] } }> {
         if (!hostnames || hostnames.length === 0) return {};
-        const hostnameFeatures = await this.registryAggregator.getFeaturesWithRegistries(hostnames); // result.hostname.featureName[branchIndex]
-        const plainArray: { registryUrl: string, hostname: string, name: string, branch: string, manifest?: Manifest }[] = [];
 
-        for (const registryUrl in hostnameFeatures) {
-            for (const hostname in hostnameFeatures[registryUrl]) {
-                const features = hostnameFeatures[registryUrl][hostname];
-                for (const name in features) {
-                    const branch = features[name][0]; // ToDo: select branch
-                    plainArray.push({ registryUrl, hostname, name, branch });
+        const hostnameManifests = await this.registryAggregator.getManifestsWithRegistries(hostnames);
+        const hostnameManifests2 = {};
+
+        const groupBy = function (xs, key) {
+            return xs.reduce(function (rv, x) {
+                (rv[x[key]] = rv[x[key]] || []).push(x);
+                return rv;
+            }, {});
+        };
+
+        for (const registry in hostnameManifests) {
+            hostnameManifests2[registry] = {};
+            for (const hostname in hostnameManifests[registry]) {
+                hostnameManifests2[registry][hostname] = [];
+                const grouped = groupBy(hostnameManifests[registry][hostname], 'name');
+                for (const name in grouped) {
+                    hostnameManifests2[registry][hostname].push(grouped[name].sort((a, b) => rcompare(a.version, b.version))[0]);
                 }
             }
         }
 
-        const manifests = await Promise.all(plainArray.map(module => this._loadManifestByBranch(module.name, module.branch, replaceUri).then(manifest => ({
-            registryUrl: module.registryUrl, hostname: module.hostname, manifest
-        }))));
-
-        const hostnameManifests: { [registryUrl: string]: { [hostname: string]: Manifest[] } } = {};
-
-        for (const { registryUrl, hostname, manifest } of manifests) {
-            if (!hostnameManifests[registryUrl]) hostnameManifests[registryUrl] = {};
-            if (!hostnameManifests[registryUrl][hostname]) hostnameManifests[registryUrl][hostname] = [];
-            hostnameManifests[registryUrl][hostname].push(manifest);
-        }
-
-        return hostnameManifests;
+        return hostnameManifests2;
     }
 
     private async _loadManifestByBranch(name: string, branch: string, replaceUri: boolean) {

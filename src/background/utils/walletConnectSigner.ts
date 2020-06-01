@@ -2,7 +2,7 @@ import * as ethers from "ethers";
 import { walletConnector, sendTransaction } from '../services/walletConnectService';
 
 export class WalletConnectSigner extends ethers.Signer {
-    public provider = new ethers.providers.JsonRpcProvider('https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992');
+    public provider = new ethers.providers.JsonRpcProvider('https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992', 'rinkeby');
     //public provider = new ethers.providers.WebSocketProvider('wss://rinkeby.infura.io/ws/v3/eda881d858ae4a25b2dfbbd0b4629992', 'rinkeby');
 
     connect(provider: ethers.ethers.providers.Provider): ethers.ethers.Signer {

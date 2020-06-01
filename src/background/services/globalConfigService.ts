@@ -21,7 +21,7 @@ export default class GlobalConfigService {
         const config = new GlobalConfig();
         config.id = this._configId;
         config.registries = [{
-            url: "0x653a7a48f7CEB2F972Ad7faBfe994F42B0F1D20A",
+            url: "0x46e1947fFE48eE83C6d14688f082e960695F51B4",
             isDev: false
         }];
         config.devMode = false;

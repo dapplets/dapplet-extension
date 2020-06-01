@@ -10,7 +10,7 @@ export class DevRegistry implements Registry {
 
     private _devConfig: {
         hostnames: { [hostname: string]: { [name: string]: string } },
-        modules: { [name: string]: { [branch: string]: string } }
+        modules: { [name: string]: { [branch: string]: { [version: string]: string } } }
     } = null;
 
     constructor(public url: string) {
@@ -18,6 +18,22 @@ export class DevRegistry implements Registry {
         this._rootUrl = new URL(this.url).origin;
     }
 
+    public async getManifests(locations: string[]): Promise<{ [location: string]: Manifest[] }> {
+        await this._cacheDevConfig();
+        const result = {};
+
+        for (const location of locations) {
+            result[location] = [];
+            for (const name in (this._devConfig.hostnames[location] || {})) {
+                for (const version in this._devConfig.modules[name]['default']) {
+                    const manifest = await this._loadManifest(this._devConfig.modules[name]['default'][version]);
+                    result[location].push(manifest);
+                }
+            }
+        }
+
+        return result;
+    }
     public async getVersions(name: string, branch: string): Promise<string[]> {
         await this._cacheDevConfig();
         const branches = this._devConfig.modules[name];
@@ -31,10 +47,14 @@ export class DevRegistry implements Registry {
         const { modules } = this._devConfig;
 
         if (!modules || !modules[name] || !modules[name][branch] || !modules[name][branch][version]) {
-            return null;
+            throw new Error(`The manifest of the module "${name}@${branch}#${version}" is not found`);
         };
 
-        const manifestUri = new URL(this._devConfig.modules[name][branch][version], this._rootUrl).href;
+        return await this._loadManifest(this._devConfig.modules[name][branch][version]);
+    }
+
+    private async _loadManifest(uri: string) {
+        const manifestUri = new URL(uri, this._rootUrl).href;
         const response = await fetch(manifestUri);
         const manifest = await response.json() as Manifest;
         const distUri = new URL(manifest.dist as string, manifestUri).href;

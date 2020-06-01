@@ -29,6 +29,21 @@ export default [
                     },
                     {
                         "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "branch",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "version",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
                         "name": "title",
                         "type": "string"
                     },
@@ -131,6 +146,93 @@ export default [
         "inputs": [
             {
                 "internalType": "string",
+                "name": "location",
+                "type": "string"
+            }
+        ],
+        "name": "getManifests",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "bool",
+                        "name": "initialized",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "branch",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "version",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "mod_type",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "author",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "distHash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "string[]",
+                        "name": "distUris",
+                        "type": "string[]"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "iconHash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "string[]",
+                        "name": "iconUris",
+                        "type": "string[]"
+                    },
+                    {
+                        "internalType": "string[2][]",
+                        "name": "dependencies",
+                        "type": "string[2][]"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.Manifest[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
                 "name": "name",
                 "type": "string"
             },
@@ -178,6 +280,21 @@ export default [
                         "internalType": "bool",
                         "name": "initialized",
                         "type": "bool"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "branch",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "version",
+                        "type": "string"
                     },
                     {
                         "internalType": "string",
@@ -257,6 +374,21 @@ export default [
                         "internalType": "bool",
                         "name": "initialized",
                         "type": "bool"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "branch",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "version",
+                        "type": "string"
                     },
                     {
                         "internalType": "string",
@@ -339,6 +471,21 @@ export default [
                                 "internalType": "bool",
                                 "name": "initialized",
                                 "type": "bool"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "branch",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "version",
+                                "type": "string"
                             },
                             {
                                 "internalType": "string",

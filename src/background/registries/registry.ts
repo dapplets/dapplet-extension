@@ -10,6 +10,8 @@ export interface Registry {
     error: string;
     url: string;
 
+    getManifests(locations: string[]): Promise<{ [location: string]: Manifest[] }>;
+
     getVersions(name: string, branch: string): Promise<string[]>;
 
     resolveToManifest(name: string, branch: string, version: string): Promise<Manifest>;

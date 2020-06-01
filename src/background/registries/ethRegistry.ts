@@ -18,6 +18,41 @@ export class EthRegistry implements Registry {
         this._contract = new ethers.Contract(url, abi, signer);
     }
 
+    public async getManifests(locations: string[]): Promise<{ [x: string]: Manifest[] }> {
+        try {
+            const location = locations[0];
+            const manifests = await this._contract.getManifests(location);
+            this.isAvailable = true;
+            this.error = null;
+            const result = {
+                [location]: manifests.map(m => {
+                    const manifest = new Manifest();
+                    manifest.name = m.name;
+                    manifest.branch = m.branch;
+                    manifest.version = m.version;
+                    manifest.title = m.title;
+                    manifest.description = m.description;
+                    manifest.icon = {
+                        hash: m.iconHash,
+                        uris: m.iconUris
+                    };
+                    manifest.type = m.mod_type;
+                    manifest.dist = {
+                        hash: m.distHash,
+                        uris: m.distUris
+                    }
+                    manifest.dependencies = Object.fromEntries(m.dependencies);
+                    return manifest;
+                })
+            };
+            return result;
+        } catch (err) {
+            this.isAvailable = false;
+            this.error = err.message;
+            throw err;
+        }
+    }
+
     public async getVersions(name: string, branch: string): Promise<string[]> {
         try {
             const versions = await this._contract.getVersions(name, branch);
