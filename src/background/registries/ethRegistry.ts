@@ -3,6 +3,7 @@ import abi from './ethRegistryAbi';
 import * as ethers from "ethers";
 import { WalletConnectSigner } from '../utils/walletConnectSigner';
 import Manifest from '../models/manifest';
+import * as semver from 'semver';
 
 export class EthRegistry implements Registry {
     public isAvailable: boolean = true;
@@ -18,32 +19,37 @@ export class EthRegistry implements Registry {
         this._contract = new ethers.Contract(url, abi, signer);
     }
 
-    public async getManifests(locations: string[]): Promise<{ [x: string]: Manifest[] }> {
+    public async getManifests(locations: string[], users: string[]): Promise<{ [x: string]: Manifest[] }> {
+        console.log('users', users);
         try {
             const location = locations[0];
-            const manifests = await this._contract.getManifests(location);
+            const manifests = await this._contract.getModuleInfo(location, users.map(u => "0x000000000000000000000000" + u.replace('0x', '')), 0);
+            console.log('manifests', manifests);
             this.isAvailable = true;
             this.error = null;
             const result = {
                 [location]: manifests.map(m => {
-                    const manifest = new Manifest();
-                    manifest.name = m.name;
-                    manifest.branch = m.branch;
-                    manifest.version = m.version;
-                    manifest.title = m.title;
-                    manifest.description = m.description;
-                    manifest.icon = {
-                        hash: m.iconHash,
-                        uris: m.iconUris
-                    };
-                    manifest.type = m.mod_type;
-                    manifest.dist = {
-                        hash: m.distHash,
-                        uris: m.distUris
-                    }
-                    manifest.dependencies = Object.fromEntries(m.dependencies);
-                    return manifest;
-                })
+                    const last = m.versions[m.versions.length - 1];
+
+                    return ({
+                        type: { 1: "FEATURE", 2: "ADAPTER", 3: "RESOLVER", 4: "LIBRARY", 5: "INTERFACE" }[m.moduleType],
+                        name: m.name,
+                        branch: last.branch,
+                        version: `${last.major}.${last.minor}.${last.patch}`,
+                        title: m.title,
+                        description: m.description,
+                        icon: {
+                            hash: m.icon.hash,
+                            uris: m.icon.uris.map(u => ethers.utils.toUtf8String(u))
+                        },
+                        dist: {
+                            hash: last.binary.hash,
+                            uris: last.binary.uris.map(u => ethers.utils.toUtf8String(u)),
+                        },
+                        dependencies: last.dependencies,
+                        author: m.owner
+                    })
+                }).filter(x => x.type === 'FEATURE')
             };
             return result;
         } catch (err) {
@@ -56,9 +62,10 @@ export class EthRegistry implements Registry {
     public async getVersions(name: string, branch: string): Promise<string[]> {
         try {
             const versions = await this._contract.getVersions(name, branch);
+            console.log('getVersions', { name, branch }, versions);
             this.isAvailable = true;
             this.error = null;
-            return versions;
+            return versions.map(v => `${v.major}.${v.minor}.${v.patch}`);
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
@@ -68,22 +75,27 @@ export class EthRegistry implements Registry {
 
     public async resolveToManifest(name: string, branch: string, version: string): Promise<Manifest> {
         try {
-            const m = await this._contract.resolveToManifest(name, branch, version);
+            const m = await this._contract.resolveToManifest(name, branch, {
+                major: semver.major(version),
+                minor: semver.minor(version),
+                patch: semver.patch(version)
+            });
+            console.log('resolveToManifest', { name, branch, version }, m);
 
             const manifest = new Manifest();
-            manifest.name = name;
-            manifest.branch = branch;
-            manifest.version = version;
+            manifest.name = m.name;
+            manifest.branch = m.branch;
+            manifest.version = `${m.major}.${m.minor}.${m.patch}`;
             manifest.title = m.title;
             manifest.description = m.description;
             manifest.icon = {
-                hash: m.iconHash,
-                uris: m.iconUris
+                hash: m.icon.hash,
+                uris: m.icon.uris
             };
-            manifest.type = m.mod_type;
+            manifest.type = { 1: "FEATURE", 2: "ADAPTER", 3: "RESOLVER", 4: "LIBRARY", 5: "INTERFACE" }[m.moduleType];
             manifest.dist = {
-                hash: m.distHash,
-                uris: m.distUris
+                hash: m.binary.hash,
+                uris: m.binary.uris
             }
             manifest.dependencies = Object.fromEntries(m.dependencies);
 
@@ -99,7 +111,8 @@ export class EthRegistry implements Registry {
 
     public async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
         try {
-            const modules: string[] = await this._contract.getModules(hostnames[0]);
+            const modules: string[] = await this._contract.getModules(hostnames[0], [], 0);
+            console.log('getFeatures', { hostnames }, modules);
             const result = {};
             for (const m of modules) {
                 result[m] = ['default'];
@@ -111,7 +124,7 @@ export class EthRegistry implements Registry {
 
             this.isAvailable = true;
             this.error = null;
-            
+
             return result2;
         } catch (err) {
             this.isAvailable = false;

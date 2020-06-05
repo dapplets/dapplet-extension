@@ -10,7 +10,7 @@ export interface Registry {
     error: string;
     url: string;
 
-    getManifests(locations: string[]): Promise<{ [location: string]: Manifest[] }>;
+    getManifests(locations: string[], users: string[]): Promise<{ [location: string]: Manifest[] }>;
 
     getVersions(name: string, branch: string): Promise<string[]>;
 

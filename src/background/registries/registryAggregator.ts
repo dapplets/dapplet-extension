@@ -96,9 +96,9 @@ export class RegistryAggregator {
         return merge;
     }
 
-    public async getManifestsWithRegistries(locations: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: Manifest[] } }> {
+    public async getManifestsWithRegistries(locations: string[], users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: Manifest[] } }> {
         await this._initRegistries();
-        const regFeatures = await Promise.all(this.registries.map(r => r.getManifests(locations).then(m => ({ [r.url]: m })).catch(Error)));
+        const regFeatures = await Promise.all(this.registries.map(r => r.getManifests(locations, users).then(m => ({ [r.url]: m })).catch(Error)));
         const validRegFeatures = regFeatures.filter(result => !(result instanceof Error));
         const merge: { [registryUrl: string]: { [hostname: string]: Manifest[] } } = {};
 

@@ -16,7 +16,8 @@ export default class FeatureService {
     private _storageAggregator = new StorageAggregator();
 
     async getFeaturesByHostnames(hostnames: string[], replaceUri = false): Promise<ManifestDTO[]> {
-        const regHostnamesManfiests = await this._moduleManager.getFeaturesByHostnamesWithRegistries(hostnames, replaceUri);
+        const users = await this._globalConfigService.getTrustedUsers();
+        const regHostnamesManfiests = await this._moduleManager.getFeaturesByHostnamesWithRegistries(hostnames, replaceUri, users.map(u => u.account));
         const dtos: ManifestDTO[] = [];
 
         const configRegistries = await this._globalConfigService.getRegistries();

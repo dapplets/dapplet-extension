@@ -146,10 +146,10 @@ export default class ModuleManager {
     }
 
     // ToDo: refactor it
-    public async getFeaturesByHostnamesWithRegistries(hostnames: string[], replaceUri: boolean): Promise<{ [registryUrl: string]: { [hostname: string]: Manifest[] } }> {
+    public async getFeaturesByHostnamesWithRegistries(hostnames: string[], replaceUri: boolean, users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: Manifest[] } }> {
         if (!hostnames || hostnames.length === 0) return {};
 
-        const hostnameManifests = await this.registryAggregator.getManifestsWithRegistries(hostnames);
+        const hostnameManifests = await this.registryAggregator.getManifestsWithRegistries(hostnames, users);
         const hostnameManifests2 = {};
 
         const groupBy = function (xs, key) {

@@ -18,7 +18,7 @@ export class DevRegistry implements Registry {
         this._rootUrl = new URL(this.url).origin;
     }
 
-    public async getManifests(locations: string[]): Promise<{ [location: string]: Manifest[] }> {
+    public async getManifests(locations: string[], users: string[]): Promise<{ [location: string]: Manifest[] }> {
         await this._cacheDevConfig();
         const result = {};
 
