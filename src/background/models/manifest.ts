@@ -1,6 +1,6 @@
 import Base from '../../common/models/base';
 import { ModuleTypes } from '../../common/constants';
-import { HashUris } from '../registries/registry';
+import { StorageRef } from '../registries/registry';
 
 export default class Manifest extends Base {
     getId = () => `${this.name}#${this.branch}@${this.version}`;
@@ -12,8 +12,8 @@ export default class Manifest extends Base {
     title: string = null;
     description: string = null;
     author: string = null;
-    icon: HashUris | string = null;
-    dist: HashUris | string = null;
+    icon: StorageRef | string = null;
+    dist: StorageRef | string = null;
 
     dependencies: {
         [name: string]: string | {

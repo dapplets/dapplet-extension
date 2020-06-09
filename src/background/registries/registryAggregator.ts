@@ -1,11 +1,12 @@
-import { Registry, HashUris } from './registry';
-import { DevRegistry } from './devRegistry';
+import { Registry, StorageRef } from './registry';
+//import { DevRegistry } from './devRegistry';
 //import { TestRegistry } from './testRegistry';
 import { EthRegistry } from './ethRegistry';
 import GlobalConfigService from '../services/globalConfigService';
 import { gt, compare } from 'semver';
 import { mergeDedupe, typeOfUri, UriTypes } from '../../common/helpers';
 import Manifest from '../models/manifest';
+import ModuleInfo from '../models/moduleInfo';
 
 export class RegistryAggregator {
     public isAvailable: boolean = true;
@@ -96,11 +97,11 @@ export class RegistryAggregator {
         return merge;
     }
 
-    public async getManifestsWithRegistries(locations: string[], users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: Manifest[] } }> {
+    public async getManifestsWithRegistries(locations: string[], users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: ModuleInfo[] } }> {
         await this._initRegistries();
-        const regFeatures = await Promise.all(this.registries.map(r => r.getManifests(locations, users).then(m => ({ [r.url]: m })).catch(Error)));
+        const regFeatures = await Promise.all(this.registries.map(r => r.getModuleInfo(locations, users).then(m => ({ [r.url]: m })).catch(Error)));
         const validRegFeatures = regFeatures.filter(result => !(result instanceof Error));
-        const merge: { [registryUrl: string]: { [hostname: string]: Manifest[] } } = {};
+        const merge: { [registryUrl: string]: { [hostname: string]: ModuleInfo[] } } = {};
 
         // Deep merging of regFeatures
         for (const f of validRegFeatures) {
@@ -127,11 +128,11 @@ export class RegistryAggregator {
         return reduced;
     }
 
-    public async hashToUris(hash: string): Promise<HashUris> {
+    public async hashToUris(hash: string): Promise<StorageRef> {
         await this._initRegistries();
 
         const uriWithErrors = await Promise.all(this.registries.map(r => r.hashToUris(hash).catch(Error)));
-        const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error)) as HashUris[];
+        const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error)) as StorageRef[];
         const uris = mergeDedupe(uriNoErrors.map(x => x.uris));
 
         return {
@@ -153,7 +154,7 @@ export class RegistryAggregator {
                 .map(r => {
                     const uriType = typeOfUri(r.url);
 
-                    if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
+                    //if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
                     //if (uriType === UriTypes.Http && !r.isDev) return new TestRegistry(r.url);
                     if (uriType === UriTypes.Ethereum) return new EthRegistry(r.url);
                 });

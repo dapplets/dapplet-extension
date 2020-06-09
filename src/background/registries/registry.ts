@@ -1,6 +1,7 @@
 import Manifest from "../models/manifest";
+import ModuleInfo from "../models/moduleInfo";
 
-export type HashUris = {
+export type StorageRef = {
     hash: string;
     uris: string[];
 }
@@ -10,7 +11,7 @@ export interface Registry {
     error: string;
     url: string;
 
-    getManifests(locations: string[], users: string[]): Promise<{ [location: string]: Manifest[] }>;
+    getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }>;
 
     getVersions(name: string, branch: string): Promise<string[]>;
 
@@ -24,7 +25,7 @@ export interface Registry {
 
     addModule(name: string, branch: string, version: string, manifest: Manifest): Promise<void>;
 
-    hashToUris(hash: string): Promise<HashUris>;
+    hashToUris(hash: string): Promise<StorageRef>;
 
     getOwnership(moduleName: string): Promise<string>;
 

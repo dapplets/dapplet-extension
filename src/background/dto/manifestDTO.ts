@@ -1,19 +1,17 @@
 import { ModuleTypes } from '../../common/constants';
+import { StorageRef } from '../registries/registry';
 
 export default class ManifestDTO {
     name: string = null;
-    branch: string = null;
-    version: string = null;
+    //branch: string = null;
+    //version: string = null;
     type: ModuleTypes = null;
     title: string = null;
     description: string = null;
     author: string = null;
-    icon: {
-        hash: string;
-        uris: string[];
-    } = null;
+    icon: StorageRef = null;
     isActive: boolean = null;
-    dist: string = null;
+    //dist: string = null;
     order: number = null;
     hostnames: string[] = [];
     sourceRegistry: {

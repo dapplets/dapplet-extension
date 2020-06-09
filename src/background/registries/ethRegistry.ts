@@ -1,9 +1,19 @@
-import { Registry, HashUris } from './registry';
+import { Registry, StorageRef } from './registry';
 import abi from './ethRegistryAbi';
 import * as ethers from "ethers";
 import { WalletConnectSigner } from '../utils/walletConnectSigner';
 import Manifest from '../models/manifest';
 import * as semver from 'semver';
+import ModuleInfo from '../models/moduleInfo';
+import { ModuleTypes } from '../../common/constants';
+
+const moduleTypesMap = {
+    1: ModuleTypes.Feature,
+    2: ModuleTypes.Adapter,
+    3: ModuleTypes.Resolver,
+    4: ModuleTypes.Library,
+    5: ModuleTypes.Interface
+};
 
 export class EthRegistry implements Registry {
     public isAvailable: boolean = true;
@@ -19,38 +29,30 @@ export class EthRegistry implements Registry {
         this._contract = new ethers.Contract(url, abi, signer);
     }
 
-    public async getManifests(locations: string[], users: string[]): Promise<{ [x: string]: Manifest[] }> {
-        console.log('users', users);
+    public async getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }> {
         try {
-            const location = locations[0];
-            const manifests = await this._contract.getModuleInfo(location, users.map(u => "0x000000000000000000000000" + u.replace('0x', '')), 0);
-            console.log('manifests', manifests);
+            const usersNormalized = users.map(u => "0x000000000000000000000000" + u.replace('0x', ''));
+            const moduleInfos = await Promise.all(contextIds.map(ctx => this._contract.getModuleInfo(ctx, usersNormalized, 0).then(m => ([ctx, m]))));
             this.isAvailable = true;
             this.error = null;
-            const result = {
-                [location]: manifests.map(m => {
-                    const last = m.versions[m.versions.length - 1];
 
-                    return ({
-                        type: { 1: "FEATURE", 2: "ADAPTER", 3: "RESOLVER", 4: "LIBRARY", 5: "INTERFACE" }[m.moduleType],
-                        name: m.name,
-                        branch: last.branch,
-                        version: `${last.major}.${last.minor}.${last.patch}`,
-                        title: m.title,
-                        description: m.description,
-                        icon: {
-                            hash: m.icon.hash,
-                            uris: m.icon.uris.map(u => ethers.utils.toUtf8String(u))
-                        },
-                        dist: {
-                            hash: last.binary.hash,
-                            uris: last.binary.uris.map(u => ethers.utils.toUtf8String(u)),
-                        },
-                        dependencies: last.dependencies,
-                        author: m.owner
-                    })
-                }).filter(x => x.type === 'FEATURE')
-            };
+            const result = Object.fromEntries(moduleInfos.map(([ctx, modules]) => {
+                const mis = modules.map(m => {
+                    const mi = new ModuleInfo();
+                    mi.type = moduleTypesMap[m.moduleType];
+                    mi.name = m.name;
+                    mi.title = m.title;
+                    mi.description = m.description;
+                    mi.author = m.owner;
+                    mi.icon = {
+                        hash: m.icon.hash,
+                        uris: m.icon.uris.map(u => ethers.utils.toUtf8String(u))
+                    };
+                    return mi;
+                });
+                return [ctx, mis];
+            }));
+
             return result;
         } catch (err) {
             this.isAvailable = false;
@@ -61,11 +63,13 @@ export class EthRegistry implements Registry {
 
     public async getVersions(name: string, branch: string): Promise<string[]> {
         try {
-            const versions = await this._contract.getVersions(name, branch);
-            console.log('getVersions', { name, branch }, versions);
+            const hex = await this._contract.getVersions(name, branch, 0);
             this.isAvailable = true;
             this.error = null;
-            return versions.map(v => `${v.major}.${v.minor}.${v.patch}`);
+            const result = hex.replace('0x', '')
+                              .match(/.{1,8}/g)
+                              .map(x => `${parseInt('0x' + x[0] + x[1])}.${parseInt('0x' + x[2] + x[3])}.${parseInt('0x' + x[4] + x[5])}`);
+            return result;            
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
@@ -142,12 +146,12 @@ export class EthRegistry implements Registry {
             initialized: true,
             title: manifest.title,
             description: manifest.description,
-            iconHash: manifest.icon ? (manifest.icon as HashUris).hash : '0x0000000000000000000000000000000000000000000000000000000000000000',
-            iconUris: manifest.icon ? (manifest.icon as HashUris).uris : [],
+            iconHash: manifest.icon ? (manifest.icon as StorageRef).hash : '0x0000000000000000000000000000000000000000000000000000000000000000',
+            iconUris: manifest.icon ? (manifest.icon as StorageRef).uris : [],
             mod_type: manifest.type,
             author: manifest.author,
-            distHash: (manifest.dist as HashUris).hash, // hash of bundle
-            distUris: (manifest.dist as HashUris).uris,
+            distHash: (manifest.dist as StorageRef).hash, // hash of bundle
+            distUris: (manifest.dist as StorageRef).uris,
             dependencies: Object.entries(manifest.dependencies)
         };
         const tx = await this._contract.addModule(name, branch, version, manifestForContract);
@@ -163,7 +167,7 @@ export class EthRegistry implements Registry {
         // await tx.wait();
     }
 
-    public async hashToUris(hash: string): Promise<HashUris> {
+    public async hashToUris(hash: string): Promise<StorageRef> {
         try {
             const uris = await this._contract.hashToUris('0x' + hash);
             this.isAvailable = true;

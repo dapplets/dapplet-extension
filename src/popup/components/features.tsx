@@ -56,7 +56,8 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
     }
   }
 
-  async handleSwitchChange({ name, version, hostnames }, value, order) {
+  async handleSwitchChange(module: ManifestDTO, value, order) {
+    const { name, hostnames, sourceRegistry } = module;
     const backgroundFunctions = await initBGFunctions(extension);
     const { activateFeature, deactivateFeature } = backgroundFunctions;
     this.setState(state => {
@@ -71,9 +72,9 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
     });
 
     if (value) {
-      await activateFeature(name, version, hostnames, order);
+      await activateFeature(name, null, hostnames, order, sourceRegistry.url);
     } else {
-      await deactivateFeature(name, version, hostnames, order);
+      await deactivateFeature(name, null, hostnames, order, sourceRegistry.url);
     }
   }
 
@@ -128,7 +129,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                       <List.Description style={{ color: "#666" }}>
                         {f.description}<br />
                         Author: {f.author}<br />
-                        Version: {f.version}
+                        {/* Version: {f.version} */}
                       </List.Description>
                     </List.Content>
                   </List.Item>

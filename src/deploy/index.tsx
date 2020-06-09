@@ -9,7 +9,7 @@ import NOLOGO_PNG from '../common/resources/no-logo.png';
 import './index.scss';
 import { Bus } from '../common/bus';
 import Manifest from '../background/models/manifest';
-import { HashUris } from '../background/registries/registry';
+import { StorageRef } from '../background/registries/registry';
 
 interface IIndexProps { }
 
@@ -192,7 +192,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             floated='right'
                             size='mini'
                             circular
-                            src={(m.icon && (m.icon as HashUris).uris.length > 0) ? (((m.icon as HashUris).uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + (m.icon as HashUris).uris?.[0] : (m.icon as HashUris).uris?.[0]) : NOLOGO_PNG}
+                            src={(m.icon && (m.icon as StorageRef).uris.length > 0) ? (((m.icon as StorageRef).uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + (m.icon as StorageRef).uris?.[0] : (m.icon as StorageRef).uris?.[0]) : NOLOGO_PNG}
                         />
                         <Card.Header>{m.title}</Card.Header>
                         <Card.Meta>{m.type}</Card.Meta>

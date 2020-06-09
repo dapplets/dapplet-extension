@@ -79,19 +79,19 @@ export default [
                                 "type": "string"
                             },
                             {
-                                "internalType": "uint32",
+                                "internalType": "uint8",
                                 "name": "major",
-                                "type": "uint32"
+                                "type": "uint8"
                             },
                             {
-                                "internalType": "uint32",
+                                "internalType": "uint8",
                                 "name": "minor",
-                                "type": "uint32"
+                                "type": "uint8"
                             },
                             {
-                                "internalType": "uint32",
+                                "internalType": "uint8",
                                 "name": "patch",
-                                "type": "uint32"
+                                "type": "uint8"
                             },
                             {
                                 "internalType": "uint96",
@@ -209,19 +209,19 @@ export default [
                                 "type": "string"
                             },
                             {
-                                "internalType": "uint32",
+                                "internalType": "uint8",
                                 "name": "major",
-                                "type": "uint32"
+                                "type": "uint8"
                             },
                             {
-                                "internalType": "uint32",
+                                "internalType": "uint8",
                                 "name": "minor",
-                                "type": "uint32"
+                                "type": "uint8"
                             },
                             {
-                                "internalType": "uint32",
+                                "internalType": "uint8",
                                 "name": "patch",
-                                "type": "uint32"
+                                "type": "uint8"
                             },
                             {
                                 "internalType": "uint96",
@@ -318,19 +318,19 @@ export default [
                         "type": "string"
                     },
                     {
-                        "internalType": "uint32",
+                        "internalType": "uint8",
                         "name": "major",
-                        "type": "uint32"
+                        "type": "uint8"
                     },
                     {
-                        "internalType": "uint32",
+                        "internalType": "uint8",
                         "name": "minor",
-                        "type": "uint32"
+                        "type": "uint8"
                     },
                     {
-                        "internalType": "uint32",
+                        "internalType": "uint8",
                         "name": "patch",
-                        "type": "uint32"
+                        "type": "uint8"
                     },
                     {
                         "internalType": "uint96",
@@ -421,31 +421,19 @@ export default [
                 "internalType": "string",
                 "name": "branch",
                 "type": "string"
+            },
+            {
+                "internalType": "uint8",
+                "name": "filter",
+                "type": "uint8"
             }
         ],
         "name": "getVersions",
         "outputs": [
             {
-                "components": [
-                    {
-                        "internalType": "uint32",
-                        "name": "major",
-                        "type": "uint32"
-                    },
-                    {
-                        "internalType": "uint32",
-                        "name": "minor",
-                        "type": "uint32"
-                    },
-                    {
-                        "internalType": "uint32",
-                        "name": "patch",
-                        "type": "uint32"
-                    }
-                ],
-                "internalType": "struct DappletRegistry.Version[]",
+                "internalType": "bytes",
                 "name": "",
-                "type": "tuple[]"
+                "type": "bytes"
             }
         ],
         "stateMutability": "view",
@@ -467,19 +455,19 @@ export default [
             {
                 "components": [
                     {
-                        "internalType": "uint32",
+                        "internalType": "uint8",
                         "name": "major",
-                        "type": "uint32"
+                        "type": "uint8"
                     },
                     {
-                        "internalType": "uint32",
+                        "internalType": "uint8",
                         "name": "minor",
-                        "type": "uint32"
+                        "type": "uint8"
                     },
                     {
-                        "internalType": "uint32",
+                        "internalType": "uint8",
                         "name": "patch",
-                        "type": "uint32"
+                        "type": "uint8"
                     }
                 ],
                 "internalType": "struct DappletRegistry.Version",
@@ -502,19 +490,19 @@ export default [
                         "type": "string"
                     },
                     {
-                        "internalType": "uint32",
+                        "internalType": "uint8",
                         "name": "major",
-                        "type": "uint32"
+                        "type": "uint8"
                     },
                     {
-                        "internalType": "uint32",
+                        "internalType": "uint8",
                         "name": "minor",
-                        "type": "uint32"
+                        "type": "uint8"
                     },
                     {
-                        "internalType": "uint32",
+                        "internalType": "uint8",
                         "name": "patch",
-                        "type": "uint32"
+                        "type": "uint8"
                     },
                     {
                         "internalType": "uint8",

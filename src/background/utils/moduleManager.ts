@@ -5,6 +5,7 @@ import { addEvent } from '../services/eventService';
 import { RegistryAggregator } from '../registries/registryAggregator';
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
 import { areModulesEqual } from '../../common/helpers';
+import ModuleInfo from '../models/moduleInfo';
 
 export default class ModuleManager {
 
@@ -145,34 +146,14 @@ export default class ModuleManager {
         return hostnameManifests;
     }
 
-    // ToDo: refactor it
-    public async getFeaturesByHostnamesWithRegistries(hostnames: string[], replaceUri: boolean, users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: Manifest[] } }> {
+    // ToDo: remove it?
+    public async getFeaturesByHostnamesWithRegistries(hostnames: string[], users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: ModuleInfo[] } }> {
         if (!hostnames || hostnames.length === 0) return {};
-
         const hostnameManifests = await this.registryAggregator.getManifestsWithRegistries(hostnames, users);
-        const hostnameManifests2 = {};
-
-        const groupBy = function (xs, key) {
-            return xs.reduce(function (rv, x) {
-                (rv[x[key]] = rv[x[key]] || []).push(x);
-                return rv;
-            }, {});
-        };
-
-        for (const registry in hostnameManifests) {
-            hostnameManifests2[registry] = {};
-            for (const hostname in hostnameManifests[registry]) {
-                hostnameManifests2[registry][hostname] = [];
-                const grouped = groupBy(hostnameManifests[registry][hostname], 'name');
-                for (const name in grouped) {
-                    hostnameManifests2[registry][hostname].push(grouped[name].sort((a, b) => rcompare(a.version, b.version))[0]);
-                }
-            }
-        }
-
-        return hostnameManifests2;
+        return hostnameManifests;
     }
 
+    // ToDo: remove it?
     private async _loadManifestByBranch(name: string, branch: string, replaceUri: boolean) {
         const versions = await this.registryAggregator.getVersions(name, branch);
         const lastVersion = versions.sort(rcompare)[0]; // DESC sorting by semver // ToDo: select version

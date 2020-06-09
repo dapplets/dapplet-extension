@@ -7,7 +7,9 @@ import { StorageAggregator } from '../moduleStorages/moduleStorage';
 import GlobalConfigService from './globalConfigService';
 import { areModulesEqual, typeOfUri, UriTypes } from '../../common/helpers';
 import * as ethers from 'ethers';
-import { HashUris } from '../registries/registry';
+import { StorageRef } from '../registries/registry';
+import { DEFAULT_BRANCH_NAME } from '../../common/constants';
+import { rcompare } from 'semver';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
@@ -15,22 +17,22 @@ export default class FeatureService {
     private _moduleManager = new ModuleManager();
     private _storageAggregator = new StorageAggregator();
 
-    async getFeaturesByHostnames(hostnames: string[], replaceUri = false): Promise<ManifestDTO[]> {
+    async getFeaturesByHostnames(contextIds: string[]): Promise<ManifestDTO[]> {
         const users = await this._globalConfigService.getTrustedUsers();
-        const regHostnamesManfiests = await this._moduleManager.getFeaturesByHostnamesWithRegistries(hostnames, replaceUri, users.map(u => u.account));
+        const contextIdsByRegsitries = await this._moduleManager.getFeaturesByHostnamesWithRegistries(contextIds, users.map(u => u.account));
         const dtos: ManifestDTO[] = [];
 
         const configRegistries = await this._globalConfigService.getRegistries();
 
         let i = 0;
 
-        for (const [registryUrl, hostnamesManfiests] of Object.entries(regHostnamesManfiests)) {
-            for (const [hostname, manifests] of Object.entries(hostnamesManfiests)) {
-                for (const manifest of manifests) {
-                    const dto = dtos.find(f => areModulesEqual(f, manifest));
+        for (const [registryUrl, moduleInfosByContextId] of Object.entries(contextIdsByRegsitries)) {
+            for (const [contextId, moduleInfos] of Object.entries(moduleInfosByContextId)) {
+                for (const moduleInfo of moduleInfos) {
+                    const dto = dtos.find(d => d.name === moduleInfo.name);
                     if (!dto) {
-                        const dto: ManifestDTO = manifest as any;
-                        const config = await this._siteConfigRepository.getById(hostname); // ToDo: which contextId should we compare?
+                        const dto: ManifestDTO = moduleInfo as any;
+                        const config = await this._siteConfigRepository.getById(contextId); // ToDo: which contextId should we compare?
                         dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
                         dto.order = i++;
                         dto.sourceRegistry = {
@@ -38,11 +40,12 @@ export default class FeatureService {
                             isDev: configRegistries.find(r => r.url === registryUrl).isDev
                         };
                         if (!dto.hostnames) dto.hostnames = [];
-                        dto.hostnames.push(hostname);
+                        dto.hostnames.push(contextId);
                         dtos.push(dto);
                     } else {
+                        // ToDo: move this merging logic to aggragator
                         if (!dto.hostnames) dto.hostnames = [];
-                        dto.hostnames.push(hostname);
+                        dto.hostnames.push(contextId);
                     }
                 }
             }
@@ -51,9 +54,20 @@ export default class FeatureService {
         return dtos;
     }
 
-    private async _setFeatureActive(name: string, version: string, hostnames: string[], isActive: boolean, order: number) {
+    private async _setFeatureActive(name: string, version: string | undefined, hostnames: string[], isActive: boolean, order: number, registryUrl: string) {
+
+        if (!version && isActive) {
+            const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
+            if (!registry) throw new Error("No registry with this url exists in config.");
+            const versions = await registry.getVersions(name, DEFAULT_BRANCH_NAME);
+            if (versions.length === 0) throw new Error("This module has no versions.");
+            version = versions.sort(rcompare)[0]; // Last version by SemVer
+        }
+
+        // ToDo: save registry url of activate module?
         for (const hostname of hostnames) {
             const config = await this._siteConfigRepository.getById(hostname);
+            if (!isActive) version = config.activeFeatures[name].version;
             config.activeFeatures[name] = {
                 version,
                 isActive,
@@ -69,7 +83,7 @@ export default class FeatureService {
                     payload: [{
                         name,
                         version,
-                        branch: "default", // ToDo: fix branch
+                        branch: DEFAULT_BRANCH_NAME, // ToDo: fix branch
                         order,
                         contextIds: hostnames
                     }]
@@ -78,12 +92,12 @@ export default class FeatureService {
         }
     }
 
-    async activateFeature(name: string, version: string, hostnames: string[], order: number): Promise<void> {
-        return await this._setFeatureActive(name, version, hostnames, true, order);
+    async activateFeature(name: string, version: string | undefined, hostnames: string[], order: number, registryUrl: string): Promise<void> {
+        return await this._setFeatureActive(name, version, hostnames, true, order, registryUrl);
     }
 
-    async deactivateFeature(name: string, version: string, hostnames: string[], order: number): Promise<void> {
-        return await this._setFeatureActive(name, version, hostnames, false, order);
+    async deactivateFeature(name: string, version: string | undefined, hostnames: string[], order: number, registryUrl: string): Promise<void> {
+        return await this._setFeatureActive(name, version, hostnames, false, order, registryUrl);
     }
 
     public async getActiveModulesByHostnames(hostnames: string[]) {
@@ -141,7 +155,7 @@ export default class FeatureService {
             // ToDo: check everething before publishing
 
             // Dist file publishing
-            const dist = await this._storageAggregator.getResource(defaultManifest.dist as HashUris);
+            const dist = await this._storageAggregator.getResource(defaultManifest.dist as StorageRef);
             const distBlob = new Blob([dist], { type: "text/javascript" });
             const distUrl = (targetStorage === 'test-registry') ? await saveToTestRegistry(distBlob, targetRegistry) : await saveToSwarm(distBlob);
 
@@ -157,7 +171,7 @@ export default class FeatureService {
 
             if (defaultManifest.icon) {
                 // Icon file publishing
-                const icon = await this._storageAggregator.getResource(defaultManifest.dist as HashUris);
+                const icon = await this._storageAggregator.getResource(defaultManifest.dist as StorageRef);
                 const iconBlob = new Blob([icon], { type: "text/javascript" });
                 const iconUrl = (targetStorage === 'test-registry') ? await saveToTestRegistry(iconBlob, targetRegistry) : await saveToSwarm(iconBlob);
 

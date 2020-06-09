@@ -1,12 +1,12 @@
 import { Storage } from './storage';
 import { HttpModuleStorage } from './httpModuleStorage';
 import { SwarmModuleStorage } from './swarmModuleStorage';
-import { HashUris } from '../registries/registry';
+import { StorageRef } from '../registries/registry';
 import { ethers } from 'ethers';
 
 export class StorageAggregator {
 
-    async getResource(hashUris: HashUris | string): Promise<ArrayBuffer> {
+    async getResource(hashUris: StorageRef | string): Promise<ArrayBuffer> {
         if (typeof hashUris === 'string') {
             hashUris = {
                 hash: null,

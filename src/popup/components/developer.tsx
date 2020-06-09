@@ -6,7 +6,7 @@ import NOLOGO_PNG from '../../common/resources/no-logo.png';
 
 import { isValidUrl } from '../helpers';
 import Manifest from "../../background/models/manifest";
-import { HashUris } from "../../background/registries/registry";
+import { StorageRef } from "../../background/registries/registry";
 
 interface IDeveloperProps { }
 
@@ -163,7 +163,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                         {(modules.length > 0) ? <List divided relaxed verticalAlign='middle' size='small'>
                             {modules.map((m, i) => (
                                 <List.Item key={i}>
-                                    <Image avatar src={(m.icon && (m.icon as HashUris).uris.length > 0) ? (((m.icon as HashUris).uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + (m.icon as HashUris).uris?.[0] : (m.icon as HashUris).uris?.[0]) : NOLOGO_PNG} />
+                                    <Image avatar src={(m.icon && (m.icon as StorageRef).uris.length > 0) ? (((m.icon as StorageRef).uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + (m.icon as StorageRef).uris?.[0] : (m.icon as StorageRef).uris?.[0]) : NOLOGO_PNG} />
                                     <List.Content>
                                         <List.Header>{m.name}</List.Header>
                                         {m.branch} v{m.version}
