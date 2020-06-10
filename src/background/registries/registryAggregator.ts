@@ -1,12 +1,11 @@
-import { Registry, StorageRef } from './registry';
+import { Registry } from './registry';
 //import { DevRegistry } from './devRegistry';
-//import { TestRegistry } from './testRegistry';
 import { EthRegistry } from './ethRegistry';
 import GlobalConfigService from '../services/globalConfigService';
-import { gt, compare } from 'semver';
+import { compare } from 'semver';
 import { mergeDedupe, typeOfUri, UriTypes } from '../../common/helpers';
-import Manifest from '../models/manifest';
 import ModuleInfo from '../models/moduleInfo';
+import VersionInfo from '../models/versionInfo';
 
 export class RegistryAggregator {
     public isAvailable: boolean = true;
@@ -15,7 +14,7 @@ export class RegistryAggregator {
     async getVersions(name: string, branch: string): Promise<string[]> {
         await this._initRegistries();
 
-        const versionsWithErrors = await Promise.all(this.registries.map(r => r.getVersions(name, branch).catch(Error)));
+        const versionsWithErrors = await Promise.all(this.registries.map(r => r.getVersionNumbers(name, branch).catch(Error)));
         const versionsNoErrors = versionsWithErrors.filter(x => !(x instanceof Error)) as string[][];
         const versionsNotSorted = mergeDedupe(versionsNoErrors);
         const versionsAsc = versionsNotSorted.sort(compare); // ASC sorting by semver
@@ -23,11 +22,11 @@ export class RegistryAggregator {
         return versionsAsc;
     }
 
-    async resolveToManifest(name: string, branch: string, version: string): Promise<Manifest> {
+    async getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo> {
         await this._initRegistries();
 
-        const uriWithErrors = await Promise.all(this.registries.map(r => r.resolveToManifest(name, branch, version).catch(Error)));
-        const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error) && x !== null && x !== undefined) as Manifest[];
+        const uriWithErrors = await Promise.all(this.registries.map(r => r.getVersionInfo(name, branch, version).catch(Error)));
+        const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error) && x !== null && x !== undefined) as VersionInfo[];
         
         if (uriNoErrors.length === 0) {
             if (uriWithErrors.length === 0) {
@@ -40,64 +39,9 @@ export class RegistryAggregator {
         }
 
         return uriNoErrors[0];
-
-        //const uris = mergeDedupe(uriNoErrors);
-        
-        // return {
-        //     hash: uriNoErrors[0]?.hash || null, // ToDo: fix it
-        //     uris
-        // };
     }
 
-    async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
-        await this._initRegistries();
-        const regFeatures = await Promise.all(this.registries.map(r => r.getFeatures(hostnames).catch(Error)));
-        const validRegFeatures = regFeatures.filter(result => !(result instanceof Error));
-        const merge: { [hostname: string]: { [name: string]: string[]; } } = {};
-
-        // Deep merging of regFeatures
-        for (const f of validRegFeatures) {
-            for (const hostname in f) {
-                if (!merge[hostname]) merge[hostname] = {};
-                for (const name in f[hostname]) {
-                    if (!merge[hostname][name]) merge[hostname][name] = [];
-                    for (const branch of f[hostname][name]) {
-                        merge[hostname][name].push(branch);
-                    }
-                }
-            }
-        }
-
-        return merge;
-    }
-
-
-    async getFeaturesWithRegistries(hostnames: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: { [name: string]: string[]; } } }> {
-        await this._initRegistries();
-        const regFeatures = await Promise.all(this.registries.map(r => r.getFeatures(hostnames).then(f => ({ [r.url]: f })).catch(Error)));
-        const validRegFeatures = regFeatures.filter(result => !(result instanceof Error));
-        const merge: { [registryUrl: string]: { [hostname: string]: { [name: string]: string[]; } } } = {};
-
-        // Deep merging of regFeatures
-        for (const f of validRegFeatures) {
-            for (const registryUrl in f) {
-                if (!merge[registryUrl]) merge[registryUrl] = {};
-                for (const hostname in f[registryUrl]) {
-                    if (!merge[registryUrl][hostname]) merge[registryUrl][hostname] = {};
-                    for (const name in f[registryUrl][hostname]) {
-                        if (!merge[registryUrl][hostname][name]) merge[registryUrl][hostname][name] = [];
-                        for (const branch of f[registryUrl][hostname][name]) {
-                            merge[registryUrl][hostname][name].push(branch);
-                        }
-                    }
-                }
-            }
-        }
-
-        return merge;
-    }
-
-    public async getManifestsWithRegistries(locations: string[], users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: ModuleInfo[] } }> {
+    public async getModuleInfoWithRegistries(locations: string[], users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: ModuleInfo[] } }> {
         await this._initRegistries();
         const regFeatures = await Promise.all(this.registries.map(r => r.getModuleInfo(locations, users).then(m => ({ [r.url]: m })).catch(Error)));
         const validRegFeatures = regFeatures.filter(result => !(result instanceof Error));
@@ -126,19 +70,6 @@ export class RegistryAggregator {
         if (!validModules || validModules.length === 0) return [];
         const reduced = validModules.reduce((a, b) => a.concat(b));
         return reduced;
-    }
-
-    public async hashToUris(hash: string): Promise<StorageRef> {
-        await this._initRegistries();
-
-        const uriWithErrors = await Promise.all(this.registries.map(r => r.hashToUris(hash).catch(Error)));
-        const uriNoErrors = uriWithErrors.filter(x => !(x instanceof Error)) as StorageRef[];
-        const uris = mergeDedupe(uriNoErrors.map(x => x.uris));
-
-        return {
-            hash,
-            uris
-        };
     }
 
     private async _initRegistries() {

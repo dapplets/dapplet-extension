@@ -19,7 +19,7 @@ export default class FeatureService {
 
     async getFeaturesByHostnames(contextIds: string[]): Promise<ManifestDTO[]> {
         const users = await this._globalConfigService.getTrustedUsers();
-        const contextIdsByRegsitries = await this._moduleManager.getFeaturesByHostnamesWithRegistries(contextIds, users.map(u => u.account));
+        const contextIdsByRegsitries = await this._moduleManager.registryAggregator.getModuleInfoWithRegistries(contextIds, users.map(u => u.account));
         const dtos: ManifestDTO[] = [];
 
         const configRegistries = await this._globalConfigService.getRegistries();
@@ -59,7 +59,7 @@ export default class FeatureService {
         if (!version && isActive) {
             const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
             if (!registry) throw new Error("No registry with this url exists in config.");
-            const versions = await registry.getVersions(name, DEFAULT_BRANCH_NAME);
+            const versions = await registry.getVersionNumbers(name, DEFAULT_BRANCH_NAME);
             if (versions.length === 0) throw new Error("This module has no versions.");
             version = versions.sort(rcompare)[0]; // Last version by SemVer
         }
@@ -134,7 +134,7 @@ export default class FeatureService {
         if (modules.length === 0) return [];
         const modulesWithDeps = await this._moduleManager.resolveDependencies(modules);
         const loadedModules = await Promise.all(modulesWithDeps.map(m =>
-            this._moduleManager.loadScript(m.manifest.dist as string)
+            this._moduleManager.loadScript(m.manifest.dist)
                 .then(s => ({ script: s, manifest: m.manifest }))
         ));
         return loadedModules;

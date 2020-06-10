@@ -5,15 +5,14 @@ import { SubscribeOptions } from './overlay';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
 import * as extension from 'extensionizer';
 import { IResolver, IContentAdapter, IFeature } from './types';
-import Manifest from "../background/models/manifest";
-import ManifestDTO from "../background/dto/manifestDTO";
 import { areModulesEqual } from "../common/helpers";
+import VersionInfo from "../background/models/versionInfo";
 
 export class Injector {
     public availableContextIds: string[] = [];
 
     private registry: {
-        manifest: Manifest,
+        manifest: VersionInfo,
         clazz: any,
         instance?: any,
         order: number,
@@ -28,7 +27,7 @@ export class Injector {
     public async loadModules(modules: { name: string, branch: string, version: string, order: number, contextIds: string[] }[]) {
         if (!modules || !modules.length) return;
         const { getModulesWithDeps } = await initBGFunctions(extension);
-        const loadedModules: { manifest: Manifest, script: string }[] = await getModulesWithDeps(modules);
+        const loadedModules: { manifest: VersionInfo, script: string }[] = await getModulesWithDeps(modules);
         const orderedModules = loadedModules.map((l) => {
             const m = modules.find(m => areModulesEqual(m, l.manifest));
             return ({
@@ -75,7 +74,7 @@ export class Injector {
         });
     }
 
-    private async _processModules(modules: { manifest: Manifest, script: string, order: number, contextIds: string[] }[]) {
+    private async _processModules(modules: { manifest: VersionInfo, script: string, order: number, contextIds: string[] }[]) {
         const { optimizeDependency, getModulesWithDeps, addEvent } = await initBGFunctions(extension);
         const { core } = this;
 
@@ -105,68 +104,62 @@ export class Injector {
             };
 
             const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
-            if (manifest.type == ModuleTypes.Resolver) {
-                let branch: string = null;
-                // ToDo: add dependency support for resolver
-                const injectDecorator = () => { };
-                const injectableDecorator = (constructor) => {
+            let newBranch: string = null;
+
+            // ToDo: describe it
+            const injectableDecorator = (constructor) => {
+                if (constructor.prototype.getBranch) {
                     const resolver: IResolver = new constructor();
-                    branch = resolver.getBranch();
-                };
+                    newBranch = resolver.getBranch();
+                } else if (!this.registry.find(m => areModulesEqual(m.manifest, manifest))) {
+                    this.registry.push({
+                        manifest: manifest,
+                        clazz: constructor,
+                        instance: null,
+                        order: order,
+                        contextIds: contextIds
+                    });
+                }
+            };
 
-                // ToDo: do not exec resolver twice (when second feature is activated)
-                execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
+            // ToDo: describe it
+            const injectDecorator = (name: string) => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
+                descriptor = descriptor || {};
+                descriptor.get = () => {
+                    // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
+                    const versions = this.registry.filter(m => m.manifest.name == name).map(m => m.manifest.version);
+                    const dependency = manifest.dependencies[name];
 
-                addEvent('Branch resolving', `Resolver of "${manifest.name}" defined the "${branch}" branch`);
-                const optimizedBranch = await optimizeDependency(manifest.name, branch, manifest.version);
+                    if (dependency === undefined) {
+                        console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`);
+                        return null;
+                    }
+
+                    if (valid(dependency as string) === null) {
+                        console.error(`Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`);
+                        return null;
+                    }
+
+                    // ToDo: Should be moved to the background? 
+                    // ToDo: Fetch prefix from global settings.
+                    // ToDo: Replace '>=' to '^'
+                    const prefix = '>='; // https://devhints.io/semver
+                    const range = prefix + (typeof dependency === "string" ? dependency : dependency[DEFAULT_BRANCH_NAME]);
+
+                    const maxVer = maxSatisfying(versions, range);
+
+                    return this.registry.find(m => m.manifest.name == name && m.manifest.version == maxVer).instance;
+                }
+                return descriptor;
+            };
+
+            execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
+
+            if (newBranch) {
+                addEvent('Branch resolving', `Resolver of "${manifest.name}" defined the "${newBranch}" branch`);
+                const optimizedBranch = await optimizeDependency(manifest.name, newBranch, manifest.version);
                 const missingDependencies = await getModulesWithDeps([optimizedBranch]);
                 await this._processModules(missingDependencies);
-            } else {
-                // ToDo: describe it
-                const injectableDecorator = (constructor: Function) => {
-                    if (!this.registry.find(m => areModulesEqual(m.manifest, manifest))) {
-                        this.registry.push({
-                            manifest: manifest,
-                            clazz: constructor,
-                            instance: null,
-                            order: order,
-                            contextIds: contextIds
-                        });
-                    }
-                };
-
-                // ToDo: describe it
-                const injectDecorator = (name: string) => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
-                    descriptor = descriptor || {};
-                    descriptor.get = () => {
-                        // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
-                        const versions = this.registry.filter(m => m.manifest.name == name).map(m => m.manifest.version);
-                        const dependency = manifest.dependencies[name];
-
-                        if (dependency === undefined) {
-                            console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`);
-                            return null;
-                        }
-
-                        if (valid(dependency as string) === null) {
-                            console.error(`Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`);
-                            return null;
-                        }
-
-                        // ToDo: Should be moved to the background? 
-                        // ToDo: Fetch prefix from global settings.
-                        // ToDo: Replace '>=' to '^'
-                        const prefix = '>='; // https://devhints.io/semver
-                        const range = prefix + (typeof dependency === "string" ? dependency : dependency[DEFAULT_BRANCH_NAME]);
-
-                        const maxVer = maxSatisfying(versions, range);
-                        
-                        return this.registry.find(m => m.manifest.name == name && m.manifest.version == maxVer).instance;
-                    }
-                    return descriptor;
-                };
-
-                execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
             }
         }
     }

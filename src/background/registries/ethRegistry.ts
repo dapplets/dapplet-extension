@@ -6,13 +6,13 @@ import Manifest from '../models/manifest';
 import * as semver from 'semver';
 import ModuleInfo from '../models/moduleInfo';
 import { ModuleTypes } from '../../common/constants';
+import VersionInfo from '../models/versionInfo';
 
 const moduleTypesMap = {
     1: ModuleTypes.Feature,
     2: ModuleTypes.Adapter,
-    3: ModuleTypes.Resolver,
-    4: ModuleTypes.Library,
-    5: ModuleTypes.Interface
+    3: ModuleTypes.Library,
+    4: ModuleTypes.Interface
 };
 
 export class EthRegistry implements Registry {
@@ -32,11 +32,12 @@ export class EthRegistry implements Registry {
     public async getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }> {
         try {
             const usersNormalized = users.map(u => "0x000000000000000000000000" + u.replace('0x', ''));
-            const moduleInfos = await Promise.all(contextIds.map(ctx => this._contract.getModuleInfo(ctx, usersNormalized, 0).then(m => ([ctx, m]))));
+            const moduleInfosByCtx = await this._contract.getModuleInfoBatch(contextIds, usersNormalized, 0);
             this.isAvailable = true;
             this.error = null;
 
-            const result = Object.fromEntries(moduleInfos.map(([ctx, modules]) => {
+            const result = Object.fromEntries(moduleInfosByCtx.map((modules, i) => {
+                const ctx = contextIds[i];
                 const mis = modules.map(m => {
                     const mi = new ModuleInfo();
                     mi.type = moduleTypesMap[m.moduleType];
@@ -61,15 +62,16 @@ export class EthRegistry implements Registry {
         }
     }
 
-    public async getVersions(name: string, branch: string): Promise<string[]> {
+    public async getVersionNumbers(name: string, branch: string): Promise<string[]> {
+        console.log('getVersionNumbers', { name, branch });
         try {
-            const hex = await this._contract.getVersions(name, branch, 0);
+            const hex = await this._contract.getVersionNumbers(name, branch);
             this.isAvailable = true;
             this.error = null;
             const result = hex.replace('0x', '')
-                              .match(/.{1,8}/g)
-                              .map(x => `${parseInt('0x' + x[0] + x[1])}.${parseInt('0x' + x[2] + x[3])}.${parseInt('0x' + x[4] + x[5])}`);
-            return result;            
+                .match(/.{1,8}/g)
+                .map(x => `${parseInt('0x' + x[0] + x[1])}.${parseInt('0x' + x[2] + x[3])}.${parseInt('0x' + x[4] + x[5])}`);
+            return result;
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
@@ -77,59 +79,28 @@ export class EthRegistry implements Registry {
         }
     }
 
-    public async resolveToManifest(name: string, branch: string, version: string): Promise<Manifest> {
+    public async getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo> {
+        console.log('getVersionInfo', { name, branch, version });
         try {
-            const m = await this._contract.resolveToManifest(name, branch, {
-                major: semver.major(version),
-                minor: semver.minor(version),
-                patch: semver.patch(version)
-            });
-            console.log('resolveToManifest', { name, branch, version }, m);
+            const { dto, moduleType } = await this._contract.getVersionInfo(name, branch, semver.major(version), semver.minor(version), semver.patch(version));
 
-            const manifest = new Manifest();
-            manifest.name = m.name;
-            manifest.branch = m.branch;
-            manifest.version = `${m.major}.${m.minor}.${m.patch}`;
-            manifest.title = m.title;
-            manifest.description = m.description;
-            manifest.icon = {
-                hash: m.icon.hash,
-                uris: m.icon.uris
-            };
-            manifest.type = { 1: "FEATURE", 2: "ADAPTER", 3: "RESOLVER", 4: "LIBRARY", 5: "INTERFACE" }[m.moduleType];
-            manifest.dist = {
-                hash: m.binary.hash,
-                uris: m.binary.uris
+            const vi = new VersionInfo();
+            vi.name = name;
+            vi.branch = branch;
+            vi.version = version;
+            vi.type = moduleTypesMap[moduleType];
+            vi.dist = {
+                hash: dto.binary.hash,
+                uris: dto.binary.uris.map(u => ethers.utils.toUtf8String(u))
             }
-            manifest.dependencies = Object.fromEntries(m.dependencies);
+            vi.dependencies = Object.fromEntries(dto.dependencies.map(d => ([
+                d.name,
+                d.major + '.' + d.minor + '.' + d.patch
+            ])));
 
             this.isAvailable = true;
             this.error = null;
-            return manifest;
-        } catch (err) {
-            this.isAvailable = false;
-            this.error = err.message;
-            throw err;
-        }
-    }
-
-    public async getFeatures(hostnames: string[]): Promise<{ [hostname: string]: { [name: string]: string[]; } }> {
-        try {
-            const modules: string[] = await this._contract.getModules(hostnames[0], [], 0);
-            console.log('getFeatures', { hostnames }, modules);
-            const result = {};
-            for (const m of modules) {
-                result[m] = ['default'];
-            }
-
-            const result2 = {
-                [hostnames[0]]: result
-            };
-
-            this.isAvailable = true;
-            this.error = null;
-
-            return result2;
+            return vi;
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
@@ -165,19 +136,6 @@ export class EthRegistry implements Registry {
         });
 
         // await tx.wait();
-    }
-
-    public async hashToUris(hash: string): Promise<StorageRef> {
-        try {
-            const uris = await this._contract.hashToUris('0x' + hash);
-            this.isAvailable = true;
-            this.error = null;
-            return { hash, uris };
-        } catch (err) {
-            this.isAvailable = false;
-            this.error = err.message;
-            throw err;
-        }
     }
 
     public async getOwnership(moduleName: string) {
