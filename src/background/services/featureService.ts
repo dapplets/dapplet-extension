@@ -8,8 +8,10 @@ import GlobalConfigService from './globalConfigService';
 import { areModulesEqual, typeOfUri, UriTypes } from '../../common/helpers';
 import * as ethers from 'ethers';
 import { StorageRef } from '../registries/registry';
-import { DEFAULT_BRANCH_NAME } from '../../common/constants';
+import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants';
 import { rcompare } from 'semver';
+import ModuleInfo from '../models/moduleInfo';
+import VersionInfo from '../models/versionInfo';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
@@ -146,41 +148,41 @@ export default class FeatureService {
     };
 
     public async getAllDevModules() {
-        return await this._moduleManager.getAllDevModules();
+        return await this._moduleManager.registryAggregator.getAllDevModules();
     }
 
     // ToDo: move to another service?
-    public async deployModule(defaultManifest: Manifest, targetStorage: 'swarm' | 'test-registry', targetRegistry: string, registryKey: string): Promise<{ scriptUrl: string }> {
+    public async deployModule(mi: ModuleInfo, vi: VersionInfo, targetStorage: StorageTypes, targetRegistry: string): Promise<{ scriptUrl: string }> {
         try {
             // ToDo: check everething before publishing
 
             // Dist file publishing
-            const dist = await this._storageAggregator.getResource(defaultManifest.dist as StorageRef);
+            const dist = await this._storageAggregator.getResource(vi.dist);
             const distBlob = new Blob([dist], { type: "text/javascript" });
-            const distUrl = (targetStorage === 'test-registry') ? await saveToTestRegistry(distBlob, targetRegistry) : await saveToSwarm(distBlob);
+            const distUrl = (targetStorage === StorageTypes.TestRegsitry) ? await saveToTestRegistry(distBlob, targetRegistry) : await saveToSwarm(distBlob);
 
             // Dist file  hashing
             const distBuffer = await (distBlob as any).arrayBuffer();
             const distHash = ethers.utils.keccak256(new Uint8Array(distBuffer));
 
             // Manifest editing
-            defaultManifest.dist = {
+            vi.dist = {
                 hash: distHash,
                 uris: [distUrl]
             };
 
-            if (defaultManifest.icon) {
+            if (mi.icon) {
                 // Icon file publishing
-                const icon = await this._storageAggregator.getResource(defaultManifest.dist as StorageRef);
+                const icon = await this._storageAggregator.getResource(mi.icon);
                 const iconBlob = new Blob([icon], { type: "text/javascript" });
-                const iconUrl = (targetStorage === 'test-registry') ? await saveToTestRegistry(iconBlob, targetRegistry) : await saveToSwarm(iconBlob);
+                const iconUrl = (targetStorage === StorageTypes.TestRegsitry) ? await saveToTestRegistry(iconBlob, targetRegistry) : await saveToSwarm(iconBlob);
 
                 // Icon file  hashing
                 const iconBuffer = await (iconBlob as any).arrayBuffer();
                 const iconHash = ethers.utils.keccak256(new Uint8Array(iconBuffer));
 
                 // Manifest editing
-                defaultManifest.icon = {
+                mi.icon = {
                     hash: iconHash,
                     uris: [iconUrl]
                 };
@@ -189,7 +191,7 @@ export default class FeatureService {
             // Register manifest in Registry
             const registry = this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry);
             if (!registry) throw new Error("No registry with this url exists in config.");
-            await registry.addModule(defaultManifest.name, defaultManifest.branch, defaultManifest.version, defaultManifest);
+            await registry.addModule(mi, vi);
 
             return {
                 scriptUrl: distUrl
@@ -227,12 +229,12 @@ export default class FeatureService {
 
     public async addLocation(registryUri: string, moduleName: string, location: string) {
         const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
-        await registry.addLocation(moduleName, location);
+        await registry.addContextId(moduleName, location);
     }
 
     public async removeLocation(registryUri: string, moduleName: string, location: string) {
         const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
-        await registry.removeLocation(moduleName, location);
+        await registry.removeContextId(moduleName, location);
     }
 }
 

@@ -13,4 +13,5 @@ export default class VersionInfo extends Base {
     dependencies: {
         [name: string]: string
     } = null;
+    interfaces: string[] = [];
 }

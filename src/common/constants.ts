@@ -5,6 +5,11 @@ export const enum ModuleTypes {
     Interface = "INTERFACE"
 }
 
+export const enum StorageTypes {
+    Swarm = "swarm",
+    TestRegsitry = "test-registry"
+}
+
 export type WalletInfo = {
     compatible: boolean,
     protocolVersion: string,

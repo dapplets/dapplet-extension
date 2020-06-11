@@ -7,6 +7,8 @@ import NOLOGO_PNG from '../../common/resources/no-logo.png';
 import { isValidUrl } from '../helpers';
 import Manifest from "../../background/models/manifest";
 import { StorageRef } from "../../background/registries/registry";
+import ModuleInfo from "../../background/models/moduleInfo";
+import VersionInfo from "../../background/models/versionInfo";
 
 interface IDeveloperProps { }
 
@@ -23,7 +25,7 @@ interface IDeveloperState {
     intro: {
         popupDeveloperWelcome: boolean;
     };
-    modules: Manifest[];
+    modules: { module: ModuleInfo, versions: VersionInfo[] }[];
 }
 
 class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
@@ -51,7 +53,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
     async loadRegistries() {
         const { getRegistries, getAllDevModules } = await initBGFunctions(extension);
 
-        const modules = await getAllDevModules();
+        const modules: { module: ModuleInfo, versions: VersionInfo[] }[] = await getAllDevModules();
         this.setState({ modules });
 
         const registries = await getRegistries();
@@ -94,13 +96,13 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
         this.loadRegistries();
     }
 
-    async deployModule(moduleManifest: Manifest) {
+    async deployModule(mi: ModuleInfo, vi: VersionInfo) {
         extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
             var activeTab = tabs[0];
             extension.tabs.sendMessage(activeTab.id, {
                 type: "OPEN_DEPLOY_OVERLAY",
                 payload: {
-                    manifest: moduleManifest
+                    mi, vi
                 }
             });
             window.close();
@@ -163,13 +165,13 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                         {(modules.length > 0) ? <List divided relaxed verticalAlign='middle' size='small'>
                             {modules.map((m, i) => (
                                 <List.Item key={i}>
-                                    <Image avatar src={(m.icon && (m.icon as StorageRef).uris.length > 0) ? (((m.icon as StorageRef).uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + (m.icon as StorageRef).uris?.[0] : (m.icon as StorageRef).uris?.[0]) : NOLOGO_PNG} />
+                                    <Image avatar src={(m.module.icon && m.module.icon.uris.length > 0) ? ((m.module.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + (m.module.icon as StorageRef).uris?.[0] : (m.module.icon as StorageRef).uris?.[0]) : NOLOGO_PNG} />
                                     <List.Content>
-                                        <List.Header>{m.name}</List.Header>
-                                        {m.branch} v{m.version}
+                                        <List.Header>{m.module.name}</List.Header>
+                                        {m.versions[0].branch} v{m.versions[0].version}
                                     </List.Content>
                                     <List.Content floated='right'>
-                                        <Button size='mini' compact color='blue' onClick={() => this.deployModule(m)}>Deploy</Button>
+                                        <Button size='mini' compact color='blue' onClick={() => this.deployModule(m.module, m.versions[0])}>Deploy</Button>
                                     </List.Content>
                                 </List.Item>
                             ))}

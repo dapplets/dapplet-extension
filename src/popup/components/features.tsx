@@ -4,6 +4,7 @@ import * as extension from 'extensionizer';
 
 import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Divider } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
+import { ModuleTypes } from "../../common/constants";
 
 interface IFeaturesProps {
   contextIds: string[] | undefined;
@@ -50,7 +51,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
     const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
     if (this._isMounted) {
       this.setState({
-        features,
+        features: features.filter(f => f.type === ModuleTypes.Feature),
         isLoading: false
       });
     }

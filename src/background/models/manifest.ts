@@ -12,12 +12,10 @@ export default class Manifest extends Base {
     title: string = null;
     description: string = null;
     author: string = null;
-    icon: StorageRef | string = null;
-    dist: StorageRef | string = null;
+    icon: StorageRef = null;
+    dist: StorageRef = null;
 
     dependencies: {
-        [name: string]: string | {
-            [branch: string]: string
-        }
+        [name: string]: string
     }
 }

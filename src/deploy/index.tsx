@@ -10,11 +10,14 @@ import './index.scss';
 import { Bus } from '../common/bus';
 import Manifest from '../background/models/manifest';
 import { StorageRef } from '../background/registries/registry';
+import ModuleInfo from '../background/models/moduleInfo';
+import VersionInfo from '../background/models/versionInfo';
 
 interface IIndexProps { }
 
 interface IIndexState {
-    manifest: Manifest;
+    mi: ModuleInfo;
+    vi: VersionInfo;
     loading: boolean;
     targetRegistry: string;
     targetStorage: string;
@@ -45,7 +48,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         super(props);
 
         this.state = {
-            manifest: null,
+            mi: null,
+            vi: null,
             loading: true,
             targetRegistry: null,
             targetStorage: 'swarm',
@@ -63,8 +67,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             editLocationDone: false
         };
 
-        this.bus.subscribe('data', ({ manifest }) => {
-            this.setState({ manifest, loading: false });
+        this.bus.subscribe('data', ({ mi, vi }) => {
+            this.setState({ mi, vi, loading: false });
         });
 
         this.transferOwnershipModal = React.createRef();
@@ -86,7 +90,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     private async _updateOwnership() {
         const { getOwnership, getAccounts } = await initBGFunctions(extension);
-        const owner = await getOwnership(this.state.targetRegistry, this.state.manifest.name);
+        const owner = await getOwnership(this.state.targetRegistry, this.state.mi.name);
         const accounts = await getAccounts();
 
         this.setState({
@@ -98,21 +102,21 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     private async _transferOwnership(address: string) {
         this.setState({ newOwnerLoading: true });
         const { transferOwnership } = await initBGFunctions(extension);
-        await transferOwnership(this.state.targetRegistry, this.state.manifest.name, address);
+        await transferOwnership(this.state.targetRegistry, this.state.mi.name, address);
         this.setState({ newOwnerLoading: false, newOwnerDone: true });
     }
 
     private async _addLocation(location: string) {
         this.setState({ editLocationLoading: true });
         const { addLocation } = await initBGFunctions(extension);
-        await addLocation(this.state.targetRegistry, this.state.manifest.name, location);
+        await addLocation(this.state.targetRegistry, this.state.mi.name, location);
         this.setState({ editLocationLoading: false, editLocationDone: true });
     }
 
     private async _removeLocation(location: string) {
         this.setState({ editLocationLoading: true });
         const { removeLocation } = await initBGFunctions(extension);
-        await removeLocation(this.state.targetRegistry, this.state.manifest.name, location);
+        await removeLocation(this.state.targetRegistry, this.state.mi.name, location);
         this.setState({ editLocationLoading: false, editLocationDone: true });
     }
 
@@ -120,10 +124,10 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.setState({ loading: true });
 
         const { deployModule } = await initBGFunctions(extension);
-        const { manifest, targetRegistry, targetStorage, registryKey } = this.state;
+        const { mi, vi, targetRegistry, targetStorage, registryKey } = this.state;
 
         try {
-            const result = await deployModule(manifest, targetStorage, targetRegistry, registryKey);
+            const result = await deployModule(mi, vi, targetStorage, targetRegistry);
             this.setState({
                 message: {
                     type: 'positive',
@@ -150,7 +154,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     render() {
         const {
-            manifest: m, loading, targetRegistry,
+            mi, vi, loading, targetRegistry,
             targetStorage, deployed,
             message, registryKey, registryOptions,
             owner, currentAccount, newOwner, editLocation: newLocation,
@@ -186,24 +190,24 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     />
                 ) : null}
 
-                {(m) ? (<Card fluid>
+                {(mi) ? (<Card fluid>
                     <Card.Content>
                         <Image
                             floated='right'
                             size='mini'
                             circular
-                            src={(m.icon && (m.icon as StorageRef).uris.length > 0) ? (((m.icon as StorageRef).uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + (m.icon as StorageRef).uris?.[0] : (m.icon as StorageRef).uris?.[0]) : NOLOGO_PNG}
+                            src={(mi.icon && mi.icon.uris.length > 0) ? ((mi.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + mi.icon.uris?.[0] : mi.icon.uris?.[0]) : NOLOGO_PNG}
                         />
-                        <Card.Header>{m.title}</Card.Header>
-                        <Card.Meta>{m.type}</Card.Meta>
+                        <Card.Header>{mi.title}</Card.Header>
+                        <Card.Meta>{mi.type}</Card.Meta>
                         <Card.Description>
-                            {m.description}<br />
-                            {m.author}<br />
-                            <strong>{m.name}#{m.branch}@{m.version}</strong><br />
+                            {mi.description}<br />
+                            {mi.author}<br />
+                            <strong>{mi.name}#{vi.branch}@{vi.version}</strong><br />
                             Owner: <a href='#' onClick={() => window.open(`https://rinkeby.etherscan.io/address/${owner}`, '_blank')}>{owner}</a>
                         </Card.Description>
                     </Card.Content>
-                    {(owner === currentAccount) ?
+                    {(owner?.toLowerCase() === currentAccount?.toLowerCase()) ?
                         <Card.Content extra>
                             <div className='ui two buttons'>
 

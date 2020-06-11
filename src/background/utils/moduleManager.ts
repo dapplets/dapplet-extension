@@ -120,49 +120,4 @@ export default class ModuleManager {
             version: optimizedVersion
         };
     }
-
-    // public async getFeaturesByHostnames(hostnames: string[]): Promise<{ [hostname: string]: Manifest[] }> {
-    //     if (!hostnames || hostnames.length === 0) return {};
-    //     const hostnameFeatures = await this.registryAggregator.getFeatures(hostnames); // result.hostname.featureName[branchIndex]
-    //     const hostnameManifests: { [hostname: string]: Manifest[] } = {};
-
-    //     for (const hostname in hostnameFeatures) {
-    //         hostnameManifests[hostname] = [];
-    //         const features = hostnameFeatures[hostname];
-    //         for (const name in features) {
-    //             const branches = features[name];
-    //             const branch = branches[0]; // ToDo: select branch
-    //             const versions = await this.registryAggregator.getVersions(name, branch);
-    //             const lastVersion = versions.sort(rcompare)[0]; // DESC sorting by semver // ToDo: select version
-    //             if (!lastVersion) continue;
-    //             const manifest = await this.registryAggregator.getVersionInfo(name, branch, lastVersion);
-    //             hostnameManifests[hostname].push(manifest);
-    //         }
-    //     }
-
-    //     return hostnameManifests;
-    // }
-
-    // ToDo: remove it?
-    // public async getFeaturesByHostnamesWithRegistries(hostnames: string[], users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: ModuleInfo[] } }> {
-    //     if (!hostnames || hostnames.length === 0) return {};
-    //     const hostnameManifests = await this.registryAggregator.getManifestsWithRegistries(hostnames, users);
-    //     return hostnameManifests;
-    // }
-
-    // // ToDo: remove it?
-    // private async _loadManifestByBranch(name: string, branch: string, replaceUri: boolean) {
-    //     const versions = await this.registryAggregator.getVersions(name, branch);
-    //     const lastVersion = versions.sort(rcompare)[0]; // DESC sorting by semver // ToDo: select version
-    //     if (!lastVersion) return;
-    //     const manifest = await this.loadManifest(name, branch, lastVersion, replaceUri);
-    //     return manifest;
-    // }
-
-    public async getAllDevModules(): Promise<Manifest[]> {
-        const modules = await this.registryAggregator.getAllDevModules();
-        const manifestsWithErrors = await Promise.all(modules.map(m => this.registryAggregator.getVersionInfo(m.name, m.branch, m.version).catch(Error)));
-        const manifestsNoErrors = manifestsWithErrors.filter(x => !(x instanceof Error)) as Manifest[];
-        return manifestsNoErrors;
-    }
 }

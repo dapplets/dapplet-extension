@@ -1,11 +1,12 @@
 import { Registry } from './registry';
-//import { DevRegistry } from './devRegistry';
+import { DevRegistry } from './devRegistry';
 import { EthRegistry } from './ethRegistry';
 import GlobalConfigService from '../services/globalConfigService';
 import { compare } from 'semver';
 import { mergeDedupe, typeOfUri, UriTypes } from '../../common/helpers';
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
+import Manifest from '../models/manifest';
 
 export class RegistryAggregator {
     public isAvailable: boolean = true;
@@ -63,7 +64,7 @@ export class RegistryAggregator {
         return merge;
     }
 
-    public async getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]> {
+    public async getAllDevModules(): Promise<{ module: ModuleInfo, versions: VersionInfo[] }[]> {
         await this._initRegistries();
         const modules = await Promise.all(this.registries.map(r => r.getAllDevModules().catch((e) => e)));
         const validModules = modules.filter(result => !(result instanceof Error));
@@ -85,8 +86,7 @@ export class RegistryAggregator {
                 .map(r => {
                     const uriType = typeOfUri(r.url);
 
-                    //if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
-                    //if (uriType === UriTypes.Http && !r.isDev) return new TestRegistry(r.url);
+                    if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
                     if (uriType === UriTypes.Ethereum) return new EthRegistry(r.url);
                 });
         }

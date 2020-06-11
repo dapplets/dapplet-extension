@@ -2,13 +2,45 @@ import { Registry, StorageRef } from './registry';
 import abi from './ethRegistryAbi';
 import * as ethers from "ethers";
 import { WalletConnectSigner } from '../utils/walletConnectSigner';
-import Manifest from '../models/manifest';
 import * as semver from 'semver';
 import ModuleInfo from '../models/moduleInfo';
-import { ModuleTypes } from '../../common/constants';
+import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../../common/constants';
 import VersionInfo from '../models/versionInfo';
 
-const moduleTypesMap = {
+type EthStorageRef = {
+    hash: string; // bytes32
+    uris: string[]; // bytes[]
+}
+
+type EthModuleInfo = {
+    moduleType: number; // uint8
+    name: string; // string
+    title: string; // string
+    description: string; // string
+    owner: string; // bytes32
+    interfaces: string[]; // string[]
+    icon: EthStorageRef;
+    flags: number; // uint 
+}
+
+type EthVersionInfoDto = {
+    branch: string; // string
+    major: number; // uint8 
+    minor: number; // uint8 
+    patch: number; // uint8 
+    flags: number; // uint8 
+    binary: EthStorageRef;
+    dependencies: {
+        name: string;
+        branch: string;
+        major: number;
+        minor: number;
+        patch: number;
+    }[];
+    interfaces: string[]; // bytes32[] 
+}
+
+const moduleTypesMap: { [key: number]: ModuleTypes } = {
     1: ModuleTypes.Feature,
     2: ModuleTypes.Adapter,
     3: ModuleTypes.Library,
@@ -21,8 +53,7 @@ export class EthRegistry implements Registry {
 
     private _contract: any = null;
 
-    constructor(public url: string) { // url is a contract address
-        // example: https://test.dapplets.org/api/registry/dapplet-base
+    constructor(public url: string) {
         if (!url) throw new Error("Endpoint Url is required");
 
         const signer = new WalletConnectSigner();
@@ -32,7 +63,7 @@ export class EthRegistry implements Registry {
     public async getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }> {
         try {
             const usersNormalized = users.map(u => "0x000000000000000000000000" + u.replace('0x', ''));
-            const moduleInfosByCtx = await this._contract.getModuleInfoBatch(contextIds, usersNormalized, 0);
+            const moduleInfosByCtx: EthModuleInfo[][] = await this._contract.getModuleInfoBatch(contextIds, usersNormalized, 0);
             this.isAvailable = true;
             this.error = null;
 
@@ -44,11 +75,12 @@ export class EthRegistry implements Registry {
                     mi.name = m.name;
                     mi.title = m.title;
                     mi.description = m.description;
-                    mi.author = m.owner;
+                    mi.author = m.owner.replace('0x000000000000000000000000', '0x');
                     mi.icon = {
                         hash: m.icon.hash,
                         uris: m.icon.uris.map(u => ethers.utils.toUtf8String(u))
                     };
+                    mi.interfaces = m.interfaces;
                     return mi;
                 });
                 return [ctx, mis];
@@ -65,7 +97,7 @@ export class EthRegistry implements Registry {
     public async getVersionNumbers(name: string, branch: string): Promise<string[]> {
         console.log('getVersionNumbers', { name, branch });
         try {
-            const hex = await this._contract.getVersionNumbers(name, branch);
+            const hex: string = await this._contract.getVersionNumbers(name, branch);
             this.isAvailable = true;
             this.error = null;
             const result = hex.replace('0x', '')
@@ -82,7 +114,9 @@ export class EthRegistry implements Registry {
     public async getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo> {
         console.log('getVersionInfo', { name, branch, version });
         try {
-            const { dto, moduleType } = await this._contract.getVersionInfo(name, branch, semver.major(version), semver.minor(version), semver.patch(version));
+            const response = await this._contract.getVersionInfo(name, branch, semver.major(version), semver.minor(version), semver.patch(version));
+            const dto: EthVersionInfoDto = response.dto;
+            const moduleType: number = response.moduleType;
 
             const vi = new VersionInfo();
             vi.name = name;
@@ -97,6 +131,7 @@ export class EthRegistry implements Registry {
                 d.name,
                 d.major + '.' + d.minor + '.' + d.patch
             ])));
+            vi.interfaces = dto.interfaces;
 
             this.isAvailable = true;
             this.error = null;
@@ -108,55 +143,89 @@ export class EthRegistry implements Registry {
         }
     }
 
-    public async getAllDevModules(): Promise<{ name: string, branch: string, version: string }[]> {
+    public async getAllDevModules(): Promise<{ module: ModuleInfo, versions: VersionInfo[] }[]> {
         return Promise.resolve([]);
     }
 
-    public async addModule(name: string, branch: string, version: string, manifest: Manifest): Promise<void> {
-        const manifestForContract = {
-            initialized: true,
-            title: manifest.title,
-            description: manifest.description,
-            iconHash: manifest.icon ? (manifest.icon as StorageRef).hash : '0x0000000000000000000000000000000000000000000000000000000000000000',
-            iconUris: manifest.icon ? (manifest.icon as StorageRef).uris : [],
-            mod_type: manifest.type,
-            author: manifest.author,
-            distHash: (manifest.dist as StorageRef).hash, // hash of bundle
-            distUris: (manifest.dist as StorageRef).uris,
-            dependencies: Object.entries(manifest.dependencies)
+    public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
+        let isModuleExist = false;
+        try {
+            const mi = await this._contract.getModuleInfoByName(module.name);
+            isModuleExist = true;
+        } catch (err) {
+            isModuleExist = false;
+        }
+
+        const mi: EthModuleInfo = {
+            name: module.name,
+            title: module.title,
+            description: module.description,
+            moduleType: parseInt(Object.entries(moduleTypesMap).find(([k, v]) => v === module.type)[0]),
+            flags: 0,
+            owner: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            icon: module.icon ? {
+                hash: module.icon.hash,
+                uris: module.icon.uris.map(u => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(u)))
+            } : {
+                    hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    uris: []
+                },
+            interfaces: module.interfaces || []
         };
-        const tx = await this._contract.addModule(name, branch, version, manifestForContract);
 
-        await new Promise((resolve, reject) => {
-            this._contract.on("ModuleAdded", (name, branch, verison, manifestHash, event) => {
-                if (event.transactionHash === tx.hash) {
-                    resolve();
-                }
-            });
-        });
+        const vi: EthVersionInfoDto = {
+            branch: version.branch,
+            major: semver.major(version.version),
+            minor: semver.minor(version.version),
+            patch: semver.patch(version.version),
+            flags: 0,
+            interfaces: version.interfaces || [],
+            binary: {
+                hash: version.dist.hash,
+                uris: version.dist.uris.map(u => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(u)))
+            },
+            dependencies: version.dependencies && Object.entries(version.dependencies).map(([k, v]) => ({
+                name: k,
+                branch: "default",
+                major: semver.major(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
+                minor: semver.minor(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
+                patch: semver.patch(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME])
+            })) || []
+        };
 
-        // await tx.wait();
+        console.log({ isModuleExist, mi, vi })
+
+        const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
+        if (!isModuleExist) {
+            const tx = await this._contract.addModuleInfo([], mi, [vi], userId);
+            await tx.wait();
+        } else {
+            const tx = await this._contract.addModuleVersion(mi.name, vi, userId);
+            await tx.wait();
+        }
     }
 
     public async getOwnership(moduleName: string) {
-        const owner = await this._contract.infoByName(moduleName);
-        return owner;
+        const mi = await this._contract.getModuleInfoByName(moduleName);
+        return mi.owner.replace('0x000000000000000000000000', '0x');
     }
 
     public async transferOwnership(moduleName: string, address: string) {
-        const tx = await this._contract.transferOwnership(moduleName, address);
+        const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
+        if (address.length === 42) address = '0x000000000000000000000000' + address.replace('0x', '');
+        const tx = await this._contract.transferOwnership(moduleName, userId, address);
         await tx.wait();
     }
 
-    public async addLocation(moduleName: string, location: string) {
-        const tx = await this._contract.addLocation(moduleName, location);
+    public async addContextId(moduleName: string, contextId: string) {
+        const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
+        const tx = await this._contract.addContextId(moduleName, contextId, userId);
         await tx.wait();
     }
 
-    public async removeLocation(moduleName: string, location: string) {
-        const modules: string[] = await this._contract.getModules(location);
-        const moduleNameIndex = modules.indexOf(moduleName);
-        const tx = await this._contract.removeLocation(location, moduleNameIndex, moduleName);
+    public async removeContextId(moduleName: string, contextId: string) {
+        const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
+        const tx = await this._contract.removeContextId(moduleName, contextId, userId);
         await tx.wait();
     }
 }
