@@ -23,6 +23,14 @@ type EthModuleInfo = {
     flags: number; // uint 
 }
 
+type EthDependencyDto = {
+    name: string;
+    branch: string;
+    major: number;
+    minor: number;
+    patch: number;
+};
+
 type EthVersionInfoDto = {
     branch: string; // string
     major: number; // uint8 
@@ -30,14 +38,8 @@ type EthVersionInfoDto = {
     patch: number; // uint8 
     flags: number; // uint8 
     binary: EthStorageRef;
-    dependencies: {
-        name: string;
-        branch: string;
-        major: number;
-        minor: number;
-        patch: number;
-    }[];
-    interfaces: string[]; // bytes32[] 
+    dependencies: EthDependencyDto[];
+    interfaces: EthDependencyDto[]; // bytes32[] 
 }
 
 const moduleTypesMap: { [key: number]: ModuleTypes } = {
@@ -47,11 +49,13 @@ const moduleTypesMap: { [key: number]: ModuleTypes } = {
     4: ModuleTypes.Interface
 };
 
+// ToDo: errors from here don't reach inpage!
 export class EthRegistry implements Registry {
     public isAvailable: boolean = true;
     public error: string = null;
 
     private _contract: any = null;
+    private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>();
 
     constructor(public url: string) {
         if (!url) throw new Error("Endpoint Url is required");
@@ -62,6 +66,13 @@ export class EthRegistry implements Registry {
 
     public async getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }> {
         try {
+            const usersCacheKey = users.join(';');
+            if (!this._moduleInfoCache.has(usersCacheKey)) this._moduleInfoCache.set(usersCacheKey, new Map());
+            if (contextIds.map(c => this._moduleInfoCache.get(usersCacheKey).has(c)).every(c => c === true)) {
+                const cachedResult = Object.fromEntries(contextIds.map(c => ([c, this._moduleInfoCache.get(usersCacheKey).get(c)])));
+                return cachedResult;
+            }
+
             const usersNormalized = users.map(u => "0x000000000000000000000000" + u.replace('0x', ''));
             const moduleInfosByCtx: EthModuleInfo[][] = await this._contract.getModuleInfoBatch(contextIds, usersNormalized, 0);
             this.isAvailable = true;
@@ -83,9 +94,14 @@ export class EthRegistry implements Registry {
                     mi.interfaces = m.interfaces;
                     return mi;
                 });
+
+                if (!this._moduleInfoCache.get(usersCacheKey).has(ctx)) {
+                    this._moduleInfoCache.get(usersCacheKey).set(ctx, mis);
+                }
+
                 return [ctx, mis];
             }));
-
+            
             return result;
         } catch (err) {
             this.isAvailable = false;
@@ -95,7 +111,6 @@ export class EthRegistry implements Registry {
     }
 
     public async getVersionNumbers(name: string, branch: string): Promise<string[]> {
-        console.log('getVersionNumbers', { name, branch });
         try {
             const hex: string = await this._contract.getVersionNumbers(name, branch);
             this.isAvailable = true;
@@ -112,7 +127,6 @@ export class EthRegistry implements Registry {
     }
 
     public async getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo> {
-        console.log('getVersionInfo', { name, branch, version });
         try {
             const response = await this._contract.getVersionInfo(name, branch, semver.major(version), semver.minor(version), semver.patch(version));
             const dto: EthVersionInfoDto = response.dto;
@@ -131,7 +145,10 @@ export class EthRegistry implements Registry {
                 d.name,
                 d.major + '.' + d.minor + '.' + d.patch
             ])));
-            vi.interfaces = dto.interfaces;
+            vi.interfaces = Object.fromEntries(dto.interfaces.map(d => ([
+                d.name,
+                d.major + '.' + d.minor + '.' + d.patch
+            ])));
 
             this.isAvailable = true;
             this.error = null;
@@ -179,7 +196,6 @@ export class EthRegistry implements Registry {
             minor: semver.minor(version.version),
             patch: semver.patch(version.version),
             flags: 0,
-            interfaces: version.interfaces || [],
             binary: {
                 hash: version.dist.hash,
                 uris: version.dist.uris.map(u => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(u)))
@@ -190,10 +206,15 @@ export class EthRegistry implements Registry {
                 major: semver.major(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
                 minor: semver.minor(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
                 patch: semver.patch(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME])
+            })) || [],
+            interfaces: version.interfaces && Object.entries(version.interfaces).map(([k, v]) => ({
+                name: k,
+                branch: "default",
+                major: semver.major(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
+                minor: semver.minor(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
+                patch: semver.patch(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME])
             })) || []
         };
-
-        console.log({ isModuleExist, mi, vi })
 
         const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
         if (!isModuleExist) {
@@ -206,8 +227,12 @@ export class EthRegistry implements Registry {
     }
 
     public async getOwnership(moduleName: string) {
+        try {
         const mi = await this._contract.getModuleInfoByName(moduleName);
         return mi.owner.replace('0x000000000000000000000000', '0x');
+        } catch {
+            return null;
+        }
     }
 
     public async transferOwnership(moduleName: string, address: string) {

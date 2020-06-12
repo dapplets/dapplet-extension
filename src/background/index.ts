@@ -49,7 +49,7 @@ extension.runtime.onMessage.addListener(
     deactivateFeature: (name, version, hostnames, order, registry) => featureService.deactivateFeature(name, version, hostnames, order, registry),
     getActiveModulesByHostnames: (hostnames) => featureService.getActiveModulesByHostnames(hostnames),
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
-    optimizeDependency: (name, branch, version) => featureService.optimizeDependency(name, branch, version),
+    optimizeDependency: (name, branch, version, contextIds) => featureService.optimizeDependency(name, branch, version, contextIds),
     getAllDevModules: () => featureService.getAllDevModules(),
     deployModule: (mi, vi, targetStorage, targetRegistry) => featureService.deployModule(mi, vi, targetStorage, targetRegistry),
     getRegistries: () => featureService.getRegistries(),

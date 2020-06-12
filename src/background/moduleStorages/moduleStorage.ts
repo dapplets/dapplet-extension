@@ -6,12 +6,10 @@ import { ethers } from 'ethers';
 
 export class StorageAggregator {
 
-    async getResource(hashUris: StorageRef | string): Promise<ArrayBuffer> {
-        if (typeof hashUris === 'string') {
-            hashUris = {
-                hash: null,
-                uris: [hashUris]
-            }
+    async getResource(hashUris: StorageRef): Promise<ArrayBuffer> {
+
+        if (hashUris.uris.length === 0) {
+            throw Error("Resource doesn't have any URIs.");
         }
 
         for (const uri of hashUris.uris) {

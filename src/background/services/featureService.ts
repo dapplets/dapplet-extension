@@ -132,7 +132,7 @@ export default class FeatureService {
         return modules;
     }
 
-    public async getModulesWithDeps(modules: { name: string, branch: string, version: string }[]) {
+    public async getModulesWithDeps(modules: { name: string, branch: string, version: string, contextIds: string[] }[]) {
         if (modules.length === 0) return [];
         const modulesWithDeps = await this._moduleManager.resolveDependencies(modules);
         const loadedModules = await Promise.all(modulesWithDeps.map(m =>
@@ -142,9 +142,9 @@ export default class FeatureService {
         return loadedModules;
     }
 
-    public async optimizeDependency(name: string, branch: string, version: string) {
+    public async optimizeDependency(name: string, branch: string, version: string, contextIds: string[]) {
         // ToDo: fix this hack
-        return await this._moduleManager.optimizeDependency(name, version, branch);
+        return await this._moduleManager.optimizeDependency(name, version, branch, contextIds);
     };
 
     public async getAllDevModules() {

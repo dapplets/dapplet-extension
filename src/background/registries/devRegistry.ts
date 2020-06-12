@@ -15,9 +15,11 @@ type DevManifest = {
     author: string;
     icon?: string;
     dist: string;
-    interfaces?: string[];
+    interfaces?: {
+        [name: string]: string
+    };
 
-    dependencies: {
+    dependencies?: {
         [name: string]: string
     }
 }
@@ -29,7 +31,8 @@ export class DevRegistry implements Registry {
     public error: string = null;
 
     private _devConfig: {
-        hostnames: { [hostname: string]: { [name: string]: string } },
+        contextIds: { [moduleName: string]: string[] },
+        interfaces: { [moduleName: string]: string[] },
         modules: { [name: string]: { [branch: string]: { [version: string]: string } } }
     } = null;
 
@@ -44,10 +47,14 @@ export class DevRegistry implements Registry {
 
         for (const contextId of contextIds) {
             result[contextId] = [];
-            for (const name in (this._devConfig.hostnames[contextId] || {})) {
-                const versions = Object.keys(this._devConfig.modules[name][DEFAULT_BRANCH_NAME] || {});
+            const modules = this._fetchModulesByContextId([contextId]);
+            for (const moduleName of modules) {
+                if (!this._devConfig.modules[moduleName]) continue;
+                const versions = Object.keys(this._devConfig.modules[moduleName][DEFAULT_BRANCH_NAME] || {});
+                if (versions.length === 0) continue;
                 const lastVersion = versions.sort(rcompare)[0];
-                const info = await this._loadModuleAndVersionInfo(this._devConfig.modules[name][DEFAULT_BRANCH_NAME][lastVersion]);
+                const url = this._devConfig.modules[moduleName][DEFAULT_BRANCH_NAME][lastVersion];
+                const info = await this._loadModuleAndVersionInfo(url);
                 result[contextId].push(info.module);
             }
         }
@@ -72,7 +79,7 @@ export class DevRegistry implements Registry {
         };
 
         const info = await this._loadModuleAndVersionInfo(this._devConfig.modules[name][branch][version]);
-        
+
         return info.version;
     }
 
@@ -88,8 +95,8 @@ export class DevRegistry implements Registry {
                 const lastVersion = versions.sort(rcompare)[0]; // ToDo: is it correct?
                 const url = this._devConfig.modules[name][branch][lastVersion];
                 try {
-                const { module, version } = await this._loadModuleAndVersionInfo(url);
-                modules.push({ module, versions: [version] });
+                    const { module, version } = await this._loadModuleAndVersionInfo(url);
+                    modules.push({ module, versions: [version] });
                 } catch (err) {
                     console.error(err);
                 }
@@ -146,7 +153,7 @@ export class DevRegistry implements Registry {
             hash: null,
             uris: [new URL(dm.icon, new URL(manifestUri, this._rootUrl).href).href]
         } : null;
-        mi.interfaces = dm.interfaces;
+        mi.interfaces = Object.keys(dm.interfaces || {});
 
         const vi = new VersionInfo();
         vi.name = dm.name;
@@ -168,5 +175,22 @@ export class DevRegistry implements Registry {
         const response = await fetch(manifestUri);
         const manifest = await response.json() as DevManifest;
         return manifest;
+    }
+
+    private _fetchModulesByContextId(contextIds: string[]): string[] {
+        const result = [];
+
+        for (const contextId of contextIds) {
+            for (const moduleName in this._devConfig.contextIds) {
+                const moduleContextIds = this._devConfig.contextIds[moduleName] || [];
+                if (moduleContextIds.indexOf(contextId) !== -1) {
+                    result.push(moduleName);
+                    result.push(...this._fetchModulesByContextId([moduleName]));
+                    result.push(...this._fetchModulesByContextId(this._devConfig.interfaces[moduleName] || []));
+                }
+            }
+        }
+
+        return result;
     }
 }

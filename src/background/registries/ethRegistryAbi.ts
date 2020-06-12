@@ -414,9 +414,36 @@ export default [
                         "type": "tuple[]"
                     },
                     {
-                        "internalType": "bytes32[]",
+                        "components": [
+                            {
+                                "internalType": "string",
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "branch",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "major",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "minor",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "patch",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.DependencyDto[]",
                         "name": "interfaces",
-                        "type": "bytes32[]"
+                        "type": "tuple[]"
                     }
                 ],
                 "internalType": "struct DappletRegistry.VersionInfoDto[]",
@@ -518,9 +545,36 @@ export default [
                         "type": "tuple[]"
                     },
                     {
-                        "internalType": "bytes32[]",
+                        "components": [
+                            {
+                                "internalType": "string",
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "branch",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "major",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "minor",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "patch",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.DependencyDto[]",
                         "name": "interfaces",
-                        "type": "bytes32[]"
+                        "type": "tuple[]"
                     }
                 ],
                 "internalType": "struct DappletRegistry.VersionInfoDto",
@@ -622,9 +676,36 @@ export default [
                         "type": "tuple[]"
                     },
                     {
-                        "internalType": "bytes32[]",
+                        "components": [
+                            {
+                                "internalType": "string",
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "branch",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "major",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "minor",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "patch",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.DependencyDto[]",
                         "name": "interfaces",
-                        "type": "bytes32[]"
+                        "type": "tuple[]"
                     }
                 ],
                 "internalType": "struct DappletRegistry.VersionInfoDto[]",
@@ -774,9 +855,36 @@ export default [
                         "type": "tuple[]"
                     },
                     {
-                        "internalType": "bytes32[]",
+                        "components": [
+                            {
+                                "internalType": "string",
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "branch",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "major",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "minor",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "patch",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.DependencyDto[]",
                         "name": "interfaces",
-                        "type": "bytes32[]"
+                        "type": "tuple[]"
                     }
                 ],
                 "internalType": "struct DappletRegistry.VersionInfoDto",

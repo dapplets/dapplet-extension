@@ -126,8 +126,6 @@ export class Injector {
             const injectDecorator = (name: string) => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
                 descriptor = descriptor || {};
                 descriptor.get = () => {
-                    // ToDo: Fix error "TypeError: Cannot read property 'instance' of undefined"
-                    const versions = this.registry.filter(m => m.manifest.name == name).map(m => m.manifest.version);
                     const dependency = manifest.dependencies[name];
 
                     if (dependency === undefined) {
@@ -140,15 +138,25 @@ export class Injector {
                         return null;
                     }
 
+                    // if the module can not be found by the name, then trying to find its implementation by interface name
+                    let modules = this.registry.filter(m => m.manifest.name == name);
+                    if (modules.length === 0) {
+                        modules = this.registry.filter(m => m.manifest.interfaces?.[name] !== undefined);
+                        if (modules.length === 0) {
+                            console.error(`Can not find neither the module, nor an implementation of the interface "${name}".`);
+                            return null;
+                        }
+                    }
+
                     // ToDo: Should be moved to the background? 
                     // ToDo: Fetch prefix from global settings.
                     // ToDo: Replace '>=' to '^'
                     const prefix = '>='; // https://devhints.io/semver
                     const range = prefix + (typeof dependency === "string" ? dependency : dependency[DEFAULT_BRANCH_NAME]);
+                    const maxVer = maxSatisfying(modules.map(m => m.manifest.version), range);
 
-                    const maxVer = maxSatisfying(versions, range);
-
-                    return this.registry.find(m => m.manifest.name == name && m.manifest.version == maxVer).instance;
+                    const module = modules.find(m => m.manifest.version == maxVer);
+                    return module.instance;
                 }
                 return descriptor;
             };
@@ -157,8 +165,8 @@ export class Injector {
 
             if (newBranch) {
                 addEvent('Branch resolving', `Resolver of "${manifest.name}" defined the "${newBranch}" branch`);
-                const optimizedBranch = await optimizeDependency(manifest.name, newBranch, manifest.version);
-                const missingDependencies = await getModulesWithDeps([optimizedBranch]);
+                const optimizedBranch = await optimizeDependency(manifest.name, newBranch, manifest.version, contextIds);
+                const missingDependencies = await getModulesWithDeps([{...optimizedBranch, contextIds: contextIds }]);
                 await this._processModules(missingDependencies);
             }
         }

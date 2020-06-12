@@ -11,6 +11,7 @@ import Manifest from '../models/manifest';
 export class RegistryAggregator {
     public isAvailable: boolean = true;
     public registries: Registry[] = [];
+    private _globalConfigService = new GlobalConfigService();
 
     async getVersions(name: string, branch: string): Promise<string[]> {
         await this._initRegistries();
@@ -74,15 +75,14 @@ export class RegistryAggregator {
     }
 
     private async _initRegistries() {
-        const globalConfigService = new GlobalConfigService();
-
         // ToDo: fetch LocalConfig
-        const registries = await globalConfigService.getRegistries();
+        const registries = await this._globalConfigService.getRegistries();
+        const isDevMode = await this._globalConfigService.getDevMode();
 
         // ToDo: optimize comparison
-        if (registries.length !== this.registries.length) {
+        if (registries.filter(x => isDevMode || (!isDevMode && x.isDev === false)).length !== this.registries.length) {
             // ToDo: Dev registries are priority
-            this.registries = registries.sort((a, b) => (a.isDev === false) ? 1 : -1)
+            this.registries = registries.filter(x => isDevMode || (!isDevMode && x.isDev === false)).sort((a, b) => (a.isDev === false) ? 1 : -1)
                 .map(r => {
                     const uriType = typeOfUri(r.url);
 
