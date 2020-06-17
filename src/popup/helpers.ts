@@ -12,6 +12,6 @@ export const isValidUrl = (input: string) => {
         new URL(input);
         return true;
     } catch (_) {
-        return input.indexOf('0x') !== -1 ? true : false;
+        return input.indexOf('0x') !== -1 ? true : (input.indexOf('.eth') !== -1 ? true : false);
     }
 }
