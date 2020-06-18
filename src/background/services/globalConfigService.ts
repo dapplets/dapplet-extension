@@ -30,6 +30,7 @@ export default class GlobalConfigService {
         config.trustedUsers = [{
             account: "0x692a4d7b7be2dc1623155e90b197a82d114a74f3"
         }];
+        config.userSettings = {};
 
         await this._globalConfigRepository.deleteById(this._configId);
         await this._globalConfigRepository.create(config);
@@ -123,5 +124,32 @@ export default class GlobalConfigService {
 
     async removeTrustedUser(account: string) {
         this.updateConfig(c => c.trustedUsers = c.trustedUsers.filter(r => r.account !== account));
+    }
+
+    async getUserSettings(moduleName: string, key: string) {
+        const config = await this.get();
+        if (!config.userSettings[moduleName]) return undefined;
+        return config.userSettings[moduleName][key];
+    }
+
+    async setUserSettings(moduleName: string, key: string, value: any) {
+        const config = await this.get();
+        if (!config.userSettings[moduleName]) config.userSettings[moduleName] = {};
+        config.userSettings[moduleName][key] = value;
+        await this.set(config);
+    }
+
+    async removeUserSettings(moduleName: string, key: string) {
+        const config = await this.get();
+        if (!config.userSettings[moduleName]) return;
+        delete config.userSettings[moduleName][key];
+        await this.set(config);
+    }
+    
+    async clearUserSettings(moduleName: string) {
+        const config = await this.get();
+        if (!config.userSettings[moduleName]) return;
+        delete config.userSettings[moduleName];
+        await this.set(config);
     }
 }
