@@ -81,7 +81,9 @@ extension.runtime.onMessage.addListener(
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),
     setUserSettings: (moduleName, key, value) => globalConfigService.setUserSettings(moduleName, key, value),
     removeUserSettings: (moduleName, key) => globalConfigService.removeUserSettings(moduleName, key),
-    clearUserSettings: (moduleName) => globalConfigService.clearUserSettings(moduleName)
+    clearUserSettings: (moduleName) => globalConfigService.clearUserSettings(moduleName),
+    loadUserSettings: (url) => globalConfigService.loadUserSettings(url),
+    saveUserSettings: () => globalConfigService.saveUserSettings()
   })
 );
 

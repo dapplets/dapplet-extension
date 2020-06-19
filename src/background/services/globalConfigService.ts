@@ -2,6 +2,7 @@ import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserSt
 import { GlobalConfig } from '../models/globalConfig';
 import { typeOfUri, UriTypes } from '../../common/helpers';
 import { WalletConnectSigner } from '../utils/walletConnectSigner';
+import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 
 export default class GlobalConfigService {
     private _globalConfigRepository = new GlobalConfigBrowserStorage();
@@ -145,11 +146,28 @@ export default class GlobalConfigService {
         delete config.userSettings[moduleName][key];
         await this.set(config);
     }
-    
+
     async clearUserSettings(moduleName: string) {
         const config = await this.get();
         if (!config.userSettings[moduleName]) return;
         delete config.userSettings[moduleName];
         await this.set(config);
+    }
+
+    async loadUserSettings(url: string) {
+        const swarmStorage = new SwarmModuleStorage();
+        const data = await swarmStorage.getResource(url);
+        const json = new TextDecoder("utf-8").decode(new Uint8Array(data));
+        const config = JSON.parse(json);
+        await this.set(config);
+    }
+
+    async saveUserSettings() {
+        const config = await this.get();
+        const json = JSON.stringify(config);
+        const blob = new Blob([json], { type: "application/json" });
+        const swarmStorage = new SwarmModuleStorage();
+        const url = await swarmStorage.save(blob);
+        return url;
     }
 }
