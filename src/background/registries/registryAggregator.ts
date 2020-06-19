@@ -87,7 +87,7 @@ export class RegistryAggregator {
                     const uriType = typeOfUri(r.url);
 
                     if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
-                    if (uriType === UriTypes.Ethereum) return new EthRegistry(r.url);
+                    if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) return new EthRegistry(r.url);
                 });
         }
     }

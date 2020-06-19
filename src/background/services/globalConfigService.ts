@@ -1,5 +1,8 @@
 import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserStorage';
 import { GlobalConfig } from '../models/globalConfig';
+import { typeOfUri, UriTypes } from '../../common/helpers';
+import { WalletConnectSigner } from '../utils/walletConnectSigner';
+import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 
 export default class GlobalConfigService {
     private _globalConfigRepository = new GlobalConfigBrowserStorage();
@@ -28,6 +31,7 @@ export default class GlobalConfigService {
         config.trustedUsers = [{
             account: "0x692a4d7b7be2dc1623155e90b197a82d114a74f3"
         }];
+        config.userSettings = {};
 
         await this._globalConfigRepository.deleteById(this._configId);
         await this._globalConfigRepository.create(config);
@@ -42,10 +46,19 @@ export default class GlobalConfigService {
         const config = await this.get();
         if (config.registries.find(r => r.url === url)) return;
 
-        // ToDo: add Ethereum address validator
-        const isEthAddress = url.indexOf('0x') !== -1;
+        const isEthAddress = typeOfUri(url) === UriTypes.Ethereum;
+        const isEnsAddress = typeOfUri(url) === UriTypes.Ens;
 
-        if (!isEthAddress) {
+        if (isEthAddress || isEnsAddress) {
+            if (isEnsAddress) {
+                const signer = new WalletConnectSigner();
+                const address = await signer.resolveName(url);
+                if (!address) throw new Error("Can not resolve the ENS name");
+            }
+
+            config.registries.push({ url, isDev });
+            await this.set(config);
+        } else {
             const response = await fetch(url);
             if (response.ok || !isDev) { // ToDo: check prod registry correctly
                 config.registries.push({ url, isDev });
@@ -53,9 +66,6 @@ export default class GlobalConfigService {
             } else {
                 throw Error('The registry is not available.');
             }
-        } else {
-            config.registries.push({ url, isDev });
-            await this.set(config);
         }
     }
 
@@ -96,18 +106,68 @@ export default class GlobalConfigService {
         const config = await this.get();
         if (config.trustedUsers.find(r => r.account === account)) return;
 
-        // ToDo: add Ethereum address validator
-        const isEthAddress = account.indexOf('0x') !== -1;
+        const isEthAddress = typeOfUri(account) === UriTypes.Ethereum;
+        const isEnsAddress = typeOfUri(account) === UriTypes.Ens;
 
-        if (!isEthAddress) {
-            throw Error('User account must be valid Ethereum address');
-        } else {
+        if (isEthAddress || isEnsAddress) {
+            if (isEnsAddress) {
+                const signer = new WalletConnectSigner();
+                const address = await signer.resolveName(account);
+                if (!address) throw new Error("Can not resolve the ENS name");
+            }
+
             config.trustedUsers.push({ account: account });
             await this.set(config);
+        } else {
+            throw Error('User account must be valid Ethereum address');
         }
     }
 
     async removeTrustedUser(account: string) {
         this.updateConfig(c => c.trustedUsers = c.trustedUsers.filter(r => r.account !== account));
+    }
+
+    async getUserSettings(moduleName: string, key: string) {
+        const config = await this.get();
+        if (!config.userSettings[moduleName]) return undefined;
+        return config.userSettings[moduleName][key];
+    }
+
+    async setUserSettings(moduleName: string, key: string, value: any) {
+        const config = await this.get();
+        if (!config.userSettings[moduleName]) config.userSettings[moduleName] = {};
+        config.userSettings[moduleName][key] = value;
+        await this.set(config);
+    }
+
+    async removeUserSettings(moduleName: string, key: string) {
+        const config = await this.get();
+        if (!config.userSettings[moduleName]) return;
+        delete config.userSettings[moduleName][key];
+        await this.set(config);
+    }
+
+    async clearUserSettings(moduleName: string) {
+        const config = await this.get();
+        if (!config.userSettings[moduleName]) return;
+        delete config.userSettings[moduleName];
+        await this.set(config);
+    }
+
+    async loadUserSettings(url: string) {
+        const swarmStorage = new SwarmModuleStorage();
+        const data = await swarmStorage.getResource(url);
+        const json = new TextDecoder("utf-8").decode(new Uint8Array(data));
+        const config = JSON.parse(json);
+        await this.set(config);
+    }
+
+    async saveUserSettings() {
+        const config = await this.get();
+        const json = JSON.stringify(config);
+        const blob = new Blob([json], { type: "application/json" });
+        const swarmStorage = new SwarmModuleStorage();
+        const url = await swarmStorage.save(blob);
+        return url;
     }
 }

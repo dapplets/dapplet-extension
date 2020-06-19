@@ -6,6 +6,7 @@ import * as semver from 'semver';
 import ModuleInfo from '../models/moduleInfo';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../../common/constants';
 import VersionInfo from '../models/versionInfo';
+import { typeOfUri, UriTypes } from '../../common/helpers';
 
 type EthStorageRef = {
     hash: string; // bytes32
@@ -54,18 +55,21 @@ export class EthRegistry implements Registry {
     public isAvailable: boolean = true;
     public error: string = null;
 
-    private _contract: any = null;
+    private _signer: WalletConnectSigner;
+    private _contract: ethers.ethers.Contract;
     private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>();
 
     constructor(public url: string) {
         if (!url) throw new Error("Endpoint Url is required");
 
-        const signer = new WalletConnectSigner();
-        this._contract = new ethers.Contract(url, abi, signer);
+        this._signer = new WalletConnectSigner();
+        this._contract = new ethers.Contract(url, abi, this._signer);
     }
 
     public async getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }> {
         try {
+            users = await Promise.all(users.map(u => (typeOfUri(u) === UriTypes.Ens) ? this._signer.resolveName(u) : Promise.resolve(u)));
+            users = users.filter(u => u !== null);
             const usersCacheKey = users.join(';');
             if (!this._moduleInfoCache.has(usersCacheKey)) this._moduleInfoCache.set(usersCacheKey, new Map());
             if (contextIds.map(c => this._moduleInfoCache.get(usersCacheKey).has(c)).every(c => c === true)) {
