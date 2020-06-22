@@ -136,7 +136,7 @@ export class OverlayManager {
     }
 
     public unregister(overlay: Overlay) {
-        console.log('unregister overlay ' + overlay.title);
+        //console.log('unregister overlay ' + overlay.title);
         overlay.registered = false;
         const tab = this._tabsRegistry.filter(t => t.overlay === overlay)[0];
         if (!tab) return;

@@ -8,6 +8,8 @@ import { IResolver, IContentAdapter, IFeature } from './types';
 import { areModulesEqual } from "../common/helpers";
 import VersionInfo from "../background/models/versionInfo";
 import { AppStorage } from "./appStorage";
+import { Mnemonic } from "ethers/lib/utils";
+import Manifest from "../background/models/manifest";
 
 export class Injector {
     public availableContextIds: string[] = [];
@@ -17,7 +19,9 @@ export class Injector {
         clazz: any,
         instance?: any,
         order: number,
-        contextIds: string[]
+        contextIds: string[],
+        dependencies: string[],
+        instancedDeps: any[]
     }[] = [];
 
     constructor(public core: Core) {
@@ -43,9 +47,11 @@ export class Injector {
         // module initialization
         for (let i = 0; i < this.registry.length; i++) {
             if (this.registry[i].instance) continue;
-            this.registry[i].instance = new this.registry[i].clazz();
+            this.registry[i].instancedDeps = this.registry[i].dependencies.map(d => this._configCollectorProxy(this._getDependency(this.registry[i].manifest, d)));
+            this.registry[i].instance = new this.registry[i].clazz(...this.registry[i].instancedDeps);
             const m = this.registry[i];
-            console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} was loaded.`);
+            console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} was instanced.`);
+            // ToDo: add feedback to popup
         }
 
         // feature attaching
@@ -61,7 +67,7 @@ export class Injector {
                     const [headContextId, ...tailContextId] = id.split('/'); // ToDo: check head?
                     return tailContextId.join('/');
                 }).filter(id => !!id);
-                feature.activate();
+                feature.activate?.();
             }
         }
     }
@@ -69,7 +75,8 @@ export class Injector {
     public async unloadModules(modules: { name: string, branch: string, version: string }[]) {
         modules.map(m => this.registry.find(r => areModulesEqual(m, r.manifest))).forEach(m => {
             if (!m) return;
-            m.instance.deactivate();
+            m.instancedDeps.forEach(d => d.detachConfig?.());
+            m.instance.deactivate?.();
             console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} was unloaded.`);
             this.registry = this.registry.filter(r => r !== m);
         });
@@ -119,48 +126,28 @@ export class Injector {
                         clazz: constructor,
                         instance: null,
                         order: order,
-                        contextIds: contextIds
+                        contextIds: contextIds,
+                        dependencies: [],
+                        instancedDeps: []
                     });
                 }
             };
 
             // ToDo: describe it
-            const injectDecorator = (name: string) => (target, propertyKey: string, descriptor: PropertyDescriptor) => {
-                descriptor = descriptor || {};
-                descriptor.get = () => {
-                    const dependency = manifest.dependencies[name];
-
-                    if (dependency === undefined) {
-                        console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`);
-                        return null;
-                    }
-
-                    if (valid(dependency as string) === null) {
-                        console.error(`Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`);
-                        return null;
-                    }
-
-                    // if the module can not be found by the name, then trying to find its implementation by interface name
-                    let modules = this.registry.filter(m => m.manifest.name == name);
-                    if (modules.length === 0) {
-                        modules = this.registry.filter(m => m.manifest.interfaces?.[name] !== undefined);
-                        if (modules.length === 0) {
-                            console.error(`Can not find neither the module, nor an implementation of the interface "${name}".`);
-                            return null;
-                        }
-                    }
-
-                    // ToDo: Should be moved to the background? 
-                    // ToDo: Fetch prefix from global settings.
-                    // ToDo: Replace '>=' to '^'
-                    const prefix = '>='; // https://devhints.io/semver
-                    const range = prefix + (typeof dependency === "string" ? dependency : dependency[DEFAULT_BRANCH_NAME]);
-                    const maxVer = maxSatisfying(modules.map(m => m.manifest.version), range);
-
-                    const module = modules.find(m => m.manifest.version == maxVer);
-                    return module.instance;
+            const injectDecorator = (name: string) => (target, propertyKey: string, parameterIndex: number) => {
+                if (!this.registry.find(m => areModulesEqual(m.manifest, manifest))) {
+                    this.registry.push({
+                        manifest: manifest,
+                        clazz: target,
+                        instance: null,
+                        order: order,
+                        contextIds: contextIds,
+                        dependencies: [],
+                        instancedDeps: []
+                    });
                 }
-                return descriptor;
+                const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
+                currentModule.dependencies[parameterIndex] = name;
             };
 
             execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
@@ -168,7 +155,7 @@ export class Injector {
             if (newBranch) {
                 addEvent('Branch resolving', `Resolver of "${manifest.name}" defined the "${newBranch}" branch`);
                 const optimizedBranch = await optimizeDependency(manifest.name, newBranch, manifest.version, contextIds);
-                const missingDependencies = await getModulesWithDeps([{...optimizedBranch, contextIds: contextIds }]);
+                const missingDependencies = await getModulesWithDeps([{ ...optimizedBranch, contextIds: contextIds }]);
                 await this._processModules(missingDependencies);
             }
         }
@@ -193,6 +180,55 @@ export class Injector {
         extension.runtime.sendMessage({
             type: isActive ? "CONTEXT_STARTED" : "CONTEXT_FINISHED",
             payload: { contextIds }
+        });
+    }
+
+    private _getDependency(manifest: VersionInfo, name: string): any {
+        const dependency = manifest.dependencies[name];
+
+        if (dependency === undefined) {
+            console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`);
+            return;
+        }
+
+        if (valid(dependency as string) === null) {
+            console.error(`Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`);
+            return;
+        }
+
+        // if the module can not be found by the name, then trying to find its implementation by interface name
+        let modules = this.registry.filter(m => m.manifest.name == name);
+        if (modules.length === 0) {
+            modules = this.registry.filter(m => m.manifest.interfaces?.[name] !== undefined);
+            if (modules.length === 0) {
+                console.error(`Can not find neither the module, nor an implementation of the interface "${name}".`);
+                return null;
+            }
+        }
+
+        // ToDo: Should be moved to the background? 
+        // ToDo: Fetch prefix from global settings.
+        // ToDo: Replace '>=' to '^'
+        const prefix = '>='; // https://devhints.io/semver
+        const range = prefix + (typeof dependency === "string" ? dependency : dependency[DEFAULT_BRANCH_NAME]);
+        const maxVer = maxSatisfying(modules.map(m => m.manifest.version), range);
+
+        const module = modules.find(m => m.manifest.version == maxVer);
+        return module.instance;
+    }
+
+    private _configCollectorProxy(a: IContentAdapter<any>): IContentAdapter<any> {
+        let _cfg: any; 
+        return new Proxy(a, {
+            get: function (target: IContentAdapter<any>, prop, receiver) {
+                if (prop === 'attachConfig') {
+                    return (cfg: any) => (_cfg = cfg, a.attachConfig(cfg));
+                } if (prop === 'detachConfig') {
+                    return () => a.detachConfig(_cfg);
+                } else if (prop == 'cfg') {
+                    return _cfg;
+                } else return a[prop];
+            }
         });
     }
 }
