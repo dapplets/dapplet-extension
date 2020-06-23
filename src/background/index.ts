@@ -131,6 +131,8 @@ extension.runtime.onMessage.addListener(async (message, sender, sendResponse) =>
   if (message.type === "CONTEXT_STARTED" || message.type === "CONTEXT_FINISHED") {
     const manifests = await featureService.getActiveModulesByHostnames(message.payload.contextIds);
 
+    if (manifests.length === 0) return;
+
     extension.tabs.sendMessage(sender.tab.id, {
       type: message.type === "CONTEXT_STARTED" ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
       payload: manifests.map(m => ({

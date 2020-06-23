@@ -30,6 +30,7 @@ export default class FeatureService {
 
         let i = 0;
 
+        // ToDo: how to merge modules from different registries???
         for (const [registryUrl, moduleInfosByContextId] of Object.entries(contextIdsByRegsitries)) {
             for (const [contextId, moduleInfos] of Object.entries(moduleInfosByContextId)) {
                 for (const moduleInfo of moduleInfos) {
@@ -49,7 +50,7 @@ export default class FeatureService {
                     } else {
                         // ToDo: move this merging logic to aggragator
                         if (!dto.hostnames) dto.hostnames = [];
-                        dto.hostnames.push(contextId);
+                        if (dto.hostnames.indexOf(contextId) === -1) dto.hostnames.push(contextId);
                     }
                 }
             }
@@ -59,6 +60,7 @@ export default class FeatureService {
     }
 
     private async _setFeatureActive(name: string, version: string | undefined, hostnames: string[], isActive: boolean, order: number, registryUrl: string) {
+        hostnames = Array.from(new Set(hostnames)); // deduplicate
 
         if (!version && isActive) {
             const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
