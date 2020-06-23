@@ -60,7 +60,7 @@ export class Injector {
                                         cfg.contextIds = m.contextIds.map(id => {
                                             const [headContextId, ...tailContextId] = id.split('/'); // ToDo: check head?
                                             return tailContextId.join('/');
-                                        }).filter(id => !!id);                                        
+                                        }).filter(id => !!id);
                                     }
                                     Reflect.set(target, cfgKey, cfg);
                                     target.attachConfig(cfg);
@@ -74,19 +74,46 @@ export class Injector {
                     return depModule.instance;
                 }
             });
-            m.instance = new m.clazz(...m.instancedDeps);
-            
-            console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} was instanced.`);
-            // ToDo: add feedback to popup
+
+            try {
+                m.instance = new m.clazz(...m.instancedDeps);
+                console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`);
+                extension.runtime.sendMessage({
+                    type: "FEATURE_LOADED", payload: {
+                        name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version
+                    }
+                });
+            } catch (err) {
+                console.error(`Error of loading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
+                extension.runtime.sendMessage({
+                    type: "FEATURE_LOADING_ERROR", payload: {
+                        name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version, error: err.message
+                    }
+                });
+            }
         }
     }
 
     public async unloadModules(modules: { name: string, branch: string, version: string }[]) {
         modules.map(m => this.registry.find(r => areModulesEqual(m, r.manifest))).forEach(m => {
             if (!m) return;
-            m.instancedDeps.forEach(d => d.detachConfig());
-            console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} was unloaded.`);
-            this.registry = this.registry.filter(r => r !== m);
+            try {
+                m.instancedDeps.forEach(d => d.detachConfig());
+                console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is unloaded.`);
+                extension.runtime.sendMessage({
+                    type: "FEATURE_UNLOADED", payload: {
+                        name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version
+                    }
+                });
+                this.registry = this.registry.filter(r => r !== m);
+            } catch (err) {
+                console.error(`Error of unloading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
+                extension.runtime.sendMessage({
+                    type: "FEATURE_UNLOADING_ERROR", payload: {
+                        name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version, error: err.message
+                    }
+                });
+            }
         });
     }
 

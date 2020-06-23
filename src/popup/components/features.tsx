@@ -11,7 +11,7 @@ interface IFeaturesProps {
 }
 
 interface IFeaturesState {
-  features: ManifestDTO[];
+  features: (ManifestDTO & { isLoading: boolean, error: string })[];
   isLoading: boolean;
   error: string;
   isNoInpage: boolean;
@@ -51,13 +51,13 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
     const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
     if (this._isMounted) {
       this.setState({
-        features: features.filter(f => f.type === ModuleTypes.Feature),
+        features: features.filter(f => f.type === ModuleTypes.Feature).map(f => ({ ...f, isLoading: false, error: null })),
         isLoading: false
       });
     }
   }
 
-  async handleSwitchChange(module: ManifestDTO, value, order) {
+  async handleSwitchChange(module: (ManifestDTO & { isLoading: boolean, error: string }), value, order) {
     const { name, hostnames, sourceRegistry } = module;
     const backgroundFunctions = await initBGFunctions(extension);
     const { activateFeature, deactivateFeature } = backgroundFunctions;
@@ -65,6 +65,8 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
       const features = state.features.map(feature => {
         if (feature.name == name) {
           feature.isActive = value;
+          feature.isLoading = true;
+          feature.error = null;
         }
         return feature;
       });
@@ -72,11 +74,36 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
       return { features };
     });
 
-    if (value) {
-      await activateFeature(name, null, hostnames, order, sourceRegistry.url);
-    } else {
-      await deactivateFeature(name, null, hostnames, order, sourceRegistry.url);
+    try {
+      if (value) {
+        await activateFeature(name, null, hostnames, order, sourceRegistry.url);
+      } else {
+        await deactivateFeature(name, null, hostnames, order, sourceRegistry.url);
+      }
+    } catch (err) {
+      this.setState(state => {
+        const features = state.features.map(feature => {
+          if (feature.name == name) {
+            feature.isActive = !value;
+            feature.error = err;
+          }
+          return feature;
+        });
+  
+        return { features };
+      });
     }
+
+    this.setState(state => {
+      const features = state.features.map(feature => {
+        if (feature.name == name) {
+          feature.isLoading = false;
+        }
+        return feature;
+      });
+
+      return { features };
+    });
   }
 
   componentWillUnmount() {
@@ -116,6 +143,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                     </List.Content>
                     <List.Content style={{ float: "right", width: 60 }}>
                       <Checkbox
+                        disabled={f.isLoading ?? false}
                         toggle
                         style={{ marginTop: 5 }}
                         onChange={() => this.handleSwitchChange(f, !f.isActive, i)}
@@ -126,11 +154,11 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                       <List.Header>
                         {f.title}
                         {(f.sourceRegistry.isDev) ? (<Label style={{ marginLeft: 5 }} horizontal size='mini' color='teal'>DEV</Label>) : null}
+                        {(f.error) ? (<Popup size='mini' trigger={<Label style={{ marginLeft: 5 }} horizontal size='mini' color='red'>ERROR</Label>}>{f.error}</Popup>) : null}
                       </List.Header>
                       <List.Description style={{ color: "#666" }}>
                         {f.description}
                         {(f.sourceRegistry.isDev) ? null : (<React.Fragment><br />Author: {f.author}</React.Fragment>)}
-                        {/* Version: {f.version} */}
                       </List.Description>
                     </List.Content>
                   </List.Item>

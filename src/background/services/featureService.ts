@@ -81,29 +81,78 @@ export default class FeatureService {
             };
 
             await this._siteConfigRepository.update(config);
+        }
 
-            extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-                var activeTab = tabs[0];
-                extension.tabs.sendMessage(activeTab.id, {
-                    type: isActive ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
-                    payload: [{
-                        name,
-                        version,
-                        branch: DEFAULT_BRANCH_NAME, // ToDo: fix branch
-                        order,
-                        contextIds: hostnames
-                    }]
-                });
+        // sending command to inpage
+        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+            var activeTab = tabs[0];
+            extension.tabs.sendMessage(activeTab.id, {
+                type: isActive ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
+                payload: [{
+                    name,
+                    version,
+                    branch: DEFAULT_BRANCH_NAME, // ToDo: fix branch
+                    order,
+                    contextIds: hostnames
+                }]
             });
+        });
+
+        try {
+            await new Promise<void>((resolve, reject) => {
+                // listening of loading/unloading from inpage
+                const listener = (message, sender, sendResponse) => {
+                    if (!message || !message.type || !message.payload) return;
+                    const p = message.payload;
+                    if (message.type === 'FEATURE_LOADED') {
+                        if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === p.version && isActive === true) {
+                            extension.runtime.onMessage.removeListener(listener);
+                            resolve();
+                        }
+                    } else if (message.type === "FEATURE_UNLOADED") {
+                        if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === p.version && isActive === false) {
+                            extension.runtime.onMessage.removeListener(listener);
+                            resolve();
+                        }
+                    } else if (message.type === "FEATURE_LOADING_ERROR") {
+                        if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === p.version && isActive === true) {
+                            extension.runtime.onMessage.removeListener(listener);
+                            reject(p.error);
+                        }
+                    } else if (message.type === "FEATURE_UNLOADING_ERROR") {
+                        if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === p.version && isActive === false) {
+                            extension.runtime.onMessage.removeListener(listener);
+                            reject(p.error);
+                        }
+                    }
+                }
+
+                extension.runtime.onMessage.addListener(listener);
+            });
+        } catch (err) {
+            // revert config if error
+            for (const hostname of hostnames) {
+                const config = await this._siteConfigRepository.getById(hostname);
+                config.activeFeatures[name] = {
+                    version,
+                    isActive: !isActive,
+                    order
+                };
+
+                await this._siteConfigRepository.update(config);
+            }
+
+            // ToDo: error doesn't come to popup without this rethrowing
+            throw new Error(err);
         }
     }
 
     async activateFeature(name: string, version: string | undefined, hostnames: string[], order: number, registryUrl: string): Promise<void> {
-        return await this._setFeatureActive(name, version, hostnames, true, order, registryUrl);
+        await this._setFeatureActive(name, version, hostnames, true, order, registryUrl);
     }
 
     async deactivateFeature(name: string, version: string | undefined, hostnames: string[], order: number, registryUrl: string): Promise<void> {
-        return await this._setFeatureActive(name, version, hostnames, false, order, registryUrl);
+        await this._setFeatureActive(name, version, hostnames, false, order, registryUrl);
     }
 
     public async getActiveModulesByHostnames(hostnames: string[]) {
