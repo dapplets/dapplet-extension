@@ -8,8 +8,6 @@ import { IResolver, IContentAdapter, IFeature } from './types';
 import { areModulesEqual } from "../common/helpers";
 import VersionInfo from "../background/models/versionInfo";
 import { AppStorage } from "./appStorage";
-import { Mnemonic } from "ethers/lib/utils";
-import Manifest from "../background/models/manifest";
 
 export class Injector {
     public availableContextIds: string[] = [];
@@ -46,37 +44,47 @@ export class Injector {
 
         // module initialization
         for (let i = 0; i < this.registry.length; i++) {
-            if (this.registry[i].instance) continue;
-            this.registry[i].instancedDeps = this.registry[i].dependencies.map(d => this._configCollectorProxy(this._getDependency(this.registry[i].manifest, d)));
-            this.registry[i].instance = new this.registry[i].clazz(...this.registry[i].instancedDeps);
             const m = this.registry[i];
+            if (m.instance) continue;
+            m.instancedDeps = m.dependencies.map(d => {
+                const depModule = this._getDependency(m.manifest, d);
+                if (depModule.manifest.type === ModuleTypes.Adapter) {
+                    const cfgKey = Symbol();
+                    return new Proxy(depModule.instance, {
+                        get: function (target: IContentAdapter<any>, prop, receiver) {
+                            if (prop === 'attachConfig') {
+                                return (cfg: any) => {
+                                    if (m.manifest.type === ModuleTypes.Feature) {
+                                        cfg.orderIndex = m.order;
+                                        // ToDo: fix context ids adding
+                                        cfg.contextIds = m.contextIds.map(id => {
+                                            const [headContextId, ...tailContextId] = id.split('/'); // ToDo: check head?
+                                            return tailContextId.join('/');
+                                        }).filter(id => !!id);                                        
+                                    }
+                                    Reflect.set(target, cfgKey, cfg);
+                                    target.attachConfig(cfg);
+                                }
+                            } if (prop === 'detachConfig') {
+                                return () => target.detachConfig(Reflect.get(target, cfgKey));
+                            } else return target[prop];
+                        }
+                    });
+                } else {
+                    return depModule.instance;
+                }
+            });
+            m.instance = new m.clazz(...m.instancedDeps);
+            
             console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} was instanced.`);
             // ToDo: add feedback to popup
-        }
-
-        // feature attaching
-        for (let i = 0; i < this.registry.length; i++) {
-            const isFeature = this.registry[i].manifest.type === ModuleTypes.Feature;
-            const isNeedToActivate = !!modules.find(m => areModulesEqual(m, this.registry[i].manifest));
-
-            if (isFeature && isNeedToActivate) {
-                const feature: IFeature = this.registry[i].instance;
-                feature.orderIndex = this.registry[i].order;
-                // ToDo: fix context ids adding
-                feature.contextIds = this.registry[i].contextIds.map(id => {
-                    const [headContextId, ...tailContextId] = id.split('/'); // ToDo: check head?
-                    return tailContextId.join('/');
-                }).filter(id => !!id);
-                feature.activate?.();
-            }
         }
     }
 
     public async unloadModules(modules: { name: string, branch: string, version: string }[]) {
         modules.map(m => this.registry.find(r => areModulesEqual(m, r.manifest))).forEach(m => {
             if (!m) return;
-            m.instancedDeps.forEach(d => d.detachConfig?.());
-            m.instance.deactivate?.();
+            m.instancedDeps.forEach(d => d.detachConfig());
             console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} was unloaded.`);
             this.registry = this.registry.filter(r => r !== m);
         });
@@ -183,7 +191,7 @@ export class Injector {
         });
     }
 
-    private _getDependency(manifest: VersionInfo, name: string): any {
+    private _getDependency(manifest: VersionInfo, name: string) {
         const dependency = manifest.dependencies[name];
 
         if (dependency === undefined) {
@@ -214,21 +222,6 @@ export class Injector {
         const maxVer = maxSatisfying(modules.map(m => m.manifest.version), range);
 
         const module = modules.find(m => m.manifest.version == maxVer);
-        return module.instance;
-    }
-
-    private _configCollectorProxy(a: IContentAdapter<any>): IContentAdapter<any> {
-        let _cfg: any; 
-        return new Proxy(a, {
-            get: function (target: IContentAdapter<any>, prop, receiver) {
-                if (prop === 'attachConfig') {
-                    return (cfg: any) => (_cfg = cfg, a.attachConfig(cfg));
-                } if (prop === 'detachConfig') {
-                    return () => a.detachConfig(_cfg);
-                } else if (prop == 'cfg') {
-                    return _cfg;
-                } else return a[prop];
-            }
-        });
+        return module;
     }
 }
