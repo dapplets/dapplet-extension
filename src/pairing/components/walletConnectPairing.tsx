@@ -59,7 +59,6 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
             const wallet = result.params[0];
             if (wallet) {
                 this.setState({ wallet });
-                console.log({ wallet });
             }
 
             const config = await getGlobalConfig();

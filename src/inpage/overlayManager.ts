@@ -136,7 +136,6 @@ export class OverlayManager {
     }
 
     public unregister(overlay: Overlay) {
-        //console.log('unregister overlay ' + overlay.title);
         overlay.registered = false;
         const tab = this._tabsRegistry.filter(t => t.overlay === overlay)[0];
         if (!tab) return;
@@ -162,7 +161,6 @@ export class OverlayManager {
     }
 
     public activate(overlay: Overlay) {
-        //console.log('activate overlay ' + overlay.title);
         if (this._activeOverlay == overlay) return;
 
         if (this._activeOverlay) {
@@ -177,7 +175,6 @@ export class OverlayManager {
     }
 
     public deactivate(overlay: Overlay) {
-        //console.log('deactivate overlay ' + overlay.title);
         const tab = this._tabsRegistry.filter(t => t.overlay === overlay)[0];
         tab.tabItem.classList.toggle(ActiveTabHeaderClass, false);
         tab.contentItem.classList.toggle(ActiveTabContentClass, false);
