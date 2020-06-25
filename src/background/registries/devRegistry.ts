@@ -160,10 +160,10 @@ export class DevRegistry implements Registry {
         vi.branch = dm.branch;
         vi.version = dm.version;
         vi.type = dm.type;
-        vi.dist = {
+        vi.dist = dm.dist ? {
             hash: null,
             uris: [new URL(dm.dist, new URL(manifestUri, this._rootUrl).href).href]
-        }
+        } : null;
         vi.dependencies = dm.dependencies;
         vi.interfaces = dm.interfaces;
 

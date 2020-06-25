@@ -200,9 +200,12 @@ export class EthRegistry implements Registry {
             minor: semver.minor(version.version),
             patch: semver.patch(version.version),
             flags: 0,
-            binary: {
+            binary: version.dist ? {
                 hash: version.dist.hash,
                 uris: version.dist.uris.map(u => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(u)))
+            } : {
+                hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                uris: []
             },
             dependencies: version.dependencies && Object.entries(version.dependencies).map(([k, v]) => ({
                 name: k,

@@ -211,20 +211,26 @@ export default class FeatureService {
             const swarmStorage = new SwarmModuleStorage();
             const testStorage = new HttpModuleStorage();
 
-            // Dist file publishing
-            const dist = await this._storageAggregator.getResource(vi.dist);
-            const distBlob = new Blob([dist], { type: "text/javascript" });
-            const distUrl = (targetStorage === StorageTypes.TestRegsitry) ? await testStorage.save(distBlob, targetRegistry) : await swarmStorage.save(distBlob);
+            let scriptUrl = null;
 
-            // Dist file  hashing
-            const distBuffer = await (distBlob as any).arrayBuffer();
-            const distHash = ethers.utils.keccak256(new Uint8Array(distBuffer));
+            if (vi.dist) {
+                // Dist file publishing
+                const dist = await this._storageAggregator.getResource(vi.dist);
+                const distBlob = new Blob([dist], { type: "text/javascript" });
+                const distUrl = (targetStorage === StorageTypes.TestRegsitry) ? await testStorage.save(distBlob, targetRegistry) : await swarmStorage.save(distBlob);
+    
+                // Dist file  hashing
+                const distBuffer = await (distBlob as any).arrayBuffer();
+                const distHash = ethers.utils.keccak256(new Uint8Array(distBuffer));
+    
+                // Manifest editing
+                vi.dist = {
+                    hash: distHash,
+                    uris: [distUrl]
+                };
 
-            // Manifest editing
-            vi.dist = {
-                hash: distHash,
-                uris: [distUrl]
-            };
+                scriptUrl = distUrl;
+            }
 
             if (mi.icon) {
                 // Icon file publishing
@@ -248,9 +254,7 @@ export default class FeatureService {
             if (!registry) throw new Error("No registry with this url exists in config.");
             await registry.addModule(mi, vi);
 
-            return {
-                scriptUrl: distUrl
-            };
+            return { scriptUrl };
         } catch (err) {
             console.error(err);
             throw err;
