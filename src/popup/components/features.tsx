@@ -11,7 +11,7 @@ interface IFeaturesProps {
 }
 
 interface IFeaturesState {
-  features: (ManifestDTO & { isLoading: boolean, error: string })[];
+  features: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] })[];
   isLoading: boolean;
   error: string;
   isNoInpage: boolean;
@@ -51,53 +51,48 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
     const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
     if (this._isMounted) {
       this.setState({
-        features: features.filter(f => f.type === ModuleTypes.Feature).map(f => ({ ...f, isLoading: false, error: null })),
+        features: features.filter(f => f.type === ModuleTypes.Feature).map(f => ({ ...f, isLoading: false, error: null, versions: [] })),
         isLoading: false
       });
     }
   }
 
-  async handleSwitchChange(module: (ManifestDTO & { isLoading: boolean, error: string }), value, order) {
+  async handleSwitchChange(module: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] }), isActive, order, selectVersions: boolean) {
     const { name, hostnames, sourceRegistry } = module;
-    const backgroundFunctions = await initBGFunctions(extension);
-    const { activateFeature, deactivateFeature } = backgroundFunctions;
-    this.setState(state => {
-      const features = state.features.map(feature => {
-        if (feature.name == name) {
-          feature.isActive = value;
-          feature.isLoading = true;
-          feature.error = null;
-        }
-        return feature;
-      });
-
-      return { features };
-    });
-
-    try {
-      if (value) {
-        await activateFeature(name, null, hostnames, order, sourceRegistry.url);
-      } else {
-        await deactivateFeature(name, null, hostnames, order, sourceRegistry.url);
-      }
-    } catch (err) {
-      this.setState(state => {
-        const features = state.features.map(feature => {
-          if (feature.name == name) {
-            feature.isActive = !value;
-            feature.error = err;
-          }
-          return feature;
-        });
-  
-        return { features };
-      });
+    const { getVersions } = await initBGFunctions(extension);
+    if (selectVersions && isActive) {
+      const versions = await getVersions(module.sourceRegistry.url, module.name);
+      this._updateFeatureState(name, { versions });
+      return;
     }
 
+    await this.toggleFeature(module, null, isActive, order);
+  }
+
+  async toggleFeature(module: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] }), version: string, isActive: boolean, order: number) {
+    const { name, hostnames, sourceRegistry } = module;
+    const { activateFeature, deactivateFeature } = await initBGFunctions(extension);
+
+    this._updateFeatureState(name, { isActive, isLoading: true, error: null, versions: [] });
+
+    try {
+      if (isActive) {
+        await activateFeature(name, version, hostnames, order, sourceRegistry.url);
+      } else {
+        await deactivateFeature(name, version, hostnames, order, sourceRegistry.url);
+      }
+    } catch (err) {
+      this._updateFeatureState(name, { isActive: !isActive, error: err });
+    }
+
+    this._updateFeatureState(name, { isLoading: false });
+  }
+
+  private _updateFeatureState(name: string, f: any) {
     this.setState(state => {
       const features = state.features.map(feature => {
         if (feature.name == name) {
-          feature.isLoading = false;
+          Object.entries(f).forEach(([k, v]) => feature[k] = v);
         }
         return feature;
       });
@@ -146,7 +141,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                         disabled={f.isLoading ?? false}
                         toggle
                         style={{ marginTop: 5 }}
-                        onChange={() => this.handleSwitchChange(f, !f.isActive, i)}
+                        onChange={(e) => (this.handleSwitchChange(f, !f.isActive, i, e['shiftKey']))}
                         checked={f.isActive}
                       />
                     </List.Content>
@@ -159,6 +154,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                       <List.Description style={{ color: "#666" }}>
                         {f.description}
                         {(f.sourceRegistry.isDev) ? null : (<React.Fragment><br />Author: {f.author}</React.Fragment>)}
+                        {(f.versions.length !== 0) ? <Label.Group style={{ marginTop: 3 }} size='mini'>{f.versions.map((v, k) => <Label as='a' key={k} onClick={() => this.toggleFeature(f, v, true, i)}>{v}</Label>)}</Label.Group> : null}
                       </List.Description>
                     </List.Content>
                   </List.Item>

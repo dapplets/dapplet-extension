@@ -57,6 +57,7 @@ extension.runtime.onMessage.addListener(
     transferOwnership: (registryUri, moduleName, address) => featureService.transferOwnership(registryUri, moduleName, address),
     addLocation: (registryUri, moduleName, location) => featureService.addLocation(registryUri, moduleName, location),
     removeLocation: (registryUri, moduleName, location) => featureService.removeLocation(registryUri, moduleName, location),
+    getVersions: (registryUri, moduleName) => featureService.getVersions(registryUri, moduleName),
 
     // GlobalConfigService
     getGlobalConfig: () => globalConfigService.get(),

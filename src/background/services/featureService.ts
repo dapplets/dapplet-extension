@@ -63,10 +63,7 @@ export default class FeatureService {
         hostnames = Array.from(new Set(hostnames)); // deduplicate
 
         if (!version && isActive) {
-            const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
-            if (!registry) throw new Error("No registry with this url exists in config.");
-            const versions = await registry.getVersionNumbers(name, DEFAULT_BRANCH_NAME);
-            if (versions.length === 0) throw new Error("This module has no versions.");
+            const versions = await this.getVersions(registryUrl, name);
             version = versions.sort(rcompare)[0]; // Last version by SemVer
         }
 
@@ -218,11 +215,11 @@ export default class FeatureService {
                 const dist = await this._storageAggregator.getResource(vi.dist);
                 const distBlob = new Blob([dist], { type: "text/javascript" });
                 const distUrl = (targetStorage === StorageTypes.TestRegsitry) ? await testStorage.save(distBlob, targetRegistry) : await swarmStorage.save(distBlob);
-    
+
                 // Dist file  hashing
                 const distBuffer = await (distBlob as any).arrayBuffer();
                 const distHash = ethers.utils.keccak256(new Uint8Array(distBuffer));
-    
+
                 // Manifest editing
                 vi.dist = {
                     hash: distHash,
@@ -294,5 +291,13 @@ export default class FeatureService {
     public async removeLocation(registryUri: string, moduleName: string, location: string) {
         const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
         await registry.removeContextId(moduleName, location);
+    }
+
+    public async getVersions(registryUri: string, moduleName: string) {
+        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        if (!registry) throw new Error("No registry with this url exists in config.");
+        const versions = await registry.getVersionNumbers(moduleName, DEFAULT_BRANCH_NAME);
+        if (versions.length === 0) throw new Error("This module has no versions.");
+        return versions;
     }
 }
