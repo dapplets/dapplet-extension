@@ -76,6 +76,7 @@ export class Injector {
             });
 
             try {
+                // ToDo: compare "m.instancedDeps.length" and "m.clazz.constructor.length"
                 m.instance = new m.clazz(...m.instancedDeps);
                 console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`);
                 extension.runtime.sendMessage({
@@ -169,7 +170,13 @@ export class Injector {
             };
 
             // ToDo: describe it
-            const injectDecorator = (name: string) => (target, propertyKey: string, parameterIndex: number) => {
+            const injectDecorator = (name: string) => (target, propertyKey: string, parameterIndexOrDescriptor: number | PropertyDescriptor) => {
+                if (!name) throw new Error('The name of a module is required as the first argument of the @Inject(module_name) decorator');
+                if (typeof parameterIndexOrDescriptor !== 'number') throw new Error('@Inject(module_name) decorator can be applied to constructor parameters only');
+                // ToDo: check module_name with manifest
+
+                //if (typeof parameterIndexOrDescriptor === 'number') { // decorator applied to constructor parameters
+                
                 if (!this.registry.find(m => areModulesEqual(m.manifest, manifest))) {
                     this.registry.push({
                         manifest: manifest,
@@ -182,7 +189,13 @@ export class Injector {
                     });
                 }
                 const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
-                currentModule.dependencies[parameterIndex] = name;
+                currentModule.dependencies[parameterIndexOrDescriptor] = name;
+
+                // } else { // decorator applied to class property
+                //     parameterIndexOrDescriptor = parameterIndexOrDescriptor || {};
+                //     parameterIndexOrDescriptor.get = () => this._getDependency(manifest, name).instance;
+                //     return parameterIndexOrDescriptor;
+                // }
             };
 
             execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
