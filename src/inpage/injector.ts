@@ -174,9 +174,10 @@ export class Injector {
                 if (!name) throw new Error('The name of a module is required as the first argument of the @Inject(module_name) decorator');
                 if (typeof parameterIndexOrDescriptor !== 'number') throw new Error('@Inject(module_name) decorator can be applied to constructor parameters only');
                 // ToDo: check module_name with manifest
+                // ToDo: add module source to error description
 
                 //if (typeof parameterIndexOrDescriptor === 'number') { // decorator applied to constructor parameters
-                
+
                 if (!this.registry.find(m => areModulesEqual(m.manifest, manifest))) {
                     this.registry.push({
                         manifest: manifest,
