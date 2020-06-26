@@ -7,20 +7,22 @@ import { compare, rcompare } from 'semver';
 
 type DevManifest = {
     name: string;
-    branch: string;
     version: string;
-    type: ModuleTypes;
-    title: string;
     description: string;
-    author: string;
-    icon?: string;
-    dist: string;
-    interfaces?: {
-        [name: string]: string
-    };
+    main: string;
 
-    dependencies?: {
-        [name: string]: string
+    dapplets: {
+        name?: string;
+        branch: string;
+        type: ModuleTypes;
+        title: string;
+        icon?: string;
+        interfaces?: {
+            [name: string]: string
+        };
+        dependencies?: {
+            [name: string]: string
+        }
     }
 }
 
@@ -145,27 +147,27 @@ export class DevRegistry implements Registry {
         const dm = await this._loadManifest(manifestUri);
 
         const mi = new ModuleInfo();
-        mi.name = dm.name;
-        mi.title = dm.title;
-        mi.type = dm.type;
+        mi.name = dm.dapplets.name || dm.name;
+        mi.title = dm.dapplets.title;
+        mi.type = dm.dapplets.type;
         mi.description = dm.description;
-        mi.icon = dm.icon ? {
+        mi.icon = dm.dapplets.icon ? {
             hash: null,
-            uris: [new URL(dm.icon, new URL(manifestUri, this._rootUrl).href).href]
+            uris: [new URL(dm.dapplets.icon, new URL(manifestUri, this._rootUrl).href).href]
         } : null;
-        mi.interfaces = Object.keys(dm.interfaces || {});
+        mi.interfaces = Object.keys(dm.dapplets.interfaces || {});
 
         const vi = new VersionInfo();
-        vi.name = dm.name;
-        vi.branch = dm.branch;
+        vi.name = dm.dapplets.name || dm.name;
+        vi.branch = dm.dapplets.branch;
         vi.version = dm.version;
-        vi.type = dm.type;
-        vi.dist = dm.dist ? {
+        vi.type = dm.dapplets.type;
+        vi.dist = dm.main ? {
             hash: null,
-            uris: [new URL(dm.dist, new URL(manifestUri, this._rootUrl).href).href]
+            uris: [new URL(dm.main, new URL(manifestUri, this._rootUrl).href).href]
         } : null;
-        vi.dependencies = dm.dependencies;
-        vi.interfaces = dm.interfaces;
+        vi.dependencies = dm.dapplets.dependencies;
+        vi.interfaces = dm.dapplets.interfaces;
 
         return { module: mi, version: vi };
     }
