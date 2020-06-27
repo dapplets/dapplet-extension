@@ -73,3 +73,17 @@ export function typeOfUri(uri: string): UriTypes {
 
   return UriTypes.Unknown;
 }
+
+/**
+ * Assert function for filtering of fullfilled Promises with .filter()
+ */
+export function assertFullfilled<T>(item: PromiseSettledResult<T>): item is PromiseFulfilledResult<T> {
+  return item.status === "fulfilled";
+}
+
+/**
+ * Assert function for filtering of rejected Promises with .filter()
+ */
+export function assertRejected<T>(item: PromiseSettledResult<T>): item is PromiseRejectedResult {
+  return item.status === "rejected";
+}

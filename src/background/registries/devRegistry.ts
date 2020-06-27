@@ -188,7 +188,7 @@ export class DevRegistry implements Registry {
                 if (moduleContextIds.indexOf(contextId) !== -1) {
                     result.push(moduleName);
                     result.push(...this._fetchModulesByContextId([moduleName]));
-                    result.push(...this._fetchModulesByContextId(this._devConfig.interfaces[moduleName] || []));
+                    result.push(...this._fetchModulesByContextId(this._devConfig.interfaces && this._devConfig.interfaces[moduleName] || []));
                 }
             }
         }
