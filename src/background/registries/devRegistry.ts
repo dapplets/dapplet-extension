@@ -5,24 +5,31 @@ import VersionInfo from '../models/versionInfo';
 
 type DevManifest = {
     name: string;
+    branch: string;
     version: string;
+    type: ModuleTypes;
+    title: string;
     description: string;
-    main: string;
+    main?: string;
+    icon?: string;
+    contextIds?: string[];
+    interfaces?: {
+        [name: string]: string
+    };
+    dependencies?: {
+        [name: string]: string
+    };
+}
 
-    dapplets: {
-        name?: string;
-        branch: string;
-        type: ModuleTypes;
-        title: string;
-        icon?: string;
-        contextIds?: string[];
-        interfaces?: {
-            [name: string]: string
-        };
-        dependencies?: {
-            [name: string]: string
-        };
-    }
+type JsonReference = {
+    "$ref": string;
+}
+
+type DevManifestRaw = DevManifest & {
+    name: string | JsonReference;
+    version: string | JsonReference;
+    description: string | JsonReference;
+    main: string | JsonReference;
 }
 
 export class DevRegistry implements Registry {
@@ -32,7 +39,7 @@ export class DevRegistry implements Registry {
     public error: string = null;
 
     private _cachePromise: Promise<void> = null;
-    private _devConfig: (DevManifest | string[]) = null;
+    private _devConfig: (DevManifestRaw | string[]) = null;
     private _manifestByUrl = new Map<string, DevManifest>();
     private _infoByUrl = new Map<string, { module: ModuleInfo, version: VersionInfo }>();
 
@@ -86,11 +93,8 @@ export class DevRegistry implements Registry {
 
     private async _cacheDevConfig() {
         // protection of parallel running of __cacheDevConfig()
-        if (this._cachePromise) {
-            return this._cachePromise
-        } else {
-            this._cachePromise = this.__cacheDevConfig();
-        }
+        if (!this._cachePromise) this._cachePromise = this.__cacheDevConfig();
+        return this._cachePromise;
     }
 
     private async __cacheDevConfig() {
@@ -106,7 +110,8 @@ export class DevRegistry implements Registry {
                     const infos = await Promise.all(manifests.map(([url, m]) => this._loadModuleAndVersionInfo(url, m).then(info => ([url, info])))) as [string, { module: ModuleInfo, version: VersionInfo }][];
                     infos.forEach(([url, m]) => this._infoByUrl.set(url, m));
                 } else {
-                    this._manifestByUrl.set(this.url, this._devConfig);
+                    const manifestResolved = await this._resolveJsonRefs(this._devConfig, this.url);
+                    this._manifestByUrl.set(this.url, manifestResolved);
                     const info = await this._loadModuleAndVersionInfo(this.url, this._devConfig);
                     this._infoByUrl.set(this.url, info);
                 }
@@ -142,27 +147,27 @@ export class DevRegistry implements Registry {
 
     private async _loadModuleAndVersionInfo(manifestUri: string, dm: DevManifest): Promise<{ module: ModuleInfo, version: VersionInfo }> {
         const mi = new ModuleInfo();
-        mi.name = dm.dapplets.name || dm.name;
-        mi.title = dm.dapplets.title;
-        mi.type = dm.dapplets.type;
+        mi.name = dm.name;
+        mi.title = dm.title;
+        mi.type = dm.type;
         mi.description = dm.description;
-        mi.icon = dm.dapplets.icon ? {
+        mi.icon = dm.icon ? {
             hash: null,
-            uris: [new URL(dm.dapplets.icon, new URL(manifestUri, this._rootUrl).href).href]
+            uris: [new URL(dm.icon, new URL(manifestUri, this._rootUrl).href).href]
         } : null;
-        mi.interfaces = Object.keys(dm.dapplets.interfaces || {});
+        mi.interfaces = Object.keys(dm.interfaces || {});
 
         const vi = new VersionInfo();
-        vi.name = dm.dapplets.name || dm.name;
-        vi.branch = dm.dapplets.branch;
+        vi.name = dm.name;
+        vi.branch = dm.branch;
         vi.version = dm.version;
-        vi.type = dm.dapplets.type;
+        vi.type = dm.type;
         vi.dist = dm.main ? {
             hash: null,
             uris: [new URL(dm.main, new URL(manifestUri, this._rootUrl).href).href]
         } : null;
-        vi.dependencies = dm.dapplets.dependencies;
-        vi.interfaces = dm.dapplets.interfaces;
+        vi.dependencies = dm.dependencies;
+        vi.interfaces = dm.interfaces;
 
         return { module: mi, version: vi };
     }
@@ -170,7 +175,28 @@ export class DevRegistry implements Registry {
     private async _loadManifest(uri: string): Promise<DevManifest> {
         const manifestUri = new URL(uri, this._rootUrl).href;
         const response = await fetch(manifestUri);
-        const manifest = await response.json() as DevManifest;
+        const manifestRaw = await response.json() as DevManifestRaw;
+        const manifestResolved = await this._resolveJsonRefs(manifestRaw, manifestUri);
+        return manifestResolved;
+    }
+
+    private async _resolveJsonRefs(manifest: DevManifestRaw, manifestUri: string): Promise<DevManifest> {
+        const cache = new Map<string, any>();
+        for (const key of ['name', 'version', 'description', 'main']) {
+            if (typeof manifest[key] === 'object' && !!manifest[key]['$ref']) {
+                const [jsonUrl, path] = manifest[key]['$ref'].split('#/');
+                const jsonRefUri = new URL(jsonUrl, manifestUri).href;
+
+                if (!cache.has(jsonRefUri)) {
+                    const response = await fetch(jsonRefUri);
+                    const json = await response.json();
+                    cache.set(jsonRefUri, json);
+                }
+
+                manifest[key] = cache.get(jsonRefUri)[path];
+            }
+        }
+
         return manifest;
     }
 
@@ -187,10 +213,10 @@ export class DevRegistry implements Registry {
         }
 
         for (const [url, manifest] of Array.from(this._manifestByUrl)) {
-            if (areMatches(manifest.dapplets.contextIds || [], contextIds)) {
+            if (areMatches(manifest.contextIds || [], contextIds)) {
                 result.push(manifest.name);
                 result.push(...this._fetchModulesByContextId([manifest.name]));
-                result.push(...this._fetchModulesByContextId(Object.keys(manifest.dapplets.interfaces || {})));
+                result.push(...this._fetchModulesByContextId(Object.keys(manifest.interfaces || {})));
             }
         }
 
