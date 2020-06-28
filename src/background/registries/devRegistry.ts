@@ -1,9 +1,7 @@
-import { Registry, StorageRef } from './registry';
-import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants';
-import Manifest from '../models/manifest';
+import { Registry } from './registry';
+import { ModuleTypes } from '../../common/constants';
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
-import { compare, rcompare } from 'semver';
 
 type DevManifest = {
     name: string;
@@ -17,12 +15,13 @@ type DevManifest = {
         type: ModuleTypes;
         title: string;
         icon?: string;
+        contextIds?: string[];
         interfaces?: {
             [name: string]: string
         };
         dependencies?: {
             [name: string]: string
-        }
+        };
     }
 }
 
@@ -32,11 +31,10 @@ export class DevRegistry implements Registry {
     public isAvailable: boolean = true;
     public error: string = null;
 
-    private _devConfig: {
-        contextIds: { [moduleName: string]: string[] },
-        interfaces: { [moduleName: string]: string[] },
-        modules: { [name: string]: { [branch: string]: { [version: string]: string } } }
-    } = null;
+    private _cachePromise: Promise<void> = null;
+    private _devConfig: (DevManifest | string[]) = null;
+    private _manifestByUrl = new Map<string, DevManifest>();
+    private _infoByUrl = new Map<string, { module: ModuleInfo, version: VersionInfo }>();
 
     constructor(public url: string) {
         if (!url) throw new Error("Config Url is required");
@@ -49,14 +47,11 @@ export class DevRegistry implements Registry {
 
         for (const contextId of contextIds) {
             result[contextId] = [];
+
             const modules = this._fetchModulesByContextId([contextId]);
+
             for (const moduleName of modules) {
-                if (!this._devConfig.modules[moduleName]) continue;
-                const versions = Object.keys(this._devConfig.modules[moduleName][DEFAULT_BRANCH_NAME] || {});
-                if (versions.length === 0) continue;
-                const lastVersion = versions.sort(rcompare)[0];
-                const url = this._devConfig.modules[moduleName][DEFAULT_BRANCH_NAME][lastVersion];
-                const info = await this._loadModuleAndVersionInfo(url);
+                const info = Array.from(this._infoByUrl).map(([url, info]) => info).find(info => info.module.name === moduleName);
                 result[contextId].push(info.module);
             }
         }
@@ -66,21 +61,17 @@ export class DevRegistry implements Registry {
 
     public async getVersionNumbers(name: string, branch: string): Promise<string[]> {
         await this._cacheDevConfig();
-        const branches = this._devConfig.modules[name];
-        if (!branches || !branches[branch]) return [];
-        const versions = Object.keys(branches[branch]);
+        const versions = Array.from(this._infoByUrl).map(([k, v]) => v).filter(v => v.module.name === name && v.version.branch).map(x => x.version.version);
         return versions;
     }
 
     public async getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo> {
         await this._cacheDevConfig();
-        const { modules } = this._devConfig;
+        const info = Array.from(this._infoByUrl).map(([k, v]) => v).find(v => v.module.name === name && v.version.branch === branch && v.version.version === version);
 
-        if (!modules || !modules[name] || !modules[name][branch] || !modules[name][branch][version]) {
+        if (!info) {
             throw new Error(`The manifest of the module "${name}@${branch}#${version}" is not found`);
         };
-
-        const info = await this._loadModuleAndVersionInfo(this._devConfig.modules[name][branch][version]);
 
         return info.version;
     }
@@ -88,39 +79,45 @@ export class DevRegistry implements Registry {
     // ToDo: merge it into getModuleInfo
     public async getAllDevModules(): Promise<{ module: ModuleInfo, versions: VersionInfo[] }[]> {
         await this._cacheDevConfig();
-
         const modules: { module: ModuleInfo, versions: VersionInfo[] }[] = [];
-
-        for (const name in this._devConfig.modules) {
-            for (const branch in this._devConfig.modules[name]) {
-                const versions = Object.keys(this._devConfig.modules[name][branch] || {});
-                const lastVersion = versions.sort(rcompare)[0]; // ToDo: is it correct?
-                const url = this._devConfig.modules[name][branch][lastVersion];
-                try {
-                    const { module, version } = await this._loadModuleAndVersionInfo(url);
-                    modules.push({ module, versions: [version] });
-                } catch (err) {
-                    console.error(err);
-                }
-            }
-        }
-
+        this._infoByUrl.forEach(info => modules.push({ module: info.module, versions: [info.version] }));
         return modules;
     }
 
     private async _cacheDevConfig() {
-        //if (this.isAvailable && !this._devConfig) {
-        try {
-            const response = await fetch(this.url, { cache: 'no-store' });
-            if (!response.ok) throw new Error(response.statusText);
-            this._devConfig = await response.json();
-            this.isAvailable = true;
-            this.error = null;
-        } catch (err) {
-            this.isAvailable = false;
-            this.error = err.message;
+        // protection of parallel running of __cacheDevConfig()
+        if (this._cachePromise) {
+            return this._cachePromise
+        } else {
+            this._cachePromise = this.__cacheDevConfig();
         }
-        //}
+    }
+
+    private async __cacheDevConfig() {
+        if (!this._devConfig) {
+            try {
+                const response = await fetch(this.url, { cache: 'no-store' });
+                if (!response.ok) throw new Error(response.statusText);
+                this._devConfig = await response.json();
+
+                if (Array.isArray(this._devConfig)) {
+                    const manifests = await Promise.all(this._devConfig.map(url => this._loadManifest(url).then(m => ([url, m])))) as [string, DevManifest][];
+                    manifests.forEach(([url, m]) => this._manifestByUrl.set(url, m));
+                    const infos = await Promise.all(manifests.map(([url, m]) => this._loadModuleAndVersionInfo(url, m).then(info => ([url, info])))) as [string, { module: ModuleInfo, version: VersionInfo }][];
+                    infos.forEach(([url, m]) => this._infoByUrl.set(url, m));
+                } else {
+                    this._manifestByUrl.set(this.url, this._devConfig);
+                    const info = await this._loadModuleAndVersionInfo(this.url, this._devConfig);
+                    this._infoByUrl.set(this.url, info);
+                }
+
+                this.isAvailable = true;
+                this.error = null;
+            } catch (err) {
+                this.isAvailable = false;
+                this.error = err.message;
+            }
+        }
     }
 
     public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
@@ -143,9 +140,7 @@ export class DevRegistry implements Registry {
         return;
     }
 
-    private async _loadModuleAndVersionInfo(manifestUri: string): Promise<{ module: ModuleInfo, version: VersionInfo }> {
-        const dm = await this._loadManifest(manifestUri);
-
+    private async _loadModuleAndVersionInfo(manifestUri: string, dm: DevManifest): Promise<{ module: ModuleInfo, version: VersionInfo }> {
         const mi = new ModuleInfo();
         mi.name = dm.dapplets.name || dm.name;
         mi.title = dm.dapplets.title;
@@ -182,14 +177,20 @@ export class DevRegistry implements Registry {
     private _fetchModulesByContextId(contextIds: string[]): string[] {
         const result = [];
 
-        for (const contextId of contextIds) {
-            for (const moduleName in this._devConfig.contextIds) {
-                const moduleContextIds = this._devConfig.contextIds[moduleName] || [];
-                if (moduleContextIds.indexOf(contextId) !== -1) {
-                    result.push(moduleName);
-                    result.push(...this._fetchModulesByContextId([moduleName]));
-                    result.push(...this._fetchModulesByContextId(this._devConfig.interfaces && this._devConfig.interfaces[moduleName] || []));
+        const areMatches = (a: string[], b: string[]): boolean => {
+            for (const _a of a) {
+                for (const _b of b) {
+                    if (_a === _b) return true;
                 }
+            }
+            return false;
+        }
+
+        for (const [url, manifest] of Array.from(this._manifestByUrl)) {
+            if (areMatches(manifest.dapplets.contextIds || [], contextIds)) {
+                result.push(manifest.name);
+                result.push(...this._fetchModulesByContextId([manifest.name]));
+                result.push(...this._fetchModulesByContextId(Object.keys(manifest.dapplets.interfaces || {})));
             }
         }
 
