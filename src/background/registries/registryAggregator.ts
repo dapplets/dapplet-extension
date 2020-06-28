@@ -28,7 +28,7 @@ export class RegistryAggregator {
         await this._initRegistries();
 
         const uriWithErrors = await Promise.allSettled(this.registries.map(r => r.getVersionInfo(name, branch, version)));
-        uriWithErrors.filter(assertRejected).forEach(p => console.error(p.reason));
+        // uriWithErrors.filter(assertRejected).forEach(p => console.error(p.reason));
         const uriNoErrors = uriWithErrors.filter(assertFullfilled).map(p => p.value);
 
         if (uriNoErrors.length === 0) {
