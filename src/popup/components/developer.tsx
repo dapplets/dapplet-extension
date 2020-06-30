@@ -166,7 +166,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                                 <List.Item key={i}>
                                     <List.Content floated='left' style={{ position: 'relative' }}>
                                         <Image avatar src={(m.module.icon && m.module.icon.uris.length > 0) ? ((m.module.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + (m.module.icon as StorageRef).uris?.[0] : (m.module.icon as StorageRef).uris?.[0]) : NOLOGO_PNG} />
-                                        {(m.isDeployed?.[0]) ? <Label color='green' empty floating style={{ padding: '4px', top: '18px', left: '18px' }} /> : null}
+                                        {(m.isDeployed?.[0]) ? <Label color='green' floating style={{ padding: '4px', top: '18px', left: '18px' }} /> : null}
                                     </List.Content>
                                     <List.Content floated='right'>
                                         <Button size='mini' compact color='blue' onClick={() => this.deployModule(m.module, m.versions[0])}>Deploy</Button>
