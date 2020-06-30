@@ -70,14 +70,22 @@ export class RegistryAggregator {
         return merged;
     }
 
-    public async getAllDevModules(): Promise<{ module: ModuleInfo, versions: VersionInfo[] }[]> {
+    public async getAllDevModules(): Promise<{ module: ModuleInfo, versions: VersionInfo[], isDeployed?: boolean[] }[]> {
         await this._initRegistries();
+
+        // fetch all dev modules
         const modules = await Promise.allSettled(this.registries.map(r => r.getAllDevModules()));
         modules.filter(assertRejected).forEach(p => console.error(p.reason));
         const validModules = modules.filter(assertFullfilled).map(p => p.value);
-        if (!validModules || validModules.length === 0) return [];
         const reduced = validModules.reduce((a, b) => a.concat(b));
-        return reduced;
+
+        // check deployment in prod registries
+        const registriesConfig = await this._globalConfigService.getRegistries();
+        const prodRegistries = this.registries.filter(r => !registriesConfig.find(rc => rc.url === r.url).isDev);
+        const vis = await Promise.all(reduced.map(m => prodRegistries[0].getVersionInfo(m.module.name, m.versions[0].branch, m.versions[0].version).catch(() => null)));
+
+        const result = reduced.map((x, i) => ({ ...x, isDeployed: [!!vis[i]] }));
+        return result;
     }
 
     private async _initRegistries() {

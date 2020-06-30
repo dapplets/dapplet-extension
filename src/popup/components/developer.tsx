@@ -5,7 +5,6 @@ import { Popup, Button, Segment, Message, List, Label, Input, Icon, Image, Heade
 import NOLOGO_PNG from '../../common/resources/no-logo.png';
 
 import { isValidUrl } from '../helpers';
-import Manifest from "../../background/models/manifest";
 import { StorageRef } from "../../background/registries/registry";
 import ModuleInfo from "../../background/models/moduleInfo";
 import VersionInfo from "../../background/models/versionInfo";
@@ -25,7 +24,7 @@ interface IDeveloperState {
     intro: {
         popupDeveloperWelcome: boolean;
     };
-    modules: { module: ModuleInfo, versions: VersionInfo[] }[];
+    modules: { module: ModuleInfo, versions: VersionInfo[], isDeployed: boolean[] }[];
 }
 
 class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
@@ -53,7 +52,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
     async loadRegistries() {
         const { getRegistries, getAllDevModules } = await initBGFunctions(extension);
 
-        const modules: { module: ModuleInfo, versions: VersionInfo[] }[] = await getAllDevModules();
+        const modules: { module: ModuleInfo, versions: VersionInfo[], isDeployed: boolean[] }[] = await getAllDevModules();
         this.setState({ modules });
 
         const registries = await getRegistries();
@@ -155,7 +154,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                                 <List.Content floated='right'>
                                     <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
                                 </List.Content>
-                                <List.Content><a style={{color:'#000'}} onClick={() => window.open(r.url, '_blank')}>{r.url}</a></List.Content>
+                                <List.Content><a style={{ color: '#000' }} onClick={() => window.open(r.url, '_blank')}>{r.url}</a></List.Content>
                             </List.Item>
                         ))}
                     </List>
@@ -165,13 +164,16 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                         {(modules.length > 0) ? <List divided relaxed verticalAlign='middle' size='small'>
                             {modules.map((m, i) => (
                                 <List.Item key={i}>
-                                    <Image avatar src={(m.module.icon && m.module.icon.uris.length > 0) ? ((m.module.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + (m.module.icon as StorageRef).uris?.[0] : (m.module.icon as StorageRef).uris?.[0]) : NOLOGO_PNG} />
-                                    <List.Content>
-                                        <List.Header>{m.module.name}</List.Header>
-                                        {m.versions[0].branch} v{m.versions[0].version}
+                                    <List.Content floated='left' style={{ position: 'relative' }}>
+                                        <Image avatar src={(m.module.icon && m.module.icon.uris.length > 0) ? ((m.module.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm-gateways.net/' + (m.module.icon as StorageRef).uris?.[0] : (m.module.icon as StorageRef).uris?.[0]) : NOLOGO_PNG} />
+                                        {(m.isDeployed?.[0]) ? <Label color='green' empty floating style={{ padding: '4px', top: '18px', left: '18px' }} /> : null}
                                     </List.Content>
                                     <List.Content floated='right'>
                                         <Button size='mini' compact color='blue' onClick={() => this.deployModule(m.module, m.versions[0])}>Deploy</Button>
+                                    </List.Content>
+                                    <List.Content>
+                                        <List.Header>{m.module.name}</List.Header>
+                                        {m.versions[0].branch} v{m.versions[0].version}
                                     </List.Content>
                                 </List.Item>
                             ))}
