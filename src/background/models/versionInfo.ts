@@ -1,6 +1,7 @@
 import Base from '../../common/models/base';
 import { StorageRef } from '../registries/registry';
 import { ModuleTypes } from '../../common/constants';
+import { Environments } from '../../common/types';
 
 export default class VersionInfo extends Base {
     getId = () => this.dist.hash;
@@ -16,4 +17,5 @@ export default class VersionInfo extends Base {
     interfaces: {
         [name: string]: string
     } = null;
+    environment?: Environments = null;
 }

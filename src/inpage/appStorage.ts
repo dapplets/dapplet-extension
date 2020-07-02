@@ -1,12 +1,16 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as extension from 'extensionizer';
+import { Environments, DefaultConfig } from "../common/types";
 
 export class AppStorage {
-    constructor(private _moduleName: string) { }
+    public defaultConfig: DefaultConfig;
+
+    constructor(private _moduleName: string, private _environment: Environments) { }
 
     public async get(key: string): Promise<any> {
         const { getUserSettings } = await initBGFunctions(extension);
-        return await getUserSettings(this._moduleName, key);
+        const value = await getUserSettings(this._moduleName, key);
+        return value || (this.defaultConfig && this.defaultConfig[this._environment]?.[key]);
     }
 
     public async set(key: string, value: any): Promise<void> {

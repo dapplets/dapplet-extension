@@ -8,6 +8,7 @@ import { IResolver, IContentAdapter, IFeature } from './types';
 import { areModulesEqual } from "../common/helpers";
 import VersionInfo from "../background/models/versionInfo";
 import { AppStorage } from "./appStorage";
+import { DefaultConfig, SchemaConfig } from "../common/types";
 
 export class Injector {
     public availableContextIds: string[] = [];
@@ -145,10 +146,9 @@ export class Injector {
                 connect: core.connect.bind(core),
                 overlay: core.overlay.bind(core),
                 wallet: core.wallet.bind(core),
-                storage: new AppStorage(manifest.name)
+                storage: new AppStorage(manifest.name, manifest.environment)
             };
 
-            const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
             let newBranch: string = null;
 
             // ToDo: describe it
@@ -199,7 +199,12 @@ export class Injector {
                 // }
             };
 
-            execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
+            const configureDecorator = (_defaultConfig: DefaultConfig, _schemaConfig?: SchemaConfig) => {
+                coreWrapper.storage.defaultConfig = _defaultConfig;
+            }
+
+            const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', 'Configure', script);
+            execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator, configureDecorator);
 
             if (newBranch) {
                 addEvent('Branch resolving', `Resolver of "${manifest.name}" defined the "${newBranch}" branch`);

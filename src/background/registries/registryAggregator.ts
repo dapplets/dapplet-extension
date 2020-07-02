@@ -6,6 +6,7 @@ import { compare } from 'semver';
 import { mergeDedupe, typeOfUri, UriTypes, assertFullfilled, assertRejected } from '../../common/helpers';
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
+import { Environments } from '../../common/types';
 
 export class RegistryAggregator {
     public isAvailable: boolean = true;
@@ -26,8 +27,13 @@ export class RegistryAggregator {
 
     async getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo> {
         await this._initRegistries();
+        const registriesConfig = await this._globalConfigService.getRegistries();
 
-        const uriWithErrors = await Promise.allSettled(this.registries.map(r => r.getVersionInfo(name, branch, version)));
+        const uriWithErrors = await Promise.allSettled(this.registries.map(r => r.getVersionInfo(name, branch, version).then(vi => {
+            const isDev = registriesConfig.find(c => c.url === r.url).isDev;
+            vi.environment = isDev ? Environments.Dev : Environments.Test;
+            return vi;
+        })));
         // uriWithErrors.filter(assertRejected).forEach(p => console.error(p.reason));
         const uriNoErrors = uriWithErrors.filter(assertFullfilled).map(p => p.value);
 
