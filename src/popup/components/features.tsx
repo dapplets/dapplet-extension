@@ -2,9 +2,10 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as extension from 'extensionizer';
 
-import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Divider } from "semantic-ui-react";
+import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Icon } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
 import { ModuleTypes } from "../../common/constants";
+import ModuleInfo from "../../background/models/moduleInfo";
 
 interface IFeaturesProps {
   contextIds: string[] | undefined;
@@ -115,6 +116,17 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
     });
   }
 
+  async settingsModule(mi: ManifestDTO) {
+    extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+      var activeTab = tabs[0];
+      extension.tabs.sendMessage(activeTab.id, {
+        type: "OPEN_SETTINGS_OVERLAY",
+        payload: { mi }
+      });
+      window.close();
+    });
+  }
+
   render() {
     const { features, isLoading, error, isNoInpage } = this.state;
     return (
@@ -147,7 +159,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                     </List.Content>
                     <List.Content style={{ marginLeft: 45, marginRight: 60 }} >
                       <List.Header>
-                        {f.title}
+                        {f.title} <Icon link name='cog' size='small' onClick={() => this.settingsModule(f)}/>
                         {(f.sourceRegistry.isDev) ? (<Label style={{ marginLeft: 5 }} horizontal size='mini' color='teal'>DEV</Label>) : null}
                         {(f.error) ? (<Popup size='mini' trigger={<Label style={{ marginLeft: 5 }} horizontal size='mini' color='red'>ERROR</Label>}>{f.error}</Popup>) : null}
                       </List.Header>

@@ -172,7 +172,10 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                                         <Button size='mini' compact color='blue' onClick={() => this.deployModule(m.module, m.versions[0])}>Deploy</Button>
                                     </List.Content>
                                     <List.Content>
-                                        <List.Header>{m.module.name}</List.Header>
+                                        <List.Header>
+                                            {m.module.name}
+                                            {(!m.isDeployed?.[0]) ? <Label size='mini' horizontal >NOT DEPLOYED</Label> : null}
+                                        </List.Header>
                                         {m.versions[0].branch} v{m.versions[0].version}
                                     </List.Content>
                                 </List.Item>

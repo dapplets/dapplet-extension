@@ -35,7 +35,8 @@
     "sowa.html",
     "popup.html",
     "deploy.html",
-    "starter.html"
+    "starter.html",
+    "settings.html"
   ],
   "permissions": [
     "tabs",

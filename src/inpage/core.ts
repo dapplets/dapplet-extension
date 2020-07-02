@@ -47,6 +47,9 @@ export default class Core {
                         .then(() => sendResponse([null, 'approved']))
                         .catch(() => sendResponse(['error']));
                     return true;
+                } else if (message.type === 'OPEN_SETTINGS_OVERLAY') {
+                    this.waitSettingsOverlay(message.payload).finally(() => sendResponse());
+                    return true;
                 }
             }
         });
@@ -81,6 +84,26 @@ export default class Core {
         return new Promise<void>((resolve, reject) => {
             const pairingUrl = extension.extension.getURL('deploy.html');
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'Deploy');
+            overlay.open(() => overlay.send('data', [payload]));
+            // ToDo: add timeout?
+            overlay.onMessage((topic, message) => {
+                if (topic === 'ready') {
+                    overlay.close();
+                    resolve();
+                }
+
+                if (topic === 'error') {
+                    reject();
+                }
+            });
+        });
+    }
+
+    public waitSettingsOverlay(payload: any): Promise<void> {
+        const me = this;
+        return new Promise<void>((resolve, reject) => {
+            const pairingUrl = extension.extension.getURL('settings.html');
+            const overlay = new Overlay(this.overlayManager, pairingUrl, 'Settings');
             overlay.open(() => overlay.send('data', [payload]));
             // ToDo: add timeout?
             overlay.onMessage((topic, message) => {
