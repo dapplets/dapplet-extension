@@ -19,6 +19,10 @@ type DevManifest = {
     dependencies?: {
         [name: string]: string
     };
+    config?: {
+        schema?: string;
+        default?: string;
+    }
 }
 
 type JsonReference = {
@@ -168,6 +172,14 @@ export class DevRegistry implements Registry {
         } : null;
         vi.dependencies = dm.dependencies;
         vi.interfaces = dm.interfaces;
+        vi.schemaConfig = (dm.config && dm.config.schema) ? {
+            hash: null,
+            uris: [new URL(dm.config.schema, new URL(manifestUri, this._rootUrl).href).href]
+        } : null;
+        vi.defaultConfig = (dm.config && dm.config.default) ? {
+            hash: null,
+            uris: [new URL(dm.config.default, new URL(manifestUri, this._rootUrl).href).href]
+        } : null;
 
         return { module: mi, version: vi };
     }

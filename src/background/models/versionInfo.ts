@@ -18,4 +18,6 @@ export default class VersionInfo extends Base {
         [name: string]: string
     } = null;
     environment?: Environments = null;
+    schemaConfig: StorageRef = null;
+    defaultConfig: StorageRef = null;
 }

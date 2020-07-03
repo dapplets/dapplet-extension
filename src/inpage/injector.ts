@@ -20,7 +20,8 @@ export class Injector {
         order: number,
         contextIds: string[],
         dependencies: string[],
-        instancedDeps: any[]
+        instancedDeps: any[],
+        defaultConfig?: DefaultConfig
     }[] = [];
 
     constructor(public core: Core) {
@@ -31,7 +32,7 @@ export class Injector {
     public async loadModules(modules: { name: string, branch: string, version: string, order: number, contextIds: string[] }[]) {
         if (!modules || !modules.length) return;
         const { getModulesWithDeps } = await initBGFunctions(extension);
-        const loadedModules: { manifest: VersionInfo, script: string }[] = await getModulesWithDeps(modules);
+        const loadedModules: { manifest: VersionInfo, script: string, defaultConfig?: DefaultConfig }[] = await getModulesWithDeps(modules);
         const orderedModules = loadedModules.map((l) => {
             const m = modules.find(m => areModulesEqual(m, l.manifest));
             return ({
@@ -119,11 +120,11 @@ export class Injector {
         });
     }
 
-    private async _processModules(modules: { manifest: VersionInfo, script: string, order: number, contextIds: string[] }[]) {
+    private async _processModules(modules: { manifest: VersionInfo, script: string, order: number, contextIds: string[], defaultConfig?: DefaultConfig }[]) {
         const { optimizeDependency, getModulesWithDeps, addEvent } = await initBGFunctions(extension);
         const { core } = this;
 
-        for (const { manifest, script, order, contextIds } of modules) {
+        for (const { manifest, script, order, contextIds, defaultConfig } of modules) {
             // Module is loaded already
             const registeredModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
             if (registeredModule) {
@@ -146,7 +147,7 @@ export class Injector {
                 connect: core.connect.bind(core),
                 overlay: core.overlay.bind(core),
                 wallet: core.wallet.bind(core),
-                storage: new AppStorage(manifest.name, manifest.environment)
+                storage: new AppStorage(manifest.name, manifest.environment, defaultConfig)
             };
 
             let newBranch: string = null;
@@ -164,7 +165,8 @@ export class Injector {
                         order: order,
                         contextIds: contextIds,
                         dependencies: [],
-                        instancedDeps: []
+                        instancedDeps: [],
+                        defaultConfig: defaultConfig
                     });
                 }
             };
@@ -199,12 +201,8 @@ export class Injector {
                 // }
             };
 
-            const configureDecorator = (_defaultConfig: DefaultConfig, _schemaConfig?: SchemaConfig) => {
-                coreWrapper.storage.defaultConfig = _defaultConfig;
-            }
-
-            const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', 'Configure', script);
-            execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator, configureDecorator);
+            const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
+            execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
 
             if (newBranch) {
                 addEvent('Branch resolving', `Resolver of "${manifest.name}" defined the "${newBranch}" branch`);

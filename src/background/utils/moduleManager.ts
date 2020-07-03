@@ -58,6 +58,13 @@ export default class ModuleManager {
         return script;
     }
 
+    public async loadJson(url: StorageRef) {
+        const resource = await this._storage.getResource(url);
+        const json = new TextDecoder("utf-8").decode(new Uint8Array(resource));
+        const object = JSON.parse(json);
+        return object;
+    }
+
     //ToDo: rework the _getChildDependencies and move it into Inpage
     private async _getChildDependenciesAndManifest(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME, contextIds: string[]) {
         const vi = await this.registryAggregator.getVersionInfo(name, branch, version);

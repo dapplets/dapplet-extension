@@ -185,11 +185,16 @@ export default class FeatureService {
     public async getModulesWithDeps(modules: { name: string, branch: string, version: string, contextIds: string[] }[]) {
         if (modules.length === 0) return [];
         const modulesWithDeps = await this._moduleManager.resolveDependencies(modules);
-        const loadedModules = await Promise.all(modulesWithDeps.map(m =>
-            this._moduleManager.loadScript(m.manifest.dist)
-                .then(s => ({ script: s, manifest: m.manifest }))
-        ));
-        return loadedModules;
+        // ToDo: catch errors
+        // ToDo: run parallel
+        const scripts = await Promise.all(modulesWithDeps.map(m => this._moduleManager.loadScript(m.manifest.dist)));
+        const configs = await Promise.all(modulesWithDeps.map(m => m.manifest.defaultConfig && this._moduleManager.loadJson(m.manifest.defaultConfig)));
+
+        return modulesWithDeps.map((m, i) => ({
+            manifest: m.manifest,
+            script: scripts[i],
+            defaultConfig: configs[i]
+        }));
     }
 
     public async optimizeDependency(name: string, branch: string, version: string, contextIds: string[]) {

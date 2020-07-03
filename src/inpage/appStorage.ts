@@ -3,14 +3,12 @@ import * as extension from 'extensionizer';
 import { Environments, DefaultConfig } from "../common/types";
 
 export class AppStorage {
-    public defaultConfig: DefaultConfig;
-
-    constructor(private _moduleName: string, private _environment: Environments) { }
+    constructor(private _moduleName: string, private _environment: Environments, private _defaultConfig?: DefaultConfig) { }
 
     public async get(key: string): Promise<any> {
         const { getUserSettings } = await initBGFunctions(extension);
         const value = await getUserSettings(this._moduleName, key);
-        return value || (this.defaultConfig && this.defaultConfig[this._environment]?.[key]);
+        return value || (this._defaultConfig && this._defaultConfig[this._environment]?.[key]);
     }
 
     public async set(key: string, value: any): Promise<void> {
