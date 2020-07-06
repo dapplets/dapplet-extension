@@ -117,14 +117,9 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
   }
 
   async settingsModule(mi: ManifestDTO) {
-    extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-      var activeTab = tabs[0];
-      extension.tabs.sendMessage(activeTab.id, {
-        type: "OPEN_SETTINGS_OVERLAY",
-        payload: { mi }
-      });
-      window.close();
-    });
+    const { openSettingsOverlay } = await initBGFunctions(extension);
+    await openSettingsOverlay(mi);
+    window.close();
   }
 
   render() {

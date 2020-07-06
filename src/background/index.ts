@@ -47,6 +47,7 @@ extension.runtime.onMessage.addListener(
     getFeaturesByHostnames: (hostnames) => featureService.getFeaturesByHostnames(hostnames),
     activateFeature: (name, version, hostnames, order, registry) => featureService.activateFeature(name, version, hostnames, order, registry),
     deactivateFeature: (name, version, hostnames, order, registry) => featureService.deactivateFeature(name, version, hostnames, order, registry),
+    reloadFeature: (name, version, hostnames, order, registry) => featureService.reloadFeature(name, version, hostnames, order, registry),
     getActiveModulesByHostnames: (hostnames) => featureService.getActiveModulesByHostnames(hostnames),
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
     optimizeDependency: (name, branch, version, contextIds) => featureService.optimizeDependency(name, branch, version, contextIds),
@@ -58,6 +59,7 @@ extension.runtime.onMessage.addListener(
     addLocation: (registryUri, moduleName, location) => featureService.addLocation(registryUri, moduleName, location),
     removeLocation: (registryUri, moduleName, location) => featureService.removeLocation(registryUri, moduleName, location),
     getVersions: (registryUri, moduleName) => featureService.getVersions(registryUri, moduleName),
+    openSettingsOverlay: (mi) => featureService.openSettingsOverlay(mi),
 
     // GlobalConfigService
     getGlobalConfig: () => globalConfigService.get(),
@@ -81,6 +83,8 @@ extension.runtime.onMessage.addListener(
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),
     setUserSettings: (moduleName, key, value) => globalConfigService.setUserSettings(moduleName, key, value),
+    getAllUserSettings: (moduleName) => globalConfigService.getAllUserSettings(moduleName),
+    setAllUserSettings: (moduleName, values) => globalConfigService.setAllUserSettings(moduleName, values),
     removeUserSettings: (moduleName, key) => globalConfigService.removeUserSettings(moduleName, key),
     clearUserSettings: (moduleName) => globalConfigService.clearUserSettings(moduleName),
     loadUserSettings: (url) => globalConfigService.loadUserSettings(url),

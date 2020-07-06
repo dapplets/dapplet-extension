@@ -140,6 +140,17 @@ export default class GlobalConfigService {
         await this.set(config);
     }
 
+    async getAllUserSettings(moduleName: string) {
+        const config = await this.get();
+        return config.userSettings[moduleName] || {};
+    }
+
+    async setAllUserSettings(moduleName: string, values: any) {
+        const config = await this.get();
+        config.userSettings[moduleName] = values;
+        await this.set(config);
+    }
+
     async removeUserSettings(moduleName: string, key: string) {
         const config = await this.get();
         if (!config.userSettings[moduleName]) return;

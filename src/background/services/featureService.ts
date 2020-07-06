@@ -2,18 +2,16 @@ import ManifestDTO from '../dto/manifestDTO';
 import SiteConfigBrowserStorage from '../browserStorages/siteConfigBrowserStorage';
 import ModuleManager from '../utils/moduleManager';
 import * as extension from 'extensionizer';
-import Manifest from '../models/manifest';
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
 import GlobalConfigService from './globalConfigService';
-import { areModulesEqual, typeOfUri, UriTypes } from '../../common/helpers';
 import * as ethers from 'ethers';
-import { StorageRef } from '../registries/registry';
 import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants';
 import { rcompare } from 'semver';
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { HttpModuleStorage } from '../moduleStorages/httpModuleStorage';
+import { SchemaConfig, DefaultConfig } from '../../common/types';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
@@ -150,6 +148,13 @@ export default class FeatureService {
 
     async deactivateFeature(name: string, version: string | undefined, hostnames: string[], order: number, registryUrl: string): Promise<void> {
         await this._setFeatureActive(name, version, hostnames, false, order, registryUrl);
+    }
+
+    async reloadFeature(name: string, version: string | undefined, hostnames: string[], order: number, registryUrl: string): Promise<void> {
+        const modules = await this.getActiveModulesByHostnames(hostnames);
+        if (!modules.find(m => m.name === name)) return;
+        await this._setFeatureActive(name, version, hostnames, false, order, registryUrl);
+        await this._setFeatureActive(name, version, hostnames, true, order, registryUrl);
     }
 
     public async getActiveModulesByHostnames(hostnames: string[]) {
@@ -304,5 +309,21 @@ export default class FeatureService {
         const versions = await registry.getVersionNumbers(moduleName, DEFAULT_BRANCH_NAME);
         if (versions.length === 0) throw new Error("This module has no versions.");
         return versions;
+    }
+
+    public async openSettingsOverlay(mi: ManifestDTO) {
+        const versions = await this.getVersions(mi.sourceRegistry.url, mi.name);
+        const version = versions.sort(rcompare)[0]; // Last version by SemVer
+        const vi = await this._moduleManager.registryAggregator.getVersionInfo(mi.name, DEFAULT_BRANCH_NAME, version);
+        const schemaConfig: SchemaConfig = vi.schemaConfig && await this._moduleManager.loadJson(vi.schemaConfig);
+        const defaultConfig: DefaultConfig = vi.defaultConfig && await this._moduleManager.loadJson(vi.defaultConfig);
+
+        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+            var activeTab = tabs[0];
+            extension.tabs.sendMessage(activeTab.id, {
+                type: "OPEN_SETTINGS_OVERLAY",
+                payload: { mi, vi, schemaConfig, defaultConfig }
+            });
+        });
     }
 }
