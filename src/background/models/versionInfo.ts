@@ -4,12 +4,13 @@ import { ModuleTypes } from '../../common/constants';
 import { Environments } from '../../common/types';
 
 export default class VersionInfo extends Base {
-    getId = () => this.dist.hash;
+    getId = () => this.main.hash;
 
     type: ModuleTypes = null;
     name: string = null;
     branch: string = null;
     version: string = null;
+    main: StorageRef = null;
     dist: StorageRef = null;
     dependencies: {
         [name: string]: string

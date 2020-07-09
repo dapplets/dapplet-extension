@@ -12,6 +12,7 @@ import VersionInfo from '../models/versionInfo';
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { HttpModuleStorage } from '../moduleStorages/httpModuleStorage';
 import { SchemaConfig, DefaultConfig } from '../../common/types';
+import * as JSZip from 'jszip';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
@@ -192,13 +193,12 @@ export default class FeatureService {
         const modulesWithDeps = await this._moduleManager.resolveDependencies(modules);
         // ToDo: catch errors
         // ToDo: run parallel
-        const scripts = await Promise.all(modulesWithDeps.map(m => this._moduleManager.loadScript(m.manifest.dist)));
-        const configs = await Promise.all(modulesWithDeps.map(m => m.manifest.defaultConfig && this._moduleManager.loadJson(m.manifest.defaultConfig)));
+        const dists = await Promise.all(modulesWithDeps.map(m => this._moduleManager.loadModule(m.manifest)));
 
         return modulesWithDeps.map((m, i) => ({
             manifest: m.manifest,
-            script: scripts[i],
-            defaultConfig: configs[i]
+            script: dists[i].script,
+            defaultConfig: dists[i].defaultConfig
         }));
     }
 
@@ -220,9 +220,26 @@ export default class FeatureService {
 
             let scriptUrl = null;
 
-            if (vi.dist) {
+            const zip = new JSZip();
+
+            if (vi.main) {
+                const arr = await this._storageAggregator.getResource(vi.main);
+                zip.file('index.js', arr);
+            }
+
+            if (vi.defaultConfig) {
+                const arr = await this._storageAggregator.getResource(vi.defaultConfig);
+                zip.file('default.json', arr);
+            }
+
+            if (vi.schemaConfig) {
+                const arr = await this._storageAggregator.getResource(vi.schemaConfig);
+                zip.file('schema.json', arr);
+            }
+
+            if (vi.main) {
                 // Dist file publishing
-                const dist = await this._storageAggregator.getResource(vi.dist);
+                const dist = await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 9 }});
                 const distBlob = new Blob([dist], { type: "text/javascript" });
                 const distUrl = (targetStorage === StorageTypes.TestRegsitry) ? await testStorage.save(distBlob, targetRegistry) : await swarmStorage.save(distBlob);
 
@@ -315,14 +332,12 @@ export default class FeatureService {
         const versions = await this.getVersions(mi.sourceRegistry.url, mi.name);
         const version = versions.sort(rcompare)[0]; // Last version by SemVer
         const vi = await this._moduleManager.registryAggregator.getVersionInfo(mi.name, DEFAULT_BRANCH_NAME, version);
-        const schemaConfig: SchemaConfig = vi.schemaConfig && await this._moduleManager.loadJson(vi.schemaConfig);
-        const defaultConfig: DefaultConfig = vi.defaultConfig && await this._moduleManager.loadJson(vi.defaultConfig);
-
+        const dist = await this._moduleManager.loadModule(vi);
         extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
             var activeTab = tabs[0];
             extension.tabs.sendMessage(activeTab.id, {
                 type: "OPEN_SETTINGS_OVERLAY",
-                payload: { mi, vi, schemaConfig, defaultConfig }
+                payload: { mi, vi, schemaConfig: dist.schemaConfig, defaultConfig: dist.defaultConfig }
             });
         });
     }

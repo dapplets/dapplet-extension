@@ -11,6 +11,7 @@ type DevManifest = {
     title: string;
     description: string;
     main?: string;
+    dist?: string;
     icon?: string;
     contextIds?: string[];
     interfaces?: {
@@ -34,6 +35,7 @@ type DevManifestRaw = DevManifest & {
     version: string | JsonReference;
     description: string | JsonReference;
     main: string | JsonReference;
+    dist: string | JsonReference;
 }
 
 export class DevRegistry implements Registry {
@@ -166,9 +168,13 @@ export class DevRegistry implements Registry {
         vi.branch = dm.branch;
         vi.version = dm.version;
         vi.type = dm.type;
-        vi.dist = dm.main ? {
+        vi.main = dm.main ? {
             hash: null,
             uris: [new URL(dm.main, new URL(manifestUri, this._rootUrl).href).href]
+        } : null;
+        vi.dist = dm.dist ? {
+            hash: null,
+            uris: [new URL(dm.dist, new URL(manifestUri, this._rootUrl).href).href]
         } : null;
         vi.dependencies = dm.dependencies;
         vi.interfaces = dm.interfaces;
@@ -194,7 +200,7 @@ export class DevRegistry implements Registry {
 
     private async _resolveJsonRefs(manifest: DevManifestRaw, manifestUri: string): Promise<DevManifest> {
         const cache = new Map<string, any>();
-        for (const key of ['name', 'version', 'description', 'main']) {
+        for (const key of ['name', 'version', 'description', 'main', 'dist']) {
             if (typeof manifest[key] === 'object' && !!manifest[key]['$ref']) {
                 const [jsonUrl, path] = manifest[key]['$ref'].split('#/');
                 const jsonRefUri = new URL(jsonUrl, manifestUri).href;

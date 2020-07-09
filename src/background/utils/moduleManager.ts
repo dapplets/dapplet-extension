@@ -9,6 +9,8 @@ import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
 import { StorageRef } from '../registries/registry';
 import GlobalConfigService from '../services/globalConfigService';
+import { DefaultConfig, SchemaConfig } from '../../common/types';
+import * as JSZip from 'jszip';
 
 export default class ModuleManager {
 
@@ -52,17 +54,42 @@ export default class ModuleManager {
         return dependencies.reverse().filter(d => !!d.manifest);
     }
 
-    public async loadScript(url: StorageRef) {
+    private async _loadScript(url: StorageRef) {
         const resource = await this._storage.getResource(url);
         const script = new TextDecoder("utf-8").decode(new Uint8Array(resource));
         return script;
     }
 
-    public async loadJson(url: StorageRef) {
+    private async _loadJson(url: StorageRef) {
         const resource = await this._storage.getResource(url);
         const json = new TextDecoder("utf-8").decode(new Uint8Array(resource));
         const object = JSON.parse(json);
         return object;
+    }
+
+    private async _loadDist(url: StorageRef): Promise<{ script: string, defaultConfig: DefaultConfig, schemaConfig: SchemaConfig }> {
+        const resource = await this._storage.getResource(url);
+        const jszip = new JSZip();
+        const zip = await jszip.loadAsync(resource);
+        const script = await zip.file('index.js').async('string');
+        const defaultJson = zip.file('default.json') && await zip.file('default.json').async('string');
+        const schemaJson = zip.file('schema.json') && await zip.file('schema.json').async('string');
+        return {
+            script,
+            defaultConfig: defaultJson && JSON.parse(defaultJson),
+            schemaConfig: schemaJson && JSON.parse(schemaJson)
+        }
+    }
+
+    public async loadModule(m: VersionInfo): Promise<{ script: string, defaultConfig: DefaultConfig, schemaConfig: SchemaConfig }> {
+        if (m.dist) {
+            return this._loadDist(m.dist);
+        } else {
+            const script = await this._loadScript(m.main);
+            const defaultConfig = m.defaultConfig && await this._loadJson(m.defaultConfig);
+            const schemaConfig = m.schemaConfig && await this._loadJson(m.schemaConfig);
+            return { script, defaultConfig, schemaConfig };
+        }
     }
 
     //ToDo: rework the _getChildDependencies and move it into Inpage
@@ -119,7 +146,7 @@ export default class ModuleManager {
             branch = "default";
             version = "0.0.1"; // ToDo: fix it
         }
-        
+
         // ToDo: Fetch prefix from global settings.
         // ToDo: Replace '>=' to '^'
         const prefix = '>='; // https://devhints.io/semver
@@ -149,7 +176,7 @@ export default class ModuleManager {
     private async _findImplementation(name: string, branch: string, version: string, contextIds: string[]) {
         const users = await this._globalConfigService.getTrustedUsers().then(u => u.map(a => a.account));
         const modules = await this.registryAggregator.getModuleInfoWithRegistries(contextIds, users);
-        
+
         for (const registry in modules) {
             for (const hostname in modules[registry]) {
                 for (const mi of modules[registry][hostname]) {

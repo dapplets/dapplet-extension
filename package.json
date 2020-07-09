@@ -59,7 +59,9 @@
     "webpack-cli": "^3.3.11",
     "webpack-merge": "^4.2.2"
   },
-  "dependencies": {},
+  "dependencies": {
+    "jszip": "^3.5.0"
+  },
   "directories": {
     "doc": "docs"
   },
