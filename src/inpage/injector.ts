@@ -52,6 +52,7 @@ export class Injector {
                 const depModule = this._getDependency(m.manifest, d);
                 if (depModule.manifest.type === ModuleTypes.Adapter) {
                     const cfgKey = Symbol();
+                    const featureId = m.manifest.name;
                     return new Proxy(depModule.instance, {
                         get: function (target: IContentAdapter<any>, prop, receiver) {
                             if (prop === 'attachConfig') {
@@ -68,7 +69,13 @@ export class Injector {
                                     target.attachConfig(cfg);
                                 }
                             } if (prop === 'detachConfig') {
-                                return () => target.detachConfig(Reflect.get(target, cfgKey));
+                                return () => target.detachConfig(Reflect.get(target, cfgKey), featureId);
+                            } if (prop === 'exports') {
+                                if (typeof target.exports === 'function') {
+                                    return target.exports(featureId);
+                                } else {
+                                    return target.exports;
+                                }                                
                             } else return target[prop];
                         }
                     });
