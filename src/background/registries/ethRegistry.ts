@@ -158,6 +158,9 @@ export class EthRegistry implements Registry {
             this.error = null;
             return vi;
         } catch (err) {
+            // ToDo: is it necessary to return error here? how to return null from contract?
+            if (err.reason === "Version doesn't exist") return null;
+
             this.isAvailable = false;
             this.error = err.message;
             throw err;
