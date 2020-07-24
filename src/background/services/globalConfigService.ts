@@ -24,7 +24,7 @@ export default class GlobalConfigService {
         const config = new GlobalConfig();
         config.id = this._configId;
         config.registries = [{
-            url: "0x26530612DA7281FacEdcEd7648ad0C159Dfb370d",
+            url: "dapplet-base.eth",
             isDev: false
         }];
         config.devMode = false;
