@@ -77,6 +77,15 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         await reloadFeature(this.state.mi.name, this.state.vi.version, this.state.mi.hostnames, this.state.mi.order, this.state.mi.sourceRegistry.url);
     }
 
+    private async _resetSettings() {
+        this.setState({ loading: true });
+        const { clearUserSettings } = await initBGFunctions(extension);
+        await clearUserSettings(this.state.mi.name);
+        await this._refreshData();
+        await this._reloadFeature();
+        this.setState({ loading: false });
+    }
+
     render() {
         const { mi, vi, schemaConfig, defaultConfig, owner, data } = this.state;
 
@@ -106,6 +115,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         {schemaConfig ? <Form schema={schemaConfig || {}} onSubmit={e => this._saveData(e.formData)} formData={data}>
                             <div>
                                 <Button type="submit" primary disabled={this.state.loading} loading={this.state.loading}>Save and Reload</Button>
+                                <Button basic disabled={this.state.loading} onClick={() => this._resetSettings()}>Reset</Button>
                             </div>
                         </Form> : <p>No settings available for this dapplet.</p>}                        
                     </React.Fragment>
