@@ -11,6 +11,7 @@ import { StorageRef } from '../registries/registry';
 import GlobalConfigService from '../services/globalConfigService';
 import { DefaultConfig, SchemaConfig } from '../../common/types';
 import * as JSZip from 'jszip';
+import { TopologicalSort } from 'topological-sort';
 
 export default class ModuleManager {
 
@@ -50,8 +51,20 @@ export default class ModuleManager {
 
         await Promise.all(dependencies.map(d => resolve(d)));
 
+        // Interfaces to implementations map
+        const impl = new Map<string, string>();
+        dependencies.forEach(d => Object.keys(d.manifest.interfaces || {}).forEach(i => impl.set(i, d.name)));
+
+        // Topological sorting
+        const nodes = new Map<string, any>();
+        dependencies.forEach(d => nodes.set(d.name, d));
+        const sorting = new TopologicalSort(nodes);
+        dependencies.forEach(d => Object.keys(d.manifest.dependencies || {}).forEach(dd => sorting.addEdge(d.name, impl.get(dd) || dd)));
+        const sorted = sorting.sort();
+        const keys = [...sorted.keys()];
+
         // reverse() - the lowest script in the hierarchy should be loaded first
-        return dependencies.reverse().filter(d => !!d.manifest);
+        return keys.map(k => dependencies.find(d => d.name === k)).reverse().filter(d => !!d.manifest);
     }
 
     private async _loadScript(url: StorageRef) {

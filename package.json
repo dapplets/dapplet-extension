@@ -60,7 +60,8 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "jszip": "^3.5.0"
+    "jszip": "^3.5.0",
+    "topological-sort": "^0.3.0"
   },
   "directories": {
     "doc": "docs"
