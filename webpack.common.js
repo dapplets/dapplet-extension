@@ -8,7 +8,7 @@ function modifyManifest(buffer) {
 
   manifest.version = package.version;
   manifest.description = package.description;
-  manifest.author = package.author;  
+  manifest.author = package.author;
 
   manifest_JSON = JSON.stringify(manifest, null, 2);
   return manifest_JSON;
@@ -80,39 +80,43 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js"]
   },
   plugins: [
-    new CopyWebpackPlugin(["resources",
-      {
-        from: "manifest.json",
-        to: "manifest.json",
-        transform: (content, path) => modifyManifest(content)
-      },
-      {
-        from: "src/background/index.html",
-        to: "background.html"
-      }, {
-        from: "src/popup/index.html",
-        to: "popup.html"
-      }, {
-        from: "src/options/index.html",
-        to: "options.html"
-      }, {
-        from: "src/pairing/index.html",
-        to: "pairing.html"
-      }, {
-        from: "src/sowa/index.html",
-        to: "sowa.html"
-      }, {
-        from: "src/deploy/index.html",
-        to: "deploy.html"
-      }, {
-        from: "src/starter/index.html",
-        to: "starter.html"
-      }, {
-        from: "src/settings/index.html",
-        to: "settings.html"
-      }]),
-      new webpack.DefinePlugin({
-        EXTENSION_VERSION: JSON.stringify(package.version)
-      })
+    new CopyWebpackPlugin({
+      patterns: [
+        "resources",
+        {
+          from: "manifest.json",
+          to: "manifest.json",
+          transform: (content, path) => modifyManifest(content)
+        },
+        {
+          from: "src/background/index.html",
+          to: "background.html"
+        }, {
+          from: "src/popup/index.html",
+          to: "popup.html"
+        }, {
+          from: "src/options/index.html",
+          to: "options.html"
+        }, {
+          from: "src/pairing/index.html",
+          to: "pairing.html"
+        }, {
+          from: "src/sowa/index.html",
+          to: "sowa.html"
+        }, {
+          from: "src/deploy/index.html",
+          to: "deploy.html"
+        }, {
+          from: "src/starter/index.html",
+          to: "starter.html"
+        }, {
+          from: "src/settings/index.html",
+          to: "settings.html"
+        }
+      ]
+    }),
+    new webpack.DefinePlugin({
+      EXTENSION_VERSION: JSON.stringify(package.version)
+    })
   ]
 };
