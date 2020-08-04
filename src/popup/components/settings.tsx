@@ -2,8 +2,8 @@ import * as React from "react";
 import * as extension from 'extensionizer';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Popup, Segment, List, Label, Input, Checkbox, Icon, Header, Button } from "semantic-ui-react";
-
 import { isValidUrl } from '../helpers';
+import { typeOfUri, UriTypes } from '../../common/helpers';
 
 interface ISettingsProps {
     devMode: boolean;
@@ -145,6 +145,16 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         }
     }
 
+    async _openEtherscan(address: string) {
+        if (typeOfUri(address) === UriTypes.Ens) {
+            const { resolveName } = await initBGFunctions(extension);
+            const ethAddress = await resolveName(address);
+            window.open(`https://rinkeby.etherscan.io/address/${ethAddress}`, '_blank');
+        } else {
+            window.open(`https://rinkeby.etherscan.io/address/${address}`, '_blank');
+        }
+    }
+
     render() {
         const { isLoading, registries, registryInput, registryInputError, trustedUsers, trustedUserInput, trustedUserInputError, devMode } = this.state;
 
@@ -186,7 +196,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                                 <List.Content floated='right'>
                                     <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
                                 </List.Content>
-                                <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => window.open(`https://rinkeby.etherscan.io/address/${r.url}`, '_blank')}>{r.url}</a></List.Content>
+                                <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => this._openEtherscan(r.url)}>{r.url}</a></List.Content>
                             </List.Item>
                         ))}
                     </List>
@@ -219,7 +229,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                                 <List.Content floated='right'>
                                     <Icon link color='red' name='close' onClick={() => this.removeTrustedUser(user.account)} />
                                 </List.Content>
-                                <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => window.open(`https://rinkeby.etherscan.io/address/${user.account}`, '_blank')}>{user.account}</a></List.Content>
+                                <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => this._openEtherscan(user.account)}>{user.account}</a></List.Content>
                             </List.Item>
                         ))}
                     </List>

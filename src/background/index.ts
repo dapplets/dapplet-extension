@@ -6,6 +6,7 @@ import FeatureService from './services/featureService';
 import GlobalConfigService from './services/globalConfigService';
 import * as EventService from './services/eventService';
 import * as extension from 'extensionizer';
+import EnsService from "./services/ensService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -13,6 +14,7 @@ import * as extension from 'extensionizer';
 
 const featureService = new FeatureService();
 const globalConfigService = new GlobalConfigService();
+const ensService = new EnsService();
 
 extension.runtime.onMessage.addListener(
   setupMessageListener({
@@ -88,7 +90,10 @@ extension.runtime.onMessage.addListener(
     removeUserSettings: (moduleName, key) => globalConfigService.removeUserSettings(moduleName, key),
     clearUserSettings: (moduleName) => globalConfigService.clearUserSettings(moduleName),
     loadUserSettings: (url) => globalConfigService.loadUserSettings(url),
-    saveUserSettings: () => globalConfigService.saveUserSettings()
+    saveUserSettings: () => globalConfigService.saveUserSettings(),
+
+    // ENS
+    resolveName: (name) => ensService.resolveName(name)
   })
 );
 
