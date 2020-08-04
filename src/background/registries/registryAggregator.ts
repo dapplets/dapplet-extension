@@ -88,10 +88,15 @@ export class RegistryAggregator {
         // check deployment in prod registries
         const registriesConfig = await this._globalConfigService.getRegistries();
         const prodRegistries = this.registries.filter(r => !registriesConfig.find(rc => rc.url === r.url).isDev);
-        const vis = await Promise.all(reduced.map(m => prodRegistries[0].getVersionInfo(m.module.name, m.versions[0].branch, m.versions[0].version).catch(() => null)));
 
-        const result = reduced.map((x, i) => ({ ...x, isDeployed: [!!vis[i]] }));
-        return result;
+        if (prodRegistries.length === 0) {
+            const result = reduced.map((x, i) => ({ ...x, isDeployed: [] }));
+            return result;
+        } else {
+            const vis = await Promise.all(reduced.map(m => prodRegistries[0].getVersionInfo(m.module.name, m.versions[0].branch, m.versions[0].version).catch(() => null)));
+            const result = reduced.map((x, i) => ({ ...x, isDeployed: [!!vis[i]] }));
+            return result;
+        }
     }
 
     private async _initRegistries() {
