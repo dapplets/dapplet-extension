@@ -99,35 +99,33 @@ export class DevRegistry implements Registry {
 
     private async _cacheDevConfig() {
         // protection of parallel running of __cacheDevConfig()
-        if (!this._cachePromise) this._cachePromise = this.__cacheDevConfig();
+        if (!this._cachePromise) this._cachePromise = this.__cacheDevConfig().finally(() => this._cachePromise = null);
         return this._cachePromise;
     }
 
     private async __cacheDevConfig() {
-        if (!this._devConfig) {
-            try {
-                const response = await fetch(this.url, { cache: 'no-store' });
-                if (!response.ok) throw new Error(response.statusText);
-                this._devConfig = await response.json();
+        try {
+            const response = await fetch(this.url, { cache: 'no-store' });
+            if (!response.ok) throw new Error(response.statusText);
+            this._devConfig = await response.json();
 
-                if (Array.isArray(this._devConfig)) {
-                    const manifests = await Promise.all(this._devConfig.map(url => this._loadManifest(url).then(m => ([url, m])))) as [string, DevManifest][];
-                    manifests.forEach(([url, m]) => this._manifestByUrl.set(url, m));
-                    const infos = await Promise.all(manifests.map(([url, m]) => this._loadModuleAndVersionInfo(url, m).then(info => ([url, info])))) as [string, { module: ModuleInfo, version: VersionInfo }][];
-                    infos.forEach(([url, m]) => this._infoByUrl.set(url, m));
-                } else {
-                    const manifestResolved = await this._resolveJsonRefs(this._devConfig, this.url);
-                    this._manifestByUrl.set(this.url, manifestResolved);
-                    const info = await this._loadModuleAndVersionInfo(this.url, this._devConfig);
-                    this._infoByUrl.set(this.url, info);
-                }
-
-                this.isAvailable = true;
-                this.error = null;
-            } catch (err) {
-                this.isAvailable = false;
-                this.error = err.message;
+            if (Array.isArray(this._devConfig)) {
+                const manifests = await Promise.all(this._devConfig.map(url => this._loadManifest(url).then(m => ([url, m])))) as [string, DevManifest][];
+                manifests.forEach(([url, m]) => this._manifestByUrl.set(url, m));
+                const infos = await Promise.all(manifests.map(([url, m]) => this._loadModuleAndVersionInfo(url, m).then(info => ([url, info])))) as [string, { module: ModuleInfo, version: VersionInfo }][];
+                infos.forEach(([url, m]) => this._infoByUrl.set(url, m));
+            } else {
+                const manifestResolved = await this._resolveJsonRefs(this._devConfig, this.url);
+                this._manifestByUrl.set(this.url, manifestResolved);
+                const info = await this._loadModuleAndVersionInfo(this.url, this._devConfig);
+                this._infoByUrl.set(this.url, info);
             }
+
+            this.isAvailable = true;
+            this.error = null;
+        } catch (err) {
+            this.isAvailable = false;
+            this.error = err.message;
         }
     }
 
