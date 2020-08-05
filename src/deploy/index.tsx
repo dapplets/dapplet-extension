@@ -13,6 +13,12 @@ import { StorageRef } from '../background/registries/registry';
 import ModuleInfo from '../background/models/moduleInfo';
 import VersionInfo from '../background/models/versionInfo';
 
+enum DeploymentStatus {
+    Unknown,
+    Deployed,
+    NotDeployed
+}
+
 interface IIndexProps { }
 
 interface IIndexState {
@@ -26,9 +32,7 @@ interface IIndexState {
         header: string,
         message: string[]
     };
-    registryKey: string;
     registryOptions: { key: string, value: string, text: string }[];
-    deployed: boolean;
     owner: string;
     currentAccount: string;
     newOwner: string;
@@ -37,6 +41,7 @@ interface IIndexState {
     editLocation: string;
     editLocationLoading: boolean;
     editLocationDone: boolean;
+    deploymentStatus: DeploymentStatus;
 }
 
 class Index extends React.Component<IIndexProps, IIndexState> {
@@ -54,9 +59,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             targetRegistry: null,
             targetStorage: 'swarm',
             message: null,
-            registryKey: '',
             registryOptions: [],
-            deployed: false,
             owner: null,
             currentAccount: null,
             newOwner: '',
@@ -64,7 +67,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             newOwnerDone: false,
             editLocation: '',
             editLocationLoading: false,
-            editLocationDone: false
+            editLocationDone: false,
+            deploymentStatus: DeploymentStatus.Unknown
         };
 
         this.bus.subscribe('data', ({ mi, vi }) => {
@@ -85,7 +89,11 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             })),
             targetRegistry: prodRegistries[0]?.url || null
         });
-        await this._updateOwnership();
+        await this._updateData();
+    }
+
+    private async _updateData() {
+        return Promise.all([this._updateOwnership(), this._updateDeploymentStatus()]);
     }
 
     private async _updateOwnership() {
@@ -96,6 +104,15 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.setState({
             owner,
             currentAccount: accounts[0]
+        });
+    }
+
+    private async _updateDeploymentStatus() {
+        this.setState({ deploymentStatus: DeploymentStatus.Unknown });
+        const { getVersionInfo } = await initBGFunctions(extension);
+        const vi = await getVersionInfo(this.state.targetRegistry, this.state.mi.name, this.state.vi.branch, this.state.vi.version);
+        this.setState({
+            deploymentStatus: (vi) ? DeploymentStatus.Deployed : DeploymentStatus.NotDeployed
         });
     }
 
@@ -124,7 +141,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.setState({ loading: true });
 
         const { deployModule } = await initBGFunctions(extension);
-        const { mi, vi, targetRegistry, targetStorage, registryKey } = this.state;
+        const { mi, vi, targetRegistry, targetStorage } = this.state;
 
         try {
             const result = await deployModule(mi, vi, targetStorage, targetRegistry);
@@ -133,10 +150,10 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     type: 'positive',
                     header: 'Module was deployed',
                     message: [
-                        `Script URL:  ${result.scriptUrl}`
+                        `Script URL: ${result.scriptUrl}`
                     ]
                 },
-                deployed: true
+                deploymentStatus: DeploymentStatus.Deployed
             });
 
         } catch (err) {
@@ -155,8 +172,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     render() {
         const {
             mi, vi, loading, targetRegistry,
-            targetStorage, deployed,
-            message, registryKey, registryOptions,
+            targetStorage, 
+            message, registryOptions,
             owner, currentAccount, newOwner, editLocation: newLocation,
             newOwnerLoading, newOwnerDone, editLocationLoading: newLocationLoading,
             editLocationDone: newLocationDone
@@ -189,6 +206,14 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         content={<React.Fragment>You can not deploy this module to the selected registry, because are not the module's owner.<br />Change account to {owner}</React.Fragment>}
                     />
                 ) : null}
+
+                {(!message && this.state.deploymentStatus === DeploymentStatus.Deployed) ? 
+                    <Message
+                        warning
+                        header='The Module Already Deployed'
+                        content={<React.Fragment>This version of the module has already been deployed to the selected registry. You can choose another registry or increment the module version number.</React.Fragment>}
+                    />
+                 : null}
 
                 {(mi) ? (<Card fluid>
                     <Card.Content>
@@ -232,7 +257,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                                         <Button basic onClick={() => {
                                             this.setState({ newOwner: '', newOwnerDone: false });
                                             this.transferOwnershipModal.current.handleClose();
-                                            this._updateOwnership();
+                                            this._updateData();
                                         }}>Cancel</Button>
                                         <Button 
                                             color='blue' 
@@ -295,7 +320,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             this.setState({
                                 targetRegistry: data.value as string
                             });
-                            this._updateOwnership();
+                            this._updateData();
                         }}
                         onAddItem={(e, { value }) => {
                             this.setState((prev) => ({
@@ -325,17 +350,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         })}
                     />
 
-                    {/* <Form.Input
-                        //required
-                        label="Access Key"
-                        placeholder="Access Key"
-                        value={registryKey}
-                        onChange={(e) => this.setState({
-                            registryKey: e.target.value
-                        })}
-                    /> */}
-
-                    <Button submit="true" primary disabled={loading || deployed || !currentAccount || (!!owner && !!currentAccount && owner.toLowerCase() !== currentAccount.toLowerCase())}>Deploy</Button>
+                    <Button submit="true" primary disabled={loading || this.state.deploymentStatus === DeploymentStatus.Deployed || !currentAccount || (!!owner && !!currentAccount && owner.toLowerCase() !== currentAccount.toLowerCase())}>Deploy</Button>
                 </Form>
             </React.Fragment>
         );

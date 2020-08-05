@@ -57,6 +57,7 @@ extension.runtime.onMessage.addListener(
     deployModule: (mi, vi, targetStorage, targetRegistry) => featureService.deployModule(mi, vi, targetStorage, targetRegistry),
     getRegistries: () => featureService.getRegistries(),
     getOwnership: (registryUri, moduleName) => featureService.getOwnership(registryUri, moduleName),
+    getVersionInfo: (registryUri, moduleName, branch, version) => featureService.getVersionInfo(registryUri, moduleName, branch, version),
     transferOwnership: (registryUri, moduleName, address) => featureService.transferOwnership(registryUri, moduleName, address),
     addLocation: (registryUri, moduleName, location) => featureService.addLocation(registryUri, moduleName, location),
     removeLocation: (registryUri, moduleName, location) => featureService.removeLocation(registryUri, moduleName, location),
