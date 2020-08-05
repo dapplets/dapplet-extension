@@ -201,6 +201,7 @@ export default class Core {
                     await this._approveSowaTransaction(sowaId, metadata);
                     dappletResult = await sendLegacyTransaction(sowaId, metadata);
                 } catch (err) {
+                    console.error(err);
                 }
             }
     
