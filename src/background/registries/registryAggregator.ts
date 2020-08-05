@@ -113,7 +113,9 @@ export class RegistryAggregator {
 
                     if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
                     if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) return new EthRegistry(r.url);
-                });
+                    console.error("Invalid registry URL");
+                    return null;
+                }).filter(r => r !== null);
         }
     }
 

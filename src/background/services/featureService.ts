@@ -27,6 +27,7 @@ export default class FeatureService {
 
         const configRegistries = await this._globalConfigService.getRegistries();
 
+
         let i = 0;
 
         // ToDo: how to merge modules from different registries???
@@ -239,7 +240,7 @@ export default class FeatureService {
 
             if (vi.main) {
                 // Dist file publishing
-                const dist = await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 9 }});
+                const dist = await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 9 } });
                 const distBlob = new Blob([dist], { type: "text/javascript" });
                 const distUrl = (targetStorage === StorageTypes.TestRegsitry) ? await testStorage.save(distBlob, targetRegistry) : await swarmStorage.save(distBlob);
 

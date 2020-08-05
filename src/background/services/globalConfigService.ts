@@ -43,11 +43,16 @@ export default class GlobalConfigService {
     }
 
     async addRegistry(url: string, isDev: boolean) {
-        const config = await this.get();
-        if (config.registries.find(r => r.url === url)) return;
-
         const isEthAddress = typeOfUri(url) === UriTypes.Ethereum;
         const isEnsAddress = typeOfUri(url) === UriTypes.Ens;
+        const isHttpAddress = typeOfUri(url) === UriTypes.Http;
+
+        if (!isEthAddress && !isEnsAddress && !isHttpAddress) throw new Error("Unsupported URI type");
+        if (isDev && !isHttpAddress) throw new Error("Only HTTP(S) links are supported for development servers");
+        if (!isDev && (!isEthAddress && !isEnsAddress)) throw new Error("A public registry must have a valid Ethereum or ENS address");
+        
+        const config = await this.get();
+        if (config.registries.find(r => r.url === url)) return;
 
         if (isEthAddress || isEnsAddress) {
             if (isEnsAddress) {
@@ -109,18 +114,16 @@ export default class GlobalConfigService {
         const isEthAddress = typeOfUri(account) === UriTypes.Ethereum;
         const isEnsAddress = typeOfUri(account) === UriTypes.Ens;
 
-        if (isEthAddress || isEnsAddress) {
-            if (isEnsAddress) {
-                const signer = new WalletConnectSigner();
-                const address = await signer.resolveName(account);
-                if (!address) throw new Error("Can not resolve the ENS name");
-            }
+        if (!isEthAddress && !isEnsAddress) throw Error('User account must be valid Ethereum address');
 
-            config.trustedUsers.push({ account: account });
-            await this.set(config);
-        } else {
-            throw Error('User account must be valid Ethereum address');
+        if (isEnsAddress) {
+            const signer = new WalletConnectSigner();
+            const address = await signer.resolveName(account);
+            if (!address) throw new Error("Can not resolve the ENS name");
         }
+
+        config.trustedUsers.push({ account: account });
+        await this.set(config);
     }
 
     async removeTrustedUser(account: string) {
