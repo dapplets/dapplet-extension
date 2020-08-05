@@ -9,7 +9,7 @@ const _globalConfigService = new GlobalConfigService();
 
 let lastExtensionIcon = null;
 
-const changeIcon = () => {
+const changeIcon = () => new Promise((res, rej) => {
     extension.tabs.query({ active: true }, async function ([tab]) {
         const url = tab.url || tab.pendingUrl;
         const hostname = Helpers.getHostName(url);
@@ -25,11 +25,19 @@ const changeIcon = () => {
             lastExtensionIcon = path;
             extension.browserAction.setIcon({ path: path });
         }
-    });
-};
 
+        res();
+    });
+});
+
+let isContextMenusUpdating = false;
 // TODO Errors are thrown sometimes because context menu duplication
-const updateContextMenus = () => {
+const updateContextMenus = () => new Promise((res, rej) => {
+    if (isContextMenusUpdating) {
+        res();
+        return;
+    }
+    isContextMenusUpdating = true;
     extension.contextMenus.removeAll(function () {
         extension.tabs.query({ active: true }, async function ([tab]) {
             const url = tab.url || tab.pendingUrl;
@@ -43,7 +51,7 @@ const updateContextMenus = () => {
                     contexts: ["browser_action"],
                     onclick: async function (info, tab) {
                         await resumeByHostname(hostname);
-                        updateContextMenus();
+                        await updateContextMenus();
                     }
                 });
             } else {
@@ -52,7 +60,7 @@ const updateContextMenus = () => {
                     contexts: ["browser_action"],
                     onclick: async function (info, tab) {
                         await suspendByHostname(hostname);
-                        updateContextMenus();
+                        await updateContextMenus();
                     }
                 });
             }
@@ -65,7 +73,7 @@ const updateContextMenus = () => {
                     contexts: ["browser_action"],
                     onclick: async function (info, tab) {
                         await resumeEverywhere();
-                        updateContextMenus();
+                        await updateContextMenus();
                     }
                 });
             } else {
@@ -74,13 +82,16 @@ const updateContextMenus = () => {
                     contexts: ["browser_action"],
                     onclick: async function (info, tab) {
                         await suspendEverywhere();
-                        updateContextMenus();
+                        await updateContextMenus();
                     }
                 });
             }
+
+            isContextMenusUpdating = false;
+            res();
         });
     });
-};
+})
 
 /**
  * Suspend working of injectors by passed hostname
@@ -101,8 +112,8 @@ const suspendByHostname = async hostname => {
         await _siteConfigRepository.update(config);
     }
 
-    changeIcon();
-    updateContextMenus();
+    await changeIcon();
+    await updateContextMenus();
     console.log("Injecting is suspended at the " + hostname);
 };
 
@@ -125,8 +136,8 @@ const resumeByHostname = async hostname => {
         await _siteConfigRepository.update(config);
     }
 
-    changeIcon();
-    updateContextMenus();
+    await changeIcon();
+    await updateContextMenus();
     console.log("Injecting is resumed at the " + hostname);
 };
 
@@ -151,8 +162,8 @@ const suspendEverywhere = async () => {
     config.suspended = true;
     await _globalConfigService.set(config);
 
-    changeIcon();
-    updateContextMenus();
+    await changeIcon();
+    await updateContextMenus();
     console.log("Injecting is suspended everywhere");
 };
 
@@ -166,8 +177,8 @@ const resumeEverywhere = async () => {
     config.suspended = false;
     await _globalConfigService.set(config);
 
-    changeIcon();
-    updateContextMenus();
+    await changeIcon();
+    await updateContextMenus();
     console.log("Injecting is resumed everywhere");
 };
 

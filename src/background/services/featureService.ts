@@ -160,11 +160,15 @@ export default class FeatureService {
     }
 
     public async getActiveModulesByHostnames(hostnames: string[]) {
+        const globalConfig = await this._globalConfigService.get();
+        if (globalConfig.suspended) return [];
+        
         const configs = await Promise.all(hostnames.map(h => this._siteConfigRepository.getById(h)));
         const modules: { name: string, branch: string, version: string, order: number, hostnames: string[] }[] = [];
 
         let i = 0;
         for (const config of configs) {
+            if (config.paused) continue;
             for (const name in config.activeFeatures) {
                 if (config.activeFeatures[name].isActive !== true) continue;
 
