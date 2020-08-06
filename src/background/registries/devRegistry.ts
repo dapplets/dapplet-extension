@@ -74,7 +74,7 @@ export class DevRegistry implements Registry {
 
     public async getVersionNumbers(name: string, branch: string): Promise<string[]> {
         await this._cacheDevConfig();
-        const versions = Array.from(this._infoByUrl).map(([k, v]) => v).filter(v => v.module.name === name && v.version.branch).map(x => x.version.version);
+        const versions = Array.from(this._infoByUrl).map(([k, v]) => v).filter(v => v.module.name === name && v.version.branch === branch).map(x => x.version.version);
         return versions;
     }
 
