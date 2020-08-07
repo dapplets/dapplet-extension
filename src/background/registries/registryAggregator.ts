@@ -7,6 +7,9 @@ import { mergeDedupe, typeOfUri, UriTypes, assertFullfilled, assertRejected } fr
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
 import { Environments } from '../../common/types';
+import { allSettled } from '../../common/helpers';
+
+if (!Promise.allSettled) Promise.allSettled = allSettled;
 
 export class RegistryAggregator {
     public isAvailable: boolean = true;
@@ -56,7 +59,7 @@ export class RegistryAggregator {
         regFeatures.filter(assertRejected).forEach(p => console.error(p.reason));
         const validRegFeatures = regFeatures.filter(assertFullfilled).map((p) => p.value);
         const merged = Object.fromEntries(validRegFeatures);
-
+        
         // Below is some magic, which finds modules by names and interfaces in another registries.
         // For example: 
         // 1) An interface, linked with some location, is in the registry A.

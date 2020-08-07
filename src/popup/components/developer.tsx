@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Popup, Button, Segment, Message, List, Label, Input, Icon, Image, Header } from "semantic-ui-react";
 import NOLOGO_PNG from '../../common/resources/no-logo.png';
@@ -50,7 +50,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
     }
 
     async loadRegistries() {
-        const { getRegistries, getAllDevModules } = await initBGFunctions(extension);
+        const { getRegistries, getAllDevModules } = await initBGFunctions(browser);
 
         const modules: { module: ModuleInfo, versions: VersionInfo[], isDeployed: boolean[] }[] = await getAllDevModules();
         this.setState({ modules });
@@ -63,20 +63,20 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
     }
 
     async loadIntro() {
-        const { getIntro } = await initBGFunctions(extension);
+        const { getIntro } = await initBGFunctions(browser);
         const intro = await getIntro();
         this.setState({ intro });
     }
 
     async closeWelcomeIntro() {
-        const { setIntro } = await initBGFunctions(extension);
+        const { setIntro } = await initBGFunctions(browser);
         this.setState({ intro: { popupDeveloperWelcome: false } });
         await setIntro({ popupDeveloperWelcome: false });
     }
 
     async addRegistry(url: string) {
         this.setState({ isLoading: true });
-        const { addRegistry } = await initBGFunctions(extension);
+        const { addRegistry } = await initBGFunctions(browser);
 
         try {
             await addRegistry(url, true);
@@ -90,22 +90,21 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
 
     async removeRegistry(url: string) {
         this.setState({ isLoading: true });
-        const { removeRegistry } = await initBGFunctions(extension);
+        const { removeRegistry } = await initBGFunctions(browser);
         await removeRegistry(url);
         this.loadRegistries();
     }
 
     async deployModule(mi: ModuleInfo, vi: VersionInfo) {
-        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-            var activeTab = tabs[0];
-            extension.tabs.sendMessage(activeTab.id, {
-                type: "OPEN_DEPLOY_OVERLAY",
-                payload: {
-                    mi, vi
-                }
-            });
-            window.close();
+        const tabs = await browser.tabs.query({ currentWindow: true, active: true });
+        const activeTab = tabs[0];
+        browser.tabs.sendMessage(activeTab.id, {
+            type: "OPEN_DEPLOY_OVERLAY",
+            payload: {
+                mi, vi
+            }
         });
+        window.close();
     }
 
     render() {

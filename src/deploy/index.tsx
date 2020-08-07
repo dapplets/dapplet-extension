@@ -1,4 +1,4 @@
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -80,7 +80,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     }
 
     async componentDidMount() {
-        const { getRegistries } = await initBGFunctions(extension);
+        const { getRegistries } = await initBGFunctions(browser);
         const registries = await getRegistries();
         const prodRegistries = registries.filter(r => !r.isDev);
         this.setState({
@@ -97,7 +97,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     }
 
     private async _updateOwnership() {
-        const { getOwnership, getAccounts } = await initBGFunctions(extension);
+        const { getOwnership, getAccounts } = await initBGFunctions(browser);
         const owner = await getOwnership(this.state.targetRegistry, this.state.mi.name);
         const accounts = await getAccounts();
 
@@ -109,7 +109,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     private async _updateDeploymentStatus() {
         this.setState({ deploymentStatus: DeploymentStatus.Unknown });
-        const { getVersionInfo } = await initBGFunctions(extension);
+        const { getVersionInfo } = await initBGFunctions(browser);
         const vi = await getVersionInfo(this.state.targetRegistry, this.state.mi.name, this.state.vi.branch, this.state.vi.version);
         this.setState({
             deploymentStatus: (vi) ? DeploymentStatus.Deployed : DeploymentStatus.NotDeployed
@@ -118,21 +118,21 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     private async _transferOwnership(address: string) {
         this.setState({ newOwnerLoading: true });
-        const { transferOwnership } = await initBGFunctions(extension);
+        const { transferOwnership } = await initBGFunctions(browser);
         await transferOwnership(this.state.targetRegistry, this.state.mi.name, address);
         this.setState({ newOwnerLoading: false, newOwnerDone: true });
     }
 
     private async _addLocation(location: string) {
         this.setState({ editLocationLoading: true });
-        const { addLocation } = await initBGFunctions(extension);
+        const { addLocation } = await initBGFunctions(browser);
         await addLocation(this.state.targetRegistry, this.state.mi.name, location);
         this.setState({ editLocationLoading: false, editLocationDone: true });
     }
 
     private async _removeLocation(location: string) {
         this.setState({ editLocationLoading: true });
-        const { removeLocation } = await initBGFunctions(extension);
+        const { removeLocation } = await initBGFunctions(browser);
         await removeLocation(this.state.targetRegistry, this.state.mi.name, location);
         this.setState({ editLocationLoading: false, editLocationDone: true });
     }
@@ -140,7 +140,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     async deploySubmitHandler() {
         this.setState({ loading: true });
 
-        const { deployModule } = await initBGFunctions(extension);
+        const { deployModule } = await initBGFunctions(browser);
         const { mi, vi, targetRegistry, targetStorage } = this.state;
 
         try {

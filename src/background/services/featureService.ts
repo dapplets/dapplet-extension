@@ -1,7 +1,7 @@
 import ManifestDTO from '../dto/manifestDTO';
 import SiteConfigBrowserStorage from '../browserStorages/siteConfigBrowserStorage';
 import ModuleManager from '../utils/moduleManager';
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
 import GlobalConfigService from './globalConfigService';
 import * as ethers from 'ethers';
@@ -26,7 +26,6 @@ export default class FeatureService {
         const dtos: ManifestDTO[] = [];
 
         const configRegistries = await this._globalConfigService.getRegistries();
-
 
         let i = 0;
 
@@ -81,50 +80,48 @@ export default class FeatureService {
         }
 
         // sending command to inpage
-        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-            var activeTab = tabs[0];
-            extension.tabs.sendMessage(activeTab.id, {
-                type: isActive ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
-                payload: [{
-                    name,
-                    version,
-                    branch: DEFAULT_BRANCH_NAME, // ToDo: fix branch
-                    order,
-                    contextIds: hostnames
-                }]
-            });
+        const [activeTab] = await browser.tabs.query({ currentWindow: true, active: true });
+        browser.tabs.sendMessage(activeTab.id, {
+            type: isActive ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
+            payload: [{
+                name,
+                version,
+                branch: DEFAULT_BRANCH_NAME, // ToDo: fix branch
+                order,
+                contextIds: hostnames
+            }]
         });
 
         try {
             await new Promise<void>((resolve, reject) => {
                 // listening of loading/unloading from inpage
-                const listener = (message, sender, sendResponse) => {
+                const listener = (message, sender) => {
                     if (!message || !message.type || !message.payload) return;
                     const p = message.payload;
                     if (message.type === 'FEATURE_LOADED') {
                         if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === p.version && isActive === true) {
-                            extension.runtime.onMessage.removeListener(listener);
+                            browser.runtime.onMessage.removeListener(listener);
                             resolve();
                         }
                     } else if (message.type === "FEATURE_UNLOADED") {
                         if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === p.version && isActive === false) {
-                            extension.runtime.onMessage.removeListener(listener);
+                            browser.runtime.onMessage.removeListener(listener);
                             resolve();
                         }
                     } else if (message.type === "FEATURE_LOADING_ERROR") {
                         if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === p.version && isActive === true) {
-                            extension.runtime.onMessage.removeListener(listener);
+                            browser.runtime.onMessage.removeListener(listener);
                             reject(p.error);
                         }
                     } else if (message.type === "FEATURE_UNLOADING_ERROR") {
                         if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === p.version && isActive === false) {
-                            extension.runtime.onMessage.removeListener(listener);
+                            browser.runtime.onMessage.removeListener(listener);
                             reject(p.error);
                         }
                     }
                 }
 
-                extension.runtime.onMessage.addListener(listener);
+                browser.runtime.onMessage.addListener(listener);
             });
         } catch (err) {
             // revert config if error
@@ -162,7 +159,7 @@ export default class FeatureService {
     public async getActiveModulesByHostnames(hostnames: string[]) {
         const globalConfig = await this._globalConfigService.get();
         if (globalConfig.suspended) return [];
-        
+
         const configs = await Promise.all(hostnames.map(h => this._siteConfigRepository.getById(h)));
         const modules: { name: string, branch: string, version: string, order: number, hostnames: string[] }[] = [];
 
@@ -209,11 +206,11 @@ export default class FeatureService {
 
     public async optimizeDependency(name: string, branch: string, version: string, contextIds: string[]) {
         // ToDo: fix this hack
-        return await this._moduleManager.optimizeDependency(name, version, branch, contextIds);
+        return this._moduleManager.optimizeDependency(name, version, branch, contextIds);
     };
 
     public async getAllDevModules() {
-        return await this._moduleManager.registryAggregator.getAllDevModules();
+        return this._moduleManager.registryAggregator.getAllDevModules();
     }
 
     // ToDo: move to another service?
@@ -343,12 +340,10 @@ export default class FeatureService {
         const version = versions.sort(rcompare)[0]; // Last version by SemVer
         const vi = await this._moduleManager.registryAggregator.getVersionInfo(mi.name, DEFAULT_BRANCH_NAME, version);
         const dist = await this._moduleManager.loadModule(vi);
-        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-            var activeTab = tabs[0];
-            extension.tabs.sendMessage(activeTab.id, {
-                type: "OPEN_SETTINGS_OVERLAY",
-                payload: { mi, vi, schemaConfig: dist.schemaConfig, defaultConfig: dist.defaultConfig }
-            });
+        const [activeTab] = await browser.tabs.query({ currentWindow: true, active: true });
+        browser.tabs.sendMessage(activeTab.id, {
+            type: "OPEN_SETTINGS_OVERLAY",
+            payload: { mi, vi, schemaConfig: dist.schemaConfig, defaultConfig: dist.defaultConfig }
         });
     }
 }

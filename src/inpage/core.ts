@@ -1,5 +1,5 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 
 import { Overlay } from "./overlay";
 import { Swiper } from "./swiper";
@@ -21,35 +21,24 @@ export default class Core {
             }
         }
 
-        extension.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        browser.runtime.onMessage.addListener((message, sender) => {
             if (typeof message === 'string') {
                 if (message === "OPEN_PAIRING_OVERLAY") {
-                    this.waitPairingOverlay()
-                        .then(() => sendResponse([null, 'ready']))
-                        .catch(() => sendResponse(['error']));
-                    return true; // return true from the event listener to indicate you wish to send a response asynchronously 
+                    return this.waitPairingOverlay().then(() => ([null, 'ready'])).catch(() => (['error']));
                 } else if (message === "TOGGLE_OVERLAY") {
                     this._togglePopupOverlay();
-                    sendResponse();
                 } else if (message === "OPEN_OVERLAY") { // used by pure jslib
                     closeOverlay();
-                    sendResponse();
                 } else if (message === "CLOSE_OVERLAY") { // used by pure jslib
                     this.overlayManager && this.overlayManager.unregisterAll();
-                    sendResponse();
                 }
             } else if (typeof message === 'object' && message.type !== undefined) {
                 if (message.type === 'OPEN_DEPLOY_OVERLAY') {
-                    this.waitDeployOverlay(message.payload).finally(() => sendResponse());
-                    return true;
+                    return this.waitDeployOverlay(message.payload);
                 } else if (message.type === 'APPROVE_SOWA_TRANSACTION') {
-                    this._approveSowaTransaction(message.payload.sowaId, message.payload.metadata)
-                        .then(() => sendResponse([null, 'approved']))
-                        .catch(() => sendResponse(['error']));
-                    return true;
+                    return this._approveSowaTransaction(message.payload.sowaId, message.payload.metadata).then(() => ([null, 'approved'])).catch(() => (['error']));
                 } else if (message.type === 'OPEN_SETTINGS_OVERLAY') {
-                    this.waitSettingsOverlay(message.payload).finally(() => sendResponse());
-                    return true;
+                    return this.waitSettingsOverlay(message.payload);
                 }
             }
         });
@@ -62,7 +51,7 @@ export default class Core {
     public waitPairingOverlay(): Promise<void> {
         const me = this;
         return new Promise<void>((resolve, reject) => {
-            const pairingUrl = extension.extension.getURL('pairing.html');
+            const pairingUrl = browser.extension.getURL('pairing.html');
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'Wallet');
             overlay.open();
             // ToDo: add timeout?
@@ -82,7 +71,7 @@ export default class Core {
     public waitDeployOverlay(payload: any): Promise<void> {
         const me = this;
         return new Promise<void>((resolve, reject) => {
-            const pairingUrl = extension.extension.getURL('deploy.html');
+            const pairingUrl = browser.extension.getURL('deploy.html');
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'Deploy');
             overlay.open(() => overlay.send('data', [payload]));
             // ToDo: add timeout?
@@ -102,7 +91,7 @@ export default class Core {
     public waitSettingsOverlay(payload: any): Promise<void> {
         const me = this;
         return new Promise<void>((resolve, reject) => {
-            const pairingUrl = extension.extension.getURL('settings.html');
+            const pairingUrl = browser.extension.getURL('settings.html');
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'Settings');
             overlay.open(() => overlay.send('data', [payload]));
             // ToDo: add timeout?
@@ -121,7 +110,7 @@ export default class Core {
 
     public _togglePopupOverlay() {
         if (!this._popupOverlay?.registered) {
-            const pairingUrl = extension.extension.getURL('popup.html');
+            const pairingUrl = browser.extension.getURL('popup.html');
             this._popupOverlay = new Overlay(this.overlayManager, pairingUrl, 'Dapplets');
             this._popupOverlay.open();
         } else {
@@ -133,7 +122,7 @@ export default class Core {
         const me = this;
 
         return new Promise<void>((resolve, reject) => {
-            const pairingUrl = extension.extension.getURL('sowa.html');
+            const pairingUrl = browser.extension.getURL('sowa.html');
             const overlay = new Overlay(me.overlayManager, pairingUrl, 'SOWA');
             // ToDo: implement multiframe
             overlay.open(() => overlay.send('txmeta', [sowaId, metadata]));
@@ -154,7 +143,7 @@ export default class Core {
 
     // ToDo: use sendSowaTransaction method from background
     private async _sendWalletConnectTx(sowaId, metadata, callback: (e: { type: string, data?: any }) => void): Promise<any> {
-        const backgroundFunctions = await initBGFunctions(extension);
+        const backgroundFunctions = await initBGFunctions(browser);
         const {
             loadSowa,
             loadSowaFrames,
@@ -196,7 +185,7 @@ export default class Core {
                 dappletResult = await loadSowa(sowaId, metadata);
             } else {
                 console.log("Wallet is SOWA incompatible. Showing SOWA view...");
-    
+
                 try {
                     await this._approveSowaTransaction(sowaId, metadata);
                     dappletResult = await sendLegacyTransaction(sowaId, metadata);
@@ -204,7 +193,7 @@ export default class Core {
                     console.error(err);
                 }
             }
-    
+
             if (dappletResult) {
                 transactionCreated(dappletResult);
                 callback({ type: "created", data: dappletResult });
@@ -214,7 +203,7 @@ export default class Core {
             }
 
             return dappletResult;
-        }        
+        }
     }
 
     public connect<M>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {

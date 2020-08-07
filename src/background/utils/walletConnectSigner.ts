@@ -28,6 +28,6 @@ export class WalletConnectSigner extends ethers.Signer {
         transaction.from = walletConnector.accounts[0];
         const tx = await ethers.utils.resolveProperties(transaction);
         const txHash = await sendTransaction(tx as any);
-        return await this.provider.getTransaction(txHash);
+        return this.provider.getTransaction(txHash);
     }
 }

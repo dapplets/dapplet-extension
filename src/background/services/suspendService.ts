@@ -2,96 +2,88 @@ import * as Helpers from "../../common/helpers";
 import SiteConfigBrowserStorage from "../browserStorages/siteConfigBrowserStorage";
 import SiteConfig from "../models/siteConfig";
 import GlobalConfigService from "./globalConfigService";
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 
 const _siteConfigRepository = new SiteConfigBrowserStorage();
 const _globalConfigService = new GlobalConfigService();
 
 let lastExtensionIcon = null;
 
-const changeIcon = () => new Promise((res, rej) => {
-    extension.tabs.query({ active: true }, async function ([tab]) {
-        const url = tab.url || tab.pendingUrl;
-        const hostname = Helpers.getHostName(url);
-        const suspendityByHostname = await getSuspendityByHostname(hostname);
-        const suspendityEverywhere = await getSuspendityEverywhere();
+const changeIcon = async () => {
+    const [tab] = await browser.tabs.query({ active: true });
+    const url = tab.url || tab['pendingUrl']; // ToDo: check existance of pendingUrl
+    const hostname = Helpers.getHostName(url);
+    const suspendityByHostname = await getSuspendityByHostname(hostname);
+    const suspendityEverywhere = await getSuspendityEverywhere();
 
-        const isSuspeded = suspendityByHostname || suspendityEverywhere;
-        const path = isSuspeded
-            ? "/icons/icon-grayed16.png"
-            : "/icons/icon16.png";
+    const isSuspeded = suspendityByHostname || suspendityEverywhere;
+    const path = isSuspeded
+        ? "/icons/icon-grayed16.png"
+        : "/icons/icon16.png";
 
-        if (lastExtensionIcon != path) {
-            lastExtensionIcon = path;
-            extension.browserAction.setIcon({ path: path });
-        }
-
-        res();
-    });
-});
+    if (lastExtensionIcon != path) {
+        lastExtensionIcon = path;
+        browser.browserAction.setIcon({ path: path });
+    }
+}
 
 let isContextMenusUpdating = false;
 // TODO Errors are thrown sometimes because context menu duplication
-const updateContextMenus = () => new Promise((res, rej) => {
-    if (isContextMenusUpdating) {
-        res();
-        return;
-    }
+const updateContextMenus = async () => {
+    if (isContextMenusUpdating) return;
+
     isContextMenusUpdating = true;
-    extension.contextMenus.removeAll(function () {
-        extension.tabs.query({ active: true }, async function ([tab]) {
-            const url = tab.url || tab.pendingUrl;
-            const hostname = Helpers.getHostName(url);
+    await browser.contextMenus.removeAll();
+    const [tab] = await browser.tabs.query({ active: true });
+    const url = tab.url || tab['pendingUrl']; // ToDo: check existance of pendingUrl
+    const hostname = Helpers.getHostName(url);
 
-            const suspendityByHostname = await getSuspendityByHostname(hostname);
+    const suspendityByHostname = await getSuspendityByHostname(hostname);
 
-            if (suspendityByHostname) {
-                extension.contextMenus.create({
-                    title: "Resume on this site",
-                    contexts: ["browser_action"],
-                    onclick: async function (info, tab) {
-                        await resumeByHostname(hostname);
-                        await updateContextMenus();
-                    }
-                });
-            } else {
-                extension.contextMenus.create({
-                    title: "Suspend on this site",
-                    contexts: ["browser_action"],
-                    onclick: async function (info, tab) {
-                        await suspendByHostname(hostname);
-                        await updateContextMenus();
-                    }
-                });
+    if (suspendityByHostname) {
+        browser.contextMenus.create({
+            title: "Resume on this site",
+            contexts: ["browser_action"],
+            onclick: async function (info, tab) {
+                await resumeByHostname(hostname);
+                await updateContextMenus();
             }
-
-            const suspendityEverywhere = await getSuspendityEverywhere();
-
-            if (suspendityEverywhere) {
-                extension.contextMenus.create({
-                    title: "Resume on all sites",
-                    contexts: ["browser_action"],
-                    onclick: async function (info, tab) {
-                        await resumeEverywhere();
-                        await updateContextMenus();
-                    }
-                });
-            } else {
-                extension.contextMenus.create({
-                    title: "Suspend on all sites",
-                    contexts: ["browser_action"],
-                    onclick: async function (info, tab) {
-                        await suspendEverywhere();
-                        await updateContextMenus();
-                    }
-                });
-            }
-
-            isContextMenusUpdating = false;
-            res();
         });
-    });
-})
+    } else {
+        browser.contextMenus.create({
+            title: "Suspend on this site",
+            contexts: ["browser_action"],
+            onclick: async function (info, tab) {
+                await suspendByHostname(hostname);
+                await updateContextMenus();
+            }
+        });
+    }
+
+    const suspendityEverywhere = await getSuspendityEverywhere();
+
+    if (suspendityEverywhere) {
+        browser.contextMenus.create({
+            title: "Resume on all sites",
+            contexts: ["browser_action"],
+            onclick: async function (info, tab) {
+                await resumeEverywhere();
+                await updateContextMenus();
+            }
+        });
+    } else {
+        browser.contextMenus.create({
+            title: "Suspend on all sites",
+            contexts: ["browser_action"],
+            onclick: async function (info, tab) {
+                await suspendEverywhere();
+                await updateContextMenus();
+            }
+        });
+    }
+
+    isContextMenusUpdating = false;
+}
 
 /**
  * Suspend working of injectors by passed hostname

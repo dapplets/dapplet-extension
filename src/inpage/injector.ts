@@ -3,7 +3,7 @@ import Core from './core';
 import { maxSatisfying, valid } from 'semver';
 import { SubscribeOptions } from './overlay';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 import { IResolver, IContentAdapter, IFeature } from './types';
 import { areModulesEqual } from "../common/helpers";
 import VersionInfo from "../background/models/versionInfo";
@@ -31,7 +31,7 @@ export class Injector {
 
     public async loadModules(modules: { name: string, branch: string, version: string, order: number, contextIds: string[] }[]) {
         if (!modules || !modules.length) return;
-        const { getModulesWithDeps } = await initBGFunctions(extension);
+        const { getModulesWithDeps } = await initBGFunctions(browser);
         const loadedModules: { manifest: VersionInfo, script: string, defaultConfig?: DefaultConfig }[] = await getModulesWithDeps(modules);
         const orderedModules = loadedModules.map((l) => {
             const m = modules.find(m => areModulesEqual(m, l.manifest));
@@ -88,14 +88,14 @@ export class Injector {
                 // ToDo: compare "m.instancedDeps.length" and "m.clazz.constructor.length"
                 m.instance = new m.clazz(...m.instancedDeps);
                 console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`);
-                extension.runtime.sendMessage({
+                browser.runtime.sendMessage({
                     type: "FEATURE_LOADED", payload: {
                         name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version
                     }
                 });
             } catch (err) {
                 console.error(`Error of loading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
-                extension.runtime.sendMessage({
+                browser.runtime.sendMessage({
                     type: "FEATURE_LOADING_ERROR", payload: {
                         name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version, error: err.message
                     }
@@ -110,7 +110,7 @@ export class Injector {
             try {
                 m.instancedDeps.forEach(d => d.detachConfig());
                 console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is unloaded.`);
-                extension.runtime.sendMessage({
+                browser.runtime.sendMessage({
                     type: "FEATURE_UNLOADED", payload: {
                         name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version
                     }
@@ -118,7 +118,7 @@ export class Injector {
                 this.registry = this.registry.filter(r => r !== m);
             } catch (err) {
                 console.error(`Error of unloading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
-                extension.runtime.sendMessage({
+                browser.runtime.sendMessage({
                     type: "FEATURE_UNLOADING_ERROR", payload: {
                         name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version, error: err.message
                     }
@@ -128,7 +128,7 @@ export class Injector {
     }
 
     private async _processModules(modules: { manifest: VersionInfo, script: string, order: number, contextIds: string[], defaultConfig?: DefaultConfig }[]) {
-        const { optimizeDependency, getModulesWithDeps, addEvent } = await initBGFunctions(extension);
+        const { optimizeDependency, getModulesWithDeps, addEvent } = await initBGFunctions(browser);
         const { core } = this;
 
         for (const { manifest, script, order, contextIds, defaultConfig } of modules) {
@@ -236,7 +236,7 @@ export class Injector {
             });
         }
 
-        extension.runtime.sendMessage({
+        browser.runtime.sendMessage({
             type: isActive ? "CONTEXT_STARTED" : "CONTEXT_FINISHED",
             payload: { contextIds }
         });
