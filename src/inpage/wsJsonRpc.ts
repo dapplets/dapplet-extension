@@ -1,8 +1,9 @@
 import { IPubSub } from "./types";
+import { WebSocketProxyClient } from "../common/chrome-extension-websocket-wrapper";
 
 export class WsJsonRpc implements IPubSub {
     private _queue: any[] = [];
-    private _ws: WebSocket;
+    private _ws: WebSocketProxyClient;
 
     private _msgCount: number = 0;
 
@@ -58,14 +59,14 @@ export class WsJsonRpc implements IPubSub {
     }
 
     private _connect() {
-        this._ws = new WebSocket(this.url);
-        this._ws.onopen = () => {
+        this._ws = new WebSocketProxyClient(this.url);
+        this._ws.addEventListener('open', () => {
             this._queue.forEach(msg => this._ws.send(msg));
             this._queue = [];
-        };
-        this._ws.onclose = () => {
+        });
+        this._ws.addEventListener('close', () => {
             this._msgCount = 0;
-        };
+        });
     }
 
     private _send(data: any) {

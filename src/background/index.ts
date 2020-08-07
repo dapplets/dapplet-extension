@@ -7,6 +7,7 @@ import GlobalConfigService from './services/globalConfigService';
 import * as EventService from './services/eventService';
 import { browser } from "webextension-polyfill-ts";
 import EnsService from "./services/ensService";
+import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -97,6 +98,11 @@ browser.runtime.onMessage.addListener(
     resolveName: (name) => ensService.resolveName(name)
   })
 );
+
+// WebSocket proxy
+// ToDo: Perhaps a separate class WebSocketProxy is redundant
+const wsproxy = new WebSocketProxy();
+browser.runtime.onConnect.addListener(wsproxy.createConnectListener());
 
 // ToDo: These lines are repeated many time
 SuspendService.changeIcon();
