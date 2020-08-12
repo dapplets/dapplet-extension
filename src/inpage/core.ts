@@ -7,6 +7,8 @@ import { AutoProperties, EventDef, Connection } from "./connection";
 import { WsJsonRpc } from "./wsJsonRpc";
 import { OverlayManager } from "./overlayManager";
 import { AppStorage } from "./appStorage";
+import { ethers, providers } from "ethers";
+import { ProxySigner } from "./proxySigner";
 
 export default class Core {
     public overlayManager = new OverlayManager();
@@ -245,4 +247,9 @@ export default class Core {
     contextFinished(contextIds: any[], parentContext?: string): void { }
 
     public storage: AppStorage;
+
+    public contract(address: string, abi: any): any {
+        const signer = new ProxySigner();
+        return new ethers.Contract(address, abi, signer);
+    }
 }

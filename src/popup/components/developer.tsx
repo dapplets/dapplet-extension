@@ -82,7 +82,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
             await addRegistry(url, true);
             this.setState({ registryInput: '' });
         } catch (msg) {
-            this.setState({ registryInputError: msg });
+            this.setState({ registryInputError: msg.toString() });
         }
 
         this.loadRegistries();

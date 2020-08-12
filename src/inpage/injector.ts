@@ -154,7 +154,8 @@ export class Injector {
                 connect: core.connect.bind(core),
                 overlay: core.overlay.bind(core),
                 wallet: core.wallet.bind(core),
-                storage: new AppStorage(manifest.name, manifest.environment, defaultConfig)
+                storage: new AppStorage(manifest.name, manifest.environment, defaultConfig),
+                contract: core.contract.bind(core)
             };
 
             let newBranch: string = null;

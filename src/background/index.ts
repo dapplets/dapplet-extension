@@ -8,6 +8,7 @@ import * as EventService from './services/eventService';
 import { browser } from "webextension-polyfill-ts";
 import EnsService from "./services/ensService";
 import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
+import ProxyService from "./services/proxyService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -16,6 +17,7 @@ import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 const featureService = new FeatureService();
 const globalConfigService = new GlobalConfigService();
 const ensService = new EnsService();
+const proxyService = new ProxyService();
 
 browser.runtime.onMessage.addListener(
   setupMessageListener({
@@ -33,6 +35,7 @@ browser.runtime.onMessage.addListener(
     pairWalletViaOverlay: WalletConnectService.pairWalletViaOverlay,
     sendSowaTransaction: WalletConnectService.sendSowaTransaction,
     sendCustomRequest: WalletConnectService.sendCustomRequest,
+    sendTransaction: WalletConnectService.sendTransaction,
 
     // SuspendService
     getSuspendityByHostname: SuspendService.getSuspendityByHostname,
@@ -95,7 +98,10 @@ browser.runtime.onMessage.addListener(
     saveUserSettings: () => globalConfigService.saveUserSettings(),
 
     // ENS
-    resolveName: (name) => ensService.resolveName(name)
+    resolveName: (name) => ensService.resolveName(name),
+
+    // Contract Service
+    fetchJsonRpc: (method, params) => proxyService.fetchJsonRpc(method, params)
   })
 );
 
