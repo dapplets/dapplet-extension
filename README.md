@@ -40,7 +40,6 @@ $/
 ## Built With
 
 * [React](https://reactjs.org/) - The web framework used
-* [Material UI](https://material-ui.com/) - React components that implement Google's Material Design
 
 ## Authors
 
