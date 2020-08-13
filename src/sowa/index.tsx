@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 //import 'semantic-ui-css/semantic.min.css'
 import './index.scss';
@@ -46,7 +46,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
         this._bus = new Bus();
         this._bus.subscribe('txmeta', async (sowaId, txMeta) => {
-            const { getSowaTemplate } = await initBGFunctions(extension);
+            const { getSowaTemplate } = await initBGFunctions(browser);
             const dappletConfig = await getSowaTemplate(sowaId);
 
             let html = "Compatible SOWA view is not found.";

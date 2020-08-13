@@ -2,85 +2,88 @@ import * as Helpers from "../../common/helpers";
 import SiteConfigBrowserStorage from "../browserStorages/siteConfigBrowserStorage";
 import SiteConfig from "../models/siteConfig";
 import GlobalConfigService from "./globalConfigService";
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 
 const _siteConfigRepository = new SiteConfigBrowserStorage();
 const _globalConfigService = new GlobalConfigService();
 
 let lastExtensionIcon = null;
 
-const changeIcon = () => {
-    extension.tabs.query({ active: true }, async function ([tab]) {
-        const url = tab.url || tab.pendingUrl;
-        const hostname = Helpers.getHostName(url);
-        const suspendityByHostname = await getSuspendityByHostname(hostname);
-        const suspendityEverywhere = await getSuspendityEverywhere();
+const changeIcon = async () => {
+    const [tab] = await browser.tabs.query({ active: true });
+    const url = tab.url || tab['pendingUrl']; // ToDo: check existance of pendingUrl
+    const hostname = Helpers.getHostName(url);
+    const suspendityByHostname = await getSuspendityByHostname(hostname);
+    const suspendityEverywhere = await getSuspendityEverywhere();
 
-        const isSuspeded = suspendityByHostname || suspendityEverywhere;
-        const path = isSuspeded
-            ? "/icons/icon-grayed16.png"
-            : "/icons/icon16.png";
+    const isSuspeded = suspendityByHostname || suspendityEverywhere;
+    const path = isSuspeded
+        ? "/icons/icon-grayed16.png"
+        : "/icons/icon16.png";
 
-        if (lastExtensionIcon != path) {
-            lastExtensionIcon = path;
-            extension.browserAction.setIcon({ path: path });
-        }
-    });
-};
+    if (lastExtensionIcon != path) {
+        lastExtensionIcon = path;
+        browser.browserAction.setIcon({ path: path });
+    }
+}
 
+let isContextMenusUpdating = false;
 // TODO Errors are thrown sometimes because context menu duplication
-const updateContextMenus = () => {
-    extension.contextMenus.removeAll(function () {
-        extension.tabs.query({ active: true }, async function ([tab]) {
-            const url = tab.url || tab.pendingUrl;
-            const hostname = Helpers.getHostName(url);
+const updateContextMenus = async () => {
+    if (isContextMenusUpdating) return;
 
-            const suspendityByHostname = await getSuspendityByHostname(hostname);
+    isContextMenusUpdating = true;
+    await browser.contextMenus.removeAll();
+    const [tab] = await browser.tabs.query({ active: true });
+    const url = tab.url || tab['pendingUrl']; // ToDo: check existance of pendingUrl
+    const hostname = Helpers.getHostName(url);
 
-            if (suspendityByHostname) {
-                extension.contextMenus.create({
-                    title: "Resume on this site",
-                    contexts: ["browser_action"],
-                    onclick: async function (info, tab) {
-                        await resumeByHostname(hostname);
-                        updateContextMenus();
-                    }
-                });
-            } else {
-                extension.contextMenus.create({
-                    title: "Suspend on this site",
-                    contexts: ["browser_action"],
-                    onclick: async function (info, tab) {
-                        await suspendByHostname(hostname);
-                        updateContextMenus();
-                    }
-                });
-            }
+    const suspendityByHostname = await getSuspendityByHostname(hostname);
 
-            const suspendityEverywhere = await getSuspendityEverywhere();
-
-            if (suspendityEverywhere) {
-                extension.contextMenus.create({
-                    title: "Resume on all sites",
-                    contexts: ["browser_action"],
-                    onclick: async function (info, tab) {
-                        await resumeEverywhere();
-                        updateContextMenus();
-                    }
-                });
-            } else {
-                extension.contextMenus.create({
-                    title: "Suspend on all sites",
-                    contexts: ["browser_action"],
-                    onclick: async function (info, tab) {
-                        await suspendEverywhere();
-                        updateContextMenus();
-                    }
-                });
+    if (suspendityByHostname) {
+        browser.contextMenus.create({
+            title: "Resume on this site",
+            contexts: ["browser_action"],
+            onclick: async function (info, tab) {
+                await resumeByHostname(hostname);
+                await updateContextMenus();
             }
         });
-    });
-};
+    } else {
+        browser.contextMenus.create({
+            title: "Suspend on this site",
+            contexts: ["browser_action"],
+            onclick: async function (info, tab) {
+                await suspendByHostname(hostname);
+                await updateContextMenus();
+            }
+        });
+    }
+
+    const suspendityEverywhere = await getSuspendityEverywhere();
+
+    if (suspendityEverywhere) {
+        browser.contextMenus.create({
+            title: "Resume on all sites",
+            contexts: ["browser_action"],
+            onclick: async function (info, tab) {
+                await resumeEverywhere();
+                await updateContextMenus();
+            }
+        });
+    } else {
+        browser.contextMenus.create({
+            title: "Suspend on all sites",
+            contexts: ["browser_action"],
+            onclick: async function (info, tab) {
+                await suspendEverywhere();
+                await updateContextMenus();
+            }
+        });
+    }
+
+    isContextMenusUpdating = false;
+}
 
 /**
  * Suspend working of injectors by passed hostname
@@ -101,8 +104,8 @@ const suspendByHostname = async hostname => {
         await _siteConfigRepository.update(config);
     }
 
-    changeIcon();
-    updateContextMenus();
+    await changeIcon();
+    await updateContextMenus();
     console.log("Injecting is suspended at the " + hostname);
 };
 
@@ -125,8 +128,8 @@ const resumeByHostname = async hostname => {
         await _siteConfigRepository.update(config);
     }
 
-    changeIcon();
-    updateContextMenus();
+    await changeIcon();
+    await updateContextMenus();
     console.log("Injecting is resumed at the " + hostname);
 };
 
@@ -151,8 +154,8 @@ const suspendEverywhere = async () => {
     config.suspended = true;
     await _globalConfigService.set(config);
 
-    changeIcon();
-    updateContextMenus();
+    await changeIcon();
+    await updateContextMenus();
     console.log("Injecting is suspended everywhere");
 };
 
@@ -166,8 +169,8 @@ const resumeEverywhere = async () => {
     config.suspended = false;
     await _globalConfigService.set(config);
 
-    changeIcon();
-    updateContextMenus();
+    await changeIcon();
+    await updateContextMenus();
     console.log("Injecting is resumed everywhere");
 };
 

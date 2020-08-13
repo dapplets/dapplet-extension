@@ -1,6 +1,6 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 
 import { List, Button, Segment } from "semantic-ui-react";
 import { Container, Header } from 'semantic-ui-react'
@@ -46,7 +46,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
     }
 
     async componentDidMount() {
-        const backgroundFunctions = await initBGFunctions(extension);
+        const backgroundFunctions = await initBGFunctions(browser);
         const { generateUri, waitPairing, getGlobalConfig } = backgroundFunctions;
         var uri = await generateUri();
         console.log("New pairing URI generated", uri);
@@ -79,7 +79,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
     }
 
     async disconnect() {
-        const { disconnect } = await initBGFunctions(extension);
+        const { disconnect } = await initBGFunctions(browser);
         await disconnect();
         this.setState({ toBack: true });
     }

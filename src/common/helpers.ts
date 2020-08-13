@@ -87,3 +87,22 @@ export function assertFullfilled<T>(item: PromiseSettledResult<T>): item is Prom
 export function assertRejected<T>(item: PromiseSettledResult<T>): item is PromiseRejectedResult {
   return item.status === "rejected";
 }
+
+export function allSettled($) {'use strict';
+  var self = this;
+  return self.all(
+    $.map(
+      function (value) {
+        return self.resolve(value).then(this.$, this._);
+      },
+      {
+        $: function (value) {
+          return {status: 'fulfilled', value: value};
+        },
+        _: function (reason) {
+          return {status: 'rejected', reason: reason};
+        }
+      }
+    )
+  );
+};

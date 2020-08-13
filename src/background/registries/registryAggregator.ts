@@ -7,6 +7,9 @@ import { mergeDedupe, typeOfUri, UriTypes, assertFullfilled, assertRejected } fr
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
 import { Environments } from '../../common/types';
+import { allSettled } from '../../common/helpers';
+
+if (!Promise.allSettled) Promise.allSettled = allSettled;
 
 export class RegistryAggregator {
     public isAvailable: boolean = true;
@@ -56,7 +59,7 @@ export class RegistryAggregator {
         regFeatures.filter(assertRejected).forEach(p => console.error(p.reason));
         const validRegFeatures = regFeatures.filter(assertFullfilled).map((p) => p.value);
         const merged = Object.fromEntries(validRegFeatures);
-
+        
         // Below is some magic, which finds modules by names and interfaces in another registries.
         // For example: 
         // 1) An interface, linked with some location, is in the registry A.
@@ -88,10 +91,15 @@ export class RegistryAggregator {
         // check deployment in prod registries
         const registriesConfig = await this._globalConfigService.getRegistries();
         const prodRegistries = this.registries.filter(r => !registriesConfig.find(rc => rc.url === r.url).isDev);
-        const vis = await Promise.all(reduced.map(m => prodRegistries[0].getVersionInfo(m.module.name, m.versions[0].branch, m.versions[0].version).catch(() => null)));
 
-        const result = reduced.map((x, i) => ({ ...x, isDeployed: [!!vis[i]] }));
-        return result;
+        if (prodRegistries.length === 0) {
+            const result = reduced.map((x, i) => ({ ...x, isDeployed: [] }));
+            return result;
+        } else {
+            const vis = await Promise.all(reduced.map(m => prodRegistries[0].getVersionInfo(m.module.name, m.versions[0].branch, m.versions[0].version).catch(() => null)));
+            const result = reduced.map((x, i) => ({ ...x, isDeployed: [!!vis[i]] }));
+            return result;
+        }
     }
 
     private async _initRegistries() {
@@ -108,7 +116,9 @@ export class RegistryAggregator {
 
                     if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
                     if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) return new EthRegistry(r.url);
-                });
+                    console.error("Invalid registry URL");
+                    return null;
+                }).filter(r => r !== null);
         }
     }
 

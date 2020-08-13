@@ -110,6 +110,7 @@ export class EthRegistry implements Registry {
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
+            console.error('errrrr', err);
             throw err;
         }
     }

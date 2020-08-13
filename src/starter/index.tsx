@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 //import 'semantic-ui-css/semantic.min.css'
 import './index.scss';

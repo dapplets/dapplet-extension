@@ -1,11 +1,9 @@
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 
-export const getCurrentContextIds = (): Promise<string[]> => new Promise((res, rej) => {
-    extension.tabs.query({
-        active: true,
-        currentWindow: true
-    }, ([currentTab]) => extension.tabs.sendMessage(currentTab.id, { "type": "CURRENT_CONTEXT_IDS" }, res));
-});
+export const getCurrentContextIds = async (): Promise<string[]> => {
+    const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
+    return browser.tabs.sendMessage(currentTab.id, { "type": "CURRENT_CONTEXT_IDS" });
+};
 
 export const isValidUrl = (input: string) => {
     try {

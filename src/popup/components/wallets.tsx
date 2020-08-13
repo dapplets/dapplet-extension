@@ -1,6 +1,6 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 
 import { List, Button, Segment } from "semantic-ui-react";
 import { WalletInfo } from "../../common/constants";
@@ -29,7 +29,7 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
   }
 
   async componentDidMount() {
-    var backgroundFunctions = await initBGFunctions(extension);
+    var backgroundFunctions = await initBGFunctions(browser);
     const { checkConnection, getChainId, getAccounts, getGlobalConfig } = backgroundFunctions;
 
     const isConnected = await checkConnection();
@@ -46,13 +46,13 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
   }
 
   async disconnectButtonClick() {
-    const { disconnect } = await initBGFunctions(extension);
+    const { disconnect } = await initBGFunctions(browser);
     await disconnect();
     await this.componentDidMount();
   }
 
   async connectWallet() {
-    const { pairWalletViaOverlay } = await initBGFunctions(extension);
+    const { pairWalletViaOverlay } = await initBGFunctions(browser);
     pairWalletViaOverlay();
     window.close();
   }

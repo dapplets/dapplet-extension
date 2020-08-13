@@ -42,7 +42,8 @@
     "tabs",
     "storage",
     "contextMenus",
-    "notifications"
+    "notifications",
+    "*://localhost/*"
   ],
   "commands": {
     "toggle-overlay": {

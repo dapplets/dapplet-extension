@@ -4,7 +4,7 @@ import { getTxBuilder } from "../../common/sowa";
 import { promiseTimeout } from "../utils/promiseTimeout";
 import GlobalConfigService from "./globalConfigService";
 import { WalletInfo } from '../../common/constants';
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 import { transactionCreated, transactionRejected } from "./notificationService";
 
 const bridge = "https://bridge.walletconnect.org";
@@ -216,22 +216,15 @@ const sendTransaction = async (tx: any): Promise<any> => {
     if (!isConnected) {
         await pairWalletViaOverlay();
     }
-    return await walletConnector.sendTransaction(tx);
+    return walletConnector.sendTransaction(tx);
 }
 
 const pairWalletViaOverlay = async (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-            var activeTab = tabs[0];
-            extension.tabs.sendMessage(activeTab.id, "OPEN_PAIRING_OVERLAY", ([error, result]) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result);
-                }
-            });
-        });
-    });
+    const [activeTab] = await browser.tabs.query({ currentWindow: true, active: true });
+    const [error, result] = await browser.tabs.sendMessage(activeTab.id, "OPEN_PAIRING_OVERLAY");
+    // ToDo: use native throw in error
+    if (error) throw new Error(error);
+    return result;
 }
 
 const sendSowaTransaction = async (sowaId, metadata, callback: (e: { type: string, data?: any }) => void): Promise<any> => {
@@ -278,18 +271,8 @@ const sendSowaTransaction = async (sowaId, metadata, callback: (e: { type: strin
 }
 
 const approveSowaTxViaOverlay = async (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-        extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-            var activeTab = tabs[0];
-            extension.tabs.sendMessage(activeTab.id, "APPROVE_SOWA_TRANSACTION", ([error, result]) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result);
-                }
-            });
-        });
-    });
+    const [activeTab] = await browser.tabs.query({ currentWindow: true, active: true });
+    return browser.tabs.sendMessage(activeTab.id, "APPROVE_SOWA_TRANSACTION");
 }
 
 export {

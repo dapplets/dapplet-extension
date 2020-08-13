@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { List, Segment, Label } from "semantic-ui-react";
 
@@ -23,7 +23,7 @@ class Events extends React.Component<IEventsProps, IEventsState> {
     }
 
     async componentDidMount() {
-        const backgroundFunctions = await initBGFunctions(extension);
+        const backgroundFunctions = await initBGFunctions(browser);
         const { getEvents, setRead } = backgroundFunctions;
         const events: Event[] = await getEvents();
         this.setState({ events });

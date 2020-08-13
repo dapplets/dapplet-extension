@@ -38,7 +38,12 @@ function builderTxSolidity(tx: any, data: any) {
             if (fnName === "bigNumberify" && typeof value === "number") {
                 value = value.toString();
             }
-            value = ethers.utils[fnName](value);
+            if (fnName === "bigNumberify") {
+                value = ethers.BigNumber.from(value);
+            } else {
+                if (!ethers.utils[fnName]) throw new Error(`Invalid function: ${fnName}`);
+                value = ethers.utils[fnName](value);
+            }            
         }
 
         const hex = ethers.utils.hexlify(value);

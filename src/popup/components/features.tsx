@@ -1,6 +1,6 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 
 import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Icon } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
@@ -40,7 +40,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
       return;
     }
 
-    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(extension);
+    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(browser);
 
     const registries = await getRegistries();
     const regsWithErrors = registries.filter(r => !!r.error).length;
@@ -60,7 +60,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
 
   async handleSwitchChange(module: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] }), isActive, order, selectVersions: boolean) {
     const { name, hostnames, sourceRegistry } = module;
-    const { getVersions } = await initBGFunctions(extension);
+    const { getVersions } = await initBGFunctions(browser);
     if (selectVersions && isActive) {
       const versions = await getVersions(module.sourceRegistry.url, module.name);
       this._updateFeatureState(name, { versions });
@@ -72,7 +72,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
 
   async toggleFeature(module: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] }), version: string, isActive: boolean, order: number) {
     const { name, hostnames, sourceRegistry } = module;
-    const { activateFeature, deactivateFeature } = await initBGFunctions(extension);
+    const { activateFeature, deactivateFeature } = await initBGFunctions(browser);
 
     this._updateFeatureState(name, { isActive, isLoading: true, error: null, versions: [] });
 
@@ -106,18 +106,14 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
     this._isMounted = false;
   }
 
-  refreshContextPage() {
-    extension.tabs.query({
-      active: true,
-      currentWindow: true
-    }, ([{ id, url }]) => {
-      chrome.tabs.update(id, { url });
-      window.close();
-    });
+  async refreshContextPage() {
+    const [{ id, url }] = await browser.tabs.query({ active: true, currentWindow: true });
+    chrome.tabs.update(id, { url });
+    window.close();
   }
 
   async settingsModule(mi: ManifestDTO) {
-    const { openSettingsOverlay } = await initBGFunctions(extension);
+    const { openSettingsOverlay } = await initBGFunctions(browser);
     await openSettingsOverlay(mi);
     window.close();
   }
@@ -154,7 +150,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                     </List.Content>
                     <List.Content style={{ marginLeft: 45, marginRight: 60 }} >
                       <List.Header>
-                        {f.title} <Icon link name='cog' size='small' onClick={() => this.settingsModule(f)}/>
+                        {f.title} <Icon link name='cog' size='small' onClick={() => this.settingsModule(f)} />
                         {(f.sourceRegistry.isDev) ? (<Label style={{ marginLeft: 5 }} horizontal size='mini' color='teal'>DEV</Label>) : null}
                         {(f.error) ? (<Popup size='mini' trigger={<Label style={{ marginLeft: 5 }} horizontal size='mini' color='red'>ERROR</Label>}>{f.error}</Popup>) : null}
                       </List.Header>

@@ -1,4 +1,4 @@
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -48,7 +48,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     }
 
     private async _refreshData() {
-        const { getAllUserSettings } = await initBGFunctions(extension);
+        const { getAllUserSettings } = await initBGFunctions(browser);
         const defaultData = this.state.defaultConfig && this.state.defaultConfig[this.state.vi.environment] || {};
         const customData = await getAllUserSettings(this.state.mi.name);
         const data = { ...defaultData, ...customData };
@@ -57,7 +57,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     private async _updateOwnership() {
         if (!this.state.mi.sourceRegistry.isDev) {
-            const { getOwnership } = await initBGFunctions(extension);
+            const { getOwnership } = await initBGFunctions(browser);
             const owner = await getOwnership(this.state.mi.sourceRegistry.url, this.state.mi.name);
             this.setState({ owner });
         }
@@ -65,7 +65,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     private async _saveData(data: any) {
         this.setState({ loading: true, data });
-        const { setAllUserSettings } = await initBGFunctions(extension);
+        const { setAllUserSettings } = await initBGFunctions(browser);
         await setAllUserSettings(this.state.mi.name, data);
         await this._refreshData();
         await this._reloadFeature();
@@ -73,13 +73,13 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     }
 
     private async _reloadFeature() {
-        const { reloadFeature } = await initBGFunctions(extension);
+        const { reloadFeature } = await initBGFunctions(browser);
         await reloadFeature(this.state.mi.name, this.state.vi.version, this.state.mi.hostnames, this.state.mi.order, this.state.mi.sourceRegistry.url);
     }
 
     private async _resetSettings() {
         this.setState({ loading: true });
-        const { clearUserSettings } = await initBGFunctions(extension);
+        const { clearUserSettings } = await initBGFunctions(browser);
         await clearUserSettings(this.state.mi.name);
         await this._refreshData();
         await this._reloadFeature();

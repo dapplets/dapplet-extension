@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 import { Tab, Menu, Label } from "semantic-ui-react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 
@@ -36,7 +36,7 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
   }
 
   async updateTabs() {
-    const { getNewEventsCount, getDevMode } = await initBGFunctions(extension);
+    const { getNewEventsCount, getDevMode } = await initBGFunctions(browser);
     const newEventsCount: number = await getNewEventsCount();
     const devMode = await getDevMode();
     this.setState({ newEventsCount, devMode, loading: false });

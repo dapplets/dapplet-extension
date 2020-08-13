@@ -1,9 +1,9 @@
 import * as React from "react";
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Popup, Segment, List, Label, Input, Checkbox, Icon, Header, Button } from "semantic-ui-react";
-
 import { isValidUrl } from '../helpers';
+import { typeOfUri, UriTypes } from '../../common/helpers';
 
 interface ISettingsProps {
     devMode: boolean;
@@ -51,7 +51,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     }
 
     async loadRegistries() {
-        const { getRegistries } = await initBGFunctions(extension);
+        const { getRegistries } = await initBGFunctions(browser);
         const registries = await getRegistries();
 
         this.setState({
@@ -60,26 +60,26 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     }
 
     async loadTrustedUsers() {
-        const { getTrustedUsers } = await initBGFunctions(extension);
+        const { getTrustedUsers } = await initBGFunctions(browser);
         const trustedUsers = await getTrustedUsers();
         this.setState({ trustedUsers });
     }
 
     async loadDevMode() {
-        const { getDevMode } = await initBGFunctions(extension);
+        const { getDevMode } = await initBGFunctions(browser);
         const devMode = await getDevMode();
         this.setState({ devMode });
     }
 
     async setDevMode(isActive: boolean) {
-        const { setDevMode } = await initBGFunctions(extension);
+        const { setDevMode } = await initBGFunctions(browser);
         await setDevMode(isActive);
         this.loadDevMode();
         await this.props.updateTabs();
     }
 
     async addRegistry(url: string) {
-        const { addRegistry } = await initBGFunctions(extension);
+        const { addRegistry } = await initBGFunctions(browser);
 
         try {
             await addRegistry(url, false);
@@ -92,13 +92,13 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     }
 
     async removeRegistry(url: string) {
-        const { removeRegistry } = await initBGFunctions(extension);
+        const { removeRegistry } = await initBGFunctions(browser);
         await removeRegistry(url);
         this.loadRegistries();
     }
 
     async addTrustedUser(account: string) {
-        const { addTrustedUser } = await initBGFunctions(extension);
+        const { addTrustedUser } = await initBGFunctions(browser);
 
         try {
             await addTrustedUser(account);
@@ -111,14 +111,14 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     }
 
     async removeTrustedUser(account: string) {
-        const { removeTrustedUser } = await initBGFunctions(extension);
+        const { removeTrustedUser } = await initBGFunctions(browser);
         await removeTrustedUser(account);
         this.loadTrustedUsers();
     }
 
     async loadUserSettings() {
         this.setState({ userSettingsLoading: true });
-        const { loadUserSettings } = await initBGFunctions(extension);
+        const { loadUserSettings } = await initBGFunctions(browser);
 
         try {
             await loadUserSettings(this.state.userSettingsInput);
@@ -133,7 +133,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
 
     async saveUserSettings() {
         this.setState({ userSettingsLoading: true });
-        const { saveUserSettings } = await initBGFunctions(extension);
+        const { saveUserSettings } = await initBGFunctions(browser);
 
         try {
             const url = await saveUserSettings();
@@ -142,6 +142,16 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             this.setState({ userSettingsInputError: msg });
         } finally {
             this.setState({ userSettingsLoading: false });
+        }
+    }
+
+    async _openEtherscan(address: string) {
+        if (typeOfUri(address) === UriTypes.Ens) {
+            const { resolveName } = await initBGFunctions(browser);
+            const ethAddress = await resolveName(address);
+            window.open(`https://rinkeby.etherscan.io/address/${ethAddress}`, '_blank');
+        } else {
+            window.open(`https://rinkeby.etherscan.io/address/${address}`, '_blank');
         }
     }
 
@@ -186,7 +196,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                                 <List.Content floated='right'>
                                     <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
                                 </List.Content>
-                                <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => window.open(`https://rinkeby.etherscan.io/address/${r.url}`, '_blank')}>{r.url}</a></List.Content>
+                                <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => this._openEtherscan(r.url)}>{r.url}</a></List.Content>
                             </List.Item>
                         ))}
                     </List>
@@ -219,7 +229,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                                 <List.Content floated='right'>
                                     <Icon link color='red' name='close' onClick={() => this.removeTrustedUser(user.account)} />
                                 </List.Content>
-                                <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => window.open(`https://rinkeby.etherscan.io/address/${user.account}`, '_blank')}>{user.account}</a></List.Content>
+                                <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => this._openEtherscan(user.account)}>{user.account}</a></List.Content>
                             </List.Item>
                         ))}
                     </List>

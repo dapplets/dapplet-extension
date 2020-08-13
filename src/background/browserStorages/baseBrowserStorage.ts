@@ -1,6 +1,6 @@
 import { MapperService } from 'simple-mapper'; // ToDo like [here](https://www.npmjs.com/package/simple-mapper)
 import Base from '../../common/models/base';
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
 
 export default abstract class BaseBrowserStorage<T extends Base> {
 
@@ -9,135 +9,77 @@ export default abstract class BaseBrowserStorage<T extends Base> {
     public constructor(private _TConstructor: new (...args: any[]) => T, private _storageName: string) { }
 
     async getAll(filter?: (item: T) => boolean): Promise<T[]> {
-        return new Promise((resolve, reject) => {
-            try {
-                extension.storage.local.get(null, result => {
-                    const items: T[] = [];
+        const result = await browser.storage.local.get(null);
+        const items: T[] = [];
 
-                    for (const key in result) {
-                        if (key.indexOf(this._storageName + ':') == 0) {
-                            const item = this._mapperService.map(this._TConstructor, result[key]);
-                            if (filter == undefined || filter(item)) {
-                                items.push(item);
-                            }
-                        }
-                    }
-
-                    resolve(items);
-                });
-            } catch (e) {
-                reject(e);
+        for (const key in result) {
+            if (key.indexOf(this._storageName + ':') == 0) {
+                const item = this._mapperService.map(this._TConstructor, result[key]);
+                if (filter == undefined || filter(item)) {
+                    items.push(item);
+                }
             }
-        });
+        }
+        return items;
     }
 
     async getById(id: string): Promise<T> {
-        return new Promise((resolve, reject) => {
-            try {
-                const key = this._storageName + ':' + id;
-                extension.storage.local.get(key, result => {
-                    const value = result[key];
+        const key = this._storageName + ':' + id;
+        const result = await browser.storage.local.get(key);
+        const value = result[key];
 
-                    // not found
-                    if (!value) {
-                        resolve(null);
-                        return;
-                    }
+        // not found
+        if (!value) {
+            return null;
+        }
 
-                    const item = this._mapperService.map(this._TConstructor, value);
-                    resolve(item);
-                });
-            } catch (e) {
-                reject(e);
-            }
-        });
+        const item = this._mapperService.map(this._TConstructor, value);
+        return item;
     }
 
     async create(item: T): Promise<void> {
-        return new Promise((resolve, reject) => {
-            try {
-                if (!item.getId()) {
-                    reject("ID must be specified"); // ToDo: Where is ID generated?
-                    return;
-                }
+        if (!item.getId()) throw new Error("ID must be specified"); // ToDo: Where is ID generated?
 
-                const key = this._storageName + ':' + item.getId();
+        const key = this._storageName + ':' + item.getId();
 
-                extension.storage.local.get(key, result => {
-                    if (!!result[key]) {
-                        reject(`Item [${key}] already exists`); // ToDo: Is it allowed to replace the object?
-                        return;
-                    }
+        const result = await browser.storage.local.get(key);
+        if (!!result[key]) throw new Error(`Item [${key}] already exists`); // ToDo: Is it allowed to replace the object?
 
-                    try {
-                        const result = { [key]: item };
-                        const clone = JSON.parse(JSON.stringify(result));
-                        extension.storage.local.set(clone, () => resolve());
-                    } catch (e) {
-                        reject(e);
-                    }
-                });
-            } catch (e) {
-                reject(e);
-            }
-        });
+        const data = { [key]: item };
+        const clone = JSON.parse(JSON.stringify(data));
+        await browser.storage.local.set(clone);
     }
 
     async update(item: T): Promise<void> {
-        return new Promise((resolve, reject) => {
-            try {
-                const mappedItem = this._mapperService.map(this._TConstructor, item);
-                const key = this._storageName + ':' + mappedItem.getId();
+        const mappedItem = this._mapperService.map(this._TConstructor, item);
+        const key = this._storageName + ':' + mappedItem.getId();
 
-                const result = { [key]: mappedItem };
-                const clone = JSON.parse(JSON.stringify(result));
-                extension.storage.local.set(clone, () => resolve());
-            } catch (e) {
-                reject(e);
-            }
-        });
+        const result = { [key]: mappedItem };
+        const clone = JSON.parse(JSON.stringify(result));
+        await browser.storage.local.set(clone);
     }
+
     async delete(item: T): Promise<void> {
         this.deleteById(item.getId());
     }
 
-    async deleteById(id: string): Promise<void>  {
-        return new Promise((resolve, reject) => {
-            try {
-                const key = this._storageName + ':' + id;
-
-                try {
-                    extension.storage.local.remove(key, () => resolve());
-                } catch (e) {
-                    reject(e);
-                }
-            } catch (e) {
-                reject(e);
-            }
-        });
+    async deleteById(id: string): Promise<void> {
+        const key = this._storageName + ':' + id;
+        await browser.storage.local.remove(key);
     }
 
     async deleteAll(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            try {
-                extension.storage.local.get(null, result => {
-                    const keys: string[] = [];
+        const result = await browser.storage.local.get(null);
+        const keys: string[] = [];
 
-                    for (const key in result) {
-                        if (key.indexOf(this._storageName + ':') == 0) {
-                            keys.push(key);
-                        }
-                    }
-
-                    if (keys.length > 0) {
-                        extension.storage.local.remove(keys, () => resolve());
-                    } else {
-                        resolve();
-                    }
-                });
-            } catch (e) {
-                reject(e);
+        for (const key in result) {
+            if (key.indexOf(this._storageName + ':') == 0) {
+                keys.push(key);
             }
-        });
+        }
+
+        if (keys.length > 0) {
+            await browser.storage.local.remove(keys);
+        }
     }
 }

@@ -5,7 +5,10 @@ import * as NotificationService from "./services/notificationService";
 import FeatureService from './services/featureService';
 import GlobalConfigService from './services/globalConfigService';
 import * as EventService from './services/eventService';
-import * as extension from 'extensionizer';
+import { browser } from "webextension-polyfill-ts";
+import EnsService from "./services/ensService";
+import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
+import ProxyService from "./services/proxyService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -13,8 +16,10 @@ import * as extension from 'extensionizer';
 
 const featureService = new FeatureService();
 const globalConfigService = new GlobalConfigService();
+const ensService = new EnsService();
+const proxyService = new ProxyService();
 
-extension.runtime.onMessage.addListener(
+browser.runtime.onMessage.addListener(
   setupMessageListener({
     // WalletConnectService
     loadSowa: WalletConnectService.loadSowa,
@@ -30,6 +35,7 @@ extension.runtime.onMessage.addListener(
     pairWalletViaOverlay: WalletConnectService.pairWalletViaOverlay,
     sendSowaTransaction: WalletConnectService.sendSowaTransaction,
     sendCustomRequest: WalletConnectService.sendCustomRequest,
+    sendTransaction: WalletConnectService.sendTransaction,
 
     // SuspendService
     getSuspendityByHostname: SuspendService.getSuspendityByHostname,
@@ -55,6 +61,7 @@ extension.runtime.onMessage.addListener(
     deployModule: (mi, vi, targetStorage, targetRegistry) => featureService.deployModule(mi, vi, targetStorage, targetRegistry),
     getRegistries: () => featureService.getRegistries(),
     getOwnership: (registryUri, moduleName) => featureService.getOwnership(registryUri, moduleName),
+    getVersionInfo: (registryUri, moduleName, branch, version) => featureService.getVersionInfo(registryUri, moduleName, branch, version),
     transferOwnership: (registryUri, moduleName, address) => featureService.transferOwnership(registryUri, moduleName, address),
     addLocation: (registryUri, moduleName, location) => featureService.addLocation(registryUri, moduleName, location),
     removeLocation: (registryUri, moduleName, location) => featureService.removeLocation(registryUri, moduleName, location),
@@ -88,27 +95,38 @@ extension.runtime.onMessage.addListener(
     removeUserSettings: (moduleName, key) => globalConfigService.removeUserSettings(moduleName, key),
     clearUserSettings: (moduleName) => globalConfigService.clearUserSettings(moduleName),
     loadUserSettings: (url) => globalConfigService.loadUserSettings(url),
-    saveUserSettings: () => globalConfigService.saveUserSettings()
+    saveUserSettings: () => globalConfigService.saveUserSettings(),
+
+    // ENS
+    resolveName: (name) => ensService.resolveName(name),
+
+    // Contract Service
+    fetchJsonRpc: (method, params) => proxyService.fetchJsonRpc(method, params)
   })
 );
+
+// WebSocket proxy
+// ToDo: Perhaps a separate class WebSocketProxy is redundant
+const wsproxy = new WebSocketProxy();
+browser.runtime.onConnect.addListener(wsproxy.createConnectListener());
 
 // ToDo: These lines are repeated many time
 SuspendService.changeIcon();
 SuspendService.updateContextMenus();
 
 //listen for new tab to be activated
-extension.tabs.onActivated.addListener(function (activeInfo) {
+browser.tabs.onActivated.addListener(function (activeInfo) {
   SuspendService.changeIcon();
   SuspendService.updateContextMenus();
 });
 
 //listen for current tab to be changed
-extension.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   SuspendService.changeIcon();
   SuspendService.updateContextMenus();
 });
 
-extension.notifications.onClicked.addListener(function (notificationId) {
+browser.notifications.onClicked.addListener(function (notificationId) {
   if (
     notificationId &&
     notificationId.length > 2 &&
@@ -117,36 +135,33 @@ extension.notifications.onClicked.addListener(function (notificationId) {
   ) {
     // ToDo: it's incorrect to be linked with Ethereum and Rinkeby only.
     var url = "https://rinkeby.etherscan.io/tx/" + notificationId;
-    extension.tabs.create({ url: url });
+    browser.tabs.create({ url: url });
   }
 });
 
-extension.commands.onCommand.addListener(cmd => {
+browser.commands.onCommand.addListener((cmd) => {
   if (cmd === "toggle-overlay") {
-    extension.tabs.query({ currentWindow: true, active: true }, (tabs) => {
-      var activeTab = tabs[0];
-      extension.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY");
-    });
+    return browser.tabs.query({ currentWindow: true, active: true }).then(([activeTab]) => browser.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY"));
   }
 });
 
-extension.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((message, sender) => {
   if (!message || !message.type) return;
 
   if (message.type === "CONTEXT_STARTED" || message.type === "CONTEXT_FINISHED") {
-    const manifests = await featureService.getActiveModulesByHostnames(message.payload.contextIds);
+    return featureService.getActiveModulesByHostnames(message.payload.contextIds).then(manifests => {
+      if (manifests.length === 0) return;
 
-    if (manifests.length === 0) return;
-
-    extension.tabs.sendMessage(sender.tab.id, {
-      type: message.type === "CONTEXT_STARTED" ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
-      payload: manifests.map(m => ({
-        name: m.name,
-        version: m.version,
-        branch: m.branch, // ToDo: fix branch
-        order: m.order,
-        contextIds: m.hostnames  // ToDo: remove this map after renaming of hostnames to contextIds
-      }))
+      browser.tabs.sendMessage(sender.tab.id, {
+        type: message.type === "CONTEXT_STARTED" ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
+        payload: manifests.map(m => ({
+          name: m.name,
+          version: m.version,
+          branch: m.branch, // ToDo: fix branch
+          order: m.order,
+          contextIds: m.hostnames  // ToDo: remove this map after renaming of hostnames to contextIds
+        }))
+      });
     });
   }
 });
