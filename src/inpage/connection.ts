@@ -1,7 +1,7 @@
 import { IPubSub } from "./types"
 import { subscribe, unsubscribe, publish } from './inpage-pubsub'
 type Key = string | number | symbol
-type MsgFilter = string | ((op: any, msg: any) => boolean)
+type MsgFilter = string | Promise<string> | ((op: any, msg: any) => boolean)
 export type EventDef<T extends Key> = { [key in T]: MsgFilter }
 type MsgHandler = ((op: string, msg: any) => void)
 type EventHandler = { [key in Key]: MsgHandler[] | MsgHandler }
@@ -109,7 +109,8 @@ export class Connection implements IConnection {
         //Decision Choice 1: 
         // create listener first and setup the filter for given subscription id later
         let listener = this.listener("", h as any, ap)
-        this.send(topic, message).then(subId => listener.f = subId);
+        //this.send(topic, message).then(subId => listener.f = subId);
+        listener.f = this.send(topic, message);
         //Decision Choice 2: 
         // create listener later as the server replies with the subscription id
         //this.send(topic, message).then(subId => this.listen(subId, h as any, ap));
@@ -135,8 +136,10 @@ export class Connection implements IConnection {
         let listener: Listener
         if (filterOrHander === undefined) {
             listener = { f: undefined, h: undefined, p: [] }
-        } else if (typeof filterOrHander === 'object') { //is an EventHandler
-            listener = { f: undefined, h: filterOrHander, p: [] }
+        } else if (typeof filterOrHander === 'object' && !filterOrHander.then) { //is an EventHandler
+            listener = { f: undefined, h: filterOrHander as EventHandler, p: [] }
+        } else if (typeof filterOrHander === 'object') { // is an Promise
+            listener = { f: filterOrHander as Promise<string>, h: undefined, p: [] }
         } else if (evtOrMsgOrAP instanceof Array) {
             listener = { f: filterOrHander, h: undefined, p: evtOrMsgOrAP || [] }
         } else if (typeof evtOrMsgOrAP == 'function') {
@@ -179,9 +182,13 @@ export class Connection implements IConnection {
     onMessage(op: any, msg: any): void {
         try {
             const isTopicMatch = (op: any, msg: any, f: MsgFilter) =>
-                typeof f === 'function' ? f(op, msg) : this.topicMatch(op, f);
+                typeof f === 'function' ? f(op, msg) : this.topicMatch(op, f as string);
 
-            this.listeners.forEach((listener) => {
+            this.listeners.forEach(async (listener) => {
+                if (typeof listener.f === 'object' && listener.f.then) {
+                    listener.f = await listener.f;
+                }
+                
                 if (!listener.f || isTopicMatch(op, msg, listener.f)) {
                     if (listener.h) {
                         for (let eventId of [...Object.keys(listener.h), ANY_EVENT]) {

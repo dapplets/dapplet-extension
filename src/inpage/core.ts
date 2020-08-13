@@ -144,7 +144,7 @@ export default class Core {
     }
 
     // ToDo: use sendSowaTransaction method from background
-    private async _sendWalletConnectTx(sowaId, metadata, callback: (e: { type: string, data?: any }) => void): Promise<any> {
+    private async _sendWalletConnectTx(sowaIdOrRpcMethod, sowaMetadataOrRpcParams, callback: (e: { type: string, data?: any }) => void): Promise<any> {
         const backgroundFunctions = await initBGFunctions(browser);
         const {
             loadSowa,
@@ -174,23 +174,23 @@ export default class Core {
 
         const compatibleJsonRpc = ['personal_sign', 'eth_accounts', 'eth_sendTransaction'];
 
-        if (compatibleJsonRpc.includes(sowaId)) {
-            const result = await sendCustomRequest(sowaId, metadata);
+        if (compatibleJsonRpc.includes(sowaIdOrRpcMethod)) {
+            const result = await sendCustomRequest(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
             callback({ type: "result", data: result });
             return result;
         } else {
             if (walletInfo.protocolVersion === "0.2.0") {
                 console.log("Wallet is SOWA Frames compatible. Sending SOWA Frames transaction...");
-                dappletResult = await loadSowaFrames(sowaId, metadata);
+                dappletResult = await loadSowaFrames(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
             } else if (walletInfo.protocolVersion === "0.1.0") {
                 console.log("Wallet is SOWA compatible. Sending SOWA transaction...");
-                dappletResult = await loadSowa(sowaId, metadata);
+                dappletResult = await loadSowa(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
             } else {
                 console.log("Wallet is SOWA incompatible. Showing SOWA view...");
 
                 try {
-                    await this._approveSowaTransaction(sowaId, metadata);
-                    dappletResult = await sendLegacyTransaction(sowaId, metadata);
+                    await this._approveSowaTransaction(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
+                    dappletResult = await sendLegacyTransaction(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
                 } catch (err) {
                     console.error(err);
                 }
@@ -219,9 +219,9 @@ export default class Core {
         const transport = {
             _txCount: 0,
             _handler: null,
-            exec: (sowaId: string, ctx: any) => {
+            exec: (sowaIdOrRpcMethod: string, sowaMetadataOrRpcParams: any) => {
                 const id = (++transport._txCount).toString();
-                me._sendWalletConnectTx(sowaId, ctx, (e) => transport._handler(id, e));
+                me._sendWalletConnectTx(sowaIdOrRpcMethod, sowaMetadataOrRpcParams, (e) => transport._handler(id, e));
                 return Promise.resolve(id);
             },
             onMessage: (handler: (topic: string, message: any) => void) => {
