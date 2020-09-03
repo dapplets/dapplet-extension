@@ -1,13 +1,22 @@
 import { Overlay } from './overlay';
 
-// ToDo: clean class names
-const TabItemClass = 'pageNav__tabItem';
-const ContentItemClass = 'pageNav__contentItem';
-const ActiveTabHeaderClass = 'pageNav__tabItem--active';
-const ActiveTabContentClass = 'pageNav__contentItem--active';
-const CollapsedOverlayClass = 'overlay-collapsed';
-const HiddenOverlayClass = 'overlay-hidden';
-
+const PageNavClass = 'dapplets-overlay-nav';
+const TabListClass = 'dapplets-overlay-nav-tab-list';
+const ContentListClass = 'dapplets-overlay-nav-content-list';
+const TabItemClass = 'dapplets-overlay-nav-tab-item';
+const ContentItemClass = 'dapplets-overlay-nav-content-item';
+const ActiveTabHeaderClass = 'dapplets-overlay-nav-tab-item-active';
+const ActiveTabContentClass = 'dapplets-overlay-nav-content-item-active';
+const CloseButtonClass = 'dapplets-overlay-nav-tab-item-close-btn';
+const CollapsedOverlayClass = 'dapplets-overlay-collapsed';
+const HiddenOverlayClass = 'dapplets-overlay-hidden';
+const DappletsOverlayManagerClass = 'dapplets-overlay-manager';
+const OverlayOuterClass = 'dapplets-overlay-outer';
+const OverlayFrameClass = 'dapplets-overlay-frame';
+const OverlayBucketBarClass = 'dapplets-overlay-bucket-bar';
+const OverlayToolbarClass = 'dapplets-overlay-toolbar';
+const OverlayFrameButtonClass = 'dapplets-overlay-frame-button';
+const OverlayFrameButtonSidebarToggleClass = 'dapplets-overlay-frame-button-sidebar-toggle';
 
 export class OverlayManager {
     private _panel: HTMLElement = null;
@@ -23,17 +32,17 @@ export class OverlayManager {
 
     constructor() {
         // Side panel
-        const panel = document.createElement("dapplets-overlay-manager");
-        panel.classList.add('overlay-frame', 'overlay-outer', CollapsedOverlayClass, HiddenOverlayClass);
+        const panel = document.createElement(DappletsOverlayManagerClass);
+        panel.classList.add(OverlayFrameClass, OverlayOuterClass, CollapsedOverlayClass, HiddenOverlayClass);
         document.body.appendChild(panel);
         this._panel = panel;
 
         const bucketBar = document.createElement("div");
-        bucketBar.classList.add('overlay-bucket-bar');
+        bucketBar.classList.add(OverlayBucketBarClass);
         panel.appendChild(bucketBar);
 
         const toolBar = document.createElement("div");
-        toolBar.classList.add('overlay-toolbar');
+        toolBar.classList.add(OverlayToolbarClass);
         panel.appendChild(toolBar);
 
         const ul = document.createElement('ul');
@@ -43,24 +52,24 @@ export class OverlayManager {
         ul.appendChild(li);
 
         const button = document.createElement('button');
-        button.title = "Toggle or Resize Sidebar";
-        button.classList.add('overlay-frame-button', 'overlay-frame-button--sidebar_toggle');
+        button.title = "Toggle Overlay";
+        button.classList.add(OverlayFrameButtonClass, OverlayFrameButtonSidebarToggleClass);
         button.innerText = '⇄';
         button.onclick = () => this.toggle();
         li.appendChild(button);
 
         // Tabs
         const nav = document.createElement("div");
-        nav.classList.add('pageNav');
+        nav.classList.add(PageNavClass);
         panel.appendChild(nav);
 
         const tabList = document.createElement("div");
-        tabList.classList.add('pageNav__tabList');
+        tabList.classList.add(TabListClass);
         nav.appendChild(tabList);
         this._tabList = tabList;
 
         const contentList = document.createElement("div");
-        contentList.classList.add('pageNav__contentList');
+        contentList.classList.add(ContentListClass);
         nav.appendChild(contentList);
         this._contentList = contentList;
 
@@ -114,7 +123,7 @@ export class OverlayManager {
 
         const closeBtn = document.createElement('span');
         closeBtn.innerText = 'X';
-        closeBtn.classList.add('tabItem__closeBtn');
+        closeBtn.classList.add(CloseButtonClass);
         closeBtn.addEventListener('click', (ev) => {
             ev.cancelBubble = true;
             ev.stopPropagation();
