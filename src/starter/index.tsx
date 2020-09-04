@@ -5,7 +5,10 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 //import 'semantic-ui-css/semantic.min.css'
 import './index.scss';
 import { busInstance, StarterBus } from './starterBus';
-import { Container, Header, Button, Divider } from 'semantic-ui-react'
+import { Container, Header, Button, Divider } from 'semantic-ui-react';
+import { logger } from '../common/logger';
+
+window.onerror = logger;
 
 interface IIndexProps {
 }
