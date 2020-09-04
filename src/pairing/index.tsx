@@ -7,6 +7,9 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
 import { WalletConnectPairing } from "./components/walletConnectPairing";
 import { browser } from "webextension-polyfill-ts";
+import { logger } from '../common/logger';
+
+window.onerror = logger;
 
 interface IIndexProps {
 }
