@@ -1,8 +1,13 @@
 import { Storage as ModuleStorage } from './storage';
+import { timeoutPromise } from '../../common/helpers';
 
 export class HttpModuleStorage implements ModuleStorage {
+    
+    public timeout = 2000;
+
     public async getResource(uri: string): Promise<ArrayBuffer> {
-        const response = await fetch(uri, { cache: 'no-store' });
+        const c = new AbortController();
+        const response = await timeoutPromise(this.timeout, fetch(uri, { cache: 'no-store', signal: c.signal }), () => c.abort());
 
         if (!response.ok) {
             throw new Error(`HttpStorage can't load resource by URI ${uri}`);

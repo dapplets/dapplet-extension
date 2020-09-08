@@ -1,4 +1,7 @@
-function makeid(length) {
+import { browser } from "webextension-polyfill-ts";
+import { initBGFunctions } from "chrome-extension-message-wrapper";
+
+function makeid(length: number): string {
     var result = '';
     var characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     var charactersLength = characters.length;
@@ -8,14 +11,26 @@ function makeid(length) {
     return result;
 }
 
-export const logger = (msg, url, line, col, error) => {
+function isNeedToLog(text: string): boolean {
+    const resizeObserverLoopErrRe = /^[^(ResizeObserver loop limit exceeded)]/;
+    if (resizeObserverLoopErrRe.test(text)) return false;
+    return true;
+}
+
+export const logger = async (msg, url, line, col, error) => {
+    const { getErrorReporting } = await initBGFunctions(browser);
+    const errorReporting = await getErrorReporting();
+    if (!errorReporting) return;
+    
     let extra = !col ? '' : '\ncolumn: ' + col;
     extra += !error ? '' : '\nerror: ' + error;
-    const text = "Error: " + msg + "\nurl: " + url + "\nline: " + line + extra;
+    const text = "Error: " + msg + "\nline: " + line + extra;
+    
+    if (!isNeedToLog(text)) return;
+
     const data = {
         subject: makeid(6),
-        text: text,
-        key: 'CPdGSx9PCFmrILjVitHQiHZfHTM6bI5ZKYyZhqs1168RmyFdTGkBSS8DJ8p0ETL8'
+        text: text
     }
 
     fetch('https://dapplet-api.netlify.app/.netlify/functions/report', {
