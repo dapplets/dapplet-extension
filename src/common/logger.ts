@@ -11,7 +11,7 @@ function makeid(length) {
 export const logger = (msg, url, line, col, error) => {
     let extra = !col ? '' : '\ncolumn: ' + col;
     extra += !error ? '' : '\nerror: ' + error;
-    const text = "Error: " + msg + "\nurl: " + url + "\nline: " + line + extra;
+    const text = "Error: " + msg + "\nline: " + line + extra;
     const data = {
         subject: makeid(6),
         text: text,
