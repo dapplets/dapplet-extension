@@ -76,12 +76,10 @@ browser.runtime.onMessage.addListener(
     setGlobalConfig: (config) => globalConfigService.set(config),
     getDevMode: () => globalConfigService.getDevMode(),
     setDevMode: (isActive) => globalConfigService.setDevMode(isActive),
-
     getEvents: EventService.getEvents,
     addEvent: EventService.addEvent,
     setRead: EventService.setRead,
     getNewEventsCount: EventService.getNewEventsCount,
-
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),
     getIntro: () => globalConfigService.getIntro(),
@@ -89,6 +87,10 @@ browser.runtime.onMessage.addListener(
     getTrustedUsers: () => globalConfigService.getTrustedUsers(),
     addTrustedUser: (account) => globalConfigService.addTrustedUser(account),
     removeTrustedUser: (account) => globalConfigService.removeTrustedUser(account),
+    getAutoBackup: () => globalConfigService.getAutoBackup(),
+    setAutoBackup: (isActive) => globalConfigService.setAutoBackup(isActive),
+    getErrorReporting: () => globalConfigService.getErrorReporting(),
+    setErrorReporting: (isActive) => globalConfigService.setErrorReporting(isActive),
 
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),

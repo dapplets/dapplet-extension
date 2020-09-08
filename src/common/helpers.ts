@@ -106,3 +106,22 @@ export function allSettled($) {'use strict';
     )
   );
 };
+
+export function timeoutPromise<T>(ms: number, promise: Promise<T>, timeoutCallback?: Function) {
+  return new Promise<T>((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      timeoutCallback?.();
+      reject(new Error("promise timeout"));
+    }, ms);
+    promise.then(
+      (res) => {
+        clearTimeout(timeoutId);
+        resolve(res);
+      },
+      (err) => {
+        clearTimeout(timeoutId);
+        reject(err);
+      }
+    );
+  })
+}

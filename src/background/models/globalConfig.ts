@@ -23,4 +23,8 @@ export class GlobalConfig extends Base {
     userSettings: {
         [moduleName: string]: { [key: string]: any }
     } = {};
+
+    errorReporting: boolean = true;
+    
+    autoBackup: boolean = false;
 }

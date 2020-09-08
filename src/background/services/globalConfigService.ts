@@ -184,4 +184,22 @@ export default class GlobalConfigService {
         const url = await swarmStorage.save(blob);
         return url;
     }
+
+    async getErrorReporting() {
+        const config = await this.get();
+        return config.errorReporting;
+    }
+
+    async setErrorReporting(isActive: boolean) {
+        await this.updateConfig(c => c.errorReporting = isActive);
+    }
+
+    async getAutoBackup() {
+        const config = await this.get();
+        return config.autoBackup;
+    }
+
+    async setAutoBackup(isActive: boolean) {
+        await this.updateConfig(c => c.autoBackup = isActive);
+    }
 }

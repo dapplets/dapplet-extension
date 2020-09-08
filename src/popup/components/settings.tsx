@@ -23,6 +23,8 @@ interface ISettingsState {
     userSettingsInputError: string;
     userSettingsLoading: boolean;
     devMode: boolean;
+    autoBackup: boolean;
+    errorReporting: boolean;
 }
 
 class Settings extends React.Component<ISettingsProps, ISettingsState> {
@@ -41,12 +43,14 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             devMode: props.devMode,
             userSettingsInput: '',
             userSettingsInputError: null,
-            userSettingsLoading: false
+            userSettingsLoading: false,
+            errorReporting: true,
+            autoBackup: false
         };
     }
 
     async componentDidMount() {
-        await Promise.all([this.loadRegistries(), this.loadDevMode(), this.loadTrustedUsers()]);
+        await Promise.all([this.loadRegistries(), this.loadDevMode(), this.loadTrustedUsers(), this.loadAutoBackup(), this.loadErrorReporting()]);
         this.setState({ isLoading: false });
     }
 
@@ -76,6 +80,30 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         await setDevMode(isActive);
         this.loadDevMode();
         await this.props.updateTabs();
+    }
+
+    async loadAutoBackup() {
+        const { getAutoBackup } = await initBGFunctions(browser);
+        const autoBackup = await getAutoBackup();
+        this.setState({ autoBackup });
+    }
+
+    async setAutoBackup(isActive: boolean) {
+        const { setAutoBackup } = await initBGFunctions(browser);
+        await setAutoBackup(isActive);
+        this.loadAutoBackup();
+    }
+
+    async loadErrorReporting() {
+        const { getErrorReporting } = await initBGFunctions(browser);
+        const errorReporting = await getErrorReporting();
+        this.setState({ errorReporting });
+    }
+
+    async setErrorReporting(isActive: boolean) {
+        const { setErrorReporting } = await initBGFunctions(browser);
+        await setErrorReporting(isActive);
+        this.loadErrorReporting();
     }
 
     async addRegistry(url: string) {
@@ -156,7 +184,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     }
 
     render() {
-        const { isLoading, registries, registryInput, registryInputError, trustedUsers, trustedUserInput, trustedUserInputError, devMode } = this.state;
+        const { isLoading, registries, registryInput, registryInputError, trustedUsers, trustedUserInput, trustedUserInputError, devMode, errorReporting, autoBackup } = this.state;
 
         return (
             <React.Fragment>
@@ -256,7 +284,9 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                     </Input>
 
                     <Header as='h4'>Advanced</Header>
-                    <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} />
+                    <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /><br/>
+                    <Checkbox toggle label='Modules backup' checked={autoBackup} onChange={() => this.setAutoBackup(!autoBackup)} style={{ marginBottom: 6 }} /><br/>
+                    <Checkbox toggle label='Report about errors' checked={errorReporting} onChange={() => this.setErrorReporting(!errorReporting)} />
 
                     <Header as='h4'>About</Header>
                     <div>

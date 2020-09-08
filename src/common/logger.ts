@@ -1,4 +1,5 @@
-import { checkResultErrors } from "ethers/lib/utils";
+import { browser } from "webextension-polyfill-ts";
+import { initBGFunctions } from "chrome-extension-message-wrapper";
 
 function makeid(length: number): string {
     var result = '';
@@ -16,7 +17,11 @@ function isNeedToLog(text: string): boolean {
     return true;
 }
 
-export const logger = (msg, url, line, col, error) => {
+export const logger = async (msg, url, line, col, error) => {
+    const { getErrorReporting } = await initBGFunctions(browser);
+    const errorReporting = await getErrorReporting();
+    if (!errorReporting) return;
+    
     let extra = !col ? '' : '\ncolumn: ' + col;
     extra += !error ? '' : '\nerror: ' + error;
     const text = "Error: " + msg + "\nline: " + line + extra;
