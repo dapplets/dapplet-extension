@@ -40,8 +40,7 @@ function _makeid(length: number): string {
 }
 
 function _isNeedToLog(text: string): boolean {
-    const resizeObserverLoopErrRe = /^[^(ResizeObserver loop limit exceeded)]/;
-    if (resizeObserverLoopErrRe.test(text)) return false;
+    if (text.indexOf('ResizeObserver loop limit exceeded') !== -1) return false;
     return true;
 }
 
