@@ -1,7 +1,35 @@
 import { browser } from "webextension-polyfill-ts";
-import { initBGFunctions } from "chrome-extension-message-wrapper";
 
-function makeid(length: number): string {
+export const error = async (...args: any[]) => {
+    console.error.apply(console, args);
+
+    const isReport = await _isReportingEnabled();
+
+    if (!isReport || args.length === 0) return;
+    
+    const text = (args[0] instanceof Error) ? args[0].message + '\n' + args[0].stack : args[0].toString();
+
+    if (!_isNeedToLog(text)) return;
+
+    await _report(text);
+}
+
+export const log = async (msg, url, line, col, error) => {
+    console.error.apply(console, [msg, url, line, col, error]);
+
+    const isReport = await _isReportingEnabled();
+    if (!isReport) return;
+    
+    let extra = !col ? '' : '\ncolumn: ' + col;
+    extra += !error ? '' : '\nerror: ' + error;
+    const text = "Error: " + msg + "\nline: " + line + extra;
+
+    if (!_isNeedToLog(text)) return;
+
+    await _report(text);
+}
+
+function _makeid(length: number): string {
     var result = '';
     var characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     var charactersLength = characters.length;
@@ -11,29 +39,24 @@ function makeid(length: number): string {
     return result;
 }
 
-function isNeedToLog(text: string): boolean {
+function _isNeedToLog(text: string): boolean {
     const resizeObserverLoopErrRe = /^[^(ResizeObserver loop limit exceeded)]/;
     if (resizeObserverLoopErrRe.test(text)) return false;
     return true;
 }
 
-export const log = async (msg, url, line, col, error) => {
-    const { getErrorReporting } = await initBGFunctions(browser);
-    const errorReporting = await getErrorReporting();
-    if (!errorReporting) return;
-    
-    let extra = !col ? '' : '\ncolumn: ' + col;
-    extra += !error ? '' : '\nerror: ' + error;
-    const text = "Error: " + msg + "\nline: " + line + extra;
-    
-    if (!isNeedToLog(text)) return;
+async function _isReportingEnabled(): Promise<boolean> {
+    const config = await browser.storage.local.get('GlobalConfig:default');
+    return config?.['GlobalConfig:default']?.['errorReporting'] || true;
+}
 
+async function _report(text) {
     const data = {
-        subject: makeid(6),
+        subject: _makeid(6),
         text: text
     }
 
-    fetch('https://dapplet-api.netlify.app/.netlify/functions/report', {
+    return fetch('https://dapplet-api.netlify.app/.netlify/functions/report', {
         method: 'POST',
         mode: 'cors',
         cache: 'no-cache',

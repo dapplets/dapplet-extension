@@ -13,6 +13,7 @@ import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { HttpModuleStorage } from '../moduleStorages/httpModuleStorage';
 import { SchemaConfig, DefaultConfig } from '../../common/types';
 import * as JSZip from 'jszip';
+import * as logger from '../../common/logger';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
@@ -282,7 +283,7 @@ export default class FeatureService {
 
             return { scriptUrl };
         } catch (err) {
-            console.error(err);
+            logger.error(err);
             throw err;
         }
     }

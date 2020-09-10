@@ -14,11 +14,11 @@ browser.runtime.onMessage.addListener((message, sender) => {
 
     if (message.type === "FEATURE_ACTIVATED") {
         const features = message.payload
-        features.forEach(f => console.log(`The feature ${f.name}#${f.branch}@${f.version} was activated.`));
+        features.forEach(f => console.log(`[DAPPLETS]: The feature ${f.name}#${f.branch}@${f.version} was activated.`));
         return injector.loadModules(features);
     } else if (message.type === "FEATURE_DEACTIVATED") {
         const features = message.payload
-        features.forEach(f => console.log(`The feature ${f.name}#${f.branch}@${f.version} was deactivated.`));
+        features.forEach(f => console.log(`[DAPPLETS]: The feature ${f.name}#${f.branch}@${f.version} was deactivated.`));
         return injector.unloadModules(features);
     } else if (message.type === "CURRENT_CONTEXT_IDS") {
         return Promise.resolve(injector.availableContextIds);

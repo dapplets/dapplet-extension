@@ -24,7 +24,7 @@ export class GlobalConfig extends Base {
         [moduleName: string]: { [key: string]: any }
     } = {};
 
-    errorReporting: boolean = true;
+    errorReporting: boolean = true; // indirectly affects on '/src/common/logger.ts'
     
     autoBackup: boolean = false;
 }

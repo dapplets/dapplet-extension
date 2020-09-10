@@ -12,6 +12,7 @@ import GlobalConfigService from '../services/globalConfigService';
 import { DefaultConfig, SchemaConfig } from '../../common/types';
 import * as JSZip from 'jszip';
 import { TopologicalSort } from 'topological-sort';
+import * as logger from '../../common/logger';
 
 export default class ModuleManager {
 
@@ -45,11 +46,14 @@ export default class ModuleManager {
                     }
                 }
             } catch (err) {
-                console.error(err);
+                logger.error(err);
             }
         }
 
         await Promise.all(dependencies.map(d => resolve(d)));
+
+        dependencies.filter(d => !d.manifest).forEach(x => console.log(`[DAPPLETS]: Loading of module ${x.name}#${x.branch}@${x.version} was skipped`));
+        dependencies = dependencies.filter(d => !!d.manifest);
 
         // Interfaces to implementations map
         const impl = new Map<string, string>();
@@ -110,12 +114,12 @@ export default class ModuleManager {
         const vi = await this.registryAggregator.getVersionInfo(name, branch, version);
 
         if (vi.name != name || vi.version != version || vi.branch != branch) {
-            console.error(`Invalid public name for module. Requested: ${name}#${branch}@${version}. Recieved: ${vi.name}#${vi.branch}@${vi.version}.`);
+            logger.error(`Invalid public name for module. Requested: ${name}#${branch}@${version}. Recieved: ${vi.name}#${vi.branch}@${vi.version}.`);
             return { manifest: vi, dependencies: [] };
         }
 
         if (vi.type === ModuleTypes.Interface) {
-            console.error(`An implementation of the interface ${name} is not found.`);
+            logger.error(`An implementation of the interface ${name} is not found.`);
             return { manifest: vi, dependencies: [] };
         }
 
@@ -134,7 +138,7 @@ export default class ModuleManager {
                 });
             } else if (typeof dependency === "object") { // branch is specified
                 if (!dependency[DEFAULT_BRANCH_NAME]) {
-                    console.error(`Default branch version is not specified.`);
+                    logger.error(`Default branch version is not specified.`);
                     return;
                 }
 
@@ -144,7 +148,7 @@ export default class ModuleManager {
                     version: dependency[DEFAULT_BRANCH_NAME]
                 });
             } else {
-                console.error(`Invalid dependencies in manifest.`);
+                logger.error(`Invalid dependencies in manifest.`);
             }
         });
 
@@ -154,7 +158,7 @@ export default class ModuleManager {
     public async optimizeDependency(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME, contextIds: string[]): Promise<{ name: string, version: string, branch: string }> {
         const mi = await this._findImplementation(name, branch, version, contextIds);
         if (mi) {
-            console.log(`Found implementation for ${name}#${branch}@${version} interface: ${mi.name}`);
+            console.log(`[DAPPLETS]: Found implementation for ${name}#${branch}@${version} interface: ${mi.name}`);
             name = mi.name;
             branch = "default";
             version = "0.0.1"; // ToDo: fix it

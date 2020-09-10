@@ -82,7 +82,7 @@ export class DevRegistry implements Registry {
         await this._cacheDevConfig();
         const info = Array.from(this._infoByUrl).map(([k, v]) => v).find(v => v.module.name === name && v.version.branch === branch && v.version.version === version);
 
-        if (!info) {
+        if (!info || !info.version) {
             throw new Error(`The manifest of the module "${name}@${branch}#${version}" is not found`);
         };
 

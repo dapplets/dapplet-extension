@@ -1,10 +1,13 @@
 import { IPubSub } from "./types"
 import { subscribe, unsubscribe, publish } from './inpage-pubsub'
+import * as logger from '../common/logger';
+
 type Key = string | number | symbol
 type MsgFilter = string | Promise<string> | ((op: any, msg: any) => boolean)
 export type EventDef<T extends Key> = { [key in T]: MsgFilter }
 type MsgHandler = ((op: string, msg: any) => void)
 type EventHandler = { [key in Key]: MsgHandler[] | MsgHandler }
+
 export type AutoProperty = {
     name: string
     set: (setter: (value: any) => void) => void
@@ -219,7 +222,7 @@ export class Connection implements IConnection {
                 ap && msg[ap.name] && ap.set(msg[ap.name])
             }
         } catch (err) {
-            console.error(err);
+            logger.error(err);
         }
     }
 }

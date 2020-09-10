@@ -8,6 +8,7 @@ import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
 import { Environments } from '../../common/types';
 import { allSettled } from '../../common/helpers';
+import * as logger from '../../common/logger';
 
 if (!Promise.allSettled) Promise.allSettled = allSettled;
 
@@ -20,7 +21,7 @@ export class RegistryAggregator {
         await this._initRegistries();
 
         const versionsWithErrors = await Promise.allSettled(this.registries.map(r => r.getVersionNumbers(name, branch)));
-        versionsWithErrors.filter(assertRejected).forEach(p => console.error(p.reason));
+        versionsWithErrors.filter(assertRejected).forEach(p => logger.error(p.reason));
         const versionsNoErrors = versionsWithErrors.filter(assertFullfilled).map(p => p.value);
         const versionsNotSorted = mergeDedupe(versionsNoErrors);
         const versionsAsc = versionsNotSorted.sort(compare); // ASC sorting by semver
@@ -33,20 +34,20 @@ export class RegistryAggregator {
         const registriesConfig = await this._globalConfigService.getRegistries();
 
         const uriWithErrors = await Promise.allSettled(this.registries.map(r => r.getVersionInfo(name, branch, version).then(vi => {
+            if (!vi) return null;
             const isDev = registriesConfig.find(c => c.url === r.url).isDev;
             vi.environment = isDev ? Environments.Dev : Environments.Test;
             return vi;
         })));
-        // uriWithErrors.filter(assertRejected).forEach(p => console.error(p.reason));
-        const uriNoErrors = uriWithErrors.filter(assertFullfilled).map(p => p.value);
+        
+        const uriNoErrors = uriWithErrors.filter(assertFullfilled).map(p => p.value).filter(v => v !== null);
+        const uriErrors = uriWithErrors.filter(assertRejected);
 
         if (uriNoErrors.length === 0) {
-            if (uriWithErrors.length === 0) {
+            if (uriErrors.length === 0) {
                 throw new Error(`Could not find the manifest URI of the ${name}#${branch}@${version} module`);
             } else {
-                uriWithErrors.forEach(e => {
-                    throw e;
-                });
+                uriErrors.forEach(p => logger.error(p.reason));
             }
         }
 
@@ -56,7 +57,7 @@ export class RegistryAggregator {
     public async getModuleInfoWithRegistries(locations: string[], users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: ModuleInfo[] } }> {
         await this._initRegistries();
         const regFeatures = await Promise.allSettled(this.registries.map(r => r.getModuleInfo(locations, users).then(m => ([r.url, m]))));
-        regFeatures.filter(assertRejected).forEach(p => console.error(p.reason));
+        regFeatures.filter(assertRejected).forEach(p => logger.error(p.reason));
         const validRegFeatures = regFeatures.filter(assertFullfilled).map((p) => p.value);
         const merged = Object.fromEntries(validRegFeatures);
         
@@ -84,7 +85,7 @@ export class RegistryAggregator {
 
         // fetch all dev modules
         const modules = await Promise.allSettled(this.registries.map(r => r.getAllDevModules()));
-        modules.filter(assertRejected).forEach(p => console.error(p.reason));
+        modules.filter(assertRejected).forEach(p => logger.error(p.reason));
         const validModules = modules.filter(assertFullfilled).map(p => p.value);
         const reduced = validModules.reduce((a, b) => a.concat(b));
 
@@ -116,7 +117,7 @@ export class RegistryAggregator {
 
                     if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
                     if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) return new EthRegistry(r.url);
-                    console.error("Invalid registry URL");
+                    logger.error("Invalid registry URL");
                     return null;
                 }).filter(r => r !== null);
         }
