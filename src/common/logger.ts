@@ -17,7 +17,7 @@ function isNeedToLog(text: string): boolean {
     return true;
 }
 
-export const logger = async (msg, url, line, col, error) => {
+export const log = async (msg, url, line, col, error) => {
     const { getErrorReporting } = await initBGFunctions(browser);
     const errorReporting = await getErrorReporting();
     if (!errorReporting) return;

@@ -12,9 +12,9 @@ import Manifest from '../background/models/manifest';
 import { StorageRef } from '../background/registries/registry';
 import ModuleInfo from '../background/models/moduleInfo';
 import VersionInfo from '../background/models/versionInfo';
-import { logger } from '../common/logger';
+import * as logger from '../common/logger';
 
-window.onerror = logger;
+window.onerror = logger.log;
 
 enum DeploymentStatus {
     Unknown,

@@ -6,9 +6,9 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import './index.scss';
 import { busInstance, StarterBus } from './starterBus';
 import { Container, Header, Button, Divider } from 'semantic-ui-react';
-import { logger } from '../common/logger';
+import * as logger from '../common/logger';
 
-window.onerror = logger;
+window.onerror = logger.log;
 
 interface IIndexProps {
 }
