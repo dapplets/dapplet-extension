@@ -8,9 +8,9 @@ import { Bus } from '../common/bus';
 import styled from "styled-components";
 import { getRenderer } from '../common/sowa';
 import { Container, Header, Button } from 'semantic-ui-react';
-import { logger } from '../common/logger';
+import * as logger from '../common/logger';
 
-window.onerror = logger;
+window.onerror = logger.log;
 
 const SSowaView = styled.div`
   width: 100%;

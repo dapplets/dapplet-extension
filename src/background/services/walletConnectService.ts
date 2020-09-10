@@ -6,6 +6,7 @@ import GlobalConfigService from "./globalConfigService";
 import { WalletInfo } from '../../common/constants';
 import { browser } from "webextension-polyfill-ts";
 import { transactionCreated, transactionRejected } from "./notificationService";
+import * as logger from '../../common/logger';
 
 const bridge = "https://bridge.walletconnect.org";
 
@@ -22,10 +23,10 @@ try {
         }
 
         localStorage.clear();
-        console.log("wallet disconnected, localstorage cleaned"); // tslint:disable-line
+        console.log("[DAPPLETS]: wallet disconnected, localstorage cleaned"); // tslint:disable-line
     });
 } catch (ex) {
-    console.error("WalletConnect initialization error", ex);
+    logger.error("WalletConnect initialization error", ex);
 }
 
 const sendCustomRequest = async (method: string, params: any) => {
@@ -82,7 +83,7 @@ const sendLegacyTransaction = async (sowaId: string, txMeta: any) => {
             const builder = getTxBuilder(tx["@type"]);
             if (builder) {
                 const builtTx = builder(tx, txMeta);
-                console.log("Sending classic transaction...");
+                console.log("[DAPPLETS]: Sending classic transaction...");
                 const result = await walletConnector.sendTransaction({
                     from: walletConnector.accounts[0],
                     to: builtTx.to,
@@ -243,13 +244,13 @@ const sendSowaTransaction = async (sowaId, metadata, callback: (e: { type: strin
     const { walletInfo } = await _globalConfigService.get();
 
     if (walletInfo.protocolVersion === "0.2.0") {
-        console.log("Wallet is SOWA Frames compatible. Sending SOWA Frames transaction...");
+        console.log("[DAPPLETS]: Wallet is SOWA Frames compatible. Sending SOWA Frames transaction...");
         dappletResult = await loadSowaFrames(sowaId, metadata);
     } else if (walletInfo.protocolVersion === "0.1.0") {
-        console.log("Wallet is SOWA compatible. Sending SOWA transaction...");
+        console.log("[DAPPLETS]: Wallet is SOWA compatible. Sending SOWA transaction...");
         dappletResult = await loadSowa(sowaId, metadata);
     } else {
-        console.log("Wallet is SOWA incompatible. Showing SOWA view...");
+        console.log("[DAPPLETS]: Wallet is SOWA incompatible. Showing SOWA view...");
 
         try {
             await approveSowaTxViaOverlay();

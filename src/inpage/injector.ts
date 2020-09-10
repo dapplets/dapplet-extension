@@ -9,6 +9,7 @@ import { areModulesEqual } from "../common/helpers";
 import VersionInfo from "../background/models/versionInfo";
 import { AppStorage } from "./appStorage";
 import { DefaultConfig, SchemaConfig } from "../common/types";
+import * as logger from '../common/logger';
 
 export class Injector {
     public availableContextIds: string[] = [];
@@ -33,6 +34,8 @@ export class Injector {
         if (!modules || !modules.length) return;
         const { getModulesWithDeps } = await initBGFunctions(browser);
         const loadedModules: { manifest: VersionInfo, script: string, defaultConfig?: DefaultConfig }[] = await getModulesWithDeps(modules);
+        modules.forEach(a => !loadedModules.find(b => a.name === b.manifest.name && a.branch === b.manifest.branch && a.version === b.manifest.version) && console.log(`[DAPPLETS]: Loading of module ${a.name}#${a.branch}@${a.version} was skipped.`));
+
         const orderedModules = loadedModules.map((l) => {
             const m = modules.find(m => areModulesEqual(m, l.manifest));
             return ({
@@ -87,14 +90,14 @@ export class Injector {
             try {
                 // ToDo: compare "m.instancedDeps.length" and "m.clazz.constructor.length"
                 m.instance = new m.clazz(...m.instancedDeps);
-                console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`);
+                console.log(`[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`);
                 browser.runtime.sendMessage({
                     type: "FEATURE_LOADED", payload: {
                         name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version
                     }
                 });
             } catch (err) {
-                console.error(`Error of loading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
+                logger.error(`Error of loading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
                 browser.runtime.sendMessage({
                     type: "FEATURE_LOADING_ERROR", payload: {
                         name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version, error: err.message
@@ -109,7 +112,7 @@ export class Injector {
             if (!m) return;
             try {
                 m.instancedDeps.forEach(d => d.detachConfig());
-                console.log(`The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is unloaded.`);
+                console.log(`[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is unloaded.`);
                 browser.runtime.sendMessage({
                     type: "FEATURE_UNLOADED", payload: {
                         name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version
@@ -117,7 +120,7 @@ export class Injector {
                 });
                 this.registry = this.registry.filter(r => r !== m);
             } catch (err) {
-                console.error(`Error of unloading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
+                logger.error(`Error of unloading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
                 browser.runtime.sendMessage({
                     type: "FEATURE_UNLOADING_ERROR", payload: {
                         name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version, error: err.message
@@ -247,12 +250,12 @@ export class Injector {
         const dependency = manifest.dependencies[name];
 
         if (dependency === undefined) {
-            console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`);
+            logger.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`);
             return;
         }
 
         if (valid(dependency as string) === null) {
-            console.error(`Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`);
+            logger.error(`Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`);
             return;
         }
 
@@ -261,7 +264,7 @@ export class Injector {
         if (modules.length === 0) {
             modules = this.registry.filter(m => m.manifest.interfaces?.[name] !== undefined);
             if (modules.length === 0) {
-                console.error(`Can not find neither the module, nor an implementation of the interface "${name}".`);
+                logger.error(`Can not find neither the module, nor an implementation of the interface "${name}".`);
                 return null;
             }
         }

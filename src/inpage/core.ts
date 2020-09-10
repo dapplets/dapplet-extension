@@ -9,6 +9,7 @@ import { OverlayManager } from "./overlayManager";
 import { AppStorage } from "./appStorage";
 import { ethers, providers } from "ethers";
 import { ProxySigner } from "./proxySigner";
+import * as logger from '../common/logger';
 
 export default class Core {
     public overlayManager = new OverlayManager();
@@ -180,19 +181,19 @@ export default class Core {
             return result;
         } else {
             if (walletInfo.protocolVersion === "0.2.0") {
-                console.log("Wallet is SOWA Frames compatible. Sending SOWA Frames transaction...");
+                console.log("[DAPPLETS]: Wallet is SOWA Frames compatible. Sending SOWA Frames transaction...");
                 dappletResult = await loadSowaFrames(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
             } else if (walletInfo.protocolVersion === "0.1.0") {
-                console.log("Wallet is SOWA compatible. Sending SOWA transaction...");
+                console.log("[DAPPLETS]: Wallet is SOWA compatible. Sending SOWA transaction...");
                 dappletResult = await loadSowa(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
             } else {
-                console.log("Wallet is SOWA incompatible. Showing SOWA view...");
+                console.log("[DAPPLETS]: Wallet is SOWA incompatible. Showing SOWA view...");
 
                 try {
                     await this._approveSowaTransaction(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
                     dappletResult = await sendLegacyTransaction(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
                 } catch (err) {
-                    console.error(err);
+                    logger.error(err);
                 }
             }
 

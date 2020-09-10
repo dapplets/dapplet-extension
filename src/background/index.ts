@@ -9,13 +9,13 @@ import { browser } from "webextension-polyfill-ts";
 import EnsService from "./services/ensService";
 import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 import ProxyService from "./services/proxyService";
-import { logger } from "../common/logger";
+import * as logger from '../common/logger';
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
 // ToDo: Think about WalletConnectService, SuspendService etc, which looks like singletons.
 
-window.onerror = logger;
+window.onerror = logger.log;
 
 const featureService = new FeatureService();
 const globalConfigService = new GlobalConfigService();

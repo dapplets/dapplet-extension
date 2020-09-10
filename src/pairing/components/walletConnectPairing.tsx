@@ -49,7 +49,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
         const backgroundFunctions = await initBGFunctions(browser);
         const { generateUri, waitPairing, getGlobalConfig } = backgroundFunctions;
         var uri = await generateUri();
-        console.log("New pairing URI generated", uri);
+        console.log("[DAPPLETS]: New pairing URI generated", uri);
         const svgPath = svgObject(uri, { type: 'svg' });
         this.setState({ svgPath: svgPath.path });
 

@@ -106,7 +106,7 @@ const suspendByHostname = async hostname => {
 
     await changeIcon();
     await updateContextMenus();
-    console.log("Injecting is suspended at the " + hostname);
+    console.log("[DAPPLETS]: Injecting is suspended at the " + hostname);
 };
 
 /**
@@ -130,7 +130,7 @@ const resumeByHostname = async hostname => {
 
     await changeIcon();
     await updateContextMenus();
-    console.log("Injecting is resumed at the " + hostname);
+    console.log("[DAPPLETS]: Injecting is resumed at the " + hostname);
 };
 
 /**
@@ -156,7 +156,7 @@ const suspendEverywhere = async () => {
 
     await changeIcon();
     await updateContextMenus();
-    console.log("Injecting is suspended everywhere");
+    console.log("[DAPPLETS]: Injecting is suspended everywhere");
 };
 
 /**
@@ -171,7 +171,7 @@ const resumeEverywhere = async () => {
 
     await changeIcon();
     await updateContextMenus();
-    console.log("Injecting is resumed everywhere");
+    console.log("[DAPPLETS]: Injecting is resumed everywhere");
 };
 
 /**
