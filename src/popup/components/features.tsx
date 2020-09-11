@@ -6,6 +6,7 @@ import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Icon } f
 import ManifestDTO from "../../background/dto/manifestDTO";
 import { ModuleTypes } from "../../common/constants";
 import ModuleInfo from "../../background/models/moduleInfo";
+import { getCurrentContextIds } from "../helpers";
 
 interface IFeaturesProps {
   contextIds: Promise<string[] | undefined>;
@@ -35,6 +36,10 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
   async componentDidMount() {
     this._isMounted = true;
     const { contextIds } = this.props;
+    await this._refreshDataByContext(contextIds);
+  }
+
+  async _refreshDataByContext(contextIds: Promise<string[]>) {
     let contextIdsValues = undefined;
 
     try {
@@ -113,8 +118,9 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
 
   async refreshContextPage() {
     const [{ id, url }] = await browser.tabs.query({ active: true, currentWindow: true });
-    chrome.tabs.update(id, { url });
-    window.close();
+    const tab = await browser.tabs.update(id, { url });
+    this.setState({ isNoInpage: false, isLoading: true });
+    setTimeout(() => this._refreshDataByContext(getCurrentContextIds()), 3000); // ToDo: get rid of timeout
   }
 
   async settingsModule(mi: ManifestDTO) {
