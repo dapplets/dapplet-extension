@@ -112,8 +112,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         try {
             await addRegistry(url, false);
             this.setState({ registryInput: '' });
-        } catch (msg) {
-            this.setState({ registryInputError: msg });
+        } catch (err) {
+            this.setState({ registryInputError: err.message });
         }
 
         this.loadRegistries();
@@ -131,8 +131,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         try {
             await addTrustedUser(account);
             this.setState({ trustedUserInput: '' });
-        } catch (msg) {
-            this.setState({ trustedUserInputError: msg });
+        } catch (err) {
+            this.setState({ trustedUserInputError: err.message });
         }
 
         this.loadTrustedUsers();
@@ -152,8 +152,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             await loadUserSettings(this.state.userSettingsInput);
             this.setState({ userSettingsInput: '' });
             location.reload();
-        } catch (msg) {
-            this.setState({ userSettingsInputError: msg });
+        } catch (err) {
+            this.setState({ userSettingsInputError: err.message });
         } finally {
             this.setState({ userSettingsLoading: false });
         }
@@ -166,8 +166,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         try {
             const url = await saveUserSettings();
             this.setState({ userSettingsInput: url });
-        } catch (msg) {
-            this.setState({ userSettingsInputError: msg });
+        } catch (err) {
+            this.setState({ userSettingsInputError: err.message });
         } finally {
             this.setState({ userSettingsLoading: false });
         }
