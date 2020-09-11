@@ -1,4 +1,4 @@
-import WalletConnect from "@walletconnect/browser";
+import WalletConnect from "@walletconnect/client";
 import { SowaTemplate } from "../types/sowaTemplate";
 import { getTxBuilder } from "../../common/sowa";
 import { promiseTimeout } from "../utils/promiseTimeout";
@@ -10,26 +10,11 @@ import * as logger from '../../common/logger';
 
 const bridge = "https://bridge.walletconnect.org";
 
-var walletConnector: WalletConnect;
+var _walletConnector: WalletConnect;
 const _globalConfigService = new GlobalConfigService();
 
-try {
-    walletConnector = new WalletConnect({
-        bridge
-    });
-    walletConnector.on("disconnect", (error, payload) => {
-        if (error) {
-            throw error;
-        }
-
-        localStorage.clear();
-        console.log("[DAPPLETS]: wallet disconnected, localstorage cleaned"); // tslint:disable-line
-    });
-} catch (ex) {
-    logger.error("WalletConnect initialization error", ex);
-}
-
 const sendCustomRequest = async (method: string, params: any) => {
+    const walletConnector = getConnector();
     const result = await walletConnector.sendCustomRequest({
         jsonrpc: "2.0",
         method: method,
@@ -56,6 +41,7 @@ const loadSowa = async (sowaId, txMeta) => {
         ]
     };
 
+    const walletConnector = getConnector();
     const result = await walletConnector.sendCustomRequest(request);
     return result;
 };
@@ -69,6 +55,7 @@ const loadSowaFrames = async (sowaId, txMeta) => {
             ["2"]
         ]
     };
+    const walletConnector = getConnector();
 
     const result = await walletConnector.sendCustomRequest(request);
     return result;
@@ -84,6 +71,7 @@ const sendLegacyTransaction = async (sowaId: string, txMeta: any) => {
             if (builder) {
                 const builtTx = builder(tx, txMeta);
                 console.log("[DAPPLETS]: Sending classic transaction...");
+                const walletConnector = getConnector();
                 const result = await walletConnector.sendTransaction({
                     from: walletConnector.accounts[0],
                     to: builtTx.to,
@@ -117,6 +105,7 @@ const _getWalletInfo = async (): Promise<WalletInfo> => {
 
     for (const request of requests) {
         try {
+            const walletConnector = getConnector();
             const result = await promiseTimeout(1000, walletConnector.sendCustomRequest({
                 jsonrpc: "2.0",
                 method: request.method
@@ -136,14 +125,29 @@ const _getWalletInfo = async (): Promise<WalletInfo> => {
     }
 }
 
+const getConnector = () => {
+    if (!_walletConnector) {
+        _walletConnector = new WalletConnect({
+            bridge
+        });
+        _walletConnector.on("disconnect", (error, payload) => {
+            if (error) {
+                throw error;
+            }
+    
+            localStorage.clear();
+            console.log("[DAPPLETS]: wallet disconnected, localstorage cleaned"); // tslint:disable-line
+        });
+    }
+    return _walletConnector;
+}
 
 const disconnect = () => {
-    walletConnector.killSession();
-    localStorage.clear();
-    walletConnector = null;
-    walletConnector = new WalletConnect({
-        bridge
-    });
+    if (_walletConnector && _walletConnector.connected) {
+        _walletConnector.killSession();
+        localStorage.clear();
+        _walletConnector = null;
+    }
     // ToDo: clear globalconfig.dappletCompatibility
 };
 
@@ -154,6 +158,7 @@ const disconnect = () => {
  */
 const generateUri = async () => {
     disconnect();
+    const walletConnector = getConnector();
     await walletConnector.createSession();
     const uri = walletConnector.uri;
     return uri;
@@ -164,6 +169,7 @@ const generateUri = async () => {
  * @returns {boolean} Is connected?
  */
 const checkConnection = () => {
+    const walletConnector = getConnector();
     return walletConnector.connected;
 };
 
@@ -186,6 +192,7 @@ const waitPairing = async () => {
 
 const _waitWCPairing = () => {
     var promise = new Promise(function (resolve, reject) {
+        const walletConnector = getConnector();
         walletConnector.on("connect", (error, payload) => {
             if (error) {
                 reject(error);
@@ -199,10 +206,12 @@ const _waitWCPairing = () => {
 };
 
 const getAccounts = () => {
+    const walletConnector = getConnector();
     return walletConnector.accounts;
 };
 
 const getChainId = () => {
+    const walletConnector = getConnector();
     return walletConnector.chainId;
 };
 
@@ -217,6 +226,7 @@ const sendTransaction = async (tx: any): Promise<any> => {
     if (!isConnected) {
         await pairWalletViaOverlay();
     }
+    const walletConnector = getConnector();
     return walletConnector.sendTransaction(tx);
 }
 
@@ -289,7 +299,7 @@ export {
     sendLegacyTransaction,
     getSowaTemplate,
     sendTransaction,
-    walletConnector,
+    getConnector,
     sendSowaTransaction,
     sendCustomRequest
 };
