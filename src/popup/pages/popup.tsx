@@ -12,7 +12,7 @@ import Events from "../components/events";
 import './popup.scss';
 
 interface IPopupProps {
-  contextIds: string[];
+  contextIds: Promise<string[]>;
 }
 interface IPopupState {
   newEventsCount: number;

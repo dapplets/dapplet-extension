@@ -6,9 +6,10 @@ import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Icon } f
 import ManifestDTO from "../../background/dto/manifestDTO";
 import { ModuleTypes } from "../../common/constants";
 import ModuleInfo from "../../background/models/moduleInfo";
+import { getCurrentContextIds } from "../helpers";
 
 interface IFeaturesProps {
-  contextIds: string[] | undefined;
+  contextIds: Promise<string[] | undefined>;
 }
 
 interface IFeaturesState {
@@ -35,7 +36,16 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
   async componentDidMount() {
     this._isMounted = true;
     const { contextIds } = this.props;
-    if (contextIds === undefined) {
+    await this._refreshDataByContext(contextIds);
+  }
+
+  async _refreshDataByContext(contextIds: Promise<string[]>) {
+    let contextIdsValues = undefined;
+
+    try {
+      contextIdsValues = await contextIds;
+    } catch (err) {
+      console.error(err);
       this.setState({ isNoInpage: true, isLoading: false });
       return;
     }
@@ -49,7 +59,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
         error: `There are registries with connection problems. Please check the settings.`
       });
     }
-    const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
+    const features: ManifestDTO[] = await getFeaturesByHostnames(contextIdsValues);
     if (this._isMounted) {
       this.setState({
         features: features.filter(f => f.type === ModuleTypes.Feature).map(f => ({ ...f, isLoading: false, error: null, versions: [] })),
@@ -108,8 +118,9 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
 
   async refreshContextPage() {
     const [{ id, url }] = await browser.tabs.query({ active: true, currentWindow: true });
-    chrome.tabs.update(id, { url });
-    window.close();
+    const tab = await browser.tabs.update(id, { url });
+    this.setState({ isNoInpage: false, isLoading: true });
+    setTimeout(() => this._refreshDataByContext(getCurrentContextIds()), 3000); // ToDo: get rid of timeout
   }
 
   async settingsModule(mi: ManifestDTO) {

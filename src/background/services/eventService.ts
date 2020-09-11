@@ -1,6 +1,9 @@
 import { Event } from "../../common/models/event";
 import { generateGuid } from '../../common/utils';
 import EventBrowserStorage from '../browserStorages/eventBrowserStorage';
+import { browser } from 'webextension-polyfill-ts';
+
+_updateBadge();
 
 export async function getEvents(): Promise<Event[]> {
     const eventBrowserStorage = new EventBrowserStorage();
@@ -20,6 +23,7 @@ export async function addEvent(title: string, description: string): Promise<void
     event.isRead = false;
 
     await eventBrowserStorage.create(event);
+    await _updateBadge();
 }
 
 export async function setRead(id: string | string[]): Promise<void> {
@@ -30,6 +34,8 @@ export async function setRead(id: string | string[]): Promise<void> {
         event.isRead = true;
         await eventBrowserStorage.update(event);
     }
+
+    await _updateBadge();
 }
 
 export async function getNewEventsCount(): Promise<number> {
@@ -37,4 +43,10 @@ export async function getNewEventsCount(): Promise<number> {
     const events: Event[] = await eventBrowserStorage.getAll();
     const count = events.filter(e => e.isRead === false).length;
     return count;
+}
+
+async function _updateBadge() {
+    const count = await getNewEventsCount();
+    browser.browserAction.setBadgeText({ text: count === 0 ? '' : count.toString() });
+    browser.browserAction.setBadgeBackgroundColor({ color: '#2185d0' });
 }

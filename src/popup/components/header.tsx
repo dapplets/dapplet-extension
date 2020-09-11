@@ -5,7 +5,7 @@ import { browser } from "webextension-polyfill-ts";
 import { Button, Divider } from "semantic-ui-react";
 
 interface IHeaderProps {
-  contextIds: string[];
+  contextIds: Promise<string[]>;
 }
 
 interface IHeaderState {
@@ -26,25 +26,23 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
   }
 
   async componentDidMount() {
-    var backgroundFunctions = await initBGFunctions(browser);
-    const {
-      getSuspendityByHostname,
-      getSuspendityEverywhere
-    } = backgroundFunctions;
+    try {
+      const contextId = await this.props.contextIds;
+      const { getSuspendityByHostname, getSuspendityEverywhere } = await initBGFunctions(browser);
+      const isHostnameSuspended = await getSuspendityByHostname(contextId);
+      const isEverywhereSuspended = await getSuspendityEverywhere();
 
-    var isHostnameSuspended = await getSuspendityByHostname(
-      this.props.contextIds[0]
-    );
-    var isEverywhereSuspended = await getSuspendityEverywhere();
-
-    this.setState({
-      isHostnameSuspended: isHostnameSuspended,
-      isEverywhereSuspended: isEverywhereSuspended
-    });
+      this.setState({
+        isHostnameSuspended: isHostnameSuspended,
+        isEverywhereSuspended: isEverywhereSuspended
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async resumeByHostnameButtonClick() {
-    var backgroundFunctions = await initBGFunctions(browser);
+    const backgroundFunctions = await initBGFunctions(browser);
     const { resumeByHostname } = backgroundFunctions;
     await resumeByHostname(this.props.contextIds[0]);
 
@@ -54,7 +52,7 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
   }
 
   async resumeEverywhereButtonClick() {
-    var backgroundFunctions = await initBGFunctions(browser);
+    const backgroundFunctions = await initBGFunctions(browser);
     const { resumeEverywhere } = backgroundFunctions;
     await resumeEverywhere();
 
