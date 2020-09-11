@@ -8,7 +8,7 @@ import { ModuleTypes } from "../../common/constants";
 import ModuleInfo from "../../background/models/moduleInfo";
 
 interface IFeaturesProps {
-  contextIds: string[] | undefined;
+  contextIds: Promise<string[] | undefined>;
 }
 
 interface IFeaturesState {
@@ -35,7 +35,12 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
   async componentDidMount() {
     this._isMounted = true;
     const { contextIds } = this.props;
-    if (contextIds === undefined) {
+    let contextIdsValues = undefined;
+
+    try {
+      contextIdsValues = await contextIds;
+    } catch (err) {
+      console.error(err);
       this.setState({ isNoInpage: true, isLoading: false });
       return;
     }
@@ -49,7 +54,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
         error: `There are registries with connection problems. Please check the settings.`
       });
     }
-    const features: ManifestDTO[] = await getFeaturesByHostnames(contextIds);
+    const features: ManifestDTO[] = await getFeaturesByHostnames(contextIdsValues);
     if (this._isMounted) {
       this.setState({
         features: features.filter(f => f.type === ModuleTypes.Feature).map(f => ({ ...f, isLoading: false, error: null, versions: [] })),

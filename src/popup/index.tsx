@@ -7,8 +7,4 @@ import * as logger from '../common/logger';
 
 window.onerror = logger.log;
 
-(async function() {
-    // ToDo: update contextIds
-    const contextIds = await getCurrentContextIds();
-    ReactDOM.render(<Popup contextIds={contextIds} />, document.querySelector('#app'));
-})();
+ReactDOM.render(<Popup contextIds={getCurrentContextIds()} />, document.querySelector('#app'));
