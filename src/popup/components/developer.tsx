@@ -4,7 +4,7 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Popup, Button, Segment, Message, List, Label, Input, Icon, Image, Header } from "semantic-ui-react";
 import NOLOGO_PNG from '../../common/resources/no-logo.png';
 
-import { isValidUrl } from '../helpers';
+import { getCurrentTab, isValidUrl } from '../helpers';
 import { StorageRef } from "../../background/registries/registry";
 import ModuleInfo from "../../background/models/moduleInfo";
 import VersionInfo from "../../background/models/versionInfo";
@@ -96,9 +96,8 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
     }
 
     async deployModule(mi: ModuleInfo, vi: VersionInfo) {
-        const tabs = await browser.tabs.query({ currentWindow: true, active: true });
-        const activeTab = tabs[0];
-        browser.tabs.sendMessage(activeTab.id, {
+        const tab = await getCurrentTab();
+        browser.tabs.sendMessage(tab.id, {
             type: "OPEN_DEPLOY_OVERLAY",
             payload: {
                 mi, vi

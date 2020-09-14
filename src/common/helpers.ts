@@ -1,3 +1,5 @@
+import { browser, Tabs } from "webextension-polyfill-ts";
+
 export function getHostName(url: string): string {
   return new URL(url).hostname;
 }
@@ -88,7 +90,8 @@ export function assertRejected<T>(item: PromiseSettledResult<T>): item is Promis
   return item.status === "rejected";
 }
 
-export function allSettled($) {'use strict';
+export function allSettled($) {
+  'use strict';
   var self = this;
   return self.all(
     $.map(
@@ -97,10 +100,10 @@ export function allSettled($) {'use strict';
       },
       {
         $: function (value) {
-          return {status: 'fulfilled', value: value};
+          return { status: 'fulfilled', value: value };
         },
         _: function (reason) {
-          return {status: 'rejected', reason: reason};
+          return { status: 'rejected', reason: reason };
         }
       }
     )
@@ -124,4 +127,20 @@ export function timeoutPromise<T>(ms: number, promise: Promise<T>, timeoutCallba
       }
     );
   })
+}
+
+export async function getCurrentTab(): Promise<Tabs.Tab> {
+  const [tab] = await browser.tabs.query({ currentWindow: true, active: true });
+  const popupUrl = browser.extension.getURL('popup.html');
+  
+  if (tab.url.indexOf(popupUrl) !== -1) {
+    const params = new URLSearchParams(new URL(tab.url).search); // For automated testing open popup in separated tab with URL /popup.html?tabUrl=https://example.com
+    const url = params.get('tabUrl');
+    if (url) {
+      const [currentTab] = await browser.tabs.query({ url: url });
+      return currentTab;
+    }
+  }
+
+  return tab;
 }

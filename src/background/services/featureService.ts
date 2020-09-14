@@ -14,6 +14,7 @@ import { HttpModuleStorage } from '../moduleStorages/httpModuleStorage';
 import { SchemaConfig, DefaultConfig } from '../../common/types';
 import * as JSZip from 'jszip';
 import * as logger from '../../common/logger';
+import { getCurrentTab } from '../../common/helpers';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
@@ -81,7 +82,7 @@ export default class FeatureService {
         }
 
         // sending command to inpage
-        const [activeTab] = await browser.tabs.query({ currentWindow: true, active: true });
+        const activeTab = await getCurrentTab();
         browser.tabs.sendMessage(activeTab.id, {
             type: isActive ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
             payload: [{
@@ -341,7 +342,7 @@ export default class FeatureService {
         const version = versions.sort(rcompare)[0]; // Last version by SemVer
         const vi = await this._moduleManager.registryAggregator.getVersionInfo(mi.name, DEFAULT_BRANCH_NAME, version);
         const dist = await this._moduleManager.loadModule(vi);
-        const [activeTab] = await browser.tabs.query({ currentWindow: true, active: true });
+        const activeTab = await getCurrentTab();
         browser.tabs.sendMessage(activeTab.id, {
             type: "OPEN_SETTINGS_OVERLAY",
             payload: { mi, vi, schemaConfig: dist.schemaConfig, defaultConfig: dist.defaultConfig }

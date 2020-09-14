@@ -6,7 +6,7 @@ import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Icon } f
 import ManifestDTO from "../../background/dto/manifestDTO";
 import { ModuleTypes } from "../../common/constants";
 import ModuleInfo from "../../background/models/moduleInfo";
-import { getCurrentContextIds } from "../helpers";
+import { getCurrentContextIds, getCurrentTab } from "../helpers";
 
 interface IFeaturesProps {
   contextIds: Promise<string[] | undefined>;
@@ -117,8 +117,8 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
   }
 
   async refreshContextPage() {
-    const [{ id, url }] = await browser.tabs.query({ active: true, currentWindow: true });
-    const tab = await browser.tabs.update(id, { url });
+    const tab = await getCurrentTab();
+    await browser.tabs.update(tab.id, { url: tab.url });
     this.setState({ isNoInpage: false, isLoading: true });
     setTimeout(() => this._refreshDataByContext(getCurrentContextIds()), 3000); // ToDo: get rid of timeout
   }

@@ -10,7 +10,7 @@ const _globalConfigService = new GlobalConfigService();
 let lastExtensionIcon = null;
 
 const changeIcon = async () => {
-    const [tab] = await browser.tabs.query({ active: true });
+    const tab = await Helpers.getCurrentTab();
     const url = tab.url || tab['pendingUrl']; // ToDo: check existance of pendingUrl
     const hostname = Helpers.getHostName(url);
     const suspendityByHostname = await getSuspendityByHostname(hostname);
@@ -34,7 +34,7 @@ const updateContextMenus = async () => {
 
     isContextMenusUpdating = true;
     await browser.contextMenus.removeAll();
-    const [tab] = await browser.tabs.query({ active: true });
+    const tab = await Helpers.getCurrentTab();
     const url = tab.url || tab['pendingUrl']; // ToDo: check existance of pendingUrl
     const hostname = Helpers.getHostName(url);
 

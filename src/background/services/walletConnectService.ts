@@ -7,6 +7,7 @@ import { WalletInfo } from '../../common/constants';
 import { browser } from "webextension-polyfill-ts";
 import { transactionCreated, transactionRejected } from "./notificationService";
 import * as logger from '../../common/logger';
+import { getCurrentTab } from "../../common/helpers";
 
 const bridge = "https://bridge.walletconnect.org";
 
@@ -231,7 +232,7 @@ const sendTransaction = async (tx: any): Promise<any> => {
 }
 
 const pairWalletViaOverlay = async (): Promise<void> => {
-    const [activeTab] = await browser.tabs.query({ currentWindow: true, active: true });
+    const activeTab = await getCurrentTab();
     const [error, result] = await browser.tabs.sendMessage(activeTab.id, "OPEN_PAIRING_OVERLAY");
     // ToDo: use native throw in error
     if (error) throw new Error(error);
@@ -282,7 +283,7 @@ const sendSowaTransaction = async (sowaId, metadata, callback: (e: { type: strin
 }
 
 const approveSowaTxViaOverlay = async (): Promise<void> => {
-    const [activeTab] = await browser.tabs.query({ currentWindow: true, active: true });
+    const activeTab = await getCurrentTab();
     return browser.tabs.sendMessage(activeTab.id, "APPROVE_SOWA_TRANSACTION");
 }
 

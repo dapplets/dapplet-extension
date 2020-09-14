@@ -3,7 +3,6 @@
         "target": "es5",
         "module": "commonjs",
         "moduleResolution": "node",
-        "rootDir": "src",
         "outDir": "lib",
         "sourceMap": true,
         "jsx": "react",

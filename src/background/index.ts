@@ -10,6 +10,7 @@ import EnsService from "./services/ensService";
 import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 import ProxyService from "./services/proxyService";
 import * as logger from '../common/logger';
+import { getCurrentTab } from "../common/helpers";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -146,7 +147,7 @@ browser.notifications.onClicked.addListener(function (notificationId) {
 
 browser.commands.onCommand.addListener((cmd) => {
   if (cmd === "toggle-overlay") {
-    return browser.tabs.query({ currentWindow: true, active: true }).then(([activeTab]) => browser.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY"));
+    return getCurrentTab().then((activeTab) => browser.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY"));
   }
 });
 

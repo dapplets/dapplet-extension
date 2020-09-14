@@ -1,9 +1,16 @@
-import { browser } from "webextension-polyfill-ts";
+import { browser, Tabs } from "webextension-polyfill-ts";
 
 export const getCurrentContextIds = async (): Promise<string[]> => {
-    const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
-    return browser.tabs.sendMessage(currentTab.id, { "type": "CURRENT_CONTEXT_IDS" });
+    const tab = await getCurrentTab();
+    return browser.tabs.sendMessage(tab.id, { "type": "CURRENT_CONTEXT_IDS" });
 };
+
+export const getCurrentTab = async () : Promise<Tabs.Tab> => {
+    const params = new URLSearchParams(location.search); // For automated testing open popup in separated tab with URL /popup.html?tabUrl=https://example.com
+    const url = params.get('tabUrl');
+    const [currentTab] = await browser.tabs.query(url ? { url: url } : { currentWindow: true, active: true });
+    return currentTab;
+}
 
 export const isValidUrl = (input: string) => {
     try {
