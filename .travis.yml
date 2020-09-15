@@ -2,5 +2,9 @@ language: node_js
 node_js: node
 services: xvfb
 
+addons:
+  chrome: stable
+
 script:
-  - npm run test
+  - npm run build:extension
+  - travis_retry npm run test
