@@ -10,6 +10,7 @@ import VersionInfo from "../background/models/versionInfo";
 import { AppStorage } from "./appStorage";
 import { DefaultConfig, SchemaConfig } from "../common/types";
 import * as logger from '../common/logger';
+import { ModalDimmer } from "semantic-ui-react";
 
 export class Injector {
     public availableContextIds: string[] = [];
@@ -22,7 +23,8 @@ export class Injector {
         contextIds: string[],
         dependencies: string[],
         instancedDeps: any[],
-        defaultConfig?: DefaultConfig
+        defaultConfig?: DefaultConfig,
+        onActionHandler?: Function
     }[] = [];
 
     constructor(public core: Core) {
@@ -32,6 +34,9 @@ export class Injector {
 
     public async loadModules(modules: { name: string, branch: string, version: string, order: number, contextIds: string[] }[]) {
         if (!modules || !modules.length) return;
+
+        // ToDo: add modules to registry before loading
+
         const { getModulesWithDeps } = await initBGFunctions(browser);
         const loadedModules: { manifest: VersionInfo, script: string, defaultConfig?: DefaultConfig }[] = await getModulesWithDeps(modules);
         modules.forEach(a => !loadedModules.find(b => a.name === b.manifest.name && a.branch === b.manifest.branch && a.version === b.manifest.version) && console.log(`[DAPPLETS]: Loading of module ${a.name}#${a.branch}@${a.version} was skipped.`));
@@ -130,6 +135,20 @@ export class Injector {
         });
     }
 
+    public async openDappletAction(moduleName: string) {
+        const module = this.registry.find(m => m.manifest.name === moduleName);
+        if (!module || !module.instance) throw Error('The dapplet is not activated.');
+        
+        //while (!module && !module.instance) await new Promise((res) => setTimeout(res, 500));
+
+        module.onActionHandler?.();
+    }
+
+    public setActionHandler(moduleName: string, handler: Function) {
+        const module = this.registry.find(m => m.manifest.name === moduleName);
+        module.onActionHandler = handler;
+    }
+
     private async _processModules(modules: { manifest: VersionInfo, script: string, order: number, contextIds: string[], defaultConfig?: DefaultConfig }[]) {
         const { optimizeDependency, getModulesWithDeps, addEvent } = await initBGFunctions(browser);
         const { core } = this;
@@ -158,7 +177,8 @@ export class Injector {
                 overlay: core.overlay.bind(core),
                 wallet: core.wallet.bind(core),
                 storage: new AppStorage(manifest.name, manifest.environment, defaultConfig),
-                contract: core.contract.bind(core)
+                contract: core.contract.bind(core),
+                onAction: (handler: Function) => this.setActionHandler(manifest.name, handler)
             };
 
             let newBranch: string = null;

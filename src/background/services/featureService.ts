@@ -348,4 +348,11 @@ export default class FeatureService {
             payload: { mi, vi, schemaConfig: dist.schemaConfig, defaultConfig: dist.defaultConfig }
         });
     }
+
+    public async openDappletAction(moduleName: string, tabId: number) {
+        return browser.tabs.sendMessage(tabId, {
+            type: "OPEN_DAPPLET_ACTION",
+            payload: { moduleName }
+        });
+    }
 }
