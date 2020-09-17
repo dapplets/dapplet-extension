@@ -22,5 +22,8 @@ browser.runtime.onMessage.addListener((message, sender) => {
         return injector.unloadModules(features);
     } else if (message.type === "CURRENT_CONTEXT_IDS") {
         return Promise.resolve(injector.availableContextIds);
+    } else if (message.type === "OPEN_DAPPLET_ACTION") {
+        const { moduleName } = message.payload
+        return injector.openDappletAction(moduleName);
     }
 });

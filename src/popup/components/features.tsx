@@ -2,18 +2,20 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Icon } from "semantic-ui-react";
+import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Icon, ButtonProps } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
 import { ModuleTypes } from "../../common/constants";
 import ModuleInfo from "../../background/models/moduleInfo";
 import { getCurrentContextIds, getCurrentTab } from "../helpers";
+
+type ManifestAndDetails = ManifestDTO & { isLoading: boolean, isActionLoading: boolean, error: string, versions: string[] };
 
 interface IFeaturesProps {
   contextIds: Promise<string[] | undefined>;
 }
 
 interface IFeaturesState {
-  features: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] })[];
+  features: ManifestAndDetails[];
   isLoading: boolean;
   error: string;
   isNoInpage: boolean;
@@ -62,7 +64,7 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
     const features: ManifestDTO[] = await getFeaturesByHostnames(contextIdsValues);
     if (this._isMounted) {
       this.setState({
-        features: features.filter(f => f.type === ModuleTypes.Feature).map(f => ({ ...f, isLoading: false, error: null, versions: [] })),
+        features: features.filter(f => f.type === ModuleTypes.Feature).map(f => ({ ...f, isLoading: false, isActionLoading: false, error: null, versions: [] })),
         isLoading: false
       });
     }
@@ -129,6 +131,20 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
     window.close();
   }
 
+  openDappletAction = async (f: ManifestAndDetails) => {
+    try {
+      this._updateFeatureState(f.name, { isActionLoading: true });
+      const { openDappletAction } = await initBGFunctions(browser);
+      const tab = await getCurrentTab();
+      await openDappletAction(f.name, tab.id);
+      window.close();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      this._updateFeatureState(f.name, { isActionLoading: false });
+    }
+  }
+
   render() {
     const { features, isLoading, error, isNoInpage } = this.state;
     return (
@@ -168,7 +184,8 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                       <List.Description style={{ color: "#666" }}>
                         {f.description}
                         {(f.sourceRegistry.isDev) ? null : (<React.Fragment><br />Author: {f.author}</React.Fragment>)}
-                        {(f.versions.length !== 0) ? <Label.Group style={{ marginTop: 3 }} size='mini'>{f.versions.map((v, k) => <Label as='a' key={k} onClick={() => this.toggleFeature(f, v, true, i)}>{v}</Label>)}</Label.Group> : null}
+                        {(f.versions.length !== 0) ? <Label.Group style={{ marginTop: 3 }} size='mini'>{f.versions.map((v, k) => <Label as='a' key={k} onClick={() => this.toggleFeature(f, v, true, i)}>{v}</Label>)}</Label.Group> : null}<br />
+                        {(f.isActive) ? <Button size='mini' primary disabled={(f.isLoading || f.isActionLoading) ?? false} style={{ marginTop: '4px' }} onClick={() => this.openDappletAction(f)}>Open</Button> : null}
                       </List.Description>
                     </List.Content>
                   </List.Item>

@@ -246,6 +246,7 @@ export default class Core {
     // ToDo: remove it or implement!
     contextStarted(contextIds: any[], parentContext?: string): void { }
     contextFinished(contextIds: any[], parentContext?: string): void { }
+    onAction(handler: Function) { };
 
     public storage: AppStorage;
 
