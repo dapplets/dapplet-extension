@@ -8,3 +8,4 @@ addons:
 script:
   - npm run build:extension
   - travis_retry npm run test
+  
