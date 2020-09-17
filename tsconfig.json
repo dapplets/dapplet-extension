@@ -13,5 +13,5 @@
         "downlevelIteration": true,
         "declaration": true
     },
-    "exclude": ["tests"]
+    "exclude": ["tests", "lib", "jslib", "build", "node_modules"]
 }
