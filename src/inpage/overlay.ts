@@ -17,15 +17,20 @@ export class Overlay implements IPubSub {
     public onmessage: (topic: string, message: any) => void = null;
 
     constructor(manager: OverlayManager, uri: string, public title: string) {
+
+        // disable cache
+        const url = new URL(uri);
+        url.searchParams.set('_dc', Date.now().toString());
+
         this._manager = manager;
         this.frame = document.createElement('iframe');
-        this.frame.src = uri;
+        this.frame.src = url.href;
         this.frame.allowFullscreen = true;
         this.frame.addEventListener('load', () => {
             //setTimeout(() => {
-                this._isFrameLoaded = true;
-                this._queue.forEach(msg => this._send(msg));
-                this._queue = [];
+            this._isFrameLoaded = true;
+            this._queue.forEach(msg => this._send(msg));
+            this._queue = [];
             //}, 1000);
         });
     }
@@ -107,7 +112,7 @@ export class Overlay implements IPubSub {
             if (e.source !== this.frame.contentWindow) return; // Listen messages from only our frame
             if (!e.data) return;
             const data = JSON.parse(e.data);
-            if (data.topic !== undefined)  handler(data.topic, data.message);
+            if (data.topic !== undefined) handler(data.topic, data.message);
         }
 
         window.addEventListener('message', listener);
