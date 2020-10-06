@@ -3,7 +3,7 @@ import { browser } from "webextension-polyfill-ts";
 import { Tab, Menu, Label } from "semantic-ui-react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 
-import Features from "../components/features";
+import Dapplets from "../components/dapplets";
 import Header from "../components/header";
 import Wallets from "../components/wallets";
 import Settings from "../components/settings";
@@ -53,7 +53,7 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
       {
         menuItem: "Dapplets",
         render: () => (
-          <Tab.Pane attached={false} as={() => <Features contextIds={contextIds} />} />
+          <Tab.Pane attached={false} as={() => <Dapplets contextIds={contextIds} />} />
         )
       },
       {

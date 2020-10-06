@@ -10,18 +10,18 @@ import { getCurrentContextIds, getCurrentTab } from "../helpers";
 
 type ManifestAndDetails = ManifestDTO & { isLoading: boolean, isActionLoading: boolean, error: string, versions: string[] };
 
-interface IFeaturesProps {
+interface IDappletsProps {
   contextIds: Promise<string[] | undefined>;
 }
 
-interface IFeaturesState {
+interface IDappletsState {
   features: ManifestAndDetails[];
   isLoading: boolean;
   error: string;
   isNoInpage: boolean;
 }
 
-class Features extends React.Component<IFeaturesProps, IFeaturesState> {
+class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   private _isMounted: boolean = false;
 
   constructor(props) {
@@ -211,4 +211,4 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
   }
 }
 
-export default Features;
+export default Dapplets;
