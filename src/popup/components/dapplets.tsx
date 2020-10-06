@@ -10,18 +10,18 @@ import { getCurrentContextIds, getCurrentTab } from "../helpers";
 
 type ManifestAndDetails = ManifestDTO & { isLoading: boolean, isActionLoading: boolean, error: string, versions: string[] };
 
-interface IFeaturesProps {
+interface IDappletsProps {
   contextIds: Promise<string[] | undefined>;
 }
 
-interface IFeaturesState {
+interface IDappletsState {
   features: ManifestAndDetails[];
   isLoading: boolean;
   error: string;
   isNoInpage: boolean;
 }
 
-class Features extends React.Component<IFeaturesProps, IFeaturesState> {
+class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   private _isMounted: boolean = false;
 
   constructor(props) {
@@ -177,7 +177,9 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                     </List.Content>
                     <List.Content style={{ marginLeft: 45, marginRight: 60 }} >
                       <List.Header>
-                        {f.title} <Icon link name='cog' size='small' onClick={() => this.settingsModule(f)} />
+                        {f.title}
+                        <Icon style={{ marginLeft: '4px' }} link name='cog' size='small' onClick={() => this.settingsModule(f)} />
+                        {(f.isActive) ? <Icon link name='home' size='small' onClick={() => this.openDappletAction(f)} /> : null}
                         {(f.sourceRegistry.isDev) ? (<Label style={{ marginLeft: 5 }} horizontal size='mini' color='teal'>DEV</Label>) : null}
                         {(f.error) ? (<Popup size='mini' trigger={<Label style={{ marginLeft: 5 }} horizontal size='mini' color='red'>ERROR</Label>}>{f.error}</Popup>) : null}
                       </List.Header>
@@ -185,7 +187,6 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
                         {f.description}
                         {(f.sourceRegistry.isDev) ? null : (<React.Fragment><br />Author: {f.author}</React.Fragment>)}
                         {(f.versions.length !== 0) ? <Label.Group style={{ marginTop: 3 }} size='mini'>{f.versions.map((v, k) => <Label as='a' key={k} onClick={() => this.toggleFeature(f, v, true, i)}>{v}</Label>)}</Label.Group> : null}<br />
-                        {(f.isActive) ? <Button size='mini' primary disabled={(f.isLoading || f.isActionLoading) ?? false} style={{ marginTop: '4px' }} onClick={() => this.openDappletAction(f)}>Open</Button> : null}
                       </List.Description>
                     </List.Content>
                   </List.Item>
@@ -211,4 +212,4 @@ class Features extends React.Component<IFeaturesProps, IFeaturesState> {
   }
 }
 
-export default Features;
+export default Dapplets;
