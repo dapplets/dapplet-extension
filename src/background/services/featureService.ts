@@ -14,7 +14,7 @@ import { HttpModuleStorage } from '../moduleStorages/httpModuleStorage';
 import { SchemaConfig, DefaultConfig } from '../../common/types';
 import * as JSZip from 'jszip';
 import * as logger from '../../common/logger';
-import { getCurrentTab } from '../../common/helpers';
+import { getCurrentTab, mergeDedupe } from '../../common/helpers';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
@@ -40,6 +40,8 @@ export default class FeatureService {
                         const dto: ManifestDTO = moduleInfo as any;
                         const config = await this._siteConfigRepository.getById(contextId); // ToDo: which contextId should we compare?
                         dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
+                        dto.activeVersion = (dto.isActive) ? (config.activeFeatures[dto.name]?.version || null) : null;
+                        dto.lastVersion = (dto.isActive) ? await this.getVersions(registryUrl, dto.name).then(x => x.sort(rcompare)[0]) : null; // ToDo: how does this affect performance?
                         dto.order = i++;
                         dto.sourceRegistry = {
                             url: registryUrl,
@@ -51,7 +53,7 @@ export default class FeatureService {
                     } else {
                         // ToDo: move this merging logic to aggragator
                         if (!dto.hostnames) dto.hostnames = [];
-                        if (dto.hostnames.indexOf(contextId) === -1) dto.hostnames.push(contextId);
+                        dto.hostnames = mergeDedupe([dto.hostnames, [contextId]]);
                     }
                 }
             }
