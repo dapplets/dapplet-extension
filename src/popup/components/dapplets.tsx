@@ -7,6 +7,7 @@ import ManifestDTO from "../../background/dto/manifestDTO";
 import { ModuleTypes } from "../../common/constants";
 import ModuleInfo from "../../background/models/moduleInfo";
 import { getCurrentContextIds, getCurrentTab } from "../helpers";
+import { rcompare, rsort } from "semver";
 
 type ManifestAndDetails = ManifestDTO & { isLoading: boolean, isActionLoading: boolean, error: string, versions: string[] };
 
@@ -73,20 +74,24 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   async handleSwitchChange(module: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] }), isActive, order, selectVersions: boolean) {
     const { name, hostnames, sourceRegistry } = module;
     const { getVersions } = await initBGFunctions(browser);
+
+    const allVersions = await getVersions(module.sourceRegistry.url, module.name);
+
     if (selectVersions && isActive) {
-      const versions = await getVersions(module.sourceRegistry.url, module.name);
-      this._updateFeatureState(name, { versions });
+      this._updateFeatureState(name, { versions: allVersions });
       return;
+    } else {
+      const lastVersion = allVersions.sort(rcompare)[0];
+      await this.toggleFeature(module, lastVersion, isActive, order, allVersions);
     }
 
-    await this.toggleFeature(module, null, isActive, order);
   }
 
-  async toggleFeature(module: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] }), version: string, isActive: boolean, order: number) {
+  async toggleFeature(module: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] }), version: string, isActive: boolean, order: number, allVersions: string[]) {
     const { name, hostnames, sourceRegistry } = module;
     const { activateFeature, deactivateFeature } = await initBGFunctions(browser);
 
-    this._updateFeatureState(name, { isActive, isLoading: true, error: null, versions: [] });
+    this._updateFeatureState(name, { isActive, isLoading: true, error: null, versions: [], activeVersion: (isActive) ? version : null, lastVersion: allVersions.sort(rcompare)[0] });
 
     try {
       if (isActive) {
@@ -182,11 +187,15 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
                         {(f.isActive) ? <Icon link name='home' size='small' onClick={() => this.openDappletAction(f)} /> : null}
                         {(f.sourceRegistry.isDev) ? (<Label style={{ marginLeft: 5 }} horizontal size='mini' color='teal'>DEV</Label>) : null}
                         {(f.error) ? (<Popup size='mini' trigger={<Label style={{ marginLeft: 5 }} horizontal size='mini' color='red'>ERROR</Label>}>{f.error}</Popup>) : null}
+                        {(f.isActive && f.activeVersion && f.lastVersion) ? (
+                          (f.lastVersion === f.activeVersion) ? <Label style={{ marginLeft: 5, cursor: 'default' }} horizontal size='mini' color='green' title='Up to date'>{f.activeVersion}</Label>
+                            : <Label style={{ marginLeft: 5, cursor: 'default' }} horizontal size='mini' color='orange' title={`New version is available: ${f.lastVersion}`}>{f.activeVersion}</Label>
+                        ) : null}
                       </List.Header>
                       <List.Description style={{ color: "#666" }}>
                         {f.description}
                         {(f.sourceRegistry.isDev) ? null : (<React.Fragment><br />Author: {f.author}</React.Fragment>)}
-                        {(f.versions.length !== 0) ? <Label.Group style={{ marginTop: 3 }} size='mini'>{f.versions.map((v, k) => <Label as='a' key={k} onClick={() => this.toggleFeature(f, v, true, i)}>{v}</Label>)}</Label.Group> : null}<br />
+                        {(f.versions.length !== 0) ? <Label.Group style={{ marginTop: 3 }} size='mini'>{f.versions.map((v, k) => <Label as='a' key={k} onClick={() => this.toggleFeature(f, v, true, i, f.versions)}>{v}</Label>)}</Label.Group> : null}<br />
                       </List.Description>
                     </List.Content>
                   </List.Item>

@@ -11,6 +11,8 @@ export default class ManifestDTO {
     author: string = null;
     icon: StorageRef = null;
     isActive: boolean = null;
+    activeVersion?: string | null = null;
+    lastVersion?: string | null = null;
     //dist: string = null;
     order: number = null;
     hostnames: string[] = [];
