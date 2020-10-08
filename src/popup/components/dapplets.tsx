@@ -189,7 +189,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
                         {(f.error) ? (<Popup size='mini' trigger={<Label style={{ marginLeft: 5 }} horizontal size='mini' color='red'>ERROR</Label>}>{f.error}</Popup>) : null}
                         {(f.isActive && f.activeVersion && f.lastVersion) ? (
                           (f.lastVersion === f.activeVersion) ? <Label style={{ marginLeft: 5, cursor: 'default' }} horizontal size='mini' color='green' title='Up to date'>{f.activeVersion}</Label>
-                            : <Label style={{ marginLeft: 5, cursor: 'default' }} horizontal size='mini' color='orange' title={`New version is available: ${f.lastVersion}`}>{f.activeVersion}</Label>
+                            : <Label style={{ marginLeft: 5, cursor: 'default' }} horizontal size='mini' color='orange' title={`New version is available: ${f.lastVersion}`}><Icon style={{ margin: '0 .25rem 0 0' }} name='arrow up' />{f.activeVersion}</Label>
                         ) : null}
                       </List.Header>
                       <List.Description style={{ color: "#666" }}>
