@@ -25,6 +25,7 @@ interface ISettingsState {
     devMode: boolean;
     autoBackup: boolean;
     errorReporting: boolean;
+    isUpdateAvailable: boolean;
 }
 
 class Settings extends React.Component<ISettingsProps, ISettingsState> {
@@ -45,12 +46,13 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             userSettingsInputError: null,
             userSettingsLoading: false,
             errorReporting: true,
-            autoBackup: false
+            autoBackup: false,
+            isUpdateAvailable: false
         };
     }
 
     async componentDidMount() {
-        await Promise.all([this.loadRegistries(), this.loadDevMode(), this.loadTrustedUsers(), this.loadAutoBackup(), this.loadErrorReporting()]);
+        await Promise.all([this.loadRegistries(), this.loadDevMode(), this.loadTrustedUsers(), this.loadAutoBackup(), this.loadErrorReporting(), this.checkUpdates()]);
         this.setState({ isLoading: false });
     }
 
@@ -98,6 +100,12 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         const { getErrorReporting } = await initBGFunctions(browser);
         const errorReporting = await getErrorReporting();
         this.setState({ errorReporting });
+    }
+
+    async checkUpdates() {
+        const { isExtensionUpdateAvailable } = await initBGFunctions(browser);
+        const isUpdateAvailable = await isExtensionUpdateAvailable();
+        this.setState({ isUpdateAvailable });
     }
 
     async setErrorReporting(isActive: boolean) {
@@ -284,13 +292,16 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                     </Input>
 
                     <Header as='h4'>Advanced</Header>
-                    <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /><br/>
-                    <Checkbox toggle label='Modules backup' checked={autoBackup} onChange={() => this.setAutoBackup(!autoBackup)} style={{ marginBottom: 6 }} /><br/>
+                    <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /><br />
+                    <Checkbox toggle label='Modules backup' checked={autoBackup} onChange={() => this.setAutoBackup(!autoBackup)} style={{ marginBottom: 6 }} /><br />
                     <Checkbox toggle label='Report about errors' checked={errorReporting} onChange={() => this.setErrorReporting(!errorReporting)} />
 
                     <Header as='h4'>About</Header>
                     <div>
-                        <a href='#' onClick={() => window.open(`https://github.com/dapplets/dapplet-extension/releases/tag/v${EXTENSION_VERSION}`, '_blank')}>v{EXTENSION_VERSION}</a>
+                        <a href='#' onClick={() => window.open(`https://github.com/dapplets/dapplet-extension/releases`, '_blank')}>
+                            v{EXTENSION_VERSION}
+                        </a>
+                        {this.state.isUpdateAvailable ? <Icon title='New version is available' style={{ margin: '0 0 0 0.25em' }} color='orange' name='arrow up' /> : null}
                     </div>
                 </Segment>
 

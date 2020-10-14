@@ -11,6 +11,7 @@ import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 import ProxyService from "./services/proxyService";
 import * as logger from '../common/logger';
 import { getCurrentTab } from "../common/helpers";
+import * as GithubService from "./services/githubService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -108,7 +109,10 @@ browser.runtime.onMessage.addListener(
     resolveName: (name) => ensService.resolveName(name),
 
     // Contract Service
-    fetchJsonRpc: (method, params) => proxyService.fetchJsonRpc(method, params)
+    fetchJsonRpc: (method, params) => proxyService.fetchJsonRpc(method, params),
+
+    // Github Service
+    isExtensionUpdateAvailable: () => GithubService.isExtensionUpdateAvailable()
   })
 );
 
