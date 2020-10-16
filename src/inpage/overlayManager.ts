@@ -113,7 +113,13 @@ export class OverlayManager {
 
         const tabItem = document.createElement('div');
         tabItem.classList.add(TabItemClass);
-        tabItem.innerText = overlay.title;
+
+        const titleDiv = document.createElement('div');
+        titleDiv.innerText = overlay.title;
+        titleDiv.title = overlay.title;
+        titleDiv.classList.add('dapplets-overlay-nav-tab-item-title');
+
+        tabItem.appendChild(titleDiv);
         tabItem.addEventListener('click', (ev) => {
             ev.cancelBubble = true;
             ev.stopPropagation();
@@ -121,7 +127,7 @@ export class OverlayManager {
         });
         this._tabList.appendChild(tabItem);
 
-        const closeBtn = document.createElement('span');
+        const closeBtn = document.createElement('div');
         closeBtn.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="4 4 16 16" style="width: 10px;">
                 <path d="M0 0h24v24H0z" fill="none"/>
