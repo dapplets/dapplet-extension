@@ -111,7 +111,7 @@ export class EthRegistry implements Registry {
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
-            logger.error('errrrr', err);
+            logger.error('Error in EthRegistry class when module info is fetching', err);
             throw err;
         }
     }
