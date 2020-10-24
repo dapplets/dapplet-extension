@@ -183,8 +183,8 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
                     <List.Content style={{ marginLeft: 45, marginRight: 60 }} >
                       <List.Header>
                         {f.title}
-                        <Icon style={{ marginLeft: '4px' }} link name='cog' size='small' onClick={() => this.settingsModule(f)} />
-                        {(f.isActive) ? <Icon link name='home' size='small' onClick={() => this.openDappletAction(f)} /> : null}
+                        <Icon style={{ marginLeft: '4px', fontSize: '0.9em' }} link name='cog' size='small' onClick={() => this.settingsModule(f)} />
+                        {(f.isActive) ? <Icon style={{ fontSize: '0.9em' }} link name='home' size='small' onClick={() => this.openDappletAction(f)} /> : null}
                         {(f.sourceRegistry.isDev) ? (<Label style={{ marginLeft: 5 }} horizontal size='mini' color='teal'>DEV</Label>) : null}
                         {(f.error) ? (<Popup size='mini' trigger={<Label style={{ marginLeft: 5 }} horizontal size='mini' color='red'>ERROR</Label>}>{f.error}</Popup>) : null}
                         {(f.isActive && f.activeVersion && f.lastVersion) ? (
