@@ -163,7 +163,7 @@
 
 .dapplets-overlay-nav-content-item {
     display: none;
-    height: 100%;
+    height: calc(100% - 36px);
 }
 
 .dapplets-overlay-nav-content-item-active {
