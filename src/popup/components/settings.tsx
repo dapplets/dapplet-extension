@@ -2,7 +2,7 @@ import * as React from "react";
 import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Popup, Segment, List, Label, Input, Checkbox, Icon, Header, Button } from "semantic-ui-react";
-import { isValidUrl } from '../helpers';
+import { isValidHttp, isValidUrl } from '../helpers';
 import { typeOfUri, UriTypes } from '../../common/helpers';
 
 interface ISettingsProps {
@@ -13,15 +13,24 @@ interface ISettingsProps {
 interface ISettingsState {
     isLoading: boolean;
     connected: boolean;
+
     registries: { url: string, isDev: boolean, isAvailable: boolean, error: string }[];
     registryInput: string;
     registryInputError: string;
+
     trustedUsers: { account: string }[];
     trustedUserInput: string;
     trustedUserInputError: string;
+
     userSettingsInput: string;
     userSettingsInputError: string;
     userSettingsLoading: boolean;
+
+    providerInput: string;
+    providerInputError: string;
+    providerLoading: boolean;
+    providerEdited: boolean;
+
     devMode: boolean;
     autoBackup: boolean;
     errorReporting: boolean;
@@ -47,12 +56,24 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             userSettingsLoading: false,
             errorReporting: true,
             autoBackup: false,
-            isUpdateAvailable: false
+            isUpdateAvailable: false,
+            providerInput: '',
+            providerInputError: null,
+            providerLoading: false,
+            providerEdited: false
         };
     }
 
     async componentDidMount() {
-        await Promise.all([this.loadRegistries(), this.loadDevMode(), this.loadTrustedUsers(), this.loadAutoBackup(), this.loadErrorReporting(), this.checkUpdates()]);
+        await Promise.all([
+            this.loadRegistries(),
+            this.loadDevMode(),
+            this.loadTrustedUsers(),
+            this.loadAutoBackup(),
+            this.loadErrorReporting(),
+            this.checkUpdates(),
+            this.loadProvider()
+        ]);
         this.setState({ isLoading: false });
     }
 
@@ -75,6 +96,20 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         const { getDevMode } = await initBGFunctions(browser);
         const devMode = await getDevMode();
         this.setState({ devMode });
+    }
+
+    async loadProvider() {
+        const { getEthereumProvider } = await initBGFunctions(browser);
+        const provider = await getEthereumProvider();
+        this.setState({ providerInput: provider });
+    }
+
+    async setProvider(provider: string) {
+        this.setState({ providerLoading: true });
+        const { setEthereumProvider } = await initBGFunctions(browser);
+        await setEthereumProvider(provider);
+        this.loadAutoBackup();
+        this.setState({ providerLoading: false, providerEdited: false });
     }
 
     async setDevMode(isActive: boolean) {
@@ -292,6 +327,26 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                     </Input>
 
                     <Header as='h4'>Advanced</Header>
+
+                    <Header as='h5'>Ethereum Provider</Header>
+                    <Input
+                        size='mini'
+                        fluid
+                        placeholder='Provider URL'
+                        error={!!this.state.providerInputError || !isValidHttp(this.state.providerInput)}
+                        action
+                        iconPosition='left'
+                        loading={this.state.providerLoading}
+                        style={{ marginBottom: '15px' }}
+                    >
+                        <Icon name='server' />
+                        <input
+                            value={this.state.providerInput}
+                            onChange={(e) => this.setState({ providerInput: e.target.value, providerInputError: null, providerEdited: true })}
+                        />
+                        <Button size='mini' disabled={this.state.providerLoading || !this.state.providerEdited || !isValidHttp(this.state.providerInput)} color='blue' onClick={() => this.setProvider(this.state.providerInput)}>Save</Button>
+                    </Input>
+
                     <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /><br />
                     <Checkbox toggle label='Modules backup' checked={autoBackup} onChange={() => this.setAutoBackup(!autoBackup)} style={{ marginBottom: 6 }} /><br />
                     <Checkbox toggle label='Report about errors' checked={errorReporting} onChange={() => this.setErrorReporting(!errorReporting)} />

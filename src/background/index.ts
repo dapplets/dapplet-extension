@@ -104,6 +104,8 @@ browser.runtime.onMessage.addListener(
     clearUserSettings: (moduleName) => globalConfigService.clearUserSettings(moduleName),
     loadUserSettings: (url) => globalConfigService.loadUserSettings(url),
     saveUserSettings: () => globalConfigService.saveUserSettings(),
+    getEthereumProvider: () => globalConfigService.getEthereumProvider(),
+    setEthereumProvider: (url) => globalConfigService.setEthereumProvider(url),
 
     // ENS
     resolveName: (name) => ensService.resolveName(name),

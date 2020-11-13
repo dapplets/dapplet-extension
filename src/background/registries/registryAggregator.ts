@@ -107,6 +107,7 @@ export class RegistryAggregator {
         // ToDo: fetch LocalConfig
         const registries = await this._globalConfigService.getRegistries();
         const isDevMode = await this._globalConfigService.getDevMode();
+        const providerUrl = await this._globalConfigService.getEthereumProvider();
 
         // ToDo: optimize comparison
         if (registries.filter(x => isDevMode || (!isDevMode && x.isDev === false)).length !== this.registries.length) {
@@ -116,7 +117,7 @@ export class RegistryAggregator {
                     const uriType = typeOfUri(r.url);
 
                     if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
-                    if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) return new EthRegistry(r.url);
+                    if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) return new EthRegistry(r.url, providerUrl);
                     logger.error("Invalid registry URL");
                     return null;
                 }).filter(r => r !== null);

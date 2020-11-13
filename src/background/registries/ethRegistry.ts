@@ -60,10 +60,10 @@ export class EthRegistry implements Registry {
     private _contract: ethers.ethers.Contract;
     private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>();
 
-    constructor(public url: string) {
+    constructor(public url: string, providerUrl: string) {
         if (!url) throw new Error("Endpoint Url is required");
 
-        this._signer = new WalletConnectSigner();
+        this._signer = new WalletConnectSigner(providerUrl);
         this._contract = new ethers.Contract(url, abi, this._signer);
     }
 
