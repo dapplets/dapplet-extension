@@ -32,6 +32,7 @@ export default class GlobalConfigService {
             account: "0x692a4d7b7be2dc1623155e90b197a82d114a74f3"
         }];
         config.userSettings = {};
+        config.providerUrl = 'https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992';
 
         await this._globalConfigRepository.deleteById(this._configId);
         await this._globalConfigRepository.create(config);
@@ -56,7 +57,8 @@ export default class GlobalConfigService {
 
         if (isEthAddress || isEnsAddress) {
             if (isEnsAddress) {
-                const signer = new WalletConnectSigner();
+                const provider = await this.getEthereumProvider();
+                const signer = new WalletConnectSigner(provider);
                 const address = await signer.resolveName(url);
                 if (!address) throw new Error("Can not resolve the ENS name");
             }
@@ -117,7 +119,8 @@ export default class GlobalConfigService {
         if (!isEthAddress && !isEnsAddress) throw Error('User account must be valid Ethereum address');
 
         if (isEnsAddress) {
-            const signer = new WalletConnectSigner();
+            const provider = await this.getEthereumProvider();
+            const signer = new WalletConnectSigner(provider);
             const address = await signer.resolveName(account);
             if (!address) throw new Error("Can not resolve the ENS name");
         }
@@ -201,5 +204,14 @@ export default class GlobalConfigService {
 
     async setAutoBackup(isActive: boolean) {
         await this.updateConfig(c => c.autoBackup = isActive);
+    }
+
+    async setEthereumProvider(url: string) {
+        await this.updateConfig(c => c.providerUrl = url);
+        window.location.reload();
+    }
+
+    async getEthereumProvider() {
+        return this.get().then(x => x.providerUrl);
     }
 }

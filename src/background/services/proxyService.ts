@@ -1,7 +1,12 @@
+import GlobalConfigService from "./globalConfigService";
+
 export default class ProxyService {
     private _nextId: number = 0;
+    private _globalConfig = new GlobalConfigService();
+    
     async fetchJsonRpc(method: string, params?: Array<any>): Promise<any> {
-        const endpointUrl = 'https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992'
+        const endpointUrl = await this._globalConfig.getEthereumProvider();
+
         const request = {
             method: method,
             params: params,
@@ -11,7 +16,10 @@ export default class ProxyService {
 
         return fetch(endpointUrl, {
             method: 'POST',
-            body: JSON.stringify(request)
+            body: JSON.stringify(request),
+            headers: {
+                'Content-Type': 'application/json'
+            }
         }).then(res => res.json()).then(json => json.result);
     }
 }
