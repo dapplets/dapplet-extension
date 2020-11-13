@@ -207,7 +207,8 @@ export default class GlobalConfigService {
     }
 
     async setEthereumProvider(url: string) {
-        return this.updateConfig(c => c.providerUrl = url);
+        await this.updateConfig(c => c.providerUrl = url);
+        window.location.reload();
     }
 
     async getEthereumProvider() {
