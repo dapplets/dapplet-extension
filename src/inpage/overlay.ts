@@ -24,6 +24,7 @@ export class Overlay implements IPubSub {
 
         this._manager = manager;
         this.frame = document.createElement('iframe');
+        this.frame.allow = 'clipboard-write';
         this.frame.src = url.href;
         this.frame.allowFullscreen = true;
         this.frame.addEventListener('load', () => {
