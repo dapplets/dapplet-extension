@@ -5,13 +5,17 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 export class ProxySigner extends ethers.Signer {
     public provider = new ethers.providers.Web3Provider((method, params) => initBGFunctions(browser).then(f => f.fetchJsonRpc(method, params)));
 
+    constructor(private _app: string) {
+        super();
+    }
+
     connect(provider: ethers.ethers.providers.Provider): ethers.ethers.Signer {
         throw new Error("Method not implemented.");
     }
 
     async getAddress(): Promise<string> {
-        const { getAccounts } = await initBGFunctions(browser);
-        return getAccounts().then(addresses => addresses[0] || '0x0000000000000000000000000000000000000000');
+        const { getAddress } = await initBGFunctions(browser);
+        return getAddress(this._app);
     }
 
     async signMessage(message: ethers.utils.BytesLike): Promise<string> {
@@ -23,10 +27,8 @@ export class ProxySigner extends ethers.Signer {
     }
 
     async sendTransaction(transaction: ethers.providers.TransactionRequest): Promise<ethers.providers.TransactionResponse> {
-        const { sendTransaction } = await initBGFunctions(browser);
-        transaction.from = await this.getAddress();
-        const tx = await ethers.utils.resolveProperties(transaction);
-        const txHash = await sendTransaction(tx as any);
+        const { sendTransactionOutHash } = await initBGFunctions(browser);
+        const txHash = await sendTransactionOutHash(this._app, transaction);
         return this.provider.getTransaction(txHash);
     }
 }

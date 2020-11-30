@@ -199,4 +199,8 @@ export class OverlayManager {
         tab.tabItem.classList.toggle(ActiveTabHeaderClass, false);
         tab.contentItem.classList.toggle(ActiveTabContentClass, false);
     }
+
+    public getOverlays() {
+        return this._tabsRegistry.map(x => x.overlay);
+    }
 }

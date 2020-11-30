@@ -144,3 +144,14 @@ export async function getCurrentTab(): Promise<Tabs.Tab> {
 
   return tab;
 }
+
+export function networkName(chainId: number) {
+  const map = {
+    1: 'mainnet',
+    3: 'ropsten',
+    4: 'rinkeby',
+    42: 'kovan'
+  }
+
+  return map[chainId] ?? 'unknown';
+}

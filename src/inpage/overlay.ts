@@ -16,7 +16,7 @@ export class Overlay implements IPubSub {
     public registered: boolean = false;
     public onmessage: (topic: string, message: any) => void = null;
 
-    constructor(manager: OverlayManager, uri: string, public title: string) {
+    constructor(manager: OverlayManager, public uri: string, public title: string) {
 
         // disable cache
         const url = new URL(uri);
@@ -65,8 +65,8 @@ export class Overlay implements IPubSub {
         this._manager.unregister(this);
     }
 
-    public send(topic: string, message: any) {
-        const msg = JSON.stringify({ topic, args: message }); // ToDo: fix args
+    public send(topic: string, args: any[]) {
+        const msg = JSON.stringify({ topic, args }); // ToDo: fix args
         this.frame.contentWindow.postMessage(msg, '*');
     }
 

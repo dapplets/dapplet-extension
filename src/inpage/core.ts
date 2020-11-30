@@ -42,6 +42,8 @@ export default class Core {
                     return this._approveSowaTransaction(message.payload.sowaId, message.payload.metadata).then(() => ([null, 'approved'])).catch(() => (['error']));
                 } else if (message.type === 'OPEN_SETTINGS_OVERLAY') {
                     return this.waitSettingsOverlay(message.payload);
+                } else if (message.type === 'OPEN_PAIRING_OVERLAY') {
+                    return this.waitPairingOverlay(message.payload.topic, message.payload.args).then(() => ([null, 'ready'])).catch(() => (['error']));
                 }
             }
         });
@@ -51,12 +53,16 @@ export default class Core {
         swiper.on("right", () => this.overlayManager.close());
     }
 
-    public waitPairingOverlay(): Promise<void> {
+    public waitPairingOverlay(topic?: string, args?: any[]): Promise<void> {
         const me = this;
         return new Promise<void>((resolve, reject) => {
+
             const pairingUrl = browser.extension.getURL('pairing.html');
-            const overlay = new Overlay(this.overlayManager, pairingUrl, 'Wallet');
+            let overlay = this.overlayManager.getOverlays().find(x => x.uri === pairingUrl);
+            if (!overlay) overlay = new Overlay(this.overlayManager, pairingUrl, 'Wallet');
+
             overlay.open();
+
             // ToDo: add timeout?
             overlay.onMessage((topic, message) => {
                 if (topic === 'ready') {
@@ -68,6 +74,10 @@ export default class Core {
                     reject();
                 }
             });
+
+            if (topic) {
+                overlay.send(topic, args);
+            }
         });
     }
 
@@ -145,67 +155,20 @@ export default class Core {
     }
 
     // ToDo: use sendSowaTransaction method from background
-    private async _sendWalletConnectTx(sowaIdOrRpcMethod, sowaMetadataOrRpcParams, callback: (e: { type: string, data?: any }) => void): Promise<any> {
-        const backgroundFunctions = await initBGFunctions(browser);
-        const {
-            loadSowa,
-            loadSowaFrames,
-            transactionCreated,
-            transactionRejected,
-            checkConnection,
-            getGlobalConfig,
-            sendLegacyTransaction,
-            sendCustomRequest
-        } = backgroundFunctions;
-
-        const isConnected = await checkConnection();
-
-
-        if (!isConnected) {
-            callback({ type: "pairing" });
-            await this.waitPairingOverlay();
-            callback({ type: "paired" });
-        }
+    private async _sendWalletConnectTx(app: string, sowaIdOrRpcMethod, sowaMetadataOrRpcParams, callback: (e: { type: string, data?: any }) => void): Promise<any> {
+        const { sendCustomRequest } = await initBGFunctions(browser);
 
         callback({ type: "pending" });
-
-        let dappletResult = null;
-
-        const { walletInfo } = await getGlobalConfig();
-
-        const compatibleJsonRpc = ['personal_sign', 'eth_accounts', 'eth_sendTransaction'];
-
-        if (compatibleJsonRpc.includes(sowaIdOrRpcMethod)) {
-            const result = await sendCustomRequest(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
-            callback({ type: "result", data: result });
-            return result;
-        } else {
-            if (walletInfo.protocolVersion === "0.2.0") {
-                console.log("[DAPPLETS]: Wallet is SOWA Frames compatible. Sending SOWA Frames transaction...");
-                dappletResult = await loadSowaFrames(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
-            } else if (walletInfo.protocolVersion === "0.1.0") {
-                console.log("[DAPPLETS]: Wallet is SOWA compatible. Sending SOWA transaction...");
-                dappletResult = await loadSowa(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
-            } else {
-                console.log("[DAPPLETS]: Wallet is SOWA incompatible. Showing SOWA view...");
-
-                try {
-                    await this._approveSowaTransaction(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
-                    dappletResult = await sendLegacyTransaction(sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
-                } catch (err) {
-                    logger.error(err);
-                }
+        
+        try {
+            const result = await sendCustomRequest(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
+            if (result) {
+                callback({ type: "created", data: result });
+                callback({ type: "result", data: result });
             }
-
-            if (dappletResult) {
-                transactionCreated(dappletResult);
-                callback({ type: "created", data: dappletResult });
-            } else {
-                transactionRejected();
-                callback({ type: "rejected" });
-            }
-
-            return dappletResult;
+        } catch (err) {
+            logger.error(err);
+            callback({ type: "rejected" });
         }
     }
 
@@ -215,14 +178,14 @@ export default class Core {
         return conn;
     }
 
-    public wallet<M>(cfg?: {}, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
+    public wallet<M>(cfg?: {}, eventDef?: EventDef<any>, app?: string): AutoProperties<M> & Connection {
         const me = this;
         const transport = {
             _txCount: 0,
             _handler: null,
             exec: (sowaIdOrRpcMethod: string, sowaMetadataOrRpcParams: any) => {
                 const id = (++transport._txCount).toString();
-                me._sendWalletConnectTx(sowaIdOrRpcMethod, sowaMetadataOrRpcParams, (e) => transport._handler(id, e));
+                me._sendWalletConnectTx(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams, (e) => transport._handler(id, e));
                 return Promise.resolve(id);
             },
             onMessage: (handler: (topic: string, message: any) => void) => {
@@ -250,8 +213,8 @@ export default class Core {
 
     public storage: AppStorage;
 
-    public contract(address: string, abi: any): any {
-        const signer = new ProxySigner();
+    public contract(address: string, abi: any, app?: string): any {
+        const signer = new ProxySigner(app);
         return new ethers.Contract(address, abi, signer);
     }
 }

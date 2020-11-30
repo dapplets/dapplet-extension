@@ -175,9 +175,9 @@ export class Injector {
                 contextFinished: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), false),
                 connect: core.connect.bind(core),
                 overlay: core.overlay.bind(core),
-                wallet: core.wallet.bind(core),
+                wallet: (cfg, eventDef) => core.wallet(cfg, eventDef, manifest.name),
                 storage: new AppStorage(manifest.name, manifest.environment, defaultConfig),
-                contract: core.contract.bind(core),
+                contract: (address, abi) => core.contract(address, abi, manifest.name),
                 onAction: (handler: Function) => this.setActionHandler(manifest.name, handler)
             };
 

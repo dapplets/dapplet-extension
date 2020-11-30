@@ -100,13 +100,13 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     }
 
     private async _updateOwnership() {
-        const { getOwnership, getAccounts } = await initBGFunctions(browser);
+        const { getOwnership, getAddress } = await initBGFunctions(browser);
         const owner = await getOwnership(this.state.targetRegistry, this.state.mi.name);
-        const accounts = await getAccounts();
+        const account = await getAddress('extension');
 
         this.setState({
             owner,
-            currentAccount: accounts[0]
+            currentAccount: account
         });
     }
 

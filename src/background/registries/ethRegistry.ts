@@ -1,7 +1,6 @@
 import { Registry, StorageRef } from './registry';
 import abi from './ethRegistryAbi';
 import * as ethers from "ethers";
-import { WalletConnectSigner } from '../utils/walletConnectSigner';
 import * as semver from 'semver';
 import ModuleInfo from '../models/moduleInfo';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../../common/constants';
@@ -56,14 +55,11 @@ export class EthRegistry implements Registry {
     public isAvailable: boolean = true;
     public error: string = null;
 
-    private _signer: WalletConnectSigner;
     private _contract: ethers.ethers.Contract;
     private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>();
 
-    constructor(public url: string, providerUrl: string) {
+    constructor(public url: string, private _signer: ethers.ethers.Signer) {
         if (!url) throw new Error("Endpoint Url is required");
-
-        this._signer = new WalletConnectSigner(providerUrl);
         this._contract = new ethers.Contract(url, abi, this._signer);
     }
 

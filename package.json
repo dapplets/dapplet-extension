@@ -31,7 +31,7 @@
     "chrome-extension-message-wrapper": "github:dapplets/chrome-extension-message-wrapper",
     "copy-webpack-plugin": "^6.1.0",
     "css-loader": "^4.3.0",
-    "ethers": "^5.0.12",
+    "ethers": "^5.0.21",
     "fibers": "^5.0.0",
     "file-loader": "^6.1.0",
     "jszip": "^3.5.0",
@@ -64,10 +64,12 @@
     "webextension-polyfill-ts": "^0.19.0",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
-    "webpack-merge": "^5.1.4"
-  },
-  "dependencies": {
-    "@walletconnect/client": "^1.3.1"
+    "webpack-merge": "^5.1.4",
+    "@walletconnect/client": "^1.3.1",
+    "@walletconnect/web3-provider": "^1.3.1",
+    "ethereum-blockies-base64": "^1.0.2",
+    "metamask-extension-provider": "^2.0.0",
+    "react-time-ago": "^6.2.1"
   },
   "directories": {
     "doc": "docs"

@@ -4,6 +4,10 @@ import * as ReactDOM from 'react-dom';
 import { getCurrentContextIds } from './helpers';
 import Popup from './pages/popup';
 import * as logger from '../common/logger';
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+
+TimeAgo.addDefaultLocale(en);
 
 window.onerror = logger.log;
 

@@ -1,5 +1,5 @@
 import { setupMessageListener } from "chrome-extension-message-wrapper";
-import * as WalletConnectService from "./services/walletConnectService";
+import { WalletService } from "./services/walletService";
 import * as SuspendService from "./services/suspendService";
 import * as NotificationService from "./services/notificationService";
 import FeatureService from './services/featureService';
@@ -19,29 +19,38 @@ import * as GithubService from "./services/githubService";
 
 window.onerror = logger.log;
 
-const featureService = new FeatureService();
 const globalConfigService = new GlobalConfigService();
-const ensService = new EnsService();
+const walletService = new WalletService(globalConfigService);
+const featureService = new FeatureService(globalConfigService, walletService);
+const ensService = new EnsService(walletService);
 const proxyService = new ProxyService();
 
 browser.runtime.onMessage.addListener(
   setupMessageListener({
-    // WalletConnectService
-    loadSowa: WalletConnectService.loadSowa,
-    generateUri: WalletConnectService.generateUri,
-    checkConnection: WalletConnectService.checkConnection,
-    waitPairing: WalletConnectService.waitPairing,
-    disconnect: WalletConnectService.disconnect,
-    getAccounts: WalletConnectService.getAccounts,
-    getChainId: WalletConnectService.getChainId,
-    loadSowaFrames: WalletConnectService.loadSowaFrames,
-    sendLegacyTransaction: WalletConnectService.sendLegacyTransaction,
-    getSowaTemplate: WalletConnectService.getSowaTemplate,
-    pairWalletViaOverlay: WalletConnectService.pairWalletViaOverlay,
-    sendSowaTransaction: WalletConnectService.sendSowaTransaction,
-    sendCustomRequest: WalletConnectService.sendCustomRequest,
-    sendTransaction: WalletConnectService.sendTransaction,
 
+    // WalletService
+    loadSowa: () => console.log('WalletConnectService.loadSowa is deprecated'),
+    generateUri: () => console.log('WalletConnectService.generateUri is deprecated'),
+    checkConnection: () => console.log('WalletConnectService.checkConnection is deprecated'),
+    waitPairing: () => console.log('WalletConnectService.waitPairing is deprecated'),
+    disconnect: () => console.log('WalletConnectService.disconnect is deprecated'),
+    getAccounts: () => console.log('WalletConnectService.getAccounts is deprecated'),
+    getChainId: () => console.log('WalletConnectService.getChainId is deprecated'),
+    loadSowaFrames: () => console.log('WalletConnectService.loadSowaFrames is deprecated'),
+    sendLegacyTransaction: () => console.log('WalletConnectService.sendLegacyTransaction is deprecated'),
+    getSowaTemplate: () => console.log('WalletConnectService.getSowaTemplate is deprecated'),
+    sendSowaTransaction: () => console.log('WalletConnectService.sendSowaTransaction is deprecated'),
+    sendTransaction: () => console.log('WalletConnectService.sendTransaction is deprecated'),
+    
+    connectWallet: (type) => walletService.connectWallet(type),
+    disconnectWallet: (type) => walletService.disconnectWallet(type),
+    getWalletDescriptors: () => walletService.getWalletDescriptors(),
+    pairWalletViaOverlay: () => walletService.pairWalletViaOverlay(),
+    setWalletFor: (walletType, app) => walletService.setWalletFor(walletType, app),
+    getAddress: (app) => walletService.getAddress(app),
+    sendTransactionOutHash: (app, tx) => walletService.sendTransactionOutHash(app, tx),
+    sendCustomRequest: (app, method, params) => walletService.sendCustomRequest(app, method, params),
+    
     // SuspendService
     getSuspendityByHostname: SuspendService.getSuspendityByHostname,
     getSuspendityEverywhere: SuspendService.getSuspendityEverywhere,

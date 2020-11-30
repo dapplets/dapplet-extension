@@ -9,13 +9,18 @@ import VersionInfo from '../models/versionInfo';
 import { Environments } from '../../common/types';
 import { allSettled } from '../../common/helpers';
 import * as logger from '../../common/logger';
+import { WalletService } from '../services/walletService';
 
 if (!Promise.allSettled) Promise.allSettled = allSettled;
 
 export class RegistryAggregator {
     public isAvailable: boolean = true;
     public registries: Registry[] = [];
-    private _globalConfigService = new GlobalConfigService();
+
+    constructor(
+        private _globalConfigService: GlobalConfigService,
+        private _walletService: WalletService
+    ) { }
 
     async getVersions(name: string, branch: string): Promise<string[]> {
         await this._initRegistries();
@@ -107,7 +112,7 @@ export class RegistryAggregator {
         // ToDo: fetch LocalConfig
         const registries = await this._globalConfigService.getRegistries();
         const isDevMode = await this._globalConfigService.getDevMode();
-        const providerUrl = await this._globalConfigService.getEthereumProvider();
+        const signer = await this._walletService.getSignerFor('extension');
 
         // ToDo: optimize comparison
         if (registries.filter(x => isDevMode || (!isDevMode && x.isDev === false)).length !== this.registries.length) {
@@ -117,7 +122,7 @@ export class RegistryAggregator {
                     const uriType = typeOfUri(r.url);
 
                     if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
-                    if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) return new EthRegistry(r.url, providerUrl);
+                    if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) return new EthRegistry(r.url, signer);
                     logger.error("Invalid registry URL");
                     return null;
                 }).filter(r => r !== null);

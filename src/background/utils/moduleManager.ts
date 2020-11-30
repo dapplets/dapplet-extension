@@ -10,15 +10,22 @@ import VersionInfo from '../models/versionInfo';
 import { StorageRef } from '../registries/registry';
 import GlobalConfigService from '../services/globalConfigService';
 import { DefaultConfig, SchemaConfig } from '../../common/types';
-import * as JSZip from 'jszip';
+import JSZip from 'jszip';
 import { TopologicalSort } from 'topological-sort';
 import * as logger from '../../common/logger';
+import { WalletService } from '../services/walletService';
 
 export default class ModuleManager {
 
-    public registryAggregator = new RegistryAggregator();
+    public registryAggregator: RegistryAggregator;
     private _storage = new StorageAggregator();
-    private _globalConfigService = new GlobalConfigService();
+
+    constructor(
+        private _globalConfigService: GlobalConfigService,
+        private _walletService: WalletService
+    ) { 
+        this.registryAggregator = new RegistryAggregator(this._globalConfigService, this._walletService);
+    }
 
     public async resolveDependencies(modules: { name: string, version: string, branch?: string, contextIds: string[] }[]) {
         // ToDo: Add dependency optimizer

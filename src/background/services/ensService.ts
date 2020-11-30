@@ -1,13 +1,13 @@
-import { WalletConnectSigner } from "../utils/walletConnectSigner";
-import GlobalConfigService from "./globalConfigService";
+import { WalletService } from "./walletService";
 
 export default class EnsService {
 
-    private _globalConfigService = new GlobalConfigService();
+    constructor(
+        private _walletService: WalletService
+    ) {}
 
     async resolveName(name: string): Promise<string> {
-        const providerUrl = await this._globalConfigService.getEthereumProvider();
-        const signer = new WalletConnectSigner(providerUrl);
+        const signer = await this._walletService.getSignerFor('extension');
         return signer.resolveName(name);
     }
 }

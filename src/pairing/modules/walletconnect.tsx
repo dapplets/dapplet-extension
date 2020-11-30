@@ -9,10 +9,11 @@ import { Link, Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
 import { WalletInfo } from '../../common/constants';
 
-interface ISelectWalletProps {
+interface Props {
+    bus: Bus;
 }
 
-interface ISelectWalletState {
+interface State {
     svgPath: string;
     isPaired: boolean;
     error: string;
@@ -30,12 +31,9 @@ interface ISelectWalletState {
     toBack: boolean;
 }
 
-export class WalletConnectPairing extends React.Component<ISelectWalletProps, ISelectWalletState> {
-    private bus: Bus = null;
-
+export default class extends React.Component<Props, State> {
     constructor(props) {
         super(props);
-        this.bus = new Bus();
         this.state = {
             svgPath: null,
             isPaired: false,
@@ -46,36 +44,52 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
     }
 
     async componentDidMount() {
-        const backgroundFunctions = await initBGFunctions(browser);
-        const { generateUri, waitPairing, getGlobalConfig } = backgroundFunctions;
-        var uri = await generateUri();
-        console.log("[DAPPLETS]: New pairing URI generated", uri);
-        const svgPath = svgObject(uri, { type: 'svg' });
-        this.setState({ svgPath: svgPath.path });
+        // const { generateUri, waitPairing, getGlobalConfig } = await initBGFunctions(browser);
+        // var uri = await generateUri();
+        // console.log("[DAPPLETS]: New pairing URI generated", uri);
+        // const svgPath = svgObject(uri, { type: 'svg' });
+        // this.setState({ svgPath: svgPath.path });
 
-        const result = await waitPairing();
+        // const result = await waitPairing();
 
-        if (result) {
-            const wallet = result.params[0];
-            if (wallet) {
-                this.setState({ wallet });
-            }
+        // if (result) {
+        //     const wallet = result.params[0];
+        //     if (wallet) {
+        //         this.setState({ wallet });
+        //     }
 
-            const config = await getGlobalConfig();
+        //     const config = await getGlobalConfig();
 
-            this.setState({
-                isPaired: true,
-                walletInfo: config.walletInfo
+        //     this.setState({
+        //         isPaired: true,
+        //         walletInfo: config.walletInfo
+        //     });
+        //     this.props.bus.publish('paired');
+        // } else {
+        //     this.setState({
+        //         isPaired: true,
+        //         error: 'Wallet paring failed'
+        //     });
+        //     this.props.bus.publish('error');
+        // }
+
+        try {
+            const { connectWallet } = await initBGFunctions(browser);
+
+            this.props.bus.subscribe('walletconnect', (uri) => {
+                const svgPath = svgObject(uri, { type: 'svg' });
+                this.setState({ svgPath: svgPath.path });
             });
-            this.bus.publish('paired');
-        } else {
-            this.setState({
-                isPaired: true,
-                error: 'Wallet paring failed'
-            });
-            this.bus.publish('error');
+
+            await connectWallet('walletconnect');
+            this.setState({ isPaired: true });
+        } catch (err) {
+            this.setState({ isPaired: true, error: 'Error ' });
         }
+    }
 
+    componentWillUnmount() {
+        this.props.bus.unsubscribe('walletconnect');
     }
 
     async disconnect() {
@@ -85,7 +99,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
     }
 
     async continue() {
-        this.bus.publish('ready');
+        this.props.bus.publish('ready');
     }
 
     render() {
@@ -113,7 +127,7 @@ export class WalletConnectPairing extends React.Component<ISelectWalletProps, IS
                                     <p>Chain ID: {wallet?.chainId}</p>
                                     <p>Peer Name: {wallet?.peerMeta?.name}</p>
                                     <p>Peer URL: {wallet?.peerMeta?.url}</p>
-                                    <p>SOWA Compatibility: {walletInfo?.compatible ? "Yes": "No"}</p>
+                                    <p>SOWA Compatibility: {walletInfo?.compatible ? "Yes" : "No"}</p>
                                     <p>SOWA Protocol Version: {walletInfo?.protocolVersion || "UNKNOWN"}</p>
                                     <p>SOWA Engine Version: {walletInfo?.engineVersion || "UNKNOWN"}</p>
                                     <p>Device Manufacturer: {walletInfo?.device?.manufacturer || "UNKNOWN"}</p>

@@ -12,15 +12,23 @@ import VersionInfo from '../models/versionInfo';
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { HttpModuleStorage } from '../moduleStorages/httpModuleStorage';
 import { SchemaConfig, DefaultConfig } from '../../common/types';
-import * as JSZip from 'jszip';
+import JSZip from 'jszip';
 import * as logger from '../../common/logger';
 import { getCurrentTab, mergeDedupe } from '../../common/helpers';
+import EnsService from './ensService';
+import { WalletService } from './walletService';
 
 export default class FeatureService {
     private _siteConfigRepository = new SiteConfigBrowserStorage();
-    private _globalConfigService = new GlobalConfigService();
-    private _moduleManager = new ModuleManager();
+    private _moduleManager: ModuleManager;
     private _storageAggregator = new StorageAggregator();
+
+    constructor(
+        private _globalConfigService: GlobalConfigService, 
+        private _walletService: WalletService
+    ) { 
+        this._moduleManager = new ModuleManager(this._globalConfigService, this._walletService);
+    }
 
     async getFeaturesByHostnames(contextIds: string[]): Promise<ManifestDTO[]> {
         const users = await this._globalConfigService.getTrustedUsers();

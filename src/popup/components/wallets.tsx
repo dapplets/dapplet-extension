@@ -2,18 +2,24 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { List, Button, Segment } from "semantic-ui-react";
+import { List, Button, Segment, Comment, Icon } from "semantic-ui-react";
 import { WalletInfo } from "../../common/constants";
+import { WalletDescriptor } from "../../background/services/walletService";
+import makeBlockie from 'ethereum-blockies-base64';
+import ReactTimeAgo from 'react-time-ago';
+
+import * as walletIcons from '../../common/resources/wallets';
+import { networkName } from "../../common/helpers";
+import { CheckIcon } from "./CheckIcon";
 
 interface IWalletsProps {
 
 }
 
 interface IWalletsState {
-  isConnected: boolean;
-  chainId: any; // TODO: what kind of type?
-  accounts: any[];
-  walletInfo: WalletInfo;
+  descriptors: WalletDescriptor[];
+  //walletInfo: WalletInfo;
+  loading: boolean;
 }
 
 class Wallets extends React.Component<IWalletsProps, IWalletsState> {
@@ -21,33 +27,28 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
     super(props);
 
     this.state = {
-      isConnected: false,
-      chainId: null,
-      accounts: [],
-      walletInfo: null
+      descriptors: [],
+      loading: true
+      //walletInfo: null
     };
   }
 
   async componentDidMount() {
-    var backgroundFunctions = await initBGFunctions(browser);
-    const { checkConnection, getChainId, getAccounts, getGlobalConfig } = backgroundFunctions;
+    const { getWalletDescriptors, getGlobalConfig } = await initBGFunctions(browser);
 
-    const isConnected = await checkConnection();
-    const chainId = await getChainId();
-    const accounts = await getAccounts();
-    const { walletInfo } = await getGlobalConfig();
+    const descriptors = await getWalletDescriptors();
+    //const { walletInfo } = await getGlobalConfig();
 
     this.setState({
-      isConnected,
-      chainId,
-      accounts,
-      walletInfo
+      descriptors,
+      loading: false
+      //walletInfo
     });
   }
 
-  async disconnectButtonClick() {
-    const { disconnect } = await initBGFunctions(browser);
-    await disconnect();
+  async disconnectButtonClick(wallet: string) {
+    const { disconnectWallet } = await initBGFunctions(browser);
+    await disconnectWallet(wallet);
     await this.componentDidMount();
   }
 
@@ -57,57 +58,54 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
     window.close();
   }
 
+  async setWalletFor(type: string) {
+    const { setWalletFor } = await initBGFunctions(browser);
+    await setWalletFor(type, 'extension');
+    await this.componentDidMount();
+  }
+
   render() {
-    const { isConnected, chainId, accounts, walletInfo } = this.state;
+    const { descriptors, loading } = this.state;
+
+    if (loading) return null;
+
+    const connectedDescriptors = descriptors.filter(x => x.connected);
 
     return (
       <React.Fragment>
         <Segment className="internalTab">
-          <List>
-            <List.Item>
-              <List.Header>Wallet Connection</List.Header>
-              <List.Description>
-                {isConnected ? "Connected" : "Disconnected"}
-              </List.Description>
-            </List.Item>
+          {(connectedDescriptors.length > 0) ? 
+          <Comment.Group>
+            {connectedDescriptors.map((x, i) => (
+              <Comment key={i}>
+                {(x.account) ? <Comment.Avatar src={makeBlockie(x.account)} /> : null}
+                <Comment.Content>
+                  <Comment.Author style={{ display: 'inline' }}>
+                    {(x.default) ? <Icon name='star' /> : <Icon link name='star outline' onClick={() => this.setWalletFor(x.type)} />}
+                    {(x.account) ? x.account.substr(0, 6) + '...' + x.account.substr(38) : null}
+                  </Comment.Author>
+                  {/* <Comment.Author style={{ display: 'inline' }}>{x.account}</Comment.Author> */}
+                  <Comment.Metadata>
+                    <CheckIcon text='Copied' name='copy' onClick={() => navigator.clipboard.writeText(x.account)} />
+                    <Icon link name='external' onClick={() => window.open(`https://${(x.chainId === 1) ? '' : networkName(x.chainId) + '.'}etherscan.io/address/${x.account}`, '_blank')} />
+                    {(x.lastUsage) ? <ReactTimeAgo date={x.lastUsage} locale="en-US"/> : null}
+                  </Comment.Metadata>
+                  <Comment.Text>
+                    {walletIcons[x.type] ? <img style={{ width: '16px' }} src={walletIcons[x.type]} /> : null}
+                    {x.meta?.icon ? <img style={{ width: '16px' }} src={x.meta.icon} /> : null}
+                    <span style={{ marginLeft: '0.5em' }}>{networkName(x.chainId)}</span>
+                  </Comment.Text>
+                  <Comment.Actions>
+                    <Comment.Action onClick={() => this.disconnectButtonClick(x.type)}>Disconnect</Comment.Action>
+                  </Comment.Actions>
+                </Comment.Content>
+              </Comment>
+            ))}
+          </Comment.Group> : 
+          <div style={{ marginBottom: '10px'}}>No connected wallets</div>}
 
-            {isConnected && (
-              <React.Fragment>
-                <List.Item>
-                  <List.Header>Chain ID</List.Header>
-                  <List.Description>{chainId}</List.Description>
-                </List.Item>
-                <List.Item>
-                  <List.Header>Accounts</List.Header>
-                  <List.Description>{accounts.join(", ")}</List.Description>
-                </List.Item>
-                <List.Item>
-                  <List.Header>SOWA Compatibility</List.Header>
-                  <List.Description>{walletInfo?.compatible ? "Yes" : "No"}</List.Description>
-                </List.Item>
-                <List.Item>
-                  <List.Header>Device</List.Header>
-                  <List.Description>{walletInfo?.device?.manufacturer} {walletInfo?.device?.model}</List.Description>
-                </List.Item>
-                <List.Item>
-                  <List.Header>SOWA Protocol Version</List.Header>
-                  <List.Description>{walletInfo?.protocolVersion}</List.Description>
-                </List.Item>
-                <List.Item>
-                  <List.Header>SOWA Engine Version</List.Header>
-                  <List.Description>{walletInfo?.engineVersion}</List.Description>
-                </List.Item>
-              </React.Fragment>
-            )}
-          </List>
-          {isConnected && (
-            <Button onClick={() => this.disconnectButtonClick()}>
-              Disconnect wallet
-            </Button>
-          )}
-          {!isConnected && (
-            <Button onClick={() => this.connectWallet()}>Connect</Button>
-          )}
+          <Button onClick={() => this.connectWallet()}>Connect</Button>
+
         </Segment>
       </React.Fragment>
     );

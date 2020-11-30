@@ -29,4 +29,6 @@ export class GlobalConfig extends Base {
     autoBackup: boolean = false;
 
     providerUrl: string = null;
+
+    walletsUsage: { [moduleName: string]: string } = {};
 }

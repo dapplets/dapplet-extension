@@ -1,7 +1,6 @@
 import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserStorage';
 import { GlobalConfig } from '../models/globalConfig';
 import { typeOfUri, UriTypes } from '../../common/helpers';
-import { WalletConnectSigner } from '../utils/walletConnectSigner';
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 
 export default class GlobalConfigService {
@@ -33,6 +32,7 @@ export default class GlobalConfigService {
         }];
         config.userSettings = {};
         config.providerUrl = 'https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992';
+        config.walletsUsage = {};
 
         await this._globalConfigRepository.deleteById(this._configId);
         await this._globalConfigRepository.create(config);
@@ -56,12 +56,12 @@ export default class GlobalConfigService {
         if (config.registries.find(r => r.url === url)) return;
 
         if (isEthAddress || isEnsAddress) {
-            if (isEnsAddress) {
-                const provider = await this.getEthereumProvider();
-                const signer = new WalletConnectSigner(provider);
-                const address = await signer.resolveName(url);
-                if (!address) throw new Error("Can not resolve the ENS name");
-            }
+            // ToDo: fix it
+            // if (isEnsAddress) {
+            //     const signer = new WalletConnectSigner();
+            //     const address = await signer.resolveName(url);
+            //     if (!address) throw new Error("Can not resolve the ENS name");
+            // }
 
             config.registries.push({ url, isDev });
             await this.set(config);
@@ -118,12 +118,13 @@ export default class GlobalConfigService {
 
         if (!isEthAddress && !isEnsAddress) throw Error('User account must be valid Ethereum address');
 
-        if (isEnsAddress) {
-            const provider = await this.getEthereumProvider();
-            const signer = new WalletConnectSigner(provider);
-            const address = await signer.resolveName(account);
-            if (!address) throw new Error("Can not resolve the ENS name");
-        }
+        // ToDo: fix it
+        // if (isEnsAddress) {
+        //     const provider = await this.getEthereumProvider();
+        //     const signer = new WalletConnectSigner(provider);
+        //     const address = await signer.resolveName(account);
+        //     if (!address) throw new Error("Can not resolve the ENS name");
+        // }
 
         config.trustedUsers.push({ account: account });
         await this.set(config);
@@ -194,7 +195,7 @@ export default class GlobalConfigService {
     }
 
     async setErrorReporting(isActive: boolean) {
-        await this.updateConfig(c => c.errorReporting = isActive);
+        return this.updateConfig(c => c.errorReporting = isActive);
     }
 
     async getAutoBackup() {
@@ -203,7 +204,7 @@ export default class GlobalConfigService {
     }
 
     async setAutoBackup(isActive: boolean) {
-        await this.updateConfig(c => c.autoBackup = isActive);
+        return this.updateConfig(c => c.autoBackup = isActive);
     }
 
     async setEthereumProvider(url: string) {
@@ -213,5 +214,14 @@ export default class GlobalConfigService {
 
     async getEthereumProvider() {
         return this.get().then(x => x.providerUrl);
+    }
+
+    async getWalletsUsage() {
+        const config = await this.get();
+        return config.walletsUsage;
+    }
+
+    async setWalletsUsage(walletsUsage: { [moduleName: string]: string }) {
+        return this.updateConfig(c => c.walletsUsage = walletsUsage);
     }
 }
