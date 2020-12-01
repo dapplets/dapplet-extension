@@ -10,7 +10,7 @@ import VersionInfo from '../models/versionInfo';
 import { StorageRef } from '../registries/registry';
 import GlobalConfigService from '../services/globalConfigService';
 import { DefaultConfig, SchemaConfig } from '../../common/types';
-import * as JSZip from 'jszip';
+import JSZip from 'jszip';
 import { TopologicalSort } from 'topological-sort';
 import * as logger from '../../common/logger';
 

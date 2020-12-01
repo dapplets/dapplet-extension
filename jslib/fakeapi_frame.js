@@ -3,39 +3,42 @@ const browser = {};
 browser.tabs = {};
 browser.runtime = {};
 
-browser.runtime.sendMessage = function (message, callback) {
+browser.runtime.sendMessage = async function (message, callback) {
     //console.log('browser.runtime.sendMessage', arguments);
-    sendMessage(message, callback);
+    return sendMessage(message, callback);
 }
-browser.tabs.sendMessage = function (tabId, message, callback) {
+browser.tabs.sendMessage = async function (tabId, message, callback) {
     //console.log('browser.tabs.sendMessage', arguments);
-    sendMessage(message, callback);
+    return sendMessage(message, callback);
 }
 
 function randomHex(len) {
     return Array.from(crypto.getRandomValues(new Uint8Array(len))).map(x => x.toString(16)).join('');
 }
 
-function sendMessage(message, callback) {
-    const id = randomHex(8);
+async function sendMessage(message, callback) {
+    return new Promise((res, rej) => {
+        const id = randomHex(8);
 
-    window.top.postMessage(JSON.stringify({
-        request: message,
-        id: id
-    }), '*');
-
-    const handler = (event) => {
-        try {
-            const payload = JSON.parse(event.data);
-
-            if (payload.id === id && (payload.response !== undefined || payload.request === undefined)) {
-                callback !== undefined && callback(payload.response);
-                window.removeEventListener('message', handler);
-            }
-        } catch (err) {}
-    }
-
-    window.addEventListener('message', handler);
+        window.top.postMessage(JSON.stringify({
+            request: message,
+            id: id
+        }), '*');
+    
+        const handler = (event) => {
+            try {
+                const payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+    
+                if (payload.id === id && (payload.response !== undefined || payload.request === undefined)) {
+                    window.removeEventListener('message', handler);
+                    callback !== undefined && typeof callback === 'function' && callback(payload.response);
+                    res(payload.response);
+                }
+            } catch (err) {}
+        }
+    
+        window.addEventListener('message', handler);
+    });    
 }
 
 

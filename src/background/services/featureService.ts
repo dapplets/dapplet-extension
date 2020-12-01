@@ -12,7 +12,7 @@ import VersionInfo from '../models/versionInfo';
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { HttpModuleStorage } from '../moduleStorages/httpModuleStorage';
 import { SchemaConfig, DefaultConfig } from '../../common/types';
-import * as JSZip from 'jszip';
+import JSZip from 'jszip';
 import * as logger from '../../common/logger';
 import { getCurrentTab, mergeDedupe } from '../../common/helpers';
 
