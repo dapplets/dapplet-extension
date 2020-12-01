@@ -83,42 +83,29 @@ export default class FeatureService {
             await this._siteConfigRepository.update(config);
         }
 
-        // sending command to inpage
-        const activeTab = await getCurrentTab();
-        browser.tabs.sendMessage(activeTab.id, {
-            type: isActive ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
-            payload: [{
-                name,
-                version,
-                branch: DEFAULT_BRANCH_NAME, // ToDo: fix branch
-                order,
-                contextIds: hostnames
-            }]
-        });
-
         try {
-            await new Promise<void>((resolve, reject) => {
+            await new Promise<void>(async (resolve, reject) => {
                 // listening of loading/unloading from inpage
                 const listener = (message, sender) => {
                     if (!message || !message.type || !message.payload) return;
                     const p = message.payload;
                     if (message.type === 'FEATURE_LOADED') {
-                        if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === p.version && isActive === true) {
+                        if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === version && isActive === true) {
                             browser.runtime.onMessage.removeListener(listener);
                             resolve();
                         }
                     } else if (message.type === "FEATURE_UNLOADED") {
-                        if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === p.version && isActive === false) {
+                        if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === version && isActive === false) {
                             browser.runtime.onMessage.removeListener(listener);
                             resolve();
                         }
                     } else if (message.type === "FEATURE_LOADING_ERROR") {
-                        if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === p.version && isActive === true) {
+                        if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === version && isActive === true) {
                             browser.runtime.onMessage.removeListener(listener);
                             reject(p.error);
                         }
                     } else if (message.type === "FEATURE_UNLOADING_ERROR") {
-                        if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === p.version && isActive === false) {
+                        if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === version && isActive === false) {
                             browser.runtime.onMessage.removeListener(listener);
                             reject(p.error);
                         }
@@ -126,6 +113,19 @@ export default class FeatureService {
                 }
 
                 browser.runtime.onMessage.addListener(listener);
+
+                // sending command to inpage
+                const activeTab = await getCurrentTab();
+                browser.tabs.sendMessage(activeTab.id, {
+                    type: isActive ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
+                    payload: [{
+                        name,
+                        version,
+                        branch: DEFAULT_BRANCH_NAME, // ToDo: fix branch
+                        order,
+                        contextIds: hostnames
+                    }]
+                });
             });
         } catch (err) {
             // revert config if error

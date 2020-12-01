@@ -25,6 +25,8 @@ browser.tabs = {};
 browser.tabs.onActivated = {};
 browser.tabs.onUpdated = {};
 
+const callbacksMap = new WeakMap();
+
 browser.browserAction.setIcon = async function (details, callback) {
     //console.log('browser.browserAction.setIcon', arguments);
     callback !== undefined && typeof callback === 'function' && callback();
@@ -108,9 +110,10 @@ browser.notifications.create = async function (notificationId, options, callback
 browser.notifications.onClicked.addListener = function () {
     //console.log('browser.notifications.onClicked.addListener', arguments);
 }
+
 browser.runtime.onMessage.addListener = function (callback) {
     //console.log('browser.runtime.onMessage.addListener', arguments);
-    window.addEventListener('message', async e => {
+    const callbackWrapper = async e => {
         try {
             const payload = JSON.parse(e.data);
             if (payload.request !== undefined) {
@@ -143,7 +146,14 @@ browser.runtime.onMessage.addListener = function (callback) {
                 }
             }
         } catch (err) { }
-    });
+    };
+    callbacksMap.set(callback, callbackWrapper)    
+    window.addEventListener('message', callbackWrapper);
+}
+
+browser.runtime.onMessage.removeListener = function (callback) {
+    const callbackWrapper = callbacksMap.get(callback);
+    window.removeEventListener('message', callbackWrapper);
 }
 
 browser.runtime.onConnect.addListener = function (callback) {
