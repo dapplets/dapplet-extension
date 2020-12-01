@@ -18,26 +18,35 @@ browser.notifications = {};
 browser.notifications.onClicked = {};
 browser.runtime = {};
 browser.runtime.onMessage = {};
+browser.runtime.onConnect = {};
 browser.storage = {};
 browser.storage.local = {};
 browser.tabs = {};
 browser.tabs.onActivated = {};
 browser.tabs.onUpdated = {};
 
-browser.browserAction.setIcon = function (details, callback) {
+browser.browserAction.setIcon = async function (details, callback) {
     //console.log('browser.browserAction.setIcon', arguments);
-    callback !== undefined && callback();
+    callback !== undefined && typeof callback === 'function' && callback();
+}
+browser.browserAction.setBadgeText = async function (details, callback) {
+    //console.log('browser.browserAction.setBadgeText', arguments);
+    callback !== undefined && typeof callback === 'function' && callback();
+}
+browser.browserAction.setBadgeBackgroundColor = async function (details, callback) {
+    //console.log('browser.browserAction.setBadgeBackgroundColor', arguments);
+    callback !== undefined && typeof callback === 'function' && callback();
 }
 browser.commands.onCommand.addListener = function () {
     //console.log('browser.commands.onCommand.addListener', arguments);
 }
-browser.contextMenus.create = function (createProperties, callback) {
+browser.contextMenus.create = async function (createProperties, callback) {
     //console.log('browser.contextMenus.create', arguments);
-    callback !== undefined && callback();
+    callback !== undefined && typeof callback === 'function' && callback();
 }
-browser.contextMenus.removeAll = function (callback) {
+browser.contextMenus.removeAll = async function (callback) {
     //console.log('browser.contextMenus.removeAll', arguments);
-    callback !== undefined && callback();
+    callback !== undefined && typeof callback === 'function' && callback();
 }
 
 browser.extension.getURL = function (url) {
@@ -71,13 +80,15 @@ browser.extension.getURL = function (url) {
           <div id="app"></div>
           <script>` + fakeapi_frame_script + `</script>
           <script>
-            window.browser.tabs.query = function (query, callback) {
-                //console.log('browser.tabs.query', arguments);
-                callback !== undefined && callback([{
+            window.browser.tabs.query = async function (query, callback) {
+                //console.log('browser.tabs.query2', arguments);
+                const result = [{
                     id: '1',
                     url: '${window.location.href}',
                     pendingUrl: '${window.location.href}'
-                }]);
+                }];
+                callback !== undefined && typeof callback === 'function' && callback(result);
+                return Promise.resolve(result);
             }
           </script>
           <script>` + script + `</script>
@@ -90,47 +101,60 @@ browser.extension.getURL = function (url) {
     return uri;
 }
 
-browser.notifications.create = function (notificationId, options, callback) {
+browser.notifications.create = async function (notificationId, options, callback) {
     //console.log('browser.notifications.create', arguments);
-    callback !== undefined && callback();
+    callback !== undefined && typeof callback === 'function' && callback();
 }
 browser.notifications.onClicked.addListener = function () {
     //console.log('browser.notifications.onClicked.addListener', arguments);
 }
 browser.runtime.onMessage.addListener = function (callback) {
     //console.log('browser.runtime.onMessage.addListener', arguments);
-    window.addEventListener('message', e => {
+    window.addEventListener('message', async e => {
         try {
             const payload = JSON.parse(e.data);
             if (payload.request !== undefined) {
-                callback !== undefined && callback(payload.request, {
-                    tab: {
-                        id: '1',
-                        url: window.location.href,
-                        pendingUrl: window.location.href
-                    }
-                }, (result) => {
+                if (callback !== undefined && typeof callback === 'function') {
+                    const response = await Promise.resolve(callback(payload.request, {
+                        tab: {
+                            id: '1',
+                            url: window.location.href,
+                            pendingUrl: window.location.href
+                        }
+                    }));
+
+                    if (response === undefined) return;
+
+                    // console.log('request', payload.request);
+                    // console.log('response', response);
+
                     for (let i = 0; i < window.frames.length; i++) {
                         const frame = window.frames[i];
                         frame.postMessage(JSON.stringify({
                             id: payload.id,
-                            response: result
+                            response
                         }), '*');
                     }
+
                     window.postMessage(JSON.stringify({
                         id: payload.id,
-                        response: result
+                        response
                     }), '*');
-                })
+                }
             }
-        } catch (err) {}
+        } catch (err) { }
     });
 }
-browser.runtime.sendMessage = function (message, callback) {
-    //console.log('browser.runtime.sendMessage', arguments);
-    sendMessage(message, callback);
+
+browser.runtime.onConnect.addListener = function (callback) {
+    console.log('browser.runtime.onConnect.addListener', arguments);
 }
-browser.storage.local.get = function (key, callback) {
+
+browser.runtime.sendMessage = async function (message, callback) {
+    //console.log('browser.runtime.sendMessage', arguments);
+    return sendMessage(message, callback);
+}
+browser.storage.local.get = async function (key, callback) {
     //console.log('browser.storage.local.get', arguments);
     const _storage = JSON.parse(localStorage.getItem('dapplet-extension') || "{}");
 
@@ -156,9 +180,10 @@ browser.storage.local.get = function (key, callback) {
         result[key] = _storage[key];
     }
     //console.log('result storage', result);
-    callback !== undefined && callback(result);
+    callback !== undefined && typeof callback === 'function' && callback(result);
+    return result;
 }
-browser.storage.local.remove = function (key, callback) {
+browser.storage.local.remove = async function (key, callback) {
     //console.log('browser.storage.local.remove', arguments);
     const _storage = JSON.parse(localStorage.getItem('dapplet-extension') || "{}");
     if (Array.isArray(key)) {
@@ -171,9 +196,9 @@ browser.storage.local.remove = function (key, callback) {
 
     localStorage.setItem('dapplet-extension', JSON.stringify(_storage));
 
-    callback !== undefined && callback();
+    callback !== undefined && typeof callback === 'function' && callback();
 }
-browser.storage.local.set = function (key, value, callback) {
+browser.storage.local.set = async function (key, value, callback) {
     //console.log('browser.storage.local.set', arguments);
     const _storage = JSON.parse(localStorage.getItem('dapplet-extension') || "{}");
     if (typeof key === 'object') {
@@ -182,16 +207,15 @@ browser.storage.local.set = function (key, value, callback) {
             _storage[oKey] = key[oKey];
         });
         localStorage.setItem('dapplet-extension', JSON.stringify(_storage));
-        value();
     } else {
         _storage[key] = value;
         localStorage.setItem('dapplet-extension', JSON.stringify(_storage));
-        callback !== undefined && callback();
     }
+    callback !== undefined && typeof callback === 'function' && callback();
 }
-browser.tabs.create = function (createProperties, callback) {
+browser.tabs.create = async function (createProperties, callback) {
     //console.log('browser.tabs.create', arguments);
-    callback !== undefined && callback();
+    callback !== undefined && typeof callback === 'function' && callback();
 }
 browser.tabs.onActivated.addListener = function () {
     //console.log('browser.tabs.onActivated.addListener', arguments);
@@ -199,43 +223,48 @@ browser.tabs.onActivated.addListener = function () {
 browser.tabs.onUpdated.addListener = function () {
     //console.log('browser.tabs.onUpdated.addListener', arguments);
 }
-browser.tabs.query = function (query, callback) {
+browser.tabs.query = async function (query, callback) {
     //console.log('browser.tabs.query', arguments);
-    callback !== undefined && callback([{
+    const result = [{
         id: '1',
         url: window.location.href,
         pendingUrl: window.location.href
-    }]);
+    }];
+    callback !== undefined && typeof callback === 'function' && callback(result);
+    return Promise.resolve(result);
 }
-browser.tabs.sendMessage = function (tabId, message, callback) {
+browser.tabs.sendMessage = async function (tabId, message, callback) {
     //console.log('browser.tabs.sendMessage', arguments);
-    sendMessage(message, callback);
+    return sendMessage(message, callback);
 }
 
 function randomHex(len) {
     return Array.from(crypto.getRandomValues(new Uint8Array(len))).map(x => x.toString(16)).join('');
 }
 
-function sendMessage(message, callback) {
-    const id = randomHex(8);
+async function sendMessage(message, callback) {
+    return new Promise((res, rej) => {
+        const id = randomHex(8);
 
-    window.top.postMessage(JSON.stringify({
-        request: message,
-        id: id
-    }), '*');
+        window.top.postMessage(JSON.stringify({
+            request: message,
+            id: id
+        }), '*');
 
-    const handler = (event) => {
-        try {
-            const payload = JSON.parse(event.data);
+        const handler = (event) => {
+            try {
+                const payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
-            if (payload.id === id && (payload.response !== undefined || payload.request === undefined)) {
-                callback !== undefined && callback(payload.response);
-                window.removeEventListener('message', handler);
-            }
-        } catch (err) {}
-    }
+                if (payload.id === id && (payload.response !== undefined || payload.request === undefined)) {
+                    window.removeEventListener('message', handler);
+                    callback !== undefined && typeof callback === 'function' && callback(payload.response);
+                    res(payload.response);
+                }
+            } catch (err) { }
+        }
 
-    window.addEventListener('message', handler);
+        window.addEventListener('message', handler);
+    });
 }
 
 

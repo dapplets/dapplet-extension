@@ -130,7 +130,8 @@ export function timeoutPromise<T>(ms: number, promise: Promise<T>, timeoutCallba
 }
 
 export async function getCurrentTab(): Promise<Tabs.Tab> {
-  const [tab] = await browser.tabs.query({ currentWindow: true, active: true });
+  const tabs = await browser.tabs.query({ currentWindow: true, active: true });
+  const tab = tabs[0];
   const popupUrl = browser.extension.getURL('popup.html');
   
   if (tab.url.indexOf(popupUrl) !== -1) {

@@ -20,7 +20,9 @@ export class Overlay implements IPubSub {
 
         // disable cache
         const url = new URL(uri);
-        url.searchParams.set('_dc', Date.now().toString());
+        if (url.protocol !== 'blob:') {
+            url.searchParams.set('_dc', Date.now().toString());
+        }
 
         this._manager = manager;
         this.frame = document.createElement('iframe');
