@@ -147,7 +147,7 @@ browser.runtime.onMessage.addListener = function (callback) {
             }
         } catch (err) { }
     };
-    callbacksMap.set(callback, callbackWrapper)    
+    callbacksMap.set(callback, callbackWrapper)
     window.addEventListener('message', callbackWrapper);
 }
 
