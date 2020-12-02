@@ -245,15 +245,19 @@ export class Injector {
     }
 
     private async _setContextActivivty(contextIds: any[], parentContext: string, isActive: boolean) {
+        if (contextIds.length === 0) return;
+
         contextIds = parentContext ? contextIds.map(({ id }) => parentContext + '/' + id) : contextIds;
 
         if (isActive) {
+            // console.log('Context started:', contextIds);
             contextIds.forEach(id => {
                 if (this.availableContextIds.indexOf(id) === -1) {
                     this.availableContextIds.push(id);
                 }
             });
         } else {
+            // console.log('Context finished:', contextIds);
             contextIds.forEach(id => {
                 const index = this.availableContextIds.indexOf(id);
                 if (index > -1) this.availableContextIds.splice(index, 1);
