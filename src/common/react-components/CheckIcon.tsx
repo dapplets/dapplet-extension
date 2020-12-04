@@ -6,6 +6,7 @@ interface Props {
     name: SemanticICONS;
     text: string;
     onClick: (...args: any[]) => void;
+    style?: any;
 }
 
 interface State {
@@ -34,6 +35,7 @@ export class CheckIcon extends React.Component<Props, State> {
                 open
                 size='mini'
                 trigger={<Icon
+                    style={this.props.style}
                     link
                     name='check'
                     onClick={this.clickHandler}
@@ -41,6 +43,7 @@ export class CheckIcon extends React.Component<Props, State> {
             />
         } else {
             return <Icon
+                style={this.props.style}
                 link
                 name={(this.state.clicked) ? 'check' : this.props.name}
                 onClick={this.clickHandler}

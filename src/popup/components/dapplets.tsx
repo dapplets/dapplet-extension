@@ -100,7 +100,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
         await deactivateFeature(name, version, hostnames, order, sourceRegistry.url);
       }
     } catch (err) {
-      this._updateFeatureState(name, { isActive: !isActive, error: err });
+      this._updateFeatureState(name, { isActive: !isActive, error: err.message });
     }
 
     this._updateFeatureState(name, { isLoading: false });

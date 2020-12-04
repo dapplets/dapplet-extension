@@ -9,7 +9,7 @@ import { getCurrentTab } from '../../common/helpers';
 export default class extends ethers.Signer implements ExtendedSigner {
 
     public provider = new ethers.providers.JsonRpcProvider('https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992', 'rinkeby');
-    private _walletconnect: WalletConnect;
+    private _walletconnect?: WalletConnect;
 
     constructor() {
         super();
@@ -19,7 +19,7 @@ export default class extends ethers.Signer implements ExtendedSigner {
     }
 
     async getAddress(): Promise<string> {
-        return Promise.resolve(this._walletconnect.accounts[0] || '0x0000000000000000000000000000000000000000');
+        return Promise.resolve(this._walletconnect?.accounts[0] || '0x0000000000000000000000000000000000000000');
     }
 
     async signMessage(message: string | ethers.Bytes): Promise<string> {
@@ -52,7 +52,7 @@ export default class extends ethers.Signer implements ExtendedSigner {
     }
 
     isConnected() {
-        return this._walletconnect.connected;
+        return this._walletconnect?.connected ?? false;
     }
 
     async connectWallet(): Promise<void> {
@@ -72,7 +72,7 @@ export default class extends ethers.Signer implements ExtendedSigner {
     }
 
     async disconnectWallet() {
-        if (this._walletconnect.connected) {
+        if (this._walletconnect?.connected) {
             await this._walletconnect.killSession();
             delete localStorage['walletconnect'];
             delete localStorage['walletconnect_lastUsage'];
@@ -81,7 +81,7 @@ export default class extends ethers.Signer implements ExtendedSigner {
     }
 
     async getMeta() {
-        const m = this._walletconnect.peerMeta;
+        const m = this._walletconnect?.peerMeta;
         return (m) ? {
             name: m.name,
             description: m.description,

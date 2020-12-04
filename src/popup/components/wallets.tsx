@@ -10,7 +10,7 @@ import ReactTimeAgo from 'react-time-ago';
 
 import * as walletIcons from '../../common/resources/wallets';
 import { networkName } from "../../common/helpers";
-import { CheckIcon } from "./CheckIcon";
+import { CheckIcon } from "../../common/react-components/CheckIcon";
 
 interface IWalletsProps {
 
@@ -88,7 +88,7 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
                   <Comment.Metadata>
                     <CheckIcon text='Copied' name='copy' onClick={() => navigator.clipboard.writeText(x.account)} />
                     <Icon link name='external' onClick={() => window.open(`https://${(x.chainId === 1) ? '' : networkName(x.chainId) + '.'}etherscan.io/address/${x.account}`, '_blank')} />
-                    {(x.lastUsage) ? <ReactTimeAgo date={x.lastUsage} locale="en-US"/> : null}
+                    {(x.lastUsage) ? <ReactTimeAgo date={new Date(x.lastUsage)} locale="en-US"/> : null}
                   </Comment.Metadata>
                   <Comment.Text>
                     {walletIcons[x.type] ? <img style={{ width: '16px' }} src={walletIcons[x.type]} /> : null}

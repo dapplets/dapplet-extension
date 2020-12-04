@@ -10,7 +10,10 @@ import { browser } from "webextension-polyfill-ts";
 import * as logger from '../common/logger';
 import { Bus } from '../common/bus';
 import * as modules from './modules';
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
 
+TimeAgo.addDefaultLocale(en);
 window.onerror = logger.log;
 
 interface Props {
