@@ -140,8 +140,9 @@
 }
 
 .dapplets-overlay-nav-tab-list {
-    background: #f3f3f3;
     display: flex;
+    flex: auto;
+    overflow-x: auto;
 }
 
 .dapplets-overlay-nav-tab-item {
@@ -157,8 +158,17 @@
     background: #fff;
 }
 
+.dapplets-overlay-nav-top-panel {
+    background: #f3f3f3;
+    display: flex;
+}
+
+.dapplets-overlay-nav-top-actions {
+    display: flex;
+}
+
 .dapplets-overlay-nav-content-list {
-    height: 100%;
+    height: calc(100% - 36px);
 }
 
 .dapplets-overlay-nav-content-item {
@@ -193,4 +203,53 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.dapplets-action-dropdown {
+    position: relative;
+    display: inline-block;
+
+    button {
+        color: rgba(0, 0, 0, 0.6);
+        border: none;
+        cursor: pointer;
+        height: 100%;
+        padding: 0 8px;
+    }
+
+    button > svg {
+        width: 20px;
+    }
+
+    > div {
+        display: none;
+        position: absolute;
+        background-color: #fff;
+        min-width: 160px;
+        z-index: 99999;
+        box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+        border: 1px solid rgba(34, 36, 38, 0.15);
+        border-radius: 4px;
+    }
+
+    > div > a {
+        color: black;
+        padding: 10px 16px;
+        text-decoration: none;
+        display: block;
+    }
+
+    div > a:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &:hover > div {
+        display: block;
+        right: 0;
+    }
+
+    &:hover > button {
+        color: rgba(0, 0, 0, 0.8);
+        background: rgba(0, 0, 0, 0.1);
+    }
 }

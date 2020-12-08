@@ -69,7 +69,8 @@ export class Overlay implements IPubSub {
 
     public send(topic: string, args: any[]) {
         const msg = JSON.stringify({ topic, args }); // ToDo: fix args
-        this.frame.contentWindow.postMessage(msg, '*');
+        // this.frame.contentWindow.postMessage(msg, '*');
+        this._send(msg);
     }
 
     private _send(data: any) {

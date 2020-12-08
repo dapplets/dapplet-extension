@@ -6,9 +6,12 @@ import Popup from './pages/popup';
 import * as logger from '../common/logger';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
+import { Bus } from '../common/bus';
+
+const bus = new Bus();
 
 TimeAgo.addDefaultLocale(en);
 
 window.onerror = logger.log;
 
-ReactDOM.render(<Popup contextIds={getCurrentContextIds()} />, document.querySelector('#app'));
+ReactDOM.render(<Popup bus={bus} contextIds={getCurrentContextIds()} />, document.querySelector('#app'));

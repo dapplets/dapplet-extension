@@ -10,25 +10,40 @@ import Settings from "../components/settings";
 import Developer from "../components/developer";
 import Events from "../components/events";
 import './popup.scss';
+import { Bus } from "../../common/bus";
 
 interface IPopupProps {
   contextIds: Promise<string[]>;
+  bus: Bus;
 }
 interface IPopupState {
   newEventsCount: number;
   devMode: boolean;
   loading: boolean;
+  defaultActiveIndex: number | undefined;
+  reload: number;
 }
 
 class Popup extends React.Component<IPopupProps, IPopupState> {
+
   constructor(props) {
     super(props);
 
     this.state = {
       newEventsCount: 0,
       devMode: false,
-      loading: true
+      loading: true,
+      defaultActiveIndex: undefined,
+      reload: 0
     };
+
+    props.bus.subscribe('changeTab', (path) => {
+      if (path === 'dapplets') this.setState({ defaultActiveIndex: 0, reload: Math.random() });
+      if (path === 'events') this.setState({ defaultActiveIndex: 1, reload: Math.random() });
+      if (path === 'wallets') this.setState({ defaultActiveIndex: 2, reload: Math.random() });
+      if (path === 'settings') this.setState({ defaultActiveIndex: 3, reload: Math.random() });
+      if (path === 'developer') this.setState({ defaultActiveIndex: 4, reload: Math.random() });
+    })
   }
 
   async componentDidMount() {
@@ -91,9 +106,9 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
 
     return (
       <React.Fragment>
-        <div className="popupContainer">
+        <div className="popupContainer" key={this.state.reload}>
           {(this.props.contextIds) ? <Header contextIds={this.props.contextIds} /> : null}
-          <Tab menu={{ secondary: true, pointing: true }} panes={panes} />
+          <Tab menu={{ secondary: true, pointing: true }} panes={panes} defaultActiveIndex={this.state.defaultActiveIndex}/>
         </div>
       </React.Fragment>
     );
