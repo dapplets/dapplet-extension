@@ -37,7 +37,7 @@
     "deploy.html",
     "starter.html",
     "settings.html",
-    "static/*"
+    "login.html"
   ],
   "permissions": [
     "tabs",

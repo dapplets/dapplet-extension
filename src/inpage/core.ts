@@ -44,6 +44,8 @@ export default class Core {
                     return this.waitSettingsOverlay(message.payload);
                 } else if (message.type === 'OPEN_PAIRING_OVERLAY') {
                     return this.waitPairingOverlay(message.payload.topic, message.payload.args).then(() => ([null, 'ready'])).catch(() => (['error']));
+                } else if (message.type === 'OPEN_LOGIN_OVERLAY') {
+                    return this.waitLoginOverlay(message.payload.topic, message.payload.args).then(() => ([null, 'ready'])).catch((err) => ([err]));
                 }
             }
         });
@@ -63,9 +65,42 @@ export default class Core {
 
             overlay.open();
 
+            // ToDo: add overlay.onclose
+
             // ToDo: add timeout?
             overlay.onMessage((topic, message) => {
                 if (topic === 'ready') {
+                    overlay.close();
+                    resolve();
+                }
+
+                if (topic === 'error') {
+                    reject();
+                }
+            });
+
+            if (topic) {
+                overlay.send(topic, args);
+            }
+        });
+    }
+
+    public waitLoginOverlay(topic?: string, args?: any[]): Promise<void> {
+        const me = this;
+        return new Promise<void>((resolve, reject) => {
+
+            const url = browser.extension.getURL('login.html');
+            //let overlay = this.overlayManager.getOverlays().find(x => x.uri === pairingUrl);
+            const overlay = new Overlay(this.overlayManager, url, 'Login');
+
+            overlay.open();
+
+            overlay.onclose = () => reject('Login rejected');
+
+            // ToDo: add timeout?
+            overlay.onMessage((topic, message) => {
+                if (topic === 'ready') {
+                    overlay.onclose = null;
                     overlay.close();
                     resolve();
                 }
@@ -87,6 +122,9 @@ export default class Core {
             const pairingUrl = browser.extension.getURL('deploy.html');
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'Deploy');
             overlay.open(() => overlay.send('data', [payload]));
+
+            // ToDo: add overlay.onclose
+
             // ToDo: add timeout?
             overlay.onMessage((topic, message) => {
                 if (topic === 'ready') {
@@ -107,6 +145,10 @@ export default class Core {
             const pairingUrl = browser.extension.getURL('settings.html');
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'Settings');
             overlay.open(() => overlay.send('data', [payload]));
+
+            // ToDo: add overlay.onclose
+
+            
             // ToDo: add timeout?
             overlay.onMessage((topic, message) => {
                 if (topic === 'ready') {
@@ -178,7 +220,10 @@ export default class Core {
         return conn;
     }
 
-    public wallet<M>(cfg?: {}, eventDef?: EventDef<any>, app?: string): AutoProperties<M> & Connection {
+    public async wallet<M>(cfg?: { username: string, domainId: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<AutoProperties<M> & Connection> {
+        const { prepareWalletFor } = await initBGFunctions(browser);
+        await prepareWalletFor(app, cfg);
+        
         const me = this;
         const transport = {
             _txCount: 0,

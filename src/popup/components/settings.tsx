@@ -31,6 +31,11 @@ interface ISettingsState {
     providerLoading: boolean;
     providerEdited: boolean;
 
+    identityInput: string;
+    identityInputError: string;
+    identityLoading: boolean;
+    identityEdited: boolean;
+
     devMode: boolean;
     autoBackup: boolean;
     errorReporting: boolean;
@@ -60,7 +65,11 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             providerInput: '',
             providerInputError: null,
             providerLoading: false,
-            providerEdited: false
+            providerEdited: false,
+            identityInput: '',
+            identityInputError: null,
+            identityLoading: false,
+            identityEdited: false
         };
     }
 
@@ -72,7 +81,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             this.loadAutoBackup(),
             this.loadErrorReporting(),
             this.checkUpdates(),
-            this.loadProvider()
+            this.loadProvider(),
+            this.loadIdentityContract()
         ]);
         this.setState({ isLoading: false });
     }
@@ -108,7 +118,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         this.setState({ providerLoading: true });
         const { setEthereumProvider } = await initBGFunctions(browser);
         await setEthereumProvider(provider);
-        this.loadAutoBackup();
+        this.loadProvider();
         this.setState({ providerLoading: false, providerEdited: false });
     }
 
@@ -141,6 +151,20 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         const { isExtensionUpdateAvailable } = await initBGFunctions(browser);
         const isUpdateAvailable = await isExtensionUpdateAvailable();
         this.setState({ isUpdateAvailable });
+    }
+
+    async loadIdentityContract() {
+        const { getIdentityContract } = await initBGFunctions(browser);
+        const identityInput = await getIdentityContract();
+        this.setState({ identityInput });
+    }
+
+    async setIdentityContract(address: string) {
+        this.setState({ identityLoading: true });
+        const { setIdentityContract } = await initBGFunctions(browser);
+        await setIdentityContract(address);
+        this.loadIdentityContract();
+        this.setState({ identityLoading: false, identityEdited: false });
     }
 
     async setErrorReporting(isActive: boolean) {
@@ -345,6 +369,25 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             onChange={(e) => this.setState({ providerInput: e.target.value, providerInputError: null, providerEdited: true })}
                         />
                         <Button size='mini' disabled={this.state.providerLoading || !this.state.providerEdited || !isValidHttp(this.state.providerInput)} color='blue' onClick={() => this.setProvider(this.state.providerInput)}>Save</Button>
+                    </Input>
+
+                    <Header as='h5'>Identity Contract</Header>
+                    <Input
+                        size='mini'
+                        fluid
+                        placeholder='Contract address'
+                        error={!!this.state.identityInputError || !isValidUrl(this.state.identityInput)}
+                        action
+                        iconPosition='left'
+                        loading={this.state.identityLoading}
+                        style={{ marginBottom: '15px' }}
+                    >
+                        <Icon name='users' />
+                        <input
+                            value={this.state.identityInput}
+                            onChange={(e) => this.setState({ identityInput: e.target.value, identityInputError: null, identityEdited: true })}
+                        />
+                        <Button size='mini' disabled={this.state.identityLoading || !this.state.identityEdited || !isValidUrl(this.state.identityInput)} color='blue' onClick={() => this.setIdentityContract(this.state.identityInput)}>Save</Button>
                     </Input>
 
                     <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /><br />

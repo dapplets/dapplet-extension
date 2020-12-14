@@ -102,13 +102,34 @@ export class EthRegistry implements Registry {
 
                 return [ctx, mis];
             }));
-            
+
             return result;
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
             logger.error('Error in EthRegistry class when module info is fetching', err);
             throw err;
+        }
+    }
+
+    public async getModuleInfoByName(name: string): Promise<ModuleInfo> {
+        try {
+            const m = await this._contract.getModuleInfoByName(name);
+            const mi = new ModuleInfo();
+            mi.type = moduleTypesMap[m.moduleType];
+            mi.name = m.name;
+            mi.title = m.title;
+            mi.description = m.description;
+            mi.author = m.owner.replace('0x000000000000000000000000', '0x');
+            mi.icon = {
+                hash: m.icon.hash,
+                uris: m.icon.uris.map(u => ethers.utils.toUtf8String(u))
+            };
+            mi.interfaces = m.interfaces;
+            return mi;
+        } catch (err) {
+            console.error(err);
+            return null;
         }
     }
 
@@ -205,9 +226,9 @@ export class EthRegistry implements Registry {
                 hash: version.dist.hash,
                 uris: version.dist.uris.map(u => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(u)))
             } : {
-                hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-                uris: []
-            },
+                    hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    uris: []
+                },
             dependencies: version.dependencies && Object.entries(version.dependencies).map(([k, v]) => ({
                 name: k,
                 branch: "default",
@@ -234,10 +255,11 @@ export class EthRegistry implements Registry {
         }
     }
 
+    // ToDo: use getModuleInfoByName instead
     public async getOwnership(moduleName: string) {
         try {
-        const mi = await this._contract.getModuleInfoByName(moduleName);
-        return mi.owner.replace('0x000000000000000000000000', '0x');
+            const mi = await this._contract.getModuleInfoByName(moduleName);
+            return mi.owner.replace('0x000000000000000000000000', '0x');
         } catch {
             return null;
         }

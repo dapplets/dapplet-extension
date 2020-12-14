@@ -15,6 +15,7 @@ export class Overlay implements IPubSub {
     public frame: HTMLIFrameElement = null;
     public registered: boolean = false;
     public onmessage: (topic: string, message: any) => void = null;
+    public onclose: Function = null;
 
     constructor(manager: OverlayManager, public uri: string, public title: string) {
 

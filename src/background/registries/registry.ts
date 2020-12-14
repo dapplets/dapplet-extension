@@ -13,6 +13,7 @@ export interface Registry {
     url: string;
 
     getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }>;
+    getModuleInfoByName(name: string): Promise<ModuleInfo>;
     getVersionNumbers(name: string, branch: string): Promise<string[]>;
     getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo>;
     getAllDevModules(): Promise<{ module: ModuleInfo, versions: VersionInfo[] }[]>;

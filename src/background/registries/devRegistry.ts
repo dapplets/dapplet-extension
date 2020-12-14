@@ -71,6 +71,12 @@ export class DevRegistry implements Registry {
 
         return result;
     }
+    
+    public async getModuleInfoByName(name: string): Promise<ModuleInfo> {
+        await this._cacheDevConfig();
+        const info = Array.from(this._infoByUrl).map(([k, v]) => v.module).find(v => v.name === name);
+        return info;
+    }
 
     public async getVersionNumbers(name: string, branch: string): Promise<string[]> {
         await this._cacheDevConfig();

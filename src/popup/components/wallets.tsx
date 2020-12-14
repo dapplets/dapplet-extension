@@ -4,7 +4,7 @@ import { browser } from "webextension-polyfill-ts";
 
 import { List, Button, Segment, Comment, Icon } from "semantic-ui-react";
 import { WalletInfo } from "../../common/constants";
-import { WalletDescriptor } from "../../background/services/walletService";
+import { DefaultSigners, WalletDescriptor } from "../../background/services/walletService";
 import makeBlockie from 'ethereum-blockies-base64';
 import ReactTimeAgo from 'react-time-ago';
 
@@ -60,7 +60,7 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
 
   async setWalletFor(type: string) {
     const { setWalletFor } = await initBGFunctions(browser);
-    await setWalletFor(type, 'extension');
+    await setWalletFor(type, DefaultSigners.EXTENSION);
     await this.componentDidMount();
   }
 

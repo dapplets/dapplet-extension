@@ -324,6 +324,11 @@ export default class FeatureService {
         return registry.getVersionInfo(moduleName, branch, version);
     }
 
+    public async getModuleInfoByName(registryUri: string, moduleName: string) {
+        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        return registry.getModuleInfoByName(moduleName);
+    }
+
     public async transferOwnership(registryUri: string, moduleName: string, address: string) {
         const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
         await registry.transferOwnership(moduleName, address);

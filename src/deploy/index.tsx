@@ -13,6 +13,7 @@ import { StorageRef } from '../background/registries/registry';
 import ModuleInfo from '../background/models/moduleInfo';
 import VersionInfo from '../background/models/versionInfo';
 import * as logger from '../common/logger';
+import { DefaultSigners } from "../background/services/walletService";
 
 window.onerror = logger.log;
 
@@ -102,7 +103,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     private async _updateOwnership() {
         const { getOwnership, getAddress } = await initBGFunctions(browser);
         const owner = await getOwnership(this.state.targetRegistry, this.state.mi.name);
-        const account = await getAddress('extension');
+        const account = await getAddress(DefaultSigners.EXTENSION);
 
         this.setState({
             owner,

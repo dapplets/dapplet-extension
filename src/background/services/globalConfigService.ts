@@ -33,6 +33,7 @@ export default class GlobalConfigService {
         config.userSettings = {};
         config.providerUrl = 'https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992';
         config.walletsUsage = {};
+        config.identityContract = '0xf6b3a0B20281796D465bB8613e233BE30be07084';
 
         await this._globalConfigRepository.deleteById(this._configId);
         await this._globalConfigRepository.create(config);
@@ -223,5 +224,13 @@ export default class GlobalConfigService {
 
     async setWalletsUsage(walletsUsage: { [moduleName: string]: string }) {
         return this.updateConfig(c => c.walletsUsage = walletsUsage);
+    }
+
+    async getIdentityContract() {
+        return this.get().then(x => x.identityContract);
+    }
+
+    async setIdentityContract(address: string) {
+        return this.updateConfig(c => c.identityContract = address);
     }
 }

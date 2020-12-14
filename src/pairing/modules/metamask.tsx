@@ -16,6 +16,7 @@ interface Props {
 interface State {
     error: string;
     connected: boolean;
+    toBack: boolean;
 }
 
 export default class extends React.Component<Props, State> {
@@ -23,7 +24,8 @@ export default class extends React.Component<Props, State> {
         super(props);
         this.state = {
             error: null,
-            connected: false
+            connected: false,
+            toBack: false
         };
     }
 
@@ -38,9 +40,31 @@ export default class extends React.Component<Props, State> {
         }
     }
 
+    async disconnect() {
+        const { disconnectWallet } = await initBGFunctions(browser);
+        await disconnectWallet('metamask');
+        this.setState({ toBack: true });
+    }
+
+    async continue() {
+        this.props.bus.publish('ready');
+    }
+
     render() {
+        if (this.state.toBack === true) {
+            return <Redirect to='/' />
+        }
+
         if (this.state.error) return (<div>{this.state.error}</div>);
+
         if (!this.state.connected) return (<div>Metamask is connecting</div>);
-        if (this.state.connected) return (<div>Metamask is connected</div>);
+
+        if (this.state.connected) return (<div>
+            <div>Metamask is connected</div>
+            <div>
+                <Button onClick={() => this.disconnect()}>Disconnect</Button>
+                <Button primary onClick={() => this.continue()}>Continue</Button>
+            </div>
+        </div>);
     }
 }

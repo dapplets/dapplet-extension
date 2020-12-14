@@ -31,4 +31,6 @@ export class GlobalConfig extends Base {
     providerUrl: string = null;
 
     walletsUsage: { [moduleName: string]: string } = {};
+
+    identityContract: string = null;
 }

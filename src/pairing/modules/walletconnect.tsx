@@ -79,6 +79,7 @@ export default class extends React.Component<Props, State> {
             this.props.bus.subscribe('walletconnect', (uri) => {
                 const svgPath = svgObject(uri, { type: 'svg' });
                 this.setState({ svgPath: svgPath.path });
+                this.props.bus.unsubscribe('walletconnect');
             });
 
             await connectWallet('walletconnect');
@@ -93,8 +94,8 @@ export default class extends React.Component<Props, State> {
     }
 
     async disconnect() {
-        const { disconnect } = await initBGFunctions(browser);
-        await disconnect();
+        const { disconnectWallet } = await initBGFunctions(browser);
+        await disconnectWallet('walletconnect');
         this.setState({ toBack: true });
     }
 
@@ -133,7 +134,7 @@ export default class extends React.Component<Props, State> {
                                     <p>Device Manufacturer: {walletInfo?.device?.manufacturer || "UNKNOWN"}</p>
                                     <p>Device Model: {walletInfo?.device?.model || "UNKNOWN"}</p>
                                     <Button onClick={() => this.disconnect()}>Disconnect</Button>
-                                    <Button onClick={() => this.continue()}>Continue</Button>
+                                    <Button primary onClick={() => this.continue()}>Continue</Button>
                                 </div>
                             ) : (<p>{error}</p>)}
                         </React.Fragment>

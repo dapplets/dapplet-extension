@@ -12,6 +12,7 @@ import ProxyService from "./services/proxyService";
 import * as logger from '../common/logger';
 import { getCurrentTab } from "../common/helpers";
 import * as GithubService from "./services/githubService";
+import { IdentityService } from "./services/identityService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -24,24 +25,26 @@ const walletService = new WalletService(globalConfigService);
 const featureService = new FeatureService(globalConfigService, walletService);
 const ensService = new EnsService(walletService);
 const proxyService = new ProxyService();
+const identityService = new IdentityService(globalConfigService, walletService);
 
 browser.runtime.onMessage.addListener(
   setupMessageListener({
 
     // WalletService
-    loadSowa: () => console.log('WalletConnectService.loadSowa is deprecated'),
-    generateUri: () => console.log('WalletConnectService.generateUri is deprecated'),
-    checkConnection: () => console.log('WalletConnectService.checkConnection is deprecated'),
-    waitPairing: () => console.log('WalletConnectService.waitPairing is deprecated'),
-    disconnect: () => console.log('WalletConnectService.disconnect is deprecated'),
-    getAccounts: () => console.log('WalletConnectService.getAccounts is deprecated'),
-    getChainId: () => console.log('WalletConnectService.getChainId is deprecated'),
-    loadSowaFrames: () => console.log('WalletConnectService.loadSowaFrames is deprecated'),
-    sendLegacyTransaction: () => console.log('WalletConnectService.sendLegacyTransaction is deprecated'),
-    getSowaTemplate: () => console.log('WalletConnectService.getSowaTemplate is deprecated'),
-    sendSowaTransaction: () => console.log('WalletConnectService.sendSowaTransaction is deprecated'),
-    sendTransaction: () => console.log('WalletConnectService.sendTransaction is deprecated'),
+    loadSowa: () => console.warn('WalletConnectService.loadSowa is deprecated'),
+    generateUri: () => console.warn('WalletConnectService.generateUri is deprecated'),
+    checkConnection: () => console.warn('WalletConnectService.checkConnection is deprecated'),
+    waitPairing: () => console.warn('WalletConnectService.waitPairing is deprecated'),
+    disconnect: () => console.warn('WalletConnectService.disconnect is deprecated'),
+    getAccounts: () => console.warn('WalletConnectService.getAccounts is deprecated'),
+    getChainId: () => console.warn('WalletConnectService.getChainId is deprecated'),
+    loadSowaFrames: () => console.warn('WalletConnectService.loadSowaFrames is deprecated'),
+    sendLegacyTransaction: () => console.warn('WalletConnectService.sendLegacyTransaction is deprecated'),
+    getSowaTemplate: () => console.warn('WalletConnectService.getSowaTemplate is deprecated'),
+    sendSowaTransaction: () => console.warn('WalletConnectService.sendSowaTransaction is deprecated'),
+    sendTransaction: () => console.warn('WalletConnectService.sendTransaction is deprecated'),
     
+    prepareWalletFor: (app, cfg) => walletService.prepareWalletFor(app, cfg),
     connectWallet: (type) => walletService.connectWallet(type),
     disconnectWallet: (type) => walletService.disconnectWallet(type),
     getWalletDescriptors: () => walletService.getWalletDescriptors(),
@@ -76,6 +79,7 @@ browser.runtime.onMessage.addListener(
     getRegistries: () => featureService.getRegistries(),
     getOwnership: (registryUri, moduleName) => featureService.getOwnership(registryUri, moduleName),
     getVersionInfo: (registryUri, moduleName, branch, version) => featureService.getVersionInfo(registryUri, moduleName, branch, version),
+    getModuleInfoByName: (registryUri, moduleName) => featureService.getModuleInfoByName(registryUri, moduleName),
     transferOwnership: (registryUri, moduleName, address) => featureService.transferOwnership(registryUri, moduleName, address),
     addLocation: (registryUri, moduleName, location) => featureService.addLocation(registryUri, moduleName, location),
     removeLocation: (registryUri, moduleName, location) => featureService.removeLocation(registryUri, moduleName, location),
@@ -103,6 +107,7 @@ browser.runtime.onMessage.addListener(
     setAutoBackup: (isActive) => globalConfigService.setAutoBackup(isActive),
     getErrorReporting: () => globalConfigService.getErrorReporting(),
     setErrorReporting: (isActive) => globalConfigService.setErrorReporting(isActive),
+    getIdentityContract: globalConfigService.getIdentityContract.bind(globalConfigService),
 
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),
@@ -123,7 +128,11 @@ browser.runtime.onMessage.addListener(
     fetchJsonRpc: (method, params) => proxyService.fetchJsonRpc(method, params),
 
     // Github Service
-    isExtensionUpdateAvailable: () => GithubService.isExtensionUpdateAvailable()
+    isExtensionUpdateAvailable: () => GithubService.isExtensionUpdateAvailable(),
+
+    // Identity Service
+    getIdentityAccounts: identityService.getAccounts.bind(identityService),
+    addIdentityAccount: identityService.addAccount.bind(identityService),
   })
 );
 

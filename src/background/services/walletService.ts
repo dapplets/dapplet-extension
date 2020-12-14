@@ -5,6 +5,15 @@ import { ExtendedSigner } from '../signers/interface';
 import * as signers from '../signers';
 import GlobalConfigService from './globalConfigService';
 
+export enum DefaultSigners {
+    EXTENSION = 'extension'
+}
+
+export enum WalletTypes {
+    WALLETCONNECT = 'walletconnect',
+    METAMASK = 'metamask'
+}
+
 export type WalletDescriptor = {
     type: string;
     meta: {
@@ -28,16 +37,23 @@ export class WalletService {
         Object.entries(signers).forEach(([k, v]) => this._map[k] = new v());
     }
 
-    async connectWallet(type: string) {
+    async connectWallet(type: WalletTypes) {
         return this._map[type].connectWallet();
     }
 
-    async disconnectWallet(type: string) {
-        return this._map[type].disconnectWallet();
+    async disconnectWallet(type: WalletTypes) {
+        await this._map[type].disconnectWallet();
+        const wallets = await this._globalConfigService.getWalletsUsage();
+        for (const app in wallets) {
+            if (wallets[app].toLowerCase() === type.toLowerCase()) {
+                delete wallets[app];
+            }
+        }
+        await this._globalConfigService.setWalletsUsage(wallets);
     }
 
     async getWalletDescriptors(): Promise<WalletDescriptor[]> {
-        const wallet = await this.getWalletFor('extension');
+        const wallet = await this.getWalletFor(DefaultSigners.EXTENSION);
         const wallets = await this._globalConfigService.getWalletsUsage();
 
         return Promise.all(Object.entries(this._map).map(async ([k, v]) => {
@@ -58,7 +74,7 @@ export class WalletService {
         }));
     }
 
-    async getSignerFor(app: string): Promise<Signer> {
+    async getSignerFor(app: string | DefaultSigners): Promise<Signer> {
         const me = this;
         return new (class extends Signer {
             provider = new providers.JsonRpcProvider('https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992', 'rinkeby');
@@ -86,12 +102,13 @@ export class WalletService {
         })();
     }
 
-    public async getWalletFor(app: string) {
+    // return: walletType
+    public async getWalletFor(app: string | DefaultSigners) {
         const wallets = await this._globalConfigService.getWalletsUsage();
         return wallets[app];
     }
 
-    public async setWalletFor(walletType: string, app: string) {
+    public async setWalletFor(walletType: WalletTypes, app: string | DefaultSigners) {
         const wallets = await this._globalConfigService.getWalletsUsage();
         wallets[app] = walletType;
         await this._globalConfigService.setWalletsUsage(wallets);
@@ -105,22 +122,50 @@ export class WalletService {
         return result;
     }
 
-    public async getAddress(app: string): Promise<string> {
+    public async loginViaOverlay(app: string | DefaultSigners, cfg?: { username: string, domainId: number, fullname?: string, img?: string }): Promise<void> {
+        const activeTab = await getCurrentTab();
+        const [error, result] = await browser.tabs.sendMessage(activeTab.id, { 
+            type: "OPEN_LOGIN_OVERLAY", 
+            payload: {
+                topic: 'login',
+                args: [app, cfg]
+            }
+         });
+        // ToDo: use native throw in error
+        if (error) throw new Error(error);
+        return result;
+    }
+
+    public async prepareWalletFor(app: string | DefaultSigners, cfg?: { username: string, domainId: number, fullname?: string, img?: string }) {
+        const walletType = await this.getWalletFor(app);
+        if (!walletType) {
+            return this.loginViaOverlay(app, cfg);
+        }
+
+        const pairedWallets = await this.getWalletDescriptors();
+        const suitableWallet = pairedWallets.find(x => x.type === walletType);
+
+        if (!suitableWallet || !suitableWallet.connected) {
+            return this.loginViaOverlay(app, cfg);
+        }
+    }
+
+    public async getAddress(app: string | DefaultSigners): Promise<string> {
         const signer = await this._getInternalSignerFor(app);
         return signer?.getAddress() ?? '0x0000000000000000000000000000000000000000';
     }
 
-    public async sendTransactionOutHash(app: string, transaction: providers.TransactionRequest): Promise<string> {
+    public async sendTransactionOutHash(app: string | DefaultSigners, transaction: providers.TransactionRequest): Promise<string> {
         const signer = await this._getInternalSignerFor(app) ?? await this._pairSignerFor(app);
         return signer.sendTransactionOutHash(transaction);
     }
 
-    public async sendCustomRequest(app: string, method: string, params: any[]): Promise<any> {
+    public async sendCustomRequest(app: string | DefaultSigners, method: string, params: any[]): Promise<any> {
         const signer = await this._getInternalSignerFor(app) ?? await this._pairSignerFor(app);
         return signer.sendCustomRequest(method, params);
     }
 
-    private async _getInternalSignerFor(app: string): Promise<ExtendedSigner> {
+    private async _getInternalSignerFor(app: string | DefaultSigners): Promise<ExtendedSigner> {
         const walletType = await this.getWalletFor(app);
 
         if (walletType && this._map[walletType].isConnected()) return this._map[walletType];
@@ -135,7 +180,7 @@ export class WalletService {
         }
     }
 
-    private async _pairSignerFor(app: string): Promise<ExtendedSigner> {
+    private async _pairSignerFor(app: string | DefaultSigners): Promise<ExtendedSigner> {
         // pairing
         await this.pairWalletViaOverlay();
 
