@@ -9,7 +9,7 @@ import * as logger from '../common/logger';
 import { Bus } from '../common/bus';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
-import { Login } from './component/Login';
+import { App } from './pages/App';
 
 TimeAgo.addDefaultLocale(en);
 window.onerror = logger.log;
@@ -18,5 +18,5 @@ const bus = new Bus();
 
 bus.subscribe('login', (app, account) => {
     console.log(`Login request from ${app}`);
-    ReactDOM.render(<Login bus={bus} account={account} app={app} />, document.querySelector('#app'));
+    ReactDOM.render(<App bus={bus} account={account} app={app} />, document.querySelector('#app'));
 })

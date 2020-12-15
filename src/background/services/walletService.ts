@@ -124,13 +124,29 @@ export class WalletService {
 
     public async loginViaOverlay(app: string | DefaultSigners, cfg?: { username: string, domainId: number, fullname?: string, img?: string }): Promise<void> {
         const activeTab = await getCurrentTab();
-        const [error, result] = await browser.tabs.sendMessage(activeTab.id, { 
-            type: "OPEN_LOGIN_OVERLAY", 
+        const [error, result] = await browser.tabs.sendMessage(activeTab.id, {
+            type: "OPEN_LOGIN_OVERLAY",
             payload: {
                 topic: 'login',
                 args: [app, cfg]
             }
-         });
+        });
+        
+        // ToDo: use native throw in error
+        if (error) throw new Error(error);
+        return result;
+    }
+
+    public async selectWalletViaOverlay(app: string | DefaultSigners, cfg?: { username: string, domainId: number, fullname?: string, img?: string }): Promise<void> {
+        const activeTab = await getCurrentTab();
+        const [error, result] = await browser.tabs.sendMessage(activeTab.id, {
+            type: "OPEN_LOGIN_OVERLAY",
+            payload: {
+                topic: 'login',
+                args: [app]
+            }
+        });
+
         // ToDo: use native throw in error
         if (error) throw new Error(error);
         return result;
@@ -138,15 +154,26 @@ export class WalletService {
 
     public async prepareWalletFor(app: string | DefaultSigners, cfg?: { username: string, domainId: number, fullname?: string, img?: string }) {
         const walletType = await this.getWalletFor(app);
+
         if (!walletType) {
-            return this.loginViaOverlay(app, cfg);
+            // is login required?
+            if (cfg) {
+                return this.loginViaOverlay(app, cfg);
+            } else {
+                return this.selectWalletViaOverlay(app);
+            }
         }
 
         const pairedWallets = await this.getWalletDescriptors();
         const suitableWallet = pairedWallets.find(x => x.type === walletType);
 
         if (!suitableWallet || !suitableWallet.connected) {
-            return this.loginViaOverlay(app, cfg);
+            // is login required?
+            if (cfg) {
+                return this.loginViaOverlay(app, cfg);
+            } else {
+                return this.selectWalletViaOverlay(app);
+            }
         }
     }
 

@@ -2,17 +2,14 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { Container, Header, Button, Image, Comment, Icon, Message } from 'semantic-ui-react'
-import { Link } from "react-router-dom";
-import * as logos from '../../common/resources/wallets';
+import { Header, Button, Comment, Icon, Message } from 'semantic-ui-react'
 import { WalletDescriptor } from "../../background/services/walletService";
 
 import makeBlockie from 'ethereum-blockies-base64';
 import ReactTimeAgo from 'react-time-ago';
 import { CheckIcon } from "../../common/react-components/CheckIcon";
 import * as walletIcons from '../../common/resources/wallets';
-import { networkName } from "../../common/helpers";
-import { ProfileCard } from "./ProfileCard";
+import { ProfileCard } from "../component/ProfileCard";
 import { Bus } from "../../common/bus";
 import { Account, DomainTypes } from "../../background/services/identityService";
 
