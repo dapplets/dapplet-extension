@@ -100,7 +100,7 @@
     "branches": [
       "master",
       {
-        "name": "alpha",
+        "name": "develop",
         "prerelease": "alpha"
       }
     ],
