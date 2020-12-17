@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - develop
     paths-ignore:
       - 'package.json'
       - 'package-lock.json'
