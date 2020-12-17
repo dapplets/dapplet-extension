@@ -101,6 +101,7 @@
       "master",
       {
         "name": "develop",
+        "channel": "alpha",
         "prerelease": "alpha"
       }
     ],
