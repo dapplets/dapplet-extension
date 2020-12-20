@@ -7,15 +7,27 @@ import { browser } from 'webextension-polyfill-ts';
 import { getCurrentTab } from '../../common/helpers';
 
 export default class extends ethers.Signer implements ExtendedSigner {
-
+    
     public provider = new ethers.providers.JsonRpcProvider('https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992', 'rinkeby');
-    private _walletconnect?: WalletConnect;
+    private __walletconnect?: WalletConnect;
 
-    constructor() {
-        super();
-        this._walletconnect = new WalletConnect({
-            bridge: "https://bridge.walletconnect.org"
-        });
+    private get _walletconnect() {
+        if (!this.__walletconnect) {
+            this.__walletconnect = new WalletConnect({
+                bridge: "https://bridge.walletconnect.org"
+            });
+            this.__walletconnect.on('display_uri', (err, payload) => {
+                if (err) throw err;
+                const [uri] = payload.params;
+                this._showQR(uri);
+            });
+        }
+
+        return this.__walletconnect;
+    }
+
+    private set _walletconnect(v: any) {
+        this.__walletconnect = v;
     }
 
     async getAddress(): Promise<string> {
@@ -56,9 +68,11 @@ export default class extends ethers.Signer implements ExtendedSigner {
     }
 
     async connectWallet(): Promise<void> {
-        return new Promise(async (resolve, reject) => {
-            if (this._walletconnect.connected) return;
-            await this._walletconnect.createSession();
+        if (this._walletconnect.connected) return;
+        this._walletconnect['_handshakeTopic'] = ''; // ToDo: remove after update of WalletConnect to >1.3.1
+        await this._walletconnect.createSession();
+
+        return new Promise((resolve, reject) => {
             this._walletconnect.on('connect', (error, payload) => {
                 if (error) {
                     reject(error);
@@ -67,7 +81,6 @@ export default class extends ethers.Signer implements ExtendedSigner {
                     resolve(payload);
                 }
             });
-            this._showQR(this._walletconnect.uri);
         });
     }
 

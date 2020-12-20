@@ -32,6 +32,9 @@ interface State {
 }
 
 export default class extends React.Component<Props, State> {
+
+    private _mounted = true;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -44,34 +47,8 @@ export default class extends React.Component<Props, State> {
     }
 
     async componentDidMount() {
-        // const { generateUri, waitPairing, getGlobalConfig } = await initBGFunctions(browser);
-        // var uri = await generateUri();
-        // console.log("[DAPPLETS]: New pairing URI generated", uri);
-        // const svgPath = svgObject(uri, { type: 'svg' });
-        // this.setState({ svgPath: svgPath.path });
 
-        // const result = await waitPairing();
-
-        // if (result) {
-        //     const wallet = result.params[0];
-        //     if (wallet) {
-        //         this.setState({ wallet });
-        //     }
-
-        //     const config = await getGlobalConfig();
-
-        //     this.setState({
-        //         isPaired: true,
-        //         walletInfo: config.walletInfo
-        //     });
-        //     this.props.bus.publish('paired');
-        // } else {
-        //     this.setState({
-        //         isPaired: true,
-        //         error: 'Wallet paring failed'
-        //     });
-        //     this.props.bus.publish('error');
-        // }
+        this._mounted = true;
 
         try {
             const { connectWallet } = await initBGFunctions(browser);
@@ -83,13 +60,14 @@ export default class extends React.Component<Props, State> {
             });
 
             await connectWallet('walletconnect');
-            this.setState({ isPaired: true });
+            if (this._mounted) this.setState({ isPaired: true });
         } catch (err) {
-            this.setState({ isPaired: true, error: 'Error ' });
+            if (this._mounted) this.setState({ isPaired: true, error: err.message });
         }
     }
 
     componentWillUnmount() {
+        this._mounted = false;
         this.props.bus.unsubscribe('walletconnect');
     }
 
@@ -117,7 +95,7 @@ export default class extends React.Component<Props, State> {
                         <Header as='h2'>WalletConnect Pairing</Header>
                         <p>Scan QR code with a WalletConnect-compatible wallet</p>
                         {svgPath ? (<svg viewBox="1 1 53 53"><path d={svgPath} /></svg>) : null}
-                        <Button><Link to="/">Back</Link></Button>
+                        <Button onClick={() => this.setState({ toBack: true })}>Back</Button>
                     </React.Fragment>
                 ) : (
                         <React.Fragment>
