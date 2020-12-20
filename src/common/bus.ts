@@ -46,7 +46,7 @@ export class Bus {
 
         while (this._queue[topic]?.length > 0) {
             const args = this._queue[topic].shift();
-            handler.apply({}, ...args);
+            handler.apply({}, args);
         }
     }
 
