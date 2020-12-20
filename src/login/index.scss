@@ -1,5 +1,5 @@
 $primary-color: darkblue;
-$background-color: #BADA55;
+$background-color: #bada55;
 
 // Chrome applies an 8px margin by default (gross).
 body {
@@ -8,4 +8,10 @@ body {
 
 .container {
     padding: 10px;
+}
+
+.emoji {
+    height: 1em !important;
+    margin-left: 0.2em;
+    display: inline !important;
 }
