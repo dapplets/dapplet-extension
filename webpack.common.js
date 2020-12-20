@@ -6,7 +6,7 @@ const webpack = require("webpack");
 function modifyManifest(buffer) {
   const manifest = JSON.parse(buffer.toString());
 
-  manifest.version = package.version;
+  manifest.version = package.version.replace(/-.*/gm, '');
   manifest.description = package.description;
   manifest.author = package.author;
 
