@@ -150,12 +150,22 @@
     padding: 8px 12px;
     background: #ececec;
     z-index: 2;
-    min-width: 80px;
     max-width: 150px;
+}
+
+/* divider between inactive tabs */
+.dapplets-overlay-nav-tab-item:not(.dapplets-overlay-nav-tab-item-active):not(:last-child)::after {
+    content: "";
+    border-right: 1px #aaaaaa solid;
+    position: relative;
+    right: -12px;
 }
 
 .dapplets-overlay-nav-tab-item-active {
     background: #fff;
+    position: relative;
+    left: -1px;
+    border-left: 1px solid #fff;
 }
 
 .dapplets-overlay-nav-top-panel {
