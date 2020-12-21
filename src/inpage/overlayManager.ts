@@ -119,6 +119,7 @@ export class OverlayManager {
             const url = browser.extension.getURL('popup.html');
             this._popupOverlay = this._popupOverlay ?? new Overlay(this, url + `#/${(e.target as any).innerText.toLowerCase()}`, 'Dapplets');
             this._popupOverlay.send('changeTab', [(e.target as any).innerText.toLowerCase()]);
+            this.activate(this._popupOverlay);
         });
         topActions.appendChild(menuAction);
 
