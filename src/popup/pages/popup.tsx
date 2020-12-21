@@ -66,14 +66,14 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
 
     const panes = [
       {
-        menuItem: "Dapplets",
+        menuItem: <Menu.Item key='dapplets' style={{ padding: '.85714286em 0.8em' }}>Dapplets</Menu.Item>,
         render: () => (
           <Tab.Pane attached={false} as={() => <Dapplets contextIds={contextIds} />} />
         )
       },
       {
         menuItem: (
-          <Menu.Item key='messages'>
+          <Menu.Item key='messages' style={{ padding: '.85714286em 0.8em' }}>
             Events{newEventsCount !== 0 ? <Label color='red' circular size='mini'>{newEventsCount}</Label> : null}
           </Menu.Item>
         ),
@@ -82,13 +82,13 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
         )
       },
       {
-        menuItem: "Wallets",
+        menuItem: <Menu.Item key='wallets' style={{ padding: '.85714286em 0.8em' }}>Wallets</Menu.Item>,
         render: () => (
           <Tab.Pane attached={false} as={Wallets} />
         )
       },
       {
-        menuItem: "Settings",
+        menuItem: <Menu.Item key='settings' style={{ padding: '.85714286em 0.8em' }}>Settings</Menu.Item>,
         render: () => (
           <Tab.Pane attached={false} as={() => <Settings devMode={devMode} updateTabs={() => this.updateTabs()} />} />
         )
@@ -97,7 +97,7 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
 
     if (devMode) {
       panes.push({
-        menuItem: "Developer",
+        menuItem: <Menu.Item key='developer' style={{ padding: '.85714286em 0.8em' }}>Developer</Menu.Item>,
         render: () => (
           <Tab.Pane attached={false} as={Developer} />
         )
