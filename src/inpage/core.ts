@@ -166,7 +166,7 @@ export default class Core {
     public _togglePopupOverlay() {
         if (!this._popupOverlay?.registered) {
             const pairingUrl = browser.extension.getURL('popup.html');
-            this._popupOverlay = new Overlay(this.overlayManager, pairingUrl, 'Dapplets');
+            this._popupOverlay = new Overlay(this.overlayManager, pairingUrl, 'Dapplets', true);
             this._popupOverlay.open();
         } else {
             this.overlayManager.toggle();

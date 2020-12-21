@@ -31,7 +31,7 @@ export class OverlayManager {
 
     private _tabsRegistry: {
         overlay: Overlay,
-        tabItem: HTMLDivElement,
+        tabItem?: HTMLDivElement,
         contentItem: HTMLDivElement
     }[] = [];
 
@@ -116,9 +116,13 @@ export class OverlayManager {
         `;
         menuAction.classList.add('dapplets-action-dropdown');
         menuAction.addEventListener('click', (e) => {
+            const text = (e.target as any).innerText;
+            if (!text) return;
+
+            const path = text.toLowerCase();
             const url = browser.extension.getURL('popup.html');
-            this._popupOverlay = this._popupOverlay ?? new Overlay(this, url + `#/${(e.target as any).innerText.toLowerCase()}`, 'Dapplets');
-            this._popupOverlay.send('changeTab', [(e.target as any).innerText.toLowerCase()]);
+            this._popupOverlay = this._popupOverlay ?? new Overlay(this, url + `#/${path}`, 'Dapplets', true);
+            this._popupOverlay.send('changeTab', [path]);
             this.activate(this._popupOverlay);
         });
         topActions.appendChild(menuAction);
@@ -166,44 +170,48 @@ export class OverlayManager {
         overlay.registered = true;
         if (this._tabsRegistry.filter(t => t.overlay === overlay).length > 0) return;
 
-        const tabItem = document.createElement('div');
-        tabItem.classList.add(TabItemClass);
-
-        const titleDiv = document.createElement('div');
-        titleDiv.innerText = overlay.title;
-        titleDiv.title = overlay.title;
-        titleDiv.classList.add('dapplets-overlay-nav-tab-item-title');
-
-        tabItem.appendChild(titleDiv);
-        tabItem.addEventListener('click', (ev) => {
-            ev.cancelBubble = true;
-            ev.stopPropagation();
-            this.activate(overlay);
-        });
-        this._tabList.appendChild(tabItem);
-
-        const closeBtn = document.createElement('div');
-        closeBtn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="4 4 16 16" style="width: 10px;">
-                <path d="M0 0h24v24H0z" fill="none"/>
-                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-            </svg>
-        `;
-        closeBtn.classList.add(CloseButtonClass);
-        closeBtn.addEventListener('click', (ev) => {
-            ev.cancelBubble = true;
-            ev.stopPropagation();
-            //this.unregister(overlay);
-            overlay.close();
-        });
-        tabItem.appendChild(closeBtn);
-
         const contentItem = document.createElement('div');
         contentItem.classList.add(ContentItemClass);
         contentItem.appendChild(overlay.frame);
         this._contentList.appendChild(contentItem);
 
-        this._tabsRegistry.push({ overlay, tabItem, contentItem });
+        if (!overlay.hidden) {
+            const tabItem = document.createElement('div');
+            tabItem.classList.add(TabItemClass);
+
+            const titleDiv = document.createElement('div');
+            titleDiv.innerText = overlay.title;
+            titleDiv.title = overlay.title;
+            titleDiv.classList.add('dapplets-overlay-nav-tab-item-title');
+
+            tabItem.appendChild(titleDiv);
+            tabItem.addEventListener('click', (ev) => {
+                ev.cancelBubble = true;
+                ev.stopPropagation();
+                this.activate(overlay);
+            });
+            this._tabList.appendChild(tabItem);
+
+            const closeBtn = document.createElement('div');
+            closeBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="4 4 16 16" style="width: 10px;">
+                <path d="M0 0h24v24H0z" fill="none"/>
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+        `;
+            closeBtn.classList.add(CloseButtonClass);
+            closeBtn.addEventListener('click', (ev) => {
+                ev.cancelBubble = true;
+                ev.stopPropagation();
+                //this.unregister(overlay);
+                overlay.close();
+            });
+            tabItem.appendChild(closeBtn);
+
+            this._tabsRegistry.push({ overlay, tabItem, contentItem });
+        } else {
+            this._tabsRegistry.push({ overlay, contentItem });
+        }
 
         this.activate(overlay);
 
@@ -216,7 +224,7 @@ export class OverlayManager {
         const tab = this._tabsRegistry.filter(t => t.overlay === overlay)[0];
         if (!tab) return;
 
-        this._tabList.removeChild(tab.tabItem);
+        if (tab.tabItem) this._tabList.removeChild(tab.tabItem);
         this._contentList.removeChild(tab.contentItem);
 
         this._tabsRegistry = this._tabsRegistry.filter(t => t.overlay !== overlay);
@@ -244,7 +252,7 @@ export class OverlayManager {
         }
 
         const tab = this._tabsRegistry.filter(t => t.overlay === overlay)[0];
-        tab.tabItem.classList.toggle(ActiveTabHeaderClass, true);
+        if (tab.tabItem) tab.tabItem.classList.toggle(ActiveTabHeaderClass, true);
         tab.contentItem.classList.toggle(ActiveTabContentClass, true);
 
         this._activeOverlay = overlay;
@@ -252,7 +260,7 @@ export class OverlayManager {
 
     public deactivate(overlay: Overlay) {
         const tab = this._tabsRegistry.filter(t => t.overlay === overlay)[0];
-        tab.tabItem.classList.toggle(ActiveTabHeaderClass, false);
+        if (tab.tabItem) tab.tabItem.classList.toggle(ActiveTabHeaderClass, false);
         tab.contentItem.classList.toggle(ActiveTabContentClass, false);
     }
 

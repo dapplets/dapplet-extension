@@ -17,7 +17,7 @@ export class Overlay implements IPubSub {
     public onmessage: (topic: string, message: any) => void = null;
     public onclose: Function = null;
 
-    constructor(manager: OverlayManager, public uri: string, public title: string) {
+    constructor(manager: OverlayManager, public uri: string, public title: string, public hidden: boolean = false) {
 
         // disable cache
         const url = new URL(uri);
