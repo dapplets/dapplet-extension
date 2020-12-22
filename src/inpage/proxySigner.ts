@@ -20,7 +20,7 @@ export class ProxySigner extends ethers.Signer {
 
     async signMessage(message: ethers.utils.BytesLike): Promise<string> {
         throw new Error("Method not implemented.");
-    }    
+    }
 
     async signTransaction(transaction: ethers.providers.TransactionRequest): Promise<string> {
         throw new Error("Method not implemented.");
@@ -29,6 +29,14 @@ export class ProxySigner extends ethers.Signer {
     async sendTransaction(transaction: ethers.providers.TransactionRequest): Promise<ethers.providers.TransactionResponse> {
         const { sendTransactionOutHash } = await initBGFunctions(browser);
         const txHash = await sendTransactionOutHash(this._app, transaction);
-        return this.provider.getTransaction(txHash);
+        
+        // the wait of a transaction from another provider can be long
+        let tx = null;
+        while (tx === null) {
+            await new Promise((res) => setTimeout(res, 1000));
+            tx = await this.provider.getTransaction(txHash);
+        }
+
+        return tx;
     }
 }
