@@ -1,10 +1,35 @@
 export default [
     {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
         "inputs": [
             {
                 "internalType": "bytes32",
                 "name": "",
                 "type": "bytes32"
+            }
+        ],
+        "name": "accountIdxs",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             },
             {
                 "internalType": "uint256",
@@ -348,7 +373,7 @@ export default [
                     },
                     {
                         "internalType": "bytes32",
-                        "name": "accountIdx",
+                        "name": "accountKey",
                         "type": "bytes32"
                     },
                     {
@@ -410,7 +435,7 @@ export default [
                     },
                     {
                         "internalType": "bytes32",
-                        "name": "accountIdx",
+                        "name": "accountKey",
                         "type": "bytes32"
                     },
                     {
