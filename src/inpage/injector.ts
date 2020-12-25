@@ -98,14 +98,22 @@ export class Injector {
                 console.log(`[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`);
                 browser.runtime.sendMessage({
                     type: "FEATURE_LOADED", payload: {
-                        name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version
+                        name: m.manifest.name, 
+                        branch: m.manifest.branch, 
+                        version: m.manifest.version,
+                        runtime: {
+                            isActionHandler: !!m.onActionHandler
+                        }
                     }
                 });
             } catch (err) {
                 logger.error(`Error of loading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
                 browser.runtime.sendMessage({
                     type: "FEATURE_LOADING_ERROR", payload: {
-                        name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version, error: err.message
+                        name: m.manifest.name, 
+                        branch: m.manifest.branch, 
+                        version: m.manifest.version, 
+                        error: err.message
                     }
                 });
             }

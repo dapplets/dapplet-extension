@@ -24,9 +24,9 @@ export default class FeatureService {
     private _storageAggregator = new StorageAggregator();
 
     constructor(
-        private _globalConfigService: GlobalConfigService, 
+        private _globalConfigService: GlobalConfigService,
         private _walletService: WalletService
-    ) { 
+    ) {
         this._moduleManager = new ModuleManager(this._globalConfigService, this._walletService);
     }
 
@@ -48,6 +48,7 @@ export default class FeatureService {
                         const dto: ManifestDTO = moduleInfo as any;
                         const config = await this._siteConfigRepository.getById(contextId); // ToDo: which contextId should we compare?
                         dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
+                        dto.isActionHandler = config.activeFeatures[dto.name]?.runtime?.isActionHandler || false;
                         dto.activeVersion = (dto.isActive) ? (config.activeFeatures[dto.name]?.version || null) : null;
                         dto.lastVersion = (dto.isActive) ? await this.getVersions(registryUrl, dto.name).then(x => x.sort(rcompare)[0]) : null; // ToDo: how does this affect performance?
                         dto.order = i++;
@@ -85,14 +86,15 @@ export default class FeatureService {
             config.activeFeatures[name] = {
                 version,
                 isActive,
-                order
+                order,
+                runtime: null
             };
 
             await this._siteConfigRepository.update(config);
         }
 
         try {
-            await new Promise<void>(async (resolve, reject) => {
+            const runtime = await new Promise<void>(async (resolve, reject) => {
                 // listening of loading/unloading from inpage
                 const listener = (message, sender) => {
                     if (!message || !message.type || !message.payload) return;
@@ -100,12 +102,12 @@ export default class FeatureService {
                     if (message.type === 'FEATURE_LOADED') {
                         if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === version && isActive === true) {
                             browser.runtime.onMessage.removeListener(listener);
-                            resolve();
+                            resolve(p.runtime);
                         }
                     } else if (message.type === "FEATURE_UNLOADED") {
                         if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === version && isActive === false) {
                             browser.runtime.onMessage.removeListener(listener);
-                            resolve();
+                            resolve(p.runtime);
                         }
                     } else if (message.type === "FEATURE_LOADING_ERROR") {
                         if (p.name === name && p.branch === DEFAULT_BRANCH_NAME && p.version === version && isActive === true) {
@@ -135,6 +137,13 @@ export default class FeatureService {
                     }]
                 });
             });
+
+            // ToDo: merge with config updating upper
+            for (const hostname of hostnames) {
+                const config = await this._siteConfigRepository.getById(hostname);
+                config.activeFeatures[name].runtime = runtime;
+                await this._siteConfigRepository.update(config);
+            }
         } catch (err) {
             // revert config if error
             for (const hostname of hostnames) {
@@ -142,7 +151,8 @@ export default class FeatureService {
                 config.activeFeatures[name] = {
                     version,
                     isActive: !isActive,
-                    order
+                    order,
+                    runtime: null
                 };
 
                 await this._siteConfigRepository.update(config);

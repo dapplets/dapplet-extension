@@ -11,6 +11,7 @@ export default class SiteConfig extends Base {
             version: string;
             isActive: boolean;
             order: number;
+            runtime: { isActionHandler: boolean } & any;
         }
     } = {};
 

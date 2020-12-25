@@ -99,6 +99,9 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
       } else {
         await deactivateFeature(name, version, hostnames, order, sourceRegistry.url);
       }
+      
+      await this._refreshDataByContext(this.props.contextIds);
+
     } catch (err) {
       this._updateFeatureState(name, { isActive: !isActive, error: err.message });
     }
@@ -184,7 +187,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
                       <List.Header>
                         {f.title}
                         <Icon style={{ marginLeft: '4px', fontSize: '0.9em' }} link name='cog' size='small' onClick={() => this.settingsModule(f)} />
-                        {(f.isActive) ? <Icon style={{ fontSize: '0.9em' }} link name='home' size='small' onClick={() => this.openDappletAction(f)} /> : null}
+                        {(f.isActive && f.isActionHandler) ? <Icon style={{ fontSize: '0.9em' }} link name='home' size='small' onClick={() => this.openDappletAction(f)} /> : null}
                         {(f.sourceRegistry.isDev) ? (<Label style={{ marginLeft: 5 }} horizontal size='mini' color='teal'>DEV</Label>) : null}
                         {(f.error) ? (<Popup size='mini' trigger={<Label style={{ marginLeft: 5 }} horizontal size='mini' color='red'>ERROR</Label>}>{f.error}</Popup>) : null}
                         {(f.isActive && f.activeVersion && f.lastVersion) ? (
