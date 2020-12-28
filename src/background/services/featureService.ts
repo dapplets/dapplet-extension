@@ -49,6 +49,7 @@ export default class FeatureService {
                         const config = await this._siteConfigRepository.getById(contextId); // ToDo: which contextId should we compare?
                         dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
                         dto.isActionHandler = config.activeFeatures[dto.name]?.runtime?.isActionHandler || false;
+                        dto.isHomeHandler = config.activeFeatures[dto.name]?.runtime?.isHomeHandler || false;
                         dto.activeVersion = (dto.isActive) ? (config.activeFeatures[dto.name]?.version || null) : null;
                         dto.lastVersion = (dto.isActive) ? await this.getVersions(registryUrl, dto.name).then(x => x.sort(rcompare)[0]) : null; // ToDo: how does this affect performance?
                         dto.order = i++;
@@ -377,6 +378,13 @@ export default class FeatureService {
     public async openDappletAction(moduleName: string, tabId: number) {
         return browser.tabs.sendMessage(tabId, {
             type: "OPEN_DAPPLET_ACTION",
+            payload: { moduleName }
+        });
+    }
+
+    public async openDappletHome(moduleName: string, tabId: number) {
+        return browser.tabs.sendMessage(tabId, {
+            type: "OPEN_DAPPLET_HOME",
             payload: { moduleName }
         });
     }

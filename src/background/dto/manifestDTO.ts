@@ -12,6 +12,7 @@ export default class ManifestDTO {
     icon: StorageRef = null;
     isActive: boolean = null;
     isActionHandler: boolean = null;
+    isHomeHandler: boolean = null;
     activeVersion?: string | null = null;
     lastVersion?: string | null = null;
     //dist: string = null;

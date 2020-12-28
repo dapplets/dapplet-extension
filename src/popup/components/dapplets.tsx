@@ -9,7 +9,7 @@ import ModuleInfo from "../../background/models/moduleInfo";
 import { getCurrentContextIds, getCurrentTab } from "../helpers";
 import { rcompare, rsort } from "semver";
 
-type ManifestAndDetails = ManifestDTO & { isLoading: boolean, isActionLoading: boolean, error: string, versions: string[] };
+type ManifestAndDetails = ManifestDTO & { isLoading: boolean, isActionLoading: boolean, isHomeLoading: boolean, error: string, versions: string[] };
 
 interface IDappletsProps {
   contextIds: Promise<string[] | undefined>;
@@ -65,7 +65,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     const features: ManifestDTO[] = await getFeaturesByHostnames(contextIdsValues);
     if (this._isMounted) {
       this.setState({
-        features: features.filter(f => f.type === ModuleTypes.Feature).map(f => ({ ...f, isLoading: false, isActionLoading: false, error: null, versions: [] })),
+        features: features.filter(f => f.type === ModuleTypes.Feature).map(f => ({ ...f, isLoading: false, isActionLoading: false, isHomeLoading: false, error: null, versions: [] })),
         isLoading: false
       });
     }
@@ -153,6 +153,20 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     }
   }
 
+  openDappletHome = async (f: ManifestAndDetails) => {
+    try {
+      this._updateFeatureState(f.name, { isHomeLoading: true });
+      const { openDappletHome } = await initBGFunctions(browser);
+      const tab = await getCurrentTab();
+      await openDappletHome(f.name, tab.id);
+      window.close();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      this._updateFeatureState(f.name, { isHomeLoading: false });
+    }
+  }
+
   render() {
     const { features, isLoading, error, isNoInpage } = this.state;
     return (
@@ -188,6 +202,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
                         {f.title}
                         <Icon style={{ marginLeft: '4px', fontSize: '0.9em' }} link name='cog' size='small' onClick={() => this.settingsModule(f)} />
                         {(f.isActive && f.isActionHandler) ? <Icon style={{ fontSize: '0.9em' }} link name='home' size='small' onClick={() => this.openDappletAction(f)} /> : null}
+                        {(f.isActive && f.isHomeHandler) ? <Icon style={{ fontSize: '0.9em' }} link name='external' size='small' onClick={() => this.openDappletHome(f)} /> : null}
                         {(f.sourceRegistry.isDev) ? (<Label style={{ marginLeft: 5 }} horizontal size='mini' color='teal'>DEV</Label>) : null}
                         {(f.error) ? (<Popup size='mini' trigger={<Label style={{ marginLeft: 5 }} horizontal size='mini' color='red'>ERROR</Label>}>{f.error}</Popup>) : null}
                         {(f.isActive && f.activeVersion && f.lastVersion) ? (

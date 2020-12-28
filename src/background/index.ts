@@ -86,6 +86,7 @@ browser.runtime.onMessage.addListener(
     getVersions: (registryUri, moduleName) => featureService.getVersions(registryUri, moduleName),
     openSettingsOverlay: (mi) => featureService.openSettingsOverlay(mi),
     openDappletAction: (name, tabId) => featureService.openDappletAction(name, tabId),
+    openDappletHome: (name, tabId) => featureService.openDappletHome(name, tabId),
 
     // GlobalConfigService
     getGlobalConfig: () => globalConfigService.get(),

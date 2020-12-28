@@ -24,7 +24,8 @@ export class Injector {
         dependencies: string[],
         instancedDeps: any[],
         defaultConfig?: DefaultConfig,
-        onActionHandler?: Function
+        onActionHandler?: Function,
+        onHomeHandler?: Function
     }[] = [];
 
     constructor(public core: Core) {
@@ -102,7 +103,8 @@ export class Injector {
                         branch: m.manifest.branch, 
                         version: m.manifest.version,
                         runtime: {
-                            isActionHandler: !!m.onActionHandler
+                            isActionHandler: !!m.onActionHandler,
+                            isHomeHandler: !!m.onHomeHandler
                         }
                     }
                 });
@@ -152,9 +154,23 @@ export class Injector {
         module.onActionHandler?.();
     }
 
+    public async openDappletHome(moduleName: string) {
+        const module = this.registry.find(m => m.manifest.name === moduleName);
+        if (!module || !module.instance) throw Error('The dapplet is not activated.');
+        
+        //while (!module && !module.instance) await new Promise((res) => setTimeout(res, 500));
+
+        module.onHomeHandler?.();
+    }
+
     public setActionHandler(moduleName: string, handler: Function) {
         const module = this.registry.find(m => m.manifest.name === moduleName);
         module.onActionHandler = handler;
+    }
+
+    public setHomeHandler(moduleName: string, handler: Function) {
+        const module = this.registry.find(m => m.manifest.name === moduleName);
+        module.onHomeHandler = handler;
     }
 
     private async _processModules(modules: { manifest: VersionInfo, script: string, order: number, contextIds: string[], defaultConfig?: DefaultConfig }[]) {
@@ -186,7 +202,8 @@ export class Injector {
                 wallet: (cfg, eventDef) => core.wallet(cfg, eventDef, manifest.name),
                 storage: new AppStorage(manifest.name, manifest.environment, defaultConfig),
                 contract: (address, abi) => core.contract(address, abi, manifest.name),
-                onAction: (handler: Function) => this.setActionHandler(manifest.name, handler)
+                onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
+                onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler)
             };
 
             let newBranch: string = null;

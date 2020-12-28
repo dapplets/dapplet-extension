@@ -25,5 +25,8 @@ browser.runtime.onMessage.addListener((message, sender) => {
     } else if (message.type === "OPEN_DAPPLET_ACTION") {
         const { moduleName } = message.payload
         return injector.openDappletAction(moduleName);
+    } else if (message.type === "OPEN_DAPPLET_HOME") {
+        const { moduleName } = message.payload
+        return injector.openDappletHome(moduleName);
     }
 });
