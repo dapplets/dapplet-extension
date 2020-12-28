@@ -24,7 +24,15 @@ export default class extends ethers.Signer implements ExtendedSigner {
     
     async sendTransaction(transaction: TransactionRequest): Promise<ethers.providers.TransactionResponse> {
         const txHash = await this.sendTransactionOutHash(transaction);
-        return this.provider.getTransaction(txHash);
+        
+        // the wait of a transaction from another provider can be long
+        let tx = null;
+        while (tx === null) {
+            await new Promise((res) => setTimeout(res, 1000));
+            tx = await this.provider.getTransaction(txHash);
+        }
+
+        return tx;
     }
 
     async sendTransactionOutHash(transaction: TransactionRequest): Promise<string> {
