@@ -40,6 +40,7 @@ interface ISettingsState {
     autoBackup: boolean;
     errorReporting: boolean;
     isUpdateAvailable: boolean;
+    popupInOverlay: boolean;
 }
 
 class Settings extends React.Component<ISettingsProps, ISettingsState> {
@@ -69,7 +70,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             identityInput: '',
             identityInputError: null,
             identityLoading: false,
-            identityEdited: false
+            identityEdited: false,
+            popupInOverlay: false
         };
     }
 
@@ -80,6 +82,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             this.loadTrustedUsers(),
             this.loadAutoBackup(),
             this.loadErrorReporting(),
+            this.loadPopupInOverlay(),
             this.checkUpdates(),
             this.loadProvider(),
             this.loadIdentityContract()
@@ -145,6 +148,18 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         const { getErrorReporting } = await initBGFunctions(browser);
         const errorReporting = await getErrorReporting();
         this.setState({ errorReporting });
+    }
+
+    async loadPopupInOverlay() {
+        const { getPopupInOverlay } = await initBGFunctions(browser);
+        const popupInOverlay = await getPopupInOverlay();
+        this.setState({ popupInOverlay });
+    }
+
+    async setPopupInOverlay(isActive: boolean) {
+        const { setPopupInOverlay } = await initBGFunctions(browser);
+        await setPopupInOverlay(isActive);
+        this.loadPopupInOverlay();
     }
 
     async checkUpdates() {
@@ -251,7 +266,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     }
 
     render() {
-        const { isLoading, registries, registryInput, registryInputError, trustedUsers, trustedUserInput, trustedUserInputError, devMode, errorReporting, autoBackup } = this.state;
+        const { isLoading, registries, registryInput, registryInputError, trustedUsers, trustedUserInput, trustedUserInputError, devMode, errorReporting, autoBackup, popupInOverlay } = this.state;
 
         return (
             <React.Fragment>
@@ -392,7 +407,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
 
                     <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /><br />
                     <Checkbox toggle label='Modules backup' checked={autoBackup} onChange={() => this.setAutoBackup(!autoBackup)} style={{ marginBottom: 6 }} /><br />
-                    <Checkbox toggle label='Report about errors' checked={errorReporting} onChange={() => this.setErrorReporting(!errorReporting)} />
+                    <Checkbox toggle label='Report about errors' checked={errorReporting} onChange={() => this.setErrorReporting(!errorReporting)} style={{ marginBottom: 6 }} />
+                    <Checkbox toggle label='Open the popup in the overlay' checked={popupInOverlay} onChange={() => this.setPopupInOverlay(!popupInOverlay)} />
 
                     <Header as='h4'>About</Header>
                     <div>

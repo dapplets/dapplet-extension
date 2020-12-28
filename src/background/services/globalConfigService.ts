@@ -2,6 +2,7 @@ import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserSt
 import { GlobalConfig } from '../models/globalConfig';
 import { typeOfUri, UriTypes } from '../../common/helpers';
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
+import { browser } from "webextension-polyfill-ts";
 
 export default class GlobalConfigService {
     private _globalConfigRepository = new GlobalConfigBrowserStorage();
@@ -34,6 +35,7 @@ export default class GlobalConfigService {
         config.providerUrl = 'https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992';
         config.walletsUsage = {};
         config.identityContract = '0xf6b3a0B20281796D465bB8613e233BE30be07084';
+        config.popupInOverlay = false;
 
         await this._globalConfigRepository.deleteById(this._configId);
         await this._globalConfigRepository.create(config);
@@ -197,6 +199,16 @@ export default class GlobalConfigService {
 
     async setErrorReporting(isActive: boolean) {
         return this.updateConfig(c => c.errorReporting = isActive);
+    }
+
+    async getPopupInOverlay() {
+        const config = await this.get();
+        return config.popupInOverlay;
+    }
+
+    async setPopupInOverlay(isActive: boolean) {
+        await this.updateConfig(c => c.popupInOverlay = isActive);
+        await browser.browserAction.setPopup({ popup: (isActive) ? '' : 'popup.html' });
     }
 
     async getAutoBackup() {

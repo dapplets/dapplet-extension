@@ -43,7 +43,7 @@ browser.runtime.onMessage.addListener(
     getSowaTemplate: () => console.warn('WalletConnectService.getSowaTemplate is deprecated'),
     sendSowaTransaction: () => console.warn('WalletConnectService.sendSowaTransaction is deprecated'),
     sendTransaction: () => console.warn('WalletConnectService.sendTransaction is deprecated'),
-    
+
     prepareWalletFor: (app, cfg) => walletService.prepareWalletFor(app, cfg),
     connectWallet: (type) => walletService.connectWallet(type),
     disconnectWallet: (type) => walletService.disconnectWallet(type),
@@ -53,7 +53,7 @@ browser.runtime.onMessage.addListener(
     getAddress: (app) => walletService.getAddress(app),
     sendTransactionOutHash: (app, tx) => walletService.sendTransactionOutHash(app, tx),
     sendCustomRequest: (app, method, params) => walletService.sendCustomRequest(app, method, params),
-    
+
     // SuspendService
     getSuspendityByHostname: SuspendService.getSuspendityByHostname,
     getSuspendityEverywhere: SuspendService.getSuspendityEverywhere,
@@ -109,6 +109,8 @@ browser.runtime.onMessage.addListener(
     getErrorReporting: () => globalConfigService.getErrorReporting(),
     setErrorReporting: (isActive) => globalConfigService.setErrorReporting(isActive),
     getIdentityContract: globalConfigService.getIdentityContract.bind(globalConfigService),
+    getPopupInOverlay: () => globalConfigService.getPopupInOverlay(),
+    setPopupInOverlay: (isActive) => globalConfigService.setPopupInOverlay(isActive),
 
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),
@@ -196,4 +198,14 @@ browser.runtime.onMessage.addListener((message, sender) => {
       });
     });
   }
+});
+
+globalConfigService.getPopupInOverlay().then((popupInOverlay) => {
+  browser.browserAction.setPopup({
+    popup: (popupInOverlay) ? '' : 'popup.html'
+  });
+});
+
+browser.browserAction.onClicked.addListener((tab) => {
+  return getCurrentTab().then((activeTab) => browser.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY"));
 });

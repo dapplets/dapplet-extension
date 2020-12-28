@@ -33,4 +33,6 @@ export class GlobalConfig extends Base {
     walletsUsage: { [moduleName: string]: string } = {};
 
     identityContract: string = null;
+
+    popupInOverlay: boolean = false;
 }
