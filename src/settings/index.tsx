@@ -25,6 +25,7 @@ interface IIndexState {
     owner: string;
     data: any;
     loading: boolean;
+    devMode: boolean;
 }
 
 class Index extends React.Component<IIndexProps, IIndexState> {
@@ -40,11 +41,25 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             defaultConfig: null,
             owner: null,
             data: {},
-            loading: false
+            loading: false,
+            devMode: false
         };
 
         this.bus.subscribe('data', async ({ mi, vi, schemaConfig, defaultConfig }) => {
-            this.setState({ mi, vi, schemaConfig, defaultConfig });
+            const { getDevMode } = await initBGFunctions(browser);
+            const devMode = await getDevMode();
+            
+            if (!devMode) {
+                if (schemaConfig && schemaConfig.properties) {
+                    for (const key in schemaConfig.properties) {
+                        if (schemaConfig.properties[key].hidden) {
+                            delete schemaConfig.properties[key];
+                        }
+                    }
+                }
+            }
+
+            this.setState({ mi, vi, schemaConfig, defaultConfig, devMode });
             await this._refreshData();
             await this._updateOwnership();
         });
