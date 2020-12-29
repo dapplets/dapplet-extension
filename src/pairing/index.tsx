@@ -12,6 +12,7 @@ import { Bus } from '../common/bus';
 import * as modules from './modules';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
+import { Container } from 'semantic-ui-react';
 
 TimeAgo.addDefaultLocale(en);
 window.onerror = logger.log;
@@ -31,13 +32,15 @@ class Index extends React.Component<Props, State> {
 
     render() {
         return (
-            <HashRouter>
-                <Switch>
-                    <Route exact path="/" component={SelectWallet} />
-                    <Route path="/metamask" component={() => <modules.metamask bus={this.bus} />} />
-                    <Route path="/walletconnect" component={() => <modules.walletconnect bus={this.bus} />} />
-                </Switch>
-            </HashRouter>
+            <Container text style={{ paddingTop: '30px' }}>
+                <HashRouter>
+                    <Switch>
+                        <Route exact path="/" component={SelectWallet} />
+                        <Route path="/metamask" component={() => <modules.metamask bus={this.bus} />} />
+                        <Route path="/walletconnect" component={() => <modules.walletconnect bus={this.bus} />} />
+                    </Switch>
+                </HashRouter>
+            </Container>
         );
     }
 }

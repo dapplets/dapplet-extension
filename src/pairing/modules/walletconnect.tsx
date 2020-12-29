@@ -8,6 +8,7 @@ import { svgObject } from "qr-image";
 import { Link, Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
 import { WalletInfo } from '../../common/constants';
+import { WalletDescriptor } from "../../background/services/walletService";
 
 interface Props {
     bus: Bus;
@@ -15,20 +16,10 @@ interface Props {
 
 interface State {
     svgPath: string;
-    isPaired: boolean;
+    connected: boolean;
     error: string;
-    wallet?: {
-        accounts?: string[],
-        chainId?: number,
-        peerId?: string,
-        peerMeta?: {
-            icons?: string[],
-            name?: string,
-            url?: string
-        }
-    }
-    walletInfo: WalletInfo;
     toBack: boolean;
+    descriptor: WalletDescriptor | null;
 }
 
 export default class extends React.Component<Props, State> {
@@ -39,10 +30,10 @@ export default class extends React.Component<Props, State> {
         super(props);
         this.state = {
             svgPath: null,
-            isPaired: false,
+            connected: false,
             error: null,
-            walletInfo: null,
-            toBack: false
+            toBack: false,
+            descriptor: null
         };
     }
 
@@ -51,7 +42,7 @@ export default class extends React.Component<Props, State> {
         this._mounted = true;
 
         try {
-            const { connectWallet } = await initBGFunctions(browser);
+            const { connectWallet, getWalletDescriptors } = await initBGFunctions(browser);
 
             this.props.bus.subscribe('walletconnect', (uri) => {
                 const svgPath = svgObject(uri, { type: 'svg' });
@@ -60,9 +51,11 @@ export default class extends React.Component<Props, State> {
             });
 
             await connectWallet('walletconnect');
-            if (this._mounted) this.setState({ isPaired: true });
+            const descriptors = await getWalletDescriptors();
+            const descriptor = descriptors.find(x => x.type === 'walletconnect');
+            if (this._mounted) this.setState({ connected: true, descriptor });
         } catch (err) {
-            if (this._mounted) this.setState({ isPaired: true, error: err.message });
+            if (this._mounted) this.setState({ connected: true, error: err.message });
         }
     }
 
@@ -82,42 +75,42 @@ export default class extends React.Component<Props, State> {
     }
 
     render() {
-        const { svgPath, isPaired, error, wallet, walletInfo, toBack } = this.state;
+        const s = this.state;
 
-        if (toBack === true) {
+        if (s.toBack === true) {
             return <Redirect to='/' />
         }
 
-        return (
-            <Container text>
-                {!isPaired ? (
-                    <React.Fragment>
-                        <Header as='h2'>WalletConnect Pairing</Header>
-                        <p>Scan QR code with a WalletConnect-compatible wallet</p>
-                        {svgPath ? (<svg viewBox="1 1 53 53"><path d={svgPath} /></svg>) : null}
-                        <Button onClick={() => this.setState({ toBack: true })}>Back</Button>
-                    </React.Fragment>
-                ) : (
-                        <React.Fragment>
-                            {!error ? (
-                                <div>
-                                    <Header as='h2'>Wallet connected</Header>
-                                    <p>Account: {wallet?.accounts[0]}</p>
-                                    <p>Chain ID: {wallet?.chainId}</p>
-                                    <p>Peer Name: {wallet?.peerMeta?.name}</p>
-                                    <p>Peer URL: {wallet?.peerMeta?.url}</p>
-                                    <p>SOWA Compatibility: {walletInfo?.compatible ? "Yes" : "No"}</p>
-                                    <p>SOWA Protocol Version: {walletInfo?.protocolVersion || "UNKNOWN"}</p>
-                                    <p>SOWA Engine Version: {walletInfo?.engineVersion || "UNKNOWN"}</p>
-                                    <p>Device Manufacturer: {walletInfo?.device?.manufacturer || "UNKNOWN"}</p>
-                                    <p>Device Model: {walletInfo?.device?.model || "UNKNOWN"}</p>
-                                    <Button onClick={() => this.disconnect()}>Disconnect</Button>
-                                    <Button primary onClick={() => this.continue()}>Continue</Button>
-                                </div>
-                            ) : (<p>{error}</p>)}
-                        </React.Fragment>
-                    )}
-            </Container>
+        if (s.error) return (
+            <>
+                <h3>Error</h3>
+                <p>{s.error}</p>
+                <Button onClick={() => this.setState({ toBack: true })}>Back</Button>
+            </>
         );
+
+        if (!s.connected) return (
+            <React.Fragment>
+                <Header as='h2'>WalletConnect Pairing</Header>
+                <p>Scan QR code with a WalletConnect-compatible wallet</p>
+                {s.svgPath ? (<svg viewBox="1 1 53 53"><path d={s.svgPath} /></svg>) : null}
+                <Button onClick={() => this.setState({ toBack: true })}>Back</Button>
+            </React.Fragment>
+        );
+
+        if (s.connected) return (<>
+            <h3>Connected</h3>
+            <p>The wallet is connected</p>
+            {(s.descriptor.meta) ? <Segment style={{ textAlign: 'center' }}>
+                <img src={s.descriptor.meta.icon} alt={s.descriptor.meta.name} style={{ width: '64px' }} />
+                <div style={{ fontWeight: 'bold', fontSize: '1.3em' }}>{s.descriptor.meta.name}</div>
+                <div>{s.descriptor.meta.description}</div>
+                <div>{s.descriptor.account}</div>
+            </Segment> : null}
+            <div style={{ marginTop: '15px' }}>
+                <Button onClick={() => this.disconnect()}>Disconnect</Button>
+                <Button primary onClick={() => this.continue()}>Continue</Button>
+            </div>
+        </>);
     }
 }

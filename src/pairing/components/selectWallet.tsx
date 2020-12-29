@@ -54,8 +54,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
         const disconnectedWallets = this.state.descriptors.filter(x => !x.connected);
 
         return (
-            <Container text style={{ paddingTop: '30px' }}>
-
+            <>
                 {(connectedWallets.length > 0) ? <>
                     <Header as='h3'>Your active wallet connections</Header>
                     <Comment.Group>
@@ -116,7 +115,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                     </Button> : null}
 
                 </> : null}
-            </Container>
+            </>
         );
     }
 }
