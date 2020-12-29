@@ -115,12 +115,12 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                                 </Card.Description>
                             </Card.Content>
                         </Card>
-                        {schemaConfig ? <Form schema={schemaConfig || {}} onSubmit={e => this._saveData(e.formData)} formData={data}>
+                        {(schemaConfig && schemaConfig.properties && Object.entries(schemaConfig.properties).map(([k, v]) => !v['hidden']).length > 0) ? <Form schema={schemaConfig || {}} onSubmit={e => this._saveData(e.formData)} formData={data}>
                             <div>
                                 <Button type="submit" primary disabled={this.state.loading} loading={this.state.loading}>Save and Reload</Button>
                                 <Button basic disabled={this.state.loading} onClick={() => this._resetSettings()}>Reset</Button>
                             </div>
-                        </Form> : <p>No settings available for this dapplet.</p>}                        
+                        </Form> : <p>No settings available for this dapplet.</p>}
                     </React.Fragment>
                 ) : <Dimmer active inverted>
                         <Loader inverted>Loading</Loader>
