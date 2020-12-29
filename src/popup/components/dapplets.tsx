@@ -13,6 +13,7 @@ type ManifestAndDetails = ManifestDTO & { isLoading: boolean, isActionLoading: b
 
 interface IDappletsProps {
   contextIds: Promise<string[] | undefined>;
+  isOverlay: boolean;
 }
 
 interface IDappletsState {
@@ -171,7 +172,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     const { features, isLoading, error, isNoInpage } = this.state;
     return (
       <React.Fragment>
-        <Segment loading={isLoading} className="internalTab">
+        <Segment loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTab"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
           {(error) ? (<Message floating warning>{error}</Message>) : null}
 
           {!isNoInpage ?

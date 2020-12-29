@@ -9,7 +9,9 @@ import { StorageRef } from "../../background/registries/registry";
 import ModuleInfo from "../../background/models/moduleInfo";
 import VersionInfo from "../../background/models/versionInfo";
 
-interface IDeveloperProps { }
+interface IDeveloperProps {
+    isOverlay: boolean;
+}
 
 interface IDeveloperState {
     isLoading: boolean;
@@ -116,7 +118,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                     <p>Here you can connect to development servers to debug modules, publish them to public registries using your wallet.</p>
                 </Message>) : null}
 
-                <Segment loading={isLoading} className="internalTabDeveloper">
+                <Segment loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTabDeveloper"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
 
                     <Header as='h4'>Development Servers</Header>
                     <Input

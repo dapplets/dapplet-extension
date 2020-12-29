@@ -46,6 +46,8 @@ export default class Core {
                     return this.waitPairingOverlay(message.payload.topic, message.payload.args).then(() => ([null, 'ready'])).catch(() => (['error']));
                 } else if (message.type === 'OPEN_LOGIN_OVERLAY') {
                     return this.waitLoginOverlay(message.payload.topic, message.payload.args).then(() => ([null, 'ready'])).catch((err) => ([err]));
+                } else if (message.type === 'OPEN_POPUP_OVERLAY') {
+                    return Promise.resolve(this.overlayManager.openPopup(message.payload.path));
                 }
             }
         });

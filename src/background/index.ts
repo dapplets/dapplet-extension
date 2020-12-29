@@ -207,5 +207,5 @@ globalConfigService.getPopupInOverlay().then((popupInOverlay) => {
 });
 
 browser.browserAction.onClicked.addListener((tab) => {
-  return getCurrentTab().then((activeTab) => browser.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY"));
+  return getCurrentTab().then((activeTab) => browser.tabs.sendMessage(activeTab.id, { type: "OPEN_POPUP_OVERLAY", payload: { path: 'dapplets' } }));
 });

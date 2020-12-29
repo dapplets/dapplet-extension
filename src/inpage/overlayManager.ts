@@ -1,4 +1,5 @@
 import { browser } from 'webextension-polyfill-ts';
+import { capitalizeFirstLetter } from '../common/helpers';
 import { Overlay } from './overlay';
 
 const PageNavClass = 'dapplets-overlay-nav';
@@ -119,10 +120,7 @@ export class OverlayManager {
             if (!text) return;
 
             const path = text.toLowerCase();
-            const url = browser.extension.getURL('popup.html');
-            this._popupOverlay = this._popupOverlay ?? new Overlay(this, url + `#/${path}`, 'Dapplets', true);
-            this._popupOverlay.send('changeTab', [path]);
-            this.activate(this._popupOverlay);
+            this.openPopup(path);
         });
         topActions.appendChild(menuAction);
 
@@ -265,5 +263,15 @@ export class OverlayManager {
 
     public getOverlays() {
         return this._tabsRegistry.map(x => x.overlay);
+    }
+
+    public openPopup(path: string) {
+        const url = browser.extension.getURL('popup.html') + `#/${path}`;
+        const overlays = this.getOverlays();
+        const overlay = overlays.find(x => x.uri === url) ?? new Overlay(this, url, capitalizeFirstLetter(path));
+        overlay.send('changeTab', [path]);
+        this.activate(overlay);
+        this.show();
+        this.open();
     }
 }

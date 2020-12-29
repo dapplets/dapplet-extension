@@ -6,7 +6,7 @@ import { List, Segment, Label } from "semantic-ui-react";
 import { Event } from '../../common/models/event';
 
 interface IEventsProps {
-
+    isOverlay: boolean;
 }
 
 interface IEventsState {
@@ -34,7 +34,7 @@ class Events extends React.Component<IEventsProps, IEventsState> {
         const { events } = this.state;
         return (
             <React.Fragment>
-                <Segment loading={false} className="internalTab">
+                <Segment loading={false} className={(this.props.isOverlay) ? undefined : "internalTab"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
                     <List divided relaxed>
                         {events.map(e => (
                             <List.Item key={e.id}>

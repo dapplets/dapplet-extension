@@ -8,6 +8,7 @@ import { typeOfUri, UriTypes } from '../../common/helpers';
 interface ISettingsProps {
     devMode: boolean;
     updateTabs: () => Promise<void>;
+    isOverlay: boolean;
 }
 
 interface ISettingsState {
@@ -270,7 +271,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
 
         return (
             <React.Fragment>
-                <Segment loading={isLoading} className="internalTabSettings">
+                <Segment loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTabSettings"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
 
                     <Header as='h4'>Public Registries</Header>
                     <Input

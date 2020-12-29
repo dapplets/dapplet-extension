@@ -22,6 +22,7 @@ interface IPopupState {
   loading: boolean;
   defaultActiveIndex: number | undefined;
   reload: number;
+  isOverlay: boolean;
 }
 
 class Popup extends React.Component<IPopupProps, IPopupState> {
@@ -34,10 +35,12 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
       devMode: false,
       loading: true,
       defaultActiveIndex: undefined,
-      reload: 0
+      reload: 0,
+      isOverlay: false
     };
 
     props.bus.subscribe('changeTab', (path) => {
+      this.setState({ isOverlay: true });
       if (path === 'dapplets') this.setState({ defaultActiveIndex: 0, reload: Math.random() });
       //if (path === 'events') this.setState({ defaultActiveIndex: 1, reload: Math.random() });
       if (path === 'wallets') this.setState({ defaultActiveIndex: 1, reload: Math.random() });
@@ -68,7 +71,7 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
       {
         menuItem: <Menu.Item key='dapplets' style={{ padding: '.85714286em 0.8em' }}>Dapplets</Menu.Item>,
         render: () => (
-          <Tab.Pane attached={false} as={() => <Dapplets contextIds={contextIds} />} />
+          <Tab.Pane attached={false} as={() => <Dapplets contextIds={contextIds} isOverlay={this.state.isOverlay} />} />
         )
       },
       // {
@@ -78,19 +81,19 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
       //     </Menu.Item>
       //   ),
       //   render: () => (
-      //     <Tab.Pane attached={false} as={Events} />
+      //     <Tab.Pane attached={false} as={() => <Events isOverlay={this.state.isOverlay}/>} />
       //   )
       // },
       {
         menuItem: <Menu.Item key='wallets' style={{ padding: '.85714286em 0.8em' }}>Wallets</Menu.Item>,
         render: () => (
-          <Tab.Pane attached={false} as={Wallets} />
+          <Tab.Pane attached={false} as={() => <Wallets isOverlay={this.state.isOverlay} />} />
         )
       },
       {
         menuItem: <Menu.Item key='settings' style={{ padding: '.85714286em 0.8em' }}>Settings</Menu.Item>,
         render: () => (
-          <Tab.Pane attached={false} as={() => <Settings devMode={devMode} updateTabs={() => this.updateTabs()} />} />
+          <Tab.Pane attached={false} as={() => <Settings devMode={devMode} updateTabs={() => this.updateTabs()} isOverlay={this.state.isOverlay} />} />
         )
       }
     ];
@@ -99,7 +102,7 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
       panes.push({
         menuItem: <Menu.Item key='developer' style={{ padding: '.85714286em 0.8em' }}>Developer</Menu.Item>,
         render: () => (
-          <Tab.Pane attached={false} as={Developer} />
+          <Tab.Pane attached={false} as={() => <Developer isOverlay={this.state.isOverlay} />} />
         )
       });
     }
@@ -108,7 +111,7 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
       <React.Fragment>
         <div className="popupContainer" key={this.state.reload}>
           {(this.props.contextIds) ? <Header contextIds={this.props.contextIds} /> : null}
-          <Tab menu={{ secondary: true, pointing: true }} panes={panes} defaultActiveIndex={this.state.defaultActiveIndex}/>
+          <Tab menu={{ secondary: true, pointing: true, style: { display: (this.state.isOverlay) ? 'none' : undefined } }} panes={panes} defaultActiveIndex={this.state.defaultActiveIndex} />
         </div>
       </React.Fragment>
     );

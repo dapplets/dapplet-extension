@@ -156,3 +156,7 @@ export function networkName(chainId: number) {
 
   return map[chainId] ?? 'unknown';
 }
+
+export function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
