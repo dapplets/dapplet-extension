@@ -39,10 +39,10 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
 
     props.bus.subscribe('changeTab', (path) => {
       if (path === 'dapplets') this.setState({ defaultActiveIndex: 0, reload: Math.random() });
-      if (path === 'events') this.setState({ defaultActiveIndex: 1, reload: Math.random() });
-      if (path === 'wallets') this.setState({ defaultActiveIndex: 2, reload: Math.random() });
-      if (path === 'settings') this.setState({ defaultActiveIndex: 3, reload: Math.random() });
-      if (path === 'developer') this.setState({ defaultActiveIndex: 4, reload: Math.random() });
+      //if (path === 'events') this.setState({ defaultActiveIndex: 1, reload: Math.random() });
+      if (path === 'wallets') this.setState({ defaultActiveIndex: 1, reload: Math.random() });
+      if (path === 'settings') this.setState({ defaultActiveIndex: 2, reload: Math.random() });
+      if (path === 'developer') this.setState({ defaultActiveIndex: 3, reload: Math.random() });
     })
   }
 
@@ -71,16 +71,16 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
           <Tab.Pane attached={false} as={() => <Dapplets contextIds={contextIds} />} />
         )
       },
-      {
-        menuItem: (
-          <Menu.Item key='messages' style={{ padding: '.85714286em 0.8em' }}>
-            Events{newEventsCount !== 0 ? <Label color='red' circular size='mini'>{newEventsCount}</Label> : null}
-          </Menu.Item>
-        ),
-        render: () => (
-          <Tab.Pane attached={false} as={Events} />
-        )
-      },
+      // {
+      //   menuItem: (
+      //     <Menu.Item key='messages' style={{ padding: '.85714286em 0.8em' }}>
+      //       Events{newEventsCount !== 0 ? <Label color='red' circular size='mini'>{newEventsCount}</Label> : null}
+      //     </Menu.Item>
+      //   ),
+      //   render: () => (
+      //     <Tab.Pane attached={false} as={Events} />
+      //   )
+      // },
       {
         menuItem: <Menu.Item key='wallets' style={{ padding: '.85714286em 0.8em' }}>Wallets</Menu.Item>,
         render: () => (

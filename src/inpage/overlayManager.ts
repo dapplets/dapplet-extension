@@ -108,7 +108,6 @@ export class OverlayManager {
             </button>
             <div>
                 <a href="#">Dapplets</a>
-                <a href="#">Events</a>
                 <a href="#">Wallets</a>
                 <a href="#">Settings</a>
                 <a href="#">Developer</a>

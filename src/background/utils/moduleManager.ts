@@ -186,9 +186,9 @@ export default class ModuleManager {
 
         // ToDo: catch null in optimizedVersion
 
-        if (version != optimizedVersion) {
-            addEvent('Dependency Optimizer', `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`);
-        }
+        // if (version != optimizedVersion) {
+        //     addEvent('Dependency Optimizer', `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`);
+        // }
 
         return {
             name: name,
