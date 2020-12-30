@@ -9,6 +9,11 @@ export default class extends ethers.Signer implements ExtendedSigner {
     public provider = new ethers.providers.JsonRpcProvider('https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992', 'rinkeby');
     private _metamask = createMetaMaskProvider();
 
+    constructor() {
+        super();
+        this._metamask['autoRefreshOnNetworkChange'] = false; // silence the warning from metamask https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange 
+    }
+
     async getAddress(): Promise<string> {
         // ToDo: replace to ethereum.request({ method: 'eth_accounts' }) 
         return this._metamask.selectedAddress;
