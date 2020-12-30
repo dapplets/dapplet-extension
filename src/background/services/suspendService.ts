@@ -11,6 +11,7 @@ let lastExtensionIcon = null;
 
 const changeIcon = async () => {
     const tab = await Helpers.getCurrentTab();
+    if (!tab) return;
     const url = tab.url || tab['pendingUrl']; // ToDo: check existance of pendingUrl
     const hostname = Helpers.getHostName(url);
     const suspendityByHostname = await getSuspendityByHostname(hostname);
@@ -35,6 +36,7 @@ const updateContextMenus = async () => {
     isContextMenusUpdating = true;
     await browser.contextMenus.removeAll();
     const tab = await Helpers.getCurrentTab();
+    if (!tab) return;
     const url = tab.url || tab['pendingUrl']; // ToDo: check existance of pendingUrl
     const hostname = Helpers.getHostName(url);
 
