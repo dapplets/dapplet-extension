@@ -406,7 +406,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                         <Button size='mini' disabled={this.state.identityLoading || !this.state.identityEdited || !isValidUrl(this.state.identityInput)} color='blue' onClick={() => this.setIdentityContract(this.state.identityInput)}>Save</Button>
                     </Input>
 
-                    <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /><br />
+                    {/* <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /><br /> */}
                     <Checkbox toggle label='Modules backup' checked={autoBackup} onChange={() => this.setAutoBackup(!autoBackup)} style={{ marginBottom: 6 }} /><br />
                     <Checkbox toggle label='Report about errors' checked={errorReporting} onChange={() => this.setErrorReporting(!errorReporting)} style={{ marginBottom: 6 }} />
                     <Checkbox toggle label='Open the popup in the overlay' checked={popupInOverlay} onChange={() => this.setPopupInOverlay(!popupInOverlay)} />

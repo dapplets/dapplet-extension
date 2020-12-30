@@ -27,7 +27,7 @@ export default class GlobalConfigService {
             url: "dapplet-base.eth",
             isDev: false
         }];
-        config.devMode = false;
+        config.devMode = true;
         config.trustedUsers = [{
             account: "0x692a4d7b7be2dc1623155e90b197a82d114a74f3"
         }];
