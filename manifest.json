@@ -1,8 +1,9 @@
 {
-  "name": "Dapplet Extension",
+  "name": "Dapplets",
   "version": "",
   "description": "",
   "author": "",
+  "short_name": "Dapplets",
   "background": {
     "page": "background.html",
     "persistent": true

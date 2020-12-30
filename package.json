@@ -1,7 +1,7 @@
 {
   "name": "@dapplets/dapplet-extension",
   "version": "0.21.0-alpha.6",
-  "description": "Adds controls to legacy web sites.",
+  "description": "The Bridge to the Augmented Web.",
   "main": "./lib/index.min.js",
   "types": "./lib/index.d.ts",
   "scripts": {
@@ -84,7 +84,7 @@
     "extension",
     "ethereum"
   ],
-  "author": "Dapplets Team",
+  "author": "Dapplets Team <contact@dapplets.org>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/dapplets/dapplet-extension/issues"
