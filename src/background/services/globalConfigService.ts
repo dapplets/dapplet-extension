@@ -9,15 +9,16 @@ export default class GlobalConfigService {
     private _configId: string = 'default';
 
     async get(): Promise<GlobalConfig> {
-        let config = await this._globalConfigRepository.getById(this._configId);
-        if (!config) await this.resetConfig();
-        config = await this._globalConfigRepository.getById(this._configId);
-
-        return config;
+        return this._globalConfigRepository.getById(this._configId);
     }
 
     async set(config: GlobalConfig): Promise<void> {
         await this._globalConfigRepository.update(config);
+    }
+
+    async initConifg(): Promise<void> {
+        let config = await this._globalConfigRepository.getById(this._configId);
+        if (!config) await this.resetConfig();
     }
 
     async resetConfig(): Promise<void> {
