@@ -6,6 +6,7 @@ import { ethers } from 'ethers';
 import { CentralizedModuleStorage } from './centralizedModuleStorage';
 import GlobalConfigService from '../services/globalConfigService';
 import * as logger from '../../common/logger';
+import { StorageTypes } from '../../common/constants';
 
 export class StorageAggregator {
 
@@ -19,14 +20,15 @@ export class StorageAggregator {
 
         for (const uri of hashUris.uris) {
             const protocol = uri.substr(0, uri.indexOf('://'));
-            const storage = this._chooseStorage(protocol);
+            const storage = this._getStorageByProtocol(protocol);
 
             try {
                 const buffer = await storage.getResource(uri);
-                if (this._checkHash(buffer, hashUris.hash, uri)) {
-                    if (hashUris.hash) this._globalConfigService.getAutoBackup().then(x => x && this._backup(buffer, hashUris.hash.replace('0x', ''))); // don't wait
-                    return buffer;
-                }
+                if (this._checkHash(buffer, hashUris.hash, uri)) return buffer;
+                // if (this._checkHash(buffer, hashUris.hash, uri)) {
+                //     if (hashUris.hash) this._globalConfigService.getAutoBackup().then(x => x && this._backup(buffer, hashUris.hash.replace('0x', ''))); // don't wait
+                //     return buffer;
+                // }
             } catch (err) {
                 logger.error(err);
             }
@@ -41,11 +43,27 @@ export class StorageAggregator {
         throw Error("Can not fetch resource");
     }
 
-    private async _backup(buffer: ArrayBuffer, hash: string) {
-        const centralizedStorage = new CentralizedModuleStorage();
-        const blob = new Blob([buffer], { type: 'application/octet-stream' });
-        const newHash = await centralizedStorage.save(blob);
-        if (hash !== newHash) logger.error('Backup is corrupted: invalid hashes', hash, newHash);
+    public async save(blob: Blob, targetStorages: StorageTypes[]): Promise<StorageRef> {
+        const buffer = await (blob as any).arrayBuffer();
+        const hash = ethers.utils.keccak256(new Uint8Array(buffer));
+        const uris = [];
+
+        for (const storageType of targetStorages) {
+            const storage = this._getStorageByType(storageType);
+            const uri = await storage.save(blob);
+            uris.push(uri);
+        }
+
+        const autobackup = await this._globalConfigService.getAutoBackup();
+        if (autobackup) {
+            const centralizedStorage = new CentralizedModuleStorage();
+            const backupHash = await centralizedStorage.save(blob);
+            if (hash !== backupHash) {
+                logger.error('Backup is corrupted: invalid hashes', hash, backupHash);
+            }
+        }
+
+        return { hash, uris };
     }
 
     private _checkHash(buffer: ArrayBuffer, expectedHash: string, uri: string) {
@@ -64,7 +82,7 @@ export class StorageAggregator {
         }
     }
 
-    private _chooseStorage(protocol: string): Storage {
+    private _getStorageByProtocol(protocol: string): Storage {
         switch (protocol) {
             case "http":
             case "https":
@@ -73,6 +91,17 @@ export class StorageAggregator {
                 return new SwarmModuleStorage();
             default:
                 throw new Error("Unsupported protocol");
+        }
+    }
+
+    private _getStorageByType(type: StorageTypes): Storage {
+        switch (type) {
+            // case StorageTypes.TestRegsitry:
+            //     return new HttpModuleStorage();
+            case StorageTypes.Swarm:
+                return new SwarmModuleStorage();
+            default:
+                throw new Error("Unsupported storage type");
         }
     }
 }

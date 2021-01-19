@@ -240,8 +240,8 @@ export default class FeatureService {
     public async deployModule(mi: ModuleInfo, vi: VersionInfo, targetStorage: StorageTypes, targetRegistry: string): Promise<{ scriptUrl: string }> {
         try {
             // ToDo: check everething before publishing
-            const swarmStorage = new SwarmModuleStorage();
-            const testStorage = new HttpModuleStorage();
+            //const swarmStorage = new SwarmModuleStorage();
+            //const testStorage = new HttpModuleStorage();
 
             let scriptUrl = null;
 
@@ -264,38 +264,23 @@ export default class FeatureService {
 
             if (vi.main) {
                 // Dist file publishing
-                const dist = await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 9 } });
-                const distBlob = new Blob([dist], { type: "text/javascript" });
-                const distUrl = (targetStorage === StorageTypes.TestRegsitry) ? await testStorage.save(distBlob, targetRegistry) : await swarmStorage.save(distBlob);
-
-                // Dist file  hashing
-                const distBuffer = await (distBlob as any).arrayBuffer();
-                const distHash = ethers.utils.keccak256(new Uint8Array(distBuffer));
+                const buf = await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 9 } });
+                const blob = new Blob([buf], { type: "application/zip" });
+                const hashUris = await this._storageAggregator.save(blob, [targetStorage]);
 
                 // Manifest editing
-                vi.dist = {
-                    hash: distHash,
-                    uris: [distUrl]
-                };
-
-                scriptUrl = distUrl;
+                vi.dist = hashUris;
+                scriptUrl = hashUris.uris[0]; // ToDo: remove it?
             }
 
             if (mi.icon) {
                 // Icon file publishing
-                const icon = await this._storageAggregator.getResource(mi.icon);
-                const iconBlob = new Blob([icon], { type: "text/javascript" });
-                const iconUrl = (targetStorage === StorageTypes.TestRegsitry) ? await testStorage.save(iconBlob, targetRegistry) : await swarmStorage.save(iconBlob);
-
-                // Icon file  hashing
-                const iconBuffer = await (iconBlob as any).arrayBuffer();
-                const iconHash = ethers.utils.keccak256(new Uint8Array(iconBuffer));
+                const buf = await this._storageAggregator.getResource(mi.icon);
+                const blob = new Blob([buf], { type: "image/png" });
+                const hashUris = await this._storageAggregator.save(blob, [targetStorage]);
 
                 // Manifest editing
-                mi.icon = {
-                    hash: iconHash,
-                    uris: [iconUrl]
-                };
+                mi.icon = hashUris;
             }
 
             // Register manifest in Registry
