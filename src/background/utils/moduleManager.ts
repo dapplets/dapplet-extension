@@ -23,7 +23,7 @@ export default class ModuleManager {
     constructor(
         private _globalConfigService: GlobalConfigService,
         private _walletService: WalletService
-    ) { 
+    ) {
         this.registryAggregator = new RegistryAggregator(this._globalConfigService, this._walletService);
     }
 
