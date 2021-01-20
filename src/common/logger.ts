@@ -6,7 +6,7 @@ export const error = async (...args: any[]) => {
     const isReport = await _isReportingEnabled();
 
     if (!isReport || args.length === 0) return;
-    
+
     const text = (args[0] instanceof Error) ? args[0].message + '\n' + args[0].stack : args[0].toString();
 
     if (!_isNeedToLog(text)) return;
@@ -19,7 +19,7 @@ export const log = async (msg, url, line, col, error) => {
 
     const isReport = await _isReportingEnabled();
     if (!isReport) return;
-    
+
     let extra = !col ? '' : '\ncolumn: ' + col;
     extra += !error ? '' : '\nerror: ' + error;
     const text = "Error: " + msg + "\nline: " + line + extra;
@@ -45,15 +45,17 @@ function _isNeedToLog(text: string): boolean {
 }
 
 async function _isReportingEnabled(): Promise<boolean> {
-    const config = await browser.storage.local.get('GlobalConfig:default');
+    const config = await browser.storage.local.get('GlobalConfig:default'); // ToDo: call it via background service
     return config?.['GlobalConfig:default']?.['errorReporting'] || true;
 }
 
 async function _report(text) {
-    const data = {
-        subject: _makeid(6),
-        text: text
-    }
+    const config = await browser.storage.local.get('GlobalConfig:default');
+    const userAgentId = config?.['GlobalConfig:default']?.['userAgentId'];
+    const userAgentName = config?.['GlobalConfig:default']?.['userAgentName'];
+    const subject = _makeid(6) + ` from ${userAgentId}` + ((userAgentName && userAgentName.length > 0) ? ' (' + userAgentName + ')' : '');
+
+    const data = { subject, text };
 
     return fetch('https://dapplet-api.netlify.app/.netlify/functions/report', {
         method: 'POST',

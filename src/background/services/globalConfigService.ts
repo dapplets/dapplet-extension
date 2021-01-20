@@ -3,6 +3,7 @@ import { GlobalConfig } from '../models/globalConfig';
 import { typeOfUri, UriTypes } from '../../common/helpers';
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { browser } from "webextension-polyfill-ts";
+import { generateGuid } from '../../common/utils';
 
 export default class GlobalConfigService {
     private _globalConfigRepository = new GlobalConfigBrowserStorage();
@@ -39,6 +40,8 @@ export default class GlobalConfigService {
         config.popupInOverlay = false;
         config.autoBackup = true;
         config.errorReporting = true;
+        config.userAgentId = generateGuid(); 
+        config.userAgentName = '';
 
         await this._globalConfigRepository.deleteById(this._configId);
         await this._globalConfigRepository.create(config);
@@ -247,5 +250,17 @@ export default class GlobalConfigService {
 
     async setIdentityContract(address: string) {
         return this.updateConfig(c => c.identityContract = address);
+    }
+
+    async getUserAgentId() {
+        return this.get().then(x => x.userAgentId);
+    }
+
+    async getUserAgentName() {
+        return this.get().then(x => x.userAgentName);
+    }
+
+    async setUserAgentName(value: string) {
+        return this.updateConfig(c => c.userAgentName = value);
     }
 }

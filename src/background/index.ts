@@ -112,6 +112,9 @@ import { IdentityService } from "./services/identityService";
       getIdentityContract: globalConfigService.getIdentityContract.bind(globalConfigService),
       getPopupInOverlay: () => globalConfigService.getPopupInOverlay(),
       setPopupInOverlay: (isActive) => globalConfigService.setPopupInOverlay(isActive),
+      getUserAgentId: globalConfigService.getUserAgentId.bind(globalConfigService),
+      getUserAgentName: globalConfigService.getUserAgentName.bind(globalConfigService),
+      setUserAgentName: globalConfigService.setUserAgentName.bind(globalConfigService),
 
       // UserSettings (AppStorage)
       getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),

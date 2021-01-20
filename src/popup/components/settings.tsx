@@ -39,9 +39,15 @@ interface ISettingsState {
 
     devMode: boolean;
     autoBackup: boolean;
-    errorReporting: boolean;
     isUpdateAvailable: boolean;
     popupInOverlay: boolean;
+    
+    errorReporting: boolean;
+    userAgentId: string;
+    userAgentNameInput: string;
+    userAgentNameInputError: string;
+    userAgentNameLoading: boolean;
+    userAgentNameEdited: boolean;
 }
 
 class Settings extends React.Component<ISettingsProps, ISettingsState> {
@@ -61,7 +67,6 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             userSettingsInput: '',
             userSettingsInputError: null,
             userSettingsLoading: false,
-            errorReporting: true,
             autoBackup: false,
             isUpdateAvailable: false,
             providerInput: '',
@@ -72,7 +77,13 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             identityInputError: null,
             identityLoading: false,
             identityEdited: false,
-            popupInOverlay: false
+            popupInOverlay: false,
+            errorReporting: true,
+            userAgentId: '',
+            userAgentNameInput: '',
+            userAgentNameInputError: null,
+            userAgentNameLoading: false,
+            userAgentNameEdited: false
         };
     }
 
@@ -86,7 +97,9 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             this.loadPopupInOverlay(),
             this.checkUpdates(),
             this.loadProvider(),
-            this.loadIdentityContract()
+            this.loadIdentityContract(),
+            this.loadUserAgentId(),
+            this.loadUserAgentName()
         ]);
         this.setState({ isLoading: false });
     }
@@ -161,6 +174,28 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         const { setPopupInOverlay } = await initBGFunctions(browser);
         await setPopupInOverlay(isActive);
         this.loadPopupInOverlay();
+    }
+
+    async loadUserAgentId() {
+        const { getUserAgentId } = await initBGFunctions(browser);
+        const userAgentId = await getUserAgentId();
+
+        this.setState({ userAgentId });
+    }
+
+    async loadUserAgentName() {
+        const { getUserAgentName } = await initBGFunctions(browser);
+        const userAgentNameInput = await getUserAgentName();
+
+        this.setState({ userAgentNameInput });
+    }
+
+    async setUserAgentName(userAgentName: string) {
+        this.setState({ userAgentNameLoading: true });
+        const { setUserAgentName } = await initBGFunctions(browser);
+        await setUserAgentName(userAgentName);
+        this.loadUserAgentName();
+        this.setState({ userAgentNameLoading: false, userAgentNameEdited: false });
     }
 
     async checkUpdates() {
@@ -407,9 +442,28 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                     </Input>
 
                     {/* <Checkbox toggle label='Development Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /><br /> */}
+                    <Checkbox toggle label='Open the popup in the overlay' checked={popupInOverlay} onChange={() => this.setPopupInOverlay(!popupInOverlay)} style={{ marginBottom: 6 }} />
                     <Checkbox toggle label='Modules backup' checked={autoBackup} onChange={() => this.setAutoBackup(!autoBackup)} style={{ marginBottom: 6 }} /><br />
-                    <Checkbox toggle label='Report about errors' checked={errorReporting} onChange={() => this.setErrorReporting(!errorReporting)} style={{ marginBottom: 6 }} />
-                    <Checkbox toggle label='Open the popup in the overlay' checked={popupInOverlay} onChange={() => this.setPopupInOverlay(!popupInOverlay)} />
+                    <Checkbox toggle label='Bug reports' checked={errorReporting} onChange={() => this.setErrorReporting(!errorReporting)} />
+
+                    <Header as='h5'>User Agent Name</Header>
+                    <Input
+                        size='mini'
+                        fluid
+                        placeholder='User agent name...'
+                        error={!!this.state.userAgentNameInputError}
+                        action
+                        iconPosition='left'
+                        loading={this.state.userAgentNameLoading}
+                        style={{ marginBottom: '15px' }}
+                    >
+                        <Icon name='bug' />
+                        <input
+                            value={this.state.userAgentNameInput}
+                            onChange={(e) => this.setState({ userAgentNameInput: e.target.value, userAgentNameInputError: null, userAgentNameEdited: true })}
+                        />
+                        <Button size='mini' disabled={this.state.userAgentNameLoading || !this.state.userAgentNameEdited} color='blue' onClick={() => this.setUserAgentName(this.state.userAgentNameInput)}>Save</Button>
+                    </Input>
 
                     <Header as='h4'>About</Header>
                     <div>

@@ -26,6 +26,10 @@ export class GlobalConfig extends Base {
 
     errorReporting: boolean = true; // indirectly affects on '/src/common/logger.ts'
     
+    userAgentId: string = null;
+    
+    userAgentName: string = null;
+    
     autoBackup: boolean = true;
 
     providerUrl: string = null;
@@ -34,5 +38,5 @@ export class GlobalConfig extends Base {
 
     identityContract: string = null;
 
-    popupInOverlay: boolean = false;
+    popupInOverlay: boolean = false;    
 }
