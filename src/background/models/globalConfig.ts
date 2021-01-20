@@ -26,7 +26,7 @@ export class GlobalConfig extends Base {
 
     errorReporting: boolean = true; // indirectly affects on '/src/common/logger.ts'
     
-    autoBackup: boolean = false;
+    autoBackup: boolean = true;
 
     providerUrl: string = null;
 

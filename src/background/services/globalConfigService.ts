@@ -37,6 +37,8 @@ export default class GlobalConfigService {
         config.walletsUsage = {};
         config.identityContract = '0xf6b3a0B20281796D465bB8613e233BE30be07084';
         config.popupInOverlay = false;
+        config.autoBackup = true;
+        config.errorReporting = true;
 
         await this._globalConfigRepository.deleteById(this._configId);
         await this._globalConfigRepository.create(config);
