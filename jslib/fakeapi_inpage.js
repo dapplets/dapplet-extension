@@ -4,12 +4,14 @@ import pairing_script from '!raw-loader!../build/pairing.js'
 import sowa_script from '!raw-loader!../build/sowa.js'
 import starter_script from '!raw-loader!../build/starter.js'
 import settings_script from '!raw-loader!../build/settings.js'
+import login_script from '!raw-loader!../build/login.js'
 
 import fakeapi_frame_script from '!raw-loader!./fakeapi_frame.js'
 
 const browser = {};
 
 browser.browserAction = {};
+browser.browserAction.onClicked = {};
 browser.commands = {};
 browser.commands.onCommand = {};
 browser.contextMenus = {};
@@ -39,6 +41,13 @@ browser.browserAction.setBadgeBackgroundColor = async function (details, callbac
     //console.log('browser.browserAction.setBadgeBackgroundColor', arguments);
     callback !== undefined && typeof callback === 'function' && callback();
 }
+browser.browserAction.setPopup = async function (details, callback) {
+    //console.log('browser.browserAction.setBadgeBackgroundColor', arguments);
+    callback !== undefined && typeof callback === 'function' && callback();
+}
+browser.browserAction.onClicked.addListener = function () {
+    //console.log('browser.commands.onCommand.addListener', arguments);
+}
 browser.commands.onCommand.addListener = function () {
     //console.log('browser.commands.onCommand.addListener', arguments);
 }
@@ -51,8 +60,12 @@ browser.contextMenus.removeAll = async function (callback) {
     callback !== undefined && typeof callback === 'function' && callback();
 }
 
+const _blobUriCache = {};
+
 browser.extension.getURL = function (url) {
     //console.log('browser.extension.getURL', arguments);
+
+    if (_blobUriCache[url] !== undefined) return _blobUriCache[url];
 
     let script = null;
 
@@ -68,6 +81,8 @@ browser.extension.getURL = function (url) {
         script = starter_script;
     } else if (url === 'settings.html') {
         script = settings_script;
+    } else if (url === 'login.html') {
+        script = login_script;
     }
 
     if (script === null) return;
@@ -100,6 +115,7 @@ browser.extension.getURL = function (url) {
     });
 
     const uri = window.URL.createObjectURL(blob);
+    _blobUriCache[url] = uri;
     return uri;
 }
 
@@ -157,7 +173,7 @@ browser.runtime.onMessage.removeListener = function (callback) {
 }
 
 browser.runtime.onConnect.addListener = function (callback) {
-    console.log('browser.runtime.onConnect.addListener', arguments);
+    //console.log('browser.runtime.onConnect.addListener', arguments);
 }
 
 browser.runtime.sendMessage = async function (message, callback) {
