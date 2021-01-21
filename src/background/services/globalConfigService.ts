@@ -34,7 +34,7 @@ export default class GlobalConfigService {
             account: "0x692a4d7b7be2dc1623155e90b197a82d114a74f3"
         }];
         config.userSettings = {};
-        config.providerUrl = 'https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992';
+        config.providerUrl = 'https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c';
         config.walletsUsage = {};
         config.identityContract = '0xf6b3a0B20281796D465bB8613e233BE30be07084';
         config.popupInOverlay = false;
