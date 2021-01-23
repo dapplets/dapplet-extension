@@ -169,6 +169,58 @@ export class OverlayManager {
 
         const contentItem = document.createElement('div');
         contentItem.classList.add(ContentItemClass);
+
+        // adding loading spinner
+        const loaderDiv = document.createElement('div');
+        loaderDiv.classList.add('loader-container');
+        loaderDiv.innerHTML = `
+            <style>
+                .loader-container {
+                    z-index: -1;
+                    position: absolute;
+                    top: calc(50vh - 88px);
+                }
+
+                .loader-container .flex {
+                    min-height: 60pt
+                }
+
+                .loader-container .loader {
+                    width: 50pt;
+                    height: 50pt;
+                    margin-left: auto;
+                    margin-right: auto;
+                    border: 5px solid #f1f1f1;
+                    border-top: 5px solid #000;
+                    border-radius: 50%;
+                    animation: spin 2s linear infinite
+                }
+
+                @keyframes spin {
+                    0% {
+                        transform: rotate(0)
+                    }
+                    100% {
+                        transform: rotate(360deg)
+                    }
+                }
+
+                .loader-container .load-text {
+                    padding-top: 15px;
+                    text-align: center;
+                    font: 14pt "Helvetica Neue", Helvetica, Arial, sans-serif;
+                    color: #000
+                }
+            </style>
+            <div class="flex">
+                <div class="loader"></div>
+            </div>
+            <div class="load-text">Loading Overlay...</div>
+            <div class="load-text">Downloading from decentralized sources like Swarm or IPFS can take some time</div>
+        `;
+        contentItem.appendChild(loaderDiv);
+
+        // adding frame
         contentItem.appendChild(overlay.frame);
         this._contentList.appendChild(contentItem);
 
