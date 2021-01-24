@@ -24,7 +24,9 @@ export class StorageAggregator {
 
             try {
                 const buffer = await storage.getResource(uri);
-                if (this._checkHash(buffer, hashUris.hash, uri)) return buffer;
+                if (this._checkHash(buffer, hashUris.hash, uri)) {
+                    return buffer;
+                }
                 // if (this._checkHash(buffer, hashUris.hash, uri)) {
                 //     if (hashUris.hash) this._globalConfigService.getAutoBackup().then(x => x && this._backup(buffer, hashUris.hash.replace('0x', ''))); // don't wait
                 //     return buffer;
@@ -54,13 +56,11 @@ export class StorageAggregator {
             uris.push(uri);
         }
 
-        const autobackup = await this._globalConfigService.getAutoBackup();
-        if (autobackup) {
-            const centralizedStorage = new CentralizedModuleStorage();
-            const backupHash = await centralizedStorage.save(blob);
-            if (hash !== backupHash) {
-                logger.error('Backup is corrupted: invalid hashes', hash, backupHash);
-            }
+        // backup to centralized storage
+        const centralizedStorage = new CentralizedModuleStorage();
+        const backupHash = await centralizedStorage.save(blob);
+        if (hash.replace('0x', '') !== backupHash.replace('0x', '')) {
+            throw Error(`Backup is corrupted: invalid hashes ${hash} ${backupHash}`);
         }
 
         return { hash, uris };
