@@ -28,7 +28,7 @@ export class CentralizedModuleStorage implements ModuleStorage {
         });
     
         const json = await response.json();
-        if (!json.success) throw new Error(json.message || "Error in saveToStorage");
+        if (!json.success) throw new Error(json.message || "Cannot save object to centralized storage");
         if (!json.data || json.data.length !== 64) throw new Error("Invalid hash was returned by server");
         return json.data;
     }
