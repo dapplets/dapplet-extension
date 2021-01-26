@@ -19,16 +19,16 @@ export class Overlay implements IPubSub {
 
     constructor(manager: OverlayManager, public uri: string, public title: string, public hidden: boolean = false) {
 
-        // disable cache
-        const url = new URL(uri);
-        if (url.protocol !== 'blob:') {
-            url.searchParams.set('_dc', Date.now().toString());
-        }
+        // // disable cache
+        // const url = new URL(uri);
+        // if (url.protocol !== 'blob:') {
+        //     url.searchParams.set('_dc', Date.now().toString());
+        // }
 
         this._manager = manager;
         this.frame = document.createElement('iframe');
         this.frame.allow = 'clipboard-write';
-        this.frame.src = url.href;
+        this.frame.src = uri;
         this.frame.allowFullscreen = true;
         this.frame.addEventListener('load', () => {
             //setTimeout(() => {
