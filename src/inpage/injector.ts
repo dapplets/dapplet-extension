@@ -75,7 +75,7 @@ export class Injector {
                                         }).filter(id => !!id);
                                     }
                                     Reflect.set(target, cfgKey, cfg);
-                                    target.attachConfig(cfg);
+                                    return target.attachConfig(cfg);
                                 }
                             } if (prop === 'detachConfig') {
                                 return () => target.detachConfig(Reflect.get(target, cfgKey), featureId);
