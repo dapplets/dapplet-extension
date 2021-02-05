@@ -5,7 +5,7 @@ import { browser } from "webextension-polyfill-ts";
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
 import GlobalConfigService from './globalConfigService';
 import * as ethers from 'ethers';
-import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants';
+import { DEFAULT_BRANCH_NAME, ModuleTypes, StorageTypes } from '../../common/constants';
 import { rcompare } from 'semver';
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
@@ -59,6 +59,7 @@ export default class FeatureService {
                         };
                         if (!dto.hostnames) dto.hostnames = [];
                         dto.hostnames.push(contextId);
+                        dto.available = true;
                         dtos.push(dto);
                     } else {
                         // ToDo: move this merging logic to aggragator
@@ -66,6 +67,31 @@ export default class FeatureService {
                         dto.hostnames = mergeDedupe([dto.hostnames, [contextId]]);
                     }
                 }
+            }
+        }
+
+        // Adding of unavailable dapplets
+        for (const contextId of contextIds) {
+            const config = await this._siteConfigRepository.getById(contextId);
+            for (const moduleName in config.activeFeatures) {
+                const moduleInfo = config.activeFeatures[moduleName].moduleInfo;
+                if (dtos.find(x => x.name === moduleName) || !moduleInfo) continue;
+                const registryUrl = config.activeFeatures[moduleName].registryUrl;
+                const dto: ManifestDTO = moduleInfo as any;
+                dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
+                dto.isActionHandler = config.activeFeatures[dto.name]?.runtime?.isActionHandler || false;
+                dto.isHomeHandler = config.activeFeatures[dto.name]?.runtime?.isHomeHandler || false;
+                dto.activeVersion = (dto.isActive) ? (config.activeFeatures[dto.name]?.version || null) : null;
+                dto.lastVersion = (dto.isActive) ? await this.getVersions(registryUrl, dto.name).then(x => x.sort(rcompare)[0]).catch(x => null) : null; // ToDo: how does this affect performance?
+                dto.order = i++;
+                dto.sourceRegistry = {
+                    url: registryUrl,
+                    isDev: configRegistries.find(r => r.url === registryUrl)?.isDev
+                };
+                if (!dto.hostnames) dto.hostnames = [];
+                dto.hostnames.push(contextId);
+                dto.available = false;
+                dtos.push(dto);
             }
         }
 
@@ -80,6 +106,13 @@ export default class FeatureService {
             version = versions.sort(rcompare)[0]; // Last version by SemVer
         }
 
+        // Cache manifest
+        let moduleInfo = null;
+        const _getModuleInfo = async () => {
+            if (!moduleInfo) moduleInfo = await this.getModuleInfoByName(registryUrl, name);
+            return moduleInfo;
+        }
+
         // ToDo: save registry url of activate module?
         for (const hostname of hostnames) {
             const config = await this._siteConfigRepository.getById(hostname);
@@ -88,7 +121,9 @@ export default class FeatureService {
                 version,
                 isActive,
                 order,
-                runtime: null
+                runtime: null,
+                moduleInfo: isActive ? await _getModuleInfo() : (config.activeFeatures[name].moduleInfo ?? await _getModuleInfo()),
+                registryUrl
             };
 
             await this._siteConfigRepository.update(config);
@@ -153,7 +188,9 @@ export default class FeatureService {
                     version,
                     isActive: !isActive,
                     order,
-                    runtime: null
+                    runtime: null,
+                    moduleInfo: config.activeFeatures[name].moduleInfo,
+                    registryUrl
                 };
 
                 await this._siteConfigRepository.update(config);
@@ -292,6 +329,36 @@ export default class FeatureService {
         } catch (err) {
             logger.error(err);
             throw err;
+        }
+    }
+
+    public async removeDapplet(name: string, hostnames: string[]) {
+        let version = null;
+        let order = null;
+        let wasActive = false;
+
+        for (const hostname of hostnames) {
+            const config = await this._siteConfigRepository.getById(hostname);
+            version = config.activeFeatures[name].version;
+            order = config.activeFeatures[name].order;
+            wasActive = config.activeFeatures[name].isActive;
+            delete config.activeFeatures[name];
+            await this._siteConfigRepository.update(config);
+        }
+
+        if (wasActive) {
+            // sending command to inpage
+            const activeTab = await getCurrentTab();
+            browser.tabs.sendMessage(activeTab.id, {
+                type: "FEATURE_DEACTIVATED",
+                payload: [{
+                    name,
+                    version,
+                    branch: DEFAULT_BRANCH_NAME, // ToDo: fix branch
+                    order,
+                    contextIds: hostnames
+                }]
+            });
         }
     }
 

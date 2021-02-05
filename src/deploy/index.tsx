@@ -233,10 +233,10 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             {mi.description}<br />
                             {mi.author}<br />
                             <strong>{mi.name}#{vi.branch}@{vi.version}</strong><br />
-                            Owner: <a href='#' onClick={() => window.open(`https://rinkeby.etherscan.io/address/${owner}`, '_blank')}>{owner}</a>
+                            {(owner) ? <>Owner: <a href='#' onClick={() => window.open(`https://rinkeby.etherscan.io/address/${owner}`, '_blank')}>{owner}</a></> : null}
                         </Card.Description>
                     </Card.Content>
-                    {(owner?.toLowerCase() === currentAccount?.toLowerCase()) ?
+                    {(owner && owner?.toLowerCase() === currentAccount?.toLowerCase()) ?
                         <Card.Content extra>
                             <div className='ui two buttons'>
 

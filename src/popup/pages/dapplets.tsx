@@ -8,8 +8,8 @@ import { ModuleTypes } from "../../common/constants";
 import ModuleInfo from "../../background/models/moduleInfo";
 import { getCurrentContextIds, getCurrentTab } from "../helpers";
 import { rcompare, rsort } from "semver";
-
-type ManifestAndDetails = ManifestDTO & { isLoading: boolean, isActionLoading: boolean, isHomeLoading: boolean, error: string, versions: string[] };
+import { Dapplet, ManifestAndDetails } from "../components/dapplet";
+import Manifest from "../../background/models/manifest";
 
 interface IDappletsProps {
   contextIds: Promise<string[] | undefined>;
@@ -100,7 +100,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
       } else {
         await deactivateFeature(name, version, hostnames, order, sourceRegistry.url);
       }
-      
+
       await this._refreshDataByContext(this.props.contextIds);
 
     } catch (err) {
@@ -168,6 +168,15 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     }
   }
 
+  removeDapplet = async (f: Manifest) => {
+    const { removeDapplet } = await initBGFunctions(browser);
+    const contextIds = await this.props.contextIds;
+    await removeDapplet(f.name, contextIds);
+    this.setState({
+      features: this.state.features.filter(x => x.name !== f.name)
+    });
+  }
+
   render() {
     const { features, isLoading, error, isNoInpage } = this.state;
     return (
@@ -179,45 +188,17 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
             (features.length > 0) ? (
               <List divided relaxed>
                 {features.map((f, i) => (
-                  <List.Item key={i} style={{ overflow: "hidden" }}>
-                    <List.Content style={{ width: 45, float: "left" }}>
-                      <Popup trigger={<Image size="mini" avatar alt={f.description} src={(f.icon?.uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://gateway.ethswarm.org/files/' + f.icon.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0] : f.icon?.uris?.[0]} />}>
-                        <h4>Related Context IDs</h4>
-                        <List>{f.hostnames?.map((h, j) => <List.Item key={j}>{h}</List.Item>)}</List>
-
-                        <h4>Source registry</h4>
-                        <List>{f.sourceRegistry.url}</List>
-                      </Popup>
-                    </List.Content>
-                    <List.Content style={{ float: "right", width: 60 }}>
-                      <Checkbox
-                        disabled={f.isLoading ?? false}
-                        toggle
-                        style={{ marginTop: 5 }}
-                        onChange={(e) => (this.handleSwitchChange(f, !f.isActive, i, e['shiftKey']))}
-                        checked={f.isActive}
-                      />
-                    </List.Content>
-                    <List.Content style={{ marginLeft: 45, marginRight: 60 }} >
-                      <List.Header>
-                        {f.title}
-                        <Icon style={{ marginLeft: '4px', fontSize: '0.9em' }} link name='cog' size='small' onClick={() => this.settingsModule(f)} />
-                        {(f.isActive && f.isActionHandler) ? <Icon style={{ fontSize: '0.9em' }} link name='home' size='small' onClick={() => this.openDappletAction(f)} /> : null}
-                        {(f.isActive && f.isHomeHandler) ? <Icon style={{ fontSize: '0.9em' }} link name='external' size='small' onClick={() => this.openDappletHome(f)} /> : null}
-                        {(f.sourceRegistry.isDev) ? (<Label style={{ marginLeft: 5 }} horizontal size='mini' color='teal'>DEV</Label>) : null}
-                        {(f.error) ? (<Popup size='mini' trigger={<Label style={{ marginLeft: 5 }} horizontal size='mini' color='red'>ERROR</Label>}>{f.error}</Popup>) : null}
-                        {(f.isActive && f.activeVersion && f.lastVersion) ? (
-                          (f.lastVersion === f.activeVersion) ? <Label style={{ marginLeft: 5, cursor: 'default' }} horizontal size='mini' color='green' title='Up to date'>{f.activeVersion}</Label>
-                            : <Label style={{ marginLeft: 5, cursor: 'default' }} horizontal size='mini' color='orange' title={`New version is available: ${f.lastVersion}`}><Icon style={{ margin: '0 .25rem 0 0' }} name='arrow up' />{f.activeVersion}</Label>
-                        ) : null}
-                      </List.Header>
-                      <List.Description style={{ color: "#666" }}>
-                        {f.description}
-                        {(f.sourceRegistry.isDev) ? null : (<React.Fragment><br />Author: {f.author}</React.Fragment>)}
-                        {(f.versions.length !== 0) ? <Label.Group style={{ marginTop: 3 }} size='mini'>{f.versions.map((v, k) => <Label as='a' key={k} onClick={() => this.toggleFeature(f, v, true, i, f.versions)}>{v}</Label>)}</Label.Group> : null}<br />
-                      </List.Description>
-                    </List.Content>
-                  </List.Item>
+                  <Dapplet
+                    key={i}
+                    index={i}
+                    feature={f}
+                    onSwitchChange={this.handleSwitchChange.bind(this)}
+                    onSettingsModule={this.settingsModule.bind(this)}
+                    onOpenDappletAction={this.openDappletAction.bind(this)}
+                    onOpenDappletHome={this.openDappletHome.bind(this)}
+                    onToggleFeature={this.toggleFeature.bind(this)}
+                    onRemoveDapplet={this.removeDapplet.bind(this)}
+                  />
                 ))}
               </List>
             ) : (<div>No available features for current site.</div>)

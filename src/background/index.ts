@@ -88,6 +88,7 @@ import { IdentityService } from "./services/identityService";
       openSettingsOverlay: (mi) => featureService.openSettingsOverlay(mi),
       openDappletAction: (name, tabId) => featureService.openDappletAction(name, tabId),
       openDappletHome: (name, tabId) => featureService.openDappletHome(name, tabId),
+      removeDapplet: (name, hostnames) => featureService.removeDapplet(name, hostnames),
 
       // GlobalConfigService
       getGlobalConfig: () => globalConfigService.get(),
