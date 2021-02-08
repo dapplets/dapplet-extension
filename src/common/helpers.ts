@@ -136,7 +136,7 @@ export async function getCurrentTab(): Promise<Tabs.Tab | null> {
   if (!tab) return null;
 
   const popupUrl = browser.extension.getURL('popup.html');
-  
+
   if (tab.url.indexOf(popupUrl) !== -1) {
     const params = new URLSearchParams(new URL(tab.url).search); // For automated testing open popup in separated tab with URL /popup.html?tabUrl=https://example.com
     const url = params.get('tabUrl');
@@ -166,15 +166,23 @@ export function capitalizeFirstLetter(string) {
 
 export async function fetchWithTimeout(resource, options) {
   const { timeout = 8000 } = options;
-  
+
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
 
-  const response = await fetch(resource, {
-    ...options,
-    signal: controller.signal  
-  });
-  clearTimeout(id);
+  try {
+    const response = await fetch(resource, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(id);
 
-  return response;
+    return response;
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw Error('Request timeout exceeded');
+    } else {
+      throw err;
+    }
+  }
 }
