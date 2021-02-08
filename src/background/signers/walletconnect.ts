@@ -8,7 +8,7 @@ import { getCurrentTab } from '../../common/helpers';
 
 export default class extends ethers.Signer implements ExtendedSigner {
     
-    public provider = new ethers.providers.JsonRpcProvider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 'rinkeby');
+    public provider = new ethers.providers.StaticJsonRpcProvider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 4);
     private __walletconnect?: WalletConnect;
 
     private get _walletconnect() {
