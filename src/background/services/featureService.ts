@@ -4,18 +4,13 @@ import ModuleManager from '../utils/moduleManager';
 import { browser } from "webextension-polyfill-ts";
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
 import GlobalConfigService from './globalConfigService';
-import * as ethers from 'ethers';
-import { DEFAULT_BRANCH_NAME, ModuleTypes, StorageTypes } from '../../common/constants';
+import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants';
 import { rcompare } from 'semver';
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
-import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
-import { HttpModuleStorage } from '../moduleStorages/httpModuleStorage';
-import { SchemaConfig, DefaultConfig } from '../../common/types';
 import JSZip from 'jszip';
 import * as logger from '../../common/logger';
 import { getCurrentTab, mergeDedupe } from '../../common/helpers';
-import EnsService from './ensService';
 import { WalletService } from './walletService';
 
 export default class FeatureService {
@@ -32,6 +27,7 @@ export default class FeatureService {
 
     async getFeaturesByHostnames(contextIds: string[]): Promise<ManifestDTO[]> {
         const users = await this._globalConfigService.getTrustedUsers();
+        this._moduleManager = new ModuleManager(this._globalConfigService, this._walletService);
         const contextIdsByRegsitries = await this._moduleManager.registryAggregator.getModuleInfoWithRegistries(contextIds, users.map(u => u.account));
         const dtos: ManifestDTO[] = [];
 
@@ -251,11 +247,13 @@ export default class FeatureService {
     }
 
     public async getModulesWithDeps(modules: { name: string, branch: string, version: string, contextIds: string[] }[]) {
+        const moduleManager = new ModuleManager(this._globalConfigService, this._walletService);
+
         if (modules.length === 0) return [];
-        const modulesWithDeps = await this._moduleManager.resolveDependencies(modules);
+        const modulesWithDeps = await moduleManager.resolveDependencies(modules);
         // ToDo: catch errors
         // ToDo: run parallel
-        const dists = await Promise.all(modulesWithDeps.map(m => this._moduleManager.loadModule(m.manifest)));
+        const dists = await Promise.all(modulesWithDeps.map(m => moduleManager.loadModule(m.manifest)));
 
         return modulesWithDeps.map((m, i) => ({
             manifest: m.manifest,
