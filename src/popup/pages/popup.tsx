@@ -109,7 +109,7 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
 
     return (
       <React.Fragment>
-        <div className="popupContainer" key={this.state.reload}>
+        <div className={(this.state.isOverlay) ? "popupContainer" : "popupContainer popup"} key={this.state.reload}>
           {(this.props.contextIds) ? <Header contextIds={this.props.contextIds} /> : null}
           <Tab menu={{ secondary: true, pointing: true, style: { display: (this.state.isOverlay) ? 'none' : undefined } }} panes={panes} defaultActiveIndex={this.state.defaultActiveIndex} />
         </div>

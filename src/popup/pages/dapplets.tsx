@@ -2,7 +2,7 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Icon, ButtonProps } from "semantic-ui-react";
+import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Icon, ButtonProps, Input } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
 import { ModuleTypes } from "../../common/constants";
 import ModuleInfo from "../../background/models/moduleInfo";
@@ -21,20 +21,18 @@ interface IDappletsState {
   isLoading: boolean;
   error: string;
   isNoInpage: boolean;
+  search: string;
 }
 
 class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   private _isMounted: boolean = false;
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      features: [],
-      isLoading: true,
-      error: null,
-      isNoInpage: false
-    };
+  state = {
+    features: [],
+    isLoading: true,
+    error: null,
+    isNoInpage: false,
+    search: ''
   }
 
   async componentDidMount() {
@@ -177,12 +175,45 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     });
   }
 
+  _searchChangeHandler(value: string) {
+    this.setState({ search: value });
+  }
+
+  _getFilteredDapplets() {
+    const { features, search } = this.state;
+    if (!search || search.length === 0) return features;
+
+    const find = (a: string) => (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1;
+    return features.filter((x: ManifestAndDetails) => find(x.name) || find(x.title) || find(x.description) || find(x.author));
+  }
+
   render() {
-    const { features, isLoading, error, isNoInpage } = this.state;
+    const { isLoading, error, isNoInpage, search } = this.state;
+    const features = this._getFilteredDapplets();
+
     return (
       <React.Fragment>
-        <Segment loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTab"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
-          {(error) ? (<Message floating warning>{error}</Message>) : null}
+        {(!isLoading) ? <Input
+          fluid
+          iconPosition='left'
+          icon
+          placeholder='Search...'
+          input
+        >
+          <Icon name='search' />
+          <input value={search} onChange={e => this._searchChangeHandler(e.target.value)} />
+          {(search.length > 0) ? <Icon 
+            name='close' 
+            link 
+            style={{ right: '1px', left: 'initial' }} 
+            onClick={() => this._searchChangeHandler('')}
+          /> : null}
+        </Input> : null}
+
+        <Segment loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTabDapplets"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
+
+
+          {/* {(error) ? (<Message floating warning>{error}</Message>) : null} */}
 
           {!isNoInpage ?
             (features.length > 0) ? (
