@@ -138,8 +138,8 @@ export class EthRegistry implements Registry {
             const hex: string = await this._contract.getVersionNumbers(name, branch);
             this.isAvailable = true;
             this.error = null;
-            const result = hex.replace('0x', '')
-                .match(/.{1,8}/g)
+            const result = (hex.replace('0x', '')
+                .match(/.{1,8}/g) ?? [])
                 .map(x => `${parseInt('0x' + x[0] + x[1])}.${parseInt('0x' + x[2] + x[3])}.${parseInt('0x' + x[4] + x[5])}`);
             return result;
         } catch (err) {
