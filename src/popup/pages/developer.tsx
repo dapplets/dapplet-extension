@@ -1,7 +1,7 @@
 import * as React from "react";
 import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { Popup, Button, Segment, Message, List, Label, Input, Icon, Image, Header } from "semantic-ui-react";
+import { Popup, Button, Segment, Message, List, Label, Input, Icon, Image, Header, Checkbox } from "semantic-ui-react";
 import NOLOGO_PNG from '../../common/resources/no-logo.png';
 
 import { getCurrentTab, isValidUrl } from '../helpers';

@@ -6,7 +6,7 @@ import createMetaMaskProvider from 'metamask-extension-provider';
 
 export default class extends ethers.Signer implements ExtendedSigner {
 
-    public provider = new ethers.providers.JsonRpcProvider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 'rinkeby');
+    public provider = new ethers.providers.StaticJsonRpcProvider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 4);
     private _metamask = window['ethereum'] ?? createMetaMaskProvider();
 
     constructor() {

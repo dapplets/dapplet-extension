@@ -3,12 +3,12 @@ import { browser } from "webextension-polyfill-ts";
 import { Tab, Menu, Label } from "semantic-ui-react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 
-import Dapplets from "../components/dapplets";
+import Dapplets from "./dapplets";
 import Header from "../components/header";
-import Wallets from "../components/wallets";
-import Settings from "../components/settings";
-import Developer from "../components/developer";
-import Events from "../components/events";
+import Wallets from "./wallets";
+import Settings from "./settings";
+import Developer from "./developer";
+import Events from "./events";
 import './popup.scss';
 import { Bus } from "../../common/bus";
 
@@ -109,7 +109,7 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
 
     return (
       <React.Fragment>
-        <div className="popupContainer" key={this.state.reload}>
+        <div className={(this.state.isOverlay) ? "popupContainer" : "popupContainer popup"} key={this.state.reload}>
           {(this.props.contextIds) ? <Header contextIds={this.props.contextIds} /> : null}
           <Tab menu={{ secondary: true, pointing: true, style: { display: (this.state.isOverlay) ? 'none' : undefined } }} panes={panes} defaultActiveIndex={this.state.defaultActiveIndex} />
         </div>

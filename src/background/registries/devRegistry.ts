@@ -2,6 +2,7 @@ import { Registry } from './registry';
 import { ModuleTypes } from '../../common/constants';
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
+import { fetchWithTimeout } from '../../common/helpers';
 
 type DevManifest = {
     name: string;
@@ -49,6 +50,8 @@ export class DevRegistry implements Registry {
     private _manifestByUrl = new Map<string, DevManifest>();
     private _infoByUrl = new Map<string, { module: ModuleInfo, version: VersionInfo }>();
 
+    readonly TIMEOUT = 3000; // 3 seconds
+
     constructor(public url: string) {
         if (!url) throw new Error("Config Url is required");
         this._rootUrl = new URL(this.url).origin;
@@ -71,7 +74,7 @@ export class DevRegistry implements Registry {
 
         return result;
     }
-    
+
     public async getModuleInfoByName(name: string): Promise<ModuleInfo> {
         await this._cacheDevConfig();
         const info = Array.from(this._infoByUrl).map(([k, v]) => v.module).find(v => v.name === name);
@@ -111,7 +114,7 @@ export class DevRegistry implements Registry {
 
     private async __cacheDevConfig() {
         try {
-            const response = await fetch(this.url, { cache: 'no-store' });
+            const response = await fetchWithTimeout(this.url, { cache: 'no-store', timeout: this.TIMEOUT });
             if (!response.ok) throw new Error(response.statusText);
             this._devConfig = await response.json();
 
@@ -196,7 +199,7 @@ export class DevRegistry implements Registry {
 
     private async _loadManifest(uri: string): Promise<DevManifest> {
         const manifestUri = new URL(uri, this._rootUrl).href;
-        const response = await fetch(manifestUri);
+        const response = await fetchWithTimeout(manifestUri, { timeout: this.TIMEOUT });
         const manifestRaw = await response.json() as DevManifestRaw;
         const manifestResolved = await this._resolveJsonRefs(manifestRaw, manifestUri);
         return manifestResolved;
@@ -210,7 +213,7 @@ export class DevRegistry implements Registry {
                 const jsonRefUri = new URL(jsonUrl, manifestUri).href;
 
                 if (!cache.has(jsonRefUri)) {
-                    const response = await fetch(jsonRefUri);
+                    const response = await fetchWithTimeout(jsonRefUri, { timeout: this.TIMEOUT });
                     const json = await response.json();
                     cache.set(jsonRefUri, json);
                 }

@@ -77,7 +77,7 @@ export class WalletService {
     async getSignerFor(app: string | DefaultSigners): Promise<Signer> {
         const me = this;
         return new (class extends Signer {
-            provider = new providers.JsonRpcProvider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 'rinkeby');
+            provider = new providers.StaticJsonRpcProvider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 4);
 
             async getAddress(): Promise<string> {
                 return '0x0000000000000000000000000000000000000000';
