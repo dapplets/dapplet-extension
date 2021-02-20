@@ -12,8 +12,10 @@ import ReactTimeAgo from 'react-time-ago';
 import { CheckIcon } from "../../common/react-components/CheckIcon";
 import * as walletIcons from '../../common/resources/wallets';
 import { networkName } from "../../common/helpers";
+import { Bus } from "../../common/bus";
 
 interface ISelectWalletProps {
+    bus: Bus;
 }
 
 interface ISelectWalletState {
@@ -45,6 +47,11 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
         const { disconnectWallet } = await initBGFunctions(browser);
         await disconnectWallet(wallet);
         await this.componentDidMount();
+    }
+
+    private _openMetamaskWebpage() {
+        window.open('https://metamask.io/', '_blank');
+        this.props.bus.publish('ready');
     }
 
     render() {
@@ -90,29 +97,45 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                 {(disconnectedWallets.length > 0) ? <>
                     <Header as='h3'>Connect a new wallet</Header>
 
-                    {(!this.state.descriptors.find(x => x.type === 'metamask').connected) ? <Button
-                        disabled={this.state.descriptors.find(x => x.type === 'metamask').available === false}
-                        basic
-                        fluid
-                        size='large'
-                        onClick={() => window.location.hash = '/metamask'}
-                        style={{ height: '64px', marginBottom: '10px' }}
-                    >
-                        <Image size='mini' verticalAlign='middle' src={logos.metamask} />{' '}
-                        <span>MetaMask</span>
-                    </Button> : null}
+                    {(!this.state.descriptors.find(x => x.type === 'metamask').connected) ?
+                        (this.state.descriptors.find(x => x.type === 'metamask').available) ?
+                            <Button
+                                // disabled={this.state.descriptors.find(x => x.type === 'metamask').available === false}
+                                basic
+                                fluid
+                                size='large'
+                                onClick={() => window.location.hash = '/metamask'}
+                                style={{ height: '64px', marginBottom: '10px' }}
+                            >
+                                <Image size='mini' verticalAlign='middle' src={logos.metamask} />{' '}
+                                <span>MetaMask</span>
+                            </Button> :
+                            <Button
+                                // disabled={this.state.descriptors.find(x => x.type === 'metamask').available === false}
+                                basic
+                                fluid
+                                size='large'
+                                onClick={() => this._openMetamaskWebpage()}
+                                style={{ height: '64px', marginBottom: '10px' }}
+                            >
+                                <Image size='mini' verticalAlign='middle' src={logos.metamask} />{' '}
+                                <span>Install MetaMask</span>
+                            </Button> :
+                        null}
 
-                    {(!this.state.descriptors.find(x => x.type === 'walletconnect').connected) ? <Button
-                        disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
-                        basic
-                        fluid
-                        size='large'
-                        onClick={() => window.location.hash = '/walletconnect'}
-                        style={{ height: '64px', marginBottom: '10px' }}
-                    >
-                        <Image size='mini' verticalAlign='middle' src={logos.walletconnect} />{' '}
-                        <span>WalletConnect</span>
-                    </Button> : null}
+                    {(!this.state.descriptors.find(x => x.type === 'walletconnect').connected) ?
+                        <Button
+                            // disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
+                            basic
+                            fluid
+                            size='large'
+                            onClick={() => window.location.hash = '/walletconnect'}
+                            style={{ height: '64px', marginBottom: '10px' }}
+                        >
+                            <Image size='mini' verticalAlign='middle' src={logos.walletconnect} />{' '}
+                            <span>WalletConnect</span>
+                        </Button> :
+                        null}
 
                 </> : null}
             </>

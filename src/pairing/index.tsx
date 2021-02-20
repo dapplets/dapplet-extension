@@ -35,7 +35,7 @@ class Index extends React.Component<Props, State> {
             <Container text style={{ paddingTop: '30px' }}>
                 <HashRouter>
                     <Switch>
-                        <Route exact path="/" component={SelectWallet} />
+                        <Route exact path="/" component={() => <SelectWallet bus={this.bus} />} />
                         <Route path="/metamask" component={() => <modules.metamask bus={this.bus} />} />
                         <Route path="/walletconnect" component={() => <modules.walletconnect bus={this.bus} />} />
                     </Switch>
