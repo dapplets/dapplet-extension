@@ -71,6 +71,10 @@ export default class extends ethers.Signer implements ExtendedSigner {
         throw new Error("Method not implemented.");
     }
 
+    isAvailable() {
+        return true;
+    }
+
     isConnected() {
         return this._walletconnect?.connected ?? false;
     }

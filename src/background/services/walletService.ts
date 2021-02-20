@@ -22,6 +22,7 @@ export type WalletDescriptor = {
         description: string;
     } | null;
     connected: boolean;
+    available: boolean;
     account: string;
     chainId: number;
     apps: string[];
@@ -65,6 +66,7 @@ export class WalletService {
                 type: k,
                 meta,
                 connected: v.isConnected(),
+                available: v.isAvailable(),
                 account,
                 chainId,
                 apps: Object.entries(wallets).filter(([_, v]) => v === k).map(([k, v]) => k),

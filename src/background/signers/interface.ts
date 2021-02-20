@@ -1,6 +1,7 @@
 import { Signer, ethers } from "ethers";
 
 export interface ExtendedSigner extends Signer {
+    isAvailable(): boolean;
     isConnected(): boolean;
     connectWallet(): Promise<void>;
     disconnectWallet(): Promise<void>;

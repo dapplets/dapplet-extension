@@ -91,7 +91,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                     <Header as='h3'>Connect a new wallet</Header>
 
                     {(!this.state.descriptors.find(x => x.type === 'metamask').connected) ? <Button
-                        // disabled={this.state.descriptors.find(x => x.type === 'metamask').connected}
+                        disabled={this.state.descriptors.find(x => x.type === 'metamask').available === false}
                         basic
                         fluid
                         size='large'
@@ -103,7 +103,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                     </Button> : null}
 
                     {(!this.state.descriptors.find(x => x.type === 'walletconnect').connected) ? <Button
-                        //disabled={this.state.descriptors.find(x => x.type === 'walletconnect').connected}
+                        disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
                         basic
                         fluid
                         size='large'

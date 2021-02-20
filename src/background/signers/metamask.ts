@@ -7,11 +7,27 @@ import createMetaMaskProvider from 'metamask-extension-provider';
 export default class extends ethers.Signer implements ExtendedSigner {
 
     public provider = new ethers.providers.StaticJsonRpcProvider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 4);
-    private _metamask = window['ethereum'] ?? createMetaMaskProvider();
+    private _metamaskProvider;
 
-    constructor() {
-        super();
-        this._metamask['autoRefreshOnNetworkChange'] = false; // silence the warning from metamask https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange 
+    private _available = false;
+
+    private get _metamask() {
+        if (!this._metamaskProvider) {
+            this._metamaskProvider = window['ethereum'] ?? createMetaMaskProvider();
+            this._metamask['autoRefreshOnNetworkChange'] = false; // silence the warning from metamask https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange 
+            this._metamaskProvider.on('connect', () => this._available = true);
+            this._metamaskProvider.on('disconnect', () => (this._available = false, this._metamaskProvider = null));
+            // another available events: _initialized, chainChanged, networkChanged, accountsChanged, message, data, error
+            // this._metamaskProvider.on('connect', (...args) => console.log('connect', args))
+            // this._metamaskProvider.on('disconnect', (...args) => console.log('disconnect', args))
+            // this._metamaskProvider.on('_initialized', (...args) => console.log('_initialized', args))
+            // this._metamaskProvider.on('chainChanged', (...args) => console.log('chainChanged', args))
+            // this._metamaskProvider.on('networkChanged', (...args) => console.log('networkChanged', args))
+            // this._metamaskProvider.on('accountsChanged', (...args) => console.log('accountsChanged', args))
+            // this._metamaskProvider.on('message', (...args) => console.log('message', args))
+            // this._metamaskProvider.on('data', (...args) => console.log('data', args))
+        }
+        return this._metamaskProvider;
     }
 
     async getAddress(): Promise<string> {
@@ -26,10 +42,10 @@ export default class extends ethers.Signer implements ExtendedSigner {
     async signTransaction(transaction: Deferrable<TransactionRequest>): Promise<string> {
         throw new Error('Not implemented');
     }
-    
+
     async sendTransaction(transaction: TransactionRequest): Promise<ethers.providers.TransactionResponse> {
         const txHash = await this.sendTransactionOutHash(transaction);
-        
+
         // the wait of a transaction from another provider can be long
         let tx = null;
         while (tx === null) {
@@ -41,13 +57,13 @@ export default class extends ethers.Signer implements ExtendedSigner {
     }
 
     async sendTransactionOutHash(transaction: TransactionRequest): Promise<string> {
+        localStorage['metamask_lastUsage'] = new Date().toISOString();
         transaction.from = await this.getAddress();
         const tx = await ethers.utils.resolveProperties(transaction);
         const txHash = await this._metamask.request({
             method: 'eth_sendTransaction',
             params: [tx]
         }) as string;
-        localStorage['metamask_lastUsage'] = new Date().toISOString();
         return txHash;
     }
 
@@ -57,6 +73,10 @@ export default class extends ethers.Signer implements ExtendedSigner {
 
     connect(provider: Provider): ethers.Signer {
         throw new Error("Method not implemented.");
+    }
+
+    isAvailable() {
+        return this._available;
     }
 
     isConnected() {
