@@ -54,6 +54,7 @@ import { IdentityService } from "./services/identityService";
       getAddress: (app) => walletService.getAddress(app),
       sendTransactionOutHash: (app, tx) => walletService.sendTransactionOutHash(app, tx),
       sendCustomRequest: (app, method, params) => walletService.sendCustomRequest(app, method, params),
+      waitTransaction: (app, txHash, confirmations) => walletService.waitTransaction(app, txHash, confirmations),
 
       // SuspendService
       getSuspendityByHostname: SuspendService.getSuspendityByHostname,

@@ -194,6 +194,16 @@ export class WalletService {
         return signer.sendCustomRequest(method, params);
     }
 
+    public async waitTransaction(app: string | DefaultSigners, txHash: string, confirmations?: number) {
+        const signer = await this._getInternalSignerFor(app) ?? await this._pairSignerFor(app);
+        // the wait of a transaction from another provider can be long
+        while (true) {
+            await new Promise((res) => setTimeout(res, 1000));
+            const tx = await signer.provider.getTransaction(txHash);
+            if (tx) return tx.wait(confirmations);
+        }
+    }
+
     private async _getInternalSignerFor(app: string | DefaultSigners): Promise<ExtendedSigner> {
         const walletType = await this.getWalletFor(app);
 

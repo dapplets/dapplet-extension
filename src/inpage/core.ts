@@ -150,7 +150,7 @@ export default class Core {
 
             // ToDo: add overlay.onclose
 
-            
+
             // ToDo: add timeout?
             overlay.onMessage((topic, message) => {
                 if (topic === 'ready') {
@@ -200,15 +200,18 @@ export default class Core {
 
     // ToDo: use sendSowaTransaction method from background
     private async _sendWalletConnectTx(app: string, sowaIdOrRpcMethod, sowaMetadataOrRpcParams, callback: (e: { type: string, data?: any }) => void): Promise<any> {
-        const { sendCustomRequest } = await initBGFunctions(browser);
+        const { sendCustomRequest, waitTransaction } = await initBGFunctions(browser);
 
         callback({ type: "pending" });
-        
+
         try {
-            const result = await sendCustomRequest(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
-            if (result) {
-                callback({ type: "created", data: result });
-                callback({ type: "result", data: result });
+            const txHash = await sendCustomRequest(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
+            if (txHash) {
+                callback({ type: "created", data: txHash });
+                callback({ type: "result", data: txHash });
+
+                const tx = await waitTransaction(app, txHash);
+                callback({ type: "mined", data: tx });
             }
         } catch (err) {
             logger.error(err);
@@ -225,7 +228,7 @@ export default class Core {
     public async wallet<M>(cfg?: { username: string, domainId: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<AutoProperties<M> & Connection> {
         const { prepareWalletFor } = await initBGFunctions(browser);
         await prepareWalletFor(app, cfg);
-        
+
         const me = this;
         const transport = {
             _txCount: 0,
