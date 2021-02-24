@@ -145,7 +145,7 @@ export default class Core {
         const me = this;
         return new Promise<void>((resolve, reject) => {
             const pairingUrl = browser.extension.getURL('settings.html');
-            const overlay = new Overlay(this.overlayManager, pairingUrl, 'Settings');
+            const overlay = new Overlay(this.overlayManager, pairingUrl, 'User Settings');
             overlay.open(() => overlay.send('data', [payload]));
 
             // ToDo: add overlay.onclose
