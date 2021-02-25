@@ -10,7 +10,7 @@ export class GlobalConfig extends Base {
 
     walletInfo: WalletInfo = null;
 
-    registries: { url: string, isDev: boolean }[] = [];
+    registries: { url: string, isDev: boolean, isEnabled: boolean }[] = [];
 
     intro = {
         popupDeveloperWelcome: true

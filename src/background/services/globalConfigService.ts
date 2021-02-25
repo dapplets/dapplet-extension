@@ -27,7 +27,8 @@ export default class GlobalConfigService {
         config.id = this._configId;
         config.registries = [{
             url: "dapplet-base.eth",
-            isDev: false
+            isDev: false,
+            isEnabled: true
         }];
         config.devMode = true;
         config.trustedUsers = [{
@@ -49,7 +50,8 @@ export default class GlobalConfigService {
 
     async getRegistries() {
         const config = await this.get();
-        return config.registries;
+        const registries = config.registries.map(x => ({ ...x, isEnabled: (x.isEnabled === undefined) ? true : x.isEnabled }));
+        return registries;
     }
 
     async addRegistry(url: string, isDev: boolean) {
@@ -72,12 +74,12 @@ export default class GlobalConfigService {
             //     if (!address) throw new Error("Can not resolve the ENS name");
             // }
 
-            config.registries.push({ url, isDev });
+            config.registries.push({ url, isDev, isEnabled: true });
             await this.set(config);
         } else {
             const response = await fetch(url);
             if (response.ok || !isDev) { // ToDo: check prod registry correctly
-                config.registries.push({ url, isDev });
+                config.registries.push({ url, isDev, isEnabled: true });
                 await this.set(config);
             } else {
                 throw Error('The registry is not available.');
@@ -86,7 +88,15 @@ export default class GlobalConfigService {
     }
 
     async removeRegistry(url: string) {
-        this.updateConfig(c => c.registries = c.registries.filter(r => r.url !== url));
+        return this.updateConfig(c => c.registries = c.registries.filter(r => r.url !== url));
+    }
+
+    async enableRegistry(url: string) {
+        return this.updateConfig(c => c.registries.find(x => x.url === url).isEnabled = true);
+    }
+
+    async disableRegistry(url: string) {
+        return this.updateConfig(c => c.registries.find(x => x.url === url).isEnabled = false);
     }
 
     async getIntro() {
@@ -95,7 +105,7 @@ export default class GlobalConfigService {
     }
 
     async setIntro(intro: any) {
-        this.updateConfig(c => Object.entries(intro).forEach(([key, value]) => c.intro[key] = value));
+        return this.updateConfig(c => Object.entries(intro).forEach(([key, value]) => c.intro[key] = value));
     }
 
     async getDevMode() {
@@ -104,7 +114,7 @@ export default class GlobalConfigService {
     }
 
     async setDevMode(isActive: boolean) {
-        this.updateConfig(c => c.devMode = isActive);
+        return this.updateConfig(c => c.devMode = isActive);
     }
 
     async updateConfig(callback: (config: GlobalConfig) => void) {
@@ -140,7 +150,7 @@ export default class GlobalConfigService {
     }
 
     async removeTrustedUser(account: string) {
-        this.updateConfig(c => c.trustedUsers = c.trustedUsers.filter(r => r.account !== account));
+        return this.updateConfig(c => c.trustedUsers = c.trustedUsers.filter(r => r.account !== account));
     }
 
     async getUserSettings(moduleName: string, key: string) {

@@ -95,7 +95,7 @@ export class RegistryAggregator {
         const modules = await Promise.allSettled(registries.map(r => r.getAllDevModules()));
         modules.filter(assertRejected).forEach(p => logger.error(p.reason));
         const validModules = modules.filter(assertFullfilled).map(p => p.value);
-        const reduced = validModules.reduce((a, b) => a.concat(b));
+        const reduced = validModules.length > 0 ? validModules.reduce((a, b) => a.concat(b)) : [];
 
         // check deployment in prod registries
         const registriesConfig = await this._globalConfigService.getRegistries();
@@ -113,14 +113,21 @@ export class RegistryAggregator {
 
     private async _initRegistries() {
         // ToDo: fetch LocalConfig
-        const registries = await this._globalConfigService.getRegistries();
+        const configuredRegistries = await this._globalConfigService.getRegistries();
         const isDevMode = await this._globalConfigService.getDevMode();
         const signer = await this._walletService.getSignerFor(DefaultSigners.EXTENSION);
 
+
+        const enabledRegistries = configuredRegistries.filter(x => x.isEnabled);
+        const disabledRegistries = configuredRegistries.filter(x => !x.isEnabled);
+
+        // remove disabled registries
+        disabledRegistries.forEach(x => this.registries = this.registries.filter(y => y.url !== x.url));
+
         // ToDo: optimize comparison
-        if (registries.filter(x => isDevMode || (!isDevMode && x.isDev === false)).length !== this.registries.length) {
+        if (enabledRegistries.filter(x => isDevMode || (!isDevMode && x.isDev === false)).length !== this.registries.length) {
             // ToDo: Dev registries are priority
-            this.registries = registries.filter(x => isDevMode || (!isDevMode && x.isDev === false)).sort((a, b) => (a.isDev === false) ? 1 : -1)
+            this.registries = enabledRegistries.filter(x => isDevMode || (!isDevMode && x.isDev === false)).sort((a, b) => (a.isDev === false) ? 1 : -1)
                 .map(r => {
                     const uriType = typeOfUri(r.url);
 

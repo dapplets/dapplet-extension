@@ -8,6 +8,7 @@ import { getCurrentTab, isValidUrl } from '../helpers';
 import { StorageRef } from "../../background/registries/registry";
 import ModuleInfo from "../../background/models/moduleInfo";
 import VersionInfo from "../../background/models/versionInfo";
+import { HoverLabel } from "../components/HoverLabel";
 
 interface IDeveloperProps {
     isOverlay: boolean;
@@ -19,6 +20,7 @@ interface IDeveloperState {
         url: string,
         isDev: boolean,
         isAvailable: boolean,
+        isEnabled: boolean,
         error: string
     }[];
     registryInput: string;
@@ -108,6 +110,20 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
         window.close();
     }
 
+    async enableRegistry(url: string) {
+        this.setState({ isLoading: true });
+        const { enableRegistry } = await initBGFunctions(browser);
+        await enableRegistry(url);
+        this.loadRegistries();
+    }
+
+    async disableRegistry(url: string) {
+        this.setState({ isLoading: true });
+        const { disableRegistry } = await initBGFunctions(browser);
+        await disableRegistry(url);
+        this.loadRegistries();
+    }
+
     render() {
         const { isLoading, registries, registryInput, registryInputError, intro, modules } = this.state;
 
@@ -145,11 +161,16 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                         {registries.map((r, i) => (
                             <List.Item key={i}>
                                 <List.Content floated='left'>
-                                    <Popup
-                                        trigger={<Label size='mini' horizontal color={(r.isAvailable) ? 'green' : 'red'}>{(r.isAvailable) ? 'ONLINE' : (r.error) ? 'ERROR' : 'OFFLINE'}</Label>}
-                                        content={r.error || 'Ready'}
-                                        size='mini'
-                                    />
+                                    {(r.isEnabled) ?
+                                        ((!r.error) ?
+                                            <HoverLabel style={{ cursor: 'pointer', width: '56px', textAlign: 'center' }} size="mini" horizontal color="green" hoverText="DISABLE" hoverColor="red" onClick={() => this.disableRegistry(r.url)}>ENABLED</HoverLabel> :
+                                            <Popup
+                                                trigger={<HoverLabel style={{ cursor: 'pointer', width: '56px', textAlign: 'center' }} size="mini" horizontal color="green" hoverText="DISABLE" hoverColor="red" onClick={() => this.disableRegistry(r.url)}>ERROR</HoverLabel>}
+                                                content={r.error}
+                                                size='mini'
+                                            />) :
+                                        <HoverLabel style={{ cursor: 'pointer', width: '56px', textAlign: 'center' }} size="mini" horizontal color="grey" hoverText="ENABLE" hoverColor="green" onClick={() => this.enableRegistry(r.url)}>DISABLED</HoverLabel>
+                                    }
                                 </List.Content>
                                 <List.Content floated='right'>
                                     <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />

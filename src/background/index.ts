@@ -102,6 +102,8 @@ import { IdentityService } from "./services/identityService";
       getNewEventsCount: EventService.getNewEventsCount,
       addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
       removeRegistry: (url) => globalConfigService.removeRegistry(url),
+      enableRegistry: (url) => globalConfigService.enableRegistry(url),
+      disableRegistry: (url) => globalConfigService.disableRegistry(url),
       getIntro: () => globalConfigService.getIntro(),
       setIntro: (intro) => globalConfigService.setIntro(intro),
       getTrustedUsers: () => globalConfigService.getTrustedUsers(),
