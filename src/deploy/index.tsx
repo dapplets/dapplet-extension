@@ -2,7 +2,7 @@ import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Button, Form, Message, Image, Card, Modal, Input } from 'semantic-ui-react';
+import { Button, Form, Message, Image, Card, Modal, Input, Icon } from 'semantic-ui-react';
 //import 'semantic-ui-css/semantic.min.css';
 import NOLOGO_PNG from '../common/resources/no-logo.png';
 
@@ -75,16 +75,19 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             deploymentStatus: DeploymentStatus.Unknown
         };
 
-        this.bus.subscribe('data', ({ mi, vi }) => {
+        this.bus.subscribe('data', async ({ mi, vi }) => {
             this.setState({ mi, vi, loading: false });
+
+            await this._updateData();
         });
 
         this.transferOwnershipModal = React.createRef();
         this.addLocationModal = React.createRef();
     }
 
-    async componentDidMount() {
+    private async _updateData() {
         const { getRegistries } = await initBGFunctions(browser);
+
         const registries = await getRegistries();
         const prodRegistries = registries.filter(r => !r.isDev);
         this.setState({
@@ -93,21 +96,18 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             })),
             targetRegistry: prodRegistries[0]?.url || null
         });
-        await this._updateData();
-    }
 
-    private async _updateData() {
         return Promise.all([this._updateOwnership(), this._updateDeploymentStatus()]);
     }
 
     private async _updateOwnership() {
         const { getOwnership, getAddress } = await initBGFunctions(browser);
         const owner = await getOwnership(this.state.targetRegistry, this.state.mi.name);
-        const account = await getAddress(DefaultSigners.EXTENSION);
+        const currentAccount = await getAddress(DefaultSigners.EXTENSION);
 
         this.setState({
             owner,
-            currentAccount: account
+            currentAccount
         });
     }
 
@@ -173,6 +173,12 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         }
     }
 
+    async pairWallet() {
+        const { pairWalletViaOverlay } = await initBGFunctions(browser);
+        await pairWalletViaOverlay();
+        await this._updateData();
+    }
+
     render() {
         const {
             mi, vi, loading, targetRegistry,
@@ -182,6 +188,12 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             newOwnerLoading, newOwnerDone, editLocationLoading: newLocationLoading,
             editLocationDone: newLocationDone
         } = this.state;
+
+        const isNotNullCurrentAccount = !(!currentAccount || currentAccount === '0x0000000000000000000000000000000000000000');
+        const isNotWalletPaired = !isNotNullCurrentAccount && !!owner;
+        const isNotAnOwner = !!owner && isNotNullCurrentAccount && owner.toLowerCase() !== currentAccount.toLowerCase();
+        const isAlreadyDeployed = !message && this.state.deploymentStatus === DeploymentStatus.Deployed;
+        const isButtonDisabled = loading || this.state.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner;
 
         return (
             <React.Fragment>
@@ -195,15 +207,19 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     {message.message.map((m, i) => <p key={i} style={{ overflowWrap: 'break-word' }}>{m}</p>)}
                 </Message>) : null}
 
-                {(!currentAccount && !!owner) ? (
+                {(isNotWalletPaired) ? (
                     <Message
                         error
                         header='Wallet is not paired'
-                        content={<React.Fragment>You can not deploy a module without wallet pairing.<br />Change account to {owner}</React.Fragment>}
+                        content={<React.Fragment>
+                            You can not deploy a module without wallet pairing.<br />
+                            Change account to {owner}<br/>
+                            Connect a new wallet <Icon name='chain' link onClick={() => this.pairWallet()}/>
+                        </React.Fragment>}
                     />
                 ) : null}
 
-                {(!!owner && !!currentAccount && owner.toLowerCase() !== currentAccount.toLowerCase()) ? (
+                {(isNotAnOwner) ? (
                     <Message
                         error
                         header='Action Forbidden'
@@ -211,7 +227,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     />
                 ) : null}
 
-                {(!message && this.state.deploymentStatus === DeploymentStatus.Deployed) ? 
+                {(isAlreadyDeployed) ? 
                     <Message
                         warning
                         header='The Module Already Deployed'
@@ -354,7 +370,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         })}
                     />
 
-                    <Button submit="true" primary disabled={loading || this.state.deploymentStatus === DeploymentStatus.Deployed || !currentAccount || (!!owner && !!currentAccount && owner.toLowerCase() !== currentAccount.toLowerCase())}>Deploy</Button>
+                    <Button submit="true" primary disabled={isButtonDisabled}>Deploy</Button>
                 </Form>
             </React.Fragment>
         );
