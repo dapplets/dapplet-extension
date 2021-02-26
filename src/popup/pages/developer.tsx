@@ -165,7 +165,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                                         ((!r.error) ?
                                             <HoverLabel style={{ cursor: 'pointer', width: '56px', textAlign: 'center' }} size="mini" horizontal color="green" hoverText="DISABLE" hoverColor="red" onClick={() => this.disableRegistry(r.url)}>ENABLED</HoverLabel> :
                                             <Popup
-                                                trigger={<HoverLabel style={{ cursor: 'pointer', width: '56px', textAlign: 'center' }} size="mini" horizontal color="green" hoverText="DISABLE" hoverColor="red" onClick={() => this.disableRegistry(r.url)}>ERROR</HoverLabel>}
+                                                trigger={<HoverLabel style={{ cursor: 'pointer', width: '56px', textAlign: 'center' }} size="mini" horizontal color="red" hoverText="DISABLE" hoverColor="red" onClick={() => this.disableRegistry(r.url)}>ERROR</HoverLabel>}
                                                 content={r.error}
                                                 size='mini'
                                             />) :
