@@ -39,6 +39,9 @@ export default class ModuleManager {
         const resolve = async (parent: { name: string, branch: string, version: string, contextIds: string[], manifest: VersionInfo }) => {
             try {
                 const moduleDeps = await this._getChildDependenciesAndManifest(parent.name, parent.version, parent.branch, parent.contextIds);
+
+                if (!moduleDeps) return;
+
                 parent.manifest = moduleDeps.manifest;
 
                 if (!moduleDeps.manifest || !moduleDeps.dependencies) return;
@@ -119,6 +122,10 @@ export default class ModuleManager {
     //ToDo: rework the _getChildDependencies and move it into Inpage
     private async _getChildDependenciesAndManifest(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME, contextIds: string[]) {
         const vi = await this.registryAggregator.getVersionInfo(name, branch, version);
+
+        if (!vi) {
+            return null;
+        }
 
         if (vi.name != name || vi.version != version || vi.branch != branch) {
             logger.error(`Invalid public name for module. Requested: ${name}#${branch}@${version}. Recieved: ${vi.name}#${vi.branch}@${vi.version}.`);

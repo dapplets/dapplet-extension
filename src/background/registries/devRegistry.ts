@@ -92,7 +92,8 @@ export class DevRegistry implements Registry {
         const info = Array.from(this._infoByUrl).map(([k, v]) => v).find(v => v.module.name === name && v.version.branch === branch && v.version.version === version);
 
         if (!info || !info.version) {
-            throw new Error(`The manifest of the module "${name}@${branch}#${version}" is not found`);
+            // console.error(`The manifest of the module "${name}@${branch}#${version}" is not found`);
+            return null;
         };
 
         return info.version;

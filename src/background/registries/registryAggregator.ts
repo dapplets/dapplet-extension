@@ -53,7 +53,8 @@ export class RegistryAggregator {
 
         if (uriNoErrors.length === 0) {
             uriErrors.forEach(p => logger.error(p.reason));
-            throw new Error(`Could not find the manifest URI of the ${name}#${branch}@${version} module`);
+            console.error(`Could not find the manifest URI of the ${name}#${branch}@${version} module`);
+            return null;
         }
 
         return uriNoErrors[0];
