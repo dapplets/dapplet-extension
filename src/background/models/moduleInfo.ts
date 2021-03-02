@@ -12,4 +12,5 @@ export default class ModuleInfo extends Base {
     author: string = null;
     icon?: StorageRef = null;
     interfaces: string[] = [];
+    contextIds: string[] = [];
 }

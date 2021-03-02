@@ -2,7 +2,7 @@ import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Button, Form, Message, Image, Card, Modal, Input, Icon } from 'semantic-ui-react';
+import { Button, Form, Message, Image, Card, Modal, Input, Icon, List } from 'semantic-ui-react';
 //import 'semantic-ui-css/semantic.min.css';
 import NOLOGO_PNG from '../common/resources/no-logo.png';
 
@@ -20,7 +20,8 @@ window.onerror = logger.log;
 enum DeploymentStatus {
     Unknown,
     Deployed,
-    NotDeployed
+    NotDeployed,
+    NewModule
 }
 
 interface IIndexProps { }
@@ -77,7 +78,6 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
         this.bus.subscribe('data', async ({ mi, vi }) => {
             this.setState({ mi, vi, loading: false });
-
             await this._updateData();
         });
 
@@ -113,10 +113,12 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     private async _updateDeploymentStatus() {
         this.setState({ deploymentStatus: DeploymentStatus.Unknown });
-        const { getVersionInfo } = await initBGFunctions(browser);
+        const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser);
+        const mi = await getModuleInfoByName(this.state.targetRegistry, this.state.mi.name);
         const vi = await getVersionInfo(this.state.targetRegistry, this.state.mi.name, this.state.vi.branch, this.state.vi.version);
         this.setState({
-            deploymentStatus: (vi) ? DeploymentStatus.Deployed : DeploymentStatus.NotDeployed
+            deploymentStatus: (!mi) ? DeploymentStatus.NewModule : 
+                              (vi) ? DeploymentStatus.Deployed : DeploymentStatus.NotDeployed
         });
     }
 
@@ -194,6 +196,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         const isNotAnOwner = !!owner && isNotNullCurrentAccount && owner.toLowerCase() !== currentAccount.toLowerCase();
         const isAlreadyDeployed = !message && this.state.deploymentStatus === DeploymentStatus.Deployed;
         const isButtonDisabled = loading || this.state.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner;
+        const isNewModule =  this.state.deploymentStatus === DeploymentStatus.NewModule;
 
         return (
             <React.Fragment>
@@ -232,6 +235,23 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         warning
                         header='The Module Already Deployed'
                         content={<React.Fragment>This version of the module has already been deployed to the selected registry. You can choose another registry or increment the module version number.</React.Fragment>}
+                    />
+                 : null}
+
+                 {(isNewModule) ? 
+                    <Message 
+                        info
+                        header='New Module'
+                        content={<>
+                            This module will be published for the first time in the selected registry.
+                            {(this.state.mi.contextIds && this.state.mi.contextIds.length > 0) ? <>
+                                <br/>
+                                The following Context IDs will be added by default:
+                                <List as='ul' style={{ marginTop: '4px' }}>
+                                    {this.state.mi.contextIds.map((x, i) => <List.Item key={i} as='li'>{x}</List.Item>)}                                    
+                                </List>
+                            </> : null}
+                        </>}
                     />
                  : null}
 

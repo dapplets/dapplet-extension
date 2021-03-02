@@ -169,6 +169,7 @@ export class DevRegistry implements Registry {
             uris: [new URL(dm.icon, new URL(manifestUri, this._rootUrl).href).href]
         } : null;
         mi.interfaces = Object.keys(dm.interfaces || {});
+        mi.contextIds = dm.contextIds ?? [];
 
         const vi = new VersionInfo();
         vi.name = dm.name;
