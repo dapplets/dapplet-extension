@@ -47,6 +47,7 @@ interface IIndexState {
     editLocationLoading: boolean;
     editLocationDone: boolean;
     deploymentStatus: DeploymentStatus;
+    trustedUsers: { account: string }[];
 }
 
 class Index extends React.Component<IIndexProps, IIndexState> {
@@ -73,7 +74,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             editLocation: '',
             editLocationLoading: false,
             editLocationDone: false,
-            deploymentStatus: DeploymentStatus.Unknown
+            deploymentStatus: DeploymentStatus.Unknown,
+            trustedUsers: []
         };
 
         this.bus.subscribe('data', async ({ mi, vi }) => {
@@ -86,15 +88,17 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     }
 
     private async _updateData() {
-        const { getRegistries } = await initBGFunctions(browser);
+        const { getRegistries, getTrustedUsers } = await initBGFunctions(browser);
 
         const registries = await getRegistries();
+        const trustedUsers = await getTrustedUsers();
         const prodRegistries = registries.filter(r => !r.isDev);
         this.setState({
             registryOptions: prodRegistries.map(r => ({
                 key: r.url, text: r.url, value: r.url
             })),
-            targetRegistry: prodRegistries[0]?.url || null
+            targetRegistry: prodRegistries[0]?.url || null,
+            trustedUsers
         });
 
         return Promise.all([this._updateOwnership(), this._updateDeploymentStatus()]);
@@ -146,10 +150,16 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     async deploySubmitHandler() {
         this.setState({ loading: true });
 
-        const { deployModule } = await initBGFunctions(browser);
-        const { mi, vi, targetRegistry, targetStorage } = this.state;
+        const { deployModule, addTrustedUser } = await initBGFunctions(browser);
+        const { mi, vi, targetRegistry, targetStorage, currentAccount } = this.state;
 
         try {
+            const isNotNullCurrentAccount = !(!currentAccount || currentAccount === '0x0000000000000000000000000000000000000000');
+            const isNotTrustedUser = isNotNullCurrentAccount && !this.state.trustedUsers.find(x => x.account.toLowerCase() === currentAccount.toLowerCase());
+            if (isNotTrustedUser) {
+                await addTrustedUser(currentAccount.toLowerCase());
+            }
+
             const result = await deployModule(mi, vi, targetStorage, targetRegistry);
             this.setState({
                 message: {
@@ -196,7 +206,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         const isNotAnOwner = !!owner && isNotNullCurrentAccount && owner.toLowerCase() !== currentAccount.toLowerCase();
         const isAlreadyDeployed = !message && this.state.deploymentStatus === DeploymentStatus.Deployed;
         const isButtonDisabled = loading || this.state.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner;
-        const isNewModule =  this.state.deploymentStatus === DeploymentStatus.NewModule;
+        const isNewModule = this.state.deploymentStatus === DeploymentStatus.NewModule;
+        const isNotTrustedUser = isNotNullCurrentAccount && !this.state.trustedUsers.find(x => x.account.toLowerCase() === currentAccount.toLowerCase());
 
         return (
             <React.Fragment>
@@ -255,6 +266,17 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     />
                  : null}
 
+                {(isNotTrustedUser && this.state.deploymentStatus !== DeploymentStatus.Deployed) ? 
+                    <Message 
+                        info
+                        header='Untrusted User'
+                        content={<>
+                            Your account is not on the list of trusted users.<br/>
+                            It will be added automatically when the module is deployed.
+                        </>}
+                    /> 
+                : null}
+
                 {(mi) ? (<Card fluid>
                     <Card.Content>
                         <Image
@@ -275,7 +297,6 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     {(owner && owner?.toLowerCase() === currentAccount?.toLowerCase()) ?
                         <Card.Content extra>
                             <div className='ui two buttons'>
-
 
                                 <Modal closeOnEscape={false} closeOnDimmerClick={false} ref={this.transferOwnershipModal} dimmer='inverted' trigger={<Button basic color='grey'>Transfer ownership</Button>} centered={false}>
                                     <Modal.Header>Ownership Transfering</Modal.Header>
