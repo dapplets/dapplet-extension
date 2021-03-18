@@ -2,9 +2,7 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { Button, Segment } from "semantic-ui-react";
-import { Header } from 'semantic-ui-react'
-import { svgObject } from "qr-image";
+import { Button, Segment, Loader } from "semantic-ui-react";
 import { Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
 import { WalletDescriptor } from "../../background/services/walletService";
@@ -14,58 +12,39 @@ interface Props {
 }
 
 interface State {
-    svgPath: string;
-    connected: boolean;
     error: string;
+    connected: boolean;
     toBack: boolean;
     descriptor: WalletDescriptor | null;
 }
 
 export default class extends React.Component<Props, State> {
-
-    private _mounted = true;
-
     constructor(props) {
         super(props);
         this.state = {
-            svgPath: null,
-            connected: false,
             error: null,
+            connected: false,
             toBack: false,
             descriptor: null
         };
     }
 
     async componentDidMount() {
-
-        this._mounted = true;
-
         try {
             const { connectWallet, getWalletDescriptors } = await initBGFunctions(browser);
-
-            this.props.bus.subscribe('walletconnect', (uri) => {
-                const svgPath = svgObject(uri, { type: 'svg' });
-                this.setState({ svgPath: svgPath.path });
-                this.props.bus.unsubscribe('walletconnect');
-            });
-
-            await connectWallet('walletconnect');
+            await connectWallet('near');
             const descriptors = await getWalletDescriptors();
-            const descriptor = descriptors.find(x => x.type === 'walletconnect');
-            if (this._mounted) this.setState({ connected: true, descriptor });
+            const descriptor = descriptors.find(x => x.type === 'near');
+            this.setState({ connected: true, descriptor });
         } catch (err) {
-            if (this._mounted) this.setState({ connected: true, error: err.message });
+            console.log(err);
+            this.setState({ error: err.message });
         }
-    }
-
-    componentWillUnmount() {
-        this._mounted = false;
-        this.props.bus.unsubscribe('walletconnect');
     }
 
     async disconnect() {
         const { disconnectWallet } = await initBGFunctions(browser);
-        await disconnectWallet('walletconnect');
+        await disconnectWallet('near');
         this.setState({ toBack: true });
     }
 
@@ -89,12 +68,9 @@ export default class extends React.Component<Props, State> {
         );
 
         if (!s.connected) return (
-            <React.Fragment>
-                <Header as='h2'>WalletConnect Pairing</Header>
-                <p>Scan QR code with a WalletConnect-compatible wallet</p>
-                {s.svgPath ? (<svg viewBox="1 1 53 53"><path d={s.svgPath} /></svg>) : null}
-                <Button onClick={() => this.setState({ toBack: true })}>Back</Button>
-            </React.Fragment>
+            <>
+                <Loader active inline='centered' >Please unlock your wallet to continue</Loader>
+            </>
         );
 
         if (s.connected) return (<>

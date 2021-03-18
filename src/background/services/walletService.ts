@@ -11,7 +11,8 @@ export enum DefaultSigners {
 
 export enum WalletTypes {
     WALLETCONNECT = 'walletconnect',
-    METAMASK = 'metamask'
+    METAMASK = 'metamask',
+    NEAR = 'near'
 }
 
 export type WalletDescriptor = {

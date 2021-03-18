@@ -40,6 +40,7 @@
     "jszip": "^3.5.0",
     "metamask-extension-provider": "^3.0.0",
     "mocha": "^8.2.1",
+    "near-api-js": "^0.39.0",
     "node-sass": "^4.14.1",
     "puppeteer": "^5.5.0",
     "qr-image": "^3.2.0",

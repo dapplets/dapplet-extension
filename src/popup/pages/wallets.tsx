@@ -29,20 +29,17 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
     this.state = {
       descriptors: [],
       loading: true
-      //walletInfo: null
     };
   }
 
   async componentDidMount() {
-    const { getWalletDescriptors, getGlobalConfig } = await initBGFunctions(browser);
+    const { getWalletDescriptors } = await initBGFunctions(browser);
 
     const descriptors = await getWalletDescriptors();
-    //const { walletInfo } = await getGlobalConfig();
 
     this.setState({
       descriptors,
       loading: false
-      //walletInfo
     });
   }
 
@@ -87,7 +84,7 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
                   <div style={{ flex: 'auto', marginLeft: '10px' }}>
                     <div style={{ display: 'inline', color: 'rgba(0,0,0,.4)' }}>
                       {/* {(x.default) ? <Icon name='star' /> : <Icon link name='star outline' onClick={() => this.setWalletFor(x.type)} />} */}
-                      {(x.account) ? <span title={x.account} style={{ color: '#000', fontWeight: 'bold' }}>{x.account.substr(0, 6) + '...' + x.account.substr(38)}</span> : null}
+                      {(x.account) ? <span title={x.account} style={{ color: '#000', fontWeight: 'bold' }}>{(x.account.length === 42) ? x.account.substr(0, 6) + '...' + x.account.substr(38) : x.account}</span> : null}
                       <CheckIcon text='Copied' name='copy' style={{ marginLeft: '4px' }} onClick={() => navigator.clipboard.writeText(x.account)} />
                     </div>
                     {/* <Comment.Author style={{ display: 'inline' }}>{x.account}</Comment.Author> */}

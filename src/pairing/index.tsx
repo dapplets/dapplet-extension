@@ -38,6 +38,7 @@ class Index extends React.Component<Props, State> {
                         <Route exact path="/" component={() => <SelectWallet bus={this.bus} />} />
                         <Route path="/metamask" component={() => <modules.metamask bus={this.bus} />} />
                         <Route path="/walletconnect" component={() => <modules.walletconnect bus={this.bus} />} />
+                        <Route path="/near" component={() => <modules.near bus={this.bus} />} />
                     </Switch>
                 </HashRouter>
             </Container>

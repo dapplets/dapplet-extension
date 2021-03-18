@@ -2,12 +2,9 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { List, Button, Segment, Loader, Message, Icon } from "semantic-ui-react";
-import { Container, Header } from 'semantic-ui-react'
-import { svgObject } from "qr-image";
-import { Link, Redirect } from "react-router-dom";
+import { Button, Segment, Loader, Message, Icon } from "semantic-ui-react";
+import { Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
-import { WalletInfo } from '../../common/constants';
 import { WalletDescriptor } from "../../background/services/walletService";
 
 interface Props {
