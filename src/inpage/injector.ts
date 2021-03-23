@@ -12,21 +12,23 @@ import { DefaultConfig, SchemaConfig } from "../common/types";
 import * as logger from '../common/logger';
 import { ModalDimmer } from "semantic-ui-react";
 
+type RegistriedModule = {
+    manifest: VersionInfo,
+    clazz: any,
+    instance?: any,
+    order: number,
+    contextIds: string[],
+    dependencies: string[],
+    instancedDeps: any[],
+    defaultConfig?: DefaultConfig,
+    onActionHandler?: Function,
+    onHomeHandler?: Function
+}
+
 export class Injector {
     public availableContextIds: string[] = [];
 
-    private registry: {
-        manifest: VersionInfo,
-        clazz: any,
-        instance?: any,
-        order: number,
-        contextIds: string[],
-        dependencies: string[],
-        instancedDeps: any[],
-        defaultConfig?: DefaultConfig,
-        onActionHandler?: Function,
-        onHomeHandler?: Function
-    }[] = [];
+    private registry: RegistriedModule[] = [];
 
     constructor(public core: Core) {
         this._setContextActivivty([window.location.hostname], undefined, true);
@@ -57,50 +59,27 @@ export class Injector {
         for (let i = 0; i < this.registry.length; i++) {
             const m = this.registry[i];
             if (m.instance) continue;
-            m.instancedDeps = m.dependencies.map(d => {
-                const depModule = this._getDependency(m.manifest, d);
-                if (depModule.manifest.type === ModuleTypes.Adapter) {
-                    const cfgKey = Symbol();
-                    const featureId = m.manifest.name;
-                    return new Proxy(depModule.instance, {
-                        get: function (target: IContentAdapter<any>, prop, receiver) {
-                            if (prop === 'attachConfig') {
-                                return (cfg: any) => {
-                                    if (m.manifest.type === ModuleTypes.Feature) {
-                                        cfg.orderIndex = m.order;
-                                        // ToDo: fix context ids adding
-                                        cfg.contextIds = m.contextIds.map(id => {
-                                            const [headContextId, ...tailContextId] = id.split('/'); // ToDo: check head?
-                                            return tailContextId.join('/');
-                                        }).filter(id => !!id);
-                                    }
-                                    Reflect.set(target, cfgKey, cfg);
-                                    return target.attachConfig(cfg);
-                                }
-                            } if (prop === 'detachConfig') {
-                                return () => target.detachConfig(Reflect.get(target, cfgKey), featureId);
-                            } if (prop === 'exports') {
-                                if (typeof target.exports === 'function') {
-                                    return target.exports(featureId);
-                                } else {
-                                    return target.exports;
-                                }                                
-                            } else return target[prop];
-                        }
-                    });
-                } else {
-                    return depModule.instance;
-                }
-            });
+
+            m.instancedDeps = m.dependencies.map(d => this._proxifyModule(this._getDependency(m.manifest, d), m));
 
             try {
                 // ToDo: compare "m.instancedDeps.length" and "m.clazz.constructor.length"
                 m.instance = new m.clazz(...m.instancedDeps);
+
+                if (m.instance.activate !== undefined) {
+                    if (typeof m.instance.activate === 'function') {
+                        // ToDo: activate modules in parallel
+                        await m.instance.activate();
+                    } else {
+                        throw new Error('activate() must be a function.');
+                    }
+                }
+
                 console.log(`[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`);
                 browser.runtime.sendMessage({
                     type: "FEATURE_LOADED", payload: {
-                        name: m.manifest.name, 
-                        branch: m.manifest.branch, 
+                        name: m.manifest.name,
+                        branch: m.manifest.branch,
                         version: m.manifest.version,
                         runtime: {
                             isActionHandler: !!m.onActionHandler,
@@ -112,9 +91,9 @@ export class Injector {
                 logger.error(`Error of loading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
                 browser.runtime.sendMessage({
                     type: "FEATURE_LOADING_ERROR", payload: {
-                        name: m.manifest.name, 
-                        branch: m.manifest.branch, 
-                        version: m.manifest.version, 
+                        name: m.manifest.name,
+                        branch: m.manifest.branch,
+                        version: m.manifest.version,
                         error: err.message
                     }
                 });
@@ -123,10 +102,23 @@ export class Injector {
     }
 
     public async unloadModules(modules: { name: string, branch: string, version: string }[]) {
-        modules.map(m => this.registry.find(r => areModulesEqual(m, r.manifest))).forEach(m => {
+        const registriedModules = modules.map(m => this.registry.find(r => areModulesEqual(m, r.manifest)));
+
+        for (const m of registriedModules) {
             if (!m) return;
+
             try {
                 m.instancedDeps.forEach(d => d.detachConfig());
+
+                if (m.instance.deactivate !== undefined) {
+                    if (typeof m.instance.deactivate === 'function') {
+                        // ToDo: deactivate modules in parallel
+                        await m.instance.deactivate();
+                    } else {
+                        throw new Error('deactivate() must be a function.');
+                    }
+                }
+
                 console.log(`[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is unloaded.`);
                 browser.runtime.sendMessage({
                     type: "FEATURE_UNLOADED", payload: {
@@ -142,24 +134,18 @@ export class Injector {
                     }
                 });
             }
-        });
+        }
     }
 
     public async openDappletAction(moduleName: string) {
         const module = this.registry.find(m => m.manifest.name === moduleName);
         if (!module || !module.instance) throw Error('The dapplet is not activated.');
-        
-        //while (!module && !module.instance) await new Promise((res) => setTimeout(res, 500));
-
         module.onActionHandler?.();
     }
 
     public async openDappletHome(moduleName: string) {
         const module = this.registry.find(m => m.manifest.name === moduleName);
         if (!module || !module.instance) throw Error('The dapplet is not activated.');
-        
-        //while (!module && !module.instance) await new Promise((res) => setTimeout(res, 500));
-
         module.onHomeHandler?.();
     }
 
@@ -231,37 +217,47 @@ export class Injector {
             };
 
             // ToDo: describe it
-            const injectDecorator = (name: string) => (target, propertyKey: string, parameterIndexOrDescriptor: number | PropertyDescriptor) => {
+            const injectDecorator = (name: string) => {
                 if (!name) throw new Error('The name of a module is required as the first argument of the @Inject(module_name) decorator');
-                if (typeof parameterIndexOrDescriptor !== 'number') throw new Error('@Inject(module_name) decorator can be applied to constructor parameters only');
-                // ToDo: check module_name with manifest
-                // ToDo: add module source to error description
 
-                //if (typeof parameterIndexOrDescriptor === 'number') { // decorator applied to constructor parameters
+                return (target, propertyKey: string, parameterIndexOrDescriptor: number | PropertyDescriptor) => {
+                    // ToDo: check module_name with manifest
+                    // ToDo: add module source to error description
 
-                if (!this.registry.find(m => areModulesEqual(m.manifest, manifest))) {
-                    this.registry.push({
-                        manifest: manifest,
-                        clazz: target,
-                        instance: null,
-                        order: order,
-                        contextIds: contextIds,
-                        dependencies: [],
-                        instancedDeps: []
-                    });
+                    if (typeof parameterIndexOrDescriptor === 'number') { // decorator applied to constructor parameters
+                        if (!this.registry.find(m => areModulesEqual(m.manifest, manifest))) {
+                            this.registry.push({
+                                manifest: manifest,
+                                clazz: target,
+                                instance: null,
+                                order: order,
+                                contextIds: contextIds,
+                                dependencies: [],
+                                instancedDeps: []
+                            });
+                        }
+                        const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
+                        currentModule.dependencies[parameterIndexOrDescriptor] = name;
+                    } else { // decorator applied to class property
+                        parameterIndexOrDescriptor = parameterIndexOrDescriptor || {};
+                        parameterIndexOrDescriptor.get = () => {
+                            const depModule = this._getDependency(manifest, name);
+                            const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
+                            return this._proxifyModule(depModule, currentModule);
+                        }
+                        return parameterIndexOrDescriptor;
+                    }
                 }
-                const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
-                currentModule.dependencies[parameterIndexOrDescriptor] = name;
+            }
 
-                // } else { // decorator applied to class property
-                //     parameterIndexOrDescriptor = parameterIndexOrDescriptor || {};
-                //     parameterIndexOrDescriptor.get = () => this._getDependency(manifest, name).instance;
-                //     return parameterIndexOrDescriptor;
-                // }
-            };
-
-            const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
-            execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
+            try {
+                const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
+                execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
+            } catch (err) {
+                // ToDo: remove module from this.registry
+                console.error(err);
+                continue;
+            }
 
             if (newBranch) {
                 //addEvent('Branch resolving', `Resolver of "${manifest.name}" defined the "${newBranch}" branch`);
@@ -330,5 +326,46 @@ export class Injector {
 
         const module = modules.find(m => m.manifest.version == maxVer);
         return module;
+    }
+
+    private _proxifyModule(proxiedModule: RegistriedModule, contextModule: RegistriedModule) {
+        if (proxiedModule.manifest.type === ModuleTypes.Adapter) {
+            const cfgKey = Symbol();
+            const featureId = contextModule.manifest.name;
+            return new Proxy(proxiedModule.instance, {
+                get: function (target: IContentAdapter<any>, prop, receiver) {
+                    if (prop === 'attachConfig') {
+                        return (cfg: any) => {
+                            if (contextModule.manifest.type === ModuleTypes.Feature) {
+                                cfg.orderIndex = contextModule.order;
+                                // ToDo: fix context ids adding
+                                cfg.contextIds = contextModule.contextIds.map(id => {
+                                    const [headContextId, ...tailContextId] = id.split('/'); // ToDo: check head?
+                                    return tailContextId.join('/');
+                                }).filter(id => !!id);
+                            }
+                            Reflect.set(target, cfgKey, cfg);
+                            return target.attachConfig(cfg);
+                        }
+                    } if (prop === 'detachConfig') {
+                        return () => target.detachConfig(Reflect.get(target, cfgKey), featureId);
+                    } if (prop === 'attachFeature') {
+                        console.error('attachFeature() method is deprecated.');
+                        return () => null;
+                    } if (prop === 'detachFeature') {
+                        console.error('detachFeature() method is deprecated.');
+                        return () => null;
+                    } if (prop === 'exports') {
+                        if (typeof target.exports === 'function') {
+                            return target.exports(featureId);
+                        } else {
+                            return target.exports;
+                        }
+                    } else return target[prop];
+                }
+            });
+        } else {
+            return proxiedModule.instance;
+        }
     }
 }
