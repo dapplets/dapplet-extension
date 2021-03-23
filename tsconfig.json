@@ -12,7 +12,8 @@
         "allowSyntheticDefaultImports": true,
         "downlevelIteration": true,
         "declaration": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "skipLibCheck": true
     },
     "exclude": ["tests", "lib", "jslib", "build", "node_modules"]
 }

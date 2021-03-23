@@ -33,12 +33,12 @@ module.exports = {
   module: {
     rules: [
       {
-        exclude: /node_modules/,
+        include: path.resolve(__dirname, 'src'),
         test: /\.tsx?$/,
         use: "ts-loader"
       },
       {
-        exclude: /node_modules/,
+        include: path.resolve(__dirname, 'src'),
         test: /\.scss$/,
         use: [
           {
@@ -55,14 +55,12 @@ module.exports = {
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader', 'resolve-url-loader'],
-        include: [
-          path.join(__dirname, 'src'),
-          /node_modules/
-        ]
+        include: path.resolve(__dirname, 'src'),
       },
       {
         test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/],
         loader: "url-loader",
+        include: path.resolve(__dirname, 'src'),
         options: {
           limit: 10000,
           name: "static/[name].[hash:8].[ext]",
@@ -71,6 +69,7 @@ module.exports = {
       {
         test: [/\.eot$/, /\.ttf$/, /\.woff$/, /\.woff2$/],
         loader: "file-loader",
+        include: path.resolve(__dirname, 'src'),
         options: {
           name: "static/[name].[hash:8].[ext]",
         },
@@ -78,7 +77,15 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: [".ts", ".tsx", ".js"]
+    extensions: [".ts", ".tsx", ".js"],
+    fallback: {
+      "crypto": false,
+      "assert": require.resolve('assert-browserify'),
+      "stream": require.resolve('stream-browserify'),
+      "http": false,
+      "https": false,
+      "zlib": false
+    }
   },
   plugins: [
     new CopyWebpackPlugin({
@@ -121,6 +128,10 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       EXTENSION_VERSION: JSON.stringify(package.version)
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+      process: 'process/browser'
     })
   ]
 };
