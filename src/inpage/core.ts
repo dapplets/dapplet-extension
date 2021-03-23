@@ -10,6 +10,12 @@ import { AppStorage } from "./appStorage";
 import { ethers, providers } from "ethers";
 import { ProxySigner } from "./proxySigner";
 import * as logger from '../common/logger';
+import { BackgroundNear } from "./near/backgroundNear";
+import { BackgroundWalletConnection } from "./near/backgroundWalletConnection";
+import { ConnectedWalletAccount, InMemorySigner } from "near-api-js";
+import * as NearAPI from "near-api-js";
+import { BackgroundKeyStore } from "./near/backgroundKeyStore";
+import { BackgroundJsonRpcProvider } from "./near/backgroundJsonRpcProvider";
 
 export default class Core {
     public overlayManager = new OverlayManager();
@@ -267,5 +273,20 @@ export default class Core {
     public contract(address: string, abi: any, app?: string): any {
         const signer = new ProxySigner(app);
         return new ethers.Contract(address, abi, signer);
+    }
+
+    public near = {
+        async wallet(app?: string) {
+            const { localStorage_getItem } = await initBGFunctions(browser);
+            const authDataKey = 'null_wallet_auth_key';
+            const authData = JSON.parse(await localStorage_getItem(authDataKey));
+            
+            const near = new BackgroundNear(app);
+            const wallet = new BackgroundWalletConnection(near, null);
+            wallet._authData = authData;
+
+            const account = wallet.account();
+            return account;
+        }
     }
 }

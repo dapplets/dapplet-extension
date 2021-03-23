@@ -203,7 +203,10 @@ export class Injector {
                 storage: new AppStorage(manifest.name, manifest.environment, defaultConfig),
                 contract: (address, abi) => core.contract(address, abi, manifest.name),
                 onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
-                onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler)
+                onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
+                near: {
+                    wallet: () => core.near.wallet(manifest.name)
+                }
             };
 
             let newBranch: string = null;

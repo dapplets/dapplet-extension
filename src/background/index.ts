@@ -144,6 +144,17 @@ import { IdentityService } from "./services/identityService";
       // Identity Service
       getIdentityAccounts: identityService.getAccounts.bind(identityService),
       addIdentityAccount: identityService.addAccount.bind(identityService),
+
+      // LocalStorage
+      localStorage_setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
+      localStorage_getItem: (key) => Promise.resolve(localStorage.getItem(key)),
+      localStorage_removeItem: (key) => Promise.resolve(localStorage.removeItem(key)),
+      localStorage_clear: () => Promise.resolve(localStorage.clear()),
+      localStorage_key: (index) => Promise.resolve(localStorage.key(index)),
+      localStorage_length: () => Promise.resolve(localStorage.length),
+
+      // Extension Basic
+      createTab: (url) => browser.tabs.create({ url })
     })
   );
 

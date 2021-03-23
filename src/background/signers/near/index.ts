@@ -5,7 +5,8 @@ import { ExtendedSigner } from "../interface";
 import * as nearAPI from 'near-api-js';
 import { CustomWalletConnection } from "./customWalletConnection";
 import { browser } from "webextension-polyfill-ts";
-import { Near } from "near-api-js";
+import { ConnectedWalletAccount, Connection, Contract, Near } from "near-api-js";
+import { JsonRpcProvider } from "near-api-js/lib/providers";
 
 export default class extends ethers.Signer implements ExtendedSigner {
 
@@ -18,7 +19,9 @@ export default class extends ethers.Signer implements ExtendedSigner {
                 nodeUrl: 'https://rpc.testnet.near.org',
                 walletUrl: 'https://wallet.testnet.near.org',
                 helperUrl: 'https://helper.testnet.near.org',
-                deps: { keyStore: new nearAPI.keyStores.BrowserLocalStorageKeyStore() }
+                deps: {
+                    keyStore: new nearAPI.keyStores.BrowserLocalStorageKeyStore()
+                }
             });
 
             this.__nearWallet = new CustomWalletConnection(near, null);
@@ -51,8 +54,13 @@ export default class extends ethers.Signer implements ExtendedSigner {
         throw new Error("sendTransactionOutHash() is not implemented");
     }
 
-    async sendCustomRequest(method: string, params: any[]): Promise<any> {
-        throw new Error("sendCustomRequest() is not implemented");
+    async sendCustomRequest(method: string, params: any): Promise<any> {
+        const provider: JsonRpcProvider = this._nearWallet.account().connection.provider as any;
+        return provider.sendJsonRpc(method, params);
+    }
+
+    async requestSignTransactions(transactions: any, callbackUrl: any) {
+        return this._nearWallet.requestSignTransactions(transactions, callbackUrl);
     }
 
     connect(provider: Provider): ethers.Signer {
@@ -84,7 +92,6 @@ export default class extends ethers.Signer implements ExtendedSigner {
                 const tab = await browser.tabs.get(tabId);
                 const { url } = tab;
                 if (url.indexOf(browser.extension.getURL('pairing.html')) === 0) {
-                    console.log(url)
                     if (isPairing) return;
 
                     isPairing = true;

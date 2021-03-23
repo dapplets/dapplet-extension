@@ -1,0 +1,14 @@
+import { providers } from "near-api-js";
+import { browser } from "webextension-polyfill-ts";
+import { initBGFunctions } from "chrome-extension-message-wrapper";
+
+export class BackgroundJsonRpcProvider extends providers.JsonRpcProvider {
+    constructor(private _app: string) {
+        super();
+    }
+
+    async sendJsonRpc(method: string, params: object): Promise<any> {
+        const { sendCustomRequest } = await initBGFunctions(browser);
+        return sendCustomRequest(this._app, method, params);
+    }
+}
