@@ -277,9 +277,13 @@ export default class Core {
 
     public near = {
         async wallet(app?: string) {
-            const { localStorage_getItem } = await initBGFunctions(browser);
+            const { localStorage_getItem, pairWalletViaOverlay } = await initBGFunctions(browser);
             const authDataKey = 'null_wallet_auth_key';
-            const authData = JSON.parse(await localStorage_getItem(authDataKey));
+            let authData = JSON.parse(await localStorage_getItem(authDataKey));
+            if (!authData) {
+                await pairWalletViaOverlay();
+                authData = JSON.parse(await localStorage_getItem(authDataKey));
+            }
             
             const near = new BackgroundNear(app);
             const wallet = new BackgroundWalletConnection(near, null);
@@ -290,9 +294,13 @@ export default class Core {
         },
 
         async contract(contractId: string, options: { viewMethods: string[]; changeMethods: string[] }, app?: string) {
-            const { localStorage_getItem } = await initBGFunctions(browser);
+            const { localStorage_getItem, pairWalletViaOverlay } = await initBGFunctions(browser);
             const authDataKey = 'null_wallet_auth_key';
-            const authData = JSON.parse(await localStorage_getItem(authDataKey));
+            let authData = JSON.parse(await localStorage_getItem(authDataKey));
+            if (!authData) {
+                await pairWalletViaOverlay();
+                authData = JSON.parse(await localStorage_getItem(authDataKey));
+            }
             
             const near = new BackgroundNear(app);
             const wallet = new BackgroundWalletConnection(near, null);
