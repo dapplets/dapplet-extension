@@ -10,7 +10,7 @@ import EnsService from "./services/ensService";
 import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 import ProxyService from "./services/proxyService";
 import * as logger from '../common/logger';
-import { getCurrentTab } from "../common/helpers";
+import { getCurrentTab, waitTab } from "../common/helpers";
 import * as GithubService from "./services/githubService";
 import { IdentityService } from "./services/identityService";
 
@@ -154,7 +154,13 @@ import { IdentityService } from "./services/identityService";
       localStorage_length: () => Promise.resolve(localStorage.length),
 
       // Extension Basic
-      createTab: (url) => browser.tabs.create({ url })
+      createTab: (url) => browser.tabs.create({ url }),
+      removeTab: (tabId) => browser.tabs.remove(tabId),
+      updateTab: (tabId, updateProperties) => browser.tabs.update(tabId, updateProperties),
+      queryTab: (queryInfo) => browser.tabs.query(queryInfo),
+
+      // Helpers
+      waitTab: (url) => waitTab(url)
     })
   );
 

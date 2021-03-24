@@ -186,3 +186,24 @@ export async function fetchWithTimeout(resource, options) {
     }
   }
 }
+
+export function generateGuid() {
+  return "xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      var r = (Math.random() * 16) | 0,
+          v = c == "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+  });
+};
+
+export async function waitTab(url: string) {
+  return new Promise<Tabs.Tab>((res, rej) => {
+    const handler = async (tabId: number) => {
+      const tab = await browser.tabs.get(tabId);
+      if (tab.url.indexOf(url) === 0) {
+        res(tab);
+        browser.tabs.onUpdated.removeListener(handler);
+      }
+    }
+    browser.tabs.onUpdated.addListener(handler);
+  });
+}

@@ -1,5 +1,5 @@
 import { browser } from "webextension-polyfill-ts";
-import { generateGuid } from '../../common/utils';
+import { generateGuid } from '../../common/helpers';
 
 const transactionCreated = async transactionId => {
     return browser.notifications.create(

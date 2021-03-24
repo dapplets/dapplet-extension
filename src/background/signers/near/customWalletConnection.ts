@@ -41,22 +41,16 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
     }
 
     async requestSignTransactions(transactions: nearAPI.transactions.Transaction[], callbackUrl?: string) {
-        console.log('request', transactions)
         const currentUrl = new URL(window.location.href);
-        console.log('request 1')
         const newUrl = new URL('sign', this._walletBaseUrl);
-        console.log('request 2')
 
         newUrl.searchParams.set('transactions', transactions
             .map(transaction => serialize(nearAPI.transactions.SCHEMA, transaction))
             .map(serialized => Buffer.from(serialized).toString('base64'))
             .join(','));
-            console.log('request 3')
         newUrl.searchParams.set('callbackUrl', callbackUrl || currentUrl.href);
-        console.log('request 4')
 
         browser.tabs.create({ url: newUrl.toString() });
-        console.log('request 5')
     }
 
     async completeSignIn(accountId, publicKey, allKeys) {

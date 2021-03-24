@@ -1,5 +1,5 @@
 import { Event } from "../../common/models/event";
-import { generateGuid } from '../../common/utils';
+import { generateGuid } from '../../common/helpers';
 import EventBrowserStorage from '../browserStorages/eventBrowserStorage';
 import { browser } from 'webextension-polyfill-ts';
 

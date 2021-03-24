@@ -3,7 +3,7 @@ import { GlobalConfig } from '../models/globalConfig';
 import { typeOfUri, UriTypes } from '../../common/helpers';
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { browser } from "webextension-polyfill-ts";
-import { generateGuid } from '../../common/utils';
+import { generateGuid } from '../../common/helpers';
 
 export default class GlobalConfigService {
     private _globalConfigRepository = new GlobalConfigBrowserStorage();

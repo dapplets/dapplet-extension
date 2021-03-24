@@ -287,6 +287,20 @@ export default class Core {
 
             const account = wallet.account();
             return account;
+        },
+
+        async contract(contractId: string, options: { viewMethods: string[]; changeMethods: string[] }, app?: string) {
+            const { localStorage_getItem } = await initBGFunctions(browser);
+            const authDataKey = 'null_wallet_auth_key';
+            const authData = JSON.parse(await localStorage_getItem(authDataKey));
+            
+            const near = new BackgroundNear(app);
+            const wallet = new BackgroundWalletConnection(near, null);
+            wallet._authData = authData;
+
+            const account = wallet.account();
+            const contract = await new NearAPI.Contract(account, contractId, options);
+            return contract;
         }
     }
 }

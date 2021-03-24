@@ -2,6 +2,7 @@ import * as nearAPI from 'near-api-js';
 import { serialize } from 'borsh';
 import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { CustomConnectedWalletAccount } from './customConnectedWalletAccount';
 
 const LOGIN_WALLET_URL_SUFFIX = '/login/';
 const PENDING_ACCESS_KEY_PREFIX = 'pending_key'; // browser storage key for a pending access key (i.e. key has been generated but we are not sure it was added yet)
@@ -67,5 +68,12 @@ export class BackgroundWalletConnection extends nearAPI.WalletConnection {
                 await this._moveKeyFromTempToPermanent(accountId, publicKey);
             }
         }
+    }
+
+    account() {
+        if (!this._connectedAccount) {
+            this._connectedAccount = new CustomConnectedWalletAccount(this, this._near.connection, this._authData.accountId);
+        }
+        return this._connectedAccount;
     }
 }

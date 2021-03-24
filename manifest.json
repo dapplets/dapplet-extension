@@ -37,7 +37,8 @@
     "deploy.html",
     "starter.html",
     "settings.html",
-    "login.html"
+    "login.html",
+    "callback.html"
   ],
   "permissions": [
     "tabs",

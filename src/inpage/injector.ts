@@ -10,7 +10,6 @@ import VersionInfo from "../background/models/versionInfo";
 import { AppStorage } from "./appStorage";
 import { DefaultConfig, SchemaConfig } from "../common/types";
 import * as logger from '../common/logger';
-import { ModalDimmer } from "semantic-ui-react";
 
 type RegistriedModule = {
     manifest: VersionInfo,
@@ -191,7 +190,8 @@ export class Injector {
                 onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
                 onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
                 near: {
-                    wallet: () => core.near.wallet(manifest.name)
+                    wallet: () => core.near.wallet(manifest.name),
+                    contract: (contractId, options) => core.near.contract(contractId, options, manifest.name)
                 }
             };
 

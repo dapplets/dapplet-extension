@@ -123,6 +123,9 @@ module.exports = {
         }, {
           from: "src/login/index.html",
           to: "login.html"
+        }, {
+          from: "src/callback/index.html",
+          to: "callback.html"
         }
       ]
     }),

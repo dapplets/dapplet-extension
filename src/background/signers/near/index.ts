@@ -7,6 +7,7 @@ import { CustomWalletConnection } from "./customWalletConnection";
 import { browser } from "webextension-polyfill-ts";
 import { ConnectedWalletAccount, Connection, Contract, Near } from "near-api-js";
 import { JsonRpcProvider } from "near-api-js/lib/providers";
+import { generateGuid, waitTab } from "../../../common/helpers";
 
 export default class extends ethers.Signer implements ExtendedSigner {
 
@@ -81,53 +82,42 @@ export default class extends ethers.Signer implements ExtendedSigner {
             const [currentTab] = await browser.tabs.query({ active: true });
             const currentTabId = currentTab.id;
 
+            const requestId = generateGuid();
+
             await this._nearWallet.requestSignIn({
-                successUrl: browser.extension.getURL('pairing.html?success=true'),
-                failureUrl: browser.extension.getURL('pairing.html?success=false')
+                successUrl: browser.extension.getURL(`callback.html?request_id=${requestId}&success=true`),
+                failureUrl: browser.extension.getURL(`callback.html?request_id=${requestId}&success=false`)
             });
 
-            let isPairing = false;
+            const tab = await waitTab(browser.extension.getURL(`callback.html?request_id=${requestId}`));
 
-            browser.tabs.onUpdated.addListener(async (tabId) => {
-                const tab = await browser.tabs.get(tabId);
-                const { url } = tab;
-                if (url.indexOf(browser.extension.getURL('pairing.html')) === 0) {
-                    if (isPairing) return;
+            const urlObject = new URL(tab.url);
+            const success = urlObject.searchParams.get('success') === "true";
 
-                    isPairing = true;
+            if (success) {
+                const accountId = urlObject.searchParams.get('account_id');
+                const publicKey = urlObject.searchParams.get('public_key');
+                const allKeys = urlObject.searchParams.get('all_keys');
 
-                    const urlObject = new URL(url);
-
-                    const success = urlObject.searchParams.get('success') === "true";
-
-                    if (success) {
-                        const accountId = urlObject.searchParams.get('account_id');
-                        const publicKey = urlObject.searchParams.get('public_key');
-                        const allKeys = urlObject.searchParams.get('all_keys');
-
-                        // TODO: Handle situation when access key is not added
-                        if (accountId) {
-                            await browser.tabs.update(currentTabId, { active: true });
-                            this._nearWallet.completeSignIn(accountId, publicKey, allKeys);
-                            localStorage['near_lastUsage'] = new Date().toISOString();
-                            await new Promise((res, rej) => setTimeout(res, 1000));
-                            await browser.tabs.remove(tabId);
-                            res();
-                        } else {
-                            await browser.tabs.update(currentTabId, { active: true });
-                            await new Promise((res, rej) => setTimeout(res, 1000));
-                            await browser.tabs.remove(tabId);
-                            rej('No account_id params in callback URL');
-                        }
-
-                        isPairing = false;
-                    } else {
-                        await new Promise((res, rej) => setTimeout(res, 1000));
-                        await browser.tabs.remove(tabId);
-                        rej('Access denied');
-                    }
+                // TODO: Handle situation when access key is not added
+                if (accountId) {
+                    await browser.tabs.update(currentTabId, { active: true });
+                    this._nearWallet.completeSignIn(accountId, publicKey, allKeys);
+                    localStorage['near_lastUsage'] = new Date().toISOString();
+                    await new Promise((res, rej) => setTimeout(res, 1000));
+                    await browser.tabs.remove(tab.id);
+                    res();
+                } else {
+                    await browser.tabs.update(currentTabId, { active: true });
+                    await new Promise((res, rej) => setTimeout(res, 1000));
+                    await browser.tabs.remove(tab.id);
+                    rej('No account_id params in callback URL');
                 }
-            });
+            } else {
+                await new Promise((res, rej) => setTimeout(res, 1000));
+                await browser.tabs.remove(tab.id);
+                rej('Access denied');
+            }
         });
     }
 
