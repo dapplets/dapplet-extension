@@ -7,15 +7,13 @@ import { AutoProperties, EventDef, Connection } from "./connection";
 import { WsJsonRpc } from "./wsJsonRpc";
 import { OverlayManager } from "./overlayManager";
 import { AppStorage } from "./appStorage";
-import { ethers, providers } from "ethers";
+import * as ethers from "ethers";
 import { ProxySigner } from "./proxySigner";
 import * as logger from '../common/logger';
 import { BackgroundNear } from "./near/backgroundNear";
 import { BackgroundWalletConnection } from "./near/backgroundWalletConnection";
-import { ConnectedWalletAccount, InMemorySigner } from "near-api-js";
 import * as NearAPI from "near-api-js";
-import { BackgroundKeyStore } from "./near/backgroundKeyStore";
-import { BackgroundJsonRpcProvider } from "./near/backgroundJsonRpcProvider";
+
 
 export default class Core {
     public overlayManager = new OverlayManager();
@@ -311,4 +309,6 @@ export default class Core {
             return contract;
         }
     }
+
+    utils = ethers.utils;
 }

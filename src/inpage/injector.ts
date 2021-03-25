@@ -192,7 +192,8 @@ export class Injector {
                 near: {
                     wallet: () => core.near.wallet(manifest.name),
                     contract: (contractId, options) => core.near.contract(contractId, options, manifest.name)
-                }
+                },
+                utils: core.utils
             };
 
             let newBranch: string = null;
