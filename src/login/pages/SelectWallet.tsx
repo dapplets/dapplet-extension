@@ -2,18 +2,18 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { Header, Button, Comment, Icon, Message } from 'semantic-ui-react'
-import { WalletDescriptor } from "../../background/services/walletService";
+import { Header, Button, Comment, Icon, Message } from 'semantic-ui-react';
 
 import makeBlockie from 'ethereum-blockies-base64';
 import ReactTimeAgo from 'react-time-ago';
 import { CheckIcon } from "../../common/react-components/CheckIcon";
 import * as walletIcons from '../../common/resources/wallets';
-import { ProfileCard } from "../component/ProfileCard";
 import { Bus } from "../../common/bus";
+import { ChainTypes, WalletDescriptor } from "../../common/types";
 
 interface Props {
     app: string;
+    chain: ChainTypes;
     bus: Bus;
 }
 
@@ -48,26 +48,34 @@ export class SelectWallet extends React.Component<Props, State> {
 
     async selectWallet(wallet: string) {
         const { setWalletFor } = await initBGFunctions(browser);
-        const { app } = this.props;
-        await setWalletFor(wallet, app);
+        const { app, chain } = this.props;
+        await setWalletFor(wallet, app, chain);
         this.props.bus.publish('ready');
         await this.componentDidMount();
     }
 
     async pairWallet() {
         const { pairWalletViaOverlay } = await initBGFunctions(browser);
-        await pairWalletViaOverlay();
+        await pairWalletViaOverlay(this.props.chain);
         await this.loadData();
     }
 
     render() {
-        if (this.state.loading) return null;
+        const p = this.props,
+              s = this.state;
 
-        const connectedWallets = this.state.descriptors.filter(x => x.connected);
-        const disconnectedWallets = this.state.descriptors.filter(x => !x.connected);
+        if (s.loading) return null;
+
+        const connectedWallets = s.descriptors.filter(x => x.connected).filter(x => x.chain ? x.chain === p.chain : true);
+        // const disconnectedWallets = s.descriptors.filter(x => !x.connected);
 
         return (
             <div style={{ padding: '30px 20px' }}>
+
+                <Message
+                    header='Select Wallet'
+                    content={`You are choosing a wallet for "${p.app}" application in "${p.chain}" chain.`}
+                />
 
                 {(connectedWallets.length > 0) ? <>
                     <Header as='h3'>Your active wallet connections</Header>

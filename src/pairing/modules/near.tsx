@@ -5,7 +5,7 @@ import { browser } from "webextension-polyfill-ts";
 import { Button, Segment, Loader } from "semantic-ui-react";
 import { Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
-import { WalletDescriptor } from "../../background/services/walletService";
+import { WalletDescriptor } from "../../common/types";
 
 interface Props {
     bus: Bus;

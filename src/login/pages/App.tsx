@@ -1,9 +1,9 @@
 import * as React from "react";
-import { WalletDescriptor } from "../../background/services/walletService";
 import { Bus } from "../../common/bus";
 import { Account } from "../../background/services/identityService";
 import { Login } from './Login';
 import { SelectWallet } from './SelectWallet';
+import { ChainTypes, WalletDescriptor } from "../../common/types";
 
 interface Props {
     account?: {
@@ -13,6 +13,7 @@ interface Props {
         domainId: number;
     };
     app: string;
+    chain: ChainTypes;
     bus: Bus;
 }
 
@@ -35,9 +36,9 @@ export class App extends React.Component<Props, State> {
         const p = this.props;
 
         if (p.account) {
-            return <Login bus={p.bus} account={p.account} app={p.app} />;
+            return <Login bus={p.bus} account={p.account} app={p.app} chain={p.chain} />;
         } else {
-            return <SelectWallet bus={p.bus} app={p.app} />;
+            return <SelectWallet bus={p.bus} app={p.app} chain={p.chain} />;
         }
     }
 }

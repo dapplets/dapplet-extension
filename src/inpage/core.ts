@@ -13,6 +13,7 @@ import * as logger from '../common/logger';
 import { BackgroundNear } from "./near/backgroundNear";
 import { BackgroundWalletConnection } from "./near/backgroundWalletConnection";
 import * as NearAPI from "near-api-js";
+import { ChainTypes } from "../common/types";
 
 
 export default class Core {
@@ -30,9 +31,7 @@ export default class Core {
 
         browser.runtime.onMessage.addListener((message, sender) => {
             if (typeof message === 'string') {
-                if (message === "OPEN_PAIRING_OVERLAY") {
-                    return this.waitPairingOverlay().then(() => ([null, 'ready'])).catch(() => (['error']));
-                } else if (message === "TOGGLE_OVERLAY") {
+                if (message === "TOGGLE_OVERLAY") {
                     this._togglePopupOverlay();
                 } else if (message === "OPEN_OVERLAY") { // used by pure jslib
                     closeOverlay();
@@ -204,17 +203,17 @@ export default class Core {
 
     // ToDo: use sendSowaTransaction method from background
     private async _sendWalletConnectTx(app: string, sowaIdOrRpcMethod, sowaMetadataOrRpcParams, callback: (e: { type: string, data?: any }) => void): Promise<any> {
-        const { sendCustomRequest, waitTransaction } = await initBGFunctions(browser);
+        const { eth_sendCustomRequest, eth_waitTransaction } = await initBGFunctions(browser);
 
         callback({ type: "pending" });
 
         try {
-            const txHash = await sendCustomRequest(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
+            const txHash = await eth_sendCustomRequest(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
             if (txHash) {
                 callback({ type: "created", data: txHash });
                 callback({ type: "result", data: txHash });
 
-                const tx = await waitTransaction(app, txHash);
+                const tx = await eth_waitTransaction(app, txHash);
                 callback({ type: "mined", data: tx });
             }
         } catch (err) {
@@ -231,7 +230,7 @@ export default class Core {
 
     public async wallet<M>(cfg?: { username: string, domainId: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<AutoProperties<M> & Connection> {
         const { prepareWalletFor } = await initBGFunctions(browser);
-        await prepareWalletFor(app, cfg);
+        await prepareWalletFor(app, ChainTypes.ETHEREUM, cfg);
 
         const me = this;
         const transport = {
@@ -275,14 +274,17 @@ export default class Core {
 
     public near = {
         async wallet(app?: string) {
-            const { localStorage_getItem, pairWalletViaOverlay } = await initBGFunctions(browser);
+            const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser);
+            // ToDo: remove it?
+            await prepareWalletFor(app, ChainTypes.NEAR, null);
+            
             const authDataKey = 'null_wallet_auth_key';
             let authData = JSON.parse(await localStorage_getItem(authDataKey));
             if (!authData) {
-                await pairWalletViaOverlay();
+                await prepareWalletFor(app, ChainTypes.NEAR, null);
                 authData = JSON.parse(await localStorage_getItem(authDataKey));
             }
-            
+
             const near = new BackgroundNear(app);
             const wallet = new BackgroundWalletConnection(near, null);
             wallet._authData = authData;
@@ -292,14 +294,17 @@ export default class Core {
         },
 
         async contract(contractId: string, options: { viewMethods: string[]; changeMethods: string[] }, app?: string) {
-            const { localStorage_getItem, pairWalletViaOverlay } = await initBGFunctions(browser);
+            const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser);
+            // ToDo: remove it?
+            await prepareWalletFor(app, ChainTypes.NEAR, null);
+            
             const authDataKey = 'null_wallet_auth_key';
             let authData = JSON.parse(await localStorage_getItem(authDataKey));
             if (!authData) {
-                await pairWalletViaOverlay();
+                await prepareWalletFor(app, ChainTypes.NEAR, null);
                 authData = JSON.parse(await localStorage_getItem(authDataKey));
             }
-            
+
             const near = new BackgroundNear(app);
             const wallet = new BackgroundWalletConnection(near, null);
             wallet._authData = authData;

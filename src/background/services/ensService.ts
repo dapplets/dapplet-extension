@@ -1,4 +1,5 @@
-import { DefaultSigners, WalletService } from "./walletService";
+import { DefaultSigners } from "../../common/types";
+import { WalletService } from "./walletService";
 
 export default class EnsService {
 
@@ -7,7 +8,7 @@ export default class EnsService {
     ) {}
 
     async resolveName(name: string): Promise<string> {
-        const signer = await this._walletService.getSignerFor(DefaultSigners.EXTENSION);
+        const signer = await this._walletService.eth_getSignerFor(DefaultSigners.EXTENSION);
         return signer.resolveName(name);
     }
 }

@@ -7,7 +7,7 @@ import { Header } from 'semantic-ui-react'
 import { svgObject } from "qr-image";
 import { Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
-import { WalletDescriptor } from "../../background/services/walletService";
+import { WalletDescriptor } from "../../common/types";
 
 interface Props {
     bus: Bus;

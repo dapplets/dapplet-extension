@@ -16,7 +16,7 @@ window.onerror = logger.log;
 
 const bus = new Bus();
 
-bus.subscribe('login', (app, account) => {
+bus.subscribe('login', (app, chain, account) => {
     console.log(`Login request from ${app}`);
-    ReactDOM.render(<App bus={bus} account={account} app={app} />, document.querySelector('#app'));
+    ReactDOM.render(<App bus={bus} account={account} chain={chain} app={app} />, document.querySelector('#app'));
 })

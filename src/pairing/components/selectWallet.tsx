@@ -2,20 +2,19 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { Container, Header, Button, Image, Comment, Icon } from 'semantic-ui-react'
-import { Link } from "react-router-dom";
+import { Header, Button, Image, Comment, Message } from 'semantic-ui-react'
 import * as logos from '../../common/resources/wallets';
-import { WalletDescriptor } from "../../background/services/walletService";
 
 import makeBlockie from 'ethereum-blockies-base64';
 import ReactTimeAgo from 'react-time-ago';
 import { CheckIcon } from "../../common/react-components/CheckIcon";
 import * as walletIcons from '../../common/resources/wallets';
-import { networkName } from "../../common/helpers";
 import { Bus } from "../../common/bus";
+import { ChainTypes, WalletDescriptor } from "../../common/types";
 
 interface ISelectWalletProps {
     bus: Bus;
+    chain: ChainTypes;
 }
 
 interface ISelectWalletState {
@@ -55,13 +54,20 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
     }
 
     render() {
+        const p = this.props;
+
         if (this.state.loading) return null;
 
-        const connectedWallets = this.state.descriptors.filter(x => x.connected);
-        const disconnectedWallets = this.state.descriptors.filter(x => !x.connected);
+        const connectedWallets = this.state.descriptors.filter(x => x.connected).filter(x => p.chain ? p.chain === x.chain : true);
+        const disconnectedWallets = this.state.descriptors.filter(x => !x.connected).filter(x => p.chain ? p.chain === x.chain : true);
 
         return (
             <>
+                <Message
+                    header='Wallet Pairing'
+                    content={`You are pairing a wallet for "${p.chain}" chain.`}
+                />
+
                 {(connectedWallets.length > 0) ? <>
                     <Header as='h3'>Your active wallet connections</Header>
                     <Comment.Group>
@@ -97,7 +103,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                 {(disconnectedWallets.length > 0) ? <>
                     <Header as='h3'>Connect a new wallet</Header>
 
-                    {(!this.state.descriptors.find(x => x.type === 'metamask').connected) ?
+                    {(!this.state.descriptors.find(x => x.type === 'metamask').connected && (!p.chain || p.chain === ChainTypes.ETHEREUM)) ?
                         (this.state.descriptors.find(x => x.type === 'metamask').available) ?
                             <Button
                                 // disabled={this.state.descriptors.find(x => x.type === 'metamask').available === false}
@@ -123,7 +129,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                             </Button> :
                         null}
 
-                    {(!this.state.descriptors.find(x => x.type === 'walletconnect').connected) ?
+                    {(!this.state.descriptors.find(x => x.type === 'walletconnect').connected && (!p.chain || p.chain === ChainTypes.ETHEREUM)) ?
                         <Button
                             // disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
                             basic
@@ -137,7 +143,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                         </Button> :
                         null}
                         
-                    {(!this.state.descriptors.find(x => x.type === 'near').connected) ?
+                    {(!this.state.descriptors.find(x => x.type === 'near').connected && (!p.chain || p.chain === ChainTypes.NEAR)) ?
                         <Button
                             // disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
                             basic

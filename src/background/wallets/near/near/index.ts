@@ -1,15 +1,15 @@
 import { Provider, TransactionRequest } from "@ethersproject/providers";
 import { ethers } from "ethers";
 import { Deferrable } from "ethers/lib/utils";
-import { ExtendedSigner } from "../interface";
+import { NearWallet } from "../interface";
 import * as nearAPI from 'near-api-js';
 import { CustomWalletConnection } from "./customWalletConnection";
 import { browser } from "webextension-polyfill-ts";
 import { ConnectedWalletAccount, Connection, Contract, Near } from "near-api-js";
 import { JsonRpcProvider } from "near-api-js/lib/providers";
-import { generateGuid, waitTab } from "../../../common/helpers";
+import { generateGuid, waitTab } from "../../../../common/helpers";
 
-export default class extends ethers.Signer implements ExtendedSigner {
+export default class implements NearWallet {
 
     private __nearWallet: CustomWalletConnection = null;
 
@@ -37,22 +37,6 @@ export default class extends ethers.Signer implements ExtendedSigner {
 
     async getChainId() {
         return 0;
-    }
-
-    async signMessage(message: string | ethers.Bytes): Promise<string> {
-        throw new Error("signMessage() is not implemented");
-    }
-
-    async signTransaction(transaction: Deferrable<TransactionRequest>): Promise<string> {
-        throw new Error("signTransaction() is not implemented");
-    }
-
-    async sendTransaction(transaction: TransactionRequest): Promise<ethers.providers.TransactionResponse> {
-        throw new Error("sendTransaction() is not implemented");
-    }
-
-    async sendTransactionOutHash(transaction: TransactionRequest): Promise<string> {
-        throw new Error("sendTransactionOutHash() is not implemented");
     }
 
     async sendCustomRequest(method: string, params: any): Promise<any> {

@@ -1,10 +1,10 @@
 import { Provider, TransactionRequest } from "@ethersproject/providers";
 import { ethers } from "ethers";
 import { Deferrable } from "ethers/lib/utils";
-import { ExtendedSigner } from "./interface";
+import { EthereumWallet } from "./interface";
 import createMetaMaskProvider from 'metamask-extension-provider';
 
-export default class extends ethers.Signer implements ExtendedSigner {
+export default class extends ethers.Signer implements EthereumWallet {
 
     public provider = new ethers.providers.StaticJsonRpcProvider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 4);
     private _metamaskProvider;

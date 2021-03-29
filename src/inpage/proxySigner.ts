@@ -1,6 +1,7 @@
 import * as ethers from "ethers";
 import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { ChainTypes } from "../common/types";
 
 export class ProxySigner extends ethers.Signer {
     public provider = new ethers.providers.Web3Provider((method, params) => initBGFunctions(browser).then(f => f.fetchJsonRpc(method, params)));
@@ -15,7 +16,7 @@ export class ProxySigner extends ethers.Signer {
 
     async getAddress(): Promise<string> {
         const { getAddress } = await initBGFunctions(browser);
-        return getAddress(this._app);
+        return getAddress(this._app, ChainTypes.ETHEREUM);
     }
 
     async signMessage(message: ethers.utils.BytesLike): Promise<string> {
@@ -27,8 +28,8 @@ export class ProxySigner extends ethers.Signer {
     }
 
     async sendTransaction(transaction: ethers.providers.TransactionRequest): Promise<ethers.providers.TransactionResponse> {
-        const { sendTransactionOutHash } = await initBGFunctions(browser);
-        const txHash = await sendTransactionOutHash(this._app, transaction);
+        const { eth_sendTransactionOutHash } = await initBGFunctions(browser);
+        const txHash = await eth_sendTransactionOutHash(this._app, transaction);
         
         // the wait of a transaction from another provider can be long
         let tx = null;

@@ -1,11 +1,9 @@
 import metamask from './metamask';
 import walletconnect from './walletconnect';
-import near from './near';
 //import walletlink from './walletlink';
 
-export {
+export default {
     metamask,
-    walletconnect,
-    near
+    walletconnect
     //walletlink
 }

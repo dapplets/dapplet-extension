@@ -6,10 +6,10 @@ import { compare } from 'semver';
 import { mergeDedupe, typeOfUri, UriTypes, assertFullfilled, assertRejected } from '../../common/helpers';
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
-import { Environments } from '../../common/types';
+import { Environments, DefaultSigners } from '../../common/types';
 import { allSettled } from '../../common/helpers';
 import * as logger from '../../common/logger';
-import { DefaultSigners, WalletService } from '../services/walletService';
+import { WalletService } from '../services/walletService';
 
 if (!Promise.allSettled) Promise.allSettled = allSettled;
 
@@ -116,7 +116,7 @@ export class RegistryAggregator {
         // ToDo: fetch LocalConfig
         const configuredRegistries = await this._globalConfigService.getRegistries();
         const isDevMode = await this._globalConfigService.getDevMode();
-        const signer = await this._walletService.getSignerFor(DefaultSigners.EXTENSION);
+        const signer = await this._walletService.eth_getSignerFor(DefaultSigners.EXTENSION);
 
 
         const enabledRegistries = configuredRegistries.filter(x => x.isEnabled);

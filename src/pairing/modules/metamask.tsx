@@ -2,10 +2,10 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { Button, Segment, Loader, Message, Icon } from "semantic-ui-react";
+import { Button, Segment, Loader } from "semantic-ui-react";
 import { Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
-import { WalletDescriptor } from "../../background/services/walletService";
+import { ChainTypes, WalletDescriptor } from "../../common/types";
 
 interface Props {
     bus: Bus;

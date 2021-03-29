@@ -17,3 +17,35 @@ export enum Environments {
     Test = "test",
     Main = "main"
 }
+
+export enum DefaultSigners {
+    EXTENSION = 'extension'
+}
+
+export enum ChainTypes {
+    ETHEREUM = 'ethereum',
+    NEAR = 'near'
+}
+
+export enum WalletTypes {
+    WALLETCONNECT = 'walletconnect',
+    METAMASK = 'metamask',
+    NEAR = 'near'
+}
+
+export type WalletDescriptor = {
+    chain: string;
+    type: string;
+    meta: {
+        icon: string;
+        name: string;
+        description: string;
+    } | null;
+    connected: boolean;
+    available: boolean;
+    account: string;
+    chainId: number;
+    apps: string[];
+    default: boolean;
+    lastUsage: string;
+}

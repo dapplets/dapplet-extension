@@ -1,7 +1,8 @@
 import * as ethers from 'ethers';
 import abi from './abi';
-import { DefaultSigners, WalletService } from '../walletService';
+import { WalletService } from '../walletService';
 import GlobalConfigService from '../globalConfigService';
+import { DefaultSigners } from '../../../common/types';
 
 export enum AccountStatus {
     NoIssues,
@@ -54,7 +55,7 @@ export class IdentityService {
 
     private async _init() {
         if (this._contract) return;
-        const signer = await this._walletService.getSignerFor(DefaultSigners.EXTENSION);
+        const signer = await this._walletService.eth_getSignerFor(DefaultSigners.EXTENSION);
         const address = await this._globalConfigService.getIdentityContract();
         this._contract = new ethers.Contract(address, abi, signer);
     }

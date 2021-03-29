@@ -247,10 +247,10 @@ export default class GlobalConfigService {
 
     async getWalletsUsage() {
         const config = await this.get();
-        return config.walletsUsage;
+        return config.walletsUsage ?? {};
     }
 
-    async setWalletsUsage(walletsUsage: { [moduleName: string]: string }) {
+    async setWalletsUsage(walletsUsage: { [moduleName: string]: { [chain: string]: string } }) {
         return this.updateConfig(c => c.walletsUsage = walletsUsage);
     }
 

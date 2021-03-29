@@ -8,7 +8,7 @@ export class BackgroundJsonRpcProvider extends providers.JsonRpcProvider {
     }
 
     async sendJsonRpc(method: string, params: object): Promise<any> {
-        const { sendCustomRequest } = await initBGFunctions(browser);
-        return sendCustomRequest(this._app, method, params);
+        const { near_sendCustomRequest } = await initBGFunctions(browser);
+        return near_sendCustomRequest(this._app, method, params);
     }
 }

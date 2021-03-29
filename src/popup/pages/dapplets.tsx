@@ -2,12 +2,11 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { Button, Image, List, Checkbox, Segment, Message, Popup, Label, Icon, ButtonProps, Input } from "semantic-ui-react";
+import { Button, List, Segment, Icon, Input } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
 import { ModuleTypes } from "../../common/constants";
-import ModuleInfo from "../../background/models/moduleInfo";
 import { getCurrentContextIds, getCurrentTab } from "../helpers";
-import { rcompare, rsort } from "semver";
+import { rcompare } from "semver";
 import { Dapplet, ManifestAndDetails } from "../components/dapplet";
 import Manifest from "../../background/models/manifest";
 

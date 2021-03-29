@@ -8,12 +8,10 @@ import NOLOGO_PNG from '../common/resources/no-logo.png';
 
 import './index.scss';
 import { Bus } from '../common/bus';
-import Manifest from '../background/models/manifest';
-import { StorageRef } from '../background/registries/registry';
 import ModuleInfo from '../background/models/moduleInfo';
 import VersionInfo from '../background/models/versionInfo';
 import * as logger from '../common/logger';
-import { DefaultSigners } from "../background/services/walletService";
+import { ChainTypes, DefaultSigners } from "../common/types";
 
 window.onerror = logger.log;
 
@@ -107,7 +105,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     private async _updateOwnership() {
         const { getOwnership, getAddress } = await initBGFunctions(browser);
         const owner = await getOwnership(this.state.targetRegistry, this.state.mi.name);
-        const currentAccount = await getAddress(DefaultSigners.EXTENSION);
+        const currentAccount = await getAddress(DefaultSigners.EXTENSION, ChainTypes.ETHEREUM);
 
         this.setState({
             owner,
@@ -187,7 +185,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     async pairWallet() {
         const { pairWalletViaOverlay } = await initBGFunctions(browser);
-        await pairWalletViaOverlay();
+        await pairWalletViaOverlay(ChainTypes.ETHEREUM);
         await this._updateData();
     }
 

@@ -1,6 +1,6 @@
-import { Signer, ethers } from "ethers";
-
-export interface ExtendedSigner extends Signer {
+export interface GenericWallet {
+    getAddress(): Promise<string>;
+    getChainId(): Promise<number>;
     isAvailable(): boolean;
     isConnected(): boolean;
     connectWallet(): Promise<void>;
@@ -11,6 +11,4 @@ export interface ExtendedSigner extends Signer {
         name: string;
         description: string;
     } | null>;
-    sendTransactionOutHash(transaction: ethers.providers.TransactionRequest): Promise<string>;
-    sendCustomRequest(method: string, params: any[]): Promise<any>;
 }

@@ -2,15 +2,13 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { List, Button, Segment, Comment, Icon } from "semantic-ui-react";
-import { WalletInfo } from "../../common/constants";
-import { DefaultSigners, WalletDescriptor } from "../../background/services/walletService";
+import { Button, Segment, Comment } from "semantic-ui-react";
 import makeBlockie from 'ethereum-blockies-base64';
 import ReactTimeAgo from 'react-time-ago';
 
 import * as walletIcons from '../../common/resources/wallets';
-import { networkName } from "../../common/helpers";
 import { CheckIcon } from "../../common/react-components/CheckIcon";
+import { ChainTypes, DefaultSigners, WalletDescriptor } from "../../common/types";
 
 interface IWalletsProps {
   isOverlay: boolean;
@@ -52,17 +50,17 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
   async connectWallet() {
     const { pairWalletViaOverlay } = await initBGFunctions(browser);
     if (this.props.isOverlay) {
-      await pairWalletViaOverlay();
+      await pairWalletViaOverlay(null);
       await this.componentDidMount();
     } else {
-      pairWalletViaOverlay();
+      pairWalletViaOverlay(null);
       window.close();
     }
   }
 
   async setWalletFor(type: string) {
     const { setWalletFor } = await initBGFunctions(browser);
-    await setWalletFor(type, DefaultSigners.EXTENSION);
+    await setWalletFor(type, DefaultSigners.EXTENSION, ChainTypes.ETHEREUM);
     await this.componentDidMount();
   }
 

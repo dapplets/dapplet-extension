@@ -3,7 +3,6 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
 import { Header, Button, Comment, Icon, Message } from 'semantic-ui-react'
-import { WalletDescriptor } from "../../background/services/walletService";
 
 import makeBlockie from 'ethereum-blockies-base64';
 import ReactTimeAgo from 'react-time-ago';
@@ -12,6 +11,7 @@ import * as walletIcons from '../../common/resources/wallets';
 import { ProfileCard } from "../component/ProfileCard";
 import { Bus } from "../../common/bus";
 import { Account, DomainTypes } from "../../background/services/identityService";
+import { ChainTypes, WalletDescriptor } from "../../common/types";
 
 interface Props {
     account: {
@@ -21,6 +21,7 @@ interface Props {
         domainId: number;
     };
     app: string;
+    chain: ChainTypes;
     bus: Bus;
 }
 
@@ -60,14 +61,14 @@ export class Login extends React.Component<Props, State> {
     async selectWallet(wallet: string) {
         const { setWalletFor } = await initBGFunctions(browser);
         const { app } = this.props;
-        await setWalletFor(wallet, app);
+        await setWalletFor(wallet, app, ChainTypes.ETHEREUM);
         this.props.bus.publish('ready');
         await this.componentDidMount();
     }
 
     async pairWallet() {
         const { pairWalletViaOverlay } = await initBGFunctions(browser);
-        await pairWalletViaOverlay();
+        await pairWalletViaOverlay(ChainTypes.ETHEREUM);
         await this.loadData();
     }
 
@@ -79,6 +80,11 @@ export class Login extends React.Component<Props, State> {
 
         return (
             <div style={{ padding: '30px 20px' }}>
+                <Message
+                    warning
+                    header='Experimental Feature'
+                    content='Authorization with account tuples is in the development stage. Please do not utilize this feature in production.'
+                />
 
                 <Header as='h3'>Login to your account</Header>
                 <ProfileCard account={this.props.account} />
