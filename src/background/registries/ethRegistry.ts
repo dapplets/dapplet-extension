@@ -247,7 +247,7 @@ export class EthRegistry implements Registry {
 
         const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
         if (!isModuleExist) {
-            const tx = await this._contract.addModuleInfo([], mi, [vi], userId);
+            const tx = await this._contract.addModuleInfo(module.contextIds, mi, [vi], userId);
             await tx.wait();
         } else {
             const tx = await this._contract.addModuleVersion(mi.name, vi, userId);
