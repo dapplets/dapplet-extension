@@ -1,4 +1,5 @@
 import { browser, Tabs } from "webextension-polyfill-ts";
+import { typeOfUri, UriTypes } from "../common/helpers";
 
 export const getCurrentContextIds = async (): Promise<string[]> => {
     const tab = await getCurrentTab();
@@ -13,12 +14,13 @@ export const getCurrentTab = async (): Promise<Tabs.Tab> => {
 }
 
 export const isValidUrl = (input: string) => {
-    try {
-        new URL(input);
-        return true;
-    } catch (_) {
-        return input.indexOf('0x') !== -1 ? true : (input.indexOf('.eth') !== -1 ? true : false);
-    }
+    const type = typeOfUri(input);
+
+    if (type === UriTypes.Ens) return true;
+    if (type === UriTypes.Ethereum) return true;
+    if (type === UriTypes.Near) return true;
+
+    return false;
 }
 
 export const isValidHttp = (url: string) => {

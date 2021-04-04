@@ -1,4 +1,5 @@
 import { browser, Tabs } from "webextension-polyfill-ts";
+import { ChainTypes } from "./types";
 
 export function getHostName(url: string): string {
   return new URL(url).hostname;
@@ -42,7 +43,8 @@ export enum UriTypes {
   Swarm,
   Ipfs,
   Ethereum,
-  Ens
+  Ens,
+  Near
 }
 
 /**
@@ -71,6 +73,12 @@ export function typeOfUri(uri: string): UriTypes {
 
   if (uriLower.lastIndexOf('.eth') === uriLower.length - 4) {
     return UriTypes.Ens;
+  }
+
+  if (uriLower.lastIndexOf('.near') === uriLower.length - 5 || 
+      uriLower.lastIndexOf('.testnet') === uriLower.length - 8 ||
+      uriLower.indexOf('dev-') === 0) {
+    return UriTypes.Near;
   }
 
   return UriTypes.Unknown;
@@ -206,4 +214,13 @@ export async function waitTab(url: string) {
     }
     browser.tabs.onUpdated.addListener(handler);
   });
+}
+
+export function chainByUri(t: UriTypes): ChainTypes {
+  switch (t) {
+      case UriTypes.Ens: return ChainTypes.ETHEREUM;
+      case UriTypes.Ethereum: return ChainTypes.ETHEREUM;
+      case UriTypes.Near: return ChainTypes.NEAR;
+      default: return null;
+  }
 }

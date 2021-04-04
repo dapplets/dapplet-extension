@@ -120,4 +120,8 @@ export default class implements NearWallet {
     getLastUsage() {
         return localStorage['near_lastUsage'];
     }
+
+    getAccount() {
+        return this._nearWallet.account();
+    }
 }

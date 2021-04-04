@@ -10,6 +10,7 @@ import { Environments, DefaultSigners } from '../../common/types';
 import { allSettled } from '../../common/helpers';
 import * as logger from '../../common/logger';
 import { WalletService } from '../services/walletService';
+import { NearRegistry } from './nearRegistry';
 
 if (!Promise.allSettled) Promise.allSettled = allSettled;
 
@@ -116,8 +117,8 @@ export class RegistryAggregator {
         // ToDo: fetch LocalConfig
         const configuredRegistries = await this._globalConfigService.getRegistries();
         const isDevMode = await this._globalConfigService.getDevMode();
-        const signer = await this._walletService.eth_getSignerFor(DefaultSigners.EXTENSION);
-
+        const eth_signer = await this._walletService.eth_getSignerFor(DefaultSigners.EXTENSION);
+        const near_account = await this._walletService.near_getAccount(DefaultSigners.EXTENSION);
 
         const enabledRegistries = configuredRegistries.filter(x => x.isEnabled);
         const disabledRegistries = configuredRegistries.filter(x => !x.isEnabled);
@@ -133,7 +134,9 @@ export class RegistryAggregator {
                     const uriType = typeOfUri(r.url);
 
                     if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
-                    if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) return new EthRegistry(r.url, signer);
+                    if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) return new EthRegistry(r.url, eth_signer);
+                    if (uriType === UriTypes.Near) return new NearRegistry(r.url, near_account);
+
                     logger.error("Invalid registry URL");
                     return null;
                 }).filter(r => r !== null);

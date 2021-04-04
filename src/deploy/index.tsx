@@ -12,6 +12,7 @@ import ModuleInfo from '../background/models/moduleInfo';
 import VersionInfo from '../background/models/versionInfo';
 import * as logger from '../common/logger';
 import { ChainTypes, DefaultSigners } from "../common/types";
+import { typeOfUri, chainByUri } from "../common/helpers";
 
 window.onerror = logger.log;
 
@@ -29,6 +30,7 @@ interface IIndexState {
     vi: VersionInfo;
     loading: boolean;
     targetRegistry: string;
+    targetChain: ChainTypes;
     targetStorage: string;
     message: {
         type: "negative" | "positive",
@@ -61,6 +63,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             vi: null,
             loading: true,
             targetRegistry: null,
+            targetChain: null,
             targetStorage: 'swarm',
             message: null,
             registryOptions: [],
@@ -96,7 +99,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                 key: r.url, text: r.url, value: r.url
             })),
             targetRegistry: prodRegistries[0]?.url || null,
-            trustedUsers
+            trustedUsers,
+            targetChain: chainByUri(typeOfUri(prodRegistries[0]?.url ?? ''))
         });
 
         return Promise.all([this._updateOwnership(), this._updateDeploymentStatus()]);
@@ -105,7 +109,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     private async _updateOwnership() {
         const { getOwnership, getAddress } = await initBGFunctions(browser);
         const owner = await getOwnership(this.state.targetRegistry, this.state.mi.name);
-        const currentAccount = await getAddress(DefaultSigners.EXTENSION, ChainTypes.ETHEREUM);
+        const currentAccount = await getAddress(DefaultSigners.EXTENSION, this.state.targetChain);
 
         this.setState({
             owner,
@@ -118,10 +122,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser);
         const mi = await getModuleInfoByName(this.state.targetRegistry, this.state.mi.name);
         const vi = await getVersionInfo(this.state.targetRegistry, this.state.mi.name, this.state.vi.branch, this.state.vi.version);
-        this.setState({
-            deploymentStatus: (!mi) ? DeploymentStatus.NewModule : 
-                              (vi) ? DeploymentStatus.Deployed : DeploymentStatus.NotDeployed
-        });
+        const deploymentStatus = (!mi) ? DeploymentStatus.NewModule : (vi) ? DeploymentStatus.Deployed : DeploymentStatus.NotDeployed;
+        this.setState({ deploymentStatus });
     }
 
     private async _transferOwnership(address: string) {
@@ -175,7 +177,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                 message: {
                     type: 'negative',
                     header: 'Publication error',
-                    message: [err]
+                    message: [err.message]
                 }
             });
         } finally {
@@ -185,7 +187,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     async pairWallet() {
         const { pairWalletViaOverlay } = await initBGFunctions(browser);
-        await pairWalletViaOverlay(ChainTypes.ETHEREUM);
+        await pairWalletViaOverlay(this.state.targetChain);
         await this._updateData();
     }
 

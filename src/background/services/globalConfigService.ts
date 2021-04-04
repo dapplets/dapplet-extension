@@ -58,15 +58,16 @@ export default class GlobalConfigService {
         const isEthAddress = typeOfUri(url) === UriTypes.Ethereum;
         const isEnsAddress = typeOfUri(url) === UriTypes.Ens;
         const isHttpAddress = typeOfUri(url) === UriTypes.Http;
+        const isNearAddress = typeOfUri(url) === UriTypes.Near;
 
-        if (!isEthAddress && !isEnsAddress && !isHttpAddress) throw new Error("Unsupported URI type");
+        if (!isEthAddress && !isEnsAddress && !isHttpAddress && !isNearAddress) throw new Error("Unsupported URI type");
         if (isDev && !isHttpAddress) throw new Error("Only HTTP(S) links are supported for development servers");
-        if (!isDev && (!isEthAddress && !isEnsAddress)) throw new Error("A public registry must have a valid Ethereum or ENS address");
+        if (!isDev && (!isEthAddress && !isEnsAddress && !isNearAddress)) throw new Error("A public registry must have a valid Ethereum, ENS or NEAR Protocol address");
         
         const config = await this.get();
         if (config.registries.find(r => r.url === url)) return;
 
-        if (isEthAddress || isEnsAddress) {
+        if (isEthAddress || isEnsAddress || isNearAddress) {
             // ToDo: fix it
             // if (isEnsAddress) {
             //     const signer = new WalletConnectSigner();
@@ -134,8 +135,9 @@ export default class GlobalConfigService {
 
         const isEthAddress = typeOfUri(account) === UriTypes.Ethereum;
         const isEnsAddress = typeOfUri(account) === UriTypes.Ens;
+        const isNearAddress = typeOfUri(account) === UriTypes.Near;
 
-        if (!isEthAddress && !isEnsAddress) throw Error('User account must be valid Ethereum address');
+        if (!isEthAddress && !isEnsAddress && !isNearAddress) throw Error('User account must be valid Ethereum or NEAR Protocol address');
 
         // ToDo: fix it
         // if (isEnsAddress) {
