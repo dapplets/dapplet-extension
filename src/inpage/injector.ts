@@ -17,8 +17,9 @@ type RegistriedModule = {
     instance?: any,
     order: number,
     contextIds: string[],
-    dependencies: string[],
-    instancedDeps: any[],
+    contructorDependencies: string[],
+    instancedPropertyDependencies: { [name: string]: any },
+    instancedConstructorDeps: any[],
     defaultConfig?: DefaultConfig,
     onActionHandler?: Function,
     onHomeHandler?: Function
@@ -59,11 +60,11 @@ export class Injector {
             const m = this.registry[i];
             if (m.instance) continue;
 
-            m.instancedDeps = m.dependencies.map(d => this._proxifyModule(this._getDependency(m.manifest, d), m));
+            m.instancedConstructorDeps = m.contructorDependencies.map(d => this._proxifyModule(this._getDependency(m.manifest, d), m));
 
             try {
                 // ToDo: compare "m.instancedDeps.length" and "m.clazz.constructor.length"
-                m.instance = new m.clazz(...m.instancedDeps);
+                m.instance = new m.clazz(...m.instancedConstructorDeps);
 
                 if (m.instance.activate !== undefined) {
                     if (typeof m.instance.activate === 'function') {
@@ -107,7 +108,8 @@ export class Injector {
             if (!m) return;
 
             try {
-                m.instancedDeps.forEach(d => d.detachConfig());
+                m.instancedConstructorDeps.forEach(d => d.detachConfig());
+                Object.values(m.instancedPropertyDependencies).forEach(x => x.detachConfig());
 
                 if (m.instance.deactivate !== undefined) {
                     if (typeof m.instance.deactivate === 'function') {
@@ -210,8 +212,9 @@ export class Injector {
                         instance: null,
                         order: order,
                         contextIds: contextIds,
-                        dependencies: [],
-                        instancedDeps: [],
+                        contructorDependencies: [],
+                        instancedPropertyDependencies: {},
+                        instancedConstructorDeps: [],
                         defaultConfig: defaultConfig
                     });
                 }
@@ -233,18 +236,25 @@ export class Injector {
                                 instance: null,
                                 order: order,
                                 contextIds: contextIds,
-                                dependencies: [],
-                                instancedDeps: []
+                                contructorDependencies: [],
+                                instancedPropertyDependencies: {},
+                                instancedConstructorDeps: [],
+                                defaultConfig: defaultConfig
                             });
                         }
+
                         const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
-                        currentModule.dependencies[parameterIndexOrDescriptor] = name;
+                        currentModule.contructorDependencies[parameterIndexOrDescriptor] = name;
                     } else { // decorator applied to class property
                         parameterIndexOrDescriptor = parameterIndexOrDescriptor || {};
                         parameterIndexOrDescriptor.get = () => {
-                            const depModule = this._getDependency(manifest, name);
                             const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
-                            return this._proxifyModule(depModule, currentModule);
+                            if (!currentModule.instancedPropertyDependencies[name]) {
+                                const depModule = this._getDependency(manifest, name);
+                                const instancedModule = this._proxifyModule(depModule, currentModule);
+                                currentModule.instancedPropertyDependencies[name] = instancedModule;
+                            }
+                            return currentModule.instancedPropertyDependencies[name];
                         }
                         return parameterIndexOrDescriptor;
                     }
