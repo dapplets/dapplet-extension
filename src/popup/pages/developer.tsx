@@ -195,7 +195,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                                     <List.Content>
                                         <List.Header>
                                             {m.module.name}
-                                            {(m.isDeployed?.[0] === false) ? <Label size='mini' horizontal >NOT DEPLOYED</Label> : null}
+                                            {(m.isDeployed?.[0] === false) ? <Label style={{ marginLeft: '4px' }} size='mini' horizontal >NOT DEPLOYED</Label> : null}
                                         </List.Header>
                                         {m.versions[0].branch} v{m.versions[0].version}
                                     </List.Content>
