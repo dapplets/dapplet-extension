@@ -274,9 +274,8 @@ export default class FeatureService {
     // ToDo: move to another service?
     public async deployModule(mi: ModuleInfo, vi: VersionInfo, targetStorage: StorageTypes, targetRegistry: string): Promise<{ scriptUrl: string }> {
         try {
-            // ToDo: check everething before publishing
-            //const swarmStorage = new SwarmModuleStorage();
-            //const testStorage = new HttpModuleStorage();
+            // ToDo: check everything before publishing
+            if (mi.icon && !mi.icon.uris[0].endsWith('.png')) throw new Error('Type of module icon must be PNG.');
 
             let scriptUrl = null;
 
@@ -337,9 +336,10 @@ export default class FeatureService {
 
         for (const hostname of hostnames) {
             const config = await this._siteConfigRepository.getById(hostname);
+            if (!config.activeFeatures[name]) continue;
             version = config.activeFeatures[name].version;
             order = config.activeFeatures[name].order;
-            wasActive = config.activeFeatures[name].isActive;
+            wasActive = wasActive || config.activeFeatures[name].isActive;
             delete config.activeFeatures[name];
             await this._siteConfigRepository.update(config);
         }
