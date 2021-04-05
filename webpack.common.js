@@ -80,8 +80,8 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js"],
     fallback: {
       "crypto": false,
-      "assert": require.resolve('assert-browserify'),
       "stream": require.resolve('stream-browserify'),
+      "assert": require.resolve('assert-browserify'),
       "http": false,
       "https": false,
       "zlib": false

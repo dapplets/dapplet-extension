@@ -5,24 +5,11 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 //import 'semantic-ui-css/semantic.min.css'
 import './index.scss';
 import { Bus } from '../common/bus';
-import styled from "styled-components";
 import { getRenderer } from '../common/sowa';
 import { Container, Header, Button } from 'semantic-ui-react';
 import * as logger from '../common/logger';
 
 window.onerror = logger.log;
-
-const SSowaView = styled.div`
-  width: 100%;
-  padding: 20px 20px;
-  margin: 0 0 15px 0;
-  background: rgb(255,255,255);
-  border-radius: 6px;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-  border-bottom-color: rgba(12,12,13,0);
-  box-shadow: 0px 2px 6px 0 rgba(0,0,0,0.1), 0 0 1px 0 rgba(50,50,93,0.02), -1px 2px 10px 0 rgba(59,59,92,0.15);
-`;
 
 interface IIndexProps {
 }
@@ -86,7 +73,20 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         <Header as='h2'>SOWA Transaction</Header>
                         <p>Your wallet doesn't support SOWA transactions.<br/>It might look like this:</p>
                         {/* {x.map(a=><SSowaView dangerouslySetInnerHTML={{ __html: a.renderedSowaView }} />)} */}
-                        <SSowaView dangerouslySetInnerHTML={{ __html: renderedSowaView }} />
+                        <div 
+                            style={{
+                                width: "100%",
+                                padding: "20px 20px",
+                                margin: "0 0 15px 0",
+                                background: "rgb(255,255,255)",
+                                borderRadius: "6px",
+                                borderBottomWidth: "1px",
+                                borderBottomStyle: "solid",
+                                borderBottomColor: "rgba(12,12,13,0)",
+                                boxShadow: "0px 2px 6px 0 rgba(0,0,0,0.1), 0 0 1px 0 rgba(50,50,93,0.02), -1px 2px 10px 0 rgba(59,59,92,0.15)"
+                            }}
+                            dangerouslySetInnerHTML={{ __html: renderedSowaView }} 
+                        />
                         <div>
                             <Button primary onClick={() => this._bus.publish('approved')}>Continue</Button>
                             <Button basic onClick={() => this._bus.publish('error')}>Reject</Button>

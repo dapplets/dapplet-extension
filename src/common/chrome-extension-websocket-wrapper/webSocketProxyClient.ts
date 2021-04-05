@@ -1,13 +1,14 @@
+import { browser } from 'webextension-polyfill-ts';
 import { MESSAGE_BUS_NAME } from './constants'
 
 export default class WebSocketProxyClient {
-    private _port: chrome.runtime.Port = null;
+    private _port;
     private _isMsgBusConnected: boolean = false;
     private _eventTarget = new EventTarget();
     public readyState: number = WebSocket.CONNECTING;
 
     constructor(url: string) {
-        this._port = chrome.runtime.connect({ name: MESSAGE_BUS_NAME });
+        this._port = browser.runtime.connect(undefined, { name: MESSAGE_BUS_NAME });
         this.url = url;
         this._isMsgBusConnected = true;
 
