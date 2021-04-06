@@ -19,6 +19,7 @@ export const isValidUrl = (input: string) => {
     if (type === UriTypes.Ens) return true;
     if (type === UriTypes.Ethereum) return true;
     if (type === UriTypes.Near) return true;
+    if (type === UriTypes.Http) return true;
 
     return false;
 }

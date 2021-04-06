@@ -1,13 +1,11 @@
-import { Registry, StorageRef } from './registry';
+import { Registry } from './registry';
 import * as semver from 'semver';
 import ModuleInfo from '../models/moduleInfo';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../../common/constants';
 import VersionInfo from '../models/versionInfo';
-import { typeOfUri, UriTypes } from '../../common/helpers';
 import * as logger from '../../common/logger';
 import * as nearAPI from 'near-api-js';
 import { ethers } from 'ethers';
-
 
 type EthStorageRef = {
     hash: string; // bytes32
