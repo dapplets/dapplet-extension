@@ -186,7 +186,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                             {modules.map((m, i) => (
                                 <List.Item key={i}>
                                     <List.Content floated='left' style={{ position: 'relative' }}>
-                                        <Image avatar src={(m.module.icon && m.module.icon.uris.length > 0) ? ((m.module.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://gateway.ethswarm.org/files/' + (m.module.icon as StorageRef).uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0] : (m.module.icon as StorageRef).uris?.[0]) : NOLOGO_PNG} />
+                                        <Image avatar src={(m.module.icon && m.module.icon.uris.length > 0) ? ((m.module.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm.dapplets.org/files/' + (m.module.icon as StorageRef).uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0] : (m.module.icon as StorageRef).uris?.[0]) : NOLOGO_PNG} />
                                         {(m.isDeployed?.[0] === true) ? <Label color='green' floating style={{ padding: '4px', top: '18px', left: '18px' }} /> : null}
                                     </List.Content>
                                     <List.Content floated='right'>

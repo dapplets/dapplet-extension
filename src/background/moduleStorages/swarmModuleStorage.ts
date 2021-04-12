@@ -3,7 +3,7 @@ import { timeoutPromise } from '../../common/helpers';
 
 export class SwarmModuleStorage implements ModuleStorage {
 
-    private _gateway = "https://gateway.ethswarm.org/";
+    private _gateway = "https://swarm.dapplets.org/";
 
     public timeout = 5000;
     
