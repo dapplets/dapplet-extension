@@ -1,5 +1,4 @@
-import { Registry } from './registry';
-import * as semver from 'semver';
+import { Registry, StorageRef } from './registry';
 import ModuleInfo from '../models/moduleInfo';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../../common/constants';
 import VersionInfo from '../models/versionInfo';
@@ -7,40 +6,36 @@ import * as logger from '../../common/logger';
 import * as nearAPI from 'near-api-js';
 import { ethers } from 'ethers';
 
-type EthStorageRef = {
+type NearStorageRef = {
     hash: string; // bytes32
     uris: string[]; // bytes[]
 }
 
-type EthModuleInfo = {
-    moduleType: number; // uint8
+type NearModuleInfo = {
+    moduleType: number; // u8
     name: string; // string
-    title: string; // string
-    description: string; // string
-    owner: string; // bytes32
-    interfaces: string[]; // string[]
-    icon: EthStorageRef;
-    flags: number; // uint 
+    owner: string; // string
 }
 
-type EthDependencyDto = {
+type NearDependency = {
     name: string;
     branch: string;
-    major: number;
-    minor: number;
-    patch: number;
+    version: string;
 };
 
-type EthVersionInfoDto = {
-    moduleType: number; // uint8
-    branch: string; // string
-    major: number; // uint8 
-    minor: number; // uint8 
-    patch: number; // uint8 
-    flags: number; // uint8 
-    binary: EthStorageRef;
-    dependencies: EthDependencyDto[];
-    interfaces: EthDependencyDto[]; // bytes32[] 
+type NearVersionInfo = {
+    name: string;
+    branch: string;
+    version: string;
+    owner: string;
+    moduleType: number;
+    title: string;
+    description: string;
+    icon: NearStorageRef;
+    reference: NearStorageRef;
+    docs: NearStorageRef;
+    dependencies: NearDependency[];
+    interfaces: NearDependency[];
 }
 
 const moduleTypesMap: { [key: number]: ModuleTypes } = {
@@ -60,13 +55,12 @@ export class NearRegistry implements Registry {
 
     constructor(public url: string, private _nearAccount: nearAPI.ConnectedWalletAccount) {
         this._contract = new nearAPI.Contract(this._nearAccount, this.url, {
-            viewMethods: ['getModuleInfoBatch', 'getModuleInfo', 'getModuleInfoByName', 'getVersionNumbers', 'getVersionInfo'],
-            changeMethods: ['addModuleInfo', 'addModuleVersion', 'addModuleVersionBatch', 'transferOwnership', 'addContextId', 'removeContextId']
+            viewMethods: ['getLastVersionsByContextIds', 'getModules', 'getVersionInfo', 'getModuleNames', 'getModuleInfoByNames', 'getModuleBranches', 'getModuleInfoByName', 'getAllContextIds', 'getAllListers', 'getAllModules', 'getContextIdsByModule', 'getModulesByContextId', 'getModuleInfoBatch', 'getModuleInfo', 'getInterfacesOfModule', 'getVersionNumbers'],
+            changeMethods: ['addModuleVersion', 'transferOwnership', 'createModule', 'addContextId', 'addModuleWithContexts', 'removeContextId']
         });
     }
 
     public async getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }> {
-        // console.log('getModuleInfo', { contextIds, users });
         try {
             const usersCacheKey = users.join(';');
             if (!this._moduleInfoCache.has(usersCacheKey)) this._moduleInfoCache.set(usersCacheKey, new Map());
@@ -75,7 +69,7 @@ export class NearRegistry implements Registry {
                 return cachedResult;
             }
 
-            const moduleInfosByCtx: EthModuleInfo[][] = await this._contract.getModuleInfoBatch({ ctxIds: contextIds, users: users, maxBufLen: 0 });
+            const moduleInfosByCtx: NearVersionInfo[][] = await this._contract.getLastVersionsByContextIds({ ctxIds: contextIds, users: users, maxBufLen: 0 });
             this.isAvailable = true;
             this.error = null;
 
@@ -88,11 +82,8 @@ export class NearRegistry implements Registry {
                     mi.title = m.title;
                     mi.description = m.description;
                     mi.author = m.owner;
-                    mi.icon = {
-                        hash: ethers.utils.hexlify(ethers.utils.base64.decode(m.icon.hash)),
-                        uris: m.icon.uris.map(u => ethers.utils.toUtf8String(ethers.utils.base64.decode(u)))
-                    };
-                    mi.interfaces = m.interfaces;
+                    mi.icon = this._fromNearStorageRef(m.icon);
+                    mi.interfaces = m.interfaces.map(x => x.name);
                     return mi;
                 });
 
@@ -102,8 +93,6 @@ export class NearRegistry implements Registry {
 
                 return [ctx, mis];
             }));
-
-            // console.log('getModuleInfo', { result });
 
             return result;
         } catch (err) {
@@ -116,41 +105,30 @@ export class NearRegistry implements Registry {
 
     public async getModuleInfoByName(name: string): Promise<ModuleInfo> {
         try {
-            // console.log('getModuleInfoByName', { name });
+            const v: NearVersionInfo | null = await this._contract.getLastVersionInfo({ name });
+            if (!v) return null;
 
-            const m = await this._contract.getModuleInfoByName({ mod_name: name });
             const mi = new ModuleInfo();
-            mi.type = moduleTypesMap[m.moduleType];
-            mi.name = m.name;
-            mi.title = m.title;
-            mi.description = m.description;
-            mi.author = m.owner;
-            mi.icon = {
-                hash: ethers.utils.hexlify(ethers.utils.base64.decode(m.icon.hash)),
-                uris: m.icon.uris.map(u => ethers.utils.toUtf8String(ethers.utils.base64.decode(u)))
-            };
-            mi.interfaces = m.interfaces;
-
-            // console.log('getModuleInfoByName', { result: mi });
+            mi.type = moduleTypesMap[v.moduleType];
+            mi.name = v.name;
+            mi.title = v.title;
+            mi.description = v.description;
+            mi.author = v.owner;
+            mi.icon = this._fromNearStorageRef(v.icon);
+            mi.interfaces = v.interfaces.map(x => x.name);
             return mi;
+
         } catch (err) {
-            //console.error(err);
             return null;
         }
     }
 
     public async getVersionNumbers(name: string, branch: string): Promise<string[]> {
         try {
-            // console.log('getVersionNumbers', { name, branch });
-
-            const versions = await this._contract.getVersionNumbers({ name: name, branch: branch });
+            const versions = await this._contract.getVersionNumbers({ name, branch });
             this.isAvailable = true;
             this.error = null;
-            const result = versions.map(x => `${x.major}.${x.minor}.${x.patch}`);
-
-            // console.log('getVersionNumbers', { result });
-
-            return result;
+            return versions;
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
@@ -160,16 +138,11 @@ export class NearRegistry implements Registry {
 
     public async getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo> {
         try {
-            // console.log('getVersionInfo', { name, branch, version });
+            const response = await this._contract.getVersionInfo({ name, branch, version });
 
-            const response = await this._contract.getVersionInfo({
-                name: name,
-                branch: branch,
-                major: semver.major(version),
-                minor: semver.minor(version),
-                patch: semver.patch(version)
-            });
-            const dto: EthVersionInfoDto = response;
+            if (!response) return null;
+
+            const dto: NearVersionInfo = response;
             const moduleType: number = response.moduleType;
 
             const vi = new VersionInfo();
@@ -177,31 +150,15 @@ export class NearRegistry implements Registry {
             vi.branch = branch;
             vi.version = version;
             vi.type = moduleTypesMap[moduleType];
-            vi.dist = {
-                hash: ethers.utils.hexlify(ethers.utils.base64.decode(dto.binary.hash)),
-                uris: dto.binary.uris.map(u => ethers.utils.toUtf8String(ethers.utils.base64.decode(u)))
-            }
-            vi.dependencies = Object.fromEntries(dto.dependencies.map(d => ([
-                d.name,
-                d.major + '.' + d.minor + '.' + d.patch
-            ])));
-            vi.interfaces = Object.fromEntries(dto.interfaces.map(d => ([
-                d.name,
-                d.major + '.' + d.minor + '.' + d.patch
-            ])));
+            vi.dist = this._fromNearStorageRef(dto.reference),
+            vi.dependencies = Object.fromEntries(dto.dependencies.map(d => ([d.name, d.version])));
+            vi.interfaces = Object.fromEntries(dto.interfaces.map(d => ([d.name, d.version])));
 
             this.isAvailable = true;
             this.error = null;
 
-            // console.log('getVersionInfo', { result: vi });
-
             return vi;
         } catch (err) {
-            // ToDo: is it necessary to return error here? how to return null from contract?
-            // console.log('getVersionInfo', { error: err });
-
-            if (err.message.indexOf('Version doesn\'t exist') !== -1) return null;
-
             this.isAvailable = false;
             this.error = err.message;
             throw err;
@@ -213,140 +170,82 @@ export class NearRegistry implements Registry {
     }
 
     public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
+        const moduleType = parseInt(Object.entries(moduleTypesMap).find(([k, v]) => v === module.type)[0]);
 
-        // console.log('addModule', { module, version });
-
-        let isModuleExist = false;
-        try {
-            const mi = await this._contract.getModuleInfoByName({
-                mod_name: module.name
-            });
-            isModuleExist = true;
-        } catch (err) {
-            isModuleExist = false;
-        }
-
-        const mi: EthModuleInfo = {
+        const mInfo: NearModuleInfo = {
+            moduleType: moduleType,
             name: module.name,
-            title: module.title,
-            description: module.description,
-            moduleType: parseInt(Object.entries(moduleTypesMap).find(([k, v]) => v === module.type)[0]),
-            flags: 0,
-            owner: this._nearAccount.accountId,
-            icon: module.icon ? {
-                hash: ethers.utils.base64.encode(module.icon.hash),
-                uris: module.icon.uris.map(u => ethers.utils.base64.encode(ethers.utils.toUtf8Bytes(u)))
-            } : {
-                hash: "",
-                uris: []
-            },
-            interfaces: module.interfaces || []
+            owner: this._nearAccount.accountId
         };
 
-        const vi: EthVersionInfoDto = {
-            moduleType: parseInt(Object.entries(moduleTypesMap).find(([k, v]) => v === module.type)[0]),
+        const vInfo: NearVersionInfo = {
+            name: module.name,
             branch: version.branch,
-            major: semver.major(version.version),
-            minor: semver.minor(version.version),
-            patch: semver.patch(version.version),
-            flags: 0,
-            binary: version.dist ? {
-                hash: ethers.utils.base64.encode(version.dist.hash),
-                uris: version.dist.uris.map(u => ethers.utils.base64.encode(ethers.utils.toUtf8Bytes(u)))
-            } : {
-                hash: "",
-                uris: []
-            },
+            version: version.version,
+            owner: this._nearAccount.accountId,
+            moduleType: moduleType,
+            title: module.title,
+            description: module.description,
+            icon: this._toNearStorageRef(module.icon),
+            reference: this._toNearStorageRef(version.dist),
+            docs: null, // ToDo: this._encodeStorageRef(version.docs),
             dependencies: version.dependencies && Object.entries(version.dependencies).map(([k, v]) => ({
                 name: k,
                 branch: "default",
-                major: semver.major(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
-                minor: semver.minor(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
-                patch: semver.patch(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME])
+                version: typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]
             })) || [],
             interfaces: version.interfaces && Object.entries(version.interfaces).map(([k, v]) => ({
                 name: k,
                 branch: "default",
-                major: semver.major(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
-                minor: semver.minor(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
-                patch: semver.patch(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME])
+                version: typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]
             })) || []
         };
 
-        const userId = this._nearAccount.accountId;
-        if (!isModuleExist) {
-            await this._contract.addModuleInfo({
-                contextIds: module.contextIds,
-                mInfo: mi,
-                vInfos: [vi],
-                owner: userId
-            });
-        } else {
-            await this._contract.addModuleVersion({
-                mod_name: mi.name,
-                vInfo: vi,
-                owner: userId
-            });
-        }
-
-        // console.log('addModule', { result: 'done' });
+        await this._contract.addModuleWithContexts({
+            contextIds: module.contextIds,
+            mInfo: mInfo,
+            vInfo: vInfo
+        }, 300000000000000);
     }
 
     // ToDo: use getModuleInfoByName instead
-    public async getOwnership(moduleName: string) {
-
-        // console.log('getOwnership', { moduleName });
-
+    public async getOwnership(name: string) {
         try {
-            const mi = await this._contract.getModuleInfoByName({ mod_name: moduleName });
-            const result = mi.owner;
-
-            // console.log('getOwnership', { result });
-
-            return result;
+            const mi = await this._contract.getModuleInfoByName({ name });
+            return mi?.owner;
         } catch {
             return null;
         }
     }
 
     public async transferOwnership(moduleName: string, address: string) {
-        // console.log('transferOwnership', { moduleName, address });
-
-        const userId = this._nearAccount.accountId;
-
         await this._contract.transferOwnership({
-            mod_name: moduleName,
-            oldUserId: userId,
-            newUserId: address
+            moduleName: moduleName,
+            newOwner: address
         });
-
-        // console.log('transferOwnership', { result: 'done' });
     }
 
     public async addContextId(moduleName: string, contextId: string) {
-
-        // console.log('addContextId', { moduleName, contextId });
-
-        const userId = this._nearAccount.accountId;
-        await this._contract.addContextId({
-            mod_name: moduleName,
-            contextId: contextId,
-            owner: userId
-        });
-
-        // console.log('addContextId', { result: 'done' });
+        await this._contract.addContextId({ contextId, moduleName });
     }
 
     public async removeContextId(moduleName: string, contextId: string) {
-        // console.log('removeContextId', { moduleName, contextId });
+        await this._contract.removeContextId({ contextId, moduleName });
+    }
 
-        const userId = this._nearAccount.accountId;
-        await this._contract.removeContextId({
-            mod_name: moduleName,
-            contextId: contextId,
-            owner: userId
-        });
+    private _toNearStorageRef(ref: StorageRef): NearStorageRef {
+        if (ref === null) return null;
+        return {
+            hash: ethers.utils.base64.encode(ref.hash),
+            uris: ref.uris.map(u => ethers.utils.base64.encode(ethers.utils.toUtf8Bytes(u)))
+        }
+    }
 
-        // console.log('removeContextId', { result: 'done' });
+    private _fromNearStorageRef(ref: NearStorageRef): StorageRef {
+        if (ref === null) return null;
+        return {
+            hash: ethers.utils.hexlify(ethers.utils.base64.decode(ref.hash)),
+            uris: ref.uris.map(u => ethers.utils.toUtf8String(ethers.utils.base64.decode(u)))
+        }
     }
 }
