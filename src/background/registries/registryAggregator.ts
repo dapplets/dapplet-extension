@@ -11,6 +11,7 @@ import { allSettled } from '../../common/helpers';
 import * as logger from '../../common/logger';
 import { WalletService } from '../services/walletService';
 import { NearRegistry } from './nearRegistry';
+import { ModuleTypes } from '../../common/constants';
 
 if (!Promise.allSettled) Promise.allSettled = allSettled;
 
@@ -78,6 +79,12 @@ export class RegistryAggregator {
         // 4) Without this magic, the feature will not be found by the location, with which the interface is linked.
 
         const additionalLocations = validRegFeatures.map(([k, v]) => ([k, Object.entries(v).map(([k2, v2]) => ([k2, mergeDedupe(v2.map(x => ([x.name, ...x.interfaces])))])).filter(x => x[1].length !== 0)])) as [string, [string, string[]][]][];
+        const mergedModuleInfos = Object.values(merged).map(x => Object.values(x).reduce((a,b) => a.concat(b), [])).reduce((a,b) => a.concat(b), []);
+        for (const [registryUrl, contexts] of additionalLocations) {
+            for (const context of contexts) {
+                context[1] = context[1].filter(c => mergedModuleInfos.find(x => x.name === c)?.type !== ModuleTypes.Feature);
+            }
+        }
         const promiseResults = await Promise.allSettled(additionalLocations.map(([registryUrl, locations2]) => Promise.allSettled(locations2.map(([oldLocation, newLocations]) => Promise.allSettled(registries.filter(r => r.url !== registryUrl).map(r => r.getModuleInfo(newLocations, users).then(res => ([r.url, oldLocation, mergeDedupe(Object.entries(res).map(x => x[1]))]))))))));
         const promiseValues = mergeDedupe(promiseResults.filter(assertFullfilled).map(x => mergeDedupe(x.value.filter(assertFullfilled).map(y => y.value.filter(assertFullfilled).map(z => z.value))))) as [string, string, ModuleInfo[]][];
         promiseValues.forEach(([regUrl, location, modules]) => {
