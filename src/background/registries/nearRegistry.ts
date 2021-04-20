@@ -55,7 +55,7 @@ export class NearRegistry implements Registry {
 
     constructor(public url: string, private _nearAccount: nearAPI.ConnectedWalletAccount) {
         this._contract = new nearAPI.Contract(this._nearAccount, this.url, {
-            viewMethods: ['getLastVersionsByContextIds', 'getModules', 'getVersionInfo', 'getModuleNames', 'getModuleInfoByNames', 'getModuleBranches', 'getModuleInfoByName', 'getAllContextIds', 'getAllListers', 'getAllModules', 'getContextIdsByModule', 'getModulesByContextId', 'getModuleInfoBatch', 'getModuleInfo', 'getInterfacesOfModule', 'getVersionNumbers'],
+            viewMethods: ['getLastVersionInfo', 'getLastVersionsByContextIds', 'getModules', 'getVersionInfo', 'getModuleNames', 'getModuleInfoByNames', 'getModuleBranches', 'getModuleInfoByName', 'getAllContextIds', 'getAllListers', 'getAllModules', 'getContextIdsByModule', 'getModulesByContextId', 'getModuleInfoBatch', 'getModuleInfo', 'getInterfacesOfModule', 'getVersionNumbers'],
             changeMethods: ['addModuleVersion', 'transferOwnership', 'createModule', 'addContextId', 'addModuleWithContexts', 'removeContextId']
         });
     }
@@ -122,6 +122,7 @@ export class NearRegistry implements Registry {
             return mi;
 
         } catch (err) {
+            logger.error(err);
             return null;
         }
     }
