@@ -33,7 +33,7 @@ export class WalletService {
         await this._map[chain][wallet].disconnectWallet();
 
         const usage = await this._globalConfigService.getWalletsUsage();
-        
+
         for (const app in usage) {
             if (usage?.[app]?.[chain] === wallet) {
                 delete usage[app][chain];
@@ -72,7 +72,6 @@ export class WalletService {
         })));
     }
 
-    // !!
     async eth_getSignerFor(app: string | DefaultSigners): Promise<Signer> {
         const me = this;
         return new (class extends Signer {
@@ -91,7 +90,7 @@ export class WalletService {
             }
 
             async sendTransaction(transaction: providers.TransactionRequest): Promise<providers.TransactionResponse> {
-                const signer = await me._getInternalSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet ?? await me._pairSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet ;
+                const signer = await me._getInternalSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet ?? await me._pairSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet;
                 return signer.sendTransaction(transaction);
             }
 
@@ -154,19 +153,16 @@ export class WalletService {
         return wallet?.getAddress() ?? '0x0000000000000000000000000000000000000000';
     }
 
-    // !!!
     public async eth_sendTransactionOutHash(app: string | DefaultSigners, transaction: providers.TransactionRequest): Promise<string> {
         const wallet = await this._getInternalSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet ?? await this._pairSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet;
         return wallet.sendTransactionOutHash(transaction);
     }
 
-    // !!!
     public async eth_sendCustomRequest(app: string | DefaultSigners, method: string, params: any[]): Promise<any> {
         const wallet = await this._getInternalSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet ?? await this._pairSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet;
         return wallet.sendCustomRequest(method, params);
     }
 
-    // !!!
     public async eth_waitTransaction(app: string | DefaultSigners, txHash: string, confirmations?: number) {
         const wallet = await this._getInternalSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet ?? await this._pairSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet;
         // the wait of a transaction from another provider can be long
@@ -177,19 +173,18 @@ export class WalletService {
         }
     }
 
-    // !!!
     public async near_sendCustomRequest(app: string | DefaultSigners, method: string, params: any[]): Promise<any> {
         const wallet = await this._getInternalSignerFor(app, ChainTypes.NEAR) as NearWallet ?? await this._pairSignerFor(app, ChainTypes.NEAR) as NearWallet;
         return wallet.sendCustomRequest(method, params);
     }
 
-    // !!!
+
     public async near_getAccount(app: string | DefaultSigners) {
-        const wallet = await this._getInternalSignerFor(app, ChainTypes.NEAR) as NearWallet ?? await this._pairSignerFor(app, ChainTypes.NEAR) as NearWallet;
+        const wallet = await this._getInternalSignerFor(app, ChainTypes.NEAR, false) as NearWallet;
         return wallet.getAccount();
     }
 
-    private async _getInternalSignerFor(app: string | DefaultSigners, chain: ChainTypes): Promise<GenericWallet> {
+    private async _getInternalSignerFor(app: string | DefaultSigners, chain: ChainTypes, isConnected: boolean = true): Promise<GenericWallet> {
         const defaults = await this._getWalletFor(app);
         const defaultWallet = defaults?.[chain];
 
@@ -200,6 +195,12 @@ export class WalletService {
         // choose first connected wallet
         for (const wallet in this._map[chain]) {
             if (this._map[chain][wallet].isConnected()) {
+                return this._map[chain][wallet];
+            }
+        }
+
+        if (!isConnected) {
+            for (const wallet in this._map[chain]) {
                 return this._map[chain][wallet];
             }
         }

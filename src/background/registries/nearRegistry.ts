@@ -98,7 +98,10 @@ export class NearRegistry implements Registry {
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
-            logger.error('Error in EthRegistry class when module info is fetching', err);
+            logger.error('Error in EthRegistry class when module info is fetching', err, {
+                method: 'getModuleInfo',
+                args: { contextIds, users }
+            });
             throw err;
         }
     }

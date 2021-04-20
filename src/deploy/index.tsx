@@ -221,9 +221,9 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     {message.message.map((m, i) => <p key={i} style={{ overflowWrap: 'break-word' }}>{m}</p>)}
                 </Message>) : null}
 
-                {(isNotWalletPaired) ? (
+                {(!isNotNullCurrentAccount) ? ((owner) ? (
                     <Message
-                        error
+                        warning
                         header='Wallet is not paired'
                         content={<React.Fragment>
                             You can not deploy a module without wallet pairing.<br />
@@ -231,7 +231,16 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             Connect a new wallet <Icon name='chain' link onClick={() => this.pairWallet()}/>
                         </React.Fragment>}
                     />
-                ) : null}
+                ) : (
+                    <Message
+                        warning
+                        header='Wallet is not paired'
+                        content={<React.Fragment>
+                            You can not deploy a module without wallet pairing.<br />
+                            Connect a new wallet <Icon name='chain' link onClick={() => this.pairWallet()}/>
+                        </React.Fragment>}
+                    />
+                )) : null}
 
                 {(isNotAnOwner) ? (
                     <Message
