@@ -26,14 +26,15 @@ export default class GlobalConfigService {
         const config = new GlobalConfig();
         config.id = this._configId;
         config.registries = [{
-            url: "dapplet-base.eth",
+            url: "dev-1618299934008-8069722",
             isDev: false,
             isEnabled: true
         }];
         config.devMode = true;
-        config.trustedUsers = [{
-            account: "0x692a4d7b7be2dc1623155e90b197a82d114a74f3"
-        }];
+        config.trustedUsers = [
+            { account: "buidl.testnet" },
+            { account: "nik3ter.testnet" }
+        ];
         config.userSettings = {};
         config.providerUrl = 'https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c';
         config.walletsUsage = {};
@@ -41,7 +42,7 @@ export default class GlobalConfigService {
         config.popupInOverlay = false;
         config.autoBackup = true;
         config.errorReporting = true;
-        config.userAgentId = generateGuid(); 
+        config.userAgentId = generateGuid();
         config.userAgentName = '';
 
         await this._globalConfigRepository.deleteById(this._configId);
@@ -63,7 +64,7 @@ export default class GlobalConfigService {
         if (!isEthAddress && !isEnsAddress && !isHttpAddress && !isNearAddress) throw new Error("Unsupported URI type");
         if (isDev && !isHttpAddress) throw new Error("Only HTTP(S) links are supported for development servers");
         if (!isDev && (!isEthAddress && !isEnsAddress && !isNearAddress)) throw new Error("A public registry must have a valid Ethereum, ENS or NEAR Protocol address");
-        
+
         const config = await this.get();
         if (config.registries.find(r => r.url === url)) return;
 
