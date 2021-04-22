@@ -2,7 +2,7 @@ import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Card, Image, Button, Segment, Dimmer, Loader } from 'semantic-ui-react';
+import { Card, Image, Button, Segment, Dimmer, Loader, Message } from 'semantic-ui-react';
 //import 'semantic-ui-css/semantic.min.css';
 import './index.scss';
 import { Bus } from '../common/bus';
@@ -26,6 +26,7 @@ interface IIndexState {
     data: any;
     loading: boolean;
     devMode: boolean;
+    hiddenProperties: string[];
 }
 
 class Index extends React.Component<IIndexProps, IIndexState> {
@@ -42,13 +43,21 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             owner: null,
             data: {},
             loading: false,
-            devMode: false
+            devMode: false,
+            hiddenProperties: []
         };
 
         this.bus.subscribe('data', async ({ mi, vi, schemaConfig, defaultConfig }) => {
             const { getDevMode } = await initBGFunctions(browser);
             const devMode = await getDevMode();
             
+            const hiddenProperties = (schemaConfig && schemaConfig.properties) ? 
+                Object.entries(schemaConfig.properties)
+                    .filter(([k, v]: any) => v.hidden)
+                    .map(([k, v]: any) => v.title ?? k) 
+                : [];
+            
+            // Do not show hidden settings when developer mode is disabled
             if (!devMode) {
                 if (schemaConfig && schemaConfig.properties) {
                     for (const key in schemaConfig.properties) {
@@ -59,7 +68,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                 }
             }
 
-            this.setState({ mi, vi, schemaConfig, defaultConfig, devMode });
+            this.setState({ mi, vi, schemaConfig, defaultConfig, devMode, hiddenProperties });
             await this._refreshData();
             await this._updateOwnership();
         });
@@ -113,6 +122,16 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
                 {(mi && vi) ? (
                     <React.Fragment>
+
+                        {/* Warning about Hidden properties */}
+                        {(this.state.devMode && this.state.hiddenProperties.length > 0) ?
+                            <Message warning>
+                                <Message.Header>Hidden settings</Message.Header>
+                                <p>The following settings will be hidden in the testing and production environments:</p>
+                                <p>{this.state.hiddenProperties.join(', ')}</p>
+                            </Message> : null}
+
+                        {/* Module Header Info */}
                         <Card fluid>
                             <Card.Content>
                                 <Image
@@ -130,12 +149,15 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                                 </Card.Description>
                             </Card.Content>
                         </Card>
-                        {(schemaConfig && schemaConfig.properties && Object.entries(schemaConfig.properties).map(([k, v]) => !v['hidden']).length > 0) ? <Form schema={schemaConfig || {}} onSubmit={e => this._saveData(e.formData)} formData={data}>
+
+                        {/* Form */}
+                        {(schemaConfig && schemaConfig.properties) ? <Form schema={schemaConfig || {}} onSubmit={e => this._saveData(e.formData)} formData={data}>
                             <div>
                                 <Button type="submit" primary disabled={this.state.loading} loading={this.state.loading}>Save and Reload</Button>
                                 <Button basic disabled={this.state.loading} onClick={() => this._resetSettings()}>Reset</Button>
                             </div>
                         </Form> : <p>No settings available for this dapplet.</p>}
+
                     </React.Fragment>
                 ) : <Dimmer active inverted>
                         <Loader inverted>Loading</Loader>

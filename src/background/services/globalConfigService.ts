@@ -30,7 +30,7 @@ export default class GlobalConfigService {
             isDev: false,
             isEnabled: true
         }];
-        config.devMode = true;
+        config.devMode = false;
         config.trustedUsers = [
             { account: "buidl.testnet" },
             { account: "nik3ter.testnet" }
