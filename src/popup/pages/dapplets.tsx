@@ -128,7 +128,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     const tab = await getCurrentTab();
     await browser.tabs.update(tab.id, { url: tab.url });
     this.setState({ isNoInpage: false, isLoading: true });
-    setTimeout(() => this._refreshDataByContext(getCurrentContextIds()), 3000); // ToDo: get rid of timeout
+    setTimeout(() => this._refreshDataByContext(getCurrentContextIds()), 4000); // ToDo: get rid of timeout
   }
 
   async settingsModule(mi: ManifestDTO) {
@@ -197,7 +197,6 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
           iconPosition='left'
           icon
           placeholder='Search...'
-          input
         >
           <Icon name='search' />
           <input value={search} onChange={e => this._searchChangeHandler(e.target.value)} />
@@ -209,11 +208,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
           /> : null}
         </Input> : null}
 
-        <Segment loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTabDapplets"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
-
-
-          {/* {(error) ? (<Message floating warning>{error}</Message>) : null} */}
-
+        <Segment loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTabDapplets"} style={{ marginTop: '10px'}} >
           {!isNoInpage ?
             (features.length > 0) ? (
               <List divided relaxed>
@@ -243,6 +238,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
                 color='blue'
                 content='Refresh'
                 onClick={() => this.refreshContextPage()}
+                style={{ marginTop: '6px' }}
               />
             </div>)}
         </Segment>

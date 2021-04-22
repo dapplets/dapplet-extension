@@ -15,7 +15,6 @@ import { BackgroundWalletConnection } from "./near/backgroundWalletConnection";
 import * as NearAPI from "near-api-js";
 import { ChainTypes } from "../common/types";
 
-
 export default class Core {
     public overlayManager = new OverlayManager();
     private _popupOverlay: Overlay = null;

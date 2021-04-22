@@ -15,6 +15,8 @@ interface IHeaderState {
 }
 
 class Header extends React.Component<IHeaderProps, IHeaderState> {
+  private _mounted = false;
+
   constructor(props) {
     super(props);
 
@@ -26,19 +28,27 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
   }
 
   async componentDidMount() {
+    this._mounted = true;
+    
     try {
       const contextId = await this.props.contextIds;
       const { getSuspendityByHostname, getSuspendityEverywhere } = await initBGFunctions(browser);
       const isHostnameSuspended = await getSuspendityByHostname(contextId);
       const isEverywhereSuspended = await getSuspendityEverywhere();
 
-      this.setState({
-        isHostnameSuspended: isHostnameSuspended,
-        isEverywhereSuspended: isEverywhereSuspended
-      });
+      if (this._mounted) {
+        this.setState({
+          isHostnameSuspended: isHostnameSuspended,
+          isEverywhereSuspended: isEverywhereSuspended
+        });
+      }
     } catch (err) {
       console.error(err);
     }
+  }
+
+  componentWillUnmount() {
+    this._mounted = false;
   }
 
   async resumeByHostnameButtonClick() {
