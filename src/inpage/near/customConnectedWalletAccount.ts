@@ -4,9 +4,37 @@ import { baseDecode } from 'borsh';
 import { browser } from 'webextension-polyfill-ts';
 import { generateGuid } from '../../common/helpers';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { ChainTypes } from '../../common/types';
 
 export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
+
+    accountId: string;
+
+    constructor(walletConnection: nearAPI.WalletConnection, connection: nearAPI.Connection, accountId: string, private _app: string) {
+        super(walletConnection, connection, accountId);
+    }
+
     async signAndSendTransaction(receiverId: string, actions: nearAPI.transactions.Action[]): Promise<nearAPI.providers.FinalExecutionOutcome> {
+        if (!this.accountId) {
+            const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser);
+            // ToDo: remove it?
+            await prepareWalletFor(this._app, ChainTypes.NEAR, null);
+            
+            const authDataKey = 'null_wallet_auth_key';
+            let authData = JSON.parse(await localStorage_getItem(authDataKey));
+            if (!authData) {
+                await prepareWalletFor(this._app, ChainTypes.NEAR, null);
+                authData = JSON.parse(await localStorage_getItem(authDataKey));
+            }
+
+            if (!authData) {
+                throw new Error('Wallet is not connected');
+            }
+
+            this.walletConnection._authData = authData;
+            this.accountId = authData.accountId;
+        }
+
         const localKey = await this.connection.signer.getPublicKey(this.accountId, this.connection.networkId);
         let accessKey = await this.accessKeyForTransaction(receiverId, actions, localKey);
         if (!accessKey) {

@@ -285,7 +285,7 @@ export default class Core {
             }
 
             const near = new BackgroundNear(app);
-            const wallet = new BackgroundWalletConnection(near, null);
+            const wallet = new BackgroundWalletConnection(near, null, app);
             wallet._authData = authData;
 
             const account = wallet.account();
@@ -293,23 +293,10 @@ export default class Core {
         },
 
         async contract(contractId: string, options: { viewMethods: string[]; changeMethods: string[] }, app?: string) {
-            const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser);
-            // ToDo: remove it?
-            await prepareWalletFor(app, ChainTypes.NEAR, null);
-            
-            const authDataKey = 'null_wallet_auth_key';
-            let authData = JSON.parse(await localStorage_getItem(authDataKey));
-            if (!authData) {
-                await prepareWalletFor(app, ChainTypes.NEAR, null);
-                authData = JSON.parse(await localStorage_getItem(authDataKey));
-            }
-
             const near = new BackgroundNear(app);
-            const wallet = new BackgroundWalletConnection(near, null);
-            wallet._authData = authData;
-
+            const wallet = new BackgroundWalletConnection(near, null, app);
             const account = wallet.account();
-            const contract = await new NearAPI.Contract(account, contractId, options);
+            const contract = new NearAPI.Contract(account, contractId, options);
             return contract;
         }
     }

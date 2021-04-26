@@ -15,6 +15,11 @@ interface SignInOptions {
 }
 
 export class BackgroundWalletConnection extends nearAPI.WalletConnection {
+
+    constructor(near: nearAPI.Near, appKeyPrefix: string, private _app: string) {
+        super(near, appKeyPrefix);
+    }
+
     async requestSignIn(
         contractIdOrOptions: string | SignInOptions = {},
         title?: string,
@@ -72,7 +77,7 @@ export class BackgroundWalletConnection extends nearAPI.WalletConnection {
 
     account() {
         if (!this._connectedAccount) {
-            this._connectedAccount = new CustomConnectedWalletAccount(this, this._near.connection, this._authData.accountId);
+            this._connectedAccount = new CustomConnectedWalletAccount(this, this._near.connection, this._authData.accountId, this._app);
         }
         return this._connectedAccount;
     }
