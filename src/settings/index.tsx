@@ -127,7 +127,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         {(this.state.devMode && this.state.hiddenProperties.length > 0) ?
                             <Message warning>
                                 <Message.Header>Hidden settings</Message.Header>
-                                <p>The following settings will be hidden in the testing and production environments:</p>
+                                <p>The following options are available only in developer mode:</p>
                                 <p>{this.state.hiddenProperties.join(', ')}</p>
                             </Message> : null}
 
