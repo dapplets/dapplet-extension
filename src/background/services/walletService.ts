@@ -52,7 +52,7 @@ export class WalletService {
             const arr: string[] = [];
             for (const app in usage) {
                 if (usage[app]?.[chain] === wallet) {
-                    arr.push(usage[app]?.[chain]);
+                    arr.push(app);
                 }
             }
             return arr;
@@ -107,6 +107,13 @@ export class WalletService {
         await this._globalConfigService.setWalletsUsage(wallets);
     }
 
+    public async unsetWalletFor(app: string | DefaultSigners, chain: ChainTypes) {
+        const wallets = await this._globalConfigService.getWalletsUsage();
+        if (!wallets[app]) return;
+        delete wallets[app][chain];
+        await this._globalConfigService.setWalletsUsage(wallets);
+    }
+
     public async pairWalletViaOverlay(chain: ChainTypes): Promise<void> {
         const activeTab = await getCurrentTab();
         // ToDo: pass chain
@@ -128,7 +135,7 @@ export class WalletService {
 
         if (!defaultWallet) {
             // is login required?
-            if (cfg) {
+            if (cfg && cfg.username && cfg.domainId) {
                 return this._loginViaOverlay(app, chain, cfg);
             } else {
                 return this._selectWalletViaOverlay(app, chain);
@@ -140,7 +147,7 @@ export class WalletService {
 
         if (!suitableWallet || !suitableWallet.connected) {
             // is login required?
-            if (cfg) {
+            if (cfg && cfg.username && cfg.domainId) {
                 return this._loginViaOverlay(app, chain, cfg);
             } else {
                 return this._selectWalletViaOverlay(app, chain);

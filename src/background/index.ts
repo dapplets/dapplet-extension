@@ -38,6 +38,7 @@ import { IdentityService } from "./services/identityService";
       getWalletDescriptors: walletService.getWalletDescriptors.bind(walletService),
       pairWalletViaOverlay: walletService.pairWalletViaOverlay.bind(walletService),
       setWalletFor: walletService.setWalletFor.bind(walletService),
+      unsetWalletFor: walletService.unsetWalletFor.bind(walletService),
       getAddress: walletService.getAddress.bind(walletService),
 
       eth_sendTransactionOutHash: walletService.eth_sendTransactionOutHash.bind(walletService),

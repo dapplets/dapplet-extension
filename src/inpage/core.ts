@@ -15,6 +15,12 @@ import { BackgroundWalletConnection } from "./near/backgroundWalletConnection";
 import * as NearAPI from "near-api-js";
 import { ChainTypes } from "../common/types";
 
+interface WalletConnection {
+    isConnected(): Promise<boolean>;
+    connect(): Promise<void>;
+    disconnect(): Promise<void>;
+}
+
 export default class Core {
     public overlayManager = new OverlayManager();
     private _popupOverlay: Overlay = null;
@@ -227,29 +233,92 @@ export default class Core {
         return conn;
     }
 
-    public async wallet<M>(cfg?: { username: string, domainId: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<AutoProperties<M> & Connection> {
-        const { prepareWalletFor } = await initBGFunctions(browser);
-        await prepareWalletFor(app, ChainTypes.ETHEREUM, cfg);
+    public async wallet<M>(cfg: { type: 'ethereum', network: 'rinkeby', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & AutoProperties<M> & Connection>
+    public async wallet<M>(cfg: { type: 'near', network: 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearAPI.ConnectedWalletAccount>
+    public async wallet<M>(cfg: { type: 'ethereum' | 'near', network: 'rinkeby' | 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
+        if (!cfg || !cfg.type || !cfg.network) throw new Error("\"type\" and \"network\" are required in Core.wallet().");
+        if (cfg.type !== 'near' && cfg.type !== 'ethereum') throw new Error("The \"ethereum\" and \"near\" only are supported in Core.wallet().");
+        if (cfg.type === 'near' && cfg.network !== 'testnet') throw new Error("\"testnet\" network only is supported in \"near\" type wallet.");
+        if (cfg.type === 'ethereum' && cfg.network !== 'rinkeby') throw new Error("\"rinkeby\" network only is supported in \"ethereum\" type wallet.");
 
         const me = this;
-        const transport = {
-            _txCount: 0,
-            _handler: null,
-            exec: (sowaIdOrRpcMethod: string, sowaMetadataOrRpcParams: any) => {
-                const id = (++transport._txCount).toString();
-                me._sendWalletConnectTx(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams, (e) => transport._handler(id, e));
-                return Promise.resolve(id);
+
+        const isConnected = async () => {
+            const { getWalletDescriptors } = await initBGFunctions(browser);
+            const descriptors = await getWalletDescriptors();
+            const suitableWallet = descriptors.find(x => x.chain === cfg.type && x.apps.indexOf(app) !== -1);
+            return suitableWallet ? suitableWallet.connected : false;
+        };
+
+        const getWalletObject = async () => {
+            const connected = await isConnected();
+            if (!connected) return null;
+
+            if (cfg.type === 'ethereum') {
+                const transport = {
+                    _txCount: 0,
+                    _handler: null,
+                    exec: (sowaIdOrRpcMethod: string, sowaMetadataOrRpcParams: any) => {
+                        const id = (++transport._txCount).toString();
+                        me._sendWalletConnectTx(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams, (e) => transport._handler(id, e));
+                        return Promise.resolve(id);
+                    },
+                    onMessage: (handler: (topic: string, message: any) => void) => {
+                        transport._handler = handler;
+                        return {
+                            off: () => transport._handler = null
+                        }
+                    }
+                }
+
+                const conn = Connection.create<M>(transport, eventDef);
+                return conn;
+            } else if (cfg.type === 'near') {
+                const { localStorage_getItem } = await initBGFunctions(browser);
+                const authDataKey = 'null_wallet_auth_key';
+                let authData = JSON.parse(await localStorage_getItem(authDataKey));
+                if (!authData) return null;
+
+                const near = new BackgroundNear(app);
+                const wallet = new BackgroundWalletConnection(near, null, app);
+                wallet._authData = authData;
+                return wallet.account();
+            } else {
+                throw new Error('Invalid wallet type.');
+            }
+        };
+
+        const _wallet = await getWalletObject();
+
+        const proxied = {
+            _wallet: _wallet,
+
+            async isConnected(): Promise<boolean> {
+                return isConnected();
             },
-            onMessage: (handler: (topic: string, message: any) => void) => {
-                transport._handler = handler;
-                return {
-                    off: () => transport._handler = null
+
+            async connect(): Promise<void> {
+                const { prepareWalletFor } = await initBGFunctions(browser);
+                await prepareWalletFor(app, cfg.type, cfg);
+                this._wallet = await getWalletObject();
+            },
+
+            async disconnect(): Promise<void> {
+                const { unsetWalletFor } = await initBGFunctions(browser);
+                await unsetWalletFor(app, cfg.type);
+                this._wallet = null;
+            }
+        };
+
+        return new Proxy(proxied, {
+            get(target, prop) {
+                if (prop in target) {
+                    return target[prop];
+                } else if (target._wallet !== null) {
+                    return target._wallet[prop];
                 }
             }
-        }
-
-        const conn = Connection.create<M>(transport, eventDef);
-        return conn;
+        }) as any;
     }
 
     public overlay<M>(cfg: { url: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
@@ -276,7 +345,7 @@ export default class Core {
             const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser);
             // ToDo: remove it?
             await prepareWalletFor(app, ChainTypes.NEAR, null);
-            
+
             const authDataKey = 'null_wallet_auth_key';
             let authData = JSON.parse(await localStorage_getItem(authDataKey));
             if (!authData) {
@@ -290,6 +359,8 @@ export default class Core {
 
             const account = wallet.account();
             return account;
+
+
         },
 
         async contract(contractId: string, options: { viewMethods: string[]; changeMethods: string[] }, app?: string) {
