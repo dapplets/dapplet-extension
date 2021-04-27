@@ -15,6 +15,8 @@ import { BackgroundWalletConnection } from "./near/backgroundWalletConnection";
 import * as NearAPI from "near-api-js";
 import { ChainTypes } from "../common/types";
 
+type Abi = any;
+
 interface WalletConnection {
     isConnected(): Promise<boolean>;
     connect(): Promise<void>;
@@ -335,42 +337,22 @@ export default class Core {
 
     public storage: AppStorage;
 
-    public contract(address: string, abi: any, app?: string): any {
-        const signer = new ProxySigner(app);
-        return new ethers.Contract(address, abi, signer);
-    }
-
-    public near = {
-        async wallet(app?: string) {
-            const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser);
-            // ToDo: remove it?
-            await prepareWalletFor(app, ChainTypes.NEAR, null);
-
-            const authDataKey = 'null_wallet_auth_key';
-            let authData = JSON.parse(await localStorage_getItem(authDataKey));
-            if (!authData) {
-                await prepareWalletFor(app, ChainTypes.NEAR, null);
-                authData = JSON.parse(await localStorage_getItem(authDataKey));
-            }
-
-            const near = new BackgroundNear(app);
-            const wallet = new BackgroundWalletConnection(near, null, app);
-            wallet._authData = authData;
-
-            const account = wallet.account();
-            return account;
-
-
-        },
-
-        async contract(contractId: string, options: { viewMethods: string[]; changeMethods: string[] }, app?: string) {
+    public contract(type: 'ethereum', address: string, options: Abi, app?: string): any
+    public contract(type: 'near', address: string, options: { viewMethods: string[]; changeMethods: string[] }, app?: string): any
+    public contract(type: 'near' | 'ethereum', address: string, options: any, app?: string): any {
+        if (type === 'ethereum') {
+            const signer = new ProxySigner(app);
+            return new ethers.Contract(address, options, signer);
+        } else if (type === 'near') {
             const near = new BackgroundNear(app);
             const wallet = new BackgroundWalletConnection(near, null, app);
             const account = wallet.account();
-            const contract = new NearAPI.Contract(account, contractId, options);
+            const contract = new NearAPI.Contract(account, address, options);
             return contract;
+        } else {
+            throw new Error("\"ethereum\" and \"near\" contracts only are supported.");
         }
     }
-
+    
     utils = ethers.utils;
 }

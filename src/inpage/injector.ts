@@ -188,7 +188,7 @@ export class Injector {
                 overlay: core.overlay.bind(core),
                 wallet: (cfg, eventDef) => core.wallet(cfg, eventDef, manifest.name),
                 storage: new AppStorage(manifest.name, manifest.environment, defaultConfig),
-                contract: (address, abi) => core.contract(address, abi, manifest.name),
+                contract: (type, address, options) => core.contract(type, address, options, manifest.name),
                 onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
                 onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
                 utils: core.utils
