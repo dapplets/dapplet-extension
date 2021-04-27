@@ -181,7 +181,7 @@ export class WalletService {
     }
 
     public async near_sendCustomRequest(app: string | DefaultSigners, method: string, params: any[]): Promise<any> {
-        const wallet = await this._getInternalSignerFor(app, ChainTypes.NEAR) as NearWallet ?? await this._pairSignerFor(app, ChainTypes.NEAR) as NearWallet;
+        const wallet = await this._getInternalSignerFor(app, ChainTypes.NEAR, false) as NearWallet;
         return wallet.sendCustomRequest(method, params);
     }
 
