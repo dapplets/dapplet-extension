@@ -10,19 +10,15 @@ export default class GlobalConfigService {
     private _configId: string = 'default';
 
     async get(): Promise<GlobalConfig> {
-        return this._globalConfigRepository.getById(this._configId);
+        const config = await this._globalConfigRepository.getById(this._configId);
+        return config ?? this.getInitialConfig();
     }
 
     async set(config: GlobalConfig): Promise<void> {
         await this._globalConfigRepository.update(config);
     }
 
-    async initConifg(): Promise<void> {
-        let config = await this._globalConfigRepository.getById(this._configId);
-        if (!config) await this.resetConfig();
-    }
-
-    async resetConfig(): Promise<void> {
+    getInitialConfig(): GlobalConfig {
         const config = new GlobalConfig();
         config.id = this._configId;
         config.registries = [{
@@ -45,8 +41,7 @@ export default class GlobalConfigService {
         config.userAgentId = generateGuid();
         config.userAgentName = '';
 
-        await this._globalConfigRepository.deleteById(this._configId);
-        await this._globalConfigRepository.create(config);
+        return config;
     }
 
     async getRegistries() {
