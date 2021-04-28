@@ -25,7 +25,8 @@ module.exports = {
     deploy: path.join(__dirname, "src/deploy/index.tsx"),
     starter: path.join(__dirname, "src/starter/index.tsx"),
     settings: path.join(__dirname, "src/settings/index.tsx"),
-    login: path.join(__dirname, "src/login/index.tsx")
+    login: path.join(__dirname, "src/login/index.tsx"),
+    welcome: path.join(__dirname, "src/welcome/index.tsx")
   },
   output: {
     path: path.join(__dirname, "build"),
@@ -127,6 +128,9 @@ module.exports = {
         }, {
           from: "src/callback/index.html",
           to: "callback.html"
+        }, {
+          from: "src/welcome/index.html",
+          to: "welcome.html"
         }
       ]
     }),
