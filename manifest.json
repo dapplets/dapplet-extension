@@ -1,6 +1,7 @@
 {
   "name": "Dapplets",
   "version": "",
+  "version_name": "",
   "description": "",
   "author": "",
   "short_name": "Dapplets",
@@ -45,6 +46,7 @@
     "storage",
     "contextMenus",
     "notifications",
+    "downloads",
     "*://localhost/*"
   ],
   "commands": {
