@@ -4,6 +4,7 @@ import { typeOfUri, UriTypes } from '../../common/helpers';
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { browser } from "webextension-polyfill-ts";
 import { generateGuid } from '../../common/helpers';
+import SiteConfig from '../models/siteConfig';
 
 export default class GlobalConfigService {
     private _globalConfigRepository = new GlobalConfigBrowserStorage();
@@ -40,6 +41,7 @@ export default class GlobalConfigService {
         config.errorReporting = true;
         config.userAgentId = generateGuid();
         config.userAgentName = '';
+        config.hostnames = {};
 
         return config;
     }
@@ -270,5 +272,27 @@ export default class GlobalConfigService {
 
     async setUserAgentName(value: string) {
         return this.updateConfig(c => c.userAgentName = value);
+    }
+
+    async getSiteConfigById(id: string) {
+        const globalConfig = await this.get();
+        let config = globalConfig.hostnames?.[id];
+
+        if (!config) {
+            config = new SiteConfig();
+            config.hostname = id;
+            config.activeFeatures = {};
+            config.paused = false;
+        }
+
+        return config;
+    }
+
+    async updateSiteConfig(config: SiteConfig) {
+        const globalConfig = await this.get();
+        if (!config.hostname) throw new Error("\"hostname\" is required in SiteConfig.");
+        if (!globalConfig.hostnames) globalConfig.hostnames = {};
+        globalConfig.hostnames[config.hostname] = config;
+        await this.set(globalConfig);
     }
 }

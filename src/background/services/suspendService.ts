@@ -1,10 +1,7 @@
 import * as Helpers from "../../common/helpers";
-import SiteConfigBrowserStorage from "../browserStorages/siteConfigBrowserStorage";
-import SiteConfig from "../models/siteConfig";
 import GlobalConfigService from "./globalConfigService";
 import { browser } from "webextension-polyfill-ts";
 
-const _siteConfigRepository = new SiteConfigBrowserStorage();
 const _globalConfigService = new GlobalConfigService();
 
 let lastExtensionIcon = null;
@@ -94,17 +91,9 @@ const updateContextMenus = async () => {
  * @returns {Promise<void>}
  */
 const suspendByHostname = async hostname => {
-    // TODO: move this logic to config service
-    var config = await _siteConfigRepository.getById(hostname);
-    if (!config) {
-        config = new SiteConfig();
-        config.hostname = hostname;
-        config.paused = true;
-        await _siteConfigRepository.create(config);
-    } else {
-        config.paused = true;
-        await _siteConfigRepository.update(config);
-    }
+    const config = await _globalConfigService.getSiteConfigById(hostname);
+    config.paused = true;
+    await _globalConfigService.updateSiteConfig(config);
 
     await changeIcon();
     await updateContextMenus();
@@ -118,17 +107,9 @@ const suspendByHostname = async hostname => {
  * @returns {Promise<void>}
  */
 const resumeByHostname = async hostname => {
-    // TODO: move this logic to config service?
-    var config = await _siteConfigRepository.getById(hostname);
-    if (!config) {
-        config = new SiteConfig();
-        config.hostname = hostname;
-        config.paused = false;
-        await _siteConfigRepository.create(config);
-    } else {
-        config.paused = false;
-        await _siteConfigRepository.update(config);
-    }
+    const config = await _globalConfigService.getSiteConfigById(hostname);
+    config.paused = false;
+    await _globalConfigService.updateSiteConfig(config);
 
     await changeIcon();
     await updateContextMenus();
@@ -142,7 +123,7 @@ const resumeByHostname = async hostname => {
  * @returns {Promise<boolean>}
  */
 const getSuspendityByHostname = async hostname => {
-    var config = await _siteConfigRepository.getById(hostname);
+    var config = await _globalConfigService.getSiteConfigById(hostname);
     return (!config) ? false : config.paused;
 };
 

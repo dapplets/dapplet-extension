@@ -1,5 +1,4 @@
 import ManifestDTO from '../dto/manifestDTO';
-import SiteConfigBrowserStorage from '../browserStorages/siteConfigBrowserStorage';
 import ModuleManager from '../utils/moduleManager';
 import { browser } from "webextension-polyfill-ts";
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
@@ -14,7 +13,6 @@ import { getCurrentTab, mergeDedupe } from '../../common/helpers';
 import { WalletService } from './walletService';
 
 export default class FeatureService {
-    private _siteConfigRepository = new SiteConfigBrowserStorage();
     private _moduleManager: ModuleManager;
     private _storageAggregator = new StorageAggregator();
 
@@ -42,7 +40,7 @@ export default class FeatureService {
                     const dto = dtos.find(d => d.name === moduleInfo.name);
                     if (!dto) {
                         const dto: ManifestDTO = moduleInfo as any;
-                        const config = await this._siteConfigRepository.getById(contextId); // ToDo: which contextId should we compare?
+                        const config = await this._globalConfigService.getSiteConfigById(contextId); // ToDo: which contextId should we compare?
                         dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
                         dto.isActionHandler = config.activeFeatures[dto.name]?.runtime?.isActionHandler || false;
                         dto.isHomeHandler = config.activeFeatures[dto.name]?.runtime?.isHomeHandler || false;
@@ -68,7 +66,7 @@ export default class FeatureService {
 
         // Adding of unavailable dapplets
         for (const contextId of contextIds) {
-            const config = await this._siteConfigRepository.getById(contextId);
+            const config = await this._globalConfigService.getSiteConfigById(contextId);
             for (const moduleName in config.activeFeatures) {
                 const moduleInfo = config.activeFeatures[moduleName].moduleInfo;
                 if (dtos.find(x => x.name === moduleName) || !moduleInfo) continue;
@@ -111,7 +109,7 @@ export default class FeatureService {
 
         // ToDo: save registry url of activate module?
         for (const hostname of hostnames) {
-            const config = await this._siteConfigRepository.getById(hostname);
+            const config = await this._globalConfigService.getSiteConfigById(hostname);
             if (!isActive) version = config.activeFeatures[name].version;
             config.activeFeatures[name] = {
                 version,
@@ -122,7 +120,7 @@ export default class FeatureService {
                 registryUrl
             };
 
-            await this._siteConfigRepository.update(config);
+            await this._globalConfigService.updateSiteConfig(config);
         }
 
         try {
@@ -172,14 +170,14 @@ export default class FeatureService {
 
             // ToDo: merge with config updating upper
             for (const hostname of hostnames) {
-                const config = await this._siteConfigRepository.getById(hostname);
+                const config = await this._globalConfigService.getSiteConfigById(hostname);
                 config.activeFeatures[name].runtime = runtime;
-                await this._siteConfigRepository.update(config);
+                await this._globalConfigService.updateSiteConfig(config);
             }
         } catch (err) {
             // revert config if error
             for (const hostname of hostnames) {
-                const config = await this._siteConfigRepository.getById(hostname);
+                const config = await this._globalConfigService.getSiteConfigById(hostname);
                 config.activeFeatures[name] = {
                     version,
                     isActive: !isActive,
@@ -189,7 +187,7 @@ export default class FeatureService {
                     registryUrl
                 };
 
-                await this._siteConfigRepository.update(config);
+                await this._globalConfigService.updateSiteConfig(config);
             }
 
             // ToDo: error doesn't come to popup without this rethrowing
@@ -216,7 +214,7 @@ export default class FeatureService {
         const globalConfig = await this._globalConfigService.get();
         if (globalConfig.suspended) return [];
 
-        const configs = await Promise.all(hostnames.map(h => this._siteConfigRepository.getById(h)));
+        const configs = await Promise.all(hostnames.map(h => this._globalConfigService.getSiteConfigById(h)));
         const modules: { name: string, branch: string, version: string, order: number, hostnames: string[] }[] = [];
 
         let i = 0;
@@ -335,13 +333,13 @@ export default class FeatureService {
         let wasActive = false;
 
         for (const hostname of hostnames) {
-            const config = await this._siteConfigRepository.getById(hostname);
+            const config = await this._globalConfigService.getSiteConfigById(hostname);
             if (!config.activeFeatures[name]) continue;
             version = config.activeFeatures[name].version;
             order = config.activeFeatures[name].order;
             wasActive = wasActive || config.activeFeatures[name].isActive;
             delete config.activeFeatures[name];
-            await this._siteConfigRepository.update(config);
+            await this._globalConfigService.updateSiteConfig(config);
         }
 
         if (wasActive) {
