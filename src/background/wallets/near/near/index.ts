@@ -63,7 +63,7 @@ export default class implements NearWallet {
 
     async connectWallet(): Promise<void> {
         return new Promise<void>(async (res, rej) => {
-            const [currentTab] = await browser.tabs.query({ active: true });
+            const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
             const currentTabId = currentTab.id;
 
             const requestId = generateGuid();

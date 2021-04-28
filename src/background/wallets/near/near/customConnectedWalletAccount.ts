@@ -35,7 +35,7 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
         const requestId = generateGuid();
         const callbackUrl = browser.extension.getURL(`callback.html?request_id=${requestId}`);
 
-        const [currentTab] = await browser.tabs.query({ active: true });
+        const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
         
         await this.walletConnection.requestSignTransactions([transaction], callbackUrl);
 
