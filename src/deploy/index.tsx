@@ -147,7 +147,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.setState({ editLocationLoading: false, editLocationDone: true });
     }
 
-    async deploySubmitHandler() {
+    async deployButtonClickHandler() {
         this.setState({ loading: true });
 
         const { deployModule, addTrustedUser } = await initBGFunctions(browser);
@@ -378,7 +378,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                 </Card>) : null}
 
 
-                <Form loading={loading} onSubmit={() => this.deploySubmitHandler()}>
+                <Form loading={loading}>
 
                     <Form.Select
                         required
@@ -420,7 +420,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         })}
                     />
 
-                    <Button submit="true" primary disabled={isButtonDisabled}>Deploy</Button>
+                    <Button primary disabled={isButtonDisabled} onClick={() => this.deployButtonClickHandler()}>Deploy</Button>
                 </Form>
             </React.Fragment>
         );
