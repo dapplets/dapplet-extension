@@ -282,12 +282,18 @@ export class OverlayManager {
         if (tab.tabItem) this._tabList.removeChild(tab.tabItem);
         this._contentList.removeChild(tab.contentItem);
 
+        const tabIndex = this._tabsRegistry.indexOf(tab);
         this._tabsRegistry = this._tabsRegistry.filter(t => t.overlay !== overlay);
 
         if (this._activeOverlay === overlay) {
             this._activeOverlay = null;
-            const nextTab = this._tabsRegistry[0];
-            nextTab && this.activate(nextTab.overlay);
+
+            if (this._tabsRegistry.length > 0) {
+                // if there are tabs on the right, then open the next one, otherwise open the last
+                const areTabsRight = this._tabsRegistry.length > tabIndex;
+                const nextTab = (areTabsRight) ? this._tabsRegistry[tabIndex] : this._tabsRegistry[this._tabsRegistry.length - 1];
+                this.activate(nextTab.overlay);
+            }
         }
 
         if (this._tabsRegistry.length == 0) {
