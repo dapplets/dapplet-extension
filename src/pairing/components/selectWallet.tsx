@@ -63,10 +63,10 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
 
         return (
             <>
-                <Message
+                {(p.chain) ? <Message
                     header='Wallet Pairing'
                     content={`You are pairing a wallet for "${p.chain}" chain.`}
-                />
+                /> : null}
 
                 {(connectedWallets.length > 0) ? <>
                     <Header as='h3'>Your active wallet connections</Header>
