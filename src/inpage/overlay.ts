@@ -28,9 +28,9 @@ export class Overlay implements IPubSub {
         this._manager = manager;
         this.frame = document.createElement('iframe');
         this.frame.allow = 'clipboard-write';
-        this.frame.sandbox.add('allow-scripts'); // to use js frameworks in overlays
-        this.frame.sandbox.add('allow-forms'); // ToDo: rjsf uses forms in settings overlay. disallow it
-        this.frame.sandbox.add('allow-popups'); // ToDo: links depend on it. disallow it.
+        // this.frame.sandbox.add('allow-scripts'); // to use js frameworks in overlays
+        // this.frame.sandbox.add('allow-forms'); // ToDo: rjsf uses forms in settings overlay. disallow it
+        // this.frame.sandbox.add('allow-popups'); // ToDo: links depend on it. disallow it.
         this.frame.src = uri;
         this.frame.allowFullscreen = true;
         this.frame.addEventListener('load', () => {
