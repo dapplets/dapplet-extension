@@ -99,14 +99,14 @@ export class SelectWallet extends React.Component<Props, State> {
                                     </div>
                                 </div>
                                 <div>
-                                    <Button primary onClick={() => this.selectWallet(x.type)} size='tiny' style={{ margin: '5px 0' }}>Select</Button>
+                                    <Button primary onClick={() => this.selectWallet(x.type)} style={{ margin: '5px 0' }}>Select</Button>
                                 </div>
                             </div>
                         ))}
 
                         <Message info style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <p>Don't see your account here? You can <b>change an active account</b> in a connected wallet or </p>
-                            <Button color='olive' onClick={() => this.pairWallet()}>
+                            <Button color='teal' onClick={() => this.pairWallet()}>
                               Connect a new wallet
                             </Button>
                         </Message>
