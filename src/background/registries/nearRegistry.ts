@@ -5,6 +5,7 @@ import VersionInfo from '../models/versionInfo';
 import * as logger from '../../common/logger';
 import * as nearAPI from 'near-api-js';
 import { ethers } from 'ethers';
+import { typeOfUri, UriTypes } from '../../common/helpers';
 
 type NearStorageRef = {
     hash: string; // bytes32
@@ -62,6 +63,7 @@ export class NearRegistry implements Registry {
 
     public async getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }> {
         try {
+            users = users.filter(x => typeOfUri(x) === UriTypes.Near);
             const usersCacheKey = users.join(';');
             if (!this._moduleInfoCache.has(usersCacheKey)) this._moduleInfoCache.set(usersCacheKey, new Map());
             if (contextIds.map(c => this._moduleInfoCache.get(usersCacheKey).has(c)).every(c => c === true)) {

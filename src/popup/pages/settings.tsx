@@ -15,7 +15,7 @@ interface ISettingsState {
     isLoading: boolean;
     connected: boolean;
 
-    registries: { url: string, isDev: boolean, isAvailable: boolean, error: string }[];
+    registries: { url: string, isDev: boolean, isAvailable: boolean, error: string, isEnabled: boolean }[];
     registryInput: string;
     registryInputError: string;
 
@@ -296,9 +296,17 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             const { resolveName } = await initBGFunctions(browser);
             const ethAddress = await resolveName(address);
             window.open(`https://rinkeby.etherscan.io/address/${ethAddress}`, '_blank');
-        } else {
+        } else if (typeOfUri(address) === UriTypes.Ethereum) {
             window.open(`https://rinkeby.etherscan.io/address/${address}`, '_blank');
+        } else if (typeOfUri(address) === UriTypes.Near) {
+            window.open(`https://explorer.testnet.near.org/accounts/${address}`, '_blank');
         }
+    }
+
+    async enableRegistry(url: string) {
+        const { enableRegistry } = await initBGFunctions(browser);
+        await enableRegistry(url);
+        this.loadRegistries();
     }
 
     render() {
@@ -321,7 +329,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             color: 'blue'
                         }}
                         fluid
-                        placeholder='ENS or 0x address...'
+                        placeholder='NEAR or Ethereum address...'
                         value={registryInput}
                         onChange={(e) => this.setState({ registryInput: e.target.value, registryInputError: null })}
                         error={!!registryInputError}
@@ -333,20 +341,32 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                         {registries.map((r, i) => (
                             <List.Item key={i}>
                                 <List.Content floated='left'>
-                                    <Popup
-                                        trigger={<Label size='mini' horizontal color={(r.isAvailable) ? 'green' : 'red'}>{(r.isAvailable) ? 'ONLINE' : (r.error) ? 'ERROR' : 'OFFLINE'}</Label>}
-                                        content={r.error || 'Ready'}
-                                        size='mini'
-                                    />
+                                    <Checkbox radio checked={r.isEnabled} onClick={() => this.enableRegistry(r.url)}/>
                                 </List.Content>
                                 <List.Content floated='right'>
-                                    <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
+                                    <Icon link style={{ position: 'relative', top: '2px' }} color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
                                 </List.Content>
-                                <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => this._openEtherscan(r.url)}>{r.url}</a></List.Content>
+                                <List.Content>
+                                    <a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => this.enableRegistry(r.url)}>{r.url}</a>
+                                    {(r.isEnabled && r.error) ? <Popup
+                                        trigger={
+                                            <Label 
+                                                style={{ marginLeft: '6px', position: 'relative', top: '-1px', cursor: 'default' }}
+                                                size='mini' 
+                                                horizontal 
+                                                color='red'
+                                            >
+                                                ERROR
+                                            </Label>
+                                        }
+                                        content={r.error}
+                                        size='mini'
+                                    /> : null}
+                                    
+                                </List.Content>
                             </List.Item>
                         ))}
                     </List>
-
 
                     <Header as='h4'>Trusted Users</Header>
                     <Input
@@ -361,7 +381,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             color: 'blue'
                         }}
                         fluid
-                        placeholder='ENS or 0x address...'
+                        placeholder='NEAR or Ethereum address...'
                         value={trustedUserInput}
                         onChange={(e) => this.setState({ trustedUserInput: e.target.value, trustedUserInputError: null })}
                         error={!!trustedUserInputError}
@@ -384,7 +404,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                     <Input
                         size='mini'
                         fluid
-                        placeholder='Swarm Address...'
+                        placeholder='Swarm address...'
                         error={!!this.state.userSettingsInputError}
                         action
                         iconPosition='left'
@@ -422,7 +442,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                         <Button size='mini' disabled={this.state.providerLoading || !this.state.providerEdited || !isValidHttp(this.state.providerInput)} color='blue' onClick={() => this.setProvider(this.state.providerInput)}>Save</Button>
                     </Input>
 
-                    <Header as='h5'>Identity Contract</Header>
+                    {/* <Header as='h5'>Identity Contract</Header>
                     <Input
                         size='mini'
                         fluid
@@ -439,7 +459,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             onChange={(e) => this.setState({ identityInput: e.target.value, identityInputError: null, identityEdited: true })}
                         />
                         <Button size='mini' disabled={this.state.identityLoading || !this.state.identityEdited || !isValidUrl(this.state.identityInput)} color='blue' onClick={() => this.setIdentityContract(this.state.identityInput)}>Save</Button>
-                    </Input>
+                    </Input> */}
 
                     <div><Checkbox toggle label='Developer Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /></div>
                     <div><Checkbox toggle label='Open the popup in the overlay' checked={popupInOverlay} onChange={() => this.setPopupInOverlay(!popupInOverlay)} style={{ marginBottom: 6 }} /></div>

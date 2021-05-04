@@ -22,15 +22,16 @@ export default class GlobalConfigService {
     getInitialConfig(): GlobalConfig {
         const config = new GlobalConfig();
         config.id = this._configId;
-        config.registries = [{
-            url: "dev-1619784199964-4356216",
-            isDev: false,
-            isEnabled: true
-        }];
+        config.registries = [
+            { url: "dev-1619784199964-4356216", isDev: false, isEnabled: true },
+            { url: "dapplet-base.eth", isDev: false, isEnabled: false }
+        ];
         config.devMode = false;
         config.trustedUsers = [
             { account: "buidl.testnet" },
-            { account: "nik3ter.testnet" }
+            { account: "nik3ter.testnet" },
+            { account: "0x692a4d7B7BE2dc1623155E90B197a82D114a74f3" },
+            { account: "0x9126d36880905fcb9e5f2a7f7c4f19703d52bc62" }
         ];
         config.userSettings = {};
         config.providerUrl = 'https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c';
@@ -65,6 +66,9 @@ export default class GlobalConfigService {
         const config = await this.get();
         if (config.registries.find(r => r.url === url)) return;
 
+        // Dev registries are enabled by default
+        const isEnabled = isDev ? true : false;
+
         if (isEthAddress || isEnsAddress || isNearAddress) {
             // ToDo: fix it
             // if (isEnsAddress) {
@@ -73,12 +77,12 @@ export default class GlobalConfigService {
             //     if (!address) throw new Error("Can not resolve the ENS name");
             // }
 
-            config.registries.push({ url, isDev, isEnabled: true });
+            config.registries.push({ url, isDev, isEnabled: isEnabled });
             await this.set(config);
         } else {
             const response = await fetch(url);
             if (response.ok || !isDev) { // ToDo: check prod registry correctly
-                config.registries.push({ url, isDev, isEnabled: true });
+                config.registries.push({ url, isDev, isEnabled: isEnabled });
                 await this.set(config);
             } else {
                 throw Error('The registry is not available.');
@@ -91,7 +95,17 @@ export default class GlobalConfigService {
     }
 
     async enableRegistry(url: string) {
-        return this.updateConfig(c => c.registries.find(x => x.url === url).isEnabled = true);
+        const config = await this.get();
+        const registry = config.registries.find(x => x.url === url);
+        registry.isEnabled = true;
+        
+        // only one production registry can be enabled
+        if (!registry.isDev) {
+            config.registries.filter(x => x.url !== url && !x.isDev)
+                .forEach(x => x.isEnabled = false);
+        }
+
+        return this.set(config);
     }
 
     async disableRegistry(url: string) {
