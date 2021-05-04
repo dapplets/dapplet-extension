@@ -72,10 +72,10 @@ export class SelectWallet extends React.Component<Props, State> {
         return (
             <div style={{ padding: '30px 20px' }}>
 
-                <Message
-                    header='Select Wallet'
-                    content={`You are choosing a wallet for "${p.app}" application in "${p.chain}" chain.`}
-                />
+                <Message>
+                  <Message.Header>Select Wallet</Message.Header>
+                  <p>You are choosing a wallet for <b>{p.app}</b> application in <b>{p.chain}</b> chain.</p>
+                </Message>
 
                 {(connectedWallets.length > 0) ? <>
                     <Header as='h3'>Your active wallet connections</Header>
@@ -104,21 +104,19 @@ export class SelectWallet extends React.Component<Props, State> {
                             </div>
                         ))}
 
-                        <Message info >
-                            <p>Don't see your account here? You can:</p>
-                            <Message.List>
-                                <Message.Item>change an active account in a connected wallet</Message.Item>
-                                <Message.Item>connect a new wallet <Icon name='chain' link onClick={() => this.pairWallet()}/></Message.Item>
-                            </Message.List>
+                        <Message info style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                            <p>Don't see your account here? You can <b>change an active account</b> in a connected wallet or </p>
+                            <Button color='olive' onClick={() => this.pairWallet()}>
+                              Connect a new wallet
+                            </Button>
                         </Message>
                     </Comment.Group>
-                </> : <Message warning >
+                </> : <Message warning style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                         <p>No one of connected wallets is eligible to sign on behalf of the account you selected.</p>
-                        <p>You can:</p>
-                        <Message.List>
-                            <Message.Item>change an active account in a connected wallet</Message.Item>
-                            <Message.Item>connect a new wallet <Icon name='chain' link onClick={() => this.pairWallet()}/></Message.Item>
-                        </Message.List>
+                        <p>You can <b>change an active account</b> in a connected wallet or </p>
+                        <Button color='olive' onClick={() => this.pairWallet()}>
+                          Connect a new wallet
+                        </Button>
                     </Message>}
             </div>
         );
