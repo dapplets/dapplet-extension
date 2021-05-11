@@ -1,5 +1,6 @@
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const package = require('./package.json');
 const webpack = require("webpack");
 
@@ -37,7 +38,14 @@ module.exports = {
       {
         include: path.resolve(__dirname, 'src'),
         test: /\.tsx?$/,
-        use: "ts-loader"
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+            },
+          },
+        ],
       },
       {
         include: path.resolve(__dirname, 'src'),
@@ -140,6 +148,7 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
       process: 'process/browser'
-    })
+    }),
+    new ForkTsCheckerWebpackPlugin()
   ]
 };
