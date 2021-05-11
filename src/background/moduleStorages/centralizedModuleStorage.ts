@@ -32,4 +32,8 @@ export class CentralizedModuleStorage implements ModuleStorage {
         if (!json.data || json.data.length !== 64) throw new Error("Invalid hash was returned by server");
         return json.data;
     }
+    
+    saveDir(tarBlob: Blob): Promise<string> {
+        throw new Error('Method not implemented.');
+    }
 }

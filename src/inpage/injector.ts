@@ -185,7 +185,26 @@ export class Injector {
                 contextStarted: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), true),
                 contextFinished: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), false),
                 connect: core.connect.bind(core),
-                overlay: core.overlay.bind(core),
+                overlay: (cfg, eventDef) => {
+                    if (cfg.name) {
+                        const overlay = manifest.overlays?.[cfg.name];
+                        if (!overlay) throw new Error(`Cannot find overlay with name "${cfg.name}" in the manifest.`);
+                        
+                        const url = new URL(overlay.uris[0]);
+
+                        if (url.protocol === 'bzz:') {
+                            cfg.url = `https://swarm.dapplets.org/bzz/${url.pathname.slice(2)}`;
+                            return core.overlay(cfg, eventDef);
+                        } else if (url.protocol === 'http:' || url.protocol === 'https:') {
+                            cfg.url = url.href;
+                            return core.overlay(cfg, eventDef);
+                        } else {
+                            throw new Error(`Invalid protocol "${url.protocol}" in the overlay address.`);
+                        }
+                    } else {
+                        return core.overlay(cfg, eventDef);
+                    }
+                },
                 wallet: (cfg, eventDef) => core.wallet(cfg, eventDef, manifest.name),
                 storage: new AppStorage(manifest.name, manifest.environment, defaultConfig),
                 contract: (type, address, options) => core.contract(type, address, options, manifest.name),

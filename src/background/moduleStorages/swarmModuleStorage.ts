@@ -38,4 +38,19 @@ export class SwarmModuleStorage implements ModuleStorage {
         const url = "bzz://" + json.reference;
         return url;
     }
+    
+    public async saveDir(tarBlob: Blob): Promise<string> {
+        const response = await fetch(this._gateway + 'dirs', {
+            method: 'POST',
+            body: tarBlob,
+            headers: {
+                'swarm-index-document': 'index.html'
+            }
+        });
+    
+        const json = await response.json();
+        if (!json.reference) throw new Error("Cannot upload file to Swarm."); // ToDo: show message
+        const url = "bzz://" + json.reference;
+        return url;
+    }
 }

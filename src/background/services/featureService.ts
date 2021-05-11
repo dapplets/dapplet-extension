@@ -11,6 +11,7 @@ import JSZip from 'jszip';
 import * as logger from '../../common/logger';
 import { getCurrentTab, mergeDedupe } from '../../common/helpers';
 import { WalletService } from './walletService';
+import { Tar } from '../../common/tar';
 
 export default class FeatureService {
     private _moduleManager: ModuleManager;
@@ -254,7 +255,7 @@ export default class FeatureService {
         const dists = await Promise.all(modulesWithDeps.map(m => moduleManager.loadModule(m.manifest)));
 
         return modulesWithDeps.map((m, i) => ({
-            manifest: m.manifest,
+            manifest: Object.assign(m.manifest, dists[i].internalManifest), // merge manifests from registry and bundle (zip) 
             script: dists[i].script,
             defaultConfig: dists[i].defaultConfig
         }));
@@ -292,6 +293,39 @@ export default class FeatureService {
             if (vi.schemaConfig) {
                 const arr = await this._storageAggregator.getResource(vi.schemaConfig);
                 zip.file('schema.json', arr);
+            }
+
+            // upload overlays declared in manifest
+            // it packs all files from `assets-manifest.json` into tar container
+            if (vi.overlays) {
+                for (const overlayName in vi.overlays) {
+                    const baseUrl = vi.overlays[overlayName].uris[0];
+                    const assetManifestUrl = new URL('assets-manifest.json', baseUrl).href;
+                    const arr = await this._storageAggregator.getResource({ uris: [assetManifestUrl], hash: null });
+                    const json = String.fromCharCode.apply(null, new Uint8Array(arr));
+                    const assetManifest = JSON.parse(json);
+                    const assets = Object.values(assetManifest);
+
+                    const files = await Promise.all(assets.map((x: string) => this._storageAggregator.getResource({ uris: [new URL(x, baseUrl).href], hash: null }).then(y => ({ url: x, arr: y }))));
+
+                    const tar = new Tar();
+                    for (const file of files) {
+                        const path = (file.url[0] === '/') ? file.url.slice(1) : file.url;
+                        tar.addFileArrayBuffer(path, file.arr);
+                    }
+                    const blob = await tar.write();
+
+                    const hashUris = await this._storageAggregator.saveDir(blob, [targetStorage]);
+                    vi.overlays[overlayName] = hashUris;
+
+                    console.log(hashUris);
+                }
+
+                // Add manifest to zip (just for overlays yet)
+                const manifest = { overlays: vi.overlays };
+                const manifestJson = JSON.stringify(manifest);
+                const manifestArr = new TextEncoder().encode(manifestJson);
+                zip.file('dapplet.json', manifestArr);
             }
 
             if (vi.main) {

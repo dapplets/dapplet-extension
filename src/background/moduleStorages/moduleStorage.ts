@@ -42,7 +42,7 @@ export class StorageAggregator {
             if (this._checkHash(buffer, hashUris.hash, hashUris.hash)) return buffer;
         }
 
-        throw Error("Can not fetch resource");
+        throw Error(`Can not fetch resource by URIs: ${hashUris.uris.join(', ')}`);
     }
 
     public async save(blob: Blob, targetStorages: StorageTypes[]): Promise<StorageRef> {
@@ -61,6 +61,20 @@ export class StorageAggregator {
         const backupHash = await centralizedStorage.save(blob);
         if (hash.replace('0x', '') !== backupHash.replace('0x', '')) {
             throw Error(`Backup is corrupted: invalid hashes ${hash} ${backupHash}`);
+        }
+
+        return { hash, uris };
+    }
+
+    public async saveDir(blob: Blob, targetStorages: StorageTypes[]): Promise<StorageRef> {
+        const buffer = await (blob as any).arrayBuffer();
+        const hash = ethers.utils.keccak256(new Uint8Array(buffer));
+        const uris = [];
+
+        for (const storageType of targetStorages) {
+            const storage = this._getStorageByType(storageType);
+            const uri = await storage.saveDir(blob);
+            uris.push(uri);
         }
 
         return { hash, uris };

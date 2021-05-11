@@ -93,7 +93,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
         const registries = await getRegistries();
         const trustedUsers = await getTrustedUsers();
-        const prodRegistries = registries.filter(r => !r.isDev);
+        const prodRegistries = registries.filter(r => !r.isDev && r.isEnabled);
         this.setState({
             registryOptions: prodRegistries.map(r => ({
                 key: r.url, text: r.url, value: r.url
@@ -380,30 +380,11 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
                 <Form loading={loading}>
 
-                    <Form.Select
+                    <Form.Input
                         required
                         label='Target Registry'
-                        options={registryOptions}
-                        placeholder='Target Registry'
-                        value={targetRegistry}
-                        onChange={(e, data) => {
-                            this.setState({
-                                targetRegistry: data.value as string
-                            });
-                            this._updateData();
-                        }}
-                        onAddItem={(e, { value }) => {
-                            this.setState((prev) => ({
-                                registryOptions: [{
-                                    key: value as string,
-                                    text: value as string,
-                                    value: value as string
-                                }, ...prev.registryOptions],
-                            }))
-                        }}
-                        allowAdditions
-                        selection
-                        search
+                        value={targetRegistry ?? ''}
+                        readOnly
                     />
 
                     <Form.Select
@@ -420,7 +401,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         })}
                     />
 
-                    <Button primary disabled={isButtonDisabled} onClick={() => this.deployButtonClickHandler()}>Deploy</Button>
+<Button primary disabled={isButtonDisabled} onClick={() => this.deployButtonClickHandler()}>Deploy</Button>
                 </Form>
             </React.Fragment>
         );

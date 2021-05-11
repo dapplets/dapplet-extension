@@ -323,7 +323,9 @@ export default class Core {
         }) as any;
     }
 
-    public overlay<M>(cfg: { url: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
+    public overlay<M>(cfg: { name: string, url?: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection
+    public overlay<M>(cfg: { name?: string, url: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection
+    public overlay<M>(cfg: { name: string, url: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
         const _overlay = new Overlay(this.overlayManager, cfg.url, cfg.title);
         const conn = Connection.create<M>(_overlay, eventDef);
         return conn;
@@ -353,6 +355,6 @@ export default class Core {
             throw new Error("\"ethereum\" and \"near\" contracts only are supported.");
         }
     }
-    
+
     utils = ethers.utils;
 }

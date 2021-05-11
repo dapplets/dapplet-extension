@@ -21,4 +21,7 @@ export default class VersionInfo extends Base {
     environment?: Environments = null;
     schemaConfig: StorageRef = null;
     defaultConfig: StorageRef = null;
+    overlays: {
+        [name: string]: StorageRef
+    } = null;
 }

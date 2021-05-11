@@ -32,4 +32,8 @@ export class HttpModuleStorage implements ModuleStorage {
         const url = `${registryUrl}/storage/${json.data}`;
         return url;
     }
+    
+    saveDir(tarBlob: Blob): Promise<string> {
+        throw new Error('Method not implemented.');
+    }
 }

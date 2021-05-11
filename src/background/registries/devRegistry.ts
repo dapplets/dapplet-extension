@@ -24,7 +24,10 @@ type DevManifest = {
     config?: {
         schema?: string;
         default?: string;
-    }
+    };
+    overlays?: {
+        [name: string]: string
+    };
 }
 
 type JsonReference = {
@@ -195,6 +198,7 @@ export class DevRegistry implements Registry {
             hash: null,
             uris: [new URL(dm.config.default, new URL(manifestUri, this._rootUrl).href).href]
         } : null;
+        vi.overlays = (dm.overlays) ? Object.fromEntries(Object.entries(dm.overlays).map(([k, v]) => ([k, { uris: [v], hash: null }]))) : null;
 
         return { module: mi, version: vi };
     }

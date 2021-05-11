@@ -94,28 +94,32 @@ export default class ModuleManager {
         return object;
     }
 
-    private async _loadDist(url: StorageRef): Promise<{ script: string, defaultConfig: DefaultConfig, schemaConfig: SchemaConfig }> {
+    private async _loadDist(url: StorageRef): Promise<{ script: string, defaultConfig: DefaultConfig, schemaConfig: SchemaConfig, internalManifest: any }> {
         const resource = await this._storage.getResource(url);
         const jszip = new JSZip();
         const zip = await jszip.loadAsync(resource);
+        
         const script = await zip.file('index.js').async('string');
         const defaultJson = zip.file('default.json') && await zip.file('default.json').async('string');
         const schemaJson = zip.file('schema.json') && await zip.file('schema.json').async('string');
+        const internalManifestJson = zip.file('dapplet.json') && await zip.file('dapplet.json').async('string');
+
         return {
             script,
             defaultConfig: defaultJson && JSON.parse(defaultJson),
-            schemaConfig: schemaJson && JSON.parse(schemaJson)
+            schemaConfig: schemaJson && JSON.parse(schemaJson),
+            internalManifest: internalManifestJson && JSON.parse(internalManifestJson),
         }
     }
 
-    public async loadModule(m: VersionInfo): Promise<{ script: string, defaultConfig: DefaultConfig, schemaConfig: SchemaConfig }> {
+    public async loadModule(m: VersionInfo): Promise<{ script: string, defaultConfig: DefaultConfig, schemaConfig: SchemaConfig, internalManifest: any }> {
         if (m.dist) {
             return this._loadDist(m.dist);
         } else {
             const script = await this._loadScript(m.main);
             const defaultConfig = m.defaultConfig && await this._loadJson(m.defaultConfig);
             const schemaConfig = m.schemaConfig && await this._loadJson(m.schemaConfig);
-            return { script, defaultConfig, schemaConfig };
+            return { script, defaultConfig, schemaConfig, internalManifest: null };
         }
     }
 
