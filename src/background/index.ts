@@ -256,7 +256,14 @@ browser.runtime.onInstalled.addListener(async (details) => {
       const resp = await fetch(url.href);
       const json = await resp.json();
 
-      await globalConfigService.set(json);
+      if (Array.isArray(json)) {
+        for (const j of json) {
+          await globalConfigService.set(j);
+        }
+      } else {
+        await globalConfigService.set(json);
+      }      
+      
       console.log(`The predefined configuration was initialized. URL: ${url.href}`);
     } catch (err) {
       console.error("Cannot set predefined configuration.", err);
