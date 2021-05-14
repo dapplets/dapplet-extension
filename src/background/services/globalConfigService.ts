@@ -49,7 +49,8 @@ export default class GlobalConfigService {
         const existingConfig = await this._globalConfigRepository.getById(targetProfileId);
         if (existingConfig) throw new Error(`Profile "${targetProfileId}" already exists.`);
 
-        const config = await this._globalConfigRepository.getById(sourceProfileId);
+        let config = await this._globalConfigRepository.getById(sourceProfileId);
+        if (!config && sourceProfileId === this._defaultConfigId) config = this.getInitialConfig();
         if (!config) throw new Error(`Profile "${sourceProfileId}" doesn't exist.`);
 
         config.id = targetProfileId;
@@ -77,7 +78,11 @@ export default class GlobalConfigService {
     }
 
     async exportProfile(profileId: string): Promise<string> {
-        const config = await this._globalConfigRepository.getById(profileId);
+        let config = await this._globalConfigRepository.getById(profileId);
+        
+        if (!config && profileId === this._defaultConfigId) config = this.getInitialConfig();
+        if (!config) throw new Error(`Profile "${profileId}" doesn't exist.`);
+
         const json = JSON.stringify(config);
         const blob = new Blob([json], { type: "application/json" });
         const swarmStorage = new SwarmModuleStorage();
