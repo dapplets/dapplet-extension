@@ -1,9 +1,10 @@
 import * as React from "react";
 import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { Popup, Segment, List, Label, Input, Checkbox, Icon, Header, Button } from "semantic-ui-react";
+import { Popup, Segment, List, Label, Input, Checkbox, Icon, Header, Button, Dropdown, Form, Divider } from "semantic-ui-react";
 import { isValidHttp, isValidUrl } from '../helpers';
 import { typeOfUri, UriTypes } from '../../common/helpers';
+import { CopyButton } from '../../common/react-components/CopyButton';
 
 interface ISettingsProps {
     devMode: boolean;
@@ -14,6 +15,10 @@ interface ISettingsProps {
 interface ISettingsState {
     isLoading: boolean;
     connected: boolean;
+
+    profiles: string[];
+    currentProfile: string;
+    profileSearchQuery: string;
 
     registries: { url: string, isDev: boolean, isAvailable: boolean, error: string, isEnabled: boolean }[];
     registryInput: string;
@@ -57,6 +62,9 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         this.state = {
             isLoading: true,
             connected: false,
+            profiles: [],
+            currentProfile: '',
+            profileSearchQuery: '',
             registries: [],
             registryInput: '',
             registryInputError: null,
@@ -88,7 +96,13 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     }
 
     async componentDidMount() {
+        await this.loadAll();
+    }
+
+    async loadAll() {
+        this.setState({ isLoading: true });
         await Promise.all([
+            this.loadProfiles(),
             this.loadRegistries(),
             this.loadDevMode(),
             this.loadTrustedUsers(),
@@ -102,6 +116,16 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             this.loadUserAgentName()
         ]);
         this.setState({ isLoading: false });
+    }
+
+    async loadProfiles() {
+        const { getProfiles } = await initBGFunctions(browser);
+        const profiles = await getProfiles();
+
+        this.setState({
+            profiles: profiles.map(x => x.id),
+            currentProfile: profiles.find(x => x.isActive).id
+        });
     }
 
     async loadRegistries() {
@@ -309,12 +333,93 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         this.loadRegistries();
     }
 
+    async _copyOrImportProfile(urlOrName: string) {
+        let newProfileId = null;
+
+        if (typeOfUri(urlOrName) === UriTypes.Swarm) {
+            const { importProfile } = await initBGFunctions(browser);
+            newProfileId = await importProfile(urlOrName);
+        } else {
+            const { copyProfile } = await initBGFunctions(browser);
+            const sourceProfileName = this.state.currentProfile;
+            await copyProfile(urlOrName, sourceProfileName);
+            newProfileId = urlOrName;
+        }
+
+        const { setActiveProfile } = await initBGFunctions(browser);
+        await setActiveProfile(newProfileId);
+
+        await this.loadAll();
+    }
+
+    async _setActiveProfile(name: string) {
+        const { setActiveProfile } = await initBGFunctions(browser);
+        await setActiveProfile(name);
+        await this.loadAll();
+    }
+
+    async _exportProfile() {
+        const { exportProfile } = await initBGFunctions(browser);
+        const url = await exportProfile(this.state.currentProfile);
+        await navigator.clipboard.writeText(url);
+    }
+
+    async _shareExtension() {
+        const { createShareLink } = await initBGFunctions(browser);
+        const url = await createShareLink(this.state.currentProfile);
+        await navigator.clipboard.writeText(url);
+    }
+
     render() {
         const { isLoading, registries, registryInput, registryInputError, trustedUsers, trustedUserInput, trustedUserInputError, devMode, errorReporting, autoBackup, popupInOverlay } = this.state;
 
         return (
             <React.Fragment>
                 <Segment loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTabSettings"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
+
+                    <Header as='h4'>Version</Header>
+                    <div>
+                        <a href='#' onClick={() => window.open(`https://github.com/dapplets/dapplet-extension/releases`, '_blank')}>
+                            v{EXTENSION_VERSION}
+                        </a>
+                        {this.state.isUpdateAvailable ? <Icon title='New version is available' style={{ margin: '0 0 0 0.25em' }} color='orange' name='arrow up' /> : null}
+                    </div>
+
+                    <Header as='h4'>Profile</Header>
+                    <Form size='mini'>
+                        <Form.Dropdown
+                            compact
+                            options={this.state.profiles.map(x => ({
+                                key: x,
+                                text: x,
+                                value: x
+                            }))}
+                            placeholder='Choose Profile'
+                            search
+                            selection
+                            fluid
+                            allowAdditions
+                            additionLabel={(typeOfUri(this.state.profileSearchQuery) === UriTypes.Swarm) ? "Import profile from " : "Copy profile as "}
+                            value={this.state.currentProfile}
+                            onAddItem={(e, data) => this._copyOrImportProfile(data.value as string)}
+                            onChange={(e, data) => this._setActiveProfile(data.value as string)}
+                            onSearchChange={(e, data) => this.setState({ profileSearchQuery: data.searchQuery })}
+                        />
+                    </Form>
+                    <div style={{ marginTop: '10px' }}>
+                        <CopyButton 
+                            onClick={() => this._exportProfile()} 
+                            style={{ width: '150px' }} 
+                            labelBefore='Export Profile' 
+                            labelAfter='Copied to Clipboard'
+                        />
+                        <CopyButton 
+                            onClick={() => this._shareExtension()} 
+                            style={{ width: '150px' }} 
+                            labelBefore='Share Extension' 
+                            labelAfter='Copied to Clipboard'
+                        />
+                    </div>
 
                     <Header as='h4'>Public Registries</Header>
                     <Input
@@ -484,14 +589,6 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                         />
                         <Button size='mini' disabled={this.state.userAgentNameLoading || !this.state.userAgentNameEdited} color='blue' onClick={() => this.setUserAgentName(this.state.userAgentNameInput)}>Save</Button>
                     </Input>
-
-                    <Header as='h4'>About</Header>
-                    <div>
-                        <a href='#' onClick={() => window.open(`https://github.com/dapplets/dapplet-extension/releases`, '_blank')}>
-                            v{EXTENSION_VERSION}
-                        </a>
-                        {this.state.isUpdateAvailable ? <Icon title='New version is available' style={{ margin: '0 0 0 0.25em' }} color='orange' name='arrow up' /> : null}
-                    </div>
                 </Segment>
 
             </React.Fragment>

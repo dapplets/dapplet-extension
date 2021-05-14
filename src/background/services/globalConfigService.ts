@@ -8,10 +8,11 @@ import SiteConfig from '../models/siteConfig';
 
 export default class GlobalConfigService {
     private _globalConfigRepository = new GlobalConfigBrowserStorage();
-    private _configId: string = 'default';
+    private _defaultConfigId: string = 'default';
 
     async get(): Promise<GlobalConfig> {
-        const config = await this._globalConfigRepository.getById(this._configId);
+        const configs = await this._globalConfigRepository.getAll();
+        const config = configs.find(x => x.isActive) ?? configs.find(x => x.id === this._defaultConfigId);
         return config ?? this.getInitialConfig();
     }
 
@@ -19,9 +20,82 @@ export default class GlobalConfigService {
         await this._globalConfigRepository.update(config);
     }
 
+    async getProfiles(): Promise<{ id: string, isActive: boolean }[]> {
+        const configs = await this._globalConfigRepository.getAll();
+        if (configs.length === 0) configs.push(this.getInitialConfig());
+        if (!configs.find(x => x.isActive)) configs.find(x => x.id === this._defaultConfigId).isActive = true;
+        return configs.map(x => ({ id: x.id, isActive: x.isActive }));
+    }
+
+    async setActiveProfile(profileId: string) {
+        const configs = await this._globalConfigRepository.getAll();
+
+        for (const config of configs) {
+            // activate new config
+            if (config.id === profileId) {
+                config.isActive = true;
+                await this._globalConfigRepository.update(config);
+            }
+
+            // deactivate old configs
+            if (config.id !== profileId && config.isActive === true) {
+                config.isActive = false;
+                await this._globalConfigRepository.update(config);
+            }
+        }
+    }
+
+    async copyProfile(targetProfileId: string, sourceProfileId: string) {
+        const existingConfig = await this._globalConfigRepository.getById(targetProfileId);
+        if (existingConfig) throw new Error(`Profile "${targetProfileId}" already exists.`);
+
+        const config = await this._globalConfigRepository.getById(sourceProfileId);
+        if (!config) throw new Error(`Profile "${sourceProfileId}" doesn't exist.`);
+
+        config.id = targetProfileId;
+        config.isActive = false;
+
+        await this._globalConfigRepository.create(config);
+    }
+
+    async importProfile(url: string): Promise<string> {
+        const swarmStorage = new SwarmModuleStorage();
+        const arr = await swarmStorage.getResource(url);
+        const json = new TextDecoder("utf-8").decode(new Uint8Array(arr));
+        const config = JSON.parse(json);
+
+        let id = config.id;
+        while (await this._globalConfigRepository.getById(id)) {
+            id += ' Copy';
+        }
+
+        config.id = id;
+
+        await this._globalConfigRepository.create(config);
+
+        return config.id;
+    }
+
+    async exportProfile(profileId: string): Promise<string> {
+        const config = await this._globalConfigRepository.getById(profileId);
+        const json = JSON.stringify(config);
+        const blob = new Blob([json], { type: "application/json" });
+        const swarmStorage = new SwarmModuleStorage();
+        const url = await swarmStorage.save(blob);
+        return url;
+    }
+
+    async createShareLink(profileId: string): Promise<string> {
+        const bzzLink = await this.exportProfile(profileId);
+        const absoluteLink = 'https://swarm.dapplets.org/files/' + bzzLink.replace('bzz://', '');
+        const shareLink = `https://github.com/dapplets/dapplet-extension/releases/latest/download/dapplet-extension.zip?config=${absoluteLink}`;
+        return shareLink;
+    }
+
     getInitialConfig(): GlobalConfig {
         const config = new GlobalConfig();
-        config.id = this._configId;
+        config.id = this._defaultConfigId;
+        config.isActive = true;
         config.registries = [
             { url: "dev-1619784199964-4356216", isDev: false, isEnabled: true },
             { url: "dapplet-base.eth", isDev: false, isEnabled: false }
@@ -98,7 +172,7 @@ export default class GlobalConfigService {
         const config = await this.get();
         const registry = config.registries.find(x => x.url === url);
         registry.isEnabled = true;
-        
+
         // only one production registry can be enabled
         if (!registry.isDev) {
             config.registries.filter(x => x.url !== url && !x.isDev)

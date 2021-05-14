@@ -7,6 +7,8 @@ export class GlobalConfig extends Base {
 
     id: string = 'default';
 
+    isActive: boolean = false;
+
     suspended: boolean = false;
 
     walletInfo: WalletInfo = null;

@@ -38,14 +38,15 @@ export default abstract class BaseBrowserStorage<T extends Base> {
     }
 
     async create(item: T): Promise<void> {
-        if (!item.getId()) throw new Error("ID must be specified"); // ToDo: Where is ID generated?
+        const mappedItem = this._mapperService.map(this._TConstructor, item);
+        if (!mappedItem.getId()) throw new Error("ID must be specified"); // ToDo: Where is ID generated?
 
-        const key = this._storageName + ':' + item.getId();
+        const key = this._storageName + ':' + mappedItem.getId();
 
         const result = await browser.storage.local.get(key);
         if (!!result[key]) throw new Error(`Item [${key}] already exists`); // ToDo: Is it allowed to replace the object?
 
-        const data = { [key]: item };
+        const data = { [key]: mappedItem };
         const clone = JSON.parse(JSON.stringify(data));
         await browser.storage.local.set(clone);
     }

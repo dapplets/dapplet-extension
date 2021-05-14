@@ -80,6 +80,12 @@ browser.runtime.onMessage.addListener(
     removeDapplet: (name, hostnames) => featureService.removeDapplet(name, hostnames),
 
     // GlobalConfigService
+    getProfiles: globalConfigService.getProfiles.bind(globalConfigService),
+    setActiveProfile: globalConfigService.setActiveProfile.bind(globalConfigService),
+    copyProfile: globalConfigService.copyProfile.bind(globalConfigService),
+    importProfile: globalConfigService.importProfile.bind(globalConfigService),
+    exportProfile: globalConfigService.exportProfile.bind(globalConfigService),
+    createShareLink: globalConfigService.createShareLink.bind(globalConfigService),
     getGlobalConfig: () => globalConfigService.get(),
     setGlobalConfig: (config) => globalConfigService.set(config),
     getDevMode: () => globalConfigService.getDevMode(),
