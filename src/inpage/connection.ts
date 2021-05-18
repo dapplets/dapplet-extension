@@ -39,10 +39,11 @@ export interface IConnection {
     //bind(e: EventType): Listener
     addAutoProperty(apConfig: AutoPropertyConf, setter: (v: any) => void, ctx?: any): AutoProperty
     sendAndListen(topic: string, message: any, h: MsgHandler | EventHandler): this
-    listen(h: EventHandler): this
+    /*listen(h: EventHandler): this
     listen(f: MsgFilter, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): this
-    listen(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): this
+    listen(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): this*/
+    listen(h: MsgHandler | EventHandler): this
     listener(h: EventHandler): Listener
     listener(f: MsgFilter, ap?: AutoProperty[]): Listener
     listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): Listener
@@ -120,12 +121,13 @@ export class Connection implements IConnection {
         return this;
     }
 
-    listen(h: EventHandler): this
+    /*listen(h: EventHandler): this
     listen(f: MsgFilter, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): this
-    listen(filterOrHander: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): this {
-        this.listener.call(this, arguments)
+    listen(filterOrHander: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): this {*/
+    listen(h: MsgHandler | EventHandler, ap?: AutoProperty[]): this {
+        let listener = this.listener("", h as any, ap)
         return this
     }
 
