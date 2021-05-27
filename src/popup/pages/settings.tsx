@@ -5,6 +5,7 @@ import { Popup, Segment, List, Label, Input, Checkbox, Icon, Header, Button, Dro
 import { isValidHttp, isValidUrl } from '../helpers';
 import { typeOfUri, UriTypes } from '../../common/helpers';
 import { CopyButton } from '../../common/react-components/CopyButton';
+import { ProfileDropdown } from "../components/ProfileDropdown";
 
 interface ISettingsProps {
     devMode: boolean;
@@ -358,238 +359,238 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         await this.loadAll();
     }
 
-    async _exportProfile() {
-        const { exportProfile } = await initBGFunctions(browser);
-        const url = await exportProfile(this.state.currentProfile);
-        await navigator.clipboard.writeText(url);
-    }
-
-    async _shareExtension() {
-        const { createShareLink } = await initBGFunctions(browser);
-        const url = await createShareLink(this.state.currentProfile);
-        await navigator.clipboard.writeText(url);
-    }
-
     render() {
+        const p = this.props;
+        const s = this.state;
+
         const { isLoading, registries, registryInput, registryInputError, trustedUsers, trustedUserInput, trustedUserInputError, devMode, errorReporting, autoBackup, popupInOverlay } = this.state;
 
         return (
             <React.Fragment>
-                <Segment loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTabSettings"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
+                <Segment.Group loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTabSettings"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
+                    <Segment>
+                        <Header as='h4'>Profile</Header>
+                        <ProfileDropdown 
+                            currentProfileId={s.currentProfile} 
+                            profiles={s.profiles.map(x => ({ id: x, text: x }))}
+                            onRefresh={() => this.loadAll()}
+                            // onAddItem={(e, data) => this._copyOrImportProfile(data.value as string)}
+                            // onChange={(e, data) => this._setActiveProfile(data.value as string)}
+                            // onSearchChange={(e, data) => this.setState({ profileSearchQuery: data.searchQuery })}
+                        />
+                        {/* <Form size='mini'>
+                            <Form.Dropdown
+                                compact
+                                options={this.state.profiles.map(x => ({
+                                    key: x,
+                                    text: x,
+                                    value: x
+                                }))}
+                                placeholder='Choose Profile'
+                                search
+                                selection
+                                fluid
+                                allowAdditions
+                                additionLabel={(typeOfUri(this.state.profileSearchQuery) === UriTypes.Swarm) ? "Import profile from " : "Copy profile as "}
+                                value={this.state.currentProfile}
+                                onAddItem={(e, data) => this._copyOrImportProfile(data.value as string)}
+                                onChange={(e, data) => this._setActiveProfile(data.value as string)}
+                                onSearchChange={(e, data) => this.setState({ profileSearchQuery: data.searchQuery })}
+                            />
+                        </Form>
+                        <div style={{ marginTop: '10px' }}>
+                            <CopyButton 
+                                onClick={() => this._exportProfile()} 
+                                style={{ width: '150px' }} 
+                                labelBefore='Export Profile' 
+                                labelAfter='Copied to Clipboard'
+                            />
+                            <CopyButton 
+                                onClick={() => this._shareExtension()} 
+                                style={{ width: '150px' }} 
+                                labelBefore='Share Extension' 
+                                labelAfter='Copied to Clipboard'
+                            />
+                        </div> */}
+                    </Segment>
+                    
+                    <Segment>
+                        <Header as='h4'>Version</Header>
+                        <div>
+                            <a href='#' onClick={() => window.open(`https://github.com/dapplets/dapplet-extension/releases`, '_blank')}>
+                                v{EXTENSION_VERSION}
+                            </a>
+                            {this.state.isUpdateAvailable ? <Icon title='New version is available' style={{ margin: '0 0 0 0.25em' }} color='orange' name='arrow up' /> : null}
+                        </div>
 
-                    <Header as='h4'>Version</Header>
-                    <div>
-                        <a href='#' onClick={() => window.open(`https://github.com/dapplets/dapplet-extension/releases`, '_blank')}>
-                            v{EXTENSION_VERSION}
-                        </a>
-                        {this.state.isUpdateAvailable ? <Icon title='New version is available' style={{ margin: '0 0 0 0.25em' }} color='orange' name='arrow up' /> : null}
-                    </div>
-
-                    <Header as='h4'>Profile</Header>
-                    <Form size='mini'>
-                        <Form.Dropdown
-                            compact
-                            options={this.state.profiles.map(x => ({
-                                key: x,
-                                text: x,
-                                value: x
-                            }))}
-                            placeholder='Choose Profile'
-                            search
-                            selection
+                        <Header as='h4'>Public Registries</Header>
+                        <Input
+                            size='mini'
+                            icon='code'
+                            iconPosition='left'
+                            action={{
+                                content: 'Add',
+                                size: 'mini',
+                                onClick: () => this.addRegistry(registryInput),
+                                disabled: !(isValidUrl(registryInput) && !registries.find(r => r.url === registryInput)),
+                                color: 'blue'
+                            }}
                             fluid
-                            allowAdditions
-                            additionLabel={(typeOfUri(this.state.profileSearchQuery) === UriTypes.Swarm) ? "Import profile from " : "Copy profile as "}
-                            value={this.state.currentProfile}
-                            onAddItem={(e, data) => this._copyOrImportProfile(data.value as string)}
-                            onChange={(e, data) => this._setActiveProfile(data.value as string)}
-                            onSearchChange={(e, data) => this.setState({ profileSearchQuery: data.searchQuery })}
+                            placeholder='NEAR or Ethereum address...'
+                            value={registryInput}
+                            onChange={(e) => this.setState({ registryInput: e.target.value, registryInputError: null })}
+                            error={!!registryInputError}
                         />
-                    </Form>
-                    <div style={{ marginTop: '10px' }}>
-                        <CopyButton 
-                            onClick={() => this._exportProfile()} 
-                            style={{ width: '150px' }} 
-                            labelBefore='Export Profile' 
-                            labelAfter='Copied to Clipboard'
+
+                        {(registryInputError) ? <Label basic color='red' pointing>{registryInputError}</Label> : null}
+
+                        <List divided relaxed size='small'>
+                            {registries.map((r, i) => (
+                                <List.Item key={i}>
+                                    <List.Content floated='left'>
+                                        <Checkbox radio checked={r.isEnabled} onClick={() => this.enableRegistry(r.url)}/>
+                                    </List.Content>
+                                    <List.Content floated='right'>
+                                        <Icon link style={{ position: 'relative', top: '2px' }} color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
+                                    </List.Content>
+                                    <List.Content>
+                                        <a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => this.enableRegistry(r.url)}>{r.url}</a>
+                                        {(r.isEnabled && r.error) ? <Popup
+                                            trigger={
+                                                <Label 
+                                                    style={{ marginLeft: '6px', position: 'relative', top: '-1px', cursor: 'default' }}
+                                                    size='mini' 
+                                                    horizontal 
+                                                    color='red'
+                                                >
+                                                    ERROR
+                                                </Label>
+                                            }
+                                            content={r.error}
+                                            size='mini'
+                                        /> : null}
+                                        
+                                    </List.Content>
+                                </List.Item>
+                            ))}
+                        </List>
+
+                        <Header as='h4'>Trusted Users</Header>
+                        <Input
+                            size='mini'
+                            icon='ethereum'
+                            iconPosition='left'
+                            action={{
+                                content: 'Add',
+                                size: 'mini',
+                                onClick: () => this.addTrustedUser(trustedUserInput),
+                                disabled: !(isValidUrl(trustedUserInput) && !registries.find(r => r.url === trustedUserInput)),
+                                color: 'blue'
+                            }}
+                            fluid
+                            placeholder='NEAR or Ethereum address...'
+                            value={trustedUserInput}
+                            onChange={(e) => this.setState({ trustedUserInput: e.target.value, trustedUserInputError: null })}
+                            error={!!trustedUserInputError}
                         />
-                        <CopyButton 
-                            onClick={() => this._shareExtension()} 
-                            style={{ width: '150px' }} 
-                            labelBefore='Share Extension' 
-                            labelAfter='Copied to Clipboard'
-                        />
-                    </div>
 
-                    <Header as='h4'>Public Registries</Header>
-                    <Input
-                        size='mini'
-                        icon='code'
-                        iconPosition='left'
-                        action={{
-                            content: 'Add',
-                            size: 'mini',
-                            onClick: () => this.addRegistry(registryInput),
-                            disabled: !(isValidUrl(registryInput) && !registries.find(r => r.url === registryInput)),
-                            color: 'blue'
-                        }}
-                        fluid
-                        placeholder='NEAR or Ethereum address...'
-                        value={registryInput}
-                        onChange={(e) => this.setState({ registryInput: e.target.value, registryInputError: null })}
-                        error={!!registryInputError}
-                    />
+                        {(trustedUserInputError) ? <Label basic color='red' pointing>{trustedUserInputError}</Label> : null}
 
-                    {(registryInputError) ? <Label basic color='red' pointing>{registryInputError}</Label> : null}
+                        <List divided relaxed size='small'>
+                            {trustedUsers.map((user, i) => (
+                                <List.Item key={i}>
+                                    <List.Content floated='right'>
+                                        <Icon link color='red' name='close' onClick={() => this.removeTrustedUser(user.account)} />
+                                    </List.Content>
+                                    <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => this._openEtherscan(user.account)}>{user.account}</a></List.Content>
+                                </List.Item>
+                            ))}
+                        </List>
 
-                    <List divided relaxed size='small'>
-                        {registries.map((r, i) => (
-                            <List.Item key={i}>
-                                <List.Content floated='left'>
-                                    <Checkbox radio checked={r.isEnabled} onClick={() => this.enableRegistry(r.url)}/>
-                                </List.Content>
-                                <List.Content floated='right'>
-                                    <Icon link style={{ position: 'relative', top: '2px' }} color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
-                                </List.Content>
-                                <List.Content>
-                                    <a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => this.enableRegistry(r.url)}>{r.url}</a>
-                                    {(r.isEnabled && r.error) ? <Popup
-                                        trigger={
-                                            <Label 
-                                                style={{ marginLeft: '6px', position: 'relative', top: '-1px', cursor: 'default' }}
-                                                size='mini' 
-                                                horizontal 
-                                                color='red'
-                                            >
-                                                ERROR
-                                            </Label>
-                                        }
-                                        content={r.error}
-                                        size='mini'
-                                    /> : null}
-                                    
-                                </List.Content>
-                            </List.Item>
-                        ))}
-                    </List>
+                        <Header as='h5'>User Settings</Header>
+                        <Input
+                            size='mini'
+                            fluid
+                            placeholder='Swarm address...'
+                            error={!!this.state.userSettingsInputError}
+                            action
+                            iconPosition='left'
+                            loading={this.state.userSettingsLoading}
+                        >
+                            <Icon name='cog'></Icon>
+                            <input
+                                value={this.state.userSettingsInput}
+                                onChange={(e) => this.setState({ userSettingsInput: e.target.value, userSettingsInputError: null })}
+                            />
+                            <Button size="mini" disabled={this.state.userSettingsLoading} onClick={() => this.loadUserSettings()}>Load</Button>
+                            <Button size="mini" disabled={this.state.userSettingsLoading} color='blue' onClick={() => this.saveUserSettings()}>Save</Button>
+                        </Input>
 
-                    <Header as='h4'>Trusted Users</Header>
-                    <Input
-                        size='mini'
-                        icon='ethereum'
-                        iconPosition='left'
-                        action={{
-                            content: 'Add',
-                            size: 'mini',
-                            onClick: () => this.addTrustedUser(trustedUserInput),
-                            disabled: !(isValidUrl(trustedUserInput) && !registries.find(r => r.url === trustedUserInput)),
-                            color: 'blue'
-                        }}
-                        fluid
-                        placeholder='NEAR or Ethereum address...'
-                        value={trustedUserInput}
-                        onChange={(e) => this.setState({ trustedUserInput: e.target.value, trustedUserInputError: null })}
-                        error={!!trustedUserInputError}
-                    />
+                        <Header as='h4'>Advanced</Header>
 
-                    {(trustedUserInputError) ? <Label basic color='red' pointing>{trustedUserInputError}</Label> : null}
+                        <Header as='h5'>Ethereum Provider</Header>
+                        <Input
+                            size='mini'
+                            fluid
+                            placeholder='Provider URL'
+                            error={!!this.state.providerInputError || !isValidHttp(this.state.providerInput)}
+                            action
+                            iconPosition='left'
+                            loading={this.state.providerLoading}
+                            style={{ marginBottom: '15px' }}
+                        >
+                            <Icon name='server' />
+                            <input
+                                value={this.state.providerInput}
+                                onChange={(e) => this.setState({ providerInput: e.target.value, providerInputError: null, providerEdited: true })}
+                            />
+                            <Button size='mini' disabled={this.state.providerLoading || !this.state.providerEdited || !isValidHttp(this.state.providerInput)} color='blue' onClick={() => this.setProvider(this.state.providerInput)}>Save</Button>
+                        </Input>
 
-                    <List divided relaxed size='small'>
-                        {trustedUsers.map((user, i) => (
-                            <List.Item key={i}>
-                                <List.Content floated='right'>
-                                    <Icon link color='red' name='close' onClick={() => this.removeTrustedUser(user.account)} />
-                                </List.Content>
-                                <List.Content><a style={{ color: '#000', lineHeight: '1.4em' }} onClick={() => this._openEtherscan(user.account)}>{user.account}</a></List.Content>
-                            </List.Item>
-                        ))}
-                    </List>
+                        {/* <Header as='h5'>Identity Contract</Header>
+                        <Input
+                            size='mini'
+                            fluid
+                            placeholder='Contract address'
+                            error={!!this.state.identityInputError || !isValidUrl(this.state.identityInput)}
+                            action
+                            iconPosition='left'
+                            loading={this.state.identityLoading}
+                            style={{ marginBottom: '15px' }}
+                        >
+                            <Icon name='users' />
+                            <input
+                                value={this.state.identityInput}
+                                onChange={(e) => this.setState({ identityInput: e.target.value, identityInputError: null, identityEdited: true })}
+                            />
+                            <Button size='mini' disabled={this.state.identityLoading || !this.state.identityEdited || !isValidUrl(this.state.identityInput)} color='blue' onClick={() => this.setIdentityContract(this.state.identityInput)}>Save</Button>
+                        </Input> */}
 
-                    <Header as='h5'>User Settings</Header>
-                    <Input
-                        size='mini'
-                        fluid
-                        placeholder='Swarm address...'
-                        error={!!this.state.userSettingsInputError}
-                        action
-                        iconPosition='left'
-                        loading={this.state.userSettingsLoading}
-                    >
-                        <Icon name='cog'></Icon>
-                        <input
-                            value={this.state.userSettingsInput}
-                            onChange={(e) => this.setState({ userSettingsInput: e.target.value, userSettingsInputError: null })}
-                        />
-                        <Button.Group size='mini'>
-                            <Button disabled={this.state.userSettingsLoading} onClick={() => this.loadUserSettings()}>Load</Button>
-                            <Button disabled={this.state.userSettingsLoading} color='blue' onClick={() => this.saveUserSettings()}>Save</Button>
-                        </Button.Group>
-                    </Input>
+                        <div><Checkbox toggle label='Developer Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /></div>
+                        <div><Checkbox toggle label='Open the popup in the overlay' checked={popupInOverlay} onChange={() => this.setPopupInOverlay(!popupInOverlay)} style={{ marginBottom: 6 }} /></div>
+                        {/* <Checkbox toggle label='Modules backup' checked={autoBackup} onChange={() => this.setAutoBackup(!autoBackup)} style={{ marginBottom: 6 }} /><br /> */}
+                        <div><Checkbox toggle label='Bug reports' checked={errorReporting} onChange={() => this.setErrorReporting(!errorReporting)} /></div>
 
-                    <Header as='h4'>Advanced</Header>
-
-                    <Header as='h5'>Ethereum Provider</Header>
-                    <Input
-                        size='mini'
-                        fluid
-                        placeholder='Provider URL'
-                        error={!!this.state.providerInputError || !isValidHttp(this.state.providerInput)}
-                        action
-                        iconPosition='left'
-                        loading={this.state.providerLoading}
-                        style={{ marginBottom: '15px' }}
-                    >
-                        <Icon name='server' />
-                        <input
-                            value={this.state.providerInput}
-                            onChange={(e) => this.setState({ providerInput: e.target.value, providerInputError: null, providerEdited: true })}
-                        />
-                        <Button size='mini' disabled={this.state.providerLoading || !this.state.providerEdited || !isValidHttp(this.state.providerInput)} color='blue' onClick={() => this.setProvider(this.state.providerInput)}>Save</Button>
-                    </Input>
-
-                    {/* <Header as='h5'>Identity Contract</Header>
-                    <Input
-                        size='mini'
-                        fluid
-                        placeholder='Contract address'
-                        error={!!this.state.identityInputError || !isValidUrl(this.state.identityInput)}
-                        action
-                        iconPosition='left'
-                        loading={this.state.identityLoading}
-                        style={{ marginBottom: '15px' }}
-                    >
-                        <Icon name='users' />
-                        <input
-                            value={this.state.identityInput}
-                            onChange={(e) => this.setState({ identityInput: e.target.value, identityInputError: null, identityEdited: true })}
-                        />
-                        <Button size='mini' disabled={this.state.identityLoading || !this.state.identityEdited || !isValidUrl(this.state.identityInput)} color='blue' onClick={() => this.setIdentityContract(this.state.identityInput)}>Save</Button>
-                    </Input> */}
-
-                    <div><Checkbox toggle label='Developer Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /></div>
-                    <div><Checkbox toggle label='Open the popup in the overlay' checked={popupInOverlay} onChange={() => this.setPopupInOverlay(!popupInOverlay)} style={{ marginBottom: 6 }} /></div>
-                    {/* <Checkbox toggle label='Modules backup' checked={autoBackup} onChange={() => this.setAutoBackup(!autoBackup)} style={{ marginBottom: 6 }} /><br /> */}
-                    <div><Checkbox toggle label='Bug reports' checked={errorReporting} onChange={() => this.setErrorReporting(!errorReporting)} /></div>
-
-                    <Header as='h5'>User Agent Name</Header>
-                    <Input
-                        size='mini'
-                        fluid
-                        placeholder='User agent name...'
-                        error={!!this.state.userAgentNameInputError}
-                        action
-                        iconPosition='left'
-                        loading={this.state.userAgentNameLoading}
-                        style={{ marginBottom: '15px' }}
-                    >
-                        <Icon name='bug' />
-                        <input
-                            value={this.state.userAgentNameInput}
-                            onChange={(e) => this.setState({ userAgentNameInput: e.target.value, userAgentNameInputError: null, userAgentNameEdited: true })}
-                        />
-                        <Button size='mini' disabled={this.state.userAgentNameLoading || !this.state.userAgentNameEdited} color='blue' onClick={() => this.setUserAgentName(this.state.userAgentNameInput)}>Save</Button>
-                    </Input>
-                </Segment>
+                        <Header as='h5'>User Agent Name</Header>
+                        <Input
+                            size='mini'
+                            fluid
+                            placeholder='User agent name...'
+                            error={!!this.state.userAgentNameInputError}
+                            action
+                            iconPosition='left'
+                            loading={this.state.userAgentNameLoading}
+                            style={{ marginBottom: '15px' }}
+                        >
+                            <Icon name='bug' />
+                            <input
+                                value={this.state.userAgentNameInput}
+                                onChange={(e) => this.setState({ userAgentNameInput: e.target.value, userAgentNameInputError: null, userAgentNameEdited: true })}
+                            />
+                            <Button size='mini' disabled={this.state.userAgentNameLoading || !this.state.userAgentNameEdited} color='blue' onClick={() => this.setUserAgentName(this.state.userAgentNameInput)}>Save</Button>
+                        </Input>
+                    </Segment>
+                </Segment.Group>
 
             </React.Fragment>
         );

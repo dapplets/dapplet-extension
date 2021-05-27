@@ -46,14 +46,25 @@ export default class GlobalConfigService {
     }
 
     async copyProfile(targetProfileId: string, sourceProfileId: string) {
-        const existingConfig = await this._globalConfigRepository.getById(targetProfileId);
-        if (existingConfig) throw new Error(`Profile "${targetProfileId}" already exists.`);
+        if (targetProfileId) {
+            const existingConfig = await this._globalConfigRepository.getById(targetProfileId);
+            if (existingConfig) throw new Error(`Profile "${targetProfileId}" already exists.`);
+        }
 
         let config = await this._globalConfigRepository.getById(sourceProfileId);
         if (!config && sourceProfileId === this._defaultConfigId) config = this.getInitialConfig();
         if (!config) throw new Error(`Profile "${sourceProfileId}" doesn't exist.`);
 
-        config.id = targetProfileId;
+        if (targetProfileId) {
+            config.id = targetProfileId;
+        } else {
+            let id = config.id;
+            while (await this._globalConfigRepository.getById(id)) {
+                id += ' Copy';
+            }
+            config.id = id;
+        }
+
         config.isActive = false;
 
         await this._globalConfigRepository.create(config);
@@ -79,7 +90,7 @@ export default class GlobalConfigService {
 
     async exportProfile(profileId: string): Promise<string> {
         let config = await this._globalConfigRepository.getById(profileId);
-        
+
         if (!config && profileId === this._defaultConfigId) config = this.getInitialConfig();
         if (!config) throw new Error(`Profile "${profileId}" doesn't exist.`);
 
