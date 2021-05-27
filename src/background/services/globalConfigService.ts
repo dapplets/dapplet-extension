@@ -1,6 +1,6 @@
 import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserStorage';
 import { GlobalConfig } from '../models/globalConfig';
-import { typeOfUri, UriTypes } from '../../common/helpers';
+import { incrementFilename, typeOfUri, UriTypes } from '../../common/helpers';
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { browser } from "webextension-polyfill-ts";
 import { generateGuid } from '../../common/helpers';
@@ -45,45 +45,63 @@ export default class GlobalConfigService {
         }
     }
 
-    async copyProfile(targetProfileId: string, sourceProfileId: string) {
-        if (targetProfileId) {
-            const existingConfig = await this._globalConfigRepository.getById(targetProfileId);
-            if (existingConfig) throw new Error(`Profile "${targetProfileId}" already exists.`);
-        }
+    async renameProfile(profileId: string, newProfileId: string) {
+        const oldConfig = await this._globalConfigRepository.getById(profileId);
+        if (!oldConfig) throw new Error(`The "${profileId}" profile doesn't exist.`);
 
+        oldConfig.id = newProfileId;
+        await this._globalConfigRepository.deleteById(profileId);
+        await this._globalConfigRepository.create(oldConfig);
+    }
+
+    async copyProfile(sourceProfileId: string, makeActive = false) {
         let config = await this._globalConfigRepository.getById(sourceProfileId);
         if (!config && sourceProfileId === this._defaultConfigId) config = this.getInitialConfig();
         if (!config) throw new Error(`Profile "${sourceProfileId}" doesn't exist.`);
-
-        if (targetProfileId) {
-            config.id = targetProfileId;
-        } else {
-            let id = config.id;
-            while (await this._globalConfigRepository.getById(id)) {
-                id += ' Copy';
-            }
-            config.id = id;
+        
+        // Add increment for uniqueness of profile id
+        while (await this._globalConfigRepository.getById(config.id)) {
+            config.id = incrementFilename(config.id);
         }
 
         config.isActive = false;
 
         await this._globalConfigRepository.create(config);
+
+        if (makeActive) {
+            await this.setActiveProfile(config.id);
+        }
+
+        return config.id;
     }
 
-    async importProfile(url: string): Promise<string> {
+    async deleteProfile(id: string) {
+        let config = await this._globalConfigRepository.getById(id);
+        if (!config) return;
+        if (config.isActive) throw new Error(`Cannot delete active profile.`);
+
+        await this._globalConfigRepository.deleteById(id);
+    }
+
+    async importProfile(url: string, makeActive = false): Promise<string> {
         const swarmStorage = new SwarmModuleStorage();
         const arr = await swarmStorage.getResource(url);
         const json = new TextDecoder("utf-8").decode(new Uint8Array(arr));
         const config = JSON.parse(json);
 
-        let id = config.id;
-        while (await this._globalConfigRepository.getById(id)) {
-            id += ' Copy';
+        // Add increment for uniqueness of profile id
+        while (await this._globalConfigRepository.getById(config.id)) {
+            config.id = incrementFilename(config.id);
         }
 
-        config.id = id;
+        // ToDo: reset unwanted settings
+        config.isActive = false;
 
         await this._globalConfigRepository.create(config);
+
+        if (makeActive) {
+            await this.setActiveProfile(config.id);
+        }
 
         return config.id;
     }
@@ -93,6 +111,8 @@ export default class GlobalConfigService {
 
         if (!config && profileId === this._defaultConfigId) config = this.getInitialConfig();
         if (!config) throw new Error(`Profile "${profileId}" doesn't exist.`);
+
+        config.isActive = false;
 
         const json = JSON.stringify(config);
         const blob = new Blob([json], { type: "application/json" });

@@ -82,7 +82,9 @@ browser.runtime.onMessage.addListener(
     // GlobalConfigService
     getProfiles: globalConfigService.getProfiles.bind(globalConfigService),
     setActiveProfile: globalConfigService.setActiveProfile.bind(globalConfigService),
+    renameProfile: globalConfigService.renameProfile.bind(globalConfigService),
     copyProfile: globalConfigService.copyProfile.bind(globalConfigService),
+    deleteProfile: globalConfigService.deleteProfile.bind(globalConfigService),
     importProfile: globalConfigService.importProfile.bind(globalConfigService),
     exportProfile: globalConfigService.exportProfile.bind(globalConfigService),
     createShareLink: globalConfigService.createShareLink.bind(globalConfigService),

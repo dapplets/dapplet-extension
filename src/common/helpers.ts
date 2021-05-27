@@ -75,9 +75,9 @@ export function typeOfUri(uri: string): UriTypes {
     return UriTypes.Ens;
   }
 
-  if (uriLower.lastIndexOf('.near') === uriLower.length - 5 || 
-      uriLower.lastIndexOf('.testnet') === uriLower.length - 8 ||
-      uriLower.indexOf('dev-') === 0) {
+  if (uriLower.lastIndexOf('.near') === uriLower.length - 5 ||
+    uriLower.lastIndexOf('.testnet') === uriLower.length - 8 ||
+    uriLower.indexOf('dev-') === 0) {
     return UriTypes.Near;
   }
 
@@ -197,9 +197,9 @@ export async function fetchWithTimeout(resource, options) {
 
 export function generateGuid() {
   return "xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-      var r = (Math.random() * 16) | 0,
-          v = c == "x" ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
   });
 };
 
@@ -218,9 +218,19 @@ export async function waitTab(url: string) {
 
 export function chainByUri(t: UriTypes): ChainTypes {
   switch (t) {
-      case UriTypes.Ens: return ChainTypes.ETHEREUM;
-      case UriTypes.Ethereum: return ChainTypes.ETHEREUM;
-      case UriTypes.Near: return ChainTypes.NEAR;
-      default: return null;
+    case UriTypes.Ens: return ChainTypes.ETHEREUM;
+    case UriTypes.Ethereum: return ChainTypes.ETHEREUM;
+    case UriTypes.Near: return ChainTypes.NEAR;
+    default: return null;
   }
+}
+
+/**
+ * Add increment to filename for uniqueness
+ * @param name filename
+ * @returns 
+ */
+export function incrementFilename(name: string): string {
+  const n = Number.parseInt(/\(([0-9]*)\)$/gm.exec(name)?.[1] ?? '1');
+  return (n === 1) ? `${name} (2)` : name.replace(/\(([0-9]*)\)$/gm, `(${n + 1})`);
 }

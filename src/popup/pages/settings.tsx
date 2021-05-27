@@ -19,7 +19,6 @@ interface ISettingsState {
 
     profiles: string[];
     currentProfile: string;
-    profileSearchQuery: string;
 
     registries: { url: string, isDev: boolean, isAvailable: boolean, error: string, isEnabled: boolean }[];
     registryInput: string;
@@ -65,7 +64,6 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             connected: false,
             profiles: [],
             currentProfile: '',
-            profileSearchQuery: '',
             registries: [],
             registryInput: '',
             registryInputError: null,
@@ -334,87 +332,24 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         this.loadRegistries();
     }
 
-    async _copyOrImportProfile(urlOrName: string) {
-        let newProfileId = null;
-
-        if (typeOfUri(urlOrName) === UriTypes.Swarm) {
-            const { importProfile } = await initBGFunctions(browser);
-            newProfileId = await importProfile(urlOrName);
-        } else {
-            const { copyProfile } = await initBGFunctions(browser);
-            const sourceProfileName = this.state.currentProfile;
-            await copyProfile(urlOrName, sourceProfileName);
-            newProfileId = urlOrName;
-        }
-
-        const { setActiveProfile } = await initBGFunctions(browser);
-        await setActiveProfile(newProfileId);
-
-        await this.loadAll();
-    }
-
-    async _setActiveProfile(name: string) {
-        const { setActiveProfile } = await initBGFunctions(browser);
-        await setActiveProfile(name);
-        await this.loadAll();
-    }
-
     render() {
-        const p = this.props;
         const s = this.state;
 
         const { isLoading, registries, registryInput, registryInputError, trustedUsers, trustedUserInput, trustedUserInputError, devMode, errorReporting, autoBackup, popupInOverlay } = this.state;
 
         return (
             <React.Fragment>
-                <Segment.Group loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTabSettings"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
-                    <Segment>
+                <Segment.Group className={(this.props.isOverlay) ? undefined : "internalTabSettings"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
+                    <Segment loading={isLoading}>
                         <Header as='h4'>Profile</Header>
                         <ProfileDropdown 
                             currentProfileId={s.currentProfile} 
                             profiles={s.profiles.map(x => ({ id: x, text: x }))}
                             onRefresh={() => this.loadAll()}
-                            // onAddItem={(e, data) => this._copyOrImportProfile(data.value as string)}
-                            // onChange={(e, data) => this._setActiveProfile(data.value as string)}
-                            // onSearchChange={(e, data) => this.setState({ profileSearchQuery: data.searchQuery })}
                         />
-                        {/* <Form size='mini'>
-                            <Form.Dropdown
-                                compact
-                                options={this.state.profiles.map(x => ({
-                                    key: x,
-                                    text: x,
-                                    value: x
-                                }))}
-                                placeholder='Choose Profile'
-                                search
-                                selection
-                                fluid
-                                allowAdditions
-                                additionLabel={(typeOfUri(this.state.profileSearchQuery) === UriTypes.Swarm) ? "Import profile from " : "Copy profile as "}
-                                value={this.state.currentProfile}
-                                onAddItem={(e, data) => this._copyOrImportProfile(data.value as string)}
-                                onChange={(e, data) => this._setActiveProfile(data.value as string)}
-                                onSearchChange={(e, data) => this.setState({ profileSearchQuery: data.searchQuery })}
-                            />
-                        </Form>
-                        <div style={{ marginTop: '10px' }}>
-                            <CopyButton 
-                                onClick={() => this._exportProfile()} 
-                                style={{ width: '150px' }} 
-                                labelBefore='Export Profile' 
-                                labelAfter='Copied to Clipboard'
-                            />
-                            <CopyButton 
-                                onClick={() => this._shareExtension()} 
-                                style={{ width: '150px' }} 
-                                labelBefore='Share Extension' 
-                                labelAfter='Copied to Clipboard'
-                            />
-                        </div> */}
                     </Segment>
                     
-                    <Segment>
+                    <Segment loading={isLoading}>
                         <Header as='h4'>Version</Header>
                         <div>
                             <a href='#' onClick={() => window.open(`https://github.com/dapplets/dapplet-extension/releases`, '_blank')}>
