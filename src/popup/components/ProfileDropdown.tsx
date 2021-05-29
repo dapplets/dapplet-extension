@@ -18,9 +18,6 @@ interface State {
   isExportUploading: boolean;
   isExportCopied: boolean;
   exportError: string;
-  isShareUploading: boolean;
-  isShareCopied: boolean;
-  shareError: string;
   deletingProfileId: string;
   renamingValue: string;
   importInputValue: string;
@@ -43,9 +40,6 @@ export class ProfileDropdown extends React.Component<Props, State> {
       isExportUploading: false,
       isExportCopied: false,
       exportError: null,
-      isShareUploading: false,
-      isShareCopied: false,
-      shareError: null,
       deletingProfileId: null,
       renamingValue: "",
       importInputValue: "",
@@ -127,34 +121,6 @@ export class ProfileDropdown extends React.Component<Props, State> {
       isExportCopied: false,
       isExportUploading: false,
     });
-  };
-
-  resetShareHandler = async () => {
-    this.setState({
-      shareError: null,
-      isShareCopied: false,
-      isShareUploading: false,
-    });
-  };
-
-  shareHandler = async (e) => {
-    this.setState({ isShareUploading: true });
-
-    try {
-      const { createShareLink } = await initBGFunctions(browser);
-      const url = await createShareLink(this.props.currentProfileId);
-      await navigator.clipboard.writeText(url);
-      this.setState({ isShareUploading: false, isShareCopied: true });
-      await new Promise((r) => setTimeout(r, 3000));
-      this.setState({ isShareCopied: false });
-    } catch (err) {
-      this.setState({
-        isShareUploading: false,
-        shareError: err instanceof Error ? err.message : err,
-      });
-      await new Promise((r) => setTimeout(r, 3000));
-      this.setState({ shareError: null });
-    }
   };
 
   saveRenameHandler = async () => {
@@ -304,36 +270,6 @@ export class ProfileDropdown extends React.Component<Props, State> {
             onClick={this.exportHandler}
             disabled={s.isExportUploading}
             loading={s.isExportUploading}
-          />
-        )}
-        {s.isShareCopied ? (
-          <Button
-            size="mini"
-            basic
-            icon="check"
-            content="Copied"
-            onClick={this.resetShareHandler}
-          />
-        ) : s.shareError ? (
-          <Button
-            size="mini"
-            basic
-            icon="exclamation triangle"
-            color="red"
-            content="Error"
-            title={s.shareError}
-            onClick={this.resetShareHandler}
-          />
-        ) : (
-          <Button
-            title="Share an extension link with your profile"
-            size="mini"
-            basic
-            icon="share"
-            content="Share"
-            onClick={this.shareHandler}
-            disabled={s.isShareUploading}
-            loading={s.isShareUploading}
           />
         )}
       </div>

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { browser } from "webextension-polyfill-ts";
-import { Tab, Menu, Label } from "semantic-ui-react";
+import { Tab, Menu } from "semantic-ui-react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 
 import Dapplets from "./dapplets";
@@ -11,6 +11,7 @@ import Developer from "./developer";
 import Events from "./events";
 import "./popup.scss";
 import { Bus } from "../../common/bus";
+import { ShareButton } from "../components/ShareButton";
 
 interface IPopupProps {
   contextIds: Promise<string[]>;
@@ -151,6 +152,13 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
 
     return (
       <React.Fragment>
+        <ShareButton
+          style={{
+            position: "absolute",
+            top: "15px",
+            right: "10px",
+          }}
+        />
         <div
           className={
             this.state.isOverlay ? "popupContainer" : "popupContainer popup"
