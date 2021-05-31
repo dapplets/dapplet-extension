@@ -10,27 +10,22 @@ import { ChainTypes, DefaultSigners, WalletDescriptor, WalletTypes } from '../..
 
 export class WalletService {
 
-    private _map: { [chain: string]: { [wallet: string]: GenericWallet } } = {};
+    private _map: Promise<{ [chain: string]: { [wallet: string]: GenericWallet } }>;
 
-    constructor(private _globalConfigService: GlobalConfigService) {
-        for (const chain in wallets) {
-            this._map[chain] = {};
-            for (const wallet in wallets[chain]) {
-                this._map[chain][wallet] = new wallets[chain][wallet]();
-            }
-        }
-    }
+    constructor(private _globalConfigService: GlobalConfigService) { }
 
     async connectWallet(wallet: WalletTypes) {
         // ToDo: is need chain argument?
-        const chain = this._getWalletsArray().find(x => x.wallet === wallet).chain;
-        return this._map[chain][wallet].connectWallet();
+        const chain = (await this._getWalletsArray()).find(x => x.wallet === wallet).chain;
+        const map = await this._getWalletsMap();
+        return map[chain][wallet].connectWallet();
     }
 
     async disconnectWallet(wallet: WalletTypes) {
         // ToDo: is need chain argument?
-        const chain = this._getWalletsArray().find(x => x.wallet === wallet).chain;
-        await this._map[chain][wallet].disconnectWallet();
+        const chain = (await this._getWalletsArray()).find(x => x.wallet === wallet).chain;
+        const map = await this._getWalletsMap();
+        await map[chain][wallet].disconnectWallet();
 
         const usage = await this._globalConfigService.getWalletsUsage();
 
@@ -46,7 +41,7 @@ export class WalletService {
     async getWalletDescriptors(): Promise<WalletDescriptor[]> {
         const defaults = await this._getWalletFor(DefaultSigners.EXTENSION);
         const usage = await this._globalConfigService.getWalletsUsage();
-        const arr = this._getWalletsArray();
+        const arr = await this._getWalletsArray();
 
         const getUsageApps = (chain: ChainTypes, wallet: WalletTypes) => {
             const arr: string[] = [];
@@ -74,8 +69,9 @@ export class WalletService {
 
     async eth_getSignerFor(app: string | DefaultSigners): Promise<Signer> {
         const me = this;
+        const providerUrl = await this._globalConfigService.getEthereumProvider();
         return new (class extends Signer {
-            provider = new providers.StaticJsonRpcProvider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 4);
+            provider = new providers.StaticJsonRpcProvider(providerUrl);
 
             async getAddress(): Promise<string> {
                 return '0x0000000000000000000000000000000000000000';
@@ -194,21 +190,22 @@ export class WalletService {
     private async _getInternalSignerFor(app: string | DefaultSigners, chain: ChainTypes, isConnected: boolean = true): Promise<GenericWallet> {
         const defaults = await this._getWalletFor(app);
         const defaultWallet = defaults?.[chain];
+        const map = await this._getWalletsMap();
 
-        if (defaultWallet && this._map[chain][defaultWallet].isConnected()) return this._map[chain][defaultWallet];
+        if (defaultWallet && map[chain][defaultWallet].isConnected()) return map[chain][defaultWallet];
 
         // ToDo: clean walletType?
 
         // choose first connected wallet
-        for (const wallet in this._map[chain]) {
-            if (this._map[chain][wallet].isConnected()) {
-                return this._map[chain][wallet];
+        for (const wallet in map[chain]) {
+            if (map[chain][wallet].isConnected()) {
+                return map[chain][wallet];
             }
         }
 
         if (!isConnected) {
-            for (const wallet in this._map[chain]) {
-                return this._map[chain][wallet];
+            for (const wallet in map[chain]) {
+                return map[chain][wallet];
             }
         }
     }
@@ -216,25 +213,28 @@ export class WalletService {
     private async _pairSignerFor(app: string | DefaultSigners, chain: ChainTypes): Promise<GenericWallet> {
         // pairing
         await this.pairWalletViaOverlay(chain);
+        
+        const map = await this._getWalletsMap();
 
         // choose first connected wallet
-        for (const wallet in this._map[chain]) {
-            if (this._map[chain][wallet].isConnected()) {
-                return this._map[chain][wallet];
+        for (const wallet in map[chain]) {
+            if (map[chain][wallet].isConnected()) {
+                return map[chain][wallet];
             }
         }
 
         throw new Error('Cannot find signer');
     }
 
-    private _getWalletsArray() {
+    private async _getWalletsArray() {
+        const map = await this._getWalletsMap();
         const arr: { chain: ChainTypes, wallet: WalletTypes, instance: GenericWallet }[] = [];
-        for (const chain in this._map) {
-            for (const wallet in this._map[chain]) {
+        for (const chain in map) {
+            for (const wallet in map[chain]) {
                 arr.push({
                     chain: chain as ChainTypes,
                     wallet: wallet as WalletTypes,
-                    instance: this._map[chain][wallet]
+                    instance: map[chain][wallet]
                 })
             }
         }
@@ -275,5 +275,25 @@ export class WalletService {
     private async _getWalletFor(app: string | DefaultSigners): Promise<{ [chain: string]: string }> {
         const wallets = await this._globalConfigService.getWalletsUsage();
         return wallets[app] ?? {};
+    }
+
+    private async _getWalletsMap() {
+        if (!this._map) {
+            this._map = this._globalConfigService.getEthereumProvider().then(providerUrl => {
+                const map = {};
+                const config = { providerUrl };
+
+                for (const chain in wallets) {
+                    map[chain] = {};
+                    for (const wallet in wallets[chain]) {
+                        map[chain][wallet] = new wallets[chain][wallet](config);
+                    }
+                }
+
+                return map;
+            });
+        }
+
+        return this._map;
     }
 }

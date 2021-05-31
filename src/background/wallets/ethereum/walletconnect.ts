@@ -8,7 +8,7 @@ import { getCurrentTab } from '../../../common/helpers';
 
 export default class extends ethers.Signer implements EthereumWallet {
     
-    public provider = new ethers.providers.StaticJsonRpcProvider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 4);
+    public provider: ethers.providers.StaticJsonRpcProvider;
     private __walletconnect?: WalletConnect;
 
     private get _walletconnect() {
@@ -28,6 +28,11 @@ export default class extends ethers.Signer implements EthereumWallet {
 
     private set _walletconnect(v: any) {
         this.__walletconnect = v;
+    }
+
+    constructor(config: { providerUrl: string }) {
+        super();
+        this.provider = new ethers.providers.StaticJsonRpcProvider(config.providerUrl);
     }
 
     async getAddress(): Promise<string> {

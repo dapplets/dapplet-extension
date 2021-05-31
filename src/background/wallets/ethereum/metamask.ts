@@ -1,14 +1,13 @@
 import { Provider, TransactionRequest } from "@ethersproject/providers";
 import { ethers } from "ethers";
-import { Deferrable } from "ethers/lib/utils";
+import { Deferrable, SupportedAlgorithm } from "ethers/lib/utils";
 import { EthereumWallet } from "./interface";
 import createMetaMaskProvider from 'metamask-extension-provider';
 
 export default class extends ethers.Signer implements EthereumWallet {
 
-    public provider = new ethers.providers.StaticJsonRpcProvider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 4);
+    public provider: ethers.providers.StaticJsonRpcProvider;
     private _metamaskProvider;
-
     private _available = false;
 
     private get _metamask() {
@@ -28,6 +27,11 @@ export default class extends ethers.Signer implements EthereumWallet {
             // this._metamaskProvider.on('data', (...args) => console.log('data', args))
         }
         return this._metamaskProvider;
+    }
+
+    constructor(config: { providerUrl: string }) {
+        super();
+        this.provider = new ethers.providers.StaticJsonRpcProvider(config.providerUrl);
     }
 
     async getAddress(): Promise<string> {
