@@ -9,6 +9,7 @@ import { StorageRef } from "../../background/registries/registry";
 import ModuleInfo from "../../background/models/moduleInfo";
 import VersionInfo from "../../background/models/versionInfo";
 import { HoverLabel } from "../components/HoverLabel";
+import { joinUrls } from "../../common/helpers";
 
 interface IDeveloperProps {
     isOverlay: boolean;
@@ -29,6 +30,7 @@ interface IDeveloperState {
         popupDeveloperWelcome: boolean;
     };
     modules: { module: ModuleInfo, versions: VersionInfo[], isDeployed: boolean[] }[];
+    swarmGatewayUrl: string;
 }
 
 class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
@@ -44,13 +46,20 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
             intro: {
                 popupDeveloperWelcome: false
             },
-            modules: []
+            modules: [],
+            swarmGatewayUrl: ''
         };
     }
 
-    componentDidMount() {
-        this.loadRegistries();
-        this.loadIntro();
+    async componentDidMount() {
+        await this.loadSwarmGateway();
+        await Promise.all([this.loadRegistries(), this.loadIntro()]);
+    }
+
+    async loadSwarmGateway() {
+        const { getSwarmGateway } = await initBGFunctions(browser);
+        const swarmGatewayUrl = await getSwarmGateway();
+        this.setState({ swarmGatewayUrl });
     }
 
     async loadRegistries() {
@@ -186,7 +195,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                             {modules.map((m, i) => (
                                 <List.Item key={i}>
                                     <List.Content floated='left' style={{ position: 'relative' }}>
-                                        <Image avatar src={(m.module.icon && m.module.icon.uris.length > 0) ? ((m.module.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm.dapplets.org/files/' + (m.module.icon as StorageRef).uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0] : (m.module.icon as StorageRef).uris?.[0]) : NOLOGO_PNG} />
+                                        <Image avatar src={(m.module.icon && m.module.icon.uris.length > 0) ? ((m.module.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? joinUrls(this.state.swarmGatewayUrl, 'files/' + (m.module.icon as StorageRef).uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0]) : (m.module.icon as StorageRef).uris?.[0]) : NOLOGO_PNG} />
                                         {(m.isDeployed?.[0] === true) ? <Label color='green' floating style={{ padding: '4px', top: '18px', left: '18px' }} /> : null}
                                     </List.Content>
                                     <List.Content floated='right'>

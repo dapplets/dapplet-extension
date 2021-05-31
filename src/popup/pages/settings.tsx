@@ -37,6 +37,11 @@ interface ISettingsState {
     providerLoading: boolean;
     providerEdited: boolean;
 
+    swarmGatewayInput: string;
+    swarmGatewayInputError: string;
+    swarmGatewayLoading: boolean;
+    swarmGatewayEdited: boolean;
+
     identityInput: string;
     identityInputError: string;
     identityLoading: boolean;
@@ -80,6 +85,10 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             providerInputError: null,
             providerLoading: false,
             providerEdited: false,
+            swarmGatewayInput: '',
+            swarmGatewayInputError: null,
+            swarmGatewayLoading: false,
+            swarmGatewayEdited: false,
             identityInput: '',
             identityInputError: null,
             identityLoading: false,
@@ -110,6 +119,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             this.loadPopupInOverlay(),
             this.checkUpdates(),
             this.loadProvider(),
+            this.loadSwarmGateway(),
             this.loadIdentityContract(),
             this.loadUserAgentId(),
             this.loadUserAgentName()
@@ -160,6 +170,20 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         await setEthereumProvider(provider);
         this.loadProvider();
         this.setState({ providerLoading: false, providerEdited: false });
+    }
+
+    async loadSwarmGateway() {
+        const { getSwarmGateway } = await initBGFunctions(browser);
+        const gateway = await getSwarmGateway();
+        this.setState({ swarmGatewayInput: gateway });
+    }
+
+    async setSwarmGateway(gateway: string) {
+        this.setState({ swarmGatewayLoading: true });
+        const { setSwarmGateway } = await initBGFunctions(browser);
+        await setSwarmGateway(gateway);
+        this.loadSwarmGateway();
+        this.setState({ swarmGatewayLoading: false, swarmGatewayEdited: false });
     }
 
     async setDevMode(isActive: boolean) {
@@ -480,6 +504,25 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                                 onChange={(e) => this.setState({ providerInput: e.target.value, providerInputError: null, providerEdited: true })}
                             />
                             <Button size='mini' disabled={this.state.providerLoading || !this.state.providerEdited || !isValidHttp(this.state.providerInput)} color='blue' onClick={() => this.setProvider(this.state.providerInput)}>Save</Button>
+                        </Input>
+
+                        <Header as='h5'>Swarm Gateway</Header>
+                        <Input
+                            size='mini'
+                            fluid
+                            placeholder='Gateway URL'
+                            error={!!this.state.swarmGatewayInputError || !isValidHttp(this.state.swarmGatewayInput)}
+                            action
+                            iconPosition='left'
+                            loading={this.state.swarmGatewayLoading}
+                            style={{ marginBottom: '15px' }}
+                        >
+                            <Icon name='server' />
+                            <input
+                                value={this.state.swarmGatewayInput}
+                                onChange={(e) => this.setState({ swarmGatewayInput: e.target.value, swarmGatewayInputError: null, swarmGatewayEdited: true })}
+                            />
+                            <Button size='mini' disabled={this.state.swarmGatewayLoading || !this.state.swarmGatewayEdited || !isValidHttp(this.state.swarmGatewayInput)} color='blue' onClick={() => this.setSwarmGateway(this.state.swarmGatewayInput)}>Save</Button>
                         </Input>
 
                         {/* <Header as='h5'>Identity Contract</Header>

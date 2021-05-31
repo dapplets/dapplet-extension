@@ -37,6 +37,8 @@ export class GlobalConfig extends Base {
 
     providerUrl: string = null;
 
+    swarmGatewayUrl: string = null;
+
     walletsUsage: { [moduleName: string]: { [chain: string]: string } } = {}; // { 'extension': { 'ethereum': 'metamask', 'near': 'near' }}
 
     identityContract: string = null;

@@ -1,6 +1,6 @@
 import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserStorage';
 import { GlobalConfig } from '../models/globalConfig';
-import { incrementFilename, typeOfUri, UriTypes } from '../../common/helpers';
+import { incrementFilename, joinUrls, typeOfUri, UriTypes } from '../../common/helpers';
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { browser } from "webextension-polyfill-ts";
 import { generateGuid } from '../../common/helpers';
@@ -13,6 +13,11 @@ export default class GlobalConfigService {
     async get(): Promise<GlobalConfig> {
         const configs = await this._globalConfigRepository.getAll();
         const config = configs.find(x => x.isActive) ?? configs.find(x => x.id === this._defaultConfigId);
+
+        if (config) {
+            if (!config.swarmGatewayUrl) config.swarmGatewayUrl = this.getInitialConfig().swarmGatewayUrl;
+        }
+
         return config ?? this.getInitialConfig();
     }
 
@@ -84,7 +89,8 @@ export default class GlobalConfigService {
     }
 
     async importProfile(url: string, makeActive = false): Promise<string> {
-        const swarmStorage = new SwarmModuleStorage();
+        const swarmGatewayUrl = await this.getSwarmGateway();
+        const swarmStorage = new SwarmModuleStorage({ swarmGatewayUrl });
         const arr = await swarmStorage.getResource(url);
         const json = new TextDecoder("utf-8").decode(new Uint8Array(arr));
         const config = JSON.parse(json);
@@ -116,14 +122,16 @@ export default class GlobalConfigService {
 
         const json = JSON.stringify(config);
         const blob = new Blob([json], { type: "application/json" });
-        const swarmStorage = new SwarmModuleStorage();
+        const swarmGatewayUrl = await this.getSwarmGateway();
+        const swarmStorage = new SwarmModuleStorage({ swarmGatewayUrl });
         const url = await swarmStorage.save(blob);
         return url;
     }
 
     async createShareLink(profileId: string): Promise<string> {
         const bzzLink = await this.exportProfile(profileId);
-        const absoluteLink = 'https://swarm.dapplets.org/files/' + bzzLink.replace('bzz://', '');
+        const swarmGatewayUrl = await this.getSwarmGateway();
+        const absoluteLink = joinUrls(swarmGatewayUrl, 'files/' + bzzLink.replace('bzz://', ''));
         const shareLink = `https://github.com/dapplets/dapplet-extension/releases/latest/download/dapplet-extension.zip?config=${absoluteLink}`;
         return shareLink;
     }
@@ -145,6 +153,7 @@ export default class GlobalConfigService {
         ];
         config.userSettings = {};
         config.providerUrl = 'https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c';
+        config.swarmGatewayUrl = 'https://swarm.dapplets.org/';
         config.walletsUsage = {};
         config.identityContract = '0xf6b3a0B20281796D465bB8613e233BE30be07084';
         config.popupInOverlay = false;
@@ -316,7 +325,8 @@ export default class GlobalConfigService {
     }
 
     async loadUserSettings(url: string) {
-        const swarmStorage = new SwarmModuleStorage();
+        const swarmGatewayUrl = await this.getSwarmGateway();
+        const swarmStorage = new SwarmModuleStorage({ swarmGatewayUrl });
         const data = await swarmStorage.getResource(url);
         const json = new TextDecoder("utf-8").decode(new Uint8Array(data));
         const config = JSON.parse(json);
@@ -327,7 +337,8 @@ export default class GlobalConfigService {
         const config = await this.get();
         const json = JSON.stringify(config);
         const blob = new Blob([json], { type: "application/json" });
-        const swarmStorage = new SwarmModuleStorage();
+        const swarmGatewayUrl = await this.getSwarmGateway();
+        const swarmStorage = new SwarmModuleStorage({ swarmGatewayUrl });
         const url = await swarmStorage.save(blob);
         return url;
     }
@@ -367,6 +378,15 @@ export default class GlobalConfigService {
 
     async getEthereumProvider() {
         return this.get().then(x => x.providerUrl);
+    }
+
+    async setSwarmGateway(url: string) {
+        await this.updateConfig(c => c.swarmGatewayUrl = url);
+        window.location.reload();
+    }
+
+    async getSwarmGateway() {
+        return this.get().then(x => x.swarmGatewayUrl);
     }
 
     async getWalletsUsage() {

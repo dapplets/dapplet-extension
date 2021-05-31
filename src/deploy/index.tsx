@@ -12,7 +12,7 @@ import ModuleInfo from '../background/models/moduleInfo';
 import VersionInfo from '../background/models/versionInfo';
 import * as logger from '../common/logger';
 import { ChainTypes, DefaultSigners } from "../common/types";
-import { typeOfUri, chainByUri } from "../common/helpers";
+import { typeOfUri, chainByUri, joinUrls } from "../common/helpers";
 
 window.onerror = logger.log;
 
@@ -23,7 +23,9 @@ enum DeploymentStatus {
     NewModule
 }
 
-interface IIndexProps { }
+interface IIndexProps { 
+    swarmGatewayUrl: string;
+}
 
 interface IIndexState {
     mi: ModuleInfo;
@@ -292,7 +294,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             floated='right'
                             size='mini'
                             circular
-                            src={(mi.icon && mi.icon.uris.length > 0) ? ((mi.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm.dapplets.org/files/' + mi.icon.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0] : mi.icon.uris?.[0]) : NOLOGO_PNG}
+                            src={(mi.icon && mi.icon.uris.length > 0) ? ((mi.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? joinUrls(this.props.swarmGatewayUrl, 'files/' + mi.icon.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0]) : mi.icon.uris?.[0]) : NOLOGO_PNG}
                         />
                         <Card.Header>{mi.title}</Card.Header>
                         <Card.Meta>{mi.type}</Card.Meta>
@@ -401,11 +403,13 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         })}
                     />
 
-<Button primary disabled={isButtonDisabled} onClick={() => this.deployButtonClickHandler()}>Deploy</Button>
+                    <Button primary disabled={isButtonDisabled} onClick={() => this.deployButtonClickHandler()}>Deploy</Button>
                 </Form>
             </React.Fragment>
         );
     }
 }
 
-ReactDOM.render(<Index />, document.querySelector('#app'));
+initBGFunctions(browser)
+    .then(x => x.getSwarmGateway())
+    .then(x => ReactDOM.render(<Index swarmGatewayUrl={x}/>, document.querySelector('#app')));

@@ -234,3 +234,7 @@ export function incrementFilename(name: string): string {
   const n = Number.parseInt(/\(([0-9]*)\)$/gm.exec(name)?.[1] ?? '1');
   return (n === 1) ? `${name} (2)` : name.replace(/\(([0-9]*)\)$/gm, `(${n + 1})`);
 }
+
+export function joinUrls(base: string, url: string) {
+  return (new URL(url, base)).href;
+}

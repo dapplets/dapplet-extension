@@ -20,7 +20,7 @@ export class StorageAggregator {
 
         for (const uri of hashUris.uris) {
             const protocol = uri.substr(0, uri.indexOf('://'));
-            const storage = this._getStorageByProtocol(protocol);
+            const storage = await this._getStorageByProtocol(protocol);
 
             try {
                 const buffer = await storage.getResource(uri);
@@ -51,7 +51,7 @@ export class StorageAggregator {
         const uris = [];
 
         for (const storageType of targetStorages) {
-            const storage = this._getStorageByType(storageType);
+            const storage = await this._getStorageByType(storageType);
             const uri = await storage.save(blob);
             uris.push(uri);
         }
@@ -72,7 +72,7 @@ export class StorageAggregator {
         const uris = [];
 
         for (const storageType of targetStorages) {
-            const storage = this._getStorageByType(storageType);
+            const storage = await this._getStorageByType(storageType);
             const uri = await storage.saveDir(blob);
             uris.push(uri);
         }
@@ -96,24 +96,28 @@ export class StorageAggregator {
         }
     }
 
-    private _getStorageByProtocol(protocol: string): Storage {
+    private async _getStorageByProtocol(protocol: string): Promise<Storage> {
+        const swarmGatewayUrl = await this._globalConfigService.getSwarmGateway();
+
         switch (protocol) {
             case "http":
             case "https":
                 return new HttpModuleStorage();
             case "bzz":
-                return new SwarmModuleStorage();
+                return new SwarmModuleStorage({ swarmGatewayUrl });
             default:
                 throw new Error("Unsupported protocol");
         }
     }
 
-    private _getStorageByType(type: StorageTypes): Storage {
+    private async _getStorageByType(type: StorageTypes): Promise<Storage> {
+        const swarmGatewayUrl = await this._globalConfigService.getSwarmGateway();
+
         switch (type) {
             // case StorageTypes.TestRegsitry:
             //     return new HttpModuleStorage();
             case StorageTypes.Swarm:
-                return new SwarmModuleStorage();
+                return new SwarmModuleStorage({ swarmGatewayUrl });
             default:
                 throw new Error("Unsupported storage type");
         }

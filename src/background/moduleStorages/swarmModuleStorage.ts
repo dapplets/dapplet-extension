@@ -1,16 +1,19 @@
 import { Storage as ModuleStorage } from './storage';
-import { timeoutPromise } from '../../common/helpers';
+import { timeoutPromise, joinUrls } from '../../common/helpers';
 
 export class SwarmModuleStorage implements ModuleStorage {
 
-    private _gateway = "https://swarm.dapplets.org/";
-
+    private _gateway: string;
     public timeout = 5000;
+
+    constructor(config: { swarmGatewayUrl: string }) {
+        this._gateway = config.swarmGatewayUrl;
+    }
     
     public async getResource(uri: string): Promise<ArrayBuffer> {
 
         const c = new AbortController();
-        const response = await timeoutPromise(this.timeout, fetch(this._gateway + "files/" + this._extractReference(uri), { signal: c.signal }), () => c.abort());
+        const response = await timeoutPromise(this.timeout, fetch(joinUrls(this._gateway, "files/" + this._extractReference(uri)), { signal: c.signal }), () => c.abort());
 
         if (!response.ok) {
             throw new Error(`HttpStorage can't load resource by URI ${uri}`);
@@ -28,7 +31,7 @@ export class SwarmModuleStorage implements ModuleStorage {
     }
 
     public async save(blob: Blob) {
-        const response = await fetch(this._gateway + 'files', {
+        const response = await fetch(joinUrls(this._gateway, 'files'), {
             method: 'POST',
             body: blob
         });
@@ -40,7 +43,7 @@ export class SwarmModuleStorage implements ModuleStorage {
     }
     
     public async saveDir(tarBlob: Blob): Promise<string> {
-        const response = await fetch(this._gateway + 'dirs', {
+        const response = await fetch(joinUrls(this._gateway, 'dirs'), {
             method: 'POST',
             body: tarBlob,
             headers: {

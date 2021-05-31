@@ -12,6 +12,7 @@ import VersionInfo from '../background/models/versionInfo';
 import Form from "@rjsf/semantic-ui";
 import NOLOGO_PNG from '../common/resources/no-logo.png';
 import * as logger from '../common/logger';
+import { joinUrls } from "../common/helpers";
 
 window.onerror = logger.log;
 
@@ -27,6 +28,7 @@ interface IIndexState {
     loading: boolean;
     devMode: boolean;
     hiddenProperties: string[];
+    swarmGatewayUrl: string;
 }
 
 class Index extends React.Component<IIndexProps, IIndexState> {
@@ -44,12 +46,14 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             data: {},
             loading: false,
             devMode: false,
-            hiddenProperties: []
+            hiddenProperties: [],
+            swarmGatewayUrl: ''
         };
 
         this.bus.subscribe('data', async ({ mi, vi, schemaConfig, defaultConfig }) => {
-            const { getDevMode } = await initBGFunctions(browser);
+            const { getDevMode, getSwarmGateway } = await initBGFunctions(browser);
             const devMode = await getDevMode();
+            const swarmGatewayUrl = await getSwarmGateway();
             
             const hiddenProperties = (schemaConfig && schemaConfig.properties) ? 
                 Object.entries(schemaConfig.properties)
@@ -68,7 +72,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                 }
             }
 
-            this.setState({ mi, vi, schemaConfig, defaultConfig, devMode, hiddenProperties });
+            this.setState({ mi, vi, schemaConfig, defaultConfig, devMode, hiddenProperties, swarmGatewayUrl });
             await this._refreshData();
             await this._updateOwnership();
         });
@@ -138,7 +142,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                                     floated='right'
                                     size='mini'
                                     circular
-                                    src={(mi.icon && mi.icon.uris.length > 0) ? ((mi.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? 'https://swarm.dapplets.org/files/' + mi.icon.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0] : mi.icon.uris?.[0]) : NOLOGO_PNG}
+                                    src={(mi.icon && mi.icon.uris.length > 0) ? ((mi.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? joinUrls(this.state.swarmGatewayUrl, 'files/' + mi.icon.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0]) : mi.icon.uris?.[0]) : NOLOGO_PNG}
                                 />
                                 <Card.Header>{mi.title}</Card.Header>
                                 <Card.Meta>{mi.type}</Card.Meta>

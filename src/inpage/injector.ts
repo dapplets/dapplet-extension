@@ -5,7 +5,7 @@ import { SubscribeOptions } from './overlay';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
 import { browser } from "webextension-polyfill-ts";
 import { IResolver, IContentAdapter, IFeature } from './types';
-import { areModulesEqual } from "../common/helpers";
+import { areModulesEqual, joinUrls } from "../common/helpers";
 import VersionInfo from "../background/models/versionInfo";
 import { AppStorage } from "./appStorage";
 import { DefaultConfig, SchemaConfig } from "../common/types";
@@ -161,8 +161,10 @@ export class Injector {
     }
 
     private async _processModules(modules: { manifest: VersionInfo, script: string, order: number, contextIds: string[], defaultConfig?: DefaultConfig }[]) {
-        const { optimizeDependency, getModulesWithDeps, addEvent } = await initBGFunctions(browser);
+        const { optimizeDependency, getModulesWithDeps, addEvent, getSwarmGateway } = await initBGFunctions(browser);
         const { core } = this;
+
+        const swarmGatewayUrl = await getSwarmGateway();
 
         for (const { manifest, script, order, contextIds, defaultConfig } of modules) {
             // Module is loaded already
@@ -193,7 +195,7 @@ export class Injector {
                         const url = new URL(overlay.uris[0]);
 
                         if (url.protocol === 'bzz:') {
-                            cfg.url = `https://swarm.dapplets.org/bzz/${url.pathname.slice(2)}`;
+                            cfg.url = joinUrls(swarmGatewayUrl, `bzz/${url.pathname.slice(2)}`);
                             return core.overlay(cfg, eventDef);
                         } else if (url.protocol === 'http:' || url.protocol === 'https:') {
                             cfg.url = url.href;

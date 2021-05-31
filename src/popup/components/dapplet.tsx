@@ -14,6 +14,7 @@ import {
   Popup,
 } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
+import { joinUrls } from "../../common/helpers";
 
 export type ManifestAndDetails = ManifestDTO & {
   isLoading: boolean;
@@ -33,6 +34,8 @@ interface Props {
   onOpenDappletHome: Function;
   onToggleFeature: Function;
   onRemoveDapplet: Function;
+
+  swarmGatewayUrl: string;
 }
 
 interface State {}
@@ -56,8 +59,8 @@ export class Dapplet extends React.Component<Props, State> {
                 src={
                   f.icon
                     ? f.icon?.uris?.[0]?.indexOf("bzz:/") !== -1
-                      ? "https://swarm.dapplets.org/files/" +
-                        f.icon?.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0]
+                      ? joinUrls(this.props.swarmGatewayUrl, "files/" +
+                        f.icon?.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0])
                       : f.icon?.uris?.[0]
                     : null
                 }

@@ -21,6 +21,7 @@ interface IDappletsState {
   error: string;
   isNoInpage: boolean;
   search: string;
+  swarmGatewayUrl: string;
 }
 
 class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
@@ -31,7 +32,8 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     isLoading: true,
     error: null,
     isNoInpage: false,
-    search: ''
+    search: '',
+    swarmGatewayUrl: ''
   }
 
   async componentDidMount() {
@@ -51,7 +53,9 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
       return;
     }
 
-    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(browser);
+    const { getFeaturesByHostnames, getRegistries, getSwarmGateway } = await initBGFunctions(browser);
+
+    const swarmGatewayUrl = await getSwarmGateway();
 
     const registries = await getRegistries();
     const regsWithErrors = registries.filter(r => !!r.error).length;
@@ -60,11 +64,14 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
         error: `There are registries with connection problems. Please check the settings.`
       });
     }
+
     const features: ManifestDTO[] = await getFeaturesByHostnames(contextIdsValues);
+
     if (this._isMounted) {
       this.setState({
         features: features.filter(f => f.type === ModuleTypes.Feature).map(f => ({ ...f, isLoading: false, isActionLoading: false, isHomeLoading: false, error: null, versions: [] })),
-        isLoading: false
+        isLoading: false,
+        swarmGatewayUrl
       });
     }
   }
@@ -223,6 +230,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
                     onOpenDappletHome={this.openDappletHome.bind(this)}
                     onToggleFeature={this.toggleFeature.bind(this)}
                     onRemoveDapplet={this.removeDapplet.bind(this)}
+                    swarmGatewayUrl={this.state.swarmGatewayUrl}
                   />
                 ))}
               </List>
