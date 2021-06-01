@@ -2,13 +2,14 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { Button, List, Segment, Icon, Input } from "semantic-ui-react";
+import { Button, List, Segment, Icon, Input, Message } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
 import { ModuleTypes } from "../../common/constants";
 import { getCurrentContextIds, getCurrentTab } from "../helpers";
 import { rcompare } from "semver";
 import { Dapplet, ManifestAndDetails } from "../components/dapplet";
 import Manifest from "../../background/models/manifest";
+import { DevMessage } from "../components/DevMessage";
 
 interface IDappletsProps {
   contextIds: Promise<string[] | undefined>;
@@ -22,6 +23,7 @@ interface IDappletsState {
   isNoInpage: boolean;
   search: string;
   swarmGatewayUrl: string;
+  devMessage: string;
 }
 
 class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
@@ -33,7 +35,8 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     error: null,
     isNoInpage: false,
     search: '',
-    swarmGatewayUrl: ''
+    swarmGatewayUrl: '',
+    devMessage: null
   }
 
   async componentDidMount() {
@@ -194,11 +197,13 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   }
 
   render() {
-    const { isLoading, error, isNoInpage, search } = this.state;
+    const { isLoading, error, isNoInpage, search, devMessage } = this.state;
     const features = this._getFilteredDapplets();
 
     return (
       <React.Fragment>
+        <DevMessage />
+
         {(!isLoading) ? <Input
           fluid
           iconPosition='left'

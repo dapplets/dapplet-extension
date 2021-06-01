@@ -48,4 +48,6 @@ export class GlobalConfig extends Base {
     hostnames: {
         [hostname: string]: SiteConfig;
     } = {}
+
+    lastDevMessageHash: string = null;
 }

@@ -439,4 +439,12 @@ export default class GlobalConfigService {
         globalConfig.hostnames[config.hostname] = config;
         await this.set(globalConfig);
     }
+
+    async getLastDevMessageHash() {
+        return this.get().then(x => x.lastDevMessageHash);
+    }
+
+    async setLastDevMessageHash(hash: string) {
+        return this.updateConfig(c => c.lastDevMessageHash = hash);
+    }
 }

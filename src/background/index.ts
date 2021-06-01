@@ -11,7 +11,7 @@ import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 import ProxyService from "./services/proxyService";
 import * as logger from '../common/logger';
 import { getCurrentTab, waitTab } from "../common/helpers";
-import * as GithubService from "./services/githubService";
+import GithubService from "./services/githubService";
 import { IdentityService } from "./services/identityService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
@@ -20,6 +20,7 @@ import { IdentityService } from "./services/identityService";
 window.onerror = logger.log;
 
 const globalConfigService = new GlobalConfigService();
+const githubService = new GithubService(globalConfigService);
 const walletService = new WalletService(globalConfigService);
 const featureService = new FeatureService(globalConfigService, walletService);
 const ensService = new EnsService(walletService);
@@ -137,7 +138,9 @@ browser.runtime.onMessage.addListener(
     fetchJsonRpc: (method, params) => proxyService.fetchJsonRpc(method, params),
 
     // Github Service
-    isExtensionUpdateAvailable: () => GithubService.isExtensionUpdateAvailable(),
+    isExtensionUpdateAvailable: githubService.isExtensionUpdateAvailable.bind(githubService),
+    getDevMessage: githubService.getDevMessage.bind(githubService),
+    hideDevMessage: githubService.hideDevMessage.bind(githubService),
 
     // Identity Service
     getIdentityAccounts: identityService.getAccounts.bind(identityService),

@@ -17,6 +17,7 @@ interface IPopupProps {
   contextIds: Promise<string[]>;
   bus: Bus;
 }
+
 interface IPopupState {
   newEventsCount: number;
   devMode: boolean;
