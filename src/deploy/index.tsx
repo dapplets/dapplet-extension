@@ -23,9 +23,7 @@ enum DeploymentStatus {
     NewModule
 }
 
-interface IIndexProps { 
-    swarmGatewayUrl: string;
-}
+interface IIndexProps { }
 
 interface IIndexState {
     mi: ModuleInfo;
@@ -50,6 +48,7 @@ interface IIndexState {
     editLocationDone: boolean;
     deploymentStatus: DeploymentStatus;
     trustedUsers: { account: string }[];
+    swarmGatewayUrl: string;
 }
 
 class Index extends React.Component<IIndexProps, IIndexState> {
@@ -78,11 +77,14 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             editLocationLoading: false,
             editLocationDone: false,
             deploymentStatus: DeploymentStatus.Unknown,
-            trustedUsers: []
+            trustedUsers: [],
+            swarmGatewayUrl: ''
         };
 
         this.bus.subscribe('data', async ({ mi, vi }) => {
-            this.setState({ mi, vi, loading: false });
+            const { getSwarmGateway } = await initBGFunctions(browser);
+            const swarmGatewayUrl = await getSwarmGateway();
+            this.setState({ mi, vi, loading: false, swarmGatewayUrl });
             await this._updateData();
         });
 
@@ -294,7 +296,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             floated='right'
                             size='mini'
                             circular
-                            src={(mi.icon && mi.icon.uris.length > 0) ? ((mi.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? joinUrls(this.props.swarmGatewayUrl, 'files/' + mi.icon.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0]) : mi.icon.uris?.[0]) : NOLOGO_PNG}
+                            src={(mi.icon && mi.icon.uris.length > 0) ? ((mi.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? joinUrls(this.state.swarmGatewayUrl, 'files/' + mi.icon.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0]) : mi.icon.uris?.[0]) : NOLOGO_PNG}
                         />
                         <Card.Header>{mi.title}</Card.Header>
                         <Card.Meta>{mi.type}</Card.Meta>
@@ -410,6 +412,4 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     }
 }
 
-initBGFunctions(browser)
-    .then(x => x.getSwarmGateway())
-    .then(x => ReactDOM.render(<Index swarmGatewayUrl={x}/>, document.querySelector('#app')));
+ReactDOM.render(<Index />, document.querySelector('#app'));
