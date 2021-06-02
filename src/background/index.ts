@@ -116,6 +116,8 @@ browser.runtime.onMessage.addListener(
     getUserAgentId: globalConfigService.getUserAgentId.bind(globalConfigService),
     getUserAgentName: globalConfigService.getUserAgentName.bind(globalConfigService),
     setUserAgentName: globalConfigService.setUserAgentName.bind(globalConfigService),
+    getIgnoredUpdate: globalConfigService.getIgnoredUpdate.bind(globalConfigService),
+    setIgnoredUpdate: globalConfigService.setIgnoredUpdate.bind(globalConfigService),
 
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),
@@ -138,7 +140,7 @@ browser.runtime.onMessage.addListener(
     fetchJsonRpc: (method, params) => proxyService.fetchJsonRpc(method, params),
 
     // Github Service
-    isExtensionUpdateAvailable: githubService.isExtensionUpdateAvailable.bind(githubService),
+    getNewExtensionVersion: githubService.getNewExtensionVersion.bind(githubService),
     getDevMessage: githubService.getDevMessage.bind(githubService),
     hideDevMessage: githubService.hideDevMessage.bind(githubService),
 

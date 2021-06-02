@@ -447,4 +447,12 @@ export default class GlobalConfigService {
     async setLastDevMessageHash(hash: string) {
         return this.updateConfig(c => c.lastDevMessageHash = hash);
     }
+
+    async getIgnoredUpdate() {
+        return this.get().then(x => x.ignoredUpdate);
+    }
+
+    async setIgnoredUpdate(version: string) {
+        return this.updateConfig(c => c.ignoredUpdate = version);
+    }
 }

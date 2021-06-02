@@ -1,16 +1,16 @@
 import { ethers } from 'ethers';
-import { gt } from 'semver';
+import { gt, clean } from 'semver';
 import GlobalConfigService from './globalConfigService';
 
 export default class GithubService {
 
     constructor(private _globalConfigService: GlobalConfigService) { }
 
-    async isExtensionUpdateAvailable() {
+    async getNewExtensionVersion() {
         const url = 'https://api.github.com/repos/dapplets/dapplet-extension/releases/latest';
         const resp = await fetch(url);
         const json = await resp.json();
-        return gt(json.name, EXTENSION_VERSION);
+        return gt(json.name, EXTENSION_VERSION) ? clean(json.name) : null;
     }
 
     /**

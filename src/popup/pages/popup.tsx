@@ -153,13 +153,17 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
 
     return (
       <React.Fragment>
-        <ShareButton
+        {(!this.state.isOverlay) ? <div
           style={{
             position: "absolute",
             top: "15px",
             right: "10px",
+            display: 'flex'
           }}
-        />
+        >
+          <ShareButton />
+        </div> : null}
+
         <div
           className={
             this.state.isOverlay ? "popupContainer" : "popupContainer popup"

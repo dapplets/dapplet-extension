@@ -246,8 +246,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     }
 
     async checkUpdates() {
-        const { isExtensionUpdateAvailable } = await initBGFunctions(browser);
-        const isUpdateAvailable = await isExtensionUpdateAvailable();
+        const { getNewExtensionVersion } = await initBGFunctions(browser);
+        const isUpdateAvailable = !!(await getNewExtensionVersion());
         this.setState({ isUpdateAvailable });
     }
 
