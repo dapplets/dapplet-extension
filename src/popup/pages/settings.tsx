@@ -3,8 +3,7 @@ import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Popup, Segment, List, Label, Input, Checkbox, Icon, Header, Button, Dropdown, Form, Divider } from "semantic-ui-react";
 import { isValidHttp, isValidUrl } from '../helpers';
-import { typeOfUri, UriTypes } from '../../common/helpers';
-import { CopyButton } from '../../common/react-components/CopyButton';
+import { parseModuleName, typeOfUri, UriTypes } from '../../common/helpers';
 import { ProfileDropdown } from "../components/ProfileDropdown";
 
 interface ISettingsProps {
@@ -58,6 +57,11 @@ interface ISettingsState {
     userAgentNameInputError: string;
     userAgentNameLoading: boolean;
     userAgentNameEdited: boolean;
+
+    dynamicAdapterInput: string;
+    dynamicAdapterInputError: string;
+    dynamicAdapterLoading: boolean;
+    dynamicAdapterEdited: boolean;
 }
 
 class Settings extends React.Component<ISettingsProps, ISettingsState> {
@@ -99,7 +103,11 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             userAgentNameInput: '',
             userAgentNameInputError: null,
             userAgentNameLoading: false,
-            userAgentNameEdited: false
+            userAgentNameEdited: false,
+            dynamicAdapterInput: '',
+            dynamicAdapterInputError: null,
+            dynamicAdapterLoading: false,
+            dynamicAdapterEdited: false
         };
     }
 
@@ -122,7 +130,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             this.loadSwarmGateway(),
             this.loadIdentityContract(),
             this.loadUserAgentId(),
-            this.loadUserAgentName()
+            this.loadUserAgentName(),
+            this.loadDynamicAdapter()
         ]);
         this.setState({ isLoading: false });
     }
@@ -243,6 +252,21 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         await setUserAgentName(userAgentName);
         this.loadUserAgentName();
         this.setState({ userAgentNameLoading: false, userAgentNameEdited: false });
+    }
+
+    async loadDynamicAdapter() {
+        const { getDynamicAdapter } = await initBGFunctions(browser);
+        const dynamicAdapterInput = await getDynamicAdapter();
+
+        this.setState({ dynamicAdapterInput });
+    }
+
+    async setDynamicAdapter(dynamicAdapter: string) {
+        this.setState({ dynamicAdapterLoading: true });
+        const { setDynamicAdapter } = await initBGFunctions(browser);
+        await setDynamicAdapter(dynamicAdapter);
+        this.loadDynamicAdapter();
+        this.setState({ dynamicAdapterLoading: false, dynamicAdapterEdited: false });
     }
 
     async checkUpdates() {
@@ -566,6 +590,25 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                                 onChange={(e) => this.setState({ userAgentNameInput: e.target.value, userAgentNameInputError: null, userAgentNameEdited: true })}
                             />
                             <Button size='mini' disabled={this.state.userAgentNameLoading || !this.state.userAgentNameEdited} color='blue' onClick={() => this.setUserAgentName(this.state.userAgentNameInput)}>Save</Button>
+                        </Input>
+
+                        <Header as='h5'>Dynamic Adapter</Header>
+                        <Input
+                            size='mini'
+                            fluid
+                            placeholder='dynamic-adapter.dapplet-base.eth#default@latest'
+                            error={!!this.state.dynamicAdapterInputError}
+                            action
+                            iconPosition='left'
+                            loading={this.state.dynamicAdapterLoading}
+                            style={{ marginBottom: '15px' }}
+                        >
+                            <Icon name='plug' />
+                            <input
+                                value={this.state.dynamicAdapterInput}
+                                onChange={(e) => this.setState({ dynamicAdapterInput: e.target.value, dynamicAdapterInputError: null, dynamicAdapterEdited: true })}
+                            />
+                            <Button size='mini' disabled={this.state.dynamicAdapterLoading || !this.state.dynamicAdapterEdited || !parseModuleName(this.state.dynamicAdapterInput)} color='blue' onClick={() => this.setDynamicAdapter(this.state.dynamicAdapterInput)}>Save</Button>
                         </Input>
                     </Segment>
                 </Segment.Group>

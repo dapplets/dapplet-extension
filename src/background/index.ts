@@ -132,6 +132,8 @@ browser.runtime.onMessage.addListener(
     setEthereumProvider: (url) => globalConfigService.setEthereumProvider(url),
     getSwarmGateway: globalConfigService.getSwarmGateway.bind(globalConfigService),
     setSwarmGateway: globalConfigService.setSwarmGateway.bind(globalConfigService),
+    getDynamicAdapter: globalConfigService.getDynamicAdapter.bind(globalConfigService),
+    setDynamicAdapter: globalConfigService.setDynamicAdapter.bind(globalConfigService),
 
     // ENS
     resolveName: (name) => ensService.resolveName(name),

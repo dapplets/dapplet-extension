@@ -42,7 +42,11 @@ export class Injector {
 
         const { getModulesWithDeps } = await initBGFunctions(browser);
         const loadedModules: { manifest: VersionInfo, script: string, defaultConfig?: DefaultConfig }[] = await getModulesWithDeps(modules);
-        modules.forEach(a => !loadedModules.find(b => a.name === b.manifest.name && a.branch === b.manifest.branch && a.version === b.manifest.version) && console.log(`[DAPPLETS]: Loading of module ${a.name}#${a.branch}@${a.version} was skipped.`));
+        modules.forEach(a => !loadedModules.find(b => 
+            a.name === b.manifest.name 
+            && (!a.branch || a.branch === b.manifest.branch) 
+            && (!a.version || a.version === 'latest' || a.version === b.manifest.version)
+        ) && console.log(`[DAPPLETS]: Loading of module ${a.name}#${a.branch}@${a.version} was skipped.`));
 
         const orderedModules = loadedModules.map((l) => {
             const m = modules.find(m => areModulesEqual(m, l.manifest));
@@ -184,8 +188,8 @@ export class Injector {
             const coreWrapper = {
                 overlayManager: core.overlayManager,
                 waitPairingOverlay: core.waitPairingOverlay,
-                contextStarted: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), true),
-                contextFinished: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, window.location.hostname + (parentContext ? `/${parentContext}` : ""), false),
+                contextStarted: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, parentContext, true),
+                contextFinished: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, parentContext, false),
                 connect: core.connect.bind(core),
                 overlay: (cfg, eventDef) => {
                     if (cfg.name) {
@@ -212,6 +216,7 @@ export class Injector {
                 contract: (type, address, options) => core.contract(type, address, options, manifest.name),
                 onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
                 onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
+                getContentDetectors: () => core.getContentDetectors(),
                 utils: core.utils
             };
 
@@ -299,7 +304,8 @@ export class Injector {
     private async _setContextActivivty(contextIds: any[], parentContext: string, isActive: boolean) {
         if (contextIds.length === 0) return;
 
-        contextIds = parentContext ? contextIds.map(({ id }) => parentContext + '/' + id) : contextIds;
+        contextIds = contextIds.map(ctx => (typeof ctx === 'string') ? ctx : ctx.id).filter(x => x !== undefined && x !== null);
+        contextIds = parentContext ? contextIds.map((ctx) => parentContext + '/' + ctx) : contextIds;
 
         if (isActive) {
             // console.log('Context started:', contextIds);
@@ -315,6 +321,8 @@ export class Injector {
                 if (index > -1) this.availableContextIds.splice(index, 1);
             });
         }
+
+        // ToDo: [bug] context started fires twicely
 
         browser.runtime.sendMessage({
             type: isActive ? "CONTEXT_STARTED" : "CONTEXT_FINISHED",

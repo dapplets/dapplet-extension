@@ -162,6 +162,7 @@ export default class GlobalConfigService {
         config.userAgentId = generateGuid();
         config.userAgentName = '';
         config.hostnames = {};
+        config.dynamicAdapter = 'dynamic-adapter.dapplet-base.eth#default@latest';
 
         return config;
     }
@@ -454,5 +455,13 @@ export default class GlobalConfigService {
 
     async setIgnoredUpdate(version: string) {
         return this.updateConfig(c => c.ignoredUpdate = version);
+    }
+
+    async getDynamicAdapter() {
+        return this.get().then(x => x.dynamicAdapter);
+    }
+
+    async setDynamicAdapter(dynamicAdapter: string) {
+        return this.updateConfig(c => c.dynamicAdapter = dynamicAdapter);
     }
 }

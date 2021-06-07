@@ -13,7 +13,6 @@ import * as logger from '../common/logger';
 import { BackgroundNear } from "./near/backgroundNear";
 import { BackgroundWalletConnection } from "./near/backgroundWalletConnection";
 import * as NearAPI from "near-api-js";
-import { ChainTypes } from "../common/types";
 
 type Abi = any;
 
@@ -21,6 +20,11 @@ interface WalletConnection {
     isConnected(): Promise<boolean>;
     connect(): Promise<void>;
     disconnect(): Promise<void>;
+}
+
+type Locator = {
+    contextId: string;
+    selector: string;
 }
 
 export default class Core {
@@ -354,6 +358,13 @@ export default class Core {
         } else {
             throw new Error("\"ethereum\" and \"near\" contracts only are supported.");
         }
+    }
+
+    public getContentDetectors(): Locator[] {
+        return [{
+            contextId: 'video',
+            selector: 'video'
+        }];
     }
 
     utils = ethers.utils;

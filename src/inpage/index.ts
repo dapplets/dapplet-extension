@@ -13,13 +13,13 @@ browser.runtime.onMessage.addListener((message, sender) => {
     if (!message || !message.type) return;
 
     if (message.type === "FEATURE_ACTIVATED") {
-        const features = message.payload
-        features.forEach(f => console.log(`[DAPPLETS]: The feature ${f.name}#${f.branch}@${f.version} was activated.`));
-        return injector.loadModules(features);
+        const modules = message.payload
+        modules.forEach(f => console.log(`[DAPPLETS]: The module ${f.name}${(f.branch) ? '#' + f.branch : ''}${(f.version) ? '@' + f.version : ''} was activated.`));
+        return injector.loadModules(modules);
     } else if (message.type === "FEATURE_DEACTIVATED") {
-        const features = message.payload
-        features.forEach(f => console.log(`[DAPPLETS]: The feature ${f.name}#${f.branch}@${f.version} was deactivated.`));
-        return injector.unloadModules(features);
+        const modules = message.payload
+        modules.forEach(f => console.log(`[DAPPLETS]: The module ${f.name}${(f.branch) ? '#' + f.branch : ''}${(f.version) ? '@' + f.version : ''} was deactivated.`));
+        return injector.unloadModules(modules);
     } else if (message.type === "CURRENT_CONTEXT_IDS") {
         return Promise.resolve(injector.availableContextIds);
     } else if (message.type === "OPEN_DAPPLET_ACTION") {

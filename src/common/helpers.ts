@@ -238,3 +238,15 @@ export function incrementFilename(name: string): string {
 export function joinUrls(base: string, url: string) {
   return (new URL(url, base)).href;
 }
+
+export function parseModuleName(str: string): { name: string, branch: string, version: string } | null {
+  const regex = /^([a-z0-9\.-]+)(?:#([a-z0-9-]+))?(?:@((?:[0-9]+\.[0-9]+\.[0-9]+)|latest))?$/gm;
+  const parsed = regex.exec(str);
+  if (!parsed) return null;
+
+  return {
+    name: parsed[1] ?? null,
+    branch: parsed[2] ?? null,
+    version: parsed[3] ?? null
+  };
+}

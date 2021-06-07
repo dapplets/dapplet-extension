@@ -9,7 +9,7 @@ import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
 import JSZip from 'jszip';
 import * as logger from '../../common/logger';
-import { getCurrentTab, mergeDedupe } from '../../common/helpers';
+import { getCurrentTab, mergeDedupe, parseModuleName } from '../../common/helpers';
 import { WalletService } from './walletService';
 import { Tar } from '../../common/tar';
 
@@ -211,11 +211,11 @@ export default class FeatureService {
         await this._setFeatureActive(name, version, hostnames, true, order, registryUrl);
     }
 
-    public async getActiveModulesByHostnames(hostnames: string[]) {
+    public async getActiveModulesByHostnames(contextIds: string[]) {
         const globalConfig = await this._globalConfigService.get();
         if (globalConfig.suspended) return [];
 
-        const configs = await Promise.all(hostnames.map(h => this._globalConfigService.getSiteConfigById(h)));
+        const configs = await Promise.all(contextIds.map(h => this._globalConfigService.getSiteConfigById(h)));
         const modules: { name: string, branch: string, version: string, order: number, hostnames: string[] }[] = [];
 
         let i = 0;
@@ -242,10 +242,28 @@ export default class FeatureService {
             }
         }
 
+        // Activate dynamic adapter for dynamic contexts searching
+        const hostnames = contextIds.filter(x => /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/gm.test(x));
+        if (hostnames.length > 0) {
+            const dynamicAdapter = await this._globalConfigService.getDynamicAdapter();
+            if (dynamicAdapter) {
+                const parsed = parseModuleName(dynamicAdapter);
+                if (parsed) {
+                    modules.push({
+                        name: parsed.name,
+                        branch: parsed.branch,
+                        version: parsed.version,
+                        order: -1,
+                        hostnames: hostnames
+                    });
+                }
+            }
+        }        
+
         return modules;
     }
 
-    public async getModulesWithDeps(modules: { name: string, branch: string, version: string, contextIds: string[] }[]) {
+    public async getModulesWithDeps(modules: { name: string, branch?: string, version?: string, contextIds: string[] }[]) {
         const moduleManager = new ModuleManager(this._globalConfigService, this._walletService);
 
         if (modules.length === 0) return [];

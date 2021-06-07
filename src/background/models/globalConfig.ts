@@ -52,4 +52,6 @@ export class GlobalConfig extends Base {
     lastDevMessageHash: string = null;
 
     ignoredUpdate: string = null;
+
+    dynamicAdapter: string = null;
 }

@@ -27,7 +27,7 @@ export default class ModuleManager {
         this.registryAggregator = new RegistryAggregator(this._globalConfigService, this._walletService);
     }
 
-    public async resolveDependencies(modules: { name: string, version: string, branch?: string, contextIds: string[] }[]) {
+    public async resolveDependencies(modules: { name: string, version?: string, branch?: string, contextIds: string[] }[]) {
         // ToDo: Add dependency optimizer
         // Search for the following topics: 
         // 1. Topological Sorting
@@ -36,9 +36,9 @@ export default class ModuleManager {
         let dependencies: { name: string, branch: string, version: string, contextIds: string[], manifest: VersionInfo }[] =
             modules.map(({ name, version, branch, contextIds }) => ({ name, version, branch: !branch ? DEFAULT_BRANCH_NAME : branch, contextIds, manifest: null }));
 
-        const resolve = async (parent: { name: string, branch: string, version: string, contextIds: string[], manifest: VersionInfo }) => {
+        const resolve = async (parent: { name: string, branch: string | null, version: string | null, contextIds: string[], manifest: VersionInfo }) => {
             try {
-                const moduleDeps = await this._getChildDependenciesAndManifest(parent.name, parent.version, parent.branch, parent.contextIds);
+                const moduleDeps = await this._getChildDependenciesAndManifest(parent);
 
                 if (!moduleDeps) return;
 
@@ -124,20 +124,31 @@ export default class ModuleManager {
     }
 
     //ToDo: rework the _getChildDependencies and move it into Inpage
-    private async _getChildDependenciesAndManifest(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME, contextIds: string[]) {
-        const vi = await this.registryAggregator.getVersionInfo(name, branch, version);
+    private async _getChildDependenciesAndManifest(module: { name: string, version: string | null, branch: string | null, contextIds: string[] }) { 
+        if (!module.branch) {
+            module.branch = DEFAULT_BRANCH_NAME;
+        }
+
+        if (!module.version || module.version === 'latest') {
+            const versions = await this.registryAggregator.getVersions(module.name, module.branch);
+            if (versions.length === 0) return null;
+            module.version = versions.sort(rcompare)[0];
+            console.log(`Version for module "${module.name}#${module.branch}" is not specified. The latest version ${module.version} is selected.`);
+        }
+
+        const vi = await this.registryAggregator.getVersionInfo(module.name, module.branch, module.version);
 
         if (!vi) {
             return null;
         }
 
-        if (vi.name != name || vi.version != version || vi.branch != branch) {
-            logger.error(`Invalid public name for module. Requested: ${name}#${branch}@${version}. Recieved: ${vi.name}#${vi.branch}@${vi.version}.`);
+        if (vi.name !== module.name || vi.version !== module.version || vi.branch !== module.branch) {
+            logger.error(`Invalid public name for module. Requested: ${module.name}#${module.branch}@${module.version}. Recieved: ${vi.name}#${vi.branch}@${vi.version}.`);
             return { manifest: vi, dependencies: [] };
         }
 
         if (vi.type === ModuleTypes.Interface) {
-            logger.error(`An implementation of the interface ${name} is not found.`);
+            logger.error(`An implementation of the interface ${module.name} is not found.`);
             return { manifest: vi, dependencies: [] };
         }
 
