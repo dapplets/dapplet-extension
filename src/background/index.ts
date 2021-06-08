@@ -257,24 +257,42 @@ browser.runtime.onInstalled.addListener(async (details) => {
     const config = url.searchParams.get('config');
     if (!config) return;
 
-    return config;
+    const customParams: { ['string']?: string } = {};
+    url.searchParams.forEach((value, key) => {
+      if (key !== 'config') customParams[key] = value;
+    });
+    return { config, customParams };
   }
 
-  const config = await findPredefinedConfig();
+  const { config, customParams } = await findPredefinedConfig();
   if (config) {
     try {
       const url = new URL(config);
       const resp = await fetch(url.href);
       const json = await resp.json();
 
+      const addCustomParams = (defParamsConfig: any) => {
+        Object.entries(customParams).forEach(([name, value]) => {
+          let parsedValue: any;
+          try {
+            parsedValue = JSON.parse(<string>value);
+          } catch (e) {
+            parsedValue = value;
+          }
+          defParamsConfig[name] = parsedValue;
+        });
+      }
+
       if (Array.isArray(json)) {
         for (const j of json) {
+          addCustomParams(j);
           await globalConfigService.set(j);
         }
       } else {
+        addCustomParams(json);
         await globalConfigService.set(json);
-      }      
-      
+      }
+
       console.log(`The predefined configuration was initialized. URL: ${url.href}`);
     } catch (err) {
       console.error("Cannot set predefined configuration.", err);
