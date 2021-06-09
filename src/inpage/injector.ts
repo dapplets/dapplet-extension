@@ -17,9 +17,11 @@ type RegistriedModule = {
     instance?: any,
     order: number,
     contextIds: string[],
-    contructorDependencies: string[],
+    constructorDependencies: string[],
     instancedPropertyDependencies: { [name: string]: any },
     instancedConstructorDeps: any[],
+    activateMethodsDependencies: string[],
+    instancedActivateMethodsDependencies: any[],
     defaultConfig?: DefaultConfig,
     onActionHandler?: Function,
     onHomeHandler?: Function
@@ -64,7 +66,8 @@ export class Injector {
             const m = this.registry[i];
             if (m.instance) continue;
 
-            m.instancedConstructorDeps = m.contructorDependencies.map(d => this._proxifyModule(this._getDependency(m.manifest, d), m));
+            m.instancedConstructorDeps = m.constructorDependencies.map(d => this._proxifyModule(this._getDependency(m.manifest, d), m));
+            m.instancedActivateMethodsDependencies = m.activateMethodsDependencies.map(d => this._proxifyModule(this._getDependency(m.manifest, d), m));
 
             try {
                 // ToDo: compare "m.instancedDeps.length" and "m.clazz.constructor.length"
@@ -73,7 +76,7 @@ export class Injector {
                 if (m.instance.activate !== undefined) {
                     if (typeof m.instance.activate === 'function') {
                         // ToDo: activate modules in parallel
-                        await m.instance.activate();
+                        await m.instance.activate(...m.instancedActivateMethodsDependencies);
                     } else {
                         throw new Error('activate() must be a function.');
                     }
@@ -234,10 +237,12 @@ export class Injector {
                         instance: null,
                         order: order,
                         contextIds: contextIds,
-                        contructorDependencies: [],
+                        constructorDependencies: [],
                         instancedPropertyDependencies: {},
                         instancedConstructorDeps: [],
-                        defaultConfig: defaultConfig
+                        defaultConfig: defaultConfig,
+                        activateMethodsDependencies: [],
+                        instancedActivateMethodsDependencies: [],
                     });
                 }
             };
@@ -246,11 +251,16 @@ export class Injector {
             const injectDecorator = (name: string) => {
                 if (!name) throw new Error('The name of a module is required as the first argument of the @Inject(module_name) decorator');
 
-                return (target, propertyKey: string, parameterIndexOrDescriptor: number | PropertyDescriptor) => {
+                return (target: any | { constructor: any }, propertyOrMethodName: string | undefined, parameterIndex: number | undefined) => {
                     // ToDo: check module_name with manifest
                     // ToDo: add module source to error description
+                    
+                    // ContructorDecorator: class, undefined, parameterIndex
+                    // PropertyDecorator: class(obj), property_name, undefined
+                    // ParameterDecorator: class(obj), method_name, parameterIndex
 
-                    if (typeof parameterIndexOrDescriptor === 'number') { // decorator applied to constructor parameters
+                    // Constructor Parameter Decorator
+                    if (propertyOrMethodName === undefined) {
                         if (!this.registry.find(m => areModulesEqual(m.manifest, manifest))) {
                             this.registry.push({
                                 manifest: manifest,
@@ -258,18 +268,22 @@ export class Injector {
                                 instance: null,
                                 order: order,
                                 contextIds: contextIds,
-                                contructorDependencies: [],
+                                constructorDependencies: [],
                                 instancedPropertyDependencies: {},
                                 instancedConstructorDeps: [],
+                                activateMethodsDependencies: [],
+                                instancedActivateMethodsDependencies: [],
                                 defaultConfig: defaultConfig
                             });
                         }
 
                         const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
-                        currentModule.contructorDependencies[parameterIndexOrDescriptor] = name;
-                    } else { // decorator applied to class property
-                        parameterIndexOrDescriptor = parameterIndexOrDescriptor || {};
-                        parameterIndexOrDescriptor.get = () => {
+                        currentModule.constructorDependencies[parameterIndex] = name;
+                    } 
+                    // Class Property Decorator
+                    else if (parameterIndex === undefined) {
+                      return {
+                        get: () => {
                             const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
                             if (!currentModule.instancedPropertyDependencies[name]) {
                                 const depModule = this._getDependency(manifest, name);
@@ -278,7 +292,32 @@ export class Injector {
                             }
                             return currentModule.instancedPropertyDependencies[name];
                         }
-                        return parameterIndexOrDescriptor;
+                      }
+                    } 
+                    // Method Parameter Decorator
+                    else if (propertyOrMethodName === 'activate') {
+                        if (!this.registry.find(m => areModulesEqual(m.manifest, manifest))) {
+                            this.registry.push({
+                                manifest: manifest,
+                                clazz: target.constructor,
+                                instance: null,
+                                order: order,
+                                contextIds: contextIds,
+                                constructorDependencies: [],
+                                instancedPropertyDependencies: {},
+                                activateMethodsDependencies: [],
+                                instancedActivateMethodsDependencies: [],
+                                instancedConstructorDeps: [],
+                                defaultConfig: defaultConfig
+                            });
+                        }
+
+                        const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
+                        currentModule.activateMethodsDependencies[parameterIndex] = name;
+                    } 
+                    // Invalid Decorator
+                    else {
+                        console.error("Invalid decorator. Inject() decorator can be applied on constructor's parameters, class properties, activate() method's parameters only.");
                     }
                 }
             }
