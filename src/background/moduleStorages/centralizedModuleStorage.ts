@@ -1,13 +1,18 @@
 import { Storage as ModuleStorage } from './storage';
 import { timeoutPromise } from '../../common/helpers';
+import { ethers } from 'ethers';
+
+type PresignedPost = { [key: string]: string };
 
 export class CentralizedModuleStorage implements ModuleStorage {
     public timeout = 5000;
-    private _endpoint = "https://dapplet-api.herokuapp.com/storage/";
+    private _s3ReadEndpoint = "https://dapplet-api.s3-website.nl-ams.scw.cloud/";
+    private _s3WriteEndpoint = "https://dapplet-api.s3.nl-ams.scw.cloud/";
+    private _authEndpoint = "https://dapplet-api.herokuapp.com/s3/presign";
 
     public async getResource(hash: string): Promise<ArrayBuffer> {
         const c = new AbortController();
-        const response = await timeoutPromise(this.timeout, fetch(this._endpoint + hash, { signal: c.signal }), () => c.abort());
+        const response = await timeoutPromise(this.timeout, fetch(this._s3ReadEndpoint + hash, { signal: c.signal }), () => c.abort());
 
         if (!response.ok) {
             throw new Error(`CentralizedModuleStorage can't load resource by hash: ${hash}`);
@@ -19,21 +24,40 @@ export class CentralizedModuleStorage implements ModuleStorage {
     }
 
     public async save(blob: Blob) {
-        var form = new FormData();
+        const buffer = await (blob as any).arrayBuffer();
+        const hash = ethers.utils.keccak256(new Uint8Array(buffer)).replace('0x', '');
+        const presignedPost = await this._createPresignedPost(hash);
+        await this._createObject(blob, presignedPost);
+        return hash;
+    }
+
+    saveDir(tarBlob: Blob): Promise<string> {
+        throw new Error('Method not implemented.');
+    }
+
+    private async _createPresignedPost(id: string): Promise<PresignedPost> {
+        const body = JSON.stringify({ id });
+        const response = await fetch(this._authEndpoint, {
+            method: 'POST',
+            body,
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const json = await response.json();
+        if (!json.success) throw new Error(json.message || "Cannot create presigned post for S3 storage");
+        return json.data.formData;
+    }
+
+    private async _createObject(blob: Blob, presignedPost: PresignedPost) {
+        const form = new FormData();
         form.append('file', blob);
-    
-        const response = await fetch(this._endpoint, {
+        Object.entries(presignedPost).forEach(([k, v]) => form.set(k, v));
+
+        const response = await fetch(this._s3WriteEndpoint, {
             method: 'POST',
             body: form
         });
-    
-        const json = await response.json();
-        if (!json.success) throw new Error(json.message || "Cannot save object to centralized storage");
-        if (!json.data || json.data.length !== 64) throw new Error("Invalid hash was returned by server");
-        return json.data;
-    }
-    
-    saveDir(tarBlob: Blob): Promise<string> {
-        throw new Error('Method not implemented.');
+
+        if (!response.ok) throw new Error("Cannot save object to centralized storage");
     }
 }
