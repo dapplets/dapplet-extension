@@ -20,13 +20,15 @@ export class StorageAggregator {
 
         for (const uri of hashUris.uris) {
             const protocol = uri.substr(0, uri.indexOf('://'));
-            const storage = await this._getStorageByProtocol(protocol);
-
+            const decentStorage = await this._getStorageByProtocol(protocol);
+            const centralizedStorage = new CentralizedModuleStorage();
+            const fetchController = new AbortController();
             try {
-                const buffer = await storage.getResource(uri);
-                if (this._checkHash(buffer, hashUris.hash, uri)) {
-                    return buffer;
-                }
+                const decentStBuffer = decentStorage.getResource(uri, fetchController);
+                const centStBuffer = centralizedStorage.getResource(hashUris.hash.replace('0x', ''), fetchController);
+                const buffer = await Promise.any([decentStBuffer, centStBuffer]);
+                fetchController.abort();
+                if (this._checkHash(buffer, hashUris.hash, uri)) return buffer;
                 // if (this._checkHash(buffer, hashUris.hash, uri)) {
                 //     if (hashUris.hash) this._globalConfigService.getAutoBackup().then(x => x && this._backup(buffer, hashUris.hash.replace('0x', ''))); // don't wait
                 //     return buffer;
@@ -34,12 +36,6 @@ export class StorageAggregator {
             } catch (err) {
                 logger.error(err);
             }
-        }
-
-        if (hashUris.hash) {
-            const centralizedStorage = new CentralizedModuleStorage();
-            const buffer = await centralizedStorage.getResource(hashUris.hash.replace('0x', ''));
-            if (this._checkHash(buffer, hashUris.hash, hashUris.hash)) return buffer;
         }
 
         throw Error(`Can not fetch resource by URIs: ${hashUris.uris.join(', ')}`);

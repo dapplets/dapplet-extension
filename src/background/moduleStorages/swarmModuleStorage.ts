@@ -10,10 +10,13 @@ export class SwarmModuleStorage implements ModuleStorage {
         this._gateway = config.swarmGatewayUrl;
     }
     
-    public async getResource(uri: string): Promise<ArrayBuffer> {
+    public async getResource(uri: string, fetchController: AbortController = new AbortController()): Promise<ArrayBuffer> {
 
-        const c = new AbortController();
-        const response = await timeoutPromise(this.timeout, fetch(joinUrls(this._gateway, "files/" + this._extractReference(uri)), { signal: c.signal }), () => c.abort());
+        const response = await timeoutPromise(
+            this.timeout,
+            fetch(joinUrls(this._gateway, "files/" + this._extractReference(uri)), { signal: fetchController.signal }),
+            () => fetchController.abort()
+        );
 
         if (!response.ok) {
             throw new Error(`HttpStorage can't load resource by URI ${uri}`);

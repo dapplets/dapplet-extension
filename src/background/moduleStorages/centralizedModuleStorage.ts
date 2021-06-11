@@ -10,9 +10,12 @@ export class CentralizedModuleStorage implements ModuleStorage {
     private _s3WriteEndpoint = "https://dapplet-api.s3.nl-ams.scw.cloud/";
     private _authEndpoint = "https://dapplet-api.herokuapp.com/s3/presign";
 
-    public async getResource(hash: string): Promise<ArrayBuffer> {
-        const c = new AbortController();
-        const response = await timeoutPromise(this.timeout, fetch(this._s3ReadEndpoint + hash, { signal: c.signal }), () => c.abort());
+    public async getResource(hash: string, fetchController: AbortController = new AbortController()): Promise<ArrayBuffer> {
+        const response = await timeoutPromise(
+            this.timeout,
+            fetch(this._s3ReadEndpoint + hash, { signal: fetchController.signal }),
+            () => fetchController.abort()
+        );
 
         if (!response.ok) {
             throw new Error(`CentralizedModuleStorage can't load resource by hash: ${hash}`);
