@@ -34,7 +34,7 @@ export class CentralizedModuleStorage implements ModuleStorage {
         return hash;
     }
 
-    saveDir(tarBlob: Blob): Promise<string> {
+    async saveDir(data: { files: { url: string, arr: ArrayBuffer }[], hash: string }): Promise<string> {
         throw new Error('Method not implemented.');
     }
 

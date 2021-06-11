@@ -7,6 +7,7 @@ import { CentralizedModuleStorage } from './centralizedModuleStorage';
 import GlobalConfigService from '../services/globalConfigService';
 import * as logger from '../../common/logger';
 import { StorageTypes } from '../../common/constants';
+import { Tar } from '../../common/tar';
 
 export class StorageAggregator {
 
@@ -62,7 +63,8 @@ export class StorageAggregator {
         return { hash, uris };
     }
 
-    public async saveDir(blob: Blob, targetStorages: StorageTypes[]): Promise<StorageRef> {
+    public async saveDir(files: { url: string, arr: ArrayBuffer }[], targetStorages: StorageTypes[]): Promise<StorageRef> {
+        const blob = await this._tarify(files);
         const buffer = await (blob as any).arrayBuffer();
         const hash = ethers.utils.keccak256(new Uint8Array(buffer));
         const uris = [];
@@ -71,6 +73,13 @@ export class StorageAggregator {
             const storage = await this._getStorageByType(storageType);
             const uri = await storage.saveDir(blob);
             uris.push(uri);
+        }
+
+        // backup to centralized storage
+        const centralizedStorage = new CentralizedModuleStorage();
+        const backupHash = await centralizedStorage.saveDir({ files, hash });
+        if (hash.replace('0x', '') !== backupHash.replace('0x', '')) {
+            throw Error(`Backup is corrupted: invalid hashes ${hash} ${backupHash}`);
         }
 
         return { hash, uris };
@@ -117,5 +126,16 @@ export class StorageAggregator {
             default:
                 throw new Error("Unsupported storage type");
         }
+    }
+
+    private async _tarify(files: {url: string, arr: ArrayBuffer}[]): Promise<Blob> {
+        const tar = new Tar();
+        for (const file of files) {
+            const path = (file.url[0] === '/') ? file.url.slice(1) : file.url;
+            tar.addFileArrayBuffer(path, file.arr);
+        }
+        const blob = await tar.write();
+
+        return blob;
     }
 }

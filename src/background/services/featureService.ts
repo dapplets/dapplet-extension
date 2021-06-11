@@ -326,14 +326,7 @@ export default class FeatureService {
 
                     const files = await Promise.all(assets.map((x: string) => this._storageAggregator.getResource({ uris: [new URL(x, baseUrl).href], hash: null }).then(y => ({ url: x, arr: y }))));
 
-                    const tar = new Tar();
-                    for (const file of files) {
-                        const path = (file.url[0] === '/') ? file.url.slice(1) : file.url;
-                        tar.addFileArrayBuffer(path, file.arr);
-                    }
-                    const blob = await tar.write();
-
-                    const hashUris = await this._storageAggregator.saveDir(blob, [targetStorage]);
+                    const hashUris = await this._storageAggregator.saveDir(files, [targetStorage]);
                     vi.overlays[overlayName] = hashUris;
 
                     console.log(hashUris);
