@@ -29,13 +29,28 @@ export class CentralizedModuleStorage implements ModuleStorage {
     public async save(blob: Blob) {
         const buffer = await (blob as any).arrayBuffer();
         const hash = ethers.utils.keccak256(new Uint8Array(buffer)).replace('0x', '');
-        const presignedPost = await this._createPresignedPost(hash);
-        await this._createObject(blob, presignedPost);
+        
+        let presignedPost: PresignedPost = null;
+        try {
+            presignedPost = await this._createPresignedPost(hash);
+        } catch (err) {
+            if (err.message.indexOf('Item with such ID already exists') !== -1) {
+                console.log(`Object "${hash}" already exists in centralized storage. Skipping uploading...`);
+                return hash;
+            } else {
+                throw err;
+            }
+        }
+
+        await this._createObject(blob, presignedPost, hash);
         return hash;
     }
 
     async saveDir(data: { files: { url: string, arr: ArrayBuffer }[], hash: string }): Promise<string> {
-        throw new Error('Method not implemented.');
+        const hash = data.hash.replace('0x', '');
+        const presignedPost = await this._createPresignedPost(hash);
+        await Promise.all(data.files.map(x => this._createObject(new Blob([x.arr]), presignedPost, hash + '/' + x.url)));
+        return data.hash;
     }
 
     private async _createPresignedPost(id: string): Promise<PresignedPost> {
@@ -51,10 +66,11 @@ export class CentralizedModuleStorage implements ModuleStorage {
         return json.data.formData;
     }
 
-    private async _createObject(blob: Blob, presignedPost: PresignedPost) {
+    private async _createObject(blob: Blob, presignedPost: PresignedPost, key: string) {
         const form = new FormData();
         form.append('file', blob);
         Object.entries(presignedPost).forEach(([k, v]) => form.set(k, v));
+        form.set('key', key);
 
         const response = await fetch(this._s3WriteEndpoint, {
             method: 'POST',

@@ -328,8 +328,6 @@ export default class FeatureService {
 
                     const hashUris = await this._storageAggregator.saveDir(files, [targetStorage]);
                     vi.overlays[overlayName] = hashUris;
-
-                    console.log(hashUris);
                 }
 
                 // Add manifest to zip (just for overlays yet)
