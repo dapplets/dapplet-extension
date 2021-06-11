@@ -18,30 +18,32 @@ export class StorageAggregator {
             throw Error("Resource doesn't have any URIs.");
         }
 
+        const fetchController = new AbortController();
+        const buffers = [];
+
         for (const uri of hashUris.uris) {
             const protocol = uri.substr(0, uri.indexOf('://'));
             const decentStorage = await this._getStorageByProtocol(protocol);
-            const centralizedStorage = new CentralizedModuleStorage();
-            const fetchController = new AbortController();
-            try {
-                const decentStBuffer = decentStorage.getResource(uri, fetchController);
-                const centStBuffer = centralizedStorage.getResource(hashUris.hash.replace('0x', ''), fetchController);
-                const buffer = await Promise.any([decentStBuffer, centStBuffer]);
-                fetchController.abort();
-                if (this._checkHash(buffer, hashUris.hash, uri)) return buffer;
-                // if (this._checkHash(buffer, hashUris.hash, uri)) {
-                //     if (hashUris.hash) this._globalConfigService.getAutoBackup().then(x => x && this._backup(buffer, hashUris.hash.replace('0x', ''))); // don't wait
-                //     return buffer;
-                // }
-            } catch (err) {
-                logger.error(err);
-            }
+            const decentStBuffer = decentStorage.getResource(uri, fetchController);
+            buffers.push(decentStBuffer);
         }
 
         if (hashUris.hash) {
             const centralizedStorage = new CentralizedModuleStorage();
-            const buffer = await centralizedStorage.getResource(hashUris.hash.replace('0x', ''));
+            const centStBuffer = centralizedStorage.getResource(hashUris.hash.replace('0x', ''), fetchController);
+            buffers.push(centStBuffer);
+        }
+
+        try {
+            const buffer = await Promise.any(buffers);
+            fetchController.abort();
             if (this._checkHash(buffer, hashUris.hash, hashUris.hash)) return buffer;
+            // if (this._checkHash(buffer, hashUris.hash, uri)) {
+            //     if (hashUris.hash) this._globalConfigService.getAutoBackup().then(x => x && this._backup(buffer, hashUris.hash.replace('0x', ''))); // don't wait
+            //     return buffer;
+            // }
+        } catch (err) {
+            logger.error(err);
         }
 
         throw Error(`Can not fetch resource by URIs: ${hashUris.uris.join(', ')}`);
