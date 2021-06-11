@@ -38,6 +38,12 @@ export class StorageAggregator {
             }
         }
 
+        if (hashUris.hash) {
+            const centralizedStorage = new CentralizedModuleStorage();
+            const buffer = await centralizedStorage.getResource(hashUris.hash.replace('0x', ''));
+            if (this._checkHash(buffer, hashUris.hash, hashUris.hash)) return buffer;
+        }
+
         throw Error(`Can not fetch resource by URIs: ${hashUris.uris.join(', ')}`);
     }
 
