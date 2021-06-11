@@ -201,7 +201,10 @@ export class Injector {
                         
                         const url = new URL(overlay.uris[0]);
 
-                        if (url.protocol === 'bzz:') {
+                        if (overlay.hash) {
+                            cfg.url = joinUrls('https://dapplet-api.s3-website.nl-ams.scw.cloud/', overlay.hash.replace('0x', ''));
+                            return core.overlay(cfg, eventDef);
+                        } else if (url.protocol === 'bzz:') {
                             cfg.url = joinUrls(swarmGatewayUrl, `bzz/${url.pathname.slice(2)}`);
                             return core.overlay(cfg, eventDef);
                         } else if (url.protocol === 'http:' || url.protocol === 'https:') {
