@@ -168,10 +168,11 @@ export class Injector {
     }
 
     private async _processModules(modules: { manifest: VersionInfo, script: string, order: number, contextIds: string[], defaultConfig?: DefaultConfig }[]) {
-        const { optimizeDependency, getModulesWithDeps, addEvent, getSwarmGateway } = await initBGFunctions(browser);
+        const { optimizeDependency, getModulesWithDeps, addEvent, getSwarmGateway, getPreferedOverlayStorage } = await initBGFunctions(browser);
         const { core } = this;
 
         const swarmGatewayUrl = await getSwarmGateway();
+        const preferedOverlayStorage = await getPreferedOverlayStorage();
 
         for (const { manifest, script, order, contextIds, defaultConfig } of modules) {
             // Module is loaded already
@@ -201,7 +202,7 @@ export class Injector {
                         
                         const url = new URL(overlay.uris[0]);
 
-                        if (overlay.hash) {
+                        if (preferedOverlayStorage === 'centralized' && overlay.hash) {
                             cfg.url = joinUrls('https://dapplet-api.s3-website.nl-ams.scw.cloud/', overlay.hash.replace('0x', ''));
                             return core.overlay(cfg, eventDef);
                         } else if (url.protocol === 'bzz:') {
@@ -209,6 +210,9 @@ export class Injector {
                             return core.overlay(cfg, eventDef);
                         } else if (url.protocol === 'http:' || url.protocol === 'https:') {
                             cfg.url = url.href;
+                            return core.overlay(cfg, eventDef);
+                        } else if (preferedOverlayStorage === 'decentralized' && overlay.hash) {
+                            cfg.url = joinUrls('https://dapplet-api.s3-website.nl-ams.scw.cloud/', overlay.hash.replace('0x', ''));
                             return core.overlay(cfg, eventDef);
                         } else {
                             throw new Error(`Invalid protocol "${url.protocol}" in the overlay address.`);

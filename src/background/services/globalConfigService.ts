@@ -16,6 +16,7 @@ export default class GlobalConfigService {
 
         if (config) {
             if (!config.swarmGatewayUrl) config.swarmGatewayUrl = this.getInitialConfig().swarmGatewayUrl;
+            if (!config.preferedOverlayStorage) config.preferedOverlayStorage = this.getInitialConfig().preferedOverlayStorage;
         }
 
         return config ?? this.getInitialConfig();
@@ -163,6 +164,7 @@ export default class GlobalConfigService {
         config.userAgentName = '';
         config.hostnames = {};
         config.dynamicAdapter = 'dynamic-adapter.dapplet-base.eth#default@latest';
+        config.preferedOverlayStorage = 'centralized';
 
         return config;
     }
@@ -463,5 +465,13 @@ export default class GlobalConfigService {
 
     async setDynamicAdapter(dynamicAdapter: string) {
         return this.updateConfig(c => c.dynamicAdapter = dynamicAdapter);
+    }
+
+    async getPreferedOverlayStorage() {
+        return this.get().then(x => x.preferedOverlayStorage);
+    }
+
+    async setPreferedOverlayStorage(storage: string) {
+        return this.updateConfig(c => c.preferedOverlayStorage = storage);
     }
 }

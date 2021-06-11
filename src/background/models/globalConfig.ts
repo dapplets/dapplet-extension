@@ -54,4 +54,6 @@ export class GlobalConfig extends Base {
     ignoredUpdate: string = null;
 
     dynamicAdapter: string = null;
+
+    preferedOverlayStorage: string = null;
 }

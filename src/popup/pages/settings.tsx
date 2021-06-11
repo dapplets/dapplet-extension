@@ -1,7 +1,7 @@
 import * as React from "react";
 import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { Popup, Segment, List, Label, Input, Checkbox, Icon, Header, Button, Dropdown, Form, Divider } from "semantic-ui-react";
+import { Popup, Segment, List, Label, Input, Checkbox, Icon, Header, Button, Dropdown, Form, Divider, Menu } from "semantic-ui-react";
 import { isValidHttp, isValidUrl } from '../helpers';
 import { parseModuleName, typeOfUri, UriTypes } from '../../common/helpers';
 import { ProfileDropdown } from "../components/ProfileDropdown";
@@ -62,6 +62,8 @@ interface ISettingsState {
     dynamicAdapterInputError: string;
     dynamicAdapterLoading: boolean;
     dynamicAdapterEdited: boolean;
+
+    preferedOverlayStorage: string;
 }
 
 class Settings extends React.Component<ISettingsProps, ISettingsState> {
@@ -107,7 +109,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             dynamicAdapterInput: '',
             dynamicAdapterInputError: null,
             dynamicAdapterLoading: false,
-            dynamicAdapterEdited: false
+            dynamicAdapterEdited: false,
+            preferedOverlayStorage: ''
         };
     }
 
@@ -131,7 +134,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             this.loadIdentityContract(),
             this.loadUserAgentId(),
             this.loadUserAgentName(),
-            this.loadDynamicAdapter()
+            this.loadDynamicAdapter(),
+            this.loadPreferedOverlayStorage()
         ]);
         this.setState({ isLoading: false });
     }
@@ -380,6 +384,18 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         this.loadRegistries();
     }
 
+    async loadPreferedOverlayStorage() {
+        const { getPreferedOverlayStorage } = await initBGFunctions(browser);
+        const preferedOverlayStorage = await getPreferedOverlayStorage();
+        this.setState({ preferedOverlayStorage });
+    }
+
+    async selectPreferedOverlayStorage(storage: string) {
+        const { setPreferedOverlayStorage } = await initBGFunctions(browser);
+        await setPreferedOverlayStorage(storage);
+        this.loadPreferedOverlayStorage();
+    }
+
     render() {
         const s = this.state;
 
@@ -610,6 +626,34 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             />
                             <Button size='mini' disabled={this.state.dynamicAdapterLoading || !this.state.dynamicAdapterEdited || !parseModuleName(this.state.dynamicAdapterInput)} color='blue' onClick={() => this.setDynamicAdapter(this.state.dynamicAdapterInput)}>Save</Button>
                         </Input>
+
+                        <Header as='h5'>Prefered Overlay Storage</Header>
+                        <Menu size="mini" style={{ boxShadow: "none", border: "none" }}>
+                            <Dropdown
+                                fluid
+                                basic
+                                button
+                                className="mini"
+                                floating
+                                text={s.preferedOverlayStorage}
+                            >
+                                <Dropdown.Menu style={{ maxHeight: "17rem", overflowY: "auto" }}>
+                                <Dropdown.Divider style={{ margin: "unset" }} />
+                                {[
+                                    { id: 'centralized', text: 'Centralized'},
+                                    { id: 'decentralized', text: 'Decentralized'}
+                                ].map((x) => (
+                                    <Dropdown.Item
+                                        selected={x.id === s.preferedOverlayStorage}
+                                        key={x.id}
+                                        id={x.id}
+                                        content={x.text}
+                                        onClick={() => this.selectPreferedOverlayStorage(x.id)}
+                                    />
+                                ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </Menu>
                     </Segment>
                 </Segment.Group>
 

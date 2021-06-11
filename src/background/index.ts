@@ -118,6 +118,8 @@ browser.runtime.onMessage.addListener(
     setUserAgentName: globalConfigService.setUserAgentName.bind(globalConfigService),
     getIgnoredUpdate: globalConfigService.getIgnoredUpdate.bind(globalConfigService),
     setIgnoredUpdate: globalConfigService.setIgnoredUpdate.bind(globalConfigService),
+    getPreferedOverlayStorage: globalConfigService.getPreferedOverlayStorage.bind(globalConfigService),
+    setPreferedOverlayStorage: globalConfigService.setPreferedOverlayStorage.bind(globalConfigService),
 
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),
