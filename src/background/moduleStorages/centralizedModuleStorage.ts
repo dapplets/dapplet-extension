@@ -5,9 +5,12 @@ export class CentralizedModuleStorage implements ModuleStorage {
     public timeout = 5000;
     private _endpoint = "https://dapplet-api.herokuapp.com/storage/";
 
-    public async getResource(hash: string): Promise<ArrayBuffer> {
-        const c = new AbortController();
-        const response = await timeoutPromise(this.timeout, fetch(this._endpoint + hash, { signal: c.signal }), () => c.abort());
+    public async getResource(hash: string, fetchController: AbortController = new AbortController()): Promise<ArrayBuffer> {
+        const response = await timeoutPromise(
+            this.timeout,
+            fetch(this._endpoint + hash, { signal: fetchController.signal }),
+            () => fetchController.abort()
+        );
 
         if (!response.ok) {
             throw new Error(`CentralizedModuleStorage can't load resource by hash: ${hash}`);

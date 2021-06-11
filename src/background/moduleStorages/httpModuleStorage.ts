@@ -5,9 +5,12 @@ export class HttpModuleStorage implements ModuleStorage {
     
     public timeout = 2000;
 
-    public async getResource(uri: string): Promise<ArrayBuffer> {
-        const c = new AbortController();
-        const response = await timeoutPromise(this.timeout, fetch(uri, { cache: 'no-store', signal: c.signal }), () => c.abort());
+    public async getResource(uri: string, fetchController: AbortController = new AbortController()): Promise<ArrayBuffer> {
+        const response = await timeoutPromise(
+            this.timeout,
+            fetch(uri, { cache: 'no-store', signal: fetchController.signal }),
+            () => fetchController.abort()
+        );
 
         if (!response.ok) {
             throw new Error(`HttpStorage can't load resource by URI ${uri}`);
