@@ -21,36 +21,43 @@ export default class extends ethers.Signer implements EthereumWallet {
     }
 
     signMessage(message: string | ethers.utils.Bytes): Promise<string> {
-        if (!this._wallet) throw new Error("Wallet is not connected 2");
+        if (!this._wallet) throw new Error("Wallet is not connected");
         return this._wallet.signMessage(message);
     }
 
     signTransaction(transaction: TransactionRequest): Promise<string> {
-        if (!this._wallet) throw new Error("Wallet is not connected 3");
+        if (!this._wallet) throw new Error("Wallet is not connected");
         return this._wallet.signTransaction(transaction);
     }
 
     connect(provider: Provider): ethers.Signer {
-        if (!this._wallet) throw new Error("Wallet is not connected 4");
+        if (!this._wallet) throw new Error("Wallet is not connected");
         return this._wallet.connect(provider);
     }
 
     async sendTransaction(transaction: TransactionRequest): Promise<ethers.providers.TransactionResponse> {
-        if (!this._wallet) throw new Error("Wallet is not connected 5");
+        if (!this._wallet) throw new Error("Wallet is not connected");
         localStorage['dapplets_lastUsage'] = new Date().toISOString();
         return this._wallet.sendTransaction(transaction);
     }
 
     async sendTransactionOutHash(transaction: TransactionRequest): Promise<string> {
-        if (!this._wallet) throw new Error("Wallet is not connected 6");
+        if (!this._wallet) throw new Error("Wallet is not connected");
         localStorage['dapplets_lastUsage'] = new Date().toISOString();
         const tx = await this._wallet.sendTransaction(transaction);
         return tx.hash;
     }
 
     async sendCustomRequest(method: string, params: any[]): Promise<any> {
-        if (!this._wallet) throw new Error("Wallet is not connected 7");
-        return this.provider.send(method, params);
+        if (method === 'eth_sendTransaction') {
+            return this.sendTransactionOutHash(params[0] as any);
+        } else if (method === 'eth_accounts') {
+            const address = await this.getAddress();
+            return [address];
+        } else {
+            if (!this._wallet) throw new Error("Wallet is not connected");
+            return this.provider.send(method, params);
+        }
     }
 
     isAvailable() {
