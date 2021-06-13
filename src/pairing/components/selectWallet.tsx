@@ -156,6 +156,20 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                             <span>NEAR Wallet</span>
                         </Button> :
                         null}
+                    
+                    {(!this.state.descriptors.find(x => x.type === 'dapplets').connected && (!p.chain || p.chain === ChainTypes.ETHEREUM)) ?
+                        <Button
+                            // disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
+                            basic
+                            fluid
+                            size='large'
+                            onClick={() => window.location.hash = '/dapplets'}
+                            style={{ height: '64px', marginBottom: '10px' }}
+                        >
+                            <Image size='mini' verticalAlign='middle' src={logos.dapplets} style={{ padding: '4px' }} />{' '}
+                            <span>Built-in Wallet</span>
+                        </Button> :
+                        null}
 
                 </> : null}
             </>

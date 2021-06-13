@@ -28,6 +28,7 @@ export class App extends React.Component<Props, State> {
                         <Route path="/metamask" component={() => <modules.metamask bus={p.bus} />} />
                         <Route path="/walletconnect" component={() => <modules.walletconnect bus={p.bus} />} />
                         <Route path="/near" component={() => <modules.near bus={p.bus} />} />
+                        <Route path="/dapplets" component={() => <modules.dapplets bus={p.bus} />} />
                     </Switch>
                 </HashRouter>
             </Container>
