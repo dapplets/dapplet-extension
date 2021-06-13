@@ -64,7 +64,7 @@ export default class GlobalConfigService {
         let config = await this._globalConfigRepository.getById(sourceProfileId);
         if (!config && sourceProfileId === this._defaultConfigId) config = this.getInitialConfig();
         if (!config) throw new Error(`Profile "${sourceProfileId}" doesn't exist.`);
-        
+
         // Add increment for uniqueness of profile id
         while (await this._globalConfigRepository.getById(config.id)) {
             config.id = incrementFilename(config.id);
@@ -142,8 +142,8 @@ export default class GlobalConfigService {
         config.id = this._defaultConfigId;
         config.isActive = true;
         config.registries = [
-            { url: "dev-1619784199964-4356216", isDev: false, isEnabled: true },
-            { url: "dapplet-base.eth", isDev: false, isEnabled: false }
+            { url: "dapplet-base.eth", isDev: false, isEnabled: true },
+            { url: "dev-1619784199964-4356216", isDev: false, isEnabled: false }
         ];
         config.devMode = false;
         config.trustedUsers = [
@@ -202,13 +202,35 @@ export default class GlobalConfigService {
             config.registries.push({ url, isDev, isEnabled: isEnabled });
             await this.set(config);
         } else {
-            const response = await fetch(url);
-            if (response.ok || !isDev) { // ToDo: check prod registry correctly
+
+            // ToDo: check prod registry correctly
+            if (!isDev) {
                 config.registries.push({ url, isDev, isEnabled: isEnabled });
                 await this.set(config);
-            } else {
-                throw Error('The registry is not available.');
+                return;
             }
+
+            const checkAndAdd = async (url) => {
+                try {
+                    const resp = await fetch(url);
+                    if (!resp.ok) return false;
+                    const obj = await resp.json();
+                    if (!(Array.isArray(obj) || obj.name && obj.version && obj.type)) return false;
+                    if (config.registries.find(r => r.url === url)) return true;
+                    config.registries.push({ url, isDev, isEnabled: isEnabled });
+                    await this.set(config);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+
+            // try find manifest by another paths
+            const success = await checkAndAdd(url) || 
+                await checkAndAdd(joinUrls(url, 'dapplet.json')) || 
+                await checkAndAdd(joinUrls(url, 'index.json'));
+
+            if (!success) throw Error('The registry is not available.');
         }
     }
 
