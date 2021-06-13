@@ -220,12 +220,12 @@ export default class Core {
 
         try {
             const txHash = await eth_sendCustomRequest(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
-            if (txHash) {
+            if (typeof txHash === 'string' && txHash.startsWith('0x') && txHash.length === 66) {
                 callback({ type: "created", data: txHash });
-                callback({ type: "result", data: txHash });
-
                 const tx = await eth_waitTransaction(app, txHash);
                 callback({ type: "mined", data: tx });
+            } else {
+                callback({ type: "result", data: txHash });
             }
         } catch (err) {
             logger.error(err);
@@ -368,4 +368,6 @@ export default class Core {
     }
 
     utils = ethers.utils;
+
+    BigNumber = ethers.BigNumber;
 }
