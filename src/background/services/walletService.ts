@@ -11,6 +11,7 @@ import { ChainTypes, DefaultSigners, WalletDescriptor, WalletTypes } from '../..
 export class WalletService {
 
     private _map: Promise<{ [chain: string]: { [wallet: string]: GenericWallet } }>;
+    private _signersByApp = new Map<string, Signer>();
 
     constructor(private _globalConfigService: GlobalConfigService) { }
 
@@ -68,36 +69,47 @@ export class WalletService {
     }
 
     async eth_getSignerFor(app: string | DefaultSigners): Promise<Signer> {
-        const me = this;
-        const providerUrl = await this._globalConfigService.getEthereumProvider();
-        return new (class extends Signer {
-            provider = new providers.StaticJsonRpcProvider(providerUrl);
+        if (!this._signersByApp.has(app)) {
+            const me = this;
+            const providerUrl = await this._globalConfigService.getEthereumProvider();
+            const signer = new (class extends Signer {
 
-            async getAddress(): Promise<string> {
-                const signer = await me._getInternalSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet;
-                if (!signer) return '0x0000000000000000000000000000000000000000';
-                const address = await signer.getAddress();
-                if (!address) return '0x0000000000000000000000000000000000000000';
-                return address;
-            }
+                constructor() {
+                    super();
+                    console.log('signer inited', app);
+                }
+                provider = new providers.StaticJsonRpcProvider(providerUrl);
+    
+                async getAddress(): Promise<string> {
+                    const signer = await me._getInternalSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet;
+                    if (!signer) return '0x0000000000000000000000000000000000000000';
+                    const address = await signer.getAddress();
+                    if (!address) return '0x0000000000000000000000000000000000000000';
+                    return address;
+                }
+    
+                async signMessage(message: string | utils.Bytes): Promise<string> {
+                    throw new Error('Method not implemented.');
+                }
+    
+                async signTransaction(transaction: utils.Deferrable<providers.TransactionRequest>): Promise<string> {
+                    throw new Error('Method not implemented.');
+                }
+    
+                async sendTransaction(transaction: providers.TransactionRequest): Promise<providers.TransactionResponse> {
+                    const signer = await me._getInternalSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet ?? await me._pairSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet;
+                    return signer.sendTransaction(transaction);
+                }
+    
+                connect(provider: providers.Provider): Signer {
+                    throw new Error('Method not implemented.');
+                }
+            })();
 
-            async signMessage(message: string | utils.Bytes): Promise<string> {
-                throw new Error('Method not implemented.');
-            }
-
-            async signTransaction(transaction: utils.Deferrable<providers.TransactionRequest>): Promise<string> {
-                throw new Error('Method not implemented.');
-            }
-
-            async sendTransaction(transaction: providers.TransactionRequest): Promise<providers.TransactionResponse> {
-                const signer = await me._getInternalSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet ?? await me._pairSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet;
-                return signer.sendTransaction(transaction);
-            }
-
-            connect(provider: providers.Provider): Signer {
-                throw new Error('Method not implemented.');
-            }
-        })();
+            this._signersByApp.set(app, signer);
+        }
+        
+        return this._signersByApp.get(app);
     }
 
     public async setWalletFor(walletType: WalletTypes, app: string | DefaultSigners, chain: ChainTypes) {
