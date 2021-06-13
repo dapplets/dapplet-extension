@@ -167,7 +167,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                             style={{ height: '64px', marginBottom: '10px' }}
                         >
                             <Image size='mini' verticalAlign='middle' src={logos.dapplets} style={{ padding: '4px' }} />{' '}
-                            <span>Built-in Wallet</span>
+                            <span>Built-in Test Only Wallet</span>
                         </Button> :
                         null}
 

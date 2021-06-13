@@ -69,7 +69,7 @@ export default class extends React.Component<Props, State> {
 
         if (!s.connected) return (
             <>
-                <Loader active inline='centered' >Please unlock your wallet to continue</Loader>
+                <Loader active inline='centered' >Generating a private key</Loader>
             </>
         );
 
