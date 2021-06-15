@@ -22,23 +22,28 @@ export class StorageAggregator {
         const fetchController = new AbortController();
         const buffers = [];
 
+        const getVerifiedResource = async (storage, uri) => {
+            const buffer = await storage.getResource(uri, fetchController);
+            return this._checkHash(buffer, hashUris.hash, uri) && buffer;
+        };
+
         for (const uri of hashUris.uris) {
             const protocol = uri.substr(0, uri.indexOf('://'));
             const decentStorage = await this._getStorageByProtocol(protocol);
-            const decentStBuffer = decentStorage.getResource(uri, fetchController);
+            const decentStBuffer = getVerifiedResource(decentStorage, uri);
             buffers.push(decentStBuffer);
         }
 
         if (hashUris.hash) {
             const centralizedStorage = new CentralizedModuleStorage();
-            const centStBuffer = centralizedStorage.getResource(hashUris.hash.replace('0x', ''), fetchController);
+            const centStBuffer = getVerifiedResource(centralizedStorage, hashUris.hash.replace('0x', ''));
             buffers.push(centStBuffer);
         }
 
         try {
             const buffer = await Promise.any(buffers);
             fetchController.abort();
-            if (this._checkHash(buffer, hashUris.hash, hashUris.hash)) return buffer;
+            return buffer;
             // if (this._checkHash(buffer, hashUris.hash, uri)) {
             //     if (hashUris.hash) this._globalConfigService.getAutoBackup().then(x => x && this._backup(buffer, hashUris.hash.replace('0x', ''))); // don't wait
             //     return buffer;
