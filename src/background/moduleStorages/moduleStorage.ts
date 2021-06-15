@@ -24,7 +24,8 @@ export class StorageAggregator {
 
         const getVerifiedResource = async (storage, uri) => {
             const buffer = await storage.getResource(uri, fetchController);
-            return this._checkHash(buffer, hashUris.hash, uri) && buffer;
+            if (this._checkHash(buffer, hashUris.hash, uri)) return buffer;
+            throw new Error(`Hash is not valid. URL: ${uri}, expected: ${hashUris.hash}, recieved: ${ethers.utils.keccak256(new Uint8Array(buffer))}`)
         };
 
         for (const uri of hashUris.uris) {
