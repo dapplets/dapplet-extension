@@ -145,7 +145,7 @@ export default class GlobalConfigService {
             { url: "dapplet-base.eth", isDev: false, isEnabled: true },
             { url: "dev-1619784199964-4356216", isDev: false, isEnabled: false }
         ];
-        config.devMode = false;
+        config.devMode = true;
         config.trustedUsers = [
             { account: "buidl.testnet" },
             { account: "nik3ter.testnet" },
