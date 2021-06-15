@@ -246,59 +246,51 @@ browser.browserAction.onClicked.addListener((tab) => {
 browser.runtime.onInstalled.addListener(async (details) => {
 
   // Find predefined config URL in downloads
-  const findPredefinedConfig = async () => {
-    if (details.reason !== 'install') return;
+  if (details.reason !== 'install') return;
+  const downloads = await browser.downloads.search({ filenameRegex: 'dapplet-extension' });
+  if (downloads.length === 0) return;
+  const [downloadItem] = downloads.sort((a, b) => -a.startTime.localeCompare(b.startTime));
+  if (!downloadItem || !downloadItem.url) return;
+  const url = new URL(downloadItem.url);
+  const config = url.searchParams.get('config');
+  if (!config) return;
 
-    const downloads = await browser.downloads.search({ filenameRegex: 'dapplet-extension' });
-    if (downloads.length === 0) return;
+  // Find override parameters in URL
+  const customParams = {};
+  url.searchParams.forEach((value, key) => {
+    if (key !== 'config') customParams[key] = value;
+  });
 
-    const [downloadItem] = downloads.sort((a, b) => -a.startTime.localeCompare(b.startTime));
-    if (!downloadItem || !downloadItem.url) return;
+  try {
+    const url = new URL(config);
+    const resp = await fetch(url.href);
+    const json = await resp.json();
 
-    const url = new URL(downloadItem.url);
-    const config = url.searchParams.get('config');
-    if (!config) return;
-
-    const customParams: { ['string']?: string } = {};
-    url.searchParams.forEach((value, key) => {
-      if (key !== 'config') customParams[key] = value;
-    });
-    return { config, customParams };
-  }
-
-  const { config, customParams } = await findPredefinedConfig();
-  if (config) {
-    try {
-      const url = new URL(config);
-      const resp = await fetch(url.href);
-      const json = await resp.json();
-
-      const addCustomParams = (defParamsConfig: any) => {
-        Object.entries(customParams).forEach(([name, value]) => {
-          let parsedValue: any;
-          try {
-            parsedValue = JSON.parse(<string>value);
-          } catch (e) {
-            parsedValue = value;
-          }
-          defParamsConfig[name] = parsedValue;
-        });
-      }
-
-      if (Array.isArray(json)) {
-        for (const j of json) {
-          addCustomParams(j);
-          await globalConfigService.set(j);
+    const addCustomParams = (defParamsConfig: any) => {
+      Object.entries(customParams).forEach(([name, value]) => {
+        let parsedValue: any;
+        try {
+          parsedValue = JSON.parse(<string>value);
+        } catch (e) {
+          parsedValue = value;
         }
-      } else {
-        addCustomParams(json);
-        await globalConfigService.set(json);
-      }
-
-      console.log(`The predefined configuration was initialized. URL: ${url.href}`);
-    } catch (err) {
-      console.error("Cannot set predefined configuration.", err);
+        defParamsConfig[name] = parsedValue;
+      });
     }
+
+    if (Array.isArray(json)) {
+      for (const j of json) {
+        addCustomParams(j);
+        await globalConfigService.set(j);
+      }
+    } else {
+      addCustomParams(json);
+      await globalConfigService.set(json);
+    }
+
+    console.log(`The predefined configuration was initialized. URL: ${url.href}`);
+  } catch (err) {
+    console.error("Cannot set predefined configuration.", err);
   }
 
   // const welcomeUrl = new URL(browser.extension.getURL('welcome.html'));
