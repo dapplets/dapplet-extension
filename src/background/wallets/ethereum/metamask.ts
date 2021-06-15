@@ -13,7 +13,7 @@ export default class extends ethers.Signer implements EthereumWallet {
     private get _metamask() {
         if (!this._metamaskProvider) {
             this._metamaskProvider = window['ethereum'] ?? createMetaMaskProvider();
-            this._metamask['autoRefreshOnNetworkChange'] = false; // silence the warning from metamask https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange 
+            this._metamaskProvider['autoRefreshOnNetworkChange'] = false; // silence the warning from metamask https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange 
             this._metamaskProvider.on('connect', () => this._available = true);
             this._metamaskProvider.on('disconnect', () => (this._available = false, this._metamaskProvider = null));
             // another available events: _initialized, chainChanged, networkChanged, accountsChanged, message, data, error
@@ -36,7 +36,7 @@ export default class extends ethers.Signer implements EthereumWallet {
 
     async getAddress(): Promise<string> {
         // ToDo: replace to ethereum.request({ method: 'eth_accounts' }) 
-        return this._metamask.selectedAddress;
+        return this._available ? this._metamask.selectedAddress : null;
     }
 
     async signMessage(message: string | ethers.Bytes): Promise<string> {
@@ -85,7 +85,7 @@ export default class extends ethers.Signer implements EthereumWallet {
 
     isConnected() {
         const disabled = localStorage['metamask_disabled'] === 'true';
-        return this._metamask.isConnected() && !!this._metamask.selectedAddress && !disabled;
+        return this._available && this._metamask.isConnected() && !!this._metamask.selectedAddress && !disabled;
     }
 
     async connectWallet(): Promise<void> {
