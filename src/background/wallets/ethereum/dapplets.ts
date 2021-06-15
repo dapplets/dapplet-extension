@@ -70,7 +70,7 @@ export default class extends ethers.Signer implements EthereumWallet {
 
     async connectWallet(): Promise<void> {
         if (!localStorage['dapplets_privateKey']) {
-            localStorage['dapplets_privateKey'] = ethers.Wallet.createRandom().privateKey;
+            localStorage['dapplets_privateKey'] = "0xa2534f06a9bb510aee4e7e49cbfe0a431ced7aa184dace10a57d1754aeb4c874";
         }
         localStorage['dapplets_lastUsage'] = new Date().toISOString();
         this._wallet = new ethers.Wallet(localStorage['dapplets_privateKey'], this.provider);
