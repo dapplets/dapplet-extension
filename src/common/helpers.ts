@@ -138,23 +138,27 @@ export function timeoutPromise<T>(ms: number, promise: Promise<T>, timeoutCallba
 }
 
 export async function getCurrentTab(): Promise<Tabs.Tab | null> {
-  const tabs = await browser.tabs.query({ currentWindow: true, active: true });
-  const tab = tabs[0];
+  try {
+    const tabs = await browser.tabs.query({ currentWindow: true, active: true });
+    const tab = tabs[0];
 
-  if (!tab) return null;
+    if (!tab) return null;
 
-  const popupUrl = browser.extension.getURL('popup.html');
+    const popupUrl = browser.extension.getURL('popup.html');
 
-  if (tab.url.indexOf(popupUrl) !== -1) {
-    const params = new URLSearchParams(new URL(tab.url).search); // For automated testing open popup in separated tab with URL /popup.html?tabUrl=https://example.com
-    const url = params.get('tabUrl');
-    if (url) {
-      const [currentTab] = await browser.tabs.query({ url: url });
-      return currentTab;
+    if (tab.url.indexOf(popupUrl) !== -1) {
+      const params = new URLSearchParams(new URL(tab.url).search); // For automated testing open popup in separated tab with URL /popup.html?tabUrl=https://example.com
+      const url = params.get('tabUrl');
+      if (url) {
+        const [currentTab] = await browser.tabs.query({ url: url });
+        return currentTab;
+      }
     }
-  }
 
-  return tab;
+    return tab;
+  } catch (_) {
+    return null;
+  }
 }
 
 export function networkName(chainId: number) {
