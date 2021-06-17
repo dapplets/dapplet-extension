@@ -14,6 +14,7 @@
     "clean": "rm -rf ./build && rm -rf ./lib"
   },
   "devDependencies": {
+    "@metamask/providers": "^8.1.1",
     "@rjsf/core": "^2.5.1",
     "@rjsf/semantic-ui": "^2.5.1",
     "@semantic-release/exec": "^5.0.0",
@@ -28,12 +29,13 @@
     "chrome-extension-message-wrapper": "github:dapplets/chrome-extension-message-wrapper",
     "copy-webpack-plugin": "^9.0.0",
     "css-loader": "^5.2.6",
+    "detect-browser": "^5.2.0",
     "ethereum-blockies-base64": "^1.0.2",
     "ethers": "^5.3.1",
+    "extension-port-stream": "^2.0.1",
     "file-loader": "^6.2.0",
     "fork-ts-checker-webpack-plugin": "^6.2.10",
     "jszip": "^3.6.0",
-    "metamask-extension-provider": "^3.0.0",
     "near-api-js": "^0.39.0",
     "node-sass": "^6.0.0",
     "process": "^0.11.10",

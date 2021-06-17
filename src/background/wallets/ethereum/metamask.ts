@@ -1,18 +1,24 @@
 import { Provider, TransactionRequest } from "@ethersproject/providers";
 import { ethers } from "ethers";
-import { Deferrable, SupportedAlgorithm } from "ethers/lib/utils";
+import { Deferrable } from "ethers/lib/utils";
+import { MetaMaskInpageProvider } from '@metamask/providers';
+import PortStream from 'extension-port-stream';
+import { detect } from 'detect-browser';
+import { browser } from 'webextension-polyfill-ts';
 import { EthereumWallet } from "./interface";
-import createMetaMaskProvider from 'metamask-extension-provider';
 
 export default class extends ethers.Signer implements EthereumWallet {
 
     public provider: ethers.providers.StaticJsonRpcProvider;
-    private _metamaskProvider;
+    private _metamaskProvider: MetaMaskInpageProvider | undefined;
     private _available = false;
 
-    private get _metamask() {
+    private get _metamask(): MetaMaskInpageProvider {
         if (!this._metamaskProvider) {
-            this._metamaskProvider = window['ethereum'] ?? createMetaMaskProvider();
+            const currentMetaMaskId = this._getMetaMaskId();
+            const metamaskPort = browser.runtime.connect(currentMetaMaskId);
+            const pluginStream = new PortStream(metamaskPort);
+            this._metamaskProvider = new MetaMaskInpageProvider(pluginStream);
             this._metamaskProvider['autoRefreshOnNetworkChange'] = false; // silence the warning from metamask https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange 
             this._metamaskProvider.on('connect', () => this._available = true);
             this._metamaskProvider.on('disconnect', () => (this._available = false, this._metamaskProvider = null));
@@ -80,6 +86,7 @@ export default class extends ethers.Signer implements EthereumWallet {
     }
 
     isAvailable() {
+        console.log('isAvailable', this._available);
         return this._available;
     }
 
@@ -113,5 +120,21 @@ export default class extends ethers.Signer implements EthereumWallet {
 
     getLastUsage() {
         return localStorage['metamask_lastUsage'];
+    }
+
+    private _getMetaMaskId() {
+        const config = {
+            "CHROME_ID": "nkbihfbeogaeaoehlefnkodbefgpgknn",
+            "FIREFOX_ID": "webextension@metamask.io"
+        }
+        const browser = detect();
+        switch (browser && browser.name) {
+            case 'chrome':
+                return config.CHROME_ID
+            case 'firefox':
+                return config.FIREFOX_ID
+            default:
+                return config.CHROME_ID
+        }
     }
 }
