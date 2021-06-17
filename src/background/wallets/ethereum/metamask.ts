@@ -10,30 +10,7 @@ import { EthereumWallet } from "./interface";
 export default class extends ethers.Signer implements EthereumWallet {
 
     public provider: ethers.providers.StaticJsonRpcProvider;
-    private _metamaskProvider: MetaMaskInpageProvider | undefined;
-    private _available = false;
-
-    private get _metamask(): MetaMaskInpageProvider {
-        if (!this._metamaskProvider) {
-            const currentMetaMaskId = this._getMetaMaskId();
-            const metamaskPort = browser.runtime.connect(currentMetaMaskId);
-            const pluginStream = new PortStream(metamaskPort);
-            this._metamaskProvider = new MetaMaskInpageProvider(pluginStream);
-            this._metamaskProvider['autoRefreshOnNetworkChange'] = false; // silence the warning from metamask https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange 
-            this._metamaskProvider.on('connect', () => this._available = true);
-            this._metamaskProvider.on('disconnect', () => (this._available = false, this._metamaskProvider = null));
-            // another available events: _initialized, chainChanged, networkChanged, accountsChanged, message, data, error
-            // this._metamaskProvider.on('connect', (...args) => console.log('connect', args))
-            // this._metamaskProvider.on('disconnect', (...args) => console.log('disconnect', args))
-            // this._metamaskProvider.on('_initialized', (...args) => console.log('_initialized', args))
-            // this._metamaskProvider.on('chainChanged', (...args) => console.log('chainChanged', args))
-            // this._metamaskProvider.on('networkChanged', (...args) => console.log('networkChanged', args))
-            // this._metamaskProvider.on('accountsChanged', (...args) => console.log('accountsChanged', args))
-            // this._metamaskProvider.on('message', (...args) => console.log('message', args))
-            // this._metamaskProvider.on('data', (...args) => console.log('data', args))
-        }
-        return this._metamaskProvider;
-    }
+    private _metamaskProviderPromise: Promise<MetaMaskInpageProvider> | null = null;
 
     constructor(config: { providerUrl: string }) {
         super();
@@ -41,8 +18,13 @@ export default class extends ethers.Signer implements EthereumWallet {
     }
 
     async getAddress(): Promise<string> {
-        // ToDo: replace to ethereum.request({ method: 'eth_accounts' }) 
-        return this._available ? this._metamask.selectedAddress : null;
+        try {
+            // ToDo: replace to ethereum.request({ method: 'eth_accounts' }) 
+            const metamask = await this._getMetamaskProvider();
+            return metamask.selectedAddress;
+        } catch (_) {
+            return null;
+        }
     }
 
     async signMessage(message: string | ethers.Bytes): Promise<string> {
@@ -67,10 +49,11 @@ export default class extends ethers.Signer implements EthereumWallet {
     }
 
     async sendTransactionOutHash(transaction: TransactionRequest): Promise<string> {
+        const metamask = await this._getMetamaskProvider();
         localStorage['metamask_lastUsage'] = new Date().toISOString();
         transaction.from = await this.getAddress();
         const tx = await ethers.utils.resolveProperties(transaction);
-        const txHash = await this._metamask.request({
+        const txHash = await metamask.request({
             method: 'eth_sendTransaction',
             params: [tx]
         }) as string;
@@ -78,29 +61,42 @@ export default class extends ethers.Signer implements EthereumWallet {
     }
 
     async sendCustomRequest(method: string, params: any[]): Promise<any> {
-        return this._metamask.request({ method, params });
+        const metamask = await this._getMetamaskProvider();
+        return metamask.request({ method, params });
     }
 
     connect(provider: Provider): ethers.Signer {
         throw new Error("Method not implemented.");
     }
 
-    isAvailable() {
-        console.log('isAvailable', this._available);
-        return this._available;
+    async isAvailable() {
+        try {
+            await this._getMetamaskProvider();
+            return true
+        } catch (_) {
+            return false;
+        }
     }
 
-    isConnected() {
+    async isConnected() {
         const disabled = localStorage['metamask_disabled'] === 'true';
-        return this._available && this._metamask.isConnected() && !!this._metamask.selectedAddress && !disabled;
+        if (disabled) return false;
+
+        try {
+            const metamask = await this._getMetamaskProvider();
+            return metamask.isConnected() && !!metamask.selectedAddress;
+        } catch (_) {
+            return false;
+        }
     }
 
     async connectWallet(): Promise<void> {
+        const metamask = await this._getMetamaskProvider();
         if (localStorage['metamask_disabled'] === 'true') {
-            await this._metamask.request({ method: "wallet_requestPermissions", params: [{ eth_accounts: {} }] });
+            await metamask.request({ method: "wallet_requestPermissions", params: [{ eth_accounts: {} }] });
             delete localStorage['metamask_disabled'];
         } else {
-            await this._metamask.request({ method: 'eth_requestAccounts' });
+            await metamask.request({ method: 'eth_requestAccounts' });
         }
         localStorage['metamask_lastUsage'] = new Date().toISOString();
     }
@@ -120,6 +116,45 @@ export default class extends ethers.Signer implements EthereumWallet {
 
     getLastUsage() {
         return localStorage['metamask_lastUsage'];
+    }
+
+    private async _getMetamaskProvider(): Promise<MetaMaskInpageProvider> {
+        if (!this._metamaskProviderPromise) {
+            this._metamaskProviderPromise = new Promise((res, rej) => {
+                const currentMetaMaskId = this._getMetaMaskId();
+                const metamaskPort = browser.runtime.connect(currentMetaMaskId);
+                metamaskPort.onDisconnect.addListener(() => browser.runtime.lastError); // mute "Unchecked runtime.lastError"
+                const pluginStream = new PortStream(metamaskPort);
+                const metamask = new MetaMaskInpageProvider(pluginStream, {
+                    // mute all messages from provider
+                    logger: {
+                        warn: () => {},
+                        log: () => {},
+                        error: () => {},
+                        debug: () => {},
+                        info: () => {},
+                        trace: () => {}
+                    }
+                });
+                metamask['autoRefreshOnNetworkChange'] = false; // silence the warning from metamask https://docs.metamask.io/guide/ethereum-provider.html#ethereum-autorefreshonnetworkchange 
+                metamask.on('connect', () => res(metamask));
+                metamask.on('disconnect', () => {
+                    this._metamaskProviderPromise = null;
+                    rej('MetaMask is unavailable.');
+                });
+                // another available events: _initialized, chainChanged, networkChanged, accountsChanged, message, data, error
+                // metamask.on('connect', (...args) => console.log('connect', args))
+                // metamask.on('disconnect', (...args) => console.log('disconnect', args))
+                // metamask.on('_initialized', (...args) => console.log('_initialized', args))
+                // metamask.on('chainChanged', (...args) => console.log('chainChanged', args))
+                // metamask.on('networkChanged', (...args) => console.log('networkChanged', args))
+                // metamask.on('accountsChanged', (...args) => console.log('accountsChanged', args))
+                // metamask.on('message', (...args) => console.log('message', args))
+                // metamask.on('data', (...args) => console.log('data', args))
+            });
+        }
+
+        return this._metamaskProviderPromise;
     }
 
     private _getMetaMaskId() {

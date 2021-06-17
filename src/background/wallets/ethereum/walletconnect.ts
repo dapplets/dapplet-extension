@@ -76,11 +76,11 @@ export default class extends ethers.Signer implements EthereumWallet {
         throw new Error("Method not implemented.");
     }
 
-    isAvailable() {
+    async isAvailable() {
         return true;
     }
 
-    isConnected() {
+    async isConnected() {
         return this._walletconnect?.connected ?? false;
     }
 

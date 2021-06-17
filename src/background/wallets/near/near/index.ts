@@ -52,11 +52,11 @@ export default class implements NearWallet {
         throw new Error("connect() is not implemented");
     }
 
-    isAvailable() {
+    async isAvailable() {
         return true;
     }
 
-    isConnected() {
+    async isConnected() {
         const accountId = this._nearWallet.getAccountId();
         return accountId && accountId.length > 0;
     }

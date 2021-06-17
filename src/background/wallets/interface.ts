@@ -1,8 +1,8 @@
 export interface GenericWallet {
     getAddress(): Promise<string>;
     getChainId(): Promise<number>;
-    isAvailable(): boolean;
-    isConnected(): boolean;
+    isAvailable(): Promise<boolean>;
+    isConnected(): Promise<boolean>;
     connectWallet(): Promise<void>;
     disconnectWallet(): Promise<void>;
     getLastUsage(): string;

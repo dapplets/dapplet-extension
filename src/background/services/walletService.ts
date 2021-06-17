@@ -58,8 +58,8 @@ export class WalletService {
             chain: w.chain,
             type: w.wallet,
             meta: await w.instance.getMeta(),
-            connected: w.instance.isConnected(),
-            available: w.instance.isAvailable(),
+            connected: await w.instance.isConnected(),
+            available: await w.instance.isAvailable(),
             account: await w.instance.getAddress(),
             chainId: await w.instance.getChainId(),
             apps: getUsageApps(w.chain, w.wallet),
@@ -208,13 +208,13 @@ export class WalletService {
         const defaultWallet = defaults?.[chain];
         const map = await this._getWalletsMap();
 
-        if (defaultWallet && map[chain][defaultWallet].isConnected()) return map[chain][defaultWallet];
+        if (defaultWallet && await map[chain][defaultWallet].isConnected()) return map[chain][defaultWallet];
 
         // ToDo: clean walletType?
 
         // choose first connected wallet
         for (const wallet in map[chain]) {
-            if (map[chain][wallet].isConnected()) {
+            if (await map[chain][wallet].isConnected()) {
                 return map[chain][wallet];
             }
         }
@@ -234,7 +234,7 @@ export class WalletService {
 
         // choose first connected wallet
         for (const wallet in map[chain]) {
-            if (map[chain][wallet].isConnected()) {
+            if (await map[chain][wallet].isConnected()) {
                 return map[chain][wallet];
             }
         }

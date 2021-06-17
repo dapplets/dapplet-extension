@@ -60,11 +60,11 @@ export default class extends ethers.Signer implements EthereumWallet {
         }
     }
 
-    isAvailable() {
+    async isAvailable() {
         return true;
     }
 
-    isConnected() {
+    async isConnected() {
         return !!localStorage['dapplets_privateKey'];
     }
 
