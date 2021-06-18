@@ -1,10 +1,36 @@
 import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserStorage';
 import { GlobalConfig } from '../models/globalConfig';
-import { incrementFilename, joinUrls, typeOfUri, UriTypes } from '../../common/helpers';
+import { incrementFilename, joinUrls, pick, typeOfUri, UriTypes } from '../../common/helpers';
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { browser } from "webextension-polyfill-ts";
 import { generateGuid } from '../../common/helpers';
 import SiteConfig from '../models/siteConfig';
+
+const EXPORTABLE_PROPERTIES = [
+    'id',
+    // 'isActive',
+    // 'suspended',
+    // 'walletInfo',
+    'registries',
+    // 'intro',
+    'devMode',
+    'trustedUsers',
+    // 'userSettings',
+    'errorReporting',
+    // 'userAgentId',
+    'userAgentName',
+    // 'autoBackup',
+    'providerUrl',
+    'swarmGatewayUrl',
+    // 'walletsUsage',
+    'identityContract',
+    'popupInOverlay',
+    'hostnames',
+    //'lastDevMessageHash',
+    //'ignoredUpdate',
+    'dynamicAdapter',
+    'preferedOverlayStorage'
+];
 
 export default class GlobalConfigService {
     private _globalConfigRepository = new GlobalConfigBrowserStorage();
@@ -95,22 +121,24 @@ export default class GlobalConfigService {
         const arr = await swarmStorage.getResource(url);
         const json = new TextDecoder("utf-8").decode(new Uint8Array(arr));
         const config = JSON.parse(json);
+        const importingConfig = pick(config, ...EXPORTABLE_PROPERTIES);
+        const mergedConfigs = Object.assign(this.getInitialConfig(), importingConfig);
 
         // Add increment for uniqueness of profile id
-        while (await this._globalConfigRepository.getById(config.id)) {
-            config.id = incrementFilename(config.id);
+        while (await this._globalConfigRepository.getById(mergedConfigs.id)) {
+            mergedConfigs.id = incrementFilename(mergedConfigs.id);
         }
 
         // ToDo: reset unwanted settings
-        config.isActive = false;
+        mergedConfigs.isActive = false;
 
-        await this._globalConfigRepository.create(config);
+        await this._globalConfigRepository.create(mergedConfigs);
 
         if (makeActive) {
-            await this.setActiveProfile(config.id);
+            await this.setActiveProfile(mergedConfigs.id);
         }
 
-        return config.id;
+        return mergedConfigs.id;
     }
 
     async exportProfile(profileId: string): Promise<string> {
@@ -119,9 +147,8 @@ export default class GlobalConfigService {
         if (!config && profileId === this._defaultConfigId) config = this.getInitialConfig();
         if (!config) throw new Error(`Profile "${profileId}" doesn't exist.`);
 
-        config.isActive = false;
-
-        const json = JSON.stringify(config);
+        const exportedConfig = pick(config, ...EXPORTABLE_PROPERTIES);
+        const json = JSON.stringify(exportedConfig);
         const blob = new Blob([json], { type: "application/json" });
         const swarmGatewayUrl = await this.getSwarmGateway();
         const swarmStorage = new SwarmModuleStorage({ swarmGatewayUrl });

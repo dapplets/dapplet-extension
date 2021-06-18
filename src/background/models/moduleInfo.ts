@@ -3,8 +3,9 @@ import { ModuleTypes } from '../../common/constants';
 import { StorageRef } from '../registries/registry';
 
 export default class ModuleInfo extends Base {
-    getId = () => this.name;
+    getId = () => this.registryUrl + ':' + this.name;
 
+    registryUrl: string = null;
     name: string = null;
     type: ModuleTypes = null;
     title: string = null;

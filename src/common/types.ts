@@ -49,3 +49,9 @@ export type WalletDescriptor = {
     default: boolean;
     lastUsage: string;
 }
+
+export type ModuleId = {
+    name: string, 
+    branch: string, 
+    version: string
+}

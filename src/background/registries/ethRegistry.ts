@@ -127,6 +127,7 @@ export class EthRegistry implements Registry {
                 uris: m.icon.uris.map(u => ethers.utils.toUtf8String(u))
             };
             mi.interfaces = m.interfaces;
+            mi.registryUrl = this.url;
             return mi;
         } catch (err) {
             console.error(err);

@@ -1,5 +1,5 @@
 import { browser, Tabs } from "webextension-polyfill-ts";
-import { ChainTypes } from "./types";
+import { ChainTypes, ModuleId } from "./types";
 
 export function getHostName(url: string): string {
   return new URL(url).hostname;
@@ -27,8 +27,8 @@ export function mergeArrays<T>(input: T[][]): T[] {
  * @param a manifest's part B
  */
 export function areModulesEqual(
-  a: { name: string, branch: string, version: string },
-  b: { name: string, branch: string, version: string }
+  a: ModuleId,
+  b: ModuleId
 ): boolean {
   return (
     a.name === b.name &&
@@ -253,4 +253,11 @@ export function parseModuleName(str: string): { name: string, branch: string, ve
     branch: parsed[2] ?? null,
     version: parsed[3] ?? null
   };
+}
+
+export function pick(o: any, ...fields: string[]) {
+  return fields.reduce((a, x) => {
+    if (o.hasOwnProperty(x)) a[x] = o[x];
+    return a;
+  }, {});
 }

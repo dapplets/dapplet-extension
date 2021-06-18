@@ -13,7 +13,7 @@ export default class SiteConfig extends Base {
             isActive: boolean;
             order: number;
             runtime: { isActionHandler: boolean } & any;
-            moduleInfo: ModuleInfo;
+            //moduleInfo: ModuleInfo;
             registryUrl: string;
         }
     } = {};

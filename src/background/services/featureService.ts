@@ -11,11 +11,12 @@ import JSZip from 'jszip';
 import * as logger from '../../common/logger';
 import { getCurrentTab, mergeDedupe, parseModuleName } from '../../common/helpers';
 import { WalletService } from './walletService';
-import { Tar } from '../../common/tar';
+import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
 
 export default class FeatureService {
     private _moduleManager: ModuleManager;
     private _storageAggregator = new StorageAggregator();
+    private _moduleInfoBrowserStorage = new ModuleInfoBrowserStorage();
 
     constructor(
         private _globalConfigService: GlobalConfigService,
@@ -69,9 +70,9 @@ export default class FeatureService {
         for (const contextId of contextIds) {
             const config = await this._globalConfigService.getSiteConfigById(contextId);
             for (const moduleName in config.activeFeatures) {
-                const moduleInfo = config.activeFeatures[moduleName].moduleInfo;
-                if (dtos.find(x => x.name === moduleName) || !moduleInfo) continue;
                 const registryUrl = config.activeFeatures[moduleName].registryUrl;
+                const moduleInfo = await this.getModuleInfoByName(registryUrl, moduleName);
+                if (dtos.find(x => x.name === moduleName) || !moduleInfo) continue;
                 const dto: ManifestDTO = moduleInfo as any;
                 dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
                 dto.isActionHandler = config.activeFeatures[dto.name]?.runtime?.isActionHandler || false;
@@ -101,13 +102,6 @@ export default class FeatureService {
             version = versions.sort(rcompare)[0]; // Last version by SemVer
         }
 
-        // Cache manifest
-        let moduleInfo = null;
-        const _getModuleInfo = async () => {
-            if (!moduleInfo) moduleInfo = await this.getModuleInfoByName(registryUrl, name);
-            return moduleInfo;
-        }
-
         // ToDo: save registry url of activate module?
         for (const hostname of hostnames) {
             const config = await this._globalConfigService.getSiteConfigById(hostname);
@@ -117,7 +111,6 @@ export default class FeatureService {
                 isActive,
                 order,
                 runtime: null,
-                moduleInfo: isActive ? await _getModuleInfo() : (config.activeFeatures[name].moduleInfo ?? await _getModuleInfo()),
                 registryUrl
             };
 
@@ -184,7 +177,6 @@ export default class FeatureService {
                     isActive: !isActive,
                     order,
                     runtime: null,
-                    moduleInfo: config.activeFeatures[name].moduleInfo,
                     registryUrl
                 };
 
@@ -426,9 +418,26 @@ export default class FeatureService {
         return registry.getVersionInfo(moduleName, branch, version);
     }
 
-    public async getModuleInfoByName(registryUri: string, moduleName: string) {
-        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
-        return registry.getModuleInfoByName(moduleName);
+    public async getModuleInfoByName(registryUrl: string, moduleName: string) {
+        const registriesConfig = await this._globalConfigService.getRegistries();
+        const isDev = registriesConfig.find(x => x.url === registryUrl).isDev;
+
+        if (isDev) {
+            const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
+            const moduleInfo = await registry.getModuleInfoByName(moduleName);
+            return moduleInfo;
+        } else {
+            const moduleInfo = await this._moduleInfoBrowserStorage.get(registryUrl, moduleName);
+
+            if (moduleInfo) {
+                return moduleInfo;
+            } else {
+                const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
+                const moduleInfo = await registry.getModuleInfoByName(moduleName);
+                await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
+                return moduleInfo;
+            }
+        }                
     }
 
     public async transferOwnership(registryUri: string, moduleName: string, address: string) {

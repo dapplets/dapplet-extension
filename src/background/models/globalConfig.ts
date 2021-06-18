@@ -3,10 +3,11 @@ import { WalletInfo } from '../../common/constants';
 import SiteConfig from './siteConfig';
 
 export class GlobalConfig extends Base {
+
     getId = () => this.id;
-
+    
     id: string = 'default';
-
+    
     isActive: boolean = false;
 
     suspended: boolean = false;

@@ -121,6 +121,7 @@ export class NearRegistry implements Registry {
             mi.author = v.owner;
             mi.icon = this._fromNearStorageRef(v.icon);
             mi.interfaces = v.interfaces.map(x => x.name);
+            mi.registryUrl = this.url;
             return mi;
 
         } catch (err) {
