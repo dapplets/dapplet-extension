@@ -481,6 +481,14 @@ export default class GlobalConfigService {
         return this.updateConfig(c => c.ignoredUpdate = version);
     }
 
+    async getLastMessageSeenTimestamp() {
+        return this.get().then(x => x.lastMessageSeenTimestamp);
+    }
+
+    async setLastMessageSeenTimestamp(lastMessageSeenTimestamp: string) {
+        return this.updateConfig(c => c.lastMessageSeenTimestamp = lastMessageSeenTimestamp);
+    }
+
     async getDynamicAdapter() {
         return this.get().then(x => x.dynamicAdapter);
     }
