@@ -376,25 +376,6 @@ export default class GlobalConfigService {
         await this.set(config);
     }
 
-    async loadUserSettings(url: string) {
-        const swarmGatewayUrl = await this.getSwarmGateway();
-        const swarmStorage = new SwarmModuleStorage({ swarmGatewayUrl });
-        const data = await swarmStorage.getResource(url);
-        const json = new TextDecoder("utf-8").decode(new Uint8Array(data));
-        const config = JSON.parse(json);
-        await this.set(config);
-    }
-
-    async saveUserSettings() {
-        const config = await this.get();
-        const json = JSON.stringify(config);
-        const blob = new Blob([json], { type: "application/json" });
-        const swarmGatewayUrl = await this.getSwarmGateway();
-        const swarmStorage = new SwarmModuleStorage({ swarmGatewayUrl });
-        const url = await swarmStorage.save(blob);
-        return url;
-    }
-
     async getErrorReporting() {
         const config = await this.get();
         return config.errorReporting;

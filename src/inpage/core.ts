@@ -22,7 +22,7 @@ interface WalletConnection {
     disconnect(): Promise<void>;
 }
 
-type Locator = {
+type ContentDetector = {
     contextId: string;
     selector: string;
 }
@@ -360,7 +360,7 @@ export default class Core {
         }
     }
 
-    public getContentDetectors(): Locator[] {
+    public getContentDetectors(): ContentDetector[] {
         return [{
             contextId: 'video',
             selector: 'video'
