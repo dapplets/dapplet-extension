@@ -54,6 +54,8 @@ export class GlobalConfig extends Base {
 
     ignoredUpdate: string = null;
 
+    lastMessageSeenTimestamp: string = null;
+
     dynamicAdapter: string = null;
 
     preferedOverlayStorage: string = null;

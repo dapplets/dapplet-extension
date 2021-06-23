@@ -12,6 +12,7 @@ import ProxyService from "./services/proxyService";
 import * as logger from '../common/logger';
 import { getCurrentTab, waitTab } from "../common/helpers";
 import GithubService from "./services/githubService";
+import DiscordService from "./services/discordService";
 import { IdentityService } from "./services/identityService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
@@ -21,6 +22,7 @@ window.onerror = logger.log;
 
 const globalConfigService = new GlobalConfigService();
 const githubService = new GithubService(globalConfigService);
+const discordService = new DiscordService(globalConfigService);
 const walletService = new WalletService(globalConfigService);
 const featureService = new FeatureService(globalConfigService, walletService);
 const ensService = new EnsService(walletService);
@@ -118,6 +120,8 @@ browser.runtime.onMessage.addListener(
     setUserAgentName: globalConfigService.setUserAgentName.bind(globalConfigService),
     getIgnoredUpdate: globalConfigService.getIgnoredUpdate.bind(globalConfigService),
     setIgnoredUpdate: globalConfigService.setIgnoredUpdate.bind(globalConfigService),
+    getLastMessageSeenTimestamp: globalConfigService.getLastMessageSeenTimestamp.bind(globalConfigService),
+    setLastMessageSeenTimestamp: globalConfigService.setLastMessageSeenTimestamp.bind(globalConfigService),
     getPreferedOverlayStorage: globalConfigService.getPreferedOverlayStorage.bind(globalConfigService),
     setPreferedOverlayStorage: globalConfigService.setPreferedOverlayStorage.bind(globalConfigService),
 
@@ -147,6 +151,10 @@ browser.runtime.onMessage.addListener(
     getNewExtensionVersion: githubService.getNewExtensionVersion.bind(githubService),
     getDevMessage: githubService.getDevMessage.bind(githubService),
     hideDevMessage: githubService.hideDevMessage.bind(githubService),
+
+    // Discord Service
+    getDiscordMessages: discordService.getDiscordMessages.bind(discordService),
+    hideDiscordMessages: discordService.hideDiscordMessages.bind(discordService),
 
     // Identity Service
     getIdentityAccounts: identityService.getAccounts.bind(identityService),
