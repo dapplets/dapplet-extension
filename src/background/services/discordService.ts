@@ -14,19 +14,16 @@ export default class DiscordService {
       const url = `https://dapplet-api.herokuapp.com/announcements`;
       try {
           const resp = await fetch(url);
-          const messages: IDiscordMessage[] = (await resp.json()).data;
-          if (messages.length === 0) return [];
+          const parsedResp = await resp.json();
+          if (!parsedResp.success) throw new Error(parsedResp.message);
+
+          const messages: IDiscordMessage[] = parsedResp.data;
 
           const lastTimestamp = await this._globalConfigService.getLastMessageSeenTimestamp();
           if (!lastTimestamp) return messages;
 
           const lastTimestampDateMs = (new Date(lastTimestamp)).getTime();
-          for (let i = messages.length - 1; i >= 0 ; i--) {
-            const timestampDateMs = (new Date(messages[i].timestamp)).getTime();
-            if (lastTimestampDateMs === timestampDateMs) return messages.slice(0, i);
-            if (lastTimestampDateMs < timestampDateMs) return messages.slice(0, i + 1);
-          }
-          return messages;
+          return messages.filter((msg) => (new Date(msg.timestamp)).getTime() > lastTimestampDateMs);
       } catch (err) {
           console.error(err);
       }

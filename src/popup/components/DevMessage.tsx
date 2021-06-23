@@ -4,6 +4,7 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 import { SecureLink } from "react-secure-link";
 import Linkify from "react-linkify";
+import ReactTimeAgo from 'react-time-ago';
 
 interface Props {}
 
@@ -50,7 +51,7 @@ export class DevMessage extends React.Component<Props, State> {
 
   async _hideDiscordMessages() {
     const { hideDiscordMessages } = await initBGFunctions(browser);
-    await hideDiscordMessages(this.state.discordMessages[this.state.discordMessages.length - 1].timestamp);
+    await hideDiscordMessages(this.state.discordMessages[0].timestamp);
     this.setState({ discordMessages: [] });
   }
 
@@ -87,29 +88,6 @@ export class DevMessage extends React.Component<Props, State> {
 
     if (s.discordMessages.length) {
       const { authorUsername, content, timestamp, link } = s.discordMessages[0];
-      const date = new Date(timestamp);
-      const currentDate = Date.now();
-      const secondsPassed = (currentDate - date.getTime()) / 1000;
-      let timeMessage: string;
-      if (secondsPassed > 0 && secondsPassed < 60) {
-        const n = Math.trunc(secondsPassed);
-        timeMessage = `${n} second${n % 10 === 1 ? '' : 's'} ago`;
-      } else if (secondsPassed >= 60 && (secondsPassed / 60) < 60) {
-        const n = Math.trunc(secondsPassed / 60);
-        timeMessage = `${n} minute${n % 10 === 1 ? '' : 's'} ago`;
-      } else if ((secondsPassed / 60) >= 60 && (secondsPassed / 3600) < 24) {
-        const n = Math.trunc(secondsPassed / 3600);
-        timeMessage = `${n} hour${n % 10 === 1 ? '' : 's'} ago`;
-      } else if ((secondsPassed / 3600) >= 24 && (secondsPassed / 86400) < 30) {
-        const n = Math.trunc(secondsPassed / 86400);
-        timeMessage = `${n} day${n % 10 === 1 ? '' : 's'} ago`;
-      } else if ((secondsPassed / 86400) >= 30 && (secondsPassed / 86400) < 365) {
-        const n = Math.trunc(secondsPassed / 2635200);
-        timeMessage = `${n} month${n % 10 === 1 ? '' : 's'} ago`;
-      } else if ((secondsPassed / 86400) >= 365) {
-        const n = Math.trunc(secondsPassed / 31536000);
-        timeMessage = `${n} year${n % 10 === 1 ? '' : 's'} ago`;
-      }
 
       const otherUnreadMsgsNumber = s.discordMessages.length - 1;
       let linkMessage: string;
@@ -133,7 +111,7 @@ export class DevMessage extends React.Component<Props, State> {
             <p style={{ marginBottom: '0', fontSize: '13px' }}>
               <b>{authorUsername}</b>
               <span style={{ fontSize: '12px', opacity: '.7', letterSpacing: '0.3px', paddingLeft: '5px' }}>
-                {timeMessage}
+                <ReactTimeAgo date={new Date(timestamp)} locale="en-US" />
               </span>
             </p>
             <p style={{ margin: '0 auto' }}>
