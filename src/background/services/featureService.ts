@@ -424,6 +424,7 @@ export default class FeatureService {
 
         if (isDev) {
             const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
+            if (!registry) return null;
             const moduleInfo = await registry.getModuleInfoByName(moduleName);
             return moduleInfo;
         } else {
@@ -433,6 +434,7 @@ export default class FeatureService {
                 return moduleInfo;
             } else {
                 const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
+                if (!registry) return null;
                 const moduleInfo = await registry.getModuleInfoByName(moduleName);
                 await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
                 return moduleInfo;
