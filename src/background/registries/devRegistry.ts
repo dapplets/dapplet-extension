@@ -177,6 +177,7 @@ export class DevRegistry implements Registry {
         mi.registryUrl = this.url;
         
         const vi = new VersionInfo();
+        vi.registryUrl = this.url;
         vi.name = dm.name;
         vi.branch = dm.branch;
         vi.version = dm.version;

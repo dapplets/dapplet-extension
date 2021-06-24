@@ -130,26 +130,23 @@ export default class ModuleManager {
         }
 
         if (!module.version || module.version === 'latest') {
-            const versions = await this.registryAggregator.getVersions(module.name, module.branch);
-            if (versions.length === 0) return null;
-            module.version = versions.sort(rcompare)[0];
+            const version = await this.registryAggregator.getLastVersion(module.name, module.branch);
+            if (!version) return null;
+            module.version = version;
             console.log(`Version for module "${module.name}#${module.branch}" is not specified. The latest version ${module.version} is selected.`);
         }
 
-        const vi = await this.registryAggregator.getVersionInfo(module.name, module.branch, module.version);
-
-        if (!vi) {
-            return null;
-        }
-
-        if (vi.name !== module.name || vi.version !== module.version || vi.branch !== module.branch) {
-            logger.error(`Invalid public name for module. Requested: ${module.name}#${module.branch}@${module.version}. Recieved: ${vi.name}#${vi.branch}@${vi.version}.`);
-            return { manifest: vi, dependencies: [] };
-        }
+        let vi = await this.registryAggregator.getVersionInfo(module.name, module.branch, module.version);
+        if (!vi) return null;
 
         if (vi.type === ModuleTypes.Interface) {
-            logger.error(`An implementation of the interface ${module.name} is not found.`);
-            return { manifest: vi, dependencies: [] };
+            vi = await this._findImplementation(module.name, module.branch, module.version, module.contextIds);
+            if (vi) {
+                console.log(`[DAPPLETS]: Found implementation for ${module.name}#${module.branch}@${module.version} interface: ${vi.name}`);
+            } else {
+                logger.error(`An implementation of the interface ${module.name} is not found.`);
+                return { manifest: vi, dependencies: [] };
+            }
         }
 
         if (!vi.dependencies) return { manifest: vi, dependencies: [] };
@@ -185,14 +182,6 @@ export default class ModuleManager {
     }
 
     public async optimizeDependency(name: string, version: string, branch: string = DEFAULT_BRANCH_NAME, contextIds: string[]): Promise<{ name: string, version: string, branch: string }> {
-        const mi = await this._findImplementation(name, branch, version, contextIds);
-        if (mi) {
-            console.log(`[DAPPLETS]: Found implementation for ${name}#${branch}@${version} interface: ${mi.name}`);
-            name = mi.name;
-            branch = "default";
-            version = "0.0.1"; // ToDo: fix it
-        }
-
         // ToDo: Fetch prefix from global settings.
         // ToDo: Replace '>=' to '^'
         const prefix = '>='; // https://devhints.io/semver
@@ -219,7 +208,7 @@ export default class ModuleManager {
         };
     }
 
-    private async _findImplementation(name: string, branch: string, version: string, contextIds: string[]) {
+    private async _findImplementation(name: string, branch: string, version: string, contextIds: string[]): Promise<VersionInfo> {
         const users = await this._globalConfigService.getTrustedUsers().then(u => u.map(a => a.account));
         const modules = await this.registryAggregator.getModuleInfoWithRegistries(contextIds, users);
 
@@ -227,7 +216,9 @@ export default class ModuleManager {
             for (const hostname in modules[registry]) {
                 for (const mi of modules[registry][hostname]) {
                     if (mi.interfaces && mi.interfaces.indexOf(name) !== -1) {
-                        return mi;
+                        const version = await this.registryAggregator.getLastVersion(mi.name, DEFAULT_BRANCH_NAME); // ToDo: fix it
+                        const vi = await this.registryAggregator.getVersionInfo(mi.name, DEFAULT_BRANCH_NAME, version); 
+                        return vi;
                     }
                 }
             }

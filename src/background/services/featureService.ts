@@ -27,7 +27,6 @@ export default class FeatureService {
 
     async getFeaturesByHostnames(contextIds: string[]): Promise<ManifestDTO[]> {
         const users = await this._globalConfigService.getTrustedUsers();
-        this._moduleManager = new ModuleManager(this._globalConfigService, this._walletService);
         const contextIdsByRegsitries = await this._moduleManager.registryAggregator.getModuleInfoWithRegistries(contextIds, users.map(u => u.account));
         const dtos: ManifestDTO[] = [];
 
@@ -256,13 +255,11 @@ export default class FeatureService {
     }
 
     public async getModulesWithDeps(modules: { name: string, branch?: string, version?: string, contextIds: string[] }[]) {
-        const moduleManager = new ModuleManager(this._globalConfigService, this._walletService);
-
         if (modules.length === 0) return [];
-        const modulesWithDeps = await moduleManager.resolveDependencies(modules);
+        const modulesWithDeps = await this._moduleManager.resolveDependencies(modules);
         // ToDo: catch errors
         // ToDo: run parallel
-        const dists = await Promise.all(modulesWithDeps.map(m => moduleManager.loadModule(m.manifest)));
+        const dists = await Promise.all(modulesWithDeps.map(m => this._moduleManager.loadModule(m.manifest)));
 
         return modulesWithDeps.map((m, i) => ({
             manifest: Object.assign(m.manifest, dists[i].internalManifest), // merge manifests from registry and bundle (zip) 

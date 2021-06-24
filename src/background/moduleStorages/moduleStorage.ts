@@ -16,7 +16,7 @@ export class StorageAggregator {
     async getResource(hashUris: StorageRef): Promise<ArrayBuffer> {
 
         if (hashUris.uris.length === 0) {
-            throw Error("Resource doesn't have any URIs.");
+            throw Error(`Resource doesn't have any URIs. Hash: ${hashUris.hash}`);
         }
 
         const fetchController = new AbortController();
@@ -44,6 +44,7 @@ export class StorageAggregator {
         try {
             const buffer = await Promise.any(buffers);
             fetchController.abort();
+
             return buffer;
             // if (this._checkHash(buffer, hashUris.hash, uri)) {
             //     if (hashUris.hash) this._globalConfigService.getAutoBackup().then(x => x && this._backup(buffer, hashUris.hash.replace('0x', ''))); // don't wait

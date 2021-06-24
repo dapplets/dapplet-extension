@@ -2,7 +2,7 @@ import { Registry } from './registry';
 import { DevRegistry } from './devRegistry';
 import { EthRegistry } from './ethRegistry';
 import GlobalConfigService from '../services/globalConfigService';
-import { compare } from 'semver';
+import { compare, rcompare } from 'semver';
 import { mergeDedupe, typeOfUri, UriTypes, assertFullfilled, assertRejected } from '../../common/helpers';
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
@@ -12,12 +12,16 @@ import * as logger from '../../common/logger';
 import { WalletService } from '../services/walletService';
 import { NearRegistry } from './nearRegistry';
 import { ModuleTypes } from '../../common/constants';
+import VersionInfoBrowserStorage from '../browserStorages/versionInfoStorage';
+import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
 
 if (!Promise.allSettled) Promise.allSettled = allSettled;
 
 export class RegistryAggregator {
     public isAvailable: boolean = true;
     public registries: Registry[] = [];
+
+    private _versionInfoStorage = new VersionInfoBrowserStorage();
 
     constructor(
         private _globalConfigService: GlobalConfigService,
@@ -37,18 +41,27 @@ export class RegistryAggregator {
         return versionsAsc;
     }
 
+    async getLastVersion(name: string, branch: string): Promise<string | null> {
+        const versions = await this.getVersions(name, branch);
+        if (versions.length === 0) return null;
+        return versions.sort(rcompare)[0];
+    }
+
     async getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo> {
         await this._initRegistries();
         const registries = this._getNonSkippedRegistries();
 
         const registriesConfig = await this._globalConfigService.getRegistries();
 
-        const uriWithErrors = await Promise.allSettled(registries.map(r => r.getVersionInfo(name, branch, version).then(vi => {
-            if (!vi) return null;
+        const uriWithErrors = await Promise.allSettled(registries.map(r => {
             const isDev = registriesConfig.find(c => c.url === r.url).isDev;
-            vi.environment = isDev ? Environments.Dev : Environments.Test;
-            return vi;
-        })));
+            const promise = isDev ? r.getVersionInfo(name, branch, version) : this._cacheVersionInfo(r, name, branch, version);
+            return promise.then(vi => {
+                if (!vi) return null;
+                vi.environment = isDev ? Environments.Dev : Environments.Test;
+                return vi;
+            })
+        }));
 
         const uriNoErrors = uriWithErrors.filter(assertFullfilled).map(p => p.value).filter(v => v !== null);
         const uriErrors = uriWithErrors.filter(assertRejected);
@@ -59,7 +72,18 @@ export class RegistryAggregator {
             return null;
         }
 
-        return uriNoErrors[0];
+        const vi = uriNoErrors[0];
+
+        if (!vi) {
+            return null;
+        }
+
+        if (vi.name !== name || vi.version !== version || vi.branch !== branch) {
+            logger.error(`Invalid public name for module. Requested: ${name}#${branch}@${version}. Recieved: ${vi.name}#${vi.branch}@${vi.version}.`);
+            return null;
+        }
+
+        return vi;
     }
 
     public async getModuleInfoWithRegistries(locations: string[], users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: ModuleInfo[] } }> {
@@ -79,7 +103,7 @@ export class RegistryAggregator {
         // 4) Without this magic, the feature will not be found by the location, with which the interface is linked.
 
         const additionalLocations = validRegFeatures.map(([k, v]) => ([k, Object.entries(v).map(([k2, v2]) => ([k2, mergeDedupe(v2.map(x => ([x.name, ...x.interfaces])))])).filter(x => x[1].length !== 0)])) as [string, [string, string[]][]][];
-        const mergedModuleInfos = Object.values(merged).map(x => Object.values(x).reduce((a,b) => a.concat(b), [])).reduce((a,b) => a.concat(b), []);
+        const mergedModuleInfos = Object.values(merged).map(x => Object.values(x).reduce((a, b) => a.concat(b), [])).reduce((a, b) => a.concat(b), []);
         for (const [registryUrl, contexts] of additionalLocations) {
             for (const context of contexts) {
                 context[1] = context[1].filter(c => mergedModuleInfos.find(x => x.name === c)?.type !== ModuleTypes.Feature);
@@ -120,6 +144,10 @@ export class RegistryAggregator {
         }
     }
 
+    public getRegistryByUri(uri: string): Registry {
+        return this.registries.find(f => f.url === uri);
+    }
+
     private async _initRegistries() {
         // ToDo: fetch LocalConfig
         const configuredRegistries = await this._globalConfigService.getRegistries();
@@ -155,7 +183,25 @@ export class RegistryAggregator {
         return this.registries.filter(x => x.isAvailable);
     }
 
-    public getRegistryByUri(uri: string): Registry {
-        return this.registries.find(f => f.url === uri);
+    private async _cacheVersionInfo(registry: Registry, name: string, branch: string, version: string) {
+        const cachedVi = await this._versionInfoStorage.get(registry.url, name, branch, version);
+        if (cachedVi) return cachedVi;
+
+        const vi = await registry.getVersionInfo(name, branch, version);
+        if (!vi) return null;
+
+        await this._versionInfoStorage.create(vi);
+        return vi;
     }
+
+    // private async _cacheModuleInfo(registry: Registry, name: string) {
+    //     const cachedMi = await this._versionInfoStorage.get(registry.url, name);
+    //     if (cachedMi) return cachedMi;
+
+    //     const mi = await registry.getModuleInfo(name);
+    //     if (!mi) return null;
+
+    //     await this._versionInfoStorage.create(mi);
+    //     return mi;
+    // }
 }

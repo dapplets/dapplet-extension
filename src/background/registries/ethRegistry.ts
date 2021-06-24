@@ -158,6 +158,7 @@ export class EthRegistry implements Registry {
             const moduleType: number = response.moduleType;
 
             const vi = new VersionInfo();
+            vi.registryUrl = this.url;
             vi.name = name;
             vi.branch = branch;
             vi.version = version;

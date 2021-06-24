@@ -4,8 +4,9 @@ import { ModuleTypes } from '../../common/constants';
 import { Environments } from '../../common/types';
 
 export default class VersionInfo extends Base {
-    getId = () => this.main.hash;
+    getId = () => this.registryUrl + ':' + this.name + '#' + this.branch + '@' + this.version;
 
+    registryUrl: string = null;
     type: ModuleTypes = null;
     name: string = null;
     branch: string = null;
