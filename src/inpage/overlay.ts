@@ -8,7 +8,6 @@ export enum SubscribeOptions {
 
 
 export class Overlay implements IPubSub {
-    private _manager: OverlayManager = null;
     private _queue: any[] = [];
     private _isFrameLoaded: boolean = false;
     private _msgCount: number = 0;
@@ -16,8 +15,9 @@ export class Overlay implements IPubSub {
     public registered: boolean = false;
     public onmessage: (topic: string, message: any) => void = null;
     public onclose: Function = null;
+    public loader: HTMLDivElement;
 
-    constructor(manager: OverlayManager, public uri: string, public title: string, public hidden: boolean = false) {
+    constructor(private _manager: OverlayManager, public uri: string, public title: string, public hidden: boolean = false) {
 
         // // disable cache
         // const url = new URL(uri);
@@ -25,7 +25,7 @@ export class Overlay implements IPubSub {
         //     url.searchParams.set('_dc', Date.now().toString());
         // }
 
-        this._manager = manager;
+        this._addLoader();
         this.frame = document.createElement('iframe');
         this.frame.allow = 'clipboard-write';
         // this.frame.sandbox.add('allow-scripts'); // to use js frameworks in overlays
@@ -35,6 +35,7 @@ export class Overlay implements IPubSub {
         this.frame.allowFullscreen = true;
         this.frame.addEventListener('load', () => {
             //setTimeout(() => {
+            this.loader?.remove();
             this._isFrameLoaded = true;
             this._queue.forEach(msg => this._send(msg));
             this._queue = [];
@@ -128,5 +129,56 @@ export class Overlay implements IPubSub {
         return {
             off: () => window.removeEventListener('message', listener)
         };
+    }
+
+    private _addLoader() {
+      const loaderDiv = document.createElement('div');
+      loaderDiv.classList.add('loader-container');
+      loaderDiv.innerHTML = `
+          <style>
+              .loader-container {
+                  z-index: -1;
+                  position: absolute;
+                  top: calc(50vh - 88px);
+              }
+
+              .loader-container .flex {
+                  min-height: 60pt
+              }
+
+              .loader-container .loader {
+                  width: 50pt;
+                  height: 50pt;
+                  margin-left: auto;
+                  margin-right: auto;
+                  border: 5px solid #f1f1f1;
+                  border-top: 5px solid #000;
+                  border-radius: 50%;
+                  animation: spin 2s linear infinite
+              }
+
+              @keyframes spin {
+                  0% {
+                      transform: rotate(0)
+                  }
+                  100% {
+                      transform: rotate(360deg)
+                  }
+              }
+
+              .loader-container .load-text {
+                  padding-top: 15px;
+                  text-align: center;
+                  font: 14pt "Helvetica Neue", Helvetica, Arial, sans-serif;
+                  color: #000
+              }
+          </style>
+          <div class="flex">
+              <div class="loader"></div>
+          </div>
+          <div class="load-text">Loading Overlay...</div>
+          <div class="load-text">Downloading from decentralized sources like Swarm or IPFS can take some time</div>
+      `;
+      this.loader = loaderDiv;
     }
 }
