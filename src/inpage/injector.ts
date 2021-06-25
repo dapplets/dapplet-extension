@@ -413,7 +413,7 @@ export class Injector {
 
     private _proxifyModule(proxiedModule: RegistriedModule, contextModule: RegistriedModule) {
         if (proxiedModule.manifest.type === ModuleTypes.Adapter) {
-            const cfgKey = Symbol();
+            const cfgsKey = Symbol();
             const featureId = contextModule.manifest.name;
             return new Proxy(proxiedModule.instance, {
                 get: function (target: IContentAdapter<any>, prop, receiver) {
@@ -427,11 +427,21 @@ export class Injector {
                                     return tailContextId.join('/');
                                 }).filter(id => !!id);
                             }
-                            Reflect.set(target, cfgKey, cfg);
+
+                            // remember configs to detach it later
+                            if (!Reflect.has(target, cfgsKey)) {
+                                Reflect.set(target, cfgsKey, [cfg]);
+                            } else {
+                                Reflect.get(target, cfgsKey).push(cfg);
+                            }
+                            
                             return target.attachConfig(cfg);
                         }
                     } if (prop === 'detachConfig') {
-                        return () => target.detachConfig(Reflect.get(target, cfgKey), featureId);
+                        return (cfg) => {
+                            const cfgs = cfg ? [cfg] : Reflect.get(target, cfgsKey);
+                            cfgs.forEach(x => target.detachConfig(x, featureId));
+                        }
                     } if (prop === 'attachFeature') {
                         console.error('attachFeature() method is deprecated.');
                         return () => null;
