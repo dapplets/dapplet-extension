@@ -1,6 +1,6 @@
 import { IPubSub } from "./types"
 import { subscribe, unsubscribe, publish } from './inpage-pubsub'
-import * as logger from '../common/logger';
+
 
 type Key = string | number | symbol
 type MsgFilter = string | Promise<string> | ((op: any, msg: any) => boolean)
@@ -224,7 +224,7 @@ export class Connection implements IConnection {
                 ap && msg[ap.name] && ap.set(msg[ap.name])
             }
         } catch (err) {
-            logger.error(err);
+            console.error(err);
         }
     }
 }

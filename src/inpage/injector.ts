@@ -9,7 +9,7 @@ import { areModulesEqual, joinUrls } from "../common/helpers";
 import VersionInfo from "../background/models/versionInfo";
 import { AppStorage } from "./appStorage";
 import { DefaultConfig, SchemaConfig } from "../common/types";
-import * as logger from '../common/logger';
+
 
 type RegistriedModule = {
     manifest: VersionInfo,
@@ -95,7 +95,7 @@ export class Injector {
                     }
                 });
             } catch (err) {
-                logger.error(`Error of loading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
+                console.error(`Error of loading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
                 browser.runtime.sendMessage({
                     type: "FEATURE_LOADING_ERROR", payload: {
                         name: m.manifest.name,
@@ -135,7 +135,7 @@ export class Injector {
                 });
                 this.registry = this.registry.filter(r => r !== m);
             } catch (err) {
-                logger.error(`Error of unloading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
+                console.error(`Error of unloading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `, err);
                 browser.runtime.sendMessage({
                     type: "FEATURE_UNLOADING_ERROR", payload: {
                         name: m.manifest.name, branch: m.manifest.branch, version: m.manifest.version, error: err.message
@@ -381,12 +381,12 @@ export class Injector {
         const dependency = manifest.dependencies[name];
 
         if (dependency === undefined) {
-            logger.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`);
+            console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`);
             return;
         }
 
         if (valid(dependency as string) === null) {
-            logger.error(`Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`);
+            console.error(`Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`);
             return;
         }
 
@@ -395,7 +395,7 @@ export class Injector {
         if (modules.length === 0) {
             modules = this.registry.filter(m => m.manifest.interfaces?.[name] !== undefined);
             if (modules.length === 0) {
-                logger.error(`Can not find neither the module, nor an implementation of the interface "${name}".`);
+                console.error(`Can not find neither the module, nor an implementation of the interface "${name}".`);
                 return null;
             }
         }

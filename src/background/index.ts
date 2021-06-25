@@ -9,7 +9,7 @@ import { browser } from "webextension-polyfill-ts";
 import EnsService from "./services/ensService";
 import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 import ProxyService from "./services/proxyService";
-import * as logger from '../common/logger';
+import * as tracing from '../common/tracing';
 import { getCurrentTab, waitTab } from "../common/helpers";
 import GithubService from "./services/githubService";
 import DiscordService from "./services/discordService";
@@ -18,7 +18,7 @@ import { IdentityService } from "./services/identityService";
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
 // ToDo: Think about WalletConnectService, SuspendService etc, which looks like singletons.
-window.onerror = logger.log;
+tracing.startTracing();
 
 const globalConfigService = new GlobalConfigService();
 const githubService = new GithubService(globalConfigService);

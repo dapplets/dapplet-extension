@@ -6,7 +6,7 @@ import ModuleInfo from '../models/moduleInfo';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../../common/constants';
 import VersionInfo from '../models/versionInfo';
 import { typeOfUri, UriTypes } from '../../common/helpers';
-import * as logger from '../../common/logger';
+
 
 type EthStorageRef = {
     hash: string; // bytes32
@@ -108,7 +108,7 @@ export class EthRegistry implements Registry {
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
-            logger.error('Error in EthRegistry class when module info is fetching', err);
+            console.error('Error in EthRegistry class when module info is fetching', err);
             throw err;
         }
     }

@@ -19,6 +19,7 @@ declare module "*.svg" {
 }
 
 declare var EXTENSION_VERSION: string;
+declare var EXTENSION_ENV: 'development' | 'production';
 
 interface ObjectConstructor {
     /**

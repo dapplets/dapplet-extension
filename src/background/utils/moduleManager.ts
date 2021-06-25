@@ -12,7 +12,7 @@ import GlobalConfigService from '../services/globalConfigService';
 import { DefaultConfig, SchemaConfig } from '../../common/types';
 import JSZip from 'jszip';
 import { TopologicalSort } from 'topological-sort';
-import * as logger from '../../common/logger';
+
 import { WalletService } from '../services/walletService';
 
 export default class ModuleManager {
@@ -56,7 +56,7 @@ export default class ModuleManager {
                     }
                 }
             } catch (err) {
-                logger.error(err);
+                console.error(err);
             }
         }
 
@@ -144,7 +144,7 @@ export default class ModuleManager {
             if (vi) {
                 console.log(`[DAPPLETS]: Found implementation for ${module.name}#${module.branch}@${module.version} interface: ${vi.name}`);
             } else {
-                logger.error(`An implementation of the interface ${module.name} is not found.`);
+                console.error(`An implementation of the interface ${module.name} is not found.`);
                 return { manifest: vi, dependencies: [] };
             }
         }
@@ -164,7 +164,7 @@ export default class ModuleManager {
                 });
             } else if (typeof dependency === "object") { // branch is specified
                 if (!dependency[DEFAULT_BRANCH_NAME]) {
-                    logger.error(`Default branch version is not specified.`);
+                    console.error(`Default branch version is not specified.`);
                     return;
                 }
 
@@ -174,7 +174,7 @@ export default class ModuleManager {
                     version: dependency[DEFAULT_BRANCH_NAME]
                 });
             } else {
-                logger.error(`Invalid dependencies in manifest.`);
+                console.error(`Invalid dependencies in manifest.`);
             }
         });
 

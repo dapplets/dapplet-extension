@@ -9,7 +9,7 @@ import { OverlayManager } from "./overlayManager";
 import { AppStorage } from "./appStorage";
 import * as ethers from "ethers";
 import { ProxySigner } from "./proxySigner";
-import * as logger from '../common/logger';
+
 import { BackgroundNear } from "./near/backgroundNear";
 import { BackgroundWalletConnection } from "./near/backgroundWalletConnection";
 import * as NearAPI from "near-api-js";
@@ -228,7 +228,7 @@ export default class Core {
                 callback({ type: "result", data: txHash });
             }
         } catch (err) {
-            logger.error(err);
+            console.error(err);
             callback({ type: "rejected" });
         }
     }

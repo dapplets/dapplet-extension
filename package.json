@@ -134,5 +134,9 @@
         }
       ]
     ]
+  },
+  "dependencies": {
+    "@sentry/browser": "^6.7.2",
+    "@sentry/tracing": "^6.7.2"
   }
 }

@@ -5,7 +5,7 @@ import { StorageRef } from '../registries/registry';
 import { ethers } from 'ethers';
 import { CentralizedModuleStorage } from './centralizedModuleStorage';
 import GlobalConfigService from '../services/globalConfigService';
-import * as logger from '../../common/logger';
+
 import { StorageTypes } from '../../common/constants';
 import { Tar } from '../../common/tar';
 
@@ -51,7 +51,7 @@ export class StorageAggregator {
             //     return buffer;
             // }
         } catch (err) {
-            logger.error(err);
+            console.error(err);
         }
 
         throw Error(`Can not fetch resource by URIs: ${hashUris.uris.join(', ')}`);
@@ -104,7 +104,7 @@ export class StorageAggregator {
         if (expectedHash !== null) {
             const hash = ethers.utils.keccak256(new Uint8Array(buffer));
             if (hash.replace('0x', '') !== expectedHash.replace('0x', '')) {
-                logger.error(`Hash is not valid. URL: ${uri}, expected: ${expectedHash}, recieved: ${hash}`);
+                console.error(`Hash is not valid. URL: ${uri}, expected: ${expectedHash}, recieved: ${hash}`);
                 return false;
             } else {
                 //console.log(`[DAPPLETS]: Successful hash checking. URL: ${uri}, expected: ${hashUris.hash}, recieved: ${hash}`);

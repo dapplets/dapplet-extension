@@ -5,14 +5,14 @@ import './index.scss';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
 import { browser } from "webextension-polyfill-ts";
-import * as logger from '../common/logger';
+import * as tracing from '../common/tracing';
 import { Bus } from '../common/bus';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import { App } from './pages/App';
 
 TimeAgo.addDefaultLocale(en);
-window.onerror = logger.log;
+tracing.startTracing();
 
 const bus = new Bus();
 

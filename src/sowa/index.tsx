@@ -7,9 +7,9 @@ import './index.scss';
 import { Bus } from '../common/bus';
 import { getRenderer } from '../common/sowa';
 import { Container, Header, Button } from 'semantic-ui-react';
-import * as logger from '../common/logger';
+import * as tracing from '../common/tracing';
 
-window.onerror = logger.log;
+tracing.startTracing();
 
 interface IIndexProps {
 }

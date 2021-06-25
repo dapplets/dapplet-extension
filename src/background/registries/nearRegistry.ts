@@ -2,7 +2,7 @@ import { Registry, StorageRef } from './registry';
 import ModuleInfo from '../models/moduleInfo';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../../common/constants';
 import VersionInfo from '../models/versionInfo';
-import * as logger from '../../common/logger';
+
 import * as nearAPI from 'near-api-js';
 import { ethers } from 'ethers';
 import { typeOfUri, UriTypes } from '../../common/helpers';
@@ -100,7 +100,7 @@ export class NearRegistry implements Registry {
         } catch (err) {
             this.isAvailable = false;
             this.error = err.message;
-            logger.error('Error in EthRegistry class when module info is fetching', err, {
+            console.error('Error in EthRegistry class when module info is fetching', err, {
                 method: 'getModuleInfo',
                 args: { contextIds, users }
             });
@@ -125,7 +125,7 @@ export class NearRegistry implements Registry {
             return mi;
 
         } catch (err) {
-            logger.error(err);
+            console.error(err);
             return null;
         }
     }

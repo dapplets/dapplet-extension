@@ -8,7 +8,7 @@ import { rcompare } from 'semver';
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
 import JSZip from 'jszip';
-import * as logger from '../../common/logger';
+
 import { getCurrentTab, mergeDedupe, parseModuleName } from '../../common/helpers';
 import { WalletService } from './walletService';
 import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
@@ -354,7 +354,7 @@ export default class FeatureService {
 
             return { scriptUrl };
         } catch (err) {
-            logger.error(err);
+            console.error(err);
             throw err;
         }
     }

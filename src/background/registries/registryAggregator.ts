@@ -8,7 +8,7 @@ import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
 import { Environments, DefaultSigners } from '../../common/types';
 import { allSettled } from '../../common/helpers';
-import * as logger from '../../common/logger';
+
 import { WalletService } from '../services/walletService';
 import { NearRegistry } from './nearRegistry';
 import { ModuleTypes } from '../../common/constants';
@@ -33,7 +33,7 @@ export class RegistryAggregator {
         const registries = this._getNonSkippedRegistries();
 
         const versionsWithErrors = await Promise.allSettled(registries.map(r => r.getVersionNumbers(name, branch)));
-        versionsWithErrors.filter(assertRejected).forEach(p => logger.error(p.reason));
+        versionsWithErrors.filter(assertRejected).forEach(p => console.error(p.reason));
         const versionsNoErrors = versionsWithErrors.filter(assertFullfilled).map(p => p.value);
         const versionsNotSorted = mergeDedupe(versionsNoErrors);
         const versionsAsc = versionsNotSorted.sort(compare); // ASC sorting by semver
@@ -67,7 +67,7 @@ export class RegistryAggregator {
         const uriErrors = uriWithErrors.filter(assertRejected);
 
         if (uriNoErrors.length === 0) {
-            uriErrors.forEach(p => logger.error(p.reason));
+            uriErrors.forEach(p => console.error(p.reason));
             console.error(`Could not find the manifest URI of the ${name}#${branch}@${version} module`);
             return null;
         }
@@ -79,7 +79,7 @@ export class RegistryAggregator {
         }
 
         if (vi.name !== name || vi.version !== version || vi.branch !== branch) {
-            logger.error(`Invalid public name for module. Requested: ${name}#${branch}@${version}. Recieved: ${vi.name}#${vi.branch}@${vi.version}.`);
+            console.error(`Invalid public name for module. Requested: ${name}#${branch}@${version}. Recieved: ${vi.name}#${vi.branch}@${vi.version}.`);
             return null;
         }
 
@@ -91,7 +91,7 @@ export class RegistryAggregator {
         const registries = this._getNonSkippedRegistries();
 
         const regFeatures = await Promise.allSettled(registries.map(r => r.getModuleInfo(locations, users).then(m => ([r.url, m]))));
-        regFeatures.filter(assertRejected).forEach(p => logger.error(p.reason));
+        regFeatures.filter(assertRejected).forEach(p => console.error(p.reason));
         const validRegFeatures = regFeatures.filter(assertFullfilled).map((p) => p.value);
         const merged = Object.fromEntries(validRegFeatures);
 
@@ -126,7 +126,7 @@ export class RegistryAggregator {
 
         // fetch all dev modules
         const modules = await Promise.allSettled(registries.map(r => r.getAllDevModules()));
-        modules.filter(assertRejected).forEach(p => logger.error(p.reason));
+        modules.filter(assertRejected).forEach(p => console.error(p.reason));
         const validModules = modules.filter(assertFullfilled).map(p => p.value);
         const reduced = validModules.length > 0 ? validModules.reduce((a, b) => a.concat(b)) : [];
 
@@ -172,7 +172,7 @@ export class RegistryAggregator {
                     if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) return new EthRegistry(r.url, eth_signer);
                     if (uriType === UriTypes.Near) return new NearRegistry(r.url, near_account);
 
-                    logger.error("Invalid registry URL");
+                    console.error("Invalid registry URL");
                     return null;
                 }).filter(r => r !== null);
         }

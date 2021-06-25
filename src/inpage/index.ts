@@ -2,9 +2,9 @@ import { Injector } from './injector'
 import Core from './core';
 import { browser } from "webextension-polyfill-ts";
 import './index.scss';
-import * as logger from '../common/logger';
+import * as tracing from '../common/tracing';
 
-window.onerror = logger.log;
+tracing.startTracing();
 
 const core = new Core(); // ToDo: is it global for all modules?
 const injector = new Injector(core);

@@ -11,10 +11,10 @@ import { DefaultConfig, SchemaConfig } from '../common/types';
 import VersionInfo from '../background/models/versionInfo';
 import Form from "@rjsf/semantic-ui";
 import NOLOGO_PNG from '../common/resources/no-logo.png';
-import * as logger from '../common/logger';
+import * as tracing from '../common/tracing';
 import { joinUrls } from "../common/helpers";
 
-window.onerror = logger.log;
+tracing.startTracing();
 
 interface IIndexProps { }
 

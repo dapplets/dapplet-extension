@@ -10,11 +10,11 @@ import './index.scss';
 import { Bus } from '../common/bus';
 import ModuleInfo from '../background/models/moduleInfo';
 import VersionInfo from '../background/models/versionInfo';
-import * as logger from '../common/logger';
+import * as tracing from '../common/tracing';
 import { ChainTypes, DefaultSigners } from "../common/types";
 import { typeOfUri, chainByUri, joinUrls } from "../common/helpers";
 
-window.onerror = logger.log;
+tracing.startTracing();
 
 enum DeploymentStatus {
     Unknown,
