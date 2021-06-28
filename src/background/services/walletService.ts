@@ -128,6 +128,7 @@ export class WalletService {
 
     public async pairWalletViaOverlay(chain: ChainTypes): Promise<void> {
         const activeTab = await getCurrentTab();
+        if (!activeTab) return;
         // ToDo: pass chain
         const [error, result] = await browser.tabs.sendMessage(activeTab.id, {
             type: "OPEN_PAIRING_OVERLAY",
@@ -259,6 +260,7 @@ export class WalletService {
 
     private async _loginViaOverlay(app: string | DefaultSigners, chain: ChainTypes, cfg?: { username: string, domainId: number, fullname?: string, img?: string }): Promise<void> {
         const activeTab = await getCurrentTab();
+        if (!activeTab) return;
         const [error, result] = await browser.tabs.sendMessage(activeTab.id, {
             type: "OPEN_LOGIN_OVERLAY",
             payload: {
@@ -274,6 +276,7 @@ export class WalletService {
 
     private async _selectWalletViaOverlay(app: string | DefaultSigners, chain: ChainTypes): Promise<void> {
         const activeTab = await getCurrentTab();
+        if (!activeTab) return;
         const [error, result] = await browser.tabs.sendMessage(activeTab.id, {
             type: "OPEN_LOGIN_OVERLAY",
             payload: {

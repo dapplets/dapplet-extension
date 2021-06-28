@@ -125,6 +125,7 @@ export default class extends ethers.Signer implements EthereumWallet {
 
     private async _showQR(uri: string) {
         const activeTab = await getCurrentTab();
+        if (!activeTab) return;
         const [error, result] = await browser.tabs.sendMessage(activeTab.id, {
             type: "OPEN_PAIRING_OVERLAY",
             payload: {

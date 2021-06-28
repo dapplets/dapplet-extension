@@ -3,6 +3,7 @@ import { typeOfUri, UriTypes } from "../common/helpers";
 
 export const getCurrentContextIds = async (): Promise<string[]> => {
     const tab = await getCurrentTab();
+    if (!tab) return [];
     return browser.tabs.sendMessage(tab.id, { "type": "CURRENT_CONTEXT_IDS" });
 };
 

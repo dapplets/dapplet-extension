@@ -110,6 +110,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
 
     async deployModule(mi: ModuleInfo, vi: VersionInfo) {
         const tab = await getCurrentTab();
+        if (!tab) return;
         browser.tabs.sendMessage(tab.id, {
             type: "OPEN_DEPLOY_OVERLAY",
             payload: {

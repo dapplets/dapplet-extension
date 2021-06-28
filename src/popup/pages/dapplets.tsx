@@ -136,6 +136,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
 
   async refreshContextPage() {
     const tab = await getCurrentTab();
+    if (!tab) return;
     await browser.tabs.update(tab.id, { url: tab.url });
     this.setState({ isNoInpage: false, isLoading: true });
     setTimeout(() => this._refreshDataByContext(getCurrentContextIds()), 4000); // ToDo: get rid of timeout
@@ -152,6 +153,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
       this._updateFeatureState(f.name, { isActionLoading: true });
       const { openDappletAction } = await initBGFunctions(browser);
       const tab = await getCurrentTab();
+      if (!tab) return;
       await openDappletAction(f.name, tab.id);
       window.close();
     } catch (err) {
@@ -166,6 +168,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
       this._updateFeatureState(f.name, { isHomeLoading: true });
       const { openDappletHome } = await initBGFunctions(browser);
       const tab = await getCurrentTab();
+      if (!tab) return;
       await openDappletHome(f.name, tab.id);
       window.close();
     } catch (err) {

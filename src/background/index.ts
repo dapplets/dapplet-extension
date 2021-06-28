@@ -213,7 +213,7 @@ browser.notifications.onClicked.addListener(function (notificationId) {
 
 browser.commands.onCommand.addListener((cmd) => {
   if (cmd === "toggle-overlay") {
-    return getCurrentTab().then((activeTab) => browser.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY"));
+    return getCurrentTab().then((activeTab) => activeTab && browser.tabs.sendMessage(activeTab.id, "TOGGLE_OVERLAY"));
   }
 });
 
@@ -245,7 +245,7 @@ globalConfigService.getPopupInOverlay().then((popupInOverlay) => {
 });
 
 browser.browserAction.onClicked.addListener((tab) => {
-  return getCurrentTab().then((activeTab) => browser.tabs.sendMessage(activeTab.id, { type: "OPEN_POPUP_OVERLAY", payload: { path: 'dapplets' } }));
+  return getCurrentTab().then((activeTab) => activeTab && browser.tabs.sendMessage(activeTab.id, { type: "OPEN_POPUP_OVERLAY", payload: { path: 'dapplets' } }));
 });
 
 // Set predefined configuration when extension is installed

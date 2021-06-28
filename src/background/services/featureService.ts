@@ -149,6 +149,7 @@ export default class FeatureService {
 
                 // sending command to inpage
                 const activeTab = await getCurrentTab();
+                if (!activeTab) return;
                 browser.tabs.sendMessage(activeTab.id, {
                     type: isActive ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
                     payload: [{
@@ -377,6 +378,7 @@ export default class FeatureService {
         if (wasActive) {
             // sending command to inpage
             const activeTab = await getCurrentTab();
+            if (!activeTab) return;
             browser.tabs.sendMessage(activeTab.id, {
                 type: "FEATURE_DEACTIVATED",
                 payload: [{
@@ -468,6 +470,7 @@ export default class FeatureService {
         const vi = await this._moduleManager.registryAggregator.getVersionInfo(mi.name, DEFAULT_BRANCH_NAME, version);
         const dist = await this._moduleManager.loadModule(vi);
         const activeTab = await getCurrentTab();
+        if (!activeTab) return;
         browser.tabs.sendMessage(activeTab.id, {
             type: "OPEN_SETTINGS_OVERLAY",
             payload: { mi, vi, schemaConfig: dist.schemaConfig, defaultConfig: dist.defaultConfig }
