@@ -263,6 +263,17 @@ export function pick(o: any, ...fields: string[]) {
   }, {});
 }
 
+export async function waitClosingTab(tabId: number, windowId: number) {
+  return new Promise<void>((res, rej) => {
+    const handler = (_tabId, removeInfo) => {
+      if (_tabId === tabId && windowId === removeInfo.windowId) {
+        res();
+        browser.tabs.onRemoved.removeListener(handler);
+      }
+    }
+    browser.tabs.onRemoved.addListener(handler);
+  });
+}
 export function formatModuleId({ name, branch, version }: ModuleId) {
   return `${name}#${branch ?? DEFAULT_BRANCH_NAME}@${version}`;
 }
