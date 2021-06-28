@@ -78,7 +78,8 @@ export default class GlobalConfigService {
     }
 
     async renameProfile(profileId: string, newProfileId: string) {
-        const oldConfig = await this._globalConfigRepository.getById(profileId);
+        let oldConfig = await this._globalConfigRepository.getById(profileId);
+        if (!oldConfig && profileId === this._defaultConfigId) oldConfig = this.getInitialConfig();
         if (!oldConfig) throw new Error(`The "${profileId}" profile doesn't exist.`);
 
         oldConfig.id = newProfileId;
