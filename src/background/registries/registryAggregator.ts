@@ -144,7 +144,8 @@ export class RegistryAggregator {
         }
     }
 
-    public getRegistryByUri(uri: string): Registry {
+    public async getRegistryByUri(uri: string): Promise<Registry> {
+        await this._initRegistries();
         return this.registries.find(f => f.url === uri);
     }
 

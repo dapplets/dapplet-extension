@@ -349,7 +349,7 @@ export default class FeatureService {
             }
 
             // Register manifest in Registry
-            const registry = this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry);
+            const registry = await this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry);
             if (!registry) throw new Error("No registry with this url exists in config.");
             await registry.addModule(mi, vi);
 
@@ -394,8 +394,8 @@ export default class FeatureService {
 
     async getRegistries() {
         const configRegistries = await this._globalConfigService.getRegistries();
-        const result = configRegistries.map(c => {
-            const reg = this._moduleManager.registryAggregator.getRegistryByUri(c.url);
+        const result = configRegistries.map(async c => {
+            const reg = await this._moduleManager.registryAggregator.getRegistryByUri(c.url);
             return {
                 isAvailable: reg?.isAvailable || false,
                 error: reg?.error,
@@ -403,17 +403,17 @@ export default class FeatureService {
             }
         });
 
-        return result;
+        return Promise.all(result);
     }
 
     public async getOwnership(registryUri: string, moduleName: string) {
-        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
         const owner = await registry.getOwnership(moduleName);
         return owner;
     }
 
     public async getVersionInfo(registryUri: string, moduleName: string, branch: string, version: string) {
-        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
         return registry.getVersionInfo(moduleName, branch, version);
     }
 
@@ -422,7 +422,7 @@ export default class FeatureService {
         const isDev = registriesConfig.find(x => x.url === registryUrl).isDev;
 
         if (isDev) {
-            const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
+            const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
             if (!registry) return null;
             const moduleInfo = await registry.getModuleInfoByName(moduleName);
             return moduleInfo;
@@ -432,7 +432,7 @@ export default class FeatureService {
             if (moduleInfo) {
                 return moduleInfo;
             } else {
-                const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
+                const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
                 if (!registry) return null;
                 const moduleInfo = await registry.getModuleInfoByName(moduleName);
                 await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
@@ -442,22 +442,22 @@ export default class FeatureService {
     }
 
     public async transferOwnership(registryUri: string, moduleName: string, address: string) {
-        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
         await registry.transferOwnership(moduleName, address);
     }
 
     public async addLocation(registryUri: string, moduleName: string, location: string) {
-        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
         await registry.addContextId(moduleName, location);
     }
 
     public async removeLocation(registryUri: string, moduleName: string, location: string) {
-        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
         await registry.removeContextId(moduleName, location);
     }
 
     public async getVersions(registryUri: string, moduleName: string) {
-        const registry = this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
         if (!registry) throw new Error("No registry with this url exists in config.");
         const versions = await registry.getVersionNumbers(moduleName, DEFAULT_BRANCH_NAME);
         if (versions.length === 0) throw new Error("This module has no versions.");
