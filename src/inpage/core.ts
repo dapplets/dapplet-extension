@@ -327,12 +327,20 @@ export default class Core {
         }) as any;
     }
 
-    public overlay<M>(cfg: { name: string, url?: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection
-    public overlay<M>(cfg: { name?: string, url: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection
-    public overlay<M>(cfg: { name: string, url: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
+    public overlay<M>(cfg: { name: string, url?: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void }
+    public overlay<M>(cfg: { name?: string, url: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void }
+    public overlay<M>(cfg: { name: string, url: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void } {
         const _overlay = new Overlay(this.overlayManager, cfg.url, cfg.title);
         const conn = Connection.create<M>(_overlay, eventDef);
-        return conn;
+        const overrides = {
+            isOpen() {
+                return _overlay.registered;
+            },
+            close() {
+                _overlay.close();
+            }
+        }
+        return Object.assign(conn, overrides);
     }
 
     // ToDo: remove it or implement!
