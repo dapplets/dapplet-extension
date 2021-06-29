@@ -54,6 +54,12 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
     async componentDidMount() {
         await this.loadSwarmGateway();
         await Promise.all([this.loadRegistries(), this.loadIntro()]);
+        const currentTab = await getCurrentTab();
+        const currentUrl = currentTab.url;
+        const urlEnding = currentUrl.split('/').reverse()[0];
+        if (['index.json', 'dapplet.json'].includes(urlEnding)) {
+          this.setState({ registryInput: currentUrl });
+        }
     }
 
     async loadSwarmGateway() {
