@@ -56,6 +56,8 @@ export default class Core {
                     return this._approveSowaTransaction(message.payload.sowaId, message.payload.metadata).then(() => ([null, 'approved'])).catch(() => (['error']));
                 } else if (message.type === 'OPEN_SETTINGS_OVERLAY') {
                     return this.waitSettingsOverlay(message.payload);
+                } else if (message.type === 'OPEN_GUIDE_OVERLAY') {
+                    return this.waitGuideOverlay(message.payload);
                 } else if (message.type === 'OPEN_PAIRING_OVERLAY') {
                     return this.waitPairingOverlay(message.payload.topic, message.payload.args).then(() => ([null, 'ready'])).catch(() => (['error']));
                 } else if (message.type === 'OPEN_LOGIN_OVERLAY') {
@@ -160,6 +162,30 @@ export default class Core {
         return new Promise<void>((resolve, reject) => {
             const pairingUrl = browser.extension.getURL('settings.html');
             const overlay = new Overlay(this.overlayManager, pairingUrl, 'User Settings');
+            overlay.open(() => overlay.send('data', [payload]));
+
+            // ToDo: add overlay.onclose
+
+
+            // ToDo: add timeout?
+            overlay.onMessage((topic, message) => {
+                if (topic === 'ready') {
+                    overlay.close();
+                    resolve();
+                }
+
+                if (topic === 'error') {
+                    reject();
+                }
+            });
+        });
+    }
+
+    public waitGuideOverlay(payload: any): Promise<void> {
+        const me = this;
+        return new Promise<void>((resolve, reject) => {
+            const pairingUrl = browser.extension.getURL('guide.html');
+            const overlay = new Overlay(this.overlayManager, pairingUrl, 'Upgrade Guide');
             overlay.open(() => overlay.send('data', [payload]));
 
             // ToDo: add overlay.onclose

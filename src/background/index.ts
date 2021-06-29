@@ -14,6 +14,7 @@ import { getCurrentTab, waitClosingTab, waitTab } from "../common/helpers";
 import GithubService from "./services/githubService";
 import DiscordService from "./services/discordService";
 import { IdentityService } from "./services/identityService";
+import { GuideService } from "./services/guideService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -28,6 +29,7 @@ const featureService = new FeatureService(globalConfigService, walletService);
 const ensService = new EnsService(walletService);
 const proxyService = new ProxyService();
 const identityService = new IdentityService(globalConfigService, walletService);
+const guideService = new GuideService();
 
 browser.runtime.onMessage.addListener(
   setupMessageListener({
@@ -46,6 +48,9 @@ browser.runtime.onMessage.addListener(
     eth_sendCustomRequest: walletService.eth_sendCustomRequest.bind(walletService),
     eth_waitTransaction: walletService.eth_waitTransaction.bind(walletService),
     near_sendCustomRequest: walletService.near_sendCustomRequest.bind(walletService),
+
+    // Upgrade Guide
+    openGuideOverlay: guideService.openGuideOverlay.bind(guideService),
 
     // SuspendService
     getSuspendityByHostname: SuspendService.getSuspendityByHostname,

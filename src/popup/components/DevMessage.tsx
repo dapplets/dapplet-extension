@@ -6,7 +6,9 @@ import { SecureLink } from "react-secure-link";
 import Linkify from "react-linkify";
 import ReactTimeAgo from 'react-time-ago';
 
-interface Props {}
+interface Props {
+  isOverlay: boolean
+}
 
 interface State {
   devMessage: string;
@@ -61,9 +63,15 @@ export class DevMessage extends React.Component<Props, State> {
     this.setState({ newExtensionVersion: null });
   }
 
-  _downloadUpdate() {
-    const url = 'https://github.com/dapplets/dapplet-extension/releases/latest/download/dapplet-extension.zip';
-    window.open(url, '_blank');
+  async _showUpgradeGuide() {
+    const { openGuideOverlay } = await initBGFunctions(browser);
+    if (this.props.isOverlay) {
+      await openGuideOverlay();
+      await this.componentDidMount();
+    } else {
+      openGuideOverlay();
+      window.close();
+    }
   }
 
   render() {
@@ -74,11 +82,11 @@ export class DevMessage extends React.Component<Props, State> {
         <Message info size="small">
           <div style={{ display: 'flex' }}>
           <Message.Content style={{ flex: 'auto'}}>
-            <Message.Header>Update extension</Message.Header>
+            <Message.Header>Upgrade extension</Message.Header>
             <p>Newer version is available: <a href="https://github.com/dapplets/dapplet-extension/releases/latest" target="_blank"><b>{s.newExtensionVersion}</b></a></p>
           </Message.Content>
             <Button.Group size="mini" style={{ display: 'unset', margin: 'auto 0'} }>
-              <Button primary onClick={this._downloadUpdate.bind(this)}>Update</Button>
+              <Button primary onClick={this._showUpgradeGuide.bind(this)}>Upgrade</Button>
               <Button onClick={this._ignoreUpdate.bind(this)}>Ignore</Button>
             </Button.Group>
           </div>
