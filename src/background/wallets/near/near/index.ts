@@ -62,52 +62,41 @@ export default class implements NearWallet {
     }
 
     async connectWallet(): Promise<void> {
-        return new Promise<void>(async (res, rej) => {
-            const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
-            const currentTabId = currentTab.id;
+        const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
+        const currentTabId = currentTab.id;
 
-            const requestId = generateGuid();
-            const callbackUrl = browser.extension.getURL(`callback.html?request_id=${requestId}`);
+        const requestId = generateGuid();
+        const callbackUrl = browser.extension.getURL(`callback.html?request_id=${requestId}`);
 
-            let callbackTab = null;
-            const waitTabPromise = waitTab(callbackUrl).then(x => callbackTab = x);
-            const requestPromise = this._nearWallet.requestSignIn({
-                successUrl: browser.extension.getURL(`callback.html?request_id=${requestId}&success=true`),
-                failureUrl: browser.extension.getURL(`callback.html?request_id=${requestId}&success=false`)
-            });
-
-            await Promise.race([waitTabPromise, requestPromise]);
-
-            if (!callbackTab) throw new Error(`User rejected the transaction.`);
-
-            const urlObject = new URL(callbackTab.url);
-            const success = urlObject.searchParams.get('success') === "true";
-
-            if (success) {
-                const accountId = urlObject.searchParams.get('account_id');
-                const publicKey = urlObject.searchParams.get('public_key');
-                const allKeys = urlObject.searchParams.get('all_keys');
-
-                // TODO: Handle situation when access key is not added
-                if (accountId) {
-                    await browser.tabs.update(currentTabId, { active: true });
-                    this._nearWallet.completeSignIn(accountId, publicKey, allKeys);
-                    localStorage['near_lastUsage'] = new Date().toISOString();
-                    await new Promise((res, rej) => setTimeout(res, 1000));
-                    await browser.tabs.remove(callbackTab.id);
-                    res();
-                } else {
-                    await browser.tabs.update(currentTabId, { active: true });
-                    await new Promise((res, rej) => setTimeout(res, 1000));
-                    await browser.tabs.remove(callbackTab.id);
-                    rej('No account_id params in callback URL');
-                }
-            } else {
-                await new Promise((res, rej) => setTimeout(res, 1000));
-                await browser.tabs.remove(callbackTab.id);
-                rej('Access denied');
-            }
+        let callbackTab = null;
+        const waitTabPromise = waitTab(callbackUrl).then(x => callbackTab = x);
+        const requestPromise = this._nearWallet.requestSignIn({
+            successUrl: browser.extension.getURL(`callback.html?request_id=${requestId}&success=true`),
+            failureUrl: browser.extension.getURL(`callback.html?request_id=${requestId}&success=false`)
         });
+
+        await Promise.race([waitTabPromise, requestPromise]);
+
+        await browser.tabs.update(currentTabId, { active: true });
+
+        if (!callbackTab) throw new Error('Wallet connection request rejected.');
+
+        await browser.tabs.remove(callbackTab.id);
+
+        const urlObject = new URL(callbackTab.url);
+        const success = urlObject.searchParams.get('success') === "true";
+
+        if (!success) throw new Error('Wallet connection request rejected');
+
+        const accountId = urlObject.searchParams.get('account_id');
+        const publicKey = urlObject.searchParams.get('public_key');
+        const allKeys = urlObject.searchParams.get('all_keys');
+
+        // TODO: Handle situation when access key is not added
+        if (!accountId) throw new Error('No account_id params in callback URL');
+
+        this._nearWallet.completeSignIn(accountId, publicKey, allKeys);
+        localStorage['near_lastUsage'] = new Date().toISOString();
     }
 
     async disconnectWallet() {

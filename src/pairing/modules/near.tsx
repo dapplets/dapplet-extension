@@ -37,7 +37,7 @@ export default class extends React.Component<Props, State> {
             const descriptor = descriptors.find(x => x.type === 'near');
             this.setState({ connected: true, descriptor });
         } catch (err) {
-            console.log(err);
+            console.error(err);
             this.setState({ error: err.message });
         }
     }
