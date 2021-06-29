@@ -23,6 +23,7 @@ type RegistriedModule = {
     activateMethodsDependencies: string[],
     instancedActivateMethodsDependencies: any[],
     defaultConfig?: DefaultConfig,
+    schemaConfig?: SchemaConfig,
     onActionHandler?: Function,
     onHomeHandler?: Function
 }
@@ -43,7 +44,7 @@ export class Injector {
         // ToDo: add modules to registry before loading
 
         const { getModulesWithDeps } = await initBGFunctions(browser);
-        const loadedModules: { manifest: VersionInfo, script: string, defaultConfig?: DefaultConfig }[] = await getModulesWithDeps(modules);
+        const loadedModules: { manifest: VersionInfo, script: string, defaultConfig?: DefaultConfig, schemaConfig?: SchemaConfig }[] = await getModulesWithDeps(modules);
         modules.forEach(a => !loadedModules.find(b => 
             a.name === b.manifest.name 
             && (!a.branch || a.branch === b.manifest.branch) 
@@ -167,14 +168,14 @@ export class Injector {
         module.onHomeHandler = handler;
     }
 
-    private async _processModules(modules: { manifest: VersionInfo, script: string, order: number, contextIds: string[], defaultConfig?: DefaultConfig }[]) {
+    private async _processModules(modules: { manifest: VersionInfo, script: string, order: number, contextIds: string[], defaultConfig?: DefaultConfig, schemaConfig?: SchemaConfig }[]) {
         const { optimizeDependency, getModulesWithDeps, addEvent, getSwarmGateway, getPreferedOverlayStorage } = await initBGFunctions(browser);
         const { core } = this;
 
         const swarmGatewayUrl = await getSwarmGateway();
         const preferedOverlayStorage = await getPreferedOverlayStorage();
 
-        for (const { manifest, script, order, contextIds, defaultConfig } of modules) {
+        for (const { manifest, script, order, contextIds, defaultConfig, schemaConfig } of modules) {
             // Module is loaded already
             const registeredModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
             if (registeredModule) {
@@ -222,7 +223,7 @@ export class Injector {
                     }
                 },
                 wallet: (cfg, eventDef) => core.wallet(cfg, eventDef, manifest.name),
-                storage: new AppStorage(manifest.name, manifest.environment, defaultConfig),
+                storage: new AppStorage(manifest, defaultConfig, schemaConfig),
                 contract: (type, address, options) => core.contract(type, address, options, manifest.name),
                 onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
                 onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
@@ -249,6 +250,7 @@ export class Injector {
                         instancedPropertyDependencies: {},
                         instancedConstructorDeps: [],
                         defaultConfig: defaultConfig,
+                        schemaConfig: schemaConfig,
                         activateMethodsDependencies: [],
                         instancedActivateMethodsDependencies: [],
                     });
@@ -281,7 +283,8 @@ export class Injector {
                                 instancedConstructorDeps: [],
                                 activateMethodsDependencies: [],
                                 instancedActivateMethodsDependencies: [],
-                                defaultConfig: defaultConfig
+                                defaultConfig: defaultConfig,
+                                schemaConfig: schemaConfig
                             });
                         }
 
@@ -316,7 +319,8 @@ export class Injector {
                                 activateMethodsDependencies: [],
                                 instancedActivateMethodsDependencies: [],
                                 instancedConstructorDeps: [],
-                                defaultConfig: defaultConfig
+                                defaultConfig: defaultConfig,
+                                schemaConfig: schemaConfig
                             });
                         }
 

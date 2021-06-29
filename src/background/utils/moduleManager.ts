@@ -117,8 +117,8 @@ export default class ModuleManager {
             return this._loadDist(m.dist);
         } else {
             const script = await this._loadScript(m.main);
-            const defaultConfig = m.defaultConfig && await this._loadJson(m.defaultConfig);
-            const schemaConfig = m.schemaConfig && await this._loadJson(m.schemaConfig);
+            const defaultConfig = m.defaultConfig && await this._loadJson(m.defaultConfig).catch(() => null);
+            const schemaConfig = m.schemaConfig && await this._loadJson(m.schemaConfig).catch(() => null);
             return { script, defaultConfig, schemaConfig, internalManifest: null };
         }
     }

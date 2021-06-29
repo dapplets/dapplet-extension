@@ -265,7 +265,8 @@ export default class FeatureService {
         return modulesWithDeps.map((m, i) => ({
             manifest: Object.assign(m.manifest, dists[i].internalManifest), // merge manifests from registry and bundle (zip) 
             script: dists[i].script,
-            defaultConfig: dists[i].defaultConfig
+            defaultConfig: dists[i].defaultConfig,
+            schemaConfig: dists[i].schemaConfig
         }));
     }
 

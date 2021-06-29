@@ -1,9 +1,23 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
-import { Environments, DefaultConfig } from "../common/types";
+import VersionInfo from "../background/models/versionInfo";
+import { formatModuleId } from "../common/helpers";
+import { Environments, DefaultConfig, SchemaConfig } from "../common/types";
 
 export class AppStorage {
-    constructor(private _moduleName: string, private _environment: Environments, private _defaultConfig?: DefaultConfig) { }
+    
+    private _moduleName: string;
+    private _environment: Environments;
+
+    constructor(manifest: VersionInfo, private _defaultConfig?: DefaultConfig, private _schemaConfig?: SchemaConfig) { 
+        if (!manifest.name) throw new Error(`Cannot initialize AppStorage: "name" is required in the module manifest ${formatModuleId(manifest)}`);
+        if (!manifest.environment) throw new Error(`Cannot initialize AppStorage: the current runtime environment is unknown (dev|test|prod) ${formatModuleId(manifest)}.`);
+        if (!!manifest.defaultConfig && !_defaultConfig) console.error(`Cannot load the default configuration of the module ${formatModuleId(manifest)}.`);
+        if (!!manifest.schemaConfig && !_schemaConfig) console.error(`Cannot load the default configuration of the module ${formatModuleId(manifest)}.`);
+
+        this._moduleName = manifest.name;
+        this._environment = manifest.environment;
+    }
 
     public async get(key: string): Promise<any> {
         const { getUserSettings } = await initBGFunctions(browser);

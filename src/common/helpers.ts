@@ -1,4 +1,5 @@
 import { browser, Tabs } from "webextension-polyfill-ts";
+import { DEFAULT_BRANCH_NAME } from "./constants";
 import { ChainTypes, ModuleId } from "./types";
 
 export function getHostName(url: string): string {
@@ -260,4 +261,8 @@ export function pick(o: any, ...fields: string[]) {
     if (o.hasOwnProperty(x)) a[x] = o[x];
     return a;
   }, {});
+}
+
+export function formatModuleId({ name, branch, version }: ModuleId) {
+  return `${name}#${branch ?? DEFAULT_BRANCH_NAME}@${version}`;
 }
