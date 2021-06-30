@@ -65,13 +65,18 @@ export default class FeatureService {
             }
         }
 
+        const activeRegistries = configRegistries.filter(x => x.isEnabled);
+        
         // Adding of unavailable dapplets
         for (const contextId of contextIds) {
             const config = await this._globalConfigService.getSiteConfigById(contextId);
             for (const moduleName in config.activeFeatures) {
                 const registryUrl = config.activeFeatures[moduleName].registryUrl;
+                if (!activeRegistries.find(r => r.url === registryUrl)) continue;
+
                 const moduleInfo = await this.getModuleInfoByName(registryUrl, moduleName);
                 if (dtos.find(x => x.name === moduleName) || !moduleInfo) continue;
+
                 const dto: ManifestDTO = moduleInfo as any;
                 dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
                 dto.isActionHandler = config.activeFeatures[dto.name]?.runtime?.isActionHandler || false;
@@ -81,7 +86,7 @@ export default class FeatureService {
                 dto.order = i++;
                 dto.sourceRegistry = {
                     url: registryUrl,
-                    isDev: configRegistries.find(r => r.url === registryUrl)?.isDev
+                    isDev: activeRegistries.find(r => r.url === registryUrl)?.isDev
                 };
                 if (!dto.hostnames) dto.hostnames = [];
                 dto.hostnames.push(contextId);
