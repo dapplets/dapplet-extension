@@ -6,7 +6,7 @@ type PresignedPost = { [key: string]: string };
 
 export class CentralizedModuleStorage implements ModuleStorage {
     public timeout = 5000;
-    private _s3ReadEndpoint = "https://dapplet-api.s3-website.nl-ams.scw.cloud/";
+    private _s3ReadEndpoint = "https://dapplet-api.s3.nl-ams.scw.cloud/";
     private _s3WriteEndpoint = "https://dapplet-api.s3.nl-ams.scw.cloud/";
     private _authEndpoint = "https://dapplet-api.herokuapp.com/s3/presign";
 
