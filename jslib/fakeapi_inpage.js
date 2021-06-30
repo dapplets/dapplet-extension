@@ -26,6 +26,7 @@ browser.storage.local = {};
 browser.tabs = {};
 browser.tabs.onActivated = {};
 browser.tabs.onUpdated = {};
+browser.runtime.onInstalled = {};
 
 const callbacksMap = new WeakMap();
 
@@ -263,6 +264,7 @@ browser.tabs.sendMessage = async function (tabId, message, callback) {
     //console.log('browser.tabs.sendMessage', arguments);
     return sendMessage(message, callback);
 }
+browser.runtime.onInstalled.addListener = function () {}
 
 function randomHex(len) {
     return Array.from(crypto.getRandomValues(new Uint8Array(len))).map(x => x.toString(16)).join('');
