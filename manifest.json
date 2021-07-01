@@ -39,7 +39,8 @@
     "starter.html",
     "settings.html",
     "login.html",
-    "callback.html"
+    "callback.html",
+    "guide.html"
   ],
   "permissions": [
     "tabs",

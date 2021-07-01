@@ -205,7 +205,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
 
     return (
       <React.Fragment>
-        <DevMessage />
+        <DevMessage isOverlay={this.props.isOverlay} />
 
         {(!isLoading) ? <Input
           fluid
