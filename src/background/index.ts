@@ -311,16 +311,18 @@ browser.runtime.onInstalled.addListener(async (details) => {
 });
 
 // Reinject content scripts
-browser.tabs.query({ url: ["http://*/*", "https://*/*"] })
-  .then(foundTabs =>
-    Promise.all(foundTabs.map(x => browser.tabs.sendMessage(x.id, { "type": "CURRENT_CONTEXT_IDS" })
-      .then(() => false)
-      .catch(() => {
-        browser.tabs.executeScript(x.id, { file: 'inpage.js' });
-        return true;
-      })))
-  )
-  .then(x => {
-    const reinjectedNumber = x.filter(x => !!x).length;
-    if (reinjectedNumber > 0) console.log(`${reinjectedNumber} content scripts were reinjected after background reloading.`);
-  });
+if (window['DAPPLETS_JSLIB'] !== true) {
+  browser.tabs.query({ url: ["http://*/*", "https://*/*"] })
+    .then(foundTabs =>
+      Promise.all(foundTabs.map(x => browser.tabs.sendMessage(x.id, { "type": "CURRENT_CONTEXT_IDS" })
+        .then(() => false)
+        .catch(() => {
+          browser.tabs.executeScript(x.id, { file: 'inpage.js' });
+          return true;
+        })))
+    )
+    .then(x => {
+      const reinjectedNumber = x.filter(x => !!x).length;
+      if (reinjectedNumber > 0) console.log(`${reinjectedNumber} content scripts were reinjected after background reloading.`);
+    });
+}

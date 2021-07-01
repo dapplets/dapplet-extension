@@ -37,14 +37,14 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
       loading: true,
       defaultActiveIndex: undefined,
       reload: 0,
-      isOverlay: false,
+      isOverlay: (window['DAPPLETS_JSLIB'] !== true) ? false : true,
     };
 
     props.bus.subscribe("changeTab", (path) => {
       this.setState({ isOverlay: true });
       if (path === "dapplets")
         this.setState({ defaultActiveIndex: 0, reload: Math.random() });
-      //if (path === 'events') this.setState({ defaultActiveIndex: 1, reload: Math.random() });
+        //if (path === 'events') this.setState({ defaultActiveIndex: 1, reload: Math.random() });
       if (path === "wallets")
         this.setState({ defaultActiveIndex: 1, reload: Math.random() });
       if (path === "settings")
