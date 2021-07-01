@@ -3,11 +3,19 @@ import * as ReactDOM from 'react-dom';
 import { List } from 'semantic-ui-react';
 //import 'semantic-ui-css/semantic.min.css';
 import './index.scss';
+import { browser } from "webextension-polyfill-ts";
+import { initBGFunctions } from "chrome-extension-message-wrapper";
 
 interface Props {}
 interface State {}
 
 class Index extends React.Component<Props, State> {
+
+  _openExtensionsHandler = async () => {
+    const { createTab } = await initBGFunctions(browser);
+    await createTab('chrome://extensions/');
+  }
+
   render() {
     return (
       <React.Fragment>
@@ -19,7 +27,7 @@ class Index extends React.Component<Props, State> {
             </a>
           </List.Item>
           <List.Item as='li'>
-            Open <b>chrome://extensions</b> in a new tab
+            Open <a onClick={this._openExtensionsHandler} href="#">chrome://extensions</a> in a new tab
           </List.Item>
           <List.Item as='li'>
             <p>Remove the previous version of the extension</p>
