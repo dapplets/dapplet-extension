@@ -168,6 +168,11 @@ export class Injector {
         module.onHomeHandler = handler;
     }
 
+    public async dispose() {
+        const modules = this.registry.map(x => x.manifest);
+        await this.unloadModules(modules);
+    }
+
     private async _processModules(modules: { manifest: VersionInfo, script: string, order: number, contextIds: string[], defaultConfig?: DefaultConfig, schemaConfig?: SchemaConfig }[]) {
         const { optimizeDependency, getModulesWithDeps, addEvent, getSwarmGateway, getPreferedOverlayStorage } = await initBGFunctions(browser);
         const { core } = this;
@@ -444,7 +449,7 @@ export class Injector {
                     } if (prop === 'detachConfig') {
                         return (cfg) => {
                             const cfgs = cfg ? [cfg] : Reflect.get(target, cfgsKey);
-                            cfgs.forEach(x => target.detachConfig(x, featureId));
+                            cfgs?.forEach(x => target.detachConfig(x, featureId));
                         }
                     } if (prop === 'attachFeature') {
                         console.error('attachFeature() method is deprecated.');

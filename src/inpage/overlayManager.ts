@@ -287,4 +287,9 @@ export class OverlayManager {
         this.show();
         this.open();
     }
+
+    public destroy() {
+        this.unregisterAll();
+        this._panel.remove();
+    }
 }

@@ -48,7 +48,9 @@
     "contextMenus",
     "notifications",
     "downloads",
-    "*://localhost/*"
+    "*://localhost/*",
+    "http://*/*",
+    "https://*/*"
   ],
   "commands": {
     "toggle-overlay": {

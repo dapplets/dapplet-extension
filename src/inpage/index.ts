@@ -30,3 +30,9 @@ browser.runtime.onMessage.addListener((message, sender) => {
         return injector.openDappletHome(moduleName);
     }
 });
+
+browser.runtime.connect().onDisconnect.addListener(() => {
+    console.log('[DAPPLETS]: The connection to the background service has been lost. Content script is unloading...');
+    injector.dispose();
+    core.overlayManager.destroy();
+});
