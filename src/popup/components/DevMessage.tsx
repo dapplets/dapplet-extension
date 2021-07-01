@@ -7,7 +7,8 @@ import Linkify from "react-linkify";
 import ReactTimeAgo from 'react-time-ago';
 
 interface Props {
-  isOverlay: boolean
+  isOverlay: boolean;
+  style?: any;
 }
 
 interface State {
@@ -79,18 +80,20 @@ export class DevMessage extends React.Component<Props, State> {
 
     if (s.newExtensionVersion) {
       return (
-        <Message info size="small">
-          <div style={{ display: 'flex' }}>
-          <Message.Content style={{ flex: 'auto'}}>
-            <Message.Header>Upgrade extension</Message.Header>
-            <p>Newer version is available: <a href="https://github.com/dapplets/dapplet-extension/releases/latest" target="_blank"><b>{s.newExtensionVersion}</b></a></p>
-          </Message.Content>
-            <Button.Group size="mini" style={{ display: 'unset', margin: 'auto 0'} }>
-              <Button primary onClick={this._showUpgradeGuide.bind(this)}>Upgrade</Button>
-              <Button onClick={this._ignoreUpdate.bind(this)}>Ignore</Button>
-            </Button.Group>
-          </div>
-        </Message>
+        <div style={this.props.style}>
+          <Message info size="small">
+            <div style={{ display: 'flex' }}>
+            <Message.Content style={{ flex: 'auto'}}>
+              <Message.Header>Upgrade extension</Message.Header>
+              <p>Newer version is available: <a href="https://github.com/dapplets/dapplet-extension/releases/latest" target="_blank"><b>{s.newExtensionVersion}</b></a></p>
+            </Message.Content>
+              <Button.Group size="mini" style={{ display: 'unset', margin: 'auto 0'} }>
+                <Button primary onClick={this._showUpgradeGuide.bind(this)}>Upgrade</Button>
+                <Button onClick={this._ignoreUpdate.bind(this)}>Ignore</Button>
+              </Button.Group>
+            </div>
+          </Message>
+        </div>
       );
     }
 
@@ -109,33 +112,35 @@ export class DevMessage extends React.Component<Props, State> {
         linkMessage = 'more than 10 unread messages';
       }
       return (
-        <Message info onDismiss={() => this._hideDiscordMessages()} style={{ paddingBottom: '5px' }}>
-          <Message.Header>
-            <a href={link} target="_blank" style={{ color: '#276f86' }}>
-              Dapplets announcements
-            </a>
-          </Message.Header>
-          <Message.Content style={{ marginTop: '10px' }}>
-            <p style={{ marginBottom: '0', fontSize: '13px' }}>
-              <b>{authorUsername}</b>
-              <span style={{ fontSize: '12px', opacity: '.7', letterSpacing: '0.3px', paddingLeft: '5px' }}>
-                <ReactTimeAgo date={new Date(timestamp)} locale="en-US" />
-              </span>
-            </p>
-            <p style={{ margin: '0 auto' }}>
-              <Linkify componentDecorator={( decoratedHref: string, decoratedText: string, key: Key) => (
-                <SecureLink href={decoratedHref} key={key}>{decoratedText}</SecureLink>
-              )}>
-                {content}
-              </Linkify>
-            </p>
-            <div style={{ fontSize: '13px', marginTop: '10px' }}>
-              <a href={link} target="_blank">
-                {linkMessage}
+        <div style={this.props.style}>
+          <Message info onDismiss={() => this._hideDiscordMessages()} style={{ paddingBottom: '5px' }}>
+            <Message.Header>
+              <a href={link} target="_blank" style={{ color: '#276f86' }}>
+                Dapplets announcements
               </a>
-            </div>
-          </Message.Content>
-        </Message>
+            </Message.Header>
+            <Message.Content style={{ marginTop: '10px' }}>
+              <p style={{ marginBottom: '0', fontSize: '13px' }}>
+                <b>{authorUsername}</b>
+                <span style={{ fontSize: '12px', opacity: '.7', letterSpacing: '0.3px', paddingLeft: '5px' }}>
+                  <ReactTimeAgo date={new Date(timestamp)} locale="en-US" />
+                </span>
+              </p>
+              <p style={{ margin: '0 auto' }}>
+                <Linkify componentDecorator={( decoratedHref: string, decoratedText: string, key: Key) => (
+                  <SecureLink href={decoratedHref} key={key}>{decoratedText}</SecureLink>
+                )}>
+                  {content}
+                </Linkify>
+              </p>
+              <div style={{ fontSize: '13px', marginTop: '10px' }}>
+                <a href={link} target="_blank">
+                  {linkMessage}
+                </a>
+              </div>
+            </Message.Content>
+          </Message>
+        </div>
       );
     }
 
@@ -143,18 +148,20 @@ export class DevMessage extends React.Component<Props, State> {
       const [title, ...messages] = s.devMessage.split('\n');
 
       return (
-        <Message info onDismiss={() => this._hideDevMessage()}>
-          <Message.Header>{title}</Message.Header>
-          <p>
-            <Linkify
-              componentDecorator={( decoratedHref: string, decoratedText: string, key: Key) => (
-                <SecureLink href={decoratedHref} key={key}>{decoratedText}</SecureLink>
-              )}
-            >
-              {messages.map((x) => (<>{x}<br /></>))}
-            </Linkify>
-          </p>
-        </Message>
+        <div style={this.props.style}>
+          <Message info onDismiss={() => this._hideDevMessage()}>
+            <Message.Header>{title}</Message.Header>
+            <p>
+              <Linkify
+                componentDecorator={( decoratedHref: string, decoratedText: string, key: Key) => (
+                  <SecureLink href={decoratedHref} key={key}>{decoratedText}</SecureLink>
+                )}
+              >
+                {messages.map((x, i) => (<>{x}<br key={i} /></>))}
+              </Linkify>
+            </p>
+          </Message>
+        </div>
       );
     }
 

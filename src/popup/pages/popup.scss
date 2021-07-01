@@ -34,3 +34,9 @@ body {
 .popupContainer.popup {
     width: 493px;
 }
+
+.internalTabColumn {
+    height: 520px;
+    display: flex;
+    flex-direction: column;
+}

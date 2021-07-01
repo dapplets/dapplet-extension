@@ -145,13 +145,13 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
         const { isLoading, registries, registryInput, registryInputError, intro, modules } = this.state;
 
         return (
-            <React.Fragment>
-                {(intro.popupDeveloperWelcome) ? (<Message info onDismiss={() => this.closeWelcomeIntro()}>
+            <div className={(this.props.isOverlay) ? undefined : "internalTabColumn"}>
+                {(intro.popupDeveloperWelcome) ? (<Message info onDismiss={() => this.closeWelcomeIntro()} style={{ display: 'inline-table' }}>
                     <Message.Header>Welcome to Development Mode!</Message.Header>
                     <p>Here you can connect to development servers to debug modules, publish them to public registries using your wallet.</p>
                 </Message>) : null}
 
-                <Segment loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTabDeveloper"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
+                <Segment loading={isLoading} style={{ margin: 0, flex: 'auto', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
                     <Header as='h4'>Development Servers</Header>
                     <Input
@@ -197,8 +197,8 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                         ))}
                     </List>
 
-                    <Header as='h4'>Modules</Header>
-                    <div style={{ maxHeight: 300, overflowY: 'scroll' }}>
+                    <Header as='h4' style={{ marginTop: '0.5em' }}>Modules</Header>
+                    <div style={{ overflowY: 'auto', flex: 'auto' }}>
                         {(modules.length > 0) ? <List divided relaxed verticalAlign='middle' size='small'>
                             {modules.map((m, i) => (
                                 <List.Item key={i}>
@@ -222,7 +222,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                     </div>
                 </Segment>
 
-            </React.Fragment>
+            </div>
         );
     }
 }

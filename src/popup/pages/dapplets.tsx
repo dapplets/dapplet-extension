@@ -205,59 +205,61 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
 
     return (
       <React.Fragment>
-        <DevMessage isOverlay={this.props.isOverlay} />
+        <div className={(this.props.isOverlay) ? undefined : "internalTabColumn"}>
+          <DevMessage style={{ marginBottom: '10px' }} isOverlay={this.props.isOverlay} />
 
-        {(!isLoading) ? <Input
-          fluid
-          iconPosition='left'
-          icon
-          placeholder='Search...'
-        >
-          <Icon name='search' />
-          <input value={search} onChange={e => this._searchChangeHandler(e.target.value)} />
-          {(search.length > 0) ? <Icon 
-            name='close' 
-            link 
-            style={{ right: '1px', left: 'initial' }} 
-            onClick={() => this._searchChangeHandler('')}
-          /> : null}
-        </Input> : null}
+          {(!isLoading) ? <Input
+            fluid
+            iconPosition='left'
+            icon
+            placeholder='Search...'
+          >
+            <Icon name='search' />
+            <input value={search} onChange={e => this._searchChangeHandler(e.target.value)} />
+            {(search.length > 0) ? <Icon 
+              name='close' 
+              link 
+              style={{ right: '1px', left: 'initial' }} 
+              onClick={() => this._searchChangeHandler('')}
+            /> : null}
+          </Input> : null}
 
-        <Segment loading={isLoading} className={(this.props.isOverlay) ? undefined : "internalTabDapplets"} style={{ marginTop: '10px'}} >
-          {!isNoInpage ?
-            (features.length > 0) ? (
-              <List divided relaxed>
-                {features.map((f, i) => (
-                  <Dapplet
-                    key={i}
-                    index={i}
-                    feature={f}
-                    onSwitchChange={this.handleSwitchChange.bind(this)}
-                    onSettingsModule={this.settingsModule.bind(this)}
-                    onOpenDappletAction={this.openDappletAction.bind(this)}
-                    onOpenDappletHome={this.openDappletHome.bind(this)}
-                    onToggleFeature={this.toggleFeature.bind(this)}
-                    onRemoveDapplet={this.removeDapplet.bind(this)}
-                    swarmGatewayUrl={this.state.swarmGatewayUrl}
-                  />
-                ))}
-              </List>
-            ) : (<div>No available features for current site.</div>)
-            : (<div>
-              No connection with context webpage.
-              <br />
-              Please refresh it.
-              <br />
-              <Button
-                compact
-                size='tiny'
-                color='blue'
-                content='Refresh'
-                onClick={() => this.refreshContextPage()}
-                style={{ marginTop: '6px' }}
-              />
-            </div>)}
-        </Segment>
+          <Segment loading={isLoading} style={{ flex: 'auto', overflowY: 'auto' }} >
+            {!isNoInpage ?
+              (features.length > 0) ? (
+                <List divided relaxed>
+                  {features.map((f, i) => (
+                    <Dapplet
+                      key={i}
+                      index={i}
+                      feature={f}
+                      onSwitchChange={this.handleSwitchChange.bind(this)}
+                      onSettingsModule={this.settingsModule.bind(this)}
+                      onOpenDappletAction={this.openDappletAction.bind(this)}
+                      onOpenDappletHome={this.openDappletHome.bind(this)}
+                      onToggleFeature={this.toggleFeature.bind(this)}
+                      onRemoveDapplet={this.removeDapplet.bind(this)}
+                      swarmGatewayUrl={this.state.swarmGatewayUrl}
+                    />
+                  ))}
+                </List>
+              ) : (<div>No available features for current site.</div>)
+              : (<div>
+                No connection with context webpage.
+                <br />
+                Please refresh it.
+                <br />
+                <Button
+                  compact
+                  size='tiny'
+                  color='blue'
+                  content='Refresh'
+                  onClick={() => this.refreshContextPage()}
+                  style={{ marginTop: '6px' }}
+                />
+              </div>)}
+          </Segment>
+        </div>
       </React.Fragment>
     );
   }
