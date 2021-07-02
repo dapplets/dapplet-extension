@@ -1,3 +1,4 @@
+import common_script from '!raw-loader!../build/common.js'
 import popup_script from '!raw-loader!../build/popup.js'
 import deploy_script from '!raw-loader!../build/deploy.js'
 import pairing_script from '!raw-loader!../build/pairing.js'
@@ -112,6 +113,7 @@ browser.extension.getURL = function (url) {
                 return Promise.resolve(result);
             }
           </script>
+          <script>` + common_script + `</script>
           <script>` + script + `</script>
         </body>
         </html>`], {
@@ -267,8 +269,9 @@ browser.tabs.sendMessage = async function (tabId, message, callback) {
     //console.log('browser.tabs.sendMessage', arguments);
     return sendMessage(message, callback);
 }
-browser.runtime.onInstalled.addListener = function () {}
-browser.tabs.executeScript = function () {}
+browser.runtime.onInstalled.addListener = function () { }
+browser.tabs.executeScript = async function () { }
+browser.runtime.connect = () => ({ onDisconnect: { addListener: () => { } } })
 
 function randomHex(len) {
     return Array.from(crypto.getRandomValues(new Uint8Array(len))).map(x => x.toString(16)).join('');
@@ -302,3 +305,5 @@ async function sendMessage(message, callback) {
 
 Object.defineProperty(window, 'browser', { value: browser });
 Object.defineProperty(window, 'DAPPLETS_JSLIB', { value: true });
+
+eval(common_script);

@@ -3,6 +3,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const package = require('./package.json');
 const webpack = require("webpack");
+const TerserPlugin = require("terser-webpack-plugin");
 
 function modifyManifest(buffer) {
   const manifest = JSON.parse(buffer.toString());
@@ -97,6 +98,18 @@ module.exports = {
       "https": false,
       "zlib": false
     }
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      name: 'common'
+    },
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        extractComments: false
+      }),
+    ],
   },
   plugins: [
     new CopyWebpackPlugin({

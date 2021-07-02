@@ -317,7 +317,8 @@ if (window['DAPPLETS_JSLIB'] !== true) {
       Promise.all(foundTabs.map(x => browser.tabs.sendMessage(x.id, { "type": "CURRENT_CONTEXT_IDS" })
         .then(() => false)
         .catch(() => {
-          browser.tabs.executeScript(x.id, { file: 'inpage.js' });
+          browser.tabs.executeScript(x.id, { file: 'common.js' })
+            .then(() => browser.tabs.executeScript(x.id, { file: 'inpage.js' }))
           return true;
         })))
     )

@@ -1,26 +1,46 @@
-let libraryName = 'index';
-let outputFile, mode;
-const env = 'build';
+const { ConcatSource } = require('webpack-sources');
+const TerserPlugin = require("terser-webpack-plugin");
 
-if (env === 'build') {
-  mode = 'production';
-  outputFile = libraryName + '.min.js';
-} else {
-  mode = 'development';
-  outputFile = libraryName + '.js';
+class RemoveUseStrictPlugin {
+    apply(compiler) {
+        compiler.hooks.compilation.tap('RemoveUseStrictPlugin', (compilation) => {
+            compilation.hooks.processAssets.tap(
+                {
+                    name: 'RemoveUseStrictPlugin',
+                    stage: compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
+                },
+                (assets) => Object.keys(assets).forEach((fileName) => {
+                    let result = compilation.assets[fileName].source();
+                    result = result.replace(/use strict/g, '');
+                    compilation.assets[fileName] = new ConcatSource(result);
+                })
+            );
+        })
+    }
 }
 
 const config = {
-  mode: mode,
+  mode: 'production',
   entry: __dirname + '/jslib/index.js',
   //devtool: 'inline-source-map',
   output: {
     path: __dirname + '/lib',
-    filename: outputFile,
-    library: libraryName,
+    filename: 'index.min.js',
+    library: 'index',
     libraryTarget: 'umd',
     umdNamedDefine: true,
     globalObject: "typeof self !== 'undefined' ? self : this"
+  },
+  plugins: [
+    new RemoveUseStrictPlugin()
+  ],
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        extractComments: false
+      }),
+    ],
   }
 };
 

@@ -26,6 +26,7 @@
         "https://*/*"
       ],
       "js": [
+        "common.js",
       	"inpage.js"
       ],
       "run_at": "document_idle"
