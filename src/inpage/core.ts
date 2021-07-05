@@ -68,6 +68,17 @@ export default class Core {
             }
         });
 
+        // API for context web pages
+        window.addEventListener('message', ({ data }) => {
+            if (typeof data === 'object' && data.type !== undefined) {
+                if (data.type === 'OPEN_POPUP_OVERLAY') {
+                    return Promise.resolve(this.overlayManager.openPopup(data.payload.path));
+                } else if (data.type === 'CLOSE_OVERLAY') {
+                    this.overlayManager && this.overlayManager.unregisterAll();
+                }
+            }
+        });
+
         const swiper = new Swiper(document.body);
         swiper.on("left", () => closeOverlay());
         swiper.on("right", () => this.overlayManager.close());
