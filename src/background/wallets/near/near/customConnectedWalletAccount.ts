@@ -5,7 +5,9 @@ import { browser } from 'webextension-polyfill-ts';
 import { generateGuid, waitTab } from '../../../../common/helpers';
 
 export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
+
     async signAndSendTransaction(receiverId: string, actions: nearAPI.transactions.Action[]): Promise<nearAPI.providers.FinalExecutionOutcome> {
+        if (!this.accountId) throw new Error('this.accountId is undefined');
         const localKey = await this.connection.signer.getPublicKey(this.accountId, this.connection.networkId);
         let accessKey = await this.accessKeyForTransaction(receiverId, actions, localKey);
         if (!accessKey) {

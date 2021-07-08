@@ -15,6 +15,7 @@ interface SignInOptions {
 }
 
 export class CustomWalletConnection extends nearAPI.WalletConnection {
+
     async requestSignIn(
         contractIdOrOptions: string | SignInOptions = {},
         title?: string,
@@ -63,7 +64,14 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
                 accountId,
                 allKeys
             };
+
             window.localStorage.setItem(this._authDataKey, JSON.stringify(this._authData));
+
+            // It fixes the error "Cannot find matching key for transaction sent to <account_id>"
+            if (this._connectedAccount) {
+                Object.defineProperty(this._connectedAccount, 'accountId', { value: accountId, writable: true });
+            }
+
             if (publicKey) {
                 await this._moveKeyFromTempToPermanent(accountId, publicKey);
             }
