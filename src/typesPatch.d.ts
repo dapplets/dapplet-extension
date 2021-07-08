@@ -18,6 +18,11 @@ declare module "*.svg" {
     export default value;
 }
 
+declare module "*.css" {
+    const value: any;
+    export default value;
+}
+
 declare var EXTENSION_VERSION: string;
 declare var EXTENSION_ENV: 'development' | 'production';
 

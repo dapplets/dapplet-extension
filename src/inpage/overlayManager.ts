@@ -2,6 +2,7 @@ import { browser } from 'webextension-polyfill-ts';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { capitalizeFirstLetter } from '../common/helpers';
 import { Overlay } from './overlay';
+import INNER_STYLE from '!raw-loader!./overlay.css';
 
 const PageNavClass = 'dapplets-overlay-nav';
 const TopPanelClass = 'dapplets-overlay-nav-top-panel';
@@ -16,7 +17,6 @@ const CloseButtonClass = 'dapplets-overlay-nav-tab-item-close-btn';
 const CollapsedOverlayClass = 'dapplets-overlay-collapsed';
 const HiddenOverlayClass = 'dapplets-overlay-hidden';
 const DappletsOverlayManagerClass = 'dapplets-overlay-manager';
-const OverlayOuterClass = 'dapplets-overlay-outer';
 const OverlayFrameClass = 'dapplets-overlay-frame';
 const OverlayBucketBarClass = 'dapplets-overlay-bucket-bar';
 const OverlayToolbarClass = 'dapplets-overlay-toolbar';
@@ -38,17 +38,23 @@ export class OverlayManager {
     constructor() {
         // Side panel
         const panel = document.createElement(DappletsOverlayManagerClass);
-        panel.classList.add(OverlayFrameClass, OverlayOuterClass, CollapsedOverlayClass, HiddenOverlayClass);
+        panel.classList.add(OverlayFrameClass, CollapsedOverlayClass, HiddenOverlayClass);
         document.body.appendChild(panel);
         this._panel = panel;
 
+        const shadow = panel.attachShadow({ mode: 'closed' });
+
+        const style = document.createElement('style');
+        style.textContent = INNER_STYLE;
+        shadow.appendChild(style);
+        
         const bucketBar = document.createElement("div");
         bucketBar.classList.add(OverlayBucketBarClass);
-        panel.appendChild(bucketBar);
+        shadow.appendChild(bucketBar);
 
         const toolBar = document.createElement("div");
         toolBar.classList.add(OverlayToolbarClass);
-        panel.appendChild(toolBar);
+        shadow.appendChild(toolBar);
 
         const ul = document.createElement('ul');
         toolBar.appendChild(ul);
@@ -66,7 +72,7 @@ export class OverlayManager {
         // Tabs
         const nav = document.createElement("div");
         nav.classList.add(PageNavClass);
-        panel.appendChild(nav);
+        shadow.appendChild(nav);
 
         const topPanel = document.createElement("div");
         topPanel.classList.add(TopPanelClass);
