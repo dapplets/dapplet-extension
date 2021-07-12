@@ -1,16 +1,18 @@
 import { OverlayManager } from './overlayManager';
 import { IPubSub } from './types';
 
+const OVERLAY_LOADING_TIMEOUT = 5000;
+
 export enum SubscribeOptions {
     SINGLE_THREAD,
     MULTI_THREAD
 }
 
-
 export class Overlay implements IPubSub {
     private _queue: any[] = [];
     private _isFrameLoaded: boolean = false;
     private _msgCount: number = 0;
+
     public frame: HTMLIFrameElement = null;
     public registered: boolean = false;
     public onmessage: (topic: string, message: any) => void = null;
@@ -34,32 +36,33 @@ export class Overlay implements IPubSub {
         this.frame.src = uri;
         this.frame.allowFullscreen = true;
         this.frame.addEventListener('load', () => {
-            //setTimeout(() => {
             this.loader?.remove();
             this._isFrameLoaded = true;
             this._queue.forEach(msg => this._send(msg));
             this._queue = [];
-            //}, 1000);
-        });
+        });        
     }
 
     /**
      * Opens tab. If it doesn't exist, then adds tab to the panel.
      */
     public open(callback?: Function) {
+        this._addLoader();
         this._manager.register(this);
         this._manager.activate(this);
         this._manager.open();
 
-        if (!callback || typeof callback !== 'function') return;
-
         if (this._isFrameLoaded) {
-            callback.apply({});
+            callback?.apply({});
         } else {
+            const timeoutId = setTimeout(() => this._addSlowMessage(), OVERLAY_LOADING_TIMEOUT);
+
             const loadHandler = () => {
-                callback.apply({});
+                clearTimeout(timeoutId);
+                callback?.apply({});
                 this.frame.removeEventListener('load', loadHandler);
             }
+
             this.frame.addEventListener('load', loadHandler);
         }
     }
@@ -132,9 +135,12 @@ export class Overlay implements IPubSub {
     }
 
     private _addLoader() {
-      const loaderDiv = document.createElement('div');
-      loaderDiv.classList.add('loader-container');
-      loaderDiv.innerHTML = `
+        if (!this.loader) {
+            this.loader = document.createElement('div');
+            this.loader.classList.add('loader-container');
+        }
+
+        this.loader.innerHTML = `
           <style>
               .loader-container {
                   z-index: -1;
@@ -179,6 +185,66 @@ export class Overlay implements IPubSub {
           <div class="load-text">Loading Overlay...</div>
           <div class="load-text">Downloading from decentralized sources like Swarm or IPFS can take some time</div>
       `;
-      this.loader = loaderDiv;
+    }
+
+    private _addSlowMessage() {
+        if (!this.loader) {
+            this.loader = document.createElement('div');
+            this.loader.classList.add('loader-container');
+        }
+
+        this.loader.innerHTML = `
+          <style>
+              .loader-container {
+                  z-index: -1;
+                  position: absolute;
+                  top: calc(50vh - 88px);
+              }
+
+              .loader-container .flex {
+                  min-height: 60pt
+              }
+
+              .loader-container .loader {
+                  width: 50pt;
+                  height: 50pt;
+                  margin-left: auto;
+                  margin-right: auto;
+                  border: 5px solid #f1f1f1;
+                  border-top: 5px solid #000;
+                  border-radius: 50%;
+                  animation: spin 2s linear infinite
+              }
+
+              @keyframes spin {
+                  0% {
+                      transform: rotate(0)
+                  }
+                  100% {
+                      transform: rotate(360deg)
+                  }
+              }
+
+              .loader-container .load-text {
+                  padding-top: 15px;
+                  text-align: center;
+                  font: 14pt "Helvetica Neue", Helvetica, Arial, sans-serif;
+                  color: #000
+              }
+
+              .loader-container .load-text-desc {
+                  padding-top: 15px;
+                  text-align: center;
+                  font: 12pt "Helvetica Neue", Helvetica, Arial, sans-serif;
+                  color: #000
+              }
+          </style>
+          <div class="flex">
+              <div class="loader"></div>
+          </div>
+          <div class="load-text">Loading Overlay...</div>
+          <div class="load-text">The overlay it is taking a while to load.</div>
+          <div class="load-text-desc">If the overlay does not load, try changing your preferred overlay storage in the extension settings.</div>
+      `;
     }
 }
