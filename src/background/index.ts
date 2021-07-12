@@ -322,8 +322,8 @@ browser.runtime.onInstalled.addListener(async () => {
 // Reinject content scripts
 if (window['DAPPLETS_JSLIB'] !== true) {
   browser.tabs.query({ url: ["http://*/*", "https://*/*"] })
-    .then(foundTabs =>
-      Promise.all(foundTabs.map(x => browser.tabs.sendMessage(x.id, { "type": "CURRENT_CONTEXT_IDS" })
+    .then(foundTabs => 
+      Promise.all(foundTabs.filter(x => x.status === 'complete').map(x => browser.tabs.sendMessage(x.id, { "type": "CURRENT_CONTEXT_IDS" })
         .then(() => false)
         .catch(() => {
           browser.tabs.executeScript(x.id, { file: 'common.js' })
