@@ -478,7 +478,6 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             fluid
                             placeholder='Provider URL'
                             error={!!this.state.providerInputError || !isValidHttp(this.state.providerInput)}
-                            action
                             iconPosition='left'
                             loading={this.state.providerLoading}
                             style={{ marginBottom: '15px' }}
@@ -486,9 +485,9 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             <Icon name='server' />
                             <input
                                 value={this.state.providerInput}
+                                onBlur={() => !(this.state.providerLoading || !this.state.providerEdited || !isValidHttp(this.state.providerInput)) && this.setProvider(this.state.providerInput)}
                                 onChange={(e) => this.setState({ providerInput: e.target.value, providerInputError: null, providerEdited: true })}
                             />
-                            <Button size='mini' disabled={this.state.providerLoading || !this.state.providerEdited || !isValidHttp(this.state.providerInput)} color='blue' onClick={() => this.setProvider(this.state.providerInput)}>Save</Button>
                         </Input>
 
                         <Header as='h5'>Swarm Gateway</Header>
@@ -497,7 +496,6 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             fluid
                             placeholder='Gateway URL'
                             error={!!this.state.swarmGatewayInputError || !isValidHttp(this.state.swarmGatewayInput)}
-                            action
                             iconPosition='left'
                             loading={this.state.swarmGatewayLoading}
                             style={{ marginBottom: '15px' }}
@@ -505,9 +503,9 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             <Icon name='server' />
                             <input
                                 value={this.state.swarmGatewayInput}
+                                onBlur={() => !(this.state.swarmGatewayLoading || !this.state.swarmGatewayEdited || !isValidHttp(this.state.swarmGatewayInput)) && this.setSwarmGateway(this.state.swarmGatewayInput)}
                                 onChange={(e) => this.setState({ swarmGatewayInput: e.target.value, swarmGatewayInputError: null, swarmGatewayEdited: true })}
                             />
-                            <Button size='mini' disabled={this.state.swarmGatewayLoading || !this.state.swarmGatewayEdited || !isValidHttp(this.state.swarmGatewayInput)} color='blue' onClick={() => this.setSwarmGateway(this.state.swarmGatewayInput)}>Save</Button>
                         </Input>
 
                         {/* <Header as='h5'>Identity Contract</Header>
@@ -540,7 +538,6 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             fluid
                             placeholder='User agent name...'
                             error={!!this.state.userAgentNameInputError}
-                            action
                             iconPosition='left'
                             loading={this.state.userAgentNameLoading}
                             style={{ marginBottom: '15px' }}
@@ -548,9 +545,9 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             <Icon name='bug' />
                             <input
                                 value={this.state.userAgentNameInput}
+                                onBlur={() => !(this.state.userAgentNameLoading || !this.state.userAgentNameEdited) && this.setUserAgentName(this.state.userAgentNameInput)}
                                 onChange={(e) => this.setState({ userAgentNameInput: e.target.value, userAgentNameInputError: null, userAgentNameEdited: true })}
                             />
-                            <Button size='mini' disabled={this.state.userAgentNameLoading || !this.state.userAgentNameEdited} color='blue' onClick={() => this.setUserAgentName(this.state.userAgentNameInput)}>Save</Button>
                         </Input>
 
                         <Header as='h5'>Dynamic Adapter</Header>
@@ -559,7 +556,6 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             fluid
                             placeholder='dynamic-adapter.dapplet-base.eth#default@latest'
                             error={!!this.state.dynamicAdapterInputError}
-                            action
                             iconPosition='left'
                             loading={this.state.dynamicAdapterLoading}
                             style={{ marginBottom: '15px' }}
@@ -567,9 +563,9 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             <Icon name='plug' />
                             <input
                                 value={this.state.dynamicAdapterInput}
+                                onBlur={() => !(this.state.dynamicAdapterLoading || !this.state.dynamicAdapterEdited || !parseModuleName(this.state.dynamicAdapterInput)) && this.setDynamicAdapter(this.state.dynamicAdapterInput)}
                                 onChange={(e) => this.setState({ dynamicAdapterInput: e.target.value, dynamicAdapterInputError: null, dynamicAdapterEdited: true })}
                             />
-                            <Button size='mini' disabled={this.state.dynamicAdapterLoading || !this.state.dynamicAdapterEdited || !parseModuleName(this.state.dynamicAdapterInput)} color='blue' onClick={() => this.setDynamicAdapter(this.state.dynamicAdapterInput)}>Save</Button>
                         </Input>
 
                         <Header as='h5'>Prefered Overlay Storage</Header>

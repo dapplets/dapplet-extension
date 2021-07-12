@@ -411,7 +411,6 @@ export default class GlobalConfigService {
 
     async setEthereumProvider(url: string) {
         await this.updateConfig(c => c.providerUrl = url);
-        window.location.reload();
     }
 
     async getEthereumProvider() {
@@ -420,7 +419,6 @@ export default class GlobalConfigService {
 
     async setSwarmGateway(url: string) {
         await this.updateConfig(c => c.swarmGatewayUrl = url);
-        window.location.reload();
     }
 
     async getSwarmGateway() {
