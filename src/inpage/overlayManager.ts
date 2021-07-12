@@ -47,7 +47,7 @@ export class OverlayManager {
         const style = document.createElement('style');
         style.textContent = INNER_STYLE;
         shadow.appendChild(style);
-        
+
         const bucketBar = document.createElement("div");
         bucketBar.classList.add(OverlayBucketBarClass);
         shadow.appendChild(bucketBar);
@@ -107,33 +107,43 @@ export class OverlayManager {
         // });
         // topActions.appendChild(avatarAction);
 
-        // ToDo: fix it
-        (async () => {
-            const { getDevMode } = await initBGFunctions(browser);
-            const devMode = await getDevMode();
+        const menuAction = document.createElement("div");
+        
+        const menuButton = document.createElement("button");
+        menuButton.innerHTML = `<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="bars" class="svg-inline--fa fa-bars fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path></svg>`;
+        
+        const menuDropdown = document.createElement("div");
+        
+        const menuDappletsItem = document.createElement("div");
+        menuDappletsItem.innerText = "Dapplets";
+        menuDappletsItem.addEventListener('click', () => this.openPopup('dapplets'));
+        menuDropdown.appendChild(menuDappletsItem);
+        
+        const menuWalletsItem = document.createElement("div");
+        menuWalletsItem.innerText = "Wallets";
+        menuWalletsItem.addEventListener('click', () => this.openPopup('wallets'));
+        menuDropdown.appendChild(menuWalletsItem);
+        
+        const menuSettingsItem = document.createElement("div");
+        menuSettingsItem.innerText = "Settings";
+        menuSettingsItem.addEventListener('click', () => this.openPopup('settings'));
+        menuDropdown.appendChild(menuSettingsItem);
 
-            const menuAction = document.createElement("div");
-            menuAction.innerHTML = `
-                <button>
-                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="bars" class="svg-inline--fa fa-bars fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path></svg>
-                </button>
-                <div>
-                    <div>Dapplets</div>
-                    <div>Wallets</div>
-                    <div>Settings</div>
-                    ${(devMode) ? '<div>Developer</div>' : ''}
-                </div>
-            `;
-            menuAction.classList.add('dapplets-action-dropdown');
-            menuAction.addEventListener('click', (e) => {
-                const text = (e.target as any).innerText;
-                if (!text) return;
+        menuAction.appendChild(menuButton);
+        menuAction.appendChild(menuDropdown);
 
-                const path = text.toLowerCase();
-                this.openPopup(path);
+        menuAction.classList.add('dapplets-action-dropdown');
+        topActions.appendChild(menuAction);
+
+        initBGFunctions(browser)
+            .then(({ getDevMode }) => getDevMode())
+            .then(devMode => {
+                if (!devMode) return;
+                const menuDeveloperItem = document.createElement("div");
+                menuDeveloperItem.innerText = "Developer";
+                menuDeveloperItem.addEventListener('click', () => this.openPopup('developer'));
+                menuDropdown.appendChild(menuDeveloperItem);
             });
-            topActions.appendChild(menuAction);
-        })();
 
         const contentList = document.createElement("div");
         contentList.classList.add(ContentListClass);
