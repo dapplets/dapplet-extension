@@ -27,7 +27,7 @@ class Index extends React.Component<Props, State> {
             </a>
           </List.Item>
           <List.Item as='li'>
-            Open <a onClick={this._openExtensionsHandler} href="#">chrome://extensions</a> in a new tab
+            Open <a onClick={this._openExtensionsHandler} style={{ cursor: 'pointer' }}>chrome://extensions</a> in a new tab
           </List.Item>
           <List.Item as='li'>
             <p>Remove the previous version of the extension</p>

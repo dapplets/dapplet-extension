@@ -149,7 +149,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                                 <Card.Description>
                                     {mi.description}<br />
                                     <strong>{mi.name}#{vi.branch}@{vi.version}</strong><br />
-                                    {(owner) ? <React.Fragment>Owner: <a href='#' onClick={() => window.open(`https://rinkeby.etherscan.io/address/${owner}`, '_blank')}>{owner}</a></React.Fragment> : null}
+                                    {(owner) ? <React.Fragment>Owner: <a style={{ cursor: 'pointer' }} onClick={() => window.open(`https://rinkeby.etherscan.io/address/${owner}`, '_blank')}>{owner}</a></React.Fragment> : null}
                                 </Card.Description>
                             </Card.Content>
                         </Card>

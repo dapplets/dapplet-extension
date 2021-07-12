@@ -161,13 +161,14 @@
     border: 1px solid rgba(34, 36, 38, 0.15);
     border-radius: 4px;
 }
-.dapplets-action-dropdown > div > a {
+.dapplets-action-dropdown > div > div {
     color: black;
     padding: 10px 16px;
     text-decoration: none;
     display: block;
+    cursor: pointer;
 }
-.dapplets-action-dropdown div > a:hover {
+.dapplets-action-dropdown div > div:hover {
     background-color: rgba(0, 0, 0, 0.05);
 }
 .dapplets-action-dropdown:hover > div {

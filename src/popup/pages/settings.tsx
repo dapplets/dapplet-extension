@@ -380,7 +380,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                     <Segment loading={isLoading}>
                         <Header as='h4'>Version</Header>
                         <div>
-                            <a href='#' onClick={() => window.open(`https://github.com/dapplets/dapplet-extension/releases`, '_blank')}>
+                            <a style={{ cursor: 'pointer' }} onClick={() => window.open(`https://github.com/dapplets/dapplet-extension/releases`, '_blank')}>
                                 v{EXTENSION_VERSION}
                             </a>
                             {this.state.isUpdateAvailable ? <Icon title='New version is available' style={{ margin: '0 0 0 0.25em' }} color='orange' name='arrow up' /> : null}
