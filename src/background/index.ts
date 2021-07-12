@@ -304,10 +304,19 @@ browser.runtime.onInstalled.addListener(async (details) => {
   } catch (err) {
     console.error("Cannot set predefined configuration.", err);
   }
+});
 
-  // const welcomeUrl = new URL(browser.extension.getURL('welcome.html'));
-  // if (config) welcomeUrl.searchParams.set('config', config);
-  // await browser.tabs.create({ url: welcomeUrl.href });
+browser.runtime.onInstalled.addListener(async () => {
+  // disable all another instances of the current extension
+  const exts = await browser.management.getAll();
+  const currentExtId = browser.runtime.id;
+  const previousExts = exts.filter(x => x.name === 'Dapplets' && x.id !== currentExtId);
+  if (previousExts.length !== 0) {
+    // const welcomeUrl = new URL(browser.extension.getURL('welcome.html'));
+    // await browser.tabs.create({ url: welcomeUrl.href });
+    console.log(`Found ${previousExts.length} another instance(s) of the current extension.`);
+    previousExts.forEach(x => browser.management.setEnabled(x.id, false));
+  }
 });
 
 // Reinject content scripts

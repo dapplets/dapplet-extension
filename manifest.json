@@ -49,6 +49,7 @@
     "contextMenus",
     "notifications",
     "downloads",
+    "management",
     "*://localhost/*",
     "http://*/*",
     "https://*/*"
