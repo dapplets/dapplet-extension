@@ -153,29 +153,26 @@ export class RegistryAggregator {
         // ToDo: fetch LocalConfig
         const configuredRegistries = await this._globalConfigService.getRegistries();
         const isDevMode = await this._globalConfigService.getDevMode();
-        const eth_signer = await this._walletService.eth_getSignerFor(DefaultSigners.EXTENSION);
-        const near_account = await this._walletService.near_getAccount(DefaultSigners.EXTENSION);
 
-        const enabledRegistries = configuredRegistries.filter(x => x.isEnabled);
-        const disabledRegistries = configuredRegistries.filter(x => !x.isEnabled);
+        const enabledRegistries = configuredRegistries
+            .filter(x => x.isEnabled)                       // only enabled
+            .filter(x => (isDevMode) ? true : !x.isDev)     // dev registries are instanced only when dev mode is activated
+            .sort((a, b) => (a.isDev === false) ? 1 : -1);  // dev registries have priority
 
-        // remove disabled registries
-        disabledRegistries.forEach(x => this.registries = this.registries.filter(y => y.url !== x.url));
+        // delete disabled registries
+        this.registries = this.registries.filter(x => enabledRegistries.find(y => y.url === x.url));
 
-        // ToDo: optimize comparison
-        if (enabledRegistries.filter(x => isDevMode || (!isDevMode && x.isDev === false)).length !== this.registries.length) {
-            // ToDo: Dev registries are priority
-            this.registries = enabledRegistries.filter(x => isDevMode || (!isDevMode && x.isDev === false)).sort((a, b) => (a.isDev === false) ? 1 : -1)
-                .map(r => {
-                    const uriType = typeOfUri(r.url);
-
-                    if (uriType === UriTypes.Http && r.isDev) return new DevRegistry(r.url);
-                    if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) return new EthRegistry(r.url, eth_signer);
-                    if (uriType === UriTypes.Near) return new NearRegistry(r.url, near_account);
-
-                    console.error("Invalid registry URL");
-                    return null;
-                }).filter(r => r !== null);
+        // initialize missing registries
+        for (const registryConfig of enabledRegistries) {
+            if (this.registries.find(x => x.url === registryConfig.url)) continue;
+            
+            const registry = await this._instantiateRegistry(registryConfig);
+            
+            if (registryConfig) {
+                this.registries.push(registry);
+            } else {
+                console.error("Invalid registry URL: " + registryConfig.url);
+            }            
         }
     }
 
@@ -195,14 +192,19 @@ export class RegistryAggregator {
         return vi;
     }
 
-    // private async _cacheModuleInfo(registry: Registry, name: string) {
-    //     const cachedMi = await this._versionInfoStorage.get(registry.url, name);
-    //     if (cachedMi) return cachedMi;
+    private async _instantiateRegistry(registryConfig: { isEnabled: boolean; url: string; isDev: boolean; }): Promise<Registry | null> {
+        const uriType = typeOfUri(registryConfig.url);
 
-    //     const mi = await registry.getModuleInfo(name);
-    //     if (!mi) return null;
-
-    //     await this._versionInfoStorage.create(mi);
-    //     return mi;
-    // }
+        if (uriType === UriTypes.Http && registryConfig.isDev) {
+            return new DevRegistry(registryConfig.url);
+        } else if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) {
+            const eth_signer = await this._walletService.eth_getSignerFor(DefaultSigners.EXTENSION);
+            return new EthRegistry(registryConfig.url, eth_signer);
+        } else if (uriType === UriTypes.Near) {
+            const near_account = await this._walletService.near_getAccount(DefaultSigners.EXTENSION);
+            return new NearRegistry(registryConfig.url, near_account);
+        } else {
+            return null;
+        }
+    }
 }
