@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { SelectWallet } from "./components/selectWallet";
-//import 'semantic-ui-css/semantic.min.css';
+import '../common/semantic-ui-css/semantic.min.css';
 import './index.scss';
 import { HashRouter, Route, Switch } from "react-router-dom";
 import { Bus } from '../common/bus';

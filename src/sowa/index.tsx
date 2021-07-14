@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-//import 'semantic-ui-css/semantic.min.css'
+import '../common/semantic-ui-css/semantic.min.css';
 import './index.scss';
 import { Bus } from '../common/bus';
 import { getRenderer } from '../common/sowa';

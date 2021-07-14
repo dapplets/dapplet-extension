@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-//import 'semantic-ui-css/semantic.min.css';
+import '../common/semantic-ui-css/semantic.min.css';
 import * as tracing from '../common/tracing';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';

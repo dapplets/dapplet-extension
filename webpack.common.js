@@ -33,7 +33,8 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, "build"),
-    filename: "[name].js"
+    filename: "[name].js",
+    publicPath: ''
   },
   module: {
     rules: [
@@ -52,40 +53,30 @@ module.exports = {
       {
         include: path.resolve(__dirname, 'src'),
         test: /\.scss$/,
-        use: [
-          {
-            loader: "style-loader" // Creates style nodes from JS strings
-          },
-          {
-            loader: "css-loader" // Translates CSS into CommonJS
-          },
-          {
-            loader: "sass-loader" // Compiles Sass to CSS
-          }
-        ]
+        use: ["style-loader", "css-loader", "sass-loader"]
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader', 'resolve-url-loader'],
-        include: path.resolve(__dirname, 'src'),
+        use: ['style-loader', 'css-loader'],
+        include: [path.resolve(__dirname, 'src'), /node_modules/]
       },
       {
-        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/],
+        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/, /\.eot$/, /\.ttf$/, /\.woff$/, /\.woff2$/],
         loader: "url-loader",
-        include: path.resolve(__dirname, 'src'),
+        include: [path.resolve(__dirname, 'src'), /node_modules/],
         options: {
-          limit: 10000,
+          limit: 100000,
           name: "static/[name].[hash:8].[ext]",
         },
       },
-      {
-        test: [/\.eot$/, /\.ttf$/, /\.woff$/, /\.woff2$/],
-        loader: "file-loader",
-        include: path.resolve(__dirname, 'src'),
-        options: {
-          name: "static/[name].[hash:8].[ext]",
-        },
-      }
+      // {
+      //   test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/, /\.eot$/, /\.ttf$/, /\.woff$/, /\.woff2$/],
+      //   loader: "file-loader",
+      //   include: [path.resolve(__dirname, 'src'), /node_modules/],
+      //   options: {
+      //     name: "static/[name].[hash:8].[ext]",
+      //   },
+      // }
     ]
   },
   resolve: {

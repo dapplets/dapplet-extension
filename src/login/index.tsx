@@ -1,10 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-//import 'semantic-ui-css/semantic.min.css'
+import '../common/semantic-ui-css/semantic.min.css'
 import './index.scss';
-import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
-import { browser } from "webextension-polyfill-ts";
 import * as tracing from '../common/tracing';
 import { Bus } from '../common/bus';
 import TimeAgo from 'javascript-time-ago';
