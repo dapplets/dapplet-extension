@@ -96,7 +96,6 @@ export class WalletService {
                 }
     
                 async sendTransaction(transaction: providers.TransactionRequest): Promise<providers.TransactionResponse> {
-                    console.log('sendTransaction');
                     const signer = await me._getInternalSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet ?? await me._pairSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet;
                     return signer.sendTransaction(transaction);
                 }

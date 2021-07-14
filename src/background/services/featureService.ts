@@ -441,7 +441,7 @@ export default class FeatureService {
                 const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
                 if (!registry) return null;
                 const moduleInfo = await registry.getModuleInfoByName(moduleName);
-                await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
+                if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
                 return moduleInfo;
             }
         }                

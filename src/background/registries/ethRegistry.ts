@@ -130,7 +130,7 @@ export class EthRegistry implements Registry {
             mi.registryUrl = this.url;
             return mi;
         } catch (err) {
-            console.error(err);
+            //console.error(err);
             return null;
         }
     }
