@@ -9,7 +9,7 @@ export class SwarmModuleStorage implements ModuleStorage {
     constructor(config: { swarmGatewayUrl: string }) {
         this._gateway = config.swarmGatewayUrl;
     }
-    
+
     public async getResource(uri: string, fetchController: AbortController = new AbortController()): Promise<ArrayBuffer> {
 
         const response = await timeoutPromise(
@@ -38,13 +38,21 @@ export class SwarmModuleStorage implements ModuleStorage {
             method: 'POST',
             body: blob
         });
-    
+
+        if (!response.ok) {
+            const error = await response.json()
+                .then(x => `${x.code} ${x.message}`)
+                .catch(() => `${response.status} ${response.statusText}`);
+
+            throw new Error(error);
+        }
+
         const json = await response.json();
         if (!json.reference) throw new Error("Cannot upload file to Swarm."); // ToDo: show message
         const url = "bzz://" + json.reference;
         return url;
     }
-    
+
     public async saveDir(tarBlob: Blob): Promise<string> {
         const response = await fetch(joinUrls(this._gateway, 'dirs'), {
             method: 'POST',
@@ -53,7 +61,15 @@ export class SwarmModuleStorage implements ModuleStorage {
                 'swarm-index-document': 'index.html'
             }
         });
-    
+
+        if (!response.ok) {
+            const error = await response.json()
+                .then(x => `${x.code} ${x.message}`)
+                .catch(() => `${response.status} ${response.statusText}`);
+
+            throw new Error(error);
+        }
+
         const json = await response.json();
         if (!json.reference) throw new Error("Cannot upload file to Swarm."); // ToDo: show message
         const url = "bzz://" + json.reference;
