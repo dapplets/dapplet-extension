@@ -410,6 +410,17 @@ export default class GlobalConfigService {
     }
 
     async setEthereumProvider(url: string) {
+        if (typeOfUri(url) !== UriTypes.Http) throw new Error("URL must be a valid HTTP(S) address.");
+
+        try {
+            const body = JSON.stringify({ "jsonrpc": "2.0", "method": "eth_blockNumber", "params": [], "id": 0 });
+            const response = await fetch(url, { method: 'POST', body });
+            const json = await response.json();
+            if (!json.result) throw new Error();
+        } catch (err) {
+            throw new Error('The server returns invalid response. Make sure the server complies with the Ethereum JSON-RPC Specification.');
+        }
+
         await this.updateConfig(c => c.providerUrl = url);
     }
 
@@ -418,6 +429,16 @@ export default class GlobalConfigService {
     }
 
     async setSwarmGateway(url: string) {
+        if (typeOfUri(url) !== UriTypes.Http) throw new Error("URL must be a valid HTTP(S) address.");
+
+        try {
+            const response = await fetch(url);
+            const text = await response.text();
+            if (!text.includes('Ethereum Swarm Bee')) throw new Error();
+        } catch (err) {
+            throw new Error('The server returns invalid response. Make sure the server complies with the Swarm API Specification.');
+        }
+
         await this.updateConfig(c => c.swarmGatewayUrl = url);
     }
 

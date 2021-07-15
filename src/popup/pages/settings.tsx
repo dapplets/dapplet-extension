@@ -171,11 +171,19 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     }
 
     async setProvider(provider: string) {
-        this.setState({ providerLoading: true });
-        const { setEthereumProvider } = await initBGFunctions(browser);
-        await setEthereumProvider(provider);
-        this.loadProvider();
-        this.setState({ providerLoading: false, providerEdited: false });
+        try {
+            this.setState({ providerLoading: true });
+            const { setEthereumProvider } = await initBGFunctions(browser);
+            await setEthereumProvider(provider);
+            this.loadProvider();
+            this.setState({ providerLoading: false, providerEdited: false });
+        } catch (err) {
+            this.setState({ 
+                providerLoading: false, 
+                providerEdited: false,
+                providerInputError: err.message
+            });
+        }
     }
 
     async loadSwarmGateway() {
@@ -185,11 +193,19 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     }
 
     async setSwarmGateway(gateway: string) {
-        this.setState({ swarmGatewayLoading: true });
-        const { setSwarmGateway } = await initBGFunctions(browser);
-        await setSwarmGateway(gateway);
-        this.loadSwarmGateway();
-        this.setState({ swarmGatewayLoading: false, swarmGatewayEdited: false });
+        try {
+            this.setState({ swarmGatewayLoading: true });
+            const { setSwarmGateway } = await initBGFunctions(browser);
+            await setSwarmGateway(gateway);
+            this.loadSwarmGateway();
+            this.setState({ swarmGatewayLoading: false, swarmGatewayEdited: false });
+        } catch (err) {
+            this.setState({ 
+                swarmGatewayLoading: false, 
+                swarmGatewayEdited: false, 
+                swarmGatewayInputError: err.message
+            });
+        }
     }
 
     async setDevMode(isActive: boolean) {
@@ -480,7 +496,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             error={!!this.state.providerInputError || !isValidHttp(this.state.providerInput)}
                             iconPosition='left'
                             loading={this.state.providerLoading}
-                            style={{ marginBottom: '15px' }}
+                            // style={{ marginBottom: '15px' }}
                         >
                             <Icon name='server' />
                             <input
@@ -490,6 +506,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             />
                         </Input>
 
+                        {(this.state.providerInputError) ? <Label basic color='red' pointing>{this.state.providerInputError}</Label> : null}
+
                         <Header as='h5'>Swarm Gateway</Header>
                         <Input
                             size='mini'
@@ -498,7 +516,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             error={!!this.state.swarmGatewayInputError || !isValidHttp(this.state.swarmGatewayInput)}
                             iconPosition='left'
                             loading={this.state.swarmGatewayLoading}
-                            style={{ marginBottom: '15px' }}
+                            // style={{ marginBottom: '15px' }}
                         >
                             <Icon name='server' />
                             <input
@@ -507,6 +525,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                                 onChange={(e) => this.setState({ swarmGatewayInput: e.target.value, swarmGatewayInputError: null, swarmGatewayEdited: true })}
                             />
                         </Input>
+
+                        {(this.state.swarmGatewayInputError) ? <Label basic color='red' pointing>{this.state.swarmGatewayInputError}</Label> : null}
 
                         {/* <Header as='h5'>Identity Contract</Header>
                         <Input
@@ -527,7 +547,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                             <Button size='mini' disabled={this.state.identityLoading || !this.state.identityEdited || !isValidUrl(this.state.identityInput)} color='blue' onClick={() => this.setIdentityContract(this.state.identityInput)}>Save</Button>
                         </Input> */}
 
-                        <div><Checkbox toggle label='Developer Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /></div>
+                        <div style={{ marginTop: '15px'}}><Checkbox toggle label='Developer Mode' checked={devMode} onChange={() => this.setDevMode(!devMode)} style={{ marginBottom: 6 }} /></div>
                         <div><Checkbox toggle label='Open the popup in the overlay' checked={popupInOverlay} onChange={() => this.setPopupInOverlay(!popupInOverlay)} style={{ marginBottom: 6 }} /></div>
                         {/* <Checkbox toggle label='Modules backup' checked={autoBackup} onChange={() => this.setAutoBackup(!autoBackup)} style={{ marginBottom: 6 }} /><br /> */}
                         <div><Checkbox toggle label='Bug reports' checked={errorReporting} onChange={() => this.setErrorReporting(!errorReporting)} /></div>
