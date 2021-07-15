@@ -73,6 +73,7 @@ browser.runtime.onMessage.addListener(
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
     optimizeDependency: (name, branch, version, contextIds) => featureService.optimizeDependency(name, branch, version, contextIds),
     getAllDevModules: () => featureService.getAllDevModules(),
+    uploadModule: (mi, vi, targetStorage) => featureService.uploadModule(mi, vi, targetStorage),
     deployModule: (mi, vi, targetStorage, targetRegistry) => featureService.deployModule(mi, vi, targetStorage, targetRegistry),
     getRegistries: () => featureService.getRegistries(),
     getOwnership: (registryUri, moduleName) => featureService.getOwnership(registryUri, moduleName),

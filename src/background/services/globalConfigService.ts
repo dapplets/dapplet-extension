@@ -160,7 +160,7 @@ export default class GlobalConfigService {
     async createShareLink(profileId: string): Promise<string> {
         const bzzLink = await this.exportProfile(profileId);
         const swarmGatewayUrl = await this.getSwarmGateway();
-        const absoluteLink = joinUrls(swarmGatewayUrl, 'files/' + bzzLink.replace('bzz://', ''));
+        const absoluteLink = joinUrls(swarmGatewayUrl, 'bzz/' + bzzLink.replace('bzz://', ''));
         const shareLink = `https://github.com/dapplets/dapplet-extension/releases/latest/download/dapplet-extension.zip?config=${absoluteLink}`;
         return shareLink;
     }

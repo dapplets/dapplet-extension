@@ -142,7 +142,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                                     floated='right'
                                     size='mini'
                                     circular
-                                    src={(mi.icon && mi.icon.uris.length > 0) ? ((mi.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? joinUrls(this.state.swarmGatewayUrl, 'files/' + mi.icon.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0]) : mi.icon.uris?.[0]) : NOLOGO_PNG}
+                                    src={(mi.icon && mi.icon.uris.length > 0) ? ((mi.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? joinUrls(this.state.swarmGatewayUrl, 'bzz/' + mi.icon.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0]) : mi.icon.uris?.[0]) : NOLOGO_PNG}
                                 />
                                 <Card.Header>{mi.title}</Card.Header>
                                 <Card.Meta>{mi.type}</Card.Meta>

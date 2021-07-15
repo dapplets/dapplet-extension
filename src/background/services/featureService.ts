@@ -66,7 +66,7 @@ export default class FeatureService {
         }
 
         const activeRegistries = configRegistries.filter(x => x.isEnabled);
-        
+
         // Adding of unavailable dapplets
         for (const contextId of contextIds) {
             const config = await this._globalConfigService.getSiteConfigById(contextId);
@@ -255,7 +255,7 @@ export default class FeatureService {
                     });
                 }
             }
-        }        
+        }
 
         return modules;
     }
@@ -286,6 +286,20 @@ export default class FeatureService {
 
     // ToDo: move to another service?
     public async deployModule(mi: ModuleInfo, vi: VersionInfo, targetStorage: StorageTypes, targetRegistry: string): Promise<{ scriptUrl: string }> {
+        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry);
+        if (!registry) throw new Error("No registry with this url exists in config.");
+
+        try {
+            const scriptUrl = await this.uploadModule(mi, vi, targetStorage);
+            await registry.addModule(mi, vi); // Register manifest in Registry
+            return { scriptUrl };
+        } catch (err) {
+            console.error(err);
+            throw err;
+        }
+    }
+
+    public async uploadModule(mi: ModuleInfo, vi: VersionInfo, targetStorage: StorageTypes): Promise<string> {
         try {
             // ToDo: check everything before publishing
             if (mi.icon && !mi.icon.uris[0].endsWith('.png')) throw new Error('Type of module icon must be PNG.');
@@ -354,12 +368,7 @@ export default class FeatureService {
                 mi.icon = hashUris;
             }
 
-            // Register manifest in Registry
-            const registry = await this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry);
-            if (!registry) throw new Error("No registry with this url exists in config.");
-            await registry.addModule(mi, vi);
-
-            return { scriptUrl };
+            return scriptUrl;
         } catch (err) {
             console.error(err);
             throw err;
@@ -444,7 +453,7 @@ export default class FeatureService {
                 if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
                 return moduleInfo;
             }
-        }                
+        }
     }
 
     public async transferOwnership(registryUri: string, moduleName: string, address: string) {

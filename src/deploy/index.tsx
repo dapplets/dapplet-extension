@@ -189,6 +189,38 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         }
     }
 
+    async reuploadButtonClickHandler() {
+        this.setState({ loading: true });
+
+        const { uploadModule } = await initBGFunctions(browser);
+        const { mi, vi, targetStorage } = this.state;
+
+        try {
+            const scriptUrl = await uploadModule(mi, vi, targetStorage);
+            this.setState({
+                message: {
+                    type: 'positive',
+                    header: 'Module was reuploaded',
+                    message: [
+                        `Script URL: ${scriptUrl}`
+                    ]
+                },
+                deploymentStatus: DeploymentStatus.Deployed
+            });
+
+        } catch (err) {
+            this.setState({
+                message: {
+                    type: 'negative',
+                    header: 'Publication error',
+                    message: [err.message]
+                }
+            });
+        } finally {
+            this.setState({ loading: false });
+        }
+    }
+
     async pairWallet() {
         const { pairWalletViaOverlay } = await initBGFunctions(browser);
         await pairWalletViaOverlay(this.state.targetChain);
@@ -296,7 +328,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             floated='right'
                             size='mini'
                             circular
-                            src={(mi.icon && mi.icon.uris.length > 0) ? ((mi.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? joinUrls(this.state.swarmGatewayUrl, 'files/' + mi.icon.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0]) : mi.icon.uris?.[0]) : NOLOGO_PNG}
+                            src={(mi.icon && mi.icon.uris.length > 0) ? ((mi.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? joinUrls(this.state.swarmGatewayUrl, 'bzz/' + mi.icon.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0]) : mi.icon.uris?.[0]) : NOLOGO_PNG}
                         />
                         <Card.Header>{mi.title}</Card.Header>
                         <Card.Meta>{mi.type}</Card.Meta>
@@ -406,6 +438,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     />
 
                     <Button primary disabled={isButtonDisabled} onClick={() => this.deployButtonClickHandler()}>Deploy</Button>
+                    <Button disabled={!isAlreadyDeployed} onClick={() => this.reuploadButtonClickHandler()}>Reupload</Button>
                 </Form>
             </React.Fragment>
         );

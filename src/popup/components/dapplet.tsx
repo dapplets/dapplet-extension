@@ -59,7 +59,7 @@ export class Dapplet extends React.Component<Props, State> {
                 src={
                   f.icon
                     ? f.icon?.uris?.[0]?.indexOf("bzz:/") !== -1
-                      ? joinUrls(this.props.swarmGatewayUrl, "files/" +
+                      ? joinUrls(this.props.swarmGatewayUrl, "bzz/" +
                         f.icon?.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0])
                       : f.icon?.uris?.[0]
                     : null

@@ -14,7 +14,7 @@ export class SwarmModuleStorage implements ModuleStorage {
 
         const response = await timeoutPromise(
             this.timeout,
-            fetch(joinUrls(this._gateway, "files/" + this._extractReference(uri)), { signal: fetchController.signal }),
+            fetch(joinUrls(this._gateway, "bzz/" + this._extractReference(uri)), { signal: fetchController.signal }),
             () => fetchController.abort()
         );
 
@@ -34,7 +34,7 @@ export class SwarmModuleStorage implements ModuleStorage {
     }
 
     public async save(blob: Blob) {
-        const response = await fetch(joinUrls(this._gateway, 'files'), {
+        const response = await fetch(joinUrls(this._gateway, 'bzz'), {
             method: 'POST',
             body: blob
         });
