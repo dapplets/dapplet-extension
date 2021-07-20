@@ -46,11 +46,12 @@ export class SwarmModuleStorage implements ModuleStorage {
     }
     
     public async saveDir(tarBlob: Blob): Promise<string> {
-        const response = await fetch(joinUrls(this._gateway, 'dirs'), {
+        const response = await fetch(joinUrls(this._gateway, 'bzz'), {
             method: 'POST',
             body: tarBlob,
             headers: {
-                'swarm-index-document': 'index.html'
+                'swarm-index-document': 'index.html',
+                'swarm-collection': 'true'
             }
         });
     
