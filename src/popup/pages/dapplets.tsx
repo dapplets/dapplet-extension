@@ -61,10 +61,19 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     const swarmGatewayUrl = await getSwarmGateway();
 
     const registries = await getRegistries();
-    const regsWithErrors = registries.filter(r => !!r.error).length;
-    if (regsWithErrors > 0) {
+    const regsWithErrors = registries.filter(r => !r.isDev && !!r.isEnabled && !!r.error);
+    if (regsWithErrors.length > 0) {
+      const isProviderProblems = regsWithErrors.filter(({ error }) => 
+        error.includes('missing response') ||
+        error.includes('could not detect network')
+      ).length > 0;
+
+      const description = isProviderProblems ? 
+        'It looks like the blockchain provider is not available. Check provider addresses in the settings, or try again later.' :
+        'Please check the settings.';
+
       this.setState({
-        error: `There are registries with connection problems. Please check the settings.`
+        error: `Cannot connect to the Dapplet Registry (${regsWithErrors.map(x => x.url).join(', ')}).\n${description}`
       });
     }
 
@@ -207,6 +216,8 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
       <React.Fragment>
         <div className={(this.props.isOverlay) ? undefined : "internalTabColumn"}>
           <DevMessage style={{ marginBottom: '10px' }} isOverlay={this.props.isOverlay} />
+
+          {(error) ? <Message error content={error.split('\n').map(x => <>{x}<br/></>)} /> : null}
 
           {(!isLoading) ? <Input
             fluid
