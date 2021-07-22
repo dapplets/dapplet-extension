@@ -130,6 +130,8 @@ browser.runtime.onMessage.addListener(
     setLastMessageSeenTimestamp: globalConfigService.setLastMessageSeenTimestamp.bind(globalConfigService),
     getPreferedOverlayStorage: globalConfigService.getPreferedOverlayStorage.bind(globalConfigService),
     setPreferedOverlayStorage: globalConfigService.setPreferedOverlayStorage.bind(globalConfigService),
+    getSwarmPostageStampId: globalConfigService.getSwarmPostageStampId.bind(globalConfigService),
+    setSwarmPostageStampId: globalConfigService.setSwarmPostageStampId.bind(globalConfigService),
 
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),

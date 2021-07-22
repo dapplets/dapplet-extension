@@ -34,3 +34,7 @@ export const isValidHttp = (url: string) => {
 
     return true;
 }
+
+export const isValidPostageStampId = (id: string) => {
+    return /^[0-9a-f]{64}$/gm.test(id);
+}

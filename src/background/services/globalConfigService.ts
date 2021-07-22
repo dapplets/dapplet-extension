@@ -42,6 +42,7 @@ export default class GlobalConfigService {
 
         if (config) {
             if (!config.swarmGatewayUrl) config.swarmGatewayUrl = this.getInitialConfig().swarmGatewayUrl;
+            if (!config.swarmPostageStampId) config.swarmPostageStampId = this.getInitialConfig().swarmPostageStampId;
             if (!config.preferedOverlayStorage) config.preferedOverlayStorage = this.getInitialConfig().preferedOverlayStorage;
         }
 
@@ -118,7 +119,8 @@ export default class GlobalConfigService {
 
     async importProfile(url: string, makeActive = false): Promise<string> {
         const swarmGatewayUrl = await this.getSwarmGateway();
-        const swarmStorage = new SwarmModuleStorage({ swarmGatewayUrl });
+        const swarmPostageStampId = await this.getSwarmPostageStampId();
+        const swarmStorage = new SwarmModuleStorage({ swarmGatewayUrl, swarmPostageStampId });
         const arr = await swarmStorage.getResource(url);
         const json = new TextDecoder("utf-8").decode(new Uint8Array(arr));
         const config = JSON.parse(json);
@@ -152,7 +154,8 @@ export default class GlobalConfigService {
         const json = JSON.stringify(exportedConfig);
         const blob = new Blob([json], { type: "application/json" });
         const swarmGatewayUrl = await this.getSwarmGateway();
-        const swarmStorage = new SwarmModuleStorage({ swarmGatewayUrl });
+        const swarmPostageStampId = await this.getSwarmPostageStampId();
+        const swarmStorage = new SwarmModuleStorage({ swarmGatewayUrl, swarmPostageStampId });
         const url = await swarmStorage.save(blob);
         return url;
     }
@@ -197,6 +200,7 @@ export default class GlobalConfigService {
         config.hostnames = {};
         config.dynamicAdapter = 'dynamic-adapter.dapplet-base.eth#default@latest';
         config.preferedOverlayStorage = 'centralized';
+        config.swarmPostageStampId = '59b7a1ef40a1b3143e9e80e7eb90175b83996fcf86f13480dbe0e21a732572e9';
 
         return config;
     }
@@ -535,5 +539,13 @@ export default class GlobalConfigService {
 
     async setPreferedOverlayStorage(storage: string) {
         return this.updateConfig(c => c.preferedOverlayStorage = storage);
+    }
+
+    async getSwarmPostageStampId() {
+        return this.get().then(x => x.swarmPostageStampId);
+    }
+
+    async setSwarmPostageStampId(postageStampId: string) {
+        return this.updateConfig(c => c.swarmPostageStampId = postageStampId);
     }
 }

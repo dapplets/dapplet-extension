@@ -59,4 +59,6 @@ export class GlobalConfig extends Base {
     dynamicAdapter: string = null;
 
     preferedOverlayStorage: string = null;
+
+    swarmPostageStampId: string = null;
 }

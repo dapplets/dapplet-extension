@@ -117,33 +117,33 @@ export class StorageAggregator {
     }
 
     private async _getStorageByProtocol(protocol: string): Promise<Storage> {
-        const swarmGatewayUrl = await this._globalConfigService.getSwarmGateway();
-
         switch (protocol) {
             case "http":
             case "https":
                 return new HttpModuleStorage();
             case "bzz":
-                return new SwarmModuleStorage({ swarmGatewayUrl });
+                const swarmGatewayUrl = await this._globalConfigService.getSwarmGateway();
+                const swarmPostageStampId = await this._globalConfigService.getSwarmPostageStampId();
+                return new SwarmModuleStorage({ swarmGatewayUrl, swarmPostageStampId });
             default:
                 throw new Error("Unsupported protocol");
         }
     }
 
     private async _getStorageByType(type: StorageTypes): Promise<Storage> {
-        const swarmGatewayUrl = await this._globalConfigService.getSwarmGateway();
-
         switch (type) {
             // case StorageTypes.TestRegsitry:
             //     return new HttpModuleStorage();
             case StorageTypes.Swarm:
-                return new SwarmModuleStorage({ swarmGatewayUrl });
+                const swarmGatewayUrl = await this._globalConfigService.getSwarmGateway();
+                const swarmPostageStampId = await this._globalConfigService.getSwarmPostageStampId();
+                return new SwarmModuleStorage({ swarmGatewayUrl, swarmPostageStampId });
             default:
                 throw new Error("Unsupported storage type");
         }
     }
 
-    private async _tarify(files: {url: string, arr: ArrayBuffer}[]): Promise<Blob> {
+    private async _tarify(files: { url: string, arr: ArrayBuffer }[]): Promise<Blob> {
         const tar = new Tar();
         for (const file of files) {
             const path = (file.url[0] === '/') ? file.url.slice(1) : file.url;

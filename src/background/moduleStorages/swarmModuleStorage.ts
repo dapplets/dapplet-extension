@@ -4,10 +4,12 @@ import { timeoutPromise, joinUrls } from '../../common/helpers';
 export class SwarmModuleStorage implements ModuleStorage {
 
     private _gateway: string;
+    private _swarmPostageStampId: string;
     public timeout = 5000;
 
-    constructor(config: { swarmGatewayUrl: string }) {
+    constructor(config: { swarmGatewayUrl: string, swarmPostageStampId: string }) {
         this._gateway = config.swarmGatewayUrl;
+        this._swarmPostageStampId = config.swarmPostageStampId;
     }
 
     public async getResource(uri: string, fetchController: AbortController = new AbortController()): Promise<ArrayBuffer> {
@@ -36,7 +38,11 @@ export class SwarmModuleStorage implements ModuleStorage {
     public async save(blob: Blob) {
         const response = await fetch(joinUrls(this._gateway, 'bzz'), {
             method: 'POST',
-            body: blob
+            body: blob,
+            headers: {
+                'swarm-collection': 'false',
+                'swarm-postage-batch-id': this._swarmPostageStampId
+            }
         });
 
         if (!response.ok) {
@@ -59,7 +65,8 @@ export class SwarmModuleStorage implements ModuleStorage {
             body: tarBlob,
             headers: {
                 'swarm-index-document': 'index.html',
-                'swarm-collection': 'true'
+                'swarm-collection': 'true',
+                'swarm-postage-batch-id': this._swarmPostageStampId
             }
         });
 

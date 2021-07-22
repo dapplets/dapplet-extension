@@ -2,7 +2,7 @@ import * as React from "react";
 import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Popup, Segment, List, Label, Input, Checkbox, Icon, Header, Button, Dropdown, Form, Divider, Menu } from "semantic-ui-react";
-import { isValidHttp, isValidUrl } from '../helpers';
+import { isValidHttp, isValidUrl, isValidPostageStampId } from '../helpers';
 import { parseModuleName, typeOfUri, UriTypes } from '../../common/helpers';
 import { ProfileDropdown } from "../components/ProfileDropdown";
 
@@ -36,6 +36,11 @@ interface ISettingsState {
     swarmGatewayInputError: string;
     swarmGatewayLoading: boolean;
     swarmGatewayEdited: boolean;
+    
+    swarmPostageStampIdInput: string;
+    swarmPostageStampIdInputError: string;
+    swarmPostageStampIdLoading: boolean;
+    swarmPostageStampIdEdited: boolean;
 
     identityInput: string;
     identityInputError: string;
@@ -88,6 +93,10 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             swarmGatewayInputError: null,
             swarmGatewayLoading: false,
             swarmGatewayEdited: false,
+            swarmPostageStampIdInput: '',
+            swarmPostageStampIdInputError: null,
+            swarmPostageStampIdLoading: false,
+            swarmPostageStampIdEdited: false,
             identityInput: '',
             identityInputError: null,
             identityLoading: false,
@@ -124,6 +133,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             this.checkUpdates(),
             this.loadProvider(),
             this.loadSwarmGateway(),
+            this.loadSwarmPostageStampId(),
             this.loadIdentityContract(),
             this.loadUserAgentId(),
             this.loadUserAgentName(),
@@ -204,6 +214,28 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                 swarmGatewayLoading: false, 
                 swarmGatewayEdited: false, 
                 swarmGatewayInputError: err.message
+            });
+        }
+    }
+
+    async loadSwarmPostageStampId() {
+        const { getSwarmPostageStampId } = await initBGFunctions(browser);
+        const id = await getSwarmPostageStampId();
+        this.setState({ swarmPostageStampIdInput: id });
+    }
+
+    async setSwarmPostageStampId(id: string) {
+        try {
+            this.setState({ swarmPostageStampIdLoading: true });
+            const { setSwarmPostageStampId } = await initBGFunctions(browser);
+            await setSwarmPostageStampId(id);
+            this.loadSwarmPostageStampId();
+            this.setState({ swarmPostageStampIdLoading: false, swarmPostageStampIdEdited: false });
+        } catch (err) {
+            this.setState({ 
+                swarmPostageStampIdLoading: false, 
+                swarmPostageStampIdEdited: false, 
+                swarmPostageStampIdInputError: err.message
             });
         }
     }
@@ -527,6 +559,26 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                         </Input>
 
                         {(this.state.swarmGatewayInputError) ? <Label basic color='red' pointing>{this.state.swarmGatewayInputError}</Label> : null}
+
+                        <Header as='h5'>Swarm Postage Stamp ID</Header>
+                        <Input
+                            size='mini'
+                            fluid
+                            placeholder='Postage Stamp ID'
+                            error={!!this.state.swarmPostageStampIdInputError || !isValidPostageStampId(this.state.swarmPostageStampIdInput)}
+                            iconPosition='left'
+                            loading={this.state.swarmPostageStampIdLoading}
+                            // style={{ marginBottom: '15px' }}
+                        >
+                            <Icon name='server' />
+                            <input
+                                value={this.state.swarmPostageStampIdInput}
+                                onBlur={() => !(this.state.swarmPostageStampIdLoading || !this.state.swarmPostageStampIdEdited || !isValidPostageStampId(this.state.swarmPostageStampIdInput)) && this.setSwarmPostageStampId(this.state.swarmPostageStampIdInput)}
+                                onChange={(e) => this.setState({ swarmPostageStampIdInput: e.target.value, swarmPostageStampIdInputError: null, swarmPostageStampIdEdited: true })}
+                            />
+                        </Input>
+
+                        {(this.state.swarmPostageStampIdInputError) ? <Label basic color='red' pointing>{this.state.swarmPostageStampIdInputError}</Label> : null}
 
                         {/* <Header as='h5'>Identity Contract</Header>
                         <Input
