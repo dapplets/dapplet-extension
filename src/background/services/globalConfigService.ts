@@ -173,8 +173,8 @@ export default class GlobalConfigService {
         config.id = this._defaultConfigId;
         config.isActive = true;
         config.registries = [
-            { url: "dapplet-base.eth", isDev: false, isEnabled: true },
-            { url: "dev-1619784199964-4356216", isDev: false, isEnabled: false },
+            { url: "registry.dapplet-base.eth", isDev: false, isEnabled: true },
+            { url: "dev-1627024020035-70641704943070", isDev: false, isEnabled: false },
             { url: "https://localhost:8080/index.json", isDev: true, isEnabled: false },
             { url: "https://localhost:3001/dapplet.json", isDev: true, isEnabled: false },
             { url: "https://localhost:3002/dapplet.json", isDev: true, isEnabled: false },
@@ -189,7 +189,7 @@ export default class GlobalConfigService {
         ];
         config.userSettings = {};
         config.providerUrl = 'https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c';
-        config.swarmGatewayUrl = 'https://swarm.dapplets.org/';
+        config.swarmGatewayUrl = 'https://bee.dapplets.org/';
         config.walletsUsage = {};
         config.identityContract = '0xf6b3a0B20281796D465bB8613e233BE30be07084';
         config.popupInOverlay = false;
