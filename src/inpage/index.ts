@@ -7,7 +7,7 @@ import { IframeMessenger } from './iframeMessenger';
 import { OverlayManagerIframe } from './overlay/iframe/overlayManager';
 import { OverlayManager } from './overlay/root/overlayManager';
 import { IOverlay } from './overlay/interfaces';
-import { assertFullfilled } from '../common/helpers';
+import { assertFullfilled, timeoutPromise } from '../common/helpers';
 
 // do not inject to overlays frames
 if (window.name !== 'dapplet-overlay') {
@@ -23,7 +23,7 @@ if (window.name !== 'dapplet-overlay') {
 
     const getAllContextIds = async (): Promise<string[]> => {
         const contextIDs = [...injector.availableContextIds];
-        const frameResults = await Promise.allSettled((Array.from(window.frames).map(x => iframeMessenger.call('CURRENT_CONTEXT_IDS', [], x))));
+        const frameResults = await Promise.allSettled((Array.from(window.frames).map(x => timeoutPromise(300, iframeMessenger.call('CURRENT_CONTEXT_IDS', [], x)))));
         frameResults.filter(assertFullfilled).forEach(x => contextIDs.push(...x.value));
         return Array.from(new Set(contextIDs)); // deduplicate array
     };
