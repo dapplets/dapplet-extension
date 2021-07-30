@@ -45,14 +45,3 @@ $/
 
 * **Dmitry Palchun** - *Initial work* - [ethernian](https://github.com/ethernian)
 * **Alexander Sakhaev** - *Initial work* - [alsakhaev](https://github.com/alsakhaev)
-
-## Screenshots
-
-### Features List
-
-![](docs/images/ext-screenshot-features.png)
-
-### Development Mode
-
-![](docs/images/ext-screenshot-dev.png)
-
