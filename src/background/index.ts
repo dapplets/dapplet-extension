@@ -242,6 +242,8 @@ browser.runtime.onMessage.addListener((message, sender) => {
           order: m.order,
           contextIds: m.hostnames  // ToDo: remove this map after renaming of hostnames to contextIds
         }))
+      }, {
+        frameId: sender.frameId
       });
     });
   }
@@ -325,14 +327,17 @@ browser.runtime.onInstalled.addListener(async () => {
 // Reinject content scripts
 if (window['DAPPLETS_JSLIB'] !== true) {
   browser.tabs.query({ url: ["http://*/*", "https://*/*"] })
-    .then(foundTabs => 
-      Promise.all(foundTabs.filter(x => x.status === 'complete').map(x => browser.tabs.sendMessage(x.id, { "type": "CURRENT_CONTEXT_IDS" })
-        .then(() => false)
-        .catch(() => {
-          browser.tabs.executeScript(x.id, { file: 'common.js' })
-            .then(() => browser.tabs.executeScript(x.id, { file: 'inpage.js' }))
-          return true;
-        })))
+    .then(x => x.filter(x => x.status === 'complete'))
+    .then(foundTabs =>
+      Promise.all(
+        foundTabs.map(x => browser.tabs.sendMessage(x.id, { "type": "CURRENT_CONTEXT_IDS" })
+          .then(() => false)
+          .catch((e) => {
+            browser.tabs.executeScript(x.id, { file: 'common.js' })
+              .then(() => browser.tabs.executeScript(x.id, { file: 'inpage.js' }))
+            return true;
+          }))
+      )
     )
     .then(x => {
       const reinjectedNumber = x.filter(x => !!x).length;

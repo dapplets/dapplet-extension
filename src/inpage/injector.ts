@@ -1,10 +1,9 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import Core from './core';
 import { maxSatisfying, valid } from 'semver';
-import { SubscribeOptions } from './overlay';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
 import { browser } from "webextension-polyfill-ts";
-import { IResolver, IContentAdapter, IFeature } from './types';
+import { IResolver, IContentAdapter } from './types';
 import { areModulesEqual, joinUrls } from "../common/helpers";
 import VersionInfo from "../background/models/versionInfo";
 import { AppStorage } from "./appStorage";
@@ -45,9 +44,9 @@ export class Injector {
 
         const { getModulesWithDeps } = await initBGFunctions(browser);
         const loadedModules: { manifest: VersionInfo, script: string, defaultConfig?: DefaultConfig, schemaConfig?: SchemaConfig }[] = await getModulesWithDeps(modules);
-        modules.forEach(a => !loadedModules.find(b => 
-            a.name === b.manifest.name 
-            && (!a.branch || a.branch === b.manifest.branch) 
+        modules.forEach(a => !loadedModules.find(b =>
+            a.name === b.manifest.name
+            && (!a.branch || a.branch === b.manifest.branch)
             && (!a.version || a.version === 'latest' || a.version === b.manifest.version)
         ) && console.log(`[DAPPLETS]: Loading of module ${a.name}#${a.branch}@${a.version} was skipped.`));
 
@@ -205,7 +204,7 @@ export class Injector {
                     if (cfg.name) {
                         const overlay = manifest.overlays?.[cfg.name];
                         if (!overlay) throw new Error(`Cannot find overlay with name "${cfg.name}" in the manifest.`);
-                        
+
                         const url = new URL(overlay.uris[0]);
 
                         if (preferedOverlayStorage === 'centralized' && overlay.hash) {
@@ -269,7 +268,7 @@ export class Injector {
                 return (target: any | { constructor: any }, propertyOrMethodName: string | undefined, parameterIndex: number | undefined) => {
                     // ToDo: check module_name with manifest
                     // ToDo: add module source to error description
-                    
+
                     // ContructorDecorator: class, undefined, parameterIndex
                     // PropertyDecorator: class(obj), property_name, undefined
                     // ParameterDecorator: class(obj), method_name, parameterIndex
@@ -295,21 +294,21 @@ export class Injector {
 
                         const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
                         currentModule.constructorDependencies[parameterIndex] = name;
-                    } 
+                    }
                     // Class Property Decorator
                     else if (parameterIndex === undefined) {
-                      return {
-                        get: () => {
-                            const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
-                            if (!currentModule.instancedPropertyDependencies[name]) {
-                                const depModule = this._getDependency(manifest, name);
-                                const instancedModule = this._proxifyModule(depModule, currentModule);
-                                currentModule.instancedPropertyDependencies[name] = instancedModule;
+                        return {
+                            get: () => {
+                                const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
+                                if (!currentModule.instancedPropertyDependencies[name]) {
+                                    const depModule = this._getDependency(manifest, name);
+                                    const instancedModule = this._proxifyModule(depModule, currentModule);
+                                    currentModule.instancedPropertyDependencies[name] = instancedModule;
+                                }
+                                return currentModule.instancedPropertyDependencies[name];
                             }
-                            return currentModule.instancedPropertyDependencies[name];
                         }
-                      }
-                    } 
+                    }
                     // Method Parameter Decorator
                     else if (propertyOrMethodName === 'activate') {
                         if (!this.registry.find(m => areModulesEqual(m.manifest, manifest))) {
@@ -331,7 +330,7 @@ export class Injector {
 
                         const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
                         currentModule.activateMethodsDependencies[parameterIndex] = name;
-                    } 
+                    }
                     // Invalid Decorator
                     else {
                         console.error("Invalid decorator. Inject() decorator can be applied on constructor's parameters, class properties, activate() method's parameters only.");
@@ -340,8 +339,8 @@ export class Injector {
             }
 
             try {
-                const execScript = new Function('Core', 'SubscribeOptions', 'Inject', 'Injectable', script);
-                execScript(coreWrapper, SubscribeOptions, injectDecorator, injectableDecorator);
+                const execScript = new Function('Core', 'Inject', 'Injectable', script);
+                execScript(coreWrapper, injectDecorator, injectableDecorator);
             } catch (err) {
                 // ToDo: remove module from this.registry
                 console.error(err);
@@ -443,7 +442,7 @@ export class Injector {
                             } else {
                                 Reflect.get(target, cfgsKey).push(cfg);
                             }
-                            
+
                             return target.attachConfig(cfg);
                         }
                     } if (prop === 'detachConfig') {

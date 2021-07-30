@@ -1,8 +1,10 @@
 import { browser } from 'webextension-polyfill-ts';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { capitalizeFirstLetter } from '../common/helpers';
+import { capitalizeFirstLetter } from '../../../common/helpers';
 import { Overlay } from './overlay';
 import INNER_STYLE from '!raw-loader!./overlay.css';
+import { IOverlayManager } from '../interfaces';
+import { IframeMessenger } from '../../iframeMessenger';
 
 const PageNavClass = 'dapplets-overlay-nav';
 const TopPanelClass = 'dapplets-overlay-nav-top-panel';
@@ -23,7 +25,7 @@ const OverlayToolbarClass = 'dapplets-overlay-toolbar';
 const OverlayFrameButtonClass = 'dapplets-overlay-frame-button';
 const OverlayFrameButtonSidebarToggleClass = 'dapplets-overlay-frame-button-sidebar-toggle';
 
-export class OverlayManager {
+export class OverlayManager implements IOverlayManager {
     private _panel: HTMLElement = null;
     private _tabList: HTMLDivElement = null;
     private _contentList: HTMLDivElement = null;
@@ -35,7 +37,7 @@ export class OverlayManager {
         contentItem: HTMLDivElement
     }[] = [];
 
-    constructor() {
+    constructor(private _iframeMessenger: IframeMessenger) {
         // Side panel
         const panel = document.createElement(DappletsOverlayManagerClass);
         panel.classList.add(OverlayFrameClass, CollapsedOverlayClass, HiddenOverlayClass);
@@ -101,29 +103,29 @@ export class OverlayManager {
         // avatarAction.addEventListener('click', (e) => {
         //     if ((e.target as any).innerText === 'Account Groups') {
         //         const url = browser.extension.getURL('identity.html');
-        //         this._identityOverlay = this._identityOverlay ?? new Overlay(this, url, 'Identity');
+        //         this._identityOverlay = this._identityOverlay ?? this.createNewOverlay(url, 'Identity');
         //         this._identityOverlay.open();
         //     }
         // });
         // topActions.appendChild(avatarAction);
 
         const menuAction = document.createElement("div");
-        
+
         const menuButton = document.createElement("button");
         menuButton.innerHTML = `<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="bars" class="svg-inline--fa fa-bars fa-w-14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path></svg>`;
-        
+
         const menuDropdown = document.createElement("div");
-        
+
         const menuDappletsItem = document.createElement("div");
         menuDappletsItem.innerText = "Dapplets";
         menuDappletsItem.addEventListener('click', () => this.openPopup('dapplets'));
         menuDropdown.appendChild(menuDappletsItem);
-        
+
         const menuWalletsItem = document.createElement("div");
         menuWalletsItem.innerText = "Wallets";
         menuWalletsItem.addEventListener('click', () => this.openPopup('wallets'));
         menuDropdown.appendChild(menuWalletsItem);
-        
+
         const menuSettingsItem = document.createElement("div");
         menuSettingsItem.innerText = "Settings";
         menuSettingsItem.addEventListener('click', () => this.openPopup('settings'));
@@ -185,6 +187,7 @@ export class OverlayManager {
 
     public register(overlay: Overlay) {
         overlay.registered = true;
+        overlay.onregisteredchange?.(true);
         if (this._tabsRegistry.filter(t => t.overlay === overlay).length > 0) return;
 
         const contentItem = document.createElement('div');
@@ -240,6 +243,7 @@ export class OverlayManager {
 
     public unregister(overlay: Overlay) {
         overlay.registered = false;
+        overlay.onregisteredchange?.(false);
         overlay.onclose?.();
         const tab = this._tabsRegistry.filter(t => t.overlay === overlay)[0];
         if (!tab) return;
@@ -297,7 +301,7 @@ export class OverlayManager {
     public openPopup(path: string) {
         const url = browser.extension.getURL('popup.html') + `#/${path}`;
         const overlays = this.getOverlays();
-        const overlay = overlays.find(x => x.uri === url) ?? new Overlay(this, url, capitalizeFirstLetter(path));
+        const overlay = overlays.find(x => x.uri === url) ?? this.createOverlay(url, capitalizeFirstLetter(path));
         overlay.send('changeTab', [path]);
         this.activate(overlay);
         this.show();
@@ -307,5 +311,10 @@ export class OverlayManager {
     public destroy() {
         this.unregisterAll();
         this._panel.remove();
+    }
+
+    public createOverlay(uri: string, title: string, hidden: boolean = false): Overlay {
+        const overlay = new Overlay(this, uri, title, hidden);
+        return overlay;
     }
 }

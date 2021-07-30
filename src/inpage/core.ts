@@ -1,11 +1,10 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { Overlay } from "./overlay";
+import { IOverlay, IOverlayManager } from "./overlay/interfaces";
 import { Swiper } from "./swiper";
 import { AutoProperties, EventDef, Connection } from "./connection";
 import { WsJsonRpc } from "./wsJsonRpc";
-import { OverlayManager } from "./overlayManager";
 import { AppStorage } from "./appStorage";
 import * as ethers from "ethers";
 import { ProxySigner } from "./proxySigner";
@@ -28,60 +27,61 @@ type ContentDetector = {
 }
 
 export default class Core {
-    public overlayManager = new OverlayManager();
-    private _popupOverlay: Overlay = null;
+    private _popupOverlay: IOverlay = null;
 
-    constructor() {
-        const closeOverlay = () => {
-            if (this._popupOverlay == null) {
-                this._togglePopupOverlay()
-            } else {
-                this._popupOverlay.open()
+    constructor(isIframe: boolean, public overlayManager: IOverlayManager) {
+        if (!isIframe) {
+            const closeOverlay = () => {
+                if (this._popupOverlay == null) {
+                    this._togglePopupOverlay()
+                } else {
+                    this._popupOverlay.open()
+                }
             }
+
+            browser.runtime.onMessage.addListener((message, sender) => {
+                if (typeof message === 'string') {
+                    if (message === "TOGGLE_OVERLAY") {
+                        this._togglePopupOverlay();
+                    } else if (message === "OPEN_OVERLAY") { // used by pure jslib
+                        closeOverlay();
+                    } else if (message === "CLOSE_OVERLAY") { // used by pure jslib
+                        this.overlayManager && this.overlayManager.unregisterAll();
+                    }
+                } else if (typeof message === 'object' && message.type !== undefined) {
+                    if (message.type === 'OPEN_DEPLOY_OVERLAY') {
+                        return this.waitDeployOverlay(message.payload);
+                    } else if (message.type === 'APPROVE_SOWA_TRANSACTION') {
+                        return this._approveSowaTransaction(message.payload.sowaId, message.payload.metadata).then(() => ([null, 'approved'])).catch(() => (['error']));
+                    } else if (message.type === 'OPEN_SETTINGS_OVERLAY') {
+                        return this.waitSettingsOverlay(message.payload);
+                    } else if (message.type === 'OPEN_GUIDE_OVERLAY') {
+                        return this.waitGuideOverlay(message.payload);
+                    } else if (message.type === 'OPEN_PAIRING_OVERLAY') {
+                        return this.waitPairingOverlay(message.payload.topic, message.payload.args).then(() => ([null, 'ready'])).catch(() => (['error']));
+                    } else if (message.type === 'OPEN_LOGIN_OVERLAY') {
+                        return this.waitLoginOverlay(message.payload.topic, message.payload.args).then(() => ([null, 'ready'])).catch((err) => ([err]));
+                    } else if (message.type === 'OPEN_POPUP_OVERLAY') {
+                        return Promise.resolve(this.overlayManager.openPopup(message.payload.path));
+                    }
+                }
+            });
+
+            // API for context web pages
+            window.addEventListener('message', ({ data }) => {
+                if (typeof data === 'object' && data.type !== undefined) {
+                    if (data.type === 'OPEN_POPUP_OVERLAY') {
+                        return Promise.resolve(this.overlayManager.openPopup(data.payload.path));
+                    } else if (data.type === 'CLOSE_OVERLAY') {
+                        this.overlayManager && this.overlayManager.unregisterAll();
+                    }
+                }
+            });
+
+            const swiper = new Swiper(document.body);
+            swiper.on("left", () => closeOverlay());
+            swiper.on("right", () => this.overlayManager.close());
         }
-
-        browser.runtime.onMessage.addListener((message, sender) => {
-            if (typeof message === 'string') {
-                if (message === "TOGGLE_OVERLAY") {
-                    this._togglePopupOverlay();
-                } else if (message === "OPEN_OVERLAY") { // used by pure jslib
-                    closeOverlay();
-                } else if (message === "CLOSE_OVERLAY") { // used by pure jslib
-                    this.overlayManager && this.overlayManager.unregisterAll();
-                }
-            } else if (typeof message === 'object' && message.type !== undefined) {
-                if (message.type === 'OPEN_DEPLOY_OVERLAY') {
-                    return this.waitDeployOverlay(message.payload);
-                } else if (message.type === 'APPROVE_SOWA_TRANSACTION') {
-                    return this._approveSowaTransaction(message.payload.sowaId, message.payload.metadata).then(() => ([null, 'approved'])).catch(() => (['error']));
-                } else if (message.type === 'OPEN_SETTINGS_OVERLAY') {
-                    return this.waitSettingsOverlay(message.payload);
-                } else if (message.type === 'OPEN_GUIDE_OVERLAY') {
-                    return this.waitGuideOverlay(message.payload);
-                } else if (message.type === 'OPEN_PAIRING_OVERLAY') {
-                    return this.waitPairingOverlay(message.payload.topic, message.payload.args).then(() => ([null, 'ready'])).catch(() => (['error']));
-                } else if (message.type === 'OPEN_LOGIN_OVERLAY') {
-                    return this.waitLoginOverlay(message.payload.topic, message.payload.args).then(() => ([null, 'ready'])).catch((err) => ([err]));
-                } else if (message.type === 'OPEN_POPUP_OVERLAY') {
-                    return Promise.resolve(this.overlayManager.openPopup(message.payload.path));
-                }
-            }
-        });
-
-        // API for context web pages
-        window.addEventListener('message', ({ data }) => {
-            if (typeof data === 'object' && data.type !== undefined) {
-                if (data.type === 'OPEN_POPUP_OVERLAY') {
-                    return Promise.resolve(this.overlayManager.openPopup(data.payload.path));
-                } else if (data.type === 'CLOSE_OVERLAY') {
-                    this.overlayManager && this.overlayManager.unregisterAll();
-                }
-            }
-        });
-
-        const swiper = new Swiper(document.body);
-        swiper.on("left", () => closeOverlay());
-        swiper.on("right", () => this.overlayManager.close());
     }
 
     public waitPairingOverlay(topic?: string, args?: any[]): Promise<void> {
@@ -89,8 +89,8 @@ export default class Core {
         return new Promise<void>((resolve, reject) => {
 
             const pairingUrl = browser.extension.getURL('pairing.html');
-            let overlay = this.overlayManager.getOverlays().find(x => x.uri === pairingUrl);
-            if (!overlay) overlay = new Overlay(this.overlayManager, pairingUrl, 'Wallet');
+            let overlay = me.overlayManager.getOverlays().find(x => x.uri === pairingUrl);
+            if (!overlay) overlay = me.overlayManager.createOverlay(pairingUrl, 'Wallet');
 
             overlay.open();
 
@@ -120,7 +120,7 @@ export default class Core {
 
             const url = browser.extension.getURL('login.html');
             //let overlay = this.overlayManager.getOverlays().find(x => x.uri === pairingUrl);
-            const overlay = new Overlay(this.overlayManager, url, 'Login');
+            const overlay = me.overlayManager.createOverlay(url, 'Login');
 
             overlay.open();
 
@@ -149,7 +149,7 @@ export default class Core {
         const me = this;
         return new Promise<void>((resolve, reject) => {
             const pairingUrl = browser.extension.getURL('deploy.html');
-            const overlay = new Overlay(this.overlayManager, pairingUrl, 'Deploy');
+            const overlay = me.overlayManager.createOverlay(pairingUrl, 'Deploy');
             overlay.open(() => overlay.send('data', [payload]));
 
             // ToDo: add overlay.onclose
@@ -172,7 +172,7 @@ export default class Core {
         const me = this;
         return new Promise<void>((resolve, reject) => {
             const pairingUrl = browser.extension.getURL('settings.html');
-            const overlay = new Overlay(this.overlayManager, pairingUrl, 'User Settings');
+            const overlay = me.overlayManager.createOverlay(pairingUrl, 'User Settings');
             overlay.open(() => overlay.send('data', [payload]));
 
             // ToDo: add overlay.onclose
@@ -194,14 +194,14 @@ export default class Core {
 
     public async waitGuideOverlay(payload: any): Promise<void> {
         const pairingUrl = browser.extension.getURL('guide.html');
-        const overlay = new Overlay(this.overlayManager, pairingUrl, 'Upgrade Guide');
+        const overlay = this.overlayManager.createOverlay(pairingUrl, 'Upgrade Guide');
         overlay.open(() => overlay.send('data', [payload]));
     }
 
     public _togglePopupOverlay() {
         if (!this._popupOverlay?.registered) {
             const pairingUrl = browser.extension.getURL('popup.html');
-            this._popupOverlay = new Overlay(this.overlayManager, pairingUrl, 'Dapplets', true);
+            this._popupOverlay = this.overlayManager.createOverlay(pairingUrl, 'Dapplets', true);
             this._popupOverlay.open();
         } else {
             this.overlayManager.toggle();
@@ -213,7 +213,7 @@ export default class Core {
 
         return new Promise<void>((resolve, reject) => {
             const pairingUrl = browser.extension.getURL('sowa.html');
-            const overlay = new Overlay(me.overlayManager, pairingUrl, 'SOWA');
+            const overlay = me.overlayManager.createOverlay(pairingUrl, 'SOWA');
             // ToDo: implement multiframe
             overlay.open(() => overlay.send('txmeta', [sowaId, metadata]));
             // ToDo: add timeout?
@@ -349,7 +349,7 @@ export default class Core {
     public overlay<M>(cfg: { name: string, url?: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void }
     public overlay<M>(cfg: { name?: string, url: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void }
     public overlay<M>(cfg: { name: string, url: string, title: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void } {
-        const _overlay = new Overlay(this.overlayManager, cfg.url, cfg.title);
+        const _overlay = this.overlayManager.createOverlay(cfg.url, cfg.title);
         const conn = Connection.create<M>(_overlay, eventDef);
         const overrides = {
             isOpen() {

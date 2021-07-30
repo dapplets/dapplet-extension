@@ -1,14 +1,9 @@
+import { IOverlay } from '../interfaces';
 import { OverlayManager } from './overlayManager';
-import { IPubSub } from './types';
 
 const OVERLAY_LOADING_TIMEOUT = 5000;
 
-export enum SubscribeOptions {
-    SINGLE_THREAD,
-    MULTI_THREAD
-}
-
-export class Overlay implements IPubSub {
+export class Overlay implements IOverlay {
     private _queue: any[] = [];
     private _isFrameLoaded: boolean = false;
     private _msgCount: number = 0;
@@ -18,6 +13,7 @@ export class Overlay implements IPubSub {
     public onmessage: (topic: string, message: any) => void = null;
     public onclose: Function = null;
     public loader: HTMLDivElement;
+    public onregisteredchange: (value: boolean) => void = null;
 
     constructor(private _manager: OverlayManager, public uri: string, public title: string, public hidden: boolean = false) {
 
@@ -40,7 +36,8 @@ export class Overlay implements IPubSub {
             this._isFrameLoaded = true;
             this._queue.forEach(msg => this._send(msg));
             this._queue = [];
-        });        
+        });
+        this.frame.name = 'dapplet-overlay'; // to distinguish foreign frames from overlays (see inpage/index.ts)
     }
 
     /**
