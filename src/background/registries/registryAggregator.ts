@@ -156,8 +156,7 @@ export class RegistryAggregator {
 
         const enabledRegistries = configuredRegistries
             .filter(x => x.isEnabled)                       // only enabled
-            .filter(x => (isDevMode) ? true : !x.isDev)     // dev registries are instanced only when dev mode is activated
-            .sort((a, b) => (a.isDev === false) ? 1 : -1);  // dev registries have priority
+            .filter(x => (isDevMode) ? true : !x.isDev);    // dev registries are instanced only when dev mode is activated 
 
         // delete disabled registries
         this.registries = this.registries.filter(x => enabledRegistries.find(y => y.url === x.url));
@@ -174,6 +173,9 @@ export class RegistryAggregator {
                 console.error("Invalid registry URL: " + registryConfig.url);
             }            
         }
+
+        // dev registries have priority
+        this.registries = this.registries.sort((a, b) => (enabledRegistries.find(x => x.url === a.url)?.isDev === false) ? 1 : -1);
     }
 
     private _getNonSkippedRegistries() {
