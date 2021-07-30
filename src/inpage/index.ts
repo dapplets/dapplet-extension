@@ -65,10 +65,7 @@ if (window.name !== 'dapplet-overlay') {
     iframeMessenger.on('OVERLAY_CREATE', (id: string, uri: string, title: string, hidden: boolean, source: any) => {
         const overlay = overlayManager.createOverlay(uri, title, hidden);
         overlay.onregisteredchange = (v) => iframeMessenger.call('OVERLAY_REGISTERED_CHANGE', [id, v], source);
-        overlay.onMessage((topic, message) => {
-            console.log('onMessage', { topic, message });
-            iframeMessenger.call('OVERLAY_EXEC', [id, topic, message], source)
-        });
+        overlay.onMessage((topic, message) => iframeMessenger.call('OVERLAY_EXEC', [id, topic, message], source));
         overlayMap.set(id, overlay);
         return true;
     });
