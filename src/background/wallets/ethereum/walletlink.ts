@@ -8,7 +8,7 @@
 
 // export default class extends ethers.Signer implements ExtendedSigner {
 
-//     public provider = new ethers.providers.StaticJsonRpcProvider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 'rinkeby');
+//     public provider = new ethers.providers.StaticJsonRpcProvider('https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992', 'rinkeby');
 //     private _walletlink: WalletLink;
 //     private _ethereum: WalletLinkProvider;
 
@@ -19,7 +19,7 @@
 //             appLogoUrl: 'https://dapplets.org/favicon.png',
 //             darkMode: false
 //         });
-//         this._ethereum = this._walletlink.makeWeb3Provider('https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c', 4);
+//         this._ethereum = this._walletlink.makeWeb3Provider('https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992', 4);
 //     }
 
 //     async getAddress(): Promise<string> {

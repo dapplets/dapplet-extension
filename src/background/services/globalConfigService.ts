@@ -188,7 +188,7 @@ export default class GlobalConfigService {
             { account: "0x9126d36880905fcb9e5f2a7f7c4f19703d52bc62" }
         ];
         config.userSettings = {};
-        config.providerUrl = 'https://rinkeby.infura.io/v3/e2b99cd257a5468d94749fa32f75fc3c';
+        config.providerUrl = 'https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992';
         config.swarmGatewayUrl = 'https://bee.dapplets.org/';
         config.walletsUsage = {};
         config.identityContract = '0xf6b3a0B20281796D465bB8613e233BE30be07084';
