@@ -150,12 +150,9 @@ browser.runtime.onMessage.addListener = function (callback) {
 
                     if (response === undefined) return;
 
-                    // console.log('request', payload.request);
-                    // console.log('response', response);
-
-                    for (let i = 0; i < window.frames.length; i++) {
-                        const frame = window.frames[i];
-                        frame.postMessage(JSON.stringify({
+                    const frames = window.document.querySelector('dapplets-overlay-manager')?.shadowRoot?.querySelectorAll('iframe') ?? [];
+                    for (const frame of frames) {
+                        frame.contentWindow.postMessage(JSON.stringify({
                             id: payload.id,
                             response
                         }), '*');
@@ -281,16 +278,13 @@ async function sendMessage(message, callback) {
     return new Promise((res, rej) => {
         const id = randomHex(8);
 
-        window.top.postMessage(JSON.stringify({
-            request: message,
-            id: id
-        }), '*');
-
         const handler = (event) => {
             try {
-                const payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+                const payload = typeof event.data === 'string' ? 
+                    JSON.parse(event.data) : (typeof event.data.message === 'string') ? 
+                        JSON.parse(event.data.message) : null;
 
-                if (payload.id === id && (payload.response !== undefined || payload.request === undefined)) {
+                if (!!payload && payload.id === id && (payload.response !== undefined || payload.request === undefined)) {
                     window.removeEventListener('message', handler);
                     callback !== undefined && typeof callback === 'function' && callback(payload.response);
                     res(payload.response);
@@ -299,6 +293,11 @@ async function sendMessage(message, callback) {
         }
 
         window.addEventListener('message', handler);
+
+        window.top.postMessage(JSON.stringify({
+            request: message,
+            id: id
+        }), '*');
     });
 }
 

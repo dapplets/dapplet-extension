@@ -3,6 +3,7 @@ import { Integrations } from "@sentry/tracing";
 
 export function startTracing() {
     if (EXTENSION_ENV !== "production") return;
+    if (window["DAPPLETS_JSLIB"] === true) return; // ToDo: log errors in jslib
 
     Sentry.init({
         dsn: "https://41ee3f6e2cdc41b89f14b6377d56d1d5@o880231.ingest.sentry.io/5833728",

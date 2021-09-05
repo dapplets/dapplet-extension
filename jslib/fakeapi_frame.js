@@ -20,25 +20,27 @@ async function sendMessage(message, callback) {
     return new Promise((res, rej) => {
         const id = randomHex(8);
 
-        window.top.postMessage(JSON.stringify({
-            request: message,
-            id: id
-        }), '*');
-    
         const handler = (event) => {
             try {
-                const payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-    
-                if (payload.id === id && (payload.response !== undefined || payload.request === undefined)) {
+                const payload = typeof event.data === 'string' ? 
+                    JSON.parse(event.data) : (typeof event.data.message === 'string') ? 
+                        JSON.parse(event.data.message) : null;
+
+                if (!!payload && payload.id === id && (payload.response !== undefined || payload.request === undefined)) {
                     window.removeEventListener('message', handler);
                     callback !== undefined && typeof callback === 'function' && callback(payload.response);
                     res(payload.response);
                 }
-            } catch (err) {}
+            } catch (err) { }
         }
-    
+
         window.addEventListener('message', handler);
-    });    
+
+        window.top.postMessage(JSON.stringify({
+            request: message,
+            id: id
+        }), '*');
+    });
 }
 
 

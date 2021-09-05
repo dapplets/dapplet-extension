@@ -33,7 +33,7 @@ export class Injector {
     private registry: RegistriedModule[] = [];
 
     constructor(public core: Core) {
-        this._setContextActivivty([window.location.hostname], undefined, true);
+        this._setContextActivivty([new URL(window["DAPPLETS_ORIGINAL_HREF"] ?? window.location.href).hostname], undefined, true);
         window.exports = {}; // for CommonJS modules compatibility
     }
 

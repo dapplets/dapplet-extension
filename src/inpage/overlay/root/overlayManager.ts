@@ -41,10 +41,9 @@ export class OverlayManager implements IOverlayManager {
         // Side panel
         const panel = document.createElement(DappletsOverlayManagerClass);
         panel.classList.add(OverlayFrameClass, CollapsedOverlayClass, HiddenOverlayClass);
-        document.body.appendChild(panel);
         this._panel = panel;
 
-        const shadow = panel.attachShadow({ mode: 'closed' });
+        const shadow = panel.attachShadow({ mode: 'open' });
 
         const style = document.createElement('style');
         style.textContent = INNER_STYLE;
@@ -151,6 +150,9 @@ export class OverlayManager implements IOverlayManager {
         contentList.classList.add(ContentListClass);
         nav.appendChild(contentList);
         this._contentList = contentList;
+
+
+        document.body.appendChild(panel);
     }
 
     /**
