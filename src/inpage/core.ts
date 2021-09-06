@@ -397,4 +397,8 @@ export default class Core {
     utils = ethers.utils;
 
     BigNumber = ethers.BigNumber;
+
+    public starterOverlay() {
+        return this.overlay({ url: browser.extension.getURL('starter.html'), title: 'Starter' });
+    }
 }
