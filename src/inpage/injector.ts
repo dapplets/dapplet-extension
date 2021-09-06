@@ -233,7 +233,8 @@ export class Injector {
                 onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
                 getContentDetectors: () => core.getContentDetectors(),
                 utils: core.utils,
-                BigNumber: core.BigNumber
+                BigNumber: core.BigNumber,
+                starterOverlay: core.starterOverlay
             };
 
             let newBranch: string = null;
