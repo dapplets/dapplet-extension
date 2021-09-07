@@ -137,8 +137,8 @@ browser.runtime.onMessage.addListener = function (callback) {
     //console.log('browser.runtime.onMessage.addListener', arguments);
     const callbackWrapper = async e => {
         try {
-            const payload = JSON.parse(e.data);
-            if (payload.request !== undefined) {
+            const payload = (typeof e.data === 'string') ? JSON.parse(e.data) : (typeof e.data.message === 'string') ? JSON.parse(e.data.message): null;
+            if (payload && payload.request !== undefined) {
                 if (callback !== undefined && typeof callback === 'function') {
                     const response = await Promise.resolve(callback(payload.request, {
                         tab: {

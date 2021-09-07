@@ -3,7 +3,7 @@ import { timeoutPromise } from '../../common/helpers';
 
 export class HttpModuleStorage implements ModuleStorage {
     
-    public timeout = 2000;
+    public timeout = 10000;
 
     public async getResource(uri: string, fetchController: AbortController = new AbortController()): Promise<ArrayBuffer> {
         const response = await timeoutPromise(

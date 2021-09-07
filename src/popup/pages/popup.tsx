@@ -41,7 +41,6 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
     };
 
     props.bus.subscribe("changeTab", (path) => {
-      console.log('onChangeTab', path);
       this.setState({ isOverlay: true });
       if (path === "dapplets")
         this.setState({ defaultActiveIndex: 0, reload: Math.random() });

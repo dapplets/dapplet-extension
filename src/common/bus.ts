@@ -10,8 +10,11 @@ export class Bus {
             let data = null;
 
             try {
-                console.log('bus.onmessage', { event: e });
-                data = JSON.parse(e.data);
+                if (typeof e.data === 'object' && typeof e.data.message === 'string') {
+                    data = JSON.parse(e.data.message);
+                } else {
+                    data = JSON.parse(e.data);
+                }
             } catch {
                 return;
             }
@@ -21,7 +24,6 @@ export class Bus {
             let callbacks = this._callbacks[data.topic] || [];
 
             if (callbacks.length === 0) {
-                console.log('bus.onmessage', 'queued');
                 if (this._queue[data.topic]) {
                     this._queue[data.topic].push(data.args)
                 } else {
@@ -29,7 +31,6 @@ export class Bus {
                 }
             } else {
                 for (const callback of callbacks) {
-                    console.log('bus.onmessage', 'call callback');
                     callback.apply({}, data.args);
                 }
             }
@@ -37,12 +38,12 @@ export class Bus {
     }
 
     publish(topic, ...args) {
-        const msg = JSON.stringify({ topic, args });
+        const windowName = window.name;
+        const msg = JSON.stringify({ topic, args, windowName });
         window.parent.postMessage(msg, '*');
     }
 
     subscribe(topic, handler) {
-        console.log('bus.subscribe', topic);
         if (!this._callbacks[topic]) {
             this._callbacks[topic] = [];
         }

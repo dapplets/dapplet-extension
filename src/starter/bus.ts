@@ -4,7 +4,9 @@ export class Bus {
     constructor() {
         window.addEventListener('message', async (e) => {
             try {
-                const data = JSON.parse(e.data);
+                const json = (typeof e.data === 'string') ? e.data : (typeof e.data === 'object' && typeof e.data.message === 'string') ? e.data.message : null;
+                if (!json) return;
+                const data = JSON.parse(json);
                 if (!data || !data.topic) return;
 
                 const callbacks = this._callbacks[data.topic] || [];
