@@ -238,7 +238,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
             /> : null}
           </Input> : null}
 
-          <Segment loading={isLoading} style={{ flex: 'auto', overflowY: 'auto' }} >
+          <Segment loading={isLoading} style={{ flex: 'auto', overflowY: 'auto', minHeight: '90px' }} >
             {!isNoInpage ?
               (features.length > 0) ? (
                 <List divided relaxed>

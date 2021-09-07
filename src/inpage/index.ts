@@ -9,10 +9,9 @@ import { OverlayManager } from './overlay/root/overlayManager';
 import { IOverlay } from './overlay/interfaces';
 import { assertFullfilled, timeoutPromise } from '../common/helpers';
 
-// do not inject to overlays frames
-if (window.name !== 'dapplet-overlay') {
+tracing.startTracing();
 
-    tracing.startTracing();
+function init() {
 
     const isIframe = self !== top;
 
@@ -87,5 +86,13 @@ if (window.name !== 'dapplet-overlay') {
     iframeMessenger.on('OVERLAY_EXEC', (id: string, topic: string, message: any) => {
         return overlayMap.get(id)?.exec(topic, message);
     });
+}
 
+// do not inject to overlays frames
+if (window.name.indexOf('dapplet-overlay') === -1) {
+    if (window.document.body) {
+        init();
+    } else {
+        window.addEventListener('DOMContentLoaded', () => init());
+    }
 }

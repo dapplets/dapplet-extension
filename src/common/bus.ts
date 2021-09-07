@@ -10,7 +10,11 @@ export class Bus {
             let data = null;
 
             try {
-                data = JSON.parse(e.data);
+                if (typeof e.data === 'object' && typeof e.data.message === 'string') {
+                    data = JSON.parse(e.data.message);
+                } else {
+                    data = JSON.parse(e.data);
+                }
             } catch {
                 return;
             }
@@ -34,7 +38,8 @@ export class Bus {
     }
 
     publish(topic, ...args) {
-        const msg = JSON.stringify({ topic, args });
+        const windowName = window.name;
+        const msg = JSON.stringify({ topic, args, windowName });
         window.parent.postMessage(msg, '*');
     }
 

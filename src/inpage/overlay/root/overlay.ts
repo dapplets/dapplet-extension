@@ -1,3 +1,4 @@
+import { generateGuid } from '../../../common/helpers';
 import { IOverlay } from '../interfaces';
 import { OverlayManager } from './overlayManager';
 
@@ -37,7 +38,7 @@ export class Overlay implements IOverlay {
             this._queue.forEach(msg => this._send(msg));
             this._queue = [];
         });
-        this.frame.name = 'dapplet-overlay'; // to distinguish foreign frames from overlays (see inpage/index.ts)
+        this.frame.name = 'dapplet-overlay/' + generateGuid(); // to distinguish foreign frames from overlays (see inpage/index.ts)
     }
 
     /**
@@ -98,10 +99,17 @@ export class Overlay implements IOverlay {
             this._send(data);
 
             const listener = (e: MessageEvent) => {
-                if (e.source != this.frame.contentWindow) return; // Listen messages from only our frame
-                if (!e.data) return;
+                let data = null;
 
-                const data = JSON.parse(e.data);
+                try {
+                    if (!e.data) return;
+                    const json = (typeof e.data === 'string') ? e.data : (typeof e.data === 'object' && typeof e.data.message === 'string') ? e.data.message : null;
+                    if (!json) return;
+                    data = JSON.parse(json);
+                } catch (_) { }
+
+                if (!data) return;
+                if (!(e.source === this.frame.contentWindow || data.windowName === this.frame.name)) return; // Listen messages from only our frame
 
                 if (!data.topic && data.id === id) {
                     window.removeEventListener('message', listener);
@@ -118,9 +126,20 @@ export class Overlay implements IOverlay {
 
     public onMessage(handler: (topic: string, message: any) => void) {
         const listener = (e: MessageEvent) => {
-            if (e.source !== this.frame.contentWindow) return; // Listen messages from only our frame
-            if (!e.data) return;
-            const data = JSON.parse(e.data);
+            let data = null;
+
+            try {
+                if (!e.data) return;
+                const json = (typeof e.data === 'string') ? e.data : (typeof e.data === 'object' && typeof e.data.message === 'string') ? e.data.message : null;
+                if (!json) return;
+                data = JSON.parse(json);
+            } catch (_) { }
+
+            if (!data) return;
+
+            // ToDo: the expression below is always false in jslib + wombat
+            if (!(e.source === this.frame.contentWindow || data.windowName === this.frame.name)) return; // Listen messages from only our frame
+
             if (data.topic !== undefined) handler(data.topic, data.message);
         }
 
