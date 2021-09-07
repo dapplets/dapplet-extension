@@ -55,12 +55,21 @@ export class EthRegistry implements Registry {
     public isAvailable: boolean = true;
     public error: string = null;
 
-    private _contract: ethers.ethers.Contract;
     private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>();
+    private _contract: ethers.ethers.Contract = null;
+    private get _contractPromise(): Promise<ethers.ethers.Contract> {
+        if (this._contract) {
+            return Promise.resolve(this._contract);
+        } else {
+            return this._signer.resolveName(this.url).then(x => {
+                this._contract = new ethers.Contract(x, abi, this._signer);
+                return this._contract;
+            });
+        }
+    };
 
     constructor(public url: string, private _signer: ethers.ethers.Signer) {
         if (!url) throw new Error("Endpoint Url is required");
-        this._contract = new ethers.Contract(url, abi, this._signer);
     }
 
     public async getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }> {
@@ -69,6 +78,8 @@ export class EthRegistry implements Registry {
             users = await Promise.all(users.map(u => (typeOfUri(u) === UriTypes.Ens) ? this._signer.resolveName(u) : Promise.resolve(u)));
             users = users.filter(u => u !== null);
             const usersCacheKey = users.join(';');
+            
+            // ToDo: maybe it's overcached
             if (!this._moduleInfoCache.has(usersCacheKey)) this._moduleInfoCache.set(usersCacheKey, new Map());
             if (contextIds.map(c => this._moduleInfoCache.get(usersCacheKey).has(c)).every(c => c === true)) {
                 const cachedResult = Object.fromEntries(contextIds.map(c => ([c, this._moduleInfoCache.get(usersCacheKey).get(c)])));
@@ -76,7 +87,8 @@ export class EthRegistry implements Registry {
             }
 
             const usersNormalized = users.map(u => "0x000000000000000000000000" + u.replace('0x', ''));
-            const moduleInfosByCtx: EthModuleInfo[][] = await this._contract.getModuleInfoBatch(contextIds, usersNormalized, 0);
+            const contract = await this._contractPromise;
+            const moduleInfosByCtx: EthModuleInfo[][] = await contract.getModuleInfoBatch(contextIds, usersNormalized, 0);
             this.isAvailable = true;
             this.error = null;
 
@@ -115,7 +127,8 @@ export class EthRegistry implements Registry {
 
     public async getModuleInfoByName(name: string): Promise<ModuleInfo> {
         try {
-            const m = await this._contract.getModuleInfoByName(name);
+            const contract = await this._contractPromise;
+            const m = await contract.getModuleInfoByName(name);
             const mi = new ModuleInfo();
             mi.type = moduleTypesMap[m.moduleType];
             mi.name = m.name;
@@ -137,7 +150,8 @@ export class EthRegistry implements Registry {
 
     public async getVersionNumbers(name: string, branch: string): Promise<string[]> {
         try {
-            const hex: string = await this._contract.getVersionNumbers(name, branch);
+            const contract = await this._contractPromise;
+            const hex: string = await contract.getVersionNumbers(name, branch);
             this.isAvailable = true;
             this.error = null;
             const result = (hex.replace('0x', '')
@@ -153,7 +167,8 @@ export class EthRegistry implements Registry {
 
     public async getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo> {
         try {
-            const response = await this._contract.getVersionInfo(name, branch, semver.major(version), semver.minor(version), semver.patch(version));
+            const contract = await this._contractPromise;
+            const response = await contract.getVersionInfo(name, branch, semver.major(version), semver.minor(version), semver.patch(version));
             const dto: EthVersionInfoDto = response.dto;
             const moduleType: number = response.moduleType;
 
@@ -196,7 +211,8 @@ export class EthRegistry implements Registry {
     public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
         let isModuleExist = false;
         try {
-            const mi = await this._contract.getModuleInfoByName(module.name);
+            const contract = await this._contractPromise;
+            const mi = await contract.getModuleInfoByName(module.name);
             isModuleExist = true;
         } catch (err) {
             isModuleExist = false;
@@ -249,11 +265,12 @@ export class EthRegistry implements Registry {
         };
 
         const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
+        const contract = await this._contractPromise;
         if (!isModuleExist) {
-            const tx = await this._contract.addModuleInfo(module.contextIds, mi, [vi], userId);
+            const tx = await contract.addModuleInfo(module.contextIds, mi, [vi], userId);
             await tx.wait();
         } else {
-            const tx = await this._contract.addModuleVersion(mi.name, vi, userId);
+            const tx = await contract.addModuleVersion(mi.name, vi, userId);
             await tx.wait();
         }
     }
@@ -261,7 +278,8 @@ export class EthRegistry implements Registry {
     // ToDo: use getModuleInfoByName instead
     public async getOwnership(moduleName: string) {
         try {
-            const mi = await this._contract.getModuleInfoByName(moduleName);
+            const contract = await this._contractPromise;
+            const mi = await contract.getModuleInfoByName(moduleName);
             return mi.owner.replace('0x000000000000000000000000', '0x');
         } catch {
             return null;
@@ -271,19 +289,22 @@ export class EthRegistry implements Registry {
     public async transferOwnership(moduleName: string, address: string) {
         const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
         if (address.length === 42) address = '0x000000000000000000000000' + address.replace('0x', '');
-        const tx = await this._contract.transferOwnership(moduleName, userId, address);
+        const contract = await this._contractPromise;
+        const tx = await contract.transferOwnership(moduleName, userId, address);
         await tx.wait();
     }
 
     public async addContextId(moduleName: string, contextId: string) {
         const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
-        const tx = await this._contract.addContextId(moduleName, contextId, userId);
+        const contract = await this._contractPromise;
+        const tx = await contract.addContextId(moduleName, contextId, userId);
         await tx.wait();
     }
 
     public async removeContextId(moduleName: string, contextId: string) {
         const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
-        const tx = await this._contract.removeContextId(moduleName, contextId, userId);
+        const contract = await this._contractPromise;
+        const tx = await contract.removeContextId(moduleName, contextId, userId);
         await tx.wait();
     }
 }

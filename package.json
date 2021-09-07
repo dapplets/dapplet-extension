@@ -31,7 +31,7 @@
     "css-loader": "^5.2.6",
     "detect-browser": "^5.2.0",
     "ethereum-blockies-base64": "^1.0.2",
-    "ethers": "^5.3.1",
+    "ethers": "^5.4.6",
     "extension-port-stream": "^2.0.1",
     "file-loader": "^6.2.0",
     "fork-ts-checker-webpack-plugin": "^6.2.10",

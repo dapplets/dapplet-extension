@@ -74,10 +74,11 @@ export class WalletService {
             const providerUrl = await this._globalConfigService.getEthereumProvider();
             const signer = new (class extends Signer {
 
+                provider = new providers.StaticJsonRpcProvider(providerUrl, 4);
+                
                 constructor() {
                     super();
                 }
-                provider = new providers.StaticJsonRpcProvider(providerUrl);
     
                 async getAddress(): Promise<string> {
                     const signer = await me._getInternalSignerFor(app, ChainTypes.ETHEREUM) as EthereumWallet;

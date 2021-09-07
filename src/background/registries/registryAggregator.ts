@@ -22,6 +22,7 @@ export class RegistryAggregator {
     public registries: Registry[] = [];
 
     private _versionInfoStorage = new VersionInfoBrowserStorage();
+    private _initializationPromise = null;
 
     constructor(
         private _globalConfigService: GlobalConfigService,
@@ -148,8 +149,17 @@ export class RegistryAggregator {
         await this._initRegistries();
         return this.registries.find(f => f.url === uri);
     }
-
+    
     private async _initRegistries() {
+        // prevent multiple initializations of registries
+        if (!this._initializationPromise) {
+            this._initializationPromise = this.__initRegistries().then(() => this._initializationPromise = null);
+        }
+
+        return this._initializationPromise;
+    }
+
+    private async __initRegistries() {
         // ToDo: fetch LocalConfig
         const configuredRegistries = await this._globalConfigService.getRegistries();
         const isDevMode = await this._globalConfigService.getDevMode();
@@ -179,8 +189,10 @@ export class RegistryAggregator {
     }
 
     private _getNonSkippedRegistries() {
+        // ToDo: make this logic smarter. Currently it generates bugs with error caching
         // Skipping of errored registries
-        return this.registries.filter(x => x.isAvailable);
+        // return this.registries.filter(x => x.isAvailable);
+        return this.registries;
     }
 
     private async _cacheVersionInfo(registry: Registry, name: string, branch: string, version: string) {

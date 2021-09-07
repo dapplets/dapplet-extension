@@ -14,7 +14,7 @@ export default class extends ethers.Signer implements EthereumWallet {
 
     constructor(config: { providerUrl: string }) {
         super();
-        this.provider = new ethers.providers.StaticJsonRpcProvider(config.providerUrl);
+        this.provider = new ethers.providers.StaticJsonRpcProvider(config.providerUrl, 4);
     }
 
     async getAddress(): Promise<string> {

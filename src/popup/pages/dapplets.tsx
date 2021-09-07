@@ -65,7 +65,8 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     if (regsWithErrors.length > 0) {
       const isProviderProblems = regsWithErrors.filter(({ error }) => 
         error.includes('missing response') ||
-        error.includes('could not detect network')
+        error.includes('could not detect network') || 
+        error.includes('resolver or addr is not configured for ENS name')
       ).length > 0;
 
       const description = isProviderProblems ? 
