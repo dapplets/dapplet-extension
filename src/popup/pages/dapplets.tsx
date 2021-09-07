@@ -57,8 +57,10 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     }
 
     const { getFeaturesByHostnames, getRegistries, getSwarmGateway } = await initBGFunctions(browser);
-
+    
     const swarmGatewayUrl = await getSwarmGateway();
+    
+    const features: ManifestDTO[] = await getFeaturesByHostnames(contextIdsValues);
 
     const registries = await getRegistries();
     const regsWithErrors = registries.filter(r => !r.isDev && !!r.isEnabled && !!r.error);
@@ -66,7 +68,8 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
       const isProviderProblems = regsWithErrors.filter(({ error }) => 
         error.includes('missing response') ||
         error.includes('could not detect network') || 
-        error.includes('resolver or addr is not configured for ENS name')
+        error.includes('resolver or addr is not configured for ENS name') || 
+        error.includes('invalid contract address or ENS name')
       ).length > 0;
 
       const description = isProviderProblems ? 
@@ -78,7 +81,6 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
       });
     }
 
-    const features: ManifestDTO[] = await getFeaturesByHostnames(contextIdsValues);
 
     if (this._isMounted) {
       this.setState({
