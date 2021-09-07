@@ -73,12 +73,14 @@ export class Overlay implements IOverlay {
     }
 
     public send(topic: string, args: any[]) {
+        console.log('overlay.send', { topic, args });
         const msg = JSON.stringify({ topic, args }); // ToDo: fix args
         // this.frame.contentWindow.postMessage(msg, '*');
         this._send(msg);
     }
 
     private _send(data: any) {
+        console.log('overlay._send', { data, loaded: this._isFrameLoaded });
         if (!this._isFrameLoaded) {
             this._queue.push(data);
             this.open();
