@@ -15,6 +15,7 @@ import GithubService from "./services/githubService";
 import DiscordService from "./services/discordService";
 import { IdentityService } from "./services/identityService";
 import { GuideService } from "./services/guideService";
+import { ModuleTypes } from "../common/constants";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -230,7 +231,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
   if (!message || !message.type) return;
 
   if (message.type === "CONTEXT_STARTED" || message.type === "CONTEXT_FINISHED") {
-    return featureService.getActiveModulesByHostnames(message.payload.contextIds).then(manifests => {
+    featureService.getActiveModulesByHostnames(message.payload.contextIds).then(manifests => {
       if (manifests.length === 0) return;
 
       browser.tabs.sendMessage(sender.tab.id, {
@@ -246,6 +247,28 @@ browser.runtime.onMessage.addListener((message, sender) => {
         frameId: sender.frameId
       });
     });
+
+    // Load adapters, providing stable context IDs.
+    const idContexts = message.payload.contextIds.filter(x => x.endsWith('/id'));
+    if (idContexts.length > 0) {
+      featureService.getFeaturesByHostnames(idContexts).then(manifests => {
+        const adapters = manifests.filter(x => x.type === ModuleTypes.Adapter);
+        if (adapters.length === 0) return;
+        
+        browser.tabs.sendMessage(sender.tab.id, {
+          type: message.type === "CONTEXT_STARTED" ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
+          payload: adapters.map(m => ({
+            name: m.name,
+            version: "latest",
+            branch: "default", // ToDo: fix branch
+            order: m.order,
+            contextIds: m.hostnames  // ToDo: remove this map after renaming of hostnames to contextIds
+          }))
+        }, {
+          frameId: sender.frameId
+        });
+      });
+    }
   }
 });
 

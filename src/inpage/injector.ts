@@ -364,26 +364,34 @@ export class Injector {
         contextIds = parentContext ? contextIds.map((ctx) => parentContext + '/' + ctx) : contextIds;
 
         if (isActive) {
-            // console.log('Context started:', contextIds);
+            const newContextIds = [];
             contextIds.forEach(id => {
                 if (this.availableContextIds.indexOf(id) === -1) {
                     this.availableContextIds.push(id);
+                    newContextIds.push(id);
                 }
             });
+
+            if (newContextIds.length > 0) {
+                // console.log('[DAPPLETS] Context started:', newContextIds);
+                browser.runtime.sendMessage({ type: "CONTEXT_STARTED", payload: { contextIds } });
+            }
+
         } else {
-            // console.log('Context finished:', contextIds);
+            const oldContextIds = [];
             contextIds.forEach(id => {
                 const index = this.availableContextIds.indexOf(id);
-                if (index > -1) this.availableContextIds.splice(index, 1);
+                if (index > -1) {
+                    this.availableContextIds.splice(index, 1);
+                    oldContextIds.push(id);
+                }
             });
+
+            if (oldContextIds.length > 0) {
+                // console.log('[DAPPLETS] Context finished:', oldContextIds);
+                browser.runtime.sendMessage({ type: "CONTEXT_FINISHED", payload: { contextIds } });
+            }
         }
-
-        // ToDo: [bug] context started fires twicely
-
-        browser.runtime.sendMessage({
-            type: isActive ? "CONTEXT_STARTED" : "CONTEXT_FINISHED",
-            payload: { contextIds }
-        });
     }
 
     private _getDependency(manifest: VersionInfo, name: string) {
