@@ -3,13 +3,13 @@ import ModuleManager from '../utils/moduleManager';
 import { browser } from "webextension-polyfill-ts";
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
 import GlobalConfigService from './globalConfigService';
-import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants';
+import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, ModuleTypes, StorageTypes } from '../../common/constants';
 import { rcompare } from 'semver';
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
 import JSZip from 'jszip';
 
-import { getCurrentTab, mergeDedupe, parseModuleName } from '../../common/helpers';
+import { areModulesEqual, getCurrentTab, mergeDedupe, parseModuleName } from '../../common/helpers';
 import { WalletService } from './walletService';
 import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
 
@@ -31,6 +31,7 @@ export default class FeatureService {
         const dtos: ManifestDTO[] = [];
 
         const configRegistries = await this._globalConfigService.getRegistries();
+        const everywhereConfig = await this._globalConfigService.getSiteConfigById(CONTEXT_ID_WILDCARD);
 
         let i = 0;
 
@@ -42,10 +43,10 @@ export default class FeatureService {
                     if (!dto) {
                         const dto: ManifestDTO = moduleInfo as any;
                         const config = await this._globalConfigService.getSiteConfigById(contextId); // ToDo: which contextId should we compare?
-                        dto.isActive = config.activeFeatures[dto.name]?.isActive || false;
-                        dto.isActionHandler = config.activeFeatures[dto.name]?.runtime?.isActionHandler || false;
-                        dto.isHomeHandler = config.activeFeatures[dto.name]?.runtime?.isHomeHandler || false;
-                        dto.activeVersion = (dto.isActive) ? (config.activeFeatures[dto.name]?.version || null) : null;
+                        dto.isActive = config.activeFeatures[dto.name]?.isActive || everywhereConfig.activeFeatures[dto.name]?.isActive ||false;
+                        dto.isActionHandler = config.activeFeatures[dto.name]?.runtime?.isActionHandler || everywhereConfig.activeFeatures[dto.name]?.runtime?.isActionHandler || false;
+                        dto.isHomeHandler = config.activeFeatures[dto.name]?.runtime?.isHomeHandler || everywhereConfig.activeFeatures[dto.name]?.runtime?.isHomeHandler ||false;
+                        dto.activeVersion = (dto.isActive) ? (config.activeFeatures[dto.name]?.version || everywhereConfig.activeFeatures[dto.name]?.version || null) : null;
                         dto.lastVersion = (dto.isActive) ? await this.getVersions(registryUrl, dto.name).then(x => x.sort(rcompare)[0]) : null; // ToDo: how does this affect performance?
                         dto.order = i++;
                         dto.sourceRegistry = {
@@ -221,7 +222,7 @@ export default class FeatureService {
             for (const name in config.activeFeatures) {
                 if (config.activeFeatures[name].isActive !== true) continue;
 
-                const branch = 'default';
+                const branch = DEFAULT_BRANCH_NAME; // ToDo: is it correct?
                 const version = config.activeFeatures[name].version;
                 const index = modules.findIndex(m => m.name === name && m.branch === branch && m.version === version);
 
@@ -230,10 +231,38 @@ export default class FeatureService {
                 } else {
                     modules.push({
                         name,
-                        branch, // ToDo: is it correct?
+                        branch,
                         version,
                         order: i++,
                         hostnames: [config.hostname]
+                    });
+                }
+            }
+        }
+
+        // Activate dapplets enabled everywhere
+        // ToDo: it reduces performance because of additional request to a registry
+        //       it's need to be fixed after registry improvements (should return all contextIds by module)
+        const availableModules = await this.getFeaturesByHostnames(contextIds);
+        const config = await this._globalConfigService.getSiteConfigById(CONTEXT_ID_WILDCARD);
+        for (const dto of availableModules) {
+            if (config.activeFeatures[dto.name]?.isActive === true) {
+                const moduleId = {
+                    name: dto.name,
+                    branch: DEFAULT_BRANCH_NAME,
+                    version: config.activeFeatures[dto.name].version
+                };
+                const index = modules.findIndex(m => areModulesEqual(m, moduleId));
+                
+                if (index !== -1) {
+                    modules[index].hostnames.push(config.hostname);
+                } else {
+                    modules.push({
+                        name: moduleId.name,
+                        branch: moduleId.branch,
+                        version: moduleId.version,
+                        order: i++,
+                        hostnames: dto.hostnames
                     });
                 }
             }

@@ -8,6 +8,7 @@ import { OverlayManagerIframe } from './overlay/iframe/overlayManager';
 import { OverlayManager } from './overlay/root/overlayManager';
 import { IOverlay } from './overlay/interfaces';
 import { assertFullfilled, timeoutPromise } from '../common/helpers';
+import { CONTEXT_ID_WILDCARD } from '../common/constants';
 
 tracing.startTracing();
 
@@ -31,7 +32,7 @@ function init() {
         if (!message || !message.type) return;
 
         if (message.type === "FEATURE_ACTIVATED") {
-            const modules = message.payload.filter(x => x.contextIds.filter(v => injector.availableContextIds.includes(v)).length > 0);
+            const modules = message.payload.filter(x => x.contextIds.filter(v => injector.availableContextIds.includes(v) || v === CONTEXT_ID_WILDCARD).length > 0);
             modules.forEach(f => console.log(`[DAPPLETS]: The module ${f.name}${(f.branch) ? '#' + f.branch : ''}${(f.version) ? '@' + f.version : ''} was activated.`));
             return injector.loadModules(modules);
         } else if (message.type === "FEATURE_DEACTIVATED") {

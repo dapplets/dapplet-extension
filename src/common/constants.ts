@@ -22,3 +22,4 @@ export type WalletInfo = {
 
 export const DEFAULT_BRANCH_NAME = "default";
 
+export const CONTEXT_ID_WILDCARD = "*";

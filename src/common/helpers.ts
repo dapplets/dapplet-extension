@@ -277,3 +277,14 @@ export async function waitClosingTab(tabId: number, windowId: number) {
 export function formatModuleId({ name, branch, version }: ModuleId) {
   return `${name}#${branch ?? DEFAULT_BRANCH_NAME}@${version}`;
 }
+
+/**
+ * Returns new array with all matches of `substr` replaced by elements of `newstrArray`
+ */
+export function multipleReplace(arr: string[], substr: string, newstrArray: string[]) {
+  const newArr = arr.filter(x => x !== substr);
+  if (newArr.length !== arr.length) {
+      newArr.push(...newstrArray);
+  }
+  return newArr;
+}

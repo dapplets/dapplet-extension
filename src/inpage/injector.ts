@@ -1,10 +1,10 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import Core from './core';
 import { maxSatisfying, valid } from 'semver';
-import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../common/constants';
+import { ModuleTypes, DEFAULT_BRANCH_NAME, CONTEXT_ID_WILDCARD } from '../common/constants';
 import { browser } from "webextension-polyfill-ts";
 import { IResolver, IContentAdapter } from './types';
-import { areModulesEqual, joinUrls } from "../common/helpers";
+import { areModulesEqual, joinUrls, multipleReplace } from "../common/helpers";
 import VersionInfo from "../background/models/versionInfo";
 import { AppStorage } from "./appStorage";
 import { DefaultConfig, SchemaConfig } from "../common/types";
@@ -39,6 +39,7 @@ export class Injector {
 
     public async loadModules(modules: { name: string, branch: string, version: string, order: number, contextIds: string[] }[]) {
         if (!modules || !modules.length) return;
+        modules.forEach(x => x.contextIds = multipleReplace(x.contextIds, CONTEXT_ID_WILDCARD, this.availableContextIds));
 
         // ToDo: add modules to registry before loading
 

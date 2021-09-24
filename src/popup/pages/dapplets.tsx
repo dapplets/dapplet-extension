@@ -4,7 +4,7 @@ import { browser } from "webextension-polyfill-ts";
 
 import { Button, List, Segment, Icon, Input, Message } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
-import { ModuleTypes } from "../../common/constants";
+import { CONTEXT_ID_WILDCARD, ModuleTypes } from "../../common/constants";
 import { getCurrentContextIds, getCurrentTab } from "../helpers";
 import { rcompare } from "semver";
 import { Dapplet, ManifestAndDetails } from "../components/dapplet";
@@ -113,11 +113,14 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
 
     this._updateFeatureState(name, { isActive, isLoading: true, error: null, versions: [], activeVersion: (isActive) ? version : null, lastVersion: allVersions.sort(rcompare)[0] });
 
+    const isEverywhere = true;
+    const targetContextIds = isEverywhere ? [CONTEXT_ID_WILDCARD] : hostnames;
+
     try {
       if (isActive) {
-        await activateFeature(name, version, hostnames, order, sourceRegistry.url);
+        await activateFeature(name, version, targetContextIds, order, sourceRegistry.url);
       } else {
-        await deactivateFeature(name, version, hostnames, order, sourceRegistry.url);
+        await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url);
       }
 
       await this._refreshDataByContext(this.props.contextIds);

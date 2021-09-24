@@ -10,12 +10,12 @@ import EnsService from "./services/ensService";
 import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 import ProxyService from "./services/proxyService";
 import * as tracing from '../common/tracing';
-import { getCurrentTab, waitClosingTab, waitTab } from "../common/helpers";
+import { getCurrentTab, multipleReplace, waitClosingTab, waitTab } from "../common/helpers";
 import GithubService from "./services/githubService";
 import DiscordService from "./services/discordService";
 import { IdentityService } from "./services/identityService";
 import { GuideService } from "./services/guideService";
-import { ModuleTypes } from "../common/constants";
+import { CONTEXT_ID_WILDCARD, ModuleTypes } from "../common/constants";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -241,7 +241,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
           version: m.version,
           branch: m.branch, // ToDo: fix branch
           order: m.order,
-          contextIds: m.hostnames  // ToDo: remove this map after renaming of hostnames to contextIds
+          contextIds: multipleReplace(m.hostnames, CONTEXT_ID_WILDCARD, message.payload.contextIds)  // ToDo: remove this map after renaming of hostnames to contextIds
         }))
       }, {
         frameId: sender.frameId
