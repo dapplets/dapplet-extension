@@ -50,7 +50,7 @@ const moduleTypesMap: { [key: number]: ModuleTypes } = {
     4: ModuleTypes.Interface
 };
 
-// ToDo: errors from here don't reach inpage!
+// ToDo: errors from here don't reach contentscript!
 export class EthRegistry implements Registry {
     public isAvailable: boolean = true;
     public error: string = null;

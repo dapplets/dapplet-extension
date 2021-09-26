@@ -38,7 +38,7 @@ export class Overlay implements IOverlay {
             this._queue.forEach(msg => this._send(msg));
             this._queue = [];
         });
-        this.frame.name = 'dapplet-overlay/' + generateGuid(); // to distinguish foreign frames from overlays (see inpage/index.ts)
+        this.frame.name = 'dapplet-overlay/' + generateGuid(); // to distinguish foreign frames from overlays (see contentscript/index.ts)
     }
 
     /**

@@ -20,7 +20,7 @@ interface IDappletsState {
   features: ManifestAndDetails[];
   isLoading: boolean;
   error: string;
-  isNoInpage: boolean;
+  isNoContentScript: boolean;
   search: string;
   swarmGatewayUrl: string;
   devMessage: string;
@@ -33,7 +33,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     features: [],
     isLoading: true,
     error: null,
-    isNoInpage: false,
+    isNoContentScript: false,
     search: '',
     swarmGatewayUrl: '',
     devMessage: null
@@ -52,7 +52,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
       contextIdsValues = await contextIds;
     } catch (err) {
       console.error(err);
-      this.setState({ isNoInpage: true, isLoading: false });
+      this.setState({ isNoContentScript: true, isLoading: false });
       return;
     }
 
@@ -153,7 +153,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     const tab = await getCurrentTab();
     if (!tab) return;
     await browser.tabs.update(tab.id, { url: tab.url });
-    this.setState({ isNoInpage: false, isLoading: true });
+    this.setState({ isNoContentScript: false, isLoading: true });
     setTimeout(() => this._refreshDataByContext(getCurrentContextIds()), 4000); // ToDo: get rid of timeout
   }
 
@@ -215,7 +215,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   }
 
   render() {
-    const { isLoading, error, isNoInpage, search, devMessage } = this.state;
+    const { isLoading, error, isNoContentScript, search, devMessage } = this.state;
     const features = this._getFilteredDapplets();
 
     return (
@@ -242,7 +242,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
           </Input> : null}
 
           <Segment loading={isLoading} style={{ flex: 'auto', overflowY: 'auto', minHeight: '90px' }} >
-            {!isNoInpage ?
+            {!isNoContentScript ?
               (features.length > 0) ? (
                 <List divided relaxed>
                   {features.map((f, i) => (

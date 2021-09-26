@@ -34,11 +34,11 @@ package "pkg: Dapplet Platform" as Platform {
 package "pkg: Browser Extension" as Plugin {
     [Background Services] as Background
     [Popup]
-    [Feature Injector] as InpageInjector
+    [Feature Injector] as ContentScriptInjector
     [Options]
-    Background <-- InpageInjector : (9) load Features \n with deps
+    Background <-- ContentScriptInjector : (9) load Features \n with deps
     Background <-- Popup : (3) get list of\nFeatures
-    InpageInjector .> injected : injects
+    ContentScriptInjector .> injected : injects
 
     Background <-> Options : (2) settings
     BusinessCase .down.> Feature : (6) widget augmentation

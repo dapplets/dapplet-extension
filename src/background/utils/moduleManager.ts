@@ -123,7 +123,7 @@ export default class ModuleManager {
         }
     }
 
-    //ToDo: rework the _getChildDependencies and move it into Inpage
+    //ToDo: rework the _getChildDependencies and move it into ContentScript
     private async _getChildDependenciesAndManifest(module: { name: string, version: string | null, branch: string | null, contextIds: string[] }) { 
         if (!module.branch) {
             module.branch = DEFAULT_BRANCH_NAME;

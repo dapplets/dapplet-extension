@@ -13,7 +13,7 @@ $/
   resources/
   src/
     background/
-    inpage/
+    contentscript/
     options/
     popup/
     manifest.json
@@ -25,7 +25,7 @@ $/
 - `resources` - The static files which is copying to `build` directory as is
 - `src` - Main projects (the product code)
 - `src\backgorund` - Background service of extension. It works globally in browser
-- `src\inpage` - These scripts are running in the context of each viewing webpage
+- `src\contentscript` - These scripts are running in the context of each viewing webpage
 - `src\options` - The settings page. It's available in browser's settings => extensions => Injector Extension => options
 - `src\popup` - The popup window that is displayed when extension icon is clicked
 - `src\manifest.json` - The manifest of browser extension

@@ -124,7 +124,7 @@ export default class FeatureService {
 
         try {
             const runtime = await new Promise<void>(async (resolve, reject) => {
-                // listening of loading/unloading from inpage
+                // listening of loading/unloading from contentscript
                 const listener = (message, sender) => {
                     if (!message || !message.type || !message.payload) return;
                     const p = message.payload;
@@ -153,7 +153,7 @@ export default class FeatureService {
 
                 browser.runtime.onMessage.addListener(listener);
 
-                // sending command to inpage
+                // sending command to contentscript
                 const activeTab = await getCurrentTab();
                 if (!activeTab) return;
                 browser.tabs.sendMessage(activeTab.id, {
@@ -420,7 +420,7 @@ export default class FeatureService {
         }
 
         if (wasActive) {
-            // sending command to inpage
+            // sending command to contentscript
             const activeTab = await getCurrentTab();
             if (!activeTab) return;
             browser.tabs.sendMessage(activeTab.id, {

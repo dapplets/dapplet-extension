@@ -36,12 +36,12 @@ cloud "decentralized\nstorage for\nmodules and\nsettings" as Storage
 package "pkg: Browser Extension" as Plugin {
     [Background Services] as Background
     [Popup]
-    [Feature Injector] as InpageInjector
+    [Feature Injector] as ContentScriptInjector
     [<<User Personal Page>>\nDashbord, Module Editor\nand Control Center] as PersonalPage
     Background <-> PersonalPage : (2) settings\nand new modules
     Background <-- Popup : (3) get list of\nFeatures
-    Background <-- InpageInjector : (4) load Features \n with deps
-    InpageInjector --> injected : (5) injects
+    Background <-- ContentScriptInjector : (4) load Features \n with deps
+    ContentScriptInjector --> injected : (5) injects
 
     BusinessCase -down-> Feature : (8) widget live data
     BusinessCase -down-> Overlay : (9) overlay data

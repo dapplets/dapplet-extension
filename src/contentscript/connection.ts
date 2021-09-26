@@ -1,5 +1,5 @@
 import { IPubSub } from "./types"
-import { subscribe, unsubscribe, publish } from './inpage-pubsub'
+import { subscribe, unsubscribe, publish } from './contentscript-pubsub'
 
 
 type Key = string | number | symbol

@@ -21,7 +21,7 @@ module.exports = {
   entry: {
     popup: path.join(__dirname, "src/popup/index.tsx"),
     background: path.join(__dirname, "src/background/index.ts"),
-    inpage: path.join(__dirname, "src/inpage/index.ts"),
+    contentscript: path.join(__dirname, "src/contentscript/index.ts"),
     pairing: path.join(__dirname, "src/pairing/index.tsx"),
     sowa: path.join(__dirname, "src/sowa/index.tsx"),
     deploy: path.join(__dirname, "src/deploy/index.tsx"),

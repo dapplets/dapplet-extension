@@ -31,7 +31,7 @@
       ],
       "js": [
         "common.js",
-      	"inpage.js"
+      	"contentscript.js"
       ],
       "run_at": "document_idle",
       "all_frames": true

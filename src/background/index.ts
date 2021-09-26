@@ -357,7 +357,7 @@ if (window['DAPPLETS_JSLIB'] !== true) {
           .then(() => false)
           .catch((e) => {
             browser.tabs.executeScript(x.id, { file: 'common.js' })
-              .then(() => browser.tabs.executeScript(x.id, { file: 'inpage.js' }))
+              .then(() => browser.tabs.executeScript(x.id, { file: 'contentscript.js' }))
             return true;
           }))
       )

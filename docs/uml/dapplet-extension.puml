@@ -11,11 +11,11 @@ database "InBrowser\nStorage" as Storage
 
 package "pkg: dapplet-extension" {
     [Background]
-    [Inpage]
+    [ContentScript]
     [Popup]
     [Options]
 
-    Background <..> Inpage : (9) scripts of modules
+    Background <..> ContentScript : (9) scripts of modules
     Background <..> Popup : (3) feature list
     Background <..> Options
 
@@ -23,7 +23,7 @@ package "pkg: dapplet-extension" {
     Ethereum -down-> Background : (1) modules
     ExternalAPI -down-> Background : (6) augmentation data
 
-    Inpage <-down-> DOM : (5) widgets
+    ContentScript <-down-> DOM : (5) widgets
 }
 
 @enduml
