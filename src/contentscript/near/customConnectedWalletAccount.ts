@@ -62,7 +62,7 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
         const transaction = nearAPI.transactions.createTransaction(this.accountId, publicKey, receiverId, nonce, actions, blockHash);
 
         const requestId = generateGuid();
-        const callbackUrl = browser.extension.getURL(`callback.html?request_id=${requestId}`);
+        const callbackUrl = browser.runtime.getURL(`callback.html?request_id=${requestId}`);
         
         const { waitTab, removeTab, updateTab, queryTab } = await initBGFunctions(browser);
         const [currentTab] = await queryTab({ active: true, currentWindow: true });

@@ -340,7 +340,7 @@ browser.runtime.onInstalled.addListener(async () => {
   const currentExtId = browser.runtime.id;
   const previousExts = exts.filter(x => x.name === 'Dapplets' && x.id !== currentExtId);
   if (previousExts.length !== 0) {
-    // const welcomeUrl = new URL(browser.extension.getURL('welcome.html'));
+    // const welcomeUrl = new URL(browser.runtime.getURL('welcome.html'));
     // await browser.tabs.create({ url: welcomeUrl.href });
     console.log(`Found ${previousExts.length} another instance(s) of the current extension.`);
     previousExts.forEach(x => browser.management.setEnabled(x.id, false));

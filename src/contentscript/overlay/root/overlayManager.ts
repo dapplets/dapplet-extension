@@ -101,7 +101,7 @@ export class OverlayManager implements IOverlayManager {
         // avatarAction.classList.add('dapplets-action-dropdown');
         // avatarAction.addEventListener('click', (e) => {
         //     if ((e.target as any).innerText === 'Account Groups') {
-        //         const url = browser.extension.getURL('identity.html');
+        //         const url = browser.runtime.getURL('identity.html');
         //         this._identityOverlay = this._identityOverlay ?? this.createNewOverlay(url, 'Identity');
         //         this._identityOverlay.open();
         //     }
@@ -301,7 +301,7 @@ export class OverlayManager implements IOverlayManager {
     }
 
     public openPopup(path: string) {
-        const url = browser.extension.getURL('popup.html') + `#/${path}`;
+        const url = browser.runtime.getURL('popup.html') + `#/${path}`;
         const overlays = this.getOverlays();
         const overlay = overlays.find(x => x.uri === url) ?? this.createOverlay(url, capitalizeFirstLetter(path));
         overlay.send('changeTab', [path]);

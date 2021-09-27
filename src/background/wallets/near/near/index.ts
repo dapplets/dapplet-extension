@@ -66,13 +66,13 @@ export default class implements NearWallet {
         const currentTabId = currentTab.id;
 
         const requestId = generateGuid();
-        const callbackUrl = browser.extension.getURL(`callback.html?request_id=${requestId}`);
+        const callbackUrl = browser.runtime.getURL(`callback.html?request_id=${requestId}`);
 
         let callbackTab = null;
         const waitTabPromise = waitTab(callbackUrl).then(x => callbackTab = x);
         const requestPromise = this._nearWallet.requestSignIn({
-            successUrl: browser.extension.getURL(`callback.html?request_id=${requestId}&success=true`),
-            failureUrl: browser.extension.getURL(`callback.html?request_id=${requestId}&success=false`)
+            successUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=true`),
+            failureUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=false`)
         });
 
         await Promise.race([waitTabPromise, requestPromise]);

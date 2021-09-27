@@ -88,7 +88,7 @@ export default class Core {
         const me = this;
         return new Promise<void>((resolve, reject) => {
 
-            const pairingUrl = browser.extension.getURL('pairing.html');
+            const pairingUrl = browser.runtime.getURL('pairing.html');
             let overlay = me.overlayManager.getOverlays().find(x => x.uri === pairingUrl);
             if (!overlay) overlay = me.overlayManager.createOverlay(pairingUrl, 'Wallet');
 
@@ -118,7 +118,7 @@ export default class Core {
         const me = this;
         return new Promise<void>((resolve, reject) => {
 
-            const url = browser.extension.getURL('login.html');
+            const url = browser.runtime.getURL('login.html');
             //let overlay = this.overlayManager.getOverlays().find(x => x.uri === pairingUrl);
             const overlay = me.overlayManager.createOverlay(url, 'Login');
 
@@ -148,7 +148,7 @@ export default class Core {
     public waitDeployOverlay(payload: any): Promise<void> {
         const me = this;
         return new Promise<void>((resolve, reject) => {
-            const pairingUrl = browser.extension.getURL('deploy.html');
+            const pairingUrl = browser.runtime.getURL('deploy.html');
             const overlay = me.overlayManager.createOverlay(pairingUrl, 'Deploy');
             overlay.open(() => overlay.send('data', [payload]));
 
@@ -171,7 +171,7 @@ export default class Core {
     public waitSettingsOverlay(payload: any): Promise<void> {
         const me = this;
         return new Promise<void>((resolve, reject) => {
-            const pairingUrl = browser.extension.getURL('settings.html');
+            const pairingUrl = browser.runtime.getURL('settings.html');
             const overlay = me.overlayManager.createOverlay(pairingUrl, 'User Settings');
             overlay.open(() => overlay.send('data', [payload]));
 
@@ -193,14 +193,14 @@ export default class Core {
     }
 
     public async waitGuideOverlay(payload: any): Promise<void> {
-        const pairingUrl = browser.extension.getURL('guide.html');
+        const pairingUrl = browser.runtime.getURL('guide.html');
         const overlay = this.overlayManager.createOverlay(pairingUrl, 'Upgrade Guide');
         overlay.open(() => overlay.send('data', [payload]));
     }
 
     public _togglePopupOverlay() {
         if (!this._popupOverlay?.registered) {
-            const pairingUrl = browser.extension.getURL('popup.html');
+            const pairingUrl = browser.runtime.getURL('popup.html');
             this._popupOverlay = this.overlayManager.createOverlay(pairingUrl, 'Dapplets', true);
             this._popupOverlay.open();
         } else {
@@ -212,7 +212,7 @@ export default class Core {
         const me = this;
 
         return new Promise<void>((resolve, reject) => {
-            const pairingUrl = browser.extension.getURL('sowa.html');
+            const pairingUrl = browser.runtime.getURL('sowa.html');
             const overlay = me.overlayManager.createOverlay(pairingUrl, 'SOWA');
             // ToDo: implement multiframe
             overlay.open(() => overlay.send('txmeta', [sowaId, metadata]));
@@ -399,6 +399,6 @@ export default class Core {
     BigNumber = ethers.BigNumber;
 
     public starterOverlay() {
-        return this.overlay({ url: browser.extension.getURL('starter.html'), title: 'Starter' });
+        return this.overlay({ url: browser.runtime.getURL('starter.html'), title: 'Starter' });
     }
 }

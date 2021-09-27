@@ -145,7 +145,7 @@ export async function getCurrentTab(): Promise<Tabs.Tab | null> {
 
     if (!tab) return null;
 
-    const popupUrl = browser.extension.getURL('popup.html');
+    const popupUrl = browser.runtime.getURL('popup.html');
 
     if (tab.url.indexOf(popupUrl) !== -1) {
       const params = new URLSearchParams(new URL(tab.url).search); // For automated testing open popup in separated tab with URL /popup.html?tabUrl=https://example.com
