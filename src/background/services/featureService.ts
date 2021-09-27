@@ -54,7 +54,7 @@ export default class FeatureService {
                             isDev: configRegistries.find(r => r.url === registryUrl).isDev
                         };
                         if (!dto.hostnames) dto.hostnames = [];
-                        dto.hostnames.push(contextId);
+                        dto.hostnames = mergeDedupe([dto.hostnames, [contextId]]);
                         dto.available = true;
                         dtos.push(dto);
                     } else {
@@ -90,7 +90,7 @@ export default class FeatureService {
                     isDev: activeRegistries.find(r => r.url === registryUrl)?.isDev
                 };
                 if (!dto.hostnames) dto.hostnames = [];
-                dto.hostnames.push(contextId);
+                dto.hostnames = mergeDedupe([dto.hostnames, [contextId]]);
                 dto.available = false;
                 dtos.push(dto);
             }
