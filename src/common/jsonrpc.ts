@@ -1,16 +1,16 @@
-import { generateGuid } from "../common/helpers";
-
-export class IframeMessenger {
+export class JsonRpc {
 
     private _callbacks = new Map<string, Set<Function>>();
+    private _outcomingRequests = new Set<string>();
 
-    constructor() {
+    constructor(private _defaultWindow: Window = window) {
         window.addEventListener('message', this._handler);
     }
 
-    public call(method: string, params: any[], frame: Window): Promise<any> {
+    public call(method: string, params: any[], frame: Window = this._defaultWindow): Promise<any> {
         return new Promise((res, rej) => {
-            const id = generateGuid();
+            const id = (crypto as any).randomUUID();
+            this._outcomingRequests.add(id);
 
             const rpcRequest = {
                 "jsonrpc": "2.0",
@@ -25,8 +25,10 @@ export class IframeMessenger {
                 try {
                     const rpcResponse = JSON.parse(event.data);
                     if (rpcResponse.id !== id) return;
+                    if (rpcResponse.method) return;
 
                     window.removeEventListener('message', handler);
+                    this._outcomingRequests.delete(id);
 
                     if (rpcResponse.error) {
                         rej(rpcResponse.error.message);
@@ -63,6 +65,7 @@ export class IframeMessenger {
         }
 
         if (!rpcRequest.method || !rpcRequest.params || !rpcRequest.id) return;
+        if (this._outcomingRequests.has(rpcRequest.id)) return;
 
         const callbacks = this._callbacks.get(rpcRequest.method) ?? new Set();
         

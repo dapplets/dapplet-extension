@@ -22,6 +22,7 @@ module.exports = {
     popup: path.join(__dirname, "src/popup/index.tsx"),
     background: path.join(__dirname, "src/background/index.ts"),
     contentscript: path.join(__dirname, "src/contentscript/index.ts"),
+    inpage: path.join(__dirname, "src/inpage/index.ts"),
     pairing: path.join(__dirname, "src/pairing/index.tsx"),
     sowa: path.join(__dirname, "src/sowa/index.tsx"),
     deploy: path.join(__dirname, "src/deploy/index.tsx"),
@@ -92,7 +93,10 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
-      chunks: 'all',
+      chunks(chunk) {
+        // exclude `inpage`
+        return chunk.name !== 'inpage';
+      },
       name: 'common'
     },
     minimize: true,

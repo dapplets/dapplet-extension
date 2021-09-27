@@ -1,5 +1,5 @@
 import { generateGuid } from "../../../common/helpers";
-import { IframeMessenger } from "../../iframeMessenger";
+import { JsonRpc } from "../../../common/jsonrpc";
 import { IOverlay } from "../interfaces";
 
 export class OverlayIframe implements IOverlay {
@@ -13,7 +13,7 @@ export class OverlayIframe implements IOverlay {
     private _id: string;
     private _callbacks = new Set<Function>();
 
-    constructor(public uri: string, public title: string, public hidden: boolean = false, private _iframeMessenger: IframeMessenger) {
+    constructor(public uri: string, public title: string, public hidden: boolean = false, private _iframeMessenger: JsonRpc) {
         this._id = generateGuid();
         this._iframeMessenger.call('OVERLAY_CREATE', [this._id, uri, title, hidden], window.top);
         this._iframeMessenger.on('OVERLAY_EXEC', (id: string, topic: string, message: string) => {

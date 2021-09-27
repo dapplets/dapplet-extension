@@ -46,7 +46,8 @@
     "settings.html",
     "login.html",
     "callback.html",
-    "guide.html"
+    "guide.html",
+    "inpage.js"
   ],
   "permissions": [
     "tabs",

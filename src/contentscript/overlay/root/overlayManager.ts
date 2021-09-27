@@ -4,7 +4,7 @@ import { capitalizeFirstLetter } from '../../../common/helpers';
 import { Overlay } from './overlay';
 import INNER_STYLE from '!raw-loader!./overlay.css';
 import { IOverlayManager } from '../interfaces';
-import { IframeMessenger } from '../../iframeMessenger';
+import { JsonRpc } from '../../../common/jsonrpc';
 
 const PageNavClass = 'dapplets-overlay-nav';
 const TopPanelClass = 'dapplets-overlay-nav-top-panel';
@@ -37,7 +37,7 @@ export class OverlayManager implements IOverlayManager {
         contentItem: HTMLDivElement
     }[] = [];
 
-    constructor(private _iframeMessenger: IframeMessenger) {
+    constructor(private _iframeMessenger: JsonRpc) {
         // Side panel
         const panel = document.createElement(DappletsOverlayManagerClass);
         panel.classList.add(OverlayFrameClass, CollapsedOverlayClass, HiddenOverlayClass);
