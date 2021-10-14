@@ -47,6 +47,7 @@
     "login.html",
     "callback.html",
     "guide.html",
+    "overlay.html",
     "inpage.js"
   ],
   "permissions": [

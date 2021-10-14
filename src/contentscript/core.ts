@@ -12,6 +12,7 @@ import { ProxySigner } from "./proxySigner";
 import { BackgroundNear } from "./near/backgroundNear";
 import { BackgroundWalletConnection } from "./near/backgroundWalletConnection";
 import * as NearAPI from "near-api-js";
+import { SystemOverlayTabs } from "../common/types";
 
 type Abi = any;
 
@@ -198,6 +199,19 @@ export default class Core {
         overlay.open(() => overlay.send('data', [payload]));
     }
 
+    public async waitSystemOverlay(payload: { activeTab: SystemOverlayTabs, payload: any }): Promise<void> {
+        const pairingUrl = browser.runtime.getURL('overlay.html');
+        const overlay = this.overlayManager.createOverlay(pairingUrl, 'System');
+        overlay.open(() => overlay.send('data', [payload]));
+        overlay.onMessage((topic) => {
+            if (topic === 'cancel') {
+                overlay.close();
+            } else if (topic === 'ready') {
+                overlay.close();
+            }
+        });
+    }
+
     public _togglePopupOverlay() {
         if (!this._popupOverlay?.registered) {
             const pairingUrl = browser.runtime.getURL('popup.html');
@@ -367,6 +381,7 @@ export default class Core {
     contextFinished(contextIds: any[], parentContext?: string): void { }
     onAction(handler: Function) { };
     onHome(handler: Function) { };
+    onShareLink(handler: (data: any) => void) { };
 
     public storage: AppStorage;
 
@@ -400,5 +415,12 @@ export default class Core {
 
     public starterOverlay() {
         return this.overlay({ url: browser.runtime.getURL('starter.html'), title: 'Starter' });
+    }
+
+    public createShareLink(targetUrl: string, modulePayload: any, _env?: { contextIds: string[], registry: string, moduleId: string }): string {
+        const payload = [EXTENSION_VERSION, _env.registry, _env.moduleId, ['*'], modulePayload];
+        const base64Payload = btoa(JSON.stringify(payload));
+        const WEB_PROXY_URL = 'https://web.dapplets.org/live/';
+        return WEB_PROXY_URL + targetUrl + '#dapplet/' + base64Payload;
     }
 }

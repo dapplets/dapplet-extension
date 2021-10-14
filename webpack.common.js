@@ -30,7 +30,8 @@ module.exports = {
     settings: path.join(__dirname, "src/settings/index.tsx"),
     login: path.join(__dirname, "src/login/index.tsx"),
     welcome: path.join(__dirname, "src/welcome/index.tsx"),
-    guide: path.join(__dirname, "src/guide/index.tsx")
+    guide: path.join(__dirname, "src/guide/index.tsx"),
+    overlay: path.join(__dirname, "src/overlay/index.tsx")
   },
   output: {
     path: path.join(__dirname, "build"),
@@ -151,6 +152,9 @@ module.exports = {
         }, {
           from: "src/guide/index.html",
           to: "guide.html"
+        }, {
+          from: "src/overlay/index.html",
+          to: "overlay.html"
         }
       ]
     }),

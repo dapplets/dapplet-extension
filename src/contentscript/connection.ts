@@ -200,7 +200,7 @@ export class Connection implements IConnection {
                             let cond = this.eventDef ? this.eventDef[eventId] : eventId
                             
                             //ToDo: extract msg.type default
-                            if ((typeof cond === 'function' ? cond(op, msg) : msg.type == cond) || eventId === ANY_EVENT) {
+                            if ((typeof cond === 'function' ? cond(op, msg) : msg?.type == cond) || eventId === ANY_EVENT) {
                                 const handlers = listener.h[eventId]
                                 if (!handlers) continue
                                 

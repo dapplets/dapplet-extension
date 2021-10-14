@@ -4,11 +4,10 @@ import { maxSatisfying, valid } from 'semver';
 import { ModuleTypes, DEFAULT_BRANCH_NAME, CONTEXT_ID_WILDCARD } from '../common/constants';
 import { browser } from "webextension-polyfill-ts";
 import { IResolver, IContentAdapter } from './types';
-import { areModulesEqual, joinUrls, multipleReplace } from "../common/helpers";
+import { areModulesEqual, formatModuleId, joinUrls, multipleReplace, parseModuleName } from "../common/helpers";
 import VersionInfo from "../background/models/versionInfo";
 import { AppStorage } from "./appStorage";
 import { DefaultConfig, SchemaConfig } from "../common/types";
-
 
 type RegistriedModule = {
     manifest: VersionInfo,
@@ -24,15 +23,16 @@ type RegistriedModule = {
     defaultConfig?: DefaultConfig,
     schemaConfig?: SchemaConfig,
     onActionHandler?: Function,
-    onHomeHandler?: Function
+    onHomeHandler?: Function,
+    onShareLinkHandler?: Function
 }
 
 export class Injector {
     public availableContextIds: string[] = [];
 
-    private registry: RegistriedModule[] = [];
+    public registry: RegistriedModule[] = [];
 
-    constructor(public core: Core) {
+    constructor(public core: Core, private env?: { shareLinkPayload: { moduleId: string, payload: any, isAllOk: boolean } }) {
         this._setContextActivivty([new URL(window["DAPPLETS_ORIGINAL_HREF"] ?? window.location.href).hostname], undefined, true);
         window.exports = {}; // for CommonJS modules compatibility
     }
@@ -80,6 +80,19 @@ export class Injector {
                         await m.instance.activate(...m.instancedActivateMethodsDependencies);
                     } else {
                         throw new Error('activate() must be a function.');
+                    }
+                }
+
+                // Transfer data from share links (for dapplets already activated)
+                const sl = this.env?.shareLinkPayload;
+                const slModuleId = sl ? parseModuleName(sl.moduleId) : null;
+                if (sl && areModulesEqual(slModuleId, m.manifest)) {
+                    if (sl.payload) {
+                        try {
+                            this.sendShareLinkData(slModuleId.name, sl.payload);
+                        } catch (e) {
+                            console.error(e);
+                        }
                     }
                 }
 
@@ -158,6 +171,12 @@ export class Injector {
         module.onHomeHandler?.();
     }
 
+    public async sendShareLinkData(moduleName: string, data: any) {
+        const module = this.registry.find(m => m.manifest.name === moduleName);
+        if (!module || !module.instance) throw Error('The dapplet is not activated.');
+        module.onShareLinkHandler?.(data);
+    }
+
     public setActionHandler(moduleName: string, handler: Function) {
         const module = this.registry.find(m => m.manifest.name === moduleName);
         module.onActionHandler = handler;
@@ -166,6 +185,11 @@ export class Injector {
     public setHomeHandler(moduleName: string, handler: Function) {
         const module = this.registry.find(m => m.manifest.name === moduleName);
         module.onHomeHandler = handler;
+    }
+
+    public setShareLinkHandler(moduleName: string, handler: Function) {
+        const module = this.registry.find(m => m.manifest.name === moduleName);
+        module.onShareLinkHandler = handler;
     }
 
     public async dispose() {
@@ -232,10 +256,16 @@ export class Injector {
                 contract: (type, address, options) => core.contract(type, address, options, manifest.name),
                 onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
                 onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
+                onShareLink: (handler: Function) => this.setShareLinkHandler(manifest.name, handler),
                 getContentDetectors: () => core.getContentDetectors(),
                 utils: core.utils,
                 BigNumber: core.BigNumber,
-                starterOverlay: core.starterOverlay
+                starterOverlay: core.starterOverlay,
+                createShareLink: (targetUrl: string, modulePayload: any) => core.createShareLink(targetUrl, modulePayload, {
+                    contextIds: ['*'], // ToDo: Replace wildcard on real context IDs
+                    moduleId: formatModuleId(manifest),
+                    registry: manifest.registryUrl
+                })
             };
 
             let newBranch: string = null;

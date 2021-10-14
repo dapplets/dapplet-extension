@@ -5,7 +5,7 @@ import * as NotificationService from "./services/notificationService";
 import FeatureService from './services/featureService';
 import GlobalConfigService from './services/globalConfigService';
 import * as EventService from './services/eventService';
-import { browser } from "webextension-polyfill-ts";
+import { browser, Tabs } from "webextension-polyfill-ts";
 import EnsService from "./services/ensService";
 import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 import ProxyService from "./services/proxyService";
@@ -254,7 +254,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
       featureService.getFeaturesByHostnames(idContexts).then(manifests => {
         const adapters = manifests.filter(x => x.type === ModuleTypes.Adapter);
         if (adapters.length === 0) return;
-        
+
         browser.tabs.sendMessage(sender.tab.id, {
           type: message.type === "CONTEXT_STARTED" ? "FEATURE_ACTIVATED" : "FEATURE_DEACTIVATED",
           payload: adapters.map(m => ({
@@ -366,4 +366,16 @@ if (window['DAPPLETS_JSLIB'] !== true) {
       const reinjectedNumber = x.filter(x => !!x).length;
       if (reinjectedNumber > 0) console.log(`${reinjectedNumber} content scripts were reinjected after background reloading.`);
     });
+
+  function redirectFromProxyServer(tab: Tabs.Tab) {
+    const groups = /https:\/\/web\.dapplets\.org\/live\/(.*)/gm.exec(tab.url);
+    const [, targetUrl] = groups ?? [];
+    if (targetUrl) {
+      browser.tabs.update(tab.id, { url: targetUrl });
+
+    }
+  }
+
+  browser.tabs.onCreated.addListener(redirectFromProxyServer);
+  browser.tabs.onUpdated.addListener(tabId => browser.tabs.get(tabId).then(redirectFromProxyServer));
 }

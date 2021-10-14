@@ -1,0 +1,11 @@
+$primary-color: darkblue;
+$background-color: #BADA55;
+
+// Chrome applies an 8px margin by default (gross).
+body {
+    padding: 30px 15px 30px 15px;
+}
+
+img {
+  max-width: 100%;
+}

@@ -217,6 +217,8 @@ export default class GlobalConfigService {
         const isHttpAddress = typeOfUri(url) === UriTypes.Http;
         const isNearAddress = typeOfUri(url) === UriTypes.Near;
 
+        if (isHttpAddress) isDev = true;
+
         if (!isEthAddress && !isEnsAddress && !isHttpAddress && !isNearAddress) throw new Error("Unsupported URI type");
         if (isDev && !isHttpAddress) throw new Error("Only HTTP(S) links are supported for development servers");
         if (!isDev && (!isEthAddress && !isEnsAddress && !isNearAddress)) throw new Error("A public registry must have a valid Ethereum, ENS or NEAR Protocol address");

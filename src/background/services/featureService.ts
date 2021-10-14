@@ -458,12 +458,15 @@ export default class FeatureService {
 
     public async getVersionInfo(registryUri: string, moduleName: string, branch: string, version: string) {
         const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        if (!registry) return null;
         return registry.getVersionInfo(moduleName, branch, version);
     }
 
     public async getModuleInfoByName(registryUrl: string, moduleName: string) {
         const registriesConfig = await this._globalConfigService.getRegistries();
-        const isDev = registriesConfig.find(x => x.url === registryUrl).isDev;
+        const config = registriesConfig.find(x => x.url === registryUrl);
+        if (!config) return null;
+        const isDev = config.isDev;
 
         if (isDev) {
             const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);

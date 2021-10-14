@@ -1,6 +1,7 @@
 import { browser, Tabs } from "webextension-polyfill-ts";
 import { DEFAULT_BRANCH_NAME } from "./constants";
 import { ChainTypes, ModuleId } from "./types";
+import * as semver from "semver";
 
 export function getHostName(url: string): string {
   return new URL(url).hostname;
@@ -284,7 +285,38 @@ export function formatModuleId({ name, branch, version }: ModuleId) {
 export function multipleReplace(arr: string[], substr: string, newstrArray: string[]) {
   const newArr = arr.filter(x => x !== substr);
   if (newArr.length !== arr.length) {
-      newArr.push(...newstrArray);
+    newArr.push(...newstrArray);
   }
   return newArr;
+}
+
+export function tryParseBase64Payload(base64Payload: string): {
+  sourceExtensionVersion: string,
+  registry: string,
+  moduleId: string,
+  contextIds: string[],
+  payload: any
+} {
+  try {
+    const json = atob(base64Payload);
+    const data = JSON.parse(json);
+    if (!Array.isArray(data)) throw new Error('Invalid payload. It must be Base64 encoded JSON-array.');
+    const [version] = data;
+
+    // ToDo: check extension version when protocol will be changed
+
+    if (semver.valid(version)) {
+      const [, registry, moduleId, contextIds, payload] = data;
+      if (!registry) throw new Error('Invalid registry URI in the payload.');
+      if (!moduleId || !parseModuleName(moduleId)) throw new Error('Invalid module ID in the payload.');
+      if (!contextIds || !Array.isArray(contextIds) || contextIds.length === 0) throw new Error('Invalid context IDs in the payload. Must be least one.')
+
+      return { sourceExtensionVersion: version, moduleId, registry, payload, contextIds };
+    } else {
+      throw new Error('Invalid extension version in the payload.');
+    }
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 }

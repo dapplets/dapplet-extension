@@ -7,20 +7,36 @@ import { JsonRpc } from '../common/jsonrpc';
 import { OverlayManagerIframe } from './overlay/iframe/overlayManager';
 import { OverlayManager } from './overlay/root/overlayManager';
 import { IOverlay } from './overlay/interfaces';
-import { assertFullfilled, timeoutPromise } from '../common/helpers';
+import { assertFullfilled, tryParseBase64Payload, parseModuleName, timeoutPromise } from '../common/helpers';
 import { CONTEXT_ID_WILDCARD } from '../common/constants';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { SystemOverlayTabs } from '../common/types';
 
-tracing.startTracing();
+// tracing.startTracing();
 
-function init() {
+const IS_LIBRARY = window['DAPPLETS_JSLIB'] === true;
+
+async function init() {
+
+    const shareLinkPayload = await processShareLink().catch((e) => {
+        console.error(e);
+        return null;
+    });
 
     const isIframe = self !== top;
 
     const jsonrpc = new JsonRpc();
     const overlayManager = (isIframe) ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc);
     const core = new Core(isIframe, overlayManager); // ToDo: is it global for all modules?
-    const injector = new Injector(core);
+    const injector = new Injector(core, { shareLinkPayload });
+
+    // Open confirmation overlay if checks are not passed
+    if (shareLinkPayload && !shareLinkPayload.isAllOk) {
+        core.waitSystemOverlay({
+            activeTab: SystemOverlayTabs.DAPPLET_CONFIRMATION,
+            payload: shareLinkPayload
+        });
+    }
 
     const getAllContextIds = async (): Promise<string[]> => {
         const contextIDs = [...injector.availableContextIds];
@@ -113,6 +129,84 @@ function injectScript(url: string) {
     } catch (error) {
         console.error('[DAPPLETS]: Dapplets API injection failed.', error);
     }
+}
+
+async function processShareLink() {
+    const url = window.location.href;
+    const groups = /(.*)#dapplet\/(.*)/gm.exec(url);
+    const [, urlNoPayload, payloadBase64] = groups ?? [];
+    if (!urlNoPayload || !payloadBase64) return;
+
+    // window.location.href = window.location.href.replace('#dapplet/' + payloadBase64, '');
+
+    const payload = tryParseBase64Payload(payloadBase64);
+    if (!payload) return;
+
+    const { moduleId, registry, contextIds } = payload;
+    const { getModuleInfoByName, getTrustedUsers, getRegistries, getActiveModulesByHostnames, addRegistry, enableRegistry, addTrustedUser, activateFeature, deactivateFeature } = await initBGFunctions(browser);
+
+    const registries = await getRegistries();
+    const targetRegistry = registries.find(x => x.url === registry);
+    const isRegistryExists = !!targetRegistry;
+    if (!isRegistryExists) {
+        if (IS_LIBRARY) {
+            await addRegistry(registry);
+        } else {
+            return { ...payload, isAllOk: false };
+        }
+    }
+
+    const isRegistryEnabled = isRegistryExists && targetRegistry.isEnabled;
+    if (!isRegistryEnabled) {
+        if (IS_LIBRARY) {
+            await enableRegistry(registry);
+        } else {
+            return { ...payload, isAllOk: false };
+        }
+    }
+
+    const targetModuleId = parseModuleName(moduleId);
+    const mi = await getModuleInfoByName(registry, targetModuleId.name);
+    if (!mi) throw new Error(`ShareLink: Cannot find the module "${targetModuleId.name}" in the registry "${registry}"`);
+
+    const trustedUsers = await getTrustedUsers();
+    const targetTrustedUser = trustedUsers.find(x => x.account.toLowerCase() === mi.author?.toLowerCase());
+    const isRegistryDev = isRegistryExists && targetRegistry.isDev;
+    const isTrustedUserExists = !!targetTrustedUser || isRegistryDev;
+    if (!isTrustedUserExists) {
+        if (IS_LIBRARY) {
+            await addTrustedUser(mi.author);
+        } else {
+            return { ...payload, isAllOk: false };
+        }
+    }
+
+    // const isTrustedUserEnabled = true || isRegistryDev; // ToDo: use targetTrustedUser.isEnabled when Trusted User (de)activation feature will be done.
+    // ToDo: enable trusted user
+    // if (!s.isTrustedUserEnabled) { }
+
+    const activeModules = await getActiveModulesByHostnames(contextIds);
+    const activeModule = activeModules.find(x => x.name === targetModuleId.name && x.branch === targetModuleId.branch);
+    const isModuleActivated = !!activeModule;
+    if (!isModuleActivated) {
+        if (IS_LIBRARY) {
+            await activateFeature(targetModuleId.name, targetModuleId.version, contextIds, 0, registry);
+        } else {
+            return { ...payload, isAllOk: false };
+        }
+    }
+
+    const isModuleVersionEqual = isModuleActivated && activeModule.version === targetModuleId.version;
+    if (isModuleActivated && !isModuleVersionEqual) {
+        if (IS_LIBRARY) {
+            await deactivateFeature(targetModuleId.name, activeModule.version, contextIds, 0, registry);
+            await activateFeature(targetModuleId.name, targetModuleId.version, contextIds, 0, registry);
+        } else {
+            return { ...payload, isAllOk: false };
+        }
+    }
+    
+    return { ...payload, isAllOk: true };
 }
 
 // do not inject to overlays frames

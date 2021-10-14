@@ -7,6 +7,7 @@ import starter_script from '!raw-loader!../build/starter.js'
 import settings_script from '!raw-loader!../build/settings.js'
 import login_script from '!raw-loader!../build/login.js'
 import guide_script from '!raw-loader!../build/guide.js'
+import overlay_script from '!raw-loader!../build/overlay.js'
 
 import fakeapi_frame_script from '!raw-loader!./fakeapi_frame.js'
 
@@ -88,6 +89,8 @@ browser.extension.getURL = function (url) {
         script = login_script;
     } else if (url === 'guide.html') {
         script = guide_script;
+    } else if (url === 'overlay.html') {
+        script = overlay_script;
     }
 
     if (script === null) return;

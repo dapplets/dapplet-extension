@@ -55,3 +55,7 @@ export type ModuleId = {
     branch: string, 
     version: string
 }
+
+export enum SystemOverlayTabs {
+    DAPPLET_CONFIRMATION = 'DAPPLET_CONFIRMATION'
+}
