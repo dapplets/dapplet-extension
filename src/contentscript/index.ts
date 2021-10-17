@@ -7,7 +7,7 @@ import { JsonRpc } from '../common/jsonrpc';
 import { OverlayManagerIframe } from './overlay/iframe/overlayManager';
 import { OverlayManager } from './overlay/root/overlayManager';
 import { IOverlay } from './overlay/interfaces';
-import { assertFullfilled, tryParseBase64Payload, parseModuleName, timeoutPromise } from '../common/helpers';
+import { assertFullfilled, tryParseBase64Payload, parseModuleName, timeoutPromise, parseShareLink } from '../common/helpers';
 import { CONTEXT_ID_WILDCARD } from '../common/constants';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { SystemOverlayTabs } from '../common/types';
@@ -133,8 +133,7 @@ function injectScript(url: string) {
 
 async function processShareLink() {
     const url = window.location.href;
-    const groups = /(.*)#dapplet\/(.*)/gm.exec(url);
-    const [, urlNoPayload, payloadBase64] = groups ?? [];
+    const { urlNoPayload, payloadBase64 } = parseShareLink(url);
     if (!urlNoPayload || !payloadBase64) return;
 
     // window.location.href = window.location.href.replace('#dapplet/' + payloadBase64, '');

@@ -320,3 +320,13 @@ export function tryParseBase64Payload(base64Payload: string): {
     return null;
   }
 }
+
+export function parseShareLink(url: string) {
+  const groups = /(.*)#dapplet\/(.*)/gm.exec(url);
+  if (groups) {
+    const [, urlNoPayload, payloadBase64] = groups;
+    return { urlNoPayload, payloadBase64 };
+  } else {
+    return { urlNoPayload: url, payloadBase64: null };
+  }
+}
