@@ -11,7 +11,7 @@ import { CONTEXT_ID_WILDCARD } from '../common/constants';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { SystemOverlayTabs } from '../common/types';
 
-const IS_OVERLAY_IFRAME = window.name.indexOf('dapplet-overlay') === -1;
+const IS_OVERLAY_IFRAME = window.name.indexOf('dapplet-overlay') !== -1;
 
 // do not inject to overlays frames
 if (!IS_OVERLAY_IFRAME) {
