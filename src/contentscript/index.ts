@@ -149,7 +149,7 @@ if (!IS_OVERLAY_IFRAME) {
         const targetRegistry = registries.find(x => x.url === registry);
         const isRegistryExists = !!targetRegistry;
         if (!isRegistryExists) {
-            await addRegistry(registry);
+            await addRegistry(registry, false);
         }
 
         const isRegistryEnabled = isRegistryExists && targetRegistry.isEnabled;

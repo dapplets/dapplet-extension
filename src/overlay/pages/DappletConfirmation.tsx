@@ -124,7 +124,7 @@ export class DappletConfirmation extends React.Component<Props, State> {
     // ToDo: move it to the background?
 
     if (!s.isRegistryExists) {
-      await addRegistry(p.data.registry);
+      await addRegistry(p.data.registry, false);
     }
 
     if (!s.isRegistryEnabled) {
@@ -155,7 +155,7 @@ export class DappletConfirmation extends React.Component<Props, State> {
     const s = this.state, p = this.props;
     this.setState({ isLoading: true });
     const { addRegistry } = await initBGFunctions(browser);
-    await addRegistry(p.data.registry);
+    await addRegistry(p.data.registry, false);
     await this.componentDidMount();
   }
 
