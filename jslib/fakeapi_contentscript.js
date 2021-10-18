@@ -18,7 +18,7 @@ browser.browserAction.onClicked = {};
 browser.commands = {};
 browser.commands.onCommand = {};
 browser.contextMenus = {};
-browser.extension = {};
+browser.runtime = {};
 browser.notifications = {};
 browser.notifications.onClicked = {};
 browser.runtime = {};
@@ -66,8 +66,8 @@ browser.contextMenus.removeAll = async function (callback) {
 
 const _blobUriCache = {};
 
-browser.extension.getURL = function (url) {
-    //console.log('browser.extension.getURL', arguments);
+browser.runtime.getURL = function (url) {
+    //console.log('browser.runtime.getURL', arguments);
 
     if (_blobUriCache[url] !== undefined) return _blobUriCache[url];
 

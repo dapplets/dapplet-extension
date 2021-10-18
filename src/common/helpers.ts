@@ -290,13 +290,15 @@ export function multipleReplace(arr: string[], substr: string, newstrArray: stri
   return newArr;
 }
 
-export function tryParseBase64Payload(base64Payload: string): {
+export type ShareLinkPayload = {
   sourceExtensionVersion: string,
   registry: string,
   moduleId: string,
   contextIds: string[],
   payload: any
-} {
+}
+
+export function tryParseBase64Payload(base64Payload: string): ShareLinkPayload {
   try {
     const json = atob(base64Payload);
     const data = JSON.parse(json);

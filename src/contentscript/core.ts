@@ -33,22 +33,14 @@ export default class Core {
 
     constructor(isIframe: boolean, public overlayManager: IOverlayManager) {
         if (!isIframe) {
-            const closeOverlay = () => {
-                if (this._popupOverlay == null) {
-                    this._togglePopupOverlay()
-                } else {
-                    this._popupOverlay.open()
-                }
-            }
-
             browser.runtime.onMessage.addListener((message, sender) => {
                 if (typeof message === 'string') {
                     if (message === "TOGGLE_OVERLAY") {
-                        this._togglePopupOverlay();
+                        this.toggleOverlay();
                     } else if (message === "OPEN_OVERLAY") { // used by pure jslib
-                        closeOverlay();
+                        this.openOverlay();
                     } else if (message === "CLOSE_OVERLAY") { // used by pure jslib
-                        this.overlayManager && this.overlayManager.unregisterAll();
+                        this.closeOverlay();
                     }
                 } else if (typeof message === 'object' && message.type !== undefined) {
                     if (message.type === 'OPEN_DEPLOY_OVERLAY') {
@@ -75,13 +67,13 @@ export default class Core {
                     if (data.type === 'OPEN_POPUP_OVERLAY') {
                         return Promise.resolve(this.overlayManager.openPopup(data.payload.path));
                     } else if (data.type === 'CLOSE_OVERLAY') {
-                        this.overlayManager && this.overlayManager.unregisterAll();
+                        this.closeOverlay();
                     }
                 }
             });
 
             const swiper = new Swiper(document.body);
-            swiper.on("left", () => closeOverlay());
+            swiper.on("left", () => this.openOverlay());
             swiper.on("right", () => this.overlayManager.close());
         }
     }
@@ -213,13 +205,25 @@ export default class Core {
         });
     }
 
-    public _togglePopupOverlay() {
+    public toggleOverlay() {
         if (!this._popupOverlay?.registered) {
             const pairingUrl = browser.runtime.getURL('popup.html');
             this._popupOverlay = this.overlayManager.createOverlay(pairingUrl, 'Dapplets', true);
             this._popupOverlay.open();
         } else {
             this.overlayManager.toggle();
+        }
+    }
+
+    public closeOverlay() {
+        this.overlayManager && this.overlayManager.unregisterAll();
+    }
+
+    public openOverlay() {
+        if (this._popupOverlay == null) {
+            this.toggleOverlay()
+        } else {
+            this._popupOverlay.open()
         }
     }
 

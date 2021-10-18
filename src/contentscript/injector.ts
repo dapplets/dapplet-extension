@@ -27,13 +27,16 @@ type RegistriedModule = {
     onShareLinkHandler?: Function
 }
 
+const DAPPLETS_ORIGINAL_HREF: string = window["DAPPLETS_ORIGINAL_HREF"];
+const IS_LIBRARY = window['DAPPLETS_JSLIB'] === true;
+
 export class Injector {
     public availableContextIds: string[] = [];
 
     public registry: RegistriedModule[] = [];
 
     constructor(public core: Core, private env?: { shareLinkPayload: { moduleId: string, payload: any, isAllOk: boolean } }) {
-        this._setContextActivivty([new URL(window["DAPPLETS_ORIGINAL_HREF"] ?? window.location.href).hostname], undefined, true);
+        this._setContextActivivty([new URL(DAPPLETS_ORIGINAL_HREF ?? window.location.href).hostname], undefined, true);
         window.exports = {}; // for CommonJS modules compatibility
     }
 
@@ -390,6 +393,13 @@ export class Injector {
 
     private async _setContextActivivty(contextIds: any[], parentContext: string, isActive: boolean) {
         if (contextIds.length === 0) return;
+
+        if (IS_LIBRARY && DAPPLETS_ORIGINAL_HREF && parentContext === window.location.hostname) {
+            try {
+                const { hostname } = new URL(DAPPLETS_ORIGINAL_HREF);
+                parentContext = hostname;
+            } catch (_) {}
+        }
 
         contextIds = contextIds.map(ctx => (typeof ctx === 'string') ? ctx : ctx.id).filter(x => x !== undefined && x !== null);
         contextIds = parentContext ? contextIds.map((ctx) => parentContext + '/' + ctx) : contextIds;

@@ -6,7 +6,7 @@ import { JsonRpc } from '../common/jsonrpc';
 import { OverlayManagerIframe } from './overlay/iframe/overlayManager';
 import { OverlayManager } from './overlay/root/overlayManager';
 import { IOverlay } from './overlay/interfaces';
-import { assertFullfilled, tryParseBase64Payload, parseModuleName, timeoutPromise, parseShareLink } from '../common/helpers';
+import { assertFullfilled, tryParseBase64Payload, parseModuleName, timeoutPromise, parseShareLink, ShareLinkPayload } from '../common/helpers';
 import { CONTEXT_ID_WILDCARD } from '../common/constants';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { SystemOverlayTabs } from '../common/types';
@@ -20,12 +20,10 @@ if (!IS_OVERLAY_IFRAME) {
     const IS_IFRAME = self !== top;
 
     async function init() {
-
         const shareLinkPayload = await processShareLink().catch((e) => {
-            console.error(e);
+            console.error('Cannot process the share link', e);
             return null;
         });
-
 
         const jsonrpc = new JsonRpc();
         const overlayManager = (IS_IFRAME) ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc);
@@ -33,7 +31,7 @@ if (!IS_OVERLAY_IFRAME) {
         const injector = new Injector(core, { shareLinkPayload });
 
         // Open confirmation overlay if checks are not passed
-        if (shareLinkPayload && !shareLinkPayload.isAllOk) {
+        if (!IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
             core.waitSystemOverlay({
                 activeTab: SystemOverlayTabs.DAPPLET_CONFIRMATION,
                 payload: shareLinkPayload
@@ -115,8 +113,17 @@ if (!IS_OVERLAY_IFRAME) {
             return initBGFunctions(browser).then(x => x.getWalletDescriptors());
         });
 
+        jsonrpc.on('openOverlay', () => Promise.resolve(core.openOverlay()));
+        jsonrpc.on('closeOverlay', () => Promise.resolve(core.closeOverlay()));
+        jsonrpc.on('toggleOverlay', () => Promise.resolve(core.toggleOverlay()));
+
         if (!IS_IFRAME && !IS_LIBRARY) {
+            // ToDo: inject in dapplets store only
             injectScript(browser.runtime.getURL('inpage.js'));
+        }
+
+        if (IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
+            confirmShareLink(shareLinkPayload);
         }
     }
 
@@ -130,6 +137,53 @@ if (!IS_OVERLAY_IFRAME) {
             container.removeChild(scriptTag);
         } catch (error) {
             console.error('[DAPPLETS]: Dapplets API injection failed.', error);
+        }
+    }
+
+    async function confirmShareLink(payload: ShareLinkPayload) {
+
+        const { moduleId, registry, contextIds } = payload;
+        const { getModuleInfoByName, getTrustedUsers, getRegistries, getActiveModulesByHostnames, addRegistry, enableRegistry, addTrustedUser, activateFeature, deactivateFeature } = await initBGFunctions(browser);
+
+        const registries = await getRegistries();
+        const targetRegistry = registries.find(x => x.url === registry);
+        const isRegistryExists = !!targetRegistry;
+        if (!isRegistryExists) {
+            await addRegistry(registry);
+        }
+
+        const isRegistryEnabled = isRegistryExists && targetRegistry.isEnabled;
+        if (!isRegistryEnabled) {
+            await enableRegistry(registry);
+        }
+
+        const targetModuleId = parseModuleName(moduleId);
+        const mi = await getModuleInfoByName(registry, targetModuleId.name);
+        if (!mi) throw new Error(`ShareLink: Cannot find the module "${targetModuleId.name}" in the registry "${registry}"`);
+
+        const trustedUsers = await getTrustedUsers();
+        const targetTrustedUser = trustedUsers.find(x => x.account.toLowerCase() === mi.author?.toLowerCase());
+        const isRegistryDev = isRegistryExists && targetRegistry.isDev;
+        const isTrustedUserExists = !!targetTrustedUser || isRegistryDev;
+        if (!isTrustedUserExists) {
+            await addTrustedUser(mi.author);
+        }
+
+        // const isTrustedUserEnabled = true || isRegistryDev; // ToDo: use targetTrustedUser.isEnabled when Trusted User (de)activation feature will be done.
+        // ToDo: enable trusted user
+        // if (!s.isTrustedUserEnabled) { }
+
+        const activeModules = await getActiveModulesByHostnames(contextIds);
+        const activeModule = activeModules.find(x => x.name === targetModuleId.name && x.branch === targetModuleId.branch);
+        const isModuleActivated = !!activeModule;
+        if (!isModuleActivated) {
+            await activateFeature(targetModuleId.name, targetModuleId.version, contextIds, 0, registry);
+        }
+
+        const isModuleVersionEqual = isModuleActivated && activeModule.version === targetModuleId.version;
+        if (isModuleActivated && !isModuleVersionEqual) {
+            await deactivateFeature(targetModuleId.name, activeModule.version, contextIds, 0, registry);
+            await activateFeature(targetModuleId.name, targetModuleId.version, contextIds, 0, registry);
         }
     }
 
@@ -150,20 +204,12 @@ if (!IS_OVERLAY_IFRAME) {
         const targetRegistry = registries.find(x => x.url === registry);
         const isRegistryExists = !!targetRegistry;
         if (!isRegistryExists) {
-            if (IS_LIBRARY) {
-                await addRegistry(registry);
-            } else {
-                return { ...payload, isAllOk: false };
-            }
+            return { ...payload, isAllOk: false };
         }
 
         const isRegistryEnabled = isRegistryExists && targetRegistry.isEnabled;
         if (!isRegistryEnabled) {
-            if (IS_LIBRARY) {
-                await enableRegistry(registry);
-            } else {
-                return { ...payload, isAllOk: false };
-            }
+            return { ...payload, isAllOk: false };
         }
 
         const targetModuleId = parseModuleName(moduleId);
@@ -175,11 +221,7 @@ if (!IS_OVERLAY_IFRAME) {
         const isRegistryDev = isRegistryExists && targetRegistry.isDev;
         const isTrustedUserExists = !!targetTrustedUser || isRegistryDev;
         if (!isTrustedUserExists) {
-            if (IS_LIBRARY) {
-                await addTrustedUser(mi.author);
-            } else {
-                return { ...payload, isAllOk: false };
-            }
+            return { ...payload, isAllOk: false };
         }
 
         // const isTrustedUserEnabled = true || isRegistryDev; // ToDo: use targetTrustedUser.isEnabled when Trusted User (de)activation feature will be done.
@@ -190,21 +232,12 @@ if (!IS_OVERLAY_IFRAME) {
         const activeModule = activeModules.find(x => x.name === targetModuleId.name && x.branch === targetModuleId.branch);
         const isModuleActivated = !!activeModule;
         if (!isModuleActivated) {
-            if (IS_LIBRARY) {
-                await activateFeature(targetModuleId.name, targetModuleId.version, contextIds, 0, registry);
-            } else {
-                return { ...payload, isAllOk: false };
-            }
+            return { ...payload, isAllOk: false };
         }
 
         const isModuleVersionEqual = isModuleActivated && activeModule.version === targetModuleId.version;
         if (isModuleActivated && !isModuleVersionEqual) {
-            if (IS_LIBRARY) {
-                await deactivateFeature(targetModuleId.name, activeModule.version, contextIds, 0, registry);
-                await activateFeature(targetModuleId.name, targetModuleId.version, contextIds, 0, registry);
-            } else {
-                return { ...payload, isAllOk: false };
-            }
+            return { ...payload, isAllOk: false };
         }
 
         return { ...payload, isAllOk: true };
