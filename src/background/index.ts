@@ -10,7 +10,7 @@ import EnsService from "./services/ensService";
 import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 import ProxyService from "./services/proxyService";
 import * as tracing from '../common/tracing';
-import { getCurrentTab, multipleReplace, waitClosingTab, waitTab } from "../common/helpers";
+import { getCurrentTab, multipleReplace, reloadCurrentPage, waitClosingTab, waitTab } from "../common/helpers";
 import GithubService from "./services/githubService";
 import DiscordService from "./services/discordService";
 import { IdentityService } from "./services/identityService";
@@ -183,7 +183,8 @@ browser.runtime.onMessage.addListener(
 
     // Helpers
     waitTab: (url) => waitTab(url),
-    waitClosingTab: (tabId, windowId) => waitClosingTab(tabId, windowId)
+    waitClosingTab: (tabId, windowId) => waitClosingTab(tabId, windowId),
+    reloadCurrentPage: () => reloadCurrentPage()
   })
 );
 

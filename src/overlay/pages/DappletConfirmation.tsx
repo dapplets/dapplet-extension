@@ -119,17 +119,9 @@ export class DappletConfirmation extends React.Component<Props, State> {
     this.setState({ isLoading: true });
     
     const s = this.state, p = this.props;
-    const { addRegistry, enableRegistry, addTrustedUser, activateFeature, deactivateFeature } = await initBGFunctions(browser);
+    const { addTrustedUser, activateFeature, reloadFeature } = await initBGFunctions(browser);
     
     // ToDo: move it to the background?
-
-    if (!s.isRegistryExists) {
-      await addRegistry(p.data.registry, false);
-    }
-
-    if (!s.isRegistryEnabled) {
-      await enableRegistry(p.data.registry);
-    }
 
     if (!s.isTrustedUserExists) {
       await addTrustedUser(s.mi.author);
@@ -143,8 +135,7 @@ export class DappletConfirmation extends React.Component<Props, State> {
     }
 
     if (s.isModuleActivated && !s.isModuleVersionEqual) {
-      await deactivateFeature(s.mi.name, s.activeModule.version, p.data.contextIds, 0, p.data.registry);
-      await activateFeature(s.mi.name, s.vi.version, p.data.contextIds, 0, p.data.registry);
+      await reloadFeature(s.mi.name, s.vi.version, p.data.contextIds, 0, p.data.registry);
     } 
     
     // this.setState({ isLoading: false });
@@ -154,16 +145,19 @@ export class DappletConfirmation extends React.Component<Props, State> {
   async addRegistryClickHandler() {
     const s = this.state, p = this.props;
     this.setState({ isLoading: true });
-    const { addRegistry } = await initBGFunctions(browser);
+    const { addRegistry, enableRegistry, reloadCurrentPage } = await initBGFunctions(browser);
     await addRegistry(p.data.registry, false);
+    await enableRegistry(p.data.registry);
+    await reloadCurrentPage();
     await this.componentDidMount();
   }
 
   async enableRegistryClickHandler() {
     const s = this.state, p = this.props;
     this.setState({ isLoading: true });
-    const { enableRegistry } = await initBGFunctions(browser);
+    const { enableRegistry, reloadCurrentPage } = await initBGFunctions(browser);
     await enableRegistry(p.data.registry);
+    await reloadCurrentPage();
     await this.componentDidMount();
   }
 
@@ -181,22 +175,24 @@ export class DappletConfirmation extends React.Component<Props, State> {
 
     if (!s.isRegistryExists) {
       return <React.Fragment>
-        <h1>Changes Required</h1>
+        <h1>Add new registry</h1>
         <p>You are opening the share link which requires the changes.</p>
-        <p>Add and activate the registry <b>{p.data.registry}</b>?</p>
+        <p>Add and enable the registry <b>{p.data.registry}</b>?</p>
+        <p>The current webpage will be reloaded.</p>
 
-        <Button primary onClick={this.addRegistryClickHandler.bind(this)}>Add</Button>
+        <Button primary onClick={this.addRegistryClickHandler.bind(this)}>OK</Button>
         <Button onClick={this.cancelButtonClickHandler.bind(this)}>Cancel</Button>
       </React.Fragment>
     }
 
     if (!s.isRegistryEnabled) {
       return <React.Fragment>
-        <h1>Changes Required</h1>
+        <h1>Enable registry</h1>
         <p>You are opening the share link which requires the changes.</p>
         <p>Enable the registry <b>{p.data.registry}</b>?</p>
+        <p>The current webpage will be reloaded.</p>
 
-        <Button primary onClick={this.enableRegistryClickHandler.bind(this)}>Enable</Button>
+        <Button primary onClick={this.enableRegistryClickHandler.bind(this)}>OK</Button>
         <Button onClick={this.cancelButtonClickHandler.bind(this)}>Cancel</Button>
       </React.Fragment>
     }

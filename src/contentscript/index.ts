@@ -143,7 +143,7 @@ if (!IS_OVERLAY_IFRAME) {
     async function confirmShareLink(payload: ShareLinkPayload) {
 
         const { moduleId, registry, contextIds } = payload;
-        const { getModuleInfoByName, getTrustedUsers, getRegistries, getActiveModulesByHostnames, addRegistry, enableRegistry, addTrustedUser, activateFeature, deactivateFeature } = await initBGFunctions(browser);
+        const { getModuleInfoByName, getTrustedUsers, getRegistries, getActiveModulesByHostnames, addRegistry, enableRegistry, addTrustedUser, activateFeature, reloadFeature, reloadCurrentPage } = await initBGFunctions(browser);
 
         const registries = await getRegistries();
         const targetRegistry = registries.find(x => x.url === registry);
@@ -155,6 +155,7 @@ if (!IS_OVERLAY_IFRAME) {
         const isRegistryEnabled = isRegistryExists && targetRegistry.isEnabled;
         if (!isRegistryEnabled) {
             await enableRegistry(registry);
+            await reloadCurrentPage();
         }
 
         const targetModuleId = parseModuleName(moduleId);
@@ -182,8 +183,7 @@ if (!IS_OVERLAY_IFRAME) {
 
         const isModuleVersionEqual = isModuleActivated && activeModule.version === targetModuleId.version;
         if (isModuleActivated && !isModuleVersionEqual) {
-            await deactivateFeature(targetModuleId.name, activeModule.version, contextIds, 0, registry);
-            await activateFeature(targetModuleId.name, targetModuleId.version, contextIds, 0, registry);
+            await reloadFeature(targetModuleId.name, targetModuleId.version, contextIds, 0, registry);
         }
     }
 

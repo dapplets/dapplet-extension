@@ -275,6 +275,17 @@ export async function waitClosingTab(tabId: number, windowId: number) {
     browser.tabs.onRemoved.addListener(handler);
   });
 }
+
+export async function reloadCurrentPage() {
+  if (window['DAPPLETS_JSLIB'] !== true) {
+    const tab = await getCurrentTab();
+    if (!tab) return;
+    browser.tabs.reload(tab.id);
+  } else {
+    window.location.reload();
+  }
+}
+
 export function formatModuleId({ name, branch, version }: ModuleId) {
   return `${name}#${branch ?? DEFAULT_BRANCH_NAME}@${version}`;
 }
