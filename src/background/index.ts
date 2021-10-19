@@ -10,12 +10,13 @@ import EnsService from "./services/ensService";
 import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 import ProxyService from "./services/proxyService";
 import * as tracing from '../common/tracing';
-import { getCurrentTab, multipleReplace, reloadCurrentPage, waitClosingTab, waitTab } from "../common/helpers";
+import { getCurrentTab, getCurrentContextIds, multipleReplace, reloadCurrentPage, waitClosingTab, waitTab } from "../common/helpers";
 import GithubService from "./services/githubService";
 import DiscordService from "./services/discordService";
 import { IdentityService } from "./services/identityService";
 import { GuideService } from "./services/guideService";
 import { CONTEXT_ID_WILDCARD, ModuleTypes } from "../common/constants";
+import { OverlayService } from "./services/overlayService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -31,6 +32,7 @@ const ensService = new EnsService(walletService);
 const proxyService = new ProxyService();
 const identityService = new IdentityService(globalConfigService, walletService);
 const guideService = new GuideService();
+const overlayService = new OverlayService();
 
 browser.runtime.onMessage.addListener(
   setupMessageListener({
@@ -181,10 +183,15 @@ browser.runtime.onMessage.addListener(
     updateTab: (tabId, updateProperties) => browser.tabs.update(tabId, updateProperties),
     queryTab: (queryInfo) => browser.tabs.query(queryInfo),
 
+    // Overlay Service
+    openDeployOverlay: (mi, vi) => overlayService.openDeployOverlay(mi, vi),
+
     // Helpers
     waitTab: (url) => waitTab(url),
     waitClosingTab: (tabId, windowId) => waitClosingTab(tabId, windowId),
-    reloadCurrentPage: () => reloadCurrentPage()
+    reloadCurrentPage: () => reloadCurrentPage(),
+    getCurrentTab: () => getCurrentTab(),
+    getCurrentContextIds: () => getCurrentContextIds()
   })
 );
 

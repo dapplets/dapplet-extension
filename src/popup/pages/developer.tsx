@@ -4,7 +4,7 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Popup, Button, Segment, Message, List, Label, Input, Icon, Image, Header, Checkbox } from "semantic-ui-react";
 import NOLOGO_PNG from '../../common/resources/no-logo.png';
 
-import { getCurrentTab, isValidUrl } from '../helpers';
+import { isValidUrl } from '../helpers';
 import { StorageRef } from "../../background/registries/registry";
 import ModuleInfo from "../../background/models/moduleInfo";
 import VersionInfo from "../../background/models/versionInfo";
@@ -54,6 +54,7 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
     async componentDidMount() {
         await this.loadSwarmGateway();
         await Promise.all([this.loadRegistries(), this.loadIntro()]);
+        const { getCurrentTab } = await initBGFunctions(browser);
         const currentTab = await getCurrentTab();
         if (!currentTab) return;
         const currentUrl = currentTab.url;
@@ -116,14 +117,8 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
     }
 
     async deployModule(mi: ModuleInfo, vi: VersionInfo) {
-        const tab = await getCurrentTab();
-        if (!tab) return;
-        browser.tabs.sendMessage(tab.id, {
-            type: "OPEN_DEPLOY_OVERLAY",
-            payload: {
-                mi, vi
-            }
-        });
+        const { openDeployOverlay } = await initBGFunctions(browser);
+        await openDeployOverlay(mi, vi);
         window.close();
     }
 

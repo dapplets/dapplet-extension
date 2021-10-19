@@ -163,6 +163,12 @@ export async function getCurrentTab(): Promise<Tabs.Tab | null> {
   }
 }
 
+export const getCurrentContextIds = async (): Promise<string[]> => {
+  const tab = await getCurrentTab();
+  if (!tab) return [];
+  return browser.tabs.sendMessage(tab.id, { "type": "CURRENT_CONTEXT_IDS" });
+};
+
 export function networkName(chainId: number) {
   const map = {
     1: 'mainnet',

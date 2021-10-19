@@ -5,7 +5,6 @@ import { browser } from "webextension-polyfill-ts";
 import { Button, List, Segment, Icon, Input, Message } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
 import { CONTEXT_ID_WILDCARD, ModuleTypes } from "../../common/constants";
-import { getCurrentContextIds, getCurrentTab } from "../helpers";
 import { rcompare } from "semver";
 import { Dapplet, ManifestAndDetails } from "../components/dapplet";
 import Manifest from "../../background/models/manifest";
@@ -150,9 +149,10 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   }
 
   async refreshContextPage() {
+    const { getCurrentTab, getCurrentContextIds, reloadCurrentPage } = await initBGFunctions(browser);
     const tab = await getCurrentTab();
     if (!tab) return;
-    await browser.tabs.update(tab.id, { url: tab.url });
+    await reloadCurrentPage();
     this.setState({ isNoContentScript: false, isLoading: true });
     setTimeout(() => this._refreshDataByContext(getCurrentContextIds()), 4000); // ToDo: get rid of timeout
   }
@@ -166,7 +166,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   openDappletAction = async (f: ManifestAndDetails) => {
     try {
       this._updateFeatureState(f.name, { isActionLoading: true });
-      const { openDappletAction } = await initBGFunctions(browser);
+      const { openDappletAction, getCurrentTab } = await initBGFunctions(browser);
       const tab = await getCurrentTab();
       if (!tab) return;
       await openDappletAction(f.name, tab.id);
@@ -181,7 +181,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   openDappletHome = async (f: ManifestAndDetails) => {
     try {
       this._updateFeatureState(f.name, { isHomeLoading: true });
-      const { openDappletHome } = await initBGFunctions(browser);
+      const { openDappletHome, getCurrentTab } = await initBGFunctions(browser);
       const tab = await getCurrentTab();
       if (!tab) return;
       await openDappletHome(f.name, tab.id);
