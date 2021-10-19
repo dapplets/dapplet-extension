@@ -168,6 +168,7 @@ if (!IS_OVERLAY_IFRAME) {
         const isTrustedUserExists = !!targetTrustedUser || isRegistryDev;
         if (!isTrustedUserExists) {
             await addTrustedUser(mi.author);
+            await reloadCurrentPage();
         }
 
         // const isTrustedUserEnabled = true || isRegistryDev; // ToDo: use targetTrustedUser.isEnabled when Trusted User (de)activation feature will be done.

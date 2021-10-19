@@ -119,12 +119,13 @@ export class DappletConfirmation extends React.Component<Props, State> {
     this.setState({ isLoading: true });
     
     const s = this.state, p = this.props;
-    const { addTrustedUser, activateFeature, reloadFeature } = await initBGFunctions(browser);
+    const { addTrustedUser, activateFeature, reloadFeature, reloadCurrentPage } = await initBGFunctions(browser);
     
     // ToDo: move it to the background?
 
     if (!s.isTrustedUserExists) {
       await addTrustedUser(s.mi.author);
+      await reloadCurrentPage();
     }
 
     // ToDo: enable trusted user
@@ -228,6 +229,9 @@ export class DappletConfirmation extends React.Component<Props, State> {
         </ul>
       </div> : null}
 
+      {(!s.isTrustedUserExists) ?
+        <p>The current webpage will be reloaded.</p> : null}
+
       <Accordion style={{ marginBottom: '14px' }}>
         <Accordion.Title
           active={s.isDetailsVisible}
@@ -244,7 +248,7 @@ export class DappletConfirmation extends React.Component<Props, State> {
         </Accordion.Content>
       </Accordion>
 
-      <Button primary onClick={this.confirmButtonClickHandler.bind(this)}>Activate and Continue</Button>
+      <Button primary onClick={this.confirmButtonClickHandler.bind(this)}>OK</Button>
       <Button onClick={this.cancelButtonClickHandler.bind(this)}>Cancel</Button>
 
     </React.Fragment>;
