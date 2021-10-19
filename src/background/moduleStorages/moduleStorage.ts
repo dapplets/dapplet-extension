@@ -8,6 +8,7 @@ import GlobalConfigService from '../services/globalConfigService';
 
 import { StorageTypes } from '../../common/constants';
 import { Tar } from '../../common/tar';
+import { promiseAny } from '../../common/helpers';
 
 export class StorageAggregator {
 
@@ -42,7 +43,7 @@ export class StorageAggregator {
         }
 
         try {
-            const buffer = await Promise.any(buffers);
+            const buffer = await promiseAny(buffers);
             fetchController.abort();
 
             return buffer;
