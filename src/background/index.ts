@@ -368,15 +368,22 @@ if (window['DAPPLETS_JSLIB'] !== true) {
       if (reinjectedNumber > 0) console.log(`${reinjectedNumber} content scripts were reinjected after background reloading.`);
     });
 
-  function redirectFromProxyServer(tab: Tabs.Tab) {
-    const groups = /https:\/\/web\.dapplets\.org\/live\/(.*)/gm.exec(tab.url);
-    const [, targetUrl] = groups ?? [];
-    if (targetUrl) {
-      browser.tabs.update(tab.id, { url: targetUrl });
+  // workaround for firefox which prevents redirect loop
+  const loading = new Set<number>();
 
+  async function redirectFromProxyServer(tab: Tabs.Tab) {
+    if (tab.status === 'loading' && !loading.has(tab.id)) {
+      const groups = /https:\/\/web\.dapplets\.org\/live\/(.*)/gm.exec(tab.url);
+      const [, targetUrl] = groups ?? [];
+      if (targetUrl) {
+        loading.add(tab.id);
+        await browser.tabs.update(tab.id, { url: targetUrl });
+        setTimeout(() => loading.delete(tab.id), 300);
+      }
     }
   }
 
   browser.tabs.onCreated.addListener(redirectFromProxyServer);
   browser.tabs.onUpdated.addListener(tabId => browser.tabs.get(tabId).then(redirectFromProxyServer));
+  
 }
