@@ -32,7 +32,6 @@ const IS_LIBRARY = window['DAPPLETS_JSLIB'] === true;
 
 export class Injector {
     public availableContextIds: string[] = [];
-
     public registry: RegistriedModule[] = [];
 
     constructor(public core: Core, private env?: { shareLinkPayload: { moduleId: string, payload: any, isAllOk: boolean } }) {
@@ -332,16 +331,20 @@ export class Injector {
                     }
                     // Class Property Decorator
                     else if (parameterIndex === undefined) {
-                        return {
-                            get: () => {
-                                const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
-                                if (!currentModule.instancedPropertyDependencies[name]) {
-                                    const depModule = this._getDependency(manifest, name);
-                                    const instancedModule = this._proxifyModule(depModule, currentModule);
-                                    currentModule.instancedPropertyDependencies[name] = instancedModule;
-                                }
-                                return currentModule.instancedPropertyDependencies[name];
-                            }
+                        if (delete target[propertyOrMethodName]) {
+                            Object.defineProperty(target, propertyOrMethodName, {
+                                get: () => {
+                                    const currentModule = this.registry.find(m => areModulesEqual(m.manifest, manifest));
+                                    if (!currentModule.instancedPropertyDependencies[name]) {
+                                        const depModule = this._getDependency(manifest, name);
+                                        const instancedModule = this._proxifyModule(depModule, currentModule);
+                                        currentModule.instancedPropertyDependencies[name] = instancedModule;
+                                    }
+                                    return currentModule.instancedPropertyDependencies[name];
+                                },
+                                enumerable: true,
+                                configurable: true
+                            });
                         }
                     }
                     // Method Parameter Decorator
@@ -398,7 +401,7 @@ export class Injector {
             try {
                 const { hostname } = new URL(DAPPLETS_ORIGINAL_HREF);
                 parentContext = hostname;
-            } catch (_) {}
+            } catch (_) { }
         }
 
         contextIds = contextIds.map(ctx => (typeof ctx === 'string') ? ctx : ctx.id).filter(x => x !== undefined && x !== null);
