@@ -91,23 +91,32 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   }
 
   async handleSwitchChange(module: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] }), isActive, order, selectVersions: boolean) {
-    const { name, hostnames, sourceRegistry } = module;
-    const { getVersions } = await initBGFunctions(browser);
+    const { name } = module;
 
-    const allVersions = await getVersions(module.sourceRegistry.url, module.name);
 
     if (selectVersions && isActive) {
-      this._updateFeatureState(name, { versions: allVersions });
+      this._updateFeatureState(name, { isLoading: true });
+      const { getVersions } = await initBGFunctions(browser);
+      const allVersions = await getVersions(module.sourceRegistry.url, module.name);
+      this._updateFeatureState(name, { versions: allVersions, isLoading: false });
       return;
     } else {
-      const lastVersion = allVersions.sort(rcompare)[0];
-      await this.toggleFeature(module, lastVersion, isActive, order, allVersions);
+      await this.toggleFeature(module, null, isActive, order, null);
     }
 
   }
 
-  async toggleFeature(module: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] }), version: string, isActive: boolean, order: number, allVersions: string[]) {
+  async toggleFeature(module: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] }), version: string | null, isActive: boolean, order: number, allVersions: string[] | null) {
     const { name, hostnames, sourceRegistry } = module;
+    
+    this._updateFeatureState(name, { isActive, isLoading: true });
+    
+    if (!version || !allVersions) {
+      const { getVersions } = await initBGFunctions(browser);
+      allVersions = await getVersions(module.sourceRegistry.url, module.name);
+      version = allVersions.sort(rcompare)[0];
+    }
+
     const { activateFeature, deactivateFeature } = await initBGFunctions(browser);
 
     this._updateFeatureState(name, { isActive, isLoading: true, error: null, versions: [], activeVersion: (isActive) ? version : null, lastVersion: allVersions.sort(rcompare)[0] });
@@ -215,7 +224,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   }
 
   render() {
-    const { isLoading, error, isNoContentScript, search, devMessage } = this.state;
+    const { isLoading, error, isNoContentScript, search } = this.state;
     const features = this._getFilteredDapplets();
 
     return (
