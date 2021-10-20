@@ -4,7 +4,7 @@ import { browser } from "webextension-polyfill-ts";
 
 import { Button, List, Segment, Icon, Input, Message } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
-import { CONTEXT_ID_WILDCARD, ModuleTypes } from "../../common/constants";
+import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, ModuleTypes } from "../../common/constants";
 import { rcompare } from "semver";
 import { Dapplet, ManifestAndDetails } from "../components/dapplet";
 import Manifest from "../../background/models/manifest";
@@ -222,6 +222,14 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     const find = (a: string) => (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1;
     return features.filter((x: ManifestAndDetails) => find(x.name) || find(x.title) || find(x.description) || find(x.author));
   }
+  
+  async deployModule(f: ManifestAndDetails, v: string) {
+    const { openDeployOverlay, getModuleInfoByName, getVersionInfo } = await initBGFunctions(browser);
+    const mi = await getModuleInfoByName(f.sourceRegistry.url, f.name);
+    const vi = await getVersionInfo(f.sourceRegistry.url, f.name, DEFAULT_BRANCH_NAME, v);
+    await openDeployOverlay(mi, vi);
+    window.close();
+  }
 
   render() {
     const { isLoading, error, isNoContentScript, search } = this.state;
@@ -265,6 +273,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
                       onOpenDappletHome={this.openDappletHome.bind(this)}
                       onToggleFeature={this.toggleFeature.bind(this)}
                       onRemoveDapplet={this.removeDapplet.bind(this)}
+                      onDeployClick={this.deployModule.bind(this)}
                       swarmGatewayUrl={this.state.swarmGatewayUrl}
                     />
                   ))}

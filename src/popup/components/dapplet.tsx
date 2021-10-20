@@ -34,6 +34,7 @@ interface Props {
   onOpenDappletHome: Function;
   onToggleFeature: Function;
   onRemoveDapplet: Function;
+  onDeployClick: Function;
 
   swarmGatewayUrl: string;
 }
@@ -204,12 +205,14 @@ export class Dapplet extends React.Component<Props, State> {
                   <Label
                     as="a"
                     key={k}
-                    onClick={() =>
-                      this.props.onToggleFeature(f, v, true, i, f.versions)
-                    }
-                  >
-                    {v}
-                  </Label>
+                    onClick={(e) => {
+                      if (e["shiftKey"]) {
+                        this.props.onDeployClick(f, v);
+                      } else {
+                        this.props.onToggleFeature(f, v, true, i, f.versions)
+                      }
+                    }}
+                  >{v}</Label>
                 ))}
               </Label.Group>
             ) : null}
