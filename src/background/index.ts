@@ -380,7 +380,7 @@ if (window['DAPPLETS_JSLIB'] !== true) {
 
   async function redirectFromProxyServer(tab: Tabs.Tab) {
     if (tab.status === 'loading' && !loading.has(tab.id)) {
-      const groups = /https:\/\/web\.dapplets\.org\/live\/(.*)/gm.exec(tab.url);
+      const groups = /https:\/\/augm\.link\/live\/(.*)/gm.exec(tab.url);
       const [, targetUrl] = groups ?? [];
       if (targetUrl) {
         loading.add(tab.id);

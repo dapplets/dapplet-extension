@@ -423,13 +423,13 @@ export default class Core {
     }
 
     public createShareLink(targetUrl: string, modulePayload: any, _env?: { contextIds: string[], registry: string, moduleId: string }): string {
-        const groups = /https:\/\/web\.dapplets\.org\/live\/(.*)/gm.exec(targetUrl);
+        const groups = /https:\/\/augm\.link\/live\/(.*)/gm.exec(targetUrl);
         const [, targetUrlNoProxy] = groups ?? [];
         if (targetUrlNoProxy) targetUrl = targetUrlNoProxy;
         const { urlNoPayload } = parseShareLink(targetUrl); // prevent duplicate of base64 payload
         const payload = [EXTENSION_VERSION, _env.registry, _env.moduleId, ['*'], modulePayload];
         const base64Payload = btoa(JSON.stringify(payload));
-        const WEB_PROXY_URL = 'https://web.dapplets.org/live/';
+        const WEB_PROXY_URL = 'https://augm.link/live/';
         return WEB_PROXY_URL + urlNoPayload + '#dapplet/' + base64Payload;
     }
 }
