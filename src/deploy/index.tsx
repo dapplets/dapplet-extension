@@ -66,7 +66,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             loading: true,
             targetRegistry: null,
             targetChain: null,
-            targetStorages: [StorageTypes.Swarm, StorageTypes.Ipfs],
+            targetStorages: [StorageTypes.Swarm, StorageTypes.Ipfs, StorageTypes.Sia],
             message: null,
             registryOptions: [],
             owner: null,
@@ -444,6 +444,12 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         label="IPFS"
                         checked={targetStorages.includes(StorageTypes.Ipfs)}
                         onChange={(_, d) => this.changeTargetStorage(StorageTypes.Ipfs, d.checked)}
+                    />
+                    
+                    <Form.Checkbox 
+                        label="SIA"
+                        checked={targetStorages.includes(StorageTypes.Sia)}
+                        onChange={(_, d) => this.changeTargetStorage(StorageTypes.Sia, d.checked)}
                         style={{ marginBottom: '25px' }}
                     />
 

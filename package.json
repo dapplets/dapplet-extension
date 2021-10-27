@@ -137,6 +137,7 @@
   },
   "dependencies": {
     "@sentry/browser": "^6.7.2",
-    "@sentry/tracing": "^6.7.2"
+    "@sentry/tracing": "^6.7.2",
+    "skynet-js": "^4.0.18-beta"
   }
 }

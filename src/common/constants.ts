@@ -8,7 +8,8 @@ export const enum ModuleTypes {
 export const enum StorageTypes {
     Swarm = "swarm",
     TestRegsitry = "test-registry",
-    Ipfs = "ipfs"
+    Ipfs = "ipfs",
+    Sia = "sia"
 }
 
 export type WalletInfo = {

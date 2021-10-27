@@ -144,6 +144,8 @@ browser.runtime.onMessage.addListener(
     setIpfsGateway: globalConfigService.setIpfsGateway.bind(globalConfigService),
     getDynamicAdapter: globalConfigService.getDynamicAdapter.bind(globalConfigService),
     setDynamicAdapter: globalConfigService.setDynamicAdapter.bind(globalConfigService),
+    getSiaPortal: globalConfigService.getSiaPortal.bind(globalConfigService),
+    setSiaPortal: globalConfigService.setSiaPortal.bind(globalConfigService),
 
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),

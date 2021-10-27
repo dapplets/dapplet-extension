@@ -63,4 +63,6 @@ export class GlobalConfig extends Base {
     swarmPostageStampId: string = null;
 
     ipfsGatewayUrl: string = null;
+
+    siaPortalUrl: string = null;
 }

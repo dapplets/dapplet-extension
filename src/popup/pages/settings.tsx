@@ -47,6 +47,11 @@ interface ISettingsState {
     ipfsGatewayLoading: boolean;
     ipfsGatewayEdited: boolean;
 
+    siaPortalInput: string;
+    siaPortalInputError: string;
+    siaPortalLoading: boolean;
+    siaPortalEdited: boolean;
+
     identityInput: string;
     identityInputError: string;
     identityLoading: boolean;
@@ -106,6 +111,10 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             ipfsGatewayInputError: null,
             ipfsGatewayLoading: false,
             ipfsGatewayEdited: false,
+            siaPortalInput: '',
+            siaPortalInputError: null,
+            siaPortalLoading: false,
+            siaPortalEdited: false,
             identityInput: '',
             identityInputError: null,
             identityLoading: false,
@@ -144,6 +153,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             this.loadSwarmGateway(),
             this.loadSwarmPostageStampId(),
             this.loadIpfsGateway(),
+            this.loadSiaPortal(),
             this.loadIdentityContract(),
             this.loadUserAgentId(),
             this.loadUserAgentName(),
@@ -268,6 +278,28 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                 ipfsGatewayLoading: false, 
                 ipfsGatewayEdited: false, 
                 ipfsGatewayInputError: err.message
+            });
+        }
+    }
+
+    async loadSiaPortal() {
+        const { getSiaPortal } = await initBGFunctions(browser);
+        const gateway = await getSiaPortal();
+        this.setState({ siaPortalInput: gateway });
+    }
+
+    async setSiaPortal(gateway: string) {
+        try {
+            this.setState({ siaPortalLoading: true });
+            const { setSiaPortal } = await initBGFunctions(browser);
+            await setSiaPortal(gateway);
+            this.loadSiaPortal();
+            this.setState({ siaPortalLoading: false, siaPortalEdited: false });
+        } catch (err) {
+            this.setState({ 
+                siaPortalLoading: false, 
+                siaPortalEdited: false, 
+                siaPortalInputError: err.message
             });
         }
     }
@@ -631,6 +663,26 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                         </Input>
 
                         {(this.state.ipfsGatewayInputError) ? <Label basic color='red' pointing>{this.state.ipfsGatewayInputError}</Label> : null}
+
+                        <Header as='h5'>SIA Portal</Header>
+                        <Input
+                            size='mini'
+                            fluid
+                            placeholder='Gateway URL'
+                            error={!!this.state.siaPortalInputError || !isValidHttp(this.state.siaPortalInput)}
+                            iconPosition='left'
+                            loading={this.state.siaPortalLoading}
+                            // style={{ marginBottom: '15px' }}
+                        >
+                            <Icon name='server' />
+                            <input
+                                value={this.state.siaPortalInput}
+                                onBlur={() => !(this.state.siaPortalLoading || !this.state.siaPortalEdited || !isValidHttp(this.state.siaPortalInput)) && this.setSiaPortal(this.state.siaPortalInput)}
+                                onChange={(e) => this.setState({ siaPortalInput: e.target.value, siaPortalInputError: null, siaPortalEdited: true })}
+                            />
+                        </Input>
+
+                        {(this.state.siaPortalInputError) ? <Label basic color='red' pointing>{this.state.siaPortalInputError}</Label> : null}
 
                         {/* <Header as='h5'>Identity Contract</Header>
                         <Input

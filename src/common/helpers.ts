@@ -46,7 +46,8 @@ export enum UriTypes {
   Ipfs,
   Ethereum,
   Ens,
-  Near
+  Near,
+  Sia
 }
 
 /**
@@ -66,6 +67,10 @@ export function typeOfUri(uri: string): UriTypes {
 
   if (uriLower.indexOf('ipfs://') === 0) {
     return UriTypes.Ipfs
+  }
+
+  if (uriLower.indexOf('sia://') === 0) {
+    return UriTypes.Sia
   }
 
   // ToDo: add Ethereum address validator

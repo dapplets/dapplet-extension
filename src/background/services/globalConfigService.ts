@@ -23,6 +23,7 @@ const EXPORTABLE_PROPERTIES = [
     'providerUrl',
     'swarmGatewayUrl',
     'ipfsGatewayUrl',
+    'siaPortalUrl',
     // 'walletsUsage',
     'identityContract',
     'popupInOverlay',
@@ -46,6 +47,7 @@ export default class GlobalConfigService {
             if (!config.swarmPostageStampId) config.swarmPostageStampId = this.getInitialConfig().swarmPostageStampId;
             if (!config.preferedOverlayStorage) config.preferedOverlayStorage = this.getInitialConfig().preferedOverlayStorage;
             if (!config.ipfsGatewayUrl) config.ipfsGatewayUrl = this.getInitialConfig().ipfsGatewayUrl;
+            if (!config.siaPortalUrl) config.siaPortalUrl = this.getInitialConfig().siaPortalUrl;
         }
 
         return config ?? this.getInitialConfig();
@@ -206,6 +208,7 @@ export default class GlobalConfigService {
         config.preferedOverlayStorage = 'centralized';
         config.swarmPostageStampId = '59b7a1ef40a1b3143e9e80e7eb90175b83996fcf86f13480dbe0e21a732572e9';
         config.ipfsGatewayUrl = 'https://ipfs.kaleido.art';
+        config.siaPortalUrl = 'https://siasky.net';
 
         return config;
     }
@@ -563,5 +566,14 @@ export default class GlobalConfigService {
     async setIpfsGateway(url: string) {
         if (typeOfUri(url) !== UriTypes.Http) throw new Error("URL must be a valid HTTP(S) address.");
         await this.updateConfig(c => c.ipfsGatewayUrl = url);
+    }
+
+    async getSiaPortal() {
+        return this.get().then(x => x.siaPortalUrl);
+    }
+
+    async setSiaPortal(url: string) {
+        if (typeOfUri(url) !== UriTypes.Http) throw new Error("URL must be a valid HTTP(S) address.");
+        await this.updateConfig(c => c.siaPortalUrl = url);
     }
 }
