@@ -13,6 +13,7 @@ import VersionInfo from '../background/models/versionInfo';
 import * as tracing from '../common/tracing';
 import { ChainTypes, DefaultSigners } from "../common/types";
 import { typeOfUri, chainByUri, joinUrls } from "../common/helpers";
+import { StorageTypes } from "../common/constants";
 
 tracing.startTracing();
 
@@ -31,7 +32,7 @@ interface IIndexState {
     loading: boolean;
     targetRegistry: string;
     targetChain: ChainTypes;
-    targetStorage: string;
+    targetStorages: string[];
     message: {
         type: "negative" | "positive",
         header: string,
@@ -65,7 +66,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             loading: true,
             targetRegistry: null,
             targetChain: null,
-            targetStorage: 'swarm',
+            targetStorages: [StorageTypes.Swarm, StorageTypes.Ipfs],
             message: null,
             registryOptions: [],
             owner: null,
@@ -155,7 +156,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.setState({ loading: true });
 
         const { deployModule, addTrustedUser } = await initBGFunctions(browser);
-        const { mi, vi, targetRegistry, targetStorage, currentAccount } = this.state;
+        const { mi, vi, targetRegistry, targetStorages, currentAccount } = this.state;
 
         try {
             const isNotNullCurrentAccount = !(!currentAccount || currentAccount === '0x0000000000000000000000000000000000000000');
@@ -164,7 +165,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                 await addTrustedUser(currentAccount.toLowerCase());
             }
 
-            const result = await deployModule(mi, vi, targetStorage, targetRegistry);
+            const result = await deployModule(mi, vi, targetStorages, targetRegistry);
             this.setState({
                 message: {
                     type: 'positive',
@@ -193,10 +194,10 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.setState({ loading: true });
 
         const { uploadModule } = await initBGFunctions(browser);
-        const { mi, vi, targetStorage } = this.state;
+        const { mi, vi, targetStorages } = this.state;
 
         try {
-            const scriptUrl = await uploadModule(mi, vi, targetStorage);
+            const scriptUrl = await uploadModule(mi, vi, targetStorages);
             this.setState({
                 message: {
                     type: 'positive',
@@ -227,21 +228,29 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         await this._updateData();
     }
 
+    changeTargetStorage(storage: StorageTypes, checked: boolean) {
+        let { targetStorages } = this.state;
+        targetStorages = targetStorages.filter(x => x !== storage);
+        if (checked) targetStorages.push(storage);
+        this.setState({ targetStorages });
+    }
+
     render() {
         const {
             mi, vi, loading, targetRegistry,
-            targetStorage, 
+            targetStorages, 
             message, registryOptions,
             owner, currentAccount, newOwner, editLocation: newLocation,
             newOwnerLoading, newOwnerDone, editLocationLoading: newLocationLoading,
             editLocationDone: newLocationDone
         } = this.state;
 
+        const isNoStorage = targetStorages.length === 0;
         const isNotNullCurrentAccount = !(!currentAccount || currentAccount === '0x0000000000000000000000000000000000000000');
         const isNotWalletPaired = !isNotNullCurrentAccount && !!owner;
         const isNotAnOwner = !!owner && isNotNullCurrentAccount && owner.toLowerCase() !== currentAccount.toLowerCase();
         const isAlreadyDeployed = !message && this.state.deploymentStatus === DeploymentStatus.Deployed;
-        const isButtonDisabled = loading || this.state.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner;
+        const isButtonDisabled = loading || this.state.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner || isNoStorage;
         const isNewModule = this.state.deploymentStatus === DeploymentStatus.NewModule;
         const isNotTrustedUser = isNotNullCurrentAccount && !this.state.trustedUsers.find(x => x.account.toLowerCase() === currentAccount.toLowerCase());
 
@@ -423,18 +432,19 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         readOnly
                     />
 
-                    <Form.Select
-                        required
-                        label='Target Storage'
-                        options={[
-                            { key: 'swarm', text: 'Swarm', value: 'swarm' },
-                            //{ key: 'test-registry', text: 'Test Registry', value: 'test-registry' }
-                        ]}
-                        placeholder='Target Storage'
-                        value={targetStorage}
-                        onChange={(e, data) => this.setState({
-                            targetStorage: data.value as string
-                        })}
+                    <Form.Field label="Target Storage" required />
+
+                    <Form.Checkbox 
+                        label="Swarm"
+                        checked={targetStorages.includes(StorageTypes.Swarm)}
+                        onChange={(_, d) => this.changeTargetStorage(StorageTypes.Swarm, d.checked)}
+                    />
+                    
+                    <Form.Checkbox 
+                        label="IPFS"
+                        checked={targetStorages.includes(StorageTypes.Ipfs)}
+                        onChange={(_, d) => this.changeTargetStorage(StorageTypes.Ipfs, d.checked)}
+                        style={{ marginBottom: '25px' }}
                     />
 
                     <Button primary disabled={isButtonDisabled} onClick={() => this.deployButtonClickHandler()}>Deploy</Button>

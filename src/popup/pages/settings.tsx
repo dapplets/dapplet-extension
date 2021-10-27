@@ -42,6 +42,11 @@ interface ISettingsState {
     swarmPostageStampIdLoading: boolean;
     swarmPostageStampIdEdited: boolean;
 
+    ipfsGatewayInput: string;
+    ipfsGatewayInputError: string;
+    ipfsGatewayLoading: boolean;
+    ipfsGatewayEdited: boolean;
+
     identityInput: string;
     identityInputError: string;
     identityLoading: boolean;
@@ -97,6 +102,10 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             swarmPostageStampIdInputError: null,
             swarmPostageStampIdLoading: false,
             swarmPostageStampIdEdited: false,
+            ipfsGatewayInput: '',
+            ipfsGatewayInputError: null,
+            ipfsGatewayLoading: false,
+            ipfsGatewayEdited: false,
             identityInput: '',
             identityInputError: null,
             identityLoading: false,
@@ -134,6 +143,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
             this.loadProvider(),
             this.loadSwarmGateway(),
             this.loadSwarmPostageStampId(),
+            this.loadIpfsGateway(),
             this.loadIdentityContract(),
             this.loadUserAgentId(),
             this.loadUserAgentName(),
@@ -236,6 +246,28 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                 swarmPostageStampIdLoading: false, 
                 swarmPostageStampIdEdited: false, 
                 swarmPostageStampIdInputError: err.message
+            });
+        }
+    }
+
+    async loadIpfsGateway() {
+        const { getIpfsGateway } = await initBGFunctions(browser);
+        const gateway = await getIpfsGateway();
+        this.setState({ ipfsGatewayInput: gateway });
+    }
+
+    async setIpfsGateway(gateway: string) {
+        try {
+            this.setState({ ipfsGatewayLoading: true });
+            const { setIpfsGateway } = await initBGFunctions(browser);
+            await setIpfsGateway(gateway);
+            this.loadSwarmGateway();
+            this.setState({ ipfsGatewayLoading: false, ipfsGatewayEdited: false });
+        } catch (err) {
+            this.setState({ 
+                ipfsGatewayLoading: false, 
+                ipfsGatewayEdited: false, 
+                ipfsGatewayInputError: err.message
             });
         }
     }
@@ -579,6 +611,26 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                         </Input>
 
                         {(this.state.swarmPostageStampIdInputError) ? <Label basic color='red' pointing>{this.state.swarmPostageStampIdInputError}</Label> : null}
+
+                        <Header as='h5'>IPFS Gateway</Header>
+                        <Input
+                            size='mini'
+                            fluid
+                            placeholder='Gateway URL'
+                            error={!!this.state.ipfsGatewayInputError || !isValidHttp(this.state.ipfsGatewayInput)}
+                            iconPosition='left'
+                            loading={this.state.ipfsGatewayLoading}
+                            // style={{ marginBottom: '15px' }}
+                        >
+                            <Icon name='server' />
+                            <input
+                                value={this.state.ipfsGatewayInput}
+                                onBlur={() => !(this.state.ipfsGatewayLoading || !this.state.ipfsGatewayEdited || !isValidHttp(this.state.ipfsGatewayInput)) && this.setIpfsGateway(this.state.ipfsGatewayInput)}
+                                onChange={(e) => this.setState({ ipfsGatewayInput: e.target.value, ipfsGatewayInputError: null, ipfsGatewayEdited: true })}
+                            />
+                        </Input>
+
+                        {(this.state.ipfsGatewayInputError) ? <Label basic color='red' pointing>{this.state.ipfsGatewayInputError}</Label> : null}
 
                         {/* <Header as='h5'>Identity Contract</Header>
                         <Input

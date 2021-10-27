@@ -22,6 +22,7 @@ const EXPORTABLE_PROPERTIES = [
     // 'autoBackup',
     'providerUrl',
     'swarmGatewayUrl',
+    'ipfsGatewayUrl',
     // 'walletsUsage',
     'identityContract',
     'popupInOverlay',
@@ -44,6 +45,7 @@ export default class GlobalConfigService {
             if (!config.swarmGatewayUrl) config.swarmGatewayUrl = this.getInitialConfig().swarmGatewayUrl;
             if (!config.swarmPostageStampId) config.swarmPostageStampId = this.getInitialConfig().swarmPostageStampId;
             if (!config.preferedOverlayStorage) config.preferedOverlayStorage = this.getInitialConfig().preferedOverlayStorage;
+            if (!config.ipfsGatewayUrl) config.ipfsGatewayUrl = this.getInitialConfig().ipfsGatewayUrl;
         }
 
         return config ?? this.getInitialConfig();
@@ -203,6 +205,7 @@ export default class GlobalConfigService {
         config.dynamicAdapter = 'dynamic-adapter.dapplet-base.eth#default@latest';
         config.preferedOverlayStorage = 'centralized';
         config.swarmPostageStampId = '59b7a1ef40a1b3143e9e80e7eb90175b83996fcf86f13480dbe0e21a732572e9';
+        config.ipfsGatewayUrl = 'https://ipfs.kaleido.art';
 
         return config;
     }
@@ -551,5 +554,14 @@ export default class GlobalConfigService {
 
     async setSwarmPostageStampId(postageStampId: string) {
         return this.updateConfig(c => c.swarmPostageStampId = postageStampId);
+    }
+
+    async getIpfsGateway() {
+        return this.get().then(x => x.ipfsGatewayUrl);
+    }
+
+    async setIpfsGateway(url: string) {
+        if (typeOfUri(url) !== UriTypes.Http) throw new Error("URL must be a valid HTTP(S) address.");
+        await this.updateConfig(c => c.ipfsGatewayUrl = url);
     }
 }

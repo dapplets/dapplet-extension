@@ -21,7 +21,6 @@ interface IDappletsState {
   error: string;
   isNoContentScript: boolean;
   search: string;
-  swarmGatewayUrl: string;
   devMessage: string;
 }
 
@@ -34,7 +33,6 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     error: null,
     isNoContentScript: false,
     search: '',
-    swarmGatewayUrl: '',
     devMessage: null
   }
 
@@ -56,8 +54,6 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     }
 
     const { getFeaturesByHostnames, getRegistries, getSwarmGateway } = await initBGFunctions(browser);
-    
-    const swarmGatewayUrl = await getSwarmGateway();
     
     const features: ManifestDTO[] = await getFeaturesByHostnames(contextIdsValues);
 
@@ -84,8 +80,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     if (this._isMounted) {
       this.setState({
         features: features.filter(f => f.type === ModuleTypes.Feature).map(f => ({ ...f, isLoading: false, isActionLoading: false, isHomeLoading: false, error: null, versions: [] })),
-        isLoading: false,
-        swarmGatewayUrl
+        isLoading: false
       });
     }
   }
@@ -274,7 +269,6 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
                       onToggleFeature={this.toggleFeature.bind(this)}
                       onRemoveDapplet={this.removeDapplet.bind(this)}
                       onDeployClick={this.deployModule.bind(this)}
-                      swarmGatewayUrl={this.state.swarmGatewayUrl}
                     />
                   ))}
                 </List>

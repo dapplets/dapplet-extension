@@ -76,8 +76,8 @@ browser.runtime.onMessage.addListener(
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
     optimizeDependency: (name, branch, version, contextIds) => featureService.optimizeDependency(name, branch, version, contextIds),
     getAllDevModules: () => featureService.getAllDevModules(),
-    uploadModule: (mi, vi, targetStorage) => featureService.uploadModule(mi, vi, targetStorage),
-    deployModule: (mi, vi, targetStorage, targetRegistry) => featureService.deployModule(mi, vi, targetStorage, targetRegistry),
+    uploadModule: (mi, vi, targetStorages) => featureService.uploadModule(mi, vi, targetStorages),
+    deployModule: (mi, vi, targetStorages, targetRegistry) => featureService.deployModule(mi, vi, targetStorages, targetRegistry),
     getRegistries: () => featureService.getRegistries(),
     getOwnership: (registryUri, moduleName) => featureService.getOwnership(registryUri, moduleName),
     getVersionInfo: (registryUri, moduleName, branch, version) => featureService.getVersionInfo(registryUri, moduleName, branch, version),
@@ -90,6 +90,7 @@ browser.runtime.onMessage.addListener(
     openDappletAction: (name, tabId) => featureService.openDappletAction(name, tabId),
     openDappletHome: (name, tabId) => featureService.openDappletHome(name, tabId),
     removeDapplet: (name, hostnames) => featureService.removeDapplet(name, hostnames),
+    getResource: (hashUris) => featureService.getResource(hashUris),
 
     // GlobalConfigService
     getProfiles: globalConfigService.getProfiles.bind(globalConfigService),
@@ -135,6 +136,14 @@ browser.runtime.onMessage.addListener(
     setPreferedOverlayStorage: globalConfigService.setPreferedOverlayStorage.bind(globalConfigService),
     getSwarmPostageStampId: globalConfigService.getSwarmPostageStampId.bind(globalConfigService),
     setSwarmPostageStampId: globalConfigService.setSwarmPostageStampId.bind(globalConfigService),
+    getEthereumProvider: () => globalConfigService.getEthereumProvider(),
+    setEthereumProvider: (url) => globalConfigService.setEthereumProvider(url),
+    getSwarmGateway: globalConfigService.getSwarmGateway.bind(globalConfigService),
+    setSwarmGateway: globalConfigService.setSwarmGateway.bind(globalConfigService),
+    getIpfsGateway: globalConfigService.getIpfsGateway.bind(globalConfigService),
+    setIpfsGateway: globalConfigService.setIpfsGateway.bind(globalConfigService),
+    getDynamicAdapter: globalConfigService.getDynamicAdapter.bind(globalConfigService),
+    setDynamicAdapter: globalConfigService.setDynamicAdapter.bind(globalConfigService),
 
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),
@@ -143,12 +152,6 @@ browser.runtime.onMessage.addListener(
     clearUserSettings: (moduleName) => globalConfigService.clearUserSettings(moduleName),
     getAllUserSettings: (moduleName) => globalConfigService.getAllUserSettings(moduleName),
     setAllUserSettings: (moduleName, values) => globalConfigService.setAllUserSettings(moduleName, values),
-    getEthereumProvider: () => globalConfigService.getEthereumProvider(),
-    setEthereumProvider: (url) => globalConfigService.setEthereumProvider(url),
-    getSwarmGateway: globalConfigService.getSwarmGateway.bind(globalConfigService),
-    setSwarmGateway: globalConfigService.setSwarmGateway.bind(globalConfigService),
-    getDynamicAdapter: globalConfigService.getDynamicAdapter.bind(globalConfigService),
-    setDynamicAdapter: globalConfigService.setDynamicAdapter.bind(globalConfigService),
 
     // ENS
     resolveName: (name) => ensService.resolveName(name),

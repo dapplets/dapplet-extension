@@ -1,20 +1,8 @@
 import * as React from "react";
-import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { browser } from "webextension-polyfill-ts";
-import NO_LOGO from "../../common/resources/no-logo.png";
 
-import {
-  Button,
-  Checkbox,
-  Divider,
-  Icon,
-  Image,
-  Label,
-  List,
-  Popup,
-} from "semantic-ui-react";
+import { Checkbox, Icon, Label, List, Popup } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
-import { joinUrls } from "../../common/helpers";
+import { StorageRefImage } from "./StorageRefImage";
 
 export type ManifestAndDetails = ManifestDTO & {
   isLoading: boolean;
@@ -35,8 +23,6 @@ interface Props {
   onToggleFeature: Function;
   onRemoveDapplet: Function;
   onDeployClick: Function;
-
-  swarmGatewayUrl: string;
 }
 
 interface State {}
@@ -53,19 +39,9 @@ export class Dapplet extends React.Component<Props, State> {
         <List.Content style={{ width: 45, float: "left" }}>
           <Popup
             trigger={
-              <Image
-                size="mini"
-                avatar
+              <StorageRefImage
                 alt={f.description}
-                src={
-                  f.icon
-                    ? f.icon?.uris?.[0]?.indexOf("bzz:/") !== -1
-                      ? joinUrls(this.props.swarmGatewayUrl, "bzz/" +
-                        f.icon?.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0])
-                      : f.icon?.uris?.[0]
-                    : null
-                }
-                onError={(i) => (i.target.src = NO_LOGO)}
+                storageRef={f.icon}
               />
             }
           >

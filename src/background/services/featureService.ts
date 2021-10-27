@@ -12,6 +12,8 @@ import JSZip from 'jszip';
 import { areModulesEqual, getCurrentTab, mergeDedupe, parseModuleName } from '../../common/helpers';
 import { WalletService } from './walletService';
 import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
+import { StorageRef } from '../registries/registry';
+import { base64ArrayBuffer } from '../../common/base64ArrayBuffer';
 
 export default class FeatureService {
     private _moduleManager: ModuleManager;
@@ -314,12 +316,12 @@ export default class FeatureService {
     }
 
     // ToDo: move to another service?
-    public async deployModule(mi: ModuleInfo, vi: VersionInfo, targetStorage: StorageTypes, targetRegistry: string): Promise<{ scriptUrl: string }> {
+    public async deployModule(mi: ModuleInfo, vi: VersionInfo, targetStorages: StorageTypes[], targetRegistry: string): Promise<{ scriptUrl: string }> {
         const registry = await this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry);
         if (!registry) throw new Error("No registry with this url exists in config.");
 
         try {
-            const scriptUrl = await this.uploadModule(mi, vi, targetStorage);
+            const scriptUrl = await this.uploadModule(mi, vi, targetStorages);
             await registry.addModule(mi, vi); // Register manifest in Registry
             return { scriptUrl };
         } catch (err) {
@@ -328,7 +330,7 @@ export default class FeatureService {
         }
     }
 
-    public async uploadModule(mi: ModuleInfo, vi: VersionInfo, targetStorage: StorageTypes): Promise<string> {
+    public async uploadModule(mi: ModuleInfo, vi: VersionInfo, targetStorages: StorageTypes[]): Promise<string> {
         try {
             // ToDo: check everything before publishing
             if (mi.icon && !mi.icon.uris[0].endsWith('.png')) throw new Error('Type of module icon must be PNG.');
@@ -365,7 +367,7 @@ export default class FeatureService {
 
                     const files = await Promise.all(assets.map((x: string) => this._storageAggregator.getResource({ uris: [new URL(x, baseUrl).href], hash: null }).then(y => ({ url: x, arr: y }))));
 
-                    const hashUris = await this._storageAggregator.saveDir(files, [targetStorage]);
+                    const hashUris = await this._storageAggregator.saveDir(files, targetStorages);
                     vi.overlays[overlayName] = hashUris;
                 }
 
@@ -380,7 +382,7 @@ export default class FeatureService {
                 // Dist file publishing
                 const buf = await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 9 } });
                 const blob = new Blob([buf], { type: "application/zip" });
-                const hashUris = await this._storageAggregator.save(blob, [targetStorage]);
+                const hashUris = await this._storageAggregator.save(blob, targetStorages);
 
                 // Manifest editing
                 vi.dist = hashUris;
@@ -391,7 +393,7 @@ export default class FeatureService {
                 // Icon file publishing
                 const buf = await this._storageAggregator.getResource(mi.icon);
                 const blob = new Blob([buf], { type: "image/png" });
-                const hashUris = await this._storageAggregator.save(blob, [targetStorage]);
+                const hashUris = await this._storageAggregator.save(blob, targetStorages);
 
                 // Manifest editing
                 mi.icon = hashUris;
@@ -536,5 +538,11 @@ export default class FeatureService {
             type: "OPEN_DAPPLET_HOME",
             payload: { moduleName }
         });
+    }
+
+    public async getResource(hashUris: StorageRef) {
+        const arr = await this._storageAggregator.getResource(hashUris);
+        const base64 = base64ArrayBuffer(arr);
+        return base64;
     }
 }

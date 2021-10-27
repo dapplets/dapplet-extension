@@ -61,4 +61,6 @@ export class GlobalConfig extends Base {
     preferedOverlayStorage: string = null;
 
     swarmPostageStampId: string = null;
+
+    ipfsGatewayUrl: string = null;
 }

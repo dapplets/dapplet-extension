@@ -9,6 +9,7 @@ import GlobalConfigService from '../services/globalConfigService';
 import { StorageTypes } from '../../common/constants';
 import { Tar } from '../../common/tar';
 import { promiseAny } from '../../common/helpers';
+import { IpfsModuleStorage } from './ipfsModuleStorage';
 
 export class StorageAggregator {
 
@@ -126,6 +127,9 @@ export class StorageAggregator {
                 const swarmGatewayUrl = await this._globalConfigService.getSwarmGateway();
                 const swarmPostageStampId = await this._globalConfigService.getSwarmPostageStampId();
                 return new SwarmModuleStorage({ swarmGatewayUrl, swarmPostageStampId });
+            case "ipfs":
+                const ipfsGatewayUrl = await this._globalConfigService.getIpfsGateway();
+                return new IpfsModuleStorage({ ipfsGatewayUrl });
             default:
                 throw new Error("Unsupported protocol");
         }
@@ -135,10 +139,16 @@ export class StorageAggregator {
         switch (type) {
             // case StorageTypes.TestRegsitry:
             //     return new HttpModuleStorage();
+
             case StorageTypes.Swarm:
                 const swarmGatewayUrl = await this._globalConfigService.getSwarmGateway();
                 const swarmPostageStampId = await this._globalConfigService.getSwarmPostageStampId();
                 return new SwarmModuleStorage({ swarmGatewayUrl, swarmPostageStampId });
+
+            case StorageTypes.Ipfs:
+                const ipfsGatewayUrl = await this._globalConfigService.getIpfsGateway();
+                return new IpfsModuleStorage({ ipfsGatewayUrl });
+
             default:
                 throw new Error("Unsupported storage type");
         }

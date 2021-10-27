@@ -21,7 +21,7 @@ export class SwarmModuleStorage implements ModuleStorage {
         );
 
         if (!response.ok) {
-            throw new Error(`HttpStorage can't load resource by URI ${uri}`);
+            throw new Error(`SwarmStorage can't load resource by URI ${uri}`);
         }
 
         const buffer = await response.arrayBuffer();
