@@ -16,7 +16,7 @@ export class SwarmModuleStorage implements ModuleStorage {
 
         const response = await timeoutPromise(
             this.timeout,
-            fetch(joinUrls(this._gateway, "bzz/" + this._extractReference(uri)), { signal: fetchController.signal }),
+            fetch(joinUrls(this._gateway, "bzz/" + this._extractReference(uri) + "/"), { signal: fetchController.signal }),
             () => fetchController.abort()
         );
 
