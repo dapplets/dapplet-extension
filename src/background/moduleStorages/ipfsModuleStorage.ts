@@ -4,7 +4,7 @@ import { timeoutPromise, joinUrls } from '../../common/helpers';
 export class IpfsModuleStorage implements ModuleStorage {
 
     private _gateway: string;
-    public timeout = 5000;
+    public timeout = 60000;
 
     constructor(config: { ipfsGatewayUrl: string }) {
         this._gateway = config.ipfsGatewayUrl;

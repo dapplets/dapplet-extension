@@ -5,7 +5,7 @@ import { SkynetClient, parseSkylink } from "skynet-js";
 export class SiaModuleStorage implements ModuleStorage {
 
     private _client: SkynetClient;
-    public timeout = 5000;
+    public timeout = 60000;
 
     constructor(config: { siaPortalUrl: string }) {
         this._client = new SkynetClient(config.siaPortalUrl);

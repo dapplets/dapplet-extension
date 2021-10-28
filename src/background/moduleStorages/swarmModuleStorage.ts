@@ -5,7 +5,7 @@ export class SwarmModuleStorage implements ModuleStorage {
 
     private _gateway: string;
     private _swarmPostageStampId: string;
-    public timeout = 5000;
+    public timeout = 60000;
 
     constructor(config: { swarmGatewayUrl: string, swarmPostageStampId: string }) {
         this._gateway = config.swarmGatewayUrl;
