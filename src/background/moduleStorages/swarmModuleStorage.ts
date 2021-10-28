@@ -1,4 +1,4 @@
-import { Storage as ModuleStorage } from './storage';
+import { DirectoryData, Storage as ModuleStorage } from './storage';
 import { timeoutPromise, joinUrls } from '../../common/helpers';
 
 export class SwarmModuleStorage implements ModuleStorage {
@@ -59,10 +59,10 @@ export class SwarmModuleStorage implements ModuleStorage {
         return url;
     }
 
-    public async saveDir(tarBlob: Blob): Promise<string> {
+    public async saveDir(data: DirectoryData): Promise<string> {
         const response = await fetch(joinUrls(this._gateway, 'bzz'), {
             method: 'POST',
-            body: tarBlob,
+            body: data.tar,
             headers: {
                 'swarm-index-document': 'index.html',
                 'swarm-collection': 'true',

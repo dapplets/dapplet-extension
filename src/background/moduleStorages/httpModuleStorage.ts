@@ -1,4 +1,4 @@
-import { Storage as ModuleStorage } from './storage';
+import { DirectoryData, Storage as ModuleStorage } from './storage';
 import { timeoutPromise } from '../../common/helpers';
 
 export class HttpModuleStorage implements ModuleStorage {
@@ -36,7 +36,7 @@ export class HttpModuleStorage implements ModuleStorage {
         return url;
     }
     
-    saveDir(tarBlob: Blob): Promise<string> {
+    saveDir(data: DirectoryData): Promise<string> {
         throw new Error('Method not implemented.');
     }
 }

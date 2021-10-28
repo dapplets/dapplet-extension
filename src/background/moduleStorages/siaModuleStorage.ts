@@ -1,6 +1,6 @@
-import { Storage as ModuleStorage } from './storage';
+import { DirectoryData, Storage as ModuleStorage } from './storage';
 import { timeoutPromise, joinUrls } from '../../common/helpers';
-import { SkynetClient } from "skynet-js";
+import { SkynetClient, parseSkylink } from "skynet-js";
 
 export class SiaModuleStorage implements ModuleStorage {
 
@@ -13,24 +13,23 @@ export class SiaModuleStorage implements ModuleStorage {
 
     public async getResource(uri: string, fetchController: AbortController = new AbortController()): Promise<ArrayBuffer> {
         // ToDo: implement abort
-        const ref = this._extractReference(uri);
+        const ref = parseSkylink(uri);
         const response = await this._client.getFileContent<ArrayBuffer>(ref, { responseType: 'arraybuffer' });
         return response.data;
-    }
-
-    private _extractReference(uri: string) {
-        return uri.replace('sia://', '');
     }
 
     public async save(blob: Blob) {
         const file = new File([blob], 'filename');
         const { skylink } = await this._client.uploadFile(file);
-        const url = "sia://" + skylink.replace('sia://', '').replace('sia:','');
+        const url = "sia://" + parseSkylink(skylink);
         return url;
     }
 
-    public async saveDir(tarBlob: Blob): Promise<string> {
-        // ToDo: implement
-        throw new Error("Not implemented");
+    async saveDir(data: DirectoryData): Promise<string> {
+        const hash = data.hash.replace('0x', '');
+        const files = Object.fromEntries(data.files.map(x => ([x.url, new File([x.arr], x.url)])));
+        const { skylink } = await this._client.uploadDirectory(files, hash);      
+        const url = "sia://" + parseSkylink(skylink);
+        return url;
     }
 }

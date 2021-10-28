@@ -1,4 +1,4 @@
-import { Storage as ModuleStorage } from './storage';
+import { DirectoryData, Storage as ModuleStorage } from './storage';
 import { timeoutPromise, joinUrls } from '../../common/helpers';
 
 export class IpfsModuleStorage implements ModuleStorage {
@@ -57,7 +57,7 @@ export class IpfsModuleStorage implements ModuleStorage {
         return url;
     }
 
-    public async saveDir(tarBlob: Blob): Promise<string> {
+    public async saveDir(tarBlob: DirectoryData): Promise<string> {
         throw new Error("Not implemented");
         // const response = await fetch(joinUrls(this._gateway, 'bzz'), {
         //     method: 'POST',

@@ -82,20 +82,20 @@ export class StorageAggregator {
     }
 
     public async saveDir(files: { url: string, arr: ArrayBuffer }[], targetStorages: StorageTypes[]): Promise<StorageRef> {
-        const blob = await this._tarify(files);
-        const buffer = await (blob as any).arrayBuffer();
+        const tar = await this._tarify(files);
+        const buffer = await (tar as any).arrayBuffer();
         const hash = ethers.utils.keccak256(new Uint8Array(buffer));
         const uris = [];
 
         for (const storageType of targetStorages) {
             const storage = await this._getStorageByType(storageType);
-            const uri = await storage.saveDir(blob);
+            const uri = await storage.saveDir({ files, hash, tar });
             uris.push(uri);
         }
 
         // backup to centralized storage
         const centralizedStorage = new CentralizedModuleStorage();
-        const backupHash = await centralizedStorage.saveDir({ files, hash });
+        const backupHash = await centralizedStorage.saveDir({ files, hash, tar });
         if (hash.replace('0x', '') !== backupHash.replace('0x', '')) {
             throw Error(`Backup is corrupted: invalid hashes ${hash} ${backupHash}`);
         }

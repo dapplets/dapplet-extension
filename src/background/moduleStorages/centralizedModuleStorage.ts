@@ -1,4 +1,4 @@
-import { Storage as ModuleStorage } from './storage';
+import { DirectoryData, Storage as ModuleStorage } from './storage';
 import { timeoutPromise } from '../../common/helpers';
 import { ethers } from 'ethers';
 
@@ -49,7 +49,7 @@ export class CentralizedModuleStorage implements ModuleStorage {
         return hash;
     }
 
-    async saveDir(data: { files: { url: string, arr: ArrayBuffer }[], hash: string }): Promise<string> {
+    async saveDir(data: DirectoryData): Promise<string> {
         const hash = data.hash.replace('0x', '');
         const presignResponse = await this._createPresignedPost(hash);
         await Promise.all(data.files.map(x => this._createObject(new Blob([x.arr]), presignResponse, hash + '/' + x.url)));

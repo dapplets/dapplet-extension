@@ -200,10 +200,11 @@ export class Injector {
     }
 
     private async _processModules(modules: { manifest: VersionInfo, script: string, order: number, contextIds: string[], defaultConfig?: DefaultConfig, schemaConfig?: SchemaConfig }[]) {
-        const { optimizeDependency, getModulesWithDeps, addEvent, getSwarmGateway, getPreferedOverlayStorage } = await initBGFunctions(browser);
+        const { optimizeDependency, getModulesWithDeps, addEvent, getSwarmGateway, getPreferedOverlayStorage, getSiaPortal } = await initBGFunctions(browser);
         const { core } = this;
 
         const swarmGatewayUrl = await getSwarmGateway();
+        const siaPortal = await getSiaPortal();
         const preferedOverlayStorage = await getPreferedOverlayStorage();
 
         for (const { manifest, script, order, contextIds, defaultConfig, schemaConfig } of modules) {
@@ -239,6 +240,9 @@ export class Injector {
                             return core.overlay(cfg, eventDef);
                         } else if (url.protocol === 'bzz:') {
                             cfg.url = joinUrls(swarmGatewayUrl, `bzz/${url.pathname.slice(2)}`);
+                            return core.overlay(cfg, eventDef);
+                        } else if (url.protocol === 'sia:') {
+                            cfg.url = joinUrls(siaPortal, `${url.pathname.slice(2)}`);
                             return core.overlay(cfg, eventDef);
                         } else if (url.protocol === 'http:' || url.protocol === 'https:') {
                             cfg.url = url.href;
