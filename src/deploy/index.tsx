@@ -2,7 +2,7 @@ import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Button, Form, Message, Image, Card, Modal, Input, Icon, List } from 'semantic-ui-react';
+import { Button, Form, Message, Image, Card, Modal, Input, Icon, List, Popup } from 'semantic-ui-react';
 import '../common/semantic-ui-css/semantic.min.css';
 import NOLOGO_PNG from '../common/resources/no-logo.png';
 
@@ -66,7 +66,10 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             loading: true,
             targetRegistry: null,
             targetChain: null,
-            targetStorages: [StorageTypes.Swarm, StorageTypes.Ipfs, StorageTypes.Sia],
+            targetStorages: [
+                StorageTypes.Swarm, 
+                StorageTypes.Sia
+            ],
             message: null,
             registryOptions: [],
             owner: null,
@@ -435,21 +438,43 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     <Form.Field label="Target Storage" required />
 
                     <Form.Checkbox 
+                        label={<label>
+                            Centralized{' '}
+                            <Popup
+                                trigger={<Icon name='info circle' />}
+                                content='The centralized storage maintained by Dapplets Project. It backs up your modules in case decentralized storages become unavailable.'
+                                size='small'
+                            />
+                        </label>}
+                        checked={true}
+                        // checked={targetStorages.includes(StorageTypes.Centralized)}
+                        // onChange={(_, d) => this.changeTargetStorage(StorageTypes.Centralized, d.checked)}
+                        readOnly
+                    />
+
+                    <Form.Checkbox 
                         label="Swarm"
                         checked={targetStorages.includes(StorageTypes.Swarm)}
                         onChange={(_, d) => this.changeTargetStorage(StorageTypes.Swarm, d.checked)}
                     />
                     
                     <Form.Checkbox 
-                        label="IPFS"
-                        checked={targetStorages.includes(StorageTypes.Ipfs)}
-                        onChange={(_, d) => this.changeTargetStorage(StorageTypes.Ipfs, d.checked)}
-                    />
-                    
-                    <Form.Checkbox 
                         label="SIA"
                         checked={targetStorages.includes(StorageTypes.Sia)}
                         onChange={(_, d) => this.changeTargetStorage(StorageTypes.Sia, d.checked)}
+                    />
+                    
+                    <Form.Checkbox 
+                        label={<label>
+                            IPFS{' '}
+                            <Popup
+                                trigger={<Icon name='warning sign' />}
+                                content='This is an experimental feature. Uploaded modules must be manually pinned by you to keep them available. Uploading overlays is not yet implemented.'
+                                size='small'
+                            />
+                        </label>}
+                        checked={targetStorages.includes(StorageTypes.Ipfs)}
+                        onChange={(_, d) => this.changeTargetStorage(StorageTypes.Ipfs, d.checked)}
                         style={{ marginBottom: '25px' }}
                     />
 
