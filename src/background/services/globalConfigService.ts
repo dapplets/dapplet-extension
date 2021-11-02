@@ -188,6 +188,7 @@ export default class GlobalConfigService {
         config.trustedUsers = [
             { account: "buidl.testnet" },
             { account: "nik3ter.testnet" },
+            { account: "dapplets.testnet" },
             { account: "0x692a4d7B7BE2dc1623155E90B197a82D114a74f3" },
             { account: "0x9126d36880905fcb9e5f2a7f7c4f19703d52bc62" },
             { account: "0xf64849376812667bda7d902666229f8b8dd90687" },
