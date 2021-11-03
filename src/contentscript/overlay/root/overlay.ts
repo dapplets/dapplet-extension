@@ -15,6 +15,7 @@ export class Overlay implements IOverlay {
     public onclose: Function = null;
     public loader: HTMLDivElement;
     public onregisteredchange: (value: boolean) => void = null;
+    public source: string = null;
 
     constructor(private _manager: OverlayManager, public uri: string, public title: string, public hidden: boolean = false) {
 

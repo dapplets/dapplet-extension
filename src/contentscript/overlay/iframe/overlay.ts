@@ -9,6 +9,7 @@ export class OverlayIframe implements IOverlay {
     onclose: Function;
     loader: HTMLDivElement;
     onregisteredchange: (value: boolean) => void;
+    source: string = null;
 
     private _id: string;
     private _callbacks = new Set<Function>();

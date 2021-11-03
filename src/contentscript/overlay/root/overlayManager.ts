@@ -272,8 +272,9 @@ export class OverlayManager implements IOverlayManager {
         }
     }
 
-    public unregisterAll() {
-        this._tabsRegistry.forEach(({ overlay }) => this.unregister(overlay));
+    public unregisterAll(source?: string) {
+        const unregisterTabs = source ? this._tabsRegistry.filter(x => x.overlay.source === source) : this._tabsRegistry;
+        unregisterTabs.forEach(({ overlay }) => this.unregister(overlay));
     }
 
     public activate(overlay: Overlay) {

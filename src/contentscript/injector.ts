@@ -143,6 +143,9 @@ export class Injector {
                     }
                 }
 
+                // Destroy all overlays related with the module
+                this.core.overlayManager.unregisterAll(m.manifest.name);
+
                 console.log(`[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is unloaded.`);
                 browser.runtime.sendMessage({
                     type: "FEATURE_UNLOADED", payload: {
@@ -229,6 +232,7 @@ export class Injector {
                 contextFinished: (contextIds: any[], parentContext: string) => this._setContextActivivty(contextIds, parentContext, false),
                 connect: core.connect.bind(core),
                 overlay: (cfg, eventDef) => {
+                    cfg.source = manifest.name;
                     if (cfg.name) {
                         const overlay = manifest.overlays?.[cfg.name];
                         if (!overlay) throw new Error(`Cannot find overlay with name "${cfg.name}" in the manifest.`);
