@@ -13,7 +13,7 @@ import VersionInfo from '../background/models/versionInfo';
 import * as tracing from '../common/tracing';
 import { ChainTypes, DefaultSigners } from "../common/types";
 import { typeOfUri, chainByUri, joinUrls } from "../common/helpers";
-import { StorageTypes } from "../common/constants";
+import { DEFAULT_BRANCH_NAME, StorageTypes } from "../common/constants";
 
 tracing.startTracing();
 
@@ -24,11 +24,24 @@ enum DeploymentStatus {
     NewModule
 }
 
+enum DependencyType {
+    Dependency,
+    Interface
+}
+
+type DependencyChecking = {
+    name: string;
+    version: string;
+    type: DependencyType;
+    isExists?: boolean;
+}
+
 interface IIndexProps { }
 
 interface IIndexState {
     mi: ModuleInfo;
     vi: VersionInfo;
+    dependenciesChecking: DependencyChecking[];
     loading: boolean;
     targetRegistry: string;
     targetChain: ChainTypes;
@@ -63,6 +76,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.state = {
             mi: null,
             vi: null,
+            dependenciesChecking: [],
             loading: true,
             targetRegistry: null,
             targetChain: null,
@@ -85,15 +99,24 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             swarmGatewayUrl: ''
         };
 
-        this.bus.subscribe('data', async ({ mi, vi }) => {
+        this.bus.subscribe('data', async ({ mi, vi }: { mi: ModuleInfo, vi: VersionInfo }) => {
             const { getSwarmGateway } = await initBGFunctions(browser);
             const swarmGatewayUrl = await getSwarmGateway();
-            this.setState({ mi, vi, loading: false, swarmGatewayUrl });
+            const dependencies = vi.dependencies ? Object.entries(vi.dependencies).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Dependency })) : [];
+            const interfaces = vi.interfaces ? Object.entries(vi.interfaces).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Interface })) : [];
+            const dependenciesChecking = [...dependencies, ...interfaces];
+            this.setState({ mi, vi, dependenciesChecking, loading: false, swarmGatewayUrl });
             await this._updateData();
         });
 
         this.transferOwnershipModal = React.createRef();
         this.addLocationModal = React.createRef();
+    }
+
+    private async _checkDependencies() {
+        const { getVersionInfo } = await initBGFunctions(browser);
+        const { dependenciesChecking: deps, targetRegistry } = this.state;
+        await Promise.all(deps.map(x => getVersionInfo(targetRegistry, x.name, DEFAULT_BRANCH_NAME, x.version).then(y => x.isExists = !!y)));
     }
 
     private async _updateData() {
@@ -111,7 +134,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             targetChain: chainByUri(typeOfUri(prodRegistries[0]?.url ?? ''))
         });
 
-        return Promise.all([this._updateOwnership(), this._updateDeploymentStatus()]);
+        return Promise.all([this._updateOwnership(), this._updateDeploymentStatus(), this._checkDependencies()]);
     }
 
     private async _updateOwnership() {
@@ -242,7 +265,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         const {
             mi, vi, loading, targetRegistry,
             targetStorages, 
-            message, registryOptions,
+            message, dependenciesChecking,
             owner, currentAccount, newOwner, editLocation: newLocation,
             newOwnerLoading, newOwnerDone, editLocationLoading: newLocationLoading,
             editLocationDone: newLocationDone
@@ -253,9 +276,11 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         const isNotWalletPaired = !isNotNullCurrentAccount && !!owner;
         const isNotAnOwner = !!owner && isNotNullCurrentAccount && owner.toLowerCase() !== currentAccount.toLowerCase();
         const isAlreadyDeployed = !message && this.state.deploymentStatus === DeploymentStatus.Deployed;
-        const isButtonDisabled = loading || this.state.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner || isNoStorage;
         const isNewModule = this.state.deploymentStatus === DeploymentStatus.NewModule;
         const isNotTrustedUser = isNotNullCurrentAccount && !this.state.trustedUsers.find(x => x.account.toLowerCase() === currentAccount.toLowerCase());
+        const isDependenciesExist = dependenciesChecking.length > 0 ? dependenciesChecking.every(x => x.isExists === true) : true;
+        const isDependenciesLoading = dependenciesChecking.length > 0 ? dependenciesChecking.every(x => x.isExists === undefined) : false;
+        const isButtonDisabled = loading || this.state.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner || isNoStorage || isDependenciesLoading || !isDependenciesExist;
 
         return (
             <React.Fragment>
@@ -306,7 +331,18 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     />
                  : null}
 
-                 {(isNewModule) ? 
+                 {(!isDependenciesLoading && !isDependenciesExist) ? <Message 
+                         warning
+                         header='Missing Dependencies'
+                         content={<>
+                             The following modules are not published in the selected registry:<br/>
+                             <List as='ul' style={{ marginTop: '4px' }}>
+                                 {dependenciesChecking.filter(x => x.isExists === false).map((x, i) => <List.Item key={i} as='li'>{x.name}#default@{x.version}</List.Item>)}
+                             </List>
+                         </>}
+                     /> : null}
+
+                {(isNewModule) ? 
                     <Message 
                         info
                         header='New Module'
@@ -321,7 +357,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             </> : null}
                         </>}
                     />
-                 : null}
+                    : null}
 
                 {(isNotTrustedUser && this.state.deploymentStatus !== DeploymentStatus.Deployed) ? 
                     <Message 
