@@ -1,19 +1,19 @@
+import { TopologicalSort } from 'topological-sort';
+import { compare, rcompare } from 'semver';
+
 import { Registry } from './registry';
 import { DevRegistry } from './devRegistry';
 import { EthRegistry } from './ethRegistry';
 import GlobalConfigService from '../services/globalConfigService';
-import { compare, rcompare } from 'semver';
 import { mergeDedupe, typeOfUri, UriTypes, assertFullfilled, assertRejected } from '../../common/helpers';
 import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
 import { Environments, DefaultSigners } from '../../common/types';
 import { allSettled } from '../../common/helpers';
-
 import { WalletService } from '../services/walletService';
 import { NearRegistry } from './nearRegistry';
-import { ModuleTypes } from '../../common/constants';
+import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants';
 import VersionInfoBrowserStorage from '../browserStorages/versionInfoStorage';
-import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
 
 if (!Promise.allSettled) Promise.allSettled = allSettled;
 
@@ -135,14 +135,26 @@ export class RegistryAggregator {
         const registriesConfig = await this._globalConfigService.getRegistries();
         const prodRegistries = registries.filter(r => !registriesConfig.find(rc => rc.url === r.url).isDev);
 
+        let devModules: { module: ModuleInfo, versions: VersionInfo[], isDeployed?: boolean[] }[] = [];
+
         if (prodRegistries.length === 0) {
-            const result = reduced.map((x, i) => ({ ...x, isDeployed: [] }));
-            return result;
+            devModules = reduced.map((x, i) => ({ ...x, isDeployed: [] }));
         } else {
             const vis = await Promise.all(reduced.map(m => prodRegistries[0].getVersionInfo(m.module.name, m.versions[0].branch, m.versions[0].version).catch(() => null)));
-            const result = reduced.map((x, i) => ({ ...x, isDeployed: [!!vis[i]] }));
-            return result;
+            devModules = reduced.map((x, i) => ({ ...x, isDeployed: [!!vis[i]] }));
         }
+    
+        // Topological sorting by dependencies
+        const nodes = new Map<string, any>();
+        devModules.forEach(x => nodes.set(x.module.name + '#' + x.versions[0]?.branch, x));
+        const sorting = new TopologicalSort(nodes);
+        devModules.forEach(x => {
+            const deps = [...Object.keys(x.versions[0]?.dependencies || {}), ...Object.keys(x.versions[0]?.interfaces || {})];
+            deps.forEach(d => sorting.addEdge(d + '#' + DEFAULT_BRANCH_NAME, x.module.name + '#' + x.versions[0]?.branch))
+        });
+        const sorted = sorting.sort();
+
+        return [...sorted.values()].map(x => x.node);
     }
 
     public async getRegistryByUri(uri: string): Promise<Registry> {

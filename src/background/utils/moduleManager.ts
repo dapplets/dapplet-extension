@@ -1,11 +1,8 @@
 import { maxSatisfying, rcompare } from 'semver';
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants';
-import Manifest from '../models/manifest';
-import { addEvent } from '../services/eventService';
 import { RegistryAggregator } from '../registries/registryAggregator';
 import { StorageAggregator } from '../moduleStorages/moduleStorage';
 import { areModulesEqual } from '../../common/helpers';
-import ModuleInfo from '../models/moduleInfo';
 import VersionInfo from '../models/versionInfo';
 import { StorageRef } from '../registries/registry';
 import GlobalConfigService from '../services/globalConfigService';
