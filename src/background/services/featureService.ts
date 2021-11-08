@@ -45,9 +45,9 @@ export default class FeatureService {
                     if (!dto) {
                         const dto: ManifestDTO = moduleInfo as any;
                         const config = await this._globalConfigService.getSiteConfigById(contextId); // ToDo: which contextId should we compare?
-                        dto.isActive = config.activeFeatures[dto.name]?.isActive || everywhereConfig.activeFeatures[dto.name]?.isActive ||false;
+                        dto.isActive = config.activeFeatures[dto.name]?.isActive || everywhereConfig.activeFeatures[dto.name]?.isActive || false;
                         dto.isActionHandler = config.activeFeatures[dto.name]?.runtime?.isActionHandler || everywhereConfig.activeFeatures[dto.name]?.runtime?.isActionHandler || false;
-                        dto.isHomeHandler = config.activeFeatures[dto.name]?.runtime?.isHomeHandler || everywhereConfig.activeFeatures[dto.name]?.runtime?.isHomeHandler ||false;
+                        dto.isHomeHandler = config.activeFeatures[dto.name]?.runtime?.isHomeHandler || everywhereConfig.activeFeatures[dto.name]?.runtime?.isHomeHandler || false;
                         dto.activeVersion = (dto.isActive) ? (config.activeFeatures[dto.name]?.version || everywhereConfig.activeFeatures[dto.name]?.version || null) : null;
                         dto.lastVersion = (dto.isActive) ? await this.getVersions(registryUrl, dto.name).then(x => x.sort(rcompare)[0]) : null; // ToDo: how does this affect performance?
                         dto.order = i++;
@@ -255,7 +255,7 @@ export default class FeatureService {
                     version: config.activeFeatures[dto.name].version
                 };
                 const index = modules.findIndex(m => areModulesEqual(m, moduleId));
-                
+
                 if (index !== -1) {
                     modules[index].hostnames.push(config.hostname);
                 } else {
@@ -360,10 +360,35 @@ export default class FeatureService {
                 for (const overlayName in vi.overlays) {
                     const baseUrl = vi.overlays[overlayName].uris[0];
                     const assetManifestUrl = new URL('assets-manifest.json', baseUrl).href;
-                    const arr = await this._storageAggregator.getResource({ uris: [assetManifestUrl], hash: null });
+                    const arr = await this._storageAggregator.getResource({ uris: [assetManifestUrl], hash: null })
+                        .catch(() => {
+                            throw new Error("Cannot find an assets manifest by the URL: " + assetManifestUrl);
+                        });
                     const json = String.fromCharCode.apply(null, new Uint8Array(arr));
-                    const assetManifest = JSON.parse(json);
+
+                    let assetManifest: any = null;
+                    try {
+                        assetManifest = JSON.parse(json);
+                    } catch (_) {
+                        throw new Error("The assets manifest has invalid JSON.\nRequested URL: " + assetManifestUrl);
+                    }
+
+                    if (!(typeof assetManifest === 'object' && !Array.isArray(assetManifest) && assetManifest !== null)) {
+                        throw new Error(
+                            "An assets manifest must be a valid JSON object.\n" + 
+                            "Example: {\"index.html\": \"index.html\", \"styles.css\": \"css-62d9da.css\"}\n" + 
+                            "Requested URL: " + assetManifestUrl
+                        );
+                    }
+
                     const assets = Object.values(assetManifest);
+                    if (assets.indexOf("index.html") === -1) {
+                        throw new Error(
+                            "An assets manifest must contain a path to the `index.html` file.\n" + 
+                            "Example: {\"index.html\": \"index.html\", \"styles.css\": \"css-62d9da.css\"}\n" + 
+                            "Requested URL: " + assetManifestUrl
+                        );
+                    }
 
                     const files = await Promise.all(assets.map((x: string) => this._storageAggregator.getResource({ uris: [new URL(x, baseUrl).href], hash: null }).then(y => ({ url: x, arr: y }))));
 
