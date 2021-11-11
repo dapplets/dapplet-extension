@@ -446,9 +446,9 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
         if (typeOfUri(address) === UriTypes.Ens) {
             const { resolveName } = await initBGFunctions(browser);
             const ethAddress = await resolveName(address);
-            window.open(`https://rinkeby.etherscan.io/address/${ethAddress}`, '_blank');
+            window.open(`https://goerli.etherscan.io/address/${ethAddress}`, '_blank');
         } else if (typeOfUri(address) === UriTypes.Ethereum) {
-            window.open(`https://rinkeby.etherscan.io/address/${address}`, '_blank');
+            window.open(`https://goerli.etherscan.io/address/${address}`, '_blank');
         } else if (typeOfUri(address) === UriTypes.Near) {
             window.open(`https://explorer.testnet.near.org/accounts/${address}`, '_blank');
         }

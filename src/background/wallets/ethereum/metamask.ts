@@ -9,12 +9,12 @@ import { EthereumWallet } from "./interface";
 
 export default class extends ethers.Signer implements EthereumWallet {
 
-    public provider: ethers.providers.StaticJsonRpcProvider;
+    public provider: ethers.providers.JsonRpcProvider;
     private _metamaskProviderPromise: Promise<MetaMaskInpageProvider> | null = null;
 
     constructor(config: { providerUrl: string }) {
         super();
-        this.provider = new ethers.providers.StaticJsonRpcProvider(config.providerUrl, 4);
+        this.provider = new ethers.providers.JsonRpcProvider(config.providerUrl);
     }
 
     async getAddress(): Promise<string> {

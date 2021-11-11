@@ -228,8 +228,8 @@ browser.notifications.onClicked.addListener(function (notificationId) {
     notificationId[0] == "0" &&
     notificationId[1] == "x"
   ) {
-    // ToDo: it's incorrect to be linked with Ethereum and Rinkeby only.
-    var url = "https://rinkeby.etherscan.io/tx/" + notificationId;
+    // ToDo: it's incorrect to be linked with Ethereum and Goerli only.
+    var url = "https://goerli.etherscan.io/tx/" + notificationId;
     browser.tabs.create({ url: url });
   }
 });

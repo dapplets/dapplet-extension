@@ -74,7 +74,7 @@ export class WalletService {
             const providerUrl = await this._globalConfigService.getEthereumProvider();
             const signer = new (class extends Signer {
 
-                provider = new providers.StaticJsonRpcProvider(providerUrl, 4);
+                provider = new providers.JsonRpcProvider(providerUrl);
                 
                 constructor() {
                     super();
