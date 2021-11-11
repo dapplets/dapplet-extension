@@ -16,11 +16,8 @@ type EthStorageRef = {
 type EthModuleInfo = {
     moduleType: number; // uint8
     name: string; // string
-    title: string; // string
-    description: string; // string
     owner: string; // bytes32
     interfaces: string[]; // string[]
-    icon: EthStorageRef;
     flags: number; // uint 
 }
 
@@ -37,10 +34,13 @@ type EthVersionInfoDto = {
     major: number; // uint8 
     minor: number; // uint8 
     patch: number; // uint8 
-    flags: number; // uint8 
+    title: string; // string
+    description: string; // string
+    icon: EthStorageRef;
     binary: EthStorageRef;
     dependencies: EthDependencyDto[];
     interfaces: EthDependencyDto[]; // bytes32[] 
+    flags: number; // uint8 
 }
 
 const moduleTypesMap: { [key: number]: ModuleTypes } = {
@@ -73,6 +73,39 @@ export class EthRegistry implements Registry {
     }
 
     public async getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }> {
+        const misByContextId = await this._getModuleInfoPartial(contextIds, users);
+        // ToDo: optimize the number of external requests to reduce loading time
+        const values = await Promise.all(Object.values(misByContextId).map(mis => 
+            Promise.all(mis.map(x => 
+                this.getVersionNumbers(x.name, DEFAULT_BRANCH_NAME)
+                    .then(y => (y.length > 0) ? this._contract.getVersionInfo(
+                            x.name, 
+                            DEFAULT_BRANCH_NAME, 
+                            semver.major(y[y.length - 1]), 
+                            semver.minor(y[y.length - 1]), 
+                            semver.patch(y[y.length - 1])
+                        ) : null)
+                    .then(z => {
+                        if (z) {
+                            const {dto} = z;
+                            x.title = dto.title;
+                            x.description = dto.description;
+                            x.icon = {
+                                hash: dto.icon.hash,
+                                uris: dto.icon.uris.map(u => ethers.utils.toUtf8String(u))
+                            }
+                        }
+                        return x;
+                    })
+            ))
+        ));
+        const keys = Object.keys(misByContextId);
+        const entries = keys.map((x, i) => ([x, values[i]]));
+        const object = Object.fromEntries(entries);
+        return object;
+    }
+
+    private async _getModuleInfoPartial(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }> {
         try {
             users = users.filter(x => typeOfUri(x) === UriTypes.Ens || typeOfUri(x) === UriTypes.Ethereum);
             users = await Promise.all(users.map(u => (typeOfUri(u) === UriTypes.Ens) ? this._signer.resolveName(u) : Promise.resolve(u)));
@@ -98,13 +131,13 @@ export class EthRegistry implements Registry {
                     const mi = new ModuleInfo();
                     mi.type = moduleTypesMap[m.moduleType];
                     mi.name = m.name;
-                    mi.title = m.title;
-                    mi.description = m.description;
+                    // mi.title = m.title;
+                    // mi.description = m.description;
                     mi.author = m.owner.replace('0x000000000000000000000000', '0x');
-                    mi.icon = {
-                        hash: m.icon.hash,
-                        uris: m.icon.uris.map(u => ethers.utils.toUtf8String(u))
-                    };
+                    // mi.icon = {
+                    //     hash: m.icon.hash,
+                    //     uris: m.icon.uris.map(u => ethers.utils.toUtf8String(u))
+                    // };
                     mi.interfaces = m.interfaces;
                     return mi;
                 });
@@ -220,18 +253,9 @@ export class EthRegistry implements Registry {
 
         const mi: EthModuleInfo = {
             name: module.name,
-            title: module.title,
-            description: module.description,
             moduleType: parseInt(Object.entries(moduleTypesMap).find(([k, v]) => v === module.type)[0]),
             flags: 0,
             owner: "0x0000000000000000000000000000000000000000000000000000000000000000",
-            icon: module.icon ? {
-                hash: module.icon.hash,
-                uris: module.icon.uris.map(u => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(u)))
-            } : {
-                    hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-                    uris: []
-                },
             interfaces: module.interfaces || []
         };
 
@@ -240,7 +264,15 @@ export class EthRegistry implements Registry {
             major: semver.major(version.version),
             minor: semver.minor(version.version),
             patch: semver.patch(version.version),
-            flags: 0,
+            title: module.title,
+            description: module.description,
+            icon: module.icon ? {
+                hash: module.icon.hash,
+                uris: module.icon.uris.map(u => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(u)))
+            } : {
+                    hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    uris: []
+                },
             binary: version.dist ? {
                 hash: version.dist.hash,
                 uris: version.dist.uris.map(u => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(u)))
@@ -261,16 +293,16 @@ export class EthRegistry implements Registry {
                 major: semver.major(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
                 minor: semver.minor(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
                 patch: semver.patch(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME])
-            })) || []
+            })) || [],
+            flags: 0
         };
 
-        const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
         const contract = await this._contractPromise;
         if (!isModuleExist) {
-            const tx = await contract.addModuleInfo(module.contextIds, mi, [vi], userId);
+            const tx = await contract.addModuleInfo(module.contextIds, mi, [vi]);
             await tx.wait();
         } else {
-            const tx = await contract.addModuleVersion(mi.name, vi, userId);
+            const tx = await contract.addModuleVersion(mi.name, vi);
             await tx.wait();
         }
     }
@@ -287,24 +319,21 @@ export class EthRegistry implements Registry {
     }
 
     public async transferOwnership(moduleName: string, address: string) {
-        const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
         if (address.length === 42) address = '0x000000000000000000000000' + address.replace('0x', '');
         const contract = await this._contractPromise;
-        const tx = await contract.transferOwnership(moduleName, userId, address);
+        const tx = await contract.transferOwnership(moduleName, address);
         await tx.wait();
     }
 
     public async addContextId(moduleName: string, contextId: string) {
-        const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
         const contract = await this._contractPromise;
-        const tx = await contract.addContextId(moduleName, contextId, userId);
+        const tx = await contract.addContextId(moduleName, contextId);
         await tx.wait();
     }
 
     public async removeContextId(moduleName: string, contextId: string) {
-        const userId = "0x0000000000000000000000000000000000000000000000000000000000000000";
         const contract = await this._contractPromise;
-        const tx = await contract.removeContextId(moduleName, contextId, userId);
+        const tx = await contract.removeContextId(moduleName, contextId);
         await tx.wait();
     }
 }
