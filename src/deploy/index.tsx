@@ -2,7 +2,7 @@ import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Button, Form, Message, Image, Card, Modal, Input, Icon, List, Popup } from 'semantic-ui-react';
+import { Button, Form, Message, Image, Card, Modal, Input, Icon, List, Popup, Label } from 'semantic-ui-react';
 import '../common/semantic-ui-css/semantic.min.css';
 import NOLOGO_PNG from '../common/resources/no-logo.png';
 
@@ -13,7 +13,8 @@ import VersionInfo from '../background/models/versionInfo';
 import * as tracing from '../common/tracing';
 import { ChainTypes, DefaultSigners } from "../common/types";
 import { typeOfUri, chainByUri, joinUrls } from "../common/helpers";
-import { DEFAULT_BRANCH_NAME, StorageTypes } from "../common/constants";
+import { DEFAULT_BRANCH_NAME, ModuleTypes, StorageTypes } from "../common/constants";
+import { StorageRefImage } from "../popup/components/StorageRefImage";
 
 tracing.startTracing();
 
@@ -27,6 +28,12 @@ enum DeploymentStatus {
 enum DependencyType {
     Dependency,
     Interface
+}
+
+enum FormMode {
+    Deploying,
+    Creating,
+    Editing
 }
 
 type DependencyChecking = {
@@ -63,12 +70,14 @@ interface IIndexState {
     deploymentStatus: DeploymentStatus;
     trustedUsers: { account: string }[];
     swarmGatewayUrl: string;
+    mode: FormMode;
 }
 
 class Index extends React.Component<IIndexProps, IIndexState> {
     private bus = new Bus();
-    private transferOwnershipModal;
-    private addLocationModal;
+    private transferOwnershipModal = React.createRef<any>();
+    private addLocationModal = React.createRef<any>();
+    private fileInputRef = React.createRef<HTMLInputElement>();
 
     constructor(props) {
         super(props);
@@ -82,7 +91,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             targetChain: null,
             targetStorages: [
                 StorageTypes.Swarm, 
-                StorageTypes.Sia
+                StorageTypes.Sia,
+                StorageTypes.Ipfs
             ],
             message: null,
             registryOptions: [],
@@ -96,21 +106,51 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             editLocationDone: false,
             deploymentStatus: DeploymentStatus.Unknown,
             trustedUsers: [],
-            swarmGatewayUrl: ''
+            swarmGatewayUrl: '',
+            mode: null
         };
 
         this.bus.subscribe('data', async ({ mi, vi }: { mi: ModuleInfo, vi: VersionInfo }) => {
             const { getSwarmGateway } = await initBGFunctions(browser);
             const swarmGatewayUrl = await getSwarmGateway();
-            const dependencies = vi.dependencies ? Object.entries(vi.dependencies).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Dependency })) : [];
-            const interfaces = vi.interfaces ? Object.entries(vi.interfaces).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Interface })) : [];
-            const dependenciesChecking = [...dependencies, ...interfaces];
-            this.setState({ mi, vi, dependenciesChecking, loading: false, swarmGatewayUrl });
-            await this._updateData();
-        });
 
-        this.transferOwnershipModal = React.createRef();
-        this.addLocationModal = React.createRef();
+            if (mi === null && vi === null) { // New module
+                const mi = new ModuleInfo();
+                const vi = new VersionInfo();
+                vi.version = "0.0.0";
+                vi.branch = "default";
+
+                this.setState({ 
+                    mi, 
+                    vi, 
+                    loading: false, 
+                    swarmGatewayUrl,
+                    mode: FormMode.Creating
+                });
+                await this._updateData();
+            } else { // Deploy module
+                const dependencies = vi.dependencies ? Object.entries(vi.dependencies).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Dependency })) : [];
+                const interfaces = vi.interfaces ? Object.entries(vi.interfaces).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Interface })) : [];
+                const dependenciesChecking = [...dependencies, ...interfaces];
+                this.setState({ 
+                    mi, 
+                    vi, 
+                    dependenciesChecking, 
+                    loading: false, 
+                    swarmGatewayUrl,
+                    targetStorages: (Object.keys(vi.overlays ?? {}).length > 0) ? [
+                        StorageTypes.Swarm, 
+                        StorageTypes.Sia
+                    ] : [
+                        StorageTypes.Swarm, 
+                        StorageTypes.Sia,
+                        StorageTypes.Ipfs
+                    ],
+                    mode: FormMode.Deploying
+                });
+                await this._updateData();
+            }
+        });
     }
 
     private async _checkDependencies() {
@@ -134,18 +174,30 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             targetChain: chainByUri(typeOfUri(prodRegistries[0]?.url ?? ''))
         });
 
-        return Promise.all([this._updateOwnership(), this._updateDeploymentStatus(), this._checkDependencies()]);
+        if (this.state.mode === FormMode.Creating) {
+            return Promise.all([
+                this._updateCurrentAccount()
+            ]);
+        } else {
+            return Promise.all([
+                this._updateOwnership(), 
+                this._updateCurrentAccount(), 
+                this._updateDeploymentStatus(), 
+                this._checkDependencies()
+            ]);
+        }
+    }
+
+    private async _updateCurrentAccount() {
+        const { getOwnership, getAddress } = await initBGFunctions(browser);
+        const currentAccount = await getAddress(DefaultSigners.EXTENSION, this.state.targetChain);
+        this.setState({ currentAccount });
     }
 
     private async _updateOwnership() {
-        const { getOwnership, getAddress } = await initBGFunctions(browser);
+        const { getOwnership } = await initBGFunctions(browser);
         const owner = await getOwnership(this.state.targetRegistry, this.state.mi.name);
-        const currentAccount = await getAddress(DefaultSigners.EXTENSION, this.state.targetChain);
-
-        this.setState({
-            owner,
-            currentAccount
-        });
+        this.setState({ owner });
     }
 
     private async _updateDeploymentStatus() {
@@ -261,7 +313,29 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.setState({ targetStorages });
     }
 
+    async iconInputChangeHandler(event: React.ChangeEvent<HTMLInputElement>) {
+        const s = this.state;
+        const files = event.target.files;
+        if (files.length > 0) {
+            const file = files[0];
+            const base64: string = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = error => reject(error);
+            });
+            s.mi.icon = {
+                hash: null,
+                uris: [base64]
+            }
+        } else {
+            s.mi.icon = null;
+        }
+        this.setState({ mi: s.mi });
+    }
+
     render() {
+        const s = this.state;
         const {
             mi, vi, loading, targetRegistry,
             targetStorages, 
@@ -275,12 +349,14 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         const isNotNullCurrentAccount = !(!currentAccount || currentAccount === '0x0000000000000000000000000000000000000000');
         const isNotWalletPaired = !isNotNullCurrentAccount && !!owner;
         const isNotAnOwner = !!owner && isNotNullCurrentAccount && owner.toLowerCase() !== currentAccount.toLowerCase();
-        const isAlreadyDeployed = !message && this.state.deploymentStatus === DeploymentStatus.Deployed;
-        const isNewModule = this.state.deploymentStatus === DeploymentStatus.NewModule;
-        const isNotTrustedUser = isNotNullCurrentAccount && !this.state.trustedUsers.find(x => x.account.toLowerCase() === currentAccount.toLowerCase());
+        const isAlreadyDeployed = !message && s.deploymentStatus === DeploymentStatus.Deployed;
+        const isNewModule = s.deploymentStatus === DeploymentStatus.NewModule;
+        const isNotTrustedUser = isNotNullCurrentAccount && !s.trustedUsers.find(x => x.account.toLowerCase() === currentAccount.toLowerCase());
         const isDependenciesExist = dependenciesChecking.length > 0 ? dependenciesChecking.every(x => x.isExists === true) : true;
         const isDependenciesLoading = dependenciesChecking.length > 0 ? dependenciesChecking.every(x => x.isExists === undefined) : false;
-        const isButtonDisabled = loading || this.state.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner || isNoStorage || isDependenciesLoading || !isDependenciesExist;
+        const isManifestValid = mi?.name && mi?.title && mi?.description && mi?.type;
+        const isButtonDisabled = loading || s.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner || isNoStorage || isDependenciesLoading || !isDependenciesExist || !isManifestValid;
+        
 
         return (
             <React.Fragment>
@@ -297,9 +373,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                 {(!isNotNullCurrentAccount) ? ((owner) ? (
                     <Message
                         warning
-                        header='Wallet is not paired'
+                        header='The wrong wallet'
                         content={<React.Fragment>
-                            You can not deploy a module without wallet pairing.<br />
                             Change account to {owner}<br/>
                             Connect a new wallet <Icon name='chain' link onClick={() => this.pairWallet()}/>
                         </React.Fragment>}
@@ -307,9 +382,9 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                 ) : (
                     <Message
                         warning
-                        header='Wallet is not paired'
+                        header='Wallet is not connected'
                         content={<React.Fragment>
-                            You can not deploy a module without wallet pairing.<br />
+                            You can not deploy a module without a wallet.<br />
                             Connect a new wallet <Icon name='chain' link onClick={() => this.pairWallet()}/>
                         </React.Fragment>}
                     />
@@ -348,18 +423,18 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         header='New Module'
                         content={<>
                             This module will be published for the first time in the selected registry.
-                            {(this.state.mi.contextIds && this.state.mi.contextIds.length > 0) ? <>
+                            {(s.mi.contextIds && s.mi.contextIds.length > 0) ? <>
                                 <br/>
                                 The following Context IDs will be added by default:
                                 <List as='ul' style={{ marginTop: '4px' }}>
-                                    {this.state.mi.contextIds.map((x, i) => <List.Item key={i} as='li'>{x}</List.Item>)}                                    
+                                    {s.mi.contextIds.map((x, i) => <List.Item key={i} as='li'>{x}</List.Item>)}                                    
                                 </List>
                             </> : null}
                         </>}
                     />
                     : null}
 
-                {(isNotTrustedUser && this.state.deploymentStatus !== DeploymentStatus.Deployed) ? 
+                {(isNotTrustedUser && s.deploymentStatus !== DeploymentStatus.Deployed) ? 
                     <Message 
                         info
                         header='Untrusted User'
@@ -370,14 +445,9 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     /> 
                 : null}
 
-                {(mi) ? (<Card fluid>
+                {(mi && s.mode === FormMode.Deploying) ? (<Card fluid>
                     <Card.Content>
-                        <Image
-                            floated='right'
-                            size='mini'
-                            circular
-                            src={(mi.icon && mi.icon.uris.length > 0) ? ((mi.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? joinUrls(this.state.swarmGatewayUrl, 'bzz/' + mi.icon.uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0]) : mi.icon.uris?.[0]) : NOLOGO_PNG}
-                        />
+                        <StorageRefImage storageRef={mi.icon} className="ui mini circular right floated image"/>
                         <Card.Header>{mi.title}</Card.Header>
                         <Card.Meta>{mi.type}</Card.Meta>
                         <Card.Description>
@@ -387,6 +457,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             {(owner) ? <>Owner: <a href='#' onClick={() => window.open(`https://goerli.etherscan.io/address/${owner}`, '_blank')}>{owner}</a></> : null}
                         </Card.Description>
                     </Card.Content>
+
                     {(owner && owner?.toLowerCase() === currentAccount?.toLowerCase()) ?
                         <Card.Content extra>
                             <div className='ui two buttons'>
@@ -417,7 +488,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                                             color='blue' 
                                             loading={newOwnerLoading}
                                             disabled={newOwnerLoading || newOwnerDone || !newOwner}
-                                            onClick={() => this._transferOwnership(this.state.newOwner)}
+                                            onClick={() => this._transferOwnership(s.newOwner)}
                                         >{(!newOwnerDone) ? "Transfer" : "Done"}</Button>
                                     </Modal.Actions>
                                 </Modal>
@@ -445,13 +516,13 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                                             color='blue' 
                                             loading={newLocationLoading}
                                             disabled={newLocationLoading || newLocationDone || !newLocation}
-                                            onClick={() => this._addLocation(this.state.editLocation)}
+                                            onClick={() => this._addLocation(s.editLocation)}
                                         >{(!newLocationDone) ? "Add" : "Done"}</Button>
                                         <Button 
                                             color='blue' 
                                             loading={newLocationLoading}
                                             disabled={newLocationLoading || newLocationDone || !newLocation}
-                                            onClick={() => this._removeLocation(this.state.editLocation)}
+                                            onClick={() => this._removeLocation(s.editLocation)}
                                         >{(!newLocationDone) ? "Remove" : "Done"}</Button>
                                     </Modal.Actions>
                                 </Modal>
@@ -461,8 +532,71 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         </Card.Content> : null}
                 </Card>) : null}
 
-
                 <Form loading={loading}>
+
+                    {(s.mode === FormMode.Creating || s.mode === FormMode.Editing) ? <>
+                    
+                        <Form.Input
+                            required
+                            label='Module Name'
+                            placeholder="Module ID like module_name.dapplet-base.eth"
+                            value={s.mi.name ?? ''}
+                            onChange={(_, data) => (s.mi.name = data.value, s.vi.name = data.value, this.setState({ mi: s.mi, vi: s.vi }))}
+                        /> 
+
+                        <Form.Input
+                            required
+                            label='Title'
+                            placeholder="A short name of your module"
+                            value={s.mi.title ?? ''}
+                            onChange={(_, data) => (s.mi.title = data.value, this.setState({ mi: s.mi }))}
+                        />
+
+                        <Form.Input
+                            required
+                            label="Description"
+                            placeholder='A small description of what your module does'
+                            value={s.mi.description ?? ''}
+                            onChange={(_, data) => (s.mi.description = data.value, this.setState({ mi: s.mi }))}
+                        />
+
+                        <Form.Field label="Icon" />
+                        <div style={{ marginBottom: '1em' }}>                            
+                            <input
+                                ref={this.fileInputRef}
+                                type="file"
+                                accept=".png"
+                                onChange={this.iconInputChangeHandler.bind(this)}
+                            />
+                        </div>
+
+                        <Form.Field label="Module Type" required />
+                        <Form.Radio
+                            label='Library'
+                            value={ModuleTypes.Library}
+                            checked={mi.type === ModuleTypes.Library}
+                            onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Library, this.setState({ mi }))}
+                        />
+                        <Form.Radio
+                            label='Dapplet'
+                            value={ModuleTypes.Feature}
+                            checked={mi.type === ModuleTypes.Feature}
+                            onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Feature, this.setState({ mi }))}
+                        />
+                        <Form.Radio
+                            label='Adapter'
+                            value={ModuleTypes.Adapter}
+                            checked={mi.type === ModuleTypes.Adapter}
+                            onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Adapter, this.setState({ mi }))}
+                        />
+                        <Form.Radio
+                            label='Interface'
+                            value={ModuleTypes.Interface}
+                            checked={mi.type === ModuleTypes.Interface}
+                            onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Interface, this.setState({ mi }))}
+                        />
+
+                    </> : null}
 
                     <Form.Input
                         required
@@ -471,7 +605,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         readOnly
                     />
 
-                    <Form.Field label="Target Storage" required />
+                    <Form.Field label="Target Storages" required />
 
                     <Form.Checkbox 
                         label={<label>

@@ -103,7 +103,7 @@ export class DevRegistry implements Registry {
     }
 
     // ToDo: merge it into getModuleInfo
-    public async getAllDevModules(): Promise<{ module: ModuleInfo, versions: VersionInfo[] }[]> {
+    public async getAllDevModules({ users }: { users: string[] }): Promise<{ module: ModuleInfo, versions: VersionInfo[] }[]> {
         await this._cacheDevConfig();
         const modules: { module: ModuleInfo, versions: VersionInfo[] }[] = [];
         this._infoByUrl.forEach(info => modules.push({ module: info.module, versions: [info.version] }));

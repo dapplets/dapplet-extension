@@ -173,7 +173,7 @@ export class NearRegistry implements Registry {
         }
     }
 
-    public async getAllDevModules(): Promise<{ module: ModuleInfo, versions: VersionInfo[] }[]> {
+    public async getAllDevModules({ users }: { users: string[] }): Promise<{ module: ModuleInfo, versions: VersionInfo[] }[]> {
         return Promise.resolve([]);
     }
 

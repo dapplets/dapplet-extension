@@ -7,6 +7,8 @@ import NO_LOGO from "../../common/resources/no-logo.png";
 interface Props {
   alt?: string;
   storageRef: StorageRef;
+  style?: any;
+  className?: string;
 }
 
 interface State {
@@ -37,12 +39,16 @@ export class StorageRefImage extends React.Component<Props, State> {
       s = this.state;
 
     if (!s.dataUri) {
-      return <div style={{ width: "35px", height: "35px" }}></div>;
+      return <div 
+        style={p.style ?? { width: "35px", height: "35px" }}
+        className={p.className}
+      ></div>;
     }
 
     return (
       <img
-        style={{ width: "35px", height: "35px" }}
+        style={p.style ?? { width: "35px", height: "35px" }}
+        className={p.className}
         alt={p.alt}
         src={s.dataUri}
       />

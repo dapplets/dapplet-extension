@@ -32,6 +32,195 @@ export default [
     {
         "inputs": [
             {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "modsByContextType",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "name": "moduleIdxs",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "modules",
+        "outputs": [
+            {
+                "internalType": "uint8",
+                "name": "moduleType",
+                "type": "uint8"
+            },
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "owner",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint256",
+                "name": "flags",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "name": "versionNumbers",
+        "outputs": [
+            {
+                "internalType": "bytes",
+                "name": "",
+                "type": "bytes"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "name": "versions",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "modIdx",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "branch",
+                "type": "string"
+            },
+            {
+                "internalType": "uint8",
+                "name": "major",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint8",
+                "name": "minor",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint8",
+                "name": "patch",
+                "type": "uint8"
+            },
+            {
+                "internalType": "string",
+                "name": "title",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "hash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "bytes[]",
+                        "name": "uris",
+                        "type": "bytes[]"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.StorageRef",
+                "name": "icon",
+                "type": "tuple"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "hash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "bytes[]",
+                        "name": "uris",
+                        "type": "bytes[]"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.StorageRef",
+                "name": "binary",
+                "type": "tuple"
+            },
+            {
+                "internalType": "uint8",
+                "name": "flags",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "string[]",
                 "name": "ctxIds",
                 "type": "string[]"

@@ -121,12 +121,12 @@ export class RegistryAggregator {
         return merged;
     }
 
-    public async getAllDevModules(): Promise<{ module: ModuleInfo, versions: VersionInfo[], isDeployed?: boolean[] }[]> {
+    public async getAllDevModules({ users }: { users: string[] }): Promise<{ module: ModuleInfo, versions: VersionInfo[], isDeployed?: boolean[] }[]> {
         await this._initRegistries();
         const registries = this._getNonSkippedRegistries();
 
         // fetch all dev modules
-        const modules = await Promise.allSettled(registries.map(r => r.getAllDevModules()));
+        const modules = await Promise.allSettled(registries.map(r => r.getAllDevModules({ users })));
         modules.filter(assertRejected).forEach(p => console.error(p.reason));
         const validModules = modules.filter(assertFullfilled).map(p => p.value);
         const reduced = validModules.length > 0 ? validModules.reduce((a, b) => a.concat(b)) : [];
@@ -143,18 +143,8 @@ export class RegistryAggregator {
             const vis = await Promise.all(reduced.map(m => prodRegistries[0].getVersionInfo(m.module.name, m.versions[0].branch, m.versions[0].version).catch(() => null)));
             devModules = reduced.map((x, i) => ({ ...x, isDeployed: [!!vis[i]] }));
         }
-    
-        // Topological sorting by dependencies
-        const nodes = new Map<string, any>();
-        devModules.forEach(x => nodes.set(x.module.name + '#' + x.versions[0]?.branch, x));
-        const sorting = new TopologicalSort(nodes);
-        devModules.forEach(x => {
-            const deps = [...Object.keys(x.versions[0]?.dependencies || {}), ...Object.keys(x.versions[0]?.interfaces || {})];
-            deps.forEach(d => sorting.addEdge(d + '#' + DEFAULT_BRANCH_NAME, x.module.name + '#' + x.versions[0]?.branch))
-        });
-        const sorted = sorting.sort();
 
-        return [...sorted.values()].map(x => x.node);
+        return devModules;
     }
 
     public async getRegistryByUri(uri: string): Promise<Registry> {

@@ -312,7 +312,9 @@ export default class FeatureService {
     };
 
     public async getAllDevModules() {
-        return this._moduleManager.registryAggregator.getAllDevModules();
+        const descriptors = await this._walletService.getWalletDescriptors();
+        const users = descriptors.filter(x => x.available && x.connected).map(x => x.account);
+        return this._moduleManager.registryAggregator.getAllDevModules({ users });
     }
 
     // ToDo: move to another service?
@@ -333,7 +335,10 @@ export default class FeatureService {
     public async uploadModule(mi: ModuleInfo, vi: VersionInfo, targetStorages: StorageTypes[]): Promise<string> {
         try {
             // ToDo: check everything before publishing
-            if (mi.icon && !mi.icon.uris[0].endsWith('.png')) throw new Error('Type of module icon must be PNG.');
+
+            if (!mi.name) throw new Error('Module name is required.');
+            if (!/^[a-zA-Z0-9][a-zA-Z0-9-\.]*[a-zA-Z0-9]$/gm.test(mi.name)) throw new Error('Invalid module name.');
+            if (mi.icon && mi.icon.uris.length > 0 && !(mi.icon.uris[0].endsWith('.png') || mi.icon.uris[0].startsWith('data:image/png;base64'))) throw new Error('Type of module icon must be PNG.');
 
             let scriptUrl = null;
 
@@ -414,14 +419,24 @@ export default class FeatureService {
                 scriptUrl = hashUris.uris[0]; // ToDo: remove it?
             }
 
-            if (mi.icon) {
-                // Icon file publishing
-                const buf = await this._storageAggregator.getResource(mi.icon);
-                const blob = new Blob([buf], { type: "image/png" });
-                const hashUris = await this._storageAggregator.save(blob, targetStorages);
+            if (mi.icon && mi.icon.uris.length > 0) {
+                if (mi.icon.uris[0].startsWith('data:image/png;base64')) {
+                    // Icon file publishing (from base64)
+                    const res = await fetch(mi.icon.uris[0]);
+                    const blob = await res.blob();
+                    const hashUris = await this._storageAggregator.save(blob, targetStorages);
 
-                // Manifest editing
-                mi.icon = hashUris;
+                    // Manifest editing
+                    mi.icon = hashUris;
+                } else {
+                    // Icon file publishing
+                    const buf = await this._storageAggregator.getResource(mi.icon);
+                    const blob = new Blob([buf], { type: "image/png" });
+                    const hashUris = await this._storageAggregator.save(blob, targetStorages);
+    
+                    // Manifest editing
+                    mi.icon = hashUris;
+                }
             }
 
             return scriptUrl;

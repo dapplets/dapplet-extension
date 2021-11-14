@@ -9,7 +9,8 @@ import { StorageRef } from "../../background/registries/registry";
 import ModuleInfo from "../../background/models/moduleInfo";
 import VersionInfo from "../../background/models/versionInfo";
 import { HoverLabel } from "../components/HoverLabel";
-import { joinUrls } from "../../common/helpers";
+import { groupBy, joinUrls } from "../../common/helpers";
+import { DevModulesList } from "../components/DevModulesList";
 
 interface IDeveloperProps {
     isOverlay: boolean;
@@ -136,16 +137,23 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
         this.loadRegistries();
     }
 
+    async onCreateModuleHandler() {
+        const { openDeployOverlay } = await initBGFunctions(browser);
+        await openDeployOverlay(null, null);
+        window.close();
+    }
+
     render() {
         const { isLoading, registries, registryInput, registryInputError, intro, modules } = this.state;
-
+        const groupedModules = groupBy(modules, x => x.module.registryUrl);
+        
         return (
-            <div className={(this.props.isOverlay) ? undefined : "internalTabColumn"}>
+            <Segment.Group className={(this.props.isOverlay) ? undefined : "internalTabSettings"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
                 {(intro.popupDeveloperWelcome) ? (<Message info onDismiss={() => this.closeWelcomeIntro()} style={{ display: 'inline-table' }}>
                     <Message.Header>Welcome to Development Mode!</Message.Header>
                     <p>Here you can connect to development servers to debug modules, publish them to public registries using your wallet.</p>
                 </Message>) : null}
-
+                
                 <Segment loading={isLoading} style={{ margin: 0, flex: 'auto', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
                     <Header as='h4'>Development Servers</Header>
@@ -191,33 +199,37 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
                             </List.Item>
                         ))}
                     </List>
+                </Segment>
 
-                    <Header as='h4' style={{ marginTop: '0.5em' }}>Modules</Header>
-                    <div style={{ overflowY: 'auto', flex: 'auto' }}>
-                        {(modules.length > 0) ? <List divided relaxed verticalAlign='middle' size='small'>
-                            {modules.map((m, i) => (
-                                <List.Item key={i}>
-                                    <List.Content floated='left' style={{ position: 'relative' }}>
-                                        <Image avatar src={(m.module.icon && m.module.icon.uris.length > 0) ? ((m.module.icon.uris?.[0]?.indexOf('bzz:/') !== -1) ? joinUrls(this.state.swarmGatewayUrl, 'bzz/' + (m.module.icon as StorageRef).uris?.[0].match(/[0-9a-fA-F]{64}/gm)[0]) : (m.module.icon as StorageRef).uris?.[0]) : NOLOGO_PNG} />
-                                        {(m.isDeployed?.[0] === true) ? <Label color='green' floating style={{ padding: '4px', top: '18px', left: '18px' }} /> : null}
-                                    </List.Content>
-                                    <List.Content floated='right'>
-                                        <Button size='mini' compact color='blue' onClick={() => this.deployModule(m.module, m.versions[0])}>Deploy</Button>
-                                    </List.Content>
-                                    <List.Content>
-                                        <List.Header>
-                                            {m.module.name}
-                                            {(m.isDeployed?.[0] === false) ? <Label style={{ marginLeft: '4px' }} size='mini' horizontal >NOT DEPLOYED</Label> : null}
-                                        </List.Header>
-                                        {m.versions[0].branch} v{m.versions[0].version}
-                                    </List.Content>
-                                </List.Item>
-                            ))}
-                        </List> : (<div>No available development modules.</div>)}
+                <Segment disabled={isLoading}>
+                    <div>
+                        <Button
+                            size="mini"
+                            compact
+                            color="blue"
+                            onClick={this.onCreateModuleHandler.bind(this)}
+                        >
+                            Create Module
+                        </Button>
                     </div>
                 </Segment>
 
-            </div>
+                <Segment disabled={isLoading}>
+                    <Header as='h4'>Your Modules</Header>
+                    <div style={{ flex: 'auto' }}>
+                        {(modules.length > 0) ? 
+                            Object.entries(groupedModules).map(([registryUrl, modules]) => (
+                                <div style={{ marginBottom: '1.5em' }} key={registryUrl}>
+                                    <Header as='h5'>{registryUrl}</Header>
+                                    {(modules.length > 0) ? <DevModulesList modules={modules} onDetailsClick={this.deployModule.bind(this)} /> : (<div>No available development modules.</div>)}
+                                </div>
+                            )) : 
+                            (<div>No available development modules.</div>)
+                        }
+                    </div>
+                </Segment>
+
+            </Segment.Group>
         );
     }
 }

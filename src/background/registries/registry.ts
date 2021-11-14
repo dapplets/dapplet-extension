@@ -16,7 +16,7 @@ export interface Registry {
     getModuleInfoByName(name: string): Promise<ModuleInfo>;
     getVersionNumbers(name: string, branch: string): Promise<string[]>;
     getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo>;
-    getAllDevModules(): Promise<{ module: ModuleInfo, versions: VersionInfo[] }[]>;
+    getAllDevModules({ users }: { users: string[] }): Promise<{ module: ModuleInfo, versions: VersionInfo[] }[]>;
     addModule(module: ModuleInfo, version: VersionInfo): Promise<void>;
     getOwnership(moduleName: string): Promise<string>;
     transferOwnership(moduleName: string, address: string): Promise<void>;
