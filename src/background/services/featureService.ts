@@ -332,7 +332,7 @@ export default class FeatureService {
         }
     }
 
-    public async uploadModule(mi: ModuleInfo, vi: VersionInfo, targetStorages: StorageTypes[]): Promise<string> {
+    public async uploadModule(mi: ModuleInfo, vi: VersionInfo | null, targetStorages: StorageTypes[]): Promise<string> {
         try {
             // ToDo: check everything before publishing
 
@@ -344,24 +344,24 @@ export default class FeatureService {
 
             const zip = new JSZip();
 
-            if (vi.main) {
+            if (vi && vi.main) {
                 const arr = await this._storageAggregator.getResource(vi.main);
                 zip.file('index.js', arr);
             }
 
-            if (vi.defaultConfig) {
+            if (vi && vi.defaultConfig) {
                 const arr = await this._storageAggregator.getResource(vi.defaultConfig);
                 zip.file('default.json', arr);
             }
 
-            if (vi.schemaConfig) {
+            if (vi && vi.schemaConfig) {
                 const arr = await this._storageAggregator.getResource(vi.schemaConfig);
                 zip.file('schema.json', arr);
             }
 
             // upload overlays declared in manifest
             // it packs all files from `assets-manifest.json` into tar container
-            if (vi.overlays) {
+            if (vi && vi.overlays) {
                 for (const overlayName in vi.overlays) {
                     const baseUrl = vi.overlays[overlayName].uris[0];
                     const assetManifestUrl = new URL('assets-manifest.json', baseUrl).href;
@@ -408,7 +408,7 @@ export default class FeatureService {
                 zip.file('dapplet.json', manifestArr);
             }
 
-            if (vi.main) {
+            if (vi && vi.main) {
                 // Dist file publishing
                 const buf = await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 9 } });
                 const blob = new Blob([buf], { type: "application/zip" });

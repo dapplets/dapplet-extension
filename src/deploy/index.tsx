@@ -47,7 +47,7 @@ interface IIndexProps { }
 
 interface IIndexState {
     mi: ModuleInfo;
-    vi: VersionInfo;
+    vi: VersionInfo | null;
     dependenciesChecking: DependencyChecking[];
     loading: boolean;
     targetRegistry: string;
@@ -116,21 +116,17 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
             if (mi === null && vi === null) { // New module
                 const mi = new ModuleInfo();
-                const vi = new VersionInfo();
-                vi.version = "0.0.0";
-                vi.branch = "default";
 
                 this.setState({ 
                     mi, 
-                    vi, 
                     loading: false, 
                     swarmGatewayUrl,
                     mode: FormMode.Creating
                 });
                 await this._updateData();
             } else { // Deploy module
-                const dependencies = vi.dependencies ? Object.entries(vi.dependencies).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Dependency })) : [];
-                const interfaces = vi.interfaces ? Object.entries(vi.interfaces).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Interface })) : [];
+                const dependencies = vi?.dependencies ? Object.entries(vi.dependencies).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Dependency })) : [];
+                const interfaces = vi?.interfaces ? Object.entries(vi.interfaces).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Interface })) : [];
                 const dependenciesChecking = [...dependencies, ...interfaces];
                 this.setState({ 
                     mi, 
@@ -138,7 +134,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     dependenciesChecking, 
                     loading: false, 
                     swarmGatewayUrl,
-                    targetStorages: (Object.keys(vi.overlays ?? {}).length > 0) ? [
+                    targetStorages: (Object.keys(vi?.overlays ?? {}).length > 0) ? [
                         StorageTypes.Swarm, 
                         StorageTypes.Sia
                     ] : [
@@ -201,11 +197,12 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     }
 
     private async _updateDeploymentStatus() {
+        const s = this.state;
         this.setState({ deploymentStatus: DeploymentStatus.Unknown });
         const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser);
-        const mi = await getModuleInfoByName(this.state.targetRegistry, this.state.mi.name);
-        const vi = await getVersionInfo(this.state.targetRegistry, this.state.mi.name, this.state.vi.branch, this.state.vi.version);
-        const deploymentStatus = (!mi) ? DeploymentStatus.NewModule : (vi) ? DeploymentStatus.Deployed : DeploymentStatus.NotDeployed;
+        const mi = await getModuleInfoByName(s.targetRegistry, s.mi.name);
+        const deployed = s.vi ? await getVersionInfo(s.targetRegistry, s.mi.name, s.vi.branch, s.vi.version) : true;
+        const deploymentStatus = (!mi) ? DeploymentStatus.NewModule : (deployed) ? DeploymentStatus.Deployed : DeploymentStatus.NotDeployed;
         this.setState({ deploymentStatus });
     }
 
@@ -235,7 +232,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.setState({ loading: true });
 
         const { deployModule, addTrustedUser } = await initBGFunctions(browser);
-        const { mi, vi, targetRegistry, targetStorages, currentAccount } = this.state;
+        const { mi, vi, targetRegistry, targetStorages, currentAccount, mode } = this.state;
 
         try {
             const isNotNullCurrentAccount = !(!currentAccount || currentAccount === '0x0000000000000000000000000000000000000000');
@@ -244,7 +241,10 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                 await addTrustedUser(currentAccount.toLowerCase());
             }
 
-            const result = await deployModule(mi, vi, targetStorages, targetRegistry);
+            const result = (mode === FormMode.Creating) 
+                ? await deployModule(mi, null, targetStorages, targetRegistry) 
+                : await deployModule(mi, vi, targetStorages, targetRegistry);
+            
             this.setState({
                 message: {
                     type: 'positive',
@@ -343,7 +343,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             message, dependenciesChecking,
             owner, currentAccount, newOwner, editLocation: newLocation,
             newOwnerLoading, newOwnerDone, editLocationLoading: newLocationLoading,
-            editLocationDone: newLocationDone
+            editLocationDone: newLocationDone, mode
         } = this.state;
 
         const isNoStorage = targetStorages.length === 0;
@@ -356,7 +356,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         const isDependenciesExist = dependenciesChecking.length > 0 ? dependenciesChecking.every(x => x.isExists === true) : true;
         const isDependenciesLoading = dependenciesChecking.length > 0 ? dependenciesChecking.every(x => x.isExists === undefined) : false;
         const isManifestValid = mi?.name && mi?.title && mi?.description && mi?.type;
-        const isButtonDisabled = loading || s.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner || isNoStorage || isDependenciesLoading || !isDependenciesExist || !isManifestValid;
+        const isDeployButtonDisabled = loading || s.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner || isNoStorage || isDependenciesLoading || !isDependenciesExist || !isManifestValid;
+        const isReuploadButtonDisabled = !isAlreadyDeployed || mode === FormMode.Creating || !vi;
         
 
         return (
@@ -454,7 +455,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         <Card.Description>
                             {mi.description}<br />
                             {mi.author}<br />
-                            <strong>{mi.name}#{vi.branch}@{vi.version}</strong><br />
+                            {(vi) ? <strong>{mi.name}#{vi.branch}@{vi.version}</strong> : <strong>{mi.name}</strong>}<br />
                             {(owner) ? <>Owner: <a href='#' onClick={() => window.open(`https://goerli.etherscan.io/address/${owner}`, '_blank')}>{owner}</a></> : null}
                         </Card.Description>
                     </Card.Content>
@@ -542,7 +543,11 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             label='Module Name'
                             placeholder="Module ID like module_name.dapplet-base.eth"
                             value={s.mi.name ?? ''}
-                            onChange={(_, data) => (s.mi.name = data.value, s.vi.name = data.value, this.setState({ mi: s.mi, vi: s.vi }))}
+                            onChange={(_, data) => {
+                                s.mi.name = data.value;
+                                if (s.vi) s.vi.name = data.value;
+                                this.setState({ mi: s.mi, vi: s.vi });
+                            }}
                         /> 
 
                         <Form.Input
@@ -649,8 +654,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         style={{ marginBottom: '25px' }}
                     />
 
-                    <Button primary disabled={isButtonDisabled} onClick={() => this.deployButtonClickHandler()}>Deploy</Button>
-                    <Button disabled={!isAlreadyDeployed} onClick={() => this.reuploadButtonClickHandler()}>Reupload</Button>
+                    <Button primary disabled={isDeployButtonDisabled} onClick={() => this.deployButtonClickHandler()}>Deploy</Button>
+                    <Button disabled={isReuploadButtonDisabled} onClick={() => this.reuploadButtonClickHandler()}>Reupload</Button>
                 </Form>
             </React.Fragment>
         );

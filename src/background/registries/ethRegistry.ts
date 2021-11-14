@@ -181,24 +181,19 @@ export class EthRegistry implements Registry {
     }
 
     public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
-        let isModuleExist = false;
-        try {
-            const contract = await this._contractPromise;
-            const mi = await contract.getModuleInfoByName(module.name);
-            isModuleExist = true;
-        } catch (err) {
-            isModuleExist = false;
-        }
-
-        const mi = this._convertToEthMi(module);
-        const vi = this._convertToEthVi(version);
-
         const contract = await this._contractPromise;
+        const isModuleExist = await contract.getModuleInfoByName(module.name).then(x => !!x).catch(() => false);
+
+        if (isModuleExist && !version) throw new Error("A module with such name already exists.");
+
         if (!isModuleExist) {
-            const tx = await contract.addModuleInfo(module.contextIds, mi, [vi]);
+            const mi = this._convertToEthMi(module);
+            const vis = version ? this._convertToEthVi(version) : [];
+            const tx = await contract.addModuleInfo(module.contextIds, mi, vis);
             await tx.wait();
         } else {
-            const tx = await contract.addModuleVersion(mi.name, vi);
+            const vi = this._convertToEthVi(version);
+            const tx = await contract.addModuleVersion(module.name, vi);
             await tx.wait();
         }
     }

@@ -140,7 +140,12 @@ export class RegistryAggregator {
         if (prodRegistries.length === 0) {
             devModules = reduced.map((x, i) => ({ ...x, isDeployed: [] }));
         } else {
-            const vis = await Promise.all(reduced.map(m => prodRegistries[0].getVersionInfo(m.module.name, m.versions[0].branch, m.versions[0].version).catch(() => null)));
+            // ToDo: optimize amount of external requests
+            const vis = await Promise.all(reduced.map(m => 
+                m.versions[0] 
+                    ? prodRegistries[0].getVersionInfo(m.module.name, m.versions[0].branch, m.versions[0].version).catch(() => null) 
+                    : Promise.resolve(true)
+            ));
             devModules = reduced.map((x, i) => ({ ...x, isDeployed: [!!vis[i]] }));
         }
 

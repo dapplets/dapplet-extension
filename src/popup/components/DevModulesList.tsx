@@ -23,7 +23,7 @@ export class DevModulesList extends React.Component<Props, State> {
     
     // Topological sorting by dependencies
     const nodes = new Map<string, any>();
-    modules.forEach(x => nodes.set(x.module.name + '#' + x.versions[0]?.branch, x));
+    modules.forEach(x => nodes.set((x.versions[0]) ? x.module.name + '#' + x.versions[0]?.branch : x.module.name, x));
     const sorting = new TopologicalSort(nodes);
     modules.forEach(x => {
         const deps = [...Object.keys(x.versions[0]?.dependencies || {}), ...Object.keys(x.versions[0]?.interfaces || {})];
@@ -65,7 +65,7 @@ export class DevModulesList extends React.Component<Props, State> {
                   </Label>
                 ) : null}
               </List.Header>
-              {m.versions[0].branch} v{m.versions[0].version}
+              {(m.versions[0]) ? `${m.versions[0].branch} v${m.versions[0].version}` : 'Teaser module'}
             </List.Content>
           </List.Item>
         ))}
