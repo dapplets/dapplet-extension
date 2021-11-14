@@ -154,11 +154,11 @@ export class DevRegistry implements Registry {
         return;
     }
 
-    public async addContextId(moduleName: string, location: string) {
+    public async addContextId(moduleName: string, contextId: string) {
         return;
     }
 
-    public async removeContextId(moduleName: string, location: string) {
+    public async removeContextId(moduleName: string, contextId: string) {
         return;
     }
 

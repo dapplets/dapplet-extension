@@ -87,35 +87,35 @@ export class RegistryAggregator {
         return vi;
     }
 
-    public async getModuleInfoWithRegistries(locations: string[], users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: ModuleInfo[] } }> {
+    public async getModuleInfoWithRegistries(contextIds: string[], users: string[]): Promise<{ [registryUrl: string]: { [hostname: string]: ModuleInfo[] } }> {
         await this._initRegistries();
         const registries = this._getNonSkippedRegistries();
 
-        const regFeatures = await Promise.allSettled(registries.map(r => r.getModuleInfo(locations, users).then(m => ([r.url, m]))));
+        const regFeatures = await Promise.allSettled(registries.map(r => r.getModuleInfo(contextIds, users).then(m => ([r.url, m]))));
         regFeatures.filter(assertRejected).forEach(p => console.error(p.reason));
         const validRegFeatures = regFeatures.filter(assertFullfilled).map((p) => p.value);
         const merged = Object.fromEntries(validRegFeatures);
 
         // Below is some magic, which finds modules by names and interfaces in another registries.
         // For example: 
-        // 1) An interface, linked with some location, is in the registry A.
+        // 1) An interface, linked with some context ID, is in the registry A.
         // 2) An adapter, implementing the interface, is in the registry A.
         // 3) An feature, using this adapter, is in the registry B.
-        // 4) Without this magic, the feature will not be found by the location, with which the interface is linked.
+        // 4) Without this magic, the feature will not be found by the context ID, with which the interface is linked.
 
-        const additionalLocations = validRegFeatures.map(([k, v]) => ([k, Object.entries(v).map(([k2, v2]) => ([k2, mergeDedupe(v2.map(x => ([x.name, ...x.interfaces])))])).filter(x => x[1].length !== 0)])) as [string, [string, string[]][]][];
+        const additionalContextIds = validRegFeatures.map(([k, v]) => ([k, Object.entries(v).map(([k2, v2]) => ([k2, mergeDedupe(v2.map(x => ([x.name, ...x.interfaces])))])).filter(x => x[1].length !== 0)])) as [string, [string, string[]][]][];
         const mergedModuleInfos = Object.values(merged).map(x => Object.values(x).reduce((a, b) => a.concat(b), [])).reduce((a, b) => a.concat(b), []);
-        for (const [registryUrl, contexts] of additionalLocations) {
+        for (const [registryUrl, contexts] of additionalContextIds) {
             for (const context of contexts) {
                 context[1] = context[1].filter(c => mergedModuleInfos.find(x => x.name === c)?.type !== ModuleTypes.Feature);
             }
         }
-        const promiseResults = await Promise.allSettled(additionalLocations.map(([registryUrl, locations2]) => Promise.allSettled(locations2.map(([oldLocation, newLocations]) => Promise.allSettled(registries.filter(r => r.url !== registryUrl).map(r => r.getModuleInfo(newLocations, users).then(res => ([r.url, oldLocation, mergeDedupe(Object.entries(res).map(x => x[1]))]))))))));
+        const promiseResults = await Promise.allSettled(additionalContextIds.map(([registryUrl, ctxIds2]) => Promise.allSettled(ctxIds2.map(([oldCtxId, newCtxIds]) => Promise.allSettled(registries.filter(r => r.url !== registryUrl).map(r => r.getModuleInfo(newCtxIds, users).then(res => ([r.url, oldCtxId, mergeDedupe(Object.entries(res).map(x => x[1]))]))))))));
         const promiseValues = mergeDedupe(promiseResults.filter(assertFullfilled).map(x => mergeDedupe(x.value.filter(assertFullfilled).map(y => y.value.filter(assertFullfilled).map(z => z.value))))) as [string, string, ModuleInfo[]][];
-        promiseValues.forEach(([regUrl, location, modules]) => {
+        promiseValues.forEach(([regUrl, contextId, modules]) => {
             if (!merged[regUrl]) merged[regUrl] = {};
-            if (!merged[regUrl][location]) merged[regUrl][location] = [];
-            merged[regUrl][location].push(...modules);
+            if (!merged[regUrl][contextId]) merged[regUrl][contextId] = [];
+            merged[regUrl][contextId].push(...modules);
         });
 
         return merged;

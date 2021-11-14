@@ -535,14 +535,14 @@ export default class FeatureService {
         await registry.transferOwnership(moduleName, oldAccount, newAccount);
     }
 
-    public async addLocation(registryUri: string, moduleName: string, location: string) {
+    public async addContextId(registryUri: string, moduleName: string, contextId: string) {
         const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
-        await registry.addContextId(moduleName, location);
+        await registry.addContextId(moduleName, contextId);
     }
 
-    public async removeLocation(registryUri: string, moduleName: string, location: string) {
+    public async removeContextId(registryUri: string, moduleName: string, contextId: string) {
         const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
-        await registry.removeContextId(moduleName, location);
+        await registry.removeContextId(moduleName, contextId);
     }
 
     public async getVersions(registryUri: string, moduleName: string) {

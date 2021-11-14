@@ -64,9 +64,9 @@ interface IIndexState {
     newOwner: string;
     newOwnerLoading: boolean;
     newOwnerDone: boolean;
-    editLocation: string;
-    editLocationLoading: boolean;
-    editLocationDone: boolean;
+    editContextId: string;
+    editContextIdLoading: boolean;
+    editContextIdDone: boolean;
     deploymentStatus: DeploymentStatus;
     trustedUsers: { account: string }[];
     swarmGatewayUrl: string;
@@ -76,7 +76,7 @@ interface IIndexState {
 class Index extends React.Component<IIndexProps, IIndexState> {
     private bus = new Bus();
     private transferOwnershipModal = React.createRef<any>();
-    private addLocationModal = React.createRef<any>();
+    private addContextIdModal = React.createRef<any>();
     private fileInputRef = React.createRef<HTMLInputElement>();
 
     constructor(props) {
@@ -101,9 +101,9 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             newOwner: '',
             newOwnerLoading: false,
             newOwnerDone: false,
-            editLocation: '',
-            editLocationLoading: false,
-            editLocationDone: false,
+            editContextId: '',
+            editContextIdLoading: false,
+            editContextIdDone: false,
             deploymentStatus: DeploymentStatus.Unknown,
             trustedUsers: [],
             swarmGatewayUrl: '',
@@ -214,18 +214,18 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.setState({ newOwnerLoading: false, newOwnerDone: true });
     }
 
-    private async _addLocation(location: string) {
-        this.setState({ editLocationLoading: true });
-        const { addLocation } = await initBGFunctions(browser);
-        await addLocation(this.state.targetRegistry, this.state.mi.name, location);
-        this.setState({ editLocationLoading: false, editLocationDone: true });
+    private async _addContextId(contextId: string) {
+        this.setState({ editContextIdLoading: true });
+        const { addContextId } = await initBGFunctions(browser);
+        await addContextId(this.state.targetRegistry, this.state.mi.name, contextId);
+        this.setState({ editContextIdLoading: false, editContextIdDone: true });
     }
 
-    private async _removeLocation(location: string) {
-        this.setState({ editLocationLoading: true });
-        const { removeLocation } = await initBGFunctions(browser);
-        await removeLocation(this.state.targetRegistry, this.state.mi.name, location);
-        this.setState({ editLocationLoading: false, editLocationDone: true });
+    private async _removeContextId(contextId: string) {
+        this.setState({ editContextIdLoading: true });
+        const { removeContextId } = await initBGFunctions(browser);
+        await removeContextId(this.state.targetRegistry, this.state.mi.name, contextId);
+        this.setState({ editContextIdLoading: false, editContextIdDone: true });
     }
 
     async deployButtonClickHandler() {
@@ -341,9 +341,9 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             mi, vi, loading, targetRegistry,
             targetStorages, 
             message, dependenciesChecking,
-            owner, currentAccount, newOwner, editLocation: newLocation,
-            newOwnerLoading, newOwnerDone, editLocationLoading: newLocationLoading,
-            editLocationDone: newLocationDone, mode
+            owner, currentAccount, newOwner, editContextId,
+            newOwnerLoading, newOwnerDone, editContextIdLoading,
+            editContextIdDone, mode
         } = this.state;
 
         const isNoStorage = targetStorages.length === 0;
@@ -496,36 +496,36 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                                 </Modal>
 
 
-                                <Modal closeOnEscape={false} closeOnDimmerClick={false} ref={this.addLocationModal} dimmer='inverted' trigger={<Button basic color='grey'>Locations</Button>} centered={false}>
-                                    <Modal.Header>Locations</Modal.Header>
+                                <Modal closeOnEscape={false} closeOnDimmerClick={false} ref={this.addContextIdModal} dimmer='inverted' trigger={<Button basic color='grey'>Context IDs</Button>} centered={false}>
+                                    <Modal.Header>Context IDs</Modal.Header>
                                     <Modal.Content image>
                                         <Modal.Description>
                                             <p>Here you can (un)bind the module to make it (un)accessible in modules list of website context.</p>
                                             <Input
                                                 fluid
-                                                placeholder='Location address (ex: example.com)'
-                                                value={newLocation}
-                                                onChange={(e, data) => this.setState({ editLocation: data.value as string })}
+                                                placeholder='Context ID (ex: example.com)'
+                                                value={editContextId}
+                                                onChange={(e, data) => this.setState({ editContextId: data.value as string })}
                                             />
                                         </Modal.Description>
                                     </Modal.Content>
                                     <Modal.Actions>
                                         <Button basic onClick={() => {
-                                            this.setState({ editLocation: '', editLocationDone: false });
-                                            this.addLocationModal.current.handleClose();
+                                            this.setState({ editContextId: '', editContextIdDone: false });
+                                            this.addContextIdModal.current.handleClose();
                                         }}>Cancel</Button>
                                         <Button 
                                             color='blue' 
-                                            loading={newLocationLoading}
-                                            disabled={newLocationLoading || newLocationDone || !newLocation}
-                                            onClick={() => this._addLocation(s.editLocation)}
-                                        >{(!newLocationDone) ? "Add" : "Done"}</Button>
+                                            loading={editContextIdLoading}
+                                            disabled={editContextIdLoading || editContextIdDone || !editContextId}
+                                            onClick={() => this._addContextId(s.editContextId)}
+                                        >{(!editContextIdDone) ? "Add" : "Done"}</Button>
                                         <Button 
                                             color='blue' 
-                                            loading={newLocationLoading}
-                                            disabled={newLocationLoading || newLocationDone || !newLocation}
-                                            onClick={() => this._removeLocation(s.editLocation)}
-                                        >{(!newLocationDone) ? "Remove" : "Done"}</Button>
+                                            loading={editContextIdLoading}
+                                            disabled={editContextIdLoading || editContextIdDone || !editContextId}
+                                            onClick={() => this._removeContextId(s.editContextId)}
+                                        >{(!editContextIdDone) ? "Remove" : "Done"}</Button>
                                     </Modal.Actions>
                                 </Modal>
 
