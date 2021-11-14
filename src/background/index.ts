@@ -82,7 +82,7 @@ browser.runtime.onMessage.addListener(
     getOwnership: (registryUri, moduleName) => featureService.getOwnership(registryUri, moduleName),
     getVersionInfo: (registryUri, moduleName, branch, version) => featureService.getVersionInfo(registryUri, moduleName, branch, version),
     getModuleInfoByName: (registryUri, moduleName) => featureService.getModuleInfoByName(registryUri, moduleName),
-    transferOwnership: (registryUri, moduleName, address) => featureService.transferOwnership(registryUri, moduleName, address),
+    transferOwnership: (registryUri, moduleName, oldAccount, newAccount) => featureService.transferOwnership(registryUri, moduleName, oldAccount, newAccount),
     addLocation: (registryUri, moduleName, location) => featureService.addLocation(registryUri, moduleName, location),
     removeLocation: (registryUri, moduleName, location) => featureService.removeLocation(registryUri, moduleName, location),
     getVersions: (registryUri, moduleName) => featureService.getVersions(registryUri, moduleName),

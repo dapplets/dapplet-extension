@@ -530,9 +530,9 @@ export default class FeatureService {
         }
     }
 
-    public async transferOwnership(registryUri: string, moduleName: string, address: string) {
+    public async transferOwnership(registryUri: string, moduleName: string, oldAccount: string, newAccount: string) {
         const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
-        await registry.transferOwnership(moduleName, address);
+        await registry.transferOwnership(moduleName, oldAccount, newAccount);
     }
 
     public async addLocation(registryUri: string, moduleName: string, location: string) {

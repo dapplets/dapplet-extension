@@ -209,10 +209,11 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.setState({ deploymentStatus });
     }
 
-    private async _transferOwnership(address: string) {
+    private async _transferOwnership(newAccount: string) {
         this.setState({ newOwnerLoading: true });
+        const oldAccount = this.state.mi.author;
         const { transferOwnership } = await initBGFunctions(browser);
-        await transferOwnership(this.state.targetRegistry, this.state.mi.name, address);
+        await transferOwnership(this.state.targetRegistry, this.state.mi.name, newAccount, oldAccount);
         this.setState({ newOwnerLoading: false, newOwnerDone: true });
     }
 

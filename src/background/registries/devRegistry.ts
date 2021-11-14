@@ -150,7 +150,7 @@ export class DevRegistry implements Registry {
         return null;
     }
 
-    public async transferOwnership(moduleName: string, address: string): Promise<void> {
+    public async transferOwnership(moduleName: string, newAccount: string, oldAccount: string): Promise<void> {
         return;
     }
 

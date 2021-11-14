@@ -15,9 +15,9 @@ export default [
             },
             {
                 "indexed": false,
-                "internalType": "bytes32",
+                "internalType": "address",
                 "name": "owner",
-                "type": "bytes32"
+                "type": "address"
             },
             {
                 "indexed": false,
@@ -43,6 +43,31 @@ export default [
             }
         ],
         "name": "modsByContextType",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "modsByOwner",
         "outputs": [
             {
                 "internalType": "uint32",
@@ -95,9 +120,36 @@ export default [
                 "type": "string"
             },
             {
-                "internalType": "bytes32",
+                "internalType": "string",
+                "name": "title",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "hash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "bytes[]",
+                        "name": "uris",
+                        "type": "bytes[]"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.StorageRef",
+                "name": "icon",
+                "type": "tuple"
+            },
+            {
+                "internalType": "address",
                 "name": "owner",
-                "type": "bytes32"
+                "type": "address"
             },
             {
                 "internalType": "uint256",
@@ -165,33 +217,6 @@ export default [
                 "type": "uint8"
             },
             {
-                "internalType": "string",
-                "name": "title",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "description",
-                "type": "string"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "bytes32",
-                        "name": "hash",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "bytes[]",
-                        "name": "uris",
-                        "type": "bytes[]"
-                    }
-                ],
-                "internalType": "struct DappletRegistry.StorageRef",
-                "name": "icon",
-                "type": "tuple"
-            },
-            {
                 "components": [
                     {
                         "internalType": "bytes32",
@@ -226,9 +251,9 @@ export default [
                 "type": "string[]"
             },
             {
-                "internalType": "bytes32[]",
+                "internalType": "address[]",
                 "name": "users",
-                "type": "bytes32[]"
+                "type": "address[]"
             },
             {
                 "internalType": "uint32",
@@ -251,9 +276,36 @@ export default [
                         "type": "string"
                     },
                     {
-                        "internalType": "bytes32",
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "bytes32",
+                                "name": "hash",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "bytes[]",
+                                "name": "uris",
+                                "type": "bytes[]"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.StorageRef",
+                        "name": "icon",
+                        "type": "tuple"
+                    },
+                    {
+                        "internalType": "address",
                         "name": "owner",
-                        "type": "bytes32"
+                        "type": "address"
                     },
                     {
                         "internalType": "string[]",
@@ -283,9 +335,9 @@ export default [
                 "type": "string"
             },
             {
-                "internalType": "bytes32[]",
+                "internalType": "address[]",
                 "name": "users",
-                "type": "bytes32[]"
+                "type": "address[]"
             },
             {
                 "internalType": "uint32",
@@ -308,9 +360,36 @@ export default [
                         "type": "string"
                     },
                     {
-                        "internalType": "bytes32",
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "bytes32",
+                                "name": "hash",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "bytes[]",
+                                "name": "uris",
+                                "type": "bytes[]"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.StorageRef",
+                        "name": "icon",
+                        "type": "tuple"
+                    },
+                    {
+                        "internalType": "address",
                         "name": "owner",
-                        "type": "bytes32"
+                        "type": "address"
                     },
                     {
                         "internalType": "string[]",
@@ -355,9 +434,36 @@ export default [
                         "type": "string"
                     },
                     {
-                        "internalType": "bytes32",
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "bytes32",
+                                "name": "hash",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "bytes[]",
+                                "name": "uris",
+                                "type": "bytes[]"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.StorageRef",
+                        "name": "icon",
+                        "type": "tuple"
+                    },
+                    {
+                        "internalType": "address",
                         "name": "owner",
-                        "type": "bytes32"
+                        "type": "address"
                     },
                     {
                         "internalType": "string[]",
@@ -373,6 +479,258 @@ export default [
                 "internalType": "struct DappletRegistry.ModuleInfo",
                 "name": "",
                 "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "userId",
+                "type": "address"
+            }
+        ],
+        "name": "getModuleInfoByOwner",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint8",
+                        "name": "moduleType",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "bytes32",
+                                "name": "hash",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "bytes[]",
+                                "name": "uris",
+                                "type": "bytes[]"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.StorageRef",
+                        "name": "icon",
+                        "type": "tuple"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "owner",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string[]",
+                        "name": "interfaces",
+                        "type": "string[]"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "flags",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.ModuleInfo[]",
+                "name": "mods",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "branch",
+                "type": "string"
+            }
+        ],
+        "name": "getVersionNumbers",
+        "outputs": [
+            {
+                "internalType": "bytes",
+                "name": "",
+                "type": "bytes"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "branch",
+                "type": "string"
+            },
+            {
+                "internalType": "uint8",
+                "name": "major",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint8",
+                "name": "minor",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint8",
+                "name": "patch",
+                "type": "uint8"
+            }
+        ],
+        "name": "getVersionInfo",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "string",
+                        "name": "branch",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "major",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "minor",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "patch",
+                        "type": "uint8"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "bytes32",
+                                "name": "hash",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "bytes[]",
+                                "name": "uris",
+                                "type": "bytes[]"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.StorageRef",
+                        "name": "binary",
+                        "type": "tuple"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "string",
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "branch",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "major",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "minor",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "patch",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.DependencyDto[]",
+                        "name": "dependencies",
+                        "type": "tuple[]"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "string",
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "branch",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "major",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "minor",
+                                "type": "uint8"
+                            },
+                            {
+                                "internalType": "uint8",
+                                "name": "patch",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.DependencyDto[]",
+                        "name": "interfaces",
+                        "type": "tuple[]"
+                    },
+                    {
+                        "internalType": "uint8",
+                        "name": "flags",
+                        "type": "uint8"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.VersionInfoDto",
+                "name": "dto",
+                "type": "tuple"
+            },
+            {
+                "internalType": "uint8",
+                "name": "moduleType",
+                "type": "uint8"
             }
         ],
         "stateMutability": "view",
@@ -399,9 +757,36 @@ export default [
                         "type": "string"
                     },
                     {
-                        "internalType": "bytes32",
+                        "internalType": "string",
+                        "name": "title",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "description",
+                        "type": "string"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "bytes32",
+                                "name": "hash",
+                                "type": "bytes32"
+                            },
+                            {
+                                "internalType": "bytes[]",
+                                "name": "uris",
+                                "type": "bytes[]"
+                            }
+                        ],
+                        "internalType": "struct DappletRegistry.StorageRef",
+                        "name": "icon",
+                        "type": "tuple"
+                    },
+                    {
+                        "internalType": "address",
                         "name": "owner",
-                        "type": "bytes32"
+                        "type": "address"
                     },
                     {
                         "internalType": "string[]",
@@ -439,33 +824,6 @@ export default [
                         "internalType": "uint8",
                         "name": "patch",
                         "type": "uint8"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "title",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "description",
-                        "type": "string"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "bytes32",
-                                "name": "hash",
-                                "type": "bytes32"
-                            },
-                            {
-                                "internalType": "bytes[]",
-                                "name": "uris",
-                                "type": "bytes[]"
-                            }
-                        ],
-                        "internalType": "struct DappletRegistry.StorageRef",
-                        "name": "icon",
-                        "type": "tuple"
                     },
                     {
                         "components": [
@@ -567,6 +925,46 @@ export default [
     {
         "inputs": [
             {
+                "internalType": "uint32",
+                "name": "moduleIdx",
+                "type": "uint32"
+            },
+            {
+                "internalType": "string",
+                "name": "title",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "hash",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "bytes[]",
+                        "name": "uris",
+                        "type": "bytes[]"
+                    }
+                ],
+                "internalType": "struct DappletRegistry.StorageRef",
+                "name": "icon",
+                "type": "tuple"
+            }
+        ],
+        "name": "editModuleInfo",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "string",
                 "name": "mod_name",
                 "type": "string"
@@ -592,33 +990,6 @@ export default [
                         "internalType": "uint8",
                         "name": "patch",
                         "type": "uint8"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "title",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "description",
-                        "type": "string"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "bytes32",
-                                "name": "hash",
-                                "type": "bytes32"
-                            },
-                            {
-                                "internalType": "bytes[]",
-                                "name": "uris",
-                                "type": "bytes[]"
-                            }
-                        ],
-                        "internalType": "struct DappletRegistry.StorageRef",
-                        "name": "icon",
-                        "type": "tuple"
                     },
                     {
                         "components": [
@@ -747,33 +1118,6 @@ export default [
                         "type": "uint8"
                     },
                     {
-                        "internalType": "string",
-                        "name": "title",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "description",
-                        "type": "string"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "bytes32",
-                                "name": "hash",
-                                "type": "bytes32"
-                            },
-                            {
-                                "internalType": "bytes[]",
-                                "name": "uris",
-                                "type": "bytes[]"
-                            }
-                        ],
-                        "internalType": "struct DappletRegistry.StorageRef",
-                        "name": "icon",
-                        "type": "tuple"
-                    },
-                    {
                         "components": [
                             {
                                 "internalType": "bytes32",
@@ -874,218 +1218,18 @@ export default [
         "inputs": [
             {
                 "internalType": "string",
-                "name": "name",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "branch",
-                "type": "string"
-            }
-        ],
-        "name": "getVersionNumbers",
-        "outputs": [
-            {
-                "internalType": "bytes",
-                "name": "",
-                "type": "bytes"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function",
-        "constant": true
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "branch",
-                "type": "string"
-            },
-            {
-                "internalType": "uint8",
-                "name": "major",
-                "type": "uint8"
-            },
-            {
-                "internalType": "uint8",
-                "name": "minor",
-                "type": "uint8"
-            },
-            {
-                "internalType": "uint8",
-                "name": "patch",
-                "type": "uint8"
-            }
-        ],
-        "name": "getVersionInfo",
-        "outputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "string",
-                        "name": "branch",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "major",
-                        "type": "uint8"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "minor",
-                        "type": "uint8"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "patch",
-                        "type": "uint8"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "title",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "description",
-                        "type": "string"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "bytes32",
-                                "name": "hash",
-                                "type": "bytes32"
-                            },
-                            {
-                                "internalType": "bytes[]",
-                                "name": "uris",
-                                "type": "bytes[]"
-                            }
-                        ],
-                        "internalType": "struct DappletRegistry.StorageRef",
-                        "name": "icon",
-                        "type": "tuple"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "bytes32",
-                                "name": "hash",
-                                "type": "bytes32"
-                            },
-                            {
-                                "internalType": "bytes[]",
-                                "name": "uris",
-                                "type": "bytes[]"
-                            }
-                        ],
-                        "internalType": "struct DappletRegistry.StorageRef",
-                        "name": "binary",
-                        "type": "tuple"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "string",
-                                "name": "name",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "branch",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "uint8",
-                                "name": "major",
-                                "type": "uint8"
-                            },
-                            {
-                                "internalType": "uint8",
-                                "name": "minor",
-                                "type": "uint8"
-                            },
-                            {
-                                "internalType": "uint8",
-                                "name": "patch",
-                                "type": "uint8"
-                            }
-                        ],
-                        "internalType": "struct DappletRegistry.DependencyDto[]",
-                        "name": "dependencies",
-                        "type": "tuple[]"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "string",
-                                "name": "name",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "branch",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "uint8",
-                                "name": "major",
-                                "type": "uint8"
-                            },
-                            {
-                                "internalType": "uint8",
-                                "name": "minor",
-                                "type": "uint8"
-                            },
-                            {
-                                "internalType": "uint8",
-                                "name": "patch",
-                                "type": "uint8"
-                            }
-                        ],
-                        "internalType": "struct DappletRegistry.DependencyDto[]",
-                        "name": "interfaces",
-                        "type": "tuple[]"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "flags",
-                        "type": "uint8"
-                    }
-                ],
-                "internalType": "struct DappletRegistry.VersionInfoDto",
-                "name": "dto",
-                "type": "tuple"
-            },
-            {
-                "internalType": "uint8",
-                "name": "moduleType",
-                "type": "uint8"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function",
-        "constant": true
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "string",
                 "name": "mod_name",
                 "type": "string"
             },
             {
-                "internalType": "bytes32",
+                "internalType": "address",
                 "name": "newUserId",
-                "type": "bytes32"
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "oldOwnerArrIdx",
+                "type": "uint256"
             }
         ],
         "name": "transferOwnership",

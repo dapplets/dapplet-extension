@@ -226,10 +226,10 @@ export class NearRegistry implements Registry {
         }
     }
 
-    public async transferOwnership(moduleName: string, address: string) {
+    public async transferOwnership(moduleName: string, newAccount: string, oldAccount: string) {
         await this._contract.transferOwnership({
             moduleName: moduleName,
-            newOwner: address
+            newOwner: newAccount
         });
     }
 
