@@ -63,13 +63,9 @@ export class StorageAggregator {
     public async save(blob: Blob, targetStorages: StorageTypes[]): Promise<StorageRef> {
         const buffer = await (blob as any).arrayBuffer();
         const hash = ethers.utils.keccak256(new Uint8Array(buffer));
-        const uris = [];
 
-        for (const storageType of targetStorages) {
-            const storage = await this._getStorageByType(storageType);
-            const uri = await storage.save(blob);
-            uris.push(uri);
-        }
+        // upload a file to all storages simultaneously
+        const uris = await Promise.all(targetStorages.map(x => this._getStorageByType(x).then(y => y.save(blob))));
 
         // backup to centralized storage
         const centralizedStorage = new CentralizedModuleStorage();
@@ -114,7 +110,7 @@ export class StorageAggregator {
                 return true;
             }
         } else {
-            console.log(`[DAPPLETS]: Skiped hash checking. URL: ${uri}`);
+            // console.log(`[DAPPLETS]: Skiped hash checking. URL: ${uri}`);
             return true;
         }
     }
