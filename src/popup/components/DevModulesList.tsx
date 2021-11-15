@@ -65,7 +65,7 @@ export class DevModulesList extends React.Component<Props, State> {
                   </Label>
                 ) : null}
               </List.Header>
-              {(m.versions[0]) ? `${m.versions[0].branch} v${m.versions[0].version}` : 'Teaser module'}
+              {(m.versions[0]) ? `${m.versions[0].branch} v${m.versions[0].version}` : 'Under construction'}
             </List.Content>
           </List.Item>
         ))}

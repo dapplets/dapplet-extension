@@ -178,7 +178,7 @@ export class NearRegistry implements Registry {
     }
 
     public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
-        if (!version) throw new Error('NEAR Registry doesn\'t support uploading of teaser modules.');
+        if (!version) throw new Error('NEAR Registry doesn\'t support uploading of modules under construction.');
 
         const moduleType = parseInt(Object.entries(moduleTypesMap).find(([k, v]) => v === module.type)[0]);
 
