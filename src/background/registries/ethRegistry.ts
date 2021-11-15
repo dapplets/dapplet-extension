@@ -75,6 +75,9 @@ export class EthRegistry implements Registry {
     }
 
     public async getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }> {
+        if (!contextIds || contextIds.length === 0) return {};
+        if (!users || users.length === 0) return {};
+
         try {
             users = users.filter(x => typeOfUri(x) === UriTypes.Ens || typeOfUri(x) === UriTypes.Ethereum);
             users = await Promise.all(users.map(u => (typeOfUri(u) === UriTypes.Ens) ? this._signer.resolveName(u) : Promise.resolve(u)));

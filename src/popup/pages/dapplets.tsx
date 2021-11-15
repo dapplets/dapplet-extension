@@ -55,7 +55,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
 
     const { getFeaturesByHostnames, getRegistries, getSwarmGateway } = await initBGFunctions(browser);
     
-    const features: ManifestDTO[] = await getFeaturesByHostnames(contextIdsValues);
+    const features: ManifestDTO[] = (contextIdsValues) ? await getFeaturesByHostnames(contextIdsValues) : [];
 
     const registries = await getRegistries();
     const regsWithErrors = registries.filter(r => !r.isDev && !!r.isEnabled && !!r.error);
