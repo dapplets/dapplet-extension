@@ -11,14 +11,14 @@ import JSZip from 'jszip';
 
 import { areModulesEqual, getCurrentTab, mergeDedupe, parseModuleName } from '../../common/helpers';
 import { WalletService } from './walletService';
-import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
+// import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
 import { StorageRef } from '../registries/registry';
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer';
 
 export default class FeatureService {
     private _moduleManager: ModuleManager;
     private _storageAggregator = new StorageAggregator();
-    private _moduleInfoBrowserStorage = new ModuleInfoBrowserStorage();
+    // private _moduleInfoBrowserStorage = new ModuleInfoBrowserStorage();
 
     constructor(
         private _globalConfigService: GlobalConfigService,
@@ -516,17 +516,17 @@ export default class FeatureService {
             const moduleInfo = await registry.getModuleInfoByName(moduleName);
             return moduleInfo;
         } else {
-            const moduleInfo = await this._moduleInfoBrowserStorage.get(registryUrl, moduleName);
+            // const moduleInfo = await this._moduleInfoBrowserStorage.get(registryUrl, moduleName);
 
-            if (moduleInfo) {
-                return moduleInfo;
-            } else {
+            // if (moduleInfo) {
+            //     return moduleInfo;
+            // } else {
                 const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
                 if (!registry) return null;
                 const moduleInfo = await registry.getModuleInfoByName(moduleName);
-                if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
+                // if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
                 return moduleInfo;
-            }
+            // }
         }
     }
 
