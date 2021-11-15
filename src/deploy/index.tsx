@@ -15,6 +15,7 @@ import { ChainTypes, DefaultSigners } from "../common/types";
 import { typeOfUri, chainByUri, joinUrls } from "../common/helpers";
 import { DEFAULT_BRANCH_NAME, ModuleTypes, StorageTypes } from "../common/constants";
 import { StorageRefImage } from "../popup/components/StorageRefImage";
+import { EditableList } from "./EditableList";
 
 tracing.startTracing();
 
@@ -534,7 +535,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         </Card.Content> : null}
                 </Card>) : null}
 
-                <Form loading={loading}>
+                <Form loading={loading} style={{ marginBottom: '20px' }}>
 
                     {(s.mode === FormMode.Creating || s.mode === FormMode.Editing) ? <>
                     
@@ -600,6 +601,16 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             value={ModuleTypes.Interface}
                             checked={mi.type === ModuleTypes.Interface}
                             onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Interface, this.setState({ mi }))}
+                        />
+
+                        <Form.Field label="Context IDs" />
+                        <EditableList 
+                            style={{ marginBottom: '1em' }}
+                            items={this.state.mi.contextIds} 
+                            onChange={x => {
+                                this.state.mi.contextIds = x;
+                                this.setState({ mi: this.state.mi });
+                            }}
                         />
 
                     </> : null}
