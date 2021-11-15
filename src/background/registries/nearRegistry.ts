@@ -86,6 +86,7 @@ export class NearRegistry implements Registry {
                     mi.author = m.owner;
                     mi.icon = this._fromNearStorageRef(m.icon);
                     mi.interfaces = m.interfaces.map(x => x.name);
+                    mi.isUnderConstruction = false;
                     return mi;
                 });
 
@@ -122,6 +123,7 @@ export class NearRegistry implements Registry {
             mi.icon = this._fromNearStorageRef(v.icon);
             mi.interfaces = v.interfaces.map(x => x.name);
             mi.registryUrl = this.url;
+            mi.isUnderConstruction = false;
             return mi;
 
         } catch (err) {

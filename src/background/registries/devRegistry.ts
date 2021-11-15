@@ -175,6 +175,7 @@ export class DevRegistry implements Registry {
         mi.interfaces = Object.keys(dm.interfaces || {});
         mi.contextIds = dm.contextIds ?? [];
         mi.registryUrl = this.url;
+        mi.isUnderConstruction = false;
         
         const vi = new VersionInfo();
         vi.registryUrl = this.url;

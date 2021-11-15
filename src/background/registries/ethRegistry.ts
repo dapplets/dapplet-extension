@@ -5,7 +5,7 @@ import * as semver from 'semver';
 import ModuleInfo from '../models/moduleInfo';
 import { ModuleTypes, DEFAULT_BRANCH_NAME } from '../../common/constants';
 import VersionInfo from '../models/versionInfo';
-import { mergeDedupe, typeOfUri, UriTypes } from '../../common/helpers';
+import { getBitFromHex, mergeDedupe, typeOfUri, UriTypes } from '../../common/helpers';
 
 type EthStorageRef = {
     hash: string; // bytes32
@@ -20,7 +20,7 @@ type EthModuleInfo = {
     icon: EthStorageRef;
     owner: string; // bytes32
     interfaces: string[]; // string[]
-    flags: number; // uint 
+    flags: ethers.BigNumber; // uint 
 }
 
 type EthDependencyDto = {
@@ -242,6 +242,7 @@ export class EthRegistry implements Registry {
         };
         mi.interfaces = m.interfaces;
         mi.registryUrl = this.url;
+        mi.isUnderConstruction = getBitFromHex(m.flags.toHexString(), 0);
         return mi;
     }
 
@@ -271,7 +272,7 @@ export class EthRegistry implements Registry {
         return {
             name: module.name,
             moduleType: parseInt(Object.entries(moduleTypesMap).find(([k, v]) => v === module.type)[0]),
-            flags: 0,
+            flags: ethers.BigNumber.from('0x00'),
             title: module.title,
             description: module.description,
             icon: module.icon ? {

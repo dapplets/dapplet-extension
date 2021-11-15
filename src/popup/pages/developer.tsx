@@ -148,88 +148,91 @@ class Developer extends React.Component<IDeveloperProps, IDeveloperState> {
         const groupedModules = groupBy(modules, x => x.module.registryUrl);
         
         return (
-            <Segment.Group className={(this.props.isOverlay) ? undefined : "internalTabSettings"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
-                {(intro.popupDeveloperWelcome) ? (<Message info onDismiss={() => this.closeWelcomeIntro()} style={{ display: 'inline-table' }}>
-                    <Message.Header>Welcome to Development Mode!</Message.Header>
-                    <p>Here you can connect to development servers to debug modules, publish them to public registries using your wallet.</p>
-                </Message>) : null}
-                
-                <Segment loading={isLoading} style={{ margin: 0, flex: 'auto', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <> 
+                {(intro.popupDeveloperWelcome) ? (<Message info onDismiss={() => this.closeWelcomeIntro()}>
+                        <Message.Header>Welcome to Development Mode!</Message.Header>
+                        <p>Here you can connect to development servers to debug modules, publish them to public registries using your wallet.</p>
+                    </Message>) : null}
+                    
+                <Segment.Group className={(this.props.isOverlay) ? undefined : "internalTabSettings"} style={{ marginTop: (this.props.isOverlay) ? 0 : undefined }}>
+                    
+                    <Segment loading={isLoading} style={{ margin: 0, flex: 'auto', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
-                    <Header as='h4'>Development Servers</Header>
-                    <Input
-                        size='mini'
-                        icon='code'
-                        iconPosition='left'
-                        action={{
-                            content: 'Add',
-                            size: 'mini',
-                            onClick: () => this.addRegistry(registryInput),
-                            disabled: !(isValidUrl(registryInput) && !registries.find(r => r.url === registryInput)),
-                            color: 'blue'
-                        }}
-                        fluid
-                        placeholder='Dev Registry URL...'
-                        value={registryInput}
-                        onChange={(e) => this.setState({ registryInput: e.target.value, registryInputError: null })}
-                        error={!!registryInputError}
-                    />
+                        <Header as='h4'>Development Servers</Header>
+                        <Input
+                            size='mini'
+                            icon='code'
+                            iconPosition='left'
+                            action={{
+                                content: 'Add',
+                                size: 'mini',
+                                onClick: () => this.addRegistry(registryInput),
+                                disabled: !(isValidUrl(registryInput) && !registries.find(r => r.url === registryInput)),
+                                color: 'blue'
+                            }}
+                            fluid
+                            placeholder='Dev Registry URL...'
+                            value={registryInput}
+                            onChange={(e) => this.setState({ registryInput: e.target.value, registryInputError: null })}
+                            error={!!registryInputError}
+                        />
 
-                    {(registryInputError) ? <Label basic color='red' pointing>{registryInputError}</Label> : null}
+                        {(registryInputError) ? <Label basic color='red' pointing>{registryInputError}</Label> : null}
 
-                    <List divided relaxed size='small'>
-                        {registries.map((r, i) => (
-                            <List.Item key={i}>
-                                <List.Content floated='left'>
-                                    {(r.isEnabled) ?
-                                        ((!r.error) ?
-                                            <HoverLabel style={{ cursor: 'pointer', width: '56px', textAlign: 'center' }} size="mini" horizontal color="green" hoverText="DISABLE" hoverColor="red" onClick={() => this.disableRegistry(r.url)}>ENABLED</HoverLabel> :
-                                            <Popup
-                                                trigger={<HoverLabel style={{ cursor: 'pointer', width: '56px', textAlign: 'center' }} size="mini" horizontal color="red" hoverText="DISABLE" hoverColor="red" onClick={() => this.disableRegistry(r.url)}>ERROR</HoverLabel>}
-                                                content={r.error}
-                                                size='mini'
-                                            />) :
-                                        <HoverLabel style={{ cursor: 'pointer', width: '56px', textAlign: 'center' }} size="mini" horizontal color="grey" hoverText="ENABLE" hoverColor="green" onClick={() => this.enableRegistry(r.url)}>DISABLED</HoverLabel>
-                                    }
-                                </List.Content>
-                                <List.Content floated='right'>
-                                    <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
-                                </List.Content>
-                                <List.Content><a style={{ color: '#000' }} onClick={() => window.open(r.url, '_blank')}>{r.url}</a></List.Content>
-                            </List.Item>
-                        ))}
-                    </List>
-                </Segment>
+                        <List divided relaxed size='small'>
+                            {registries.map((r, i) => (
+                                <List.Item key={i}>
+                                    <List.Content floated='left'>
+                                        {(r.isEnabled) ?
+                                            ((!r.error) ?
+                                                <HoverLabel style={{ cursor: 'pointer', width: '56px', textAlign: 'center' }} size="mini" horizontal color="green" hoverText="DISABLE" hoverColor="red" onClick={() => this.disableRegistry(r.url)}>ENABLED</HoverLabel> :
+                                                <Popup
+                                                    trigger={<HoverLabel style={{ cursor: 'pointer', width: '56px', textAlign: 'center' }} size="mini" horizontal color="red" hoverText="DISABLE" hoverColor="red" onClick={() => this.disableRegistry(r.url)}>ERROR</HoverLabel>}
+                                                    content={r.error}
+                                                    size='mini'
+                                                />) :
+                                            <HoverLabel style={{ cursor: 'pointer', width: '56px', textAlign: 'center' }} size="mini" horizontal color="grey" hoverText="ENABLE" hoverColor="green" onClick={() => this.enableRegistry(r.url)}>DISABLED</HoverLabel>
+                                        }
+                                    </List.Content>
+                                    <List.Content floated='right'>
+                                        <Icon link color='red' name='close' onClick={() => this.removeRegistry(r.url)} />
+                                    </List.Content>
+                                    <List.Content><a style={{ color: '#000' }} onClick={() => window.open(r.url, '_blank')}>{r.url}</a></List.Content>
+                                </List.Item>
+                            ))}
+                        </List>
+                    </Segment>
 
-                <Segment disabled={isLoading}>
-                    <div>
-                        <Button
-                            size="mini"
-                            compact
-                            color="blue"
-                            onClick={this.onCreateModuleHandler.bind(this)}
-                        >
-                            Create Module
-                        </Button>
-                    </div>
-                </Segment>
+                    <Segment disabled={isLoading}>
+                        <div>
+                            <Button
+                                size="mini"
+                                compact
+                                color="blue"
+                                onClick={this.onCreateModuleHandler.bind(this)}
+                            >
+                                Create Module
+                            </Button>
+                        </div>
+                    </Segment>
 
-                <Segment disabled={isLoading}>
-                    <Header as='h4'>Your Modules</Header>
-                    <div style={{ flex: 'auto' }}>
-                        {(modules.length > 0) ? 
-                            Object.entries(groupedModules).map(([registryUrl, modules]) => (
-                                <div style={{ marginBottom: '1.5em' }} key={registryUrl}>
-                                    <Header as='h5'>{registryUrl}</Header>
-                                    {(modules.length > 0) ? <DevModulesList modules={modules} onDetailsClick={this.deployModule.bind(this)} /> : (<div>No available development modules.</div>)}
-                                </div>
-                            )) : 
-                            (<div>No available development modules.</div>)
-                        }
-                    </div>
-                </Segment>
+                    <Segment disabled={isLoading}>
+                        <Header as='h4'>Your Modules</Header>
+                        <div style={{ flex: 'auto' }}>
+                            {(modules.length > 0) ? 
+                                Object.entries(groupedModules).map(([registryUrl, modules]) => (
+                                    <div style={{ marginBottom: '1.5em' }} key={registryUrl}>
+                                        <Header as='h5'>{registryUrl}</Header>
+                                        {(modules.length > 0) ? <DevModulesList modules={modules} onDetailsClick={this.deployModule.bind(this)} /> : (<div>No available development modules.</div>)}
+                                    </div>
+                                )) : 
+                                (<div>No available development modules.</div>)
+                            }
+                        </div>
+                    </Segment>
 
-            </Segment.Group>
+                </Segment.Group>
+            </>
         );
     }
 }
