@@ -229,6 +229,14 @@ export class EthRegistry implements Registry {
         await tx.wait();
     }
 
+    public async editModuleInfo(module: ModuleInfo): Promise<void> {
+        const contract = await this._contractPromise;
+        const ethMi = this._convertToEthMi(module);
+        const key = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(ethMi.name));
+        const moduleIdx = await contract.moduleIdxs(key);
+        await contract.editModuleInfo(moduleIdx, ethMi.title, ethMi.description, ethMi.icon);
+    }
+
     private _convertFromEthMi(m: EthModuleInfo): ModuleInfo {
         const mi = new ModuleInfo();
         mi.type = moduleTypesMap[m.moduleType];

@@ -162,6 +162,10 @@ export class DevRegistry implements Registry {
         return;
     }
 
+    public async editModuleInfo(module: ModuleInfo): Promise<void> {
+        throw new Error('Not implemented');
+    }
+
     private async _loadModuleAndVersionInfo(manifestUri: string, dm: DevManifest): Promise<{ module: ModuleInfo, version: VersionInfo }> {
         const mi = new ModuleInfo();
         mi.name = dm.name;

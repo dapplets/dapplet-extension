@@ -245,6 +245,10 @@ export class NearRegistry implements Registry {
         await this._contract.removeContextId({ contextId, moduleName });
     }
 
+    public async editModuleInfo(module: ModuleInfo): Promise<void> {
+        throw new Error('Not implemented');
+    }
+
     private _toNearStorageRef(ref: StorageRef): NearStorageRef {
         if (ref === null) return null;
         return {

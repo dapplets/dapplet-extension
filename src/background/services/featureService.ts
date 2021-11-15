@@ -545,6 +545,30 @@ export default class FeatureService {
         await registry.removeContextId(moduleName, contextId);
     }
 
+    public async editModuleInfo(registryUri: string, targetStorages: StorageTypes[], mi: ModuleInfo) {
+        if (mi.icon && mi.icon.uris.length > 0) {
+            if (mi.icon.uris[0].startsWith('data:image/png;base64')) {
+                // Icon file publishing (from base64)
+                const res = await fetch(mi.icon.uris[0]);
+                const blob = await res.blob();
+                const hashUris = await this._storageAggregator.save(blob, targetStorages);
+
+                // Manifest editing
+                mi.icon = hashUris;
+            } else {
+                // Icon file publishing
+                const buf = await this._storageAggregator.getResource(mi.icon);
+                const blob = new Blob([buf], { type: "image/png" });
+                const hashUris = await this._storageAggregator.save(blob, targetStorages);
+
+                // Manifest editing
+                mi.icon = hashUris;
+            }
+        }
+        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        await registry.editModuleInfo(mi);
+    }
+
     public async getVersions(registryUri: string, moduleName: string) {
         const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
         if (!registry) throw new Error("No registry with this url exists in config.");

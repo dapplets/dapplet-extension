@@ -85,6 +85,7 @@ browser.runtime.onMessage.addListener(
     transferOwnership: (registryUri, moduleName, oldAccount, newAccount) => featureService.transferOwnership(registryUri, moduleName, oldAccount, newAccount),
     addContextId: (registryUri, moduleName, contextId) => featureService.addContextId(registryUri, moduleName, contextId),
     removeContextId: (registryUri, moduleName, contextId) => featureService.removeContextId(registryUri, moduleName, contextId),
+    editModuleInfo: (registryUri, targetStorages, module) => featureService.editModuleInfo(registryUri, targetStorages, module),
     getVersions: (registryUri, moduleName) => featureService.getVersions(registryUri, moduleName),
     openSettingsOverlay: (mi) => featureService.openSettingsOverlay(mi),
     openDappletAction: (name, tabId) => featureService.openDappletAction(name, tabId),

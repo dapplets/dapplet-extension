@@ -21,4 +21,5 @@ export interface Registry {
     transferOwnership(moduleName: string, newAccount: string, oldAccount: string): Promise<void>;
     addContextId(moduleName: string, contextId: string): Promise<void>;
     removeContextId(moduleName: string, contextId: string): Promise<void>;
+    editModuleInfo(module: ModuleInfo): Promise<void>;
 }
