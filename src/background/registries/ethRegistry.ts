@@ -191,7 +191,7 @@ export class EthRegistry implements Registry {
 
         if (!isModuleExist) {
             const mi = this._convertToEthMi(module);
-            const vis = version ? this._convertToEthVi(version) : [];
+            const vis = version ? [this._convertToEthVi(version)] : [];
             const tx = await contract.addModuleInfo(module.contextIds, mi, vis);
             await tx.wait();
         } else {
