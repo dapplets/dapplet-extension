@@ -5,7 +5,7 @@ import { browser } from "webextension-polyfill-ts";
 import { Button, Segment, Loader } from "semantic-ui-react";
 import { Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
-import { ChainTypes, WalletDescriptor } from "../../common/types";
+import { ChainTypes, WalletDescriptor, WalletTypes } from "../../common/types";
 
 interface Props {
     bus: Bus;
@@ -32,9 +32,9 @@ export default class extends React.Component<Props, State> {
     async componentDidMount() {
         try {
             const { connectWallet, getWalletDescriptors } = await initBGFunctions(browser);
-            await connectWallet('metamask');
+            await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.METAMASK);
             const descriptors = await getWalletDescriptors();
-            const descriptor = descriptors.find(x => x.type === 'metamask');
+            const descriptor = descriptors.find(x => x.type === WalletTypes.METAMASK);
             this.setState({ connected: true, descriptor });
         } catch (err) {
             console.log(err);
@@ -44,7 +44,7 @@ export default class extends React.Component<Props, State> {
 
     async disconnect() {
         const { disconnectWallet } = await initBGFunctions(browser);
-        await disconnectWallet('metamask');
+        await disconnectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.METAMASK);
         this.setState({ toBack: true });
     }
 

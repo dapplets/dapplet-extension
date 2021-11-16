@@ -5,10 +5,11 @@ import { browser } from "webextension-polyfill-ts";
 import { Button, Segment, Loader } from "semantic-ui-react";
 import { Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
-import { WalletDescriptor } from "../../common/types";
+import { ChainTypes, WalletDescriptor, WalletTypes } from "../../common/types";
 
 interface Props {
     bus: Bus;
+    chain: ChainTypes;
 }
 
 interface State {
@@ -32,9 +33,9 @@ export default class extends React.Component<Props, State> {
     async componentDidMount() {
         try {
             const { connectWallet, getWalletDescriptors } = await initBGFunctions(browser);
-            await connectWallet('near');
+            await connectWallet(this.props.chain, WalletTypes.NEAR);
             const descriptors = await getWalletDescriptors();
-            const descriptor = descriptors.find(x => x.type === 'near');
+            const descriptor = descriptors.find(x => x.chain === this.props.chain && x.type === WalletTypes.NEAR);
             this.setState({ connected: true, descriptor });
         } catch (err) {
             console.error(err);
@@ -44,7 +45,7 @@ export default class extends React.Component<Props, State> {
 
     async disconnect() {
         const { disconnectWallet } = await initBGFunctions(browser);
-        await disconnectWallet('near');
+        await disconnectWallet(this.props.chain, WalletTypes.NEAR);
         this.setState({ toBack: true });
     }
 

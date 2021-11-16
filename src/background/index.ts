@@ -147,6 +147,8 @@ browser.runtime.onMessage.addListener(
     setDynamicAdapter: globalConfigService.setDynamicAdapter.bind(globalConfigService),
     getSiaPortal: globalConfigService.getSiaPortal.bind(globalConfigService),
     setSiaPortal: globalConfigService.setSiaPortal.bind(globalConfigService),
+    getNearNetworks: globalConfigService.getNearNetworks.bind(globalConfigService),
+    getEthereumNetworks: globalConfigService.getEthereumNetworks.bind(globalConfigService),
 
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),

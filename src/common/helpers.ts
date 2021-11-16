@@ -236,9 +236,9 @@ export async function waitTab(url: string) {
 
 export function chainByUri(t: UriTypes): ChainTypes {
   switch (t) {
-    case UriTypes.Ens: return ChainTypes.ETHEREUM;
-    case UriTypes.Ethereum: return ChainTypes.ETHEREUM;
-    case UriTypes.Near: return ChainTypes.NEAR;
+    case UriTypes.Ens: return ChainTypes.ETHEREUM_GOERLI;
+    case UriTypes.Ethereum: return ChainTypes.ETHEREUM_GOERLI;
+    case UriTypes.Near: return ChainTypes.NEAR_TESTNET;
     default: return null;
   }
 }

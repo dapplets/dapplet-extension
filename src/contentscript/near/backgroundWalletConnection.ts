@@ -59,7 +59,7 @@ export class BackgroundWalletConnection extends nearAPI.WalletConnection {
 
     account() {
         if (!this._connectedAccount) {
-            this._connectedAccount = new CustomConnectedWalletAccount(this, this._near.connection, this._authData.accountId, this._app);
+            this._connectedAccount = new CustomConnectedWalletAccount(this, this._near.connection, this._authData.accountId, this._app, this._near.config.networkId);
         }
         return this._connectedAccount;
     }

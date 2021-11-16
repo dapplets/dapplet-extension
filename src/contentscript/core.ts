@@ -1,19 +1,18 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
+import * as ethers from "ethers";
+import * as NearApi from "near-api-js";
+
 import { IOverlay, IOverlayManager } from "./overlay/interfaces";
 import { Swiper } from "./swiper";
 import { AutoProperties, EventDef, Connection } from "./connection";
 import { WsJsonRpc } from "./wsJsonRpc";
 import { AppStorage } from "./appStorage";
-import * as ethers from "ethers";
-import { ProxySigner } from "./proxySigner";
-
-import { BackgroundNear } from "./near/backgroundNear";
-import { BackgroundWalletConnection } from "./near/backgroundWalletConnection";
-import * as NearAPI from "near-api-js";
 import { SystemOverlayTabs } from "../common/types";
 import { parseShareLink } from "../common/helpers";
+import * as near from "./near";
+import * as ethereum from "./ethereum";
 
 type Abi = any;
 
@@ -250,27 +249,6 @@ export default class Core {
         });
     }
 
-    // ToDo: use sendSowaTransaction method from background
-    private async _sendWalletConnectTx(app: string, sowaIdOrRpcMethod, sowaMetadataOrRpcParams, callback: (e: { type: string, data?: any }) => void): Promise<any> {
-        const { eth_sendCustomRequest, eth_waitTransaction } = await initBGFunctions(browser);
-
-        callback({ type: "pending" });
-
-        try {
-            const txHash = await eth_sendCustomRequest(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
-            if (typeof txHash === 'string' && txHash.startsWith('0x') && txHash.length === 66) {
-                callback({ type: "created", data: txHash });
-                const tx = await eth_waitTransaction(app, txHash);
-                callback({ type: "mined", data: tx });
-            } else {
-                callback({ type: "result", data: txHash });
-            }
-        } catch (err) {
-            console.error(err);
-            callback({ type: "rejected" });
-        }
-    }
-
     public connect<M>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
         const rpc = new WsJsonRpc(cfg.url);
         const conn = Connection.create<M>(rpc, eventDef);
@@ -278,19 +256,20 @@ export default class Core {
     }
 
     public async wallet<M>(cfg: { type: 'ethereum', network: 'rinkeby', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & AutoProperties<M> & Connection>
-    public async wallet<M>(cfg: { type: 'near', network: 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearAPI.ConnectedWalletAccount>
-    public async wallet<M>(cfg: { type: 'ethereum' | 'near', network: 'rinkeby' | 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
+    public async wallet<M>(cfg: { type: 'near', network: 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
+    public async wallet<M>(cfg: { type: 'near', network: 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
+    public async wallet<M>(cfg: { type: 'ethereum' | 'near', network: 'rinkeby' | 'testnet' | 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
         if (!cfg || !cfg.type || !cfg.network) throw new Error("\"type\" and \"network\" are required in Core.wallet().");
         if (cfg.type !== 'near' && cfg.type !== 'ethereum') throw new Error("The \"ethereum\" and \"near\" only are supported in Core.wallet().");
-        if (cfg.type === 'near' && cfg.network !== 'testnet') throw new Error("\"testnet\" network only is supported in \"near\" type wallet.");
+        if (cfg.type === 'near' && !(cfg.network == 'testnet' || cfg.network == 'mainnet')) throw new Error("\"testnet\" and \"mainnet\" network only is supported in \"near\" type wallet.");
         if (cfg.type === 'ethereum' && cfg.network !== 'rinkeby') throw new Error("\"rinkeby\" network only is supported in \"ethereum\" type wallet.");
 
-        const me = this;
+        const chainNetwork = cfg.type + '/' + cfg.network;
 
         const isConnected = async () => {
             const { getWalletDescriptors } = await initBGFunctions(browser);
             const descriptors = await getWalletDescriptors();
-            const suitableWallet = descriptors.find(x => x.chain === cfg.type && x.apps.indexOf(app) !== -1);
+            const suitableWallet = descriptors.find(x => x.chain === chainNetwork && x.apps.indexOf(app) !== -1);
             return suitableWallet ? suitableWallet.connected : false;
         };
 
@@ -299,34 +278,9 @@ export default class Core {
             if (!connected) return null;
 
             if (cfg.type === 'ethereum') {
-                const transport = {
-                    _txCount: 0,
-                    _handler: null,
-                    exec: (sowaIdOrRpcMethod: string, sowaMetadataOrRpcParams: any) => {
-                        const id = (++transport._txCount).toString();
-                        me._sendWalletConnectTx(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams, (e) => transport._handler(id, e));
-                        return Promise.resolve(id);
-                    },
-                    onMessage: (handler: (topic: string, message: any) => void) => {
-                        transport._handler = handler;
-                        return {
-                            off: () => transport._handler = null
-                        }
-                    }
-                }
-
-                const conn = Connection.create<M>(transport, eventDef);
-                return conn;
+                return ethereum.createWalletConnection(app, cfg, eventDef);
             } else if (cfg.type === 'near') {
-                const { localStorage_getItem } = await initBGFunctions(browser);
-                const authDataKey = 'null_wallet_auth_key';
-                let authData = JSON.parse(await localStorage_getItem(authDataKey));
-                if (!authData) return null;
-
-                const near = new BackgroundNear(app);
-                const wallet = new BackgroundWalletConnection(near, null, app);
-                wallet._authData = authData;
-                return wallet.account();
+                return near.createWalletConnection(app, cfg);
             } else {
                 throw new Error('Invalid wallet type.');
             }
@@ -343,13 +297,13 @@ export default class Core {
 
             async connect(): Promise<void> {
                 const { prepareWalletFor } = await initBGFunctions(browser);
-                await prepareWalletFor(app, cfg.type, cfg);
+                await prepareWalletFor(app, chainNetwork, cfg);
                 this._wallet = await getWalletObject();
             },
 
             async disconnect(): Promise<void> {
                 const { unsetWalletFor } = await initBGFunctions(browser);
-                await unsetWalletFor(app, cfg.type);
+                await unsetWalletFor(app, chainNetwork);
                 this._wallet = null;
             }
         };
@@ -395,14 +349,9 @@ export default class Core {
     public contract(type: 'near', address: string, options: { viewMethods: string[]; changeMethods: string[] }, app?: string): any
     public contract(type: 'near' | 'ethereum', address: string, options: any, app?: string): any {
         if (type === 'ethereum') {
-            const signer = new ProxySigner(app);
-            return new ethers.Contract(address, options, signer);
+            return ethereum.createContractWrapper(app, { network: 'rinkeby'}, address, options);
         } else if (type === 'near') {
-            const near = new BackgroundNear(app);
-            const wallet = new BackgroundWalletConnection(near, null, app);
-            const account = wallet.account();
-            const contract = new NearAPI.Contract(account, address, options);
-            return contract;
+            return near.createContractWrapper(app, { network: 'testnet' }, address, options);
         } else {
             throw new Error("\"ethereum\" and \"near\" contracts only are supported.");
         }
@@ -418,6 +367,9 @@ export default class Core {
     utils = ethers.utils;
 
     BigNumber = ethers.BigNumber;
+
+    ethers = ethers;
+    near = NearApi;
 
     public starterOverlay() {
         return this.overlay({ url: browser.runtime.getURL('starter.html'), title: 'Starter' });

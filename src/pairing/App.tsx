@@ -27,7 +27,8 @@ export class App extends React.Component<Props, State> {
                         <Route exact path="/" component={() => <SelectWallet bus={p.bus} chain={p.chain} />} />
                         <Route path="/metamask" component={() => <modules.metamask bus={p.bus} />} />
                         <Route path="/walletconnect" component={() => <modules.walletconnect bus={p.bus} />} />
-                        <Route path="/near" component={() => <modules.near bus={p.bus} />} />
+                        <Route path="/near_testnet" component={() => <modules.near bus={p.bus} chain={ChainTypes.NEAR_TESTNET} />} />
+                        <Route path="/near_mainnet" component={() => <modules.near bus={p.bus} chain={ChainTypes.NEAR_MAINNET} />} />
                         <Route path="/dapplets" component={() => <modules.dapplets bus={p.bus} />} />
                     </Switch>
                 </HashRouter>

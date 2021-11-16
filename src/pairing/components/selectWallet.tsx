@@ -10,7 +10,7 @@ import ReactTimeAgo from 'react-time-ago';
 import { CheckIcon } from "../../common/react-components/CheckIcon";
 import * as walletIcons from '../../common/resources/wallets';
 import { Bus } from "../../common/bus";
-import { ChainTypes, WalletDescriptor } from "../../common/types";
+import { ChainTypes, WalletDescriptor, WalletTypes } from "../../common/types";
 
 interface ISelectWalletProps {
     bus: Bus;
@@ -35,16 +35,15 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
     async componentDidMount() {
         const { getWalletDescriptors } = await initBGFunctions(browser);
         const descriptors = await getWalletDescriptors();
-
         this.setState({
             descriptors,
             loading: false
         });
     }
 
-    async disconnectButtonClick(wallet: string) {
+    async disconnectButtonClick(chain: ChainTypes, wallet: WalletTypes) {
         const { disconnectWallet } = await initBGFunctions(browser);
-        await disconnectWallet(wallet);
+        await disconnectWallet(chain, wallet);
         await this.componentDidMount();
     }
 
@@ -77,7 +76,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                                 <div style={{ flex: 'auto', marginLeft: '10px' }}>
                                     <div style={{ display: 'inline', color: 'rgba(0,0,0,.4)' }}>
                                         {/* {(x.default) ? <Icon name='star' /> : <Icon link name='star outline' onClick={() => this.setWalletFor(x.type)} />} */}
-                                        {(x.account) ? <span title={x.account} style={{ color: '#000', fontWeight: 'bold' }}>{x.account.substr(0, 6) + '...' + x.account.substr(38)}</span> : null}
+                                        {(x.account) ? <span title={x.account} style={{ color: '#000', fontWeight: 'bold' }}>{(x.account.indexOf('0x') !== -1) ? x.account.substr(0, 6) + '...' + x.account.substr(38) : x.account}</span> : null}
                                         <CheckIcon text='Copied' name='copy' style={{ marginLeft: '4px' }} onClick={() => navigator.clipboard.writeText(x.account)} />
                                     </div>
                                     {/* <Comment.Author style={{ display: 'inline' }}>{x.account}</Comment.Author> */}
@@ -93,7 +92,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                                     </Comment.Actions> */}
                                 </div>
                                 <div>
-                                    <Button onClick={() => this.disconnectButtonClick(x.type)} size='tiny' style={{ margin: '5px 0' }}>Disconnect</Button>
+                                    <Button onClick={() => this.disconnectButtonClick(x.chain, x.type)} size='tiny' style={{ margin: '5px 0' }}>Disconnect</Button>
                                 </div>
                             </div>
                         ))}
@@ -103,8 +102,8 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                 {(disconnectedWallets.length > 0) ? <>
                     <Header as='h3'>Connect a new wallet</Header>
 
-                    {(!this.state.descriptors.find(x => x.type === 'metamask').connected && (!p.chain || p.chain === ChainTypes.ETHEREUM)) ?
-                        (this.state.descriptors.find(x => x.type === 'metamask').available) ?
+                    {(!this.state.descriptors.find(x => x.type === WalletTypes.METAMASK).connected && (!p.chain || p.chain === ChainTypes.ETHEREUM_GOERLI)) ?
+                        (this.state.descriptors.find(x => x.type === WalletTypes.METAMASK).available) ?
                             <Button
                                 // disabled={this.state.descriptors.find(x => x.type === 'metamask').available === false}
                                 basic
@@ -129,7 +128,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                             </Button> :
                         null}
 
-                    {(!this.state.descriptors.find(x => x.type === 'walletconnect').connected && (!p.chain || p.chain === ChainTypes.ETHEREUM)) ?
+                    {(!this.state.descriptors.find(x => x.type === WalletTypes.WALLETCONNECT).connected && (!p.chain || p.chain === ChainTypes.ETHEREUM_GOERLI)) ?
                         <Button
                             // disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
                             basic
@@ -143,21 +142,35 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                         </Button> :
                         null}
                         
-                    {(!this.state.descriptors.find(x => x.type === 'near').connected && (!p.chain || p.chain === ChainTypes.NEAR)) ?
+                    {(!this.state.descriptors.find(x => x.type === WalletTypes.NEAR && x.chain === ChainTypes.NEAR_TESTNET).connected && (!p.chain || p.chain === ChainTypes.NEAR_TESTNET)) ?
                         <Button
                             // disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
                             basic
                             fluid
                             size='large'
-                            onClick={() => window.location.hash = '/near'}
+                            onClick={() => window.location.hash = '/near_testnet'}
                             style={{ height: '64px', marginBottom: '10px' }}
                         >
                             <Image size='mini' verticalAlign='middle' src={logos.near} style={{ padding: '4px' }} />{' '}
-                            <span>NEAR Wallet</span>
+                            <span>NEAR Wallet (Testnet)</span>
+                        </Button> :
+                        null}
+ 
+                    {(!this.state.descriptors.find(x => x.type === WalletTypes.NEAR && x.chain === ChainTypes.NEAR_MAINNET).connected && (!p.chain || p.chain === ChainTypes.NEAR_MAINNET)) ?
+                        <Button
+                            // disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
+                            basic
+                            fluid
+                            size='large'
+                            onClick={() => window.location.hash = '/near_mainnet'}
+                            style={{ height: '64px', marginBottom: '10px' }}
+                        >
+                            <Image size='mini' verticalAlign='middle' src={logos.near} style={{ padding: '4px' }} />{' '}
+                            <span>NEAR Wallet (Mainnet)</span>
                         </Button> :
                         null}
                     
-                    {(!this.state.descriptors.find(x => x.type === 'dapplets').connected && (!p.chain || p.chain === ChainTypes.ETHEREUM)) ?
+                    {(!this.state.descriptors.find(x => x.type === WalletTypes.DAPPLETS).connected && (!p.chain || p.chain === ChainTypes.ETHEREUM_GOERLI)) ?
                         <Button
                             // disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
                             basic
