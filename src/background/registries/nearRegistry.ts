@@ -86,6 +86,7 @@ export class NearRegistry implements Registry {
                     mi.author = m.owner;
                     mi.icon = this._fromNearStorageRef(m.icon);
                     mi.interfaces = m.interfaces.map(x => x.name);
+                    mi.isUnderConstruction = false;
                     return mi;
                 });
 
@@ -122,6 +123,7 @@ export class NearRegistry implements Registry {
             mi.icon = this._fromNearStorageRef(v.icon);
             mi.interfaces = v.interfaces.map(x => x.name);
             mi.registryUrl = this.url;
+            mi.isUnderConstruction = false;
             return mi;
 
         } catch (err) {
@@ -178,6 +180,8 @@ export class NearRegistry implements Registry {
     }
 
     public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
+        if (!version) throw new Error('NEAR Registry doesn\'t support uploading of modules under construction.');
+
         const moduleType = parseInt(Object.entries(moduleTypesMap).find(([k, v]) => v === module.type)[0]);
 
         const mInfo: NearModuleInfo = {
@@ -226,10 +230,10 @@ export class NearRegistry implements Registry {
         }
     }
 
-    public async transferOwnership(moduleName: string, address: string) {
+    public async transferOwnership(moduleName: string, newAccount: string, oldAccount: string) {
         await this._contract.transferOwnership({
             moduleName: moduleName,
-            newOwner: address
+            newOwner: newAccount
         });
     }
 
@@ -239,6 +243,10 @@ export class NearRegistry implements Registry {
 
     public async removeContextId(moduleName: string, contextId: string) {
         await this._contract.removeContextId({ contextId, moduleName });
+    }
+
+    public async editModuleInfo(module: ModuleInfo): Promise<void> {
+        throw new Error('Not implemented');
     }
 
     private _toNearStorageRef(ref: StorageRef): NearStorageRef {

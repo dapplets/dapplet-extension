@@ -1,4 +1,3 @@
-import Manifest from "../models/manifest";
 import ModuleInfo from "../models/moduleInfo";
 import VersionInfo from "../models/versionInfo";
 
@@ -19,7 +18,8 @@ export interface Registry {
     getAllDevModules({ users }: { users: string[] }): Promise<{ module: ModuleInfo, versions: VersionInfo[] }[]>;
     addModule(module: ModuleInfo, version: VersionInfo): Promise<void>;
     getOwnership(moduleName: string): Promise<string>;
-    transferOwnership(moduleName: string, address: string): Promise<void>;
+    transferOwnership(moduleName: string, newAccount: string, oldAccount: string): Promise<void>;
     addContextId(moduleName: string, contextId: string): Promise<void>;
     removeContextId(moduleName: string, contextId: string): Promise<void>;
+    editModuleInfo(module: ModuleInfo): Promise<void>;
 }

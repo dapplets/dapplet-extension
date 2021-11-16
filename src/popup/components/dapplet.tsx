@@ -56,7 +56,7 @@ export class Dapplet extends React.Component<Props, State> {
             <List>{f.sourceRegistry?.url}</List>
           </Popup>
         </List.Content>
-        <List.Content style={{ float: "right", width: 60 }}>
+        {!f.isUnderConstruction ? <List.Content style={{ float: "right", width: 60 }}>
           <Checkbox
             disabled={f.isLoading ?? false}
             toggle
@@ -66,17 +66,17 @@ export class Dapplet extends React.Component<Props, State> {
             }
             checked={f.isActive}
           />
-        </List.Content>
+        </List.Content> : null}
         <List.Content style={{ marginLeft: 45, marginRight: 60 }}>
           <List.Header>
             {f.title}
-            <Icon
+            {!f.isUnderConstruction ? <Icon
               style={{ marginLeft: "4px", fontSize: "0.9em" }}
               link
               name="cog"
               size="small"
               onClick={() => this.props.onSettingsModule(f)}
-            />
+            /> : null}
             {f.isActive && f.isActionHandler ? (
               <Icon
                 style={{ fontSize: "0.9em" }}
@@ -98,6 +98,11 @@ export class Dapplet extends React.Component<Props, State> {
             {f.sourceRegistry?.isDev ? (
               <Label style={{}} horizontal size="mini" color="teal">
                 DEV
+              </Label>
+            ) : null}
+            {f.isUnderConstruction ? (
+              <Label style={{ marginLeft: '8px' }} horizontal size="mini" color="teal">
+                UNDER CONSTRUCTION
               </Label>
             ) : null}
             {f.error ? (

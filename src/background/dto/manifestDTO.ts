@@ -24,4 +24,5 @@ export default class ManifestDTO {
     } = null;
     // ToDo: Add "hasUpdate", which are used in Features.tsx
     available: boolean;
+    isUnderConstruction: boolean;
 }

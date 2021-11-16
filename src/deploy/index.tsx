@@ -15,6 +15,7 @@ import { ChainTypes, DefaultSigners } from "../common/types";
 import { typeOfUri, chainByUri, joinUrls } from "../common/helpers";
 import { DEFAULT_BRANCH_NAME, ModuleTypes, StorageTypes } from "../common/constants";
 import { StorageRefImage } from "../popup/components/StorageRefImage";
+import { EditableList } from "./EditableList";
 
 tracing.startTracing();
 
@@ -46,8 +47,9 @@ type DependencyChecking = {
 interface IIndexProps { }
 
 interface IIndexState {
+    originalMi: ModuleInfo;
     mi: ModuleInfo;
-    vi: VersionInfo;
+    vi: VersionInfo | null;
     dependenciesChecking: DependencyChecking[];
     loading: boolean;
     targetRegistry: string;
@@ -64,25 +66,27 @@ interface IIndexState {
     newOwner: string;
     newOwnerLoading: boolean;
     newOwnerDone: boolean;
-    editLocation: string;
-    editLocationLoading: boolean;
-    editLocationDone: boolean;
+    editContextId: string;
+    editContextIdLoading: boolean;
+    editContextIdDone: boolean;
     deploymentStatus: DeploymentStatus;
     trustedUsers: { account: string }[];
     swarmGatewayUrl: string;
     mode: FormMode;
+    isSaving: boolean;
 }
 
 class Index extends React.Component<IIndexProps, IIndexState> {
     private bus = new Bus();
     private transferOwnershipModal = React.createRef<any>();
-    private addLocationModal = React.createRef<any>();
+    private addContextIdModal = React.createRef<any>();
     private fileInputRef = React.createRef<HTMLInputElement>();
 
     constructor(props) {
         super(props);
 
         this.state = {
+            originalMi: null,
             mi: null,
             vi: null,
             dependenciesChecking: [],
@@ -101,13 +105,14 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             newOwner: '',
             newOwnerLoading: false,
             newOwnerDone: false,
-            editLocation: '',
-            editLocationLoading: false,
-            editLocationDone: false,
+            editContextId: '',
+            editContextIdLoading: false,
+            editContextIdDone: false,
             deploymentStatus: DeploymentStatus.Unknown,
             trustedUsers: [],
             swarmGatewayUrl: '',
-            mode: null
+            mode: null,
+            isSaving: false
         };
 
         this.bus.subscribe('data', async ({ mi, vi }: { mi: ModuleInfo, vi: VersionInfo }) => {
@@ -116,29 +121,27 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
             if (mi === null && vi === null) { // New module
                 const mi = new ModuleInfo();
-                const vi = new VersionInfo();
-                vi.version = "0.0.0";
-                vi.branch = "default";
 
                 this.setState({ 
+                    originalMi: JSON.parse(JSON.stringify(mi)),
                     mi, 
-                    vi, 
                     loading: false, 
                     swarmGatewayUrl,
                     mode: FormMode.Creating
                 });
                 await this._updateData();
             } else { // Deploy module
-                const dependencies = vi.dependencies ? Object.entries(vi.dependencies).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Dependency })) : [];
-                const interfaces = vi.interfaces ? Object.entries(vi.interfaces).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Interface })) : [];
+                const dependencies = vi?.dependencies ? Object.entries(vi.dependencies).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Dependency })) : [];
+                const interfaces = vi?.interfaces ? Object.entries(vi.interfaces).map(([name, version]) => ({ name: name, version: version, type: DependencyType.Interface })) : [];
                 const dependenciesChecking = [...dependencies, ...interfaces];
                 this.setState({ 
+                    originalMi: JSON.parse(JSON.stringify(mi)),
                     mi, 
                     vi, 
                     dependenciesChecking, 
                     loading: false, 
                     swarmGatewayUrl,
-                    targetStorages: (Object.keys(vi.overlays ?? {}).length > 0) ? [
+                    targetStorages: (Object.keys(vi?.overlays ?? {}).length > 0) ? [
                         StorageTypes.Swarm, 
                         StorageTypes.Sia
                     ] : [
@@ -201,40 +204,42 @@ class Index extends React.Component<IIndexProps, IIndexState> {
     }
 
     private async _updateDeploymentStatus() {
+        const s = this.state;
         this.setState({ deploymentStatus: DeploymentStatus.Unknown });
         const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser);
-        const mi = await getModuleInfoByName(this.state.targetRegistry, this.state.mi.name);
-        const vi = await getVersionInfo(this.state.targetRegistry, this.state.mi.name, this.state.vi.branch, this.state.vi.version);
-        const deploymentStatus = (!mi) ? DeploymentStatus.NewModule : (vi) ? DeploymentStatus.Deployed : DeploymentStatus.NotDeployed;
+        const mi = await getModuleInfoByName(s.targetRegistry, s.mi.name);
+        const deployed = s.vi ? await getVersionInfo(s.targetRegistry, s.mi.name, s.vi.branch, s.vi.version) : true;
+        const deploymentStatus = (!mi) ? DeploymentStatus.NewModule : (deployed) ? DeploymentStatus.Deployed : DeploymentStatus.NotDeployed;
         this.setState({ deploymentStatus });
     }
 
-    private async _transferOwnership(address: string) {
+    private async _transferOwnership(newAccount: string) {
         this.setState({ newOwnerLoading: true });
+        const oldAccount = this.state.mi.author;
         const { transferOwnership } = await initBGFunctions(browser);
-        await transferOwnership(this.state.targetRegistry, this.state.mi.name, address);
+        await transferOwnership(this.state.targetRegistry, this.state.mi.name, newAccount, oldAccount);
         this.setState({ newOwnerLoading: false, newOwnerDone: true });
     }
 
-    private async _addLocation(location: string) {
-        this.setState({ editLocationLoading: true });
-        const { addLocation } = await initBGFunctions(browser);
-        await addLocation(this.state.targetRegistry, this.state.mi.name, location);
-        this.setState({ editLocationLoading: false, editLocationDone: true });
+    private async _addContextId(contextId: string) {
+        this.setState({ editContextIdLoading: true });
+        const { addContextId } = await initBGFunctions(browser);
+        await addContextId(this.state.targetRegistry, this.state.mi.name, contextId);
+        this.setState({ editContextIdLoading: false, editContextIdDone: true });
     }
 
-    private async _removeLocation(location: string) {
-        this.setState({ editLocationLoading: true });
-        const { removeLocation } = await initBGFunctions(browser);
-        await removeLocation(this.state.targetRegistry, this.state.mi.name, location);
-        this.setState({ editLocationLoading: false, editLocationDone: true });
+    private async _removeContextId(contextId: string) {
+        this.setState({ editContextIdLoading: true });
+        const { removeContextId } = await initBGFunctions(browser);
+        await removeContextId(this.state.targetRegistry, this.state.mi.name, contextId);
+        this.setState({ editContextIdLoading: false, editContextIdDone: true });
     }
 
     async deployButtonClickHandler() {
         this.setState({ loading: true });
 
         const { deployModule, addTrustedUser } = await initBGFunctions(browser);
-        const { mi, vi, targetRegistry, targetStorages, currentAccount } = this.state;
+        const { mi, vi, targetRegistry, targetStorages, currentAccount, mode } = this.state;
 
         try {
             const isNotNullCurrentAccount = !(!currentAccount || currentAccount === '0x0000000000000000000000000000000000000000');
@@ -243,7 +248,10 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                 await addTrustedUser(currentAccount.toLowerCase());
             }
 
-            const result = await deployModule(mi, vi, targetStorages, targetRegistry);
+            const result = (mode === FormMode.Creating) 
+                ? await deployModule(mi, null, targetStorages, targetRegistry) 
+                : await deployModule(mi, vi, targetStorages, targetRegistry);
+            
             this.setState({
                 message: {
                     type: 'positive',
@@ -334,15 +342,37 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         this.setState({ mi: s.mi });
     }
 
+    async saveChanges() {
+        try {
+            this.setState({ isSaving: true });
+            const { editModuleInfo } = await initBGFunctions(browser);
+            await editModuleInfo(this.state.targetRegistry, this.state.targetStorages, this.state.mi);
+            this.setState({ 
+                isSaving: false, 
+                originalMi: JSON.parse(JSON.stringify(this.state.mi)) 
+            });
+        } catch (err) {
+            this.setState({
+                message: {
+                    type: 'negative',
+                    header: 'Publication error',
+                    message: [err.message]
+                }
+            });
+        } finally {
+            this.setState({ isSaving: false });
+        }
+    }
+
     render() {
         const s = this.state;
         const {
             mi, vi, loading, targetRegistry,
             targetStorages, 
             message, dependenciesChecking,
-            owner, currentAccount, newOwner, editLocation: newLocation,
-            newOwnerLoading, newOwnerDone, editLocationLoading: newLocationLoading,
-            editLocationDone: newLocationDone
+            owner, currentAccount, newOwner, editContextId,
+            newOwnerLoading, newOwnerDone, editContextIdLoading,
+            editContextIdDone, mode
         } = this.state;
 
         const isNoStorage = targetStorages.length === 0;
@@ -355,7 +385,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         const isDependenciesExist = dependenciesChecking.length > 0 ? dependenciesChecking.every(x => x.isExists === true) : true;
         const isDependenciesLoading = dependenciesChecking.length > 0 ? dependenciesChecking.every(x => x.isExists === undefined) : false;
         const isManifestValid = mi?.name && mi?.title && mi?.description && mi?.type;
-        const isButtonDisabled = loading || s.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner || isNoStorage || isDependenciesLoading || !isDependenciesExist || !isManifestValid;
+        const isDeployButtonDisabled = loading || s.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner || isNoStorage || isDependenciesLoading || !isDependenciesExist || !isManifestValid;
+        const isReuploadButtonDisabled = !isAlreadyDeployed || mode === FormMode.Creating || !vi;
         
 
         return (
@@ -398,7 +429,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                     />
                 ) : null}
 
-                {(isAlreadyDeployed) ? 
+                {(isAlreadyDeployed && vi) ? 
                     <Message
                         warning
                         header='The Module Already Deployed'
@@ -453,14 +484,14 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         <Card.Description>
                             {mi.description}<br />
                             {mi.author}<br />
-                            <strong>{mi.name}#{vi.branch}@{vi.version}</strong><br />
+                            {(vi) ? <strong>{mi.name}#{vi.branch}@{vi.version}</strong> : <strong>{mi.name}</strong>}<br />
                             {(owner) ? <>Owner: <a href='#' onClick={() => window.open(`https://goerli.etherscan.io/address/${owner}`, '_blank')}>{owner}</a></> : null}
                         </Card.Description>
                     </Card.Content>
 
                     {(owner && owner?.toLowerCase() === currentAccount?.toLowerCase()) ?
                         <Card.Content extra>
-                            <div className='ui two buttons'>
+                            <div className='ui three buttons'>
 
                                 <Modal closeOnEscape={false} closeOnDimmerClick={false} ref={this.transferOwnershipModal} dimmer='inverted' trigger={<Button basic color='grey'>Transfer ownership</Button>} centered={false}>
                                     <Modal.Header>Ownership Transfering</Modal.Header>
@@ -494,54 +525,62 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                                 </Modal>
 
 
-                                <Modal closeOnEscape={false} closeOnDimmerClick={false} ref={this.addLocationModal} dimmer='inverted' trigger={<Button basic color='grey'>Locations</Button>} centered={false}>
-                                    <Modal.Header>Locations</Modal.Header>
+                                <Modal closeOnEscape={false} closeOnDimmerClick={false} ref={this.addContextIdModal} dimmer='inverted' trigger={<Button basic color='grey'>Context IDs</Button>} centered={false}>
+                                    <Modal.Header>Manage Context IDs</Modal.Header>
                                     <Modal.Content image>
                                         <Modal.Description>
                                             <p>Here you can (un)bind the module to make it (un)accessible in modules list of website context.</p>
                                             <Input
                                                 fluid
-                                                placeholder='Location address (ex: example.com)'
-                                                value={newLocation}
-                                                onChange={(e, data) => this.setState({ editLocation: data.value as string })}
+                                                placeholder='Context ID (ex: example.com)'
+                                                value={editContextId}
+                                                onChange={(e, data) => this.setState({ editContextId: data.value as string })}
                                             />
                                         </Modal.Description>
                                     </Modal.Content>
                                     <Modal.Actions>
                                         <Button basic onClick={() => {
-                                            this.setState({ editLocation: '', editLocationDone: false });
-                                            this.addLocationModal.current.handleClose();
+                                            this.setState({ editContextId: '', editContextIdDone: false });
+                                            this.addContextIdModal.current.handleClose();
                                         }}>Cancel</Button>
                                         <Button 
                                             color='blue' 
-                                            loading={newLocationLoading}
-                                            disabled={newLocationLoading || newLocationDone || !newLocation}
-                                            onClick={() => this._addLocation(s.editLocation)}
-                                        >{(!newLocationDone) ? "Add" : "Done"}</Button>
+                                            loading={editContextIdLoading}
+                                            disabled={editContextIdLoading || editContextIdDone || !editContextId}
+                                            onClick={() => this._addContextId(s.editContextId)}
+                                        >{(!editContextIdDone) ? "Add" : "Done"}</Button>
                                         <Button 
                                             color='blue' 
-                                            loading={newLocationLoading}
-                                            disabled={newLocationLoading || newLocationDone || !newLocation}
-                                            onClick={() => this._removeLocation(s.editLocation)}
-                                        >{(!newLocationDone) ? "Remove" : "Done"}</Button>
+                                            loading={editContextIdLoading}
+                                            disabled={editContextIdLoading || editContextIdDone || !editContextId}
+                                            onClick={() => this._removeContextId(s.editContextId)}
+                                        >{(!editContextIdDone) ? "Remove" : "Done"}</Button>
                                     </Modal.Actions>
                                 </Modal>
 
+                                <Button basic color='grey' onClick={() => this.setState({ mode: FormMode.Editing})}>
+                                    Edit Module Info
+                                </Button>
 
                             </div>
                         </Card.Content> : null}
                 </Card>) : null}
 
-                <Form loading={loading}>
+                <Form loading={loading} style={{ marginBottom: '20px' }}>
 
                     {(s.mode === FormMode.Creating || s.mode === FormMode.Editing) ? <>
                     
                         <Form.Input
                             required
                             label='Module Name'
+                            readOnly={mode === FormMode.Editing}
                             placeholder="Module ID like module_name.dapplet-base.eth"
                             value={s.mi.name ?? ''}
-                            onChange={(_, data) => (s.mi.name = data.value, s.vi.name = data.value, this.setState({ mi: s.mi, vi: s.vi }))}
+                            onChange={(_, data) => {
+                                s.mi.name = data.value;
+                                if (s.vi) s.vi.name = data.value;
+                                this.setState({ mi: s.mi, vi: s.vi });
+                            }}
                         /> 
 
                         <Form.Input
@@ -570,33 +609,46 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                             />
                         </div>
 
-                        <Form.Field label="Module Type" required />
-                        <Form.Radio
-                            label='Library'
-                            value={ModuleTypes.Library}
-                            checked={mi.type === ModuleTypes.Library}
-                            onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Library, this.setState({ mi }))}
-                        />
-                        <Form.Radio
-                            label='Dapplet'
-                            value={ModuleTypes.Feature}
-                            checked={mi.type === ModuleTypes.Feature}
-                            onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Feature, this.setState({ mi }))}
-                        />
-                        <Form.Radio
-                            label='Adapter'
-                            value={ModuleTypes.Adapter}
-                            checked={mi.type === ModuleTypes.Adapter}
-                            onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Adapter, this.setState({ mi }))}
-                        />
-                        <Form.Radio
-                            label='Interface'
-                            value={ModuleTypes.Interface}
-                            checked={mi.type === ModuleTypes.Interface}
-                            onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Interface, this.setState({ mi }))}
-                        />
+                        {(mode === FormMode.Creating) ? <>
+                            <Form.Field label="Module Type" required />
+                            <Form.Radio
+                                label='Library'
+                                value={ModuleTypes.Library}
+                                checked={mi.type === ModuleTypes.Library}
+                                onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Library, this.setState({ mi }))}
+                            />
+                            <Form.Radio
+                                label='Dapplet'
+                                value={ModuleTypes.Feature}
+                                checked={mi.type === ModuleTypes.Feature}
+                                onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Feature, this.setState({ mi }))}
+                            />
+                            <Form.Radio
+                                label='Adapter'
+                                value={ModuleTypes.Adapter}
+                                checked={mi.type === ModuleTypes.Adapter}
+                                onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Adapter, this.setState({ mi }))}
+                            />
+                            <Form.Radio
+                                label='Interface'
+                                value={ModuleTypes.Interface}
+                                checked={mi.type === ModuleTypes.Interface}
+                                onChange={(_, data) => data.checked && (mi.type = ModuleTypes.Interface, this.setState({ mi }))}
+                            />
+
+                            <Form.Field label="Context IDs" />
+                            <EditableList 
+                                style={{ marginBottom: '1em' }}
+                                items={this.state.mi.contextIds} 
+                                onChange={x => {
+                                    this.state.mi.contextIds = x;
+                                    this.setState({ mi: this.state.mi });
+                                }}
+                            />
+                        </> : null}
 
                     </> : null}
+
 
                     <Form.Input
                         required
@@ -648,8 +700,13 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         style={{ marginBottom: '25px' }}
                     />
 
-                    <Button primary disabled={isButtonDisabled} onClick={() => this.deployButtonClickHandler()}>Deploy</Button>
-                    <Button disabled={!isAlreadyDeployed} onClick={() => this.reuploadButtonClickHandler()}>Reupload</Button>
+                    {(mode !== FormMode.Editing) ? <>
+                        <Button primary disabled={isDeployButtonDisabled} onClick={() => this.deployButtonClickHandler()}>Deploy</Button>
+                        <Button disabled={isReuploadButtonDisabled} onClick={() => this.reuploadButtonClickHandler()}>Reupload</Button>
+                    </> : <>
+                        <Button primary disabled={!s.mi?.title || !s.mi?.description || s.isSaving} loading={s.isSaving} onClick={() => this.saveChanges()}>Save</Button>
+                        <Button disabled={s.isSaving} onClick={() => this.setState(({ originalMi }) => ({ mode: FormMode.Deploying, mi: originalMi }))}>Cancel</Button>
+                    </>}
                 </Form>
             </React.Fragment>
         );

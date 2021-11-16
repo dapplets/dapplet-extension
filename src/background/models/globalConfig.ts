@@ -1,6 +1,7 @@
 import Base from '../../common/models/base';
 import { WalletInfo } from '../../common/constants';
 import SiteConfig from './siteConfig';
+import { EthereumNetwrokConfig, NearNetworkConfig } from '../../common/types';
 
 export class GlobalConfig extends Base {
 
@@ -65,4 +66,8 @@ export class GlobalConfig extends Base {
     ipfsGatewayUrl: string = null;
 
     siaPortalUrl: string = null;
+
+    ethereumNetworks: EthereumNetwrokConfig[] = [];
+
+    nearNetworks: NearNetworkConfig[] = [];
 }

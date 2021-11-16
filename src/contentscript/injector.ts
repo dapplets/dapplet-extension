@@ -270,6 +270,8 @@ export class Injector {
                 getContentDetectors: () => core.getContentDetectors(),
                 utils: core.utils,
                 BigNumber: core.BigNumber,
+                ethers: core.ethers,
+                near: core.near,
                 starterOverlay: core.starterOverlay,
                 createShareLink: (targetUrl: string, modulePayload: any) => core.createShareLink(targetUrl, modulePayload, {
                     contextIds: ['*'], // ToDo: Replace wildcard on real context IDs

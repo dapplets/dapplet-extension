@@ -11,14 +11,14 @@ import JSZip from 'jszip';
 
 import { areModulesEqual, getCurrentTab, mergeDedupe, parseModuleName } from '../../common/helpers';
 import { WalletService } from './walletService';
-import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
+// import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
 import { StorageRef } from '../registries/registry';
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer';
 
 export default class FeatureService {
     private _moduleManager: ModuleManager;
     private _storageAggregator = new StorageAggregator();
-    private _moduleInfoBrowserStorage = new ModuleInfoBrowserStorage();
+    // private _moduleInfoBrowserStorage = new ModuleInfoBrowserStorage();
 
     constructor(
         private _globalConfigService: GlobalConfigService,
@@ -112,7 +112,9 @@ export default class FeatureService {
         // ToDo: save registry url of activate module?
         for (const hostname of hostnames) {
             const config = await this._globalConfigService.getSiteConfigById(hostname);
-            if (!isActive) version = config.activeFeatures[name].version;
+            if (!isActive && config.activeFeatures[name]) {
+                version = config.activeFeatures[name].version;
+            }
             config.activeFeatures[name] = {
                 version,
                 isActive,
@@ -332,7 +334,7 @@ export default class FeatureService {
         }
     }
 
-    public async uploadModule(mi: ModuleInfo, vi: VersionInfo, targetStorages: StorageTypes[]): Promise<string> {
+    public async uploadModule(mi: ModuleInfo, vi: VersionInfo | null, targetStorages: StorageTypes[]): Promise<string> {
         try {
             // ToDo: check everything before publishing
 
@@ -344,24 +346,24 @@ export default class FeatureService {
 
             const zip = new JSZip();
 
-            if (vi.main) {
+            if (vi && vi.main) {
                 const arr = await this._storageAggregator.getResource(vi.main);
                 zip.file('index.js', arr);
             }
 
-            if (vi.defaultConfig) {
+            if (vi && vi.defaultConfig) {
                 const arr = await this._storageAggregator.getResource(vi.defaultConfig);
                 zip.file('default.json', arr);
             }
 
-            if (vi.schemaConfig) {
+            if (vi && vi.schemaConfig) {
                 const arr = await this._storageAggregator.getResource(vi.schemaConfig);
                 zip.file('schema.json', arr);
             }
 
             // upload overlays declared in manifest
             // it packs all files from `assets-manifest.json` into tar container
-            if (vi.overlays) {
+            if (vi && vi.overlays) {
                 for (const overlayName in vi.overlays) {
                     const baseUrl = vi.overlays[overlayName].uris[0];
                     const assetManifestUrl = new URL('assets-manifest.json', baseUrl).href;
@@ -408,7 +410,7 @@ export default class FeatureService {
                 zip.file('dapplet.json', manifestArr);
             }
 
-            if (vi.main) {
+            if (vi && vi.main) {
                 // Dist file publishing
                 const buf = await zip.generateAsync({ type: "uint8array", compression: "DEFLATE", compressionOptions: { level: 9 } });
                 const blob = new Blob([buf], { type: "application/zip" });
@@ -516,33 +518,57 @@ export default class FeatureService {
             const moduleInfo = await registry.getModuleInfoByName(moduleName);
             return moduleInfo;
         } else {
-            const moduleInfo = await this._moduleInfoBrowserStorage.get(registryUrl, moduleName);
+            // const moduleInfo = await this._moduleInfoBrowserStorage.get(registryUrl, moduleName);
 
-            if (moduleInfo) {
-                return moduleInfo;
-            } else {
+            // if (moduleInfo) {
+            //     return moduleInfo;
+            // } else {
                 const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
                 if (!registry) return null;
                 const moduleInfo = await registry.getModuleInfoByName(moduleName);
-                if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
+                // if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
                 return moduleInfo;
-            }
+            // }
         }
     }
 
-    public async transferOwnership(registryUri: string, moduleName: string, address: string) {
+    public async transferOwnership(registryUri: string, moduleName: string, oldAccount: string, newAccount: string) {
         const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
-        await registry.transferOwnership(moduleName, address);
+        await registry.transferOwnership(moduleName, oldAccount, newAccount);
     }
 
-    public async addLocation(registryUri: string, moduleName: string, location: string) {
+    public async addContextId(registryUri: string, moduleName: string, contextId: string) {
         const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
-        await registry.addContextId(moduleName, location);
+        await registry.addContextId(moduleName, contextId);
     }
 
-    public async removeLocation(registryUri: string, moduleName: string, location: string) {
+    public async removeContextId(registryUri: string, moduleName: string, contextId: string) {
         const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
-        await registry.removeContextId(moduleName, location);
+        await registry.removeContextId(moduleName, contextId);
+    }
+
+    public async editModuleInfo(registryUri: string, targetStorages: StorageTypes[], mi: ModuleInfo) {
+        if (mi.icon && mi.icon.uris.length > 0) {
+            if (mi.icon.uris[0].startsWith('data:image/png;base64')) {
+                // Icon file publishing (from base64)
+                const res = await fetch(mi.icon.uris[0]);
+                const blob = await res.blob();
+                const hashUris = await this._storageAggregator.save(blob, targetStorages);
+
+                // Manifest editing
+                mi.icon = hashUris;
+            } else {
+                // Icon file publishing
+                const buf = await this._storageAggregator.getResource(mi.icon);
+                const blob = new Blob([buf], { type: "image/png" });
+                const hashUris = await this._storageAggregator.save(blob, targetStorages);
+
+                // Manifest editing
+                mi.icon = hashUris;
+            }
+        }
+        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        await registry.editModuleInfo(mi);
     }
 
     public async getVersions(registryUri: string, moduleName: string) {

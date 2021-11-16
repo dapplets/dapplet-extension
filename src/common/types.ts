@@ -23,19 +23,21 @@ export enum DefaultSigners {
 }
 
 export enum ChainTypes {
-    ETHEREUM = 'ethereum',
-    NEAR = 'near'
+    ETHEREUM_GOERLI = 'ethereum/goerli',
+    NEAR_TESTNET = 'near/testnet',
+    NEAR_MAINNET = 'near/mainnet'
 }
 
 export enum WalletTypes {
     WALLETCONNECT = 'walletconnect',
     METAMASK = 'metamask',
-    NEAR = 'near'
+    NEAR = 'near',
+    DAPPLETS = 'dapplets'
 }
 
 export type WalletDescriptor = {
-    chain: string;
-    type: string;
+    chain: ChainTypes;
+    type: WalletTypes;
     meta: {
         icon: string;
         name: string;
@@ -51,11 +53,26 @@ export type WalletDescriptor = {
 }
 
 export type ModuleId = {
-    name: string, 
-    branch: string, 
+    name: string,
+    branch: string,
     version: string
 }
 
 export enum SystemOverlayTabs {
     DAPPLET_CONFIRMATION = 'DAPPLET_CONFIRMATION'
+}
+
+export type NearNetworkConfig = {
+    networkId: string;
+    nodeUrl: string;
+    walletUrl: string;
+    helperUrl?: string;
+    explorerUrl?: string;
+}
+
+export type EthereumNetwrokConfig = {
+    networkId: string;
+    chainId: number;
+    nodeUrl: string;
+    explorerUrl?: string;
 }

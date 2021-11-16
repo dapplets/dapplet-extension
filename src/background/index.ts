@@ -82,9 +82,10 @@ browser.runtime.onMessage.addListener(
     getOwnership: (registryUri, moduleName) => featureService.getOwnership(registryUri, moduleName),
     getVersionInfo: (registryUri, moduleName, branch, version) => featureService.getVersionInfo(registryUri, moduleName, branch, version),
     getModuleInfoByName: (registryUri, moduleName) => featureService.getModuleInfoByName(registryUri, moduleName),
-    transferOwnership: (registryUri, moduleName, address) => featureService.transferOwnership(registryUri, moduleName, address),
-    addLocation: (registryUri, moduleName, location) => featureService.addLocation(registryUri, moduleName, location),
-    removeLocation: (registryUri, moduleName, location) => featureService.removeLocation(registryUri, moduleName, location),
+    transferOwnership: (registryUri, moduleName, oldAccount, newAccount) => featureService.transferOwnership(registryUri, moduleName, oldAccount, newAccount),
+    addContextId: (registryUri, moduleName, contextId) => featureService.addContextId(registryUri, moduleName, contextId),
+    removeContextId: (registryUri, moduleName, contextId) => featureService.removeContextId(registryUri, moduleName, contextId),
+    editModuleInfo: (registryUri, targetStorages, module) => featureService.editModuleInfo(registryUri, targetStorages, module),
     getVersions: (registryUri, moduleName) => featureService.getVersions(registryUri, moduleName),
     openSettingsOverlay: (mi) => featureService.openSettingsOverlay(mi),
     openDappletAction: (name, tabId) => featureService.openDappletAction(name, tabId),
@@ -146,6 +147,8 @@ browser.runtime.onMessage.addListener(
     setDynamicAdapter: globalConfigService.setDynamicAdapter.bind(globalConfigService),
     getSiaPortal: globalConfigService.getSiaPortal.bind(globalConfigService),
     setSiaPortal: globalConfigService.setSiaPortal.bind(globalConfigService),
+    getNearNetworks: globalConfigService.getNearNetworks.bind(globalConfigService),
+    getEthereumNetworks: globalConfigService.getEthereumNetworks.bind(globalConfigService),
 
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),

@@ -61,14 +61,14 @@ export class Login extends React.Component<Props, State> {
     async selectWallet(wallet: string) {
         const { setWalletFor } = await initBGFunctions(browser);
         const { app } = this.props;
-        await setWalletFor(wallet, app, ChainTypes.ETHEREUM);
+        await setWalletFor(wallet, app, ChainTypes.ETHEREUM_GOERLI);
         this.props.bus.publish('ready');
         await this.componentDidMount();
     }
 
     async pairWallet() {
         const { pairWalletViaOverlay } = await initBGFunctions(browser);
-        await pairWalletViaOverlay(ChainTypes.ETHEREUM);
+        await pairWalletViaOverlay(ChainTypes.ETHEREUM_GOERLI);
         await this.loadData();
     }
 

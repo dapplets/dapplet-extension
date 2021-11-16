@@ -10,7 +10,7 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
 
     accountId: string;
 
-    constructor(walletConnection: nearAPI.WalletConnection, connection: nearAPI.Connection, accountId: string, private _app: string) {
+    constructor(walletConnection: nearAPI.WalletConnection, connection: nearAPI.Connection, accountId: string, private _app: string, private _network: string) {
         super(walletConnection, connection, accountId);
     }
 
@@ -18,12 +18,12 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
         //if (!this.accountId) {
         const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser);
         // ToDo: remove it?
-        await prepareWalletFor(this._app, ChainTypes.NEAR, null);
+        await prepareWalletFor(this._app, 'near/' + this._network, null);
 
-        const authDataKey = 'null_wallet_auth_key';
+        const authDataKey = this._network + '_wallet_auth_key';
         let authData = JSON.parse(await localStorage_getItem(authDataKey));
         if (!authData) {
-            await prepareWalletFor(this._app, ChainTypes.NEAR, null);
+            await prepareWalletFor(this._app, 'near/' + this._network, null);
             authData = JSON.parse(await localStorage_getItem(authDataKey));
         }
 

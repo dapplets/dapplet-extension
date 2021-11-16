@@ -7,7 +7,7 @@ import { Header } from 'semantic-ui-react'
 import { svgObject } from "qr-image";
 import { Redirect } from "react-router-dom";
 import { Bus } from '../../common/bus';
-import { WalletDescriptor } from "../../common/types";
+import { ChainTypes, WalletDescriptor, WalletTypes } from "../../common/types";
 
 interface Props {
     bus: Bus;
@@ -49,9 +49,9 @@ export default class extends React.Component<Props, State> {
                 this.props.bus.unsubscribe('walletconnect');
             });
 
-            await connectWallet('walletconnect');
+            await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.WALLETCONNECT);
             const descriptors = await getWalletDescriptors();
-            const descriptor = descriptors.find(x => x.type === 'walletconnect');
+            const descriptor = descriptors.find(x => x.type === WalletTypes.WALLETCONNECT);
             if (this._mounted) this.setState({ connected: true, descriptor });
         } catch (err) {
             if (this._mounted) this.setState({ connected: true, error: err.message });
@@ -65,7 +65,7 @@ export default class extends React.Component<Props, State> {
 
     async disconnect() {
         const { disconnectWallet } = await initBGFunctions(browser);
-        await disconnectWallet('walletconnect');
+        await disconnectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.WALLETCONNECT);
         this.setState({ toBack: true });
     }
 

@@ -150,16 +150,20 @@ export class DevRegistry implements Registry {
         return null;
     }
 
-    public async transferOwnership(moduleName: string, address: string): Promise<void> {
+    public async transferOwnership(moduleName: string, newAccount: string, oldAccount: string): Promise<void> {
         return;
     }
 
-    public async addContextId(moduleName: string, location: string) {
+    public async addContextId(moduleName: string, contextId: string) {
         return;
     }
 
-    public async removeContextId(moduleName: string, location: string) {
+    public async removeContextId(moduleName: string, contextId: string) {
         return;
+    }
+
+    public async editModuleInfo(module: ModuleInfo): Promise<void> {
+        throw new Error('Not implemented');
     }
 
     private async _loadModuleAndVersionInfo(manifestUri: string, dm: DevManifest): Promise<{ module: ModuleInfo, version: VersionInfo }> {
@@ -175,6 +179,7 @@ export class DevRegistry implements Registry {
         mi.interfaces = Object.keys(dm.interfaces || {});
         mi.contextIds = dm.contextIds ?? [];
         mi.registryUrl = this.url;
+        mi.isUnderConstruction = false;
         
         const vi = new VersionInfo();
         vi.registryUrl = this.url;

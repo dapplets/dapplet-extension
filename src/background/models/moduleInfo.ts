@@ -14,4 +14,5 @@ export default class ModuleInfo extends Base {
     icon?: StorageRef = null;
     interfaces: string[] = [];
     contextIds: string[] = [];
+    isUnderConstruction: boolean = null;
 }

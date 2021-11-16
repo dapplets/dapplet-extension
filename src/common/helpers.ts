@@ -236,9 +236,9 @@ export async function waitTab(url: string) {
 
 export function chainByUri(t: UriTypes): ChainTypes {
   switch (t) {
-    case UriTypes.Ens: return ChainTypes.ETHEREUM;
-    case UriTypes.Ethereum: return ChainTypes.ETHEREUM;
-    case UriTypes.Near: return ChainTypes.NEAR;
+    case UriTypes.Ens: return ChainTypes.ETHEREUM_GOERLI;
+    case UriTypes.Ethereum: return ChainTypes.ETHEREUM_GOERLI;
+    case UriTypes.Near: return ChainTypes.NEAR_TESTNET;
     default: return null;
   }
 }
@@ -376,4 +376,43 @@ export function groupBy<T>(array: T[], predicate: (v: T) => string) {
     (acc[predicate(value)] ||= []).push(value);
     return acc;
   }, {} as { [key: string]: T[] });
+}
+
+/**
+ * Returns bit value of hex string by bit number
+ * @param hex hex string (0xdeadbeef) of any length
+ * @param bitnumber index number of bit from the end (starts from 0)
+ */
+export function getBitFromHex(hex: string, bitnumber: number): boolean {
+  return convertHexToBinary(hex).split("").reverse()[bitnumber] === '1';
+}
+
+/**
+ * Converts hex-string to binary-string. Big numbers resistance.
+ */
+export function convertHexToBinary(hex: string): string {
+  hex = hex.replace("0x", "").toLowerCase();
+  let out = "";
+  for (const c of hex) {
+    switch (c) {
+      case '0': out += "0000"; break;
+      case '1': out += "0001"; break;
+      case '2': out += "0010"; break;
+      case '3': out += "0011"; break;
+      case '4': out += "0100"; break;
+      case '5': out += "0101"; break;
+      case '6': out += "0110"; break;
+      case '7': out += "0111"; break;
+      case '8': out += "1000"; break;
+      case '9': out += "1001"; break;
+      case 'a': out += "1010"; break;
+      case 'b': out += "1011"; break;
+      case 'c': out += "1100"; break;
+      case 'd': out += "1101"; break;
+      case 'e': out += "1110"; break;
+      case 'f': out += "1111"; break;
+      default: return "";
+    }
+  }
+  return hex;
 }

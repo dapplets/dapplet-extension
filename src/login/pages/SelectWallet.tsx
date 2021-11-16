@@ -86,7 +86,7 @@ export class SelectWallet extends React.Component<Props, State> {
                                 <div style={{ flex: 'auto', marginLeft: '10px' }}>
                                     <div style={{ display: 'inline', color: 'rgba(0,0,0,.4)' }}>
                                         {/* {(x.default) ? <Icon name='star' /> : <Icon link name='star outline' onClick={() => this.setWalletFor(x.type)} />} */}
-                                        {(x.account) ? <span title={x.account} style={{ color: '#000', fontWeight: 'bold' }}>{x.account.substr(0, 6) + '...' + x.account.substr(38)}</span> : null}
+                                        {(x.account) ? <span title={x.account} style={{ color: '#000', fontWeight: 'bold' }}>{(x.account.indexOf('0x') !== -1) ? x.account.substr(0, 6) + '...' + x.account.substr(38) : x.account}</span> : null}
                                         <CheckIcon text='Copied' name='copy' style={{ marginLeft: '4px' }} onClick={() => navigator.clipboard.writeText(x.account)} />
                                     </div>
                                     {/* <Comment.Author style={{ display: 'inline' }}>{x.account}</Comment.Author> */}

@@ -16,7 +16,7 @@ export class ProxySigner extends ethers.Signer {
 
     async getAddress(): Promise<string> {
         const { getAddress } = await initBGFunctions(browser);
-        return getAddress(this._app, ChainTypes.ETHEREUM);
+        return getAddress(this._app, ChainTypes.ETHEREUM_GOERLI);
     }
 
     async signMessage(message: ethers.utils.BytesLike): Promise<string> {

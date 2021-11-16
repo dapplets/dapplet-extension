@@ -48,6 +48,8 @@ export default class GlobalConfigService {
             if (!config.preferedOverlayStorage) config.preferedOverlayStorage = this.getInitialConfig().preferedOverlayStorage;
             if (!config.ipfsGatewayUrl) config.ipfsGatewayUrl = this.getInitialConfig().ipfsGatewayUrl;
             if (!config.siaPortalUrl) config.siaPortalUrl = this.getInitialConfig().siaPortalUrl;
+            if (!config.nearNetworks) config.nearNetworks = this.getInitialConfig().nearNetworks;
+            if (!config.ethereumNetworks) config.ethereumNetworks = this.getInitialConfig().ethereumNetworks;
         }
 
         return config ?? this.getInitialConfig();
@@ -210,6 +212,40 @@ export default class GlobalConfigService {
         config.swarmPostageStampId = '59b7a1ef40a1b3143e9e80e7eb90175b83996fcf86f13480dbe0e21a732572e9';
         config.ipfsGatewayUrl = 'https://ipfs.kaleido.art';
         config.siaPortalUrl = 'https://siasky.net';
+        config.ethereumNetworks = [{
+            networkId: 'rinkeby',
+            chainId: 4,
+            nodeUrl: 'https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992',
+            explorerUrl: 'https://rinkeby.etherscan.io'
+        },{
+            networkId: 'goerli',
+            chainId: 5,
+            nodeUrl: 'https://goerli.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992',
+            explorerUrl: 'https://goerli.etherscan.io'
+        }];
+        config.nearNetworks = [{
+            networkId: "testnet",
+            nodeUrl: 'https://rpc.testnet.near.org/',
+            walletUrl: 'https://wallet.testnet.near.org/',
+            helperUrl: 'https://helper.testnet.near.org',
+            explorerUrl: 'https://explorer.testnet.near.org/',
+        }, {
+            networkId: "mainnet",
+            nodeUrl: "https://rpc.mainnet.near.org",
+            walletUrl: "https://wallet.mainnet.near.org",
+            helperUrl: "https://helper.mainnet.near.org",
+            explorerUrl: "https://explorer.mainnet.near.org"
+        }, {
+            networkId: "betanet",
+            nodeUrl: "https://rpc.betanet.near.org",
+            walletUrl: "https://wallet.betanet.near.org",
+            helperUrl: "https://helper.betanet.near.org",
+            explorerUrl: "https://explorer.betanet.near.org",
+        }, {
+            networkId: "local",
+            nodeUrl: "http://localhost:3030",
+            walletUrl: "http://localhost:4000/wallet"
+        }];
 
         return config;
     }
@@ -273,8 +309,8 @@ export default class GlobalConfigService {
             }
 
             // try find manifest by another paths
-            const success = await checkAndAdd(url) || 
-                await checkAndAdd(joinUrls(url, 'dapplet.json')) || 
+            const success = await checkAndAdd(url) ||
+                await checkAndAdd(joinUrls(url, 'dapplet.json')) ||
                 await checkAndAdd(joinUrls(url, 'index.json'));
 
             if (!success) throw Error('The registry is not available.');
@@ -576,5 +612,15 @@ export default class GlobalConfigService {
     async setSiaPortal(url: string) {
         if (typeOfUri(url) !== UriTypes.Http) throw new Error("URL must be a valid HTTP(S) address.");
         await this.updateConfig(c => c.siaPortalUrl = url);
+    }
+
+    async getNearNetworks() {
+        const config = await this.get();
+        return config.nearNetworks;
+    }
+
+    async getEthereumNetworks() {
+        const config = await this.get();
+        return config.ethereumNetworks;
     }
 }

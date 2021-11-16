@@ -8,27 +8,32 @@ import { browser } from "webextension-polyfill-ts";
 import { ConnectedWalletAccount, Connection, Contract, Near } from "near-api-js";
 import { JsonRpcProvider } from "near-api-js/lib/providers";
 import { generateGuid, timeoutPromise, waitTab } from "../../../../common/helpers";
+import { NearNetworkConfig } from "../../../../common/types";
 
 export default class implements NearWallet {
 
     private __nearWallet: CustomWalletConnection = null;
+    private _config: NearNetworkConfig;
+    private _lastUsageKey: string;
 
     private get _nearWallet() {
         if (!this.__nearWallet) {
             const near = new Near({
-                networkId: 'default',
-                nodeUrl: 'https://rpc.testnet.near.org',
-                walletUrl: 'https://wallet.testnet.near.org',
-                helperUrl: 'https://helper.testnet.near.org',
+                ...this._config,
                 deps: {
                     keyStore: new nearAPI.keyStores.BrowserLocalStorageKeyStore()
                 }
             });
 
-            this.__nearWallet = new CustomWalletConnection(near, null);
+            this.__nearWallet = new CustomWalletConnection(near, this._config.networkId);
         }
 
         return this.__nearWallet;
+    }
+
+    constructor(config: NearNetworkConfig) {
+        this._config = config;
+        this._lastUsageKey = `near_${config.networkId}_lastUsage`;
     }
 
     async getAddress(): Promise<string> {
@@ -58,7 +63,7 @@ export default class implements NearWallet {
 
     async isConnected() {
         const accountId = this._nearWallet.getAccountId();
-        return accountId && accountId.length > 0;
+        return !!accountId && accountId.length > 0;
     }
 
     async connectWallet(): Promise<void> {
@@ -96,7 +101,7 @@ export default class implements NearWallet {
         if (!accountId) throw new Error('No account_id params in callback URL');
 
         this._nearWallet.completeSignIn(accountId, publicKey, allKeys);
-        localStorage['near_lastUsage'] = new Date().toISOString();
+        localStorage[this._lastUsageKey] = new Date().toISOString();
     }
 
     async disconnectWallet() {
@@ -112,7 +117,7 @@ export default class implements NearWallet {
     }
 
     getLastUsage() {
-        return localStorage['near_lastUsage'];
+        return localStorage[this._lastUsageKey];
     }
 
     getAccount() {

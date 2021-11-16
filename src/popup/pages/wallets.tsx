@@ -8,7 +8,7 @@ import ReactTimeAgo from 'react-time-ago';
 
 import * as walletIcons from '../../common/resources/wallets';
 import { CheckIcon } from "../../common/react-components/CheckIcon";
-import { ChainTypes, DefaultSigners, WalletDescriptor } from "../../common/types";
+import { ChainTypes, DefaultSigners, WalletDescriptor, WalletTypes } from "../../common/types";
 
 interface IWalletsProps {
   isOverlay: boolean;
@@ -41,9 +41,9 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
     });
   }
 
-  async disconnectButtonClick(wallet: string) {
+  async disconnectButtonClick(chain: ChainTypes, wallet: WalletTypes) {
     const { disconnectWallet } = await initBGFunctions(browser);
-    await disconnectWallet(wallet);
+    await disconnectWallet(chain, wallet);
     await this.componentDidMount();
   }
 
@@ -60,7 +60,7 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
 
   async setWalletFor(type: string) {
     const { setWalletFor } = await initBGFunctions(browser);
-    await setWalletFor(type, DefaultSigners.EXTENSION, ChainTypes.ETHEREUM);
+    await setWalletFor(type, DefaultSigners.EXTENSION, ChainTypes.ETHEREUM_GOERLI);
     await this.componentDidMount();
   }
 
@@ -95,7 +95,7 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
                     </div>
                   </div>
                   <div>
-                    <Button onClick={() => this.disconnectButtonClick(x.type)} size='tiny' style={{ margin: '5px 0' }}>Disconnect</Button>
+                    <Button onClick={() => this.disconnectButtonClick(x.chain, x.type)} size='tiny' style={{ margin: '5px 0' }}>Disconnect</Button>
                   </div>
                 </div>
               ))}
