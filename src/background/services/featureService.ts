@@ -112,7 +112,9 @@ export default class FeatureService {
         // ToDo: save registry url of activate module?
         for (const hostname of hostnames) {
             const config = await this._globalConfigService.getSiteConfigById(hostname);
-            if (!isActive) version = config.activeFeatures[name].version;
+            if (!isActive && config.activeFeatures[name]) {
+                version = config.activeFeatures[name].version;
+            }
             config.activeFeatures[name] = {
                 version,
                 isActive,
