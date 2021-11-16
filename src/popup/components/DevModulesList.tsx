@@ -27,7 +27,11 @@ export class DevModulesList extends React.Component<Props, State> {
     const sorting = new TopologicalSort(nodes);
     modules.forEach(x => {
         const deps = [...Object.keys(x.versions[0]?.dependencies || {}), ...Object.keys(x.versions[0]?.interfaces || {})];
-        deps.forEach(d => sorting.addEdge(d + '#' + DEFAULT_BRANCH_NAME, x.module.name + '#' + x.versions[0]?.branch))
+        deps.forEach(d => {
+          if (nodes.has(d + '#' + DEFAULT_BRANCH_NAME)) {
+            sorting.addEdge(d + '#' + DEFAULT_BRANCH_NAME, x.module.name + '#' + x.versions[0]?.branch);
+          }
+        })
     });
 
     const sorted = [...sorting.sort().values()].map(x => x.node);
