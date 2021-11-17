@@ -197,7 +197,7 @@ export default class GlobalConfigService {
             { account: "team.dapplet-base.eth" }
         ];
         config.userSettings = {};
-        config.providerUrl = 'https://goerli.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992';
+        config.providerUrl = 'https://goerli.mooo.com/';
         config.swarmGatewayUrl = 'https://swarmgateway.mooo.com/';
         config.walletsUsage = {};
         config.identityContract = '0xf6b3a0B20281796D465bB8613e233BE30be07084';
@@ -220,7 +220,7 @@ export default class GlobalConfigService {
         },{
             networkId: 'goerli',
             chainId: 5,
-            nodeUrl: 'https://goerli.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992',
+            nodeUrl: 'https://goerli.mooo.com/',
             explorerUrl: 'https://goerli.etherscan.io'
         }];
         config.nearNetworks = [{
