@@ -465,11 +465,12 @@ export default class GlobalConfigService {
 
         try {
             const body = JSON.stringify({ "jsonrpc": "2.0", "method": "eth_blockNumber", "params": [], "id": 0 });
-            const response = await fetch(url, { method: 'POST', body });
+            const headers = { 'Content-Type': 'application/json' };
+            const response = await fetch(url, { method: 'POST', body, headers });
             const json = await response.json();
             if (!json.result) throw new Error();
         } catch (err) {
-            throw new Error('The server returns invalid response. Make sure the server complies with the Ethereum JSON-RPC Specification.');
+            throw new Error('The server returns invalid response. Make sure the server complies with the Ethereum JSON RPC Specification.');
         }
 
         await this.updateConfig(c => c.providerUrl = url);
