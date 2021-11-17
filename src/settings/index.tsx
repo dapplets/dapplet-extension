@@ -13,6 +13,7 @@ import Form from "@rjsf/semantic-ui";
 import NOLOGO_PNG from '../common/resources/no-logo.png';
 import * as tracing from '../common/tracing';
 import { joinUrls } from "../common/helpers";
+import { CONTEXT_ID_WILDCARD } from "../common/constants";
 
 tracing.startTracing();
 
@@ -105,7 +106,9 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     private async _reloadFeature() {
         const { reloadFeature } = await initBGFunctions(browser);
-        await reloadFeature(this.state.mi.name, this.state.vi.version, this.state.mi.hostnames, this.state.mi.order, this.state.mi.sourceRegistry.url);
+        const isEverywhere = true;
+        const targetContextIds = isEverywhere ? [CONTEXT_ID_WILDCARD] : this.state.mi.hostnames;
+        await reloadFeature(this.state.mi.name, this.state.vi.version, targetContextIds, this.state.mi.order, this.state.mi.sourceRegistry.url);
     }
 
     private async _resetSettings() {
