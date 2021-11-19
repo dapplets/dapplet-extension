@@ -259,7 +259,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
                 <List divided relaxed>
                   {features.map((f, i) => (
                     <Dapplet
-                      key={i}
+                      key={f.name}
                       index={i}
                       feature={f}
                       onSwitchChange={this.handleSwitchChange.bind(this)}

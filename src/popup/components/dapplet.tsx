@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as semver from "semver";
 
 import { Checkbox, Icon, Label, List, Popup } from "semantic-ui-react";
 import ManifestDTO from "../../background/dto/manifestDTO";
@@ -118,7 +119,7 @@ export class Dapplet extends React.Component<Props, State> {
               </Popup>
             ) : null}
             {f.isActive && f.activeVersion && f.lastVersion ? (
-              f.lastVersion === f.activeVersion ? (
+              !semver.gt(f.lastVersion, f.activeVersion) ? (
                 <Label
                   style={{ cursor: "default" }}
                   horizontal
