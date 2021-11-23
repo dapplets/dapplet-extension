@@ -255,14 +255,14 @@ export default class Core {
         return conn;
     }
 
-    public async wallet<M>(cfg: { type: 'ethereum', network: 'rinkeby', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & AutoProperties<M> & Connection>
+    public async wallet<M>(cfg: { type: 'ethereum', network: 'goerli', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & AutoProperties<M> & Connection>
     public async wallet<M>(cfg: { type: 'near', network: 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
     public async wallet<M>(cfg: { type: 'near', network: 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
-    public async wallet<M>(cfg: { type: 'ethereum' | 'near', network: 'rinkeby' | 'testnet' | 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
+    public async wallet<M>(cfg: { type: 'ethereum' | 'near', network: 'goerli' | 'testnet' | 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
         if (!cfg || !cfg.type || !cfg.network) throw new Error("\"type\" and \"network\" are required in Core.wallet().");
         if (cfg.type !== 'near' && cfg.type !== 'ethereum') throw new Error("The \"ethereum\" and \"near\" only are supported in Core.wallet().");
         if (cfg.type === 'near' && !(cfg.network == 'testnet' || cfg.network == 'mainnet')) throw new Error("\"testnet\" and \"mainnet\" network only is supported in \"near\" type wallet.");
-        if (cfg.type === 'ethereum' && cfg.network !== 'rinkeby') throw new Error("\"rinkeby\" network only is supported in \"ethereum\" type wallet.");
+        if (cfg.type === 'ethereum' && cfg.network !== 'goerli') throw new Error("\"goerli\" network only is supported in \"ethereum\" type wallet.");
 
         const chainNetwork = cfg.type + '/' + cfg.network;
 
@@ -349,7 +349,7 @@ export default class Core {
     public contract(type: 'near', address: string, options: { viewMethods: string[]; changeMethods: string[] }, app?: string): any
     public contract(type: 'near' | 'ethereum', address: string, options: any, app?: string): any {
         if (type === 'ethereum') {
-            return ethereum.createContractWrapper(app, { network: 'rinkeby'}, address, options);
+            return ethereum.createContractWrapper(app, { network: 'goerli'}, address, options);
         } else if (type === 'near') {
             return near.createContractWrapper(app, { network: 'testnet' }, address, options);
         } else {
