@@ -9,11 +9,18 @@ import { Bus } from '../common/bus';
 import ModuleInfo from '../background/models/moduleInfo';
 import { DefaultConfig, SchemaConfig } from '../common/types';
 import VersionInfo from '../background/models/versionInfo';
-import Form from "@rjsf/semantic-ui";
 import NOLOGO_PNG from '../common/resources/no-logo.png';
 import * as tracing from '../common/tracing';
 import { joinUrls } from "../common/helpers";
 import { CONTEXT_ID_WILDCARD } from "../common/constants";
+
+import { withTheme } from '@rjsf/core';
+import { Theme as SemanticUITheme } from '@rjsf/semantic-ui';
+import SelectWidget from './SelectWidget';
+
+
+SemanticUITheme.widgets.SelectWidget = SelectWidget;
+const Form = withTheme(SemanticUITheme);
 
 tracing.startTracing();
 

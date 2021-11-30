@@ -346,12 +346,13 @@ export default class Core {
     public storage: AppStorage;
 
     public contract(type: 'ethereum', address: string, options: Abi, app?: string): any
-    public contract(type: 'near', address: string, options: { viewMethods: string[]; changeMethods: string[] }, app?: string): any
+    public contract(type: 'near', address: string, options: { viewMethods: string[]; changeMethods: string[], network?: 'mainnet' | 'testnet' }, app?: string): any
     public contract(type: 'near' | 'ethereum', address: string, options: any, app?: string): any {
         if (type === 'ethereum') {
             return ethereum.createContractWrapper(app, { network: 'goerli'}, address, options);
         } else if (type === 'near') {
-            return near.createContractWrapper(app, { network: 'testnet' }, address, options);
+            const network = options.network ?? 'testnet';
+            return near.createContractWrapper(app, { network }, address, options);
         } else {
             throw new Error("\"ethereum\" and \"near\" contracts only are supported.");
         }
