@@ -33,6 +33,7 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
         const newUrl = new URL(this._walletBaseUrl + LOGIN_WALLET_URL_SUFFIX);
         newUrl.searchParams.set('success_url', options.successUrl || currentUrl.href);
         newUrl.searchParams.set('failure_url', options.failureUrl || currentUrl.href);
+        newUrl.searchParams.set('referrer', 'Dapplets Extension');
         if (options.contractId) {
             newUrl.searchParams.set('contract_id', options.contractId);
             const accessKey = nearAPI.utils.KeyPair.fromRandom('ed25519');
