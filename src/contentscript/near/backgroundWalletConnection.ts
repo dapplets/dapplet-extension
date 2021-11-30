@@ -38,6 +38,7 @@ export class BackgroundWalletConnection extends nearAPI.WalletConnection {
             .map(serialized => Buffer.from(serialized).toString('base64'))
             .join(','));
         newUrl.searchParams.set('callbackUrl', callbackUrl || currentUrl.href);
+        newUrl.searchParams.set('referrer', 'Dapplets Extension');
 
         const { createTab, waitClosingTab } = await initBGFunctions(browser);
         const tab = await createTab(newUrl.toString());

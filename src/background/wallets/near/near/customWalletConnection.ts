@@ -54,6 +54,7 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
             .map(serialized => Buffer.from(serialized).toString('base64'))
             .join(','));
         newUrl.searchParams.set('callbackUrl', callbackUrl || currentUrl.href);
+        newUrl.searchParams.set('referrer', 'Dapplets Extension');
 
         const tab = await browser.tabs.create({ url: newUrl.toString() });
         await waitClosingTab(tab.id, tab.windowId);
