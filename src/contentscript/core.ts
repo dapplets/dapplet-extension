@@ -207,7 +207,7 @@ export default class Core {
     public toggleOverlay() {
         if (!this._popupOverlay?.registered) {
             const pairingUrl = browser.runtime.getURL('popup.html');
-            this._popupOverlay = this.overlayManager.createOverlay(pairingUrl, 'Dapplets', true);
+            this._popupOverlay = this.overlayManager.createOverlay(pairingUrl, 'Dapplets', null, true);
             this._popupOverlay.open();
         } else {
             this.overlayManager.toggle();
@@ -322,8 +322,7 @@ export default class Core {
     public overlay<M>(cfg: { name: string, url?: string, title: string, source?: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void }
     public overlay<M>(cfg: { name?: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void }
     public overlay<M>(cfg: { name: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void } {
-        const _overlay = this.overlayManager.createOverlay(cfg.url, cfg.title);
-        _overlay.source = cfg.source;
+        const _overlay = this.overlayManager.createOverlay(cfg.url, cfg.title, cfg.source);
         const conn = Connection.create<M>(_overlay, eventDef);
         const overrides = {
             isOpen() {

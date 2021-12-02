@@ -19,6 +19,6 @@ export interface IOverlayManager {
     close(): void;
     getOverlays(): IOverlay[];
     toggle(): void;
-    createOverlay(url: string, title: string, hidden?: boolean): IOverlay;
+    createOverlay(url: string, title: string, source?: string, hidden?: boolean): IOverlay;
     destroy(): void;
 }

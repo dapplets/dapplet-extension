@@ -9,14 +9,13 @@ export class OverlayIframe implements IOverlay {
     onclose: Function;
     loader: HTMLDivElement;
     onregisteredchange: (value: boolean) => void;
-    source: string = null;
 
     private _id: string;
     private _callbacks = new Set<Function>();
 
-    constructor(public uri: string, public title: string, public hidden: boolean = false, private _iframeMessenger: JsonRpc) {
+    constructor(public uri: string, public title: string, public source: string = null, public hidden: boolean = false, private _iframeMessenger: JsonRpc) {
         this._id = generateGuid();
-        this._iframeMessenger.call('OVERLAY_CREATE', [this._id, uri, title, hidden], window.top);
+        this._iframeMessenger.call('OVERLAY_CREATE', [this._id, uri, title, source, hidden], window.top);
         this._iframeMessenger.on('OVERLAY_EXEC', (id: string, topic: string, message: string) => {
             if (id !== this._id) return;
             this._callbacks.forEach(x => x(topic, message));

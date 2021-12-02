@@ -316,8 +316,8 @@ export class OverlayManager implements IOverlayManager {
         this._panel.remove();
     }
 
-    public createOverlay(uri: string, title: string, hidden: boolean = false): Overlay {
-        const overlay = new Overlay(this, uri, title, hidden);
+    public createOverlay(uri: string, title: string, source: string = null, hidden: boolean = false): Overlay {
+        const overlay = new Overlay(this, uri, title, source, hidden);
         return overlay;
     }
 }
