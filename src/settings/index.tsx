@@ -37,6 +37,7 @@ interface IIndexState {
     devMode: boolean;
     hiddenProperties: string[];
     swarmGatewayUrl: string;
+    isEdited: boolean;
 }
 
 class Index extends React.Component<IIndexProps, IIndexState> {
@@ -55,7 +56,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             loading: false,
             devMode: false,
             hiddenProperties: [],
-            swarmGatewayUrl: ''
+            swarmGatewayUrl: '',
+            isEdited: false
         };
 
         this.bus.subscribe('data', async ({ mi, vi, schemaConfig, defaultConfig }) => {
@@ -108,7 +110,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         await setAllUserSettings(this.state.mi.name, data);
         await this._refreshData();
         await this._reloadFeature();
-        this.setState({ loading: false });
+        this.setState({ loading: false, isEdited: false });
     }
 
     private async _reloadFeature() {
@@ -124,7 +126,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         await clearUserSettings(this.state.mi.name);
         await this._refreshData();
         await this._reloadFeature();
-        this.setState({ loading: false });
+        this.setState({ loading: false, isEdited: false });
     }
 
     render() {
@@ -165,9 +167,14 @@ class Index extends React.Component<IIndexProps, IIndexState> {
                         </Card>
 
                         {/* Form */}
-                        {(schemaConfig && schemaConfig.properties) ? <Form schema={schemaConfig || {}} onSubmit={e => this._saveData(e.formData)} formData={data}>
+                        {(schemaConfig && schemaConfig.properties) ? <Form 
+                            schema={schemaConfig || {}} 
+                            onSubmit={e => this._saveData(e.formData)} 
+                            formData={data}
+                            onChange={(e) => this.setState({ isEdited: true, data: e.formData })}
+                        >
                             <div>
-                                <Button type="submit" primary disabled={this.state.loading} loading={this.state.loading}>Save and Reload</Button>
+                                <Button type="submit" primary disabled={this.state.loading || !this.state.isEdited} loading={this.state.loading}>Save and Reload</Button>
                                 <Button basic disabled={this.state.loading} onClick={() => this._resetSettings()}>Reset</Button>
                             </div>
                         </Form> : <p>No settings available for this dapplet.</p>}
