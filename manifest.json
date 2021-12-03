@@ -35,6 +35,18 @@
       ],
       "run_at": "document_idle",
       "all_frames": true
+    },
+    {
+      "matches": [
+        "https://wallet.near.org/*",
+        "https://wallet.mainnet.near.org/*",
+        "https://wallet.testnet.near.org/*"
+      ],
+      "js": [
+        "documentstart.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
     }
   ],
   "web_accessible_resources": [
