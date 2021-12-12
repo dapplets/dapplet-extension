@@ -1,19 +1,18 @@
 import { providers, Signer, utils } from 'ethers';
-import { browser } from 'webextension-polyfill-ts';
-import { getCurrentTab } from '../../common/helpers';
 import wallets from '../wallets';
 import GlobalConfigService from './globalConfigService';
 import { GenericWallet } from '../wallets/interface';
 import { EthereumWallet } from '../wallets/ethereum/interface';
 import { NearWallet } from '../wallets/near/interface';
 import { ChainTypes, DefaultSigners, WalletDescriptor, WalletTypes } from '../../common/types';
+import { OverlayService } from './overlayService';
 
 export class WalletService {
 
     private _map: Promise<{ [chain: string]: { [wallet: string]: GenericWallet } }>;
     private _signersByApp = new Map<string, Signer>();
 
-    constructor(private _globalConfigService: GlobalConfigService) { }
+    constructor(private _globalConfigService: GlobalConfigService, private _overlayService: OverlayService) { }
 
     async connectWallet(chain: ChainTypes, wallet: WalletTypes) {
         // ToDo: is need chain argument?
@@ -126,22 +125,6 @@ export class WalletService {
         await this._globalConfigService.setWalletsUsage(wallets);
     }
 
-    public async pairWalletViaOverlay(chain: ChainTypes): Promise<void> {
-        const activeTab = await getCurrentTab();
-        if (!activeTab) return;
-        // ToDo: pass chain
-        const [error, result] = await browser.tabs.sendMessage(activeTab.id, {
-            type: "OPEN_PAIRING_OVERLAY",
-            payload: {
-                topic: 'pair',
-                args: [chain]
-            }
-        });
-        // ToDo: use native throw in error
-        if (error) throw new Error(error);
-        return result;
-    }
-
     public async prepareWalletFor(app: string | DefaultSigners, chain: ChainTypes, cfg?: { username: string, domainId: number, fullname?: string, img?: string }) {
         const defaults = await this._getWalletFor(app);
         const defaultWallet = defaults[chain];
@@ -149,9 +132,9 @@ export class WalletService {
         if (!defaultWallet) {
             // is login required?
             if (cfg && cfg.username && cfg.domainId) {
-                return this._loginViaOverlay(app, chain, cfg);
+                return this._overlayService.loginViaOverlay(app, chain, cfg);
             } else {
-                return this._selectWalletViaOverlay(app, chain);
+                return this._overlayService.selectWalletViaOverlay(app, chain);
             }
         }
 
@@ -161,9 +144,9 @@ export class WalletService {
         if (!suitableWallet || !suitableWallet.connected) {
             // is login required?
             if (cfg && cfg.username && cfg.domainId) {
-                return this._loginViaOverlay(app, chain, cfg);
+                return this._overlayService.loginViaOverlay(app, chain, cfg);
             } else {
-                return this._selectWalletViaOverlay(app, chain);
+                return this._overlayService.selectWalletViaOverlay(app, chain);
             }
         }
     }
@@ -193,13 +176,12 @@ export class WalletService {
         }
     }
 
-    public async near_sendCustomRequest(app: string | DefaultSigners, network: string, method: string, params: any[]): Promise<any> {
+    public async near_sendCustomRequest(app: string | DefaultSigners, network: string, sessionId: string, method: string, params: any[]): Promise<any> {
         const type = (network === 'testnet') ? ChainTypes.NEAR_TESTNET : (network === 'mainnet') ? ChainTypes.NEAR_MAINNET : null;
         if (type === null) throw new Error('Unsupported network for NEAR Protocol blockchain.');
         const wallet = await this._getInternalSignerFor(app, type, false) as NearWallet;
         return wallet.sendCustomRequest(method, params);
     }
-
 
     public async near_getAccount(app: string | DefaultSigners) {
         const wallet = await this._getInternalSignerFor(app, ChainTypes.NEAR_TESTNET, false) as NearWallet;
@@ -231,7 +213,7 @@ export class WalletService {
 
     private async _pairSignerFor(app: string | DefaultSigners, chain: ChainTypes): Promise<GenericWallet> {
         // pairing
-        await this.pairWalletViaOverlay(chain);
+        await this._overlayService.pairWalletViaOverlay(chain);
         
         const map = await this._getWalletsMap();
 
@@ -258,38 +240,6 @@ export class WalletService {
             }
         }
         return arr;
-    }
-
-    private async _loginViaOverlay(app: string | DefaultSigners, chain: ChainTypes, cfg?: { username: string, domainId: number, fullname?: string, img?: string }): Promise<void> {
-        const activeTab = await getCurrentTab();
-        if (!activeTab) return;
-        const [error, result] = await browser.tabs.sendMessage(activeTab.id, {
-            type: "OPEN_LOGIN_OVERLAY",
-            payload: {
-                topic: 'login',
-                args: [app, chain, cfg]
-            }
-        });
-
-        // ToDo: use native throw in error
-        if (error) throw new Error(error);
-        return result;
-    }
-
-    private async _selectWalletViaOverlay(app: string | DefaultSigners, chain: ChainTypes): Promise<void> {
-        const activeTab = await getCurrentTab();
-        if (!activeTab) return;
-        const [error, result] = await browser.tabs.sendMessage(activeTab.id, {
-            type: "OPEN_LOGIN_OVERLAY",
-            payload: {
-                topic: 'login',
-                args: [app, chain]
-            }
-        });
-
-        // ToDo: use native throw in error
-        if (error) throw new Error(error);
-        return result;
     }
 
     // returns: walletType

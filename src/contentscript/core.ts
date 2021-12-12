@@ -9,10 +9,12 @@ import { Swiper } from "./swiper";
 import { AutoProperties, EventDef, Connection } from "./connection";
 import { WsJsonRpc } from "./wsJsonRpc";
 import { AppStorage } from "./appStorage";
-import { SystemOverlayTabs } from "../common/types";
+import { SystemOverlayTabs, LoginRequest } from "../common/types";
 import { parseShareLink } from "../common/helpers";
 import * as near from "./near";
 import * as ethereum from "./ethereum";
+import { LoginSession } from "./login/login-session";
+import { LoginRequestSettings } from "./login/types";
 
 type Abi = any;
 
@@ -56,6 +58,8 @@ export default class Core {
                         return this.waitLoginOverlay(message.payload.topic, message.payload.args).then(() => ([null, 'ready'])).catch((err) => ([err]));
                     } else if (message.type === 'OPEN_POPUP_OVERLAY') {
                         return Promise.resolve(this.overlayManager.openPopup(message.payload.path));
+                    } else if (message.type === 'OPEN_SYSTEM_OVERLAY') {
+                        return this.waitSystemOverlay(message.payload).then((x) => ([null, x])).catch((err) => ([err]));
                     }
                 }
             });
@@ -191,16 +195,20 @@ export default class Core {
         overlay.open(() => overlay.send('data', [payload]));
     }
 
-    public async waitSystemOverlay(payload: { activeTab: SystemOverlayTabs, payload: any }): Promise<void> {
-        const pairingUrl = browser.runtime.getURL('overlay.html');
-        const overlay = this.overlayManager.createOverlay(pairingUrl, 'System');
-        overlay.open(() => overlay.send('data', [payload]));
-        overlay.onMessage((topic) => {
-            if (topic === 'cancel') {
-                overlay.close();
-            } else if (topic === 'ready') {
-                overlay.close();
-            }
+    public async waitSystemOverlay(payload: { activeTab: SystemOverlayTabs, payload: any }): Promise<any> {
+        return new Promise<void>((resolve, reject) => {
+            const pairingUrl = browser.runtime.getURL('overlay.html');
+            const overlay = this.overlayManager.createOverlay(pairingUrl, 'System');
+            overlay.open(() => overlay.send('data', [payload]));
+            overlay.onMessage((topic, message) => {
+                if (topic === 'cancel') {
+                    overlay.close();
+                    reject();
+                } else if (topic === 'ready') {
+                    overlay.close();
+                    resolve(message);
+                }
+            });
         });
     }
 
@@ -384,5 +392,23 @@ export default class Core {
         const base64Payload = btoa(JSON.stringify(payload));
         const WEB_PROXY_URL = 'https://augm.link/live/';
         return WEB_PROXY_URL + urlNoPayload + '#dapplet/' + base64Payload;
+    }
+
+    public async sessions(moduleName?: string): Promise<LoginSession[]> {
+        const { getSessions } = await initBGFunctions(browser);
+        const sessions = await getSessions(moduleName);
+        return sessions.map(x => new LoginSession(x));
+    }
+
+    public async login(request: LoginRequest, settings?: LoginRequestSettings, moduleName?: string): Promise<LoginSession>
+    public async login(request: LoginRequest[], settings?: LoginRequestSettings, moduleName?: string): Promise<LoginSession[]>
+    public async login(request: LoginRequest | LoginRequest[], settings?: LoginRequestSettings, moduleName?: string): Promise<LoginSession | LoginSession[]> {
+        if (Array.isArray(request)) {
+            return Promise.all(request.map(x => this.login(x, settings, moduleName)));
+        }
+
+        const { createSession } = await initBGFunctions(browser);
+        const session = await createSession(moduleName, request);
+        return new LoginSession(session);
     }
 }

@@ -8,6 +8,7 @@ import { areModulesEqual, formatModuleId, joinUrls, multipleReplace, parseModule
 import VersionInfo from "../background/models/versionInfo";
 import { AppStorage } from "./appStorage";
 import { DefaultConfig, SchemaConfig } from "../common/types";
+import { __decorate } from "./global";
 
 type RegistriedModule = {
     manifest: VersionInfo,
@@ -277,7 +278,9 @@ export class Injector {
                     contextIds: ['*'], // ToDo: Replace wildcard on real context IDs
                     moduleId: formatModuleId(manifest),
                     registry: manifest.registryUrl
-                })
+                }),
+                sessions: () => core.sessions(manifest.name),
+                login: (req, settings) => core.login(req, settings, manifest.name),
             };
 
             let newBranch: string = null;
@@ -387,8 +390,8 @@ export class Injector {
             }
 
             try {
-                const execScript = new Function('Core', 'Inject', 'Injectable', script);
-                execScript(coreWrapper, injectDecorator, injectableDecorator);
+                const execScript = new Function('Core', 'Inject', 'Injectable', '__decorate', script);
+                execScript(coreWrapper, injectDecorator, injectableDecorator, __decorate);
             } catch (err) {
                 // ToDo: remove module from this.registry
                 console.error(err);

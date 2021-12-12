@@ -1,0 +1,59 @@
+import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { browser } from "webextension-polyfill-ts";
+import * as near from "../near";
+import * as ethereum from "../ethereum";
+
+export class LoginSession {
+    sessionId: string = null;
+    moduleName: string = null;
+    authMethod: string = null;
+    walletType: string = null;
+    expiresAt: string = null;
+    createdAt: string = null;
+    loginConfirmationId: string = null;
+
+    private get _network() {
+        return this.authMethod.split('/')[0];
+    }
+
+    private get _chain() {
+        return this.authMethod.split('/')[1];
+    }
+
+    private get _isExpired() {
+        const expiresAt = new Date(this.expiresAt).getTime();
+        const now = Date.now();
+        return expiresAt < now;
+    }
+
+    constructor(serializedSession: any) {
+        Object.assign(this, serializedSession);
+    }
+
+    async isValid(): Promise<boolean> {
+        if (this._isExpired) return false;
+        const { isValidSession } = await initBGFunctions(browser);
+        return await isValidSession(this.sessionId);
+    }
+
+    async logout() {
+        const { killSession } = await initBGFunctions(browser);
+        await killSession(this.sessionId);
+    }
+
+    async wallet() {
+        if (!await this.isValid()) return null;
+        return this._getWalletObject();
+    }
+
+    private _getWalletObject() {
+        if (this._network === 'ethereum') {
+            // ToDo: events def
+            return ethereum.createWalletConnection(this.moduleName, { network: this._chain });
+        } else if (this._network === 'near') {
+            return near.createWalletConnection(this.moduleName, { network: this._chain });
+        } else {
+            throw new Error('Invalid wallet type.');
+        }
+    };
+}

@@ -123,6 +123,7 @@ export default class extends ethers.Signer implements EthereumWallet {
         return localStorage['walletconnect_lastUsage'];
     }
 
+    // ToDo: move to OverlayService
     private async _showQR(uri: string) {
         const activeTab = await getCurrentTab();
         if (!activeTab) return;

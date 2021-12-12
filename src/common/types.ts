@@ -59,7 +59,8 @@ export type ModuleId = {
 }
 
 export enum SystemOverlayTabs {
-    DAPPLET_CONFIRMATION = 'DAPPLET_CONFIRMATION'
+    DAPPLET_CONFIRMATION = 'DAPPLET_CONFIRMATION',
+    LOGIN_SESSION = 'LOGIN_SESSION'
 }
 
 export type NearNetworkConfig = {
@@ -76,3 +77,8 @@ export type EthereumNetwrokConfig = {
     nodeUrl: string;
     explorerUrl?: string;
 }
+
+export type LoginRequest = {
+    authMethods: string[];
+    timeout: number;
+};

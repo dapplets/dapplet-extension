@@ -3,6 +3,7 @@ import { getCurrentTab } from '../../common/helpers';
 
 export class GuideService {
 
+  // ToDo: move to OverlayService
   public async openGuideOverlay(): Promise<void> {
       const activeTab = await getCurrentTab();
       if (!activeTab) return;

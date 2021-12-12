@@ -25,7 +25,7 @@ async function _sendWalletConnectTx(app: string, sowaIdOrRpcMethod, sowaMetadata
     }
 }
 
-export async function createWalletConnection<M>(app: string, cfg: { network: string }, eventDef: EventDef<any>) {
+export async function createWalletConnection<M>(app: string, cfg: { network: string }, eventDef?: EventDef<any>) {
     const transport = {
         _txCount: 0,
         _handler: null,

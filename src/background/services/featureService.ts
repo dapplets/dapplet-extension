@@ -579,6 +579,7 @@ export default class FeatureService {
         return versions;
     }
 
+    // ToDo: move to OverlayService
     public async openSettingsOverlay(mi: ManifestDTO) {
         const versions = await this.getVersions(mi.sourceRegistry.url, mi.name);
         const version = versions.sort(rcompare)[0]; // Last version by SemVer
@@ -592,6 +593,7 @@ export default class FeatureService {
         });
     }
 
+    // ToDo: move to OverlayService
     public async openDappletAction(moduleName: string, tabId: number) {
         return browser.tabs.sendMessage(tabId, {
             type: "OPEN_DAPPLET_ACTION",
@@ -599,6 +601,7 @@ export default class FeatureService {
         });
     }
 
+    // ToDo: move to OverlayService
     public async openDappletHome(moduleName: string, tabId: number) {
         return browser.tabs.sendMessage(tabId, {
             type: "OPEN_DAPPLET_HOME",

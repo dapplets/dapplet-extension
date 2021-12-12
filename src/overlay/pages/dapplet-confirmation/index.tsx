@@ -1,12 +1,12 @@
 import * as React from "react";
 import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { parseModuleName } from "../../common/helpers";
-import VersionInfo from "../../background/models/versionInfo";
-import ModuleInfo from "../../background/models/moduleInfo";
-import { DappletCard } from "../components/DappletCard";
+import { parseModuleName } from "../../../common/helpers";
+import VersionInfo from "../../../background/models/versionInfo";
+import ModuleInfo from "../../../background/models/moduleInfo";
+import { DappletCard } from "../../components/DappletCard";
 import { Accordion, Button, Icon } from "semantic-ui-react";
-import { bus } from "..";
+import { bus } from "../..";
 
 interface Props {
   data: {

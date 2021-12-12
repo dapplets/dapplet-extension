@@ -37,13 +37,13 @@ export class Bus {
         });
     }
 
-    publish(topic, ...args) {
+    publish(topic: string, message?: any) {
         const windowName = window.name;
-        const msg = JSON.stringify({ topic, args, windowName });
+        const msg = JSON.stringify({ topic, message, windowName });
         window.parent.postMessage(msg, '*');
     }
 
-    subscribe(topic, handler) {
+    subscribe(topic: string, handler: (...args: any[]) => void) {
         if (!this._callbacks[topic]) {
             this._callbacks[topic] = [];
         }
@@ -55,7 +55,7 @@ export class Bus {
         }
     }
 
-    unsubscribe(topic) {
+    unsubscribe(topic: string) {
         this._callbacks[topic] = [];
     }
 }

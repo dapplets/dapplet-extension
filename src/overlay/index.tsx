@@ -2,10 +2,14 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import '../common/semantic-ui-css/semantic.min.css';
 import './index.scss';
-import { browser } from "webextension-polyfill-ts";
-import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { Bus } from '../common/bus';
-import { App } from './pages/App';
+import { App } from './App';
+import * as tracing from '../common/tracing';
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+
+TimeAgo.addDefaultLocale(en);
+tracing.startTracing();
 
 type SystemOverlayData = {
   activeTab: string;

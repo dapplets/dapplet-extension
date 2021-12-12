@@ -17,22 +17,24 @@ import { IdentityService } from "./services/identityService";
 import { GuideService } from "./services/guideService";
 import { CONTEXT_ID_WILDCARD, ModuleTypes } from "../common/constants";
 import { OverlayService } from "./services/overlayService";
+import { SessionService } from "./services/sessionService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
 // ToDo: Think about WalletConnectService, SuspendService etc, which looks like singletons.
 tracing.startTracing();
 
+const overlayService = new OverlayService();
 const globalConfigService = new GlobalConfigService();
 const githubService = new GithubService(globalConfigService);
 const discordService = new DiscordService(globalConfigService);
-const walletService = new WalletService(globalConfigService);
+const walletService = new WalletService(globalConfigService, overlayService);
+const sessionService = new SessionService(walletService, overlayService);
 const featureService = new FeatureService(globalConfigService, walletService);
 const ensService = new EnsService(walletService);
 const proxyService = new ProxyService();
 const identityService = new IdentityService(globalConfigService, walletService);
 const guideService = new GuideService();
-const overlayService = new OverlayService();
 
 browser.runtime.onMessage.addListener(
   setupMessageListener({
@@ -42,7 +44,6 @@ browser.runtime.onMessage.addListener(
     connectWallet: walletService.connectWallet.bind(walletService),
     disconnectWallet: walletService.disconnectWallet.bind(walletService),
     getWalletDescriptors: walletService.getWalletDescriptors.bind(walletService),
-    pairWalletViaOverlay: walletService.pairWalletViaOverlay.bind(walletService),
     setWalletFor: walletService.setWalletFor.bind(walletService),
     unsetWalletFor: walletService.unsetWalletFor.bind(walletService),
     getAddress: walletService.getAddress.bind(walletService),
@@ -51,6 +52,12 @@ browser.runtime.onMessage.addListener(
     eth_sendCustomRequest: walletService.eth_sendCustomRequest.bind(walletService),
     eth_waitTransaction: walletService.eth_waitTransaction.bind(walletService),
     near_sendCustomRequest: walletService.near_sendCustomRequest.bind(walletService),
+
+    // SessionService
+    createSession: sessionService.createSession.bind(sessionService),
+    killSession: sessionService.killSession.bind(sessionService),
+    getSessions: sessionService.getSessions.bind(sessionService),
+    isValidSession: sessionService.isValidSession.bind(sessionService),
 
     // Upgrade Guide
     openGuideOverlay: guideService.openGuideOverlay.bind(guideService),
@@ -193,6 +200,7 @@ browser.runtime.onMessage.addListener(
 
     // Overlay Service
     openDeployOverlay: (mi, vi) => overlayService.openDeployOverlay(mi, vi),
+    pairWalletViaOverlay: overlayService.pairWalletViaOverlay.bind(walletService),
 
     // Helpers
     waitTab: (url) => waitTab(url),
@@ -295,6 +303,7 @@ globalConfigService.getPopupInOverlay().then((popupInOverlay) => {
 });
 
 browser.browserAction.onClicked.addListener((tab) => {
+  // ToDo: move to OverlayService
   return getCurrentTab().then((activeTab) => activeTab && browser.tabs.sendMessage(activeTab.id, { type: "OPEN_POPUP_OVERLAY", payload: { path: 'dapplets' } }));
 });
 
