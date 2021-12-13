@@ -58,6 +58,10 @@ browser.runtime.onMessage.addListener(
     killSession: sessionService.killSession.bind(sessionService),
     getSessions: sessionService.getSessions.bind(sessionService),
     isValidSession: sessionService.isValidSession.bind(sessionService),
+    getSessionItem: sessionService.getItem.bind(sessionService),
+    setSessionItem: sessionService.setItem.bind(sessionService),
+    removeSessionItem: sessionService.removeItem.bind(sessionService),
+    clearSessionItems: sessionService.clearItems.bind(sessionService),
 
     // Upgrade Guide
     openGuideOverlay: guideService.openGuideOverlay.bind(guideService),

@@ -5,6 +5,8 @@ import LoginSessionBrowserStorage from '../browserStorages/loginSessionBrowserSt
 import LoginConfirmationBrowserStorage from '../browserStorages/loginConfirmationBrowserStorage';
 import LoginSession from '../models/loginSession';
 import { OverlayService } from './overlayService';
+import SessionEntryBrowserStorage from '../browserStorages/sessionEntryBrowserStorage';
+import SessionEntry from '../models/sessionEntry';
 
 const DEFAULT_REQUEST_TIMEOUT = 1000 * 60 * 60 * 24 * 7;
 
@@ -12,6 +14,7 @@ export class SessionService {
 
     private _loginSessionBrowserStorage = new LoginSessionBrowserStorage();
     private _loginConfirmationBrowserStorage = new LoginConfirmationBrowserStorage();
+    private _sessionEntryBrowserStorage = new SessionEntryBrowserStorage();
 
     constructor(
         private _walletService: WalletService, 
@@ -36,6 +39,7 @@ export class SessionService {
 
     async killSession(sessionId: string): Promise<void> {
         await this._loginSessionBrowserStorage.deleteById(sessionId);
+        await this.clearItems(sessionId);
     }
 
     async createSession(moduleName: string, request: LoginRequest): Promise<LoginSession> {
@@ -65,5 +69,25 @@ export class SessionService {
         await this._loginSessionBrowserStorage.create(session);
 
         return session;
+    }
+
+    async getItem(sessionId: string, key: string): Promise<any> {
+        return this._sessionEntryBrowserStorage.getBySessionKey(sessionId, key);
+    }
+
+    async setItem(sessionId: string, key: string, value: any): Promise<void> {
+        const sessionEntry = new SessionEntry();
+        sessionEntry.sessionId = sessionId;
+        sessionEntry.key = key;
+        sessionEntry.value = value;
+        await this._sessionEntryBrowserStorage.create(sessionEntry);
+    }
+
+    async removeItem(sessionId: string, key: string): Promise<void> {
+        return this._sessionEntryBrowserStorage.deleteBySessionKey(sessionId, key);
+    }
+
+    async clearItems(sessionId: string): Promise<void> {
+        return this._sessionEntryBrowserStorage.clearBySessionKey(sessionId);
     }
 }

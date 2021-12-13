@@ -46,6 +46,26 @@ export class LoginSession {
         return this._getWalletObject();
     }
 
+    async getItem(key: string): Promise<any> {
+        const { getSessionItem } = await initBGFunctions(browser);
+        return getSessionItem(this.sessionId, key);
+    }
+
+    async setItem(key: string, value: any): Promise<void> {
+        const { setSessionItem } = await initBGFunctions(browser);
+        return setSessionItem(this.sessionId, key, value);
+    }
+
+    async removeItem(key: string): Promise<void> {
+        const { removeSessionItem } = await initBGFunctions(browser);
+        return removeSessionItem(this.sessionId, key);
+    }
+
+    async clear(): Promise<void> {
+        const { clearSessionItems } = await initBGFunctions(browser);
+        return clearSessionItems(this.sessionId);
+    }
+
     private _getWalletObject() {
         if (this._network === 'ethereum') {
             // ToDo: events def
