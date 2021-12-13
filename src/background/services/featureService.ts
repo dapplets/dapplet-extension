@@ -14,6 +14,7 @@ import { WalletService } from './walletService';
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
 import { StorageRef } from '../registries/registry';
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer';
+import { OverlayService } from './overlayService';
 
 export default class FeatureService {
     private _moduleManager: ModuleManager;
@@ -22,7 +23,8 @@ export default class FeatureService {
 
     constructor(
         private _globalConfigService: GlobalConfigService,
-        private _walletService: WalletService
+        private _walletService: WalletService,
+        private _overlayService: OverlayService
     ) {
         this._moduleManager = new ModuleManager(this._globalConfigService, this._walletService);
     }
@@ -579,34 +581,12 @@ export default class FeatureService {
         return versions;
     }
 
-    // ToDo: move to OverlayService
     public async openSettingsOverlay(mi: ManifestDTO) {
         const versions = await this.getVersions(mi.sourceRegistry.url, mi.name);
         const version = versions.sort(rcompare)[0]; // Last version by SemVer
         const vi = await this._moduleManager.registryAggregator.getVersionInfo(mi.name, DEFAULT_BRANCH_NAME, version);
         const dist = await this._moduleManager.loadModule(vi);
-        const activeTab = await getCurrentTab();
-        if (!activeTab) return;
-        browser.tabs.sendMessage(activeTab.id, {
-            type: "OPEN_SETTINGS_OVERLAY",
-            payload: { mi, vi, schemaConfig: dist.schemaConfig, defaultConfig: dist.defaultConfig }
-        });
-    }
-
-    // ToDo: move to OverlayService
-    public async openDappletAction(moduleName: string, tabId: number) {
-        return browser.tabs.sendMessage(tabId, {
-            type: "OPEN_DAPPLET_ACTION",
-            payload: { moduleName }
-        });
-    }
-
-    // ToDo: move to OverlayService
-    public async openDappletHome(moduleName: string, tabId: number) {
-        return browser.tabs.sendMessage(tabId, {
-            type: "OPEN_DAPPLET_HOME",
-            payload: { moduleName }
-        });
+        return await this._overlayService.openSettingsOverlay(mi, vi, dist.schemaConfig, dist.defaultConfig);
     }
 
     public async getResource(hashUris: StorageRef) {

@@ -12,7 +12,10 @@ export class WalletService {
     private _map: Promise<{ [chain: string]: { [wallet: string]: GenericWallet } }>;
     private _signersByApp = new Map<string, Signer>();
 
-    constructor(private _globalConfigService: GlobalConfigService, private _overlayService: OverlayService) { }
+    constructor(
+        private _globalConfigService: GlobalConfigService, 
+        private _overlayService: OverlayService
+    ) { }
 
     async connectWallet(chain: ChainTypes, wallet: WalletTypes) {
         // ToDo: is need chain argument?
@@ -257,7 +260,10 @@ export class WalletService {
         if (!this._map) {
             this._map = this._globalConfigService.getEthereumProvider().then(providerUrl => {
                 const map = {};
-                const config = { providerUrl };
+                const config = { 
+                    providerUrl,
+                    sendDataToPairingOverlay: this._overlayService.sendDataToPairingOverlay.bind(this._overlayService)
+                };
 
                 for (const chain in wallets) {
                     map[chain] = {};

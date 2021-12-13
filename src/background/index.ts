@@ -14,7 +14,6 @@ import { getCurrentTab, getCurrentContextIds, multipleReplace, reloadCurrentPage
 import GithubService from "./services/githubService";
 import DiscordService from "./services/discordService";
 import { IdentityService } from "./services/identityService";
-import { GuideService } from "./services/guideService";
 import { CONTEXT_ID_WILDCARD, ModuleTypes } from "../common/constants";
 import { OverlayService } from "./services/overlayService";
 import { SessionService } from "./services/sessionService";
@@ -24,17 +23,16 @@ import { SessionService } from "./services/sessionService";
 // ToDo: Think about WalletConnectService, SuspendService etc, which looks like singletons.
 tracing.startTracing();
 
-const overlayService = new OverlayService();
 const globalConfigService = new GlobalConfigService();
+const overlayService = new OverlayService();
+const proxyService = new ProxyService();
 const githubService = new GithubService(globalConfigService);
 const discordService = new DiscordService(globalConfigService);
 const walletService = new WalletService(globalConfigService, overlayService);
 const sessionService = new SessionService(walletService, overlayService);
-const featureService = new FeatureService(globalConfigService, walletService);
-const ensService = new EnsService(walletService);
-const proxyService = new ProxyService();
+const featureService = new FeatureService(globalConfigService, walletService, overlayService);
 const identityService = new IdentityService(globalConfigService, walletService);
-const guideService = new GuideService();
+const ensService = new EnsService(walletService);
 
 browser.runtime.onMessage.addListener(
   setupMessageListener({
@@ -64,7 +62,7 @@ browser.runtime.onMessage.addListener(
     clearSessionItems: sessionService.clearItems.bind(sessionService),
 
     // Upgrade Guide
-    openGuideOverlay: guideService.openGuideOverlay.bind(guideService),
+    openGuideOverlay: overlayService.openGuideOverlay.bind(overlayService),
 
     // SuspendService
     getSuspendityByHostname: SuspendService.getSuspendityByHostname,
@@ -99,8 +97,6 @@ browser.runtime.onMessage.addListener(
     editModuleInfo: (registryUri, targetStorages, module) => featureService.editModuleInfo(registryUri, targetStorages, module),
     getVersions: (registryUri, moduleName) => featureService.getVersions(registryUri, moduleName),
     openSettingsOverlay: (mi) => featureService.openSettingsOverlay(mi),
-    openDappletAction: (name, tabId) => featureService.openDappletAction(name, tabId),
-    openDappletHome: (name, tabId) => featureService.openDappletHome(name, tabId),
     removeDapplet: (name, hostnames) => featureService.removeDapplet(name, hostnames),
     getResource: (hashUris) => featureService.getResource(hashUris),
 
@@ -203,8 +199,10 @@ browser.runtime.onMessage.addListener(
     queryTab: (queryInfo) => browser.tabs.query(queryInfo),
 
     // Overlay Service
-    openDeployOverlay: (mi, vi) => overlayService.openDeployOverlay(mi, vi),
-    pairWalletViaOverlay: overlayService.pairWalletViaOverlay.bind(walletService),
+    openDeployOverlay: overlayService.openDeployOverlay.bind(overlayService),
+    pairWalletViaOverlay: overlayService.pairWalletViaOverlay.bind(overlayService),
+    openDappletHome: overlayService.openDappletHome.bind(overlayService),
+    openDappletAction: overlayService.openDappletAction.bind(overlayService),
 
     // Helpers
     waitTab: (url) => waitTab(url),
@@ -306,10 +304,7 @@ globalConfigService.getPopupInOverlay().then((popupInOverlay) => {
   });
 });
 
-browser.browserAction.onClicked.addListener((tab) => {
-  // ToDo: move to OverlayService
-  return getCurrentTab().then((activeTab) => activeTab && browser.tabs.sendMessage(activeTab.id, { type: "OPEN_POPUP_OVERLAY", payload: { path: 'dapplets' } }));
-});
+browser.browserAction.onClicked.addListener(() => overlayService.openPopupOverlay('dapplets'));
 
 // Set predefined configuration when extension is installed
 browser.runtime.onInstalled.addListener(async (details) => {

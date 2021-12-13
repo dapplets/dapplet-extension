@@ -9,6 +9,7 @@ import { getCurrentTab } from '../../../common/helpers';
 export default class extends ethers.Signer implements EthereumWallet {
     
     public provider: ethers.providers.JsonRpcProvider;
+    private _sendDataToPairingOverlay: (topic: string, args: any[]) => void;
     private __walletconnect?: WalletConnect;
 
     private get _walletconnect() {
@@ -30,9 +31,13 @@ export default class extends ethers.Signer implements EthereumWallet {
         this.__walletconnect = v;
     }
 
-    constructor(config: { providerUrl: string }) {
+    constructor(config: { 
+        providerUrl: string, 
+        sendDataToPairingOverlay: (topic: string, args: any[]) => void 
+    }) {
         super();
         this.provider = new ethers.providers.JsonRpcProvider(config.providerUrl);
+        this._sendDataToPairingOverlay = config.sendDataToPairingOverlay;
     }
 
     async getAddress(): Promise<string> {
@@ -123,16 +128,7 @@ export default class extends ethers.Signer implements EthereumWallet {
         return localStorage['walletconnect_lastUsage'];
     }
 
-    // ToDo: move to OverlayService
     private async _showQR(uri: string) {
-        const activeTab = await getCurrentTab();
-        if (!activeTab) return;
-        const [error, result] = await browser.tabs.sendMessage(activeTab.id, {
-            type: "OPEN_PAIRING_OVERLAY",
-            payload: {
-                topic: 'walletconnect',
-                args: [uri]
-            }
-        });
+        this._sendDataToPairingOverlay('walletconnect', [uri]);
     }
 }
