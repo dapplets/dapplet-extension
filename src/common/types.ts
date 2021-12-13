@@ -80,5 +80,10 @@ export type EthereumNetwrokConfig = {
 
 export type LoginRequest = {
     authMethods: string[];
-    timeout: number;
+    timeout?: number;
+    role?: string;
+    help?: string;
+    // target?: string;
+    secureLogin?: 'required' | 'optional' | 'disabled';
+    // from?: 'me' | 'any' | 'disabled';
 };

@@ -123,4 +123,8 @@ export default class implements NearWallet {
     getAccount() {
         return this._nearWallet.account();
     }
+    
+    async signMessage(message: string): Promise<string> {
+        throw new Error('Not implemented');
+    }
 }

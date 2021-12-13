@@ -1,19 +1,19 @@
 import { generateGuid } from '../../common/helpers';
-import { ChainTypes, LoginRequest } from '../../common/types';
+import { ChainTypes, LoginRequest, WalletTypes } from '../../common/types';
 import { WalletService } from './walletService';
 import LoginSessionBrowserStorage from '../browserStorages/loginSessionBrowserStorage';
-import LoginConfirmationBrowserStorage from '../browserStorages/loginConfirmationBrowserStorage';
 import LoginSession from '../models/loginSession';
 import { OverlayService } from './overlayService';
 import SessionEntryBrowserStorage from '../browserStorages/sessionEntryBrowserStorage';
 import SessionEntry from '../models/sessionEntry';
+import { toUtf8Bytes } from '@ethersproject/strings';
+import { hexlify } from '@ethersproject/bytes';
 
 const DEFAULT_REQUEST_TIMEOUT = 1000 * 60 * 60 * 24 * 7;
 
 export class SessionService {
 
     private _loginSessionBrowserStorage = new LoginSessionBrowserStorage();
-    private _loginConfirmationBrowserStorage = new LoginConfirmationBrowserStorage();
     private _sessionEntryBrowserStorage = new SessionEntryBrowserStorage();
 
     constructor(
@@ -38,25 +38,30 @@ export class SessionService {
     }
 
     async killSession(sessionId: string): Promise<void> {
-        await this._loginSessionBrowserStorage.deleteById(sessionId);
+        const session = await this._loginSessionBrowserStorage.getById(sessionId);
         await this.clearItems(sessionId);
+        await this._loginSessionBrowserStorage.deleteById(sessionId);
     }
 
     async createSession(moduleName: string, request: LoginRequest): Promise<LoginSession> {
+        const timeout = request.timeout ?? DEFAULT_REQUEST_TIMEOUT;
+        const secure = request.secureLogin ?? 'disabled';
+        
+        if (!['disabled', 'optional', 'required'].includes(secure)) throw new Error('Invalid "secureLogin" value.');
+
         const descriptors = await this._walletService.getWalletDescriptors();
-        const authMethod = request.authMethods[0]; // ToDo: array of methods
+        const authMethod = request.authMethods[0] as ChainTypes; // ToDo: array of methods
         const isSuitableWallet = descriptors.filter(x => x.chain === authMethod && x.connected === true).length > 0;
 
         if (!isSuitableWallet) {
-            await this._overlayService.pairWalletViaOverlay(authMethod as ChainTypes);
+            await this._overlayService.pairWalletViaOverlay(authMethod);
         }
 
-        const walletType = await this._overlayService.openLoginSessionOverlay(moduleName, authMethod as ChainTypes);
+        const walletType = await this._overlayService.openLoginSessionOverlay(moduleName, authMethod) as WalletTypes;
 
         const session = new LoginSession();
 
         const creationDate = new Date();
-        const timeout = request.timeout ?? DEFAULT_REQUEST_TIMEOUT;
         
         session.sessionId = generateGuid();
         session.moduleName = moduleName;
@@ -64,7 +69,23 @@ export class SessionService {
         session.walletType = walletType;
         session.expiresAt = new Date(creationDate.getTime() + timeout).toISOString();
         session.createdAt = creationDate.toISOString();
-        // session.loginConfirmationId = null;
+
+        if (secure === 'required') {
+            const message = JSON.stringify({
+                timeout: session.expiresAt,
+                from: moduleName,
+                role: request.role,
+                help: request.help
+            }, null, 2);
+              
+            const wallet = await this._walletService.getGenericWallet(authMethod, walletType);
+            const signature = await wallet.signMessage(hexlify(toUtf8Bytes(message)));
+
+            session.loginConfirmation = {
+                loginMessage: message,
+                signature: signature
+            };
+        }
 
         await this._loginSessionBrowserStorage.create(session);
 

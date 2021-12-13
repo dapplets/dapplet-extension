@@ -11,4 +11,5 @@ export interface GenericWallet {
         name: string;
         description: string;
     } | null>;
+    signMessage(message: string): Promise<string>;
 }

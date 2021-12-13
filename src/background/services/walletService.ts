@@ -188,6 +188,11 @@ export class WalletService {
         return wallet.getAccount();
     }
 
+    public async getGenericWallet(chain: ChainTypes, wallet: WalletTypes): Promise<GenericWallet> {
+        const map = await this._getWalletsMap();
+        return map[chain][wallet];
+    }
+
     private async _getInternalSignerFor(app: string | DefaultSigners, chain: ChainTypes, isConnected: boolean = true): Promise<GenericWallet> {
         const defaults = await this._getWalletFor(app);
         const defaultWallet = defaults?.[chain];

@@ -1,6 +1,6 @@
 import { Provider, TransactionRequest } from "@ethersproject/providers";
 import { ethers } from "ethers";
-import { Deferrable } from "ethers/lib/utils";
+import { Deferrable, hexlify } from "ethers/lib/utils";
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import PortStream from 'extension-port-stream';
 import { detect } from 'detect-browser';
@@ -28,7 +28,12 @@ export default class extends ethers.Signer implements EthereumWallet {
     }
 
     async signMessage(message: string | ethers.Bytes): Promise<string> {
-        throw new Error('Not implemented');
+        const metamask = await this._getMetamaskProvider();
+        const address = await this.getAddress();
+        return await metamask.request({
+            method: 'personal_sign',
+            params: [message, address.toLowerCase()]
+        }) as string;
     }
 
     async signTransaction(transaction: Deferrable<TransactionRequest>): Promise<string> {

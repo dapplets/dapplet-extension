@@ -10,7 +10,7 @@ export class LoginSession {
     walletType: string = null;
     expiresAt: string = null;
     createdAt: string = null;
-    loginConfirmationId: string = null;
+    loginConfirmation?: { loginMessage: string, signature: string } = null;
 
     private get _network() {
         return this.authMethod.split('/')[0];
