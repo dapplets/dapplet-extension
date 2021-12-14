@@ -7,7 +7,7 @@ import { ChainTypes, WalletDescriptor } from "../../../common/types";
 interface Props {
     data: {
         app: string;
-        chain: ChainTypes;
+        chains: ChainTypes[];
     };
     bus: Bus;
 }

@@ -10,7 +10,7 @@ import { ChainTypes } from '../common/types';
 
 interface Props {
     bus: Bus;
-    chain: ChainTypes;
+    chains: ChainTypes[];
 }
 
 interface State {
@@ -24,7 +24,7 @@ export class App extends React.Component<Props, State> {
             <Container text style={{ paddingTop: '30px' }}>
                 <HashRouter>
                     <Switch>
-                        <Route exact path="/" component={() => <SelectWallet bus={p.bus} chain={p.chain} />} />
+                        <Route exact path="/" component={() => <SelectWallet bus={p.bus} chains={p.chains} />} />
                         <Route path="/metamask" component={() => <modules.metamask bus={p.bus} />} />
                         <Route path="/walletconnect" component={() => <modules.walletconnect bus={p.bus} />} />
                         <Route path="/near_testnet" component={() => <modules.near bus={p.bus} chain={ChainTypes.NEAR_TESTNET} />} />

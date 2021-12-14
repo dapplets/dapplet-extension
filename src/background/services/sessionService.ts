@@ -49,15 +49,7 @@ export class SessionService {
         
         if (!['disabled', 'optional', 'required'].includes(secure)) throw new Error('Invalid "secureLogin" value.');
 
-        const descriptors = await this._walletService.getWalletDescriptors();
-        const authMethod = request.authMethods[0] as ChainTypes; // ToDo: array of methods
-        const isSuitableWallet = descriptors.filter(x => x.chain === authMethod && x.connected === true).length > 0;
-
-        if (!isSuitableWallet) {
-            await this._overlayService.pairWalletViaOverlay(authMethod);
-        }
-
-        const walletType = await this._overlayService.openLoginSessionOverlay(moduleName, authMethod) as WalletTypes;
+        const { wallet: walletType, chain } = await this._overlayService.openLoginSessionOverlay(moduleName, request.authMethods as ChainTypes[]);
 
         const session = new LoginSession();
 
@@ -65,11 +57,12 @@ export class SessionService {
         
         session.sessionId = generateGuid();
         session.moduleName = moduleName;
-        session.authMethod = authMethod;
+        session.authMethod = chain;
         session.walletType = walletType;
         session.expiresAt = new Date(creationDate.getTime() + timeout).toISOString();
         session.createdAt = creationDate.toISOString();
 
+        // ToDo: secure login optional 
         if (secure === 'required') {
             const message = JSON.stringify({
                 timeout: session.expiresAt,
@@ -78,7 +71,7 @@ export class SessionService {
                 help: request.help
             }, null, 2);
               
-            const wallet = await this._walletService.getGenericWallet(authMethod, walletType);
+            const wallet = await this._walletService.getGenericWallet(chain, walletType);
             const signature = await wallet.signMessage(hexlify(toUtf8Bytes(message)));
 
             session.loginConfirmation = {

@@ -1,6 +1,6 @@
 import { browser } from "webextension-polyfill-ts";
 import { getCurrentTab } from "../../common/helpers";
-import { ChainTypes, DefaultConfig, DefaultSigners, SystemOverlayTabs } from "../../common/types";
+import { ChainTypes, DefaultConfig, DefaultSigners, SystemOverlayTabs, WalletTypes } from "../../common/types";
 import ManifestDTO from "../dto/manifestDTO";
 import ModuleInfo from "../models/moduleInfo";
 import VersionInfo from "../models/versionInfo";
@@ -11,8 +11,9 @@ export class OverlayService {
         return await this._openLegacyOverlay("OPEN_DEPLOY_OVERLAY", { mi, vi });
     }
 
-    public async pairWalletViaOverlay(chain: ChainTypes): Promise<void> {
-        return await this._openLegacyOverlay("OPEN_PAIRING_OVERLAY", { topic: 'pair', args: [chain] });
+    public async pairWalletViaOverlay(chains: ChainTypes | ChainTypes[] | null): Promise<void> {
+        const arr = !chains ? [] : Array.isArray(chains) ? chains : [chains];
+        return await this._openLegacyOverlay("OPEN_PAIRING_OVERLAY", { topic: 'pair', args: [arr] });
     }
 
     public async loginViaOverlay(app: string | DefaultSigners, chain: ChainTypes, cfg?: { username: string, domainId: number, fullname?: string, img?: string }): Promise<void> {
@@ -23,8 +24,8 @@ export class OverlayService {
         return await this._openLegacyOverlay("OPEN_LOGIN_OVERLAY", { topic: 'login', args: [app, chain] });
     }
 
-    public async openLoginSessionOverlay(app: string | DefaultSigners, chain: ChainTypes): Promise<string> {
-        return await this._openSystemOverlay(SystemOverlayTabs.LOGIN_SESSION, { app, chain });
+    public async openLoginSessionOverlay(app: string | DefaultSigners, chains: ChainTypes[]): Promise<{ wallet: WalletTypes, chain: ChainTypes }> {
+        return await this._openSystemOverlay(SystemOverlayTabs.LOGIN_SESSION, { app, chains });
     }
 
     public async openPopupOverlay(path: string) {

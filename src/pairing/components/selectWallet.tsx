@@ -14,7 +14,7 @@ import { ChainTypes, WalletDescriptor, WalletTypes } from "../../common/types";
 
 interface ISelectWalletProps {
     bus: Bus;
-    chain: ChainTypes;
+    chains: ChainTypes[];
 }
 
 interface ISelectWalletState {
@@ -57,14 +57,21 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
 
         if (this.state.loading) return null;
 
-        const connectedWallets = this.state.descriptors.filter(x => x.connected).filter(x => p.chain ? p.chain === x.chain : true);
-        const disconnectedWallets = this.state.descriptors.filter(x => !x.connected).filter(x => p.chain ? p.chain === x.chain : true);
+        const connectedWallets = this.state.descriptors
+            .filter(x => x.connected)
+            .filter(x => p.chains.length > 0 ? p.chains.includes(x.chain) : true);
+
+        const disconnectedWallets = this.state.descriptors
+            .filter(x => !x.connected)
+            .filter(x => p.chains.length > 0 ? p.chains.includes(x.chain) : true);
+
+        const chainsLabel = (p.chains.length > 0) ? <>{p.chains.map((x, i) => (i !== p.chains.length - 1) ? <b key={x}>{x}, </b> : <b key={x}>{x}</b>)} chain{(p.chains.length > 1) ? 's' : null}</> : <><b>any</b> chain</>;
 
         return (
             <>
-                {(p.chain) ? <Message
+                {(p.chains) ? <Message
                     header='Wallet Pairing'
-                    content={`You are pairing a wallet for "${p.chain}" chain.`}
+                    content={<>You are pairing a wallet for {chainsLabel}.</>}
                 /> : null}
 
                 {(connectedWallets.length > 0) ? <>
@@ -102,7 +109,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                 {(disconnectedWallets.length > 0) ? <>
                     <Header as='h3'>Connect a new wallet</Header>
 
-                    {(!this.state.descriptors.find(x => x.type === WalletTypes.METAMASK).connected && (!p.chain || p.chain === ChainTypes.ETHEREUM_GOERLI)) ?
+                    {(!this.state.descriptors.find(x => x.type === WalletTypes.METAMASK).connected && (p.chains.length === 0 || p.chains.includes(ChainTypes.ETHEREUM_GOERLI))) ?
                         (this.state.descriptors.find(x => x.type === WalletTypes.METAMASK).available) ?
                             <Button
                                 // disabled={this.state.descriptors.find(x => x.type === 'metamask').available === false}
@@ -128,7 +135,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                             </Button> :
                         null}
 
-                    {(!this.state.descriptors.find(x => x.type === WalletTypes.WALLETCONNECT).connected && (!p.chain || p.chain === ChainTypes.ETHEREUM_GOERLI)) ?
+                    {(!this.state.descriptors.find(x => x.type === WalletTypes.WALLETCONNECT).connected && (p.chains.length === 0 || p.chains.includes(ChainTypes.ETHEREUM_GOERLI))) ?
                         <Button
                             // disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
                             basic
@@ -142,7 +149,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                         </Button> :
                         null}
                         
-                    {(!this.state.descriptors.find(x => x.type === WalletTypes.NEAR && x.chain === ChainTypes.NEAR_TESTNET).connected && (!p.chain || p.chain === ChainTypes.NEAR_TESTNET)) ?
+                    {(!this.state.descriptors.find(x => x.type === WalletTypes.NEAR && x.chain === ChainTypes.NEAR_TESTNET).connected && (p.chains.length === 0 || p.chains.includes(ChainTypes.NEAR_TESTNET))) ?
                         <Button
                             // disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
                             basic
@@ -156,7 +163,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                         </Button> :
                         null}
  
-                    {(!this.state.descriptors.find(x => x.type === WalletTypes.NEAR && x.chain === ChainTypes.NEAR_MAINNET).connected && (!p.chain || p.chain === ChainTypes.NEAR_MAINNET)) ?
+                    {(!this.state.descriptors.find(x => x.type === WalletTypes.NEAR && x.chain === ChainTypes.NEAR_MAINNET).connected && (p.chains.length === 0 || p.chains.includes(ChainTypes.NEAR_MAINNET))) ?
                         <Button
                             // disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
                             basic
@@ -170,7 +177,7 @@ export class SelectWallet extends React.Component<ISelectWalletProps, ISelectWal
                         </Button> :
                         null}
                     
-                    {(!this.state.descriptors.find(x => x.type === WalletTypes.DAPPLETS).connected && (!p.chain || p.chain === ChainTypes.ETHEREUM_GOERLI)) ?
+                    {(!this.state.descriptors.find(x => x.type === WalletTypes.DAPPLETS).connected && (p.chains.length === 0 || p.chains.includes(ChainTypes.ETHEREUM_GOERLI))) ?
                         <Button
                             // disabled={this.state.descriptors.find(x => x.type === 'walletconnect').available === false}
                             basic

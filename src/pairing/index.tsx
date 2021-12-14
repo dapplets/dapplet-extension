@@ -13,5 +13,5 @@ tracing.startTracing();
 const bus = new Bus();
 
 bus.subscribe('pair', (chain) => {
-    ReactDOM.render(<App bus={bus} chain={chain} />, document.querySelector('#app'));
+    ReactDOM.render(<App bus={bus} chains={chain} />, document.querySelector('#app'));
 })

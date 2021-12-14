@@ -14,7 +14,7 @@ import { ChainTypes, WalletDescriptor } from "../../../common/types";
 interface Props {
     data: {
         app: string;
-        chain: ChainTypes;
+        chains: ChainTypes[];
     }
     bus: Bus;
 }
@@ -48,17 +48,14 @@ export class SelectWallet extends React.Component<Props, State> {
         });
     }
 
-    async selectWallet(wallet: string) {
-        // const { setWalletFor } = await initBGFunctions(browser);
-        // const { app, chain } = this.props.data;
-        // await setWalletFor(wallet, app, chain);
-        this.props.bus.publish('ready', wallet);
+    async selectWallet(wallet: string, chain: string) {
+        this.props.bus.publish('ready', { wallet, chain });
         await this.componentDidMount();
     }
 
     async pairWallet() {
         const { pairWalletViaOverlay } = await initBGFunctions(browser);
-        await pairWalletViaOverlay(this.props.data.chain);
+        await pairWalletViaOverlay(this.props.data.chains);
         await this.loadData();
     }
 
@@ -68,7 +65,7 @@ export class SelectWallet extends React.Component<Props, State> {
 
         if (s.loading) return null;
 
-        const connectedWallets = s.descriptors.filter(x => x.connected).filter(x => x.chain ? x.chain === p.data.chain : true);
+        const connectedWallets = s.descriptors.filter(x => x.connected).filter(x => x.chain ? p.data.chains.includes(x.chain) : true);
         // const disconnectedWallets = s.descriptors.filter(x => !x.connected);
 
         return (
@@ -76,7 +73,7 @@ export class SelectWallet extends React.Component<Props, State> {
 
                 <Message>
                   <Message.Header>Select Wallet</Message.Header>
-                  <p>You are choosing a wallet for <b>{p.data.app}</b> application in <b>{p.data.chain}</b> chain.</p>
+                  <p>You are choosing a wallet for <b>{p.data.app}</b> application in {p.data.chains.map((x, i) => (i !== p.data.chains.length - 1) ? <b key={x}>{x}, </b> : <b key={x}>{x}</b>)} chain{(p.data.chains.length > 1) ? 's' : null}.</p>
                 </Message>
 
                 {(connectedWallets.length > 0) ? <>
@@ -101,7 +98,7 @@ export class SelectWallet extends React.Component<Props, State> {
                                     </div>
                                 </div>
                                 <div>
-                                    <Button primary onClick={() => this.selectWallet(x.type)} style={{ margin: '5px 0' }}>Select</Button>
+                                    <Button primary onClick={() => this.selectWallet(x.type, x.chain)} style={{ margin: '5px 0' }}>Select</Button>
                                 </div>
                             </div>
                         ))}
