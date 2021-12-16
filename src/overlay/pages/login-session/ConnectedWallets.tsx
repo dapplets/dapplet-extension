@@ -24,7 +24,7 @@ interface State {
     descriptors: WalletDescriptor[];
 }
 
-export class SelectWallet extends React.Component<Props, State> {
+export class ConnectedWallets extends React.Component<Props, State> {
     constructor(props) {
         super(props);
 
@@ -76,7 +76,7 @@ export class SelectWallet extends React.Component<Props, State> {
                   <p>You are choosing a wallet for <b>{p.data.app}</b> application in {p.data.chains.map((x, i) => (i !== p.data.chains.length - 1) ? <b key={x}>{x}, </b> : <b key={x}>{x}</b>)} chain{(p.data.chains.length > 1) ? 's' : null}.</p>
                 </Message>
 
-                {(connectedWallets.length > 0) ? <>
+                {/* {(connectedWallets.length > 0) ? <> */}
                     <Header as='h3'>Your active wallet connections</Header>
                     <Comment.Group>
                         {connectedWallets.map((x, i) => (
@@ -103,20 +103,20 @@ export class SelectWallet extends React.Component<Props, State> {
                             </div>
                         ))}
 
-                        <Message info style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                        {/* <Message info style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                             <p>Don't see your account here? You can <b>change an active account</b> in a connected wallet or </p>
                             <Button color='teal' onClick={() => this.pairWallet()}>
                               Connect a new wallet
                             </Button>
-                        </Message>
+                        </Message> */}
                     </Comment.Group>
-                </> : <Message warning style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                {/* </> : <Message warning style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
                         <p>No one of connected wallets is eligible to sign on behalf of the account you selected.</p>
                         <p>You can <b>change an active account</b> in a connected wallet or </p>
                         <Button color='olive' onClick={() => this.pairWallet()}>
                           Connect a new wallet
                         </Button>
-                    </Message>}
+                    </Message>} */}
             </div>
         );
     }
