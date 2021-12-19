@@ -32,7 +32,7 @@ export default class extends React.Component<Props, State> {
     async componentDidMount() {
         try {
             const { connectWallet, getWalletDescriptors } = await initBGFunctions(browser);
-            await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.DAPPLETS);
+            await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.DAPPLETS, null);
             const descriptors = await getWalletDescriptors();
             const descriptor = descriptors.find(x => x.type === 'dapplets');
             this.setState({ connected: true, descriptor });
@@ -44,7 +44,7 @@ export default class extends React.Component<Props, State> {
 
     async disconnect() {
         const { disconnectWallet } = await initBGFunctions(browser);
-        await disconnectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.DAPPLETS);
+        await disconnectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.DAPPLETS, null);
         this.setState({ toBack: true });
     }
 

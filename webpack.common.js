@@ -53,9 +53,20 @@ module.exports = {
         ],
       },
       {
-        include: path.resolve(__dirname, 'src'),
         test: /\.scss$/,
-        use: ["style-loader", "css-loader", "sass-loader"]
+        use: [
+          "style-loader", 
+          { 
+            loader: "css-loader", 
+            options: { 
+              modules: {
+                auto: (resourcePath) => resourcePath.endsWith(".module.scss"),
+              },
+            } 
+          }, 
+          "sass-loader"
+        ],
+        include: path.resolve(__dirname, 'src'),
       },
       {
         test: /\.css$/,

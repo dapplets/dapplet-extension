@@ -9,6 +9,7 @@ export class Overlay implements IOverlay {
     private _isFrameLoaded: boolean = false;
     private _msgCount: number = 0;
 
+    public readonly id = generateGuid();
     public frame: HTMLIFrameElement = null;
     public registered: boolean = false;
     public onmessage: (topic: string, message: any) => void = null;
@@ -16,7 +17,14 @@ export class Overlay implements IOverlay {
     public loader: HTMLDivElement;
     public onregisteredchange: (value: boolean) => void = null;
 
-    constructor(private _manager: OverlayManager, public uri: string, public title: string, public source: string = null, public hidden: boolean = false) {
+    constructor(
+        private _manager: OverlayManager, 
+        public uri: string, 
+        public title: string, 
+        public source: string = null, 
+        public hidden: boolean = false, 
+        public parent: Overlay = null
+    ) {
 
         // // disable cache
         // const url = new URL(uri);
@@ -38,7 +46,7 @@ export class Overlay implements IOverlay {
             this._queue.forEach(msg => this._send(msg));
             this._queue = [];
         });
-        this.frame.name = 'dapplet-overlay/' + generateGuid(); // to distinguish foreign frames from overlays (see contentscript/index.ts)
+        this.frame.name = 'dapplet-overlay/' + this.id; // to distinguish foreign frames from overlays (see contentscript/index.ts)
     }
 
     /**
@@ -151,6 +159,14 @@ export class Overlay implements IOverlay {
     }
 
     private _addLoader() {
+        if (this.parent) {
+            this._addLoaderPopup();
+        } else {
+            this._addLoaderOverlay();
+        }
+    }
+
+    private _addLoaderOverlay() {
         if (!this.loader) {
             this.loader = document.createElement('div');
             this.loader.classList.add('loader-container');
@@ -202,8 +218,14 @@ export class Overlay implements IOverlay {
           <div class="load-text">Downloading from decentralized sources like Swarm or IPFS can take some time</div>
       `;
     }
-
+    
     private _addSlowMessage() {
+        if (!this.parent) {
+            this._addSlowMessageOverlay();
+        }
+    }
+
+    private _addSlowMessageOverlay() {
         if (!this.loader) {
             this.loader = document.createElement('div');
             this.loader.classList.add('loader-container');
@@ -261,6 +283,27 @@ export class Overlay implements IOverlay {
           <div class="load-text">Loading Overlay...</div>
           <div class="load-text">The overlay it is taking a while to load.</div>
           <div class="load-text-desc">If the overlay does not load, try changing your preferred overlay storage in the extension settings.</div>
+      `;
+    }
+
+    private _addLoaderPopup() {
+        if (!this.loader) {
+            this.loader = document.createElement('div');
+            this.loader.classList.add('popup-loader-container');
+        }
+
+        this.loader.innerHTML = `
+            <style>
+                .popup-loader-container {
+                    background: #fff;
+                    box-sizing: border-box;
+                    padding: 18px;
+                    border-radius: 10px;
+                }
+            </style>
+            <div>
+                
+            </div>
       `;
     }
 }

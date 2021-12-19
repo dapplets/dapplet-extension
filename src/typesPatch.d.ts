@@ -23,6 +23,11 @@ declare module "*.css" {
     export default value;
 }
 
+declare module "*.module.scss" {
+    const value: any;
+    export default value;
+}
+
 declare var EXTENSION_VERSION: string;
 declare var EXTENSION_ENV: 'development' | 'production';
 

@@ -3,7 +3,7 @@ export interface GenericWallet {
     getChainId(): Promise<number>;
     isAvailable(): Promise<boolean>;
     isConnected(): Promise<boolean>;
-    connectWallet(): Promise<void>;
+    connectWallet(params: any): Promise<void>;
     disconnectWallet(): Promise<void>;
     getLastUsage(): string;
     getMeta(): Promise<{

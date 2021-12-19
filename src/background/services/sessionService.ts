@@ -49,7 +49,7 @@ export class SessionService {
         
         if (!['disabled', 'optional', 'required'].includes(secure)) throw new Error('Invalid "secureLogin" value.');
 
-        const { wallet: walletType, chain } = await this._overlayService.openLoginSessionOverlay(moduleName, request.authMethods as ChainTypes[]);
+        const { wallet: walletType, chain } = await this._overlayService.openLoginSessionOverlay(moduleName, request);
 
         const session = new LoginSession();
 

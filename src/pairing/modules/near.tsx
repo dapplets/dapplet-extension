@@ -33,7 +33,7 @@ export default class extends React.Component<Props, State> {
     async componentDidMount() {
         try {
             const { connectWallet, getWalletDescriptors } = await initBGFunctions(browser);
-            await connectWallet(this.props.chain, WalletTypes.NEAR);
+            await connectWallet(this.props.chain, WalletTypes.NEAR, null);
             const descriptors = await getWalletDescriptors();
             const descriptor = descriptors.find(x => x.chain === this.props.chain && x.type === WalletTypes.NEAR);
             this.setState({ connected: true, descriptor });

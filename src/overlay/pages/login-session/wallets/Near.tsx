@@ -4,8 +4,9 @@ import { browser } from "webextension-polyfill-ts";
 
 import { Button, Segment, Loader } from "semantic-ui-react";
 import { Redirect } from "react-router-dom";
-import { Bus } from '../../../common/bus';
-import { ChainTypes, WalletDescriptor, WalletTypes } from "../../../common/types";
+import { Bus } from '../../../../common/bus';
+import { ChainTypes, WalletDescriptor, WalletTypes } from "../../../../common/types";
+import { Loading } from "../../../components/Loading";
 
 interface Props {
     bus: Bus;
@@ -38,7 +39,7 @@ export default class extends React.Component<Props, State> {
 
         try {
             const { connectWallet, getWalletDescriptors } = await initBGFunctions(browser);
-            await connectWallet(this.props.chain, WalletTypes.NEAR);
+            await connectWallet(this.props.chain, WalletTypes.NEAR, null);
             const descriptors = await getWalletDescriptors();
             const descriptor = descriptors.find(x => x.chain === this.props.chain && x.type === WalletTypes.NEAR);
             
@@ -74,7 +75,7 @@ export default class extends React.Component<Props, State> {
         const s = this.state;
 
         if (s.toBack === true) {
-            return <Redirect to='/' />
+            return <Redirect to='/pairing' />
         }
 
         if (s.error) return (
@@ -86,9 +87,11 @@ export default class extends React.Component<Props, State> {
         );
 
         if (!s.connected) return (
-            <>
-                <Loader active inline='centered' >Please unlock your wallet to continue</Loader>
-            </>
+            <Loading
+                title="NEAR Wallet" 
+                subtitle="Please unlock your wallet to continue" 
+                onBackButtonClick={() => this.setState({ toBack: true })}
+            />
         );
 
         // if (s.connected) return (<>

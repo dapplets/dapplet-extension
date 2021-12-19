@@ -12,15 +12,10 @@ export default class extends ethers.Signer implements EthereumWallet {
     private _sendDataToPairingOverlay: (topic: string, args: any[]) => void;
     private __walletconnect?: WalletConnect;
 
-    private get _walletconnect() {
+    private get _walletconnect(): WalletConnect {
         if (!this.__walletconnect) {
             this.__walletconnect = new WalletConnect({
                 bridge: "https://bridge.walletconnect.org"
-            });
-            this.__walletconnect.on('display_uri', (err, payload) => {
-                if (err) throw err;
-                const [uri] = payload.params;
-                this._showQR(uri);
             });
         }
 
@@ -89,9 +84,18 @@ export default class extends ethers.Signer implements EthereumWallet {
         return this._walletconnect?.connected ?? false;
     }
 
-    async connectWallet(): Promise<void> {
+    async connectWallet({ overlayId }: { overlayId: string }): Promise<void> {
         if (this._walletconnect.connected) return;
         this._walletconnect['_handshakeTopic'] = ''; // ToDo: remove after update of WalletConnect to >1.3.1
+
+        const callback = (err, payload) => {
+            this._walletconnect.off('display_uri');
+            if (err) throw err;
+            const [uri] = payload.params;
+            this._showQR(uri, overlayId);
+        };
+
+        this._walletconnect.on('display_uri', callback);
         await this._walletconnect.createSession();
 
         return new Promise((resolve, reject) => {
@@ -128,7 +132,7 @@ export default class extends ethers.Signer implements EthereumWallet {
         return localStorage['walletconnect_lastUsage'];
     }
 
-    private async _showQR(uri: string) {
-        this._sendDataToPairingOverlay('walletconnect', [uri]);
+    private async _showQR(uri: string, overlayId?: string) {
+        this._sendDataToPairingOverlay('walletconnect', [uri, overlayId]);
     }
 }

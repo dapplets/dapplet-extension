@@ -1,6 +1,7 @@
 import { IPubSub } from "../types";
 
 export interface IOverlay extends IPubSub {
+    id: string;
     uri: string;
     title: string;
     registered: boolean;
@@ -19,6 +20,6 @@ export interface IOverlayManager {
     close(): void;
     getOverlays(): IOverlay[];
     toggle(): void;
-    createOverlay(url: string, title: string, source?: string, hidden?: boolean): IOverlay;
+    createOverlay(url: string, title: string, source?: string, hidden?: boolean, parent?: IOverlay): IOverlay;
     destroy(): void;
 }

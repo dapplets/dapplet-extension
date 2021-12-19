@@ -2,18 +2,22 @@ import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
-import { Button, Segment, Loader } from "semantic-ui-react";
+import { Button, Segment } from "semantic-ui-react";
+import { Header } from 'semantic-ui-react'
+import { svgObject } from "qr-image";
 import { Redirect } from "react-router-dom";
-import { Bus } from '../../../common/bus';
-import { ChainTypes, WalletDescriptor, WalletTypes } from "../../../common/types";
+import { Bus } from '../../../../common/bus';
+import { ChainTypes, WalletDescriptor, WalletTypes } from "../../../../common/types";
+import { Loading } from "../../../components/Loading";
 
 interface Props {
     bus: Bus;
 }
 
 interface State {
-    error: string;
+    svgPath: string;
     connected: boolean;
+    error: string;
     toBack: boolean;
     descriptor: WalletDescriptor | null;
 }
@@ -25,8 +29,9 @@ export default class extends React.Component<Props, State> {
     constructor(props) {
         super(props);
         this.state = {
-            error: null,
+            svgPath: null,
             connected: false,
+            error: null,
             toBack: false,
             descriptor: null
         };
@@ -37,9 +42,17 @@ export default class extends React.Component<Props, State> {
 
         try {
             const { connectWallet, getWalletDescriptors } = await initBGFunctions(browser);
-            await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.DAPPLETS);
+
+            this.props.bus.subscribe('walletconnect', (uri) => {
+                const svgPath = svgObject(uri, { type: 'svg' });
+                this.setState({ svgPath: svgPath.path });
+                this.props.bus.unsubscribe('walletconnect');
+            });
+
+            const overlayId = window.name.replace('dapplet-overlay/', '');
+            await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.WALLETCONNECT, { overlayId });
             const descriptors = await getWalletDescriptors();
-            const descriptor = descriptors.find(x => x.type === 'dapplets');
+            const descriptor = descriptors.find(x => x.type === WalletTypes.WALLETCONNECT);
             
             if (this._mounted) {
                 this.setState({ connected: true, descriptor });
@@ -54,17 +67,18 @@ export default class extends React.Component<Props, State> {
 
     componentWillUnmount() {
         this._mounted = false;
+        this.props.bus.unsubscribe('walletconnect');
     }
 
     // async disconnect() {
     //     const { disconnectWallet } = await initBGFunctions(browser);
-    //     await disconnectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.DAPPLETS);
+    //     await disconnectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.WALLETCONNECT);
     //     this.setState({ toBack: true });
     // }
 
     async continue() {
         this.props.bus.publish('ready', { 
-            wallet: WalletTypes.DAPPLETS,
+            wallet: WalletTypes.NEAR,
             chain: ChainTypes.ETHEREUM_GOERLI
         });
     }
@@ -73,7 +87,7 @@ export default class extends React.Component<Props, State> {
         const s = this.state;
 
         if (s.toBack === true) {
-            return <Redirect to='/' />
+            return <Redirect to='/pairing' />
         }
 
         if (s.error) return (
@@ -85,12 +99,13 @@ export default class extends React.Component<Props, State> {
         );
 
         if (!s.connected) return (
-            <>
-                <Loader active inline='centered' >Generating a private key</Loader>
-            </>
+            <Loading
+                title="WalletConnect" 
+                subtitle="Scan QR code with a WalletConnect-compatible wallet"
+                content={s.svgPath ? (<svg style={{ margin: '30px 0' }} viewBox="1 1 53 53"><path d={s.svgPath} /></svg>) : null}
+                onBackButtonClick={() => this.setState({ toBack: true })}
+            />
         );
-
-        return null;
 
         // if (s.connected) return (<>
         //     <h3>Connected</h3>
@@ -106,5 +121,7 @@ export default class extends React.Component<Props, State> {
         //         <Button primary onClick={() => this.continue()}>Continue</Button>
         //     </div>
         // </>);
+
+        return null;
     }
 }

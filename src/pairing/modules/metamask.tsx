@@ -32,7 +32,7 @@ export default class extends React.Component<Props, State> {
     async componentDidMount() {
         try {
             const { connectWallet, getWalletDescriptors } = await initBGFunctions(browser);
-            await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.METAMASK);
+            await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.METAMASK, null);
             const descriptors = await getWalletDescriptors();
             const descriptor = descriptors.find(x => x.type === WalletTypes.METAMASK);
             this.setState({ connected: true, descriptor });

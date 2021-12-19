@@ -110,6 +110,7 @@
     height: calc(100% - 36px);
 }
 .dapplets-overlay-nav-content-item {
+    position: relative;
     display: none;
     height: 100%;
 }
@@ -178,4 +179,19 @@
 .dapplets-action-dropdown:hover > button {
     color: rgba(0, 0, 0, 0.8);
     background: rgba(0, 0, 0, 0.1);
+}
+.dapplets-popup-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.1);
+}
+.dapplets-popup-container > * {
+    position: absolute;
+    left: calc(50% - 187.5px);
+    top: calc(50% - 271px);
+    width: 375px;
+    height: 542px;
+    border: none;
 }

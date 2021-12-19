@@ -49,7 +49,7 @@ export default class extends React.Component<Props, State> {
                 this.props.bus.unsubscribe('walletconnect');
             });
 
-            await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.WALLETCONNECT);
+            await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.WALLETCONNECT, null);
             const descriptors = await getWalletDescriptors();
             const descriptor = descriptors.find(x => x.type === WalletTypes.WALLETCONNECT);
             if (this._mounted) this.setState({ connected: true, descriptor });

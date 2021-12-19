@@ -17,11 +17,12 @@ export class WalletService {
         private _overlayService: OverlayService
     ) { }
 
-    async connectWallet(chain: ChainTypes, wallet: WalletTypes) {
+    async connectWallet(chain: ChainTypes, wallet: WalletTypes, params?: any) {
+        if (!params) params = {};
         // ToDo: is need chain argument?
         // const chain = (await this._getWalletsArray()).find(x => x.wallet === wallet).chain;
         const map = await this._getWalletsMap();
-        return map[chain][wallet].connectWallet();
+        return map[chain][wallet].connectWallet(params);
     }
 
     async disconnectWallet(chain: ChainTypes, wallet: WalletTypes) {

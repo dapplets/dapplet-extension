@@ -34,7 +34,8 @@ if (!IS_OVERLAY_IFRAME) {
         if (!IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
             core.waitSystemOverlay({
                 activeTab: SystemOverlayTabs.DAPPLET_CONFIRMATION,
-                payload: shareLinkPayload
+                payload: shareLinkPayload,
+                popup: false
             });
         }
 

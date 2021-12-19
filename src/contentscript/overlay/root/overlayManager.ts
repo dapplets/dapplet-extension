@@ -24,6 +24,7 @@ const OverlayBucketBarClass = 'dapplets-overlay-bucket-bar';
 const OverlayToolbarClass = 'dapplets-overlay-toolbar';
 const OverlayFrameButtonClass = 'dapplets-overlay-frame-button';
 const OverlayFrameButtonSidebarToggleClass = 'dapplets-overlay-frame-button-sidebar-toggle';
+const PopupContainerClass = 'dapplets-popup-container';
 
 export class OverlayManager implements IOverlayManager {
     private _panel: HTMLElement = null;
@@ -34,7 +35,7 @@ export class OverlayManager implements IOverlayManager {
     private _tabsRegistry: {
         overlay: Overlay,
         tabItem?: HTMLDivElement,
-        contentItem: HTMLDivElement
+        contentItem?: HTMLDivElement
     }[] = [];
 
     constructor(private _iframeMessenger: JsonRpc) {
@@ -192,52 +193,65 @@ export class OverlayManager implements IOverlayManager {
         overlay.onregisteredchange?.(true);
         if (this._tabsRegistry.filter(t => t.overlay === overlay).length > 0) return;
 
-        const contentItem = document.createElement('div');
-        contentItem.classList.add(ContentItemClass);
+        if (overlay.parent) {
+            const contentItem = document.createElement('div');
+            contentItem.classList.add(PopupContainerClass);
+            
+            // adding loading spinner
+            contentItem.appendChild(overlay.loader);
 
-        // adding loading spinner
-        contentItem.appendChild(overlay.loader);
-
-        // adding frame
-        contentItem.appendChild(overlay.frame);
-        this._contentList.appendChild(contentItem);
-
-        if (!overlay.hidden) {
-            const tabItem = document.createElement('div');
-            tabItem.classList.add(TabItemClass);
-
-            const titleDiv = document.createElement('div');
-            titleDiv.innerText = overlay.title;
-            titleDiv.title = overlay.title;
-            titleDiv.classList.add('dapplets-overlay-nav-tab-item-title');
-
-            tabItem.appendChild(titleDiv);
-            tabItem.addEventListener('click', (ev) => {
-                ev.cancelBubble = true;
-                ev.stopPropagation();
-                this.activate(overlay);
-            });
-            this._tabList.appendChild(tabItem);
-
-            const closeBtn = document.createElement('div');
-            closeBtn.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="4 4 16 16" style="width: 10px;">
-                    <path d="M0 0h24v24H0z" fill="none"/>
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                </svg>
-            `;
-            closeBtn.classList.add(CloseButtonClass);
-            closeBtn.addEventListener('click', (ev) => {
-                ev.cancelBubble = true;
-                ev.stopPropagation();
-                //this.unregister(overlay);
-                overlay.close();
-            });
-            tabItem.appendChild(closeBtn);
-
-            this._tabsRegistry.push({ overlay, tabItem, contentItem });
-        } else {
+            // adding frame
+            contentItem.appendChild(overlay.frame);
+            overlay.parent.frame.parentElement.appendChild(contentItem);
             this._tabsRegistry.push({ overlay, contentItem });
+        } else {
+            const contentItem = document.createElement('div');
+            contentItem.classList.add(ContentItemClass);
+    
+            // adding loading spinner
+            contentItem.appendChild(overlay.loader);
+    
+            // adding frame
+            contentItem.appendChild(overlay.frame);
+            this._contentList.appendChild(contentItem);
+
+            if (!overlay.hidden && !overlay.parent) {
+                const tabItem = document.createElement('div');
+                tabItem.classList.add(TabItemClass);
+    
+                const titleDiv = document.createElement('div');
+                titleDiv.innerText = overlay.title;
+                titleDiv.title = overlay.title;
+                titleDiv.classList.add('dapplets-overlay-nav-tab-item-title');
+    
+                tabItem.appendChild(titleDiv);
+                tabItem.addEventListener('click', (ev) => {
+                    ev.cancelBubble = true;
+                    ev.stopPropagation();
+                    this.activate(overlay);
+                });
+                this._tabList.appendChild(tabItem);
+    
+                const closeBtn = document.createElement('div');
+                closeBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="4 4 16 16" style="width: 10px;">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                `;
+                closeBtn.classList.add(CloseButtonClass);
+                closeBtn.addEventListener('click', (ev) => {
+                    ev.cancelBubble = true;
+                    ev.stopPropagation();
+                    //this.unregister(overlay);
+                    overlay.close();
+                });
+                tabItem.appendChild(closeBtn);
+    
+                this._tabsRegistry.push({ overlay, tabItem, contentItem });
+            } else {
+                this._tabsRegistry.push({ overlay, contentItem });
+            }
         }
 
         this.show();
@@ -250,10 +264,12 @@ export class OverlayManager implements IOverlayManager {
         const tab = this._tabsRegistry.filter(t => t.overlay === overlay)[0];
         if (!tab) return;
 
-        if (tab.tabItem) this._tabList.removeChild(tab.tabItem);
-        this._contentList.removeChild(tab.contentItem);
+        const childs = this._tabsRegistry.filter(x => x.overlay.parent === overlay);
+        childs.forEach(x => this.unregister(x.overlay));
 
-        const tabIndex = this._tabsRegistry.indexOf(tab);
+        tab.tabItem?.remove();
+        tab.contentItem?.remove();
+
         this._tabsRegistry = this._tabsRegistry.filter(t => t.overlay !== overlay);
 
         if (this._activeOverlay === overlay) {
@@ -261,6 +277,7 @@ export class OverlayManager implements IOverlayManager {
 
             if (this._tabsRegistry.length > 0) {
                 // if there are tabs on the right, then open the next one, otherwise open the last
+                const tabIndex = this._tabsRegistry.indexOf(tab);
                 const areTabsRight = this._tabsRegistry.length > tabIndex;
                 const nextTab = (areTabsRight) ? this._tabsRegistry[tabIndex] : this._tabsRegistry[this._tabsRegistry.length - 1];
                 this.activate(nextTab.overlay);
@@ -278,6 +295,7 @@ export class OverlayManager implements IOverlayManager {
     }
 
     public activate(overlay: Overlay) {
+        if (overlay.parent) return this.activate(overlay.parent);
         if (this._activeOverlay == overlay) return;
 
         if (this._activeOverlay) {
@@ -316,8 +334,8 @@ export class OverlayManager implements IOverlayManager {
         this._panel.remove();
     }
 
-    public createOverlay(uri: string, title: string, source: string = null, hidden: boolean = false): Overlay {
-        const overlay = new Overlay(this, uri, title, source, hidden);
+    public createOverlay(uri: string, title: string, source: string = null, hidden: boolean = false, parent: Overlay = null): Overlay {
+        const overlay = new Overlay(this, uri, title, source, hidden, parent);
         return overlay;
     }
 }
