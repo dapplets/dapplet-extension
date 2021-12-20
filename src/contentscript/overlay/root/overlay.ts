@@ -1,6 +1,7 @@
 import { generateGuid } from '../../../common/helpers';
 import { IOverlay } from '../interfaces';
 import { OverlayManager } from './overlayManager';
+import PopupLoader from '../../../overlay/assests/loader.svg';
 
 const OVERLAY_LOADING_TIMEOUT = 5000;
 
@@ -300,9 +301,18 @@ export class Overlay implements IOverlay {
                     padding: 18px;
                     border-radius: 10px;
                 }
+
+                .popup-loader-container img {
+                    width: 143px;
+                    height: 143px;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    margin: -71.5px 0 0 -71.5px;
+                }
             </style>
             <div>
-                
+                <img src="${PopupLoader}" alt="Loading" />
             </div>
       `;
     }
