@@ -11,6 +11,14 @@
 	font-size: 14px;
 }
 
+.button:hover {
+	background-color: #E52347;
+}
+
+.button:active {
+	background-color: #95132B;
+}
+
 .basic {
 	padding: 5px 10px;
 
@@ -24,4 +32,12 @@
 	font-size: 14px;
 
 	font-weight: 500;
+}
+
+.basic:hover {
+	color: #E52347;
+}
+
+.basic:active {
+	color: #95132B;
 }

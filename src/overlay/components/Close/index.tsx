@@ -10,7 +10,7 @@ export const Close: FC<CloseProps> = ({ className, ...props }: CloseProps) => {
 			className={cn(styles.close, className)}
 			{...props}
 		>
-			<img src={Icon} />
+			{/* <img src={Icon} /> */}
 		</button>
 	);
 };

@@ -51,6 +51,11 @@
 	img {
 		cursor: pointer;
 	}
+
+	img:hover {
+		filter: brightness(0) saturate(100%) invert(30%) sepia(99%) saturate(1288%) hue-rotate(
+			208deg) brightness(81%) contrast(80%);
+	}
 }
 
 .body {

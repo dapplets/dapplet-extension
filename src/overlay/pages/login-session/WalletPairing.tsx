@@ -3,10 +3,16 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 import { Redirect } from 'react-router-dom';
 
-import * as logos from '../../../common/resources/wallets';
+// import * as logos from '../../../common/resources/wallets';
 import { Bus } from "../../../common/bus";
 import { ChainTypes, WalletDescriptor, WalletTypes } from "../../../common/types";
 import { ConnectWallet } from './ConnectWallet';
+
+import DappletsLogo from '../../assests/dapplets.svg';
+import MetaMaskLogo from '../../assests/metamask.svg';
+import WalletConnectLogo from '../../assests/walletconnect.svg';
+import NearMainnetLogo from '../../assests/near_mainnet.svg';
+import NearTestnetLogo from '../../assests/near_testnet.svg';
 
 interface IWalletPairingProps {
     bus: Bus;
@@ -55,31 +61,31 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
             return {
                 id: 'metamask',
                 label: 'MetaMask',
-                icon: logos.metamask
+                icon: MetaMaskLogo
             }
         } else if (wallet === WalletTypes.WALLETCONNECT) {
             return {
                 id: 'walletconnect',
                 label: 'WalletConnect',
-                icon: logos.walletconnect
+                icon: WalletConnectLogo
             }
         } else if (wallet === WalletTypes.NEAR && chain === ChainTypes.NEAR_TESTNET) {
             return {
                 id: 'near_testnet',
                 label: 'NEAR Wallet (Testnet)',
-                icon: logos.near
+                icon: NearTestnetLogo
             }
         } else if (wallet === WalletTypes.NEAR && chain === ChainTypes.NEAR_MAINNET) {
             return {
                 id: 'near_mainnet',
                 label: 'NEAR Wallet (Mainnet)',
-                icon: logos.near
+                icon: NearMainnetLogo
             }
         } else if (wallet === WalletTypes.DAPPLETS) {
             return {
                 id: 'dapplets',
                 label: 'Built-in Test Only Wallet',
-                icon: logos.dapplets
+                icon: DappletsLogo
             }
         }
     }
