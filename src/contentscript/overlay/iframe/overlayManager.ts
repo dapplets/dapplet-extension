@@ -1,12 +1,12 @@
 import { JsonRpc } from "../../../common/jsonrpc";
-import { IOverlayManager } from "../interfaces";
+import { IOverlay, IOverlayManager } from "../interfaces";
 import { OverlayIframe } from "./overlay";
 
 export class OverlayManagerIframe implements IOverlayManager {
     constructor(private _iframeMessenger: JsonRpc) { }
 
-    createOverlay(url: string, title: string, source: string, hidden?: boolean): OverlayIframe {
-        const overlay = new OverlayIframe(url, title, source, hidden, this._iframeMessenger);
+    createOverlay(url: string, title: string, source: string, hidden?: boolean, parent?: IOverlay): OverlayIframe {
+        const overlay = new OverlayIframe(url, title, source, hidden, this._iframeMessenger, parent);
         return overlay;
     }
 

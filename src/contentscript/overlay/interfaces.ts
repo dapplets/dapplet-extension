@@ -5,6 +5,7 @@ export interface IOverlay extends IPubSub {
     uri: string;
     title: string;
     registered: boolean;
+    parent: IOverlay;
     source: string;
     send(topic: string, args: any[]): void;
     onclose: Function;

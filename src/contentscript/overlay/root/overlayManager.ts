@@ -270,6 +270,7 @@ export class OverlayManager implements IOverlayManager {
         tab.tabItem?.remove();
         tab.contentItem?.remove();
 
+        const tabIndex = this._tabsRegistry.indexOf(tab);
         this._tabsRegistry = this._tabsRegistry.filter(t => t.overlay !== overlay);
 
         if (this._activeOverlay === overlay) {
@@ -277,7 +278,6 @@ export class OverlayManager implements IOverlayManager {
 
             if (this._tabsRegistry.length > 0) {
                 // if there are tabs on the right, then open the next one, otherwise open the last
-                const tabIndex = this._tabsRegistry.indexOf(tab);
                 const areTabsRight = this._tabsRegistry.length > tabIndex;
                 const nextTab = (areTabsRight) ? this._tabsRegistry[tabIndex] : this._tabsRegistry[this._tabsRegistry.length - 1];
                 this.activate(nextTab.overlay);

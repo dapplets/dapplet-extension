@@ -11,6 +11,7 @@ import { Loading } from "../../../components/Loading";
 interface Props {
     bus: Bus;
     chain: ChainTypes;
+    frameId: string;
 }
 
 interface State {
@@ -65,10 +66,13 @@ export default class extends React.Component<Props, State> {
     // }
 
     async continue() {
-        this.props.bus.publish('ready', { 
-            wallet: WalletTypes.NEAR,
-            chain: this.props.chain
-        });
+        this.props.bus.publish('ready', [
+            this.props.frameId,
+            { 
+                wallet: WalletTypes.NEAR,
+                chain: this.props.chain
+            }
+        ]);
     }
 
     render() {

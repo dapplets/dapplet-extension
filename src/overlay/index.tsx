@@ -8,18 +8,26 @@ import { App } from './App';
 import * as tracing from '../common/tracing';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
+import { SystemOverlayData } from '../common/types';
 
 TimeAgo.addDefaultLocale(en);
 tracing.startTracing();
 
-type SystemOverlayData = {
-  activeTab: string;
-  popup: boolean;
-  payload: any;
-};
-
 export const bus = new Bus();
 
-bus.subscribe('data', (data: SystemOverlayData) => {
-    ReactDOM.render(<App activeTab={data.activeTab} data={data.payload} popup={data.popup}/>, document.querySelector('#app'));
+let frames: SystemOverlayData[] = [];
+
+bus.subscribe('data', (frameId: string, frame: SystemOverlayData) => {
+    frame.frameId = frameId;
+    frames.push(frame);
+    ReactDOM.render(<App frames={frames}/>, document.querySelector('#app'));
+});
+
+bus.subscribe('close_frame', (frameId: string) => {
+    frames = frames.filter(x => x.frameId !== frameId);
+    ReactDOM.render(<App frames={frames}/>, document.querySelector('#app'));
+    
+    if (frames.length === 0) {
+        bus.publish('close');
+    }
 });

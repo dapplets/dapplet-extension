@@ -10,6 +10,7 @@ import { Loading } from "../../../components/Loading";
 
 interface Props {
     bus: Bus;
+    frameId: string;
 }
 
 interface State {
@@ -64,10 +65,13 @@ export default class extends React.Component<Props, State> {
     // }
 
     async continue() {
-        this.props.bus.publish('ready', { 
-            wallet: WalletTypes.DAPPLETS,
-            chain: ChainTypes.ETHEREUM_GOERLI
-        });
+        this.props.bus.publish('ready', [
+            this.props.frameId, 
+            {
+                wallet: WalletTypes.DAPPLETS,
+                chain: ChainTypes.ETHEREUM_GOERLI
+            }
+        ]);
     }
 
     render() {

@@ -47,9 +47,17 @@
 	span {
 		margin: 0 9px;
 	}
+
+	img {
+		cursor: pointer;
+	}
 }
 
 .body {
+	height: 100%;
+}
+
+.body > div {
 	display: flex;
 	align-items: center;
 	justify-content: center;

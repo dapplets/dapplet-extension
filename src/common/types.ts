@@ -85,5 +85,13 @@ export type LoginRequest = {
     help?: string;
     target?: string;
     secureLogin?: 'required' | 'optional' | 'disabled';
-    // from?: 'me' | 'any' | 'disabled';
+    from?: 'me' | 'any' | 'disabled';
 };
+
+export type SystemOverlayData = {
+    frameId: string;
+    activeTab: string;
+    popup: boolean;
+    payload: any;
+};
+  

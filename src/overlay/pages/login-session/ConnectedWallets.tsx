@@ -3,6 +3,7 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 import makeBlockie from 'ethereum-blockies-base64';
 import cn from 'classnames';
+import { Redirect } from 'react-router-dom';
 
 import * as walletIcons from '../../../common/resources/wallets';
 import { Bus } from "../../../common/bus";
@@ -13,6 +14,7 @@ import base from '../../components/Base.module.scss';
 
 interface Props {
     data: {
+        frameId: string;
         app: string;
         loginRequest: LoginRequest;
     }
@@ -22,6 +24,7 @@ interface Props {
 interface State {
     loading: boolean;
     descriptors: WalletDescriptor[];
+    redirect: string | null;
 }
 
 export class ConnectedWallets extends React.Component<Props, State> {
@@ -30,7 +33,8 @@ export class ConnectedWallets extends React.Component<Props, State> {
 
         this.state = {
             loading: true,
-            descriptors: []
+            descriptors: [],
+            redirect: null
         }
     }
 
@@ -49,7 +53,8 @@ export class ConnectedWallets extends React.Component<Props, State> {
     }
 
     async selectWallet(wallet: string, chain: string) {
-        this.props.bus.publish('ready', { wallet, chain });
+        const frameId = this.props.data.frameId;
+        this.props.bus.publish('ready', [frameId, { wallet, chain }]);
         await this.componentDidMount();
     }
 
@@ -66,10 +71,14 @@ export class ConnectedWallets extends React.Component<Props, State> {
             
         const chains = this.props.data.loginRequest.authMethods;
 
+        if (s.redirect) {
+            return <Redirect to={s.redirect} />;
+        }
+
         if (s.loading) return null;
 
         const connectedWallets = s.descriptors.filter(x => x.connected).filter(x => x.chain ? chains.includes(x.chain) : true);
-        // const disconnectedWallets = s.descriptors.filter(x => !x.connected);
+        const disconnectedWallets = s.descriptors.filter(x => !x.connected).filter(x => x.chain ? chains.includes(x.chain) : true);
 
         return (
             <div className={base.wrapper}>
@@ -92,10 +101,10 @@ export class ConnectedWallets extends React.Component<Props, State> {
                     ))}
 				</ul>
 
-				<button 
+				{(disconnectedWallets.length > 0) ? <button 
                     className={cn(base.createSession, base.link)}
-                    onClick={() => window.location.hash = '/pairing'}
-                >Create new session</button>
+                    onClick={() => this.setState({ redirect: '/pairing' })}
+                >Create new session</button> : null}
 			</div>
         );
     }

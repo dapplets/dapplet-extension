@@ -10,7 +10,7 @@ import { AutoProperties, EventDef, Connection } from "./connection";
 import { WsJsonRpc } from "./wsJsonRpc";
 import { AppStorage } from "./appStorage";
 import { SystemOverlayTabs, LoginRequest } from "../common/types";
-import { parseShareLink } from "../common/helpers";
+import { generateGuid, parseShareLink } from "../common/helpers";
 import * as near from "./near";
 import * as ethereum from "./ethereum";
 import { LoginSession } from "./login/login-session";
@@ -203,23 +203,38 @@ export default class Core {
     }
 
     public async waitSystemOverlay(data: { activeTab: SystemOverlayTabs, payload: any, popup?: boolean }): Promise<any> {
+        const frameRequestId = generateGuid();
+
         return new Promise<void>((resolve, reject) => {
             const pairingUrl = browser.runtime.getURL('overlay.html');
-            const parentOverlay = (data.activeTab === SystemOverlayTabs.LOGIN_SESSION && data.payload?.loginRequest?.target) ? this.overlayManager.getOverlays().find(x => x.id === data.payload.loginRequest.target) : null;
+            
+            const isTargetLoginSession = data.activeTab === SystemOverlayTabs.LOGIN_SESSION && data.payload?.loginRequest?.target;
+            const parentOverlay = (isTargetLoginSession) ? this.overlayManager.getOverlays().find(x => x.id === data.payload.loginRequest.target) : null;
+            
             if (parentOverlay) {
                 data.popup = true;
             }
-            const overlay = this.overlayManager.createOverlay(pairingUrl, 'System', null, null, parentOverlay);
-            overlay.open(() => overlay.send('data', [data]));
-            overlay.onMessage((topic, message) => {
-                if (topic === 'cancel') {
-                    overlay.close();
-                    reject(message ?? 'Unexpected error.');
-                } else if (topic === 'ready') {
-                    overlay.close();
-                    resolve(message);
+            
+            const popupOverlay = parentOverlay ? this.overlayManager.getOverlays().find(x => x.parent?.id === parentOverlay.id) : null;
+            const overlay = popupOverlay ?? this.overlayManager.createOverlay(pairingUrl, 'System', null, null, parentOverlay);
+
+            overlay.open(() => overlay.send('data', [frameRequestId, data]));
+            overlay.onMessage((topic, data) => {
+                const [frameResponseId, message] = data ?? [];
+                if (frameResponseId === frameRequestId || !frameResponseId) {
+                    if (topic === 'cancel') {
+                        overlay.close();
+                        reject(message ?? 'Unexpected error.');
+                    } else if (topic === 'ready') {
+                        if (!frameRequestId) overlay.close();
+                        overlay.send('close_frame', [frameResponseId]);
+                        resolve(message);
+                    } else if (topic === 'close') {
+                        overlay.close();
+                    }
                 }
             });
+
         });
     }
 
@@ -423,6 +438,14 @@ export default class Core {
             const overlays = this.overlayManager.getOverlays().filter(x => x.source === moduleName);
             const target = (overlays.length > 0) ? overlays[0].id : null;
             request.target = target;
+        }
+
+        if (!request.from) {
+            request.from = "any";
+        }
+
+        if (!request.secureLogin) {
+            request.secureLogin = "optional";
         }
 
         const { createSession } = await initBGFunctions(browser);
