@@ -14,7 +14,7 @@ import { generateGuid, parseShareLink } from "../common/helpers";
 import * as near from "./near";
 import * as ethereum from "./ethereum";
 import { LoginSession } from "./login/login-session";
-import { LoginRequestSettings } from "./login/types";
+import { LoginHooks, LoginRequestSettings } from "./login/types";
 
 type Abi = any;
 
@@ -427,11 +427,15 @@ export default class Core {
         return sessions.map(x => new LoginSession(x));
     }
 
-    public async login(request: LoginRequest, settings?: LoginRequestSettings, moduleName?: string): Promise<LoginSession>
-    public async login(request: LoginRequest[], settings?: LoginRequestSettings, moduleName?: string): Promise<LoginSession[]>
-    public async login(request: LoginRequest | LoginRequest[], settings?: LoginRequestSettings, moduleName?: string): Promise<LoginSession | LoginSession[]> {
+    public async login(request: (LoginRequest & LoginHooks), settings?: (LoginRequestSettings & LoginHooks), moduleName?: string): Promise<LoginSession>
+    public async login(request: (LoginRequest & LoginHooks)[], settings?: (LoginRequestSettings & LoginHooks), moduleName?: string): Promise<LoginSession[]>
+    public async login(request: (LoginRequest & LoginHooks) | (LoginRequest & LoginHooks)[], settings?: (LoginRequestSettings & LoginHooks), moduleName?: string): Promise<LoginSession | LoginSession[]> {
         if (Array.isArray(request)) {
             return Promise.all(request.map(x => this.login(x, settings, moduleName)));
+        }
+
+        if (settings) {
+            Object.assign(request, settings);
         }
 
         if (!request.target) {
@@ -439,17 +443,16 @@ export default class Core {
             const target = (overlays.length > 0) ? overlays[0].id : null;
             request.target = target;
         }
-
-        if (!request.from) {
-            request.from = "any";
-        }
-
-        if (!request.secureLogin) {
-            request.secureLogin = "optional";
-        }
-
+        
         const { createSession } = await initBGFunctions(browser);
         const session = await createSession(moduleName, request);
-        return new LoginSession(session);
+
+        const ls = {}; // ToDo: specify LoginInfo
+        request?.onLogin.call({}, ls);
+
+        const loginSession = new LoginSession(session);
+        loginSession.logoutHandler = request.onLogout;
+
+        return loginSession;
     }
 }

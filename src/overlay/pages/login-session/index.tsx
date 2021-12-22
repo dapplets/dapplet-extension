@@ -10,6 +10,7 @@ import MetaMask from './wallets/MetaMask';
 import WalletConnect from './wallets/WalletConnect';
 import Near from './wallets/Near';
 import Dapplets from './wallets/Dapplets';
+import { LoginConfirmations } from "./LoginConfirmations";
 
 interface Props {
     request: {
@@ -35,14 +36,28 @@ export class LoginSession extends React.Component<Props, State> {
     }
 
     async routePages() {
-        const chains = this.props.request.loginRequest.authMethods;
+        const loginRequest = this.props.request.loginRequest;
+        const chains = loginRequest.authMethods;
+        const secureLogin = loginRequest.secureLogin;
 
-        const { getWalletDescriptors } = await initBGFunctions(browser);
+        const { getWalletDescriptors, getSuitableLoginConfirmations } = await initBGFunctions(browser);
+
         const descriptors = await getWalletDescriptors();
 
         const connectedWallets = descriptors
             .filter(x => x.connected)
             .filter(x => chains.length > 0 ? chains.includes(x.chain) : true);
+
+        if (secureLogin === 'required') { // ToDo: handle optional mode
+            const confirmations = await getSuitableLoginConfirmations(this.props.request.app, loginRequest);
+
+            const validConfirmations = confirmations.filter(x => !!connectedWallets.find(y => y.chain === x.authMethod && y.type === x.wallet));
+            
+            if (validConfirmations.length > 0) {
+                this.setState({ redirect: '/login-confirmations' });
+                return;
+            }
+        }
 
         if (connectedWallets.length > 0) {
             this.setState({ redirect: '/connected-wallets' });
@@ -59,13 +74,14 @@ export class LoginSession extends React.Component<Props, State> {
         return (
             <MemoryRouter>
                 <Switch>
+                    <Route exact path="/login-confirmations" component={() => <LoginConfirmations bus={p.bus} data={p.request} />} />
                     <Route exact path="/connected-wallets" component={() => <ConnectedWallets bus={p.bus} data={p.request} />} />
-                    <Route exact path="/pairing" component={() => <WalletPairing bus={p.bus} chains={chains as ChainTypes[]} />} />
-                    <Route path="/pairing/metamask" component={() => <MetaMask bus={p.bus} frameId={p.request.frameId} />} />
-                    <Route path="/pairing/walletconnect" component={() => <WalletConnect bus={p.bus} frameId={p.request.frameId} />} />
-                    <Route path="/pairing/near_testnet" component={() => <Near bus={p.bus} chain={ChainTypes.NEAR_TESTNET} frameId={p.request.frameId} />} />
-                    <Route path="/pairing/near_mainnet" component={() => <Near bus={p.bus} chain={ChainTypes.NEAR_MAINNET} frameId={p.request.frameId} />} />
-                    <Route path="/pairing/dapplets" component={() => <Dapplets bus={p.bus} frameId={p.request.frameId} />} />
+                    <Route exact path="/pairing" component={() => <WalletPairing bus={p.bus} chains={chains as ChainTypes[]} data={p.request} />} />
+                    <Route path="/pairing/metamask" component={() => <MetaMask bus={p.bus} frameId={p.request.frameId} data={p.request}  />} />
+                    <Route path="/pairing/walletconnect" component={() => <WalletConnect bus={p.bus} frameId={p.request.frameId} data={p.request} />} />
+                    <Route path="/pairing/near_testnet" component={() => <Near bus={p.bus} chain={ChainTypes.NEAR_TESTNET} frameId={p.request.frameId} data={p.request} />} />
+                    <Route path="/pairing/near_mainnet" component={() => <Near bus={p.bus} chain={ChainTypes.NEAR_MAINNET} frameId={p.request.frameId} data={p.request} />} />
+                    <Route path="/pairing/dapplets" component={() => <Dapplets bus={p.bus} frameId={p.request.frameId} data={p.request} />} />
 
                     {(s?.redirect) ? <Redirect to={s.redirect} /> : null}
                 </Switch>

@@ -7,10 +7,11 @@ import { Redirect } from 'react-router-dom';
 
 import * as walletIcons from '../../../common/resources/wallets';
 import { Bus } from "../../../common/bus";
-import { LoginRequest, WalletDescriptor } from "../../../common/types";
+import { LoginRequest, WalletDescriptor, WalletTypes } from "../../../common/types";
 import { Session } from "../../components/Session";
 import { Button } from "../../components/Button";
 import base from '../../components/Base.module.scss';
+import { Loading } from "../../components/Loading";
 
 interface Props {
     data: {
@@ -25,6 +26,11 @@ interface State {
     loading: boolean;
     descriptors: WalletDescriptor[];
     redirect: string | null;
+    signing: {
+        wallet: string;
+        error?: string | null;
+    } | null;
+    error: string;
 }
 
 export class ConnectedWallets extends React.Component<Props, State> {
@@ -34,7 +40,9 @@ export class ConnectedWallets extends React.Component<Props, State> {
         this.state = {
             loading: true,
             descriptors: [],
-            redirect: null
+            redirect: null,
+            signing: null,
+            error: null
         }
     }
 
@@ -58,6 +66,21 @@ export class ConnectedWallets extends React.Component<Props, State> {
         await this.componentDidMount();
     }
 
+    async loginWallet(wallet: string, chain: string) {
+        try {
+            this.setState({ signing: { wallet } });
+            const { app, loginRequest } = this.props.data;
+            const { createLoginConfirmation } = await initBGFunctions(browser);
+            const confirmation = await createLoginConfirmation(app, loginRequest, chain, wallet);
+            const confirmationId = confirmation.loginConfirmationId;
+            const frameId = this.props.data.frameId;
+            this.props.bus.publish('ready', [frameId, { wallet, chain, confirmationId }]);
+            await this.componentDidMount();
+        } catch (err) {
+            this.setState({ error: err.message });
+        }
+    }
+
     async pairWallet() {
         const chains = this.props.data.loginRequest.authMethods;
         const { pairWalletViaOverlay } = await initBGFunctions(browser);
@@ -70,9 +93,36 @@ export class ConnectedWallets extends React.Component<Props, State> {
               s = this.state;
             
         const chains = this.props.data.loginRequest.authMethods;
+        const secureLogin = this.props.data.loginRequest.secureLogin;
 
         if (s.redirect) {
             return <Redirect to={s.redirect} />;
+        }
+
+        if (s.error) {
+            return (
+                <Loading 
+                    title="Error" 
+                    subtitle={s.error}
+                    content={<div></div>}
+                    onBackButtonClick={() => this.setState({ redirect: '/' })}
+                />
+            )
+        }
+
+        if (s.signing) {
+            const title = {
+                [WalletTypes.DAPPLETS]: "Built-in Wallet",
+                [WalletTypes.METAMASK]: "MetaMask",
+                [WalletTypes.NEAR]: "NEAR Wallet",
+                [WalletTypes.WALLETCONNECT]: "WalletConnect"
+            }[s.signing.wallet];
+
+            return <Loading 
+                title={title}
+                subtitle="Please confirm signing in your wallet to continue"
+                onBackButtonClick={() => this.setState({ redirect: '/' })}
+            />;
         }
 
         if (s.loading) return null;
@@ -82,8 +132,8 @@ export class ConnectedWallets extends React.Component<Props, State> {
 
         return (
             <div className={base.wrapper}>
-				<h2 className={base.title}>Active sessions</h2>
-				<p className={base.subtitle}>Reuse active login</p>
+				<h2 className={base.title}>Create new session</h2>
+				<p className={base.subtitle}>select connected wallet</p>
 
 				<ul className={base.list}>
                     {connectedWallets.map((x, i) => (
@@ -95,7 +145,12 @@ export class ConnectedWallets extends React.Component<Props, State> {
                                 walletIcon={x.meta?.icon ? x.meta.icon : null}
                                 account={(x.account.indexOf('0x') !== -1) ? x.account.substring(0, 6) + '...' + x.account.substring(38) : x.account}
                                 accountIcon={x.account ? makeBlockie(x.account) : null}
-                                buttons={<Button onClick={() => this.selectWallet(x.type, x.chain)}>Select</Button>}
+                                buttons={
+                                    <>
+                                        {(secureLogin === 'disabled' || secureLogin === 'optional') ? <Button onClick={() => this.selectWallet(x.type, x.chain)}>Use</Button> : null}
+                                        {(secureLogin === 'required' || secureLogin === 'optional') ? <Button onClick={() => this.loginWallet(x.type, x.chain)}>Login</Button> : null}
+                                    </>
+                                }
                             />
                         </li>
                     ))}

@@ -40,7 +40,11 @@ export default class extends ethers.Signer implements EthereumWallet {
     }
 
     async signMessage(message: string | ethers.Bytes): Promise<string> {
-        return this._walletconnect.signMessage([message]);
+        const address = await this.getAddress();
+        return this._walletconnect.sendCustomRequest({
+            method: 'personal_sign',
+            params: [message, address.toLowerCase()]
+        });
     }
 
     async signTransaction(transaction: Deferrable<TransactionRequest>): Promise<string> {

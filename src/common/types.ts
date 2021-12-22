@@ -85,7 +85,7 @@ export type LoginRequest = {
     help?: string;
     target?: string;
     secureLogin?: 'required' | 'optional' | 'disabled';
-    from?: 'me' | 'any' | 'disabled';
+    from?: 'me' | 'any';
 };
 
 export type SystemOverlayData = {

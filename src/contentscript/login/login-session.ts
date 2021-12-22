@@ -12,6 +12,8 @@ export class LoginSession {
     createdAt: string = null;
     loginConfirmation?: { loginMessage: string, signature: string } = null;
 
+    logoutHandler?: (ls: any) => void;
+
     private get _network() {
         return this.authMethod.split('/')[0];
     }
@@ -39,6 +41,8 @@ export class LoginSession {
     async logout() {
         const { killSession } = await initBGFunctions(browser);
         await killSession(this.sessionId);
+        const ls = {}; // ToDo: specify session
+        this.logoutHandler?.call({}, ls);
     }
 
     async wallet() {

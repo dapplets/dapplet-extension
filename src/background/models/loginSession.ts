@@ -9,10 +9,7 @@ export default class LoginSession extends Base {
     walletType: string = null;
     expiresAt: string = null;
     createdAt: string = null;
-    loginConfirmation: {
-        loginMessage: string, 
-        signature: string
-    } = null;
+    loginConfirmationId: string = null;
 
     isExpired() {
         const expiresAt = new Date(this.expiresAt).getTime();

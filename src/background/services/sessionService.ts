@@ -1,18 +1,22 @@
+import { toUtf8Bytes } from '@ethersproject/strings';
+import { hexlify } from '@ethersproject/bytes';
+
 import { generateGuid } from '../../common/helpers';
 import { ChainTypes, LoginRequest, WalletTypes } from '../../common/types';
 import { WalletService } from './walletService';
-import LoginSessionBrowserStorage from '../browserStorages/loginSessionBrowserStorage';
 import LoginSession from '../models/loginSession';
 import { OverlayService } from './overlayService';
-import SessionEntryBrowserStorage from '../browserStorages/sessionEntryBrowserStorage';
 import SessionEntry from '../models/sessionEntry';
-import { toUtf8Bytes } from '@ethersproject/strings';
-import { hexlify } from '@ethersproject/bytes';
+import LoginConfirmation from '../models/loginConfirmation';
+import LoginSessionBrowserStorage from '../browserStorages/loginSessionBrowserStorage';
+import SessionEntryBrowserStorage from '../browserStorages/sessionEntryBrowserStorage';
+import LoginConfirmationBrowserStorage from '../browserStorages/loginConfirmationBrowserStorage';
 
 const DEFAULT_REQUEST_TIMEOUT = 1000 * 60 * 60 * 24 * 7;
 
 export class SessionService {
 
+    private _loginConfirmationBrowserStorage = new LoginConfirmationBrowserStorage();
     private _loginSessionBrowserStorage = new LoginSessionBrowserStorage();
     private _sessionEntryBrowserStorage = new SessionEntryBrowserStorage();
 
@@ -30,6 +34,23 @@ export class SessionService {
         return await this._loginSessionBrowserStorage.getById(sessionId);
     }
 
+    async getSuitableLoginConfirmations(moduleName: string, request: LoginRequest): Promise<LoginConfirmation[]> {
+        let confirmations = await this._loginConfirmationBrowserStorage.getAll();
+
+        if (confirmations.length === 0) return [];
+        
+        const descriptors = await this._walletService.getWalletDescriptors();
+        const suitableWallets = descriptors.filter(x => x.connected).filter(x => x.chain ? request.authMethods.includes(x.chain) : true);
+
+        confirmations = confirmations
+            .filter(x => !x.isExpired())
+            .filter(x => request.authMethods.includes(x.authMethod))
+            .filter(x => request.from === 'me' ? x.from === moduleName : true)
+            .filter(x => !!suitableWallets.find(y => y.chain === x.authMethod && y.type === x.wallet && x.address === y.account));
+
+        return confirmations;
+    }
+
     async isValidSession(sessionId: string): Promise<boolean> {
         const session = await this.getSession(sessionId);
         if (!session) return false;
@@ -38,51 +59,84 @@ export class SessionService {
     }
 
     async killSession(sessionId: string): Promise<void> {
-        const session = await this._loginSessionBrowserStorage.getById(sessionId);
+        const session = await this._loginSessionBrowserStorage.getById(sessionId); // ToDo: remove?
         await this.clearItems(sessionId);
         await this._loginSessionBrowserStorage.deleteById(sessionId);
     }
 
     async createSession(moduleName: string, request: LoginRequest): Promise<LoginSession> {
-        const timeout = request.timeout ?? DEFAULT_REQUEST_TIMEOUT;
-        const secure = request.secureLogin ?? 'disabled';
-        
-        if (!['disabled', 'optional', 'required'].includes(secure)) throw new Error('Invalid "secureLogin" value.');
+        request.timeout = request.timeout ?? DEFAULT_REQUEST_TIMEOUT;
+        request.secureLogin = request.secureLogin ?? 'disabled';
+        request.from = request.from ?? 'any';
 
-        const { wallet: walletType, chain } = await this._overlayService.openLoginSessionOverlay(moduleName, request);
+        if (request.authMethods.length === 0) throw new Error(`"authMethods" is required.`);
+
+        if (request.secureLogin === 'required') {
+            for (const authMethod of request.authMethods) {
+                if (ChainTypes.ETHEREUM_GOERLI !== authMethod) {
+                    throw new Error(`${authMethod} doesn't support secure login.`);
+                }
+            }
+        }
+        
+        if (!['disabled', 'optional', 'required'].includes(request.secureLogin)) throw new Error('Invalid "secureLogin" value.');
+
+        const { wallet, chain, confirmationId } = await this._overlayService.openLoginSessionOverlay(moduleName, request);
+
+        if (request.secureLogin === 'required' && !confirmationId) throw new Error('LoginConfirmation must be selected in secure login mode.');
+        if (!request.authMethods.includes(chain)) throw new Error('Invalid auth method selected.');
+
+        const descriptors = await this._walletService.getWalletDescriptors();
+        if (descriptors.findIndex(x => x.connected && x.type === wallet && x.chain === chain) === -1) {
+            throw new Error('Selected wallet is disconnected.');
+        }
+
+        if (confirmationId) {
+            const loginConfirmations = await this.getSuitableLoginConfirmations(moduleName, request);
+            if (loginConfirmations.findIndex(x => x.loginConfirmationId === confirmationId) === -1) {
+                throw new Error('Login confirmation is expired.');
+            }
+        }
 
         const session = new LoginSession();
-
-        const creationDate = new Date();
-        
+        const creationDate = new Date();        
         session.sessionId = generateGuid();
         session.moduleName = moduleName;
         session.authMethod = chain;
-        session.walletType = walletType;
-        session.expiresAt = new Date(creationDate.getTime() + timeout).toISOString();
+        session.walletType = wallet;
+        session.expiresAt = new Date(creationDate.getTime() + request.timeout).toISOString();
         session.createdAt = creationDate.toISOString();
-
-        // ToDo: secure login optional 
-        if (secure === 'required') {
-            const message = JSON.stringify({
-                timeout: session.expiresAt,
-                from: moduleName,
-                role: request.role,
-                help: request.help
-            }, null, 2);
-              
-            const wallet = await this._walletService.getGenericWallet(chain, walletType);
-            const signature = await wallet.signMessage(hexlify(toUtf8Bytes(message)));
-
-            session.loginConfirmation = {
-                loginMessage: message,
-                signature: signature
-            };
-        }
+        session.loginConfirmationId = confirmationId;
 
         await this._loginSessionBrowserStorage.create(session);
 
         return session;
+    }
+
+    async createLoginConfirmation(moduleName: string, request: LoginRequest, chain: ChainTypes, wallet: WalletTypes): Promise<LoginConfirmation> {
+        const loginConfirmation = new LoginConfirmation();
+        const creationDate = new Date();
+        const expiresAt = new Date(creationDate.getTime() + request.timeout).toISOString();
+        loginConfirmation.loginConfirmationId = generateGuid();
+        loginConfirmation.authMethod = chain;
+        loginConfirmation.wallet = wallet;
+        loginConfirmation.timeout = expiresAt;
+        loginConfirmation.from = moduleName;
+        loginConfirmation.role = request.role;
+        loginConfirmation.help = request.help;        
+        loginConfirmation.expiresAt = expiresAt;
+        loginConfirmation.createdAt = creationDate.toISOString();
+          
+        const genericWallet = await this._walletService.getGenericWallet(chain, wallet);
+        const signature = await genericWallet.signMessage(hexlify(toUtf8Bytes(loginConfirmation.loginMessage())));
+        loginConfirmation.signature = signature;
+
+        const address = await genericWallet.getAddress();
+        loginConfirmation.address = address;
+
+        await this._loginConfirmationBrowserStorage.create(loginConfirmation);
+
+        return loginConfirmation;
     }
 
     async getItem(sessionId: string, key: string): Promise<any> {

@@ -5,10 +5,15 @@ import { browser } from "webextension-polyfill-ts";
 import { Button, Segment, Loader } from "semantic-ui-react";
 import { Redirect } from "react-router-dom";
 import { Bus } from '../../../../common/bus';
-import { ChainTypes, WalletDescriptor, WalletTypes } from "../../../../common/types";
+import { ChainTypes, LoginRequest, WalletDescriptor, WalletTypes } from "../../../../common/types";
 import { Loading } from "../../../components/Loading";
 
 interface Props {
+    data: {
+        frameId: string;
+        app: string;
+        loginRequest: LoginRequest;
+    }
     bus: Bus;
     chain: ChainTypes;
     frameId: string;
@@ -43,6 +48,12 @@ export default class extends React.Component<Props, State> {
             await connectWallet(this.props.chain, WalletTypes.NEAR, null);
             const descriptors = await getWalletDescriptors();
             const descriptor = descriptors.find(x => x.chain === this.props.chain && x.type === WalletTypes.NEAR);
+
+            // sign message if required
+            const secureLogin = this.props.data.loginRequest.secureLogin;
+            if (secureLogin === 'required') {
+                throw new Error('NEAR Wallet doesn\'t support message signing.');
+            }
             
             if (this._mounted) {
                 this.setState({ connected: true, descriptor });
@@ -83,11 +94,12 @@ export default class extends React.Component<Props, State> {
         }
 
         if (s.error) return (
-            <>
-                <h3>Error</h3>
-                <p>{s.error}</p>
-                <Button onClick={() => this.setState({ toBack: true })}>Back</Button>
-            </>
+            <Loading 
+                title="Error" 
+                subtitle={s.error}
+                content={<div></div>}
+                onBackButtonClick={() => this.setState({ toBack: true })}
+            />
         );
 
         if (!s.connected) return (

@@ -5,10 +5,15 @@ import { browser } from "webextension-polyfill-ts";
 import { Button, Segment, Loader } from "semantic-ui-react";
 import { Redirect } from "react-router-dom";
 import { Bus } from '../../../../common/bus';
-import { ChainTypes, WalletDescriptor, WalletTypes } from "../../../../common/types";
+import { ChainTypes, LoginRequest, WalletDescriptor, WalletTypes } from "../../../../common/types";
 import { Loading } from "../../../components/Loading";
 
 interface Props {
+    data: {
+        frameId: string;
+        app: string;
+        loginRequest: LoginRequest;
+    }
     bus: Bus;
     frameId: string;
 }
@@ -16,6 +21,7 @@ interface Props {
 interface State {
     error: string;
     connected: boolean;
+    signing: boolean;
     toBack: boolean;
     descriptor: WalletDescriptor | null;
 }
@@ -29,6 +35,7 @@ export default class extends React.Component<Props, State> {
         this.state = {
             error: null,
             connected: false,
+            signing: false,
             toBack: false,
             descriptor: null
         };
@@ -38,14 +45,34 @@ export default class extends React.Component<Props, State> {
         this._mounted = true;
 
         try {
-            const { connectWallet, getWalletDescriptors } = await initBGFunctions(browser);
+            const { connectWallet, getWalletDescriptors, createLoginConfirmation } = await initBGFunctions(browser);
             await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.METAMASK, null);
             const descriptors = await getWalletDescriptors();
             const descriptor = descriptors.find(x => x.type === WalletTypes.METAMASK);
+
+            // sign message if required
+            let confirmationId = undefined;
+            const secureLogin = this.props.data.loginRequest.secureLogin;
+            if (secureLogin === 'required') {
+                this.setState({ signing: true });
+                const app = this.props.data.app;
+                const loginRequest = this.props.data.loginRequest;
+                const chain = ChainTypes.ETHEREUM_GOERLI;
+                const wallet = WalletTypes.METAMASK;
+                const confirmation = await createLoginConfirmation(app, loginRequest, chain, wallet);
+                confirmationId = confirmation.loginConfirmationId;
+            }
             
             if (this._mounted) {
                 this.setState({ connected: true, descriptor });
-                this.continue();
+                this.props.bus.publish('ready', [
+                    this.props.frameId,
+                    { 
+                        wallet: WalletTypes.METAMASK,
+                        chain: ChainTypes.ETHEREUM_GOERLI, 
+                        confirmationId
+                    }
+                ]);
             }
         } catch (err) {
             if (this._mounted) {
@@ -82,11 +109,20 @@ export default class extends React.Component<Props, State> {
         }
 
         if (s.error) return (
-            <>
-                <h3>Error</h3>
-                <p>{s.error}</p>
-                <Button onClick={() => this.setState({ toBack: true })}>Back</Button>
-            </>
+            <Loading 
+                title="Error" 
+                subtitle={s.error}
+                content={<div></div>}
+                onBackButtonClick={() => this.setState({ toBack: true })}
+            />
+        );
+
+        if (s.signing) return (
+            <Loading
+                title="MetaMask" 
+                subtitle="Please confirm signing in your wallet to continue" 
+                onBackButtonClick={() => this.setState({ toBack: true })}
+            />
         );
 
         if (!s.connected) return (

@@ -56,9 +56,11 @@ export class Overlay extends React.Component<Props, State> {
 			<div className={styles.wrapper}>
 				<header className={styles.header}>
 					<div className={styles.step}>
-						<img src={ArrowLeft} onClick={this.backButtonClickHandler.bind(this)}/>
-						<span>{s.currentTabIndex + 1} of {p.children.length}</span>
-						<img src={ArrowRight} onClick={this.nextButtonClickHandler.bind(this)}/>
+						{(p.children.length > 1) && <>
+							<img src={ArrowLeft} onClick={this.backButtonClickHandler.bind(this)}/>
+							<span>{s.currentTabIndex + 1} of {p.children.length}</span>
+							<img src={ArrowRight} onClick={this.nextButtonClickHandler.bind(this)}/>
+						</>}
 					</div>
 					<h2 className={styles.title}>
 						{p.title}<br/>{p.subtitle}

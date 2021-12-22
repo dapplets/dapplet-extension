@@ -3,7 +3,7 @@
 
 	text-align: center;
 
-	color: #2A2A2A;
+	color: #2a2a2a;
 
 	font-size: 22px;
 	line-height: 26px;
@@ -28,7 +28,7 @@
 	text-align: center;
 	text-decoration: none;
 
-	color: #D9304F;
+	color: #d9304f;
 
 	font-size: 14px;
 	font-weight: 600;
@@ -36,11 +36,11 @@
 }
 
 .link:hover {
-	color: #E52347;
+	color: #e52347;
 }
 
 .link:active {
-	color: #95132B;
+	color: #95132b;
 }
 
 .createSession {
@@ -64,6 +64,29 @@
 	padding-left: 0;
 
 	list-style: none;
+	max-height: 295px;
+	overflow-y: auto;
+
+	&::-webkit-scrollbar {
+		width: 10px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background: #f5f5f5;
+		border-left: 5px solid rgba(0, 0, 0, 0);
+		background-clip: padding-box;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: #d9304f;
+		border-left: 5px solid rgba(0, 0, 0, 0);
+		background-clip: padding-box;
+	}
+
+	&::-webkit-scrollbar-thumb:hover {
+		background: #e52347;
+		background-clip: padding-box;
+	}
 }
 
 .item {

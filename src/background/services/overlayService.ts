@@ -24,7 +24,7 @@ export class OverlayService {
         return await this._openLegacyOverlay("OPEN_LOGIN_OVERLAY", { topic: 'login', args: [app, chain] });
     }
 
-    public async openLoginSessionOverlay(app: string | DefaultSigners, loginRequest: LoginRequest): Promise<{ wallet: WalletTypes, chain: ChainTypes }> {
+    public async openLoginSessionOverlay(app: string | DefaultSigners, loginRequest: LoginRequest): Promise<{ wallet: WalletTypes, chain: ChainTypes, confirmationId?: string }> {
         return await this._openSystemOverlay(SystemOverlayTabs.LOGIN_SESSION, { app, loginRequest });
     }
 

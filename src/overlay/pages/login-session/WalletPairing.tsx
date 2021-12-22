@@ -5,7 +5,7 @@ import { Redirect } from 'react-router-dom';
 
 // import * as logos from '../../../common/resources/wallets';
 import { Bus } from "../../../common/bus";
-import { ChainTypes, WalletDescriptor, WalletTypes } from "../../../common/types";
+import { ChainTypes, LoginRequest, WalletDescriptor, WalletTypes } from "../../../common/types";
 import { ConnectWallet } from './ConnectWallet';
 
 import DappletsLogo from '../../assests/dapplets.svg';
@@ -15,6 +15,11 @@ import NearMainnetLogo from '../../assests/near_mainnet.svg';
 import NearTestnetLogo from '../../assests/near_testnet.svg';
 
 interface IWalletPairingProps {
+    data: {
+        frameId: string;
+        app: string;
+        loginRequest: LoginRequest;
+    }
     bus: Bus;
     chains: ChainTypes[];
 }
@@ -92,6 +97,7 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
 
     render() {
         const p = this.props;
+        const secureLogin = this.props.data.loginRequest.secureLogin;
 
         if (this.state.redirect) {
             return <Redirect to={this.state.redirect} />
@@ -105,8 +111,8 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
 
         const disconnectedWallets = this.state.descriptors
             .filter(x => !x.connected)
-            .filter(x => p.chains.length > 0 ? p.chains.includes(x.chain) : true);
-
+            .filter(x => p.chains.length > 0 ? p.chains.includes(x.chain) : true)
+            .filter(x => secureLogin === 'required' ? x.chain === ChainTypes.ETHEREUM_GOERLI : true);
 
         const wallets = disconnectedWallets.map(x => this.getMeta(x.type, x.chain));
 

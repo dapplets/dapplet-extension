@@ -53,8 +53,10 @@ browser.runtime.onMessage.addListener(
 
     // SessionService
     createSession: sessionService.createSession.bind(sessionService),
+    createLoginConfirmation: sessionService.createLoginConfirmation.bind(sessionService),
     killSession: sessionService.killSession.bind(sessionService),
     getSessions: sessionService.getSessions.bind(sessionService),
+    getSuitableLoginConfirmations: sessionService.getSuitableLoginConfirmations.bind(sessionService),
     isValidSession: sessionService.isValidSession.bind(sessionService),
     getSessionItem: sessionService.getItem.bind(sessionService),
     setSessionItem: sessionService.setItem.bind(sessionService),
