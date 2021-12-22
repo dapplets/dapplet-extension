@@ -87,8 +87,8 @@ export class LoginConfirmations extends React.Component<Props, State> {
 
         return (
             <div className={base.wrapper}>
-				<h2 className={base.title}>Active sessions</h2>
-				<p className={base.subtitle}>Reuse active login</p>
+				<h2 className={base.title}>Login Confirmations</h2>
+				<p className={base.subtitle}>Reuse signed login confirmation</p>
 
 				<ul className={base.list}>
                     {s.confirmations.map((x, i) => {
@@ -112,7 +112,7 @@ export class LoginConfirmations extends React.Component<Props, State> {
 				{(connectedWallets.length > 0) ? <button 
                     className={cn(base.createSession, base.link)}
                     onClick={() => this.setState({ redirect: '/connected-wallets' })}
-                >Create new session</button> : null}
+                >Sign new confirmation</button> : null}
 			</div>
         );
     }

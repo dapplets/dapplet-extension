@@ -132,8 +132,9 @@ export class ConnectedWallets extends React.Component<Props, State> {
 
         return (
             <div className={base.wrapper}>
-				<h2 className={base.title}>Create new session</h2>
-				<p className={base.subtitle}>select connected wallet</p>
+				<h2 className={base.title}>Connected Wallets</h2>
+				{(secureLogin === 'required') && <p className={base.subtitle}>Select connected wallet to sign a new login confirmation</p>}
+                {(secureLogin === 'disabled') && <p className={base.subtitle}>Select connected wallet to log in</p>}
 
 				<ul className={base.list}>
                     {connectedWallets.map((x, i) => (
@@ -147,8 +148,8 @@ export class ConnectedWallets extends React.Component<Props, State> {
                                 accountIcon={x.account ? makeBlockie(x.account) : null}
                                 buttons={
                                     <>
-                                        {(secureLogin === 'disabled' || secureLogin === 'optional') ? <Button onClick={() => this.selectWallet(x.type, x.chain)}>Use</Button> : null}
-                                        {(secureLogin === 'required' || secureLogin === 'optional') ? <Button onClick={() => this.loginWallet(x.type, x.chain)}>Login</Button> : null}
+                                        {(secureLogin === 'disabled' || secureLogin === 'optional') ? <Button onClick={() => this.selectWallet(x.type, x.chain)}>Select</Button> : null}
+                                        {(secureLogin === 'required' || secureLogin === 'optional') ? <Button onClick={() => this.loginWallet(x.type, x.chain)}>Sign</Button> : null}
                                     </>
                                 }
                             />
@@ -159,7 +160,7 @@ export class ConnectedWallets extends React.Component<Props, State> {
 				{(disconnectedWallets.length > 0) ? <button 
                     className={cn(base.createSession, base.link)}
                     onClick={() => this.setState({ redirect: '/pairing' })}
-                >Create new session</button> : null}
+                >Connect another wallet</button> : null}
 			</div>
         );
     }
