@@ -379,9 +379,9 @@ export default class Core {
 
     public storage: AppStorage;
 
-    public contract(type: 'ethereum', address: string, options: Abi, app?: string): any
-    public contract(type: 'near', address: string, options: { viewMethods: string[]; changeMethods: string[], network?: 'mainnet' | 'testnet' }, app?: string): any
-    public contract(type: 'near' | 'ethereum', address: string, options: any, app?: string): any {
+    public async contract(type: 'ethereum', address: string, options: Abi, app?: string): Promise<any>
+    public async contract(type: 'near', address: string, options: { viewMethods: string[]; changeMethods: string[], network?: 'mainnet' | 'testnet' }, app?: string): Promise<any>
+    public async contract(type: 'near' | 'ethereum', address: string, options: any, app?: string): Promise<any> {
         if (type === 'ethereum') {
             return ethereum.createContractWrapper(app, { network: 'goerli'}, address, options);
         } else if (type === 'near') {
