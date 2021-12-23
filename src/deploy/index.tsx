@@ -384,10 +384,9 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         const isNotTrustedUser = isNotNullCurrentAccount && !s.trustedUsers.find(x => x.account.toLowerCase() === currentAccount.toLowerCase());
         const isDependenciesExist = dependenciesChecking.length > 0 ? dependenciesChecking.every(x => x.isExists === true) : true;
         const isDependenciesLoading = dependenciesChecking.length > 0 ? dependenciesChecking.every(x => x.isExists === undefined) : false;
-        const isManifestValid = mi?.name && mi?.title && mi?.description && mi?.type;
+        const isManifestValid = mi?.name && mi?.title && mi?.type;
         const isDeployButtonDisabled = loading || s.deploymentStatus === DeploymentStatus.Deployed || !isNotNullCurrentAccount || isNotAnOwner || isNoStorage || isDependenciesLoading || !isDependenciesExist || !isManifestValid;
         const isReuploadButtonDisabled = !isAlreadyDeployed || mode === FormMode.Creating || !vi;
-        
 
         return (
             <React.Fragment>
