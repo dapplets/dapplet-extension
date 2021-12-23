@@ -180,7 +180,7 @@ export class WalletService {
         }
     }
 
-    public async near_sendCustomRequest(app: string | DefaultSigners, network: string, sessionId: string, method: string, params: any[]): Promise<any> {
+    public async near_sendCustomRequest(app: string | DefaultSigners, network: string, method: string, params: any[]): Promise<any> {
         const type = (network === 'testnet') ? ChainTypes.NEAR_TESTNET : (network === 'mainnet') ? ChainTypes.NEAR_MAINNET : null;
         if (type === null) throw new Error('Unsupported network for NEAR Protocol blockchain.');
         const wallet = await this._getInternalSignerFor(app, type, false) as NearWallet;
