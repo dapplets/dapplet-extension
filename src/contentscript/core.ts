@@ -448,7 +448,7 @@ export default class Core {
         const session = await createSession(moduleName, request);
 
         const ls = {}; // ToDo: specify LoginInfo
-        request?.onLogin.call({}, ls);
+        request.onLogin?.call({}, ls);
 
         const loginSession = new LoginSession(session);
         loginSession.logoutHandler = request.onLogout;
