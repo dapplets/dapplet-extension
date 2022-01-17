@@ -53,7 +53,7 @@ export default class Core {
                     } else if (message.type === 'OPEN_GUIDE_OVERLAY') {
                         return this.waitGuideOverlay(message.payload);
                     } else if (message.type === 'OPEN_PAIRING_OVERLAY') {
-                        if (message.payload.topic === 'walletconnect' && message.payload.args.length > 1) {
+                        if (message.payload.topic === 'walletconnect' && message.payload.args[1]) {
                             const [, overlayId] = message.payload.args;
                             const targetOverlay = this.overlayManager.getOverlays().find(x => x.id === overlayId);
                             targetOverlay?.send(message.payload.topic, message.payload.args);
