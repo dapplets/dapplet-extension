@@ -17,9 +17,9 @@ export const Session: FC<SessionProps> = (p: SessionProps) => {
 							<img src={p.providerIcon} className={styles.icon} />
 							<img src={p.walletIcon} className={styles.icon} />
 						</ul>
-						<span className={styles.time}>
+						{p.lastUsage && <span className={styles.time}>
 							<ReactTimeAgo date={new Date(p.lastUsage)} locale="en-US" />
-						</span>
+						</span>}
 					</div>
 				</div>
 			</div>
