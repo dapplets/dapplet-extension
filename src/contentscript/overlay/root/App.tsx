@@ -1,105 +1,137 @@
 import * as React from "react";
 import INNER_STYLE from "!raw-loader!./overlay.css";
-import { Overlay } from "./overlay";
+import { browser } from "webextension-polyfill-ts";
+import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { ContentItem } from "./ContentItem";
+import { TabItem } from "./TabItem";
+import { OverlayManager } from "./overlayManager";
 
 interface P {
-  onToggle: () => void;
-  overlays: Overlay[];
+    onToggle: () => void;
+    overlayManager: OverlayManager;
 }
 
-interface S {}
+interface S {
+    isLoadingMap: { [overlayId: string]: boolean };
+    isDevMode: boolean;
+}
 
 export class App extends React.Component<P, S> {
-  constructor(props: P) {
-    super(props);
-  }
+    private iframeRefs = new Map<string, HTMLIFrameElement>();
 
-  render() {
-    const overlays = this.props.overlays;
+    constructor(props: P) {
+        super(props);
+        this.state = {
+            isLoadingMap: Object.fromEntries(
+                this.getOverlays().map((x) => [x.id, true])
+            ),
+            isDevMode: false
+        };
+    }
 
-    return (
-      <>
-        <style>{INNER_STYLE}</style>
-        <div className="dapplets-overlay-bucket-bar"></div>
-        <div className="dapplets-overlay-toolbar">
-          <ul>
-            <li>
-              <button
-                title="Toggle Overlay"
-                className="dapplets-overlay-frame-button dapplets-overlay-frame-button-sidebar-toggle"
-                onClick={this.props.onToggle}
-              >
-                ⇄
-              </button>
-            </li>
-          </ul>
-        </div>
-        <div className="dapplets-overlay-nav">
-          <div className="dapplets-overlay-nav-top-panel">
-            <div className="dapplets-overlay-nav-tab-list">
-              {overlays.map((x) => (
-                <div className="dapplets-overlay-nav-tab-item dapplets-overlay-nav-tab-item-active">
-                  <div
-                    title={x.title}
-                    className="dapplets-overlay-nav-tab-item-title"
-                  >
-                    {x.title}
-                  </div>
-                  <div className="dapplets-overlay-nav-tab-item-close-btn">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="4 4 16 16"
-                      style={{ width: "10px" }}
-                    >
-                      <path d="M0 0h24v24H0z" fill="none"></path>
-                      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
-                    </svg>
-                  </div>
+    async componentDidMount() {
+        const { getDevMode } = await initBGFunctions(browser);
+        const isDevMode = await getDevMode();
+        this.setState({ isDevMode });
+    }
+
+    closeClickHandler = (overlayId: string) => {
+        const overlay = this.getOverlays().find((x) => x.id === overlayId);
+        overlay.close();
+    };
+
+    tabClickHandler = (overlayId: string) => {
+        const overlay = this.getOverlays().find((x) => x.id === overlayId);
+        if (!overlay) return;
+        this.props.overlayManager.activate(overlay);
+    };
+
+    loadHandler = (overlayId: string) => {
+        const { isLoadingMap } = this.state;
+        isLoadingMap[overlayId] = false;
+        this.setState({ isLoadingMap });
+    };
+
+    getOverlays() {
+        return this.props.overlayManager.getOverlays();
+    }
+
+    render() {
+        const p = this.props;
+        const s = this.state;
+        const overlays = this.getOverlays().filter(x => !x.parent);
+        const activeOverlayId = p.overlayManager.activeOverlay?.id;
+
+        return (
+            <>
+                <style>{INNER_STYLE}</style>
+                <div className="dapplets-overlay-bucket-bar"></div>
+                <div className="dapplets-overlay-toolbar">
+                    <ul>
+                        <li>
+                            <button
+                                title="Toggle Overlay"
+                                className="dapplets-overlay-frame-button dapplets-overlay-frame-button-sidebar-toggle"
+                                onClick={this.props.onToggle}
+                            >
+                                ⇄
+                            </button>
+                        </li>
+                    </ul>
                 </div>
-              ))}
-            </div>
-            <div className="dapplets-overlay-nav-top-actions">
-              <div className="dapplets-action-dropdown">
-                <button>
-                  <svg
-                    aria-hidden="true"
-                    focusable="false"
-                    data-prefix="fas"
-                    data-icon="bars"
-                    className="svg-inline--fa fa-bars fa-w-14"
-                    role="img"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 448 512"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"
-                    ></path>
-                  </svg>
-                </button>
-                <div>
-                  <div>Dapplets</div>
-                  <div>Wallets</div>
-                  <div>Settings</div>
-                  <div>Developer</div>
+                <div className="dapplets-overlay-nav">
+                    <div className="dapplets-overlay-nav-top-panel">
+                        <div className="dapplets-overlay-nav-tab-list">
+                            {overlays.map((x) => (
+                                <TabItem
+                                    key={x.id}
+                                    overlay={x}
+                                    isActive={x.id === activeOverlayId}
+                                    onCloseClick={this.closeClickHandler}
+                                    onTabClick={this.tabClickHandler}
+                                />
+                            ))}
+                        </div>
+                        <div className="dapplets-overlay-nav-top-actions">
+                            <div className="dapplets-action-dropdown">
+                                <button>
+                                    <svg
+                                        aria-hidden="true"
+                                        focusable="false"
+                                        data-prefix="fas"
+                                        data-icon="bars"
+                                        className="svg-inline--fa fa-bars fa-w-14"
+                                        role="img"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 448 512"
+                                    >
+                                        <path
+                                            fill="currentColor"
+                                            d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"
+                                        ></path>
+                                    </svg>
+                                </button>
+                                <div>
+                                    <div onClick={() => this.props.overlayManager.openPopup('dapplets')}>Dapplets</div>
+                                    <div onClick={() => this.props.overlayManager.openPopup('wallets')}>Wallets</div>
+                                    <div onClick={() => this.props.overlayManager.openPopup('settings')}>Settings</div>
+                                    {s.isDevMode && <div onClick={() => this.props.overlayManager.openPopup('developer')}>Developer</div>}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="dapplets-overlay-nav-content-list">
+                        {overlays.map((x) => (
+                            <ContentItem
+                                overlay={x}
+                                key={x.id}
+                                isActive={x.id === activeOverlayId}
+                                overlayManager={p.overlayManager}
+                            />
+                        ))}
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div className="dapplets-overlay-nav-content-list">
-            {overlays.map((x) => (
-              <div className="dapplets-overlay-nav-content-item dapplets-overlay-nav-content-item-active">
-                <iframe
-                  allow="clipboard-write"
-                  src={x.uri}
-                  allowFullScreen
-                  name={"dapplet-overlay/" + x.id}
-                ></iframe>
-              </div>
-            ))}
-          </div>
-        </div>
-      </>
-    );
-  }
+            </>
+        );
+    }
 }
