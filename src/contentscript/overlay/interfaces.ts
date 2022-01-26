@@ -13,6 +13,7 @@ export interface IOverlay extends IPubSub {
     onMessage(handler: (topic: string, message: any) => void): { off: () => void; };
     open(callback?: Function): void;
     close(): void;
+    frame: HTMLIFrameElement;
 }
 
 export interface IOverlayManager {

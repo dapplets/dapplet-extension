@@ -80,6 +80,7 @@ export class Overlay implements IOverlay {
     public close() {
         this._isFrameLoaded = false;
         this._manager.unregister(this);
+        this.frame.dispatchEvent(new CustomEvent('onOverlayClose'));
     }
 
     public send(topic: string, args: any[]) {
