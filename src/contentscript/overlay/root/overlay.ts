@@ -1,7 +1,6 @@
 import { generateGuid } from '../../../common/helpers';
 import { IOverlay } from '../interfaces';
 import { OverlayManager } from './overlayManager';
-// import PopupLoader from '../../../overlay/assests/loader.svg';
 
 export class Overlay implements IOverlay {
     public _queue: any[] = [];
@@ -149,34 +148,4 @@ export class Overlay implements IOverlay {
             off: () => window.removeEventListener('message', listener)
         };
     }
-
-    // private _addLoaderPopup() {
-    //     if (!this.loader) {
-    //         this.loader = document.createElement('div');
-    //         this.loader.classList.add('popup-loader-container');
-    //     }
-
-    //     this.loader.innerHTML = `
-    //         <style>
-    //             .popup-loader-container {
-    //                 background: #fff;
-    //                 box-sizing: border-box;
-    //                 padding: 18px;
-    //                 border-radius: 10px;
-    //             }
-
-    //             .popup-loader-container img {
-    //                 width: 143px;
-    //                 height: 143px;
-    //                 position: absolute;
-    //                 top: 50%;
-    //                 left: 50%;
-    //                 margin: -71.5px 0 0 -71.5px;
-    //             }
-    //         </style>
-    //         <div>
-    //             <img src="${PopupLoader}" alt="Loading" />
-    //         </div>
-    //   `;
-    // }
 }
