@@ -2,6 +2,7 @@ import * as React from "react";
 import { Overlay } from "./overlay";
 import cn from "classnames";
 import { OverlayManager } from "./overlayManager";
+import { PopupItem } from './PopupItem';
 
 const OVERLAY_LOADING_TIMEOUT = 5000;
 
@@ -42,18 +43,14 @@ export class ContentItem extends React.Component<P, S> {
             clearTimeout(this.timeoutId);
             this.setState({ loadingMode: LoadingMode.NotLoading });
         });
-
-        // ToDo: popup
-        const childrenOverlays = this.props.overlayManager.getOverlays().filter(x => x.parent === this.props.overlay);
-        childrenOverlays.forEach(x => {
-            this.ref.current.appendChild(x.frame);
-        });
     }
 
     render() {
         const s = this.state;
         const p = this.props;
         const x = this.props.overlay;
+
+        const childrenOverlays = p.overlayManager.getOverlays().filter(x => x.parent === p.overlay);
 
         return (
             <div
@@ -90,6 +87,8 @@ export class ContentItem extends React.Component<P, S> {
                         </div>
                     </div>
                 )}
+
+                {childrenOverlays.map(x => <PopupItem key={x.id} overlay={x} />)}
             </div>
         );
     }
