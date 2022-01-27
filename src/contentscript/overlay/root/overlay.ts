@@ -1,13 +1,10 @@
 import { generateGuid } from '../../../common/helpers';
 import { IOverlay } from '../interfaces';
 import { OverlayManager } from './overlayManager';
-import PopupLoader from '../../../overlay/assests/loader.svg';
-
-const OVERLAY_LOADING_TIMEOUT = 5000;
 
 export class Overlay implements IOverlay {
-    private _queue: any[] = [];
-    private _isFrameLoaded: boolean = false;
+    public _queue: any[] = [];
+    public _isFrameLoaded: boolean = false;
     private _msgCount: number = 0;
 
     public readonly id = generateGuid();
@@ -15,15 +12,14 @@ export class Overlay implements IOverlay {
     public registered: boolean = false;
     public onmessage: (topic: string, message: any) => void = null;
     public onclose: Function = null;
-    public loader: HTMLDivElement;
     public onregisteredchange: (value: boolean) => void = null;
 
     constructor(
-        private _manager: OverlayManager, 
-        public uri: string, 
-        public title: string, 
-        public source: string = null, 
-        public hidden: boolean = false, 
+        private _manager: OverlayManager,
+        public uri: string,
+        public title: string,
+        public source: string = null,
+        public hidden: boolean = false,
         public parent: Overlay = null
     ) {
 
@@ -33,7 +29,6 @@ export class Overlay implements IOverlay {
         //     url.searchParams.set('_dc', Date.now().toString());
         // }
 
-        this._addLoader();
         this.frame = document.createElement('iframe');
         this.frame.allow = 'clipboard-write';
         // this.frame.sandbox.add('allow-scripts'); // to use js frameworks in overlays
@@ -42,7 +37,7 @@ export class Overlay implements IOverlay {
         this.frame.src = uri;
         this.frame.allowFullscreen = true;
         this.frame.addEventListener('load', () => {
-            this.loader?.remove();
+            // this.loader?.remove();
             this._isFrameLoaded = true;
             this._queue.forEach(msg => this._send(msg));
             this._queue = [];
@@ -54,7 +49,6 @@ export class Overlay implements IOverlay {
      * Opens tab. If it doesn't exist, then adds tab to the panel.
      */
     public open(callback?: Function) {
-        this._addLoader();
         this._manager.register(this);
         this._manager.activate(this);
         this._manager.open();
@@ -62,10 +56,7 @@ export class Overlay implements IOverlay {
         if (this._isFrameLoaded) {
             callback?.apply({});
         } else {
-            const timeoutId = setTimeout(() => this._addSlowMessage(), OVERLAY_LOADING_TIMEOUT);
-
             const loadHandler = () => {
-                clearTimeout(timeoutId);
                 callback?.apply({});
                 this.frame.removeEventListener('load', loadHandler);
             }
@@ -85,7 +76,6 @@ export class Overlay implements IOverlay {
 
     public send(topic: string, args: any[]) {
         const msg = JSON.stringify({ topic, args }); // ToDo: fix args
-        // this.frame.contentWindow.postMessage(msg, '*');
         this._send(msg);
     }
 
@@ -158,163 +148,5 @@ export class Overlay implements IOverlay {
         return {
             off: () => window.removeEventListener('message', listener)
         };
-    }
-
-    private _addLoader() {
-        if (this.parent) {
-            this._addLoaderPopup();
-        } else {
-            this._addLoaderOverlay();
-        }
-    }
-
-    private _addLoaderOverlay() {
-        if (!this.loader) {
-            this.loader = document.createElement('div');
-            this.loader.classList.add('loader-container');
-        }
-
-        this.loader.innerHTML = `
-          <style>
-              .loader-container {
-                  z-index: -1;
-                  position: absolute;
-                  top: calc(50vh - 88px);
-              }
-
-              .loader-container .flex {
-                  min-height: 60pt
-              }
-
-              .loader-container .loader {
-                  width: 50pt;
-                  height: 50pt;
-                  margin-left: auto;
-                  margin-right: auto;
-                  border: 5px solid #f1f1f1;
-                  border-top: 5px solid #000;
-                  border-radius: 50%;
-                  animation: spin 2s linear infinite
-              }
-
-              @keyframes spin {
-                  0% {
-                      transform: rotate(0)
-                  }
-                  100% {
-                      transform: rotate(360deg)
-                  }
-              }
-
-              .loader-container .load-text {
-                  padding-top: 15px;
-                  text-align: center;
-                  font: 14pt "Helvetica Neue", Helvetica, Arial, sans-serif;
-                  color: #000
-              }
-          </style>
-          <div class="flex">
-              <div class="loader"></div>
-          </div>
-          <div class="load-text">Loading Overlay...</div>
-          <div class="load-text">Downloading from decentralized sources like Swarm or IPFS can take some time</div>
-      `;
-    }
-    
-    private _addSlowMessage() {
-        if (!this.parent) {
-            this._addSlowMessageOverlay();
-        }
-    }
-
-    private _addSlowMessageOverlay() {
-        if (!this.loader) {
-            this.loader = document.createElement('div');
-            this.loader.classList.add('loader-container');
-        }
-
-        this.loader.innerHTML = `
-          <style>
-              .loader-container {
-                  z-index: -1;
-                  position: absolute;
-                  top: calc(50vh - 88px);
-              }
-
-              .loader-container .flex {
-                  min-height: 60pt
-              }
-
-              .loader-container .loader {
-                  width: 50pt;
-                  height: 50pt;
-                  margin-left: auto;
-                  margin-right: auto;
-                  border: 5px solid #f1f1f1;
-                  border-top: 5px solid #000;
-                  border-radius: 50%;
-                  animation: spin 2s linear infinite
-              }
-
-              @keyframes spin {
-                  0% {
-                      transform: rotate(0)
-                  }
-                  100% {
-                      transform: rotate(360deg)
-                  }
-              }
-
-              .loader-container .load-text {
-                  padding-top: 15px;
-                  text-align: center;
-                  font: 14pt "Helvetica Neue", Helvetica, Arial, sans-serif;
-                  color: #000
-              }
-
-              .loader-container .load-text-desc {
-                  padding-top: 15px;
-                  text-align: center;
-                  font: 12pt "Helvetica Neue", Helvetica, Arial, sans-serif;
-                  color: #000
-              }
-          </style>
-          <div class="flex">
-              <div class="loader"></div>
-          </div>
-          <div class="load-text">Loading Overlay...</div>
-          <div class="load-text">The overlay it is taking a while to load.</div>
-          <div class="load-text-desc">If the overlay does not load, try changing your preferred overlay storage in the extension settings.</div>
-      `;
-    }
-
-    private _addLoaderPopup() {
-        if (!this.loader) {
-            this.loader = document.createElement('div');
-            this.loader.classList.add('popup-loader-container');
-        }
-
-        this.loader.innerHTML = `
-            <style>
-                .popup-loader-container {
-                    background: #fff;
-                    box-sizing: border-box;
-                    padding: 18px;
-                    border-radius: 10px;
-                }
-
-                .popup-loader-container img {
-                    width: 143px;
-                    height: 143px;
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    margin: -71.5px 0 0 -71.5px;
-                }
-            </style>
-            <div>
-                <img src="${PopupLoader}" alt="Loading" />
-            </div>
-      `;
     }
 }
