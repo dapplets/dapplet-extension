@@ -269,7 +269,7 @@ export class Injector {
                 onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
                 onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
                 onShareLink: (handler: Function) => this.setShareLinkHandler(manifest.name, handler),
-                getManifest: async (moduleName?: string): Promise<Omit<ModuleInfo, "interfaces"> & VersionInfo> => {
+                getManifest: async (moduleName?: string): Promise<Omit<ModuleInfo, 'interfaces'> & VersionInfo> => {
                     let module: RegistriedModule;
                     if (moduleName) {
                         module = this.registry.find(m => m.manifest.name === moduleName);
@@ -279,7 +279,7 @@ export class Injector {
                     const { getModuleInfoByName } = await initBGFunctions(browser);
                     const registry = manifest.registryUrl;
                     const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, moduleName ? moduleName : manifest.name);
-                    return { ...moduleInfo, ...module.manifest };
+                    return { ...moduleInfo, ...module.manifest, contextIds };
                 },
                 getContentDetectors: () => core.getContentDetectors(),
                 utils: core.utils,
