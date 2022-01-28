@@ -15,6 +15,8 @@ import * as near from "./near";
 import * as ethereum from "./ethereum";
 import { LoginSession } from "./login/login-session";
 import { LoginHooks, LoginRequestSettings } from "./login/types";
+import ModuleInfo from "../background/models/moduleInfo";
+import VersionInfo from "../background/models/versionInfo";
 
 type Abi = any;
 
@@ -379,6 +381,7 @@ export default class Core {
     onAction(handler: Function) { };
     onHome(handler: Function) { };
     onShareLink(handler: (data: any) => void) { };
+    public async getManifest(moduleName?: string): Promise<Omit<ModuleInfo, "interfaces"> & VersionInfo>{ return null };
 
     public storage: AppStorage;
 
