@@ -70,4 +70,6 @@ export class GlobalConfig extends Base {
     ethereumNetworks: EthereumNetwrokConfig[] = [];
 
     nearNetworks: NearNetworkConfig[] = [];
+
+    myDapplets: { registryUrl: string, name: string }[] = [];
 }

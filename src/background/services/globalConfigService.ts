@@ -50,6 +50,7 @@ export default class GlobalConfigService {
             if (!config.siaPortalUrl) config.siaPortalUrl = this.getInitialConfig().siaPortalUrl;
             if (!config.nearNetworks) config.nearNetworks = this.getInitialConfig().nearNetworks;
             if (!config.ethereumNetworks) config.ethereumNetworks = this.getInitialConfig().ethereumNetworks;
+            if (!config.myDapplets) config.myDapplets = this.getInitialConfig().myDapplets;
         }
 
         return config ?? this.getInitialConfig();
@@ -246,6 +247,7 @@ export default class GlobalConfigService {
             nodeUrl: "http://localhost:3030",
             walletUrl: "http://localhost:4000/wallet"
         }];
+        config.myDapplets = [];
 
         return config;
     }
@@ -623,5 +625,21 @@ export default class GlobalConfigService {
     async getEthereumNetworks() {
         const config = await this.get();
         return config.ethereumNetworks;
+    }
+
+    async getMyDapplets() {
+        const config = await this.get();
+        return config.myDapplets;
+    }
+
+    async addMyDapplet(registryUrl: string, name: string) {
+        const config = await this.get();
+        if (config.myDapplets.find(x => x.registryUrl === registryUrl && x.name === name)) return;
+        config.myDapplets.push({ registryUrl, name });
+        await this.set(config);
+    }
+
+    async removeMyDapplet(registryUrl: string, name: string) {
+        return this.updateConfig(c => c.myDapplets = c.myDapplets.filter(x => x.registryUrl !== registryUrl && x.name !== name));
     }
 }

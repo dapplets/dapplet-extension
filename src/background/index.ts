@@ -158,6 +158,9 @@ browser.runtime.onMessage.addListener(
     setSiaPortal: globalConfigService.setSiaPortal.bind(globalConfigService),
     getNearNetworks: globalConfigService.getNearNetworks.bind(globalConfigService),
     getEthereumNetworks: globalConfigService.getEthereumNetworks.bind(globalConfigService),
+    getMyDapplets: globalConfigService.getMyDapplets.bind(globalConfigService),
+    addMyDapplet: globalConfigService.addMyDapplet.bind(globalConfigService),
+    removeMyDapplet: globalConfigService.removeMyDapplet.bind(globalConfigService),
 
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),

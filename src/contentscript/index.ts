@@ -119,6 +119,10 @@ if (!IS_OVERLAY_IFRAME) {
             return initBGFunctions(browser).then(x => x.getWalletDescriptors());
         });
 
+        jsonrpc.on('callBackground', (method: string, args: any[]) => {
+            return initBGFunctions(browser).then(x => x[method](...args));
+        });
+
         jsonrpc.on('openOverlay', () => Promise.resolve(core.openOverlay()));
         jsonrpc.on('closeOverlay', () => Promise.resolve(core.closeOverlay()));
         jsonrpc.on('toggleOverlay', () => Promise.resolve(core.toggleOverlay()));

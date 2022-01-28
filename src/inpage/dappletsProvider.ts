@@ -1,11 +1,19 @@
 import { JsonRpc } from "../common/jsonrpc";
 import { WalletDescriptor } from "../common/types";
 
-
 type Account = {
     chain: string;
     chainId: number;
     account: string;
+}
+
+type TrustedUser = {
+    account: string;
+}
+
+type Dapplet = {
+    registry: string;
+    moduleName: string;
 }
 
 export class DappletsProvider {
@@ -38,4 +46,39 @@ export class DappletsProvider {
         return this._rpc.call('toggleOverlay', [], window);
     }
 
+    async getTrustedUsers(): Promise<TrustedUser[]> {
+        return this._rpc.call('callBackground', ['getTrustedUsers', []], window);
+    }
+
+    async addTrustedUser(account: string): Promise<void> {
+        return this._rpc.call('callBackground', ['addTrustedUser', [account]], window);
+    }
+
+    async removeTrustedUser(account: string): Promise<void> {
+        return this._rpc.call('callBackground', ['removeTrustedUser', [account]], window);
+    }
+
+    // onTrustedUsersChanged(callback: () => void): void {
+
+    // }
+
+    getMyDapplets(): Promise<Dapplet[]> { 
+        return this._rpc.call('callBackground', ['getMyDapplets', []], window);
+    }
+    
+    addMyDapplet(registryUrl: string, moduleName: string): Promise<void> { 
+        return this._rpc.call('callBackground', ['addMyDapplet', [registryUrl, moduleName]], window);
+    }
+    
+    removeMyDapplet(registryUrl: string, moduleName: string): Promise<void> { 
+        return this._rpc.call('callBackground', ['removeMyDapplet', [registryUrl, moduleName]], window);
+    }
+    
+    // onMyDappletsChanged(callback: () => void): void {
+
+    // }
+    
+    // onUninstall(callback: () => void): void {
+
+    // }
 }

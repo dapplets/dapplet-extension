@@ -101,6 +101,11 @@ export class Dapplet extends React.Component<Props, State> {
                 DEV
               </Label>
             ) : null}
+            {f.isMyDapplet ? (
+              <Label style={{ marginLeft: '8px' }} horizontal size="mini" color="black">
+                MY
+              </Label>
+            ) : null}
             {f.isUnderConstruction ? (
               <Label style={{ marginLeft: '8px' }} horizontal size="mini" color="teal">
                 UNDER CONSTRUCTION

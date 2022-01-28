@@ -25,4 +25,5 @@ export default class ManifestDTO {
     // ToDo: Add "hasUpdate", which are used in Features.tsx
     available: boolean;
     isUnderConstruction: boolean;
+    isMyDapplet: boolean;
 }
