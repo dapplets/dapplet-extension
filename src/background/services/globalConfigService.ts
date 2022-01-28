@@ -31,7 +31,8 @@ const EXPORTABLE_PROPERTIES = [
     //'lastDevMessageHash',
     //'ignoredUpdate',
     'dynamicAdapter',
-    'preferedOverlayStorage'
+    'preferedOverlayStorage',
+    'myDapplets'
 ];
 
 export default class GlobalConfigService {
