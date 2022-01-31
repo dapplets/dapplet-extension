@@ -1,0 +1,50 @@
+@import "../../assets/styles/color.variables.scss";
+
+.toolbar {
+  display: flex;
+  flex-direction: row-reverse;
+
+  width: 16px;
+
+  min-height: calc(100vh - 32px);
+
+  background: $AppBG;
+}
+
+.active {
+  margin-bottom: 25px;
+}
+
+.inner {
+  margin-right: 16px;
+}
+
+.toggleOverlay {
+  top: 48px;
+  left: 32px;
+
+  width: 52px;
+  height: 52px;
+
+  padding: 10px;
+
+  cursor: pointer;
+
+  border: none;
+  border-radius: 10px 0 0 10px;
+  background: transparent;
+
+  background: $AppBG;
+
+  svg path {
+    fill: $Secondary;
+  }
+
+  &:hover svg path {
+    fill: $SecondaryHover;
+  }
+
+  &:active svg path {
+    fill: $SecondaryPressed;
+  }
+}
