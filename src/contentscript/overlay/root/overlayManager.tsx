@@ -6,6 +6,7 @@ import { Overlay } from "./overlay";
 import { IOverlayManager } from "../interfaces";
 import { JsonRpc } from "../../../common/jsonrpc";
 import { App } from "./App";
+import INNER_STYLE from "!raw-loader!./overlayManager.css";
 
 const CollapsedOverlayClass = "dapplets-overlay-collapsed";
 const HiddenOverlayClass = "dapplets-overlay-hidden";
@@ -16,7 +17,7 @@ export class OverlayManager implements IOverlayManager {
     private _panel: HTMLElement = null;
     public activeOverlay: Overlay = null;
 
-    private _shadow = null;
+    private _root = null;
 
     private _tabsRegistry: {
         overlay: Overlay;
@@ -26,15 +27,35 @@ export class OverlayManager implements IOverlayManager {
 
     constructor(private _iframeMessenger: JsonRpc) {
         // Side panel
-        const panel = document.createElement(DappletsOverlayManagerClass);
-        panel.classList.add(
-            OverlayFrameClass,
-            CollapsedOverlayClass,
-            HiddenOverlayClass
-        );
-        this._panel = panel;
+        const extensionHostID = 'dapplets-overlay-manager';
+        const extensionHost = document.getElementById(extensionHostID);
 
-        this._shadow = panel.attachShadow({ mode: "open" });
+        if (!extensionHost) {
+            const panel = document.createElement(DappletsOverlayManagerClass);
+            panel.id = 'dapplets-overlay-manager';
+            panel.classList.add(
+                OverlayFrameClass,
+                CollapsedOverlayClass,
+                HiddenOverlayClass
+            );
+            this._panel = panel;
+
+            const shadowRoot = panel.attachShadow({ mode: "open" });
+
+            const container = document.createElement("div");
+            container.id = 'app';
+
+            shadowRoot.appendChild(container);
+            
+            this._root = container;
+        } else {
+            this._panel = extensionHost;
+            this._root = extensionHost.shadowRoot.getElementById('app');
+        }
+
+        const styles = document.createElement("style");
+        styles.innerHTML = INNER_STYLE;
+        document.head.appendChild(styles);
 
         this._render();
 
@@ -58,7 +79,7 @@ export class OverlayManager implements IOverlayManager {
         // // });
         // // topActions.appendChild(avatarAction);
 
-        document.body.appendChild(panel);
+        document.body.appendChild(this._panel);
     }
 
     /**
@@ -207,7 +228,7 @@ export class OverlayManager implements IOverlayManager {
                 onToggle={this.toggle.bind(this)}
                 ref={this.ref}
             />,
-            this._shadow
+            this._root
         );
     }
 }

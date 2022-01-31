@@ -1,5 +1,5 @@
 import * as React from "react";
-import INNER_STYLE from "!raw-loader!./overlay.css";
+import "./overlay.scss";
 import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { ContentItem } from "./ContentItem";
@@ -64,7 +64,7 @@ export class App extends React.Component<P, S> {
 
         return (
             <>
-                <style>{INNER_STYLE}</style>
+                {/* <style>{INNER_STYLE}</style> */}
                 <div className="dapplets-overlay-bucket-bar"></div>
                 <div className="dapplets-overlay-toolbar">
                     <ul>

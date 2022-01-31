@@ -1,7 +1,6 @@
 import { Injector } from './injector'
 import Core from './core';
 import { browser } from "webextension-polyfill-ts";
-import './index.scss';
 import { JsonRpc } from '../common/jsonrpc';
 import { OverlayManagerIframe } from './overlay/iframe/overlayManager';
 import { OverlayManager } from './overlay/root/overlayManager';

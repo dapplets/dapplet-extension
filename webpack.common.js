@@ -67,6 +67,57 @@ module.exports = {
           "sass-loader"
         ],
         include: path.resolve(__dirname, 'src'),
+        exclude: path.resolve(__dirname, 'src/contentscript'),
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          {
+            loader: "style-loader",
+            options: {
+              insert: function (element) {
+                const extensionHostID = 'dapplets-overlay-manager';
+                let extensionHost = document.getElementById(extensionHostID);
+    
+                if (!extensionHost) {
+                  const CollapsedOverlayClass = "dapplets-overlay-collapsed";
+                  const HiddenOverlayClass = "dapplets-overlay-hidden";
+                  const DappletsOverlayManagerClass = "dapplets-overlay-manager";
+                  const OverlayFrameClass = "dapplets-overlay-frame";
+                  
+                  const panel = document.createElement(DappletsOverlayManagerClass);
+                  panel.id = 'dapplets-overlay-manager';
+                  panel.classList.add(
+                      OverlayFrameClass,
+                      CollapsedOverlayClass,
+                      HiddenOverlayClass
+                  );
+
+                  panel.attachShadow({ mode: "open" });
+
+                  const container = document.createElement("div");
+                  container.id = 'app';
+
+                  // Add style tag to shadow host
+                  panel.shadowRoot.appendChild(element);
+                  panel.shadowRoot.appendChild(container);
+
+                  document.body.appendChild(panel);
+                }
+              },
+            },
+          },
+          { 
+            loader: "css-loader", 
+            options: { 
+              modules: {
+                auto: (resourcePath) => resourcePath.endsWith(".module.scss"),
+              },
+            } 
+          }, 
+          "sass-loader"
+        ],
+        include: path.resolve(__dirname, 'src/contentscript'),
       },
       {
         test: /\.css$/,
