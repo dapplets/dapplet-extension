@@ -459,3 +459,8 @@ export function CacheMethod() {
     return descriptor;
   };
 }
+
+export async function getThisTab(callInfo: any) {
+  const thisTab = callInfo?.sender?.tab; 
+  return thisTab;
+}

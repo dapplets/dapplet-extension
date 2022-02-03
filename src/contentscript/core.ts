@@ -450,8 +450,9 @@ export default class Core {
             request.target = target;
         }
         
-        const { createSession } = await initBGFunctions(browser);
-        const session = await createSession(moduleName, request);
+        const { createSession, getThisTab } = await initBGFunctions(browser);
+        const thisTab = await getThisTab();
+        const session = await createSession(moduleName, request, thisTab.id);
 
         const ls = {}; // ToDo: specify LoginInfo
         request.onLogin?.call({}, ls);
