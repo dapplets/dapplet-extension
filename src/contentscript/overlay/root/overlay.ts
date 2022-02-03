@@ -13,6 +13,7 @@ export class Overlay implements IOverlay {
     public onmessage: (topic: string, message: any) => void = null;
     public onclose: Function = null;
     public onregisteredchange: (value: boolean) => void = null;
+    public isError: boolean = false;
 
     constructor(
         private _manager: OverlayManager,
@@ -38,9 +39,11 @@ export class Overlay implements IOverlay {
         this.frame.allowFullscreen = true;
         this.frame.addEventListener('load', () => {
             // this.loader?.remove();
-            this._isFrameLoaded = true;
-            this._queue.forEach(msg => this._send(msg));
-            this._queue = [];
+            if (!this.isError) {
+                this._isFrameLoaded = true;
+                this._queue.forEach(msg => this._send(msg));
+                this._queue = [];
+            }
         });
         this.frame.name = 'dapplet-overlay/' + this.id; // to distinguish foreign frames from overlays (see contentscript/index.ts)
     }
@@ -57,7 +60,7 @@ export class Overlay implements IOverlay {
             callback?.apply({});
         } else {
             const loadHandler = () => {
-                callback?.apply({});
+                if (!this.isError) { callback?.apply({}); }
                 this.frame.removeEventListener('load', loadHandler);
             }
 
@@ -148,5 +151,19 @@ export class Overlay implements IOverlay {
         return {
             off: () => window.removeEventListener('message', listener)
         };
+    }
+
+    public checkAvailability() {
+        fetch(this.uri).then(x => {
+            if (!x.ok) {
+                this.isError = true;
+                this.frame.dispatchEvent(new Event('error_server'));
+            } else {
+                this.isError = false;
+            }
+        }).catch(x => {
+            this.isError = true;
+            this.frame.dispatchEvent(new Event('error_network'));
+        })
     }
 }
