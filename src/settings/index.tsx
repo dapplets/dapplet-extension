@@ -17,9 +17,10 @@ import { CONTEXT_ID_WILDCARD } from "../common/constants";
 import { withTheme } from '@rjsf/core';
 import { Theme as SemanticUITheme } from '@rjsf/semantic-ui';
 import SelectWidget from './SelectWidget';
-
+import TextWidget from './TextWidget';
 
 SemanticUITheme.widgets.SelectWidget = SelectWidget;
+SemanticUITheme.widgets.TextWidget = TextWidget;
 const Form = withTheme(SemanticUITheme);
 
 tracing.startTracing();
