@@ -1,6 +1,9 @@
 import { generateGuid } from '../../../common/helpers';
 import { IOverlay } from '../interfaces';
 import { OverlayManager } from './overlayManager';
+import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { browser } from "webextension-polyfill-ts";
+import { UrlAvailability } from '../../../common/types';
 
 export class Overlay implements IOverlay {
     public _queue: any[] = [];
@@ -153,17 +156,18 @@ export class Overlay implements IOverlay {
         };
     }
 
-    public checkAvailability() {
-        fetch(this.uri).then(x => {
-            if (!x.ok) {
-                this.isError = true;
-                this.frame.dispatchEvent(new Event('error_server'));
-            } else {
-                this.isError = false;
-            }
-        }).catch(x => {
+    public async checkAvailability() {
+        const { checkUrlAvailability } = await initBGFunctions(browser);
+        const availability: UrlAvailability = await checkUrlAvailability(this.uri);
+
+        if (availability === UrlAvailability.AVAILABLE) {
+            this.isError = false;
+        } else if (availability === UrlAvailability.NETWORK_ERROR) {
             this.isError = true;
             this.frame.dispatchEvent(new Event('error_network'));
-        })
+        } else if (availability === UrlAvailability.SERVER_ERROR) {
+            this.isError = true;
+            this.frame.dispatchEvent(new Event('error_server'));
+        }
     }
 }

@@ -94,4 +94,9 @@ export type SystemOverlayData = {
     popup: boolean;
     payload: any;
 };
-  
+
+export enum UrlAvailability {
+    AVAILABLE = "AVAILABLE",
+    NETWORK_ERROR = "NETWORK_ERROR",
+    SERVER_ERROR = "SERVER_ERROR",
+}

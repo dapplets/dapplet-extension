@@ -1,6 +1,6 @@
 import { browser, Tabs } from "webextension-polyfill-ts";
 import { DEFAULT_BRANCH_NAME } from "./constants";
-import { ChainTypes, ModuleId } from "./types";
+import { ChainTypes, ModuleId, UrlAvailability } from "./types";
 import * as semver from "semver";
 
 export function getHostName(url: string): string {
@@ -415,4 +415,17 @@ export function convertHexToBinary(hex: string): string {
     }
   }
   return hex;
+}
+
+export async function checkUrlAvailability(url: string): Promise<UrlAvailability> {
+  try {
+    const resp = await fetch(url);
+    if (resp.ok) {
+      return UrlAvailability.AVAILABLE;
+    } else {
+      return UrlAvailability.SERVER_ERROR;
+    }
+  } catch (err) {
+    return UrlAvailability.NETWORK_ERROR;
+  }
 }
