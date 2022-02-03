@@ -77,7 +77,7 @@ export class Tar {
                         let dArray = outArray;
                         return function (event) {
                             let sbuf = event.target.result;
-                            let sarr = new Uint8Array(sbuf);
+                            let sarr = new Uint8Array(sbuf as any);
                             for (let bIdx = 0; bIdx < sarr.length; bIdx++) {
                                 dArray[bIdx] = sarr[bIdx];
                             }
