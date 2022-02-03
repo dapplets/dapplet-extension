@@ -28,6 +28,11 @@ interface IWalletPairingState {
     loading: boolean;
     descriptors: WalletDescriptor[];
     redirect: string | null;
+    wallets: {
+        id: string;
+        label: string;
+        icon: any;
+    }[];
 }
 
 export class WalletPairing extends React.Component<IWalletPairingProps, IWalletPairingState> {
@@ -37,17 +42,38 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
         this.state = {
             loading: true,
             descriptors: [],
-            redirect: null
+            redirect: null,
+            wallets: []
         }
     }
 
     async componentDidMount() {
+        const p = this.props;
+        const secureLogin = this.props.data.loginRequest.secureLogin;
+
         const { getWalletDescriptors } = await initBGFunctions(browser);
         const descriptors = await getWalletDescriptors();
-        this.setState({
-            descriptors,
-            loading: false
-        });
+
+        // const connectedWallets = this.state.descriptors
+        //     .filter(x => x.connected)
+        //     .filter(x => p.chains.length > 0 ? p.chains.includes(x.chain) : true);
+        
+        const disconnectedWallets = descriptors
+            .filter(x => !x.connected)
+            .filter(x => p.chains.length > 0 ? p.chains.includes(x.chain) : true)
+            .filter(x => secureLogin === 'required' ? x.chain === ChainTypes.ETHEREUM_GOERLI : true);
+
+        const wallets = disconnectedWallets.map(x => this.getMeta(x.type, x.chain));
+
+        if (wallets.length === 0) {
+            this.setState({ redirect: '/connected-wallets' });
+        } else {
+            this.setState({
+                descriptors,
+                wallets,
+                loading: false
+            });
+        }
     }
 
     async disconnectButtonClick(chain: ChainTypes, wallet: WalletTypes) {
@@ -96,8 +122,6 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
     }
 
     render() {
-        const p = this.props;
-        const secureLogin = this.props.data.loginRequest.secureLogin;
 
         if (this.state.redirect) {
             return <Redirect to={this.state.redirect} />
@@ -105,21 +129,10 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
 
         if (this.state.loading) return null;
 
-        // const connectedWallets = this.state.descriptors
-        //     .filter(x => x.connected)
-        //     .filter(x => p.chains.length > 0 ? p.chains.includes(x.chain) : true);
-
-        const disconnectedWallets = this.state.descriptors
-            .filter(x => !x.connected)
-            .filter(x => p.chains.length > 0 ? p.chains.includes(x.chain) : true)
-            .filter(x => secureLogin === 'required' ? x.chain === ChainTypes.ETHEREUM_GOERLI : true);
-
-        const wallets = disconnectedWallets.map(x => this.getMeta(x.type, x.chain));
-
         return (
             <ConnectWallet 
                 onWalletClick={(id) => this.setState({ redirect: '/pairing/' + id })}
-                wallets={wallets}
+                wallets={this.state.wallets}
             />
         );
     }

@@ -7,7 +7,7 @@ import { CustomWalletConnection } from "./customWalletConnection";
 import { browser } from "webextension-polyfill-ts";
 import { ConnectedWalletAccount, Connection, Contract, Near } from "near-api-js";
 import { JsonRpcProvider } from "near-api-js/lib/providers";
-import { generateGuid, timeoutPromise, waitTab } from "../../../../common/helpers";
+import { CacheMethod, generateGuid, timeoutPromise, waitTab } from "../../../../common/helpers";
 import { NearNetworkConfig } from "../../../../common/types";
 
 export default class implements NearWallet {
@@ -66,13 +66,14 @@ export default class implements NearWallet {
         return !!accountId && accountId.length > 0;
     }
 
+    @CacheMethod()
     async connectWallet(): Promise<void> {
         const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
         const currentTabId = currentTab.id;
 
         const requestId = generateGuid();
         const callbackUrl = browser.runtime.getURL(`callback.html?request_id=${requestId}`);
-
+        
         let callbackTab = null;
         const waitTabPromise = waitTab(callbackUrl).then(x => callbackTab = x);
         const requestPromise = this._nearWallet.requestSignIn({
@@ -123,7 +124,7 @@ export default class implements NearWallet {
     getAccount() {
         return this._nearWallet.account();
     }
-    
+
     async signMessage(message: string): Promise<string> {
         throw new Error('Not implemented');
     }
