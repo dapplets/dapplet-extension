@@ -210,16 +210,20 @@ export class Connection implements IConnection {
                 
                 if (!listener.f || listener.f === 'dappletApi' || isTopicMatch(op, msg, listener.f)) {
                     if (listener.h) {
-                        for (let eventId of [...Object.keys(listener.h), ANY_EVENT]) {
-                            let cond = this.eventDef ? this.eventDef[eventId] : eventId
-                            
+                        const eventsIds = [...Object.keys(listener.h), ANY_EVENT];
+                        if (!eventsIds.includes(msg?.type)) {
+                            this.send(`${msg?.type}_undone`, `${msg?.type} does not exist`);
+                            return;
+                        };
+                        for (const eventId of eventsIds) {
+                            const cond = this.eventDef ? this.eventDef[eventId] : eventId;
                             //ToDo: extract msg.type default
                             if ((typeof cond === 'function' ? cond(op, msg) : msg?.type == cond) || eventId === ANY_EVENT) {
                                 const handlers = listener.h[eventId]
-                                if (!handlers) continue
+                                if (!handlers) continue;
                                 
                                 if (Array.isArray(handlers)) {
-                                    handlers.forEach(h => h(op, msg))
+                                    handlers.forEach(h => h(op, msg));
                                 } else if (listener.f === 'dappletApi') {
                                     try {
                                         const res = await (<Function>handlers)(...msg.message);
@@ -228,7 +232,7 @@ export class Connection implements IConnection {
                                         this.send(`${msg?.type}_undone`, err);
                                     }
                                 } else {
-                                    handlers(op, msg)
+                                    handlers(op, msg);
                                 }
                             }
                         }
