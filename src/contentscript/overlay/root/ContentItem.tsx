@@ -10,6 +10,8 @@ enum LoadingMode {
     NotLoading = 0,
     Loading = 1,
     SlowLoading = 2,
+    NetworkError = 3,
+    ServerError = 4
 }
 
 interface P {
@@ -24,10 +26,6 @@ interface S {
 
 export class ContentItem extends React.Component<P, S> {
     ref = React.createRef<HTMLDivElement>();
-    timeoutId = setTimeout(
-        () => this.setState({ loadingMode: LoadingMode.SlowLoading }),
-        OVERLAY_LOADING_TIMEOUT
-    );
 
     constructor(props: P) {
         super(props);
@@ -38,11 +36,46 @@ export class ContentItem extends React.Component<P, S> {
     }
 
     componentDidMount() {
-        this.ref.current.appendChild(this.props.overlay.frame);
-        this.props.overlay.frame.addEventListener("load", () => {
-            clearTimeout(this.timeoutId);
-            this.setState({ loadingMode: LoadingMode.NotLoading });
-        });
+        this.loadFrame();
+    }
+
+    loadFrame() {
+        const timeoutId = setTimeout(
+            () => this.setState({ loadingMode: LoadingMode.SlowLoading }),
+            OVERLAY_LOADING_TIMEOUT
+        );
+
+        const overlay = this.props.overlay;
+        overlay.checkAvailability();
+
+        this.setState({ loadingMode: LoadingMode.Loading });
+        
+        this.ref.current.appendChild(overlay.frame);
+        
+        const loadHandler = () => {
+            clearTimeout(timeoutId);
+            if (!overlay.isError) {
+                this.setState({ loadingMode: LoadingMode.NotLoading });
+            }
+            overlay.frame.removeEventListener("load", loadHandler);
+        };
+        overlay.frame.addEventListener("load", loadHandler);
+
+        const networkErrorHandler = () => {
+            clearTimeout(timeoutId);
+            overlay.frame.remove();
+            this.setState({ loadingMode: LoadingMode.NetworkError });
+            overlay.frame.removeEventListener("error_network", networkErrorHandler);
+        };
+        overlay.frame.addEventListener("error_network", networkErrorHandler);
+        
+        const serverErrorHandler = () => {
+            clearTimeout(timeoutId);
+            overlay.frame.remove();
+            this.setState({ loadingMode: LoadingMode.ServerError });
+            overlay.frame.removeEventListener("error_server", serverErrorHandler);
+        };
+        overlay.frame.addEventListener("error_server", serverErrorHandler);
     }
 
     render() {
@@ -54,7 +87,6 @@ export class ContentItem extends React.Component<P, S> {
 
         return (
             <div
-                ref={this.ref}
                 className={cn("dapplets-overlay-nav-content-item", {
                     "dapplets-overlay-nav-content-item-active": p.isActive,
                 })}
@@ -87,6 +119,33 @@ export class ContentItem extends React.Component<P, S> {
                         </div>
                     </div>
                 )}
+
+                {s.loadingMode === LoadingMode.NetworkError && (
+                    <div className="loader-container" style={{ zIndex: 1 }}>
+                        <div className="load-text">No Internet Connection</div>
+                        <div className="load-text">
+                            Please check your internet connection and try again
+                        </div>
+                        <div className="load-text">
+                            <button onClick={this.loadFrame.bind(this)}>Try again</button>
+                        </div>
+                    </div>
+                )}
+
+                {s.loadingMode === LoadingMode.ServerError && (
+                    <div className="loader-container" style={{ zIndex: 1 }}>
+                        <div className="load-text">Internal Server Error</div>
+                        <div className="load-text">
+                            Sorry, there were some technical issues while processing your request.
+                            You can change preferred overlay storage and try again.
+                        </div>
+                        <div className="load-text">
+                            <button onClick={this.loadFrame.bind(this)}>Try again</button>
+                        </div>
+                    </div>
+                )}
+
+                <div className="frame-container" ref={this.ref}></div>
 
                 {childrenOverlays.map(x => <PopupItem key={x.id} overlay={x} />)}
             </div>

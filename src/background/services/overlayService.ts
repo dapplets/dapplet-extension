@@ -6,7 +6,7 @@ import ModuleInfo from "../models/moduleInfo";
 import VersionInfo from "../models/versionInfo";
 
 export class OverlayService {
-    
+
     public async openDeployOverlay(mi: ModuleInfo, vi: VersionInfo) {
         return await this._openLegacyOverlay("OPEN_DEPLOY_OVERLAY", { mi, vi });
     }
@@ -24,8 +24,8 @@ export class OverlayService {
         return await this._openLegacyOverlay("OPEN_LOGIN_OVERLAY", { topic: 'login', args: [app, chain] });
     }
 
-    public async openLoginSessionOverlay(app: string | DefaultSigners, loginRequest: LoginRequest): Promise<{ wallet: WalletTypes, chain: ChainTypes, confirmationId?: string }> {
-        return await this._openSystemOverlay(SystemOverlayTabs.LOGIN_SESSION, { app, loginRequest });
+    public async openLoginSessionOverlay(app: string | DefaultSigners, loginRequest: LoginRequest, tabId: number): Promise<{ wallet: WalletTypes, chain: ChainTypes, confirmationId?: string }> {
+        return await this._openSystemOverlay(SystemOverlayTabs.LOGIN_SESSION, { app, loginRequest }, tabId);
     }
 
     public async openPopupOverlay(path: string) {
@@ -70,11 +70,14 @@ export class OverlayService {
         }
     }
 
-    private async _openSystemOverlay(activeTab: SystemOverlayTabs, payload: any) {
-        const tab = await getCurrentTab();
-        if (!tab) return;
+    private async _openSystemOverlay(activeTab: SystemOverlayTabs, payload: any, targetTabId: number = null) {
+        if (targetTabId === null) {
+            const tab = await getCurrentTab();
+            if (!tab) return;
+            targetTabId = tab.id;
+        }
 
-        const [error, result] = await browser.tabs.sendMessage(tab.id, {
+        const [error, result] = await browser.tabs.sendMessage(targetTabId, {
             type: "OPEN_SYSTEM_OVERLAY",
             payload: { activeTab, payload }
         });

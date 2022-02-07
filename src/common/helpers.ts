@@ -1,6 +1,6 @@
 import { browser, Tabs } from "webextension-polyfill-ts";
 import { DEFAULT_BRANCH_NAME } from "./constants";
-import { ChainTypes, ModuleId } from "./types";
+import { ChainTypes, ModuleId, UrlAvailability } from "./types";
 import * as semver from "semver";
 
 export function getHostName(url: string): string {
@@ -415,4 +415,52 @@ export function convertHexToBinary(hex: string): string {
     }
   }
   return hex;
+}
+
+export async function checkUrlAvailability(url: string): Promise<UrlAvailability> {
+  try {
+    const resp = await fetch(url);
+    if (resp.ok) {
+      return UrlAvailability.AVAILABLE;
+    } else {
+      return UrlAvailability.SERVER_ERROR;
+    }
+  } catch (err) {
+    return UrlAvailability.NETWORK_ERROR;
+  }
+}
+
+/**
+ * Decorator for async methods caching promises until it's not fulfilled.
+ * Prevents execution of multiple promises at the same time.
+ */
+export function CacheMethod() {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const symbol = Symbol();
+    const originMethod = descriptor.value;
+    descriptor.value = function (...args: any[]) {
+      const me = this as any;
+      if (!me[symbol]) {
+        const result = originMethod.bind(me)(...args);
+        if (result instanceof Promise) {
+          me[symbol] = result.then(x => {
+            me[symbol] = null;
+            return x;
+          }).catch((e) => {
+            me[symbol] = null;
+            throw e;
+          });
+        } else {
+          throw new Error("CachePromise decorator must be applied on async method.");
+        }
+      }
+      return me[symbol];
+    }
+    return descriptor;
+  };
+}
+
+export async function getThisTab(callInfo: any) {
+  const thisTab = callInfo?.sender?.tab; 
+  return thisTab;
 }

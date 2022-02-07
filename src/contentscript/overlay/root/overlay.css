@@ -117,7 +117,7 @@
 .dapplets-overlay-nav-content-item-active {
     display: block;
 }
-.dapplets-overlay-nav-content-item > * {
+.dapplets-overlay-nav-content-item > *, .frame-container > iframe {
     height: 100%;
     width: 100%;
     border: none;

@@ -6,6 +6,7 @@ import PortStream from 'extension-port-stream';
 import { detect } from 'detect-browser';
 import { browser } from 'webextension-polyfill-ts';
 import { EthereumWallet } from "./interface";
+import { CacheMethod } from "../../../common/helpers";
 
 export default class extends ethers.Signer implements EthereumWallet {
 
@@ -95,6 +96,7 @@ export default class extends ethers.Signer implements EthereumWallet {
         }
     }
 
+    @CacheMethod()
     async connectWallet(): Promise<void> {
         const metamask = await this._getMetamaskProvider();
         if (localStorage['metamask_disabled'] === 'true') {

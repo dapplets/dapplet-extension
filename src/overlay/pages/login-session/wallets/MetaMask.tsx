@@ -50,6 +50,8 @@ export default class extends React.Component<Props, State> {
             const descriptors = await getWalletDescriptors();
             const descriptor = descriptors.find(x => x.type === WalletTypes.METAMASK);
 
+            if (!this._mounted) return;
+
             // sign message if required
             let confirmationId = undefined;
             const secureLogin = this.props.data.loginRequest.secureLogin;

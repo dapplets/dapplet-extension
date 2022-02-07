@@ -1,6 +1,9 @@
 import { generateGuid } from '../../../common/helpers';
 import { IOverlay } from '../interfaces';
 import { OverlayManager } from './overlayManager';
+import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { browser } from "webextension-polyfill-ts";
+import { UrlAvailability } from '../../../common/types';
 
 export class Overlay implements IOverlay {
     public _queue: any[] = [];
@@ -13,6 +16,7 @@ export class Overlay implements IOverlay {
     public onmessage: (topic: string, message: any) => void = null;
     public onclose: Function = null;
     public onregisteredchange: (value: boolean) => void = null;
+    public isError: boolean = false;
 
     constructor(
         private _manager: OverlayManager,
@@ -38,9 +42,11 @@ export class Overlay implements IOverlay {
         this.frame.allowFullscreen = true;
         this.frame.addEventListener('load', () => {
             // this.loader?.remove();
-            this._isFrameLoaded = true;
-            this._queue.forEach(msg => this._send(msg));
-            this._queue = [];
+            if (!this.isError) {
+                this._isFrameLoaded = true;
+                this._queue.forEach(msg => this._send(msg));
+                this._queue = [];
+            }
         });
         this.frame.name = 'dapplet-overlay/' + this.id; // to distinguish foreign frames from overlays (see contentscript/index.ts)
     }
@@ -57,7 +63,7 @@ export class Overlay implements IOverlay {
             callback?.apply({});
         } else {
             const loadHandler = () => {
-                callback?.apply({});
+                if (!this.isError) { callback?.apply({}); }
                 this.frame.removeEventListener('load', loadHandler);
             }
 
@@ -148,5 +154,20 @@ export class Overlay implements IOverlay {
         return {
             off: () => window.removeEventListener('message', listener)
         };
+    }
+
+    public async checkAvailability() {
+        const { checkUrlAvailability } = await initBGFunctions(browser);
+        const availability: UrlAvailability = await checkUrlAvailability(this.uri);
+
+        if (availability === UrlAvailability.AVAILABLE) {
+            this.isError = false;
+        } else if (availability === UrlAvailability.NETWORK_ERROR) {
+            this.isError = true;
+            this.frame.dispatchEvent(new Event('error_network'));
+        } else if (availability === UrlAvailability.SERVER_ERROR) {
+            this.isError = true;
+            this.frame.dispatchEvent(new Event('error_server'));
+        }
     }
 }
