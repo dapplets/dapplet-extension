@@ -222,10 +222,29 @@ export function generateGuid() {
 };
 
 export async function waitTab(url: string) {
+  const expectedUrl = new URL(url);
+  
+  const isEqualUrlParams = (expectedUrl: URL, receivedUrl: URL): boolean => {
+    if (expectedUrl.origin !== receivedUrl.origin) return false;
+    if (expectedUrl.pathname !== receivedUrl.pathname) return false;
+
+    const entries: { [key: string]: string } = {};
+    expectedUrl.searchParams.forEach((v, k) => entries[k] = v);
+
+    for (const key in entries) {
+      if (!receivedUrl.searchParams.has(key) || entries[key] !== receivedUrl.searchParams.get(key)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   return new Promise<Tabs.Tab>((res, rej) => {
     const handler = async (tabId: number) => {
       const tab = await browser.tabs.get(tabId);
-      if (tab.url.indexOf(url) === 0) {
+      const receivedUrl = new URL(tab.url);
+      if (isEqualUrlParams(expectedUrl, receivedUrl)) {
         res(tab);
         browser.tabs.onUpdated.removeListener(handler);
       }
@@ -461,6 +480,6 @@ export function CacheMethod() {
 }
 
 export async function getThisTab(callInfo: any) {
-  const thisTab = callInfo?.sender?.tab; 
+  const thisTab = callInfo?.sender?.tab;
   return thisTab;
 }
