@@ -641,6 +641,6 @@ export default class GlobalConfigService {
     }
 
     async removeMyDapplet(registryUrl: string, name: string) {
-        return this.updateConfig(c => c.myDapplets = c.myDapplets.filter(x => x.registryUrl !== registryUrl && x.name !== name));
+        return this.updateConfig(c => c.myDapplets = c.myDapplets.filter(x => !(x.registryUrl === registryUrl && x.name === name)));
     }
 }
