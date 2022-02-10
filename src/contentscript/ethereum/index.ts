@@ -13,6 +13,7 @@ async function _sendWalletConnectTx(app: string, sowaIdOrRpcMethod, sowaMetadata
     try {
         const txHash = await eth_sendCustomRequest(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams);
         if (typeof txHash === 'string' && txHash.startsWith('0x') && txHash.length === 66) {
+            callback({ type: "result", data: txHash });
             callback({ type: "created", data: txHash });
             const tx = await eth_waitTransaction(app, txHash);
             callback({ type: "mined", data: tx });
@@ -21,7 +22,7 @@ async function _sendWalletConnectTx(app: string, sowaIdOrRpcMethod, sowaMetadata
         }
     } catch (err) {
         console.error(err);
-        callback({ type: "rejected" });
+        callback({ type: "rejected", data: err });
     }
 }
 
