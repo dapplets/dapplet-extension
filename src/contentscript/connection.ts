@@ -140,7 +140,8 @@ export class Connection implements IConnection {
     }
 
     declare(dappletApi: IDappletApi, ap?: AutoProperty[]): this {
-        this.listener('dappletApi', dappletApi as any, ap);       
+        const msgFilter = dappletApi.constructor?.name !== 'Object' ? 'dappletApiClass' :'dappletApi';
+        this.listener(msgFilter, dappletApi as any, ap);
         return this;
     }
 
@@ -208,9 +209,20 @@ export class Connection implements IConnection {
                     listener.f = await listener.f;
                 }
                 
-                if (!listener.f || listener.f === 'dappletApi' || isTopicMatch(op, msg, listener.f)) {
+                if (!listener.f || listener.f === 'dappletApi' || listener.f === 'dappletApiClass' || isTopicMatch(op, msg, listener.f)) {
                     if (listener.h) {
-                        const eventsIds = [...Object.keys(listener.h), ANY_EVENT];
+                        const getAllApiNames = (dappletApi: any) => {
+                            const props: string[] = [];
+                            let obj = dappletApi;
+                            do {
+                                props.push(...Object.getOwnPropertyNames(obj));
+                            } while (obj = Object.getPrototypeOf(obj));
+                            const allApiClassNames = props.filter((e, i, arr) => e != arr[i + 1] && typeof dappletApi[e] == 'function');
+                            const objBaseMethods = ['__defineGetter__', '__defineSetter__', '__lookupGetter__', '__lookupSetter__', 'constructor', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'toLocaleString', 'toString', 'valueOf'];
+                            return allApiClassNames.filter((apiName) => !objBaseMethods.includes(apiName));
+                        }
+
+                        const eventsIds = listener.f === 'dappletApiClass' ? [ ...getAllApiNames(listener.h), ANY_EVENT] : [...Object.keys(listener.h), ANY_EVENT];
                         if (!eventsIds.includes(msg?.type)) {
                             this.send(`${msg?.type}_undone`, `${msg?.type} does not exist`);
                             return;
@@ -224,12 +236,12 @@ export class Connection implements IConnection {
                                 
                                 if (Array.isArray(handlers)) {
                                     handlers.forEach(h => h(op, msg));
-                                } else if (listener.f === 'dappletApi') {
+                                } else if (listener.f === 'dappletApi' || listener.f === 'dappletApiClass') {
                                     try {
-                                        const res = await (<Function>handlers)(...msg.message);
+                                        const res = await (<Object>listener.h)[eventId](...msg.message);
                                         this.send(`${msg?.type}_done`, res);
                                     } catch (err) {
-                                        this.send(`${msg?.type}_undone`, err);
+                                        this.send(`${msg?.type}_undone`, `${err.message} ${err.stack}`);
                                     }
                                 } else {
                                     handlers(op, msg);
