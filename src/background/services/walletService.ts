@@ -6,14 +6,17 @@ import { EthereumWallet } from '../wallets/ethereum/interface';
 import { NearWallet } from '../wallets/near/interface';
 import { ChainTypes, DefaultSigners, WalletDescriptor, WalletTypes } from '../../common/types';
 import { OverlayService } from './overlayService';
+import { SessionService } from './sessionService';
 
 export class WalletService {
+
+    public sessionService: SessionService;
 
     private _map: Promise<{ [chain: string]: { [wallet: string]: GenericWallet } }>;
     private _signersByApp = new Map<string, Signer>();
 
     constructor(
-        private _globalConfigService: GlobalConfigService, 
+        private _globalConfigService: GlobalConfigService,
         private _overlayService: OverlayService
     ) { }
 
@@ -78,11 +81,11 @@ export class WalletService {
             const signer = new (class extends Signer {
 
                 provider = new providers.JsonRpcProvider(providerUrl);
-                
+
                 constructor() {
                     super();
                 }
-    
+
                 async getAddress(): Promise<string> {
                     const signer = await me._getInternalSignerFor(app, ChainTypes.ETHEREUM_GOERLI) as EthereumWallet;
                     if (!signer) return '0x0000000000000000000000000000000000000000';
@@ -90,20 +93,20 @@ export class WalletService {
                     if (!address) return '0x0000000000000000000000000000000000000000';
                     return address;
                 }
-    
+
                 async signMessage(message: string | utils.Bytes): Promise<string> {
                     throw new Error('Method not implemented.');
                 }
-    
+
                 async signTransaction(transaction: utils.Deferrable<providers.TransactionRequest>): Promise<string> {
                     throw new Error('Method not implemented.');
                 }
-    
+
                 async sendTransaction(transaction: providers.TransactionRequest): Promise<providers.TransactionResponse> {
                     const signer = await me._getInternalSignerFor(app, ChainTypes.ETHEREUM_GOERLI) as EthereumWallet ?? await me._pairSignerFor(app, ChainTypes.ETHEREUM_GOERLI) as EthereumWallet;
                     return signer.sendTransaction(transaction);
                 }
-    
+
                 connect(provider: providers.Provider): Signer {
                     throw new Error('Method not implemented.');
                 }
@@ -111,7 +114,7 @@ export class WalletService {
 
             this._signersByApp.set(app, signer);
         }
-        
+
         return this._signersByApp.get(app);
     }
 
@@ -130,6 +133,21 @@ export class WalletService {
     }
 
     public async prepareWalletFor(app: string | DefaultSigners, chain: ChainTypes, cfg?: { username: string, domainId: number, fullname?: string, img?: string }) {
+        const isLoginSession = /[a-f0-9]{32}/gm.test(app);
+
+        if (isLoginSession) {
+            const session = await this.sessionService.getSession(app);
+            if (!session) throw new Error("The session doesn't exist.");
+            if (session.isExpired()) throw new Error("The session is expired.");
+            
+            const map = await this._getWalletsMap();
+            const wallet = map[session.authMethod][session.walletType];
+            if (!await wallet.isAvailable()) throw new Error('The wallet is not available');
+            if (!await wallet.isConnected()) await wallet.connectWallet({});
+
+            return;
+        }
+        
         const defaults = await this._getWalletFor(app);
         const defaultWallet = defaults[chain];
 
@@ -162,11 +180,15 @@ export class WalletService {
 
     public async eth_sendTransactionOutHash(app: string | DefaultSigners, transaction: providers.TransactionRequest): Promise<string> {
         const wallet = await this._getInternalSignerFor(app, ChainTypes.ETHEREUM_GOERLI) as EthereumWallet ?? await this._pairSignerFor(app, ChainTypes.ETHEREUM_GOERLI) as EthereumWallet;
+        if (!await wallet.isAvailable()) throw new Error('The wallet is not available');
+        if (!await wallet.isConnected()) await wallet.connectWallet({});
         return wallet.sendTransactionOutHash(transaction);
     }
 
     public async eth_sendCustomRequest(app: string | DefaultSigners, method: string, params: any[]): Promise<any> {
         const wallet = await this._getInternalSignerFor(app, ChainTypes.ETHEREUM_GOERLI) as EthereumWallet ?? await this._pairSignerFor(app, ChainTypes.ETHEREUM_GOERLI) as EthereumWallet;
+        if (!await wallet.isAvailable()) throw new Error('The wallet is not available');
+        if (!await wallet.isConnected()) await wallet.connectWallet({});
         return wallet.sendCustomRequest(method, params);
     }
 
@@ -197,33 +219,47 @@ export class WalletService {
         return map[chain][wallet];
     }
 
-    private async _getInternalSignerFor(app: string | DefaultSigners, chain: ChainTypes, isConnected: boolean = true): Promise<GenericWallet> {
-        const defaults = await this._getWalletFor(app);
-        const defaultWallet = defaults?.[chain];
+    private async _getInternalSignerFor(appOrSessionId: string | DefaultSigners, chain: ChainTypes, isConnected: boolean = true): Promise<GenericWallet> {
         const map = await this._getWalletsMap();
 
-        if (defaultWallet && await map[chain][defaultWallet].isConnected()) return map[chain][defaultWallet];
+        const isLoginSession = /[a-f0-9]{32}/gm.test(appOrSessionId);
 
-        // ToDo: clean walletType?
+        if (!isLoginSession) {
+            const defaults = await this._getWalletFor(appOrSessionId);
+            const defaultWallet = defaults?.[chain];
 
-        // choose first connected wallet
-        for (const wallet in map[chain]) {
-            if (await map[chain][wallet].isConnected()) {
-                return map[chain][wallet];
+            if (defaultWallet && await map[chain][defaultWallet].isConnected()) {
+                return map[chain][defaultWallet];
             }
-        }
 
-        if (!isConnected) {
+            // ToDo: clean walletType?
+
+            // choose first connected wallet
             for (const wallet in map[chain]) {
-                return map[chain][wallet];
+                if (await map[chain][wallet].isConnected()) {
+                    return map[chain][wallet];
+                }
             }
+
+            if (!isConnected) {
+                for (const wallet in map[chain]) {
+                    return map[chain][wallet];
+                }
+            }
+        } else {
+            const session = await this.sessionService.getSession(appOrSessionId);
+            if (!session) throw new Error("The session doesn't exist.");
+            if (session.isExpired()) throw new Error("The session is expired.");
+
+            const wallet = map[session.authMethod][session.walletType];
+            return wallet;         
         }
     }
 
     private async _pairSignerFor(app: string | DefaultSigners, chain: ChainTypes): Promise<GenericWallet> {
         // pairing
         await this._overlayService.pairWalletViaOverlay(chain);
-        
+
         const map = await this._getWalletsMap();
 
         // choose first connected wallet
@@ -261,7 +297,7 @@ export class WalletService {
         if (!this._map) {
             this._map = this._globalConfigService.getEthereumProvider().then(providerUrl => {
                 const map = {};
-                const config = { 
+                const config = {
                     providerUrl,
                     sendDataToPairingOverlay: this._overlayService.sendDataToPairingOverlay.bind(this._overlayService)
                 };

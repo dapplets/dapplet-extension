@@ -291,10 +291,15 @@ export default class Core {
         return conn;
     }
 
+    /**
+     * @deprecated Since version 0.46.0. Will be deleted in version 0.50.0. Use `Core.login()` instead.
+     */
     public async wallet<M>(cfg: { type: 'ethereum', network: 'goerli', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & AutoProperties<M> & Connection>
     public async wallet<M>(cfg: { type: 'near', network: 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
     public async wallet<M>(cfg: { type: 'near', network: 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
     public async wallet<M>(cfg: { type: 'ethereum' | 'near', network: 'goerli' | 'testnet' | 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
+        console.warn('DEPRECATED: "Core.contract()" is deprecated since version 0.46.1. It will be deleted in version 0.50.0. Use "Core.login()" instead.');
+
         if (!cfg || !cfg.type || !cfg.network) throw new Error("\"type\" and \"network\" are required in Core.wallet().");
         if (cfg.type !== 'near' && cfg.type !== 'ethereum') throw new Error("The \"ethereum\" and \"near\" only are supported in Core.wallet().");
         if (cfg.type === 'near' && !(cfg.network == 'testnet' || cfg.network == 'mainnet')) throw new Error("\"testnet\" and \"mainnet\" network only is supported in \"near\" type wallet.");
@@ -385,9 +390,14 @@ export default class Core {
 
     public storage: AppStorage;
 
+    /**
+     * @deprecated Since version 0.46.0. Will be deleted in version 0.50.0. Use `Core.login()` instead.
+     */
     public async contract(type: 'ethereum', address: string, options: Abi, app?: string): Promise<any>
     public async contract(type: 'near', address: string, options: { viewMethods: string[]; changeMethods: string[], network?: 'mainnet' | 'testnet' }, app?: string): Promise<any>
     public async contract(type: 'near' | 'ethereum', address: string, options: any, app?: string): Promise<any> {
+        console.warn('DEPRECATED: "Core.contract()" is deprecated since version 0.46.1. It will be deleted in version 0.50.0. Use "Core.login()" instead.');
+
         if (type === 'ethereum') {
             return ethereum.createContractWrapper(app, { network: 'goerli'}, address, options);
         } else if (type === 'near') {

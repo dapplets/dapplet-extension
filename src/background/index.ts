@@ -34,6 +34,9 @@ const featureService = new FeatureService(globalConfigService, walletService, ov
 const identityService = new IdentityService(globalConfigService, walletService);
 const ensService = new EnsService(walletService);
 
+// ToDo: fix this circular dependency
+walletService.sessionService = sessionService;
+
 browser.runtime.onMessage.addListener(
   setupMessageListener({
 

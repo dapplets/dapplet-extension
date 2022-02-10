@@ -15,11 +15,11 @@ export class LoginSession {
     logoutHandler?: (ls: any) => void;
 
     private get _network() {
-        return this.authMethod.split('/')[0];
+        return this.authMethod.split('/')[0]; // ethereum, near
     }
 
     private get _chain() {
-        return this.authMethod.split('/')[1];
+        return this.authMethod.split('/')[1]; // goerli, testnet, mainnet
     }
 
     private get _isExpired() {
@@ -50,6 +50,16 @@ export class LoginSession {
         return this._getWalletObject();
     }
 
+    async contract(address: string, options: any) {
+        if (this._network === 'ethereum') {
+            return ethereum.createContractWrapper(this.sessionId, { network: this._chain }, address, options);
+        } else if (this._network === 'near') {
+            return near.createContractWrapper(this.sessionId, { network: this._chain }, address, options);
+        } else {
+            throw new Error(`Current auth method "${this._network}" doesn't support contract interactions.`);
+        }
+    }
+
     async getItem(key: string): Promise<any> {
         const { getSessionItem } = await initBGFunctions(browser);
         return getSessionItem(this.sessionId, key);
@@ -77,7 +87,7 @@ export class LoginSession {
         } else if (this._network === 'near') {
             return near.createWalletConnection(this.moduleName, { network: this._chain });
         } else {
-            throw new Error('Invalid wallet type.');
+            throw new Error(`Current auth method "${this._network}" doesn't support wallet connections.`);
         }
     };
 }
