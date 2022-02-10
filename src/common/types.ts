@@ -83,7 +83,7 @@ export type LoginRequest = {
     timeout?: number;
     role?: string;
     help?: string;
-    target?: string;
+    target?: string | any;
     secureLogin?: 'required' | 'optional' | 'disabled';
     from?: 'me' | 'any';
 };

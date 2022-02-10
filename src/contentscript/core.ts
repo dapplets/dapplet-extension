@@ -20,6 +20,13 @@ import VersionInfo from "../background/models/versionInfo";
 
 type Abi = any;
 
+type OverlayConnection<M> = AutoProperties<M> & Connection & { 
+    id: string,
+    isOpen(): boolean, 
+    close(): void, 
+    onClose(callback: () => void): void 
+};
+
 interface WalletConnection {
     isConnected(): Promise<boolean>;
     connect(): Promise<void>;
@@ -360,9 +367,9 @@ export default class Core {
         }) as any;
     }
 
-    public overlay<M>(cfg: { name: string, url?: string, title: string, source?: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void, onClose(callback: () => void): void }
-    public overlay<M>(cfg: { name?: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void, onClose(callback: () => void): void }
-    public overlay<M>(cfg: { name: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void, onClose(callback: () => void): void } {
+    public overlay<M>(cfg: { name: string, url?: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M>
+    public overlay<M>(cfg: { name?: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M>
+    public overlay<M>(cfg: { name: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M> {
         const _overlay = this.overlayManager.createOverlay(cfg.url, cfg.title, cfg.source);
         const conn = Connection.create<M>(_overlay, eventDef);
         const overrides = {
@@ -446,29 +453,35 @@ export default class Core {
     public async login(request: (LoginRequest & LoginHooks), settings?: (LoginRequestSettings & LoginHooks), moduleName?: string): Promise<LoginSession>
     public async login(request: (LoginRequest & LoginHooks)[], settings?: (LoginRequestSettings & LoginHooks), moduleName?: string): Promise<LoginSession[]>
     public async login(request: (LoginRequest & LoginHooks) | (LoginRequest & LoginHooks)[], settings?: (LoginRequestSettings & LoginHooks), moduleName?: string): Promise<LoginSession | LoginSession[]> {
-        if (Array.isArray(request)) {
-            return Promise.all(request.map(x => this.login(x, settings, moduleName)));
+        const _request = { ...request };
+
+        if (Array.isArray(_request)) {
+            return Promise.all(_request.map(x => this.login(x, settings, moduleName)));
         }
 
         if (settings) {
-            Object.assign(request, settings);
+            Object.assign(_request, settings);
         }
 
-        if (!request.target) {
+        if (!_request.target) {
             const overlays = this.overlayManager.getOverlays().filter(x => x.source === moduleName);
             const target = (overlays.length > 0) ? overlays[0].id : null;
-            request.target = target;
+            _request.target = target;
+        }
+
+        if (_request.target && typeof _request.target === 'object') {
+            _request.target = _request.target.id;
         }
         
         const { createSession, getThisTab } = await initBGFunctions(browser);
         const thisTab = await getThisTab();
-        const session = await createSession(moduleName, request, thisTab.id);
+        const session = await createSession(moduleName, _request, thisTab.id);
 
         const ls = {}; // ToDo: specify LoginInfo
-        request.onLogin?.call({}, ls);
+        _request.onLogin?.call({}, ls);
 
         const loginSession = new LoginSession(session);
-        loginSession.logoutHandler = request.onLogout;
+        loginSession.logoutHandler = _request.onLogout;
 
         return loginSession;
     }

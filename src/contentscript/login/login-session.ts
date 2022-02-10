@@ -45,12 +45,12 @@ export class LoginSession {
         this.logoutHandler?.call({}, ls);
     }
 
-    async wallet() {
+    async wallet(): Promise<any> {
         if (!await this.isValid()) return null;
         return this._getWalletObject();
     }
 
-    async contract(address: string, options: any) {
+    async contract(address: string, options: any): Promise<any> {
         if (this._network === 'ethereum') {
             return ethereum.createContractWrapper(this.sessionId, { network: this._chain }, address, options);
         } else if (this._network === 'near') {
@@ -80,10 +80,24 @@ export class LoginSession {
         return clearSessionItems(this.sessionId);
     }
 
-    private _getWalletObject() {
+    private async _getWalletObject() {
         if (this._network === 'ethereum') {
             // ToDo: events def
-            return ethereum.createWalletConnection(this.moduleName, { network: this._chain });
+            const wallet = await ethereum.createWalletConnection(this.moduleName, { network: this._chain });
+            return {
+                request: ({ method, params }: { method: string, params: any[] }): Promise<any> => {
+                    return new Promise((res, rej) => {
+                        wallet.sendAndListen(method, params, { 
+                            result: (_, { data }) => {
+                                res(data[0])
+                            },
+                            rejected: (_, { data }) => {
+                                rej(data[0])
+                            },
+                        });
+                    });
+                }
+            };
         } else if (this._network === 'near') {
             return near.createWalletConnection(this.moduleName, { network: this._chain });
         } else {
