@@ -223,7 +223,7 @@ export class Connection implements IConnection {
                         }
 
                         const eventsIds = listener.f === 'dappletApiClass' ? [ ...getAllApiNames(listener.h), ANY_EVENT] : [...Object.keys(listener.h), ANY_EVENT];
-                        if (!eventsIds.includes(msg?.type)) {
+                        if ((listener.f === 'dappletApi' || listener.f === 'dappletApiClass') && !eventsIds.includes(msg?.type)) {
                             this.send(`${msg?.type}_undone`, `${msg?.type} does not exist`);
                             return;
                         };
