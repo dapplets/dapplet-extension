@@ -43,8 +43,8 @@ export default abstract class BaseBrowserStorage<T extends Base> {
 
         const key = this._storageName + ':' + mappedItem.getId();
 
-        const result = await browser.storage.local.get(key);
-        if (!!result[key]) throw new Error(`Item [${key}] already exists`); // ToDo: Is it allowed to replace the object?
+        // const result = await browser.storage.local.get(key);
+        // if (!!result[key]) throw new Error(`Item [${key}] already exists`); // ToDo: Is it allowed to replace the object?
 
         const data = { [key]: mappedItem };
         const clone = JSON.parse(JSON.stringify(data));
