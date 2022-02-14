@@ -8,7 +8,7 @@ export type EventDef<T extends Key> = { [key in T]: MsgFilter }
 type MsgHandler = ((op: string, msg: any) => void)
 type EventHandler = { [key in Key]: MsgHandler[] | MsgHandler }
 
-interface IDappletApi { [name: string]: Function }
+interface IDappletApi { [name: string]: any }
 
 export type AutoProperty = {
     name: string
