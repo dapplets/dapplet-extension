@@ -69,7 +69,7 @@ export class SessionService {
         request.secureLogin = request.secureLogin ?? 'disabled';
         request.from = request.from ?? 'any';
 
-        if (request.authMethods.length === 0) throw new Error(`"authMethods" is required.`);
+        if (!request.authMethods || request.authMethods.length === 0) throw new Error(`"authMethods" is required.`);
 
         if (request.secureLogin === 'required') {
             for (const authMethod of request.authMethods) {

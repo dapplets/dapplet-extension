@@ -453,11 +453,12 @@ export default class Core {
     public async login(request: (LoginRequest & LoginHooks), settings?: (LoginRequestSettings & LoginHooks), moduleName?: string): Promise<LoginSession>
     public async login(request: (LoginRequest & LoginHooks)[], settings?: (LoginRequestSettings & LoginHooks), moduleName?: string): Promise<LoginSession[]>
     public async login(request: (LoginRequest & LoginHooks) | (LoginRequest & LoginHooks)[], settings?: (LoginRequestSettings & LoginHooks), moduleName?: string): Promise<LoginSession | LoginSession[]> {
-        const _request = { ...request };
-
-        if (Array.isArray(_request)) {
-            return Promise.all(_request.map(x => this.login(x, settings, moduleName)));
+        
+        if (Array.isArray(request)) {
+            return Promise.all(request.map(x => this.login(x, settings, moduleName)));
         }
+
+        const _request = { ...request };
 
         if (settings) {
             Object.assign(_request, settings);
