@@ -55,15 +55,15 @@ module.exports = {
       {
         test: /\.scss$/,
         use: [
-          "style-loader", 
-          { 
-            loader: "css-loader", 
-            options: { 
+          "style-loader",
+          {
+            loader: "css-loader",
+            options: {
               modules: {
                 auto: (resourcePath) => resourcePath.endsWith(".module.scss"),
               },
-            } 
-          }, 
+            }
+          },
           "sass-loader"
         ],
         include: path.resolve(__dirname, 'src'),
@@ -78,19 +78,19 @@ module.exports = {
               insert: function (element) {
                 const extensionHostID = 'dapplets-overlay-manager';
                 let extensionHost = document.getElementById(extensionHostID);
-    
+
                 if (!extensionHost) {
                   const CollapsedOverlayClass = "dapplets-overlay-collapsed";
                   const HiddenOverlayClass = "dapplets-overlay-hidden";
                   const DappletsOverlayManagerClass = "dapplets-overlay-manager";
                   const OverlayFrameClass = "dapplets-overlay-frame";
-                  
+
                   const panel = document.createElement(DappletsOverlayManagerClass);
                   panel.id = 'dapplets-overlay-manager';
                   panel.classList.add(
-                      OverlayFrameClass,
-                      CollapsedOverlayClass,
-                      HiddenOverlayClass
+                    OverlayFrameClass,
+                    CollapsedOverlayClass,
+                    HiddenOverlayClass
                   );
 
                   panel.attachShadow({ mode: "open" });
@@ -101,20 +101,21 @@ module.exports = {
                   // Add style tag to shadow host
                   panel.shadowRoot.appendChild(element);
                   panel.shadowRoot.appendChild(container);
-
                   document.body.appendChild(panel);
+                } else {
+                  extensionHost.shadowRoot.appendChild(element);
                 }
               },
             },
           },
-          { 
-            loader: "css-loader", 
-            options: { 
+          {
+            loader: "css-loader",
+            options: {
               modules: {
                 auto: (resourcePath) => resourcePath.endsWith(".module.scss"),
               },
-            } 
-          }, 
+            }
+          },
           "sass-loader"
         ],
         include: path.resolve(__dirname, 'src/contentscript'),
@@ -128,11 +129,17 @@ module.exports = {
         test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/, /\.eot$/, /\.ttf$/, /\.woff$/, /\.woff2$/],
         loader: "url-loader",
         include: [path.resolve(__dirname, 'src'), /node_modules/],
+        exclude: [path.resolve(__dirname, 'src/contentscript')],
         options: {
           limit: 100000,
           name: "static/[name].[hash:8].[ext]",
         },
       },
+      {
+        test: /\.svg$/,
+        include: [path.resolve(__dirname, 'src/contentscript')],
+        use: ['@svgr/webpack', "url-loader"],
+      }
       // {
       //   test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/, /\.eot$/, /\.ttf$/, /\.woff$/, /\.woff2$/],
       //   loader: "file-loader",

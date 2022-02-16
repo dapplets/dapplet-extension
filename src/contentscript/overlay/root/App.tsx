@@ -1,143 +1,155 @@
-import * as React from "react";
+import React from "react";
 import styles from "./components/Overlay/Overlay.module.scss";
 import { browser } from "webextension-polyfill-ts";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { ContentItem } from "./ContentItem";
-import { TabItem } from "./TabItem";
 import { OverlayManager } from "./overlayManager";
 import { OverlayToolbar } from "./components/OverlayToolbar";
 import cn from 'classnames';
 import { ReactNode } from "react";
+import { Profile } from "./components/Profile";
+import { SquaredButton } from "./components/SquaredButton";
+import { Icon } from "./components/Icon";
+import { ReactComponent as StoreIcon } from "./assets/svg/store.svg";
+import { ReactComponent as SearchIcon } from "./assets/svg/magnifying-glass.svg";
+import { ReactComponent as EthereumIcon } from "./assets/icons/ephir.svg";
+import { MENU } from "./components/Overlay/navigation-list";
+import { TSelectedSettings } from "./types/SelectedSettings";
 
 interface P {
-    onToggle: () => void;
-    overlayManager: OverlayManager;
+  onToggle: () => void;
+  overlayManager: OverlayManager;
 }
 
 interface S {
-    isLoadingMap: { [overlayId: string]: boolean };
-    isDevMode: boolean;
+  isLoadingMap: { [overlayId: string]: boolean };
+  isDevMode: boolean;
+  selectedMenu: TSelectedSettings;
 }
-
-export interface ITab {
-    id: number;
-    name: string;
-    notification: boolean;
-}
-
-export type TSelectedSettings = "Dapplets" | "Wallets" | "Settings" | "Developer";
 
 export interface OverlayProps {
-    children?: ReactNode;
-    baseNameSelectedSetting?: TSelectedSettings;
+  children?: ReactNode;
+  baseNameSelectedSetting?: TSelectedSettings;
 }
 
-
-const TABS = [
-    { id: 0, name: "Dapplets", notification: false },
-    { id: 1, name: "Wallets", notification: false },
-    { id: 2, name: "Settings", notification: false },
-    { id: 3, name: "Developer", notification: false },
-];
-
 export class App extends React.Component<P, S> {
-    private iframeRefs = new Map<string, HTMLIFrameElement>();
+  state: S = {
+    isLoadingMap: Object.fromEntries(
+      this.getOverlays().map((x) => [x.id, true])
+    ),
+    isDevMode: false,
+    selectedMenu: "Dapplets",
+  };
 
-    constructor(props: P) {
-        super(props);
-        this.state = {
-            isLoadingMap: Object.fromEntries(
-                this.getOverlays().map((x) => [x.id, true])
-            ),
-            isDevMode: false
-        };
-    }
+  async componentDidMount() {
+    const { getDevMode } = await initBGFunctions(browser);
+    const isDevMode = await getDevMode();
+    this.setState({ isDevMode });
+  }
 
-    async componentDidMount() {
-        const { getDevMode } = await initBGFunctions(browser);
-        const isDevMode = await getDevMode();
-        this.setState({ isDevMode });
-    }
+  closeClickHandler = (overlayId: string) => {
+    const overlay = this.getOverlays().find((x) => x.id === overlayId);
+    overlay.close();
+  };
 
-    closeClickHandler = (overlayId: string) => {
-        const overlay = this.getOverlays().find((x) => x.id === overlayId);
-        overlay.close();
-    };
+  tabClickHandler = (overlayId: string) => {
+    const overlay = this.getOverlays().find((x) => x.id === overlayId);
+    if (!overlay) return;
+    this.props.overlayManager.activate(overlay);
+    this.setState({ selectedMenu: "Dapplets" });
+  };
 
-    tabClickHandler = (overlayId: string) => {
-        const overlay = this.getOverlays().find((x) => x.id === overlayId);
-        if (!overlay) return;
-        this.props.overlayManager.activate(overlay);
-    };
+  loadHandler = (overlayId: string) => {
+    const { isLoadingMap } = this.state;
+    isLoadingMap[overlayId] = false;
+    this.setState({ isLoadingMap });
+  };
 
-    loadHandler = (overlayId: string) => {
-        const { isLoadingMap } = this.state;
-        isLoadingMap[overlayId] = false;
-        this.setState({ isLoadingMap });
-    };
+  getOverlays() {
+    return this.props.overlayManager.getOverlays();
+  }
 
-    getOverlays() {
-        return this.props.overlayManager.getOverlays();
-    }
+  createTab = (overlayName: string) => {
+    return this.props.overlayManager.openPopup(overlayName);
+  }
 
-    render() {
-        const p = this.props;
-        const s = this.state;
-        const overlays = this.getOverlays().filter(x => !x.parent);
-        const activeOverlayId = p.overlayManager.activeOverlay?.id;
+  onSelectedMenu = (name: string) => {
+    this.setState({ selectedMenu: name as TSelectedSettings });
 
-        return (
-            <>
-                {/*<style>{styles}</style>*/}
-                <div
-                    className={cn("overlay", {
-                        //[styles.show]: isShow,
-                    })}
-                >
-                    <div className={"wrapper"}>
-                        <OverlayToolbar
-                            tabs={TABS}
-                            className={styles.toolbar}
-                            nameSelectedSetting="Dapplets"
-                            idSelectedTab={0}
-                            //onNameSelectedSetting={onNameSelectedSetting}
-                            //onIdSelectedChange={onIdSelectedChange}
-                            //onRemoveTag={onRemoveTag}
-                            toggle={this.props.onToggle}
-                        />
+    const overlays = this.getOverlays();
+    const overlay = overlays.find((item) => item.title === name);
 
-                        <div className={styles.inner}>
-                            {/*<header className={styles.header}>
-						<div className={styles.left}>
-							<Profile
-								avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
-								hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
-							/>
-							<div className={styles.balance}>
-								<Icon icon={EthereumIcon} size="big" />
-								<p className={styles.amount}>25.1054</p>
-							</div>
-						</div>
-						<div className={styles.right}>
-							<SquaredButton appearance="big" icon={StoreIcon} />
-							<SquaredButton appearance="big" icon={SearchIcon} />
-						</div>
-					</header>*/}
+    if (!overlay) return this.createTab(name.toLowerCase());
+    return this.props.overlayManager.activate(overlay);
+  }
 
-                            <div className={styles.children}>
-                                {overlays.map((x) => (
-                                    <ContentItem
-                                        overlay={x}
-                                        key={x.id}
-                                        isActive={x.id === activeOverlayId}
-                                        overlayManager={p.overlayManager}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+  getTabs = () => this
+    .getOverlays()
+    .filter(x => x.uri.includes("/popup.html#/dapplets")
+      ? x
+      : !x.uri.includes("/popup.html#"));
+
+  render() {
+    const p = this.props;
+    const s = this.state;
+    const overlays = this.getOverlays().filter(x => !x.parent);
+    const activeOverlayId = p.overlayManager.activeOverlay?.id;
+
+    return (
+      <>
+        <div className={cn(styles.overlay)}>
+
+          <div className={styles.wrapper}>
+            <OverlayToolbar
+              tabs={overlays}
+              menu={MENU}
+              className={styles.toolbar}
+              nameSelectedMenu={s.selectedMenu}
+              idActiveTab={activeOverlayId}
+              isDevMode={this.state.isDevMode}
+              onSelectedMenu={this.onSelectedMenu}
+              onSelectedTab={this.tabClickHandler}
+              onRemoveTab={this.closeClickHandler}
+              toggle={this.props.onToggle}
+            />
+
+            <div className={styles.inner}>
+              <header className={styles.header}>
+                <div className={styles.left}>
+                  <Profile
+                    avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
+                    hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
+                  />
+                  <div className={styles.balance}>
+                    <Icon icon={EthereumIcon} size="big" />
+                    <p className={styles.amount}>25.1054</p>
+                  </div>
                 </div>
-            </>
-        );
-    }
+                <div className={styles.right}>
+                  <SquaredButton appearance="big" icon={StoreIcon} />
+                  <SquaredButton appearance="big" icon={SearchIcon} />
+                </div>
+              </header>
+
+              <div className={cn(styles.children, "dapplets-overlay-nav-content-list")}>
+                {overlays.map((x) => (
+                  <div key={x.id}
+                    className={cn(styles.overlayInner, {
+                      [styles.overlayActive]: x.id === activeOverlayId
+                    })}
+                  >
+                    <ContentItem
+                      overlay={x}
+                      isActive={x.id === activeOverlayId}
+                      overlayManager={p.overlayManager}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 }

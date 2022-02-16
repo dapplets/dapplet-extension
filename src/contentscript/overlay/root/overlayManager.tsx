@@ -46,7 +46,7 @@ export class OverlayManager implements IOverlayManager {
             container.id = 'app';
 
             shadowRoot.appendChild(container);
-            
+
             this._root = container;
         } else {
             this._panel = extensionHost;

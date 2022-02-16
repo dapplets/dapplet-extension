@@ -1,26 +1,29 @@
 import React, { DetailedHTMLProps, HTMLAttributes, ReactElement } from "react";
 import styles from "./OverlayToolbar.module.scss";
-//import { ReactComponent as Coolicon } from "../../assets/svg/coolicon.svg";
 import { OverlayTab } from "../OverlayTab";
 import cn from "classnames";
-import { ITab, TSelectedSettings } from "../../App";
+import { ReactComponent as Coolicon } from "../../assets/svg/coolicon.svg";
+import { ITab } from "../../types/tab";
+import { IMenu } from "../../models/menu.model";
 
+// TODO: change element hiding from Margin to transform
 export interface OverlayToolbarProps
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
 	tabs: ITab[];
-	nameSelectedSetting?: TSelectedSettings;
-	idSelectedTab: number;
+	menu: IMenu[];
+	nameSelectedMenu?: string;
+	idActiveTab: string;
+	isDevMode: boolean;
 	toggle: () => void;
-	//onNameSelectedSetting: (selected: TSelectedSettings) => void;
-	//onIdSelectedChange: (id: number) => void;
-	//onRemoveTag: (id: number) => void;
+	onSelectedMenu: (selected: string) => void;
+	onRemoveTab: (id: string) => void;
+	onSelectedTab: (id: string) => void;
 }
 
 const ToggleOverlay = ({ toggle }: Pick<OverlayToolbarProps, "toggle">): ReactElement => {
 	return (
 		<button className={styles.toggleOverlay} onClick={toggle}>
-			{/*<Coolicon />*/}
-			⇄
+			<Coolicon />
 		</button>
 	);
 };
@@ -28,18 +31,25 @@ const ToggleOverlay = ({ toggle }: Pick<OverlayToolbarProps, "toggle">): ReactEl
 export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 	const {
 		tabs,
-		nameSelectedSetting,
-		idSelectedTab,
+		nameSelectedMenu,
+		idActiveTab,
 		className,
+		isDevMode,
+		menu,
 		toggle,
-		//onRemoveTag,
-		//onNameSelectedSetting,
-		//onIdSelectedChange,
+		onSelectedMenu,
+		onSelectedTab,
+		onRemoveTab,
 		...anotherProps
 	} = props;
 
-	//const handlerTab = (id: number) => (): void => onIdSelectedChange(id);
-	//const handlerRemoveTab = (id: number) => (): void => onRemoveTag(id);
+	const handlerSelectedTab = (id: string) => (): void => onSelectedTab(id);
+	const handlerRemoveTab = (id: string) => (): void => onRemoveTab(id);
+
+	const nonSystemTabs = tabs.filter(x => !x.uri.includes("/popup.html#"));
+	const systemTabs = tabs.filter(x => x.uri.includes("/popup.html#"));
+	const tab = tabs.filter(x => x.uri.includes("/popup.html#/dapplets"))[0];
+	const isSystemTabActive = systemTabs.findIndex(x => x.id === idActiveTab) !== -1;
 
 	return (
 		<div className={cn(styles.toolbar, className)} {...anotherProps}>
@@ -47,24 +57,40 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 				<ToggleOverlay toggle={toggle} />
 
 				<div className={styles.tabs}>
-					{tabs &&
-						tabs.map(({ id, notification, name }) => {
-							const active = id === idSelectedTab;
+					<OverlayTab
+						id={'system'}
+						menu={menu}
+						nameSelectedMenu={nameSelectedMenu}
+						activeTab={isSystemTabActive}
+						onSelectedMenu={onSelectedMenu}
+						onClick={handlerSelectedTab(tab?.id)}
+						className={cn({ [styles.active]: isSystemTabActive })}
+						notification={false}
+						title={'System'}
+					/>
 
-							return (
-								<OverlayTab
-									key={id}
-									nameSelectedSetting={nameSelectedSetting}
-									//onNameSelectedSetting={onNameSelectedSetting}
-									activeTab={active}
-									//removeTab={handlerRemoveTab(id)}
-									//onClick={handlerTab(id)}
-									className={cn({ [styles.active]: active })}
-									notification={notification}
-									title={name}
-								/>
-							);
-						})}
+					<>
+						{nonSystemTabs.length > 0 &&
+							nonSystemTabs.map(({ id, title }) => {
+								const active = id === idActiveTab;
+
+								return (
+									<OverlayTab
+										id={id}
+										menu={[]}
+										key={id}
+										nameSelectedMenu={nameSelectedMenu}
+										activeTab={active}
+										onSelectedMenu={onSelectedMenu}
+										removeTab={handlerRemoveTab(id)}
+										onClick={handlerSelectedTab(id)}
+										className={cn({ [styles.active]: active })}
+										notification={false}
+										title={title}
+									/>
+								);
+							})}
+					</>
 				</div>
 			</div>
 		</div>

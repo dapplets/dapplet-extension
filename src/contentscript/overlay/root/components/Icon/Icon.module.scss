@@ -1,0 +1,19 @@
+@import "../../assets/styles/null.scss";
+
+.iconsTitle {
+  display: flex;
+  justify-content: space-between;
+
+  .small {
+    svg {
+      width: 16px;
+    }
+  }
+
+  .big {
+    width: 26px;
+    height: 26px;
+
+    background: #FFF;
+  }
+}

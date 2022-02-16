@@ -1,30 +1,20 @@
 import React, { DetailedHTMLProps, HTMLAttributes, ReactElement } from "react";
 import styles from "./OverlayTab.module.scss";
 
-//import { ReactComponent as Home } from "../../assets/svg/home-toolbar.svg";
-//import { ReactComponent as Settings } from "../../assets/svg/setting-toolbar.svg";
-//import { ReactComponent as Card } from "../../assets/svg/card.svg";
-//import { ReactComponent as Notification } from "../../assets/svg/notification.svg";
-
-//import { ReactComponent as Close } from "../../assets/svg/close.svg";
+import { ReactComponent as Close } from "../../assets/svg/close.svg";
 
 import cn from "classnames";
-import { TSelectedSettings } from "../../App";
-
-//const MENU = [
-//	{ id: 0, icon: Home, title: "Home" },
-//	{ id: 1, icon: Notification, title: "Notification" },
-//	{ id: 2, icon: Card, title: "Card" },
-//	{ id: 3, icon: Settings, title: "Settings" },
-//];
+import { IMenu } from "../../models/menu.model";
+import { IOverlay } from "../../../interfaces";
 
 export interface OverlayTabProps
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
 	activeTab?: boolean;
-	nameSelectedSetting?: TSelectedSettings;
+	nameSelectedMenu?: string;
 	image?: string;
 	notification?: boolean;
-	onNameSelectedSetting?: (selected: TSelectedSettings) => void;
+	menu: IMenu[];
+	onSelectedMenu: (selected: string) => void;
 	removeTab?: () => void;
 	notificationSetting?: boolean;
 }
@@ -33,17 +23,22 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
 	const {
 		activeTab,
 		image,
-		nameSelectedSetting,
+		id,
+		nameSelectedMenu,
 		notification,
 		notificationSetting,
 		className,
-		onNameSelectedSetting,
+		menu,
+		onSelectedMenu,
 		onClick,
 		removeTab,
 		...anotherProps
 	} = props;
 
-	const handlerClick = (title: TSelectedSettings) => (): void => onNameSelectedSetting(title);
+	const handlerClick = (title: string) => (): void => nameSelectedMenu !== title && onSelectedMenu(title);
+
+	console.log(removeTab);
+
 
 	return (
 		<div className={cn(styles.tab, className)} {...anotherProps}>
@@ -53,27 +48,27 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
 					style={{ backgroundImage: `url(${image})` }}
 					onClick={onClick}
 				/>
-				{/*{!activeTab && <Close className={styles.close} onClick={removeTab} />}*/}
+				{!activeTab && typeof removeTab !== "undefined" && <Close className={styles.close} onClick={removeTab} />}
 			</div>
 
 			{activeTab && (
 				<ul className={styles.list}>
-					{/*{MENU.map(({ id, icon: Icon, title }) => {
+					{menu && menu.map(({ _id, icon: Icon, title }) => {
 						return (
 							<li
-								key={id}
+								key={_id}
 								title={title}
-								onClick={handlerClick(title as TSelectedSettings)}
+								onClick={handlerClick(title)}
 								className={cn(styles.item, {
 									[styles.notification]: notification,
 									[styles.notificationSetting]: notificationSetting,
-									[styles.selected]: nameSelectedSetting === title,
+									[styles.selected]: nameSelectedMenu === title,
 								})}
 							>
 								<Icon className={styles.icon} />
 							</li>
 						);
-					})}*/}
+					})}
 				</ul>
 			)}
 		</div>

@@ -1,0 +1,30 @@
+@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
+
+.usersAvatars {
+  display: block;
+
+  border-radius: 50%;
+
+  img {
+    width: 100%;
+    height: 100%;
+
+    border-radius: 50%;
+  }
+}
+
+.small {
+  width: 20px;
+  height: 20px;
+
+  border: 2px solid $PureWhite;
+}
+
+.big {
+  width: 29px;
+  height: 29px;
+
+  border: 1px solid $StrokeColor;
+}
