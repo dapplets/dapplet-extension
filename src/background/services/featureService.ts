@@ -654,4 +654,23 @@ export default class FeatureService {
         const base64 = base64ArrayBuffer(arr);
         return base64;
     }
+
+    public async openDeployOverlayById(registryUri: string, name: string, branch: string | null, version: string | null) {
+        if (!branch) branch = DEFAULT_BRANCH_NAME;
+
+        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        if (!registry) throw new Error("No registry with this url exists in config.");
+
+        if (!version) {
+            const versions = await registry.getVersionNumbers(name, branch);
+            if (versions.length > 0) {
+                version = versions[versions.length - 1]; // the last version by default
+            }
+        }
+
+        const mi = await this.getModuleInfoByName(registryUri, name);
+        const vi = (version !== null) ? await this.getVersionInfo(registryUri, name, branch, version) : null;
+
+        await this._overlayService.openDeployOverlay(mi, vi);
+    }
 }

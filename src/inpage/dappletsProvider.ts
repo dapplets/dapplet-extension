@@ -63,23 +63,27 @@ export class DappletsProvider {
 
     // }
 
-    getMyDapplets(): Promise<Dapplet[]> { 
+    getMyDapplets(): Promise<Dapplet[]> {
         return this._rpc.call('callBackground', ['getMyDapplets', []], window);
     }
-    
-    addMyDapplet(registryUrl: string, moduleName: string): Promise<void> { 
+
+    addMyDapplet(registryUrl: string, moduleName: string): Promise<void> {
         return this._rpc.call('callBackground', ['addMyDapplet', [registryUrl, moduleName]], window);
     }
-    
-    removeMyDapplet(registryUrl: string, moduleName: string): Promise<void> { 
+
+    removeMyDapplet(registryUrl: string, moduleName: string): Promise<void> {
         return this._rpc.call('callBackground', ['removeMyDapplet', [registryUrl, moduleName]], window);
     }
-    
+
     // onMyDappletsChanged(callback: () => void): void {
 
     // }
-    
+
     // onUninstall(callback: () => void): void {
 
     // }
+
+    openDeployOverlay(registryUrl: string, name: string, branch: string | null, version: string | null) {
+        return this._rpc.call('callBackground', ['openDeployOverlayById', [registryUrl, name, branch, version]]);
+    }
 }

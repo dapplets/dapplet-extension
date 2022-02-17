@@ -106,6 +106,7 @@ browser.runtime.onMessage.addListener(
     openSettingsOverlay: (mi) => featureService.openSettingsOverlay(mi),
     removeDapplet: (name, hostnames) => featureService.removeDapplet(name, hostnames),
     getResource: (hashUris) => featureService.getResource(hashUris),
+    openDeployOverlayById: featureService.openDeployOverlayById.bind(featureService),
 
     // GlobalConfigService
     getProfiles: globalConfigService.getProfiles.bind(globalConfigService),
