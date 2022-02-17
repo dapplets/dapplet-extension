@@ -75,9 +75,9 @@ export class DappletsProvider {
         return this._rpc.call('callBackground', ['removeMyDapplet', [registryUrl, moduleName]], window);
     }
 
-    // onMyDappletsChanged(callback: () => void): void {
-
-    // }
+    onMyDappletsChanged(callback: () => void): void {
+        this._globalEventBus.on('mydapplets_changed', callback);
+    }
 
     // onUninstall(callback: () => void): void {
 

@@ -644,9 +644,11 @@ export default class GlobalConfigService {
         if (config.myDapplets.find(x => x.registryUrl === registryUrl && x.name === name)) return;
         config.myDapplets.push({ registryUrl, name });
         await this.set(config);
+        this._globalEventService.emit('mydapplets_changed');
     }
 
     async removeMyDapplet(registryUrl: string, name: string) {
-        return this.updateConfig(c => c.myDapplets = c.myDapplets.filter(x => !(x.registryUrl === registryUrl && x.name === name)));
+        await this.updateConfig(c => c.myDapplets = c.myDapplets.filter(x => !(x.registryUrl === registryUrl && x.name === name)));
+        this._globalEventService.emit('mydapplets_changed');
     }
 }
