@@ -1,7 +1,7 @@
 import * as React from "react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 // import * as logos from '../../../common/resources/wallets';
 import { Bus } from "../../../common/bus";
@@ -124,7 +124,7 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
     render() {
 
         if (this.state.redirect) {
-            return <Redirect to={this.state.redirect} />
+            return <Navigate to={this.state.redirect} />
         }
 
         if (this.state.loading) return null;

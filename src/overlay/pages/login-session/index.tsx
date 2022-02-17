@@ -2,7 +2,7 @@ import * as React from "react";
 import { Bus } from "../../../common/bus";
 import { ConnectedWallets } from './ConnectedWallets';
 import { ChainTypes, LoginRequest } from "../../../common/types";
-import { HashRouter, MemoryRouter, Route, Switch, Redirect } from "react-router-dom";
+import { MemoryRouter, Route, Navigate, Routes } from "react-router-dom";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 import { WalletPairing } from './WalletPairing';
@@ -73,18 +73,18 @@ export class LoginSession extends React.Component<Props, State> {
 
         return (
             <MemoryRouter>
-                <Switch>
-                    <Route exact path="/login-confirmations" component={() => <LoginConfirmations bus={p.bus} data={p.request} />} />
-                    <Route exact path="/connected-wallets" component={() => <ConnectedWallets bus={p.bus} data={p.request} />} />
-                    <Route exact path="/pairing" component={() => <WalletPairing bus={p.bus} chains={chains as ChainTypes[]} data={p.request} />} />
-                    <Route path="/pairing/metamask" component={() => <MetaMask bus={p.bus} frameId={p.request.frameId} data={p.request}  />} />
-                    <Route path="/pairing/walletconnect" component={() => <WalletConnect bus={p.bus} frameId={p.request.frameId} data={p.request} />} />
-                    <Route path="/pairing/near_testnet" component={() => <Near bus={p.bus} chain={ChainTypes.NEAR_TESTNET} frameId={p.request.frameId} data={p.request} />} />
-                    <Route path="/pairing/near_mainnet" component={() => <Near bus={p.bus} chain={ChainTypes.NEAR_MAINNET} frameId={p.request.frameId} data={p.request} />} />
-                    <Route path="/pairing/dapplets" component={() => <Dapplets bus={p.bus} frameId={p.request.frameId} data={p.request} />} />
+                <Routes>
+                    <Route path="/login-confirmations" element={<LoginConfirmations bus={p.bus} data={p.request} />} />
+                    <Route path="/connected-wallets" element={<ConnectedWallets bus={p.bus} data={p.request} />} />
+                    <Route path="/pairing" element={<WalletPairing bus={p.bus} chains={chains as ChainTypes[]} data={p.request} />} />
+                    <Route path="/pairing/metamask" element={<MetaMask bus={p.bus} frameId={p.request.frameId} data={p.request}  />} />
+                    <Route path="/pairing/walletconnect" element={<WalletConnect bus={p.bus} frameId={p.request.frameId} data={p.request} />} />
+                    <Route path="/pairing/near_testnet" element={<Near bus={p.bus} chain={ChainTypes.NEAR_TESTNET} frameId={p.request.frameId} data={p.request} />} />
+                    <Route path="/pairing/near_mainnet" element={<Near bus={p.bus} chain={ChainTypes.NEAR_MAINNET} frameId={p.request.frameId} data={p.request} />} />
+                    <Route path="/pairing/dapplets" element={<Dapplets bus={p.bus} frameId={p.request.frameId} data={p.request} />} />
 
-                    {(s?.redirect) ? <Redirect to={s.redirect} /> : null}
-                </Switch>
+                    <Route path="*" element={(s?.redirect) ? <Navigate to={s.redirect} /> : null} />
+                </Routes>
             </MemoryRouter>
         );
     }

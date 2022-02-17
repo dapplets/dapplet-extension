@@ -5,7 +5,7 @@ import { browser } from "webextension-polyfill-ts";
 import { Button, Segment } from "semantic-ui-react";
 import { Header } from 'semantic-ui-react'
 import { svgObject } from "qr-image";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { Bus } from '../../../../common/bus';
 import { ChainTypes, LoginRequest, WalletDescriptor, WalletTypes } from "../../../../common/types";
 import { Loading } from "../../../components/Loading";
@@ -108,7 +108,7 @@ export default class extends React.Component<Props, State> {
         const s = this.state;
 
         if (s.toBack === true) {
-            return <Redirect to='/pairing' />
+            return <Navigate to='/pairing' />
         }
 
         if (s.error) return (

@@ -3,7 +3,7 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
 import { Button, Segment, Loader } from "semantic-ui-react";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { Bus } from '../../common/bus';
 import { ChainTypes, WalletDescriptor, WalletTypes } from "../../common/types";
 
@@ -56,7 +56,7 @@ export default class extends React.Component<Props, State> {
         const s = this.state;
 
         if (s.toBack === true) {
-            return <Redirect to='/' />
+            return <Navigate to='/' />
         }
 
         if (s.error) return (

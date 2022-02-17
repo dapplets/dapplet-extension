@@ -75,21 +75,9 @@ module.exports = {
       },
       {
         test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/, /\.eot$/, /\.ttf$/, /\.woff$/, /\.woff2$/],
-        loader: "url-loader",
         include: [path.resolve(__dirname, 'src'), /node_modules/],
-        options: {
-          limit: 100000,
-          name: "static/[name].[hash:8].[ext]",
-        },
-      },
-      // {
-      //   test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/, /\.eot$/, /\.ttf$/, /\.woff$/, /\.woff2$/],
-      //   loader: "file-loader",
-      //   include: [path.resolve(__dirname, 'src'), /node_modules/],
-      //   options: {
-      //     name: "static/[name].[hash:8].[ext]",
-      //   },
-      // }
+        type: 'asset/inline'
+      }
     ]
   },
   resolve: {

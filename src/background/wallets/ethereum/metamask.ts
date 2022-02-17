@@ -132,7 +132,7 @@ export default class extends ethers.Signer implements EthereumWallet {
                 const metamaskPort = browser.runtime.connect(currentMetaMaskId);
                 metamaskPort.onDisconnect.addListener(() => browser.runtime.lastError); // mute "Unchecked runtime.lastError"
                 const pluginStream = new PortStream(metamaskPort);
-                const metamask = new MetaMaskInpageProvider(pluginStream, {
+                const metamask = new MetaMaskInpageProvider(pluginStream as any, {
                     // mute all messages from provider
                     logger: {
                         warn: () => {},
