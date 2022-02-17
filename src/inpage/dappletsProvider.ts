@@ -59,31 +59,31 @@ export class DappletsProvider {
         return this._rpc.call('callBackground', ['removeTrustedUser', [account]], window);
     }
 
-    onTrustedUsersChanged(callback: () => void): void {
-        this._globalEventBus.on('trustedusers_changed', callback);
-    }
-
-    getMyDapplets(): Promise<Dapplet[]> {
+    async getMyDapplets(): Promise<Dapplet[]> {
         return this._rpc.call('callBackground', ['getMyDapplets', []], window);
     }
 
-    addMyDapplet(registryUrl: string, moduleName: string): Promise<void> {
+    async addMyDapplet(registryUrl: string, moduleName: string): Promise<void> {
         return this._rpc.call('callBackground', ['addMyDapplet', [registryUrl, moduleName]], window);
     }
 
-    removeMyDapplet(registryUrl: string, moduleName: string): Promise<void> {
+    async removeMyDapplet(registryUrl: string, moduleName: string): Promise<void> {
         return this._rpc.call('callBackground', ['removeMyDapplet', [registryUrl, moduleName]], window);
+    }
+
+    async openDeployOverlay(registryUrl: string, name: string, branch: string | null = null, version: string | null = null): Promise<void> {
+        return this._rpc.call('callBackground', ['openDeployOverlayById', [registryUrl, name, branch, version]]);
+    }
+
+    onTrustedUsersChanged(callback: () => void): void {
+        this._globalEventBus.on('trustedusers_changed', callback);
     }
 
     onMyDappletsChanged(callback: () => void): void {
         this._globalEventBus.on('mydapplets_changed', callback);
     }
 
-    // onUninstall(callback: () => void): void {
-
-    // }
-
-    openDeployOverlay(registryUrl: string, name: string, branch: string | null = null, version: string | null = null) {
-        return this._rpc.call('callBackground', ['openDeployOverlayById', [registryUrl, name, branch, version]]);
+    onUninstall(callback: () => void): void {
+        this._globalEventBus.on('disconnect', callback);
     }
 }

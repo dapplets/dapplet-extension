@@ -84,6 +84,8 @@ if (!IS_OVERLAY_IFRAME) {
         // destroy when background is disconnected
         port.onDisconnect.addListener(() => {
             console.log('[DAPPLETS]: The connection to the background service has been lost. Content script is unloading...');
+            jsonrpc.call(GLOBAL_EVENT_BUS_NAME, ['disconnect', []]);
+            globalEventBus.destroy();
             jsonrpc.destroy();
             injector.dispose();
             core.overlayManager.destroy();

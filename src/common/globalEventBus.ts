@@ -64,6 +64,10 @@ export class GlobalEventBus {
         return this.off(ALL_EVENTS, callback);
     }
 
+    public destroy() {
+        this._listeners = {};
+    }
+
     private _emitExternal(event: string, ...args: any[]) {
         this._port.postMessage({ event, args });
     }
