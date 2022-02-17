@@ -1,6 +1,6 @@
 import { setupMessageListener } from "chrome-extension-message-wrapper";
 import { WalletService } from "./services/walletService";
-import * as SuspendService from "./services/suspendService";
+import { SuspendService } from "./services/suspendService";
 import * as NotificationService from "./services/notificationService";
 import FeatureService from './services/featureService';
 import GlobalConfigService from './services/globalConfigService';
@@ -21,13 +21,13 @@ import { GlobalEventService } from "./services/globalEventService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
-// ToDo: Think about WalletConnectService, SuspendService etc, which looks like singletons.
 tracing.startTracing();
 
 const globalEventService = new GlobalEventService();
-const globalConfigService = new GlobalConfigService();
+const globalConfigService = new GlobalConfigService(globalEventService);
+const suspendService = new SuspendService(globalConfigService);
 const overlayService = new OverlayService();
-const proxyService = new ProxyService();
+const proxyService = new ProxyService(globalConfigService);
 const githubService = new GithubService(globalConfigService);
 const discordService = new DiscordService(globalConfigService);
 const walletService = new WalletService(globalConfigService, overlayService);
@@ -72,12 +72,12 @@ browser.runtime.onMessage.addListener(
     openGuideOverlay: overlayService.openGuideOverlay.bind(overlayService),
 
     // SuspendService
-    getSuspendityByHostname: SuspendService.getSuspendityByHostname,
-    getSuspendityEverywhere: SuspendService.getSuspendityEverywhere,
-    suspendByHostname: SuspendService.suspendByHostname,
-    suspendEverywhere: SuspendService.suspendEverywhere,
-    resumeByHostname: SuspendService.resumeByHostname,
-    resumeEverywhere: SuspendService.resumeEverywhere,
+    getSuspendityByHostname: suspendService.getSuspendityByHostname.bind(suspendService),
+    getSuspendityEverywhere: suspendService.getSuspendityEverywhere.bind(suspendService),
+    suspendByHostname: suspendService.suspendByHostname.bind(suspendService),
+    suspendEverywhere: suspendService.suspendEverywhere.bind(suspendService),
+    resumeByHostname: suspendService.resumeByHostname.bind(suspendService),
+    resumeEverywhere: suspendService.resumeEverywhere.bind(suspendService),
 
     // NotificationService
     transactionCreated: NotificationService.transactionCreated,
@@ -233,19 +233,19 @@ browser.runtime.onConnect.addListener(wsproxy.createConnectListener());
 browser.runtime.onConnect.addListener(globalEventService.createConnectListener());
 
 // ToDo: These lines are repeated many time
-SuspendService.changeIcon();
-SuspendService.updateContextMenus();
+suspendService.changeIcon();
+suspendService.updateContextMenus();
 
 //listen for new tab to be activated
 browser.tabs.onActivated.addListener(function (activeInfo) {
-  SuspendService.changeIcon();
-  SuspendService.updateContextMenus();
+  suspendService.changeIcon();
+  suspendService.updateContextMenus();
 });
 
 //listen for current tab to be changed
 browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-  SuspendService.changeIcon();
-  SuspendService.updateContextMenus();
+  suspendService.changeIcon();
+  suspendService.updateContextMenus();
 });
 
 browser.notifications.onClicked.addListener(function (notificationId) {

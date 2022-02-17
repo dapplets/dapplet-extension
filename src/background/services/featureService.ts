@@ -18,7 +18,7 @@ import { OverlayService } from './overlayService';
 
 export default class FeatureService {
     private _moduleManager: ModuleManager;
-    private _storageAggregator = new StorageAggregator();
+    private _storageAggregator = new StorageAggregator(this._globalConfigService);
     // private _moduleInfoBrowserStorage = new ModuleInfoBrowserStorage();
 
     constructor(
@@ -26,7 +26,7 @@ export default class FeatureService {
         private _walletService: WalletService,
         private _overlayService: OverlayService
     ) {
-        this._moduleManager = new ModuleManager(this._globalConfigService, this._walletService);
+        this._moduleManager = new ModuleManager(this._globalConfigService, this._walletService, this._storageAggregator);
     }
 
     async getFeaturesByHostnames(contextIds: string[]): Promise<ManifestDTO[]> {

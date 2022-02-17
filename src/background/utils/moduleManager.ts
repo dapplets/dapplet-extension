@@ -15,11 +15,11 @@ import { WalletService } from '../services/walletService';
 export default class ModuleManager {
 
     public registryAggregator: RegistryAggregator;
-    private _storage = new StorageAggregator();
 
     constructor(
         private _globalConfigService: GlobalConfigService,
-        private _walletService: WalletService
+        private _walletService: WalletService,
+        private _storage: StorageAggregator
     ) {
         this.registryAggregator = new RegistryAggregator(this._globalConfigService, this._walletService);
     }

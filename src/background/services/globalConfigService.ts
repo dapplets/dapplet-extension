@@ -5,6 +5,7 @@ import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { browser } from "webextension-polyfill-ts";
 import { generateGuid } from '../../common/helpers';
 import SiteConfig from '../models/siteConfig';
+import { GlobalEventService } from './globalEventService';
 
 const EXPORTABLE_PROPERTIES = [
     'id',
@@ -38,6 +39,8 @@ const EXPORTABLE_PROPERTIES = [
 export default class GlobalConfigService {
     private _globalConfigRepository = new GlobalConfigBrowserStorage();
     private _defaultConfigId: string = 'default';
+
+    constructor(private _globalEventService: GlobalEventService) {}
 
     async get(): Promise<GlobalConfig> {
         const configs = await this._globalConfigRepository.getAll();
@@ -391,10 +394,13 @@ export default class GlobalConfigService {
 
         config.trustedUsers.push({ account: account });
         await this.set(config);
+        
+        this._globalEventService.emit('trustedusers_changed');
     }
 
     async removeTrustedUser(account: string) {
-        return this.updateConfig(c => c.trustedUsers = c.trustedUsers.filter(r => r.account !== account));
+        await this.updateConfig(c => c.trustedUsers = c.trustedUsers.filter(r => r.account !== account));
+        this._globalEventService.emit('trustedusers_changed');
     }
 
     async getUserSettings(moduleName: string, key: string) {

@@ -59,9 +59,9 @@ export class DappletsProvider {
         return this._rpc.call('callBackground', ['removeTrustedUser', [account]], window);
     }
 
-    // onTrustedUsersChanged(callback: () => void): void {
-
-    // }
+    onTrustedUsersChanged(callback: () => void): void {
+        this._globalEventBus.on('trustedusers_changed', callback);
+    }
 
     getMyDapplets(): Promise<Dapplet[]> {
         return this._rpc.call('callBackground', ['getMyDapplets', []], window);
@@ -83,7 +83,7 @@ export class DappletsProvider {
 
     // }
 
-    openDeployOverlay(registryUrl: string, name: string, branch: string | null, version: string | null) {
+    openDeployOverlay(registryUrl: string, name: string, branch: string | null = null, version: string | null = null) {
         return this._rpc.call('callBackground', ['openDeployOverlayById', [registryUrl, name, branch, version]]);
     }
 }
