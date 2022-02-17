@@ -10,6 +10,8 @@ import { assertFullfilled, tryParseBase64Payload, parseModuleName, timeoutPromis
 import { CONTEXT_ID_WILDCARD } from '../common/constants';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { SystemOverlayTabs } from '../common/types';
+import { GLOBAL_EVENT_BUS_NAME } from '../common/chrome-extension-websocket-wrapper/constants';
+import { GlobalEventBus } from '../common/globalEventBus';
 
 const IS_OVERLAY_IFRAME = window.name.indexOf('dapplet-overlay') !== -1;
 
@@ -68,8 +70,19 @@ if (!IS_OVERLAY_IFRAME) {
             }
         });
 
+        const port = browser.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any);
+
+        const globalEventBus = new GlobalEventBus(port);
+
+        // Global Event Bus - two way bridge with an inpage
+        globalEventBus.onAll((e, ...args) => jsonrpc.call(GLOBAL_EVENT_BUS_NAME, [e, args]));
+        jsonrpc.on(GLOBAL_EVENT_BUS_NAME, (e, args) => {
+            globalEventBus.emitExceptAll(e, ...args);
+            return true;
+        });
+        
         // destroy when background is disconnected
-        browser.runtime.connect().onDisconnect.addListener(() => {
+        port.onDisconnect.addListener(() => {
             console.log('[DAPPLETS]: The connection to the background service has been lost. Content script is unloading...');
             jsonrpc.destroy();
             injector.dispose();

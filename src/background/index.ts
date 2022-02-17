@@ -17,12 +17,14 @@ import { IdentityService } from "./services/identityService";
 import { CONTEXT_ID_WILDCARD, ModuleTypes } from "../common/constants";
 import { OverlayService } from "./services/overlayService";
 import { SessionService } from "./services/sessionService";
+import { GlobalEventService } from "./services/globalEventService";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
 // ToDo: Think about WalletConnectService, SuspendService etc, which looks like singletons.
 tracing.startTracing();
 
+const globalEventService = new GlobalEventService();
 const globalConfigService = new GlobalConfigService();
 const overlayService = new OverlayService();
 const proxyService = new ProxyService();
@@ -227,6 +229,7 @@ browser.runtime.onMessage.addListener(
 // ToDo: Perhaps a separate class WebSocketProxy is redundant
 const wsproxy = new WebSocketProxy();
 browser.runtime.onConnect.addListener(wsproxy.createConnectListener());
+browser.runtime.onConnect.addListener(globalEventService.createConnectListener());
 
 // ToDo: These lines are repeated many time
 SuspendService.changeIcon();

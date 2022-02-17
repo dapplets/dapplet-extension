@@ -1,5 +1,6 @@
 import { JsonRpc } from "../common/jsonrpc";
 import { WalletDescriptor } from "../common/types";
+import { GlobalEventBus } from "./globalEventBus";
 
 type Account = {
     chain: string;
@@ -18,7 +19,7 @@ type Dapplet = {
 
 export class DappletsProvider {
 
-    constructor(private _rpc: JsonRpc) { }
+    constructor(private _rpc: JsonRpc, private _globalEventBus: GlobalEventBus) { }
 
     async getAccounts(): Promise<Account[]> {
         const descriptors: WalletDescriptor[] = await this._rpc.call('getWalletDescriptors', [], window);
