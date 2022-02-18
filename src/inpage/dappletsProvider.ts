@@ -75,6 +75,10 @@ export class DappletsProvider {
         return this._rpc.call('callBackground', ['openDeployOverlayById', [registryUrl, name, branch, version]]);
     }
 
+    async openDeveloperOverlay(): Promise<void> {
+        return this._rpc.call('callBackground', ['openPopupOverlay', ['developer']]);
+    }
+
     onTrustedUsersChanged(callback: () => void): void {
         this._globalEventBus.on('trustedusers_changed', callback);
     }

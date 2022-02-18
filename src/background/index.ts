@@ -214,6 +214,7 @@ browser.runtime.onMessage.addListener(
     pairWalletViaOverlay: overlayService.pairWalletViaOverlay.bind(overlayService),
     openDappletHome: overlayService.openDappletHome.bind(overlayService),
     openDappletAction: overlayService.openDappletAction.bind(overlayService),
+    openPopupOverlay: overlayService.openPopupOverlay.bind(overlayService),
 
     // Helpers
     waitTab: (url) => waitTab(url),
