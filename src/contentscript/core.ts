@@ -17,25 +17,27 @@ import { LoginSession } from "./login/login-session";
 import { LoginHooks, LoginRequestSettings } from "./login/types";
 import ModuleInfo from "../background/models/moduleInfo";
 import VersionInfo from "../background/models/versionInfo";
+import State from './state';
 
 type Abi = any;
 
 type OverlayConnection<M> = AutoProperties<M> & Connection & { 
-    id: string,
-    isOpen(): boolean, 
-    close(): void, 
+    id: string
+    isOpen(): boolean
+    close(): void
     onClose(callback: () => void): void 
+    useState(any): OverlayConnection<M>
 };
 
 interface WalletConnection {
-    isConnected(): Promise<boolean>;
-    connect(): Promise<void>;
-    disconnect(): Promise<void>;
+    isConnected(): Promise<boolean>
+    connect(): Promise<void>
+    disconnect(): Promise<void>
 }
 
 type ContentDetector = {
-    contextId: string;
-    selector: string;
+    contextId: string
+    selector: string
 }
 
 export default class Core {
@@ -372,6 +374,7 @@ export default class Core {
     public overlay<M>(cfg: { name: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M> {
         const _overlay = this.overlayManager.createOverlay(cfg.url, cfg.title, cfg.source);
         const conn = Connection.create<M>(_overlay, eventDef);
+        let overridedConn: OverlayConnection<M>
         const overrides = {
             id: _overlay.id,
             isOpen() {
@@ -383,8 +386,12 @@ export default class Core {
             onClose(callback: () => void) {
                 _overlay.frame.addEventListener('onOverlayClose', () => callback());
             },
+            useState(state: any) {
+                return overridedConn;
+            }
         }
-        return Object.assign(conn, overrides);
+        overridedConn = Object.assign(conn, overrides);
+        return overridedConn;
     }
 
     // ToDo: remove it or implement!
@@ -485,5 +492,10 @@ export default class Core {
         loginSession.logoutHandler = _request.onLogout;
 
         return loginSession;
+    }
+
+    public state<T>(defaultState?: Omit<T, 'me'>) {
+        const commonState = new State<T>(defaultState);
+        return commonState;
     }
 }
