@@ -54,20 +54,20 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     }
 
     const { getFeaturesByHostnames, getRegistries, getSwarmGateway } = await initBGFunctions(browser);
-    
+
     const features: ManifestDTO[] = (contextIdsValues) ? await getFeaturesByHostnames(contextIdsValues) : [];
 
     const registries = await getRegistries();
     const regsWithErrors = registries.filter(r => !r.isDev && !!r.isEnabled && !!r.error);
     if (regsWithErrors.length > 0) {
-      const isProviderProblems = regsWithErrors.filter(({ error }) => 
+      const isProviderProblems = regsWithErrors.filter(({ error }) =>
         error.includes('missing response') ||
-        error.includes('could not detect network') || 
-        error.includes('resolver or addr is not configured for ENS name') || 
+        error.includes('could not detect network') ||
+        error.includes('resolver or addr is not configured for ENS name') ||
         error.includes('invalid contract address or ENS name')
       ).length > 0;
 
-      const description = isProviderProblems ? 
+      const description = isProviderProblems ?
         'It looks like the blockchain provider is not available. Check provider addresses in the settings, or try again later.' :
         'Please check the settings.';
 
@@ -103,9 +103,9 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
 
   async toggleFeature(module: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] }), version: string | null, isActive: boolean, order: number, allVersions: string[] | null) {
     const { name, hostnames, sourceRegistry } = module;
-    
+
     this._updateFeatureState(name, { isActive, isLoading: true });
-    
+
     if (!version || !allVersions) {
       const { getVersions } = await initBGFunctions(browser);
       allVersions = await getVersions(module.sourceRegistry.url, module.name);
@@ -217,7 +217,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     const find = (a: string) => (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1;
     return features.filter((x: ManifestAndDetails) => find(x.name) || find(x.title) || find(x.description) || find(x.author));
   }
-  
+
   async deployModule(f: ManifestAndDetails, v: string) {
     const { openDeployOverlay, getModuleInfoByName, getVersionInfo } = await initBGFunctions(browser);
     const mi = await getModuleInfoByName(f.sourceRegistry.url, f.name);
@@ -235,7 +235,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
         <div className={(this.props.isOverlay) ? undefined : "internalTabColumn"}>
           <DevMessage style={{ marginBottom: '10px' }} isOverlay={this.props.isOverlay} />
 
-          {(error) ? <Message error content={error.split('\n').map(x => <>{x}<br/></>)} /> : null}
+          {(error) ? <Message error content={error.split('\n').map(x => <>{x}<br /></>)} /> : null}
 
           {(!isLoading) ? <Input
             fluid
@@ -245,10 +245,10 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
           >
             <Icon name='search' />
             <input value={search} onChange={e => this._searchChangeHandler(e.target.value)} />
-            {(search.length > 0) ? <Icon 
-              name='close' 
-              link 
-              style={{ right: '1px', left: 'initial' }} 
+            {(search.length > 0) ? <Icon
+              name='close'
+              link
+              style={{ right: '1px', left: 'initial' }}
               onClick={() => this._searchChangeHandler('')}
             /> : null}
           </Input> : null}

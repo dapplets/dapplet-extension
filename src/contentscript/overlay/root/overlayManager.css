@@ -21,31 +21,17 @@
 }
 
 .dapplets-overlay-collapsed {
-    margin-left: 0 !important;
+    transform: translateX(0) !important;
 }
 
 .dapplets-overlay-hidden {
     display: none;
 }
 
-@media screen and (min-width: 15em) {
-    .dapplets-overlay-frame {
-        width: 90%;
-        margin-left: -90%;
-    }
-}
-
-@media screen and (min-width: 30em) {
-    .dapplets-overlay-frame {
-        width: 70%;
-        margin-left: -70%;
-    }
-}
-
 @media screen and (min-width: 37.5em) {
     .dapplets-overlay-frame {
-        transition: margin-left 0.15s cubic-bezier(0.55, 0, 0.2, 0.8);
-        width: 428px;
-        margin-left: -428px;
+        transition: transform 0.15s cubic-bezier(0.55, 0, 0.2, 0.8);
+        transform: translateX(-100%);
+        width: auto !important;
     }
 }

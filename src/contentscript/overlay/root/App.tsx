@@ -13,8 +13,25 @@ import { Icon } from "./components/Icon";
 import { ReactComponent as StoreIcon } from "./assets/svg/store.svg";
 import { ReactComponent as SearchIcon } from "./assets/svg/magnifying-glass.svg";
 import { ReactComponent as EthereumIcon } from "./assets/icons/ephir.svg";
-import { MENU } from "./components/Overlay/navigation-list";
-import { TSelectedSettings } from "./types/SelectedSettings";
+import { ReactComponent as Home } from "./assets/svg/home-toolbar.svg";
+import { ReactComponent as Settings } from "./assets/svg/setting-toolbar.svg";
+import { ReactComponent as Notification } from "./assets/svg/notification.svg";
+import { ReactComponent as Airplay } from "./assets/svg/airplay.svg";
+import { IMenu } from "./models/menu.model";
+import { ManifestAndDetails } from "../../../popup/components/dapplet";
+
+import '@fontsource/roboto';
+import '@fontsource/montserrat';
+import { Dapplets } from "./pages/Dapplets";
+
+export type TSelectedSettings = "Dapplets" | "Wallets" | "Settings" | "Developer";
+
+const MENU: IMenu[] = [
+  { _id: "0", icon: Home, title: "Dapplets" },
+  { _id: "1", icon: Notification, title: "Wallets" },
+  { _id: "2", icon: Settings, title: "Settings" },
+  { _id: "3", icon: Airplay, title: "Developer" },
+]
 
 interface P {
   onToggle: () => void;
@@ -25,6 +42,7 @@ interface S {
   isLoadingMap: { [overlayId: string]: boolean };
   isDevMode: boolean;
   selectedMenu: TSelectedSettings;
+  dapplets: ManifestAndDetails[];
 }
 
 export interface OverlayProps {
@@ -37,14 +55,18 @@ export class App extends React.Component<P, S> {
     isLoadingMap: Object.fromEntries(
       this.getOverlays().map((x) => [x.id, true])
     ),
+    dapplets: [],
     isDevMode: false,
     selectedMenu: "Dapplets",
   };
 
   async componentDidMount() {
-    const { getDevMode } = await initBGFunctions(browser);
+    const { getDevMode, getFeaturesByHostnames, getCurrentContextIds } = await initBGFunctions(browser);
+    const ids = await getCurrentContextIds();
     const isDevMode = await getDevMode();
-    this.setState({ isDevMode });
+    const dapplets = await getFeaturesByHostnames(ids);
+
+    this.setState({ isDevMode, dapplets });
   }
 
   closeClickHandler = (overlayId: string) => {
@@ -89,11 +111,13 @@ export class App extends React.Component<P, S> {
       ? x
       : !x.uri.includes("/popup.html#"));
 
+
   render() {
     const p = this.props;
     const s = this.state;
     const overlays = this.getOverlays().filter(x => !x.parent);
     const activeOverlayId = p.overlayManager.activeOverlay?.id;
+    console.log('overlays:', overlays);
 
     return (
       <>
@@ -132,7 +156,9 @@ export class App extends React.Component<P, S> {
               </header>
 
               <div className={cn(styles.children, "dapplets-overlay-nav-content-list")}>
-                {overlays.map((x) => (
+                <Dapplets dapplets={s.dapplets} />
+
+                {/*{overlays.map((x) => (
                   <div key={x.id}
                     className={cn(styles.overlayInner, {
                       [styles.overlayActive]: x.id === activeOverlayId
@@ -144,7 +170,7 @@ export class App extends React.Component<P, S> {
                       overlayManager={p.overlayManager}
                     />
                   </div>
-                ))}
+                ))}*/}
               </div>
             </div>
           </div>
