@@ -26,11 +26,14 @@ if (!IS_OVERLAY_IFRAME) {
             console.error('Cannot process the share link', e);
             return null;
         });
+        
+        const port = browser.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any);
+        const globalEventBus = new GlobalEventBus(port);
 
         const jsonrpc = new JsonRpc();
         const overlayManager = (IS_IFRAME) ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc);
         const core = new Core(IS_IFRAME, overlayManager); // ToDo: is it global for all modules?
-        const injector = new Injector(core, { shareLinkPayload });
+        const injector = new Injector(core, globalEventBus, { shareLinkPayload });
 
         // Open confirmation overlay if checks are not passed
         if (!IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
@@ -52,7 +55,7 @@ if (!IS_OVERLAY_IFRAME) {
             if (!message || !message.type) return;
 
             if (message.type === "FEATURE_ACTIVATED") {
-                const modules = message.payload.filter(x => x.contextIds.filter(v => injector.availableContextIds.includes(v) || v === CONTEXT_ID_WILDCARD).length > 0);
+                const modules = message.payload;
                 modules.forEach(f => console.log(`[DAPPLETS]: The module ${f.name}${(f.branch) ? '#' + f.branch : ''}${(f.version) ? '@' + f.version : ''} was activated.`));
                 return injector.loadModules(modules);
             } else if (message.type === "FEATURE_DEACTIVATED") {
@@ -70,9 +73,9 @@ if (!IS_OVERLAY_IFRAME) {
             }
         });
 
-        const port = browser.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any);
-
-        const globalEventBus = new GlobalEventBus(port);
+        // Handle module (de)activations from another tabs
+        globalEventBus.on('dapplet_activated', (m) => injector.loadModules([m]));
+        globalEventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]));
 
         // Global Event Bus - two way bridge with an inpage
         globalEventBus.onAll((e, ...args) => jsonrpc.call(GLOBAL_EVENT_BUS_NAME, [e, args]));

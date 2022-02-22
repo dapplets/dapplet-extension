@@ -168,8 +168,8 @@ export async function getCurrentTab(): Promise<Tabs.Tab | null> {
   }
 }
 
-export const getCurrentContextIds = async (): Promise<string[]> => {
-  const tab = await getCurrentTab();
+export const getCurrentContextIds = async (tab: Tabs.Tab | null): Promise<string[]> => {
+  if (!tab) tab = await getCurrentTab();
   if (!tab) return [];
   return browser.tabs.sendMessage(tab.id, { "type": "CURRENT_CONTEXT_IDS" });
 };

@@ -32,7 +32,7 @@ const githubService = new GithubService(globalConfigService);
 const discordService = new DiscordService(globalConfigService);
 const walletService = new WalletService(globalConfigService, overlayService);
 const sessionService = new SessionService(walletService, overlayService);
-const featureService = new FeatureService(globalConfigService, walletService, overlayService);
+const featureService = new FeatureService(globalConfigService, walletService, overlayService, globalEventService);
 const identityService = new IdentityService(globalConfigService, walletService);
 const ensService = new EnsService(walletService);
 
@@ -222,7 +222,7 @@ browser.runtime.onMessage.addListener(
     reloadCurrentPage: () => reloadCurrentPage(),
     getCurrentTab: () => getCurrentTab(),
     getThisTab: getThisTab,
-    getCurrentContextIds: () => getCurrentContextIds(),
+    getCurrentContextIds: getCurrentContextIds,
     checkUrlAvailability: (url) => checkUrlAvailability(url),
   })
 );

@@ -9,10 +9,11 @@ import { rcompare } from "semver";
 import { Dapplet, ManifestAndDetails } from "../components/dapplet";
 import Manifest from "../../background/models/manifest";
 import { DevMessage } from "../components/DevMessage";
+import { globalEventBus } from "../globalEventBus";
 
 interface IDappletsProps {
-  contextIds: Promise<string[] | undefined>;
   isOverlay: boolean;
+  currentTab: { id: number, windowId: number } | null;
 }
 
 interface IDappletsState {
@@ -22,6 +23,7 @@ interface IDappletsState {
   isNoContentScript: boolean;
   search: string;
   devMessage: string;
+  contextIds: string[];
 }
 
 class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
@@ -33,27 +35,41 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     error: null,
     isNoContentScript: false,
     search: '',
-    devMessage: null
+    devMessage: null,
+    contextIds: []
   }
 
   async componentDidMount() {
     this._isMounted = true;
-    const { contextIds } = this.props;
-    await this._refreshDataByContext(contextIds);
+
+    globalEventBus.on('context_started', this.refresh);
+    globalEventBus.on('context_finished', this.refresh);
+    globalEventBus.on('dapplet_activated', this.refresh);
+    globalEventBus.on('dapplet_deactivated', this.refresh);
+
+    await this.refresh();
   }
 
-  async _refreshDataByContext(contextIds: Promise<string[]>) {
-    let contextIdsValues = undefined;
+  componentWillUnmount() {
+    this._isMounted = false;
 
-    try {
-      contextIdsValues = await contextIds;
-    } catch (err) {
-      console.error(err);
-      this.setState({ isNoContentScript: true, isLoading: false });
-      return;
+    globalEventBus.off('context_started', this.refresh);
+    globalEventBus.off('context_finished', this.refresh);
+    globalEventBus.off('dapplet_activated', this.refresh);
+    globalEventBus.off('dapplet_deactivated', this.refresh);
+  }
+
+  refresh = async () => {
+    const { getCurrentContextIds } = await initBGFunctions(browser);
+    const contextIds = await getCurrentContextIds(this.props.currentTab);
+    if (this._isMounted) {
+      this.setState({ contextIds });
+      await this._refreshDataByContext(contextIds);
     }
+  }
 
-    const { getFeaturesByHostnames, getRegistries, getSwarmGateway } = await initBGFunctions(browser);
+  async _refreshDataByContext(contextIdsValues: string[]) {
+    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(browser);
     
     const features: ManifestDTO[] = (contextIdsValues) ? await getFeaturesByHostnames(contextIdsValues) : [];
 
@@ -75,7 +91,6 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
         error: `Cannot connect to the Dapplet Registry (${regsWithErrors.map(x => x.url).join(', ')}).\n${description}`
       });
     }
-
 
     if (this._isMounted) {
       this.setState({
@@ -126,7 +141,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
         await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url);
       }
 
-      await this._refreshDataByContext(this.props.contextIds);
+      await this._refreshDataByContext(this.state.contextIds);
 
     } catch (err) {
       this._updateFeatureState(name, { isActive: !isActive, error: err.message });
@@ -148,17 +163,13 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     });
   }
 
-  componentWillUnmount() {
-    this._isMounted = false;
-  }
-
   async refreshContextPage() {
     const { getCurrentTab, getCurrentContextIds, reloadCurrentPage } = await initBGFunctions(browser);
     const tab = await getCurrentTab();
     if (!tab) return;
     await reloadCurrentPage();
     this.setState({ isNoContentScript: false, isLoading: true });
-    setTimeout(() => this._refreshDataByContext(getCurrentContextIds()), 4000); // ToDo: get rid of timeout
+    setTimeout(() => this._refreshDataByContext(getCurrentContextIds(this.props.currentTab)), 4000); // ToDo: get rid of timeout
   }
 
   async settingsModule(mi: ManifestDTO) {
@@ -199,7 +210,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
 
   removeDapplet = async (f: Manifest) => {
     const { removeDapplet } = await initBGFunctions(browser);
-    const contextIds = await this.props.contextIds;
+    const contextIds = await this.state.contextIds;
     await removeDapplet(f.name, contextIds);
     this.setState({
       features: this.state.features.filter(x => x.name !== f.name)

@@ -10,6 +10,7 @@ import { AppStorage } from "./appStorage";
 import { DefaultConfig, SchemaConfig } from "../common/types";
 import { __decorate } from "./global";
 import ModuleInfo from "../background/models/moduleInfo";
+import { GlobalEventBus } from "../common/globalEventBus";
 
 type RegistriedModule = {
     manifest: VersionInfo,
@@ -36,12 +37,18 @@ export class Injector {
     public availableContextIds: string[] = [];
     public registry: RegistriedModule[] = [];
 
-    constructor(public core: Core, private env?: { shareLinkPayload: { moduleId: string, payload: any, isAllOk: boolean } }) {
+    constructor(
+        public core: Core, 
+        private _globalEventBus: GlobalEventBus, 
+        private env?: { shareLinkPayload: { moduleId: string, payload: any, isAllOk: boolean } }
+    ) {
         this._setContextActivivty([new URL(DAPPLETS_ORIGINAL_HREF ?? window.location.href).hostname], undefined, true);
         window.exports = {}; // for CommonJS modules compatibility
     }
 
     public async loadModules(modules: { name: string, branch: string, version: string, order: number, contextIds: string[] }[]) {
+        modules = modules.filter(x => x.contextIds.filter(v => this.availableContextIds.includes(v) || v === CONTEXT_ID_WILDCARD).length > 0);
+
         if (!modules || !modules.length) return;
         modules.forEach(x => x.contextIds = multipleReplace(x.contextIds, CONTEXT_ID_WILDCARD, this.availableContextIds));
 
@@ -445,6 +452,7 @@ export class Injector {
             if (newContextIds.length > 0) {
                 // console.log('[DAPPLETS] Context started:', newContextIds);
                 browser.runtime.sendMessage({ type: "CONTEXT_STARTED", payload: { contextIds } });
+                this._globalEventBus.emit('context_started', contextIds);
             }
 
         } else {
@@ -460,6 +468,7 @@ export class Injector {
             if (oldContextIds.length > 0) {
                 // console.log('[DAPPLETS] Context finished:', oldContextIds);
                 browser.runtime.sendMessage({ type: "CONTEXT_FINISHED", payload: { contextIds } });
+                this._globalEventBus.emit('context_finished', contextIds);
             }
         }
     }

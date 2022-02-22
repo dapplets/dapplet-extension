@@ -15,6 +15,7 @@ import { WalletService } from './walletService';
 import { StorageRef } from '../registries/registry';
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer';
 import { OverlayService } from './overlayService';
+import { GlobalEventService } from './globalEventService';
 
 export default class FeatureService {
     private _moduleManager: ModuleManager;
@@ -24,7 +25,8 @@ export default class FeatureService {
     constructor(
         private _globalConfigService: GlobalConfigService,
         private _walletService: WalletService,
-        private _overlayService: OverlayService
+        private _overlayService: OverlayService,
+        private _globalEventService: GlobalEventService
     ) {
         this._moduleManager = new ModuleManager(this._globalConfigService, this._walletService, this._storageAggregator);
     }
@@ -232,6 +234,17 @@ export default class FeatureService {
                         contextIds: hostnames
                     }]
                 });
+
+                // global notification
+                const event = isActive ? "dapplet_activated" : "dapplet_deactivated";
+                const data = {
+                    name, 
+                    branch: DEFAULT_BRANCH_NAME, 
+                    version, 
+                    order,
+                    contextIds: hostnames
+                };
+                this._globalEventService.emit(event, data);
             });
 
             // ToDo: merge with config updating upper

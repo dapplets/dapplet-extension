@@ -1,6 +1,8 @@
+import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { browser } from "webextension-polyfill-ts";
+
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { browser } from "webextension-polyfill-ts";
 import { capitalizeFirstLetter } from "../../../common/helpers";
 import { Overlay } from "./overlay";
 import { IOverlayManager } from "../interfaces";
@@ -178,7 +180,7 @@ export class OverlayManager implements IOverlayManager {
         const overlay =
             overlays.find((x) => x.uri === url) ??
             this.createOverlay(url, capitalizeFirstLetter(path));
-        overlay.send("changeTab", [path]);
+        initBGFunctions(browser).then(x => x.getThisTab()).then(x => overlay.send("changeTab", [path, x]));
         this.activate(overlay);
         this.show();
         this.open();
