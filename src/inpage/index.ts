@@ -8,3 +8,9 @@ const dappletsProvider = new DappletsProvider(jsonrpc, globalEventBus);
 
 (window as Record<string, any>).dapplets = dappletsProvider;
 window.dispatchEvent(new Event('dapplets#initialized'));
+
+globalEventBus.on('disconnect', () => {
+    (window as Record<string, any>).dapplets = undefined;
+    globalEventBus.destroy();
+    jsonrpc.destroy();
+});

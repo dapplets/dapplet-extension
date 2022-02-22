@@ -74,9 +74,9 @@ export class GlobalEventBus {
 
     private _emitLocal(event: string, ...args: any[]) {
         if (this._listeners.hasOwnProperty(event)) {
-            for (let i = 0; i < this._listeners[event].length; i++) {
-                const callback = this._listeners[event][i];
-
+            const callbacks = this._listeners[event];
+            for (let i = 0; i < callbacks.length; i++) {
+                const callback = callbacks[i];
                 callback.call(this, ...args);
             }
         }
@@ -84,9 +84,9 @@ export class GlobalEventBus {
 
     private _emitAll(event: string, ...args: any[]) {
         if (this._listeners.hasOwnProperty(ALL_EVENTS)) {
-            for (let i = 0; i < this._listeners[ALL_EVENTS].length; i++) {
-                const callback = this._listeners[ALL_EVENTS][i];
-
+            const callbacks = this._listeners[ALL_EVENTS];
+            for (let i = 0; i < callbacks.length; i++) {
+                const callback = callbacks[i];
                 callback.call(this, event, ...args);
             }
         }

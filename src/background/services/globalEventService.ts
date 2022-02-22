@@ -68,8 +68,10 @@ export class GlobalEventService {
             return null;
         }
 
-        for (let i = 0; i < this._listeners[event].length; i++) {
-            const callback = this._listeners[event][i];
+        const callbacks = this._listeners[event];
+
+        for (let i = 0; i < callbacks.length; i++) {
+            const callback = callbacks[i];
 
             callback.call(this, ...args);
         }

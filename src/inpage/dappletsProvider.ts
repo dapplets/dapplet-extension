@@ -19,6 +19,8 @@ type Dapplet = {
 
 export class DappletsProvider {
 
+    public version = EXTENSION_VERSION;
+
     constructor(private _rpc: JsonRpc, private _globalEventBus: GlobalEventBus) { }
 
     async getAccounts(): Promise<Account[]> {
