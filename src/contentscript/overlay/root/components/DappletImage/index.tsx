@@ -5,16 +5,16 @@ import { ReactComponent as Star } from "../../assets/images/icon/stars.svg";
 import NO_LOGO from "../../../../../common/resources/no-logo.png";
 
 
-import styles from "./CardImage.module.scss";
+import styles from "./DappletImage.module.scss";
 import { StorageRef } from "../../../../../background/registries/registry";
 import { browser } from "webextension-polyfill-ts";
 
-export interface CardImageProps {
+export interface DappletImageProps {
 	storageRef: StorageRef;
 	isFavourites: boolean;
 }
 
-export const CardImage: FC<CardImageProps> = (props: CardImageProps) => {
+export const DappletImage: FC<DappletImageProps> = (props: DappletImageProps) => {
 	const { storageRef, isFavourites } = props;
 	const { img } = useStorageRef(storageRef);
 

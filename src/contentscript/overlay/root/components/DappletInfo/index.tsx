@@ -1,21 +1,21 @@
 import React, { FC } from "react";
 import cn from "classnames";
-import styles from "./CardInfo.module.scss";
+import styles from "./DappletInfo.module.scss";
 
-export interface CardInfoProps {
+export interface DappletInfoProps {
 	title: string;
 	value: string;
 	appearance?: "text" | "hash" | "link";
 	className?: string;
 }
 
-export const CardInfo: FC<CardInfoProps> = ({
+export const DappletInfo: FC<DappletInfoProps> = ({
 	title,
 	value,
 	appearance = "hash",
 	className,
-}: CardInfoProps) => {
-	const visible = ({ value, appearance }: Pick<CardInfoProps, "value" | "appearance">): string => {
+}: DappletInfoProps) => {
+	const visible = ({ value, appearance }: Pick<DappletInfoProps, "value" | "appearance">): string => {
 		if (appearance === "text" || appearance === "link") return value;
 
 		const firstFourCharacters = value.substring(0, 4);

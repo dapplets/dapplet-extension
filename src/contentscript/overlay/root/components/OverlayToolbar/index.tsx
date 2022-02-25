@@ -14,6 +14,7 @@ export interface OverlayToolbarProps
 	nameSelectedMenu?: string;
 	idActiveTab: string;
 	isDevMode: boolean;
+	isSystemDapplets: boolean;
 	toggle: () => void;
 	onSelectedMenu: (selected: string) => void;
 	onRemoveTab: (id: string) => void;
@@ -35,6 +36,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 		idActiveTab,
 		className,
 		isDevMode,
+		isSystemDapplets,
 		menu,
 		toggle,
 		onSelectedMenu,
@@ -45,11 +47,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 
 	const handlerSelectedTab = (id: string) => (): void => onSelectedTab(id);
 	const handlerRemoveTab = (id: string) => (): void => onRemoveTab(id);
-
 	const nonSystemTabs = tabs.filter(x => !x.uri.includes("/popup.html#"));
-	const systemTabs = tabs.filter(x => x.uri.includes("/popup.html#"));
-	const tab = tabs.filter(x => x.uri.includes("/popup.html#/dapplets"))[0];
-	const isSystemTabActive = systemTabs.findIndex(x => x.id === idActiveTab) !== -1;
 
 	return (
 		<div className={cn(styles.toolbar, className)} {...anotherProps}>
@@ -58,15 +56,15 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 
 				<div className={styles.tabs}>
 					<OverlayTab
-						id={'system'}
+						id='system'
 						menu={menu}
 						nameSelectedMenu={nameSelectedMenu}
-						activeTab={isSystemTabActive}
+						activeTab={true}
 						onSelectedMenu={onSelectedMenu}
-						onClick={handlerSelectedTab(tab?.id)}
-						className={cn({ [styles.active]: isSystemTabActive })}
+						onClick={handlerSelectedTab("system")}
+						className={cn({ [styles.active]: true })}
 						notification={false}
-						title={'System'}
+						title="System"
 					/>
 
 					<>
@@ -81,6 +79,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 										key={id}
 										nameSelectedMenu={nameSelectedMenu}
 										activeTab={active}
+										isSystemDapplets={isSystemDapplets}
 										onSelectedMenu={onSelectedMenu}
 										removeTab={handlerRemoveTab(id)}
 										onClick={handlerSelectedTab(id)}

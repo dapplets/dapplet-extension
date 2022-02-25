@@ -1,5 +1,5 @@
 import { ManifestAndDetails } from "../../../../../popup/components/dapplet";
 
-export interface DappletsProps {
-	dapplets: ManifestAndDetails[];
-}
+//export interface DappletsProps {
+//	dapplets: ManifestAndDetails[];
+//}

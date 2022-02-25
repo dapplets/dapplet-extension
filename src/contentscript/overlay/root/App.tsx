@@ -18,7 +18,6 @@ import { ReactComponent as Settings } from "./assets/svg/setting-toolbar.svg";
 import { ReactComponent as Notification } from "./assets/svg/notification.svg";
 import { ReactComponent as Airplay } from "./assets/svg/airplay.svg";
 import { IMenu } from "./models/menu.model";
-import { ManifestAndDetails } from "../../../popup/components/dapplet";
 
 import '@fontsource/roboto';
 import '@fontsource/montserrat';
@@ -41,8 +40,8 @@ interface P {
 interface S {
   isLoadingMap: { [overlayId: string]: boolean };
   isDevMode: boolean;
-  selectedMenu: TSelectedSettings;
-  dapplets: ManifestAndDetails[];
+  selectedMenu: TSelectedSettings | null;
+  isSystemDapplets: boolean;
 }
 
 export interface OverlayProps {
@@ -55,18 +54,17 @@ export class App extends React.Component<P, S> {
     isLoadingMap: Object.fromEntries(
       this.getOverlays().map((x) => [x.id, true])
     ),
-    dapplets: [],
     isDevMode: false,
     selectedMenu: "Dapplets",
+    isSystemDapplets: true,
   };
 
   async componentDidMount() {
     const { getDevMode, getFeaturesByHostnames, getCurrentContextIds } = await initBGFunctions(browser);
     const ids = await getCurrentContextIds();
     const isDevMode = await getDevMode();
-    const dapplets = await getFeaturesByHostnames(ids);
 
-    this.setState({ isDevMode, dapplets });
+    this.setState({ isDevMode });
   }
 
   closeClickHandler = (overlayId: string) => {
@@ -75,10 +73,13 @@ export class App extends React.Component<P, S> {
   };
 
   tabClickHandler = (overlayId: string) => {
+    if (overlayId === "system") return this.systemDapplets();
+
     const overlay = this.getOverlays().find((x) => x.id === overlayId);
     if (!overlay) return;
+
     this.props.overlayManager.activate(overlay);
-    this.setState({ selectedMenu: "Dapplets" });
+    this.setState({ selectedMenu: null, isSystemDapplets: false });
   };
 
   loadHandler = (overlayId: string) => {
@@ -96,6 +97,9 @@ export class App extends React.Component<P, S> {
   }
 
   onSelectedMenu = (name: string) => {
+    if (name === "Dapplets") return this.systemDapplets();
+    if (name !== "Dapplets") this.setState({ isSystemDapplets: false });
+
     this.setState({ selectedMenu: name as TSelectedSettings });
 
     const overlays = this.getOverlays();
@@ -111,6 +115,12 @@ export class App extends React.Component<P, S> {
       ? x
       : !x.uri.includes("/popup.html#"));
 
+  systemDapplets = () => {
+    this.setState({
+      isSystemDapplets: true,
+      selectedMenu: "Dapplets",
+    });
+  }
 
   render() {
     const p = this.props;
@@ -118,6 +128,7 @@ export class App extends React.Component<P, S> {
     const overlays = this.getOverlays().filter(x => !x.parent);
     const activeOverlayId = p.overlayManager.activeOverlay?.id;
     console.log('overlays:', overlays);
+    console.log('isSystemDapplets:', s.isSystemDapplets);
 
     return (
       <>
@@ -126,11 +137,12 @@ export class App extends React.Component<P, S> {
           <div className={styles.wrapper}>
             <OverlayToolbar
               tabs={overlays}
+              isSystemDapplets={s.isSystemDapplets}
               menu={MENU}
               className={styles.toolbar}
               nameSelectedMenu={s.selectedMenu}
               idActiveTab={activeOverlayId}
-              isDevMode={this.state.isDevMode}
+              isDevMode={s.isDevMode}
               onSelectedMenu={this.onSelectedMenu}
               onSelectedTab={this.tabClickHandler}
               onRemoveTab={this.closeClickHandler}
@@ -156,21 +168,24 @@ export class App extends React.Component<P, S> {
               </header>
 
               <div className={cn(styles.children, "dapplets-overlay-nav-content-list")}>
-                <Dapplets dapplets={s.dapplets} />
+                {s.isSystemDapplets && <Dapplets />}
 
-                {/*{overlays.map((x) => (
-                  <div key={x.id}
-                    className={cn(styles.overlayInner, {
-                      [styles.overlayActive]: x.id === activeOverlayId
-                    })}
-                  >
-                    <ContentItem
-                      overlay={x}
-                      isActive={x.id === activeOverlayId}
-                      overlayManager={p.overlayManager}
-                    />
-                  </div>
-                ))}*/}
+                {
+                  overlays.map((x) => (
+                    <div key={x.id}
+                      className={cn(styles.noSystemDapplets, {
+                        [styles.hideContent]: s.isSystemDapplets,
+                        [styles.overlayActive]: !s.isSystemDapplets && x.id === activeOverlayId,
+                      })}
+                    >
+                      <ContentItem
+                        overlay={x}
+                        isActive={x.id === activeOverlayId}
+                        overlayManager={p.overlayManager}
+                      />
+                    </div>
+                  ))
+                }
               </div>
             </div>
           </div>

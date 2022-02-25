@@ -1,12 +1,12 @@
 import React, { FC, DetailedHTMLProps, HTMLAttributes } from "react";
 import cn from "classnames";
-import styles from "./Card.module.scss";
-import { CardImage } from "../CardImage";
+import styles from "./Dapplet.module.scss";
+import { DappletImage } from "../DappletImage";
 import { Icon } from "../Icon";
 import { Switch } from "../Switch";
 import { SquaredButton } from "../SquaredButton";
-import { CardTitle } from "../CardTitle";
-import { CardInfo } from "../CardInfo";
+import { DappletTitle } from "../DappletTitle";
+import { DappletInfo } from "../DappletInfo";
 import { ReactComponent as Installed } from "../../assets/icons/installed.svg";
 import { ReactComponent as Update } from "../../assets/icons/update.svg";
 import { ReactComponent as HomeIcon } from "../../assets/svg/home.svg";
@@ -16,52 +16,58 @@ import { ReactComponent as SearchIcon } from "../../assets/svg/search.svg";
 import { ReactComponent as DeleteIcon } from "../../assets/svg/delete.svg";
 import { useToggle } from "../../hooks/useToggle";
 import { Avatar } from "../Avatar";
-import { IUser } from "../../models/user.model";
-import { StorageRef } from "../../../../../background/registries/registry";
+import { ManifestAndDetails } from "../../../../../popup/components/dapplet";
 
-export interface CardProps
+export interface DappletProps
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
-	title: string;
-	description: string;
-	isFavourites: boolean;
-	isActive: boolean
-	users?: IUser[];
-	author: string;
-	website: string;
-	image: StorageRef;
+	dapplet: ManifestAndDetails & { users: any[], website: string, isFavourites: boolean };
+
+	onSwitchChange: Function;
+	onSettingsModule: Function;
+	onOpenDappletHome: Function;
+	onRemoveDapplet: Function;
 }
 
-export const Card: FC<CardProps> = (props: CardProps) => {
+export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 	const [isShowDescription, onShowDescription] = useToggle(false);
-
+	const {
+		dapplet,
+		className,
+		onSwitchChange,
+		onSettingsModule,
+		onOpenDappletHome,
+		onRemoveDapplet,
+		...anotherProps
+	} = props;
 	const {
 		title,
 		description,
-		isFavourites = false,
-		author,
 		users,
+		author,
 		website,
-		image,
-		className,
+		isFavourites,
+		icon,
 		isActive,
-		...anotherProps
-	} = props;
+		isActionHandler,
+		isUnderConstruction,
+		sourceRegistry,
+	} = dapplet;
 
 	return (
 		<div className={cn(styles.wrapperCard, className)} {...anotherProps}>
-			<CardImage isFavourites={isFavourites} storageRef={image} />
+			<DappletImage isFavourites={isFavourites} storageRef={icon} />
 
 			<div className={cn(styles.wrapperBlock)}>
 				<div className={styles.header} onClick={onShowDescription}>
 					<div className={cn(styles.blockTop)}>
-						<CardTitle isShowDescription={isShowDescription} title={title} />
+						<DappletTitle isShowDescription={isShowDescription} title={title} />
 
 						<div className={cn(styles.blockIcons)}>
 							<Icon size="small" icon={Installed} />
 							<Icon size="small" icon={Update} />
 						</div>
 
-						<Switch checked={isActive} />
+						{!isUnderConstruction && <Switch checked={isActive} onChange={() => onSwitchChange(dapplet, !isActive)} />}
 					</div>
 
 					<div className={cn(styles.blockText)}>{description}</div>
@@ -89,26 +95,68 @@ export const Card: FC<CardProps> = (props: CardProps) => {
 							{users && <p className={styles.activeUsers}>{users.length} active users</p>}
 						</div>
 						<div className={styles.descriptionBottom}>
-							{author && <CardInfo title="Author" value={author} />}
-							{website && <CardInfo title="Website" value={website} appearance="link" />}
+							{author && <DappletInfo title="Author" value={author} />}
+							{website && <DappletInfo title="Website" value={website} appearance="link" />}
 						</div>
 					</div>
 				)}
 
 				<div className={cn(styles.blockBottom)}>
 					<div className={cn(styles.firstButtons)}>
-						<SquaredButton appearance="smail" icon={HomeIcon} className={styles.squareButton} />
-						<SquaredButton appearance="smail" icon={SettingsIcon} className={styles.squareButton} />
-						<SquaredButton appearance="smail" icon={SearchIcon} className={styles.squareButton} />
-						<SquaredButton appearance="smail" icon={CloudsIcon} className={styles.squareButton} />
+						{isActive && isActionHandler && (
+							<SquaredButton
+								appearance="smail"
+								icon={HomeIcon}
+								className={styles.squareButton}
+								title="Home"
+								onClick={() => onOpenDappletHome(dapplet)}
+							/>
+						)}
+						{!isUnderConstruction && (
+							<SquaredButton
+								appearance="smail"
+								icon={SettingsIcon}
+								className={styles.squareButton}
+								title="Settings"
+								onClick={() => onSettingsModule(dapplet)}
+							/>
+						)}
 
+						{isActive && (
+							<SquaredButton
+								appearance="smail"
+								icon={SearchIcon}
+								className={styles.squareButton}
+								title="Search"
+							/>
+						)}
+
+						{isActive && (sourceRegistry?.isDev) && (
+							<SquaredButton
+								appearance="smail"
+								icon={CloudsIcon}
+								className={styles.squareButton}
+								title="Clouds"
+							/>
+						)}
+
+						{/* NO BUTTON */}
 						{!isShowDescription && (
-							<CardInfo title="Author" value={author} className={styles.cardInfo} />
+							<DappletInfo
+								title="Author"
+								value={author}
+								className={styles.cardInfo}
+							/>
 						)}
 					</div>
 
 					<div className={cn(styles.lastButton)}>
-						<SquaredButton appearance="smail" icon={DeleteIcon} />
+						{!isUnderConstruction && <SquaredButton
+							appearance="smail"
+							icon={DeleteIcon}
+							title="Delete"
+							onClick={() => onRemoveDapplet(dapplet)}
+						/>}
 					</div>
 				</div>
 			</div>
