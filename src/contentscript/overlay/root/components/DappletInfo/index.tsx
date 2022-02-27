@@ -16,6 +16,7 @@ export const DappletInfo: FC<DappletInfoProps> = ({
 	className,
 }: DappletInfoProps) => {
 	const visible = ({ value, appearance }: Pick<DappletInfoProps, "value" | "appearance">): string => {
+		if (!value) return "";
 		if (appearance === "text" || appearance === "link") return value;
 
 		const firstFourCharacters = value.substring(0, 4);

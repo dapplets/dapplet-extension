@@ -18,14 +18,17 @@ import { useToggle } from "../../hooks/useToggle";
 import { Avatar } from "../Avatar";
 import { ManifestAndDetails } from "../../../../../popup/components/dapplet";
 
+// TODO: How will the dapplets be displayed during development?
+
 export interface DappletProps
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
 	dapplet: ManifestAndDetails & { users: any[], website: string, isFavourites: boolean };
 
 	onSwitchChange: Function;
 	onSettingsModule: Function;
-	onOpenDappletHome: Function;
+	onOpenDappletAction: Function;
 	onRemoveDapplet: Function;
+	onDeployDapplet: Function;
 }
 
 export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
@@ -35,8 +38,9 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 		className,
 		onSwitchChange,
 		onSettingsModule,
-		onOpenDappletHome,
+		onOpenDappletAction,
 		onRemoveDapplet,
+		onDeployDapplet,
 		...anotherProps
 	} = props;
 	const {
@@ -109,7 +113,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 								icon={HomeIcon}
 								className={styles.squareButton}
 								title="Home"
-								onClick={() => onOpenDappletHome(dapplet)}
+								onClick={() => onOpenDappletAction(dapplet)}
 							/>
 						)}
 						{!isUnderConstruction && (
@@ -137,6 +141,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 								icon={CloudsIcon}
 								className={styles.squareButton}
 								title="Clouds"
+								onClick={() => onDeployDapplet(dapplet)}
 							/>
 						)}
 

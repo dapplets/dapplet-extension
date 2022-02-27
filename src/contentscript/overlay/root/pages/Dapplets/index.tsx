@@ -9,6 +9,8 @@ import { ManifestAndDetails } from "../../../../../popup/components/dapplet";
 import { browser } from "webextension-polyfill-ts";
 import { rcompare } from "semver";
 import { CONTEXT_ID_WILDCARD, ModuleTypes } from "../../../../../common/constants";
+import VersionInfo from "../../../../../background/models/versionInfo";
+import ModuleInfo from "../../../../../background/models/moduleInfo";
 
 export type Module = ManifestDTO & { isLoading: boolean, error: string, versions: string[] };
 
@@ -157,7 +159,7 @@ export const Dapplets = () => {
 		window.close();
 	}
 
-	const onOpenDappletHome = async (f: ManifestAndDetails) => {
+	const onOpenDappletAction = async (f: ManifestAndDetails) => {
 		try {
 			_updateFeatureState(f.name, { isActionLoading: true });
 			const { openDappletAction, getCurrentTab } = await initBGFunctions(browser);
@@ -178,6 +180,15 @@ export const Dapplets = () => {
 		await removeDapplet(f.name, contextIds);
 		const d = dapplets.filter(x => x.name !== f.name);
 		setDapplets(d);
+	}
+
+	const onDeployDapplet = async (f: ManifestAndDetails) => {
+		console.log("f", f);
+		const { openDeployOverlay } = await initBGFunctions(browser);
+
+		// TODO: activeVersion or lastVersion
+		await openDeployOverlay(f, f.activeVersion);
+		window.close();
 	}
 
 	return (
@@ -205,8 +216,9 @@ export const Dapplets = () => {
 						}}
 						onSwitchChange={onSwitchChange}
 						onSettingsModule={onOpenSettingsModule}
-						onOpenDappletHome={onOpenDappletHome}
+						onOpenDappletAction={onOpenDappletAction}
 						onRemoveDapplet={onRemoveDapplet}
+						onDeployDapplet={onDeployDapplet}
 					/>
 				)
 			})}
