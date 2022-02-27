@@ -9,8 +9,6 @@ import { ManifestAndDetails } from "../../../../../popup/components/dapplet";
 import { browser } from "webextension-polyfill-ts";
 import { rcompare } from "semver";
 import { CONTEXT_ID_WILDCARD, ModuleTypes } from "../../../../../common/constants";
-import VersionInfo from "../../../../../background/models/versionInfo";
-import ModuleInfo from "../../../../../background/models/moduleInfo";
 
 export type Module = ManifestDTO & { isLoading: boolean, error: string, versions: string[] };
 
@@ -52,7 +50,7 @@ export const Dapplets = () => {
 		}
 	}
 
-	const toggleFeature = async (module: (ManifestDTO & { isLoading: boolean, error: string, versions: string[] }), version: string | null, isActive: boolean, order: number, allVersions: string[] | null) => {
+	const toggleFeature = async (module: Module, version: string | null, isActive: boolean, order: number, allVersions: string[] | null) => {
 		const { name, hostnames, sourceRegistry } = module;
 		const {
 			getCurrentContextIds,

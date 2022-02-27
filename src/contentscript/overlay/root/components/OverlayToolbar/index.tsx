@@ -1,10 +1,11 @@
-import React, { DetailedHTMLProps, HTMLAttributes, ReactElement } from "react";
+import React, { DetailedHTMLProps, HTMLAttributes, ReactElement, useEffect } from "react";
 import styles from "./OverlayToolbar.module.scss";
 import { OverlayTab } from "../OverlayTab";
 import cn from "classnames";
 import { ReactComponent as Coolicon } from "../../assets/svg/coolicon.svg";
 import { ITab } from "../../types/tab";
 import { IMenu } from "../../models/menu.model";
+import { Overlay } from "../../overlay";
 
 // TODO: change element hiding from Margin to transform
 export interface OverlayToolbarProps
@@ -12,10 +13,12 @@ export interface OverlayToolbarProps
 	tabs: ITab[];
 	menu: IMenu[];
 	nameSelectedMenu?: string;
+	activeOverlay: Overlay;
 	idActiveTab: string;
 	isDevMode: boolean;
 	isSystemDapplets: boolean;
 	toggle: () => void;
+	onOverlayTab: () => void;
 	onSelectedMenu: (selected: string) => void;
 	onRemoveTab: (id: string) => void;
 	onSelectedTab: (id: string) => void;
@@ -37,9 +40,11 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 		className,
 		isDevMode,
 		isSystemDapplets,
+		activeOverlay,
 		menu,
 		toggle,
 		onSelectedMenu,
+		onOverlayTab,
 		onSelectedTab,
 		onRemoveTab,
 		...anotherProps
@@ -48,6 +53,12 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 	const handlerSelectedTab = (id: string) => (): void => onSelectedTab(id);
 	const handlerRemoveTab = (id: string) => (): void => onRemoveTab(id);
 	const nonSystemTabs = tabs.filter(x => !x.uri.includes("/popup.html#"));
+
+	useEffect(() => {
+		if (!activeOverlay) return;
+		const noSystem = !activeOverlay.uri.includes('/popup.html#');
+		if (noSystem) onOverlayTab();
+	}, [activeOverlay]);
 
 	return (
 		<div className={cn(styles.toolbar, className)} {...anotherProps}>

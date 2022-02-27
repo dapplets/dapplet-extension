@@ -60,8 +60,7 @@ export class App extends React.Component<P, S> {
   };
 
   async componentDidMount() {
-    const { getDevMode, getFeaturesByHostnames, getCurrentContextIds } = await initBGFunctions(browser);
-    const ids = await getCurrentContextIds();
+    const { getDevMode } = await initBGFunctions(browser);
     const isDevMode = await getDevMode();
 
     this.setState({ isDevMode });
@@ -73,7 +72,7 @@ export class App extends React.Component<P, S> {
   };
 
   tabClickHandler = (overlayId: string) => {
-    if (overlayId === "system") return this.systemDapplets();
+    if (overlayId === "system") return this.systemOverlays();
 
     const overlay = this.getOverlays().find((x) => x.id === overlayId);
     if (!overlay) return;
@@ -97,7 +96,7 @@ export class App extends React.Component<P, S> {
   }
 
   onSelectedMenu = (name: string) => {
-    if (name === "Dapplets") return this.systemDapplets();
+    if (name === "Dapplets") return this.systemOverlays();
     if (name !== "Dapplets") this.setState({ isSystemDapplets: false });
 
     this.setState({ selectedMenu: name as TSelectedSettings });
@@ -115,10 +114,16 @@ export class App extends React.Component<P, S> {
       ? x
       : !x.uri.includes("/popup.html#"));
 
-  systemDapplets = () => {
+  systemOverlays = () => {
     this.setState({
       isSystemDapplets: true,
       selectedMenu: "Dapplets",
+    });
+  }
+
+  noSystemOverlay = () => {
+    this.setState({
+      isSystemDapplets: false,
     });
   }
 
@@ -127,8 +132,7 @@ export class App extends React.Component<P, S> {
     const s = this.state;
     const overlays = this.getOverlays().filter(x => !x.parent);
     const activeOverlayId = p.overlayManager.activeOverlay?.id;
-    console.log('overlays:', overlays);
-    console.log('isSystemDapplets:', s.isSystemDapplets);
+    const activeOverlay = p.overlayManager.activeOverlay;
 
     return (
       <>
@@ -142,6 +146,8 @@ export class App extends React.Component<P, S> {
               className={styles.toolbar}
               nameSelectedMenu={s.selectedMenu}
               idActiveTab={activeOverlayId}
+              onOverlayTab={this.noSystemOverlay}
+              activeOverlay={activeOverlay}
               isDevMode={s.isDevMode}
               onSelectedMenu={this.onSelectedMenu}
               onSelectedTab={this.tabClickHandler}
