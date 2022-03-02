@@ -1,41 +1,50 @@
-interface IDappletState <T> {
-  default: Omit<T, 'me'>
-  get(id?: string): T
-  set(id: string, data: T) : void
-  getPairs(): [string, T][]
-  getAll(): { [k: string]: T }
-  has(id: string): boolean
-}
+// import { BehaviorSubject } from 'rxjs';
+import { statify, BehaviorSubjectProxy } from 'rxjs-proxify';
 
-export default class State <T> implements IDappletState <T> {
-  private _state: {
-    [name: string]: T
+const ALL_CONTEXTS = Symbol("ALL_CONTEXTS");
+
+export default class State <T> {
+  public state: {
+    [contextId: string | symbol]: BehaviorSubjectProxy<T>
   } = {};
 
-  public default: Omit<T, 'me'>;
-  
-  constructor(props?: Omit<T, 'me'>) {
-    this.default = props;
+  constructor(public readonly defaultState: T) {
+
   }
 
   public get(id: string) {
-    if (!this.has(id)) throw new Error('The State has no key of such ID');
-    return this._state[id];
+    const stateId = (id === null || id === undefined) ? ALL_CONTEXTS : id;
+
+    if (!this.state[stateId]) {
+      const subject = statify(this.defaultState);
+      // subject.subscribe((v) => {
+      //     // ToDo: send data to overlay
+      // });
+
+      // ToDo: call `subject.next(value)` when data from overlay is received.
+
+      this.state[stateId] = subject;
+    }
+
+    return this.state[stateId];
   }
 
-  public set(id: string, data: T) {
-    this._state[id] = data;
-  }
+  public set(id: string, data: Partial<T>) {
+    const stateId = (id === null || id === undefined) ? ALL_CONTEXTS : id;
 
-  public getPairs() {
-    return Object.entries(this._state);
+    if (!this.state[stateId]) {
+      const subject = statify({ ...this.defaultState, ...data });
+      this.state[stateId] = subject;
+    } else {
+      this.state[stateId].next({ ...this.defaultState, ...data });
+    }
   }
 
   public getAll() {
-    return this._state;
+    return Object.fromEntries(Object.entries(this.state).map(([k, v]) => ([k, v.value])));
   }
 
   public has(id: string) {
-    return Object.prototype.hasOwnProperty.call(this._state, id);
+    return Object.prototype.hasOwnProperty.call(this.state, id);
   }
 }

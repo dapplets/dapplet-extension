@@ -138,5 +138,9 @@
         }
       ]
     ]
+  },
+  "dependencies": {
+    "rxjs": "^6.6.7",
+    "rxjs-proxify": "^0.1.1"
   }
 }

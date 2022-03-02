@@ -1,5 +1,6 @@
 import { IPubSub } from "./types"
 import { subscribe, unsubscribe, publish } from './contentscript-pubsub'
+import State from './state';
 
 
 type Key = string | number | symbol
@@ -17,7 +18,7 @@ export type AutoProperty = {
 
 export type AutoPropertyConf = {
     name: string
-    conn: Connection
+    conn: Connection<any>
 }
 
 export type AutoProperties<M> = { [key in keyof M]: AutoProperty }
@@ -37,6 +38,7 @@ type EventType = {
 
 export interface IConnection {
     readonly listeners: Set<Listener>
+    open(msg?: any): Promise<any>
     send(op: any, msg?: any): Promise<any>
     //bind(e: EventType): Listener
     addAutoProperty(apConfig: AutoPropertyConf, setter: (v: any) => void, ctx?: any): AutoProperty
@@ -55,16 +57,28 @@ export interface IConnection {
     onMessage(op: any, msg: any): void
 }
 
-export class Connection implements IConnection {
+export class Connection <T> implements IConnection {
     private readonly listenerContextMap = new WeakMap<any, Listener>()
     private autoProperties = new Map<Key, AutoProperty>()  //ToDo: connection-wide autoproperties. Remove or not?
     public readonly listeners = new Set<Listener>()
+
+    private _commonState: State<T>
 
     constructor(
         private _bus?: IPubSub,
         private eventDef?: EventDef<any>
     ) {
         this._bus?.onMessage((operation, message) => this.onMessage(operation, message));
+    }
+
+    async open(msg?: any) {
+        await this._bus.exec('getDefaultState', this._commonState.defaultState);
+        await this._bus.exec('changeState', this._commonState.getAll());
+        return this._bus.exec('onOpen', msg);
+    }
+
+    addCommonState(state: State<T>) {
+        this._commonState = state;
     }
 
     // op - operation, subject
@@ -172,7 +186,7 @@ export class Connection implements IConnection {
     }
 
     //connection with AutoProperty support added by proxy
-    static create<M>(_bus: IPubSub, eventsDef?: EventDef<any>): AutoProperties<M> & Connection {
+    static create<M, T>(_bus: IPubSub, eventsDef?: EventDef<any>): AutoProperties<M> & Connection<T> {
         return new Proxy(new Connection(_bus, eventsDef), {
             //ToDo: this is an old code. verify Autoproperty creation 
             get(target: any, prop: string, receiver) {
@@ -203,7 +217,12 @@ export class Connection implements IConnection {
         try {
             const isTopicMatch = (op: any, msg: any, f: MsgFilter) =>
                 typeof f === 'function' ? f(op, msg) : this.topicMatch(op, f as string);
-
+            if (msg.type === 'changeState') {
+                const [id, newStateData] = msg.message;
+                this._commonState.set(id, newStateData);
+                this._bus.exec('changeState', this._commonState.getAll());
+                return;
+            }
             this.listeners.forEach(async (listener) => {
                 if (typeof listener.f === 'object' && listener.f.then) {
                     listener.f = await listener.f;

@@ -21,12 +21,12 @@ import State from './state';
 
 type Abi = any;
 
-type OverlayConnection<M> = AutoProperties<M> & Connection & { 
+type OverlayConnection<M, T> = AutoProperties<M> & Connection<T> & { 
     id: string
     isOpen(): boolean
     close(): void
-    onClose(callback: () => void): void 
-    useState(any): OverlayConnection<M>
+    onClose(callback: () => void): OverlayConnection<M, T>
+    useState(state: State<T>): OverlayConnection<M, T>
 };
 
 interface WalletConnection {
@@ -294,16 +294,16 @@ export default class Core {
         });
     }
 
-    public connect<M>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
+    public connect<M, T>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection<T> {
         const rpc = new WsJsonRpc(cfg.url);
-        const conn = Connection.create<M>(rpc, eventDef);
+        const conn = Connection.create<M, T>(rpc, eventDef);
         return conn;
     }
 
     /**
      * @deprecated Since version 0.46.0. Will be deleted in version 0.50.0. Use `Core.login()` instead.
      */
-    public async wallet<M>(cfg: { type: 'ethereum', network: 'goerli', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & AutoProperties<M> & Connection>
+    public async wallet<M, T>(cfg: { type: 'ethereum', network: 'goerli', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & AutoProperties<M> & Connection<T>>
     public async wallet<M>(cfg: { type: 'near', network: 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
     public async wallet<M>(cfg: { type: 'near', network: 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
     public async wallet<M>(cfg: { type: 'ethereum' | 'near', network: 'goerli' | 'testnet' | 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
@@ -369,12 +369,12 @@ export default class Core {
         }) as any;
     }
 
-    public overlay<M>(cfg: { name: string, url?: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M>
-    public overlay<M>(cfg: { name?: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M>
-    public overlay<M>(cfg: { name: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M> {
+    public overlay<M, T>(cfg: { name: string, url?: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M, T>
+    public overlay<M, T>(cfg: { name?: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M, T>
+    public overlay<M, T>(cfg: { name: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M, T> {
         const _overlay = this.overlayManager.createOverlay(cfg.url, cfg.title, cfg.source);
-        const conn = Connection.create<M>(_overlay, eventDef);
-        let overridedConn: OverlayConnection<M>
+        const conn = Connection.create<M, T>(_overlay, eventDef);
+        let overridedConn: OverlayConnection<M, T>
         const overrides = {
             id: _overlay.id,
             isOpen() {
@@ -385,8 +385,10 @@ export default class Core {
             },
             onClose(callback: () => void) {
                 _overlay.frame.addEventListener('onOverlayClose', () => callback());
+                return overridedConn;
             },
-            useState(state: any) {
+            useState(state: State<T>) {
+                conn.addCommonState(state);
                 return overridedConn;
             }
         }
@@ -494,7 +496,7 @@ export default class Core {
         return loginSession;
     }
 
-    public state<T>(defaultState?: Omit<T, 'me'>) {
+    public state<T>(defaultState: T) {
         const commonState = new State<T>(defaultState);
         return commonState;
     }
