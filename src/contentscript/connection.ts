@@ -38,7 +38,7 @@ type EventType = {
 
 export interface IConnection {
     readonly listeners: Set<Listener>
-    open(msg?: any): Promise<any>
+    open(id?: string): Promise<any>
     send(op: any, msg?: any): Promise<any>
     //bind(e: EventType): Listener
     addAutoProperty(apConfig: AutoPropertyConf, setter: (v: any) => void, ctx?: any): AutoProperty
@@ -71,19 +71,23 @@ export class Connection <T> implements IConnection {
         this._bus?.onMessage((operation, message) => this.onMessage(operation, message));
     }
 
-    async open(msg?: any) {
-        await this._bus.exec('getDefaultState', this._commonState.defaultState);
-        await this._bus.exec('changeState', this._commonState.getAll());
-        return this._bus.exec('onOpen', msg);
+    open(id?: string) {
+        this._bus.exec('getDefaultState', this._commonState.defaultState);
+        this._bus.exec('changeState', this._commonState.getAll());
+        return this._bus.exec('onOpen', id);
     }
 
     addCommonState(state: State<T>) {
         this._commonState = state;
+        this._commonState.connectToBus(this._bus);
     }
 
     // op - operation, subject
     // msg - payload
     send(op: any, msg?: any) { // should return promise
+        if (this._commonState !== undefined && this._commonState.getAll !== undefined ) {
+          this._bus.exec('changeState', this._commonState.getAll());
+        }
         return this._bus.exec(op, msg)
     }
 
@@ -218,8 +222,8 @@ export class Connection <T> implements IConnection {
             const isTopicMatch = (op: any, msg: any, f: MsgFilter) =>
                 typeof f === 'function' ? f(op, msg) : this.topicMatch(op, f as string);
             if (msg.type === 'changeState') {
-                const [id, newStateData] = msg.message;
-                this._commonState.set(id, newStateData);
+                const [newStateData, id] = msg.message;
+                this._commonState.set(newStateData, id);
                 this._bus.exec('changeState', this._commonState.getAll());
                 return;
             }

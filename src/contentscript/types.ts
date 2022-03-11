@@ -27,4 +27,5 @@ export interface IPubSub {
     onMessage(handler: (operation: string, message: any) => any): {
         off: () => void
     };
+    registered?: boolean;
 }
