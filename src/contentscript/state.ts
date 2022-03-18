@@ -1,10 +1,10 @@
 // import { BehaviorSubject } from 'rxjs';
 import { statify, BehaviorSubjectProxy } from 'rxjs-proxify';
-import { IPubSub } from "./types";
+import { IPubSub, ISharedState } from "./types";
 
 const ALL_CONTEXTS = Symbol("ALL_CONTEXTS");
 
-export default class State <T> {
+export default class State <T> implements ISharedState<T> {
   public state: {
     [contextId: string | symbol]: BehaviorSubjectProxy<T>
   };

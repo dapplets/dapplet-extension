@@ -1,3 +1,5 @@
+import { BehaviorSubjectProxy } from 'rxjs-proxify';
+
 export interface IModule { }
 
 export interface IContentAdapter<IAdapterConfig> extends IModule {
@@ -28,4 +30,8 @@ export interface IPubSub {
         off: () => void
     };
     registered?: boolean;
+}
+
+export interface ISharedState <T> {
+  all: BehaviorSubjectProxy<T>
 }

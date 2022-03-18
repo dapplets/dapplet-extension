@@ -1,5 +1,5 @@
 import Core from './contentscript/core';
-import { IContentAdapter, IFeature, IResolver } from './contentscript/types';
+import { IContentAdapter, IFeature, IResolver, ISharedState } from './contentscript/types';
 import { IConnection, AutoProperty, AutoPropertyConf, Listener } from './contentscript/connection';
 
 declare global {
@@ -15,5 +15,6 @@ export {
     IConnection,
     AutoProperty,
     AutoPropertyConf,
-    Listener
+    Listener,
+    ISharedState
 }
