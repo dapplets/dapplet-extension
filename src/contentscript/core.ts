@@ -388,7 +388,7 @@ export default class Core {
                 return overridedConn;
             },
             useState(state: State<T>) {
-                conn.addCommonState(state);
+                conn.setCommonState(state);
                 return overridedConn;
             }
         }

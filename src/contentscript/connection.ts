@@ -77,7 +77,7 @@ export class Connection <T> implements IConnection {
         return this._bus.exec('onOpen', id);
     }
 
-    addCommonState(state: State<T>) {
+    setCommonState(state: State<T>) {
         this._commonState = state;
         this._commonState.connectToBus(this._bus);
     }
