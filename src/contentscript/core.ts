@@ -293,8 +293,10 @@ export default class Core {
             });
         });
     }
-
-    public connect<M, T>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection<T> {
+    
+    public connect<M>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection<any>
+    public connect<M, T>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection<T>
+    public connect<M, T>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection<T | any> {
         const rpc = new WsJsonRpc(cfg.url);
         const conn = Connection.create<M, T>(rpc, eventDef);
         return conn;
