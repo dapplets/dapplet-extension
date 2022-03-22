@@ -1,6 +1,6 @@
 import { JsonRpc } from "../common/jsonrpc";
 import { WalletDescriptor } from "../common/types";
-import { GlobalEventBus } from "./globalEventBus";
+import * as EventBus from "../common/global-event-bus";
 
 type Account = {
     chain: string;
@@ -21,7 +21,7 @@ export class DappletsProvider {
 
     public version = EXTENSION_VERSION;
 
-    constructor(private _rpc: JsonRpc, private _globalEventBus: GlobalEventBus) { }
+    constructor(private _rpc: JsonRpc) { }
 
     async getAccounts(): Promise<Account[]> {
         const descriptors: WalletDescriptor[] = await this._rpc.call('getWalletDescriptors', [], window);
@@ -82,14 +82,14 @@ export class DappletsProvider {
     }
 
     onTrustedUsersChanged(callback: () => void): void {
-        this._globalEventBus.on('trustedusers_changed', callback);
+        EventBus.on('trustedusers_changed', callback);
     }
 
     onMyDappletsChanged(callback: () => void): void {
-        this._globalEventBus.on('mydapplets_changed', callback);
+        EventBus.on('mydapplets_changed', callback);
     }
 
     onUninstall(callback: () => void): void {
-        this._globalEventBus.on('disconnect', callback);
+        EventBus.on('disconnect', callback);
     }
 }

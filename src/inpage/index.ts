@@ -1,16 +1,15 @@
 import { DappletsProvider } from "./dappletsProvider";
 import { JsonRpc } from "../common/jsonrpc";
-import { GlobalEventBus } from "./globalEventBus";
+import * as EventBus from "../common/global-event-bus";
 
 const jsonrpc = new JsonRpc(window);
-const globalEventBus = new GlobalEventBus(jsonrpc);
-const dappletsProvider = new DappletsProvider(jsonrpc, globalEventBus);
+const dappletsProvider = new DappletsProvider(jsonrpc);
 
 (window as Record<string, any>).dapplets = dappletsProvider;
 window.dispatchEvent(new Event('dapplets#initialized'));
 
-globalEventBus.on('disconnect', () => {
+EventBus.on('disconnect', () => {
     (window as Record<string, any>).dapplets = undefined;
-    globalEventBus.destroy();
+    EventBus.destroy();
     jsonrpc.destroy();
 });

@@ -15,7 +15,7 @@ import { WalletService } from './walletService';
 import { StorageRef } from '../registries/registry';
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer';
 import { OverlayService } from './overlayService';
-import { GlobalEventService } from './globalEventService';
+import * as EventBus from '../../common/global-event-bus';
 
 export default class FeatureService {
     private _moduleManager: ModuleManager;
@@ -25,8 +25,7 @@ export default class FeatureService {
     constructor(
         private _globalConfigService: GlobalConfigService,
         private _walletService: WalletService,
-        private _overlayService: OverlayService,
-        private _globalEventService: GlobalEventService
+        private _overlayService: OverlayService
     ) {
         this._moduleManager = new ModuleManager(this._globalConfigService, this._walletService, this._storageAggregator);
     }
@@ -244,7 +243,8 @@ export default class FeatureService {
                     order,
                     contextIds: hostnames
                 };
-                this._globalEventService.emit(event, data);
+                
+                EventBus.emit(event, data);
             });
 
             // ToDo: merge with config updating upper

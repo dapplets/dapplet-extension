@@ -5,7 +5,7 @@ import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { browser } from "webextension-polyfill-ts";
 import { generateGuid } from '../../common/helpers';
 import SiteConfig from '../models/siteConfig';
-import { GlobalEventService } from './globalEventService';
+import * as EventBus from "../../common/global-event-bus";
 
 const EXPORTABLE_PROPERTIES = [
     'id',
@@ -39,8 +39,6 @@ const EXPORTABLE_PROPERTIES = [
 export default class GlobalConfigService {
     private _globalConfigRepository = new GlobalConfigBrowserStorage();
     private _defaultConfigId: string = 'default';
-
-    constructor(private _globalEventService: GlobalEventService) {}
 
     async get(): Promise<GlobalConfig> {
         const configs = await this._globalConfigRepository.getAll();
@@ -395,12 +393,12 @@ export default class GlobalConfigService {
         config.trustedUsers.push({ account: account });
         await this.set(config);
         
-        this._globalEventService.emit('trustedusers_changed');
+        EventBus.emit('trustedusers_changed');
     }
 
     async removeTrustedUser(account: string) {
         await this.updateConfig(c => c.trustedUsers = c.trustedUsers.filter(r => r.account !== account));
-        this._globalEventService.emit('trustedusers_changed');
+        EventBus.emit('trustedusers_changed');
     }
 
     async getUserSettings(moduleName: string, key: string) {
@@ -644,11 +642,11 @@ export default class GlobalConfigService {
         if (config.myDapplets.find(x => x.registryUrl === registryUrl && x.name === name)) return;
         config.myDapplets.push({ registryUrl, name });
         await this.set(config);
-        this._globalEventService.emit('mydapplets_changed');
+        EventBus.emit('mydapplets_changed');
     }
 
     async removeMyDapplet(registryUrl: string, name: string) {
         await this.updateConfig(c => c.myDapplets = c.myDapplets.filter(x => !(x.registryUrl === registryUrl && x.name === name)));
-        this._globalEventService.emit('mydapplets_changed');
+        EventBus.emit('mydapplets_changed');
     }
 }

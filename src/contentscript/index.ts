@@ -11,7 +11,7 @@ import { CONTEXT_ID_WILDCARD } from '../common/constants';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { SystemOverlayTabs } from '../common/types';
 import { GLOBAL_EVENT_BUS_NAME } from '../common/chrome-extension-websocket-wrapper/constants';
-import { GlobalEventBus } from '../common/globalEventBus';
+import * as EventBus from "../common/global-event-bus";
 
 const IS_OVERLAY_IFRAME = window.name.indexOf('dapplet-overlay') !== -1;
 
@@ -28,12 +28,11 @@ if (!IS_OVERLAY_IFRAME) {
         });
         
         const port = browser.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any);
-        const globalEventBus = new GlobalEventBus(port);
 
         const jsonrpc = new JsonRpc();
         const overlayManager = (IS_IFRAME) ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc);
         const core = new Core(IS_IFRAME, overlayManager); // ToDo: is it global for all modules?
-        const injector = new Injector(core, globalEventBus, { shareLinkPayload });
+        const injector = new Injector(core, { shareLinkPayload });
 
         // Open confirmation overlay if checks are not passed
         if (!IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
@@ -74,21 +73,14 @@ if (!IS_OVERLAY_IFRAME) {
         });
 
         // Handle module (de)activations from another tabs
-        globalEventBus.on('dapplet_activated', (m) => injector.loadModules([m]));
-        globalEventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]));
-
-        // Global Event Bus - two way bridge with an inpage
-        globalEventBus.onAll((e, ...args) => jsonrpc.call(GLOBAL_EVENT_BUS_NAME, [e, args]));
-        jsonrpc.on(GLOBAL_EVENT_BUS_NAME, (e, args) => {
-            globalEventBus.emitExceptAll(e, ...args);
-            return true;
-        });
+        EventBus.on('dapplet_activated', (m) => injector.loadModules([m]));
+        EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]));
         
         // destroy when background is disconnected
         port.onDisconnect.addListener(() => {
             console.log('[DAPPLETS]: The connection to the background service has been lost. Content script is unloading...');
             jsonrpc.call(GLOBAL_EVENT_BUS_NAME, ['disconnect', []]);
-            globalEventBus.destroy();
+            EventBus.destroy();
             jsonrpc.destroy();
             injector.dispose();
             core.overlayManager.destroy();

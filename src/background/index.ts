@@ -17,14 +17,13 @@ import { IdentityService } from "./services/identityService";
 import { CONTEXT_ID_WILDCARD, ModuleTypes } from "../common/constants";
 import { OverlayService } from "./services/overlayService";
 import { SessionService } from "./services/sessionService";
-import { GlobalEventService } from "./services/globalEventService";
+import * as EventBus from "../common/global-event-bus";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
 tracing.startTracing();
 
-const globalEventService = new GlobalEventService();
-const globalConfigService = new GlobalConfigService(globalEventService);
+const globalConfigService = new GlobalConfigService();
 const suspendService = new SuspendService(globalConfigService);
 const overlayService = new OverlayService();
 const proxyService = new ProxyService(globalConfigService);
@@ -32,7 +31,7 @@ const githubService = new GithubService(globalConfigService);
 const discordService = new DiscordService(globalConfigService);
 const walletService = new WalletService(globalConfigService, overlayService);
 const sessionService = new SessionService(walletService, overlayService);
-const featureService = new FeatureService(globalConfigService, walletService, overlayService, globalEventService);
+const featureService = new FeatureService(globalConfigService, walletService, overlayService);
 const identityService = new IdentityService(globalConfigService, walletService);
 const ensService = new EnsService(walletService);
 
@@ -231,7 +230,6 @@ browser.runtime.onMessage.addListener(
 // ToDo: Perhaps a separate class WebSocketProxy is redundant
 const wsproxy = new WebSocketProxy();
 browser.runtime.onConnect.addListener(wsproxy.createConnectListener());
-browser.runtime.onConnect.addListener(globalEventService.createConnectListener());
 
 // ToDo: These lines are repeated many time
 suspendService.changeIcon();

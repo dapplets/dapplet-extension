@@ -10,7 +10,7 @@ import { AppStorage } from "./appStorage";
 import { DefaultConfig, SchemaConfig } from "../common/types";
 import { __decorate } from "./global";
 import ModuleInfo from "../background/models/moduleInfo";
-import { GlobalEventBus } from "../common/globalEventBus";
+import * as EventBus from "../common/global-event-bus";
 
 type RegistriedModule = {
     manifest: VersionInfo,
@@ -38,8 +38,7 @@ export class Injector {
     public registry: RegistriedModule[] = [];
 
     constructor(
-        public core: Core, 
-        private _globalEventBus: GlobalEventBus, 
+        public core: Core,
         private env?: { shareLinkPayload: { moduleId: string, payload: any, isAllOk: boolean } }
     ) {
         this._setContextActivivty([new URL(DAPPLETS_ORIGINAL_HREF ?? window.location.href).hostname], undefined, true);
@@ -452,7 +451,7 @@ export class Injector {
             if (newContextIds.length > 0) {
                 // console.log('[DAPPLETS] Context started:', newContextIds);
                 browser.runtime.sendMessage({ type: "CONTEXT_STARTED", payload: { contextIds } });
-                this._globalEventBus.emit('context_started', contextIds);
+                EventBus.emit('context_started', contextIds);
             }
 
         } else {
@@ -468,7 +467,7 @@ export class Injector {
             if (oldContextIds.length > 0) {
                 // console.log('[DAPPLETS] Context finished:', oldContextIds);
                 browser.runtime.sendMessage({ type: "CONTEXT_FINISHED", payload: { contextIds } });
-                this._globalEventBus.emit('context_finished', contextIds);
+                EventBus.emit('context_finished', contextIds);
             }
         }
     }

@@ -9,7 +9,7 @@ import { rcompare } from "semver";
 import { Dapplet, ManifestAndDetails } from "../components/dapplet";
 import Manifest from "../../background/models/manifest";
 import { DevMessage } from "../components/DevMessage";
-import { globalEventBus } from "../globalEventBus";
+import * as EventBus from "../../common/global-event-bus";
 
 interface IDappletsProps {
   isOverlay: boolean;
@@ -42,10 +42,10 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   async componentDidMount() {
     this._isMounted = true;
 
-    globalEventBus.on('context_started', this.refresh);
-    globalEventBus.on('context_finished', this.refresh);
-    globalEventBus.on('dapplet_activated', this.refresh);
-    globalEventBus.on('dapplet_deactivated', this.refresh);
+    EventBus.on('context_started', this.refresh);
+    EventBus.on('context_finished', this.refresh);
+    EventBus.on('dapplet_activated', this.refresh);
+    EventBus.on('dapplet_deactivated', this.refresh);
 
     await this.refresh();
   }
@@ -53,10 +53,10 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   componentWillUnmount() {
     this._isMounted = false;
 
-    globalEventBus.off('context_started', this.refresh);
-    globalEventBus.off('context_finished', this.refresh);
-    globalEventBus.off('dapplet_activated', this.refresh);
-    globalEventBus.off('dapplet_deactivated', this.refresh);
+    EventBus.off('context_started', this.refresh);
+    EventBus.off('context_finished', this.refresh);
+    EventBus.off('dapplet_activated', this.refresh);
+    EventBus.off('dapplet_deactivated', this.refresh);
   }
 
   refresh = async () => {
