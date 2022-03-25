@@ -127,26 +127,15 @@ module.exports = {
       },
       {
         test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/, /\.eot$/, /\.ttf$/, /\.woff$/, /\.woff2$/],
+        type: 'asset/inline',
         include: [path.resolve(__dirname, 'src'), /node_modules/],
-        exclude: [path.resolve(__dirname, 'src/contentscript')],
-        options: {
-          limit: 100000,
-          name: "static/[name].[hash:8].[ext]",
-        },
+        exclude: [path.resolve(__dirname, 'src/contentscript')]
       },
       {
         test: /\.svg$/,
         include: [path.resolve(__dirname, 'src/contentscript')],
         use: ['@svgr/webpack', "url-loader"],
       }
-      // {
-      //   test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/, /\.eot$/, /\.ttf$/, /\.woff$/, /\.woff2$/],
-      //   loader: "file-loader",
-      //   include: [path.resolve(__dirname, 'src'), /node_modules/],
-      //   options: {
-      //     name: "static/[name].[hash:8].[ext]",
-      //   },
-      // }
     ]
   },
   resolve: {

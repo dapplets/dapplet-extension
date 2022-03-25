@@ -25,7 +25,7 @@ export const Dapplets = () => {
 		_isMounted = true;
 		const init = async () => {
 			const { getFeaturesByHostnames, getCurrentContextIds } = await initBGFunctions(browser);
-			const ids = await getCurrentContextIds();
+			const ids = await getCurrentContextIds(null);
 			const d = await getFeaturesByHostnames(ids);
 			setDapplets(d);
 		}
@@ -86,7 +86,7 @@ export const Dapplets = () => {
 				await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url);
 			}
 
-			await _refreshDataByContext(await getCurrentContextIds());
+			await _refreshDataByContext(await getCurrentContextIds(null));
 
 		} catch (err) {
 			_updateFeatureState(name, { isActive: !isActive, error: err.message });
@@ -174,7 +174,7 @@ export const Dapplets = () => {
 
 	const onRemoveDapplet = async (f: ManifestAndDetails) => {
 		const { removeDapplet, getCurrentContextIds } = await initBGFunctions(browser);
-		const contextIds = await getCurrentContextIds();
+		const contextIds = await getCurrentContextIds(null);
 		await removeDapplet(f.name, contextIds);
 		const d = dapplets.filter(x => x.name !== f.name);
 		setDapplets(d);
