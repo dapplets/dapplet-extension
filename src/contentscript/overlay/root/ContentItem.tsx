@@ -11,7 +11,8 @@ enum LoadingMode {
     Loading = 1,
     SlowLoading = 2,
     NetworkError = 3,
-    ServerError = 4
+    ServerError = 4,
+    SslError = 5
 }
 
 interface P {
@@ -49,9 +50,9 @@ export class ContentItem extends React.Component<P, S> {
         overlay.checkAvailability();
 
         this.setState({ loadingMode: LoadingMode.Loading });
-        
+
         this.ref.current.appendChild(overlay.frame);
-        
+
         const loadHandler = () => {
             clearTimeout(timeoutId);
             if (!overlay.isError) {
@@ -64,11 +65,18 @@ export class ContentItem extends React.Component<P, S> {
         const networkErrorHandler = () => {
             clearTimeout(timeoutId);
             overlay.frame.remove();
-            this.setState({ loadingMode: LoadingMode.NetworkError });
+
+            const { protocol, hostname } = new URL(overlay.uri);
+            if (protocol === 'https:' && (hostname === 'localhost' || hostname === '127.0.0.1')) {
+                this.setState({ loadingMode: LoadingMode.SslError });
+            } else {
+                this.setState({ loadingMode: LoadingMode.NetworkError });
+            }
+
             overlay.frame.removeEventListener("error_network", networkErrorHandler);
         };
         overlay.frame.addEventListener("error_network", networkErrorHandler);
-        
+
         const serverErrorHandler = () => {
             clearTimeout(timeoutId);
             overlay.frame.remove();
@@ -76,6 +84,11 @@ export class ContentItem extends React.Component<P, S> {
             overlay.frame.removeEventListener("error_server", serverErrorHandler);
         };
         overlay.frame.addEventListener("error_server", serverErrorHandler);
+    }
+
+    openOverlayInTab() {
+        const overlay = this.props.overlay;
+        window.open(overlay.uri, '_blank');
     }
 
     render() {
@@ -138,6 +151,28 @@ export class ContentItem extends React.Component<P, S> {
                         <div className="load-text">
                             Sorry, there were some technical issues while processing your request.
                             You can change preferred overlay storage and try again.
+                        </div>
+                        <div className="load-text">
+                            <button onClick={this.loadFrame.bind(this)}>Try again</button>
+                        </div>
+                    </div>
+                )}
+
+                {s.loadingMode === LoadingMode.SslError && (
+                    <div className="loader-container" style={{ zIndex: 1 }}>
+                        <div className="load-text">Unverified SSL Certificate</div>
+                        <div className="load-text">
+                            <p>
+                                If you are a dapplet developer and you are running the overlay
+                                over HTTPS, you may encounter an untrusted SSL certificate error.
+                                Open the overlay in a new browser tab and accept the self-signed certificate.
+                            </p>
+                        </div>
+                        <div className="load-text">
+                            <button onClick={this.openOverlayInTab.bind(this)}>Accept SSL</button>
+                        </div>
+                        <div className="load-text">
+                            <p>If you are not developing dapplets, then you should beware, your Internet connection may be broken.</p>
                         </div>
                         <div className="load-text">
                             <button onClick={this.loadFrame.bind(this)}>Try again</button>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Segment, Image, Comment } from 'semantic-ui-react';
-import Twemoji from 'react-twemoji';
+// import Twemoji from 'react-twemoji';
 
 interface IProps {
     account: {
@@ -26,7 +26,8 @@ export class ProfileCard extends React.Component<IProps, IState> {
                     src={p.img}
                 />
                 <Card.Header style={{ fontSize: '1.2em' }}>
-                    <Twemoji>{p.fullname}</Twemoji>
+                    {/* <Twemoji>{p.fullname}</Twemoji> */}
+                    {p.fullname}
                 </Card.Header>
                 <Card.Meta>@{p.username}</Card.Meta>
             </Card.Content>

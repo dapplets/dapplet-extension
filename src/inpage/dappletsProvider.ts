@@ -1,5 +1,6 @@
 import { JsonRpc } from "../common/jsonrpc";
 import { WalletDescriptor } from "../common/types";
+import * as EventBus from "../common/global-event-bus";
 
 type Account = {
     chain: string;
@@ -17,6 +18,8 @@ type Dapplet = {
 }
 
 export class DappletsProvider {
+
+    public version = EXTENSION_VERSION;
 
     constructor(private _rpc: JsonRpc) { }
 
@@ -58,27 +61,35 @@ export class DappletsProvider {
         return this._rpc.call('callBackground', ['removeTrustedUser', [account]], window);
     }
 
-    // onTrustedUsersChanged(callback: () => void): void {
-
-    // }
-
-    getMyDapplets(): Promise<Dapplet[]> { 
+    async getMyDapplets(): Promise<Dapplet[]> {
         return this._rpc.call('callBackground', ['getMyDapplets', []], window);
     }
-    
-    addMyDapplet(registryUrl: string, moduleName: string): Promise<void> { 
+
+    async addMyDapplet(registryUrl: string, moduleName: string): Promise<void> {
         return this._rpc.call('callBackground', ['addMyDapplet', [registryUrl, moduleName]], window);
     }
-    
-    removeMyDapplet(registryUrl: string, moduleName: string): Promise<void> { 
+
+    async removeMyDapplet(registryUrl: string, moduleName: string): Promise<void> {
         return this._rpc.call('callBackground', ['removeMyDapplet', [registryUrl, moduleName]], window);
     }
-    
-    // onMyDappletsChanged(callback: () => void): void {
 
-    // }
-    
-    // onUninstall(callback: () => void): void {
+    async openDeployOverlay(registryUrl: string, name: string, branch: string | null = null, version: string | null = null): Promise<void> {
+        return this._rpc.call('callBackground', ['openDeployOverlayById', [registryUrl, name, branch, version]]);
+    }
 
-    // }
+    async openDeveloperOverlay(): Promise<void> {
+        return this._rpc.call('callBackground', ['openPopupOverlay', ['developer']]);
+    }
+
+    onTrustedUsersChanged(callback: () => void): void {
+        EventBus.on('trustedusers_changed', callback);
+    }
+
+    onMyDappletsChanged(callback: () => void): void {
+        EventBus.on('mydapplets_changed', callback);
+    }
+
+    onUninstall(callback: () => void): void {
+        EventBus.on('disconnect', callback);
+    }
 }

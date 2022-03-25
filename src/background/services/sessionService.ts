@@ -64,12 +64,12 @@ export class SessionService {
         await this._loginSessionBrowserStorage.deleteById(sessionId);
     }
 
-    async createSession(moduleName: string, request: LoginRequest): Promise<LoginSession> {
+    async createSession(moduleName: string, request: LoginRequest, tabId: number): Promise<LoginSession> {
         request.timeout = request.timeout ?? DEFAULT_REQUEST_TIMEOUT;
         request.secureLogin = request.secureLogin ?? 'disabled';
         request.from = request.from ?? 'any';
 
-        if (request.authMethods.length === 0) throw new Error(`"authMethods" is required.`);
+        if (!request.authMethods || request.authMethods.length === 0) throw new Error(`"authMethods" is required.`);
 
         if (request.secureLogin === 'required') {
             for (const authMethod of request.authMethods) {
@@ -81,7 +81,7 @@ export class SessionService {
         
         if (!['disabled', 'optional', 'required'].includes(request.secureLogin)) throw new Error('Invalid "secureLogin" value.');
 
-        const { wallet, chain, confirmationId } = await this._overlayService.openLoginSessionOverlay(moduleName, request);
+        const { wallet, chain, confirmationId } = await this._overlayService.openLoginSessionOverlay(moduleName, request, tabId);
 
         if (request.secureLogin === 'required' && !confirmationId) throw new Error('LoginConfirmation must be selected in secure login mode.');
         if (!request.authMethods.includes(chain)) throw new Error('Invalid auth method selected.');

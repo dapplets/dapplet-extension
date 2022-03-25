@@ -15,11 +15,11 @@ export class LoginSession {
     logoutHandler?: (ls: any) => void;
 
     private get _network() {
-        return this.authMethod.split('/')[0];
+        return this.authMethod.split('/')[0]; // ethereum, near
     }
 
     private get _chain() {
-        return this.authMethod.split('/')[1];
+        return this.authMethod.split('/')[1]; // goerli, testnet, mainnet
     }
 
     private get _isExpired() {
@@ -45,9 +45,19 @@ export class LoginSession {
         this.logoutHandler?.call({}, ls);
     }
 
-    async wallet() {
+    async wallet(): Promise<any> {
         if (!await this.isValid()) return null;
         return this._getWalletObject();
+    }
+
+    async contract(address: string, options: any): Promise<any> {
+        if (this._network === 'ethereum') {
+            return ethereum.createContractWrapper(this.sessionId, { network: this._chain }, address, options);
+        } else if (this._network === 'near') {
+            return near.createContractWrapper(this.sessionId, { network: this._chain }, address, options);
+        } else {
+            throw new Error(`Current auth method "${this._network}" doesn't support contract interactions.`);
+        }
     }
 
     async getItem(key: string): Promise<any> {
@@ -70,14 +80,28 @@ export class LoginSession {
         return clearSessionItems(this.sessionId);
     }
 
-    private _getWalletObject() {
+    private async _getWalletObject() {
         if (this._network === 'ethereum') {
             // ToDo: events def
-            return ethereum.createWalletConnection(this.moduleName, { network: this._chain });
+            const wallet = await ethereum.createWalletConnection(this.moduleName, { network: this._chain });
+            return {
+                request: ({ method, params }: { method: string, params: any[] }): Promise<any> => {
+                    return new Promise((res, rej) => {
+                        wallet.sendAndListen(method, params, { 
+                            result: (_, { data }) => {
+                                res(data[0])
+                            },
+                            rejected: (_, { data }) => {
+                                rej(data[0])
+                            },
+                        });
+                    });
+                }
+            };
         } else if (this._network === 'near') {
             return near.createWalletConnection(this.moduleName, { network: this._chain });
         } else {
-            throw new Error('Invalid wallet type.');
+            throw new Error(`Current auth method "${this._network}" doesn't support wallet connections.`);
         }
     };
 }

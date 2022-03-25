@@ -199,7 +199,10 @@
 .loader-container {
     z-index: -1;
     position: absolute;
-    top: calc(50vh - 88px);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .loader-container .flex {
@@ -230,7 +233,9 @@
     padding-top: 15px;
     text-align: center;
     font: 14pt "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #000
+    color: #000;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 .popup-loader-container {

@@ -3,7 +3,7 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 import makeBlockie from 'ethereum-blockies-base64';
 import cn from 'classnames';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 import * as walletIcons from '../../../common/resources/wallets';
 import { Bus } from "../../../common/bus";
@@ -96,7 +96,7 @@ export class ConnectedWallets extends React.Component<Props, State> {
         const secureLogin = this.props.data.loginRequest.secureLogin;
 
         if (s.redirect) {
-            return <Redirect to={s.redirect} />;
+            return <Navigate to={s.redirect} />;
         }
 
         if (s.error) {

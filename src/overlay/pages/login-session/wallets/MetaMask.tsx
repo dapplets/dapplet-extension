@@ -3,7 +3,7 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 
 import { Button, Segment, Loader } from "semantic-ui-react";
-import { Redirect } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { Bus } from '../../../../common/bus';
 import { ChainTypes, LoginRequest, WalletDescriptor, WalletTypes } from "../../../../common/types";
 import { Loading } from "../../../components/Loading";
@@ -49,6 +49,8 @@ export default class extends React.Component<Props, State> {
             await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.METAMASK, null);
             const descriptors = await getWalletDescriptors();
             const descriptor = descriptors.find(x => x.type === WalletTypes.METAMASK);
+
+            if (!this._mounted) return;
 
             // sign message if required
             let confirmationId = undefined;
@@ -105,7 +107,7 @@ export default class extends React.Component<Props, State> {
         const s = this.state;
 
         if (s.toBack === true) {
-            return <Redirect to='/pairing' />
+            return <Navigate to='/pairing' />
         }
 
         if (s.error) return (

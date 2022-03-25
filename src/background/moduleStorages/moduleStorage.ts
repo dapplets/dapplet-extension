@@ -14,7 +14,7 @@ import { SiaModuleStorage } from './siaModuleStorage';
 
 export class StorageAggregator {
 
-    private _globalConfigService = new GlobalConfigService();
+    constructor(private _globalConfigService: GlobalConfigService) { }
 
     async getResource(hashUris: StorageRef): Promise<ArrayBuffer> {
 
@@ -148,7 +148,7 @@ export class StorageAggregator {
             case StorageTypes.Ipfs:
                 const ipfsGatewayUrl = await this._globalConfigService.getIpfsGateway();
                 return new IpfsModuleStorage({ ipfsGatewayUrl });
-                
+
             case StorageTypes.Sia:
                 const siaPortalUrl = await this._globalConfigService.getSiaPortal();
                 return new SiaModuleStorage({ siaPortalUrl });

@@ -8,6 +8,8 @@ export type EventDef<T extends Key> = { [key in T]: MsgFilter }
 type MsgHandler = ((op: string, msg: any) => void)
 type EventHandler = { [key in Key]: MsgHandler[] | MsgHandler }
 
+interface IDappletApi { [name: string]: any }
+
 export type AutoProperty = {
     name: string
     set: (setter: (value: any) => void) => void
@@ -19,7 +21,7 @@ export type AutoPropertyConf = {
 }
 
 export type AutoProperties<M> = { [key in keyof M]: AutoProperty }
-export type Listener = { f?: MsgFilter, h?: EventHandler, p: AutoProperty[] }
+export type Listener = { f?: MsgFilter, h?: EventHandler | IDappletApi, p: AutoProperty[] }
 
 const ANY_EVENT: any = Symbol('any_event')
 const TYPE_FILTER = (type: string) => (op: any, msg: any) => msg.type === type
@@ -43,7 +45,8 @@ export interface IConnection {
     listen(f: MsgFilter, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): this*/
-    listen(h: MsgHandler | EventHandler): this
+    declare(dappletApi: IDappletApi, ap?: AutoProperty[]): this
+    listen(h: MsgHandler | EventHandler, ap?: AutoProperty[]): this
     listener(h: EventHandler): Listener
     listener(f: MsgFilter, ap?: AutoProperty[]): Listener
     listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): Listener
@@ -126,9 +129,20 @@ export class Connection implements IConnection {
     listen(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): this
     listen(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): this
     listen(filterOrHander: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): this {*/
+    
+    /**
+     * @deprecated Since version 0.46.1. Will be deleted in version 0.50.0. Use declare instead.
+     */
     listen(h: MsgHandler | EventHandler, ap?: AutoProperty[]): this {
-        let listener = this.listener("", h as any, ap)
-        return this
+        console.warn('DEPRECATED: "listen" method of the Connection class is deprecated since version 0.46.1. Will be deleted in version 0.50.0. Use "declare" instead');
+        this.listener("", h as any, ap);
+        return this;
+    }
+
+    declare(dappletApi: IDappletApi, ap?: AutoProperty[]): this {
+        const msgFilter = dappletApi.constructor?.name !== 'Object' ? 'dappletApiClass' :'dappletApi';
+        this.listener(msgFilter, dappletApi as any, ap);
+        return this;
     }
 
     // call, when new context was created.
@@ -137,7 +151,8 @@ export class Connection implements IConnection {
     listener(f: MsgFilter, ap?: AutoProperty[]): Listener
     listener(f: MsgFilter, h: MsgHandler, ap?: AutoProperty[]): Listener
     listener(f: MsgFilter, h: EventHandler, ap?: AutoProperty[]): Listener
-    listener(filterOrHander?: MsgFilter | EventHandler, evtOrMsgOrAP?: EventHandler | MsgHandler | AutoProperty[], ap?: AutoProperty[]): Listener {
+    listener(f: MsgFilter, h: IDappletApi, ap?: AutoProperty[]): Listener
+    listener(filterOrHander?: MsgFilter | EventHandler, evtOrMsgOrApiOrAP?: EventHandler | MsgHandler | IDappletApi | AutoProperty[], ap?: AutoProperty[]): Listener {
         let listener: Listener
         if (filterOrHander === undefined) {
             listener = { f: undefined, h: undefined, p: [] }
@@ -145,12 +160,12 @@ export class Connection implements IConnection {
             listener = { f: undefined, h: filterOrHander as EventHandler, p: [] }
         } else if (typeof filterOrHander === 'object') { // is an Promise
             listener = { f: filterOrHander as Promise<string>, h: undefined, p: [] }
-        } else if (evtOrMsgOrAP instanceof Array) {
-            listener = { f: filterOrHander, h: undefined, p: evtOrMsgOrAP || [] }
-        } else if (typeof evtOrMsgOrAP == 'function') {
-            listener = { f: filterOrHander, h: { [ANY_EVENT]: evtOrMsgOrAP }, p: ap || [] }
+        } else if (evtOrMsgOrApiOrAP instanceof Array) {
+            listener = { f: filterOrHander, h: undefined, p: evtOrMsgOrApiOrAP || [] }
+        } else if (typeof evtOrMsgOrApiOrAP == 'function') {
+            listener = { f: filterOrHander, h: { [ANY_EVENT]: evtOrMsgOrApiOrAP }, p: ap || [] }
         } else {
-            listener = { f: filterOrHander, h: evtOrMsgOrAP!, p: ap || [] }
+            listener = { f: filterOrHander, h: evtOrMsgOrApiOrAP!, p: ap || [] }
         }
         this.listeners.add(listener)
         return listener
@@ -194,20 +209,42 @@ export class Connection implements IConnection {
                     listener.f = await listener.f;
                 }
                 
-                if (!listener.f || isTopicMatch(op, msg, listener.f)) {
+                if (!listener.f || listener.f === 'dappletApi' || listener.f === 'dappletApiClass' || isTopicMatch(op, msg, listener.f)) {
                     if (listener.h) {
-                        for (let eventId of [...Object.keys(listener.h), ANY_EVENT]) {
-                            let cond = this.eventDef ? this.eventDef[eventId] : eventId
-                            
+                        const getAllApiNames = (dappletApi: any) => {
+                            const props: string[] = [];
+                            let obj = dappletApi;
+                            do {
+                                props.push(...Object.getOwnPropertyNames(obj));
+                            } while (obj = Object.getPrototypeOf(obj));
+                            const allApiClassNames = props.filter((e, i, arr) => e != arr[i + 1] && typeof dappletApi[e] == 'function');
+                            const objBaseMethods = ['__defineGetter__', '__defineSetter__', '__lookupGetter__', '__lookupSetter__', 'constructor', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'toLocaleString', 'toString', 'valueOf'];
+                            return allApiClassNames.filter((apiName) => !objBaseMethods.includes(apiName));
+                        }
+
+                        const eventsIds = listener.f === 'dappletApiClass' ? [ ...getAllApiNames(listener.h), ANY_EVENT] : [...Object.keys(listener.h), ANY_EVENT];
+                        if ((listener.f === 'dappletApi' || listener.f === 'dappletApiClass') && !eventsIds.includes(msg?.type)) {
+                            this.send(`${msg?.type}_undone`, `${msg?.type} does not exist`);
+                            return;
+                        };
+                        for (const eventId of eventsIds) {
+                            const cond = this.eventDef ? this.eventDef[eventId] : eventId;
                             //ToDo: extract msg.type default
                             if ((typeof cond === 'function' ? cond(op, msg) : msg?.type == cond) || eventId === ANY_EVENT) {
                                 const handlers = listener.h[eventId]
-                                if (!handlers) continue
+                                if (!handlers) continue;
                                 
                                 if (Array.isArray(handlers)) {
-                                    handlers.forEach(h => h(op, msg))
+                                    handlers.forEach(h => h(op, msg));
+                                } else if (listener.f === 'dappletApi' || listener.f === 'dappletApiClass') {
+                                    try {
+                                        const res = await (<Object>listener.h)[eventId](...msg.message);
+                                        this.send(`${msg?.type}_done`, res);
+                                    } catch (err) {
+                                        this.send(`${msg?.type}_undone`, `${err.message} ${err.stack}`);
+                                    }
                                 } else {
-                                    handlers(op, msg)
+                                    handlers(op, msg);
                                 }
                             }
                         }

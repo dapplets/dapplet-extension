@@ -127,7 +127,6 @@ module.exports = {
       },
       {
         test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/, /\.eot$/, /\.ttf$/, /\.woff$/, /\.woff2$/],
-        loader: "url-loader",
         include: [path.resolve(__dirname, 'src'), /node_modules/],
         exclude: [path.resolve(__dirname, 'src/contentscript')],
         options: {

@@ -9,6 +9,8 @@ import { assertFullfilled, tryParseBase64Payload, parseModuleName, timeoutPromis
 import { CONTEXT_ID_WILDCARD } from '../common/constants';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { SystemOverlayTabs } from '../common/types';
+import { GLOBAL_EVENT_BUS_NAME } from '../common/chrome-extension-websocket-wrapper/constants';
+import * as EventBus from "../common/global-event-bus";
 
 const IS_OVERLAY_IFRAME = window.name.indexOf('dapplet-overlay') !== -1;
 
@@ -23,6 +25,8 @@ if (!IS_OVERLAY_IFRAME) {
             console.error('Cannot process the share link', e);
             return null;
         });
+        
+        const port = browser.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any);
 
         const jsonrpc = new JsonRpc();
         const overlayManager = (IS_IFRAME) ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc);
@@ -49,7 +53,7 @@ if (!IS_OVERLAY_IFRAME) {
             if (!message || !message.type) return;
 
             if (message.type === "FEATURE_ACTIVATED") {
-                const modules = message.payload.filter(x => x.contextIds.filter(v => injector.availableContextIds.includes(v) || v === CONTEXT_ID_WILDCARD).length > 0);
+                const modules = message.payload;
                 modules.forEach(f => console.log(`[DAPPLETS]: The module ${f.name}${(f.branch) ? '#' + f.branch : ''}${(f.version) ? '@' + f.version : ''} was activated.`));
                 return injector.loadModules(modules);
             } else if (message.type === "FEATURE_DEACTIVATED") {
@@ -67,9 +71,15 @@ if (!IS_OVERLAY_IFRAME) {
             }
         });
 
+        // Handle module (de)activations from another tabs
+        EventBus.on('dapplet_activated', (m) => injector.loadModules([m]));
+        EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]));
+        
         // destroy when background is disconnected
-        browser.runtime.connect().onDisconnect.addListener(() => {
+        port.onDisconnect.addListener(() => {
             console.log('[DAPPLETS]: The connection to the background service has been lost. Content script is unloading...');
+            jsonrpc.call(GLOBAL_EVENT_BUS_NAME, ['disconnect', []]);
+            EventBus.destroy();
             jsonrpc.destroy();
             injector.dispose();
             core.overlayManager.destroy();

@@ -83,7 +83,7 @@ export type LoginRequest = {
     timeout?: number;
     role?: string;
     help?: string;
-    target?: string;
+    target?: string | any;
     secureLogin?: 'required' | 'optional' | 'disabled';
     from?: 'me' | 'any';
 };
@@ -94,4 +94,9 @@ export type SystemOverlayData = {
     popup: boolean;
     payload: any;
 };
-  
+
+export enum UrlAvailability {
+    AVAILABLE = "AVAILABLE",
+    NETWORK_ERROR = "NETWORK_ERROR",
+    SERVER_ERROR = "SERVER_ERROR",
+}

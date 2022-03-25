@@ -15,10 +15,11 @@ import { WalletService } from './walletService';
 import { StorageRef } from '../registries/registry';
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer';
 import { OverlayService } from './overlayService';
+import * as EventBus from '../../common/global-event-bus';
 
 export default class FeatureService {
     private _moduleManager: ModuleManager;
-    private _storageAggregator = new StorageAggregator();
+    private _storageAggregator = new StorageAggregator(this._globalConfigService);
     // private _moduleInfoBrowserStorage = new ModuleInfoBrowserStorage();
 
     constructor(
@@ -26,7 +27,7 @@ export default class FeatureService {
         private _walletService: WalletService,
         private _overlayService: OverlayService
     ) {
-        this._moduleManager = new ModuleManager(this._globalConfigService, this._walletService);
+        this._moduleManager = new ModuleManager(this._globalConfigService, this._walletService, this._storageAggregator);
     }
 
     async getFeaturesByHostnames(contextIds: string[]): Promise<ManifestDTO[]> {
@@ -232,6 +233,18 @@ export default class FeatureService {
                         contextIds: hostnames
                     }]
                 });
+
+                // global notification
+                const event = isActive ? "dapplet_activated" : "dapplet_deactivated";
+                const data = {
+                    name, 
+                    branch: DEFAULT_BRANCH_NAME, 
+                    version, 
+                    order,
+                    contextIds: hostnames
+                };
+                
+                EventBus.emit(event, data);
             });
 
             // ToDo: merge with config updating upper
@@ -653,5 +666,24 @@ export default class FeatureService {
         const arr = await this._storageAggregator.getResource(hashUris);
         const base64 = base64ArrayBuffer(arr);
         return base64;
+    }
+
+    public async openDeployOverlayById(registryUri: string, name: string, branch: string | null, version: string | null) {
+        if (!branch) branch = DEFAULT_BRANCH_NAME;
+
+        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri);
+        if (!registry) throw new Error("No registry with this url exists in config.");
+
+        if (!version) {
+            const versions = await registry.getVersionNumbers(name, branch);
+            if (versions.length > 0) {
+                version = versions[versions.length - 1]; // the last version by default
+            }
+        }
+
+        const mi = await this.getModuleInfoByName(registryUri, name);
+        const vi = (version !== null) ? await this.getVersionInfo(registryUri, name, branch, version) : null;
+
+        await this._overlayService.openDeployOverlay(mi, vi);
     }
 }

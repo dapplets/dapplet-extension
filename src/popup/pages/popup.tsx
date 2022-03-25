@@ -14,7 +14,6 @@ import { Bus } from "../../common/bus";
 import { ShareButton } from "../components/ShareButton";
 
 interface IPopupProps {
-  contextIds: Promise<string[]>;
   bus: Bus;
 }
 
@@ -25,6 +24,7 @@ interface IPopupState {
   defaultActiveIndex: number | undefined;
   reload: number;
   isOverlay: boolean;
+  currentTab: { id: number, windowId: number } | null;
 }
 
 class Popup extends React.Component<IPopupProps, IPopupState> {
@@ -38,19 +38,22 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
       defaultActiveIndex: undefined,
       reload: 0,
       isOverlay: (window['DAPPLETS_JSLIB'] !== true) ? false : true,
+      currentTab: null
     };
 
-    props.bus.subscribe("changeTab", (path) => {
+    props.bus.subscribe("changeTab", (path, currentTab) => {
       this.setState({ isOverlay: true });
-      if (path === "dapplets")
-        this.setState({ defaultActiveIndex: 0, reload: Math.random() });
-        //if (path === 'events') this.setState({ defaultActiveIndex: 1, reload: Math.random() });
-      if (path === "wallets")
-        this.setState({ defaultActiveIndex: 1, reload: Math.random() });
-      if (path === "settings")
-        this.setState({ defaultActiveIndex: 2, reload: Math.random() });
-      if (path === "developer")
-        this.setState({ defaultActiveIndex: 3, reload: Math.random() });
+      if (path === "dapplets") {
+        this.setState({ defaultActiveIndex: 0, currentTab, reload: Math.random() });
+      // } else if (path === 'events') {
+      //   this.setState({ defaultActiveIndex: 1, reload: Math.random() });
+      } else if (path === "wallets") {
+        this.setState({ defaultActiveIndex: 1, currentTab, reload: Math.random() });
+      } else if (path === "settings") {
+        this.setState({ defaultActiveIndex: 2, currentTab, reload: Math.random() });
+      } else if (path === "developer") {
+        this.setState({ defaultActiveIndex: 3, currentTab, reload: Math.random() });
+      }
     });
   }
 
@@ -66,7 +69,6 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
   }
 
   render() {
-    const { contextIds } = this.props;
     const { newEventsCount, devMode, loading } = this.state;
 
     // If don't return null, it will be rendered twice
@@ -84,7 +86,7 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
             attached={false}
             as={() => (
               <Dapplets
-                contextIds={contextIds}
+                currentTab={this.state.currentTab}
                 isOverlay={this.state.isOverlay}
               />
             )}
@@ -170,9 +172,9 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
           }
           key={this.state.reload}
         >
-          {this.props.contextIds ? (
-            <Header contextIds={this.props.contextIds} />
-          ) : null}
+          {/* {this.state.contextIds ? (
+            <Header contextIds={this.state.contextIds} />
+          ) : null} */}
           <Tab
             menu={{
               secondary: true,

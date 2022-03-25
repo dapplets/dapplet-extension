@@ -2,7 +2,7 @@ import * as React from 'react';
 import { SelectWallet } from "./components/selectWallet";
 import '../common/semantic-ui-css/semantic.min.css';
 import './index.scss';
-import { HashRouter, Route, Switch } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Bus } from '../common/bus';
 import * as modules from './modules';
 import { Container } from 'semantic-ui-react';
@@ -23,14 +23,14 @@ export class App extends React.Component<Props, State> {
         return (
             <Container text style={{ paddingTop: '30px' }}>
                 <HashRouter>
-                    <Switch>
-                        <Route exact path="/" component={() => <SelectWallet bus={p.bus} chains={p.chains} />} />
-                        <Route path="/metamask" component={() => <modules.metamask bus={p.bus} />} />
-                        <Route path="/walletconnect" component={() => <modules.walletconnect bus={p.bus} />} />
-                        <Route path="/near_testnet" component={() => <modules.near bus={p.bus} chain={ChainTypes.NEAR_TESTNET} />} />
-                        <Route path="/near_mainnet" component={() => <modules.near bus={p.bus} chain={ChainTypes.NEAR_MAINNET} />} />
-                        <Route path="/dapplets" component={() => <modules.dapplets bus={p.bus} />} />
-                    </Switch>
+                    <Routes>
+                        <Route path="/" element={<SelectWallet bus={p.bus} chains={p.chains} />} />
+                        <Route path="/metamask" element={<modules.metamask bus={p.bus} />} />
+                        <Route path="/walletconnect" element={<modules.walletconnect bus={p.bus} />} />
+                        <Route path="/near_testnet" element={<modules.near bus={p.bus} chain={ChainTypes.NEAR_TESTNET} />} />
+                        <Route path="/near_mainnet" element={<modules.near bus={p.bus} chain={ChainTypes.NEAR_MAINNET} />} />
+                        <Route path="/dapplets" element={<modules.dapplets bus={p.bus} />} />
+                    </Routes>
                 </HashRouter>
             </Container>
         );

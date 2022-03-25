@@ -1,6 +1,6 @@
 import { setupMessageListener } from "chrome-extension-message-wrapper";
 import { WalletService } from "./services/walletService";
-import * as SuspendService from "./services/suspendService";
+import { SuspendService } from "./services/suspendService";
 import * as NotificationService from "./services/notificationService";
 import FeatureService from './services/featureService';
 import GlobalConfigService from './services/globalConfigService';
@@ -10,22 +10,23 @@ import EnsService from "./services/ensService";
 import { WebSocketProxy } from "../common/chrome-extension-websocket-wrapper";
 import ProxyService from "./services/proxyService";
 import * as tracing from '../common/tracing';
-import { getCurrentTab, getCurrentContextIds, multipleReplace, reloadCurrentPage, waitClosingTab, waitTab } from "../common/helpers";
+import { getCurrentTab, getCurrentContextIds, multipleReplace, reloadCurrentPage, waitClosingTab, waitTab, checkUrlAvailability, getThisTab } from "../common/helpers";
 import GithubService from "./services/githubService";
 import DiscordService from "./services/discordService";
 import { IdentityService } from "./services/identityService";
 import { CONTEXT_ID_WILDCARD, ModuleTypes } from "../common/constants";
 import { OverlayService } from "./services/overlayService";
 import { SessionService } from "./services/sessionService";
+import * as EventBus from "../common/global-event-bus";
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
-// ToDo: Think about WalletConnectService, SuspendService etc, which looks like singletons.
 tracing.startTracing();
 
 const globalConfigService = new GlobalConfigService();
+const suspendService = new SuspendService(globalConfigService);
 const overlayService = new OverlayService();
-const proxyService = new ProxyService();
+const proxyService = new ProxyService(globalConfigService);
 const githubService = new GithubService(globalConfigService);
 const discordService = new DiscordService(globalConfigService);
 const walletService = new WalletService(globalConfigService, overlayService);
@@ -33,6 +34,9 @@ const sessionService = new SessionService(walletService, overlayService);
 const featureService = new FeatureService(globalConfigService, walletService, overlayService);
 const identityService = new IdentityService(globalConfigService, walletService);
 const ensService = new EnsService(walletService);
+
+// ToDo: fix this circular dependency
+walletService.sessionService = sessionService;
 
 browser.runtime.onMessage.addListener(
   setupMessageListener({
@@ -67,12 +71,12 @@ browser.runtime.onMessage.addListener(
     openGuideOverlay: overlayService.openGuideOverlay.bind(overlayService),
 
     // SuspendService
-    getSuspendityByHostname: SuspendService.getSuspendityByHostname,
-    getSuspendityEverywhere: SuspendService.getSuspendityEverywhere,
-    suspendByHostname: SuspendService.suspendByHostname,
-    suspendEverywhere: SuspendService.suspendEverywhere,
-    resumeByHostname: SuspendService.resumeByHostname,
-    resumeEverywhere: SuspendService.resumeEverywhere,
+    getSuspendityByHostname: suspendService.getSuspendityByHostname.bind(suspendService),
+    getSuspendityEverywhere: suspendService.getSuspendityEverywhere.bind(suspendService),
+    suspendByHostname: suspendService.suspendByHostname.bind(suspendService),
+    suspendEverywhere: suspendService.suspendEverywhere.bind(suspendService),
+    resumeByHostname: suspendService.resumeByHostname.bind(suspendService),
+    resumeEverywhere: suspendService.resumeEverywhere.bind(suspendService),
 
     // NotificationService
     transactionCreated: NotificationService.transactionCreated,
@@ -101,6 +105,7 @@ browser.runtime.onMessage.addListener(
     openSettingsOverlay: (mi) => featureService.openSettingsOverlay(mi),
     removeDapplet: (name, hostnames) => featureService.removeDapplet(name, hostnames),
     getResource: (hashUris) => featureService.getResource(hashUris),
+    openDeployOverlayById: featureService.openDeployOverlayById.bind(featureService),
 
     // GlobalConfigService
     getProfiles: globalConfigService.getProfiles.bind(globalConfigService),
@@ -208,13 +213,16 @@ browser.runtime.onMessage.addListener(
     pairWalletViaOverlay: overlayService.pairWalletViaOverlay.bind(overlayService),
     openDappletHome: overlayService.openDappletHome.bind(overlayService),
     openDappletAction: overlayService.openDappletAction.bind(overlayService),
+    openPopupOverlay: overlayService.openPopupOverlay.bind(overlayService),
 
     // Helpers
     waitTab: (url) => waitTab(url),
     waitClosingTab: (tabId, windowId) => waitClosingTab(tabId, windowId),
     reloadCurrentPage: () => reloadCurrentPage(),
     getCurrentTab: () => getCurrentTab(),
-    getCurrentContextIds: () => getCurrentContextIds()
+    getThisTab: getThisTab,
+    getCurrentContextIds: getCurrentContextIds,
+    checkUrlAvailability: (url) => checkUrlAvailability(url),
   })
 );
 
@@ -224,19 +232,19 @@ const wsproxy = new WebSocketProxy();
 browser.runtime.onConnect.addListener(wsproxy.createConnectListener());
 
 // ToDo: These lines are repeated many time
-SuspendService.changeIcon();
-SuspendService.updateContextMenus();
+suspendService.changeIcon();
+suspendService.updateContextMenus();
 
 //listen for new tab to be activated
 browser.tabs.onActivated.addListener(function (activeInfo) {
-  SuspendService.changeIcon();
-  SuspendService.updateContextMenus();
+  suspendService.changeIcon();
+  suspendService.updateContextMenus();
 });
 
 //listen for current tab to be changed
 browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-  SuspendService.changeIcon();
-  SuspendService.updateContextMenus();
+  suspendService.changeIcon();
+  suspendService.updateContextMenus();
 });
 
 browser.notifications.onClicked.addListener(function (notificationId) {

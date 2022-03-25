@@ -5,6 +5,7 @@ import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage';
 import { browser } from "webextension-polyfill-ts";
 import { generateGuid } from '../../common/helpers';
 import SiteConfig from '../models/siteConfig';
+import * as EventBus from "../../common/global-event-bus";
 
 const EXPORTABLE_PROPERTIES = [
     'id',
@@ -391,10 +392,13 @@ export default class GlobalConfigService {
 
         config.trustedUsers.push({ account: account });
         await this.set(config);
+        
+        EventBus.emit('trustedusers_changed');
     }
 
     async removeTrustedUser(account: string) {
-        return this.updateConfig(c => c.trustedUsers = c.trustedUsers.filter(r => r.account !== account));
+        await this.updateConfig(c => c.trustedUsers = c.trustedUsers.filter(r => r.account !== account));
+        EventBus.emit('trustedusers_changed');
     }
 
     async getUserSettings(moduleName: string, key: string) {
@@ -638,9 +642,11 @@ export default class GlobalConfigService {
         if (config.myDapplets.find(x => x.registryUrl === registryUrl && x.name === name)) return;
         config.myDapplets.push({ registryUrl, name });
         await this.set(config);
+        EventBus.emit('mydapplets_changed');
     }
 
     async removeMyDapplet(registryUrl: string, name: string) {
-        return this.updateConfig(c => c.myDapplets = c.myDapplets.filter(x => x.registryUrl !== registryUrl && x.name !== name));
+        await this.updateConfig(c => c.myDapplets = c.myDapplets.filter(x => !(x.registryUrl === registryUrl && x.name === name)));
+        EventBus.emit('mydapplets_changed');
     }
 }

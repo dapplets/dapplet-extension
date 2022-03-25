@@ -20,6 +20,13 @@ import VersionInfo from "../background/models/versionInfo";
 
 type Abi = any;
 
+type OverlayConnection<M> = AutoProperties<M> & Connection & { 
+    id: string,
+    isOpen(): boolean, 
+    close(): void, 
+    onClose(callback: () => void): void 
+};
+
 interface WalletConnection {
     isConnected(): Promise<boolean>;
     connect(): Promise<void>;
@@ -291,10 +298,15 @@ export default class Core {
         return conn;
     }
 
+    /**
+     * @deprecated Since version 0.46.0. Will be deleted in version 0.50.0. Use `Core.login()` instead.
+     */
     public async wallet<M>(cfg: { type: 'ethereum', network: 'goerli', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & AutoProperties<M> & Connection>
     public async wallet<M>(cfg: { type: 'near', network: 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
     public async wallet<M>(cfg: { type: 'near', network: 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
     public async wallet<M>(cfg: { type: 'ethereum' | 'near', network: 'goerli' | 'testnet' | 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
+        console.warn('DEPRECATED: "Core.contract()" is deprecated since version 0.46.1. It will be deleted in version 0.50.0. Use "Core.login()" instead.');
+
         if (!cfg || !cfg.type || !cfg.network) throw new Error("\"type\" and \"network\" are required in Core.wallet().");
         if (cfg.type !== 'near' && cfg.type !== 'ethereum') throw new Error("The \"ethereum\" and \"near\" only are supported in Core.wallet().");
         if (cfg.type === 'near' && !(cfg.network == 'testnet' || cfg.network == 'mainnet')) throw new Error("\"testnet\" and \"mainnet\" network only is supported in \"near\" type wallet.");
@@ -355,9 +367,9 @@ export default class Core {
         }) as any;
     }
 
-    public overlay<M>(cfg: { name: string, url?: string, title: string, source?: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void, onClose(callback: () => void): void }
-    public overlay<M>(cfg: { name?: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void, onClose(callback: () => void): void }
-    public overlay<M>(cfg: { name: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection & { isOpen(): boolean, close(): void, onClose(callback: () => void): void } {
+    public overlay<M>(cfg: { name: string, url?: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M>
+    public overlay<M>(cfg: { name?: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M>
+    public overlay<M>(cfg: { name: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M> {
         const _overlay = this.overlayManager.createOverlay(cfg.url, cfg.title, cfg.source);
         const conn = Connection.create<M>(_overlay, eventDef);
         const overrides = {
@@ -385,9 +397,14 @@ export default class Core {
 
     public storage: AppStorage;
 
+    /**
+     * @deprecated Since version 0.46.0. Will be deleted in version 0.50.0. Use `Core.login()` instead.
+     */
     public async contract(type: 'ethereum', address: string, options: Abi, app?: string): Promise<any>
     public async contract(type: 'near', address: string, options: { viewMethods: string[]; changeMethods: string[], network?: 'mainnet' | 'testnet' }, app?: string): Promise<any>
     public async contract(type: 'near' | 'ethereum', address: string, options: any, app?: string): Promise<any> {
+        console.warn('DEPRECATED: "Core.contract()" is deprecated since version 0.46.1. It will be deleted in version 0.50.0. Use "Core.login()" instead.');
+
         if (type === 'ethereum') {
             return ethereum.createContractWrapper(app, { network: 'goerli'}, address, options);
         } else if (type === 'near') {
@@ -436,28 +453,36 @@ export default class Core {
     public async login(request: (LoginRequest & LoginHooks), settings?: (LoginRequestSettings & LoginHooks), moduleName?: string): Promise<LoginSession>
     public async login(request: (LoginRequest & LoginHooks)[], settings?: (LoginRequestSettings & LoginHooks), moduleName?: string): Promise<LoginSession[]>
     public async login(request: (LoginRequest & LoginHooks) | (LoginRequest & LoginHooks)[], settings?: (LoginRequestSettings & LoginHooks), moduleName?: string): Promise<LoginSession | LoginSession[]> {
+        
         if (Array.isArray(request)) {
             return Promise.all(request.map(x => this.login(x, settings, moduleName)));
         }
 
+        const _request = { ...request };
+
         if (settings) {
-            Object.assign(request, settings);
+            Object.assign(_request, settings);
         }
 
-        if (!request.target) {
+        if (!_request.target) {
             const overlays = this.overlayManager.getOverlays().filter(x => x.source === moduleName);
             const target = (overlays.length > 0) ? overlays[0].id : null;
-            request.target = target;
+            _request.target = target;
+        }
+
+        if (_request.target && typeof _request.target === 'object') {
+            _request.target = _request.target.id;
         }
         
-        const { createSession } = await initBGFunctions(browser);
-        const session = await createSession(moduleName, request);
+        const { createSession, getThisTab } = await initBGFunctions(browser);
+        const thisTab = await getThisTab();
+        const session = await createSession(moduleName, _request, thisTab.id);
 
         const ls = {}; // ToDo: specify LoginInfo
-        request.onLogin?.call({}, ls);
+        _request.onLogin?.call({}, ls);
 
         const loginSession = new LoginSession(session);
-        loginSession.logoutHandler = request.onLogout;
+        loginSession.logoutHandler = _request.onLogout;
 
         return loginSession;
     }

@@ -34,13 +34,9 @@ export class IpfsModuleStorage implements ModuleStorage {
     }
 
     public async save(blob: Blob) {
-
-        const formData = new FormData();
-        formData.append("file", blob);
-
         const response = await fetch(joinUrls(this._gateway, 'ipfs/'), {
             method: 'POST',
-            body: formData
+            body: blob
         });
 
         if (!response.ok) {

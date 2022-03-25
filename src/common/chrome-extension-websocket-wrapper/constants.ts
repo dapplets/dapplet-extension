@@ -1,1 +1,2 @@
 export const MESSAGE_BUS_NAME = "WSPROXY";
+export const GLOBAL_EVENT_BUS_NAME = "GLOBAL_EVENT_BUS";

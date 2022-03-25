@@ -6,6 +6,7 @@ import PortStream from 'extension-port-stream';
 import { detect } from 'detect-browser';
 import { browser } from 'webextension-polyfill-ts';
 import { EthereumWallet } from "./interface";
+import { CacheMethod } from "../../../common/helpers";
 
 export default class extends ethers.Signer implements EthereumWallet {
 
@@ -95,6 +96,7 @@ export default class extends ethers.Signer implements EthereumWallet {
         }
     }
 
+    @CacheMethod()
     async connectWallet(): Promise<void> {
         const metamask = await this._getMetamaskProvider();
         if (localStorage['metamask_disabled'] === 'true') {
@@ -130,7 +132,7 @@ export default class extends ethers.Signer implements EthereumWallet {
                 const metamaskPort = browser.runtime.connect(currentMetaMaskId);
                 metamaskPort.onDisconnect.addListener(() => browser.runtime.lastError); // mute "Unchecked runtime.lastError"
                 const pluginStream = new PortStream(metamaskPort);
-                const metamask = new MetaMaskInpageProvider(pluginStream, {
+                const metamask = new MetaMaskInpageProvider(pluginStream as any, {
                     // mute all messages from provider
                     logger: {
                         warn: () => {},
