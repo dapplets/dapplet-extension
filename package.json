@@ -70,7 +70,9 @@
     "webextension-polyfill-ts": "^0.25.0",
     "webpack": "^5.69.1",
     "webpack-cli": "^4.9.2",
-    "webpack-merge": "^5.8.0"
+    "webpack-merge": "^5.8.0",
+    "@fontsource/montserrat": "^4.5.5",
+    "@fontsource/roboto": "^4.5.3"
   },
   "directories": {
     "doc": "docs"

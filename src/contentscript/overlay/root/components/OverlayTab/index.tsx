@@ -5,7 +5,6 @@ import { ReactComponent as Close } from "../../assets/svg/close.svg";
 
 import cn from "classnames";
 import { IMenu } from "../../models/menu.model";
-import { IOverlay } from "../../../interfaces";
 
 export interface OverlayTabProps
 	extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -14,9 +13,10 @@ export interface OverlayTabProps
 	image?: string;
 	notification?: boolean;
 	menu: IMenu[];
+	notificationSetting?: boolean;
+	isSystemDapplets?: boolean;
 	onSelectedMenu: (selected: string) => void;
 	removeTab?: () => void;
-	notificationSetting?: boolean;
 }
 
 export const OverlayTab = (props: OverlayTabProps): ReactElement => {
@@ -29,6 +29,7 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
 		notificationSetting,
 		className,
 		menu,
+		isSystemDapplets,
 		onSelectedMenu,
 		onClick,
 		removeTab,
@@ -37,8 +38,8 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
 
 	const handlerClick = (title: string) => (): void => nameSelectedMenu !== title && onSelectedMenu(title);
 
-	console.log(removeTab);
-
+	const showRemoveTab = (!activeTab || (activeTab && isSystemDapplets)) && typeof removeTab !== "undefined";
+	const showMenu = activeTab && !isSystemDapplets && (menu && menu.length > 0);
 
 	return (
 		<div className={cn(styles.tab, className)} {...anotherProps}>
@@ -48,10 +49,10 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
 					style={{ backgroundImage: `url(${image})` }}
 					onClick={onClick}
 				/>
-				{!activeTab && typeof removeTab !== "undefined" && <Close className={styles.close} onClick={removeTab} />}
+				{showRemoveTab && <Close className={styles.close} onClick={removeTab} />}
 			</div>
 
-			{activeTab && (
+			{showMenu && (
 				<ul className={styles.list}>
 					{menu && menu.map(({ _id, icon: Icon, title }) => {
 						return (

@@ -3,7 +3,9 @@
 .overlay {
   z-index: 9999;
   height: 100vh;
+  min-width: 468px;
   transition: transform 0.3s ease;
+  filter: drop-shadow(-4px 8px 10px rgba(0, 0, 0, 0.25));
 }
 
 .wrapper {
@@ -13,11 +15,6 @@
   padding: 17px 15px;
 
   background: $OverlayBG;
-}
-
-.inner {
-  width: 100%;
-  height: 100%;
 }
 
 .toolbar {
@@ -70,22 +67,25 @@
 
 .children {
   width: 100%;
-  height: 95%;
+  height: 100%;
+}
 
-  div {
+.noSystemDapplets {
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100%;
-
-    iframe {
-      width: 100%;
-      height: 100%;
-    }
+    height: calc(100vh - 75px);
   }
 }
 
-.overlayInner {
+.noSystemDapplets,
+.hideContent {
   position: absolute;
   top: 0;
+  width: 100%;
+  height: 100%;
   left: 0;
   opacity: 0;
   pointer-events: none;

@@ -1,1 +1,0 @@
-export type TSelectedSettings = "Dapplets" | "Wallets" | "Settings" | "Developer";

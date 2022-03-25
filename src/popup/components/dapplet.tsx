@@ -26,7 +26,7 @@ interface Props {
   onDeployClick: Function;
 }
 
-interface State {}
+interface State { }
 
 export class Dapplet extends React.Component<Props, State> {
   state = {};

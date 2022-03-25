@@ -1,0 +1,146 @@
+@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
+
+.wrapperCard {
+  display: flex;
+
+  max-width: 421px;
+  margin-bottom: 10px;
+
+  padding: 10px 17px;
+
+  border-radius: 10px;
+
+  background: #FFF;
+
+  font-family: Montserrat, sans-serif;
+}
+
+.wrapperBlock {
+  display: flex;
+  flex-direction: column;
+
+  padding: 0 0 0 13px;
+}
+
+.blockTop {
+  display: flex;
+
+  margin: 0 0% 0 -1%;
+
+  .blockIcons {
+    display: flex;
+    justify-content: space-between;
+
+    width: 34px;
+    margin: 0 57px 0 13px;
+  }
+}
+
+.blockText {
+  display: flex;
+
+  width: 277px;
+  padding: 0 0 13px;
+
+  text-transform: lowercase;
+
+  color: $ContentBlack;
+
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 120%;
+}
+
+.blockBottom {
+  display: flex;
+  justify-content: space-between;
+}
+
+.firstButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardInfo {
+  margin-left: 10px;
+}
+
+.squareButton {
+  &:not(:last-child) {
+    margin-right: 2px;
+  }
+}
+
+.description {
+  margin-bottom: 15px;
+}
+
+.header {
+  cursor: pointer;
+}
+
+.descriptionTop,
+.avatars,
+.avatarsList {
+  display: flex;
+  align-items: center;
+}
+
+.avatarsItem {
+  &:not(:first-child) {
+    margin-left: -7px;
+  }
+}
+
+.avatars {
+  position: relative;
+
+  margin-right: 5px;
+  padding-right: 5px;
+
+  &::after {
+    position: absolute;
+    top: 50%;
+    right: 0;
+
+    width: 1px;
+    height: 16px;
+
+    content: "";
+    transform: translateY(-50%);
+
+    background-color: #E3E3E3;
+  }
+}
+
+.avatarsAnother {
+  display: block;
+
+  margin-left: 5px;
+
+  color: #588CA3;
+
+  font-size: 10px;
+  line-height: 149%;
+  text-decoration-line: underline;
+}
+
+.activeUsers {
+  color: #919191;
+
+  font-size: 10px;
+  line-height: 149%;
+}
+
+.descriptionBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  max-width: 240px;
+  margin-top: 5px;
+}

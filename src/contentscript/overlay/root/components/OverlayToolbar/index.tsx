@@ -1,10 +1,11 @@
-import React, { DetailedHTMLProps, HTMLAttributes, ReactElement } from "react";
+import React, { DetailedHTMLProps, HTMLAttributes, ReactElement, useEffect } from "react";
 import styles from "./OverlayToolbar.module.scss";
 import { OverlayTab } from "../OverlayTab";
 import cn from "classnames";
 import { ReactComponent as Coolicon } from "../../assets/svg/coolicon.svg";
 import { ITab } from "../../types/tab";
 import { IMenu } from "../../models/menu.model";
+import { Overlay } from "../../overlay";
 
 // TODO: change element hiding from Margin to transform
 export interface OverlayToolbarProps
@@ -12,9 +13,12 @@ export interface OverlayToolbarProps
 	tabs: ITab[];
 	menu: IMenu[];
 	nameSelectedMenu?: string;
+	activeOverlay: Overlay;
 	idActiveTab: string;
 	isDevMode: boolean;
+	isSystemDapplets: boolean;
 	toggle: () => void;
+	onOverlayTab: () => void;
 	onSelectedMenu: (selected: string) => void;
 	onRemoveTab: (id: string) => void;
 	onSelectedTab: (id: string) => void;
@@ -35,9 +39,12 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 		idActiveTab,
 		className,
 		isDevMode,
+		isSystemDapplets,
+		activeOverlay,
 		menu,
 		toggle,
 		onSelectedMenu,
+		onOverlayTab,
 		onSelectedTab,
 		onRemoveTab,
 		...anotherProps
@@ -45,11 +52,13 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 
 	const handlerSelectedTab = (id: string) => (): void => onSelectedTab(id);
 	const handlerRemoveTab = (id: string) => (): void => onRemoveTab(id);
-
 	const nonSystemTabs = tabs.filter(x => !x.uri.includes("/popup.html#"));
-	const systemTabs = tabs.filter(x => x.uri.includes("/popup.html#"));
-	const tab = tabs.filter(x => x.uri.includes("/popup.html#/dapplets"))[0];
-	const isSystemTabActive = systemTabs.findIndex(x => x.id === idActiveTab) !== -1;
+
+	useEffect(() => {
+		if (!activeOverlay) return;
+		const noSystem = !activeOverlay.uri.includes('/popup.html#');
+		if (noSystem) onOverlayTab();
+	}, [activeOverlay]);
 
 	return (
 		<div className={cn(styles.toolbar, className)} {...anotherProps}>
@@ -58,15 +67,15 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 
 				<div className={styles.tabs}>
 					<OverlayTab
-						id={'system'}
+						id='system'
 						menu={menu}
 						nameSelectedMenu={nameSelectedMenu}
-						activeTab={isSystemTabActive}
+						activeTab={true}
 						onSelectedMenu={onSelectedMenu}
-						onClick={handlerSelectedTab(tab?.id)}
-						className={cn({ [styles.active]: isSystemTabActive })}
+						onClick={handlerSelectedTab("system")}
+						className={cn({ [styles.active]: true })}
 						notification={false}
-						title={'System'}
+						title="System"
 					/>
 
 					<>
@@ -81,6 +90,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 										key={id}
 										nameSelectedMenu={nameSelectedMenu}
 										activeTab={active}
+										isSystemDapplets={isSystemDapplets}
 										onSelectedMenu={onSelectedMenu}
 										removeTab={handlerRemoveTab(id)}
 										onClick={handlerSelectedTab(id)}
