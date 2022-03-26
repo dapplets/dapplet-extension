@@ -1,6 +1,6 @@
-// import { BehaviorSubject } from 'rxjs';
 import { statify, BehaviorSubjectProxy } from 'rxjs-proxify';
-import { IPubSub, ISharedState } from "./types";
+import { ISharedState } from "./types";
+import { Connection } from "./connection";
 
 const ALL_CONTEXTS = Symbol("ALL_CONTEXTS");
 
@@ -8,16 +8,15 @@ export default class State <T> implements ISharedState<T> {
   public state: {
     [contextId: string | symbol]: BehaviorSubjectProxy<T>
   };
-
   public all: BehaviorSubjectProxy<T>
+  private _connection: Connection<T>
 
-  private _bus: IPubSub
-
-  constructor(public readonly defaultState: T) {
+  constructor(
+    public readonly defaultState: T,
+    public readonly type?: string
+  ) {
     this.all = statify(defaultState);
-    this.all.subscribe((v) => {
-        if (this._bus?.registered) this._bus?.exec('changeState', this.getAll());
-    });
+    if (this.type !== 'server') this.all.subscribe(() => this._connection?.send('changeState'));
     this.state = { all: this.all };
     return new Proxy(this, {
       get(target, prop) {
@@ -30,34 +29,28 @@ export default class State <T> implements ISharedState<T> {
     });
   }
 
-  public connectToBus(bus: IPubSub) {
-    this._bus = bus;
+  public addConnection(conn: Connection<T>) {
+    this._connection = conn;
+    if (this.type === 'server') this._resolveServerData('all');
   }
 
   public get(id: string | symbol) {
-    // if (id === undefined || id === 'undefined') return;
+    if (id === 'undefined') return;
     const stateId = (id === null || id === undefined) ? ALL_CONTEXTS : id;
-
     if (stateId === ALL_CONTEXTS) return this.all;
-
     if (!this.state[stateId]) {
       const subject = statify(this.defaultState);
-      subject.subscribe((v) => {
-          if (this._bus?.registered) this._bus?.exec('changeState', this.getAll());
-      });
-
+      if (this.type !== 'server') subject.subscribe(() => this._connection?.send('changeState'));
       this.state[stateId] = subject;
+      if (this.type === 'server') this._resolveServerData(stateId);
     }
-
     return this.state[stateId];
   }
 
   public set(data: Partial<T>, id?: string | symbol) {
-    // if (id === undefined || id === 'undefined') return;
+    if (id === 'undefined') return;
     const stateId = (id === null || id === undefined) ? ALL_CONTEXTS : id;
-
     if (stateId === ALL_CONTEXTS) Object.keys(data).forEach((param) => this.all[param].next(data[param]));
-
     if (!this.state[stateId]) {
       const subject = statify({ ...this.defaultState, ...data });
       this.state[stateId] = subject;
@@ -70,7 +63,14 @@ export default class State <T> implements ISharedState<T> {
     return Object.fromEntries(Object.entries(this.state).map(([k, v]) => ([k, v.value])));
   }
 
-  // public has(id: string | symbol) {
-  //   return Object.prototype.hasOwnProperty.call(this.state, id);
-  // }
+  private _resolveServerData(id: string | symbol) {
+    Object.keys(this.defaultState).forEach((key) => {
+      const ap = this._connection.addAutoProperty(
+        this._connection[key],
+        (v: any) => this[id] ? this[id][key].next(v) : this.get(id)[key].next(v),
+        { id }
+      );
+      this[id] ? this[id][key].next(ap) : this.get(id)[key].next(ap);
+    });
+  }
 }

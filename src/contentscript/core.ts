@@ -293,12 +293,12 @@ export default class Core {
             });
         });
     }
-    
-    public connect<M>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection<any>
-    public connect<M, T>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection<T>
-    public connect<M, T>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection<T | any> {
+
+    public connect<M, T>(cfg: { url: string }, defaultState: T): Connection<T> {
         const rpc = new WsJsonRpc(cfg.url);
-        const conn = Connection.create<M, T>(rpc, eventDef);
+        const conn = Connection.create<M, T>(rpc);
+        const state = this.state(defaultState, 'server');
+        conn.setCommonState(state);
         return conn;
     }
 
@@ -371,9 +371,10 @@ export default class Core {
         }) as any;
     }
 
+    public overlay<M>(cfg: { name: string, url?: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M, any>
     public overlay<M, T>(cfg: { name: string, url?: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M, T>
     public overlay<M, T>(cfg: { name?: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M, T>
-    public overlay<M, T>(cfg: { name: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M, T> {
+    public overlay<M, T>(cfg: { name: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M, T | any> {
         const _overlay = this.overlayManager.createOverlay(cfg.url, cfg.title, cfg.source);
         const conn = Connection.create<M, T>(_overlay, eventDef);
         let overridedConn: OverlayConnection<M, T>
@@ -498,8 +499,7 @@ export default class Core {
         return loginSession;
     }
 
-    public state<T>(defaultState: T) {
-        const commonState = new State<T>(defaultState);
-        return commonState;
+    public state<T>(defaultState: T, type?: string) {
+        return new State<T>(defaultState, type);
     }
 }

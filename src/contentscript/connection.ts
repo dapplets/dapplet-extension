@@ -61,33 +61,38 @@ export class Connection <T> implements IConnection {
     private readonly listenerContextMap = new WeakMap<any, Listener>()
     private autoProperties = new Map<Key, AutoProperty>()  //ToDo: connection-wide autoproperties. Remove or not?
     public readonly listeners = new Set<Listener>()
-
-    private _commonState: State<T>
+    public state: State<T>
 
     constructor(
         private _bus?: IPubSub,
-        private eventDef?: EventDef<any>
+        private _eventDef?: EventDef<any>
     ) {
         this._bus?.onMessage((operation, message) => this.onMessage(operation, message));
     }
 
     open(id?: string) {
-        this._bus.exec('getDefaultState', this._commonState.defaultState);
-        this._bus.exec('changeState', this._commonState.getAll());
+        this._bus.exec('getDefaultState', this.state.defaultState);
+        this._bus.exec('changeState', this.state.getAll());
         return this._bus.exec('onOpen', id);
     }
 
     setCommonState(state: State<T>) {
-        this._commonState = state;
-        this._commonState.connectToBus(this._bus);
+        this.state = state;
+        this.state.addConnection(this);
     }
 
     // op - operation, subject
     // msg - payload
     send(op: any, msg?: any) { // should return promise
-        if (this._commonState !== undefined && this._commonState.getAll !== undefined ) {
-          this._bus.exec('changeState', this._commonState.getAll());
+        if (
+          this.state !== undefined
+          && this.state.getAll !== undefined
+          && this.state.type !== 'server'
+          && this._bus?.registered
+        ) {
+          this._bus.exec('changeState', this.state.getAll());
         }
+        if (op === 'changeState' && msg === undefined) return;
         return this._bus.exec(op, msg)
     }
 
@@ -223,8 +228,8 @@ export class Connection <T> implements IConnection {
                 typeof f === 'function' ? f(op, msg) : this.topicMatch(op, f as string);
             if (msg.type === 'changeState') {
                 const [newStateData, id] = msg.message;
-                this._commonState.set(newStateData, id);
-                this._bus.exec('changeState', this._commonState.getAll());
+                this.state.set(newStateData, id);
+                this._bus.exec('changeState', this.state.getAll());
                 return;
             }
             this.listeners.forEach(async (listener) => {
@@ -251,7 +256,7 @@ export class Connection <T> implements IConnection {
                             return;
                         };
                         for (const eventId of eventsIds) {
-                            const cond = this.eventDef ? this.eventDef[eventId] : eventId;
+                            const cond = this._eventDef ? this._eventDef[eventId] : eventId;
                             //ToDo: extract msg.type default
                             if ((typeof cond === 'function' ? cond(op, msg) : msg?.type == cond) || eventId === ANY_EVENT) {
                                 const handlers = listener.h[eventId]
