@@ -9,7 +9,7 @@
     "build:jslib": "webpack --config webpack.jslib.js && tsc -d --emitDeclarationOnly",
     "build": "npm run build:extension && npm run build:jslib",
     "dev": "webpack --config webpack.dev.js",
-    "start": "webpack -w --config webpack.dev.js",
+    "start": "cross-env NODE_OPTIONS=--max-old-space-size=6144 webpack -w --config webpack.dev.js",
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
     "clean": "rm -rf ./build && rm -rf ./lib"
   },
@@ -34,6 +34,7 @@
     "chrome-extension-message-wrapper": "github:dapplets/chrome-extension-message-wrapper",
     "classnames": "^2.3.1",
     "copy-webpack-plugin": "^10.2.4",
+    "cross-env": "^7.0.3",
     "css-loader": "^6.6.0",
     "detect-browser": "^5.3.0",
     "ethereum-blockies-base64": "^1.0.2",
