@@ -1,6 +1,6 @@
 import * as React from "react";
 import { browser } from "webextension-polyfill-ts";
-import { Tab, Menu } from "semantic-ui-react";
+import { Tab, Menu, Label } from "semantic-ui-react";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 
 import Dapplets from "./dapplets";
@@ -45,14 +45,14 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
       this.setState({ isOverlay: true });
       if (path === "dapplets") {
         this.setState({ defaultActiveIndex: 0, currentTab, reload: Math.random() });
-      // } else if (path === 'events') {
-      //   this.setState({ defaultActiveIndex: 1, reload: Math.random() });
+      } else if (path === 'events') {
+        this.setState({ defaultActiveIndex: 1, reload: Math.random() });
       } else if (path === "wallets") {
-        this.setState({ defaultActiveIndex: 1, currentTab, reload: Math.random() });
-      } else if (path === "settings") {
         this.setState({ defaultActiveIndex: 2, currentTab, reload: Math.random() });
-      } else if (path === "developer") {
+      } else if (path === "settings") {
         this.setState({ defaultActiveIndex: 3, currentTab, reload: Math.random() });
+      } else if (path === "developer") {
+        this.setState({ defaultActiveIndex: 4, currentTab, reload: Math.random() });
       }
     });
   }
@@ -93,16 +93,16 @@ class Popup extends React.Component<IPopupProps, IPopupState> {
           />
         ),
       },
-      // {
-      //   menuItem: (
-      //     <Menu.Item key='messages' style={{ padding: '.85714286em 0.8em' }}>
-      //       Events{newEventsCount !== 0 ? <Label color='red' circular size='mini'>{newEventsCount}</Label> : null}
-      //     </Menu.Item>
-      //   ),
-      //   render: () => (
-      //     <Tab.Pane attached={false} as={() => <Events isOverlay={this.state.isOverlay}/>} />
-      //   )
-      // },
+      {
+        menuItem: (
+          <Menu.Item key='messages' style={{ padding: '.85714286em 0.8em' }}>
+            Events{newEventsCount !== 0 ? <Label color='red' circular size='mini'>{newEventsCount}</Label> : null}
+          </Menu.Item>
+        ),
+        render: () => (
+          <Tab.Pane attached={false} as={() => <Events isOverlay={this.state.isOverlay}/>} />
+        )
+      },
       {
         menuItem: (
           <Menu.Item key="wallets" style={{ padding: ".85714286em 0.8em" }}>

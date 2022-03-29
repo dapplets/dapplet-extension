@@ -11,6 +11,7 @@ import JSZip from 'jszip';
 import { TopologicalSort } from 'topological-sort';
 
 import { WalletService } from '../services/walletService';
+import { addEvent } from '../services/eventService';
 
 export default class ModuleManager {
 
@@ -194,9 +195,9 @@ export default class ModuleManager {
 
         // ToDo: catch null in optimizedVersion
 
-        // if (version != optimizedVersion) {
-        //     addEvent('Dependency Optimizer', `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`);
-        // }
+        if (version != optimizedVersion) {
+            addEvent('Dependency Optimizer', `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`);
+        }
 
         return {
             name: name,

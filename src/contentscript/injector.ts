@@ -418,7 +418,7 @@ export class Injector {
             }
 
             if (newBranch) {
-                //addEvent('Branch resolving', `Resolver of "${manifest.name}" defined the "${newBranch}" branch`);
+                addEvent('Branch resolving', `Resolver of "${manifest.name}" defined the "${newBranch}" branch`);
                 const optimizedBranch = await optimizeDependency(manifest.name, newBranch, manifest.version, contextIds);
                 const missingDependencies = await getModulesWithDeps([{ ...optimizedBranch, contextIds: contextIds }]);
                 await this._processModules(missingDependencies);
