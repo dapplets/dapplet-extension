@@ -7,7 +7,7 @@
   "scripts": {
     "build:extension": "webpack --config webpack.prod.js",
     "build:jslib": "webpack --config webpack.jslib.js && tsc -d --emitDeclarationOnly",
-    "build": "npm run build:extension && npm run build:jslib",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=6144 npm run build:extension && npm run build:jslib",
     "dev": "webpack --config webpack.dev.js",
     "start": "cross-env NODE_OPTIONS=--max-old-space-size=6144 webpack -w --config webpack.dev.js",
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
