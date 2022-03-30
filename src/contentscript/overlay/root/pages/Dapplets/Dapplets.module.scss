@@ -1,6 +1,11 @@
 .wrapper {
-	display: flex;
-	justify-content: end;
-	align-items: center;
-	margin-bottom: 5px;
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  margin-bottom: 5px;
+}
+@media (min-width: 320px) and (max-width: 640px) {
+  .wrapper {
+    margin-bottom: 22px;
+  }
 }

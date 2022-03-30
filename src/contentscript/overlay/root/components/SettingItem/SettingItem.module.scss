@@ -1,0 +1,70 @@
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
+@import '../../assets/styles/null.scss';
+
+.MainSettingsAuto {
+  max-width: 392px;
+  padding: 10px;
+
+  border-radius: 10px;
+  background-color: $PureWhite;
+
+  &:not(:last-child) {
+    margin-bottom: 5px;
+  }
+}
+
+.title {
+  position: relative;
+
+  color: $PureBlack;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.additionalSettings {
+  &::after {
+    position: absolute;
+    top: 50%;
+    right: -20px;
+
+    width: 8px;
+    height: 10px;
+
+    content: '';
+    transform: translateY(-50%) rotate(180deg);
+
+    background-image: url('../../assets/icons/up.svg');
+    background-repeat: no-repeat;
+
+    background-position: center;
+    background-size: cover;
+  }
+}
+
+.isShowAdditionalSettings::after {
+  transform: translateY(-50%) rotate(0);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+}
+
+.children {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  margin-top: 13px;
+
+  & > * {
+    margin-bottom: 10px;
+  }
+}

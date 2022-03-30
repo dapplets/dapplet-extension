@@ -1,6 +1,6 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import '../../assets/styles/null.scss';
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
 
 .wrapperCard {
   display: flex;
@@ -12,7 +12,7 @@
 
   border-radius: 10px;
 
-  background: #FFF;
+  background: #fff;
 
   font-family: Montserrat, sans-serif;
 }
@@ -108,10 +108,10 @@
     width: 1px;
     height: 16px;
 
-    content: "";
+    content: '';
     transform: translateY(-50%);
 
-    background-color: #E3E3E3;
+    background-color: #e3e3e3;
   }
 }
 
@@ -120,7 +120,7 @@
 
   margin-left: 5px;
 
-  color: #588CA3;
+  color: #588ca3;
 
   font-size: 10px;
   line-height: 149%;
@@ -141,4 +141,30 @@
 
   max-width: 240px;
   margin-top: 5px;
+}
+@media (min-width: 320px) and (max-width: 640px) {
+  .wrapperCard {
+    max-width: none;
+    min-width: 100%;
+    width: 100%;
+    background: $PureWhite;
+  }
+  .wrapperBlock {
+    width: calc(100% - 50px);
+  }
+
+  .blockTop {
+    display: flex;
+
+    .blockIcons {
+      display: flex;
+      justify-content: space-between;
+
+      width: 34px;
+      margin: 0px 8.5% 0px 4.5%;
+    }
+  }
+  .blockIcons {
+    margin: 0px 0px 0px 0px;
+  }
 }

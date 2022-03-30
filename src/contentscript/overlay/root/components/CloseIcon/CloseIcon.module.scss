@@ -1,0 +1,28 @@
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
+@import '../../assets/styles/null.scss';
+
+.button {
+  cursor: pointer;
+
+  border: none;
+  background-color: transparent;
+}
+
+.small {
+  width: 20px;
+  height: 20px;
+}
+
+.big {
+  width: 39px;
+  height: 39px;
+}
+
+.black path {
+  fill: $MainBlack;
+}
+
+.red path {
+  fill: $Primary;
+}

@@ -1,0 +1,68 @@
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
+@import '../../assets/styles/null.scss';
+.wrapper {
+  display: inline-block;
+}
+
+.title {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  cursor: pointer;
+
+  color: $StrokeColor;
+
+  font-family: Roboto, sans-serif;
+
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 16px;
+
+  &::before {
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+
+    width: 120%;
+    height: 3px;
+
+    content: '';
+    transform: translateX(-50%);
+
+    border-radius: 5px;
+
+    background-color: $StrokeColor;
+  }
+}
+
+.found {
+  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 22px;
+  min-height: 20px;
+  margin-left: 5px;
+
+  color: #fff;
+  border-radius: 100px;
+  background: #e3e3e3;
+
+  font-size: 10px;
+}
+
+.isActive {
+  color: $Primary;
+
+  &::before {
+    background-color: $Primary;
+  }
+
+  .found {
+    background-color: $Primary;
+  }
+}

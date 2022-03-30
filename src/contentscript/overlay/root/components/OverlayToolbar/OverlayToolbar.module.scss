@@ -1,4 +1,4 @@
-@import "../../assets/styles/color.variables.scss";
+@import '../../assets/styles/color.variables.scss';
 
 .toolbar {
   display: flex;
@@ -46,5 +46,22 @@
 
   &:active svg path {
     fill: $SecondaryPressed;
+  }
+}
+
+@media (min-width: 320px) and (max-width: 640px) {
+  .toolbar {
+    min-height: 52px;
+    flex-direction: row;
+    width: 100%;
+  }
+  .inner {
+    display: flex;
+  }
+  .toggleOverlay {
+    // margin: 10px 5px 0px 20px;
+    margin: 0px 5px 0px 0px;
+    background: $PureWhite;
+    border-radius: 10px;
   }
 }

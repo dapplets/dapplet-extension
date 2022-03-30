@@ -1,0 +1,91 @@
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
+@import '../../assets/styles/null.scss';
+
+.wrapper {
+  position: relative;
+
+  box-sizing: border-box;
+  width: 100%;
+
+  max-width: 421px;
+  padding: 17px 15px 10px;
+
+  border: 1px solid $WebBG;
+  border-radius: 10px;
+
+  background: #fff;
+
+  font-family: Roboto, sans-serif;
+  margin: 0px 0px 19px 0px;
+}
+
+.header {
+  position: absolute;
+  top: -10px;
+
+  padding: 5px 10px;
+
+  text-transform: uppercase;
+
+  color: $ContentBlack;
+  border: 1px solid $WebBG;
+  border-radius: 10px;
+
+  background-color: #fff;
+
+  font-size: 10px;
+  line-height: 100%;
+}
+
+.title {
+  color: $MainBlack;
+
+  color: $MainBlack;
+
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 19px;
+}
+
+.date {
+  display: block;
+
+  margin-top: 5px;
+
+  text-transform: uppercase;
+
+  color: $MainBlack;
+
+  font-size: 10px;
+  line-height: 100%;
+}
+
+.description {
+  max-width: 362px;
+  margin-top: 8px;
+
+  color: $MainBlack;
+
+  font-size: 14px;
+  line-height: 149%;
+}
+
+.button {
+  position: absolute;
+  top: 14px;
+  right: 10px;
+}
+
+.link {
+  display: block;
+
+  margin-top: 10px;
+
+  text-transform: uppercase;
+
+  color: $Primary;
+
+  font-size: 10px;
+  line-height: 100%;
+}

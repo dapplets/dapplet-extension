@@ -1,0 +1,49 @@
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
+@import '../../assets/styles/null.scss';
+
+.wrapper {
+  position: relative;
+
+  width: 100%;
+  max-width: 421px;
+  padding: 25px 20px 15px 20px;
+
+  border: 1px solid #eaf0f0;
+  border-radius: 5px;
+
+  font-family: Roboto, sans-serif;
+}
+
+.title {
+  position: absolute;
+  z-index: 2;
+  top: -10px;
+  left: 25px;
+
+  display: inline-block;
+
+  padding: 3px 10px;
+
+  color: $ContentBlack;
+  border: 1px solid $WebBG;
+  border-radius: 4px;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  &::before {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: -0.5px;
+
+    width: 101%;
+    height: 100%;
+
+    content: '';
+
+    border-radius: 3px;
+    background-color: $OverlayBG;
+  }
+}
