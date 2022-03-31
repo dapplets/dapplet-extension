@@ -145,6 +145,7 @@ export class App extends React.Component<P, S> {
     const activeOverlay = p.overlayManager.activeOverlay
     // TODO: naming wallets is the notification
     const isNotification = s.selectedMenu === 'Wallets'
+    const isSettings = s.selectedMenu === 'Settings'
     return (
       <>
         <div className={cn(styles.overlay)}>
@@ -182,8 +183,7 @@ export class App extends React.Component<P, S> {
                   <SquaredButton appearance="big" icon={SearchIcon} />
                 </div>
               </header>
-              {/* <Notifications /> */}
-              {/* <SettingsOverlay /> */}
+
               <div
                 className={cn(
                   styles.children,
@@ -192,7 +192,7 @@ export class App extends React.Component<P, S> {
               >
                 {s.isSystemDapplets && <Dapplets />}
                 {isNotification && <Notifications />}
-                {/* <Notifications /> */}
+                {isSettings && <SettingsOverlay />}
                 {/* <SettingsOverlay /> */}
 
                 {overlays.map((x) => (
@@ -202,9 +202,9 @@ export class App extends React.Component<P, S> {
                       // positionAbsolute hidden other content
                       [styles.hideContent]:
                         s.isSystemDapplets || isNotification,
+
                       [styles.overlayActive]:
-                        (!s.isSystemDapplets || !isNotification) &&
-                        x.id === activeOverlayId,
+                        !s.isSystemDapplets && x.id === activeOverlayId,
                     })}
                   >
                     <ContentItem

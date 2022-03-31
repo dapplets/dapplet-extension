@@ -1,32 +1,33 @@
 .wrapper {
-	max-width: 240px;
+  max-width: 240px;
 
-	background-color: #FFF;
-	display: flex;
-    flex-direction: column;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
 }
 
 .subtitle {
-	max-width: 208px;
-	margin-right: auto;
-	margin-left: auto;
+  max-width: 208px;
+  margin-right: auto;
+  margin-left: auto;
 
-	text-align: center;
+  text-align: center;
 }
 
 .loading {
-	position: relative;
+  position: relative;
 
-	overflow: hidden;
+  overflow: hidden;
 
-	width: 143px;
-	height: 143px;
-	margin: 20px auto;
+  width: 143px;
+  height: 143px;
+  margin: 20px auto;
 
-	border-radius: 50%;
+  border-radius: 50%;
 
-	background-image: url("../../assests/loader.svg");
-	background-repeat: no-repeat;
-	background-position: center;
-	background-size: cover;
+  background-image: url('../../assests/loader.svg');
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
