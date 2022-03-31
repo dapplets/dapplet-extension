@@ -14,7 +14,7 @@ import { CloseIcon } from '../CloseIcon'
 export interface NotificationProps {
   label: string
   message: INotification
-  onClear?: (id: string) => void
+  onClear?: Function
   href?: string
   onChange?: () => void
 }

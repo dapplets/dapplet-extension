@@ -11,7 +11,8 @@ import { SettingItem } from '../../components/SettingItem'
 import { Switch } from '../../components/Switch'
 import { Dropdown } from '../../components/Dropdown'
 import { SettingWrapper } from '../../components/SettingWrapper'
-import { Checkbox, checkboxList } from '../../components/Checkbox'
+import { Checkbox } from '../../components/Checkbox'
+// import { CheckboxList } from '../Notifications'
 
 export const NAVIGATION_LIST = [
   { _id: '0', title: 'Main' },
@@ -25,7 +26,18 @@ export const DROPDOWN_LIST = [
   { _id: '2', label: 'Vertion name' },
 ]
 
-export const Settings = () => {
+export const checkboxList = (): React.ReactElement => (
+  <>
+    <Checkbox title="System" isCheckbox={true} style={{ width: '30%' }} />
+    <Checkbox title="Label" isCheckbox={false} style={{ width: '30%' }} />
+    <Checkbox title="Label" isCheckbox={false} style={{ width: '30%' }} />
+    <Checkbox title="Label" isCheckbox={false} style={{ width: '30%' }} />
+    <Checkbox title="Label" isCheckbox={false} style={{ width: '30%' }} />
+    <Checkbox title="Label" isCheckbox={false} style={{ width: '30%' }} />
+  </>
+)
+
+export const SettingsOverlay = () => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.title}>
@@ -49,9 +61,26 @@ export const Settings = () => {
               />
               <SettingItem
                 title="Notifications"
-                component={<Switch checked={true} children={checkboxList()} />}
+                component={<Switch checked={true} />}
+                children={checkboxList()}
                 isVisibleAdditionalSettings={true}
                 isShowAdditionalSettings={true}
+              />
+            </>
+          }
+        />
+
+        <SettingWrapper
+          title="Dapplets settings"
+          children={
+            <>
+              <SettingItem
+                title="Autoactivate dapplets"
+                component={<Switch checked={false} />}
+              />
+              <SettingItem
+                title="Autoactivate dapplets"
+                component={<Switch checked={false} />}
               />
             </>
           }

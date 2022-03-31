@@ -14,6 +14,7 @@ export interface SettingItemProps
   isShowAdditionalSettings?: boolean
   isVisibleAdditionalSettings?: boolean
   onShowAdditionalSettings?: () => void
+  // children?: ReactElement
 }
 
 export const SettingItem: FC<SettingItemProps> = (props: SettingItemProps) => {

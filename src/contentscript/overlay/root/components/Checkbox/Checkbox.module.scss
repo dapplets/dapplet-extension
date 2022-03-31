@@ -61,15 +61,15 @@
     background: $Primary;
 
     &::before {
+      content: '';
       position: absolute;
-      z-index: 1;
+      z-index: 9999;
       top: 50%;
       left: 50%;
 
       width: 8px;
       height: 6px;
 
-      content: '';
       transform: translate(-50%, -50%);
 
       background-image: url('../../assets/icons/checkboxOnMainSettingsNotification.svg');

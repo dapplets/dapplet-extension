@@ -3,6 +3,7 @@ import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import styles from './Dapplets.module.scss'
+
 import { Dapplet } from '../../components/Dapplet'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
 import { ManifestAndDetails } from '../../../../../popup/components/dapplet'

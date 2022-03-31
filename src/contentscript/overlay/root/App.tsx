@@ -23,19 +23,21 @@ import '@fontsource/roboto'
 import '@fontsource/montserrat'
 import { Dapplets } from './pages/Dapplets'
 import { Notifications } from './pages/Notifications'
-import { Settings as SettingsOverlay } from './pages/Settings'
+import { SettingsOverlay } from './pages/Settings'
 
 export type TSelectedSettings =
   | 'Dapplets'
   | 'Wallets'
   | 'Settings'
   | 'Developer'
+// | 'Notifications'
 
 const MENU: IMenu[] = [
   { _id: '0', icon: Home, title: 'Dapplets' },
   { _id: '1', icon: Notification, title: 'Wallets' },
   { _id: '2', icon: Settings, title: 'Settings' },
   { _id: '3', icon: Airplay, title: 'Developer' },
+  // { _id: '4', icon: Notification, title: 'Notifications' },
 ]
 
 interface P {
@@ -62,6 +64,7 @@ export class App extends React.Component<P, S> {
     ),
     isDevMode: false,
     selectedMenu: 'Dapplets',
+
     isSystemDapplets: true,
   }
 
@@ -140,7 +143,8 @@ export class App extends React.Component<P, S> {
     const overlays = this.getOverlays().filter((x) => !x.parent)
     const activeOverlayId = p.overlayManager.activeOverlay?.id
     const activeOverlay = p.overlayManager.activeOverlay
-
+    // TODO: naming wallets is the notification
+    const isNotification = s.selectedMenu === 'Wallets'
     return (
       <>
         <div className={cn(styles.overlay)}>
@@ -178,25 +182,29 @@ export class App extends React.Component<P, S> {
                   <SquaredButton appearance="big" icon={SearchIcon} />
                 </div>
               </header>
-
+              {/* <Notifications /> */}
+              {/* <SettingsOverlay /> */}
               <div
                 className={cn(
                   styles.children,
                   'dapplets-overlay-nav-content-list'
                 )}
               >
-                {/* {s.isSystemDapplets && <Dapplets />} */}
-
+                {s.isSystemDapplets && <Dapplets />}
+                {isNotification && <Notifications />}
                 {/* <Notifications /> */}
-                <SettingsOverlay />
+                {/* <SettingsOverlay /> */}
 
                 {overlays.map((x) => (
                   <div
                     key={x.id}
                     className={cn(styles.noSystemDapplets, {
-                      [styles.hideContent]: s.isSystemDapplets,
+                      // positionAbsolute hidden other content
+                      [styles.hideContent]:
+                        s.isSystemDapplets || isNotification,
                       [styles.overlayActive]:
-                        !s.isSystemDapplets && x.id === activeOverlayId,
+                        (!s.isSystemDapplets || !isNotification) &&
+                        x.id === activeOverlayId,
                     })}
                   >
                     <ContentItem

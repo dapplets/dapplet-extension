@@ -2,17 +2,6 @@ import React, { FC, DetailedHTMLProps, HTMLAttributes } from 'react'
 import cn from 'classnames'
 import styles from './Checkbox.module.scss'
 
-export const checkboxList = (): React.ReactElement => (
-  <>
-    <Checkbox title="System" isCheckbox={true} style={{ width: '30%' }} />
-    <Checkbox title="Label" isCheckbox={false} style={{ width: '30%' }} />
-    <Checkbox title="Label" isCheckbox={false} style={{ width: '30%' }} />
-    <Checkbox title="Label" isCheckbox={false} style={{ width: '30%' }} />
-    <Checkbox title="Label" isCheckbox={false} style={{ width: '30%' }} />
-    <Checkbox title="Label" isCheckbox={false} style={{ width: '30%' }} />
-  </>
-)
-
 export interface CheckboxProps
   extends DetailedHTMLProps<
     HTMLAttributes<HTMLLabelElement>,
