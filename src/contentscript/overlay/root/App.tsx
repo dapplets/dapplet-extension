@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import styles from './components/Overlay/Overlay.module.scss'
 import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
@@ -146,6 +146,7 @@ export class App extends React.Component<P, S> {
     // TODO: naming wallets is the notification
     const isNotification = s.selectedMenu === 'Wallets'
     const isSettings = s.selectedMenu === 'Settings'
+
     return (
       <>
         <div className={cn(styles.overlay)}>

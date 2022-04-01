@@ -64,4 +64,53 @@
     background: $PureWhite;
     border-radius: 10px;
   }
+  .mobileToolbar {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    display: flex;
+    flex-direction: row-reverse;
+
+    width: 16px;
+
+    min-height: calc(100vh - 32px);
+
+    background: $AppBG;
+    .inner {
+      margin-right: 16px;
+    }
+    .tabs {
+      display: none;
+    }
+    .toggleOverlay {
+      top: 48px;
+      left: 32px;
+
+      width: 52px;
+      height: 52px;
+
+      padding: 10px;
+
+      cursor: pointer;
+
+      border: none;
+      border-radius: 10px 0 0 10px;
+      background: transparent;
+
+      background: $AppBG;
+
+      svg path {
+        fill: $Secondary;
+      }
+
+      &:hover svg path {
+        fill: $SecondaryHover;
+      }
+
+      &:active svg path {
+        fill: $SecondaryPressed;
+      }
+      margin: 0px 0px 0px 0px;
+    }
+  }
 }

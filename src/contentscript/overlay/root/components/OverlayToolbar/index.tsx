@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react'
 import styles from './OverlayToolbar.module.scss'
 import { OverlayTab } from '../OverlayTab'
@@ -33,39 +34,22 @@ export interface OverlayToolbarProps
 
 type TToggleOverlay = Pick<OverlayToolbarProps, 'toggle'> & {
   className?: string
-  clN?: () => void
+  getNode?: () => void
 }
 
 const ToggleOverlay = ({
   toggle,
   className,
-  clN,
+  getNode,
 }: // clN,
 
 TToggleOverlay): ReactElement => {
-  const nodeButton = useRef<HTMLInputElement>()
-  // const onClick = (e) => {
-  //   const parent = e.target.parentNode.getBoundingClientRect()
-  //   const element = e.target.getBoundingClientRect()
-
-  //   const x = element.left - parent.left
-  //   const y = element.top - parent.top
-  //   if (x > 1 || y > 1) {
-  //     clN = true
-  //   } else {
-  //     clN = false
-  //   }
-  //   console.log(clN)
-
-  //   console.log(x, y)
-  // }
-
   return (
     <button
       className={cn(styles.toggleOverlay, className)}
       onClick={() => {
         toggle()
-        clN()
+        getNode()
       }}
     >
       <Coolicon />
@@ -94,39 +78,53 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
   const handlerSelectedTab = (id: string) => (): void => onSelectedTab(id)
   const handlerRemoveTab = (id: string) => (): void => onRemoveTab(id)
   const nonSystemTabs = tabs.filter((x) => !x.uri.includes('/popup.html#'))
-  const nodeButton = useRef<HTMLInputElement>()
+  const nodeOverlayToolbar = useRef<HTMLInputElement>()
+  const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
   useEffect(() => {
     if (!activeOverlay) return
     const noSystem = !activeOverlay.uri.includes('/popup.html#')
     if (noSystem) onOverlayTab()
-  }, [activeOverlay, nodeButton])
-  const handleClick = () => {
-    if (nodeButton && nodeButton.current) {
-      nodeButton.current.value = ''
-      const parent = nodeButton.current.getBoundingClientRect()
-      const element = nodeButton.current.getBoundingClientRect()
+  }, [activeOverlay, nodeOverlayToolbar, isNodeOverlayToolbar])
+  const handleClickGetNodeOverlayToolbar = () => {
+    if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
+      nodeOverlayToolbar.current.value = ''
+      // const parent = nodeOverlayToolbar.current.getBoundingClientRect()
+      const element = nodeOverlayToolbar.current.getBoundingClientRect()
 
       const x = element.x
-      const y = element.top - parent.top
+      // const y = element.top - parent.top
 
       console.log(x)
-      if (x < 30) {
-        nodeButton.current.classList.add('mini')
+      if (x > 19 && x < 100) {
+        setNodeOverlayToolbar(true)
+        console.log(isNodeOverlayToolbar)
+        console.log(element)
       } else {
-        nodeButton.current.classList.remove('mini')
+        setNodeOverlayToolbar(false)
+        console.log(isNodeOverlayToolbar)
+        console.log(element)
       }
     }
   }
-  const nodeButtonMemo = useMemo(() => {}, [nodeButton])
+  const nodeButtonMemo = useMemo(() => {}, [
+    nodeOverlayToolbar,
+    isNodeOverlayToolbar,
+  ])
   return (
     <div
-      ref={nodeButton}
-      className={cn(styles.overlayToolbar, className)}
+      ref={nodeOverlayToolbar}
+      className={cn(
+        styles.overlayToolbar,
+        {
+          [styles.mobileToolbar]: isNodeOverlayToolbar,
+        },
+        className
+      )}
       {...anotherProps}
     >
       <div className={styles.inner}>
         <ToggleOverlay
-          clN={handleClick}
+          getNode={handleClickGetNodeOverlayToolbar}
           toggle={toggle}
           className="toggleOverlay"
         />
