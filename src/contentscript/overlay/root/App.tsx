@@ -200,18 +200,18 @@ export class App extends React.Component<P, S> {
                     key={x.id}
                     className={cn(styles.noSystemDapplets, {
                       // positionAbsolute hidden other content
-                      [styles.hideContent]:
-                        s.isSystemDapplets || isNotification,
+                      [styles.hideContent]: s.isSystemDapplets,
+                      // [styles.hideContent]: s.isSystemDapplets,
 
                       [styles.overlayActive]:
                         !s.isSystemDapplets && x.id === activeOverlayId,
                     })}
                   >
-                    <ContentItem
+                    {/* <ContentItem
                       overlay={x}
                       isActive={x.id === activeOverlayId}
                       overlayManager={p.overlayManager}
-                    />
+                    /> */}
                   </div>
                 ))}
               </div>

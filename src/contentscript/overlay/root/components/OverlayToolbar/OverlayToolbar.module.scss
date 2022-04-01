@@ -1,6 +1,6 @@
 @import '../../assets/styles/color.variables.scss';
 
-.toolbar {
+.overlayToolbar {
   display: flex;
   flex-direction: row-reverse;
 
@@ -50,7 +50,7 @@
 }
 
 @media (min-width: 320px) and (max-width: 640px) {
-  .toolbar {
+  .overlayToolbar {
     min-height: 52px;
     flex-direction: row;
     width: 100%;

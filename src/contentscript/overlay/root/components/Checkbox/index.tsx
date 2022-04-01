@@ -11,10 +11,11 @@ export interface CheckboxProps
   isCheckbox: boolean
 }
 export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
-  const { title, isCheckbox, ...anotherProps } = props
+  const { title, isCheckbox = false, onChange, ...anotherProps } = props
 
   return (
     <label
+      onChange={onChange}
       className={cn(styles.checkboxNotification, {
         [styles.activeNotification]: isCheckbox,
       })}

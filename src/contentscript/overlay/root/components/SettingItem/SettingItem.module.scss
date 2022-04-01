@@ -3,7 +3,7 @@
 @import '../../assets/styles/null.scss';
 
 .MainSettingsAuto {
-  max-width: 392px;
+  // max-width: 392px;
   padding: 10px;
 
   border-radius: 10px;
@@ -67,5 +67,11 @@
 
   & > * {
     margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 640px) and (min-width: 320px) {
+  .MainSettingsAuto {
+    max-width: 100%;
   }
 }

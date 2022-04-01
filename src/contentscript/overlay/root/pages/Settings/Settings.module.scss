@@ -3,6 +3,7 @@
 @import '../../assets/styles/null.scss';
 
 .wrapper {
+  padding: 27.5px 0px 0px 0px;
 }
 
 .title {
@@ -13,4 +14,14 @@
 }
 
 .settingMain {
+  padding: 10px 0px 0px 0px;
+}
+@media (max-width: 640px) and (min-width: 320px) {
+  .wrapper {
+    padding: 0px 0px 0px 0px;
+  }
+  .title {
+    justify-content: space-between;
+    padding: 0px 26px 25.5px 26px;
+  }
 }

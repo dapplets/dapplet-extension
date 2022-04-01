@@ -6,12 +6,12 @@
   position: relative;
 
   width: 100%;
-  max-width: 421px;
-  padding: 25px 20px 15px 20px;
+  // max-width: 421px;
+  padding: 25px 17px 15px 17px;
 
-  border: 1px solid #eaf0f0;
+  border: 1px solid $MainGrey;
   border-radius: 5px;
-
+  margin: 0px 0px 15px 0px;
   font-family: Roboto, sans-serif;
 }
 
@@ -26,7 +26,7 @@
   padding: 3px 10px;
 
   color: $ContentBlack;
-  border: 1px solid $WebBG;
+  border: 1px solid $MainGrey;
   border-radius: 4px;
 
   font-size: 10px;
@@ -45,5 +45,14 @@
 
     border-radius: 3px;
     background-color: $OverlayBG;
+  }
+}
+@media (max-width: 640px) and (min-width: 320px) {
+  .wrapper {
+    padding: 25px 10px 15px 10px;
+    max-width: 100%;
+  }
+  .title {
+    left: 10px;
   }
 }

@@ -3,6 +3,8 @@ import React, {
   HTMLAttributes,
   ReactElement,
   useEffect,
+  useMemo,
+  useRef,
 } from 'react'
 import styles from './OverlayToolbar.module.scss'
 import { OverlayTab } from '../OverlayTab'
@@ -31,11 +33,41 @@ export interface OverlayToolbarProps
 
 type TToggleOverlay = Pick<OverlayToolbarProps, 'toggle'> & {
   className?: string
+  clN?: () => void
 }
 
-const ToggleOverlay = ({ toggle, className }: TToggleOverlay): ReactElement => {
+const ToggleOverlay = ({
+  toggle,
+  className,
+  clN,
+}: // clN,
+
+TToggleOverlay): ReactElement => {
+  const nodeButton = useRef<HTMLInputElement>()
+  // const onClick = (e) => {
+  //   const parent = e.target.parentNode.getBoundingClientRect()
+  //   const element = e.target.getBoundingClientRect()
+
+  //   const x = element.left - parent.left
+  //   const y = element.top - parent.top
+  //   if (x > 1 || y > 1) {
+  //     clN = true
+  //   } else {
+  //     clN = false
+  //   }
+  //   console.log(clN)
+
+  //   console.log(x, y)
+  // }
+
   return (
-    <button className={cn(styles.toggleOverlay, className)} onClick={toggle}>
+    <button
+      className={cn(styles.toggleOverlay, className)}
+      onClick={() => {
+        toggle()
+        clN()
+      }}
+    >
       <Coolicon />
     </button>
   )
@@ -62,17 +94,42 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
   const handlerSelectedTab = (id: string) => (): void => onSelectedTab(id)
   const handlerRemoveTab = (id: string) => (): void => onRemoveTab(id)
   const nonSystemTabs = tabs.filter((x) => !x.uri.includes('/popup.html#'))
-
+  const nodeButton = useRef<HTMLInputElement>()
   useEffect(() => {
     if (!activeOverlay) return
     const noSystem = !activeOverlay.uri.includes('/popup.html#')
     if (noSystem) onOverlayTab()
-  }, [activeOverlay])
+  }, [activeOverlay, nodeButton])
+  const handleClick = () => {
+    if (nodeButton && nodeButton.current) {
+      nodeButton.current.value = ''
+      const parent = nodeButton.current.getBoundingClientRect()
+      const element = nodeButton.current.getBoundingClientRect()
 
+      const x = element.x
+      const y = element.top - parent.top
+
+      console.log(x)
+      if (x < 30) {
+        nodeButton.current.classList.add('mini')
+      } else {
+        nodeButton.current.classList.remove('mini')
+      }
+    }
+  }
+  const nodeButtonMemo = useMemo(() => {}, [nodeButton])
   return (
-    <div className={cn(styles.toolbar, className)} {...anotherProps}>
+    <div
+      ref={nodeButton}
+      className={cn(styles.overlayToolbar, className)}
+      {...anotherProps}
+    >
       <div className={styles.inner}>
-        <ToggleOverlay toggle={toggle} className="toggleOverlay" />
+        <ToggleOverlay
+          clN={handleClick}
+          toggle={toggle}
+          className="toggleOverlay"
+        />
 
         <div className={styles.tabs}>
           <OverlayTab

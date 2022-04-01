@@ -89,3 +89,8 @@
   font-size: 10px;
   line-height: 100%;
 }
+@media (max-width: 640px) and (min-width: 320px) {
+  .wrapper {
+    max-width: 98%;
+  }
+}

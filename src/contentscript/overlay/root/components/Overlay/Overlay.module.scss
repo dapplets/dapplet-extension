@@ -100,23 +100,19 @@
 }
 @media (min-width: 320px) and (max-width: 640px) {
   .overlay {
-    // div.dapplets-overlay-frame & {
     min-width: 100%;
     width: 100%;
-    // }
   }
 
   .wrapper {
-    // .dapplets-overlay-frame & {
     width: 100%;
     padding: 17px 20px;
-    // }
   }
   .inner {
     padding: 42px 0px 0px 0px;
   }
   .header {
-    margin-bottom: 45px;
+    margin-bottom: 35px;
   }
   .children {
   }
@@ -125,102 +121,9 @@
     top: 0;
     left: 0;
   }
-
-  .overlay {
-    .dapplets-overlay-frame.dapplets-overlay-collapsed & {
-    }
-  }
-
-  .overlay {
-    .dapplets-overlay-collapsed & {
-      @at-root {
-        // .overlay {
-        //   z-index: 9999 !important;
-        //   height: 100vh !important;
-        //   min-width: 468px !important;
-        //   // width: 320px;
-        //   transition: transform 0.3s ease !important;
-        //   filter: drop-shadow(-4px 8px 10px rgba(0, 0, 0, 0.25)) !important;
-
-        //   .wrapper {
-        //     overflow: auto;
-
-        //     height: 100%;
-        //     padding: 17px 15px;
-
-        //     background: $OverlayBG;
-        //     .toolbar {
-        //       position: absolute;
-        //       top: 0;
-        //       left: 0;
-        //     }
-        //   }
-        // }
-      }
-      @at-root {
-        // .toolbar {
-        //   display: flex !important;
-        //   flex-direction: row-reverse !important;
-
-        //   width: 16px !important;
-
-        //   min-height: calc(100vh - 32px) !important;
-
-        //   background: $AppBG;
-        //   .inner {
-        //     margin-right: 16px !important;
-        //   }
-        // }
-      }
-      @at-root {
-        // .toggleOverlay {
-        //   top: 48px;
-        //   left: 32px;
-
-        //   width: 52px;
-        //   height: 52px;
-
-        //   padding: 10px;
-
-        //   cursor: pointer;
-
-        //   border: none;
-        //   border-radius: 10px 0 0 10px;
-        //   background: transparent;
-
-        //   background: $AppBG;
-        // }
-      }
-      @at-root {
-        // .tab {
-        //   box-sizing: border-box;
-        //   max-width: 52px;
-        //   margin-top: 6px;
-        //   padding: 10px;
-        //   padding-bottom: 15px;
-
-        //   border-radius: 10px 0 0 10px;
-        //   background: #f5f5f5;
-        // }
-      }
-    }
-  }
+  // .mini {
+  //   position: absolute;
+  //   top: 0;
+  //   left: 0;
+  // }
 }
-
-// .overlay {
-//   [class*=' dapplets-overlay-collapsed'] & {
-//     z-index: 9999 !important;
-//     height: 100vh !important;
-//     min-width: 468px !important;
-//     transition: transform 0.3s ease !important;
-//     filter: drop-shadow(-4px 8px 10px rgba(0, 0, 0, 0.25));
-//   }
-
-// body .dapplets-overlay-frame.dapplets-overlay-collapsed .overlay {
-//   z-index: 9999;
-//   height: 100vh;
-//   min-width: 468px;
-//   transition: transform 0.3s ease;
-//   filter: drop-shadow(-4px 8px 10px rgba(0, 0, 0, 0.25));
-// }
-// }
