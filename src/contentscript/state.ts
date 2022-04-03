@@ -4,7 +4,7 @@ import { Connection } from "./connection";
 
 const ALL_CONTEXTS = Symbol("ALL_CONTEXTS");
 
-export type State<T> = GeneralState<T> & { [key: string]: T };
+export type State<T> = GeneralState<T> & { [key: string]: BehaviorSubjectProxy<T> };
 
 interface IState {
     new <T = {}>(
