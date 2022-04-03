@@ -52,6 +52,7 @@
     "react-secure-link": "^3.0.3",
     "react-time-ago": "^7.1.9",
     "resolve-url-loader": "^5.0.0",
+    "rxjs-proxify": "^0.1.1",
     "sass": "^1.49.7",
     "sass-loader": "^12.6.0",
     "semantic-release": "^19.0.2",
