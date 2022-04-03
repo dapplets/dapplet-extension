@@ -87,7 +87,7 @@ export class Connection<T> implements IConnection {
     private listener(f: MsgFilter, h: MsgHandler): Listener
     private listener(f: MsgFilter, h: EventHandler): Listener
     private listener(f: MsgFilter, h: IDappletApi): Listener
-    private listener(filterOrHander?: MsgFilter | EventHandler): Listener {
+    private listener(filterOrHander?: MsgFilter | EventHandler, evtOrMsgOrApiOrAP?: EventHandler | MsgHandler | IDappletApi | AutoProperty[]): Listener {
         let listener: Listener
 
         if (filterOrHander === undefined) {
@@ -96,8 +96,12 @@ export class Connection<T> implements IConnection {
             listener = { f: undefined, h: filterOrHander as EventHandler, p: [] }
         } else if (typeof filterOrHander === 'object') { // is an Promise
             listener = { f: filterOrHander as Promise<string>, h: undefined, p: [] }
+        } else if (evtOrMsgOrApiOrAP instanceof Array) {
+            listener = { f: filterOrHander, h: undefined, p: evtOrMsgOrApiOrAP || [] }
+        } else if (typeof evtOrMsgOrApiOrAP == 'function') {
+            listener = { f: filterOrHander, h: { [ANY_EVENT]: evtOrMsgOrApiOrAP }, p: [] }
         } else {
-            // listener = { f: filterOrHander, h: evtOrMsgOrApiOrAP!, p: [] }
+            listener = { f: filterOrHander, h: evtOrMsgOrApiOrAP!, p: [] }
         }
 
         this._listeners.add(listener)
