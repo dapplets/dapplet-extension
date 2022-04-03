@@ -142,7 +142,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
             title="System"
           />
 
-          <>
+          <div className={styles.TabList}>
             {nonSystemTabs.length > 0 &&
               nonSystemTabs.map(({ id, title }) => {
                 const active = id === idActiveTab
@@ -164,7 +164,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
                   />
                 )
               })}
-          </>
+          </div>
         </div>
       </div>
     </div>
