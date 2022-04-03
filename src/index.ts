@@ -1,6 +1,6 @@
 import Core from './contentscript/core';
 import { IContentAdapter, IFeature, IResolver, ISharedState } from './contentscript/types';
-import { IConnection, AutoProperty, AutoPropertyConf, Listener } from './contentscript/connection';
+import { IConnection, Listener } from './contentscript/connection';
 
 declare global {
     export function Injectable(constructor: Function);
@@ -13,8 +13,6 @@ export {
     IFeature,
     IResolver,
     IConnection,
-    AutoProperty,
-    AutoPropertyConf,
     Listener,
     ISharedState
 }

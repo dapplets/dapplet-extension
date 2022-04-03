@@ -26,7 +26,7 @@ async function _sendWalletConnectTx(app: string, sowaIdOrRpcMethod, sowaMetadata
     }
 }
 
-export async function createWalletConnection<M, T>(app: string, cfg: { network: string }, eventDef?: EventDef<any>) {
+export async function createWalletConnection<T>(app: string, cfg: { network: string }, eventDef?: EventDef<any>) {
     const transport = {
         _txCount: 0,
         _handler: null,
@@ -43,7 +43,7 @@ export async function createWalletConnection<M, T>(app: string, cfg: { network: 
         }
     }
 
-    const conn = Connection.create<M, T>(transport, eventDef);
+    const conn = new Connection<T>(transport, eventDef);
     return conn;
 }
 
