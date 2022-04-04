@@ -12,6 +12,7 @@ import { rcompare } from 'semver'
 import {
   CONTEXT_ID_WILDCARD,
   ModuleTypes,
+  DAPPLETS_STORE_URL
 } from '../../../../../common/constants'
 
 export type Module = ManifestDTO & {
@@ -243,6 +244,11 @@ export const Dapplets = () => {
     window.close()
   }
 
+  const onOpenStore = async (f: ManifestAndDetails) => {
+    const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f.name}`;
+    window.open(url, '_blank');
+  }
+
   return (
     <>
       <div className={styles.wrapper}>
@@ -269,6 +275,7 @@ export const Dapplets = () => {
               onOpenDappletAction={onOpenDappletAction}
               onRemoveDapplet={onRemoveDapplet}
               onDeployDapplet={onDeployDapplet}
+              onOpenStore={onOpenStore}
             />
           )
         })}

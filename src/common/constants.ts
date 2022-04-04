@@ -25,3 +25,5 @@ export type WalletInfo = {
 export const DEFAULT_BRANCH_NAME = "default";
 
 export const CONTEXT_ID_WILDCARD = "*";
+
+export const DAPPLETS_STORE_URL = "https://stoic-bartik-42e9f3.netlify.app";
