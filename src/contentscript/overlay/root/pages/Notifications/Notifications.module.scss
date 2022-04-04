@@ -86,6 +86,8 @@
     &::-webkit-scrollbar {
       width: 0;
     }
+    max-height: 100vh;
+    flex: 1 1 auto;
     padding: 0px 0px 0px 0px;
   }
   .notificationClose {
@@ -93,6 +95,7 @@
     padding: 10px 0px 0px 0px;
   }
   .notification {
-    max-height: 65vh;
+    flex: 1 1 auto;
+    max-height: 70vh;
   }
 }

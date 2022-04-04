@@ -39,16 +39,18 @@ export const Notifications = () => {
   }, [])
 
   const onRemoveEvent = async (f) => {
-    const { removeDapplet, getCurrentContextIds } = await initBGFunctions(
-      browser
-    )
+    const { deleteEvent, getCurrentContextIds } = await initBGFunctions(browser)
+    // const { deleteEvents } = deleteEvent
     const contextIds = await getCurrentContextIds(null)
-    await removeDapplet(f.id, contextIds)
+    // const events: Event[] = await deleteEvent(contextIds)
+
+    await deleteEvent(f.id, contextIds)
     const d = event.filter((x) => x.id !== f.id)
     setEvent(d)
   }
   const onRemoveEventsAll = async () => {
-    setEvent([])
+    const { deleteAllEvents } = await initBGFunctions(browser)
+    deleteAllEvents(event)
   }
 
   return (
