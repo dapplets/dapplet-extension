@@ -36,19 +36,22 @@ export const Notifications = () => {
     return () => {
       _isMounted = false
     }
-  }, [])
+  }, [event])
 
   const onRemoveEvent = async (f) => {
-    const { removeDapplet, getCurrentContextIds } = await initBGFunctions(
-      browser
-    )
+    const { deleteEvent, getCurrentContextIds } = await initBGFunctions(browser)
+    // const { deleteEvents } = deleteEvent
     const contextIds = await getCurrentContextIds(null)
-    await removeDapplet(f.id, contextIds)
+    // const events: Event[] = await deleteEvent(contextIds)
+
+    await deleteEvent(f.id, contextIds)
     const d = event.filter((x) => x.id !== f.id)
     setEvent(d)
   }
-  const onRemoveEventsAll = async () => {
-    setEvent([])
+  const onRemoveEventsAll = async (f) => {
+    const { deleteAllEvents } = await initBGFunctions(browser)
+    await deleteAllEvents(f)
+    setEvent(f)
   }
 
   return (
@@ -76,7 +79,7 @@ export const Notifications = () => {
 
           <div className={styles.notificationClose}>
             <CloseIcon
-              onClick={onRemoveEventsAll}
+              onClick={() => onRemoveEventsAll(event)}
               appearance="big"
               color="red"
             />

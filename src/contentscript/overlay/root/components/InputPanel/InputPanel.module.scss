@@ -1,0 +1,52 @@
+@import '../../assets/styles/null.scss';
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
+
+.inputPanel {
+  display: flex;
+  justify-content: space-between;
+
+  width: 100%;
+}
+
+.inputInfo {
+  width: 100%;
+  height: 31px;
+  padding: 5px 13px;
+
+  color: #919191;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
+  background: $AppBG;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 149%;
+}
+.inputInfo::placeholder {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+
+  color: $MainGrey;
+}
+
+.inputButton {
+  width: 49px;
+  height: 32px;
+  margin-left: 5px;
+
+  text-transform: lowercase;
+
+  color: $PureWhite;
+  border-radius: 4px;
+  background: $Primary;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+}

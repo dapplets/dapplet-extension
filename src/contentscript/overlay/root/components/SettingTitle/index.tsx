@@ -8,14 +8,22 @@ export interface SettingTitleProps {
   style?: CSSProperties
   found?: number | null
   className?: string
+  onClick?: any
 }
 
 export const SettingTitle = (props: SettingTitleProps): ReactElement => {
-  const { title, isActive = false, found = null, style, className } = props
+  const {
+    title,
+    isActive = false,
+    found = null,
+    style,
+    className,
+    onClick,
+  } = props
   const isVisibleFound = found && found > 0
 
   return (
-    <div className={cn(styles.wrapper, className)}>
+    <div className={cn(styles.wrapper, className)} onClick={onClick}>
       <h4
         className={cn(styles.title, { [styles.isActive]: isActive })}
         style={style}

@@ -3,6 +3,7 @@
 @import '../../assets/styles/null.scss';
 .wrapper {
   display: inline-block;
+  margin: 0px 22.75px;
 }
 
 .title {
@@ -13,7 +14,7 @@
 
   cursor: pointer;
 
-  color: $StrokeColor;
+  color: $MainGrey;
 
   font-family: Roboto, sans-serif;
 
@@ -34,7 +35,7 @@
 
     border-radius: 5px;
 
-    background-color: $StrokeColor;
+    background-color: $MainGrey;
   }
 }
 

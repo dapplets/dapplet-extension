@@ -18,19 +18,19 @@
 .title {
   position: absolute;
   z-index: 2;
-  top: -10px;
+  top: -12px;
   left: 25px;
 
   display: inline-block;
 
-  padding: 3px 10px;
+  padding: 0px 10px;
 
   color: $ContentBlack;
   border: 1px solid $MainGrey;
   border-radius: 4px;
 
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 500;
 
   &::before {
     position: absolute;
@@ -54,5 +54,7 @@
   }
   .title {
     left: 10px;
+
+    top: -12px;
   }
 }

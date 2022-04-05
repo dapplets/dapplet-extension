@@ -106,10 +106,12 @@
 
   .wrapper {
     width: 100%;
-    padding: 17px 20px;
   }
   .inner {
     padding: 42px 0px 0px 0px;
+    max-width: 100%;
+    flex: 1 1 auto;
+    // padding: 17px 20px;
   }
   .header {
     margin-bottom: 35px;
