@@ -21,6 +21,12 @@
   font-size: 14px;
   font-weight: 600;
   line-height: 16px;
+  &:hover {
+    color: $ContentBlack;
+  }
+  &:active {
+    color: $MainBlack;
+  }
 
   &::before {
     position: absolute;
@@ -61,6 +67,13 @@
 
   &::before {
     background-color: $Primary;
+  }
+
+  &:hover {
+    color: $PrimaryHover;
+  }
+  &:active {
+    color: $PrimaryPressed;
   }
 
   .found {

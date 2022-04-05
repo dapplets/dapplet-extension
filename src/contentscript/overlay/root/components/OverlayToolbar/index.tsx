@@ -95,7 +95,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
       // const y = element.top - parent.top
 
       console.log(x)
-      if (x > 19 && x < 100) {
+      if (x > 10 && x < 100) {
         setNodeOverlayToolbar(true)
         console.log(isNodeOverlayToolbar)
         console.log(element)

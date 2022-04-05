@@ -11,10 +11,19 @@ export interface InputPanelProps
   onSubmit?: () => void
   value?: string
   placeholder?: string
+  error?: Boolean
 }
 
 export const InputPanel: FC<InputPanelProps> = (props) => {
-  const { value, onChange, onSubmit, placeholder, ...anotherProps } = props
+  const {
+    value,
+    onChange,
+    onSubmit,
+    placeholder,
+    error = false,
+    // onClick,
+    ...anotherProps
+  } = props
   const handlerSubmit = (event: ChangeEvent<HTMLFormElement>): void => {
     event.preventDefault()
     onSubmit && onSubmit()
@@ -24,7 +33,7 @@ export const InputPanel: FC<InputPanelProps> = (props) => {
     <form className={cn(styles.inputPanel)} onSubmit={handlerSubmit}>
       <input
         value={value}
-        className={cn(styles.inputInfo)}
+        className={cn(styles.inputInfo, error && styles.error)}
         onChange={onChange}
         type="text"
         placeholder={placeholder}

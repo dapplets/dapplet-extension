@@ -9,6 +9,11 @@ import React, {
 } from 'react'
 import cn from 'classnames'
 import styles from './Settings.module.scss'
+import {
+  isValidHttp,
+  isValidUrl,
+  isValidPostageStampId,
+} from '../../../../../popup/helpers'
 import { SettingTitle } from '../../components/SettingTitle'
 import { SettingItem } from '../../components/SettingItem'
 import { Switch } from '../../components/Switch'
@@ -21,6 +26,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { useToggle } from '../../hooks/useToggle'
 import { trimUriPrefix } from 'skynet-js/dist/cjs/utils/string'
+import { useMemo } from 'react'
 
 enum SettingsTabs {
   MAIN = 0,
@@ -99,11 +105,7 @@ export const NAVIGATION_LIST = [
   { _id: '2', title: 'Developer' },
 ]
 
-export const DROPDOWN_LIST = [
-  { _id: '0', label: 'Vertion name' },
-  { _id: '1', label: 'Vertion name' },
-  { _id: '2', label: 'Vertion name' },
-]
+export const DROPDOWN_LIST = [{ _id: '0', label: 'Custom' }]
 export const CHECKBOX_LIST = [
   {
     id: 0,
@@ -153,119 +155,107 @@ export const SettingsOverlay = () => {
   const [isNotificationActive, onNotificationActive] = useToggle(false)
   const [isUpdateAvailable, onUpdateAvailable] = useState(false)
   const [activeTab, setActiveTab] = useState(SettingsTabs.ADVANCED)
+
   const [providerInput, setProviderInput] = useState('')
   const [providerEdited, setProviderEdited] = useState(false)
+  const [providerInputError, setProviderInputError] = useState(null)
+
+  const [swarmGatewayInput, setSwarmGatewayInput] = useState('')
+  const [swarmGatewayInputError, setSwarmGatewayInputError] = useState(null)
+  const [swarmGatewayEdited, setSwarmGatewayEdited] = useState(false)
+
+  const [swarmPostageStampIdInput, setSwarmPostageStampIdInput] = useState('')
+  const [swarmPostageStampIdInputError, setSwarmPostageStampIdInputError] =
+    useState(null)
+  const [swarmPostageStampIdInputEdited, setSwarmPostageStampIdInputEdited] =
+    useState(false)
+
+  const [dynamicAdapterInput, setDynamicAdapterInput] = useState('')
+  const [dynamicAdapterInputError, setDynamicAdapterInputError] = useState(null)
+  const [dynamicAdapterInputEdited, setDynamicAdapterInputEdited] =
+    useState(false)
+
   useEffect(() => {
     _isMounted = true
-    const loadProvider = async () => {
-      const { getEthereumProvider } = await initBGFunctions(browser)
-      const provider = await getEthereumProvider()
-      setProviderInput(provider)
-    }
-    const setProvider = async (provider: string) => {
-      try {
-        // this.setState({ providerLoading: true });
-        const { setEthereumProvider } = await initBGFunctions(browser)
-        await setEthereumProvider(provider)
-        // this.loadProvider();
-        // this.setState({ providerLoading: false, providerEdited: false });
-        setProviderEdited(false)
-      } catch (err) {
-        setProviderEdited(false)
-        // this.setState({
-        //     // providerLoading: false,
 
-        //     providerInputError: err.message
-        // });
-      }
-    }
     loadProvider()
-    // setProvider()?
+    loadSwarmGateway()
+    loadSwarmPostageStampId()
+    loadDynamicAdapter()
     return () => {
       _isMounted = false
     }
   }, [])
-  // useEffect(() => {
-  //   _isMounted = true
-  //   // const init = async () => {
+  const loadProvider = async () => {
+    const { getEthereumProvider } = await initBGFunctions(browser)
+    const provider = await getEthereumProvider()
+    setProviderInput(provider)
+  }
+  const setProvider = async (provider: string) => {
+    try {
+      const { setEthereumProvider } = await initBGFunctions(browser)
+      await setEthereumProvider(provider)
 
-  //   //   console.log(isUpdateAvailable)
-  //   // }
-  //   // init()
-  //   checkUpdates()
-  //   return () => {
-  //     _isMounted = false
-  //   }
-  // }, [])
+      setProviderEdited(false)
+    } catch (err) {
+      setProviderEdited(false)
+      setProviderInputError(err.message)
+    }
+  }
 
-  // const checkUpdates = async () => {
-  //   const { getNewExtensionVersion } = await initBGFunctions(browser)
-  //   const isUpdateAvailable = !!(await getNewExtensionVersion())
-  //   onUpdateAvailable(isUpdateAvailable)
-  // }
+  const loadSwarmGateway = async () => {
+    const { getSwarmGateway } = await initBGFunctions(browser)
+    const gateway = await getSwarmGateway()
+    setSwarmGatewayInput(gateway)
+  }
 
-  //   async setProvider(provider: string) {
-  //     try {
-  //         this.setState({ providerLoading: true });
-  //         const { setEthereumProvider } = await initBGFunctions(browser);
-  //         await setEthereumProvider(provider);
-  //         this.loadProvider();
-  //         this.setState({ providerLoading: false, providerEdited: false });
-  //     } catch (err) {
-  //         this.setState({
-  //             providerLoading: false,
-  //             providerEdited: false,
-  //             providerInputError: err.message
-  //         });
-  //     }
-  // }
+  const setSwarmGateway = async (gateway: string) => {
+    try {
+      const { setSwarmGateway } = await initBGFunctions(browser)
+      await setSwarmGateway(gateway)
 
-  // async _openEtherscan(address: string) {
-  //   if (typeOfUri(address) === UriTypes.Ens) {
-  //       const { resolveName } = await initBGFunctions(browser);
-  //       const ethAddress = await resolveName(address);
-  //       window.open(`https://goerli.etherscan.io/address/${ethAddress}`, '_blank');
-  //   } else if (typeOfUri(address) === UriTypes.Ethereum) {
-  //       window.open(`https://goerli.etherscan.io/address/${address}`, '_blank');
-  //   } else if (typeOfUri(address) === UriTypes.Near) {
-  //       window.open(`https://explorer.testnet.near.org/accounts/${address}`, '_blank');
-  //   }
-  // }
+      setSwarmGatewayEdited(false)
+    } catch (err) {
+      setSwarmGatewayEdited(false)
+      setSwarmGatewayInputError(err.message)
+    }
+  }
 
-  // async loadProvider() {
-  //   const { getEthereumProvider } = await initBGFunctions(browser);
-  //   const provider = await getEthereumProvider();
-  //   this.setState({ providerInput: provider });
-  // }
+  const loadSwarmPostageStampId = async () => {
+    const { getSwarmPostageStampId } = await initBGFunctions(browser)
+    const id = await getSwarmPostageStampId()
+    setSwarmPostageStampIdInput(id)
+  }
 
-  // async loadAll() {
-  //   this.setState({ isLoading: true });
-  //   await Promise.all([
-  //       this.loadProfiles(),
-  //       this.loadRegistries(),
-  //       this.loadDevMode(),
-  //       this.loadTrustedUsers(),
-  //       this.loadAutoBackup(),
-  //       this.loadErrorReporting(),
-  //       this.loadPopupInOverlay(),
-  //       this.checkUpdates(),
-  //       this.loadProvider(),
-  //       this.loadSwarmGateway(),
-  //       this.loadSwarmPostageStampId(),
-  //       this.loadIpfsGateway(),
-  //       this.loadSiaPortal(),
-  //       this.loadIdentityContract(),
-  //       this.loadUserAgentId(),
-  //       this.loadUserAgentName(),
-  //       this.loadDynamicAdapter(),
-  //       this.loadPreferedOverlayStorage()
-  //   ]);
-  //   this.setState({ isLoading: false });
-  // }
+  const setSwarmPostageStampId = async (id: string) => {
+    try {
+      const { setSwarmPostageStampId } = await initBGFunctions(browser)
+      await setSwarmPostageStampId(id)
+      setSwarmPostageStampIdInputEdited(false)
+    } catch (err) {
+      setSwarmPostageStampIdInputEdited(false)
+      setSwarmPostageStampIdInputError(err.message)
+    }
+  }
 
-  // async componentDidMount() {
-  //   await this.loadAll();
-  // }
+  const loadDynamicAdapter = async () => {
+    const { getDynamicAdapter } = await initBGFunctions(browser)
+    const dynamicAdapterInput = await getDynamicAdapter()
+
+    setDynamicAdapterInput(dynamicAdapterInput)
+  }
+
+  const setDynamicAdapter = async (dynamicAdapter: string) => {
+    const { setDynamicAdapter } = await initBGFunctions(browser)
+    await setDynamicAdapter(dynamicAdapter)
+
+    setDynamicAdapterInputEdited(false)
+  }
+
+  setProvider(providerInput)
+  setSwarmGateway(swarmGatewayInput)
+  setSwarmPostageStampId(swarmPostageStampIdInput)
+  setDynamicAdapter(dynamicAdapterInput)
 
   return (
     <div className={styles.wrapper}>
@@ -345,25 +335,8 @@ export const SettingsOverlay = () => {
         )}
         {activeTab === SettingsTabs.ADVANCED && (
           <>
-            {' '}
-            <SettingWrapper
-              title="Profile"
-              // children={
-
-              // }
-            />
-            <SettingWrapper
-              title="Version"
-              // children={
-
-              // }
-            />
-            <SettingWrapper
-              title="Trusted Users"
-              // children={
-
-              // }
-            />
+            <SettingWrapper title="Version" />
+            <SettingWrapper title="Trusted Users" />
             <SettingWrapper
               title="Core settings"
               children={
@@ -384,7 +357,16 @@ export const SettingsOverlay = () => {
                     title="Dynamic Adapter"
                     component={<Dropdown list={DROPDOWN_LIST} />}
                     children={
-                      <InputPanel placeholder="dynamic-adapter.dapplet-base.eth#default@..." />
+                      <InputPanel
+                        value={dynamicAdapterInput}
+                        error={!!dynamicAdapterInputError}
+                        onChange={(e) => {
+                          setDynamicAdapter(e.target.value)
+                          setDynamicAdapterInputError(null)
+                          setDynamicAdapterInputEdited(true)
+                        }}
+                        placeholder="dynamic-adapter.dapplet-base.eth#default@..."
+                      />
                     }
                   />
                   <SettingItem
@@ -405,14 +387,35 @@ export const SettingsOverlay = () => {
                     title="Swarm Gateway"
                     component={<Dropdown list={DROPDOWN_LIST} />}
                     children={
-                      <InputPanel placeholder="http:\\bee.dapplets.org\" />
+                      <InputPanel
+                        value={swarmGatewayInput}
+                        error={!isValidHttp(swarmGatewayInput)}
+                        onChange={(e) => {
+                          setSwarmGatewayInput(e.target.value)
+                          setSwarmGatewayInputError(null)
+                          setSwarmGatewayEdited(true)
+                        }}
+                        placeholder="http:\\bee.dapplets.org\"
+                      />
                     }
                   />
                   <SettingItem
                     title="Swarm Postage Stamp ID"
                     component={<Dropdown list={DROPDOWN_LIST} />}
                     children={
-                      <InputPanel placeholder="Swarm Postage Stamp ID" />
+                      <InputPanel
+                        value={swarmPostageStampIdInput}
+                        error={
+                          !!swarmPostageStampIdInputError ||
+                          !isValidPostageStampId(swarmPostageStampIdInput)
+                        }
+                        onChange={(e) => {
+                          setSwarmPostageStampIdInput(e.target.value)
+                          setSwarmPostageStampIdInputError(null)
+                          setSwarmPostageStampIdInputEdited(true)
+                        }}
+                        placeholder="Swarm Postage Stamp ID"
+                      />
                     }
                   />
                 </>
@@ -429,7 +432,9 @@ export const SettingsOverlay = () => {
                       onChange={(e) => {
                         setProviderInput(e.target.value)
                         setProviderEdited(true)
+                        setProviderInputError(null)
                       }}
+                      error={!isValidHttp(providerInput)}
                       value={providerInput}
                       placeholder="eda881d858ae4a25b2dfbbd0b4629992"
                     />

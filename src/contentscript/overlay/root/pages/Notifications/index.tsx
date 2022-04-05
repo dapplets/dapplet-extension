@@ -57,7 +57,7 @@ export const Notifications = () => {
   return (
     <div className={styles.wrapper}>
       {(event.length && (
-        <>
+        <div className={styles.block}>
           <div className={styles.notification}>
             {event.length > 0 &&
               event.map((x) => {
@@ -85,7 +85,7 @@ export const Notifications = () => {
             />
             <span className={styles.clearAll}>clear all</span>
           </div>
-        </>
+        </div>
       )) ||
         ''}
 
