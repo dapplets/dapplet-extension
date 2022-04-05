@@ -3,6 +3,7 @@ import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import styles from './Dapplets.module.scss'
+import * as EventBus from "../../../../../common/global-event-bus"
 
 import { Dapplet } from '../../components/Dapplet'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
@@ -33,16 +34,28 @@ export const Dapplets = () => {
   useEffect(() => {
     _isMounted = true
     const init = async () => {
-      const { getFeaturesByHostnames, getCurrentContextIds } =
+      const { getFeaturesByHostnames, getCurrentContextIds, getThisTab } =
         await initBGFunctions(browser)
-      const ids = await getCurrentContextIds(null)
+      const currentTab = await getThisTab()
+      const ids = await getCurrentContextIds(currentTab)
       const d = await getFeaturesByHostnames(ids)
       setDapplets(d)
     }
     init()
 
+    EventBus.on('mydapplets_changed', init)
+    EventBus.on('context_started', init)
+    EventBus.on('context_finished', init)
+    EventBus.on('dapplet_activated', init)
+    EventBus.on('dapplet_deactivated', init)
+
     return () => {
       _isMounted = false
+      EventBus.off('mydapplets_changed', init)
+      EventBus.off('context_started', init)
+      EventBus.off('context_finished', init)
+      EventBus.off('dapplet_activated', init)
+      EventBus.off('dapplet_deactivated', init)
     }
   }, [])
 
@@ -81,6 +94,7 @@ export const Dapplets = () => {
       getVersions,
       activateFeature,
       deactivateFeature,
+      getThisTab
     } = await initBGFunctions(browser)
 
     _updateFeatureState(name, { isActive, isLoading: true })
@@ -121,7 +135,8 @@ export const Dapplets = () => {
         )
       }
 
-      await _refreshDataByContext(await getCurrentContextIds(null))
+      const currentTab = await getThisTab()
+      await _refreshDataByContext(await getCurrentContextIds(currentTab))
     } catch (err) {
       _updateFeatureState(name, { isActive: !isActive, error: err.message })
     }
@@ -225,18 +240,16 @@ export const Dapplets = () => {
     }
   }
 
-  const onRemoveDapplet = async (f: ManifestAndDetails) => {
-    const { removeDapplet, getCurrentContextIds } = await initBGFunctions(
+  const onRemoveMyDapplet = async (f: ManifestAndDetails) => {
+    const { removeMyDapplet } = await initBGFunctions(
       browser
     )
-    const contextIds = await getCurrentContextIds(null)
-    await removeDapplet(f.name, contextIds)
+    await removeMyDapplet(f.sourceRegistry.url, f.name)
     const d = dapplets.filter((x) => x.name !== f.name)
     setDapplets(d)
   }
 
   const onDeployDapplet = async (f: ManifestAndDetails) => {
-    console.log('f', f)
     const { openDeployOverlay } = await initBGFunctions(browser)
 
     // TODO: activeVersion or lastVersion
@@ -273,7 +286,7 @@ export const Dapplets = () => {
               onSwitchChange={onSwitchChange}
               onSettingsModule={onOpenSettingsModule}
               onOpenDappletAction={onOpenDappletAction}
-              onRemoveDapplet={onRemoveDapplet}
+              onRemoveMyDapplet={dapplet.isMyDapplet ? onRemoveMyDapplet : undefined}
               onDeployDapplet={onDeployDapplet}
               onOpenStore={onOpenStore}
             />

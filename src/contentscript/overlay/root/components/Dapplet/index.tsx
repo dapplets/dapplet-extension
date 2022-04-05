@@ -31,7 +31,7 @@ export interface DappletProps
   onSwitchChange: Function
   onSettingsModule: Function
   onOpenDappletAction: Function
-  onRemoveDapplet: Function
+  onRemoveMyDapplet?: Function
   onDeployDapplet: Function
   onOpenStore: Function
 }
@@ -44,7 +44,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     onSwitchChange,
     onSettingsModule,
     onOpenDappletAction,
-    onRemoveDapplet,
+    onRemoveMyDapplet: onRemoveDapplet,
     onDeployDapplet,
     onOpenStore,
     ...anotherProps
@@ -178,7 +178,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
           </div>
 
           <div className={cn(styles.lastButton)}>
-            {!isUnderConstruction && (
+            {onRemoveDapplet && (
               <SquaredButton
                 appearance="smail"
                 icon={DeleteIcon}
