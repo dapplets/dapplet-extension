@@ -124,7 +124,7 @@ export default class FeatureService {
         if (myDappletsToAdd.length > 0) {
             const registryUrls = Array.from(new Set(myDappletsToAdd.map(x => x.registryUrl)));
             for (const registryUrl of registryUrls) {
-                const owners = Array.from(new Set(myDappletsToAdd.filter(x => x.registryUrl === registryUrl).map(x => x.author)));
+                const owners = Array.from(new Set([...users.map(x => x.account), ...myDappletsToAdd.filter(x => x.registryUrl === registryUrl).map(x => x.author)]));
                 const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl);
                 const moduleInfosByContextId = await registry.getModuleInfo(contextIds, owners);
 
