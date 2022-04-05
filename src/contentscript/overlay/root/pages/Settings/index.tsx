@@ -28,6 +28,71 @@ enum SettingsTabs {
   DEVELOPER = 2,
 }
 
+// interface ISettingsState {
+//   isLoading: boolean;
+//   connected: boolean;
+
+//   profiles: string[];
+//   currentProfile: string;
+
+//   registries: { url: string, isDev: boolean, isAvailable: boolean, error: string, isEnabled: boolean }[];
+//   registryInput: string;
+//   registryInputError: string;
+
+//   trustedUsers: { account: string }[];
+//   trustedUserInput: string;
+//   trustedUserInputError: string;
+
+//   providerInput: string;
+//   providerInputError: string;
+//   providerLoading: boolean;
+//   providerEdited: boolean;
+
+//   swarmGatewayInput: string;
+//   swarmGatewayInputError: string;
+//   swarmGatewayLoading: boolean;
+//   swarmGatewayEdited: boolean;
+
+//   swarmPostageStampIdInput: string;
+//   swarmPostageStampIdInputError: string;
+//   swarmPostageStampIdLoading: boolean;
+//   swarmPostageStampIdEdited: boolean;
+
+//   ipfsGatewayInput: string;
+//   ipfsGatewayInputError: string;
+//   ipfsGatewayLoading: boolean;
+//   ipfsGatewayEdited: boolean;
+
+//   siaPortalInput: string;
+//   siaPortalInputError: string;
+//   siaPortalLoading: boolean;
+//   siaPortalEdited: boolean;
+
+//   identityInput: string;
+//   identityInputError: string;
+//   identityLoading: boolean;
+//   identityEdited: boolean;
+
+//   devMode: boolean;
+//   autoBackup: boolean;
+//   isUpdateAvailable: boolean;
+//   popupInOverlay: boolean;
+
+//   errorReporting: boolean;
+//   userAgentId: string;
+//   userAgentNameInput: string;
+//   userAgentNameInputError: string;
+//   userAgentNameLoading: boolean;
+//   userAgentNameEdited: boolean;
+
+//   dynamicAdapterInput: string;
+//   dynamicAdapterInputError: string;
+//   dynamicAdapterLoading: boolean;
+//   dynamicAdapterEdited: boolean;
+
+//   preferedOverlayStorage: string;
+// }
+
 export const NAVIGATION_LIST = [
   { _id: '0', title: 'Main' },
   { _id: '1', title: 'Advanced' },
@@ -88,7 +153,38 @@ export const SettingsOverlay = () => {
   const [isNotificationActive, onNotificationActive] = useToggle(false)
   const [isUpdateAvailable, onUpdateAvailable] = useState(false)
   const [activeTab, setActiveTab] = useState(SettingsTabs.ADVANCED)
+  const [providerInput, setProviderInput] = useState('')
+  const [providerEdited, setProviderEdited] = useState(false)
+  useEffect(() => {
+    _isMounted = true
+    const loadProvider = async () => {
+      const { getEthereumProvider } = await initBGFunctions(browser)
+      const provider = await getEthereumProvider()
+      setProviderInput(provider)
+    }
+    const setProvider = async (provider: string) => {
+      try {
+        // this.setState({ providerLoading: true });
+        const { setEthereumProvider } = await initBGFunctions(browser)
+        await setEthereumProvider(provider)
+        // this.loadProvider();
+        // this.setState({ providerLoading: false, providerEdited: false });
+        setProviderEdited(false)
+      } catch (err) {
+        setProviderEdited(false)
+        // this.setState({
+        //     // providerLoading: false,
 
+        //     providerInputError: err.message
+        // });
+      }
+    }
+    loadProvider()
+    // setProvider()?
+    return () => {
+      _isMounted = false
+    }
+  }, [])
   // useEffect(() => {
   //   _isMounted = true
   //   // const init = async () => {
@@ -107,10 +203,69 @@ export const SettingsOverlay = () => {
   //   const isUpdateAvailable = !!(await getNewExtensionVersion())
   //   onUpdateAvailable(isUpdateAvailable)
   // }
-  console.log(activeTab)
-  const handleActiveTab = () => {
-    setActiveTab(SettingsTabs.MAIN)
-  }
+
+  //   async setProvider(provider: string) {
+  //     try {
+  //         this.setState({ providerLoading: true });
+  //         const { setEthereumProvider } = await initBGFunctions(browser);
+  //         await setEthereumProvider(provider);
+  //         this.loadProvider();
+  //         this.setState({ providerLoading: false, providerEdited: false });
+  //     } catch (err) {
+  //         this.setState({
+  //             providerLoading: false,
+  //             providerEdited: false,
+  //             providerInputError: err.message
+  //         });
+  //     }
+  // }
+
+  // async _openEtherscan(address: string) {
+  //   if (typeOfUri(address) === UriTypes.Ens) {
+  //       const { resolveName } = await initBGFunctions(browser);
+  //       const ethAddress = await resolveName(address);
+  //       window.open(`https://goerli.etherscan.io/address/${ethAddress}`, '_blank');
+  //   } else if (typeOfUri(address) === UriTypes.Ethereum) {
+  //       window.open(`https://goerli.etherscan.io/address/${address}`, '_blank');
+  //   } else if (typeOfUri(address) === UriTypes.Near) {
+  //       window.open(`https://explorer.testnet.near.org/accounts/${address}`, '_blank');
+  //   }
+  // }
+
+  // async loadProvider() {
+  //   const { getEthereumProvider } = await initBGFunctions(browser);
+  //   const provider = await getEthereumProvider();
+  //   this.setState({ providerInput: provider });
+  // }
+
+  // async loadAll() {
+  //   this.setState({ isLoading: true });
+  //   await Promise.all([
+  //       this.loadProfiles(),
+  //       this.loadRegistries(),
+  //       this.loadDevMode(),
+  //       this.loadTrustedUsers(),
+  //       this.loadAutoBackup(),
+  //       this.loadErrorReporting(),
+  //       this.loadPopupInOverlay(),
+  //       this.checkUpdates(),
+  //       this.loadProvider(),
+  //       this.loadSwarmGateway(),
+  //       this.loadSwarmPostageStampId(),
+  //       this.loadIpfsGateway(),
+  //       this.loadSiaPortal(),
+  //       this.loadIdentityContract(),
+  //       this.loadUserAgentId(),
+  //       this.loadUserAgentName(),
+  //       this.loadDynamicAdapter(),
+  //       this.loadPreferedOverlayStorage()
+  //   ]);
+  //   this.setState({ isLoading: false });
+  // }
+
+  // async componentDidMount() {
+  //   await this.loadAll();
+  // }
 
   return (
     <div className={styles.wrapper}>
@@ -270,7 +425,14 @@ export const SettingsOverlay = () => {
                   title="Ethereum Provider"
                   component={<Dropdown list={DROPDOWN_LIST} />}
                   children={
-                    <InputPanel placeholder="eda881d858ae4a25b2dfbbd0b4629992" />
+                    <InputPanel
+                      onChange={(e) => {
+                        setProviderInput(e.target.value)
+                        setProviderEdited(true)
+                      }}
+                      value={providerInput}
+                      placeholder="eda881d858ae4a25b2dfbbd0b4629992"
+                    />
                   }
                 />
               }
