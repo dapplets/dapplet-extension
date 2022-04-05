@@ -33,6 +33,7 @@ export interface DappletProps
   onOpenDappletAction: Function
   onRemoveDapplet: Function
   onDeployDapplet: Function
+  onOpenStore: Function
 }
 
 export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
@@ -45,6 +46,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     onOpenDappletAction,
     onRemoveDapplet,
     onDeployDapplet,
+    onOpenStore,
     ...anotherProps
   } = props
   const {
@@ -146,15 +148,14 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 onClick={() => onSettingsModule(dapplet)}
               />
             )}
-
-            {isActive && (
-              <SquaredButton
-                appearance="smail"
-                icon={SearchIcon}
-                className={styles.squareButton}
-                title="Search"
-              />
-            )}
+          
+            <SquaredButton
+              appearance="smail"
+              icon={SearchIcon}
+              className={styles.squareButton}
+              title="Search"
+              onClick={() => onOpenStore(dapplet)}
+            />
 
             {isActive && sourceRegistry?.isDev && (
               <SquaredButton
