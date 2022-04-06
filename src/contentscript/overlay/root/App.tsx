@@ -191,10 +191,19 @@ export class App extends React.Component<P, S> {
                   'dapplets-overlay-nav-content-list'
                 )}
               >
-                {s.isSystemDapplets && <Dapplets />}
+                {s.isSystemDapplets && (
+                  <div className={styles.dappletsBlock}>
+                    <Dapplets />
+                  </div>
+                )}
+
                 {isNotification && <Notifications />}
-                {isSettings && <SettingsOverlay />}
-                {/* <SettingsOverlay /> */}
+
+                {isSettings && (
+                  <div className={styles.settingsBlock}>
+                    <SettingsOverlay />
+                  </div>
+                )}
 
                 {overlays.map((x) => (
                   <div
