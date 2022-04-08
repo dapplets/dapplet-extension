@@ -29,4 +29,11 @@
   text-transform: uppercase;
 
   color: $PureWhite;
+
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
 }

@@ -16,7 +16,7 @@ export interface LocalhostProps {
   moduleTitle: string
   moduleType: string
   moduleBranch: string
-  moduleVersion: string
+  // moduleVersion: string
   // imgDapplet: string
 }
 
@@ -32,7 +32,7 @@ export const Localhost: FC<LocalhostProps> = (props) => {
     moduleTitle,
     moduleType,
     onModuleInfo,
-    moduleVersion,
+    // moduleVersion,
     moduleBranch,
   } = props
   const [isShowDescription, onShowDescription] = useToggle(false)
@@ -67,7 +67,7 @@ export const Localhost: FC<LocalhostProps> = (props) => {
           <div className={styles.dappletsImg}>{/* <img src="" /> */}</div>
           <div className={styles.dappletsInfo}>
             <div className={styles.dappletsTegs}>
-              <div className={styles.dappletsVersion}>{moduleVersion}</div>
+              {/* <div className={styles.dappletsVersion}>{moduleVersion}</div> */}
               <div className={styles.dappletsBranch}>{moduleBranch}</div>
             </div>
 
@@ -77,30 +77,30 @@ export const Localhost: FC<LocalhostProps> = (props) => {
               <button className={styles.dappletsReupload}>Reupload </button>
             </div>
             <div className={styles.dappletsLabel}>
-              <div>
+              {/* <div>
                 <span className={styles.dappletsLabelSpan}>ID:</span>
                 <label className={styles.dappletsLabelSpan}>rnhgrs.eth</label>
-              </div>
-              <div>
+              </div> */}
+              {/* <div>
                 <span className={styles.dappletsLabelSpan}>Ownership:</span>
                 <label className={styles.dappletsLabelSpan}>
                   0xB6fa...B8ad
                 </label>
-              </div>
-              <div>
+              </div> */}
+              {/* <div>
                 <span className={styles.dappletsLabelSpan}>Regestry:</span>
                 <label className={styles.dappletsLabelSpan}>
                   0xB6fa...B8ad
                 </label>
-              </div>
-              <div>
+              </div> */}
+              {/* <div>
                 <span className={styles.dappletsLabelSpan}>
                   Version in registry:
                 </span>
                 <label className={styles.dappletsLabelSpan}>
                   0xB6fa...B8ad
                 </label>
-              </div>
+              </div> */}
               <div>
                 <span className={styles.dappletsLabelSpan}>Type:</span>
                 <label className={styles.dappletsLabelSpan}>{moduleType}</label>

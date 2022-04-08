@@ -269,11 +269,11 @@ export const SettingsOverlay = () => {
               title="Core settings"
               children={
                 <>
-                  <SettingItem
+                  {/* <SettingItem
                     title="Registry"
                     component={<Dropdown list={DROPDOWN_LIST} />}
                     children={<InputPanel placeholder="Placeholder" />}
-                  />
+                  /> */}
                   <SettingItem
                     title="User Agent Name"
                     component={<Dropdown list={DROPDOWN_LIST} />}

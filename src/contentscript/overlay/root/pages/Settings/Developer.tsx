@@ -200,7 +200,7 @@ export const Developer = () => {
             moduleTitle={moduleInfo.title}
             moduleType={moduleInfo.type}
             moduleBranch={moduleInfo.branch}
-            moduleVersion={'v 0.5'}
+            // moduleVersion={'v 0.5'}
             // imgDapplet={dataUri}
           />
         ))}
@@ -208,10 +208,9 @@ export const Developer = () => {
 
       <div className={styles.createUnderConstraction}>
         <button className={styles.btnCreate} onClick={onCreateModuleHandler}>
-          Create under cunstruction dapplet
+          Create under construction dapplet
         </button>
       </div>
     </div>
   )
 }
-// https://goerli.mooo.com/
