@@ -1,12 +1,4 @@
-import React, {
-  FC,
-  DetailedHTMLProps,
-  HTMLAttributes,
-  ReactElement,
-  useState,
-  ChangeEventHandler,
-  useEffect,
-} from 'react'
+import React, { ReactElement, useState, useEffect, useMemo } from 'react'
 import cn from 'classnames'
 import styles from './Settings.module.scss'
 import {
@@ -14,6 +6,10 @@ import {
   isValidUrl,
   isValidPostageStampId,
 } from '../../../../../popup/helpers'
+import { browser } from 'webextension-polyfill-ts'
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import { useToggle } from '../../hooks/useToggle'
+
 import { SettingTitle } from '../../components/SettingTitle'
 import { SettingItem } from '../../components/SettingItem'
 import { Switch } from '../../components/Switch'
@@ -22,87 +18,19 @@ import { SettingWrapper } from '../../components/SettingWrapper'
 import { Checkbox } from '../../components/Checkbox'
 import { InputPanel } from '../../components/InputPanel'
 // import { CheckboxList } from '../Notifications'
-import { browser } from 'webextension-polyfill-ts'
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { useToggle } from '../../hooks/useToggle'
-import { trimUriPrefix } from 'skynet-js/dist/cjs/utils/string'
-import { useMemo } from 'react'
+
+import { Developer } from './Developer'
 
 enum SettingsTabs {
-  MAIN = 0,
-  ADVANCED = 1,
+  // MAIN = 0,
+  SETTINGS = 0,
   DEVELOPER = 2,
 }
 
-// interface ISettingsState {
-//   isLoading: boolean;
-//   connected: boolean;
-
-//   profiles: string[];
-//   currentProfile: string;
-
-//   registries: { url: string, isDev: boolean, isAvailable: boolean, error: string, isEnabled: boolean }[];
-//   registryInput: string;
-//   registryInputError: string;
-
-//   trustedUsers: { account: string }[];
-//   trustedUserInput: string;
-//   trustedUserInputError: string;
-
-//   providerInput: string;
-//   providerInputError: string;
-//   providerLoading: boolean;
-//   providerEdited: boolean;
-
-//   swarmGatewayInput: string;
-//   swarmGatewayInputError: string;
-//   swarmGatewayLoading: boolean;
-//   swarmGatewayEdited: boolean;
-
-//   swarmPostageStampIdInput: string;
-//   swarmPostageStampIdInputError: string;
-//   swarmPostageStampIdLoading: boolean;
-//   swarmPostageStampIdEdited: boolean;
-
-//   ipfsGatewayInput: string;
-//   ipfsGatewayInputError: string;
-//   ipfsGatewayLoading: boolean;
-//   ipfsGatewayEdited: boolean;
-
-//   siaPortalInput: string;
-//   siaPortalInputError: string;
-//   siaPortalLoading: boolean;
-//   siaPortalEdited: boolean;
-
-//   identityInput: string;
-//   identityInputError: string;
-//   identityLoading: boolean;
-//   identityEdited: boolean;
-
-//   devMode: boolean;
-//   autoBackup: boolean;
-//   isUpdateAvailable: boolean;
-//   popupInOverlay: boolean;
-
-//   errorReporting: boolean;
-//   userAgentId: string;
-//   userAgentNameInput: string;
-//   userAgentNameInputError: string;
-//   userAgentNameLoading: boolean;
-//   userAgentNameEdited: boolean;
-
-//   dynamicAdapterInput: string;
-//   dynamicAdapterInputError: string;
-//   dynamicAdapterLoading: boolean;
-//   dynamicAdapterEdited: boolean;
-
-//   preferedOverlayStorage: string;
-// }
-
 export const NAVIGATION_LIST = [
-  { _id: '0', title: 'Main' },
-  { _id: '1', title: 'Advanced' },
-  { _id: '2', title: 'Developer' },
+  // { _id: '0', title: 'Main' },
+  { _id: '0', title: 'Settings' },
+  { _id: '1', title: 'Developer' },
 ]
 
 export const DROPDOWN_LIST = [{ _id: '0', label: 'Custom' }]
@@ -154,7 +82,7 @@ export const SettingsOverlay = () => {
   const [isAutoupdateActive, onAutoupdateActive] = useToggle(false)
   const [isNotificationActive, onNotificationActive] = useToggle(false)
   const [isUpdateAvailable, onUpdateAvailable] = useState(false)
-  const [activeTab, setActiveTab] = useState(SettingsTabs.ADVANCED)
+  const [activeTab, setActiveTab] = useState(SettingsTabs.SETTINGS)
 
   const [providerInput, setProviderInput] = useState('')
   const [providerEdited, setProviderEdited] = useState(false)
@@ -260,15 +188,15 @@ export const SettingsOverlay = () => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.title}>
-        <SettingTitle
+        {/* <SettingTitle
           title="Main"
           onClick={() => setActiveTab(SettingsTabs.MAIN)}
           isActive={activeTab === SettingsTabs.MAIN}
-        />
+        /> */}
         <SettingTitle
-          title="Advanced"
-          onClick={() => setActiveTab(SettingsTabs.ADVANCED)}
-          isActive={activeTab === SettingsTabs.ADVANCED}
+          title="Settings"
+          onClick={() => setActiveTab(SettingsTabs.SETTINGS)}
+          isActive={activeTab === SettingsTabs.SETTINGS}
         />
         <SettingTitle
           title="Developer"
@@ -278,7 +206,7 @@ export const SettingsOverlay = () => {
       </div>
 
       <div className={styles.settingMain}>
-        {activeTab === SettingsTabs.MAIN && (
+        {/* {activeTab === SettingsTabs.MAIN && (
           <>
             <SettingWrapper
               title="Extension settings"
@@ -332,8 +260,8 @@ export const SettingsOverlay = () => {
               }
             />
           </>
-        )}
-        {activeTab === SettingsTabs.ADVANCED && (
+        )} */}
+        {activeTab === SettingsTabs.SETTINGS && (
           <>
             <SettingWrapper title="Version" />
             <SettingWrapper title="Trusted Users" />
@@ -444,7 +372,12 @@ export const SettingsOverlay = () => {
             />
           </>
         )}
+
+        {activeTab === SettingsTabs.DEVELOPER && <Developer />}
       </div>
     </div>
   )
 }
+
+// https://goerli.mooo.com/
+// 0x141442f8DC04E962478404ba6704fDDDE531D60e

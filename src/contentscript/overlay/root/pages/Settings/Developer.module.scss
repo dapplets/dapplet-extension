@@ -1,0 +1,32 @@
+@import '../../assets/styles/null.scss';
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
+
+.host {
+  padding: 15.5px 0px 7.5px 0px;
+}
+
+.btnCreate {
+  display: flex;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+
+  width: 228px;
+  height: 33px;
+
+  background: $Primary;
+  border-radius: 4px;
+
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 100%;
+
+  text-align: center;
+  text-transform: uppercase;
+
+  color: $PureWhite;
+}

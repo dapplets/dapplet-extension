@@ -3,7 +3,7 @@ import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import styles from './Dapplets.module.scss'
-import * as EventBus from "../../../../../common/global-event-bus"
+import * as EventBus from '../../../../../common/global-event-bus'
 
 import { Dapplet } from '../../components/Dapplet'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
@@ -13,7 +13,7 @@ import { rcompare } from 'semver'
 import {
   CONTEXT_ID_WILDCARD,
   ModuleTypes,
-  DAPPLETS_STORE_URL
+  DAPPLETS_STORE_URL,
 } from '../../../../../common/constants'
 
 export type Module = ManifestDTO & {
@@ -94,7 +94,7 @@ export const Dapplets = () => {
       getVersions,
       activateFeature,
       deactivateFeature,
-      getThisTab
+      getThisTab,
     } = await initBGFunctions(browser)
 
     _updateFeatureState(name, { isActive, isLoading: true })
@@ -241,9 +241,7 @@ export const Dapplets = () => {
   }
 
   const onRemoveMyDapplet = async (f: ManifestAndDetails) => {
-    const { removeMyDapplet } = await initBGFunctions(
-      browser
-    )
+    const { removeMyDapplet } = await initBGFunctions(browser)
     await removeMyDapplet(f.sourceRegistry.url, f.name)
     const d = dapplets.filter((x) => x.name !== f.name)
     setDapplets(d)
@@ -258,8 +256,8 @@ export const Dapplets = () => {
   }
 
   const onOpenStore = async (f: ManifestAndDetails) => {
-    const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f.name}`;
-    window.open(url, '_blank');
+    const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f.name}`
+    window.open(url, '_blank')
   }
 
   return (
@@ -272,26 +270,30 @@ export const Dapplets = () => {
         />
         <Dropdown list={DROPDOWN_LIST} title="Worklist:" />
       </div>
-      {dapplets &&
-        dapplets.map((dapplet) => {
-          return (
-            <Dapplet
-              key={dapplet.name}
-              dapplet={{
-                ...dapplet,
-                isFavourites: false,
-                website: 'dapplets.com',
-                users: [],
-              }}
-              onSwitchChange={onSwitchChange}
-              onSettingsModule={onOpenSettingsModule}
-              onOpenDappletAction={onOpenDappletAction}
-              onRemoveMyDapplet={dapplet.isMyDapplet ? onRemoveMyDapplet : undefined}
-              onDeployDapplet={onDeployDapplet}
-              onOpenStore={onOpenStore}
-            />
-          )
-        })}
+      <div className={styles.dappletsBlock}>
+        {dapplets &&
+          dapplets.map((dapplet) => {
+            return (
+              <Dapplet
+                key={dapplet.name}
+                dapplet={{
+                  ...dapplet,
+                  isFavourites: false,
+                  website: 'dapplets.com',
+                  users: [],
+                }}
+                onSwitchChange={onSwitchChange}
+                onSettingsModule={onOpenSettingsModule}
+                onOpenDappletAction={onOpenDappletAction}
+                onRemoveMyDapplet={
+                  dapplet.isMyDapplet ? onRemoveMyDapplet : undefined
+                }
+                onDeployDapplet={onDeployDapplet}
+                onOpenStore={onOpenStore}
+              />
+            )
+          })}
+      </div>
     </>
   )
 }

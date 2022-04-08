@@ -45,6 +45,10 @@
     border-radius: 2px;
   }
 }
+
+.settingMain > * {
+  direction: ltr;
+}
 @media (max-width: 640px) and (min-width: 320px) {
   .wrapper {
     padding: 0px 0px 0px 0px;

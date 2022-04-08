@@ -191,11 +191,7 @@ export class App extends React.Component<P, S> {
                   'dapplets-overlay-nav-content-list'
                 )}
               >
-                {s.isSystemDapplets && (
-                  <div className={styles.dappletsBlock}>
-                    <Dapplets />
-                  </div>
-                )}
+                {s.isSystemDapplets && <Dapplets />}
 
                 {isNotification && <Notifications />}
 
