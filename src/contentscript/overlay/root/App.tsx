@@ -3,6 +3,7 @@ import styles from './components/Overlay/Overlay.module.scss'
 import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { ContentItem } from './ContentItem'
+import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { OverlayManager } from './overlayManager'
 import { OverlayToolbar } from './components/OverlayToolbar'
 import cn from 'classnames'
@@ -96,6 +97,10 @@ export class App extends React.Component<P, S> {
     this.setState({ isLoadingMap })
   }
 
+  storeButtonClickHandler = () => {
+    window.open(DAPPLETS_STORE_URL, '_blank');
+  }
+
   getOverlays() {
     return this.props.overlayManager.getOverlays()
   }
@@ -180,7 +185,7 @@ export class App extends React.Component<P, S> {
                   </div>
                 </div>
                 <div className={styles.right}>
-                  <SquaredButton appearance="big" icon={StoreIcon} />
+                  <SquaredButton appearance="big" icon={StoreIcon} onClick={this.storeButtonClickHandler} />
                   <SquaredButton appearance="big" icon={SearchIcon} />
                 </div>
               </header>
