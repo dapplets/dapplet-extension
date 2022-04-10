@@ -16,8 +16,8 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
 import { Localhost } from '../../components/Localhost'
-import { version } from 'process'
 
+import { DevModule } from '../../components/DevModulesList'
 let _isMounted = true
 
 export const Developer = () => {
@@ -29,21 +29,14 @@ export const Developer = () => {
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [dataUri, setDataUri] = useState(null)
   // const [storageRef] = <StorageRef>
-  const [moduleInfo, setModuleInfo] = useState({
-    title: '',
-    branch: '',
-    type: '',
-    icon: '',
 
-    version: '',
-  })
   useEffect(() => {
     _isMounted = true
     // loadSwarmGateway()
 
     const init = async () => {
       await loadSwarmGateway()
-      await loadRegistries()
+      // await loadRegistries()
       await loadIntro()
       // await Promise.all([loadRegistries(), loadIntro()])
       const { getCurrentTab } = await initBGFunctions(browser)
@@ -141,30 +134,6 @@ export const Developer = () => {
   }
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
 
-  const registriesInfo = (x) => {
-    fetch(x)
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setModuleInfo({
-            title: result.title,
-            branch: result.branch,
-            type: result.type,
-            icon: result.icon,
-
-            version: String(Object.values(result.version)),
-          })
-          console.log(moduleInfo)
-          console.log(moduleInfo.version)
-        },
-        (error) => {
-          console.log(error)
-        }
-      )
-  }
-
-  // closeWelcomeIntro()
-  // addRegistry(registryInput)
   return (
     <div className={styles.wrapper}>
       <div className={styles.inputHost}>
@@ -193,17 +162,33 @@ export const Developer = () => {
               // console.log(r.error, r.isEnabled)
               // console.log(r)
             }}
-            onModuleInfo={() =>
-              // checkUrlAvailability(r.url).then((x) => console.log(x))
-              registriesInfo(r.url)
+            children={
+              <div className={styles.modules}>
+                {modules.length > 0 ? (
+                  Object.entries(groupedModules).map(
+                    ([registryUrl, modules]) => (
+                      <div key={registryUrl}>
+                        {modules.length > 0 ? (
+                          <DevModule
+                            modules={modules}
+                            onDetailsClick={deployModule}
+                          />
+                        ) : (
+                          <div>No available development modules.</div>
+                        )}
+                      </div>
+                    )
+                  )
+                ) : (
+                  <div>No available development modules.</div>
+                )}
+              </div>
             }
-            moduleTitle={moduleInfo.title}
-            moduleType={moduleInfo.type}
-            moduleBranch={moduleInfo.branch}
-            // moduleVersion={'v 0.5'}
-            // imgDapplet={dataUri}
           />
         ))}
+        {/* <div style={{ flex: 'auto' }}>
+         
+        </div> */}
       </div>
 
       <div className={styles.createUnderConstraction}>
