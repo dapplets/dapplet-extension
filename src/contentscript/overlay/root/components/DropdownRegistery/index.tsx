@@ -8,15 +8,22 @@ import React, {
   useEffect,
 } from 'react'
 import cn from 'classnames'
-import styles from './DropdownSettings.module.scss'
+import styles from './DropdownRegistery.module.scss'
 import { IDropdown } from '../../models/dropdown.model'
 import { useToggle } from '../../hooks/useToggle'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { browser } from 'webextension-polyfill-ts'
 import { isValidUrl } from '../../../../../popup/helpers'
 
+export interface DropdownRegisteryProps
+  extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+  list?: IDropdown[]
+  value?: IDropdown | null
+}
 let _isMounted = false
-export const DropdownSettings: FC<DropdownProps> = (props: DropdownProps) => {
+export const DropdownRegistery: FC<DropdownRegisteryProps> = (
+  props: DropdownRegisteryProps
+) => {
   const {
     list,
     className,
@@ -26,7 +33,7 @@ export const DropdownSettings: FC<DropdownProps> = (props: DropdownProps) => {
   } = props
   const [isOpen, setOpen] = useToggle(false)
   const [registryInput, setRegistryInput] = useState('')
-  const [registryInputError, setRegistryInputError] = useState('')
+  const [registryInputError, setRegistryInputError] = useState(null)
   const [registries, setRegistries] = useState([])
   useEffect(() => {
     _isMounted = true
@@ -74,7 +81,7 @@ export const DropdownSettings: FC<DropdownProps> = (props: DropdownProps) => {
     <div className={styles.wrapper}>
       {registries.map(
         (r, i) =>
-          (r.isEnabled || registryInput) && (
+          r.isEnabled && (
             <div key={i} className={styles.activeRegistry}>
               <div className={styles.inputBlock}>
                 <input
@@ -82,14 +89,18 @@ export const DropdownSettings: FC<DropdownProps> = (props: DropdownProps) => {
                     [styles.errorInput]: registryInputError,
                   })}
                   onClick={() => addRegistry(registryInput)}
-                  placeholder={r.url}
-                  value={registryInput}
+                  // placeholder={r.url}
+                  value={registryInput || r.url}
                   onChange={(e) => {
                     setRegistryInput(e.target.value)
                     setRegistryInputError(null)
                     enableRegistry(r.url)
                     // addRegistry(registryInput)
                   }}
+                  disabled={
+                    !isValidUrl(registryInput) &&
+                    !!registries.find((r) => r.url === !registryInput)
+                  }
                   // error={!!registryInputError}
                 />
 
@@ -140,10 +151,5 @@ export const DropdownSettings: FC<DropdownProps> = (props: DropdownProps) => {
   )
 }
 
-export interface DropdownProps
-  extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
-  list?: IDropdown[]
-  value?: IDropdown | null
-}
 // registry.dapplet-base.eth
 // dev-1627024020035-70641704943070

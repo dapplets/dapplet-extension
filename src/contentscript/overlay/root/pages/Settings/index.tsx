@@ -38,7 +38,43 @@ export const NAVIGATION_LIST = [
 let _isMounted = false
 export const SettingsOverlay = () => {
   const [activeTab, setActiveTab] = useState(SettingsTabs.SETTINGS)
-
+  const [devMode, setMode] = useState(false)
+  const [errorReporting, onErrorReporting] = useState(false)
+  useEffect(() => {
+    _isMounted = true
+    const init = async () => {
+      await loadDevMode()
+      await loadErrorReporting()
+      // console.log(devMode)
+    }
+    init()
+    return () => {
+      _isMounted = false
+    }
+    // devMode
+  }, [])
+  const loadDevMode = async () => {
+    const { getDevMode } = await initBGFunctions(browser)
+    const devMode = await getDevMode()
+    setMode(devMode)
+  }
+  const setDevmode = async (isActive: boolean) => {
+    const { setDevMode } = await initBGFunctions(browser)
+    await setDevMode(isActive)
+    loadDevMode()
+    // TODO: ???
+    // await this.props.updateTabs()
+  }
+  const loadErrorReporting = async () => {
+    const { getErrorReporting } = await initBGFunctions(browser)
+    const errorReporting = await getErrorReporting()
+    onErrorReporting(errorReporting)
+  }
+  const setErrorReporting = async (isActive: boolean) => {
+    const { setErrorReporting } = await initBGFunctions(browser)
+    await setErrorReporting(isActive)
+    loadErrorReporting()
+  }
   return (
     <div className={styles.wrapper}>
       <div className={styles.title}>
@@ -52,18 +88,27 @@ export const SettingsOverlay = () => {
           onClick={() => setActiveTab(SettingsTabs.SETTINGS)}
           isActive={activeTab === SettingsTabs.SETTINGS}
         />
-        <SettingTitle
-          title="Developer"
-          onClick={() => setActiveTab(SettingsTabs.DEVELOPER)}
-          isActive={activeTab === SettingsTabs.DEVELOPER}
-        />
+        {devMode && (
+          <SettingTitle
+            title="Developer"
+            onClick={() => setActiveTab(SettingsTabs.DEVELOPER)}
+            isActive={activeTab === SettingsTabs.DEVELOPER}
+          />
+        )}
       </div>
 
       <div className={styles.settingMain}>
         {/* {activeTab === SettingsTabs.MAIN && (
   <MainList/>
         )} */}
-        {activeTab === SettingsTabs.SETTINGS && <SettingsList />}
+        {activeTab === SettingsTabs.SETTINGS && (
+          <SettingsList
+            devModeProps={devMode}
+            setDevMode={setDevmode}
+            errorReporting={errorReporting}
+            setErrorReporting={setErrorReporting}
+          />
+        )}
 
         {activeTab === SettingsTabs.DEVELOPER && <Developer />}
       </div>

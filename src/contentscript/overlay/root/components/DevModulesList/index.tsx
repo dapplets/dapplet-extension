@@ -109,11 +109,11 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
               <button className={styles.dappletsReupload}>Reupload </button>
             </div>
             <div className={styles.dappletsLabel}>
-              {m.module.contextIds[0] && (
+              {m.module.name && (
                 <div>
-                  <span className={styles.dappletsLabelSpan}>ID:</span>
+                  <span className={styles.dappletsLabelSpan}>Name:</span>
                   <label className={styles.dappletsLabelSpan}>
-                    {m.module.contextIds[0]}
+                    {m.module.name}
                   </label>
                 </div>
               )}

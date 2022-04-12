@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, useEffect, useMemo } from 'react'
+import React, { ReactElement, useState, useEffect, useMemo, FC } from 'react'
 import cn from 'classnames'
 import styles from './Settings.module.scss'
 import {
@@ -17,12 +17,20 @@ import { Dropdown } from '../../components/Dropdown'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { Checkbox } from '../../components/Checkbox'
 import { InputPanel } from '../../components/InputPanel'
-import { DropdownSettings } from '../../components/DropdownSettings'
+import { DropdownRegistery } from '../../components/DropdownRegistery'
+import { DropdownTrustedUsers } from '../../components/DropdownTrustedUsers'
+import { DropdownPreferedOverlayStorage } from '../../components/DropdownPreferedOverlayStorage'
 
 export const DROPDOWN_LIST = [{ _id: '0', label: 'Custom' }]
 let _isMounted = false
-
-export const SettingsList = () => {
+export interface SettingsListProps {
+  devModeProps: boolean
+  setDevMode: (x) => void
+  errorReporting: boolean
+  setErrorReporting: (x) => void
+}
+export const SettingsList: FC<SettingsListProps> = (props) => {
+  const { devModeProps, setDevMode, errorReporting, setErrorReporting } = props
   const [isUpdateAvailable, onUpdateAvailable] = useState(false)
 
   const [providerInput, setProviderInput] = useState('')
@@ -45,18 +53,39 @@ export const SettingsList = () => {
     useState(false)
 
   const [registryInput, setRegistryInput] = useState('')
-  const [registryInputError, setRegistryInputError] = useState('')
+  const [registryInputError, setRegistryInputError] = useState(null)
   const [registries, setRegistries] = useState([])
+
+  const [userAgentNameInput, setUserAgentNameInput] = useState('')
+  const [userAgentId, setUserAgentID] = useState('')
+  const [userAgentNameInputError, setUserAgentNameInputError] = useState(null)
+  const [userAgentNameLoading, setUserAgentNameLoading] = useState(false)
+  const [userAgentNameEdited, setUserAgentNameEdited] = useState(false)
+
+  const [ipfsGatewayInput, setIpfsGatewayInput] = useState('')
+  const [ipfsGatewayInputError, setIpfsGatewayInputError] = useState(null)
+  const [ipfsGatewayLoading, setIpfsGatewayLoading] = useState(false)
+  const [ipfsGatewayEdited, setIpfsGatewayEdited] = useState(false)
+
+  const [siaPortalInput, setSiaPortalInput] = useState('')
+  const [siaPortalInputError, setSiaPortalInputError] = useState(null)
+  const [siaPortalLoading, setSiaPortalLoading] = useState(false)
+  const [siaPortalEdited, setSiaPortalEdited] = useState(false)
 
   useEffect(() => {
     _isMounted = true
     const init = async () => {
       await checkUpdates()
+      // await loadDevMode()
       await loadProvider()
       await loadSwarmGateway()
       await loadSwarmPostageStampId()
       await loadDynamicAdapter()
       await loadRegistries()
+      await loadUserAgentId()
+      await loadUserAgentName()
+      await loadIpfsGateway()
+      await loadSiaPortal()
     }
     init()
     return () => {
@@ -139,35 +168,78 @@ export const SettingsList = () => {
 
     setRegistries(registries.filter((r) => r.isDev === false))
   }
-  // const addRegistry = async (url: string) => {
-  //   const { addRegistry } = await initBGFunctions(browser)
 
-  //   try {
-  //     await addRegistry(url, false)
-  //     setRegistryInput(registryInput)
-  //   } catch (err) {
-  //     setRegistryInputError(err.message)
-  //   }
+  const loadUserAgentId = async () => {
+    const { getUserAgentId } = await initBGFunctions(browser)
+    const userAgentId = await getUserAgentId()
 
-  //   loadRegistries()
-  // }
+    setUserAgentID(userAgentId)
+  }
 
-  // const removeRegistry = async (url: string) => {
-  //   const { removeRegistry } = await initBGFunctions(browser)
-  //   await removeRegistry(url)
-  //   loadRegistries()
-  // }
+  const loadUserAgentName = async () => {
+    const { getUserAgentName } = await initBGFunctions(browser)
+    const userAgentNameInput = await getUserAgentName()
 
-  // const enableRegistry = async (url: string) => {
-  //   const { enableRegistry } = await initBGFunctions(browser)
-  //   await enableRegistry(url)
-  //   loadRegistries()
-  // }
+    setUserAgentNameInput(userAgentNameInput)
+  }
 
-  setProvider(providerInput)
-  setSwarmGateway(swarmGatewayInput)
-  setSwarmPostageStampId(swarmPostageStampIdInput)
-  setDynamicAdapter(dynamicAdapterInput)
+  const setUserAgentName = async (userAgentName: string) => {
+    setUserAgentNameLoading(true)
+    const { setUserAgentName } = await initBGFunctions(browser)
+    await setUserAgentName(userAgentName)
+    loadUserAgentName()
+    setUserAgentNameLoading(false)
+    setUserAgentNameEdited(false)
+  }
+
+  const loadIpfsGateway = async () => {
+    const { getIpfsGateway } = await initBGFunctions(browser)
+    const gateway = await getIpfsGateway()
+    setIpfsGatewayInput(gateway)
+  }
+
+  const setIpfsGateway = async (gateway: string) => {
+    try {
+      setIpfsGatewayLoading(true)
+      const { setIpfsGateway } = await initBGFunctions(browser)
+      await setIpfsGateway(gateway)
+      loadSwarmGateway()
+      setIpfsGatewayLoading(false)
+      setIpfsGatewayEdited(false)
+    } catch (err) {
+      setIpfsGatewayLoading(false)
+      setIpfsGatewayEdited(false)
+      setIpfsGatewayInputError(err.message)
+    }
+  }
+
+  const loadSiaPortal = async () => {
+    const { getSiaPortal } = await initBGFunctions(browser)
+    const gateway = await getSiaPortal()
+    setSiaPortalInput(gateway)
+  }
+
+  const setSiaPortal = async (gateway: string) => {
+    try {
+      setSiaPortalLoading(true)
+
+      const { setSiaPortal } = await initBGFunctions(browser)
+      await setSiaPortal(gateway)
+      loadSiaPortal()
+      setSiaPortalLoading(false)
+      setSiaPortalEdited(false)
+    } catch (err) {
+      setSiaPortalLoading(false)
+      setSiaPortalEdited(false)
+      setSiaPortalInputError(err.message)
+    }
+  }
+
+  // setProvider(providerInput)
+  // setSwarmGateway(swarmGatewayInput)
+  // setSwarmPostageStampId(swarmPostageStampIdInput)
+  // setDynamicAdapter(dynamicAdapterInput)
+  // setIpfsGateway(ipfsGatewayInput)
   return (
     <>
       <SettingWrapper
@@ -197,41 +269,69 @@ export const SettingsList = () => {
                 </div>
               }
             />
+            <SettingItem
+              title="Trusted Users"
+              component={<></>}
+              children={<DropdownTrustedUsers />}
+            />
             {/* Todo : on Parameters */}
             <SettingItem
-              title="Regestries"
+              title="Developer mode"
+              component={
+                <Switch
+                  checked={devModeProps}
+                  onChange={() => setDevMode(!devModeProps)}
+                />
+              }
+            />
+            <SettingItem
+              title="Bug reports"
+              component={
+                <Switch
+                  checked={errorReporting}
+                  onChange={() => setErrorReporting(!errorReporting)}
+                />
+              }
+            />
+            <SettingItem
+              title="User Agent Name"
               component={<></>}
-              children={<DropdownSettings />}
+              children={
+                <InputPanel
+                  value={userAgentNameInput}
+                  placeholder="http:\\bee.dapplets.org\"
+                  onChange={(e) => {
+                    setUserAgentName(e.target.value)
+                    // setUserAgentNameInput(e.target.value)
+                    setUserAgentNameEdited(true)
+                    setUserAgentNameInputError(null)
+                  }}
+                />
+              }
             />
           </>
         }
       />
 
       <SettingWrapper
-        title="Core settings"
+        title="Parameters"
         children={
           <>
-            {/* <SettingItem
-                    title="Registry"
-                    component={<Dropdown list={DROPDOWN_LIST} />}
-                    children={<InputPanel placeholder="Placeholder" />}
-                  /> */}
             <SettingItem
-              title="User Agent Name"
-              component={<Dropdown list={DROPDOWN_LIST} />}
-              children={
-                <InputPanel placeholder="eda881d858ae4a25b2dfbbd0b4629992" />
-              }
+              title="Regestries"
+              component={<></>}
+              children={<DropdownRegistery />}
             />
             <SettingItem
               title="Dynamic Adapter"
-              component={<Dropdown list={DROPDOWN_LIST} />}
+              component={<></>}
               children={
                 <InputPanel
                   value={dynamicAdapterInput}
                   error={!!dynamicAdapterInputError}
                   onChange={(e) => {
                     setDynamicAdapter(e.target.value)
+                    // setDynamicAdapter(e.target.value)
                     setDynamicAdapterInputError(null)
                     setDynamicAdapterInputEdited(true)
                   }}
@@ -241,27 +341,45 @@ export const SettingsList = () => {
             />
             <SettingItem
               title=" Prefered Overlay Storage"
-              component={<Dropdown list={DROPDOWN_LIST} />}
+              component={<></>}
+              children={<DropdownPreferedOverlayStorage />}
             />
 
-            {/* 
-            // Prefered Overlay Storage */}
+            {/* storages */}
           </>
         }
       />
       <SettingWrapper
-        title="Swarm setup"
+        title="Providers"
         children={
           <>
             <SettingItem
+              title="Ethereum Provider"
+              component={<></>}
+              children={
+                <InputPanel
+                  onChange={(e) => {
+                    setProvider(e.target.value)
+                    // setProviderInput(e.target.value)
+                    setProviderEdited(true)
+                    setProviderInputError(null)
+                  }}
+                  error={!isValidHttp(providerInput)}
+                  value={providerInput}
+                  placeholder="eda881d858ae4a25b2dfbbd0b4629992"
+                />
+              }
+            />
+            <SettingItem
               title="Swarm Gateway"
-              component={<Dropdown list={DROPDOWN_LIST} />}
+              component={<></>}
               children={
                 <InputPanel
                   value={swarmGatewayInput}
                   error={!isValidHttp(swarmGatewayInput)}
                   onChange={(e) => {
-                    setSwarmGatewayInput(e.target.value)
+                    setSwarmGateway(e.target.value)
+                    // setSwarmGatewayInput(e.target.value)
                     setSwarmGatewayInputError(null)
                     setSwarmGatewayEdited(true)
                   }}
@@ -271,7 +389,7 @@ export const SettingsList = () => {
             />
             <SettingItem
               title="Swarm Postage Stamp ID"
-              component={<Dropdown list={DROPDOWN_LIST} />}
+              component={<></>}
               children={
                 <InputPanel
                   value={swarmPostageStampIdInput}
@@ -280,7 +398,8 @@ export const SettingsList = () => {
                     !isValidPostageStampId(swarmPostageStampIdInput)
                   }
                   onChange={(e) => {
-                    setSwarmPostageStampIdInput(e.target.value)
+                    setSwarmPostageStampId(e.target.value)
+                    // setSwarmPostageStampIdInput(e.target.value)
                     setSwarmPostageStampIdInputError(null)
                     setSwarmPostageStampIdInputEdited(true)
                   }}
@@ -288,30 +407,44 @@ export const SettingsList = () => {
                 />
               }
             />
+            <SettingItem
+              title="IPFS Gateway"
+              component={<></>}
+              children={
+                <InputPanel
+                  value={ipfsGatewayInput}
+                  onChange={(e) => {
+                    // setIpfsGatewayInput(e.target.value)
+                    setIpfsGateway(e.target.value)
+                    setIpfsGatewayEdited(true)
+                    setIpfsGatewayInputError(null)
+                  }}
+                />
+              }
+            />
+            <SettingItem
+              title="SIA Portal"
+              component={<></>}
+              children={
+                <InputPanel
+                  value={siaPortalInput}
+                  onChange={(e) => {
+                    setSiaPortal(e.target.value)
+                    setSiaPortalEdited(true)
+                    setSiaPortalInputError(null)
+                  }}
+                />
+              }
+            />
           </>
-        }
-      />
-      <SettingWrapper
-        title="Ethereum setup"
-        children={
-          <SettingItem
-            title="Ethereum Provider"
-            component={<Dropdown list={DROPDOWN_LIST} />}
-            children={
-              <InputPanel
-                onChange={(e) => {
-                  setProviderInput(e.target.value)
-                  setProviderEdited(true)
-                  setProviderInputError(null)
-                }}
-                error={!isValidHttp(providerInput)}
-                value={providerInput}
-                placeholder="eda881d858ae4a25b2dfbbd0b4629992"
-              />
-            }
-          />
         }
       />
     </>
   )
 }
+// https://goerli.mooo.com
+// https://goerli.infura.io/v3/9ded73debfaf4834ac186320de4f85fd
+// https://goerli.infura.io/v3/6b34a47d1ef24f5b9cfff55d32685ad9
+// https://rpc.goerli.mudit.blog/
+// invalid
+// https://goerli.infura.io/v3/123123123

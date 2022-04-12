@@ -18,6 +18,7 @@ import VersionInfo from '../../../../../background/models/versionInfo'
 import { Localhost } from '../../components/Localhost'
 
 import { DevModule } from '../../components/DevModulesList'
+import { Registry } from '../../components/Registery'
 let _isMounted = true
 
 export const Developer = () => {
@@ -134,6 +135,9 @@ export const Developer = () => {
   }
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
 
+  console.log(groupedModules)
+  console.log(registries)
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.inputHost}>
@@ -149,42 +153,102 @@ export const Developer = () => {
       </div>
       <div className={styles.host}>
         {registries.map((r, i) => (
-          <Localhost
-            error={r.error}
-            isEnabled={r.isEnabled}
-            label={r.url}
-            key={i}
-            closeHost={() => removeRegistry(r.url)}
-            onClickButtonLocalhost={() => {
-              ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
-                (r.isEnabled && r.error && disableRegistry(r.url)) ||
-                (r.isEnabled && !r.error && disableRegistry(r.url))
-              // console.log(r.error, r.isEnabled)
-              // console.log(r)
-            }}
-            children={
-              <div className={styles.modules}>
-                {modules.length > 0 ? (
-                  Object.entries(groupedModules).map(
-                    ([registryUrl, modules]) => (
-                      <div key={registryUrl}>
-                        {modules.length > 0 ? (
+          <div key={i}>
+            <Localhost
+              error={r.error}
+              isEnabled={r.isEnabled}
+              label={r.url}
+              key={i}
+              closeHost={() => removeRegistry(r.url)}
+              onClickButtonLocalhost={() => {
+                ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
+                  (r.isEnabled && r.error && disableRegistry(r.url)) ||
+                  (r.isEnabled && !r.error && disableRegistry(r.url))
+                // console.log(r.error, r.isEnabled)
+                // console.log(r)
+              }}
+              children={
+                <div className={styles.modules}>
+                  {
+                    modules.length > 0 &&
+                      Object.entries(groupedModules).map(
+                        ([registryUrl, modules]) => (
+                          <div key={registryUrl}>
+                            {/* && registryUrl === r.url */}
+                            {/* {modules.length > 0  ? (
                           <DevModule
                             modules={modules}
-                            onDetailsClick={deployModule}
+                            onDetailsClick={() => deployModule}
                           />
                         ) : (
                           <div>No available development modules.</div>
-                        )}
-                      </div>
-                    )
-                  )
-                ) : (
-                  <div>No available development modules.</div>
-                )}
-              </div>
+                        )} */}
+                            {modules.length > 0 && registryUrl === r.url && (
+                              <DevModule
+                                modules={modules}
+                                onDetailsClick={() => deployModule}
+                              />
+                            )}
+                          </div>
+                        )
+                      )
+                    // : (
+                    //   <div>No available development modules.</div>
+                    // )
+                  }
+                </div>
+              }
+            />
+            {
+              modules.length > 0 &&
+                Object.entries(groupedModules).map(([registryUrl, modules]) => (
+                  <div key={registryUrl}>
+                    {/* && registryUrl === r.url */}
+                    {/* {modules.length > 0  ? (
+                          <DevModule
+                            modules={modules}
+                            onDetailsClick={() => deployModule}
+                          />
+                        ) : (
+                          <div>No available development modules.</div>
+                        )} */}
+                    {modules.length > 0 && registryUrl !== r.url && (
+                      // <DevModule
+                      //   modules={modules}
+                      //   onDetailsClick={() => deployModule}
+                      // />
+                      <Registry
+                        key={registryUrl}
+                        label={registryUrl}
+                        closeHost={() => removeRegistry(r.url)}
+                        onClickButtonLocalhost={() => {
+                          ;(!r.isEnabled &&
+                            !r.error &&
+                            enableRegistry(r.url)) ||
+                            (r.isEnabled &&
+                              r.error &&
+                              disableRegistry(r.url)) ||
+                            (r.isEnabled && !r.error && disableRegistry(r.url))
+                          // console.log(r.error, r.isEnabled)
+                          // console.log(r)
+                        }}
+                        children={
+                          <div className={styles.modules}>
+                            <DevModule
+                              modules={modules}
+                              onDetailsClick={() => deployModule}
+                            />
+                          </div>
+                        }
+                      />
+                    )}
+                  </div>
+                ))
+              // : (
+              //   <div key={i}>No available development modules.</div>
+              // )
             }
-          />
+          </div>
         ))}
         {/* <div style={{ flex: 'auto' }}>
          

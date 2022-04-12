@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC } from 'react'
+import React, { ChangeEvent, FC, useState } from 'react'
 import { InputHTMLAttributes, DetailedHTMLProps } from 'react'
 import cn from 'classnames'
 import styles from './InputPanel.module.scss'
@@ -24,10 +24,16 @@ export const InputPanel: FC<InputPanelProps> = (props) => {
     // onClick,
     ...anotherProps
   } = props
+  // const [baseState, setBaseState] = useState(value)
   const handlerSubmit = (event: ChangeEvent<HTMLFormElement>): void => {
     event.preventDefault()
     onSubmit && onSubmit()
   }
+
+  // const returnValue = (baseStat) => {
+  //   const baseState = JSON.stringify(value)
+  //   setBaseState(baseState)
+  // }
 
   return (
     <form className={cn(styles.inputPanel)} onSubmit={handlerSubmit}>
@@ -39,9 +45,12 @@ export const InputPanel: FC<InputPanelProps> = (props) => {
         placeholder={placeholder}
         {...anotherProps}
       />
-      <button className={cn(styles.inputButton)} type="submit">
-        Save
-      </button>
+      <button
+        className={cn(styles.inputButton)}
+        // onClick={() => returnValue(baseState)}
+        // type="button"
+        type="submit"
+      />
     </form>
   )
 }
