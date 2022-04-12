@@ -11,6 +11,10 @@ import { browser } from 'webextension-polyfill-ts'
 import { rcompare } from 'semver'
 import { List, Segment, Label } from 'semantic-ui-react'
 import { Event } from '../../../../../common/models/event'
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+TimeAgo.addLocale(en)
+
 import {
   CONTEXT_ID_WILDCARD,
   ModuleTypes,
@@ -29,7 +33,7 @@ export const Notifications = () => {
       const events: Event[] = await getEvents()
       setEvent(events)
       // setRead(events.map((e) => e.id))
-      // console.log(events.map((e) => e.id))
+      // console.log(events.map((e) => e.created))
     }
     init()
 
@@ -45,8 +49,11 @@ export const Notifications = () => {
     // const events: Event[] = await deleteEvent(contextIds)
 
     await deleteEvent(f.id, contextIds)
+
     const d = event.filter((x) => x.id !== f.id)
     setEvent(d)
+
+    // setEvent(d)
   }
   const onRemoveEventsAll = async (f) => {
     const { deleteAllEvents } = await initBGFunctions(browser)
@@ -60,18 +67,20 @@ export const Notifications = () => {
         <div className={styles.block}>
           <div className={styles.notification}>
             {event.length > 0 &&
-              event.map((x) => {
+              event.map((x, i) => {
                 return (
                   <Notification
-                    onClear={() => onRemoveEvent(x)}
+                    onClear={() => {
+                      setTimeout(() => {
+                        onRemoveEvent(x)
+                      }, 500)
+                    }}
                     key={x.id}
                     label={'System'}
-                    message={{
-                      ...x,
-                      title: x.title,
-                      description: x.description,
-                      date: x.created,
-                    }}
+                    title={x.title}
+                    description={x.description}
+                    _id={x.id}
+                    date={x.created}
                   />
                 )
               })}
@@ -83,7 +92,7 @@ export const Notifications = () => {
               appearance="big"
               color="red"
             />
-            <span className={styles.clearAll}>clear all</span>
+            <span className={styles.clearAll}>Clear all</span>
           </div>
         </div>
       )) ||

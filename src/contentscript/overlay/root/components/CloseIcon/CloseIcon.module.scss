@@ -22,7 +22,20 @@
 .black path {
   fill: $MainBlack;
 }
+.black:hover path {
+  fill: $ContentBlack;
+}
+.black:active path {
+  fill: $MainGrey;
+}
 
 .red path {
   fill: $Primary;
+}
+
+.red:active path {
+  fill: $PrimaryPressed;
+}
+.red:hover path {
+  fill: $PrimaryHover;
 }

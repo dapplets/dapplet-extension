@@ -6,28 +6,34 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-
+  height: 100%;
   padding: 20px 0px 0px 0px;
   overflow: hidden;
 }
 .block {
   display: flex;
   flex-direction: column;
-  height: 85vh;
+  // height: 85vh;
+  height: calc(100% - 75px);
+  // height: 100%;
   overflow: hidden;
+  padding: 0px 0px 0px 1px;
 }
 
 .notification {
   display: flex;
   width: 100%;
   flex: 1 1 auto;
-  // height: 72vh;
+  // height: calc(100% - 120px);
+  height: 50vh;
+  // height: calc(100vh - 120px);
+  // max-height: 83vh;
   flex-direction: column;
   padding: 8px 0px 0px 0px;
   overflow-y: scroll;
   direction: rtl;
   &::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
     cursor: pointer;
   }
   &::-webkit-scrollbar-track {
@@ -35,9 +41,9 @@
     background: rgb(244, 244, 244);
     background: linear-gradient(
       90deg,
-      rgba(244, 244, 244, 1) 25%,
+      rgba(244, 244, 244, 0) 10%,
       rgba(227, 227, 227, 1) 50%,
-      rgba(244, 244, 244, 1) 25%
+      rgba(244, 244, 244, 0) 90%
     );
   }
 
@@ -58,6 +64,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 68px;
   padding: 20px 0px 0px 0px;
 }
 
@@ -74,7 +81,7 @@
   // top: 0;
   // left: 0;
   width: 100%;
-  height: 100%;
+  height: 80%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -90,15 +97,16 @@
 }
 @media (max-width: 640px) and (min-width: 320px) {
   .wrapper {
-    &::-webkit-scrollbar {
-      width: 0;
-    }
+    // &::-webkit-scrollbar {
+    //   width: 0;
+    // }
     // max-height: 100vh;
     // flex: 1 1 auto;
     padding: 0px 0px 0px 0px;
   }
   .block {
-    height: 79vh;
+    // height: 79vh;
+    height: calc(100% - 145px);
   }
   .notificationClose {
     // display: none;

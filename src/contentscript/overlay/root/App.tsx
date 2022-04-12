@@ -25,17 +25,20 @@ import '@fontsource/montserrat'
 import { Dapplets } from './pages/Dapplets'
 import { Notifications } from './pages/Notifications'
 import { SettingsOverlay } from './pages/Settings'
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+TimeAgo.addLocale(en)
 
 export type TSelectedSettings =
   | 'Dapplets'
-  | 'Wallets'
+  | 'Notifications'
   | 'Settings'
   | 'Developer'
 // | 'Notifications'
 
 const MENU: IMenu[] = [
   { _id: '0', icon: Home, title: 'Dapplets' },
-  { _id: '1', icon: Notification, title: 'Wallets' },
+  { _id: '1', icon: Notification, title: 'Notifications' },
   { _id: '2', icon: Settings, title: 'Settings' },
   { _id: '3', icon: Airplay, title: 'Developer' },
   // { _id: '4', icon: Notification, title: 'Notifications' },
@@ -98,7 +101,7 @@ export class App extends React.Component<P, S> {
   }
 
   storeButtonClickHandler = () => {
-    window.open(DAPPLETS_STORE_URL, '_blank');
+    window.open(DAPPLETS_STORE_URL, '_blank')
   }
 
   getOverlays() {
@@ -149,7 +152,7 @@ export class App extends React.Component<P, S> {
     const activeOverlayId = p.overlayManager.activeOverlay?.id
     const activeOverlay = p.overlayManager.activeOverlay
     // TODO: naming wallets is the notification
-    const isNotification = s.selectedMenu === 'Wallets'
+    const isNotification = s.selectedMenu === 'Notifications'
     const isSettings = s.selectedMenu === 'Settings'
 
     return (
@@ -185,7 +188,11 @@ export class App extends React.Component<P, S> {
                   </div>
                 </div>
                 <div className={styles.right}>
-                  <SquaredButton appearance="big" icon={StoreIcon} onClick={this.storeButtonClickHandler} />
+                  <SquaredButton
+                    appearance="big"
+                    icon={StoreIcon}
+                    onClick={this.storeButtonClickHandler}
+                  />
                   <SquaredButton appearance="big" icon={SearchIcon} />
                 </div>
               </header>
