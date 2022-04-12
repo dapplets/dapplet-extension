@@ -40,7 +40,7 @@ export class Connection<T> implements IConnection {
 
     open(id?: string) {
         this._bus.exec('getDefaultState', this.state.defaultState);
-        this._bus.exec('changeState', this.state.getAll());
+        this._bus.exec('changeSharedState', this.state.getAll());
         return this._bus.exec('onOpen', id);
     }
 
@@ -53,9 +53,9 @@ export class Connection<T> implements IConnection {
           && this.state.type !== 'server'
           && this._bus?.registered
         ) {
-          this._bus.exec('changeState', this.state.getAll());
+          this._bus.exec('changeSharedState', this.state.getAll());
         }
-        if (op === 'changeState' && msg === undefined) return;
+        if (op === 'changeSharedState' && msg === undefined) return;
         return this._bus.exec(op, msg)
     }
 
@@ -174,10 +174,10 @@ export class Connection<T> implements IConnection {
             const isTopicMatch = (op: any, msg: any, f: MsgFilter) =>
                 typeof f === 'function' ? f(op, msg) : this._topicMatch(op, f as string);
 
-            if (msg.type === 'changeState') {
+            if (msg.type === 'changeSharedState') {
                 const [newStateData, id] = msg.message;
                 this.state.set(newStateData, id);
-                this._bus.exec('changeState', this.state.getAll());
+                this._bus.exec('changeSharedState', this.state.getAll());
                 return;
             }
 

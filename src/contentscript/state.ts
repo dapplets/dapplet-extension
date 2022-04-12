@@ -17,17 +17,17 @@ class GeneralState<T> implements ISharedState<T> {
     public state: {
         [contextId: string | symbol]: BehaviorSubjectProxy<T>;
     };
-    public all: BehaviorSubjectProxy<T>;
+    public global: BehaviorSubjectProxy<T>;
     private _connection: Connection<T>;
 
     constructor(
         public readonly defaultState: T,
         public readonly type?: string
     ) {
-        this.all = statify(defaultState);
+        this.global = statify(defaultState);
         if (this.type !== "server")
-            this.all.subscribe(() => this._connection?.send("changeState"));
-        this.state = { all: this.all };
+            this.global.subscribe(() => this._connection?.send("changeSharedState"));
+        this.state = { global: this.global };
         return new Proxy(this, {
             get(target, prop: string) {
                 if (prop in target) {
@@ -41,17 +41,17 @@ class GeneralState<T> implements ISharedState<T> {
 
     public addConnection(conn: Connection<T>) {
         this._connection = conn;
-        if (this.type === "server") this._resolveServerData("all");
+        if (this.type === "server") this._resolveServerData("global");
     }
 
     public get(id: string) {
         if (id === "undefined") return;
         const stateId = id === null || id === undefined ? ALL_CONTEXTS : id;
-        if (stateId === ALL_CONTEXTS) return this.all;
+        if (stateId === ALL_CONTEXTS) return this.global;
         if (!this.state[stateId]) {
             const subject = statify(this.defaultState);
             if (this.type !== "server")
-                subject.subscribe(() => this._connection?.send("changeState"));
+                subject.subscribe(() => this._connection?.send("changeSharedState"));
             this.state[stateId] = subject;
             if (this.type === "server") this._resolveServerData(stateId);
         }
@@ -63,7 +63,7 @@ class GeneralState<T> implements ISharedState<T> {
         const stateId = id === null || id === undefined ? ALL_CONTEXTS : id;
         if (stateId === ALL_CONTEXTS)
             Object.keys(data).forEach((param) =>
-                this.all[param].next(data[param])
+                this.global[param].next(data[param])
             );
         if (!this.state[stateId]) {
             const subject = statify({ ...this.defaultState, ...data });

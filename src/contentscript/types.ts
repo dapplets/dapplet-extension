@@ -33,5 +33,5 @@ export interface IPubSub {
 }
 
 export interface ISharedState <T> {
-  all: BehaviorSubjectProxy<T>
+    global: BehaviorSubjectProxy<T>
 }
