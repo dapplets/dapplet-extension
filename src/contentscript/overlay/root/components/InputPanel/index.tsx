@@ -11,7 +11,8 @@ export interface InputPanelProps
   onSubmit?: () => void
   value?: string
   placeholder?: string
-  error?: Boolean
+  error?: boolean
+  buttonDefault?: boolean
 }
 
 export const InputPanel: FC<InputPanelProps> = (props) => {
@@ -21,6 +22,7 @@ export const InputPanel: FC<InputPanelProps> = (props) => {
     onSubmit,
     placeholder,
     error = false,
+    buttonDefault = false,
     // onClick,
     ...anotherProps
   } = props
@@ -39,18 +41,24 @@ export const InputPanel: FC<InputPanelProps> = (props) => {
     <form className={cn(styles.inputPanel)} onSubmit={handlerSubmit}>
       <input
         value={value}
-        className={cn(styles.inputInfo, error && styles.error)}
+        className={cn(styles.inputInfo, error && styles.error, {
+          [styles.inputDefault]: buttonDefault,
+        })}
         onChange={onChange}
         type="text"
         placeholder={placeholder}
         {...anotherProps}
       />
       <button
-        className={cn(styles.inputButton)}
+        className={cn(styles.inputButton, {
+          [styles.buttonDefault]: buttonDefault,
+        })}
         // onClick={() => returnValue(baseState)}
         // type="button"
         type="submit"
-      />
+      >
+        {buttonDefault && 'ADD'}
+      </button>
     </form>
   )
 }

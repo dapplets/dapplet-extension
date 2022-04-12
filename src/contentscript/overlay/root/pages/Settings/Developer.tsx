@@ -142,6 +142,7 @@ export const Developer = () => {
     <div className={styles.wrapper}>
       <div className={styles.inputHost}>
         <InputPanel
+          buttonDefault
           value={registryInput}
           onChange={(e) => {
             setRegistryInput(e.target.value)

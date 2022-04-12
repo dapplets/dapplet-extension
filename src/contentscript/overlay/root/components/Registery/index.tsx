@@ -47,7 +47,7 @@ export const Registry: FC<RegisteryProps> = (props) => {
         >
           {label}
         </label>
-        <button className={styles.closeLocalhost} onClick={closeHost} />
+        {/* <button className={styles.closeLocalhost} onClick={closeHost} /> */}
       </div>
       {isShowDescription &&
         // && isEnabled && !error

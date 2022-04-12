@@ -66,6 +66,36 @@
   }
 }
 
+.inputDefault {
+  width: 364px;
+  padding: 5px 13px;
+  background: #ffffff;
+  border-radius: 10px;
+}
+.buttonDefault {
+  content: 'add';
+  width: 49px;
+  height: 31px;
+  margin-left: 5px;
+
+  text-transform: uppercase;
+
+  color: $PureWhite;
+  border-radius: 4px;
+  background: $Primary;
+
+  font-family: Roboto, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 100%;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+
 .error {
   border: 1px solid #ff6442;
   color: #ff6442;
