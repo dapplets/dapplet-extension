@@ -4,6 +4,8 @@ import React, {
   HTMLAttributes,
   ReactElement,
   useState,
+  useRef,
+  useEffect,
 } from 'react'
 import { INotification } from '../../models/notification.model'
 import cn from 'classnames'
@@ -13,6 +15,7 @@ import ReactTimeAgo from 'react-time-ago'
 import { CloseIcon } from '../CloseIcon'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
+import { on } from 'process'
 TimeAgo.addLocale(en)
 
 export interface NotificationProps {
@@ -30,17 +33,34 @@ export interface NotificationProps {
 export const Notification = (props: NotificationProps): ReactElement => {
   const { label, title, date, onClear, _id, description, href, onChange } =
     props
-  const [isOpen, onOpen] = useToggle(false)
+  const refComponent = useRef<HTMLInputElement>()
+  const [isOpen, onOpen] = useState(false)
   const [isDelete, onDelete] = useState(false)
+  const [isMoreInformation, onMoreInformation] = useToggle(false)
+
+  const booleanNode = refComponent.current?.classList.contains('more')
+  useEffect(() => {
+    if (description.length > 71) {
+      // if (refComponent && refComponent.current) {
+      refComponent.current?.classList.add('more')
+      if (booleanNode === true) {
+        onOpen(true)
+      }
+      // }
+    } else {
+      // if (refComponent && refComponent.current) {
+      refComponent.current?.classList.remove('more')
+      onOpen(false)
+      // }
+    }
+  }, [refComponent, booleanNode])
 
   const onClick = (id: string) => (): void => {
     onClear && onClear(id)
     onDelete(true)
   }
 
-  // console.log(message.date)
   const newDateNum = new Date(date)
-  // console.log(newDateNum)
 
   return (
     <div
@@ -50,19 +70,35 @@ export const Notification = (props: NotificationProps): ReactElement => {
       onChange={onChange}
     >
       <header className={styles.header}>{label}</header>
-      <h4 className={styles.title}>
-        {title}
-        <span
-          onClick={onOpen}
-          className={cn(styles.toggle, {
-            [styles.isOnOpen]: isOpen,
-          })}
-        />
-      </h4>
+      <h4 className={styles.title}>{title}</h4>
       <span className={styles.date}>
         <ReactTimeAgo date={newDateNum} locale="en-US" />
       </span>
-      {isOpen && <p className={styles.description}>{description}</p>}
+      <div className={styles.blockInfo}>
+        <p
+          ref={refComponent}
+          className={cn(styles.description, {
+            [styles.descriptionMore]: isOpen,
+            [styles.moreInformation]: isMoreInformation,
+          })}
+          onClick={() => {
+            isMoreInformation && onMoreInformation()
+          }}
+        >
+          {description}
+        </p>{' '}
+        {isOpen && (
+          <span
+            className={cn(styles.moreDescription, {
+              [styles.deleteEllipsis]: isMoreInformation,
+            })}
+            onClick={onMoreInformation}
+          >
+            ...
+          </span>
+        )}
+      </div>
+
       {href && (
         <a href="" className={styles.link}>
           Go to store

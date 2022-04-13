@@ -18,6 +18,9 @@
 
   font-family: Roboto, sans-serif;
   margin: 0px 0px 19px 0px;
+  opacity: 1;
+  transform: none;
+  transition: all 0.5s cubic-bezier(0.36, -0.64, 0.34, 1.76);
 }
 
 .header {
@@ -73,7 +76,8 @@
 }
 
 .description {
-  max-width: 362px;
+  display: inline-block;
+  // max-width: 362px;
   margin-top: 8px;
 
   color: $MainBlack;
@@ -108,5 +112,40 @@
 .delete {
   opacity: 0;
   transform: rotateX(-90deg);
-  transition: all 0.5s cubic-bezier(0.36, -0.64, 0.34, 1.76);
+  transition: all 0.7s cubic-bezier(0.36, -0.64, 0.34, 1.76);
+}
+.blockInfo {
+  display: flex;
+  align-items: flex-end;
+}
+.moreDescription {
+  color: $Secondary;
+  // position: absolute;
+  // top: 0;
+  // right: 0;
+  display: block;
+  padding: 0px 0px 5px 0px;
+  cursor: pointer;
+  &:hover {
+    color: $SecondaryHover;
+  }
+  &:active {
+    color: $SecondaryPressed;
+  }
+}
+
+.descriptionMore {
+  display: inline-block;
+  height: 25px;
+  overflow: hidden;
+  text-overflow: clip;
+  position: relative;
+}
+.moreInformation {
+  height: auto;
+  cursor: pointer;
+}
+
+.deleteEllipsis {
+  display: none;
 }
