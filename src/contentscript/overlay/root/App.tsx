@@ -223,6 +223,7 @@ export class App extends React.Component<P, S> {
 
                       [styles.overlayActive]:
                         !s.isSystemDapplets && x.id === activeOverlayId,
+                      // (!isSettings && x.id === activeOverlayId),
                     })}
                   >
                     {/* <ContentItem

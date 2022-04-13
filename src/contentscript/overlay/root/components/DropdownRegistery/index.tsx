@@ -76,78 +76,114 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
     loadRegistries()
   }
   // addRegistry{registryInput}
+  // const isNumeric = () => {
+  //   const nearReg = new RegExp(
+  //     /^(([a-z\d]+[\-_])*[a-z\d]+\.)*([a-z\d]+[\-_])*[a-z\d]+$/
+  //   )
+  //   const ephirReg = new RegExp(/^0x[a-fA-F0-9]{40}$/)
+  //   const defReg = new RegExp(
+  //     /[-a-zA-Z0-9@:%.+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%+.~#?&//=]*) /
+  //   )
+  //   return (
+  //     nearReg.test(registryInput) ||
+  //     ephirReg.test(registryInput) ||
+  //     defReg.test(registryInput)
+  //   )
+  // }
+  // console.log(isNumeric())
+  const visible = (hash: string): string => {
+    if (hash.length > 18) {
+      const firstFourCharacters = hash.substring(0, 9)
+      const lastFourCharacters = hash.substring(
+        hash.length - 0,
+        hash.length - 8
+      )
+
+      return `${firstFourCharacters}...${lastFourCharacters}`
+    } else {
+      return hash
+    }
+  }
 
   return (
-    <div className={styles.wrapper}>
-      {registries.map(
-        (r, i) =>
-          r.isEnabled && (
-            <div key={i} className={styles.activeRegistry}>
-              <div className={styles.inputBlock}>
-                <input
-                  className={cn(styles.inputRegistries, {
-                    [styles.errorInput]: registryInputError,
-                  })}
-                  onClick={() => addRegistry(registryInput)}
-                  // placeholder={r.url}
-                  value={registryInput || r.url}
-                  onChange={(e) => {
-                    setRegistryInput(e.target.value)
-                    setRegistryInputError(null)
-                    enableRegistry(r.url)
-                    // addRegistry(registryInput)
-                  }}
-                  disabled={
-                    !isValidUrl(registryInput) &&
-                    !!registries.find((r) => r.url === !registryInput)
-                  }
-                  // error={!!registryInputError}
-                />
+    <>
+      <div
+        className={cn(styles.wrapper, {
+          [styles.errorInput]: !!registryInputError,
+        })}
+        // onClick={() => {
+        //   if (isOpen) {
+        //     !isOpen
+        //   }
+        // }}
+      >
+        {registries.map(
+          (r, i) =>
+            r.isEnabled && (
+              <div key={i} className={styles.activeRegistry}>
+                <div className={cn(styles.inputBlock)}>
+                  <input
+                    className={cn(styles.inputRegistries)}
+                    onClick={() => addRegistry(registryInput)}
+                    placeholder={r.url}
+                    value={registryInput}
+                    onChange={(e) => {
+                      setRegistryInput(e.target.value)
+                      setRegistryInputError(null)
+                      enableRegistry(r.url)
+                      // addRegistry(registryInput)
+                    }}
+                    disabled={
+                      !isValidUrl(registryInput) &&
+                      !!registries.find((r) => r.url === !registryInput)
+                    }
+                  />
 
-                <span
-                  className={cn(styles.openList, { [styles.isOpen]: isOpen })}
-                  onClick={setOpen}
-                />
+                  <span
+                    className={cn(styles.openList, { [styles.isOpen]: isOpen })}
+                    onClick={setOpen}
+                  />
+                </div>
               </div>
-              {registryInputError ? (
-                <div className={styles.errorMessage}>{registryInputError}</div>
-              ) : null}
-            </div>
-          )
-      )}
+            )
+        )}
 
-      {isOpen && (
-        <div className={styles.registriesList}>
-          <div className={styles.inputBlock}>
-            <div className={styles.delimiterSpan}>-</div>
-            <span
-              className={cn(styles.openList, { [styles.isOpen]: isOpen })}
-              onClick={setOpen}
-            />
-          </div>
-
-          {registries.map((r, i) => (
-            <div key={i} className={styles.itemRegistries}>
+        {isOpen && (
+          <div className={styles.registriesList}>
+            <div className={styles.inputBlock}>
+              <div className={styles.delimiterSpan}>-</div>
               <span
-                className={styles.registrieslink}
-                onClick={() => {
-                  enableRegistry(r.url)
-                  setOpen()
-                }}
-              >
-                {r.url}
-              </span>
-              {!r.isEnabled && (
-                <span
-                  onClick={() => removeRegistry(r.url)}
-                  className={styles.deleteRegistryes}
-                />
-              )}
+                className={cn(styles.openList, { [styles.isOpen]: isOpen })}
+                onClick={setOpen}
+              />
             </div>
-          ))}
-        </div>
-      )}
-    </div>
+
+            {registries.map((r, i) => (
+              <div key={i} className={styles.itemRegistries}>
+                <span
+                  className={styles.registrieslink}
+                  onClick={() => {
+                    enableRegistry(r.url)
+                    setOpen()
+                  }}
+                >
+                  {visible(r.url)}
+                </span>
+                {!r.isEnabled && (
+                  <span
+                    onClick={() => removeRegistry(r.url)}
+                    className={styles.deleteRegistryes}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {registryInputError ? (
+        <div className={styles.errorMessage}>{registryInputError}</div>
+      ) : null}
+    </>
   )
 }
 

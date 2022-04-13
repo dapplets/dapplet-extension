@@ -4,8 +4,8 @@ import cn from 'classnames'
 import styles from './InputPanel.module.scss'
 
 export interface InputPanelProps
-  extends DetailedHTMLProps<
-    InputHTMLAttributes<HTMLInputElement>,
+  extends React.DetailedHTMLProps<
+    React.InputHTMLAttributes<HTMLInputElement>,
     HTMLInputElement
   > {
   onSubmit?: () => void
@@ -17,7 +17,7 @@ export interface InputPanelProps
 
 export const InputPanel: FC<InputPanelProps> = (props) => {
   const {
-    value,
+    value = '',
     onChange,
     onSubmit,
     placeholder,
@@ -38,14 +38,17 @@ export const InputPanel: FC<InputPanelProps> = (props) => {
   // }
 
   return (
-    <form className={cn(styles.inputPanel)} onSubmit={handlerSubmit}>
+    <form
+      className={cn(styles.inputPanel, { [styles.error]: error })}
+      onSubmit={handlerSubmit}
+    >
       <input
-        value={value}
-        className={cn(styles.inputInfo, error && styles.error, {
+        className={cn(styles.inputInfo, {
           [styles.inputDefault]: buttonDefault,
         })}
         onChange={onChange}
-        type="text"
+        // type="text"
+        //  value={value}
         placeholder={placeholder}
         {...anotherProps}
       />

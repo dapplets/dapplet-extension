@@ -92,65 +92,80 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
 
     setRegistries(registries.filter((r) => r.isDev === false))
   }
+  const visible = (hash: string): string => {
+    if (hash.length > 18) {
+      const firstFourCharacters = hash.substring(0, 9)
+      const lastFourCharacters = hash.substring(
+        hash.length - 0,
+        hash.length - 8
+      )
+
+      return `${firstFourCharacters}...${lastFourCharacters}`
+    } else {
+      return hash
+    }
+  }
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.inputTrustedUsers}>
-        <div className={styles.inputBlock}>
-          <input
-            className={cn(styles.inputUsers, {
-              [styles.errorInput]: trustedUserInputError,
-            })}
-            placeholder="NEAR or Ethereum address..."
-            value={trustedUserInput}
-            onClick={() => addTrustedUser(trustedUserInput)}
-            onChange={(e) => {
-              setTrustedUserInput(e.target.value)
-              setTrustedUserInputError(null)
-            }}
-            disabled={
-              // !(
-              !isValidUrl(trustedUserInput) &&
-              !!registries.find((r) => r.url === trustedUserInput)
-              // )
-            }
-            // error={!!trustedUserInputError}
-          />
-          <span
-            className={cn(styles.openList, { [styles.isOpen]: isOpen })}
-            onClick={setOpen}
-          />
-        </div>
-        {trustedUserInputError ? (
-          <div className={styles.errorMessage}>{trustedUserInputError}</div>
-        ) : null}
-      </div>
-      {/* {trustedUserInputError ? <span>{trustedUserInputError}</span> : null} */}
-      {isOpen && (
-        <div className={styles.userList}>
+    <>
+      <div
+        className={cn(styles.wrapper, {
+          [styles.errorInput]: trustedUserInputError,
+        })}
+      >
+        <div className={styles.inputTrustedUsers}>
           <div className={styles.inputBlock}>
-            <div className={styles.delimiterSpan}>-</div>
+            <input
+              className={cn(styles.inputUsers)}
+              placeholder="NEAR or Ethereum address..."
+              value={trustedUserInput}
+              onClick={() => addTrustedUser(trustedUserInput)}
+              onChange={(e) => {
+                setTrustedUserInput(e.target.value)
+                setTrustedUserInputError(null)
+              }}
+              disabled={
+                !isValidUrl(trustedUserInput) &&
+                !!registries.find((r) => r.url === !trustedUserInput)
+              }
+              // error={!!trustedUserInputError}
+            />
             <span
               className={cn(styles.openList, { [styles.isOpen]: isOpen })}
               onClick={setOpen}
             />
           </div>
-          {trustedUsers.map((user, i) => (
-            <div key={i} className={styles.itemUser}>
-              <a
-                className={styles.userlink}
-                onClick={() => _openEtherscan(user.account)}
-              >
-                {user.account}
-              </a>
+        </div>
+        {/* {trustedUserInputError ? <span>{trustedUserInputError}</span> : null} */}
+        {isOpen && (
+          <div className={styles.userList}>
+            <div className={styles.inputBlock}>
+              <div className={styles.delimiterSpan}>-</div>
               <span
-                className={styles.deleteUsers}
-                onClick={() => removeTrustedUser(user.account)}
+                className={cn(styles.openList, { [styles.isOpen]: isOpen })}
+                onClick={setOpen}
               />
             </div>
-          ))}
-        </div>
-      )}
-    </div>
+            {trustedUsers.map((user, i) => (
+              <div key={i} className={styles.itemUser}>
+                <a
+                  className={styles.userlink}
+                  onClick={() => _openEtherscan(user.account)}
+                >
+                  {visible(user.account)}
+                </a>
+                <span
+                  className={styles.deleteUsers}
+                  onClick={() => removeTrustedUser(user.account)}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      {trustedUserInputError ? (
+        <div className={styles.errorMessage}>{trustedUserInputError}</div>
+      ) : null}
+    </>
   )
 }
 

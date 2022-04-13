@@ -97,6 +97,7 @@
 }
 
 .error {
-  border: 1px solid #ff6442;
-  color: #ff6442;
+  background: #fef2f4;
+
+  border: 1px solid $Primary;
 }

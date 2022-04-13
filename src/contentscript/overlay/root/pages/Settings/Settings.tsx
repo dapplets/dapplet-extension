@@ -20,6 +20,7 @@ import { InputPanel } from '../../components/InputPanel'
 import { DropdownRegistery } from '../../components/DropdownRegistery'
 import { DropdownTrustedUsers } from '../../components/DropdownTrustedUsers'
 import { DropdownPreferedOverlayStorage } from '../../components/DropdownPreferedOverlayStorage'
+import { StorageTypes } from '../../../../../common/constants'
 
 export const DROPDOWN_LIST = [{ _id: '0', label: 'Custom' }]
 let _isMounted = false
@@ -36,15 +37,19 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [providerInput, setProviderInput] = useState('')
   const [providerEdited, setProviderEdited] = useState(false)
   const [providerInputError, setProviderInputError] = useState(null)
+  const [providerLoading, setProviderLoading] = useState(false)
 
   const [swarmGatewayInput, setSwarmGatewayInput] = useState('')
   const [swarmGatewayInputError, setSwarmGatewayInputError] = useState(null)
   const [swarmGatewayEdited, setSwarmGatewayEdited] = useState(false)
+  const [swarmGatewayLoading, setSwarmGatewayLoading] = useState(false)
 
   const [swarmPostageStampIdInput, setSwarmPostageStampIdInput] = useState('')
   const [swarmPostageStampIdInputError, setSwarmPostageStampIdInputError] =
     useState(null)
   const [swarmPostageStampIdInputEdited, setSwarmPostageStampIdInputEdited] =
+    useState(false)
+  const [swarmPostageStampIdLoading, setSwarmPostageStampIdLoading] =
     useState(false)
 
   const [dynamicAdapterInput, setDynamicAdapterInput] = useState('')
@@ -71,6 +76,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [siaPortalInputError, setSiaPortalInputError] = useState(null)
   const [siaPortalLoading, setSiaPortalLoading] = useState(false)
   const [siaPortalEdited, setSiaPortalEdited] = useState(false)
+
+  const [targetStorages, setTargetStorages] = useState<string[]>([
+    StorageTypes.Swarm,
+    StorageTypes.Sia,
+    StorageTypes.Ipfs,
+  ])
 
   useEffect(() => {
     _isMounted = true
@@ -104,11 +115,15 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
   const setProvider = async (provider: string) => {
     try {
+      setProviderLoading(true)
+
       const { setEthereumProvider } = await initBGFunctions(browser)
       await setEthereumProvider(provider)
-
+      loadProvider()
+      setProviderLoading(false)
       setProviderEdited(false)
     } catch (err) {
+      setProviderLoading(false)
       setProviderEdited(false)
       setProviderInputError(err.message)
     }
@@ -122,12 +137,15 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const setSwarmGateway = async (gateway: string) => {
     try {
+      setSwarmGatewayLoading(true)
       const { setSwarmGateway } = await initBGFunctions(browser)
       await setSwarmGateway(gateway)
-
+      loadSwarmGateway()
       setSwarmGatewayEdited(false)
+      setSwarmGatewayLoading(false)
     } catch (err) {
       setSwarmGatewayEdited(false)
+      setSwarmGatewayLoading(false)
       setSwarmGatewayInputError(err.message)
     }
   }
@@ -140,10 +158,15 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const setSwarmPostageStampId = async (id: string) => {
     try {
+      setSwarmPostageStampIdLoading(true)
+
       const { setSwarmPostageStampId } = await initBGFunctions(browser)
       await setSwarmPostageStampId(id)
+      loadSwarmPostageStampId()
+      setSwarmPostageStampIdLoading(false)
       setSwarmPostageStampIdInputEdited(false)
     } catch (err) {
+      setSwarmPostageStampIdLoading(false)
       setSwarmPostageStampIdInputEdited(false)
       setSwarmPostageStampIdInputError(err.message)
     }
@@ -157,10 +180,15 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const setDynamicAdapter = async (dynamicAdapter: string) => {
-    const { setDynamicAdapter } = await initBGFunctions(browser)
-    await setDynamicAdapter(dynamicAdapter)
+    try {
+      const { setDynamicAdapter } = await initBGFunctions(browser)
+      await setDynamicAdapter(dynamicAdapter)
 
-    setDynamicAdapterInputEdited(false)
+      setDynamicAdapterInputEdited(false)
+    } catch (error) {
+      setDynamicAdapterInputError(error.message)
+      console.log(dynamicAdapterInputError)
+    }
   }
   const loadRegistries = async () => {
     const { getRegistries } = await initBGFunctions(browser)
@@ -234,7 +262,11 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSiaPortalInputError(err.message)
     }
   }
-
+  const changeTargetStorage = (storage: StorageTypes, checked: boolean) => {
+    const targetStoragesChecked = targetStorages.filter((x) => x !== storage)
+    if (checked) targetStorages.push(storage)
+    setTargetStorages(targetStoragesChecked)
+  }
   // setProvider(providerInput)
   // setSwarmGateway(swarmGatewayInput)
   // setSwarmPostageStampId(swarmPostageStampIdInput)
@@ -327,24 +359,49 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
               component={<></>}
               children={
                 <InputPanel
-                  value={dynamicAdapterInput}
                   error={!!dynamicAdapterInputError}
                   onChange={(e) => {
-                    setDynamicAdapter(e.target.value)
                     // setDynamicAdapter(e.target.value)
+                    setDynamicAdapter(e.target.value)
                     setDynamicAdapterInputError(null)
                     setDynamicAdapterInputEdited(true)
                   }}
+                  value={dynamicAdapterInput}
                   placeholder="dynamic-adapter.dapplet-base.eth#default@..."
                 />
               }
             />
             <SettingItem
-              title=" Prefered Overlay Storage"
+              title="Prefered Overlay Storage"
               component={<></>}
               children={<DropdownPreferedOverlayStorage />}
             />
-
+            <SettingItem
+              title="Storages"
+              component={<></>}
+              children={
+                <div className={styles.checkboxBlock}>
+                  <Checkbox isCheckbox title="Centralized" />
+                  <Checkbox
+                    isCheckbox={targetStorages.includes(StorageTypes.Sia)}
+                    title="SIA"
+                    onChange={(e) => changeTargetStorage(StorageTypes.Sia, !e)}
+                  />
+                  <Checkbox
+                    isCheckbox={targetStorages.includes(StorageTypes.Ipfs)}
+                    title="IPFS"
+                    onChange={(e) => changeTargetStorage(StorageTypes.Ipfs, !e)}
+                  />
+                  <Checkbox
+                    isCheckbox={targetStorages.includes(StorageTypes.Swarm)}
+                    title="Swarm"
+                    onChange={(e) =>
+                      changeTargetStorage(StorageTypes.Swarm, !e)
+                    }
+                  />
+                </div>
+              }
+            />
             {/* storages */}
           </>
         }
@@ -359,14 +416,15 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
               children={
                 <InputPanel
                   onChange={(e) => {
-                    setProvider(e.target.value)
                     // setProviderInput(e.target.value)
+                    setProvider(e.target.value)
                     setProviderEdited(true)
                     setProviderInputError(null)
+                    console.log(providerInput)
                   }}
-                  error={!isValidHttp(providerInput)}
                   value={providerInput}
-                  placeholder="eda881d858ae4a25b2dfbbd0b4629992"
+                  error={!isValidHttp(providerInput)}
+                  placeholder={`${providerInput}`}
                 />
               }
             />
@@ -383,7 +441,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     setSwarmGatewayInputError(null)
                     setSwarmGatewayEdited(true)
                   }}
-                  placeholder="http:\\bee.dapplets.org\"
+                  placeholder={`${swarmGatewayInput}`}
                 />
               }
             />
@@ -403,7 +461,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     setSwarmPostageStampIdInputError(null)
                     setSwarmPostageStampIdInputEdited(true)
                   }}
-                  placeholder="Swarm Postage Stamp ID"
+                  placeholder={`${swarmPostageStampIdInput}`}
                 />
               }
             />
@@ -419,6 +477,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     setIpfsGatewayEdited(true)
                     setIpfsGatewayInputError(null)
                   }}
+                  placeholder={`${ipfsGatewayInput}`}
                 />
               }
             />
@@ -433,6 +492,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     setSiaPortalEdited(true)
                     setSiaPortalInputError(null)
                   }}
+                  placeholder={`${siaPortalInput}`}
                 />
               }
             />

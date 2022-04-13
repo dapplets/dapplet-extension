@@ -106,7 +106,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
             <div className={styles.blockInfo}>
               <h3 className={styles.dappletsTitle}>{m.module.title}</h3>
               <button className={styles.dappletsSettings} />
-              <button className={styles.dappletsReupload}>Reupload </button>
+              <button className={styles.dappletsReupload}>
+                {!m.isDeployed?.[0] ? 'Deploy' : 'Reupload'}
+              </button>
             </div>
             <div className={styles.dappletsLabel}>
               {m.module.name && (

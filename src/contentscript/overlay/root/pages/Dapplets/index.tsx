@@ -220,6 +220,8 @@ export const Dapplets = () => {
   const onOpenSettingsModule = async (mi: ManifestDTO) => {
     const { openSettingsOverlay } = await initBGFunctions(browser)
     await openSettingsOverlay(mi)
+    console.log(mi)
+
     window.close()
   }
 

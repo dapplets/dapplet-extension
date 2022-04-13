@@ -9,10 +9,11 @@ export interface CheckboxProps
   > {
   title: string
   isCheckbox: boolean
+  // onChange?: (any, any) => void
 }
 export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
   const { title, isCheckbox = false, onChange, ...anotherProps } = props
-
+  // const onChangeCheckbox = (x, y) => {}
   return (
     <label
       onChange={onChange}
@@ -21,7 +22,11 @@ export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
       })}
       {...anotherProps}
     >
-      <input className={cn(styles.inputNotification)} type="checkbox" />
+      <input
+        // onChange={() => onChange}
+        className={cn(styles.inputNotification)}
+        type="checkbox"
+      />
       <div className={styles.inner}>
         <span className={cn(styles.inputCheckbox)} />
         <span className={cn(styles.inputCheckboxTitle)}>{title}</span>

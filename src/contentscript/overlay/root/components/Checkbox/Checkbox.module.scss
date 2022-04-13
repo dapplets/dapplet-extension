@@ -31,16 +31,17 @@
 .inputCheckboxTitle {
   display: inline-block;
 
-  padding: 0 0 0 10px;
-
-  text-transform: uppercase;
-
-  color: $ContentBlack;
-
-  font-family: Roboto, sans-serif;
-
-  font-size: 10px;
+  padding: 0 0 0 8px;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
   line-height: 100%;
+
+  display: flex;
+  align-items: center;
+
+  color: $MainBlack;
 }
 
 .checkboxNotification {
