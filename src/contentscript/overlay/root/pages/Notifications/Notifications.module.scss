@@ -7,9 +7,23 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
+  // height: calc(100% - 75px);
   padding: 20px 0px 0px 0px;
   overflow: hidden;
 }
+
+.wrapper::-webkit-scrollbar {
+  width: 0;
+}
+
+.wrapper {
+  -ms-overflow-style: none;
+}
+
+.wrapper {
+  overflow: -moz-scrollbars-none;
+}
+
 .block {
   display: flex;
   flex-direction: column;
@@ -18,6 +32,15 @@
   // height: 100%;
   overflow: hidden;
   padding: 0px 0px 0px 1px;
+}
+.block::-webkit-scrollbar {
+  width: 0;
+}
+.block {
+  -ms-overflow-style: none;
+}
+.block {
+  overflow: -moz-scrollbars-none;
 }
 
 .notification {
