@@ -93,7 +93,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       await loadErrorReporting()
       await loadSwarmPostageStampId()
       await loadDynamicAdapter()
-      await loadRegistries()
+      // await loadRegistries()
       await loadUserAgentId()
       await loadUserAgentName()
       await loadIpfsGateway()
@@ -201,12 +201,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       console.log(dynamicAdapterInputError)
     }
   }
-  const loadRegistries = async () => {
-    const { getRegistries } = await initBGFunctions(browser)
-    const registries = await getRegistries()
+  // const loadRegistries = async () => {
+  //   const { getRegistries } = await initBGFunctions(browser)
+  //   const registries = await getRegistries()
 
-    setRegistries(registries.filter((r) => r.isDev === false))
-  }
+  //   setRegistries(registries.filter((r) => r.isDev === false))
+  // }
 
   const loadUserAgentId = async () => {
     const { getUserAgentId } = await initBGFunctions(browser)

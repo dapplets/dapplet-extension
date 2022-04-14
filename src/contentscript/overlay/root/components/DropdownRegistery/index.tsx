@@ -9,7 +9,7 @@ import React, {
 } from 'react'
 import cn from 'classnames'
 import styles from './DropdownRegistery.module.scss'
-import { IDropdown } from '../../models/dropdown.model'
+
 import { useToggle } from '../../hooks/useToggle'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { browser } from 'webextension-polyfill-ts'
@@ -17,17 +17,17 @@ import { isValidUrl } from '../../../../../popup/helpers'
 
 export interface DropdownRegisteryProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
-  list?: IDropdown[]
-  value?: IDropdown | null
+  // list?: IDropdown[]
+  // value?: IDropdown | null
 }
 let _isMounted = false
 export const DropdownRegistery: FC<DropdownRegisteryProps> = (
   props: DropdownRegisteryProps
 ) => {
   const {
-    list,
-    className,
-    value = null,
+    // list,
+    // className,
+    // value = null,
 
     ...anotherProps
   } = props
@@ -35,6 +35,34 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
   const [registries, setRegistries] = useState([])
+
+  // const ethereumReg = new RegExp(/^0x[a-fA-F0-9]{40}$/)
+  // const ethReg = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/)
+  // const nearReg = new RegExp(
+  //   /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/
+  // )
+  // const nearTestReg = new RegExp(
+  //   /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/
+  // )
+  // const nearImplicitAccountsReg = new RegExp(/^[0-9a-z]{64}$/)
+  // const nearDevAccountsReg = new RegExp(/^dev-\d*-\d*$/)
+
+  // const [testInput, setTestInput] = useState(false)
+  // const getTweetParse = (tweet) => {
+  //   if (
+  //     !ethereumReg.test(tweet) ||
+  //     !ethReg.test(tweet) ||
+  //     !nearReg.test(tweet) ||
+  //     !nearTestReg.test(tweet) ||
+  //     !nearImplicitAccountsReg.test(tweet) ||
+  //     !nearDevAccountsReg.test(tweet)
+  //   ) {
+  //     setTestInput(true)
+  //   } else {
+  //     setTestInput(false)
+  //   }
+  // }
+
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -45,6 +73,24 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
       _isMounted = false
     }
   }, [])
+
+  //   Ethereum
+  // /^0x[a-fA-F0-9]{40}$/
+
+  // ENS
+  // /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/
+
+  // NEAR
+  // /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/
+
+  // NEAR TESTNET
+  // /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/
+
+  // NEAR Implicit accounts
+  // /^[0-9a-z]{64}$/
+
+  // NEAR Dev accounts
+  // /^dev-\d*-\d*$/
 
   const loadRegistries = async () => {
     const { getRegistries } = await initBGFunctions(browser)
@@ -58,6 +104,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
     try {
       await addRegistry(url, false)
       setRegistryInput(registryInput)
+      setRegistryInputError(null)
     } catch (err) {
       setRegistryInputError(err.message)
     }
@@ -76,22 +123,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
     await enableRegistry(url)
     loadRegistries()
   }
-  // addRegistry{registryInput}
-  // const isNumeric = () => {
-  //   const nearReg = new RegExp(
-  //     /^(([a-z\d]+[\-_])*[a-z\d]+\.)*([a-z\d]+[\-_])*[a-z\d]+$/
-  //   )
-  //   const ephirReg = new RegExp(/^0x[a-fA-F0-9]{40}$/)
-  //   const defReg = new RegExp(
-  //     /[-a-zA-Z0-9@:%.+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%+.~#?&//=]*) /
-  //   )
-  //   return (
-  //     nearReg.test(registryInput) ||
-  //     ephirReg.test(registryInput) ||
-  //     defReg.test(registryInput)
-  //   )
-  // }
-  // console.log(isNumeric())
+
   const visible = (hash: string): string => {
     if (hash.length > 18) {
       const firstFourCharacters = hash.substring(0, 9)
@@ -106,21 +138,18 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
     }
   }
   const handleClear = () => {
-    // e.preventDefault()
     setRegistryInput('')
   }
+  // console.log(registryInputError)
 
   return (
     <>
       <div
         className={cn(styles.wrapper, {
-          [styles.errorInput]: !!registryInputError,
+          [styles.errorInput]: registryInputError,
         })}
-        // onClick={() => {
-        //   if (isOpen) {
-        //     !isOpen
-        //   }
-        // }}
+        onBlur={setOpen}
+        tabIndex={0}
       >
         {registries.map(
           (r, i) =>
@@ -129,19 +158,21 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
                 <div className={cn(styles.inputBlock)}>
                   <input
                     className={cn(styles.inputRegistries)}
-                    onClick={() => addRegistry(registryInput, handleClear)}
+                    disabled={
+                      !isValidUrl(registryInput) &&
+                      !!registries.find((r) => r.url === !registryInput)
+                    }
                     placeholder={r.url}
                     value={registryInput}
                     onChange={(e) => {
                       setRegistryInput(e.target.value)
                       setRegistryInputError(null)
-                      enableRegistry(r.url)
-                      // addRegistry(registryInput)
                     }}
-                    disabled={
-                      !isValidUrl(registryInput) &&
-                      !!registries.find((r) => r.url === !registryInput)
-                    }
+                    onClick={() => {
+                      // setRegistryInputError(null)
+                      addRegistry(registryInput, handleClear)
+                    }}
+                    onBlur={() => setRegistryInputError(null)}
                   />
 
                   <span

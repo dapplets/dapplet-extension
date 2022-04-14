@@ -59,7 +59,12 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (
     loadPreferedOverlayStorage()
   }
   return (
-    <div className={styles.wrapper} onClick={setOpen}>
+    <div
+      className={styles.wrapper}
+      onClick={setOpen}
+      onBlur={setOpen}
+      tabIndex={0}
+    >
       <div className={styles.dropdownLabel}>{preferedOverlayStorage}</div>
       <span className={styles.openDropdown} />
       {isOpen && (

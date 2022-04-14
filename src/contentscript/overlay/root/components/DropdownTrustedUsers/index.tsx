@@ -113,14 +113,14 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
     setTrustedUserInput('')
   }
 
-  const rootEl = useRef(null)
+  // const rootEl = useRef(null)
 
   // useEffect(() => {
-  const l = (e) => {
-    rootEl.current.contains(e.target) || setOpen()
-    document.addEventListener('click', l)
-    return () => document.removeEventListener('click', l)
-  }
+  // const l = (e) => {
+  //   rootEl.current.contains(e.target) || setOpen()
+  //   document.addEventListener('click', l)
+  //   return () => document.removeEventListener('click', l)
+  // }
   // }, [])
 
   // const num = useMemo(() => {
@@ -132,6 +132,8 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
         className={cn(styles.wrapper, {
           [styles.errorInput]: trustedUserInputError,
         })}
+        onBlur={setOpen}
+        tabIndex={0}
       >
         <div className={styles.inputTrustedUsers}>
           <div className={styles.inputBlock}>
@@ -148,6 +150,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
                 // addTrustedUser(trustedUserInput, handleClear)
                 // handleClear(e)
               }}
+              onBlur={() => setTrustedUserInputError(null)}
               disabled={
                 !isValidUrl(trustedUserInput) &&
                 !!registries.find((r) => r.url === !trustedUserInput)
@@ -162,8 +165,18 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
         </div>
         {/* {trustedUserInputError ? <span>{trustedUserInputError}</span> : null} */}
         {isOpen && (
-          <div className={styles.userList}>
-            <div className={styles.inputBlock}>
+          <div
+            className={styles.userList}
+            // onBlur={() => {
+            //   console.log('lala')
+            // }}
+          >
+            <div
+              className={styles.inputBlock}
+              // onBlur={() => {
+              //   console.log('lala')
+              // }}
+            >
               <div className={styles.delimiterSpan}>-</div>
               <span
                 className={cn(styles.openList, { [styles.isOpen]: isOpen })}
@@ -174,7 +187,13 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
               />
             </div>
             {trustedUsers.map((user, i) => (
-              <div key={i} className={styles.itemUser}>
+              <div
+                key={i}
+                className={styles.itemUser}
+                // onClick={() => {
+                //  onblur
+                // }}
+              >
                 <a
                   className={styles.userlink}
                   onClick={() => _openEtherscan(user.account)}

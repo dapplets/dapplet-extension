@@ -78,7 +78,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
   const handlerSelectedTab = (id: string) => (): void => onSelectedTab(id)
   const handlerRemoveTab = (id: string) => (): void => onRemoveTab(id)
   const nonSystemTabs = tabs.filter((x) => !x.uri.includes('/popup.html#'))
-  console.log(nonSystemTabs)
+  // console.log(nonSystemTabs)
 
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
