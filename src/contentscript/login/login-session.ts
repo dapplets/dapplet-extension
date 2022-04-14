@@ -89,10 +89,10 @@ export class LoginSession {
                     return new Promise((res, rej) => {
                         wallet.sendAndListen(method, params, { 
                             result: (_, { data }) => {
-                                res(data[0])
+                                res(data)
                             },
                             rejected: (_, { data }) => {
-                                rej(data[0])
+                                rej(data)
                             },
                         });
                     });

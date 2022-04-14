@@ -6,7 +6,7 @@ import * as NearApi from "near-api-js";
 
 import { IOverlay, IOverlayManager } from "./overlay/interfaces";
 import { Swiper } from "./swiper";
-import { AutoProperties, EventDef, Connection } from "./connection";
+import { EventDef, Connection } from "./connection";
 import { WsJsonRpc } from "./wsJsonRpc";
 import { AppStorage } from "./appStorage";
 import { SystemOverlayTabs, LoginRequest } from "../common/types";
@@ -17,25 +17,27 @@ import { LoginSession } from "./login/login-session";
 import { LoginHooks, LoginRequestSettings } from "./login/types";
 import ModuleInfo from "../background/models/moduleInfo";
 import VersionInfo from "../background/models/versionInfo";
+import { State } from './state';
 
 type Abi = any;
 
-type OverlayConnection<M> = AutoProperties<M> & Connection & { 
-    id: string,
-    isOpen(): boolean, 
-    close(): void, 
-    onClose(callback: () => void): void 
+type OverlayConnection<T> = Connection<T> & { 
+    id: string
+    isOpen(): boolean
+    close(): void
+    onClose(callback: () => void): OverlayConnection<T>
+    useState(state: State<T>): OverlayConnection<T>
 };
 
 interface WalletConnection {
-    isConnected(): Promise<boolean>;
-    connect(): Promise<void>;
-    disconnect(): Promise<void>;
+    isConnected(): Promise<boolean>
+    connect(): Promise<void>
+    disconnect(): Promise<void>
 }
 
 type ContentDetector = {
-    contextId: string;
-    selector: string;
+    contextId: string
+    selector: string
 }
 
 export default class Core {
@@ -292,19 +294,22 @@ export default class Core {
         });
     }
 
-    public connect<M>(cfg: { url: string }, eventDef?: EventDef<any>): AutoProperties<M> & Connection {
+    public connect<T>(cfg: { url: string }, defaultState: T): Connection<T> {
         const rpc = new WsJsonRpc(cfg.url);
-        const conn = Connection.create<M>(rpc, eventDef);
+        const conn = new Connection<T>(rpc);
+        const state = this.state(defaultState, 'server');
+        conn.state = state;
+        conn.state.addConnection(conn);
         return conn;
     }
 
     /**
      * @deprecated Since version 0.46.0. Will be deleted in version 0.50.0. Use `Core.login()` instead.
      */
-    public async wallet<M>(cfg: { type: 'ethereum', network: 'goerli', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & AutoProperties<M> & Connection>
-    public async wallet<M>(cfg: { type: 'near', network: 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
-    public async wallet<M>(cfg: { type: 'near', network: 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
-    public async wallet<M>(cfg: { type: 'ethereum' | 'near', network: 'goerli' | 'testnet' | 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
+    public async wallet<T>(cfg: { type: 'ethereum', network: 'goerli', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & Connection<T>>
+    public async wallet(cfg: { type: 'near', network: 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
+    public async wallet(cfg: { type: 'near', network: 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
+    public async wallet(cfg: { type: 'ethereum' | 'near', network: 'goerli' | 'testnet' | 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
         console.warn('DEPRECATED: "Core.contract()" is deprecated since version 0.46.1. It will be deleted in version 0.50.0. Use "Core.login()" instead.');
 
         if (!cfg || !cfg.type || !cfg.network) throw new Error("\"type\" and \"network\" are required in Core.wallet().");
@@ -367,11 +372,13 @@ export default class Core {
         }) as any;
     }
 
-    public overlay<M>(cfg: { name: string, url?: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M>
-    public overlay<M>(cfg: { name?: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M>
-    public overlay<M>(cfg: { name: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<M> {
+    public overlay<T>(cfg: { name: string, url?: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<any>
+    public overlay<T>(cfg: { name: string, url?: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<T>
+    public overlay<T>(cfg: { name?: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<T>
+    public overlay<T>(cfg: { name: string, url: string, title: string, source?: string }, eventDef?: EventDef<any>): OverlayConnection<T | any> {
         const _overlay = this.overlayManager.createOverlay(cfg.url, cfg.title, cfg.source);
-        const conn = Connection.create<M>(_overlay, eventDef);
+        const conn = new Connection<T>(_overlay, eventDef);
+        let overridedConn: OverlayConnection<T>
         const overrides = {
             id: _overlay.id,
             isOpen() {
@@ -382,9 +389,16 @@ export default class Core {
             },
             onClose(callback: () => void) {
                 _overlay.frame.addEventListener('onOverlayClose', () => callback());
+                return overridedConn;
             },
+            useState(state: State<T>) {
+                conn.state = state;
+                conn.state.addConnection(conn);
+                return overridedConn;
+            }
         }
-        return Object.assign(conn, overrides);
+        overridedConn = Object.assign(conn, overrides);
+        return overridedConn;
     }
 
     // ToDo: remove it or implement!
@@ -416,6 +430,7 @@ export default class Core {
     }
 
     public getContentDetectors(): ContentDetector[] {
+        // Note: take it from a registry in the future
         return [{
             contextId: 'video',
             selector: 'video'
@@ -485,5 +500,9 @@ export default class Core {
         loginSession.logoutHandler = _request.onLogout;
 
         return loginSession;
+    }
+
+    public state<T>(defaultState: T, type?: string) {
+        return new State<T>(defaultState, type);
     }
 }
