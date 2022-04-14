@@ -31,7 +31,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
 
     ...anotherProps
   } = props
-  const [isOpen, setOpen] = useToggle(false)
+  const [isOpen, setOpen] = useState(false)
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
   const [registries, setRegistries] = useState([])
@@ -74,24 +74,6 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
     }
   }, [])
 
-  //   Ethereum
-  // /^0x[a-fA-F0-9]{40}$/
-
-  // ENS
-  // /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/
-
-  // NEAR
-  // /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/
-
-  // NEAR TESTNET
-  // /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/
-
-  // NEAR Implicit accounts
-  // /^[0-9a-z]{64}$/
-
-  // NEAR Dev accounts
-  // /^dev-\d*-\d*$/
-
   const loadRegistries = async () => {
     const { getRegistries } = await initBGFunctions(browser)
     const registries = await getRegistries()
@@ -118,10 +100,11 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
     loadRegistries()
   }
 
-  const enableRegistry = async (url: string) => {
+  const enableRegistry = async (url: string, x: (x) => void) => {
     const { enableRegistry } = await initBGFunctions(browser)
     await enableRegistry(url)
     loadRegistries()
+    x(false)
   }
 
   const visible = (hash: string): string => {
@@ -148,7 +131,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
         className={cn(styles.wrapper, {
           [styles.errorInput]: registryInputError,
         })}
-        onBlur={setOpen}
+        onBlur={() => setOpen(false)}
         tabIndex={0}
       >
         {registries.map(
@@ -177,7 +160,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
 
                   <span
                     className={cn(styles.openList, { [styles.isOpen]: isOpen })}
-                    onClick={setOpen}
+                    onClick={() => setOpen(true)}
                   />
                 </div>
               </div>
@@ -190,7 +173,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
               <div className={styles.delimiterSpan}>-</div>
               <span
                 className={cn(styles.openList, { [styles.isOpen]: isOpen })}
-                onClick={setOpen}
+                onClick={() => setOpen(false)}
               />
             </div>
 
@@ -201,8 +184,8 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
                     [styles.activeLink]: r.isEnabled,
                   })}
                   onClick={() => {
-                    enableRegistry(r.url)
-                    setOpen()
+                    enableRegistry(r.url, setOpen)
+                    // setOpen()
                   }}
                 >
                   {visible(r.url)}

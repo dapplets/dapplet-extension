@@ -35,7 +35,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
 
     ...anotherProps
   } = props
-  const [isOpen, setOpen] = useToggle(false)
+  const [isOpen, setOpen] = useState(false)
   const [trustedUserInput, setTrustedUserInput] = useState('')
   const [trustedUserInputError, setTrustedUserInputError] = useState(null)
   const [trustedUsers, setTrustedUsers] = useState([])
@@ -132,7 +132,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
         className={cn(styles.wrapper, {
           [styles.errorInput]: trustedUserInputError,
         })}
-        onBlur={setOpen}
+        onBlur={() => setOpen(false)}
         tabIndex={0}
       >
         <div className={styles.inputTrustedUsers}>
@@ -159,7 +159,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
             />
             <span
               className={cn(styles.openList, { [styles.isOpen]: isOpen })}
-              onClick={setOpen}
+              onClick={() => setOpen(true)}
             />
           </div>
         </div>
@@ -181,7 +181,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
               <span
                 className={cn(styles.openList, { [styles.isOpen]: isOpen })}
                 onClick={
-                  () => setOpen()
+                  () => setOpen(false)
                   // l(e)
                 }
               />
