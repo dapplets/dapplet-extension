@@ -99,7 +99,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   {m.versions[0] ? m.versions[0].branch : 'Under construction'}
                 </div>
               )}
-              {!m.isDeployed?.[0] && (
+              {m.isDeployed?.[0] === false && (
                 <div className={styles.dappletsNotDeploy}>not deployed</div>
               )}
             </div>
@@ -107,7 +107,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
               <h3 className={styles.dappletsTitle}>{m.module.title}</h3>
               <button className={styles.dappletsSettings} />
               <button className={styles.dappletsReupload}>
-                {!m.isDeployed?.[0] ? 'Deploy' : 'Reupload'}
+                {m.isDeployed?.[0] === false ? 'Deploy' : 'Reupload'}
               </button>
             </div>
             <div className={styles.dappletsLabel}>

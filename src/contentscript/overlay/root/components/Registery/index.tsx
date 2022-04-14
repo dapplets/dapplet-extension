@@ -8,16 +8,16 @@ import { useToggle } from '../../hooks/useToggle'
 export interface RegisteryProps {
   // isEnabled: false
   // error: string
-  closeHost: () => void
-  onClickButtonLocalhost: () => void
+  // closeHost: () => void
+  // onClickButtonLocalhost: () => void
   label: string
 }
 export const Registry: FC<RegisteryProps> = (props) => {
   const {
     // isEnabled,
     // error,
-    closeHost,
-    onClickButtonLocalhost,
+    // closeHost,
+    // onClickButtonLocalhost,
     label,
     children,
   } = props
@@ -27,7 +27,7 @@ export const Registry: FC<RegisteryProps> = (props) => {
       <div className={styles.hostBlock}>
         <button
           disabled
-          onClick={onClickButtonLocalhost}
+          // onClick={onClickButtonLocalhost}
           className={cn(styles.buttonLocalhost, {
             // [styles.disabled]: !isEnabled && !error,
             // [styles.error]: isEnabled && error,

@@ -26,7 +26,7 @@ let _isMounted = false
 export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (
   props: DropdownProps
 ) => {
-  const [isOpen, setOpen] = useToggle(false)
+  const [isOpen, setOpen] = useState(false)
   const [preferedOverlayStorage, setPreferedOverlayStorage] = useState('')
   const {
     list,
@@ -53,16 +53,20 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (
     setPreferedOverlayStorage(preferedOverlayStorage)
   }
 
-  const selectPreferedOverlayStorage = async (storage: string) => {
+  const selectPreferedOverlayStorage = async (
+    storage: string,
+    x: (x) => void
+  ) => {
     const { setPreferedOverlayStorage } = await initBGFunctions(browser)
     await setPreferedOverlayStorage(storage)
     loadPreferedOverlayStorage()
+    x(false)
   }
   return (
     <div
       className={styles.wrapper}
-      onClick={setOpen}
-      onBlur={setOpen}
+      onClick={() => setOpen(true)}
+      onBlur={() => setOpen(false)}
       tabIndex={0}
     >
       <div className={styles.dropdownLabel}>{preferedOverlayStorage}</div>
@@ -70,7 +74,11 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (
       {isOpen && (
         <div className={styles.openOverlay}>
           <div className={styles.blockIcon}>
-            <span className={styles.closeDropdown} onClick={setOpen} />
+            <span
+              className={styles.closeDropdown}
+              onClick={() => setOpen(false)}
+              tabIndex={1}
+            />
           </div>
           {[
             { id: 'centralized', text: 'centralized' },
@@ -84,9 +92,10 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (
                 })}
                 key={id}
                 onClick={() => {
-                  selectPreferedOverlayStorage(id)
-                  setOpen()
+                  selectPreferedOverlayStorage(id, setOpen)
+                  // setOpen(false)
                 }}
+                // tabIndex={2}
               >
                 {text}
               </div>
