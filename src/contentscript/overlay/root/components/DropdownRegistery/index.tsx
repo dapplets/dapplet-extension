@@ -52,7 +52,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
 
     setRegistries(registries.filter((r) => r.isDev === false))
   }
-  const addRegistry = async (url: string) => {
+  const addRegistry = async (url: string, x: () => void) => {
     const { addRegistry } = await initBGFunctions(browser)
 
     try {
@@ -63,6 +63,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
     }
 
     loadRegistries()
+    x()
   }
   const removeRegistry = async (url: string) => {
     const { removeRegistry } = await initBGFunctions(browser)
@@ -104,6 +105,10 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
       return hash
     }
   }
+  const handleClear = () => {
+    // e.preventDefault()
+    setRegistryInput('')
+  }
 
   return (
     <>
@@ -124,7 +129,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
                 <div className={cn(styles.inputBlock)}>
                   <input
                     className={cn(styles.inputRegistries)}
-                    onClick={() => addRegistry(registryInput)}
+                    onClick={() => addRegistry(registryInput, handleClear)}
                     placeholder={r.url}
                     value={registryInput}
                     onChange={(e) => {
@@ -161,7 +166,9 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
             {registries.map((r, i) => (
               <div key={i} className={styles.itemRegistries}>
                 <span
-                  className={styles.registrieslink}
+                  className={cn(styles.registrieslink, {
+                    [styles.activeLink]: r.isEnabled,
+                  })}
                   onClick={() => {
                     enableRegistry(r.url)
                     setOpen()

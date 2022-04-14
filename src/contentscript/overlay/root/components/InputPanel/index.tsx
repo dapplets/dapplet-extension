@@ -13,6 +13,7 @@ export interface InputPanelProps
   placeholder?: string
   error?: boolean
   buttonDefault?: boolean
+  isVisibleButton?: boolean
 }
 
 export const InputPanel: FC<InputPanelProps> = (props) => {
@@ -23,6 +24,7 @@ export const InputPanel: FC<InputPanelProps> = (props) => {
     placeholder,
     error = false,
     buttonDefault = false,
+    isVisibleButton = true,
     // onClick,
     ...anotherProps
   } = props
@@ -52,16 +54,18 @@ export const InputPanel: FC<InputPanelProps> = (props) => {
         placeholder={placeholder}
         {...anotherProps}
       />
-      <button
-        className={cn(styles.inputButton, {
-          [styles.buttonDefault]: buttonDefault,
-        })}
-        // onClick={() => returnValue(baseState)}
-        // type="button"
-        type="submit"
-      >
-        {buttonDefault && 'ADD'}
-      </button>
+      {isVisibleButton && (
+        <button
+          className={cn(styles.inputButton, {
+            [styles.buttonDefault]: buttonDefault,
+          })}
+          // onClick={() => returnValue(baseState)}
+          // type="button"
+          type="submit"
+        >
+          {buttonDefault && 'ADD'}
+        </button>
+      )}
     </form>
   )
 }

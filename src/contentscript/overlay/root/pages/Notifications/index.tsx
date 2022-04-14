@@ -39,8 +39,9 @@ export const Notifications = () => {
 
     return () => {
       _isMounted = false
+      // setEvent([])
     }
-  }, [event])
+  }, [])
 
   const onRemoveEvent = async (f) => {
     const { deleteEvent, getCurrentContextIds } = await initBGFunctions(browser)

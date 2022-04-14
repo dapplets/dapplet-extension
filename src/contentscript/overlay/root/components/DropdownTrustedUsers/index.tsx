@@ -6,6 +6,8 @@ import React, {
   DetailedHTMLProps,
   useState,
   useEffect,
+  useMemo,
+  useRef,
 } from 'react'
 import cn from 'classnames'
 import styles from './DropdownTrustedUsers.module.scss'
@@ -48,8 +50,8 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
     return () => {
       _isMounted = false
     }
-  }, [])
-  const addTrustedUser = async (account: string) => {
+  }, [trustedUserInput])
+  const addTrustedUser = async (account: string, x: () => void) => {
     const { addTrustedUser } = await initBGFunctions(browser)
 
     try {
@@ -60,6 +62,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
     }
 
     loadTrustedUsers()
+    x()
   }
 
   const removeTrustedUser = async (account: string) => {
@@ -105,6 +108,24 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
       return hash
     }
   }
+  const handleClear = () => {
+    // e.preventDefault()
+    setTrustedUserInput('')
+  }
+
+  const rootEl = useRef(null)
+
+  // useEffect(() => {
+  const l = (e) => {
+    rootEl.current.contains(e.target) || setOpen()
+    document.addEventListener('click', l)
+    return () => document.removeEventListener('click', l)
+  }
+  // }, [])
+
+  // const num = useMemo(() => {
+  //   console.log(trustedUserInput)
+  // }, [trustedUserInput])
   return (
     <>
       <div
@@ -115,13 +136,17 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
         <div className={styles.inputTrustedUsers}>
           <div className={styles.inputBlock}>
             <input
+              // ref={rootEl}
               className={cn(styles.inputUsers)}
               placeholder="NEAR or Ethereum address..."
               value={trustedUserInput}
-              onClick={() => addTrustedUser(trustedUserInput)}
+              onClick={() => addTrustedUser(trustedUserInput, handleClear)}
               onChange={(e) => {
                 setTrustedUserInput(e.target.value)
                 setTrustedUserInputError(null)
+                // l(e)
+                // addTrustedUser(trustedUserInput, handleClear)
+                // handleClear(e)
               }}
               disabled={
                 !isValidUrl(trustedUserInput) &&
@@ -142,7 +167,10 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
               <div className={styles.delimiterSpan}>-</div>
               <span
                 className={cn(styles.openList, { [styles.isOpen]: isOpen })}
-                onClick={setOpen}
+                onClick={
+                  () => setOpen()
+                  // l(e)
+                }
               />
             </div>
             {trustedUsers.map((user, i) => (

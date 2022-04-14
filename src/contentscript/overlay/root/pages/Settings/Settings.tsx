@@ -87,9 +87,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     _isMounted = true
     const init = async () => {
       await checkUpdates()
-      // await loadDevMode()
+      await loadDevMode()
       await loadProvider()
       await loadSwarmGateway()
+      await loadErrorReporting()
       await loadSwarmPostageStampId()
       await loadDynamicAdapter()
       await loadRegistries()
@@ -103,6 +104,16 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       _isMounted = false
     }
   }, [])
+  const loadDevMode = async () => {
+    const { getDevMode } = await initBGFunctions(browser)
+    const devMode = await getDevMode()
+    setDevMode(devMode)
+  }
+  const loadErrorReporting = async () => {
+    const { getErrorReporting } = await initBGFunctions(browser)
+    const errorReporting = await getErrorReporting()
+    setErrorReporting(errorReporting)
+  }
   const checkUpdates = async () => {
     const { getNewExtensionVersion } = await initBGFunctions(browser)
     const isUpdateAvailable = await getNewExtensionVersion()
@@ -338,6 +349,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     setUserAgentNameEdited(true)
                     setUserAgentNameInputError(null)
                   }}
+                  isVisibleButton={false}
                 />
               }
             />

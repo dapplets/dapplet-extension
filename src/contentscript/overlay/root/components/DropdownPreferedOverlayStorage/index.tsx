@@ -59,9 +59,9 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (
     loadPreferedOverlayStorage()
   }
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} onClick={setOpen}>
       <div className={styles.dropdownLabel}>{preferedOverlayStorage}</div>
-      <span className={styles.openDropdown} onClick={setOpen} />
+      <span className={styles.openDropdown} />
       {isOpen && (
         <div className={styles.openOverlay}>
           <div className={styles.blockIcon}>
@@ -74,7 +74,9 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (
             const { id, text } = item
             return (
               <div
-                className={cn(styles.item)}
+                className={cn(styles.item, {
+                  [styles.activeItem]: text === preferedOverlayStorage,
+                })}
                 key={id}
                 onClick={() => {
                   selectPreferedOverlayStorage(id)
