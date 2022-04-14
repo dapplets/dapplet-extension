@@ -19,6 +19,7 @@ import { Localhost } from '../../components/Localhost'
 
 import { DevModule } from '../../components/DevModulesList'
 import { Registry } from '../../components/Registery'
+import TopologicalSort from 'topological-sort'
 let _isMounted = true
 
 export const Developer = () => {
@@ -135,7 +136,17 @@ export const Developer = () => {
   }
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
 
-  console.log(groupedModules)
+  // console.log(groupedModules)
+  // const isAutor = modules.map((x) => x.module.author === null)
+
+  // console.log(isAutor)
+
+  // console.log(registries)
+  // const groupedAuthor = groupBy(modules, (x) => x.module.author)
+  // console.log(groupedAuthor)
+  // const num = modules.map((x, i) => x.map((x, i) => x))
+  // console.log(num)
+  console.log(modules)
   console.log(registries)
 
   return (
@@ -187,7 +198,7 @@ export const Developer = () => {
                             {modules.length > 0 && registryUrl === r.url && (
                               <DevModule
                                 modules={modules}
-                                onDetailsClick={() => deployModule}
+                                onDetailsClick={deployModule}
                               />
                             )}
                           </div>
@@ -200,12 +211,20 @@ export const Developer = () => {
                 </div>
               }
             />
-            {
-              modules.length > 0 &&
-                Object.entries(groupedModules).map(([registryUrl, modules]) => (
-                  <div key={registryUrl}>
-                    {/* && registryUrl === r.url */}
-                    {/* {modules.length > 0  ? (
+          </div>
+        ))}
+        <div className={styles.host}>
+          {
+            modules.length > 0 &&
+              Object.entries(groupedModules).map(([registryUrl, modules]) => (
+                // {modules.author}
+
+                <div
+                  key={registryUrl}
+                  // onClick={() => console.log(modules[0].author)}
+                >
+                  {/* && registryUrl === r.url */}
+                  {/* {modules.length > 0  ? (
                           <DevModule
                             modules={modules}
                             onDetailsClick={() => deployModule}
@@ -213,47 +232,30 @@ export const Developer = () => {
                         ) : (
                           <div>No available development modules.</div>
                         )} */}
-                    {modules.length > 0 && registryUrl !== r.url && (
-                      // <DevModule
-                      //   modules={modules}
-                      //   onDetailsClick={() => deployModule}
-                      // />
-                      <Registry
-                        key={registryUrl}
-                        label={registryUrl}
-                        closeHost={() => removeRegistry(r.url)}
-                        onClickButtonLocalhost={() => {
-                          ;(!r.isEnabled &&
-                            !r.error &&
-                            enableRegistry(r.url)) ||
-                            (r.isEnabled &&
-                              r.error &&
-                              disableRegistry(r.url)) ||
-                            (r.isEnabled && !r.error && disableRegistry(r.url))
-                          // console.log(r.error, r.isEnabled)
-                          // console.log(r)
-                        }}
-                        children={
-                          <div className={styles.modules}>
-                            <DevModule
-                              modules={modules}
-                              onDetailsClick={() => deployModule}
-                            />
-                          </div>
-                        }
-                      />
-                    )}
-                  </div>
-                ))
-              // : (
-              //   <div key={i}>No available development modules.</div>
-              // )
-            }
-          </div>
-        ))}
-        {/* <div style={{ flex: 'auto' }}>
-         
-        </div> */}
+                  {modules.length > 0 && modules[0].module.author !== null && (
+                    <Registry
+                      key={registryUrl}
+                      label={registryUrl}
+                      children={
+                        <div
+                          className={styles.modules}
+                          onClick={() => console.log(modules[0].module.author)}
+                        >
+                          <DevModule
+                            modules={modules}
+                            onDetailsClick={() => deployModule}
+                          />
+                        </div>
+                      }
+                    />
+                  )}
+                </div>
+              ))
+            // : (
+            //   <div key={i}>No available development modules.</div>
+            // )
+          }
+        </div>
       </div>
 
       <div className={styles.createUnderConstraction}>
