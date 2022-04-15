@@ -23,10 +23,16 @@ import { Developer } from './Developer'
 import { SettingsList } from './Settings'
 import { MainList } from './Main'
 
+import { DappletsMainInfo } from '../DappletsInfo'
+
 enum SettingsTabs {
   // MAIN = 0,
   SETTINGS = 0,
   DEVELOPER = 2,
+}
+enum DappletsDetails {
+  MAININFO = 0,
+  SETTINGS = 1,
 }
 
 export const NAVIGATION_LIST = [
@@ -38,8 +44,12 @@ export const NAVIGATION_LIST = [
 let _isMounted = false
 export const SettingsOverlay = () => {
   const [activeTab, setActiveTab] = useState(SettingsTabs.SETTINGS)
+  const [activeTaDappletsDetails, setActiveTabDappletsDetails] = useState(
+    DappletsDetails.MAININFO
+  )
   const [devMode, setMode] = useState(false)
   const [errorReporting, onErrorReporting] = useState(false)
+  const [isDappletsDetails, setDappletsDetail] = useState(false)
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -76,43 +86,86 @@ export const SettingsOverlay = () => {
     loadErrorReporting()
   }
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.title}>
-        {/* <SettingTitle
+    <>
+      {!isDappletsDetails && (
+        <div className={styles.wrapper}>
+          <div className={styles.title}>
+            {/* <SettingTitle
           title="Main"
           onClick={() => setActiveTab(SettingsTabs.MAIN)}
           isActive={activeTab === SettingsTabs.MAIN}
         /> */}
-        <SettingTitle
-          title="Settings"
-          onClick={() => setActiveTab(SettingsTabs.SETTINGS)}
-          isActive={activeTab === SettingsTabs.SETTINGS}
-        />
-        {devMode && (
-          <SettingTitle
-            title="Developer"
-            onClick={() => setActiveTab(SettingsTabs.DEVELOPER)}
-            isActive={activeTab === SettingsTabs.DEVELOPER}
-          />
-        )}
-      </div>
+            <SettingTitle
+              title="Settings"
+              onClick={() => setActiveTab(SettingsTabs.SETTINGS)}
+              isActive={activeTab === SettingsTabs.SETTINGS}
+            />
+            {devMode && (
+              <SettingTitle
+                title="Developer"
+                onClick={() => setActiveTab(SettingsTabs.DEVELOPER)}
+                isActive={activeTab === SettingsTabs.DEVELOPER}
+              />
+            )}
+          </div>
 
-      <div className={styles.settingMain}>
-        {/* {activeTab === SettingsTabs.MAIN && (
+          <div className={styles.settingMain}>
+            {/* {activeTab === SettingsTabs.MAIN && (
   <MainList/>
         )} */}
-        {activeTab === SettingsTabs.SETTINGS && (
-          <SettingsList
-            devModeProps={devMode}
-            setDevMode={setDevmode}
-            errorReporting={errorReporting}
-            setErrorReporting={setErrorReporting}
-          />
-        )}
+            {activeTab === SettingsTabs.SETTINGS && (
+              <SettingsList
+                devModeProps={devMode}
+                setDevMode={setDevmode}
+                errorReporting={errorReporting}
+                setErrorReporting={setErrorReporting}
+              />
+            )}
 
-        {activeTab === SettingsTabs.DEVELOPER && <Developer />}
-      </div>
-    </div>
+            {activeTab === SettingsTabs.DEVELOPER && (
+              <Developer
+                isDappletsDetails={isDappletsDetails}
+                setDappletsDetail={setDappletsDetail}
+              />
+            )}
+          </div>
+        </div>
+      )}
+      {isDappletsDetails && (
+        <div className={styles.wrapper}>
+          <div className={styles.title}>
+            <SettingTitle
+              title="Main info"
+              onClick={() =>
+                setActiveTabDappletsDetails(DappletsDetails.MAININFO)
+              }
+              isActive={activeTaDappletsDetails === DappletsDetails.MAININFO}
+            />
+            <SettingTitle
+              title="Settings"
+              onClick={() =>
+                setActiveTabDappletsDetails(DappletsDetails.SETTINGS)
+              }
+              isActive={activeTaDappletsDetails === DappletsDetails.SETTINGS}
+            />
+          </div>
+          <div className={styles.settingMain}>
+            {activeTaDappletsDetails === DappletsDetails.MAININFO && (
+              <DappletsMainInfo
+                isDappletsDetails={isDappletsDetails}
+                setDappletsDetail={setDappletsDetail}
+              />
+            )}
+            {/* {activeTaDappletsDetails === DappletsDetails.SETTINGS && (
+              // <DappletsMainInfo
+              //   isDappletsDetails={isDappletsDetails}
+              //   setDappletsDetail={setDappletsDetail}
+              // />
+            )} */}
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

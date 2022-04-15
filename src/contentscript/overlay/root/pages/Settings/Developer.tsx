@@ -22,7 +22,8 @@ import { Registry } from '../../components/Registery'
 import TopologicalSort from 'topological-sort'
 let _isMounted = true
 
-export const Developer = () => {
+export const Developer = ({ isDappletsDetails, setDappletsDetail }) => {
+  const [isLoading, onLoading] = useState(true)
   const [registries, setRegistries] = useState([])
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
@@ -38,9 +39,9 @@ export const Developer = () => {
 
     const init = async () => {
       await loadSwarmGateway()
-      // await loadRegistries()
+      await loadRegistries()
       await loadIntro()
-      // await Promise.all([loadRegistries(), loadIntro()])
+
       const { getCurrentTab } = await initBGFunctions(browser)
       const currentTab = await getCurrentTab()
       if (!currentTab) return
@@ -49,11 +50,6 @@ export const Developer = () => {
       if (['index.json', 'dapplet.json'].includes(urlEnding)) {
         setRegistryInput(currentUrl)
       }
-
-      // const { getResource } = await initBGFunctions(browser)
-      // const base64 = await getResource(storageRef)
-      // const dataUri = 'data:text/plain;base64,' + base64
-      // setDataUri(dataUri)
     }
     init()
 
@@ -78,6 +74,7 @@ export const Developer = () => {
     setModules(modules)
 
     const registries = await getRegistries()
+    onLoading(false)
     setRegistries(registries.filter((r) => r.isDev === true))
   }
 
@@ -93,7 +90,7 @@ export const Developer = () => {
     await setIntro({ popupDeveloperWelcome: false })
   }
 
-  const addRegistry = async (url: string) => {
+  const addRegistry = async (url: string, x: () => void) => {
     const { addRegistry } = await initBGFunctions(browser)
 
     try {
@@ -104,9 +101,11 @@ export const Developer = () => {
     }
 
     loadRegistries()
+    x()
   }
 
   const removeRegistry = async (url: string) => {
+    onLoading(true)
     const { removeRegistry } = await initBGFunctions(browser)
     await removeRegistry(url)
     loadRegistries()
@@ -115,15 +114,17 @@ export const Developer = () => {
   const deployModule = async (mi: ModuleInfo, vi: VersionInfo) => {
     const { openDeployOverlay } = await initBGFunctions(browser)
     await openDeployOverlay(mi, vi)
-    // window.close()
+    window.close()
   }
   const enableRegistry = async (url: string) => {
+    onLoading(true)
     const { enableRegistry } = await initBGFunctions(browser)
     await enableRegistry(url)
     loadRegistries()
   }
 
   const disableRegistry = async (url: string) => {
+    onLoading(true)
     const { disableRegistry } = await initBGFunctions(browser)
     await disableRegistry(url)
     loadRegistries()
@@ -132,27 +133,57 @@ export const Developer = () => {
   const onCreateModuleHandler = async () => {
     const { openDeployOverlay } = await initBGFunctions(browser)
     await openDeployOverlay(null, null)
-    // window.close()
+    window.close()
   }
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
 
-  // console.log(groupedModules)
-  // const isAutor = modules.map((x) => x.module.author === null)
-
-  // console.log(isAutor)
-
+  // console.log(modules)
   // console.log(registries)
-  // const groupedAuthor = groupBy(modules, (x) => x.module.author)
-  // console.log(groupedAuthor)
-  // const num = modules.map((x, i) => x.map((x, i) => x))
-  // console.log(num)
-  console.log(modules)
-  console.log(registries)
+  const handleClear = () => {
+    setRegistryInput('')
+  }
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.inputHost}>
-        <InputPanel
+      <div className={styles.blockModules}>
+        <div className={styles.inputHost}>
+          <div
+            className={cn(styles.form, {})}
+            onBlur={() => {
+              setRegistryInputError(null)
+            }}
+            tabIndex={0}
+          >
+            <input
+              className={cn(styles.input, {
+                [styles.errorInput]: !!registryInputError,
+              })}
+              //  error={!!registryInputError}
+              // buttonDefault
+
+              value={registryInput}
+              onChange={(e) => {
+                setRegistryInput(e.target.value)
+                setRegistryInputError(null)
+              }}
+              placeholder="Manifest URL"
+              disabled={
+                !isValidUrl(registryInput) &&
+                !!registries.find((r) => r.url === registryInput)
+              }
+            />
+            <button
+              className={styles.buttonInput}
+              onClick={() => addRegistry(registryInput, handleClear)}
+            >
+              add
+            </button>
+          </div>
+          {registryInputError ? (
+            <div className={styles.errorMessage}>{registryInputError}</div>
+          ) : null}
+          {/* <InputPanel
+          error={!!registryInputError}
           buttonDefault
           value={registryInput}
           onChange={(e) => {
@@ -161,103 +192,113 @@ export const Developer = () => {
           }}
           onClick={() => addRegistry(registryInput)}
           placeholder="Manifest URL"
-        />
-      </div>
-      <div className={styles.host}>
-        {registries.map((r, i) => (
-          <div key={i}>
-            <Localhost
-              error={r.error}
-              isEnabled={r.isEnabled}
-              label={r.url}
-              key={i}
-              closeHost={() => removeRegistry(r.url)}
-              onClickButtonLocalhost={() => {
-                ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
-                  (r.isEnabled && r.error && disableRegistry(r.url)) ||
-                  (r.isEnabled && !r.error && disableRegistry(r.url))
-                // console.log(r.error, r.isEnabled)
-                // console.log(r)
-              }}
-              children={
-                <div className={styles.modules}>
-                  {
-                    modules.length > 0 &&
-                      Object.entries(groupedModules).map(
-                        ([registryUrl, modules]) => (
-                          <div key={registryUrl}>
-                            {/* && registryUrl === r.url */}
-                            {/* {modules.length > 0  ? (
-                          <DevModule
-                            modules={modules}
-                            onDetailsClick={() => deployModule}
-                          />
-                        ) : (
-                          <div>No available development modules.</div>
-                        )} */}
-                            {modules.length > 0 && registryUrl === r.url && (
-                              <DevModule
-                                modules={modules}
-                                onDetailsClick={deployModule}
-                              />
-                            )}
-                          </div>
-                        )
-                      )
-                    // : (
-                    //   <div>No available development modules.</div>
-                    // )
-                  }
-                </div>
-              }
-            />
-          </div>
-        ))}
-        <div className={styles.host}>
-          {
-            modules.length > 0 &&
-              Object.entries(groupedModules).map(([registryUrl, modules]) => (
-                // {modules.author}
-
-                <div
-                  key={registryUrl}
-                  // onClick={() => console.log(modules[0].author)}
-                >
-                  {/* && registryUrl === r.url */}
-                  {/* {modules.length > 0  ? (
-                          <DevModule
-                            modules={modules}
-                            onDetailsClick={() => deployModule}
-                          />
-                        ) : (
-                          <div>No available development modules.</div>
-                        )} */}
-                  {modules.length > 0 && modules[0].module.author !== null && (
-                    <Registry
-                      key={registryUrl}
-                      label={registryUrl}
-                      children={
-                        <div
-                          className={styles.modules}
-                          onClick={() => console.log(modules[0].module.author)}
-                        >
-                          <DevModule
-                            modules={modules}
-                            onDetailsClick={() => deployModule}
-                          />
-                        </div>
-                      }
-                    />
-                  )}
-                </div>
-              ))
-            // : (
-            //   <div key={i}>No available development modules.</div>
-            // )
+          disabled={
+            !isValidUrl(registryInput) &&
+            !!registries.find((r) => r.url === registryInput)
           }
+        /> */}
+        </div>
+        <div className={styles.host}>
+          {registries.map((r, i) => (
+            <div key={i}>
+              <Localhost
+                error={r.error}
+                isEnabled={r.isEnabled}
+                label={r.url}
+                key={i}
+                closeHost={() => removeRegistry(r.url)}
+                onClickButtonLocalhost={() => {
+                  ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
+                    (r.isEnabled && r.error && disableRegistry(r.url)) ||
+                    (r.isEnabled && !r.error && disableRegistry(r.url))
+                  // console.log(r.error, r.isEnabled)
+                  // console.log(r)
+                }}
+                children={
+                  <div className={styles.modules}>
+                    {
+                      modules.length > 0 &&
+                        Object.entries(groupedModules).map(
+                          ([registryUrl, modules]) => (
+                            <div key={registryUrl}>
+                              {/* && registryUrl === r.url */}
+                              {/* {modules.length > 0  ? (
+                          <DevModule
+                            modules={modules}
+                            onDetailsClick={() => deployModule}
+                          />
+                        ) : (
+                          <div>No available development modules.</div>
+                        )} */}
+                              {modules.length > 0 && registryUrl === r.url && (
+                                <DevModule
+                                  isDappletsDetails={isDappletsDetails}
+                                  setDappletsDetail={setDappletsDetail}
+                                  modules={modules}
+                                  onDetailsClick={deployModule.bind(this)}
+                                />
+                              )}
+                            </div>
+                          )
+                        )
+                      // : (
+                      //   <div>No available development modules.</div>
+                      // )
+                    }
+                  </div>
+                }
+              />
+            </div>
+          ))}
+          <div className={styles.host}>
+            {
+              modules.length > 0 &&
+                Object.entries(groupedModules).map(([registryUrl, modules]) => (
+                  // {modules.author}
+
+                  <div
+                    key={registryUrl}
+                    // onClick={() => console.log(modules[0].author)}
+                  >
+                    {/* && registryUrl === r.url */}
+                    {/* {modules.length > 0  ? (
+                          <DevModule
+                            modules={modules}
+                            onDetailsClick={() => deployModule}
+                          />
+                        ) : (
+                          <div>No available development modules.</div>
+                        )} */}
+                    {modules.length > 0 && modules[0].module.author !== null && (
+                      <Registry
+                        key={registryUrl}
+                        label={registryUrl}
+                        children={
+                          <div
+                            className={styles.modules}
+                            onClick={() =>
+                              console.log(modules[0].module.author)
+                            }
+                          >
+                            <DevModule
+                              setDappletsDetail={setDappletsDetail}
+                              isDappletsDetails={isDappletsDetails}
+                              modules={modules}
+                              onDetailsClick={deployModule.bind(this)}
+                            />
+                          </div>
+                        }
+                      />
+                    )}
+                  </div>
+                ))
+              // : (
+              //   <div key={i}>No available development modules.</div>
+              // )
+            }
+          </div>
         </div>
       </div>
-
       <div className={styles.createUnderConstraction}>
         <button className={styles.btnCreate} onClick={onCreateModuleHandler}>
           Create under construction dapplet

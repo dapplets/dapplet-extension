@@ -9,6 +9,29 @@
   transition: transform 0.3s ease;
   filter: drop-shadow(-4px 8px 10px rgba(0, 0, 0, 0.25));
 }
+.overlay::-webkit-scrollbar {
+  width: 0;
+}
+
+.overlay {
+  -ms-overflow-style: none;
+}
+
+.overlay {
+  overflow: -moz-scrollbars-none;
+}
+.overlay::-webkit-scrollbar-thumb {
+  width: 0;
+}
+.overlay::-webkit-scrollbar-track {
+  width: 0;
+}
+.wrapper::-webkit-scrollbar-thumb {
+  width: 0;
+}
+.wrapper::-webkit-scrollbar-track {
+  width: 0;
+}
 
 .wrapper {
   overflow: auto;
@@ -17,6 +40,17 @@
   padding: 17px 15px 5px 15px;
 
   background: $OverlayBG;
+}
+.wrapper::-webkit-scrollbar {
+  width: 0;
+}
+
+.wrapper {
+  -ms-overflow-style: none;
+}
+
+.wrapper {
+  overflow: -moz-scrollbars-none;
 }
 
 .toolbar {

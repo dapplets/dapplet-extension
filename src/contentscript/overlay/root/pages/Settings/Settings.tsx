@@ -284,234 +284,240 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   // setDynamicAdapter(dynamicAdapterInput)
   // setIpfsGateway(ipfsGatewayInput)
   return (
-    <>
-      <SettingWrapper
-        title="Social"
-        children={
-          <>
-            <SettingItem
-              title="Version"
-              component={
-                <div className={styles.version}>
-                  <span className={styles.versionTitle}>
-                    {EXTENSION_VERSION}
-                  </span>
-                  {isUpdateAvailable ? (
-                    <button
-                      className={styles.versionButton}
-                      onClick={() =>
-                        window.open(
-                          `https://github.com/dapplets/dapplet-extension/releases`,
-                          '_blank'
-                        )
-                      }
-                    >
-                      Update
-                    </button>
-                  ) : null}
-                </div>
-              }
-            />
-            <SettingItem
-              title="Trusted Users"
-              component={<></>}
-              children={<DropdownTrustedUsers />}
-            />
-            {/* Todo : on Parameters */}
-            <SettingItem
-              title="Developer mode"
-              component={
-                <Switch
-                  checked={devModeProps}
-                  onChange={() => setDevMode(!devModeProps)}
-                />
-              }
-            />
-            <SettingItem
-              title="Bug reports"
-              component={
-                <Switch
-                  checked={errorReporting}
-                  onChange={() => setErrorReporting(!errorReporting)}
-                />
-              }
-            />
-            <SettingItem
-              title="User Agent Name"
-              component={<></>}
-              children={
-                <InputPanel
-                  value={userAgentNameInput}
-                  placeholder="http:\\bee.dapplets.org\"
-                  onChange={(e) => {
-                    setUserAgentName(e.target.value)
-                    // setUserAgentNameInput(e.target.value)
-                    setUserAgentNameEdited(true)
-                    setUserAgentNameInputError(null)
-                  }}
-                  isVisibleButton={false}
-                />
-              }
-            />
-          </>
-        }
-      />
+    <div className={styles.blockSettings}>
+      <div className={styles.scrollBlock}>
+        <SettingWrapper
+          title="Social"
+          children={
+            <>
+              <SettingItem
+                title="Version"
+                component={
+                  <div className={styles.version}>
+                    <span className={styles.versionTitle}>
+                      {EXTENSION_VERSION}
+                    </span>
+                    {isUpdateAvailable ? (
+                      <button
+                        className={styles.versionButton}
+                        onClick={() =>
+                          window.open(
+                            `https://github.com/dapplets/dapplet-extension/releases`,
+                            '_blank'
+                          )
+                        }
+                      >
+                        Update
+                      </button>
+                    ) : null}
+                  </div>
+                }
+              />
+              <SettingItem
+                title="Trusted Users"
+                component={<></>}
+                children={<DropdownTrustedUsers />}
+              />
+              {/* Todo : on Parameters */}
+              <SettingItem
+                title="Developer mode"
+                component={
+                  <Switch
+                    checked={devModeProps}
+                    onChange={() => setDevMode(!devModeProps)}
+                  />
+                }
+              />
+              <SettingItem
+                title="Bug reports"
+                component={
+                  <Switch
+                    checked={errorReporting}
+                    onChange={() => setErrorReporting(!errorReporting)}
+                  />
+                }
+              />
+              <SettingItem
+                title="User Agent Name"
+                component={<></>}
+                children={
+                  <InputPanel
+                    value={userAgentNameInput}
+                    placeholder="http:\\bee.dapplets.org\"
+                    onChange={(e) => {
+                      setUserAgentName(e.target.value)
+                      // setUserAgentNameInput(e.target.value)
+                      setUserAgentNameEdited(true)
+                      setUserAgentNameInputError(null)
+                    }}
+                    isVisibleButton={false}
+                  />
+                }
+              />
+            </>
+          }
+        />
 
-      <SettingWrapper
-        title="Parameters"
-        children={
-          <>
-            <SettingItem
-              title="Regestries"
-              component={<></>}
-              children={<DropdownRegistery />}
-            />
-            <SettingItem
-              title="Dynamic Adapter"
-              component={<></>}
-              children={
-                <InputPanel
-                  error={!!dynamicAdapterInputError}
-                  onChange={(e) => {
-                    // setDynamicAdapter(e.target.value)
-                    setDynamicAdapter(e.target.value)
-                    setDynamicAdapterInputError(null)
-                    setDynamicAdapterInputEdited(true)
-                  }}
-                  value={dynamicAdapterInput}
-                  placeholder="dynamic-adapter.dapplet-base.eth#default@..."
-                />
-              }
-            />
-            <SettingItem
-              title="Prefered Overlay Storage"
-              component={<></>}
-              children={<DropdownPreferedOverlayStorage />}
-            />
-            <SettingItem
-              title="Storages"
-              component={<></>}
-              children={
-                <div className={styles.checkboxBlock}>
-                  <Checkbox isCheckbox title="Centralized" />
-                  <Checkbox
-                    isCheckbox={targetStorages.includes(StorageTypes.Sia)}
-                    title="SIA"
-                    onChange={(e) => changeTargetStorage(StorageTypes.Sia, !e)}
+        <SettingWrapper
+          title="Parameters"
+          children={
+            <>
+              <SettingItem
+                title="Regestries"
+                component={<></>}
+                children={<DropdownRegistery />}
+              />
+              <SettingItem
+                title="Dynamic Adapter"
+                component={<></>}
+                children={
+                  <InputPanel
+                    error={!!dynamicAdapterInputError}
+                    onChange={(e) => {
+                      // setDynamicAdapter(e.target.value)
+                      setDynamicAdapter(e.target.value)
+                      setDynamicAdapterInputError(null)
+                      setDynamicAdapterInputEdited(true)
+                    }}
+                    value={dynamicAdapterInput}
+                    placeholder="dynamic-adapter.dapplet-base.eth#default@..."
                   />
-                  <Checkbox
-                    isCheckbox={targetStorages.includes(StorageTypes.Ipfs)}
-                    title="IPFS"
-                    onChange={(e) => changeTargetStorage(StorageTypes.Ipfs, !e)}
+                }
+              />
+              <SettingItem
+                title="Prefered Overlay Storage"
+                component={<></>}
+                children={<DropdownPreferedOverlayStorage />}
+              />
+              <SettingItem
+                title="Storages"
+                component={<></>}
+                children={
+                  <div className={styles.checkboxBlock}>
+                    <Checkbox isCheckbox title="Centralized" />
+                    <Checkbox
+                      isCheckbox={targetStorages.includes(StorageTypes.Sia)}
+                      title="SIA"
+                      onChange={(e) =>
+                        changeTargetStorage(StorageTypes.Sia, !e)
+                      }
+                    />
+                    <Checkbox
+                      isCheckbox={targetStorages.includes(StorageTypes.Ipfs)}
+                      title="IPFS"
+                      onChange={(e) =>
+                        changeTargetStorage(StorageTypes.Ipfs, !e)
+                      }
+                    />
+                    <Checkbox
+                      isCheckbox={targetStorages.includes(StorageTypes.Swarm)}
+                      title="Swarm"
+                      onChange={(e) =>
+                        changeTargetStorage(StorageTypes.Swarm, !e)
+                      }
+                    />
+                  </div>
+                }
+              />
+              {/* storages */}
+            </>
+          }
+        />
+        <SettingWrapper
+          title="Providers"
+          children={
+            <>
+              <SettingItem
+                title="Ethereum Provider"
+                component={<></>}
+                children={
+                  <InputPanel
+                    onChange={(e) => {
+                      // setProviderInput(e.target.value)
+                      setProvider(e.target.value)
+                      setProviderEdited(true)
+                      setProviderInputError(null)
+                      console.log(providerInput)
+                    }}
+                    value={providerInput}
+                    error={!isValidHttp(providerInput)}
+                    placeholder={`${providerInput}`}
                   />
-                  <Checkbox
-                    isCheckbox={targetStorages.includes(StorageTypes.Swarm)}
-                    title="Swarm"
-                    onChange={(e) =>
-                      changeTargetStorage(StorageTypes.Swarm, !e)
+                }
+              />
+              <SettingItem
+                title="Swarm Gateway"
+                component={<></>}
+                children={
+                  <InputPanel
+                    value={swarmGatewayInput}
+                    error={!isValidHttp(swarmGatewayInput)}
+                    onChange={(e) => {
+                      setSwarmGateway(e.target.value)
+                      // setSwarmGatewayInput(e.target.value)
+                      setSwarmGatewayInputError(null)
+                      setSwarmGatewayEdited(true)
+                    }}
+                    placeholder={`${swarmGatewayInput}`}
+                  />
+                }
+              />
+              <SettingItem
+                title="Swarm Postage Stamp ID"
+                component={<></>}
+                children={
+                  <InputPanel
+                    value={swarmPostageStampIdInput}
+                    error={
+                      !!swarmPostageStampIdInputError ||
+                      !isValidPostageStampId(swarmPostageStampIdInput)
                     }
+                    onChange={(e) => {
+                      setSwarmPostageStampId(e.target.value)
+                      // setSwarmPostageStampIdInput(e.target.value)
+                      setSwarmPostageStampIdInputError(null)
+                      setSwarmPostageStampIdInputEdited(true)
+                    }}
+                    placeholder={`${swarmPostageStampIdInput}`}
                   />
-                </div>
-              }
-            />
-            {/* storages */}
-          </>
-        }
-      />
-      <SettingWrapper
-        title="Providers"
-        children={
-          <>
-            <SettingItem
-              title="Ethereum Provider"
-              component={<></>}
-              children={
-                <InputPanel
-                  onChange={(e) => {
-                    // setProviderInput(e.target.value)
-                    setProvider(e.target.value)
-                    setProviderEdited(true)
-                    setProviderInputError(null)
-                    console.log(providerInput)
-                  }}
-                  value={providerInput}
-                  error={!isValidHttp(providerInput)}
-                  placeholder={`${providerInput}`}
-                />
-              }
-            />
-            <SettingItem
-              title="Swarm Gateway"
-              component={<></>}
-              children={
-                <InputPanel
-                  value={swarmGatewayInput}
-                  error={!isValidHttp(swarmGatewayInput)}
-                  onChange={(e) => {
-                    setSwarmGateway(e.target.value)
-                    // setSwarmGatewayInput(e.target.value)
-                    setSwarmGatewayInputError(null)
-                    setSwarmGatewayEdited(true)
-                  }}
-                  placeholder={`${swarmGatewayInput}`}
-                />
-              }
-            />
-            <SettingItem
-              title="Swarm Postage Stamp ID"
-              component={<></>}
-              children={
-                <InputPanel
-                  value={swarmPostageStampIdInput}
-                  error={
-                    !!swarmPostageStampIdInputError ||
-                    !isValidPostageStampId(swarmPostageStampIdInput)
-                  }
-                  onChange={(e) => {
-                    setSwarmPostageStampId(e.target.value)
-                    // setSwarmPostageStampIdInput(e.target.value)
-                    setSwarmPostageStampIdInputError(null)
-                    setSwarmPostageStampIdInputEdited(true)
-                  }}
-                  placeholder={`${swarmPostageStampIdInput}`}
-                />
-              }
-            />
-            <SettingItem
-              title="IPFS Gateway"
-              component={<></>}
-              children={
-                <InputPanel
-                  value={ipfsGatewayInput}
-                  onChange={(e) => {
-                    // setIpfsGatewayInput(e.target.value)
-                    setIpfsGateway(e.target.value)
-                    setIpfsGatewayEdited(true)
-                    setIpfsGatewayInputError(null)
-                  }}
-                  placeholder={`${ipfsGatewayInput}`}
-                />
-              }
-            />
-            <SettingItem
-              title="SIA Portal"
-              component={<></>}
-              children={
-                <InputPanel
-                  value={siaPortalInput}
-                  onChange={(e) => {
-                    setSiaPortal(e.target.value)
-                    setSiaPortalEdited(true)
-                    setSiaPortalInputError(null)
-                  }}
-                  placeholder={`${siaPortalInput}`}
-                />
-              }
-            />
-          </>
-        }
-      />
-    </>
+                }
+              />
+              <SettingItem
+                title="IPFS Gateway"
+                component={<></>}
+                children={
+                  <InputPanel
+                    value={ipfsGatewayInput}
+                    onChange={(e) => {
+                      // setIpfsGatewayInput(e.target.value)
+                      setIpfsGateway(e.target.value)
+                      setIpfsGatewayEdited(true)
+                      setIpfsGatewayInputError(null)
+                    }}
+                    placeholder={`${ipfsGatewayInput}`}
+                  />
+                }
+              />
+              <SettingItem
+                title="SIA Portal"
+                component={<></>}
+                children={
+                  <InputPanel
+                    value={siaPortalInput}
+                    onChange={(e) => {
+                      setSiaPortal(e.target.value)
+                      setSiaPortalEdited(true)
+                      setSiaPortalInputError(null)
+                    }}
+                    placeholder={`${siaPortalInput}`}
+                  />
+                }
+              />
+            </>
+          }
+        />
+      </div>
+    </div>
   )
 }
 // https://goerli.mooo.com

@@ -15,6 +15,12 @@
 .wrapper::-webkit-scrollbar {
   width: 0;
 }
+.wrapper::-webkit-scrollbar-thumb {
+  width: 0;
+}
+.wrapper::-webkit-scrollbar-track {
+  width: 0;
+}
 
 .wrapper {
   -ms-overflow-style: none;
@@ -33,15 +39,15 @@
   overflow: hidden;
   padding: 0px 0px 0px 1px;
 }
-.block::-webkit-scrollbar {
-  width: 0;
-}
-.block {
-  -ms-overflow-style: none;
-}
-.block {
-  overflow: -moz-scrollbars-none;
-}
+// .block::-webkit-scrollbar {
+//   width: 0;
+// }
+// .block {
+//   -ms-overflow-style: none;
+// }
+// .block {
+//   overflow: -moz-scrollbars-none;
+// }
 
 .notification {
   display: flex;

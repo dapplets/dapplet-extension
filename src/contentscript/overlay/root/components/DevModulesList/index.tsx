@@ -40,6 +40,8 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
   )
 }
 interface PropsDeveloper {
+  isDappletsDetails: boolean
+  setDappletsDetail: (x) => void
   modules: {
     module: ModuleInfo
     versions: VersionInfo[]
@@ -48,7 +50,9 @@ interface PropsDeveloper {
   onDetailsClick: (x: any, y: any) => void
 }
 export const DevModule: FC<PropsDeveloper> = (props) => {
-  const { modules, onDetailsClick } = props
+  const { modules, onDetailsClick, isDappletsDetails, setDappletsDetail } =
+    props
+  // const [dapDet, onDappletsDetails] = useState(isDappletsDetails)
   const nodes = new Map<string, any>()
   modules.forEach((x) => {
     nodes.set(
@@ -105,7 +109,13 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
             </div>
             <div className={styles.blockInfo}>
               <h3 className={styles.dappletsTitle}>{m.module.title}</h3>
-              <button className={styles.dappletsSettings} />
+              <button
+                className={styles.dappletsSettings}
+                onClick={() => {
+                  onDetailsClick(m.module, m.versions[0])
+                  setDappletsDetail(true)
+                }}
+              />
               <button className={styles.dappletsReupload}>
                 {m.isDeployed?.[0] === false ? 'Deploy' : 'Reupload'}
               </button>

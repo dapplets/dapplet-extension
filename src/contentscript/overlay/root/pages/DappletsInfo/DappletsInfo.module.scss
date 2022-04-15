@@ -1,0 +1,365 @@
+@import '../../assets/styles/null.scss';
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+  flex: 1 1 auto;
+  max-height: 78vh;
+}
+.wrapper::-webkit-scrollbar {
+  width: 0;
+}
+
+.wrapper {
+  -ms-overflow-style: none;
+}
+
+.wrapper {
+  overflow: -moz-scrollbars-none;
+}
+
+.mainInfoBlock {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  // height: calc(100% - 75px);
+  // padding: 20px 0px 0px 0px;
+  overflow: hidden;
+  padding: 15px 0px 0px 15px;
+
+  display: flex;
+  width: 100%;
+  flex: 1 1 auto;
+  // height: calc(100% - 120px);
+  // height: 50vh;
+  // height: calc(100vh - 120px);
+  // max-height: 83vh;
+  flex-direction: column;
+  // padding: 8px 0px 0px 0px;
+  overflow-y: scroll;
+  direction: rtl;
+  &::-webkit-scrollbar {
+    width: 4px;
+    cursor: pointer;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgb(244, 244, 244);
+    background: rgb(244, 244, 244);
+    background: linear-gradient(
+      90deg,
+      rgba(244, 244, 244, 0) 10%,
+      rgba(227, 227, 227, 1) 50%,
+      rgba(244, 244, 244, 0) 90%
+    );
+  }
+  &::-webkit-scrollbar-thumb {
+    width: 4px;
+    height: 2px;
+    background: $Primary;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.09),
+      0px 2px 2px rgba(38, 117, 209, 0.04);
+    border-radius: 2px;
+  }
+}
+
+.mainInfoBlock > * {
+  direction: ltr;
+}
+
+.socialBlock {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.item {
+  margin-bottom: 10px !important;
+}
+
+.moduleTitle {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  width: 100%;
+  height: 44px;
+  margin: 0px 0px 10px 0px;
+  background: #ffffff;
+  border-radius: 10px;
+
+  font-family: 'Roboto';
+
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+
+  color: $PureBlack;
+}
+
+.inputTitle {
+  display: flex;
+  padding: 5px 13px;
+  width: 100%;
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
+
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+  color: $MainGrey;
+}
+
+.fullDescription {
+  display: flex;
+  padding: 5px 13px;
+  width: 100%;
+  min-height: 128px;
+
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
+
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+  color: $MainGrey;
+  resize: none;
+}
+
+.iconBlock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+
+  width: 100%;
+
+  background: $PureWhite;
+  border-radius: 10px;
+}
+
+.imgBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.img {
+  display: block;
+  width: 42px;
+  height: 42px;
+  background: #c4c4c4;
+
+  border: 1px solid $WebBG;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+}
+
+.imgTitle {
+  display: inline-block;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  margin: 0px 0px 0px 14px;
+  color: $PureBlack;
+}
+
+.buttonIcon {
+  display: block;
+}
+
+.addIcon {
+  display: block;
+  padding: 5px;
+
+  width: 66px;
+  height: 20px;
+
+  background: $WebBG;
+  border-radius: 10px;
+
+  font-family: 'Roboto';
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 100%;
+
+  color: $ContentBlack;
+  &:hover {
+    background: $StrokeColor;
+  }
+  &:active {
+    background: $MainGrey;
+  }
+}
+
+.ownershipBlock {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.inputOwnershipBlock {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.inputOwnership {
+  display: flex;
+  width: 100%;
+  padding: 5px 13px;
+
+  background: $AppBG;
+
+  border: 1px solid $StrokeColor;
+
+  border-radius: 5px;
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+
+  color: $MainGrey;
+}
+
+.ownershipButton {
+  display: flex;
+  margin: 0px 0px 0px 5px;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+
+  width: 67px;
+  height: 32px;
+
+  background: $Primary;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 100%;
+
+  color: #ffffff;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+
+.blockAdmins {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  width: 100%;
+  height: auto;
+
+  background: $PureWhite;
+  border-radius: 10px;
+}
+
+.adminsTitle {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  display: inline-block;
+
+  color: $PureBlack;
+}
+
+.adminsButton {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%235EC280'/%3E%3C/svg%3E");
+  &:hover {
+    background-color: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%2372D694'/%3E%3C/svg%3E");
+  }
+  &:active {
+    background-color: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%2326A651'/%3E%3C/svg%3E");
+  }
+}
+.linkNavigation {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  height: 60px;
+  margin: 20px 0px 0px 0px;
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: $WebBG;
+  }
+}
+
+.back {
+  display: block;
+  background: inherit;
+  font-family: 'Roboto';
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+  position: relative;
+  color: $MainGrey;
+  margin: 0px 0px 0px 14.5px;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -14.5px;
+    width: 11px;
+    height: 14px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%23919191'/%3E%3C/svg%3E");
+  }
+  &:hover {
+    color: $ContentBlack;
+    &::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill=' %23747376'/%3E%3C/svg%3E");
+    }
+  }
+  &:active {
+    color: $MainBlack;
+    &::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%232A2A2A'/%3E%3C/svg%3E");
+    }
+  }
+}
+
+.push {
+  display: inline-block;
+  font-family: 'Roboto';
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+  color: $Primary;
+  margin: 0 auto;
+  &:hover {
+    color: $PrimaryHover;
+  }
+  &:active {
+    color: $PrimaryPressed;
+  }
+}

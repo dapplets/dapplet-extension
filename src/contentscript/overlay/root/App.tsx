@@ -208,9 +208,9 @@ export class App extends React.Component<P, S> {
                 {isNotification && <Notifications />}
 
                 {isSettings && (
-                  <div className={styles.settingsBlock}>
-                    <SettingsOverlay />
-                  </div>
+                  // <div className={styles.settingsBlock}>
+                  <SettingsOverlay />
+                  // </div>
                 )}
 
                 {overlays.map((x) => (
@@ -223,7 +223,7 @@ export class App extends React.Component<P, S> {
 
                       [styles.overlayActive]:
                         !s.isSystemDapplets && x.id === activeOverlayId,
-                      // (!isSettings && x.id === activeOverlayId),
+                      // !isSettings && x.id === activeOverlayId,
                     })}
                   >
                     {/* <ContentItem

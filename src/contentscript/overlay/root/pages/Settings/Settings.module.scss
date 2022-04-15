@@ -6,6 +6,18 @@
   width: 100%;
   height: 100%;
   padding: 27.5px 0px 0px 0px;
+  overflow: hidden;
+}
+.wrapper::-webkit-scrollbar {
+  width: 0;
+}
+
+.wrapper {
+  -ms-overflow-style: none;
+}
+
+.wrapper {
+  overflow: -moz-scrollbars-none;
 }
 
 .title {
@@ -16,9 +28,30 @@
 }
 
 .settingMain {
-  padding: 15px 0px 0px 7px;
+  padding: 0px 0px 0px 1px;
   width: 100%;
   height: 76vh;
+}
+
+.blockSettings {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+  flex: 1 1 auto;
+  max-height: 75vh;
+}
+.scrollBlock {
+  overflow: hidden;
+  padding: 15px 0px 0px 15px;
+
+  display: flex;
+  width: 100%;
+  flex: 1 1 auto;
+  height: calc(100% - 120px);
+
+  flex-direction: column;
+
   overflow-y: scroll;
   direction: rtl;
   &::-webkit-scrollbar {
@@ -30,12 +63,11 @@
     background: rgb(244, 244, 244);
     background: linear-gradient(
       90deg,
-      rgba(244, 244, 244, 1) 25%,
+      rgba(244, 244, 244, 0) 10%,
       rgba(227, 227, 227, 1) 50%,
-      rgba(244, 244, 244, 1) 25%
+      rgba(244, 244, 244, 0) 90%
     );
   }
-
   &::-webkit-scrollbar-thumb {
     width: 4px;
     height: 2px;
@@ -45,10 +77,10 @@
     border-radius: 2px;
   }
 }
-
-.settingMain > * {
+.scrollBlock > * {
   direction: ltr;
 }
+
 @media (max-width: 640px) and (min-width: 320px) {
   .wrapper {
     padding: 0px 0px 0px 0px;

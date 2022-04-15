@@ -137,6 +137,12 @@
   line-height: 100%;
 
   color: $PureWhite;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
 }
 
 .dappletsLabel {
