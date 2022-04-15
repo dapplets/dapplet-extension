@@ -21,6 +21,7 @@ import { DropdownRegistery } from '../../components/DropdownRegistery'
 import { DropdownTrustedUsers } from '../../components/DropdownTrustedUsers'
 import { DropdownPreferedOverlayStorage } from '../../components/DropdownPreferedOverlayStorage'
 import { StorageTypes } from '../../../../../common/constants'
+import { parseModuleName } from '../../../../../common/helpers'
 
 export const DROPDOWN_LIST = [{ _id: '0', label: 'Custom' }]
 let _isMounted = false
@@ -56,6 +57,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [dynamicAdapterInputError, setDynamicAdapterInputError] = useState(null)
   const [dynamicAdapterInputEdited, setDynamicAdapterInputEdited] =
     useState(false)
+  const [dynamicAdapterLoading, setDynamicAdapterLoading] = useState(false)
 
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
@@ -191,15 +193,23 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const setDynamicAdapter = async (dynamicAdapter: string) => {
-    try {
-      const { setDynamicAdapter } = await initBGFunctions(browser)
-      await setDynamicAdapter(dynamicAdapter)
+    setDynamicAdapterLoading(true)
 
-      setDynamicAdapterInputEdited(false)
-    } catch (error) {
-      setDynamicAdapterInputError(error.message)
-      console.log(dynamicAdapterInputError)
-    }
+    const { setDynamicAdapter } = await initBGFunctions(browser)
+    await setDynamicAdapter(dynamicAdapter)
+    loadDynamicAdapter()
+    setDynamicAdapterLoading(false)
+    setDynamicAdapterInputEdited(false)
+    // this.setState({ dynamicAdapterLoading: false, dynamicAdapterEdited: false });
+    // try {
+    //   const { setDynamicAdapter } = await initBGFunctions(browser)
+    //   await setDynamicAdapter(dynamicAdapter)
+
+    //   setDynamicAdapterInputEdited(false)
+    // } catch (error) {
+    //   setDynamicAdapterInputError(error.message)
+    //   console.log(dynamicAdapterInputError)
+    // }
   }
   // const loadRegistries = async () => {
   //   const { getRegistries } = await initBGFunctions(browser)
@@ -371,17 +381,41 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 title="Dynamic Adapter"
                 component={<></>}
                 children={
-                  <InputPanel
-                    error={!!dynamicAdapterInputError}
-                    onChange={(e) => {
-                      // setDynamicAdapter(e.target.value)
-                      setDynamicAdapter(e.target.value)
-                      setDynamicAdapterInputError(null)
-                      setDynamicAdapterInputEdited(true)
-                    }}
-                    value={dynamicAdapterInput}
-                    placeholder="dynamic-adapter.dapplet-base.eth#default@..."
-                  />
+                  <div
+                    className={cn(styles.formDefault, {
+                      [styles.errorInputDefault]: !!dynamicAdapterInputError,
+                    })}
+                  >
+                    <input
+                      className={cn(styles.inputDefault, {})}
+                      value={dynamicAdapterInput}
+                      placeholder={dynamicAdapterInput}
+                      onChange={(e) => {
+                        setDynamicAdapterInput(e.target.value)
+                        setDynamicAdapterInputError(null)
+                        setDynamicAdapterInputEdited(true)
+                      }}
+                      onBlur={() =>
+                        !(
+                          dynamicAdapterLoading ||
+                          !dynamicAdapterInputEdited ||
+                          !parseModuleName(dynamicAdapterInput)
+                        ) && setDynamicAdapter(dynamicAdapterInput)
+                      }
+                    />
+                    <button className={styles.buttonInputDefault} />
+                  </div>
+                  // <InputPanel
+                  //   error={!!dynamicAdapterInputError}
+                  //   onChange={(e) => {
+                  //     // setDynamicAdapter(e.target.value)
+                  //     setDynamicAdapter(e.target.value)
+                  //     setDynamicAdapterInputError(null)
+                  //     setDynamicAdapterInputEdited(true)
+                  //   }}
+                  //   value={dynamicAdapterInput}
+                  //   placeholder="dynamic-adapter.dapplet-base.eth#default@..."
+                  // />
                 }
               />
               <SettingItem
@@ -396,6 +430,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   <div className={styles.checkboxBlock}>
                     <Checkbox isCheckbox title="Centralized" />
                     <Checkbox
+                      style={{ marginLeft: '40px' }}
                       isCheckbox={targetStorages.includes(StorageTypes.Sia)}
                       title="SIA"
                       onChange={(e) =>
@@ -405,6 +440,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <Checkbox
                       isCheckbox={targetStorages.includes(StorageTypes.Ipfs)}
                       title="IPFS"
+                      // style={{ marginRight: '20px' }}
                       onChange={(e) =>
                         changeTargetStorage(StorageTypes.Ipfs, !e)
                       }
@@ -412,6 +448,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <Checkbox
                       isCheckbox={targetStorages.includes(StorageTypes.Swarm)}
                       title="Swarm"
+                      style={{ marginRight: '40px' }}
                       onChange={(e) =>
                         changeTargetStorage(StorageTypes.Swarm, !e)
                       }
@@ -466,20 +503,67 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 title="Swarm Postage Stamp ID"
                 component={<></>}
                 children={
-                  <InputPanel
-                    value={swarmPostageStampIdInput}
-                    error={
-                      !!swarmPostageStampIdInputError ||
-                      !isValidPostageStampId(swarmPostageStampIdInput)
-                    }
-                    onChange={(e) => {
-                      setSwarmPostageStampId(e.target.value)
-                      // setSwarmPostageStampIdInput(e.target.value)
-                      setSwarmPostageStampIdInputError(null)
-                      setSwarmPostageStampIdInputEdited(true)
-                    }}
-                    placeholder={`${swarmPostageStampIdInput}`}
-                  />
+                  <>
+                    <div
+                      className={cn(styles.formDefault, {
+                        [styles.errorInputDefault]:
+                          !!swarmPostageStampIdInputError ||
+                          !isValidPostageStampId(swarmPostageStampIdInput),
+                      })}
+                      onBlur={() => {
+                        !swarmPostageStampIdLoading ||
+                          !!swarmPostageStampIdInputEdited ||
+                          (!!isValidPostageStampId(swarmPostageStampIdInput) &&
+                            setSwarmPostageStampId(swarmPostageStampIdInput))
+                      }}
+                      tabIndex={0}
+                    >
+                      <input
+                        // onLoad={swarmPostageStampIdLoading}
+                        className={cn(styles.inputDefault, {})}
+                        value={swarmPostageStampIdInput}
+                        placeholder={`${swarmPostageStampIdInput}`}
+                        onBlur={() => {
+                          !swarmPostageStampIdLoading ||
+                            !!swarmPostageStampIdInputEdited ||
+                            (!!isValidPostageStampId(
+                              swarmPostageStampIdInput
+                            ) &&
+                              setSwarmPostageStampId(swarmPostageStampIdInput))
+                        }}
+                        onChange={(e) => {
+                          // setSwarmPostageStampId(e.target.value)
+                          setSwarmPostageStampIdInput(e.target.value)
+                          setSwarmPostageStampIdInputError(null)
+                          setSwarmPostageStampIdInputEdited(true)
+                        }}
+                        // tabIndex={0}
+                      />
+                      <button className={styles.buttonInputDefault} />
+                    </div>
+                    {swarmPostageStampIdInputError ? (
+                      <div className={styles.errorMessage}>
+                        {swarmPostageStampIdInputError}
+                      </div>
+                    ) : null}
+                  </>
+                  // <InputPanel
+                  //   value={swarmPostageStampIdInput}
+                  //   onBlur={() => {
+                  //     setSwarmPostageStampIdInputError(null)
+                  //   }}
+                  //   error={
+                  //     !!swarmPostageStampIdInputError &&
+                  //     !isValidPostageStampId(swarmPostageStampIdInput)
+                  //   }
+                  //   onChange={(e) => {
+                  //     setSwarmPostageStampId(e.target.value)
+                  //     // setSwarmPostageStampIdInput(e.target.value)
+                  //     setSwarmPostageStampIdInputError(null)
+                  //     setSwarmPostageStampIdInputEdited(true)
+                  //   }}
+                  //   placeholder={`${swarmPostageStampIdInput}`}
+                  // />
                 }
               />
               <SettingItem
