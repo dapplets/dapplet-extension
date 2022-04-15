@@ -175,7 +175,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                       className={styles.inputOwnership}
                       placeholder="New owner adress"
                     />
-                    <button className={styles.ownershipButton}>Shange</button>
+                    <button className={styles.ownershipButton}>Change</button>
                   </div>
                 }
               />

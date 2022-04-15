@@ -42,14 +42,32 @@
 }
 .disabled {
   background: $MainGrey;
+  &:hover {
+    background: $StrokeColor;
+  }
+  &:active {
+    background: $ContentBlack;
+  }
 }
 
 .error {
   background: $Primary;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
 }
 
 .enabled {
   background: #5ec280;
+  &:hover {
+    background: #72d694;
+  }
+  &:active {
+    background: #26a651;
+  }
 }
 
 .labelLocalhost {
@@ -65,6 +83,7 @@
   align-items: center;
   justify-content: flex-start;
   color: $ContentBlack;
+  cursor: pointer;
 }
 
 .closeLocalhost {
