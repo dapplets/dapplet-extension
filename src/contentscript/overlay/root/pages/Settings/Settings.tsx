@@ -405,7 +405,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     }}
                     onSubmit={(e) => {
                       e.preventDefault()
-                      console.log('lolo')
+                      // console.log('lolo')
 
                       !(userAgentNameLoading || !userAgentNameEdited) &&
                         setUserAgentName(userAgentNameInput)
@@ -418,7 +418,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       className={cn(styles.inputDefault, {})}
                       value={userAgentNameInput}
                       placeholder="User agent name..."
-                      onFocus={() => setUserAgentNameInput('')}
+                      onFocus={() => {
+                        setUserAgentNameInput('')
+                        setUserAgentNameInputError(null)
+                      }}
                       onChange={(e) => {
                         setUserAgentNameInput(e.target.value)
                         setUserAgentNameEdited(true)
@@ -468,7 +471,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         className={cn(styles.inputDefault, {})}
                         value={dynamicAdapterInput}
                         placeholder={dynamicAdapterInput}
-                        onFocus={() => setDynamicAdapterInput('')}
+                        onFocus={() => {
+                          setDynamicAdapterInput('')
+                          setDynamicAdapterInputError(null)
+                        }}
                         onChange={(e) => {
                           // e.preventDefault()
                           setDynamicAdapterInput(e.target.value)
@@ -539,7 +545,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!providerInputError || !isValidHttp(providerInput),
+                          !!providerInputError && !isValidHttp(providerInput),
                       })}
                     >
                       <form
@@ -552,17 +558,21 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           //   !isValidHttp(providerInput)
                           // ) && setProvider(providerInput)
                         }
+                        onFocus={() => {
+                          setProviderInput('')
+                          setProviderInputError(null)
+                        }}
                         onSubmit={(e) => {
                           e.preventDefault()
+                          console.log('lala')
 
                           setProvider(providerInput)
                         }}
                       >
                         <input
                           className={cn(styles.inputDefault, {})}
-                          value={providerInput}
+                          value={providerInput || ''}
                           placeholder={'Provider URL'}
-                          onFocus={() => setProviderInput('')}
                           onChange={(e) => {
                             setProviderInput(e.target.value)
                             setProviderEdited(true)
@@ -598,7 +608,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!swarmGatewayInputError ||
+                          !!swarmGatewayInputError &&
                           !isValidHttp(swarmGatewayInput),
                       })}
                     >
@@ -612,6 +622,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           //   !isValidHttp(swarmGatewayInput)
                           // ) && setSwarmGateway(swarmGatewayInput)
                         }}
+                        onFocus={() => {
+                          setSwarmGatewayInput('')
+                          setSwarmGatewayInputError(null)
+                        }}
                         onSubmit={(e) => {
                           e.preventDefault()
 
@@ -622,7 +636,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           className={cn(styles.inputDefault, {})}
                           value={swarmGatewayInput}
                           placeholder={'Gateway URL'}
-                          onFocus={() => setSwarmGatewayInput('')}
                           onChange={(e) => {
                             setSwarmGatewayInput(e.target.value)
                             setSwarmGatewayInputError(null)
@@ -658,7 +671,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!swarmPostageStampIdInputError ||
+                          !!swarmPostageStampIdInputError &&
                           !isValidPostageStampId(swarmPostageStampIdInput),
                       })}
                     >
@@ -673,6 +686,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           //   ) &&
                           //     setSwarmPostageStampId(swarmPostageStampIdInput))
                         }}
+                        onFocus={() => {
+                          setSwarmPostageStampIdInput('')
+                          setSwarmPostageStampIdInputError(null)
+                        }}
                         onSubmit={(e) => {
                           e.preventDefault()
 
@@ -683,7 +700,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           className={cn(styles.inputDefault, {})}
                           value={swarmPostageStampIdInput}
                           placeholder="Postage Stamp ID"
-                          onFocus={() => setSwarmPostageStampIdInput('')}
                           onChange={(e) => {
                             setSwarmPostageStampIdInput(e.target.value)
                             setSwarmPostageStampIdInputError(null)
@@ -722,7 +738,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!ipfsGatewayInputError ||
+                          !!ipfsGatewayInputError &&
                           !isValidHttp(ipfsGatewayInput),
                       })}
                     >
@@ -736,6 +752,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           //   !isValidHttp(ipfsGatewayInput)
                           // ) && setIpfsGateway(ipfsGatewayInput)
                         }}
+                        onFocus={() => {
+                          setIpfsGatewayInput('')
+                          setIpfsGatewayInputError(null)
+                        }}
                         onSubmit={(e) => {
                           e.preventDefault()
 
@@ -746,7 +766,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           className={cn(styles.inputDefault, {})}
                           value={ipfsGatewayInput}
                           placeholder="Gateway URL"
-                          onFocus={() => setIpfsGatewayInput('')}
                           onChange={(e) => {
                             setIpfsGatewayInput(e.target.value)
                             setIpfsGatewayEdited(true)
@@ -782,7 +801,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!siaPortalInputError || !isValidHttp(siaPortalInput),
+                          !!siaPortalInputError && !isValidHttp(siaPortalInput),
                       })}
                     >
                       <form
@@ -795,6 +814,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           //   !isValidHttp(siaPortalInput)
                           // ) && setIpfsGateway(ipfsGatewayInput)
                         }}
+                        onFocus={() => {
+                          setSiaPortalInput('')
+                          setSiaPortalInputError(null)
+                        }}
                         onSubmit={(e) => {
                           e.preventDefault()
 
@@ -805,7 +828,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           className={cn(styles.inputDefault, {})}
                           value={siaPortalInput}
                           placeholder="Gateway URL"
-                          onFocus={() => setSiaPortalInput('')}
                           onChange={(e) => {
                             setSiaPortalInput(e.target.value)
                             setSiaPortalEdited(true)

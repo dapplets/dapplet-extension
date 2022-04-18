@@ -34,6 +34,7 @@ export const Notifications = () => {
       setEvent(events)
       // setRead(events.map((e) => e.id))
       // console.log(events.map((e) => e.created))
+      // onRemoveEventsAll(setEvent)
     }
     init()
 
@@ -41,7 +42,7 @@ export const Notifications = () => {
       _isMounted = false
       // setEvent([])
     }
-  }, [])
+  }, [event])
 
   const onRemoveEvent = async (f) => {
     const { deleteEvent, getCurrentContextIds } = await initBGFunctions(browser)

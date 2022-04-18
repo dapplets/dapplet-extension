@@ -93,17 +93,19 @@ export interface DappletsMainInfoProps {
   isDappletsDetails: boolean
   setDappletsDetail: (x) => void
   ModuleInfo: any
+  ModuleVersion: any
 }
 let _isMounted = false
 export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
-  const { isDappletsDetails, setDappletsDetail, ModuleInfo } = props
+  const { isDappletsDetails, setDappletsDetail, ModuleInfo, ModuleVersion } =
+    props
   const bus = new Bus()
   const transferOwnershipModal = React.createRef<any>()
   const addContextIdModal = React.createRef<any>()
   const fileInputRef = React.createRef<HTMLInputElement>()
   const [originalMi, setOriginalMi] = useState(null)
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
-  const [vi, setVi] = useState<VersionInfo>(null)
+  const [vi, setVi] = useState<VersionInfo>(ModuleVersion)
   const [dependenciesChecking, setDpendenciesChecking] =
     useState<DependencyChecking[]>()
   const [loading, setLoading] = useState(false)
@@ -140,7 +142,12 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
   useEffect(() => {
     _isMounted = true
-    const init = async () => {}
+    const init = async () => {
+      // await _updateOwnership(),
+      //   await _updateCurrentAccount(),
+      //   await _updateDeploymentStatus(),
+      //   await _checkDependencies()
+    }
     init()
     return () => {
       _isMounted = false
@@ -278,9 +285,10 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
     const oldAccount = mi.author
     const { transferOwnership } = await initBGFunctions(browser)
-    await transferOwnership(targetRegistry, mi.name, newAccount, oldAccount)
+    await transferOwnership(mi.registryUrl, mi.name, oldAccount, newAccount)
     setNewOwnerLoading(false)
     setNewOwnerDone(true)
+    // console.log(mi.author)
   }
 
   const _addContextId = async (contextId: string) => {
@@ -394,6 +402,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       mi.icon = null
     }
     setMi(mi)
+    console.log(mi)
   }
 
   const saveChanges = async () => {
@@ -414,62 +423,54 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       isSawing(false)
     }
   }
-  // const isNoStorage = targetStorages.length === 0
-  // const isNotNullCurrentAccount = !(
-  //   !currentAccount ||
-  //   currentAccount === '0x0000000000000000000000000000000000000000'
-  // )
-  // const isNotWalletPaired = !isNotNullCurrentAccount && !!owner
-  // const isNotAnOwner =
-  //   !!owner &&
-  //   isNotNullCurrentAccount &&
-  //   owner.toLowerCase() !== currentAccount.toLowerCase()
-  // const isAlreadyDeployed =
-  //   !message && deploymentStatus === DeploymentStatus.Deployed
-  // const isNewModule = deploymentStatus === DeploymentStatus.NewModule
-  // const isNotTrustedUser =
-  //   isNotNullCurrentAccount &&
-  //   !trustedUsers.find(
-  //     (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
-  //   )
+  const isNoStorage = targetStorages.length === 0
+  const isNotNullCurrentAccount = !(
+    !currentAccount ||
+    currentAccount === '0x0000000000000000000000000000000000000000'
+  )
+  const isNotWalletPaired = !isNotNullCurrentAccount && !!owner
+  const isNotAnOwner =
+    !!owner &&
+    isNotNullCurrentAccount &&
+    owner.toLowerCase() !== currentAccount.toLowerCase()
+  const isAlreadyDeployed =
+    !message && deploymentStatus === DeploymentStatus.Deployed
+  const isNewModule = deploymentStatus === DeploymentStatus.NewModule
+  const isNotTrustedUser =
+    isNotNullCurrentAccount &&
+    !trustedUsers.find(
+      (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
+    )
   // const isDependenciesExist =
   //   dependenciesChecking.length > 0
   //     ? dependenciesChecking.every((x) => x.isExists === true)
   //     : true
-  // // const isDependenciesLoading =
-  // //   dependenciesChecking.length > 0
-  // //     ? dependenciesChecking.every((x) => x.isExists === undefined)
-  // //     : false
-  // const isManifestValid = mi?.name && mi?.title && mi?.type
-  // const isDeployButtonDisabled =
-  //   loading ||
-  //   deploymentStatus === DeploymentStatus.Deployed ||
-  //   !isNotNullCurrentAccount ||
-  //   isNotAnOwner ||
-  //   isNoStorage ||
-  //   // isDependenciesLoading ||
-  //   !isDependenciesExist ||
-  //   !isManifestValid
-  // const isReuploadButtonDisabled =
-  //   !isAlreadyDeployed || mode === FormMode.Creating || !vi
+  // const isDependenciesLoading =
+  //   dependenciesChecking.length > 0
+  //     ? dependenciesChecking.every((x) => x.isExists === undefined)
+  //     : false
+  const isManifestValid = mi?.name && mi?.title && mi?.type
+  const isDeployButtonDisabled =
+    loading ||
+    deploymentStatus === DeploymentStatus.Deployed ||
+    !isNotNullCurrentAccount ||
+    isNotAnOwner ||
+    isNoStorage ||
+    // isDependenciesLoading ||
+    // !isDependenciesExist ||
+    !isManifestValid
+  const isReuploadButtonDisabled =
+    !isAlreadyDeployed || mode === FormMode.Creating || !vi
   const [miTitle = '', setMiTitle] = useState(mi.title)
   const [miDescription = '', setMiDescription] = useState(mi.description)
 
-  //   if( this.files && this.files.length > 1 )
-  //     fileName = ( this.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', this.files.length );
-  //   else
-  //     fileName = e.target.value.split( '\' ).pop();
-  // 	if( fileName )
-  //     label.querySelector( 'span' ).innerHTML = fileName;
-  //   else
-  //     label.innerHTML = labelVal;
   const fileInput = useRef<HTMLInputElement>()
   const [st, setSt] = useState([])
   const onChange = (e) => {
     const files = e.target.files
-    console.log(files)
+    // console.log(files)
     const filesArr = Array.prototype.slice.call(files)
-    console.log(filesArr)
+    // console.log(filesArr)
     setSt([
       // ...files,
       ...filesArr,
@@ -521,7 +522,11 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
               <div className={styles.iconBlock}>
                 <div className={styles.imgBlock}>
-                  <StorageRefImage storageRef={mi.icon} />
+                  <StorageRefImage
+                    className={styles.img}
+                    storageRef={mi.icon}
+                  />
+
                   {st.map((x, i) => (
                     <span className={styles.imgTitle} key={i}>
                       {x.name}
@@ -535,8 +540,12 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     type="file"
                     name="file"
                     id="file"
+                    accept=".png, .svg"
                     className={styles.inputfile}
-                    onChange={onChange}
+                    onChange={(e) => {
+                      onChange(e)
+                      iconInputChangeHandler(e)
+                    }}
                   />
                   <label htmlFor="file">Change icon</label>
                 </div>
@@ -555,10 +564,27 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 children={
                   <div className={styles.inputOwnershipBlock}>
                     <input
+                      value={newOwner}
                       className={styles.inputOwnership}
-                      placeholder="New owner adress"
+                      placeholder={mi.author || 'New owner adress'}
+                      onChange={(e) => {
+                        setNewOwner(e.target.value)
+                        // console.log(newOwner)
+                      }}
                     />
-                    <button className={styles.ownershipButton}>Change</button>
+                    {/* {owner &&
+                    owner?.toLowerCase() === currentAccount?.toLowerCase() ? ( */}
+                    <button
+                      disabled={newOwnerLoading || newOwnerDone || !newOwner}
+                      onClick={() => {
+                        _transferOwnership(newOwner)
+                        console.log(newOwner)
+                      }}
+                      className={styles.ownershipButton}
+                    >
+                      Change
+                    </button>
+                    {/* ) : null} */}
                   </div>
                 }
               />

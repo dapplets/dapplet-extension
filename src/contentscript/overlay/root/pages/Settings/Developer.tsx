@@ -26,6 +26,7 @@ export const Developer = ({
   isDappletsDetails,
   setDappletsDetail,
   setModuleInfo,
+  setModuleVersion,
 }) => {
   const [isLoading, onLoading] = useState(true)
   const [registries, setRegistries] = useState([])
@@ -241,6 +242,7 @@ export const Developer = ({
                                   modules={modules}
                                   onDetailsClick={deployModule.bind(this)}
                                   setModuleInfo={setModuleInfo}
+                                  setModuleVersion={setModuleVersion}
                                 />
                               )}
                             </div>
@@ -291,6 +293,7 @@ export const Developer = ({
                               modules={modules}
                               onDetailsClick={deployModule.bind(this)}
                               setModuleInfo={setModuleInfo}
+                              setModuleVersion={setModuleVersion}
                             />
                           </div>
                         }

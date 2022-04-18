@@ -51,6 +51,7 @@ export const SettingsOverlay = () => {
   const [errorReporting, onErrorReporting] = useState(false)
   const [isDappletsDetails, setDappletsDetail] = useState(false)
   const [ModuleInfo, setModuleInfo] = useState([])
+  const [ModuleVersion, setModuleVersion] = useState([])
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -125,6 +126,7 @@ export const SettingsOverlay = () => {
 
             {activeTab === SettingsTabs.DEVELOPER && (
               <Developer
+                setModuleVersion={setModuleVersion}
                 setModuleInfo={setModuleInfo}
                 isDappletsDetails={isDappletsDetails}
                 setDappletsDetail={setDappletsDetail}
@@ -155,6 +157,7 @@ export const SettingsOverlay = () => {
             {activeTaDappletsDetails === DappletsDetails.MAININFO && (
               <DappletsMainInfo
                 ModuleInfo={ModuleInfo}
+                ModuleVersion={ModuleVersion}
                 isDappletsDetails={isDappletsDetails}
                 setDappletsDetail={setDappletsDetail}
               />

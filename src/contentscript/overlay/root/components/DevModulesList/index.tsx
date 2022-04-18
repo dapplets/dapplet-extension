@@ -7,16 +7,18 @@ import { StorageRef } from '../../../../../background/registries/registry'
 import { DEFAULT_BRANCH_NAME } from '../../../../../common/constants'
 import TopologicalSort from 'topological-sort'
 import styles from './DevModulesList.module.scss'
+import cn from 'classnames'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { browser } from 'webextension-polyfill-ts'
 let _isMounted = true
 
 interface PropsStorageRefImage {
   storageRef: StorageRef
+  className?: string
 }
 
 export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
-  const { storageRef } = props
+  const { storageRef, className } = props
   const [dataUri, setDataUri] = useState(null)
   useEffect(() => {
     _isMounted = true
@@ -34,7 +36,7 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
     }
   })
   return (
-    <div className={styles.dappletsImg}>
+    <div className={cn(styles.dappletsImg, className)}>
       <img src={dataUri} />
     </div>
   )
@@ -48,7 +50,8 @@ interface PropsDeveloper {
     isDeployed: boolean[]
   }[]
   onDetailsClick: (x: any, y: any) => void
-  setModuleInfo?: (x) => void
+  setModuleInfo: (x) => void
+  setModuleVersion: (x) => void
 }
 export const DevModule: FC<PropsDeveloper> = (props) => {
   const {
@@ -57,6 +60,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     isDappletsDetails,
     setDappletsDetail,
     setModuleInfo,
+    setModuleVersion,
   } = props
   // const [dapDet, onDappletsDetails] = useState(isDappletsDetails)
   const nodes = new Map<string, any>()
@@ -128,6 +132,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   onDetailsClick(m.module, m.versions[0])
                   setDappletsDetail(true)
                   setModuleInfo(m.module)
+                  setModuleVersion(m.versions[0])
                   // console.log(m.module, m.versions[0])
                 }}
               />
@@ -233,6 +238,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       </label>
     </div> */
 }
+
 // <div>
 // <span className={styles.dappletsLabelSpan}>Type:</span>
 // <label className={styles.dappletsLabelSpan}>{moduleType}</label>
