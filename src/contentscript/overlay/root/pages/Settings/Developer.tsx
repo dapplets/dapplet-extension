@@ -22,7 +22,11 @@ import { Registry } from '../../components/Registery'
 import TopologicalSort from 'topological-sort'
 let _isMounted = true
 
-export const Developer = ({ isDappletsDetails, setDappletsDetail }) => {
+export const Developer = ({
+  isDappletsDetails,
+  setDappletsDetail,
+  setModuleInfo,
+}) => {
   const [isLoading, onLoading] = useState(true)
   const [registries, setRegistries] = useState([])
   const [registryInput, setRegistryInput] = useState('')
@@ -236,6 +240,7 @@ export const Developer = ({ isDappletsDetails, setDappletsDetail }) => {
                                   setDappletsDetail={setDappletsDetail}
                                   modules={modules}
                                   onDetailsClick={deployModule.bind(this)}
+                                  setModuleInfo={setModuleInfo}
                                 />
                               )}
                             </div>
@@ -285,6 +290,7 @@ export const Developer = ({ isDappletsDetails, setDappletsDetail }) => {
                               isDappletsDetails={isDappletsDetails}
                               modules={modules}
                               onDetailsClick={deployModule.bind(this)}
+                              setModuleInfo={setModuleInfo}
                             />
                           </div>
                         }

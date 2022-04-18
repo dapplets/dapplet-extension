@@ -108,11 +108,11 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
   }
 
   const visible = (hash: string): string => {
-    if (hash.length > 18) {
-      const firstFourCharacters = hash.substring(0, 9)
+    if (hash.length > 38) {
+      const firstFourCharacters = hash.substring(0, 20)
       const lastFourCharacters = hash.substring(
         hash.length - 0,
-        hash.length - 8
+        hash.length - 18
       )
 
       return `${firstFourCharacters}...${lastFourCharacters}`
@@ -123,7 +123,6 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
   const handleClear = () => {
     setRegistryInput('')
   }
-  // console.log(registryInputError)
 
   return (
     <>
@@ -138,7 +137,15 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
           (r, i) =>
             r.isEnabled && (
               <div key={i} className={styles.activeRegistry}>
-                <div className={cn(styles.inputBlock)}>
+                <form
+                  className={cn(styles.inputBlock)}
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    // setRegistryInputError(null)
+                    addRegistry(registryInput, handleClear)
+                  }}
+                  onBlur={() => setRegistryInputError(null)}
+                >
                   <input
                     className={cn(styles.inputRegistries)}
                     disabled={
@@ -151,18 +158,18 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
                       setRegistryInput(e.target.value)
                       setRegistryInputError(null)
                     }}
-                    onClick={() => {
-                      // setRegistryInputError(null)
-                      addRegistry(registryInput, handleClear)
-                    }}
-                    onBlur={() => setRegistryInputError(null)}
+                    // onClick={() => {
+                    //   // setRegistryInputError(null)
+                    //   addRegistry(registryInput, handleClear)
+                    // }}
+                    // onBlur={() => setRegistryInputError(null)}
                   />
 
                   <span
                     className={cn(styles.openList, { [styles.isOpen]: isOpen })}
                     onClick={() => setOpen(true)}
                   />
-                </div>
+                </form>
               </div>
             )
         )}

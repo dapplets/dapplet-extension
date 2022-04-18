@@ -79,11 +79,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [siaPortalLoading, setSiaPortalLoading] = useState(false)
   const [siaPortalEdited, setSiaPortalEdited] = useState(false)
 
-  const [targetStorages, setTargetStorages] = useState<string[]>([
+  const [targetStorages, setTargetStorages] = useState([
     StorageTypes.Swarm,
     StorageTypes.Sia,
     StorageTypes.Ipfs,
   ])
+  const [checkedSia, setCheckedSia] = useState(true)
+  const [checkedIPFS, setCheckedIPFS] = useState(true)
+  const [checkedSwarm, setCheckedSwarm] = useState(true)
 
   useEffect(() => {
     _isMounted = true
@@ -160,6 +163,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSwarmGatewayEdited(false)
       setSwarmGatewayLoading(false)
       setSwarmGatewayInputError(err.message)
+      console.log(err.message)
     }
   }
 
@@ -200,16 +204,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     loadDynamicAdapter()
     setDynamicAdapterLoading(false)
     setDynamicAdapterInputEdited(false)
-    // this.setState({ dynamicAdapterLoading: false, dynamicAdapterEdited: false });
-    // try {
-    //   const { setDynamicAdapter } = await initBGFunctions(browser)
-    //   await setDynamicAdapter(dynamicAdapter)
-
-    //   setDynamicAdapterInputEdited(false)
-    // } catch (error) {
-    //   setDynamicAdapterInputError(error.message)
-    //   console.log(dynamicAdapterInputError)
-    // }
   }
   // const loadRegistries = async () => {
   //   const { getRegistries } = await initBGFunctions(browser)
@@ -252,7 +246,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setIpfsGatewayLoading(true)
       const { setIpfsGateway } = await initBGFunctions(browser)
       await setIpfsGateway(gateway)
-      loadSwarmGateway()
+      loadIpfsGateway()
       setIpfsGatewayLoading(false)
       setIpfsGatewayEdited(false)
     } catch (err) {
@@ -283,16 +277,62 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSiaPortalInputError(err.message)
     }
   }
-  const changeTargetStorage = (storage: StorageTypes, checked: boolean) => {
-    const targetStoragesChecked = targetStorages.filter((x) => x !== storage)
-    if (checked) targetStorages.push(storage)
-    setTargetStorages(targetStoragesChecked)
+  // const changeTargetStorage = (storage: StorageTypes, checked: boolean) => {
+  //   const newTarget = targetStorages.filter((x) => x !== storage)
+
+  //   if (checked) targetStorages.push(storage)
+  //   setTargetStorages(newTarget)
+  // }
+
+  const getDefaultValueDynamicAdapter = async (inputValue: string) => {
+    const { getInitialConfig } = await initBGFunctions(browser)
+    const config = await getInitialConfig()
+
+    if (config.dynamicAdapter !== inputValue) {
+      await setDynamicAdapter(config.dynamicAdapter)
+    }
   }
-  // setProvider(providerInput)
-  // setSwarmGateway(swarmGatewayInput)
-  // setSwarmPostageStampId(swarmPostageStampIdInput)
-  // setDynamicAdapter(dynamicAdapterInput)
-  // setIpfsGateway(ipfsGatewayInput)
+  const getDefaultValueProvider = async (inputValue: string) => {
+    const { getInitialConfig } = await initBGFunctions(browser)
+    const config = await getInitialConfig()
+
+    if (config.providerUrl !== inputValue) {
+      await setProvider(config.providerUrl)
+    }
+  }
+  const getDefaultValueSwarmGateway = async (inputValue: string) => {
+    const { getInitialConfig } = await initBGFunctions(browser)
+    const config = await getInitialConfig()
+
+    if (config.swarmGatewayUrl !== inputValue) {
+      setSwarmGateway(config.swarmGatewayUrl)
+    }
+  }
+  const getDefaultValueSwarmPostageStampId = async (inputValue: string) => {
+    const { getInitialConfig } = await initBGFunctions(browser)
+    const config = await getInitialConfig()
+
+    if (config.swarmPostageStampId !== inputValue) {
+      setSwarmPostageStampId(config.swarmPostageStampId)
+    }
+  }
+  const getDefaultValueIpfsGateway = async (inputValue: string) => {
+    const { getInitialConfig } = await initBGFunctions(browser)
+    const config = await getInitialConfig()
+
+    if (config.ipfsGatewayUrl !== inputValue) {
+      setIpfsGateway(config.ipfsGatewayUrl)
+    }
+  }
+  const getDefaultValueSiaPortal = async (inputValue: string) => {
+    const { getInitialConfig } = await initBGFunctions(browser)
+    const config = await getInitialConfig()
+
+    if (config.siaPortalUrl !== inputValue) {
+      setSiaPortal(config.siaPortalUrl)
+    }
+  }
+
   return (
     <div className={styles.blockSettings}>
       <div className={styles.scrollBlock}>
@@ -351,17 +391,30 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 title="User Agent Name"
                 component={<></>}
                 children={
-                  <InputPanel
-                    value={userAgentNameInput}
-                    placeholder="http:\\bee.dapplets.org\"
-                    onChange={(e) => {
-                      setUserAgentName(e.target.value)
-                      // setUserAgentNameInput(e.target.value)
-                      setUserAgentNameEdited(true)
+                  <form
+                    onBlur={() => {
                       setUserAgentNameInputError(null)
                     }}
-                    isVisibleButton={false}
-                  />
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      !(userAgentNameLoading || !userAgentNameEdited) &&
+                        setUserAgentName(userAgentNameInput)
+                    }}
+                    className={cn(styles.formDefault, {
+                      [styles.errorInputDefault]: !!userAgentNameInputError,
+                    })}
+                  >
+                    <input
+                      className={cn(styles.inputDefault, {})}
+                      value={userAgentNameInput}
+                      placeholder="User agent name..."
+                      onChange={(e) => {
+                        setUserAgentName(e.target.value)
+                        setUserAgentNameEdited(true)
+                        setUserAgentNameInputError(null)
+                      }}
+                    />
+                  </form>
                 }
               />
             </>
@@ -373,7 +426,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
           children={
             <>
               <SettingItem
-                title="Regestries"
+                title="Registryes"
                 component={<></>}
                 children={<DropdownRegistery />}
               />
@@ -382,40 +435,48 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 component={<></>}
                 children={
                   <div
-                    className={cn(styles.formDefault, {
+                    className={cn(styles.formDefault, styles.formAbsolute, {
                       [styles.errorInputDefault]: !!dynamicAdapterInputError,
                     })}
                   >
-                    <input
-                      className={cn(styles.inputDefault, {})}
-                      value={dynamicAdapterInput}
-                      placeholder={dynamicAdapterInput}
-                      onChange={(e) => {
-                        setDynamicAdapterInput(e.target.value)
+                    <form
+                      style={{ width: '100%' }}
+                      // className={cn(styles.formDefault, styles.formAbsolute, {
+                      //   [styles.errorInputDefault]: !!dynamicAdapterInputError,
+                      // })}
+                      onBlur={() => {
                         setDynamicAdapterInputError(null)
-                        setDynamicAdapterInputEdited(true)
                       }}
-                      onBlur={() =>
-                        !(
-                          dynamicAdapterLoading ||
-                          !dynamicAdapterInputEdited ||
-                          !parseModuleName(dynamicAdapterInput)
-                        ) && setDynamicAdapter(dynamicAdapterInput)
-                      }
+                      onSubmit={(e) => {
+                        e.preventDefault()
+
+                        setDynamicAdapter(dynamicAdapterInput)
+                      }}
+                    >
+                      <input
+                        className={cn(styles.inputDefault, {})}
+                        value={dynamicAdapterInput}
+                        placeholder={dynamicAdapterInput}
+                        onChange={(e) => {
+                          // e.preventDefault()
+                          setDynamicAdapterInput(e.target.value)
+                          setDynamicAdapterInputError(null)
+                          setDynamicAdapterInputEdited(true)
+                        }}
+                      />
+                    </form>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        // e.stopPropagation()
+                        getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                      }}
+                      className={cn(
+                        styles.buttonInputDefault,
+                        styles.btnAbsolute
+                      )}
                     />
-                    <button className={styles.buttonInputDefault} />
                   </div>
-                  // <InputPanel
-                  //   error={!!dynamicAdapterInputError}
-                  //   onChange={(e) => {
-                  //     // setDynamicAdapter(e.target.value)
-                  //     setDynamicAdapter(e.target.value)
-                  //     setDynamicAdapterInputError(null)
-                  //     setDynamicAdapterInputEdited(true)
-                  //   }}
-                  //   value={dynamicAdapterInput}
-                  //   placeholder="dynamic-adapter.dapplet-base.eth#default@..."
-                  // />
                 }
               />
               <SettingItem
@@ -428,35 +489,29 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 component={<></>}
                 children={
                   <div className={styles.checkboxBlock}>
-                    <Checkbox isCheckbox title="Centralized" />
+                    <Checkbox isSupport isCheckbox title="Centralized" />
+
                     <Checkbox
                       style={{ marginLeft: '40px' }}
-                      isCheckbox={targetStorages.includes(StorageTypes.Sia)}
+                      isCheckbox={checkedSia}
                       title="SIA"
-                      onChange={(e) =>
-                        changeTargetStorage(StorageTypes.Sia, !e)
-                      }
+                      onChange={() => setCheckedSia(!checkedSia)}
                     />
                     <Checkbox
-                      isCheckbox={targetStorages.includes(StorageTypes.Ipfs)}
+                      isCheckbox={checkedIPFS}
                       title="IPFS"
-                      // style={{ marginRight: '20px' }}
-                      onChange={(e) =>
-                        changeTargetStorage(StorageTypes.Ipfs, !e)
-                      }
+                      onChange={() => setCheckedIPFS(!checkedIPFS)}
                     />
+
                     <Checkbox
-                      isCheckbox={targetStorages.includes(StorageTypes.Swarm)}
+                      isCheckbox={checkedSwarm}
                       title="Swarm"
                       style={{ marginRight: '40px' }}
-                      onChange={(e) =>
-                        changeTargetStorage(StorageTypes.Swarm, !e)
-                      }
+                      onChange={(e) => setCheckedSwarm(!checkedSwarm)}
                     />
                   </div>
                 }
               />
-              {/* storages */}
             </>
           }
         />
@@ -468,35 +523,117 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 title="Ethereum Provider"
                 component={<></>}
                 children={
-                  <InputPanel
-                    onChange={(e) => {
-                      // setProviderInput(e.target.value)
-                      setProvider(e.target.value)
-                      setProviderEdited(true)
-                      setProviderInputError(null)
-                      console.log(providerInput)
-                    }}
-                    value={providerInput}
-                    error={!isValidHttp(providerInput)}
-                    placeholder={`${providerInput}`}
-                  />
+                  <>
+                    <div
+                      className={cn(styles.formDefault, styles.formAbsolute, {
+                        [styles.errorInputDefault]:
+                          !!providerInputError || !isValidHttp(providerInput),
+                      })}
+                    >
+                      <form
+                        style={{ width: '100%' }}
+                        onBlur={
+                          () => setProviderInputError(null)
+                          // !(
+                          //   providerLoading ||
+                          //   !providerEdited ||
+                          //   !isValidHttp(providerInput)
+                          // ) && setProvider(providerInput)
+                        }
+                        onSubmit={(e) => {
+                          e.preventDefault()
+
+                          setProvider(providerInput)
+                        }}
+                      >
+                        <input
+                          className={cn(styles.inputDefault, {})}
+                          value={providerInput}
+                          placeholder={'Provider URL'}
+                          onChange={(e) => {
+                            setProviderInput(e.target.value)
+                            setProviderEdited(true)
+                            setProviderInputError(null)
+                          }}
+                        />
+                      </form>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          // e.stopPropagation()
+                          getDefaultValueProvider(providerInput)
+                        }}
+                        className={cn(
+                          styles.buttonInputDefault,
+                          styles.btnAbsolute
+                        )}
+                      />
+                    </div>
+                    {providerInputError ? (
+                      <div className={styles.errorMessage}>
+                        {providerInputError}
+                      </div>
+                    ) : null}
+                  </>
                 }
               />
               <SettingItem
                 title="Swarm Gateway"
                 component={<></>}
                 children={
-                  <InputPanel
-                    value={swarmGatewayInput}
-                    error={!isValidHttp(swarmGatewayInput)}
-                    onChange={(e) => {
-                      setSwarmGateway(e.target.value)
-                      // setSwarmGatewayInput(e.target.value)
-                      setSwarmGatewayInputError(null)
-                      setSwarmGatewayEdited(true)
-                    }}
-                    placeholder={`${swarmGatewayInput}`}
-                  />
+                  <>
+                    <div
+                      className={cn(styles.formDefault, styles.formAbsolute, {
+                        [styles.errorInputDefault]:
+                          !!swarmGatewayInputError ||
+                          !isValidHttp(swarmGatewayInput),
+                      })}
+                    >
+                      <form
+                        style={{ width: '100%' }}
+                        onBlur={() => {
+                          setSwarmGatewayInputError(null)
+                          // !(
+                          //   swarmGatewayLoading ||
+                          //   !swarmGatewayEdited ||
+                          //   !isValidHttp(swarmGatewayInput)
+                          // ) && setSwarmGateway(swarmGatewayInput)
+                        }}
+                        onSubmit={(e) => {
+                          e.preventDefault()
+
+                          setSwarmGateway(swarmGatewayInput)
+                        }}
+                      >
+                        <input
+                          className={cn(styles.inputDefault, {})}
+                          value={swarmGatewayInput}
+                          placeholder={'Gateway URL'}
+                          onChange={(e) => {
+                            setSwarmGatewayInput(e.target.value)
+                            setSwarmGatewayInputError(null)
+                            setSwarmGatewayEdited(true)
+                          }}
+                        />
+                      </form>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          getDefaultValueSwarmGateway(swarmGatewayInput)
+                          // setSwarmGatewayInputError(null)
+                        }}
+                        className={cn(
+                          styles.buttonInputDefault,
+                          styles.btnAbsolute
+                        )}
+                      />
+                    </div>
+                    {swarmGatewayInputError ? (
+                      <div className={styles.errorMessage}>
+                        {swarmGatewayInputError}
+                      </div>
+                    ) : null}
+                  </>
                 }
               />
               <SettingItem
@@ -505,41 +642,54 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 children={
                   <>
                     <div
-                      className={cn(styles.formDefault, {
+                      className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
                           !!swarmPostageStampIdInputError ||
                           !isValidPostageStampId(swarmPostageStampIdInput),
                       })}
-                      onBlur={() => {
-                        !swarmPostageStampIdLoading ||
-                          !!swarmPostageStampIdInputEdited ||
-                          (!!isValidPostageStampId(swarmPostageStampIdInput) &&
-                            setSwarmPostageStampId(swarmPostageStampIdInput))
-                      }}
-                      tabIndex={0}
                     >
-                      <input
-                        // onLoad={swarmPostageStampIdLoading}
-                        className={cn(styles.inputDefault, {})}
-                        value={swarmPostageStampIdInput}
-                        placeholder={`${swarmPostageStampIdInput}`}
+                      <form
+                        style={{ width: '100%' }}
                         onBlur={() => {
-                          !swarmPostageStampIdLoading ||
-                            !!swarmPostageStampIdInputEdited ||
-                            (!!isValidPostageStampId(
-                              swarmPostageStampIdInput
-                            ) &&
-                              setSwarmPostageStampId(swarmPostageStampIdInput))
-                        }}
-                        onChange={(e) => {
-                          // setSwarmPostageStampId(e.target.value)
-                          setSwarmPostageStampIdInput(e.target.value)
                           setSwarmPostageStampIdInputError(null)
-                          setSwarmPostageStampIdInputEdited(true)
+                          // !swarmPostageStampIdLoading ||
+                          //   !!swarmPostageStampIdInputEdited ||
+                          //   (!!isValidPostageStampId(
+                          //     swarmPostageStampIdInput
+                          //   ) &&
+                          //     setSwarmPostageStampId(swarmPostageStampIdInput))
                         }}
-                        // tabIndex={0}
+                        onSubmit={(e) => {
+                          e.preventDefault()
+
+                          setSwarmPostageStampId(swarmPostageStampIdInput)
+                        }}
+                      >
+                        <input
+                          className={cn(styles.inputDefault, {})}
+                          value={swarmPostageStampIdInput}
+                          placeholder="Postage Stamp ID"
+                          onChange={(e) => {
+                            setSwarmPostageStampIdInput(e.target.value)
+                            setSwarmPostageStampIdInputError(null)
+                            setSwarmPostageStampIdInputEdited(true)
+                          }}
+                          // tabIndex={0}
+                        />
+                      </form>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          getDefaultValueSwarmPostageStampId(
+                            swarmPostageStampIdInput
+                          )
+                          // setSwarmGatewayInputError(null)
+                        }}
+                        className={cn(
+                          styles.buttonInputDefault,
+                          styles.btnAbsolute
+                        )}
                       />
-                      <button className={styles.buttonInputDefault} />
                     </div>
                     {swarmPostageStampIdInputError ? (
                       <div className={styles.errorMessage}>
@@ -547,54 +697,123 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       </div>
                     ) : null}
                   </>
-                  // <InputPanel
-                  //   value={swarmPostageStampIdInput}
-                  //   onBlur={() => {
-                  //     setSwarmPostageStampIdInputError(null)
-                  //   }}
-                  //   error={
-                  //     !!swarmPostageStampIdInputError &&
-                  //     !isValidPostageStampId(swarmPostageStampIdInput)
-                  //   }
-                  //   onChange={(e) => {
-                  //     setSwarmPostageStampId(e.target.value)
-                  //     // setSwarmPostageStampIdInput(e.target.value)
-                  //     setSwarmPostageStampIdInputError(null)
-                  //     setSwarmPostageStampIdInputEdited(true)
-                  //   }}
-                  //   placeholder={`${swarmPostageStampIdInput}`}
-                  // />
                 }
               />
               <SettingItem
                 title="IPFS Gateway"
                 component={<></>}
                 children={
-                  <InputPanel
-                    value={ipfsGatewayInput}
-                    onChange={(e) => {
-                      // setIpfsGatewayInput(e.target.value)
-                      setIpfsGateway(e.target.value)
-                      setIpfsGatewayEdited(true)
-                      setIpfsGatewayInputError(null)
-                    }}
-                    placeholder={`${ipfsGatewayInput}`}
-                  />
+                  <>
+                    <div
+                      className={cn(styles.formDefault, styles.formAbsolute, {
+                        [styles.errorInputDefault]:
+                          !!ipfsGatewayInputError ||
+                          !isValidHttp(ipfsGatewayInput),
+                      })}
+                    >
+                      <form
+                        style={{ width: '100%' }}
+                        onBlur={() => {
+                          setIpfsGatewayInputError(null)
+                          // !(
+                          //   ipfsGatewayLoading ||
+                          //   !ipfsGatewayEdited ||
+                          //   !isValidHttp(ipfsGatewayInput)
+                          // ) && setIpfsGateway(ipfsGatewayInput)
+                        }}
+                        onSubmit={(e) => {
+                          e.preventDefault()
+
+                          setIpfsGateway(ipfsGatewayInput)
+                        }}
+                      >
+                        <input
+                          className={cn(styles.inputDefault, {})}
+                          value={ipfsGatewayInput}
+                          placeholder="Gateway URL"
+                          onChange={(e) => {
+                            setIpfsGatewayInput(e.target.value)
+                            setIpfsGatewayEdited(true)
+                            setIpfsGatewayInputError(null)
+                          }}
+                        />
+                      </form>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          // e.stopPropagation()
+                          getDefaultValueIpfsGateway(ipfsGatewayInput)
+                        }}
+                        className={cn(
+                          styles.buttonInputDefault,
+                          styles.btnAbsolute
+                        )}
+                      />
+                    </div>
+                    {ipfsGatewayInputError ? (
+                      <div className={styles.errorMessage}>
+                        {ipfsGatewayInputError}
+                      </div>
+                    ) : null}
+                  </>
                 }
               />
               <SettingItem
                 title="SIA Portal"
                 component={<></>}
                 children={
-                  <InputPanel
-                    value={siaPortalInput}
-                    onChange={(e) => {
-                      setSiaPortal(e.target.value)
-                      setSiaPortalEdited(true)
-                      setSiaPortalInputError(null)
-                    }}
-                    placeholder={`${siaPortalInput}`}
-                  />
+                  <>
+                    <div
+                      className={cn(styles.formDefault, styles.formAbsolute, {
+                        [styles.errorInputDefault]:
+                          !!siaPortalInputError || !isValidHttp(siaPortalInput),
+                      })}
+                    >
+                      <form
+                        style={{ width: '100%' }}
+                        onBlur={() => {
+                          setSiaPortalInputError(null)
+                          // !(
+                          //   siaPortalLoading ||
+                          //   !siaPortalEdited ||
+                          //   !isValidHttp(siaPortalInput)
+                          // ) && setIpfsGateway(ipfsGatewayInput)
+                        }}
+                        onSubmit={(e) => {
+                          e.preventDefault()
+
+                          setSiaPortal(siaPortalInput)
+                        }}
+                      >
+                        <input
+                          className={cn(styles.inputDefault, {})}
+                          value={siaPortalInput}
+                          placeholder="Gateway URL"
+                          onChange={(e) => {
+                            setSiaPortalInput(e.target.value)
+                            setSiaPortalEdited(true)
+                            setSiaPortalInputError(null)
+                          }}
+                        />
+                      </form>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          // e.stopPropagation()
+                          getDefaultValueSiaPortal(siaPortalInput)
+                        }}
+                        className={cn(
+                          styles.buttonInputDefault,
+                          styles.btnAbsolute
+                        )}
+                      />
+                    </div>
+                    {siaPortalInputError ? (
+                      <div className={styles.errorMessage}>
+                        {siaPortalInputError}
+                      </div>
+                    ) : null}
+                  </>
                 }
               />
             </>

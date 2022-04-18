@@ -46,7 +46,7 @@
 
 .checkboxNotification {
   position: relative;
-
+  width: 65px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -86,3 +86,44 @@
   display: flex;
   align-items: center;
 }
+
+label.support::before {
+  content: attr(data-title);
+}
+// span.support::before,
+label.support::before {
+  content: attr(data-title);
+  display: none;
+  position: absolute;
+  z-index: 9998;
+  top: -50px;
+  left: 0;
+  background: $PureWhite;
+  border-radius: 10px 10px 10px 0px;
+  border: 1px solid $StrokeColor;
+  box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
+  text-align: left;
+  color: #000;
+  font-family: Roboto, sans-serif;
+  font-weight: 500;
+  color: $PureBlack;
+  font-size: 10px;
+  line-height: 100%;
+  opacity: 0.9;
+  cursor: default;
+  padding: 5px;
+  margin: -15px 0 0 10px;
+
+  width: 200px;
+  min-height: 50px;
+  height: auto;
+}
+label.support:hover::before,
+label.support:focus::before {
+  display: flex;
+  // justify-content: center;
+  align-items: center;
+}
+// .support {
+//   width: 1px;
+// }

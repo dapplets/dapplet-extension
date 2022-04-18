@@ -48,10 +48,16 @@ interface PropsDeveloper {
     isDeployed: boolean[]
   }[]
   onDetailsClick: (x: any, y: any) => void
+  setModuleInfo?: (x) => void
 }
 export const DevModule: FC<PropsDeveloper> = (props) => {
-  const { modules, onDetailsClick, isDappletsDetails, setDappletsDetail } =
-    props
+  const {
+    modules,
+    onDetailsClick,
+    isDappletsDetails,
+    setDappletsDetail,
+    setModuleInfo,
+  } = props
   // const [dapDet, onDappletsDetails] = useState(isDappletsDetails)
   const nodes = new Map<string, any>()
   modules.forEach((x) => {
@@ -82,10 +88,17 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const sorted = [...sorting.sort().values()].map((x) => x.node)
 
   const visible = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 5)
+    if (hash.length > 28) {
+      const firstFourCharacters = hash.substring(0, 14)
+      const lastFourCharacters = hash.substring(
+        hash.length - 0,
+        hash.length - 14
+      )
 
-    return `${firstFourCharacters}...${lastFourCharacters}`
+      return `${firstFourCharacters}...${lastFourCharacters}`
+    } else {
+      return hash
+    }
   }
   return (
     <>
@@ -114,6 +127,8 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 onClick={() => {
                   onDetailsClick(m.module, m.versions[0])
                   setDappletsDetail(true)
+                  setModuleInfo(m.module)
+                  // console.log(m.module, m.versions[0])
                 }}
               />
               <button className={styles.dappletsReupload}>

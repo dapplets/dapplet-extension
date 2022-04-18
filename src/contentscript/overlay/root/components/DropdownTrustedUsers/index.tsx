@@ -96,11 +96,11 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
     setRegistries(registries.filter((r) => r.isDev === false))
   }
   const visible = (hash: string): string => {
-    if (hash.length > 18) {
-      const firstFourCharacters = hash.substring(0, 9)
+    if (hash.length > 38) {
+      const firstFourCharacters = hash.substring(0, 20)
       const lastFourCharacters = hash.substring(
         hash.length - 0,
-        hash.length - 8
+        hash.length - 18
       )
 
       return `${firstFourCharacters}...${lastFourCharacters}`
@@ -109,23 +109,9 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
     }
   }
   const handleClear = () => {
-    // e.preventDefault()
     setTrustedUserInput('')
   }
 
-  // const rootEl = useRef(null)
-
-  // useEffect(() => {
-  // const l = (e) => {
-  //   rootEl.current.contains(e.target) || setOpen()
-  //   document.addEventListener('click', l)
-  //   return () => document.removeEventListener('click', l)
-  // }
-  // }, [])
-
-  // const num = useMemo(() => {
-  //   console.log(trustedUserInput)
-  // }, [trustedUserInput])
   return (
     <>
       <div
@@ -136,64 +122,47 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
         tabIndex={0}
       >
         <div className={styles.inputTrustedUsers}>
-          <div className={styles.inputBlock}>
+          <form
+            className={styles.inputBlock}
+            onSubmit={(e) => {
+              e.preventDefault()
+              addTrustedUser(trustedUserInput, handleClear)
+              console.log('click')
+            }}
+          >
             <input
-              // ref={rootEl}
               className={cn(styles.inputUsers)}
               placeholder="NEAR or Ethereum address..."
               value={trustedUserInput}
-              onClick={() => addTrustedUser(trustedUserInput, handleClear)}
+              onBlur={() => setTrustedUserInputError(null)}
               onChange={(e) => {
                 setTrustedUserInput(e.target.value)
                 setTrustedUserInputError(null)
-                // l(e)
-                // addTrustedUser(trustedUserInput, handleClear)
-                // handleClear(e)
+                console.log('change')
               }}
-              onBlur={() => setTrustedUserInputError(null)}
               disabled={
                 !isValidUrl(trustedUserInput) &&
                 !!registries.find((r) => r.url === !trustedUserInput)
               }
-              // error={!!trustedUserInputError}
             />
             <span
               className={cn(styles.openList, { [styles.isOpen]: isOpen })}
               onClick={() => setOpen(true)}
             />
-          </div>
+          </form>
         </div>
-        {/* {trustedUserInputError ? <span>{trustedUserInputError}</span> : null} */}
+
         {isOpen && (
-          <div
-            className={styles.userList}
-            // onBlur={() => {
-            //   console.log('lala')
-            // }}
-          >
-            <div
-              className={styles.inputBlock}
-              // onBlur={() => {
-              //   console.log('lala')
-              // }}
-            >
+          <div className={styles.userList}>
+            <div className={styles.inputBlock}>
               <div className={styles.delimiterSpan}>-</div>
               <span
                 className={cn(styles.openList, { [styles.isOpen]: isOpen })}
-                onClick={
-                  () => setOpen(false)
-                  // l(e)
-                }
+                onClick={() => setOpen(false)}
               />
             </div>
             {trustedUsers.map((user, i) => (
-              <div
-                key={i}
-                className={styles.itemUser}
-                // onClick={() => {
-                //  onblur
-                // }}
-              >
+              <div key={i} className={styles.itemUser}>
                 <a
                   className={styles.userlink}
                   onClick={() => _openEtherscan(user.account)}

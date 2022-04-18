@@ -177,6 +177,7 @@ browser.runtime.onMessage.addListener(
     deleteEvent: EventService.deleteEvent,
     deleteAllEvents: EventService.deleteEventsAll,
     getNewEventsCount: EventService.getNewEventsCount,
+    getInitialConfig: () => globalConfigService.getInitialConfig(),
     // delete event
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),
