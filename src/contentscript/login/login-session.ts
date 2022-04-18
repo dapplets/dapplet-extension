@@ -1,7 +1,9 @@
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 import * as near from "../near";
+import { ConnectedWalletAccount } from 'near-api-js';
 import * as ethereum from "../ethereum";
+import { IEtherneumWallet } from '../ethereum/types';
 
 export class LoginSession {
     sessionId: string = null;
@@ -45,7 +47,7 @@ export class LoginSession {
         this.logoutHandler?.call({}, ls);
     }
 
-    async wallet(): Promise<any> {
+    async wallet(): Promise<ConnectedWalletAccount | IEtherneumWallet> {
         if (!await this.isValid()) return null;
         return this._getWalletObject();
     }
@@ -80,24 +82,10 @@ export class LoginSession {
         return clearSessionItems(this.sessionId);
     }
 
-    private async _getWalletObject() {
+    private async _getWalletObject(): Promise<ConnectedWalletAccount | IEtherneumWallet> {
         if (this._network === 'ethereum') {
             // ToDo: events def
-            const wallet = await ethereum.createWalletConnection(this.moduleName, { network: this._chain });
-            return {
-                request: ({ method, params }: { method: string, params: any[] }): Promise<any> => {
-                    return new Promise((res, rej) => {
-                        wallet.sendAndListen(method, params, { 
-                            result: (_, { data }) => {
-                                res(data)
-                            },
-                            rejected: (_, { data }) => {
-                                rej(data)
-                            },
-                        });
-                    });
-                }
-            };
+            return ethereum.createWalletConnection(this.moduleName, { network: this._chain });
         } else if (this._network === 'near') {
             return near.createWalletConnection(this.moduleName, { network: this._chain });
         } else {
