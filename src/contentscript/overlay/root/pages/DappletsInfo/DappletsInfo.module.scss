@@ -181,7 +181,63 @@
 .addIcon {
   display: block;
   padding: 5px;
+  z-index: 4;
+  width: 66px;
+  height: 20px;
 
+  background: $WebBG;
+  border-radius: 10px;
+
+  font-family: 'Roboto';
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 100%;
+
+  color: $ContentBlack;
+  &:hover {
+    background: $StrokeColor;
+  }
+  &:active {
+    background: $MainGrey;
+  }
+}
+
+.inputfile {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+.inputfile + label {
+  display: block;
+  padding: 5px;
+  z-index: 4;
+  width: 66px;
+  height: 20px;
+
+  background: $WebBG;
+  border-radius: 10px;
+
+  font-family: 'Roboto';
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 100%;
+  cursor: pointer;
+  color: $ContentBlack;
+  &:hover {
+    background: $StrokeColor;
+  }
+  &:active {
+    background: $MainGrey;
+  }
+}
+.inputfile:focus + label,
+.inputfile + label:hover {
+  display: block;
+  padding: 5px;
+  z-index: 4;
   width: 66px;
   height: 20px;
 

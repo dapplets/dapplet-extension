@@ -1,7 +1,12 @@
 @import '../../assets/styles/color.variables.scss';
 @import '../../assets/styles/null.scss';
 @import '../../assets/styles/fonts.scss';
-
+.checkboxBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 85px;
+}
 .inputNotification {
   position: absolute;
   top: 0;
@@ -46,7 +51,7 @@
 
 .checkboxNotification {
   position: relative;
-  width: 65px;
+  width: 16px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -55,7 +60,7 @@
 }
 
 .activeNotification {
-  width: 65px;
+  width: 16px;
 
   .inputCheckbox {
     border: none;
@@ -85,6 +90,7 @@
 .inner {
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
 label.support::before {

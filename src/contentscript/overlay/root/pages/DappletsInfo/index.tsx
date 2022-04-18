@@ -1,4 +1,11 @@
-import React, { ReactElement, useState, useEffect, useMemo, FC } from 'react'
+import React, {
+  ReactElement,
+  useState,
+  useEffect,
+  useMemo,
+  FC,
+  useRef,
+} from 'react'
 import cn from 'classnames'
 import styles from './DappletsInfo.module.scss'
 import { SettingWrapper } from '../../components/SettingWrapper'
@@ -17,6 +24,7 @@ import VersionInfo from '../../../../../background/models/versionInfo'
 import * as tracing from '../../../../../common/tracing'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
 import { typeOfUri, chainByUri, joinUrls } from '../../../../../common/helpers'
+import { StorageRefImage } from '../../components/DevModulesList'
 import {
   DEFAULT_BRANCH_NAME,
   ModuleTypes,
@@ -446,6 +454,28 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   //   !isAlreadyDeployed || mode === FormMode.Creating || !vi
   const [miTitle = '', setMiTitle] = useState(mi.title)
   const [miDescription = '', setMiDescription] = useState(mi.description)
+
+  //   if( this.files && this.files.length > 1 )
+  //     fileName = ( this.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', this.files.length );
+  //   else
+  //     fileName = e.target.value.split( '\' ).pop();
+  // 	if( fileName )
+  //     label.querySelector( 'span' ).innerHTML = fileName;
+  //   else
+  //     label.innerHTML = labelVal;
+  const fileInput = useRef<HTMLInputElement>()
+  const [st, setSt] = useState([])
+  const onChange = (e) => {
+    const files = e.target.files
+    console.log(files)
+    const filesArr = Array.prototype.slice.call(files)
+    console.log(filesArr)
+    setSt([
+      // ...files,
+      ...filesArr,
+    ])
+  }
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.mainInfoBlock}>
@@ -491,11 +521,24 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
               <div className={styles.iconBlock}>
                 <div className={styles.imgBlock}>
-                  <img className={styles.img} src={mi.icon.uris[0]} />
-                  <span className={styles.imgTitle}>Icon</span>
+                  <StorageRefImage storageRef={mi.icon} />
+                  {st.map((x, i) => (
+                    <span className={styles.imgTitle} key={i}>
+                      {x.name}
+                    </span>
+                  ))}
                 </div>
+
                 <div className={styles.buttonIcon}>
-                  <button className={styles.addIcon}>Change icon</button>
+                  <input
+                    ref={fileInput}
+                    type="file"
+                    name="file"
+                    id="file"
+                    className={styles.inputfile}
+                    onChange={onChange}
+                  />
+                  <label htmlFor="file">Change icon</label>
                 </div>
               </div>
             </div>

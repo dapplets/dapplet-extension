@@ -20,7 +20,11 @@ import { InputPanel } from '../../components/InputPanel'
 import { DropdownRegistery } from '../../components/DropdownRegistery'
 import { DropdownTrustedUsers } from '../../components/DropdownTrustedUsers'
 import { DropdownPreferedOverlayStorage } from '../../components/DropdownPreferedOverlayStorage'
-import { StorageTypes } from '../../../../../common/constants'
+import {
+  DEFAULT_BRANCH_NAME,
+  ModuleTypes,
+  StorageTypes,
+} from '../../../../../common/constants'
 import { parseModuleName } from '../../../../../common/helpers'
 
 export const DROPDOWN_LIST = [{ _id: '0', label: 'Custom' }]
@@ -277,12 +281,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSiaPortalInputError(err.message)
     }
   }
-  // const changeTargetStorage = (storage: StorageTypes, checked: boolean) => {
-  //   const newTarget = targetStorages.filter((x) => x !== storage)
+  const changeTargetStorage = (storage: StorageTypes, checked: boolean) => {
+    const newTarget = targetStorages.filter((x) => x !== storage)
 
-  //   if (checked) targetStorages.push(storage)
-  //   setTargetStorages(newTarget)
-  // }
+    if (checked) targetStorages.push(storage)
+    setTargetStorages(newTarget)
+  }
 
   const getDefaultValueDynamicAdapter = async (inputValue: string) => {
     const { getInitialConfig } = await initBGFunctions(browser)
@@ -332,6 +336,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSiaPortal(config.siaPortalUrl)
     }
   }
+
+  // const handleClear = () => {
+  //   setRegistryInput('')
+  // }
 
   return (
     <div className={styles.blockSettings}>
@@ -397,6 +405,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     }}
                     onSubmit={(e) => {
                       e.preventDefault()
+                      console.log('lolo')
+
                       !(userAgentNameLoading || !userAgentNameEdited) &&
                         setUserAgentName(userAgentNameInput)
                     }}
@@ -408,8 +418,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       className={cn(styles.inputDefault, {})}
                       value={userAgentNameInput}
                       placeholder="User agent name..."
+                      onFocus={() => setUserAgentNameInput('')}
                       onChange={(e) => {
-                        setUserAgentName(e.target.value)
+                        setUserAgentNameInput(e.target.value)
                         setUserAgentNameEdited(true)
                         setUserAgentNameInputError(null)
                       }}
@@ -457,6 +468,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         className={cn(styles.inputDefault, {})}
                         value={dynamicAdapterInput}
                         placeholder={dynamicAdapterInput}
+                        onFocus={() => setDynamicAdapterInput('')}
                         onChange={(e) => {
                           // e.preventDefault()
                           setDynamicAdapterInput(e.target.value)
@@ -492,7 +504,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <Checkbox isSupport isCheckbox title="Centralized" />
 
                     <Checkbox
-                      style={{ marginLeft: '40px' }}
+                      // style={{ marginLeft: '40px' }}
                       isCheckbox={checkedSia}
                       title="SIA"
                       onChange={() => setCheckedSia(!checkedSia)}
@@ -506,7 +518,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <Checkbox
                       isCheckbox={checkedSwarm}
                       title="Swarm"
-                      style={{ marginRight: '40px' }}
+                      // style={{ marginRight: '40px' }}
                       onChange={(e) => setCheckedSwarm(!checkedSwarm)}
                     />
                   </div>
@@ -550,6 +562,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           className={cn(styles.inputDefault, {})}
                           value={providerInput}
                           placeholder={'Provider URL'}
+                          onFocus={() => setProviderInput('')}
                           onChange={(e) => {
                             setProviderInput(e.target.value)
                             setProviderEdited(true)
@@ -609,6 +622,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           className={cn(styles.inputDefault, {})}
                           value={swarmGatewayInput}
                           placeholder={'Gateway URL'}
+                          onFocus={() => setSwarmGatewayInput('')}
                           onChange={(e) => {
                             setSwarmGatewayInput(e.target.value)
                             setSwarmGatewayInputError(null)
@@ -669,6 +683,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           className={cn(styles.inputDefault, {})}
                           value={swarmPostageStampIdInput}
                           placeholder="Postage Stamp ID"
+                          onFocus={() => setSwarmPostageStampIdInput('')}
                           onChange={(e) => {
                             setSwarmPostageStampIdInput(e.target.value)
                             setSwarmPostageStampIdInputError(null)
@@ -731,6 +746,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           className={cn(styles.inputDefault, {})}
                           value={ipfsGatewayInput}
                           placeholder="Gateway URL"
+                          onFocus={() => setIpfsGatewayInput('')}
                           onChange={(e) => {
                             setIpfsGatewayInput(e.target.value)
                             setIpfsGatewayEdited(true)
@@ -789,6 +805,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           className={cn(styles.inputDefault, {})}
                           value={siaPortalInput}
                           placeholder="Gateway URL"
+                          onFocus={() => setSiaPortalInput('')}
                           onChange={(e) => {
                             setSiaPortalInput(e.target.value)
                             setSiaPortalEdited(true)

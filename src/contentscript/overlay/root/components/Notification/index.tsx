@@ -41,17 +41,17 @@ export const Notification = (props: NotificationProps): ReactElement => {
   const booleanNode = refComponent.current?.classList.contains('more')
   useEffect(() => {
     if (description.length > 71) {
-      // if (refComponent && refComponent.current) {
-      refComponent.current?.classList.add('more')
-      if (booleanNode === true) {
+      if (refComponent && refComponent.current) {
+        refComponent.current?.classList.add('more')
+        // if (booleanNode === true) {
         onOpen(true)
+        // }
       }
-      // }
     } else {
-      // if (refComponent && refComponent.current) {
-      refComponent.current?.classList.remove('more')
-      onOpen(false)
-      // }
+      if (refComponent && refComponent.current) {
+        refComponent.current?.classList.remove('more')
+        onOpen(false)
+      }
     }
   }, [refComponent, booleanNode])
 
