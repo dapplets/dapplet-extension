@@ -15,6 +15,7 @@ import * as near from "./near";
 import * as ethereum from "./ethereum";
 import { LoginSession } from "./login/login-session";
 import { LoginHooks, LoginRequestSettings } from "./login/types";
+import { IEtherneumWallet } from "./ethereum/types";
 import ModuleInfo from "../background/models/moduleInfo";
 import VersionInfo from "../background/models/versionInfo";
 import { State } from './state';
@@ -303,15 +304,10 @@ export default class Core {
         return conn;
     }
 
-    /**
-     * @deprecated Since version 0.46.0. Will be deleted in version 0.50.0. Use `Core.login()` instead.
-     */
-    public async wallet<T>(cfg: { type: 'ethereum', network: 'goerli', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & Connection<T>>
+    public async wallet(cfg: { type: 'ethereum', network: 'goerli', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & IEtherneumWallet>
     public async wallet(cfg: { type: 'near', network: 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
     public async wallet(cfg: { type: 'near', network: 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
     public async wallet(cfg: { type: 'ethereum' | 'near', network: 'goerli' | 'testnet' | 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
-        console.warn('DEPRECATED: "Core.contract()" is deprecated since version 0.46.1. It will be deleted in version 0.50.0. Use "Core.login()" instead.');
-
         if (!cfg || !cfg.type || !cfg.network) throw new Error("\"type\" and \"network\" are required in Core.wallet().");
         if (cfg.type !== 'near' && cfg.type !== 'ethereum') throw new Error("The \"ethereum\" and \"near\" only are supported in Core.wallet().");
         if (cfg.type === 'near' && !(cfg.network == 'testnet' || cfg.network == 'mainnet')) throw new Error("\"testnet\" and \"mainnet\" network only is supported in \"near\" type wallet.");
@@ -326,7 +322,7 @@ export default class Core {
             return suitableWallet ? suitableWallet.connected : false;
         };
 
-        const getWalletObject = async () => {
+        const getWalletObject = async (): Promise<NearApi.ConnectedWalletAccount | IEtherneumWallet> => {
             const connected = await isConnected();
             if (!connected) return null;
 

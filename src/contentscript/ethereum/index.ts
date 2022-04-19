@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import { browser } from "webextension-polyfill-ts";
 import { Connection, EventDef } from "../connection";
 import { ProxySigner } from "../proxySigner";
+import { ITransactionReceipt, IEtherneumWallet } from './types';
 
 // ToDo: use sendSowaTransaction method from background
 async function _sendWalletConnectTx(app: string, sowaIdOrRpcMethod, sowaMetadataOrRpcParams, callback: (e: { type: string, data?: any }) => void): Promise<any> {
@@ -26,7 +27,7 @@ async function _sendWalletConnectTx(app: string, sowaIdOrRpcMethod, sowaMetadata
     }
 }
 
-export async function createWalletConnection<T>(app: string, cfg: { network: string }, eventDef?: EventDef<any>) {
+export async function createWalletConnection<T>(app: string, cfg: { network: string }, eventDef?: EventDef<any>): Promise<IEtherneumWallet> {
     const transport = {
         _txCount: 0,
         _handler: null,
@@ -44,7 +45,43 @@ export async function createWalletConnection<T>(app: string, cfg: { network: str
     }
 
     const conn = new Connection<T>(transport, eventDef);
-    return conn;
+    const request = ({ method, params }: { method: string, params: any[] }): Promise<any> => {
+        return new Promise((res, rej) => {
+            conn.sendAndListen(method, params, { 
+                result: (_, { data }) => {
+                    res(data)
+                },
+                rejected: (_, { data }) => {
+                    rej(data)
+                },
+            });
+        });
+    };
+    const waitTransaction = async (txHash: string, confirmations: number = 1): Promise<ITransactionReceipt> => {
+        while (true) {
+            await new Promise((res) => setTimeout(res, 1000));
+            const transactionReceipt: ITransactionReceipt = await request({
+                method: 'eth_getTransactionReceipt',
+                params: [txHash],
+            });
+            if (transactionReceipt) {
+                const blockNumber = parseInt(transactionReceipt.blockNumber, 16);
+                let lastBlockNumber = blockNumber;
+                while (true) {
+                    if (confirmations <= lastBlockNumber - blockNumber + 1) {
+                        return transactionReceipt;
+                    }
+                    await new Promise((res) => setTimeout(res, 1000));
+                    const lastBlockNumberStr = await request({
+                        method: 'eth_blockNumber',
+                        params: [],
+                    });
+                    lastBlockNumber = parseInt(lastBlockNumberStr, 16);
+                }
+            }
+        }
+    };
+    return { request, waitTransaction };
 }
 
 export async function createContractWrapper(app: string, cfg: { network: string }, address: string, options: any) {
