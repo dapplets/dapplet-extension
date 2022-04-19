@@ -498,6 +498,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     <div className={styles.wrapper}>
       <div className={styles.mainInfoBlock}>
         <SettingWrapper
+          className={styles.wrapperSettings}
           title="Social"
           children={
             <div className={styles.socialBlock}>

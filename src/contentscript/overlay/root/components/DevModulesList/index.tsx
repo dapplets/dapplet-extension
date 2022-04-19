@@ -129,6 +129,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 <div className={styles.dappletsNotDeploy}>not deployed</div>
               )}
             </div>
+
             <div className={styles.blockInfo}>
               <h3 className={styles.dappletsTitle}>{m.module.title}</h3>
               <button

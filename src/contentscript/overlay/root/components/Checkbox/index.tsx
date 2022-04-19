@@ -8,8 +8,8 @@ export interface CheckboxProps
     HTMLInputElement
   > {
   title: string
-  isCheckbox: boolean
-  isSupport?: boolean
+  isCheckbox: Boolean
+  isSupport?: Boolean
   onChange?: (x) => void
 }
 export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
@@ -32,7 +32,7 @@ export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
             className={cn(styles.input)}
             type="checkbox"
             onChange={onChange}
-            {...props}
+            {...anotherProps}
           />
           <span
             className={cn(styles.inputCheckbox, {

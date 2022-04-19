@@ -363,6 +363,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     <div className={styles.blockSettings}>
       <div className={styles.scrollBlock}>
         <SettingWrapper
+          className={styles.wrapperSettings}
           title="Social"
           children={
             <>
@@ -464,6 +465,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
         />
 
         <SettingWrapper
+          className={styles.wrapperSettings}
           title="Parameters"
           children={
             <>

@@ -226,11 +226,11 @@ export class App extends React.Component<P, S> {
                       // !isSettings && x.id === activeOverlayId,
                     })}
                   >
-                    {/* <ContentItem
+                    <ContentItem
                       overlay={x}
                       isActive={x.id === activeOverlayId}
                       overlayManager={p.overlayManager}
-                    /> */}
+                    />
                   </div>
                 ))}
               </div>
