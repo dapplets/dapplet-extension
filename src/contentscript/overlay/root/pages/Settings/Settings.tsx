@@ -92,6 +92,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [checkedIPFS, setCheckedIPFS] = useState(true)
   const [checkedSwarm, setCheckedSwarm] = useState(true)
 
+  const [isPopup, setPopup] = useState(false)
+
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -107,6 +109,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       await loadUserAgentName()
       await loadIpfsGateway()
       await loadSiaPortal()
+      await loadPopupInOverlay()
     }
     init()
     return () => {
@@ -284,8 +287,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const changeTargetStorage = (storage: StorageTypes, checked: boolean) => {
     const newTarget = targetStorages.filter((x) => x !== storage)
 
-    if (checked) targetStorages.push(storage)
+    if (checked) newTarget.push(storage)
     setTargetStorages(newTarget)
+    console.log(targetStorages)
+    console.log(newTarget)
   }
 
   const getDefaultValueDynamicAdapter = async (inputValue: string) => {
@@ -335,6 +340,19 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     if (config.siaPortalUrl !== inputValue) {
       setSiaPortal(config.siaPortalUrl)
     }
+  }
+
+  const loadPopupInOverlay = async () => {
+    const { getPopupInOverlay } = await initBGFunctions(browser)
+    const popupInOverlay = await getPopupInOverlay()
+    setPopup(popupInOverlay)
+    // setState({ popupInOverlay });
+  }
+
+  const setPopupInOverlay = async (isActive: boolean) => {
+    const { setPopupInOverlay } = await initBGFunctions(browser)
+    await setPopupInOverlay(isActive)
+    loadPopupInOverlay()
   }
 
   // const handleClear = () => {
@@ -392,6 +410,16 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   <Switch
                     checked={errorReporting}
                     onChange={() => setErrorReporting(!errorReporting)}
+                  />
+                }
+              />
+              <SettingItem
+                title="Open popup"
+                component={
+                  <Switch
+                    onChange={() => setPopupInOverlay(!isPopup)}
+                    checked={isPopup}
+                    // onChange={() => setErrorReporting(!errorReporting)}
                   />
                 }
               />
@@ -510,22 +538,40 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <Checkbox isSupport isCheckbox title="Centralized" />
 
                     <Checkbox
-                      // style={{ marginLeft: '40px' }}
-                      isCheckbox={checkedSia}
+                      isCheckbox={targetStorages.includes(StorageTypes.Sia)}
                       title="SIA"
-                      onChange={() => setCheckedSia(!checkedSia)}
+                      onChange={(e) =>
+                        changeTargetStorage(StorageTypes.Sia, e.target.checked)
+                      }
                     />
                     <Checkbox
-                      isCheckbox={checkedIPFS}
+                      isCheckbox={targetStorages.includes(StorageTypes.Ipfs)}
                       title="IPFS"
-                      onChange={() => setCheckedIPFS(!checkedIPFS)}
+                      onChange={(e) =>
+                        changeTargetStorage(StorageTypes.Ipfs, e.target.checked)
+                      }
                     />
+                    {/* <input
+                      type="checkbox"
+                      checked={targetStorages.includes(StorageTypes.Swarm)}
+                      onChange={(e) =>
+                        changeTargetStorage(
+                          StorageTypes.Swarm,
+                          e.target.checked
+                        )
+                      }
+                    /> */}
 
                     <Checkbox
-                      isCheckbox={checkedSwarm}
                       title="Swarm"
-                      // style={{ marginRight: '40px' }}
-                      onChange={(e) => setCheckedSwarm(!checkedSwarm)}
+                      isCheckbox={targetStorages.includes(StorageTypes.Swarm)}
+                      // checked={isPopup}
+                      onChange={(e) =>
+                        changeTargetStorage(
+                          StorageTypes.Swarm,
+                          e.target.checked
+                        )
+                      }
                     />
                   </div>
                 }

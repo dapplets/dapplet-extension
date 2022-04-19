@@ -4,46 +4,44 @@ import styles from './Checkbox.module.scss'
 
 export interface CheckboxProps
   extends DetailedHTMLProps<
-    HTMLAttributes<HTMLLabelElement>,
-    HTMLLabelElement
+    HTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
   > {
   title: string
   isCheckbox: boolean
   isSupport?: boolean
-  // onChange?: (any, any) => void
+  onChange?: (x) => void
 }
 export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
   const {
     title,
     isSupport = false,
-    isCheckbox = false,
+    isCheckbox = true,
     onChange,
     ...anotherProps
   } = props
-  // const onChangeCheckbox = (x, y) => {}
-  return (
-    <div className={styles.checkboxBlock}>
-      <label
-        data-title="The centralized storage maintained by Dapplets Project. It backs up your modules in case decentralized storages become unavailable."
-        onChange={onChange}
-        className={cn(styles.checkboxNotification, {
-          [styles.activeNotification]: isCheckbox,
-          [styles.support]: isSupport,
-        })}
-        {...anotherProps}
-      >
-        {isSupport && <span className={styles.support}></span>}
 
-        <input
-          // onChange={() => onChange}
-          className={cn(styles.inputNotification)}
-          type="checkbox"
-        />
-        <div className={styles.inner}>
-          <span className={cn(styles.inputCheckbox)} />
-        </div>
-      </label>
-      <span className={cn(styles.inputCheckboxTitle)}>{title}</span>
+  return (
+    <div className={styles.supportBlock}>
+      <div
+        data-title="The centralized storage maintained by Dapplets Project. It backs up your modules in case decentralized storages become unavailable."
+        className={cn(styles.checkboxBlock, { [styles.support]: isSupport })}
+      >
+        <label className={cn(styles.wrapper)}>
+          <input
+            className={cn(styles.input)}
+            type="checkbox"
+            onChange={onChange}
+            {...props}
+          />
+          <span
+            className={cn(styles.inputCheckbox, {
+              [styles.active]: isCheckbox,
+            })}
+          />
+        </label>
+        <span className={cn(styles.inputCheckboxTitle)}>{title}</span>
+      </div>
     </div>
   )
 }

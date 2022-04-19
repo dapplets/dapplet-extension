@@ -147,11 +147,12 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       //   await _updateCurrentAccount(),
       //   await _updateDeploymentStatus(),
       //   await _checkDependencies()
+      console.log(mi)
+      console.log(vi)
     }
     init()
     return () => {
       _isMounted = false
-      console.log(ModuleInfo)
     }
   }, [])
   bus.subscribe(
@@ -545,6 +546,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     onChange={(e) => {
                       onChange(e)
                       iconInputChangeHandler(e)
+                      console.log(mi.icon)
                     }}
                   />
                   <label htmlFor="file">Change icon</label>
@@ -588,9 +590,17 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                   </div>
                 }
               />
-              <div className={styles.blockAdmins}>
-                <h3 className={styles.adminsTitle}>Admins</h3>
-                <button className={styles.adminsButton} />
+              <div className={styles.wrapperAdmins}>
+                <div className={styles.blockAdmins}>
+                  <h3 className={styles.adminsTitle}>Admins</h3>
+                  <button className={styles.adminsButton} />
+                </div>
+                {mi.author && (
+                  <div className={styles.blockAuthors}>
+                    <h3 className={styles.authorTitle}>{mi.author}</h3>
+                    <button className={styles.authorDelete} />
+                  </div>
+                )}
               </div>
             </div>
           }

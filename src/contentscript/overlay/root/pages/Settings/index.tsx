@@ -24,6 +24,7 @@ import { SettingsList } from './Settings'
 import { MainList } from './Main'
 
 import { DappletsMainInfo } from '../DappletsInfo'
+import { UnderConstruction } from '../UnderConstruction'
 
 enum SettingsTabs {
   // MAIN = 0,
@@ -50,6 +51,7 @@ export const SettingsOverlay = () => {
   const [devMode, setMode] = useState(false)
   const [errorReporting, onErrorReporting] = useState(false)
   const [isDappletsDetails, setDappletsDetail] = useState(false)
+  const [isUnderConstruction, setUnderConstruction] = useState(false)
   const [ModuleInfo, setModuleInfo] = useState([])
   const [ModuleVersion, setModuleVersion] = useState([])
   useEffect(() => {
@@ -87,9 +89,11 @@ export const SettingsOverlay = () => {
     await setErrorReporting(isActive)
     loadErrorReporting()
   }
+  console.log(isUnderConstruction)
+
   return (
     <>
-      {!isDappletsDetails && (
+      {!isDappletsDetails && !isUnderConstruction && (
         <div className={styles.wrapper}>
           <div className={styles.title}>
             {/* <SettingTitle
@@ -130,6 +134,8 @@ export const SettingsOverlay = () => {
                 setModuleInfo={setModuleInfo}
                 isDappletsDetails={isDappletsDetails}
                 setDappletsDetail={setDappletsDetail}
+                isUnderConstruction={isUnderConstruction}
+                setUnderConstruction={setUnderConstruction}
               />
             )}
           </div>
@@ -168,6 +174,13 @@ export const SettingsOverlay = () => {
               //   setDappletsDetail={setDappletsDetail}
               // />
             )} */}
+          </div>
+        </div>
+      )}
+      {isUnderConstruction && !isDappletsDetails && (
+        <div className={styles.wrapper}>
+          <div className={styles.settingMain}>
+            <UnderConstruction setUnderConstruction={setUnderConstruction} />
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, FC } from 'react'
 import cn from 'classnames'
 import styles from './Developer.module.scss'
 import {
@@ -21,13 +21,23 @@ import { DevModule } from '../../components/DevModulesList'
 import { Registry } from '../../components/Registery'
 import TopologicalSort from 'topological-sort'
 let _isMounted = true
-
-export const Developer = ({
-  isDappletsDetails,
-  setDappletsDetail,
-  setModuleInfo,
-  setModuleVersion,
-}) => {
+export interface DeveloperProps {
+  isDappletsDetails: any
+  setDappletsDetail: (x) => void
+  setModuleInfo: any
+  setModuleVersion: any
+  isUnderConstruction: boolean
+  setUnderConstruction: (x) => void
+}
+export const Developer: //  = ({
+//   isDappletsDetails,
+//   setDappletsDetail,
+//   setModuleInfo,
+//   setModuleVersion,
+//   isUnderConstruction,
+//   setUnderConstruction,
+// }: DeveloperProps) =>
+FC<DeveloperProps> = (props: DeveloperProps) => {
   const [isLoading, onLoading] = useState(true)
   const [registries, setRegistries] = useState([])
   const [registryInput, setRegistryInput] = useState('')
@@ -36,6 +46,14 @@ export const Developer = ({
   const [modules, setModules] = useState([])
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [dataUri, setDataUri] = useState(null)
+  const {
+    isDappletsDetails,
+    setDappletsDetail,
+    setModuleInfo,
+    setModuleVersion,
+    isUnderConstruction,
+    setUnderConstruction,
+  } = props
   // const [storageRef] = <StorageRef>
 
   useEffect(() => {
@@ -117,9 +135,9 @@ export const Developer = ({
   }
 
   const deployModule = async (mi: ModuleInfo, vi: VersionInfo) => {
-    const { openDeployOverlay } = await initBGFunctions(browser)
-    await openDeployOverlay(mi, vi)
-    window.close()
+    // const { openDeployOverlay } = await initBGFunctions(browser)
+    // await openDeployOverlay(mi, vi)
+    // window.close()
   }
   const enableRegistry = async (url: string) => {
     onLoading(true)
@@ -309,7 +327,15 @@ export const Developer = ({
         </div>
       </div>
       <div className={styles.createUnderConstraction}>
-        <button className={styles.btnCreate} onClick={onCreateModuleHandler}>
+        <button
+          className={styles.btnCreate}
+          onClick={() => {
+            // onCreateModuleHandler()
+            setUnderConstruction(true)
+            setDappletsDetail(false)
+            // console.log(isUnderConstruction)
+          }}
+        >
           Create under construction dapplet
         </button>
       </div>

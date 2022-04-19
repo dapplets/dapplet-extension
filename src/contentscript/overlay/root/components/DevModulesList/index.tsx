@@ -25,10 +25,15 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
     // loadSwarmGateway()
 
     const init = async () => {
-      const { getResource } = await initBGFunctions(browser)
-      const base64 = await getResource(storageRef)
-      const dataUri = 'data:text/plain;base64,' + base64
-      setDataUri(dataUri)
+      const { hash, uris } = storageRef
+      if (!hash && uris.length > 0 && uris[0].indexOf('data:') === 0) {
+        setDataUri(uris[0])
+      } else {
+        const { getResource } = await initBGFunctions(browser)
+        const base64 = await getResource(storageRef)
+        const dataUri = 'data:text/plain;base64,' + base64
+        setDataUri(dataUri)
+      }
     }
     init()
     return () => {
