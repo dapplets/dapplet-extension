@@ -468,7 +468,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
           children={
             <>
               <SettingItem
-                title="Registryes"
+                title="Registries"
                 component={<></>}
                 children={<DropdownRegistery />}
               />

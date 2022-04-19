@@ -478,6 +478,22 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     ])
   }
 
+  const [author, setAuthor] = useState({ authorForm: [] })
+  const newAuthorObject = {
+    author: 'New admins',
+  }
+  const addButtonClickHandler = () => {
+    const newAuthor = Object.assign({}, author)
+    newAuthor.authorForm.push(newAuthorObject)
+    setAuthor(newAuthor)
+  }
+
+  const onDeleteChild = (id: number) => {
+    const newAuthor = Object.assign({}, author)
+    newAuthor.authorForm.splice(id, 1)
+    setAuthor(newAuthor)
+  }
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.mainInfoBlock}>
@@ -593,14 +609,20 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
               <div className={styles.wrapperAdmins}>
                 <div className={styles.blockAdmins}>
                   <h3 className={styles.adminsTitle}>Admins</h3>
-                  <button className={styles.adminsButton} />
+                  <button
+                    onClick={addButtonClickHandler}
+                    className={styles.adminsButton}
+                  />
                 </div>
-                {mi.author && (
-                  <div className={styles.blockAuthors}>
-                    <h3 className={styles.authorTitle}>{mi.author}</h3>
-                    <button className={styles.authorDelete} />
+                {author.authorForm.map((x, i) => (
+                  <div key={i} className={styles.blockAuthors}>
+                    <h3 className={styles.authorTitle}>{x.author}</h3>
+                    <button
+                      onClick={() => onDeleteChild(i)}
+                      className={styles.authorDelete}
+                    />
                   </div>
-                )}
+                ))}
               </div>
             </div>
           }

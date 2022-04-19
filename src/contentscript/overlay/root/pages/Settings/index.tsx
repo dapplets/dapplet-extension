@@ -25,6 +25,7 @@ import { MainList } from './Main'
 
 import { DappletsMainInfo } from '../DappletsInfo'
 import { UnderConstruction } from '../UnderConstruction'
+import { DappletsInfoSettings } from '../DappletsInfoSettings'
 
 enum SettingsTabs {
   // MAIN = 0,
@@ -168,12 +169,12 @@ export const SettingsOverlay = () => {
                 setDappletsDetail={setDappletsDetail}
               />
             )}
-            {/* {activeTaDappletsDetails === DappletsDetails.SETTINGS && (
-              // <DappletsMainInfo
-              //   isDappletsDetails={isDappletsDetails}
-              //   setDappletsDetail={setDappletsDetail}
-              // />
-            )} */}
+            {activeTaDappletsDetails === DappletsDetails.SETTINGS && (
+              <DappletsInfoSettings
+                isDappletsDetails={isDappletsDetails}
+                setDappletsDetail={setDappletsDetail}
+              />
+            )}
           </div>
         </div>
       )}
