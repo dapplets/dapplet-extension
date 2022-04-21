@@ -11,6 +11,7 @@ import { ReactNode } from 'react'
 import {
   Profile,
   ProfileImg,
+  ProfileLabel,
   ProfileOneImg,
   ProfileText,
 } from './components/Profile'
@@ -195,6 +196,7 @@ export class App extends React.Component<P, S> {
                   <ProfileOneImg
                   //  hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
                   />
+                  <ProfileLabel />
                   {/* <div className={styles.balance}>
                     <Icon icon={EthereumIcon} size="big" />
                     <p className={styles.amount}>25.1054</p>
