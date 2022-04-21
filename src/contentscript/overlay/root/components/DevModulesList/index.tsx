@@ -117,9 +117,12 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           {/* {m.isDeployed?.[0] === true ? <span /> : null} */}
           <div className={styles.dappletsInfo}>
             <div className={styles.dappletsTegs}>
-              <div className={styles.dappletsVersion}>
-                {m.versions[0].version}
-              </div>
+              {m.versions[0].version && (
+                <div className={styles.dappletsVersion}>
+                  {m.versions[0].version}
+                </div>
+              )}
+
               {m.versions[0].branch !== 'default' && (
                 <div className={styles.dappletsBranch}>
                   {m.versions[0] ? m.versions[0].branch : 'Under construction'}
