@@ -31,6 +31,7 @@ import {
   ModuleTypes,
   StorageTypes,
 } from '../../../../../common/constants'
+import { Icon, Message } from 'semantic-ui-react'
 
 // tracing.startTracing()
 
@@ -455,6 +456,35 @@ export const UnderConstruction: FC<UnderConstruction> = (
 
   return (
     <div className={styles.wrapper}>
+      {!isNotNullCurrentAccount ? (
+        owner ? (
+          <Message
+            warning
+            header="The wrong wallet"
+            content={
+              <React.Fragment>
+                Change account to {owner}
+                <br />
+                Connect a new wallet{' '}
+                <Icon name="chain" link onClick={() => pairWallet()} />
+              </React.Fragment>
+            }
+          />
+        ) : (
+          <Message
+            warning
+            header="Wallet is not connected"
+            content={
+              <React.Fragment>
+                You can not deploy a module without a wallet.
+                <br />
+                Connect a new wallet{' '}
+                <Icon name="chain" link onClick={() => pairWallet()} />
+              </React.Fragment>
+            }
+          />
+        )
+      ) : null}
       <div className={styles.mainInfoBlock}>
         <SettingWrapper
           title="Social"
