@@ -617,7 +617,11 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 </div>
                 {author.authorForm.map((x, i) => (
                   <div key={i} className={styles.blockAuthors}>
-                    <h3 className={styles.authorTitle}>{x.author}</h3>
+                    <input
+                      className={styles.authorTitle}
+                      placeholder={x.author}
+                      onChange={(e) => e.target.value}
+                    />
                     <button
                       onClick={() => onDeleteChild(i)}
                       className={styles.authorDelete}

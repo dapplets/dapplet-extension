@@ -154,11 +154,11 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
     loadRegistries()
   }
 
-  const onCreateModuleHandler = async () => {
-    const { openDeployOverlay } = await initBGFunctions(browser)
-    await openDeployOverlay(null, null)
-    window.close()
-  }
+  // const onCreateModuleHandler = async () => {
+  //   const { openDeployOverlay } = await initBGFunctions(browser)
+  //   await openDeployOverlay(null, null)
+  //   // window.close()
+  // }
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
 
   console.log(modules)
@@ -315,9 +315,10 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
         <button
           className={styles.btnCreate}
           onClick={() => {
-            onCreateModuleHandler()
+            // onCreateModuleHandler()
             setUnderConstruction(true)
             setDappletsDetail(false)
+
             // console.log(isUnderConstruction)
           }}
         >

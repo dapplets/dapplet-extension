@@ -61,9 +61,12 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
                 </div>
                 {contextId.contextForm.map((x, i) => (
                   <div key={i} className={styles.blockContext}>
-                    <h3 className={styles.blockContextTitle}>
-                      {x.contextForm}
-                    </h3>
+                    <input
+                      className={styles.blockContextTitle}
+                      placeholder={x.contextForm}
+                      onChange={(e) => e.target.value}
+                    />
+
                     <button
                       onClick={() => onDeleteChild(i)}
                       className={styles.contextDelete}

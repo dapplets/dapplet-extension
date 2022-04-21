@@ -8,7 +8,7 @@
   overflow: hidden;
   width: 100%;
   flex: 1 1 auto;
-  max-height: 86vh;
+  height: calc(100vh - 100px);
 }
 .wrapper::-webkit-scrollbar {
   width: 0;
@@ -449,3 +449,54 @@
     color: $PrimaryPressed;
   }
 }
+
+// .wrapper {
+//   width: 100%;
+//   max-width: 300px;
+
+//   text-align: center;
+
+//   color: #747376;
+
+//   font-family: Roboto, sans-serif;
+// }
+
+// .title,
+// .subtitle {
+//   margin-right: auto;
+//   margin-left: auto;
+// }
+
+// .title {
+//   max-width: 220px;
+
+//   font-size: 22px;
+//   font-weight: 700;
+//   line-height: 26px;
+// }
+
+// .subtitle {
+//   top: 57px;
+//   left: 41px;
+
+//   max-width: 138px;
+//   margin-top: 5px;
+
+//   font-size: 14px;
+//   font-weight: 500;
+//   line-height: 16px;
+// }
+
+// .link {
+//   display: block;
+
+//   margin-top: 10px;
+
+//   text-align: center;
+
+//   color: #d9304f;
+
+//   font-size: 14px;
+//   font-weight: 500;
+//   line-height: 16px;
+// }

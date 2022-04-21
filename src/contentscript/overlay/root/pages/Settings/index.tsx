@@ -181,7 +181,11 @@ export const SettingsOverlay = () => {
       {isUnderConstruction && !isDappletsDetails && (
         <div className={styles.wrapper}>
           <div className={styles.settingMain}>
-            <UnderConstruction setUnderConstruction={setUnderConstruction} />
+            <UnderConstruction
+              ModuleInfo={ModuleInfo}
+              ModuleVersion={ModuleVersion}
+              setUnderConstruction={setUnderConstruction}
+            />
           </div>
         </div>
       )}

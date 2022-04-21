@@ -7,9 +7,10 @@
   flex-direction: column;
   overflow: hidden;
   width: 100%;
-  height: 100%;
+  // height: 100%;
   flex: 1 1 auto;
-  max-height: 78vh;
+  // max-height: 78vh;
+  height: calc(100vh - 140px);
 }
 .wrapper::-webkit-scrollbar {
   width: 0;
@@ -365,6 +366,7 @@
 }
 
 .adminsTitle {
+  background: inherit;
   font-family: 'Roboto';
   font-style: normal;
   font-weight: 500;
@@ -467,6 +469,7 @@
 }
 
 .authorTitle {
+  background: inherit;
 }
 
 .authorDelete {
