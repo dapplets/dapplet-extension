@@ -394,7 +394,7 @@ export const ProfileText: FC<ProfileProps> = (props: ProfileProps) => {
                   {/* } */}
 
                   {/* {!hash && ( */}
-                  <div className={styles.moneyBlock}>{newTestIcons()}</div>
+                  {/* <div className={styles.moneyBlock}>{newTestIcons()}</div> */}
                   {/* )} */}
                 </div>
                 // </>
@@ -487,7 +487,7 @@ export const ProfileOneImg: FC<ProfileProps> = (props: ProfileProps) => {
                     Ethernial.Eth <div className={styles.blockEns}>ENS</div>
                   </div>
                   {/* {hash && */}
-                  <p className={styles.hash}>{visible(hash)}</p>
+                  {/* <p className={styles.hash}>{visible(hash)}</p> */}
                   {/* } */}
 
                   {/* {!hash && ( */}
