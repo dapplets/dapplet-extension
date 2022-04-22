@@ -89,43 +89,53 @@ interface IIndexState {
 }
 export interface UnderConstruction {
   setUnderConstruction: (x) => void
-  ModuleInfo: any
-  ModuleVersion: any
+  // ModuleInfo: any
+  // ModuleVersion: any
 }
 let _isMounted = false
 export const UnderConstruction: FC<UnderConstruction> = (
   props: UnderConstruction
 ) => {
-  const { setUnderConstruction, ModuleInfo, ModuleVersion } = props
+  const { setUnderConstruction } = props
   const bus = new Bus()
-  const transferOwnershipModal = React.createRef<any>()
-  const addContextIdModal = React.createRef<any>()
+  // const transferOwnershipModal = React.createRef<any>()
+  // const addContextIdModal = React.createRef<any>()
   const fileInputRef = React.createRef<HTMLInputElement>()
-  const [originalMi, setOriginalMi] = useState(null)
-  const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
-  const [vi, setVi] = useState<VersionInfo>(ModuleVersion)
-  const [dependenciesChecking, setDpendenciesChecking] =
-    useState<DependencyChecking[]>()
+  // ???
+  const [originalMi, setOriginalMi] = useState<ModuleInfo>(new ModuleInfo())
+  // type - FEATURE
+  const [mi, setMi] = useState<ModuleInfo>(new ModuleInfo())
+  // const [vi, setVi] = useState<VersionInfo>()
+  // const [dependenciesChecking, setDpendenciesChecking] =
+  //   useState<DependencyChecking[]>()
   const [loading, setLoading] = useState(false)
   const [targetRegistry, setTargetRegistry] = useState(null)
-  const [targetChain, setTargetChain] = useState<ChainTypes>(null)
-  const [message, setMessage] = useState(null)
-  const [registryOptions, setRegistryOptions] = useState([])
-  const [owner, setOwner] = useState(null)
-  const [currentAccount, setCurrentAccount] = useState(null)
-  const [newOwner, setNewOwner] = useState('')
-  const [newOwnerLoading, setNewOwnerLoading] = useState(false)
-  const [newOwnerDone, setNewOwnerDone] = useState(false)
-  const [editContextId, setEditContextId] = useState('')
-  const [editContextIdLoading, setEditContextIdLoading] = useState(false)
-  const [editContextIdDone, setEditContextIdDone] = useState(false)
-  const [deploymentStatus, setDeploymentStatus] = useState(
-    DeploymentStatus.Unknown
+  const [targetChain, setTargetChain] = useState<ChainTypes>(
+    ChainTypes.ETHEREUM_GOERLI
   )
+  const [message, setMessage] = useState(null)
+  // ???
+  const [registryOptions, setRegistryOptions] = useState([])
+  // const [owner, setOwner] = useState(null)
+  // delete wallets
+  // ??
+  const [currentAccount, setCurrentAccount] = useState(null)
+  // const [newOwner, setNewOwner] = useState('')
+  // const [newOwnerLoading, setNewOwnerLoading] = useState(false)
+  // const [newOwnerDone, setNewOwnerDone] = useState(false)
+  // const [editContextId, setEditContextId] = useState('')
+  // const [editContextIdLoading, setEditContextIdLoading] = useState(false)
+  // const [editContextIdDone, setEditContextIdDone] = useState(false)
+  // const [deploymentStatus, setDeploymentStatus] = useState(
+  //   DeploymentStatus.Unknown
+  // )
   const [trustedUsers, setTrustedUsers] = useState([])
+  // ???
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
-  const [mode, setMode] = useState(null)
-  const [sawing, isSawing] = useState(false)
+  // if form onli create - ?
+  const [mode, setMode] = useState(FormMode.Creating)
+  // ???
+  const [saving, isSaving] = useState(false)
   const [targetStorages, setTargetStorages] = useState([
     StorageTypes.Swarm,
     StorageTypes.Sia,
@@ -135,18 +145,21 @@ export const UnderConstruction: FC<UnderConstruction> = (
   useEffect(() => {
     _isMounted = true
     const init = async () => {
-      await _updateOwnership(),
-        await _updateCurrentAccount(),
-        await _updateDeploymentStatus(),
-        await _checkDependencies()
+      // await _updateOwnership(),
+      await _updateData()
+      // await _updateCurrentAccount(),
+      // await _updateDeploymentStatus(), await _checkDependencies()
       console.log(mi)
-      console.log(vi)
+      // console.log(originalMi)
+
+      // console.log(vi)
+      console.log(mode)
     }
     init()
     return () => {
       _isMounted = false
     }
-  }, [])
+  }, [mi])
 
   bus.subscribe(
     'data',
@@ -154,7 +167,10 @@ export const UnderConstruction: FC<UnderConstruction> = (
       const { getSwarmGateway } = await initBGFunctions(browser)
       const swarmGatewayUrl = await getSwarmGateway()
 
-      if (mi === null && vi === null) {
+      if (
+        mi === null
+        //  && vi === null
+      ) {
         // New module
         const mi = new ModuleInfo()
         setOriginalMi(JSON.parse(JSON.stringify(mi)))
@@ -163,55 +179,56 @@ export const UnderConstruction: FC<UnderConstruction> = (
         setSwarmGatewayUrl(swarmGatewayUrl)
         setMode(FormMode.Creating)
 
-        await _updateData()
-      } else {
+        // await _updateData()
+        // }
+        //  else {
         // Deploy module
-        const dependencies = vi?.dependencies
-          ? Object.entries(vi.dependencies).map(([name, version]) => ({
-              name: name,
-              version: version,
-              type: DependencyType.Dependency,
-            }))
-          : []
-        const interfaces = vi?.interfaces
-          ? Object.entries(vi.interfaces).map(([name, version]) => ({
-              name: name,
-              version: version,
-              type: DependencyType.Interface,
-            }))
-          : []
-        const dependenciesChecking = [...dependencies, ...interfaces]
-        setOriginalMi(JSON.parse(JSON.stringify(mi)))
-        setMi(mi)
-        setVi(vi)
-        setDpendenciesChecking(dependenciesChecking)
-        setLoading(false)
-        setSwarmGatewayUrl(swarmGatewayUrl)
+        // const dependencies = vi?.dependencies
+        //   ? Object.entries(vi.dependencies).map(([name, version]) => ({
+        //       name: name,
+        //       version: version,
+        //       type: DependencyType.Dependency,
+        //     }))
+        //   : []
+        // const interfaces = vi?.interfaces
+        //   ? Object.entries(vi.interfaces).map(([name, version]) => ({
+        //       name: name,
+        //       version: version,
+        //       type: DependencyType.Interface,
+        //     }))
+        //   : []
+        // const dependenciesChecking = [...dependencies, ...interfaces]
+        // setOriginalMi(JSON.parse(JSON.stringify(mi)))
+        // setMi(mi)
+        // setVi(vi)
+        // setDpendenciesChecking(dependenciesChecking)
+        // setLoading(false)
+        // setSwarmGatewayUrl(swarmGatewayUrl)
 
         //   Object.keys(vi?.overlays ?? {}).length > 0
         //     ? [StorageTypes.Swarm, StorageTypes.Sia]
         //     : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs],
         // mode: FormMode.Deploying,
 
-        await _updateData()
+        // await _updateData()
       }
     }
   )
 
-  const _checkDependencies = async () => {
-    const { getVersionInfo } = await initBGFunctions(browser)
-    // const { dependenciesChecking deps, targetRegistry } = dependenciesChecking
-    await Promise.all(
-      dependenciesChecking.map((x) =>
-        getVersionInfo(
-          targetRegistry,
-          x.name,
-          DEFAULT_BRANCH_NAME,
-          x.version
-        ).then((y) => (x.isExists = !!y))
-      )
-    )
-  }
+  // const _checkDependencies = async () => {
+  //   const { getVersionInfo } = await initBGFunctions(browser)
+  //   // const { dependenciesChecking deps, targetRegistry } = dependenciesChecking
+  //   await Promise.all(
+  //     dependenciesChecking.map((x) =>
+  //       getVersionInfo(
+  //         targetRegistry,
+  //         x.name,
+  //         DEFAULT_BRANCH_NAME,
+  //         x.version
+  //       ).then((y) => (x.isExists = !!y))
+  //     )
+  //   )
+  // }
 
   const _updateData = async () => {
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
@@ -229,17 +246,23 @@ export const UnderConstruction: FC<UnderConstruction> = (
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-
+    // console.log(registries)
+    // console.log(trustedUsers)
+    // console.log(prodRegistries)
+    // console.log(targetChain)
+    console.log(mi)
     if (mode === FormMode.Creating) {
-      return Promise.all([_updateCurrentAccount()])
-    } else {
-      return Promise.all([
-        _updateOwnership(),
-        _updateCurrentAccount(),
-        _updateDeploymentStatus(),
-        _checkDependencies(),
-      ])
+      // return Promise.all([_updateCurrentAccount()])
+      await _updateCurrentAccount()
     }
+    // else {
+    //   return Promise.all([
+    //     // _updateOwnership(),
+    //     _updateCurrentAccount(),
+    //     // _updateDeploymentStatus(),
+    //     // _checkDependencies(),
+    //   ])
+    // }
   }
 
   const _updateCurrentAccount = async () => {
@@ -249,68 +272,76 @@ export const UnderConstruction: FC<UnderConstruction> = (
       targetChain
     )
     setCurrentAccount(currentAccount)
-  }
-  const _updateOwnership = async () => {
-    const { getOwnership } = await initBGFunctions(browser)
-    const owner = await getOwnership(targetRegistry, mi.name)
-    setOwner(owner)
-  }
+    // console.log(targetChain)
 
-  const _updateDeploymentStatus = async () => {
-    // const s = this.state
-    setDeploymentStatus(DeploymentStatus.Unknown)
-
-    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(
-      browser
-    )
-    const miF = await getModuleInfoByName(targetRegistry, mi.name)
-    const deployed = vi
-      ? await getVersionInfo(targetRegistry, miF.name, vi.branch, vi.version)
-      : true
-    const deploymentStatus = !miF
-      ? DeploymentStatus.NewModule
-      : deployed
-      ? DeploymentStatus.Deployed
-      : DeploymentStatus.NotDeployed
-    setDeploymentStatus(deploymentStatus)
+    // console.log(currentAccount)
   }
+  // const _updateOwnership = async () => {
+  //   const { getOwnership } = await initBGFunctions(browser)
+  //   const owner = await getOwnership(targetRegistry, mi.name)
+  //   setOwner(owner)
+  // }
+
+  // const _updateDeploymentStatus = async () => {
+  //   // const s = this.state
+  //   // setDeploymentStatus(DeploymentStatus.NewModule)
+
+  //   const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(
+  //     browser
+  //   )
+  //   const miF = await getModuleInfoByName(targetRegistry, mi.name)
+  //   const deployed = vi
+  //     ? await getVersionInfo(targetRegistry, miF.name, vi.branch, vi.version)
+  //     : true
+  //   const deploymentStatus = !miF
+  //     ? DeploymentStatus.NewModule
+  //     : deployed
+  //     // ? DeploymentStatus.Deployed
+  //     // : DeploymentStatus.NotDeployed
+  //   setDeploymentStatus(deploymentStatus)
+  // }
 
   const _transferOwnership = async (newAccount: string) => {
-    setNewOwnerLoading(true)
+    // setNewOwnerLoading(true)
 
     const oldAccount = mi.author
     const { transferOwnership } = await initBGFunctions(browser)
     await transferOwnership(mi.registryUrl, mi.name, oldAccount, newAccount)
-    setNewOwnerLoading(false)
-    setNewOwnerDone(true)
+    // setNewOwnerLoading(false)
+    // setNewOwnerDone(true)
     // console.log(mi.author)
   }
 
-  const _addContextId = async (contextId: string) => {
-    setEditContextIdLoading(true)
+  // const _addContextId = async (contextId: string) => {
+  //   setEditContextIdLoading(true)
 
-    const { addContextId } = await initBGFunctions(browser)
-    await addContextId(targetRegistry, mi.name, contextId)
-    setEditContextIdLoading(false)
-    setEditContextIdDone(true)
-  }
+  //   const { addContextId } = await initBGFunctions(browser)
+  //   await addContextId(targetRegistry, mi.name, contextId)
+  //   setEditContextIdLoading(false)
+  //   setEditContextIdDone(true)
+  // }
 
-  const _removeContextId = async (contextId: string) => {
-    setEditContextIdLoading(true)
+  // const _removeContextId = async (contextId: string) => {
+  //   setEditContextIdLoading(true)
 
-    const { removeContextId } = await initBGFunctions(browser)
-    await removeContextId(targetRegistry, mi.name, contextId)
-    setEditContextIdLoading(false)
-    setEditContextIdDone(true)
-  }
+  //   const { removeContextId } = await initBGFunctions(browser)
+  //   await removeContextId(targetRegistry, mi.name, contextId)
+  //   setEditContextIdLoading(false)
+  //   setEditContextIdDone(true)
+  // }
 
   const deployButtonClickHandler = async () => {
-    setLoading(true)
+    // setLoading(true)
 
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
     // const { mi, vi, targetRegistry, targetStorages, currentAccount, mode } =
     //   this.state
 
+    mi.registryUrl = targetRegistry
+    mi.author = currentAccount
+    mi.type = ModuleTypes.Feature
+    console.log(mi)
+    console.log('lala')
     try {
       const isNotNullCurrentAccount = !(
         !currentAccount ||
@@ -326,47 +357,49 @@ export const UnderConstruction: FC<UnderConstruction> = (
       }
 
       const result =
-        mode === FormMode.Creating
-          ? await deployModule(mi, null, targetStorages, targetRegistry)
-          : await deployModule(mi, vi, targetStorages, targetRegistry)
+        mode === FormMode.Creating &&
+        (await deployModule(mi, null, targetStorages, targetRegistry))
+      // : await deployModule(mi, vi, targetStorages, targetRegistry)
       setMessage({
         type: 'positive',
         header: 'Module was deployed',
         message: [`Script URL: ${result.scriptUrl}`],
       })
-      setDeploymentStatus(DeploymentStatus.Deployed)
+      // setDeploymentStatus(DeploymentStatus.NewModule)
     } catch (err) {
       setMessage({
         type: 'negative',
         header: 'Publication error',
         message: [err.message],
       })
+      console.log([err])
     } finally {
-      setLoading(false)
+      // setLoading(false)
     }
   }
 
   const reuploadButtonClickHandler = async () => {
-    setLoading(true)
+    // setLoading(true)
 
     const { uploadModule } = await initBGFunctions(browser)
 
     try {
-      const scriptUrl = await uploadModule(mi, vi, targetStorages)
+      const scriptUrl = await uploadModule(mi, targetStorages)
       setMessage({
         type: 'positive',
         header: 'Module was reuploaded',
         message: [`Script URL: ${scriptUrl}`],
       })
-      setDeploymentStatus(DeploymentStatus.Deployed)
+      // setDeploymentStatus(DeploymentStatus.Deployed)
     } catch (err) {
       setMessage({
         type: 'negative',
         header: 'Publication error',
         message: [err.message],
+        // console.log();
       })
     } finally {
-      setLoading(false)
+      // setLoading(false)
     }
   }
 
@@ -397,16 +430,16 @@ export const UnderConstruction: FC<UnderConstruction> = (
       mi.icon = null
     }
     setMi(mi)
-    console.log(mi)
+    // console.log(mi)
   }
 
   const saveChanges = async () => {
     try {
-      isSawing(true)
+      // isSawing(true)
 
       const { editModuleInfo } = await initBGFunctions(browser)
       await editModuleInfo(targetRegistry, targetStorages, mi)
-      isSawing(false)
+      // isSawing(false)
       setOriginalMi(JSON.parse(JSON.stringify(mi)))
     } catch (err) {
       setMessage({
@@ -414,8 +447,14 @@ export const UnderConstruction: FC<UnderConstruction> = (
         header: 'Publication error',
         message: [err.message],
       })
+
+      const { editModuleInfo } = await initBGFunctions(browser)
+      await editModuleInfo(targetRegistry, targetStorages, mi)
+      console.log(editModuleInfo, 'lll')
+
+      console.log(err.message)
     } finally {
-      isSawing(false)
+      // isSawing(false)
     }
   }
 
@@ -424,24 +463,26 @@ export const UnderConstruction: FC<UnderConstruction> = (
     !currentAccount ||
     currentAccount === '0x0000000000000000000000000000000000000000'
   )
-  const isNotWalletPaired = !isNotNullCurrentAccount && !!owner
+  const isNotWalletPaired = !isNotNullCurrentAccount
+  // && !!owner
   const isNotAnOwner =
-    !!owner &&
-    isNotNullCurrentAccount &&
-    owner.toLowerCase() !== currentAccount.toLowerCase()
-  const isAlreadyDeployed =
-    !message && deploymentStatus === DeploymentStatus.Deployed
-  const isNewModule = deploymentStatus === DeploymentStatus.NewModule
-  const isNotTrustedUser =
-    isNotNullCurrentAccount &&
-    !trustedUsers.find(
-      (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
-    )
+    // !!owner &&
+    isNotNullCurrentAccount
+  //  &&
+  // owner.toLowerCase() !== currentAccount.toLowerCase()
+  // const isAlreadyDeployed =
+  //   !message && deploymentStatus === DeploymentStatus.Deployed
+  // const isNewModule = deploymentStatus === DeploymentStatus.NewModule
+  // const isNotTrustedUser =
+  //   isNotNullCurrentAccount &&
+  //   !trustedUsers.find(
+  //     (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
+  //   )
 
   const isManifestValid = mi?.name && mi?.title && mi?.type
   const isDeployButtonDisabled =
     loading ||
-    deploymentStatus === DeploymentStatus.Deployed ||
+    // deploymentStatus === DeploymentStatus.Deployed ||
     !isNotNullCurrentAccount ||
     isNotAnOwner ||
     isNoStorage ||
@@ -449,42 +490,49 @@ export const UnderConstruction: FC<UnderConstruction> = (
     // !isDependenciesExist ||
     !isManifestValid
   const isReuploadButtonDisabled =
-    !isAlreadyDeployed || mode === FormMode.Creating || !vi
+    // !isAlreadyDeployed ||
+    mode === FormMode.Creating
+  //  || !vi
 
-  // const [miTitle, setMiTitle] = useState(mi.title)
-  // const [miName, setMiName] = useState(mi.name)
+  const [miTitle, setMiTitle] = useState(mi.title)
+  const [miName, setMiName] = useState(mi.name)
+  const [miDescription, setMiDescription] = useState(mi.description)
 
   return (
     <div className={styles.wrapper}>
       {!isNotNullCurrentAccount ? (
-        owner ? (
-          <Message
-            warning
-            header="The wrong wallet"
-            content={
-              <React.Fragment>
-                Change account to {owner}
-                <br />
-                Connect a new wallet{' '}
-                <Icon name="chain" link onClick={() => pairWallet()} />
-              </React.Fragment>
-            }
-          />
-        ) : (
-          <Message
-            warning
-            header="Wallet is not connected"
-            content={
-              <React.Fragment>
-                You can not deploy a module without a wallet.
-                <br />
-                Connect a new wallet{' '}
-                <Icon name="chain" link onClick={() => pairWallet()} />
-              </React.Fragment>
-            }
-          />
-        )
-      ) : null}
+        // (
+        // owner ?
+        // (
+        //   <Message
+        //     warning
+        //     header="The wrong wallet"
+        //     content={
+        //       <React.Fragment>
+        //         {/* Change account to {owner} */}
+        //         <br />
+        //         Connect a new wallet{' '}
+        //         <Icon name="chain" link onClick={() => pairWallet()} />
+        //       </React.Fragment>
+        //     }
+        //   />
+        // ) :
+        <Message
+          warning
+          header="Wallet is not connected"
+          content={
+            <React.Fragment>
+              You can not deploy a module without a wallet.
+              <br />
+              Connect a new wallet{' '}
+              <Icon name="chain" link onClick={() => pairWallet()} />
+            </React.Fragment>
+          }
+        />
+      ) : // )
+      null}
+      {/* {message && <div>{message}</div>} */}
+
       <div className={styles.mainInfoBlock}>
         <SettingWrapper
           title="Social"
@@ -500,13 +548,21 @@ export const UnderConstruction: FC<UnderConstruction> = (
                     // label="Module Name"
                     readOnly={mode === FormMode.Editing}
                     placeholder="Module ID like module_name.dapplet-base.eth"
-                    // value={miName}
+                    // value={miName ?? ''}
                     onChange={(e) => {
                       // setMiName(e.target.value)
-                      // mi.name = e.target.value
-                      if (vi) vi.name = e.target.value
-                      setMi(mi)
-                      setVi(vi)
+                      mi.name = e.target.value
+                      // console.log(mi)
+                      // console.log(originalMi)
+                      // // setMi()
+                      // // console.log()
+                      // console.log(trustedUsers)
+                      // console.log(targetRegistry)
+                      // console.log(targetChain)
+                      // setMiName(e.target.value)
+                      // if (vi) vi.name = e.target.value
+                      // setMi()
+                      // setVi(vi)
                     }}
                     className={styles.inputTitle}
                   />
@@ -520,9 +576,10 @@ export const UnderConstruction: FC<UnderConstruction> = (
                   <input
                     required
                     placeholder="A short name of your module"
-                    // value={miTitle}
+                    // value={miTitle ?? ''}
                     onChange={(e) => {
-                      // mi.title = e.target.value
+                      mi.title = e.target.value
+                      // setMiTitle(e.target.value)
                       // setMiTitle(e.target.value)
                     }}
                     className={styles.inputTitle}
@@ -537,10 +594,11 @@ export const UnderConstruction: FC<UnderConstruction> = (
                   <input
                     required
                     placeholder="A small description of what your module does"
-                    value={''}
+                    // value={miDescription ?? ''}
                     onChange={(e) => {
                       mi.description = e.target.value
-                      setMi(mi)
+                      // setMi(mi)
+                      // setMiDescription(e.target.value)
                     }}
                     className={styles.inputTitle}
                   />
@@ -563,7 +621,16 @@ export const UnderConstruction: FC<UnderConstruction> = (
         >
           Back
         </button>
-        <button onClick={() => saveChanges()} className={styles.push}>
+        <button
+          onClick={() => {
+            deployButtonClickHandler()
+            // console.log(mi)
+            // console.log(originalMi)
+            console.log(targetRegistry)
+            console.log(targetStorages)
+          }}
+          className={styles.push}
+        >
           Done
         </button>
       </div>

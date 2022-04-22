@@ -9,6 +9,7 @@ import TopologicalSort from 'topological-sort'
 import styles from './DevModulesList.module.scss'
 import cn from 'classnames'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+// import NO_LOGO from '../../assets/images/no-logo.png'
 import { browser } from 'webextension-polyfill-ts'
 let _isMounted = true
 
@@ -42,7 +43,7 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
   })
   return (
     <div className={cn(styles.dappletsImg, className)}>
-      <img src={dataUri} />
+      {dataUri ? <img src={dataUri} /> : <span className={styles.noLogo} />}
     </div>
   )
 }
@@ -57,6 +58,8 @@ interface PropsDeveloper {
   onDetailsClick: (x: any, y: any) => void
   setModuleInfo: (x) => void
   setModuleVersion: (x) => void
+  isUnderConstructionDetails: boolean
+  setUnderConstructionDetails: (x) => void
 }
 export const DevModule: FC<PropsDeveloper> = (props) => {
   const {
@@ -66,6 +69,8 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setDappletsDetail,
     setModuleInfo,
     setModuleVersion,
+    isUnderConstructionDetails,
+    setUnderConstructionDetails,
   } = props
   // const [dapDet, onDappletsDetails] = useState(isDappletsDetails)
   const nodes = new Map<string, any>()
@@ -109,6 +114,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       return hash
     }
   }
+
   return (
     <>
       {sorted.map((m, i) => (
@@ -117,17 +123,21 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           {/* {m.isDeployed?.[0] === true ? <span /> : null} */}
           <div className={styles.dappletsInfo}>
             <div className={styles.dappletsTegs}>
-              {m.versions[0].version && (
+              {m.versions && m.versions[0] && m.versions[0].version && (
                 <div className={styles.dappletsVersion}>
                   {m.versions[0].version}
                 </div>
               )}
 
-              {m.versions[0].branch !== 'default' && (
-                <div className={styles.dappletsBranch}>
-                  {m.versions[0] ? m.versions[0].branch : 'Under construction'}
-                </div>
-              )}
+              {m.versions &&
+                m.versions[0] &&
+                m.versions[0].branch &&
+                m.versions[0].branch !== 'default' && (
+                  <div className={styles.dappletsBranch}>
+                    {(m.versions && m.versions[0] && m.versions[0].branch) ||
+                      'Under construction'}
+                  </div>
+                )}
               {m.isDeployed?.[0] === false && (
                 <div className={styles.dappletsNotDeploy}>not deployed</div>
               )}
@@ -135,19 +145,56 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
             <div className={styles.blockInfo}>
               <h3 className={styles.dappletsTitle}>{m.module.title}</h3>
-              <button
-                className={styles.dappletsSettings}
-                onClick={() => {
-                  onDetailsClick(m.module, m.versions[0])
-                  setDappletsDetail(true)
-                  setModuleInfo(m.module)
-                  setModuleVersion(m.versions[0])
-                  // console.log(m.module, m.versions[0])
-                }}
-              />
-              <button className={styles.dappletsReupload}>
-                {m.isDeployed?.[0] === false ? 'Deploy' : 'Reupload'}
-              </button>
+              {m.module.isUnderConstruction ? (
+                <span
+                  className={styles.dappletsSettingsIsUnderConstructionBlock}
+                >
+                  <button
+                    className={styles.dappletsSettingsIsUnderConstruction}
+                    onClick={() => {
+                      onDetailsClick(m.module, m.versions[0])
+                      // setDappletsDetail(true)
+                      setUnderConstructionDetails(true)
+                      setModuleInfo(m.module)
+                      setModuleVersion(m.versions[0])
+                      // console.log(m.module, m.versions[0])
+                    }}
+                  />
+                  <span className={styles.dappletsSettingsIsTocenomics} />
+                </span>
+              ) : (
+                <button
+                  className={styles.dappletsSettings}
+                  onClick={() => {
+                    onDetailsClick(m.module, m.versions[0])
+                    setDappletsDetail(true)
+                    setModuleInfo(m.module)
+                    setModuleVersion(m.versions[0])
+                    // console.log(m.module, m.versions[0])
+                  }}
+                />
+              )}
+              {m.module.isUnderConstruction ? (
+                <button
+                  // onClick={() => console.log(m.module.isUnderConstruction)}
+                  className={cn(
+                    styles.dappletsReuploadisUnderConstructionPublish,
+                    {
+                      [styles.dappletsReuploadisUnderConstructionDeploy]:
+                        m.isDeployed?.[0] === false,
+                    }
+                  )}
+                >
+                  {m.isDeployed?.[0] === false ? 'Deploy' : 'Publish'}
+                </button>
+              ) : (
+                <button
+                  // onClick={() => console.log(m.module.isUnderConstruction)}
+                  className={styles.dappletsReupload}
+                >
+                  {m.isDeployed?.[0] === false ? 'Deploy' : 'Reupload'}
+                </button>
+              )}
             </div>
             <div className={styles.dappletsLabel}>
               {m.module.name && (
@@ -163,7 +210,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 <div>
                   <span className={styles.dappletsLabelSpan}>Ownership:</span>
                   <label className={styles.dappletsLabelSpan}>
-                    {visible(`${m.module.author}`)}
+                    {visible(` ${m.module.author}`)}
                   </label>
                 </div>
               )}
@@ -175,7 +222,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   </label>
                 </div>
               )}
-              {m.versions[0].version && (
+              {m.versions && m.versions[0] && m.versions[0].version && (
                 <div>
                   <span className={styles.dappletsLabelSpan}>
                     Version in registry:
@@ -198,60 +245,3 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     </>
   )
 }
-
-{
-  /* <div className={styles.dappletsBlock}>
-<StorageRefImage storageRef={m.module.icon} />
-<div className={styles.dappletsInfo}> */
-}
-// <div className={styles.dappletsTegs}>
-//   {/* <div className={styles.dappletsVersion}>{moduleVersion}</div> */}
-//   <div className={styles.dappletsBranch}>{moduleBranch}</div>
-// </div>
-
-// <div className={styles.blockInfo}>
-//   <h3 className={styles.dappletsTitle}>{moduleTitle}</h3>
-//   <button className={styles.dappletsSettings} />
-//   <button className={styles.dappletsReupload}>Reupload </button>
-// </div>
-// <div className={styles.dappletsLabel}>
-{
-  /* <div>
-      <span className={styles.dappletsLabelSpan}>ID:</span>
-      <label className={styles.dappletsLabelSpan}>rnhgrs.eth</label>
-    </div> */
-}
-{
-  /* <div>
-      <span className={styles.dappletsLabelSpan}>Ownership:</span>
-      <label className={styles.dappletsLabelSpan}>
-        0xB6fa...B8ad
-      </label>
-    </div> */
-}
-{
-  /* <div>
-      <span className={styles.dappletsLabelSpan}>Regestry:</span>
-      <label className={styles.dappletsLabelSpan}>
-        0xB6fa...B8ad
-      </label>
-    </div> */
-}
-{
-  /* <div>
-      <span className={styles.dappletsLabelSpan}>
-        Version in registry:
-      </span>
-      <label className={styles.dappletsLabelSpan}>
-        0xB6fa...B8ad
-      </label>
-    </div> */
-}
-
-// <div>
-// <span className={styles.dappletsLabelSpan}>Type:</span>
-// <label className={styles.dappletsLabelSpan}>{moduleType}</label>
-//   </div>
-// </div>
-// </div>
-// </div>

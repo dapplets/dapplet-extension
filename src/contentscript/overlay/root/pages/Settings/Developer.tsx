@@ -16,7 +16,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
 import { Localhost } from '../../components/Localhost'
-
+import { UnderConstruction } from '../../components/UnderConstruction'
 import { DevModule } from '../../components/DevModulesList'
 import { Registry } from '../../components/Registery'
 import TopologicalSort from 'topological-sort'
@@ -29,6 +29,8 @@ export interface DeveloperProps {
   setModuleVersion: any
   isUnderConstruction: boolean
   setUnderConstruction: (x) => void
+  isUnderConstructionDetails: boolean
+  setUnderConstructionDetails: (x) => void
 }
 export const Developer: //  = ({
 //   isDappletsDetails,
@@ -54,6 +56,8 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
     setModuleVersion,
     isUnderConstruction,
     setUnderConstruction,
+    isUnderConstructionDetails,
+    setUnderConstructionDetails,
   } = props
   // const [storageRef] = <StorageRef>
 
@@ -160,10 +164,12 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
   //   // window.close()
   // }
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
+  const groupedModules2 = groupBy(modules, (x) => x.module.isUnderConstruction)
 
   console.log(modules)
   console.log(registries)
   console.log(groupedModules)
+  console.log('uk', groupedModules2)
 
   const handleClear = () => {
     setRegistryInput('')
@@ -249,6 +255,12 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                                   onDetailsClick={deployModule.bind(this)}
                                   setModuleInfo={setModuleInfo}
                                   setModuleVersion={setModuleVersion}
+                                  isUnderConstructionDetails={
+                                    isUnderConstructionDetails
+                                  }
+                                  setUnderConstructionDetails={
+                                    setUnderConstructionDetails
+                                  }
                                 />
                               )}
                             </div>
@@ -264,6 +276,59 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
             </div>
           ))}
 
+          <div className={styles.host}>
+            {modules.length > 0
+              ? Object.entries(groupedModules2).map(
+                  ([registryUrl, modules]) => (
+                    // {modules.author}
+
+                    <div
+                      key={registryUrl}
+                      // onClick={() => console.log(modules[0].author)}
+                    >
+                      {/* && registryUrl === r.url */}
+                      {/* {modules.length > 0  ? (
+                          <DevModule
+                            modules={modules}
+                            onDetailsClick={() => deployModule}
+                          />
+                        ) : (
+                          <div>No available development modules.</div>
+                        )} */}
+                      {modules.length > 0 && modules[0].module.author !== null && (
+                        <UnderConstruction
+                          key={registryUrl}
+                          label={'Dapplet under constuction'}
+                          children={
+                            <div
+                              className={styles.modules}
+                              onClick={() =>
+                                console.log(modules[0].module.author)
+                              }
+                            >
+                              <DevModule
+                                setDappletsDetail={setDappletsDetail}
+                                isDappletsDetails={isDappletsDetails}
+                                modules={modules}
+                                onDetailsClick={deployModule.bind(this)}
+                                setModuleInfo={setModuleInfo}
+                                setModuleVersion={setModuleVersion}
+                                isUnderConstructionDetails={
+                                  isUnderConstructionDetails
+                                }
+                                setUnderConstructionDetails={
+                                  setUnderConstructionDetails
+                                }
+                              />
+                            </div>
+                          }
+                        />
+                      )}
+                    </div>
+                  )
+                )
+              : null}
+          </div>
           <div className={styles.host}>
             {modules.length > 0 ? (
               Object.entries(groupedModules).map(([registryUrl, modules]) => (
@@ -298,6 +363,12 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                             onDetailsClick={deployModule.bind(this)}
                             setModuleInfo={setModuleInfo}
                             setModuleVersion={setModuleVersion}
+                            isUnderConstructionDetails={
+                              isUnderConstructionDetails
+                            }
+                            setUnderConstructionDetails={
+                              setUnderConstructionDetails
+                            }
                           />
                         </div>
                       }
@@ -318,6 +389,7 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
             // onCreateModuleHandler()
             setUnderConstruction(true)
             setDappletsDetail(false)
+            setUnderConstructionDetails(false)
 
             // console.log(isUnderConstruction)
           }}

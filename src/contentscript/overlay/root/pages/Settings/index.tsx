@@ -23,6 +23,7 @@ import { Developer } from './Developer'
 import { SettingsList } from './Settings'
 import { MainList } from './Main'
 
+import { UnderConstructionInfo } from '../UnderConstructionInfo'
 import { DappletsMainInfo } from '../DappletsInfo'
 import { UnderConstruction } from '../UnderConstruction'
 import { DappletsInfoSettings } from '../DappletsInfoSettings'
@@ -37,6 +38,12 @@ enum DappletsDetails {
   SETTINGS = 1,
 }
 
+enum UnderConstructionDetails {
+  INFO = 0,
+  TOKENOMICS = 1,
+  REWARDS = 2,
+}
+
 export const NAVIGATION_LIST = [
   // { _id: '0', title: 'Main' },
   { _id: '0', title: 'Settings' },
@@ -49,10 +56,16 @@ export const SettingsOverlay = () => {
   const [activeTaDappletsDetails, setActiveTabDappletsDetails] = useState(
     DappletsDetails.MAININFO
   )
+  const [
+    activeTabUnderConstructionDetails,
+    setActiveTabUnderConstructionDetails,
+  ] = useState(UnderConstructionDetails.INFO)
   const [devMode, setMode] = useState(false)
   const [errorReporting, onErrorReporting] = useState(false)
   const [isDappletsDetails, setDappletsDetail] = useState(false)
   const [isUnderConstruction, setUnderConstruction] = useState(false)
+  const [isUnderConstructionDetails, setUnderConstructionDetails] =
+    useState(false)
   const [ModuleInfo, setModuleInfo] = useState([])
   const [ModuleVersion, setModuleVersion] = useState([])
   useEffect(() => {
@@ -94,101 +107,173 @@ export const SettingsOverlay = () => {
 
   return (
     <>
-      {!isDappletsDetails && !isUnderConstruction && (
-        <div className={styles.wrapper}>
-          <div className={styles.title}>
-            {/* <SettingTitle
+      {!isDappletsDetails &&
+        !isUnderConstruction &&
+        !isUnderConstructionDetails && (
+          <div className={styles.wrapper}>
+            <div className={styles.title}>
+              {/* <SettingTitle
           title="Main"
           onClick={() => setActiveTab(SettingsTabs.MAIN)}
           isActive={activeTab === SettingsTabs.MAIN}
         /> */}
-            <SettingTitle
-              title="Settings"
-              onClick={() => setActiveTab(SettingsTabs.SETTINGS)}
-              isActive={activeTab === SettingsTabs.SETTINGS}
-            />
-            {devMode && (
               <SettingTitle
-                title="Developer"
-                onClick={() => setActiveTab(SettingsTabs.DEVELOPER)}
-                isActive={activeTab === SettingsTabs.DEVELOPER}
+                title="Settings"
+                onClick={() => setActiveTab(SettingsTabs.SETTINGS)}
+                isActive={activeTab === SettingsTabs.SETTINGS}
               />
-            )}
-          </div>
+              {devMode && (
+                <SettingTitle
+                  title="Developer"
+                  onClick={() => setActiveTab(SettingsTabs.DEVELOPER)}
+                  isActive={activeTab === SettingsTabs.DEVELOPER}
+                />
+              )}
+            </div>
 
-          <div className={styles.settingMain}>
-            {/* {activeTab === SettingsTabs.MAIN && (
+            <div className={styles.settingMain}>
+              {/* {activeTab === SettingsTabs.MAIN && (
   <MainList/>
         )} */}
-            {activeTab === SettingsTabs.SETTINGS && (
-              <SettingsList
-                devModeProps={devMode}
-                setDevMode={setDevmode}
-                errorReporting={errorReporting}
-                setErrorReporting={setErrorReporting}
-              />
-            )}
+              {activeTab === SettingsTabs.SETTINGS && (
+                <SettingsList
+                  devModeProps={devMode}
+                  setDevMode={setDevmode}
+                  errorReporting={errorReporting}
+                  setErrorReporting={setErrorReporting}
+                />
+              )}
 
-            {activeTab === SettingsTabs.DEVELOPER && (
-              <Developer
-                setModuleVersion={setModuleVersion}
-                setModuleInfo={setModuleInfo}
-                isDappletsDetails={isDappletsDetails}
-                setDappletsDetail={setDappletsDetail}
-                isUnderConstruction={isUnderConstruction}
+              {activeTab === SettingsTabs.DEVELOPER && (
+                <Developer
+                  setModuleVersion={setModuleVersion}
+                  setModuleInfo={setModuleInfo}
+                  isDappletsDetails={isDappletsDetails}
+                  setDappletsDetail={setDappletsDetail}
+                  isUnderConstruction={isUnderConstruction}
+                  setUnderConstruction={setUnderConstruction}
+                  isUnderConstructionDetails={isUnderConstructionDetails}
+                  setUnderConstructionDetails={setUnderConstructionDetails}
+                />
+              )}
+            </div>
+          </div>
+        )}
+      {isDappletsDetails &&
+        !isUnderConstructionDetails &&
+        !isUnderConstruction && (
+          <div className={styles.wrapper}>
+            <div className={styles.title}>
+              <SettingTitle
+                title="Main info"
+                onClick={() =>
+                  setActiveTabDappletsDetails(DappletsDetails.MAININFO)
+                }
+                isActive={activeTaDappletsDetails === DappletsDetails.MAININFO}
+              />
+              <SettingTitle
+                title="Settings"
+                onClick={() =>
+                  setActiveTabDappletsDetails(DappletsDetails.SETTINGS)
+                }
+                isActive={activeTaDappletsDetails === DappletsDetails.SETTINGS}
+              />
+            </div>
+            <div className={styles.settingMain}>
+              {activeTaDappletsDetails === DappletsDetails.MAININFO && (
+                <DappletsMainInfo
+                  ModuleInfo={ModuleInfo}
+                  ModuleVersion={ModuleVersion}
+                  isDappletsDetails={isDappletsDetails}
+                  setDappletsDetail={setDappletsDetail}
+                />
+              )}
+              {activeTaDappletsDetails === DappletsDetails.SETTINGS && (
+                <DappletsInfoSettings
+                  isDappletsDetails={isDappletsDetails}
+                  setDappletsDetail={setDappletsDetail}
+                />
+              )}
+            </div>
+          </div>
+        )}
+      {isUnderConstruction &&
+        !isDappletsDetails &&
+        !isUnderConstructionDetails && (
+          <div className={styles.wrapper}>
+            <div className={styles.settingMain}>
+              <UnderConstruction
+                // ModuleInfo={ModuleInfo}
+                // ModuleVersion={ModuleVersion}
                 setUnderConstruction={setUnderConstruction}
               />
-            )}
+            </div>
           </div>
-        </div>
-      )}
-      {isDappletsDetails && (
-        <div className={styles.wrapper}>
-          <div className={styles.title}>
-            <SettingTitle
-              title="Main info"
-              onClick={() =>
-                setActiveTabDappletsDetails(DappletsDetails.MAININFO)
-              }
-              isActive={activeTaDappletsDetails === DappletsDetails.MAININFO}
-            />
-            <SettingTitle
-              title="Settings"
-              onClick={() =>
-                setActiveTabDappletsDetails(DappletsDetails.SETTINGS)
-              }
-              isActive={activeTaDappletsDetails === DappletsDetails.SETTINGS}
-            />
-          </div>
-          <div className={styles.settingMain}>
-            {activeTaDappletsDetails === DappletsDetails.MAININFO && (
-              <DappletsMainInfo
-                ModuleInfo={ModuleInfo}
-                ModuleVersion={ModuleVersion}
-                isDappletsDetails={isDappletsDetails}
-                setDappletsDetail={setDappletsDetail}
+        )}
+
+      {!isUnderConstruction &&
+        !isDappletsDetails &&
+        isUnderConstructionDetails && (
+          <div className={styles.wrapper}>
+            <div className={styles.title}>
+              <SettingTitle
+                title="Info"
+                onClick={() =>
+                  setActiveTabUnderConstructionDetails(
+                    UnderConstructionDetails.INFO
+                  )
+                }
+                isActive={
+                  activeTabUnderConstructionDetails ===
+                  UnderConstructionDetails.INFO
+                }
               />
-            )}
-            {activeTaDappletsDetails === DappletsDetails.SETTINGS && (
-              <DappletsInfoSettings
-                isDappletsDetails={isDappletsDetails}
-                setDappletsDetail={setDappletsDetail}
+              <SettingTitle
+                title="Tokenomics"
+                onClick={() =>
+                  setActiveTabUnderConstructionDetails(
+                    UnderConstructionDetails.TOKENOMICS
+                  )
+                }
+                isActive={
+                  activeTabUnderConstructionDetails ===
+                  UnderConstructionDetails.TOKENOMICS
+                }
               />
-            )}
+              <SettingTitle
+                title="Rewards"
+                onClick={() =>
+                  setActiveTabUnderConstructionDetails(
+                    UnderConstructionDetails.REWARDS
+                  )
+                }
+                isActive={
+                  activeTabUnderConstructionDetails ===
+                  UnderConstructionDetails.REWARDS
+                }
+              />
+            </div>
+            <div className={styles.settingMain}>
+              {activeTabUnderConstructionDetails ===
+                UnderConstructionDetails.INFO && (
+                <div>
+                  <UnderConstructionInfo
+                    setUnderConstructionDetails={setUnderConstructionDetails}
+                  />
+                </div>
+              )}
+              {activeTabUnderConstructionDetails ===
+                UnderConstructionDetails.TOKENOMICS && <div></div>}
+              {activeTabUnderConstructionDetails ===
+                UnderConstructionDetails.REWARDS && <div></div>}
+              {/* <UnderConstruction
+                // ModuleInfo={ModuleInfo}
+                // ModuleVersion={ModuleVersion}
+                setUnderConstruction={setUnderConstruction}
+              /> */}
+            </div>
           </div>
-        </div>
-      )}
-      {isUnderConstruction && !isDappletsDetails && (
-        <div className={styles.wrapper}>
-          <div className={styles.settingMain}>
-            <UnderConstruction
-              ModuleInfo={ModuleInfo}
-              ModuleVersion={ModuleVersion}
-              setUnderConstruction={setUnderConstruction}
-            />
-          </div>
-        </div>
-      )}
+        )}
     </>
   )
 }
