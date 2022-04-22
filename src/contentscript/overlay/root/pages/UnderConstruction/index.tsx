@@ -366,6 +366,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
         message: [`Script URL: ${result.scriptUrl}`],
       })
       // setDeploymentStatus(DeploymentStatus.NewModule)
+      setUnderConstruction(false)
     } catch (err) {
       setMessage({
         type: 'negative',
@@ -626,8 +627,8 @@ export const UnderConstruction: FC<UnderConstruction> = (
             deployButtonClickHandler()
             // console.log(mi)
             // console.log(originalMi)
-            console.log(targetRegistry)
-            console.log(targetStorages)
+            // console.log(targetRegistry)
+            // console.log(targetStorages)
           }}
           className={styles.push}
         >

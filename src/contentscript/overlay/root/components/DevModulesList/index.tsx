@@ -123,19 +123,23 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           {/* {m.isDeployed?.[0] === true ? <span /> : null} */}
           <div className={styles.dappletsInfo}>
             <div className={styles.dappletsTegs}>
-              {m.versions && m.versions[0] && m.versions[0].version && (
-                <div className={styles.dappletsVersion}>
-                  {m.versions[0].version}
-                </div>
-              )}
+              {
+                m.versions && m.versions[0] && m.versions[0].version ? (
+                  <div className={styles.dappletsVersion}>
+                    {m.versions[0].version}
+                  </div>
+                ) : null
+                //  (
+                //   <div className={styles.dappletsVersion}>UK</div>
+                // )
+              }
 
               {m.versions &&
                 m.versions[0] &&
                 m.versions[0].branch &&
                 m.versions[0].branch !== 'default' && (
                   <div className={styles.dappletsBranch}>
-                    {(m.versions && m.versions[0] && m.versions[0].branch) ||
-                      'Under construction'}
+                    {m.versions[0].branch}
                   </div>
                 )}
               {m.isDeployed?.[0] === false && (
@@ -200,7 +204,12 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
               {m.module.name && (
                 <div>
                   <span className={styles.dappletsLabelSpan}>Name:</span>
-                  <label className={styles.dappletsLabelSpan}>
+                  <label
+                    className={cn(
+                      styles.dappletsLabelSpan,
+                      styles.dappletsLabelSpanInfo
+                    )}
+                  >
                     {m.module.name}
                   </label>
                 </div>
@@ -209,7 +218,12 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
               {m.module.author && (
                 <div>
                   <span className={styles.dappletsLabelSpan}>Ownership:</span>
-                  <label className={styles.dappletsLabelSpan}>
+                  <label
+                    className={cn(
+                      styles.dappletsLabelSpan,
+                      styles.dappletsLabelSpanInfo
+                    )}
+                  >
                     {visible(` ${m.module.author}`)}
                   </label>
                 </div>
@@ -217,7 +231,12 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
               {m.module.registryUrl && (
                 <div>
                   <span className={styles.dappletsLabelSpan}>Registry:</span>
-                  <label className={styles.dappletsLabelSpan}>
+                  <label
+                    className={cn(
+                      styles.dappletsLabelSpan,
+                      styles.dappletsLabelSpanInfo
+                    )}
+                  >
                     {visible(`${m.module.registryUrl}`)}
                   </label>
                 </div>
@@ -227,14 +246,24 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   <span className={styles.dappletsLabelSpan}>
                     Version in registry:
                   </span>
-                  <label className={styles.dappletsLabelSpan}>
+                  <label
+                    className={cn(
+                      styles.dappletsLabelSpan,
+                      styles.dappletsLabelSpanInfo
+                    )}
+                  >
                     {m.versions[0].version}
                   </label>
                 </div>
               )}
               <div>
                 <span className={styles.dappletsLabelSpan}>Type:</span>
-                <label className={styles.dappletsLabelSpan}>
+                <label
+                  className={cn(
+                    styles.dappletsLabelSpan,
+                    styles.dappletsLabelSpanInfo
+                  )}
+                >
                   {m.module.type}
                 </label>
               </div>
