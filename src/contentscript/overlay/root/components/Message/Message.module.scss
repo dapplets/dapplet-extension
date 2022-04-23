@@ -1,0 +1,66 @@
+@import '../../assets/styles/null.scss';
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
+.wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  font-family: Roboto, sans-serif;
+}
+
+.title,
+.subtitle {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.title {
+  // max-width: 220px;
+
+  font-family: 'Roboto';
+
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 26px;
+
+  color: $MainBlack;
+
+  padding: 0px 0px 4px 0px;
+}
+
+.subtitle {
+  display: block;
+  padding: 0px 0px 10px 0px;
+
+  font-family: 'Roboto';
+
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+
+  color: $MainGrey;
+}
+
+.link {
+  display: block;
+
+  margin-top: 9px;
+
+  text-align: center;
+
+  color: $Primary;
+
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
+}

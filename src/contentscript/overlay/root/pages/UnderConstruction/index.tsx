@@ -625,10 +625,6 @@ export const UnderConstruction: FC<UnderConstruction> = (
         <button
           onClick={() => {
             deployButtonClickHandler()
-            // console.log(mi)
-            // console.log(originalMi)
-            // console.log(targetRegistry)
-            // console.log(targetStorages)
           }}
           className={styles.push}
         >

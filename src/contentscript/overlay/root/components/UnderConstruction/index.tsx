@@ -34,7 +34,7 @@ export const UnderConstruction: FC<UnderConstructionProps> = (props) => {
             // [styles.enabled]: isEnabled && !error,
           })}
         >
-          UK
+          UC
           {/* {(!isEnabled && !error && 'Disabled') ||
             (isEnabled && error && 'Error') ||
             (isEnabled && !error && 'Enabled')} */}

@@ -27,6 +27,7 @@ import { UnderConstructionInfo } from '../UnderConstructionInfo'
 import { DappletsMainInfo } from '../DappletsInfo'
 import { UnderConstruction } from '../UnderConstruction'
 import { DappletsInfoSettings } from '../DappletsInfoSettings'
+import { Tokenimics } from '../Tokenomics'
 
 enum SettingsTabs {
   // MAIN = 0,
@@ -263,7 +264,11 @@ export const SettingsOverlay = () => {
                 </div>
               )}
               {activeTabUnderConstructionDetails ===
-                UnderConstructionDetails.TOKENOMICS && <div></div>}
+                UnderConstructionDetails.TOKENOMICS && (
+                <Tokenimics
+                  setUnderConstructionDetails={setUnderConstructionDetails}
+                />
+              )}
               {activeTabUnderConstructionDetails ===
                 UnderConstructionDetails.REWARDS && <div></div>}
               {/* <UnderConstruction
