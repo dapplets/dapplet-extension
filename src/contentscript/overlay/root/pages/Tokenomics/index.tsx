@@ -42,7 +42,7 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
   const { setUnderConstructionDetails, isSupport = true } = props
   const [isCreate, SetCreate] = useState(false)
 
-  const [isModal, setModal] = React.useState(false)
+  const [isModal, setModal] = useState(false)
   const onClose = () => setModal(false)
   return (
     <div className={styles.wrapper}>
