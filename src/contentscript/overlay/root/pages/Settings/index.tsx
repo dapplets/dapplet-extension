@@ -192,6 +192,8 @@ export const SettingsOverlay = () => {
               )}
               {activeTaDappletsDetails === DappletsDetails.SETTINGS && (
                 <DappletsInfoSettings
+                  ModuleInfo={ModuleInfo}
+                  ModuleVersion={ModuleVersion}
                   isDappletsDetails={isDappletsDetails}
                   setDappletsDetail={setDappletsDetail}
                 />
@@ -260,6 +262,8 @@ export const SettingsOverlay = () => {
                 UnderConstructionDetails.INFO && (
                 <div>
                   <UnderConstructionInfo
+                    ModuleInfo={ModuleInfo}
+                    ModuleVersion={ModuleVersion}
                     setUnderConstructionDetails={setUnderConstructionDetails}
                   />
                 </div>

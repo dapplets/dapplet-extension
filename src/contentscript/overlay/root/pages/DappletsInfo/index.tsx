@@ -143,18 +143,13 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   useEffect(() => {
     _isMounted = true
     const init = async () => {
-      // await _updateOwnership(),
-      //   await _updateCurrentAccount(),
-      //   await _updateDeploymentStatus(),
-      //   await _checkDependencies()
-      console.log(mi)
-      console.log(vi)
+      await _updateData()
     }
     init()
     return () => {
       _isMounted = false
     }
-  }, [])
+  }, [mi])
   bus.subscribe(
     'data',
     async ({ mi, vi }: { mi: ModuleInfo; vi: VersionInfo }) => {
@@ -238,14 +233,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
     if (mode === FormMode.Creating) {
-      return Promise.all([_updateCurrentAccount()])
-    } else {
-      return Promise.all([
-        _updateOwnership(),
-        _updateCurrentAccount(),
-        _updateDeploymentStatus(),
-        _checkDependencies(),
-      ])
+      await _updateCurrentAccount()
     }
   }
   const _updateCurrentAccount = async () => {
@@ -408,20 +396,23 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
   const saveChanges = async () => {
     try {
-      isSawing(true)
-
       const { editModuleInfo } = await initBGFunctions(browser)
       await editModuleInfo(targetRegistry, targetStorages, mi)
-      isSawing(false)
+
       setOriginalMi(JSON.parse(JSON.stringify(mi)))
+      setDappletsDetail(false)
     } catch (err) {
       setMessage({
         type: 'negative',
         header: 'Publication error',
         message: [err.message],
       })
+
+      console.log(err.message)
+      console.log(mi)
+      console.log(targetRegistry)
+      console.log(targetStorages)
     } finally {
-      isSawing(false)
     }
   }
   const isNoStorage = targetStorages.length === 0
@@ -462,8 +453,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     !isManifestValid
   const isReuploadButtonDisabled =
     !isAlreadyDeployed || mode === FormMode.Creating || !vi
-  const [miTitle = '', setMiTitle] = useState(mi.title)
-  const [miDescription = '', setMiDescription] = useState(mi.description)
 
   const fileInput = useRef<HTMLInputElement>()
   const [st, setSt] = useState([])
@@ -509,9 +498,10 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 component={<></>}
                 children={
                   <input
-                    value={miTitle}
+                    value={mi.title ?? ''}
                     onChange={(e) => {
-                      setMiTitle(e.target.value)
+                      setMi({ ...mi, title: e.target.value })
+                      console.log(mi)
                     }}
                     className={styles.inputTitle}
                   />
@@ -524,9 +514,10 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 children={
                   <input
                     className={styles.inputTitle}
-                    value={miDescription}
+                    value={mi.description ?? ''}
                     onChange={(e) => {
-                      setMiDescription(e.target.value)
+                      setMi({ ...mi, description: e.target.value })
+                      console.log(mi)
                     }}
                   />
                 }
@@ -640,7 +631,9 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
         >
           Back
         </button>
-        <a className={styles.push}>Push changes</a>
+        <button onClick={() => saveChanges()} className={styles.push}>
+          Push changes
+        </button>
       </div>
     </div>
   )

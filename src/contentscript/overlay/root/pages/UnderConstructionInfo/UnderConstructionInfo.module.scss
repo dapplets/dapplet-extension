@@ -435,6 +435,10 @@
   border: 1px solid $StrokeColor;
   box-sizing: border-box;
   border-radius: 5px;
+  margin: 0px 0px 10px 0px;
+  &:last-child {
+    margin: 0px 0px 0px 0px;
+  }
 }
 .blockContextTitle {
   font-family: 'Roboto';
@@ -444,6 +448,8 @@
   line-height: 149%;
   color: $MainGrey;
   background: inherit;
+  display: inline-block;
+  width: 100%;
 }
 
 .blockContextIDTitle {
@@ -470,6 +476,21 @@
   &:active {
     background-color: inherit;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%2326A651'/%3E%3C/svg%3E");
+  }
+}
+.contextIDButtonDisabled {
+  cursor: default;
+  background-color: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%23747376'/%3E%3C/svg%3E");
+  &:hover {
+    cursor: default;
+    background-color: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%23747376'/%3E%3C/svg%3E");
+  }
+  &:active {
+    cursor: default;
+    background-color: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%23747376'/%3E%3C/svg%3E");
   }
 }
 .contextDelete {
@@ -539,6 +560,7 @@
 }
 
 .push {
+  background: inherit;
   display: inline-block;
   font-family: 'Roboto';
   font-weight: 400;
