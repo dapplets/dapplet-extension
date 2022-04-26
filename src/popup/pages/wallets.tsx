@@ -9,6 +9,7 @@ import ReactTimeAgo from 'react-time-ago';
 import * as walletIcons from '../../common/resources/wallets';
 import { CheckIcon } from "../../common/react-components/CheckIcon";
 import { ChainTypes, DefaultSigners, WalletDescriptor, WalletTypes } from "../../common/types";
+import * as EventBus from "../../common/global-event-bus";
 
 interface IWalletsProps {
   isOverlay: boolean;
@@ -21,6 +22,8 @@ interface IWalletsState {
 }
 
 class Wallets extends React.Component<IWalletsProps, IWalletsState> {
+  private _isMounted: boolean = false;
+
   constructor(props) {
     super(props);
 
@@ -31,14 +34,27 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
   }
 
   async componentDidMount() {
+    this.refresh();
+    this._isMounted = true;
+    EventBus.on('wallet_changed', this.refresh);
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+    EventBus.off('wallet_changed', this.refresh);
+  }
+
+  refresh = async () => {
     const { getWalletDescriptors } = await initBGFunctions(browser);
 
     const descriptors = await getWalletDescriptors();
 
-    this.setState({
-      descriptors,
-      loading: false
-    });
+    if (this._isMounted) {
+      this.setState({
+        descriptors,
+        loading: false
+      });
+    }
   }
 
   async disconnectButtonClick(chain: ChainTypes, wallet: WalletTypes) {
@@ -50,10 +66,10 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
   async connectWallet() {
     const { pairWalletViaOverlay } = await initBGFunctions(browser);
     if (this.props.isOverlay) {
-      await pairWalletViaOverlay(null);
+      await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null);
       await this.componentDidMount();
     } else {
-      pairWalletViaOverlay(null);
+      pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null);
       window.close();
     }
   }

@@ -317,43 +317,51 @@ export default class Core {
 
         const isConnected = async () => {
             const { getWalletDescriptors } = await initBGFunctions(browser);
+            const sessions = await this.sessions(app);
+            const session = sessions.find(x => x.authMethod.indexOf(chainNetwork) !== -1);
+            if (!session) return false;
+
+            // ToDo: remove it when subscription on disconnect event will be implemented 
+            //       (see: /background/services/walletService.ts/disconnect())
             const descriptors = await getWalletDescriptors();
-            const suitableWallet = descriptors.find(x => x.chain === chainNetwork && x.apps.indexOf(app) !== -1);
-            return suitableWallet ? suitableWallet.connected : false;
+            const descriptor = descriptors.find(x => x.type == session.walletType);
+            return descriptor ? descriptor.connected : false;
         };
 
-        const getWalletObject = async (): Promise<NearApi.ConnectedWalletAccount | IEtherneumWallet> => {
+        const getSessionObject = async () => {
             const connected = await isConnected();
             if (!connected) return null;
 
-            if (cfg.type === 'ethereum') {
-                return ethereum.createWalletConnection(app, cfg, eventDef);
-            } else if (cfg.type === 'near') {
-                return near.createWalletConnection(app, cfg);
+            const sessions = await this.sessions(app);
+            const session = sessions.find(x => x.authMethod.indexOf(chainNetwork) !== -1);
+
+            if (!session) {
+                return null;
             } else {
-                throw new Error('Invalid wallet type.');
+                return session;
             }
         };
 
-        const _wallet = await getWalletObject();
+        const session = await getSessionObject();
+        const wallet = session ? await session.wallet() : null;
+        const me = this;
 
         const proxied = {
-            _wallet: _wallet,
+            _wallet: wallet,
+            _session: session,
 
             async isConnected(): Promise<boolean> {
                 return isConnected();
             },
 
             async connect(): Promise<void> {
-                const { prepareWalletFor } = await initBGFunctions(browser);
-                await prepareWalletFor(app, chainNetwork, cfg);
-                this._wallet = await getWalletObject();
+                if (this._session && this._wallet) return; // ???
+                this._session = await me.login({ authMethods: [chainNetwork], secureLogin: 'disabled' }, { }, app);
+                this._wallet = await this._session.wallet();
             },
 
             async disconnect(): Promise<void> {
-                const { unsetWalletFor } = await initBGFunctions(browser);
-                await unsetWalletFor(app, chainNetwork);
-                this._wallet = null;
+                return this._session.logout();               
             }
         };
 

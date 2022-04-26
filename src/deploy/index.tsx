@@ -310,7 +310,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
 
     async pairWallet() {
         const { pairWalletViaOverlay } = await initBGFunctions(browser);
-        await pairWalletViaOverlay(this.state.targetChain);
+        await pairWalletViaOverlay(this.state.targetChain, DefaultSigners.EXTENSION, null);
         await this._updateData();
     }
 

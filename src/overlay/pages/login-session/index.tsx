@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Bus } from "../../../common/bus";
 import { ConnectedWallets } from './ConnectedWallets';
-import { ChainTypes, LoginRequest } from "../../../common/types";
+import { ChainTypes, LoginRequest, DefaultSigners } from "../../../common/types";
 import { MemoryRouter, Route, Navigate, Routes } from "react-router-dom";
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
@@ -47,6 +47,10 @@ export class LoginSession extends React.Component<Props, State> {
         const connectedWallets = descriptors
             .filter(x => x.connected)
             .filter(x => chains.length > 0 ? chains.includes(x.chain) : true);
+
+        if (this.props.request.app === DefaultSigners.EXTENSION) {
+            this.setState({ redirect: '/pairing' });
+        }
 
         if (secureLogin === 'required') { // ToDo: handle optional mode
             const confirmations = await getSuitableLoginConfirmations(this.props.request.app, loginRequest);
