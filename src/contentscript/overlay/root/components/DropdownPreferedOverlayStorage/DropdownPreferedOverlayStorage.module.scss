@@ -67,12 +67,13 @@
 .item {
   cursor: pointer;
   &:hover {
-    color: $ContentBlack;
+    color: $PrimaryHover;
   }
-  &:active {
-    color: $MainBlack;
-  }
+  // &:active {
+  //   color: $MainBlack;
+  // }
 }
 .activeItem {
-  color: $Primary;
+  font-weight: 700;
+  color: $MainBlack;
 }

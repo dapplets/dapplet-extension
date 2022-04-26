@@ -63,7 +63,11 @@ export const SettingsOverlay = () => {
     setActiveTabUnderConstructionDetails,
   ] = useState(UnderConstructionDetails.INFO)
   const [devMode, setMode] = useState(false)
+  const [isSvgLoaderDevMode, setSvgLoaderDevMode] = useState(false)
+
   const [errorReporting, onErrorReporting] = useState(false)
+  const [isSvgErrorReporting, setSvgErrorReporting] = useState(false)
+
   const [isDappletsDetails, setDappletsDetail] = useState(false)
   const [isUnderConstruction, setUnderConstruction] = useState(false)
   const [isUnderConstructionDetails, setUnderConstructionDetails] =
@@ -84,21 +88,29 @@ export const SettingsOverlay = () => {
     // devMode
   }, [])
   const loadDevMode = async () => {
+    console.log('load settings')
+    setSvgLoaderDevMode(true)
     const { getDevMode } = await initBGFunctions(browser)
     const devMode = await getDevMode()
     setMode(devMode)
+    console.log('load of settings')
+    setSvgLoaderDevMode(false)
   }
   const setDevmode = async (isActive: boolean) => {
+    console.log('load settings 1')
     const { setDevMode } = await initBGFunctions(browser)
     await setDevMode(isActive)
     loadDevMode()
+    console.log('load of settings 1')
     // TODO: ???
     // await this.props.updateTabs()
   }
   const loadErrorReporting = async () => {
+    setSvgErrorReporting(true)
     const { getErrorReporting } = await initBGFunctions(browser)
     const errorReporting = await getErrorReporting()
     onErrorReporting(errorReporting)
+    setSvgErrorReporting(false)
   }
   const setErrorReporting = async (isActive: boolean) => {
     const { setErrorReporting } = await initBGFunctions(browser)
@@ -141,6 +153,8 @@ export const SettingsOverlay = () => {
                 <SettingsList
                   devModeProps={devMode}
                   setDevMode={setDevmode}
+                  isSvgLoaderDevMode={isSvgLoaderDevMode}
+                  isSvgErrorReporting={isSvgErrorReporting}
                   errorReporting={errorReporting}
                   setErrorReporting={setErrorReporting}
                 />

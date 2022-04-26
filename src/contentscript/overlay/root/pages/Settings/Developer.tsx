@@ -228,48 +228,32 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                   ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
                     (r.isEnabled && r.error && disableRegistry(r.url)) ||
                     (r.isEnabled && !r.error && disableRegistry(r.url))
-                  // console.log(r.error, r.isEnabled)
-                  // console.log(r)
                 }}
                 children={
                   <div className={styles.modules}>
-                    {
-                      modules.length > 0 &&
-                        Object.entries(groupedModules).map(
-                          ([registryUrl, modules]) => (
-                            <div key={registryUrl}>
-                              {/* && registryUrl === r.url */}
-                              {/* {modules.length > 0  ? (
-                          <DevModule
-                            modules={modules}
-                            onDetailsClick={() => deployModule}
-                          />
-                        ) : (
-                          <div>No available development modules.</div>
-                        )} */}
-                              {modules.length > 0 && registryUrl === r.url && (
-                                <DevModule
-                                  isDappletsDetails={isDappletsDetails}
-                                  setDappletsDetail={setDappletsDetail}
-                                  modules={modules}
-                                  onDetailsClick={deployModule.bind(this)}
-                                  setModuleInfo={setModuleInfo}
-                                  setModuleVersion={setModuleVersion}
-                                  isUnderConstructionDetails={
-                                    isUnderConstructionDetails
-                                  }
-                                  setUnderConstructionDetails={
-                                    setUnderConstructionDetails
-                                  }
-                                />
-                              )}
-                            </div>
-                          )
+                    {modules.length > 0 &&
+                      Object.entries(groupedModules).map(
+                        ([registryUrl, modules]) => (
+                          <div key={registryUrl}>
+                            {modules.length > 0 && registryUrl === r.url && (
+                              <DevModule
+                                isDappletsDetails={isDappletsDetails}
+                                setDappletsDetail={setDappletsDetail}
+                                modules={modules}
+                                onDetailsClick={deployModule.bind(this)}
+                                setModuleInfo={setModuleInfo}
+                                setModuleVersion={setModuleVersion}
+                                isUnderConstructionDetails={
+                                  isUnderConstructionDetails
+                                }
+                                setUnderConstructionDetails={
+                                  setUnderConstructionDetails
+                                }
+                              />
+                            )}
+                          </div>
                         )
-                      // : (
-                      //   <div>No available development modules.</div>
-                      // )
-                    }
+                      )}
                   </div>
                 }
               />
@@ -279,25 +263,16 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
           <div className={styles.host}>
             {modules.length > 0
               ? Object.entries(groupedModules2).map(
-                  ([registryUrl, modules]) => (
+                  ([isUnderConstruction, modules]) => (
                     // {modules.author}
 
                     <div
-                      key={registryUrl}
-                      // onClick={() => console.log(modules[0].author)}
+                      key={isUnderConstruction}
+                      onClick={() => console.log(modules)}
                     >
-                      {/* && registryUrl === r.url */}
-                      {/* {modules.length > 0  ? (
-                          <DevModule
-                            modules={modules}
-                            onDetailsClick={() => deployModule}
-                          />
-                        ) : (
-                          <div>No available development modules.</div>
-                        )} */}
-                      {modules.length > 0 && modules[0].module.author !== null && (
+                      {isUnderConstruction == 'true' && modules.length > 0 && (
                         <UnderConstruction
-                          key={registryUrl}
+                          key={isUnderConstruction}
                           label={'Dapplet under constuction'}
                           children={
                             <div

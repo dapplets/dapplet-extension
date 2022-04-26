@@ -333,6 +333,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     console.log(mi)
   }
   const saveChanges = async () => {
+    _addContextId(editContextId)
     try {
       const { editModuleInfo } = await initBGFunctions(browser)
       await editModuleInfo(targetRegistry, targetStorages, mi)
@@ -592,13 +593,16 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                       onChange={(e) => {
                         setEditContextId(e.target.value)
                       }}
-                      onBlur={() => {
-                        _addContextId(editContextId)
-                      }}
+                      // onBlur={() => {
+                      //   _addContextId(editContextId)
+                      // }}
                     />
 
                     <button
-                      onClick={onDeleteChildContext.bind(null, i)}
+                      onClick={() => {
+                        onDeleteChildContext(i)
+                        setEditContextId('')
+                      }}
                       className={styles.contextDelete}
                     />
                   </div>

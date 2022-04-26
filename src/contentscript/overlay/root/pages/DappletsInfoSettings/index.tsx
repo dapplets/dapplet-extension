@@ -229,6 +229,7 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
     setEditContextIdDone(true)
   }
   const saveChanges = async () => {
+    _addContextId(editContextId)
     try {
       const { editModuleInfo } = await initBGFunctions(browser)
       await editModuleInfo(targetRegistry, targetStorages, mi)
@@ -279,13 +280,17 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
                       onChange={(e) => {
                         setEditContextId(e.target.value)
                       }}
-                      onBlur={() => {
-                        _addContextId(editContextId)
-                      }}
+                      // onBlur={() => {
+                      //   // _addContextId(editContextId)
+                      //   console.log(editContextId)
+                      // }}
                     />
 
                     <button
-                      onClick={onDeleteChildContext.bind(null, i)}
+                      onClick={() => {
+                        onDeleteChildContext(i)
+                        setEditContextId('')
+                      }}
                       className={styles.contextDelete}
                     />
                   </div>

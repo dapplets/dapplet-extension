@@ -34,9 +34,18 @@ export interface SettingsListProps {
   setDevMode: (x) => void
   errorReporting: boolean
   setErrorReporting: (x) => void
+  isSvgLoaderDevMode: boolean
+  isSvgErrorReporting: boolean
 }
 export const SettingsList: FC<SettingsListProps> = (props) => {
-  const { devModeProps, setDevMode, errorReporting, setErrorReporting } = props
+  const {
+    devModeProps,
+    setDevMode,
+    errorReporting,
+    setErrorReporting,
+    isSvgLoaderDevMode,
+    isSvgErrorReporting,
+  } = props
   const [isUpdateAvailable, onUpdateAvailable] = useState(false)
 
   const [providerInput, setProviderInput] = useState('')
@@ -98,7 +107,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     _isMounted = true
     const init = async () => {
       await checkUpdates()
-      await loadDevMode()
+      // await loadDevMode()
       await loadProvider()
       await loadSwarmGateway()
       await loadErrorReporting()
@@ -399,22 +408,34 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
               <SettingItem
                 title="Developer mode"
                 component={
-                  <Switch
-                    checked={devModeProps}
-                    onChange={() => setDevMode(!devModeProps)}
-                  />
+                  <>
+                    {isSvgLoaderDevMode ? (
+                      <span className={styles.loader}></span>
+                    ) : (
+                      <Switch
+                        checked={devModeProps}
+                        onChange={() => setDevMode(!devModeProps)}
+                      />
+                    )}
+                  </>
                 }
               />
               <SettingItem
                 title="Bug reports"
                 component={
-                  <Switch
-                    checked={errorReporting}
-                    onChange={() => setErrorReporting(!errorReporting)}
-                  />
+                  <>
+                    {isSvgErrorReporting ? (
+                      <span className={styles.loader}></span>
+                    ) : (
+                      <Switch
+                        checked={errorReporting}
+                        onChange={() => setErrorReporting(!errorReporting)}
+                      />
+                    )}
+                  </>
                 }
               />
-              <SettingItem
+              {/* <SettingItem
                 title="Open popup"
                 component={
                   <Switch
@@ -423,7 +444,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     // onChange={() => setErrorReporting(!errorReporting)}
                   />
                 }
-              />
+              /> */}
               <SettingItem
                 title="User Agent Name"
                 component={<></>}
@@ -593,7 +614,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!providerInputError && !isValidHttp(providerInput),
+                          (!!providerInputError &&
+                            !isValidHttp(providerInput)) ||
+                          providerInputError,
                       })}
                     >
                       <form
@@ -656,8 +679,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!swarmGatewayInputError &&
-                          !isValidHttp(swarmGatewayInput),
+                          (!!swarmGatewayInputError &&
+                            !isValidHttp(swarmGatewayInput)) ||
+                          swarmGatewayInputError,
                       })}
                     >
                       <form
@@ -719,8 +743,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!swarmPostageStampIdInputError &&
-                          !isValidPostageStampId(swarmPostageStampIdInput),
+                          (!!swarmPostageStampIdInputError &&
+                            !isValidPostageStampId(swarmPostageStampIdInput)) ||
+                          swarmPostageStampIdInputError,
                       })}
                     >
                       <form
@@ -786,8 +811,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!ipfsGatewayInputError &&
-                          !isValidHttp(ipfsGatewayInput),
+                          (!!ipfsGatewayInputError &&
+                            !isValidHttp(ipfsGatewayInput)) ||
+                          ipfsGatewayInputError,
                       })}
                     >
                       <form
@@ -849,7 +875,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!siaPortalInputError && !isValidHttp(siaPortalInput),
+                          (!!siaPortalInputError &&
+                            !isValidHttp(siaPortalInput)) ||
+                          siaPortalInputError,
                       })}
                     >
                       <form
