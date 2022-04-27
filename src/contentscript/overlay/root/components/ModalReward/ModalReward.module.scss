@@ -33,13 +33,16 @@
   -webkit-animation-duration: 0.4s;
   animation-name: slide-in;
   animation-duration: 0.5s;
-  padding: 20px 20px;
+  padding: 22px 15px 16px 15px;
 
   width: 94%;
 
   background: $PureWhite;
   border-radius: 10px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+
+  // ??
+  height: 542px;
 }
 .modalHeader {
   display: flex;
@@ -68,6 +71,11 @@
 .modalBody {
   overflow: auto;
   padding: 0px 0px 20px 0px;
+  width: 100%;
+  display: flex;
+  flex: 1 1 auto;
+}
+.modalContent {
   width: 100%;
 }
 

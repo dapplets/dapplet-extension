@@ -36,22 +36,43 @@ export const Rewards: FC<RewardsProps> = (props) => {
     customPool: '2141234124',
   }
   const [newCustomPool, setCustomPool] = useState({ customPoolForm: [] })
-  const [recepient, setNewRecepient] = useState({ recepientNew: [] })
-  // const [num, setNum] = useState(recepientNew)
-  const newForm = Object.assign({}, recepient)
-  useEffect(() => {
-    newForm.recepientNew = [RECEPIENT_CREATE]
-    setNewRecepient(recepient)
+
+  const [items, setItems] = useState({
+    items: [],
+  })
+  const [name, setName] = useState({ name: '' })
+  const [pool, setPool] = useState({ pool: '' })
+  const [itemsRecepientForm, setItemsRecepient] = useState({
+    recepientForm: [],
+  })
+
+  const [recepient, setRecepient] = useState({ userID: '' })
+  const [condition, setCondition] = useState({ condition: '' })
+
+  useEffect(
+    () => {
+      console.log(items)
+    },
+    [
+      // name, pool, items, itemsRecepientForm, recepient
+    ]
+  )
+  const Num = useMemo(() => {
+    // if (
+    //   name.name &&
+    //   name.name.length >= 1 &&
+    //   pool.pool &&
+    //   pool.pool.length >= 1 &&
+    //   recepient.userID &&
+    //   recepient.userID.length >= 1
+    // ) {
+    //   setApplyDisabled(true)
+    // } else {
+    //   setApplyDisabled(false)
+    // }
   }, [recepient])
 
-  const newRecepientObject = {
-    userId: '',
-  }
-  const newRecepientConditionObject = {
-    condition: '',
-  }
-
-  const [isApplyDisabled, setApplyDisabled] = useState(true)
+  const [isApplyDisabled, setApplyDisabled] = useState(false)
   const [isApplyChanges, setApplyChanges] = useState(false)
   const [isModal, setModal] = useState(false)
 
@@ -67,6 +88,58 @@ export const Rewards: FC<RewardsProps> = (props) => {
     const newCustomPoolForm = Object.assign({}, newCustomPool)
     newCustomPoolForm.customPoolForm.splice(id, 1)
     setCustomPool(newCustomPoolForm)
+  }
+
+  // const [state, setState] = useState({ username: '', items: [] })
+
+  const addItem = (event) => {
+    event.preventDefault()
+
+    const newForm = Object.assign({}, items)
+
+    const pushForm = Object.assign({}, name, pool, itemsRecepientForm)
+    newForm.items.push(pushForm)
+
+    setItems(newForm)
+    console.log(items)
+  }
+
+  const handleChange = (event) => {
+    setName({ name: event.target.value })
+  }
+  const handleChangeNum = (event) => {
+    setPool({ pool: event.target.value })
+  }
+
+  // ====
+  const addButtonClickRecepient = () => {
+    const newForm = Object.assign({}, itemsRecepientForm)
+
+    newForm.recepientForm.push(recepient)
+    setItemsRecepient(newForm)
+
+    console.log(itemsRecepientForm)
+  }
+  const onDeleteChildRecepient = (id: number) => {
+    const newForm = Object.assign({}, itemsRecepientForm)
+    newForm.recepientForm.splice(id, 1)
+    setItemsRecepient(newForm)
+  }
+
+  // // ===
+  // const addButtonClickCondition = () => {
+  //   const newForm = Object.assign({}, itemsConditionForm)
+  //   newForm.conditionForm.push(condition)
+  //   setItemsCondition(newForm)
+  // }
+  // const onDeleteChildCondition = (id: number) => {
+  //   const newForm = Object.assign({}, itemsConditionForm)
+  //   newForm.conditionForm.splice(id, 1)
+  //   setItemsCondition(newForm)
+  // }
+  const handleChangeRecepient = (event) => {
+    event.preventDefault
+    setRecepient({ userID: event.target.value })
   }
 
   return (
@@ -87,6 +160,11 @@ export const Rewards: FC<RewardsProps> = (props) => {
                 {distributed}
               </span>
             </div>
+            {items.items.length !== 0 && (
+              <button className={cn(styles.pushChanges, styles.newReward)}>
+                Add new reward
+              </button>
+            )}
           </div>
         )}
 
@@ -100,6 +178,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                   // placeholder={x.author}
                   onChange={(e) => e.target.value}
                 />
+                {/* <span className={styles.inputNewCustomPoolLabel}>AUG</span> */}
                 <button
                   onClick={() => onDeleteChild(i)}
                   className={styles.buttonDeleteNewCustomPool}
@@ -112,96 +191,107 @@ export const Rewards: FC<RewardsProps> = (props) => {
                 {distributed}
               </span>
             </div>
+            {items.items.length !== 0 && (
+              <button className={cn(styles.pushChanges, styles.newReward)}>
+                Add new reward
+              </button>
+            )}
           </div>
         ))}
 
         <div className={styles.wrapperChanges}>
-          <div className={styles.createdRewardsWrapper}>
-            <>
-              {recepient.recepientNew &&
-                recepient.recepientNew.length > 0 &&
-                recepient.recepientNew.map((x, i) => (
-                  <SettingWrapper
-                    key={i}
-                    className={styles.settingWrapperCreatedRewards}
-                    title={`${x}`}
-                    children={
-                      <>
-                        <div className={styles.createdRewardsBlock}>
-                          <div className={styles.createdRewardsBlockUser}>
-                            <span className={styles.createdRewardsBlockLabel}>
-                              User:
-                            </span>
-                            <span
-                              className={styles.createdRewardsBlockLabelUser}
+          {items.items &&
+            items.items.map((item, index) => (
+              <div key={index} className={styles.createdRewardsWrapper}>
+                <SettingWrapper
+                  className={styles.settingWrapperCreatedRewards}
+                  title={`${item.name}`}
+                  children={
+                    <>
+                      {item.recepientForm &&
+                        item.recepientForm.map((x, i) => (
+                          <div key={i} className={styles.createdRewardsBlock}>
+                            <div className={styles.createdRewardsBlockUser}>
+                              <span className={styles.createdRewardsBlockLabel}>
+                                User:
+                              </span>
+                              <span
+                                className={styles.createdRewardsBlockLabelUser}
+                              >
+                                {x.userID}
+                              </span>
+                            </div>
+
+                            <div
+                              className={styles.createdRewardsBlockConditions}
                             >
-                              {''}
-                            </span>
+                              <span className={styles.createdRewardsBlockLabel}>
+                                Conditions :
+                              </span>
+                              <span
+                                className={
+                                  styles.createdRewardsBlockLabelAdapter
+                                }
+                              ></span>
+                            </div>
                           </div>
-
-                          <div className={styles.createdRewardsBlockConditions}>
-                            <span className={styles.createdRewardsBlockLabel}>
-                              Conditions :
-                            </span>
-                            <span
-                              className={styles.createdRewardsBlockLabelAdapter}
-                            ></span>
-                          </div>
-                        </div>
-                      </>
-                    }
-                  />
-                ))}
-
-              <span className={styles.percentReward}>{`Reward %`}</span>
-              <button className={styles.changeReward}>Change</button>
-            </>
-          </div>
-          <button
-            onClick={() => {
-              setModal(true)
-            }}
-            className={styles.pushChanges}
-          >
-            Push changes
-          </button>
+                        ))}
+                    </>
+                  }
+                />
+                <span
+                  className={styles.percentReward}
+                >{`Reward ${item.pool}%`}</span>
+                <button
+                  // onClick={() => {
+                  //   setModal(true)
+                  // }}
+                  className={styles.changeReward}
+                >
+                  Change
+                </button>
+              </div>
+            ))}
+          {items.items.length !== 0 && (
+            <button className={styles.pushChanges}>Push changes</button>
+          )}
         </div>
 
-        {/* {!isApplyChanges && ( */}
-        <Message
-          title="No rewards yet"
-          subtitle="Click below to create first reward"
-          // link="F.A.Q"
-          // linkText="F.A.Q"
-          children={
-            <button
-              onClick={() => {
-                setModal(true)
-              }}
-              className={styles.createRewards}
-            >
-              Create
-            </button>
-          }
-        />
-        {/* )} */}
+        {items.items.length === 0 && (
+          <Message
+            title="No rewards yet"
+            subtitle="Click below to create first reward"
+            // link="F.A.Q"
+            // linkText="F.A.Q"
+            className={styles.newMessage}
+            children={
+              <button
+                onClick={() => {
+                  setModal(true)
+                }}
+                className={styles.createRewards}
+              >
+                Create
+              </button>
+            }
+          />
+        )}
 
         <ModalReward
           visible={isModal}
-          title={'Reword creation'}
+          title={'Reward creation'}
           content={
             <>
-              <div className={styles.creationWrapper}>
+              <form
+                // onSubmit={(e) => addItem(e)}
+                className={styles.creationWrapper}
+              >
                 <div className={styles.creationFirstBlock}>
                   <div className={styles.rewardNameBlock}>
                     <span className={styles.nameLabel}>Reward name</span>
                     <input
-                      onChange={(e) => {
-                        newForm.recepientNew[0][e.target.name] = e.target.value
-
-                        setNewRecepient(newForm)
-                        console.log(RECEPIENT_CREATE)
-                      }}
+                      value={name.name}
+                      onChange={(e) => handleChange(e)}
                       name="rewardName"
                       className={styles.nameInput}
                     />
@@ -209,15 +299,9 @@ export const Rewards: FC<RewardsProps> = (props) => {
                   <div className={styles.rewardPoolBlock}>
                     <span className={styles.nameLabel}>Pool</span>
                     <input
-                      name="rewardPool"
-                      onChange={(e) => {
-                        newForm.recepientNew[0][e.target.name] = Number(
-                          e.target.value
-                        )
-
-                        setNewRecepient(newForm)
-                        console.log(RECEPIENT_CREATE)
-                      }}
+                      name="name"
+                      value={pool.pool}
+                      onChange={(e) => handleChangeNum(e)}
                       className={styles.poolInput}
                     />
                   </div>
@@ -226,54 +310,91 @@ export const Rewards: FC<RewardsProps> = (props) => {
                 <div className={styles.rewardRecepientBlock}>
                   <div className={styles.recepientBlock}>
                     <span className={styles.nameLabel}>Recipient</span>
-                    <button className={styles.customPoolButton} />
+                    <button
+                      type="button"
+                      onClick={addButtonClickRecepient}
+                      className={styles.customPoolButton}
+                    />
                   </div>
-
-                  <div className={styles.newRewardRecepientBlock}>
-                    <div className={styles.recepientInputBlock}>
-                      <input name="userId" className={styles.recepientInput} />
-                      <button className={styles.recepientInputButton} />
-                    </div>
-
-                    <div className={styles.recepientConditionalBlock}>
-                      <div className={styles.recepientChangeBlock}>
-                        <button className={styles.recepientConditionalButton} />
-                        <span className={styles.recepientConditionalLabel}>
-                          conditional
-                        </span>
-                      </div>
-
-                      <div className={styles.conditionalWrapper}>
-                        <span className={styles.conditionalLabel}>
-                          condition: if this dapplet has dependency to
-                        </span>
-                        <div className={styles.conditionalInputBlock}>
+                  {itemsRecepientForm.recepientForm &&
+                    itemsRecepientForm.recepientForm.map((x, i) => (
+                      <div key={i} className={styles.newRewardRecepientBlock}>
+                        <div className={styles.recepientInputBlock}>
                           <input
-                            name="condition"
-                            className={styles.inputConditional}
+                            name="userId"
+                            value={recepient.userID}
+                            className={styles.recepientInput}
+                            onChange={(e) => {
+                              handleChangeRecepient(e)
+                              console.log(i)
+                              console.log(recepient)
+                            }}
                           />
-                          <button className={styles.inputConditionalDelete} />
+                          <button
+                            type="button"
+                            onClick={() => onDeleteChildRecepient(i)}
+                            className={styles.recepientInputButton}
+                          />
+                        </div>
+
+                        <div className={styles.recepientConditionalBlock}>
+                          <div className={styles.recepientChangeBlock}>
+                            <button
+                              type="button"
+                              className={styles.recepientConditionalButton}
+                            />
+                            <span className={styles.recepientConditionalLabel}>
+                              conditional
+                            </span>
+                          </div>
+
+                          <div className={styles.conditionalWrapper}>
+                            <span className={styles.conditionalLabel}>
+                              condition: if this dapplet has dependency to
+                            </span>
+                            <div className={styles.conditionalInputBlock}>
+                              <input
+                                name="condition"
+                                className={styles.inputConditional}
+                              />
+                              <button
+                                type="button"
+                                className={styles.inputConditionalDelete}
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    ))}
                 </div>
-              </div>
+              </form>
             </>
             //
           }
           footer={
             <button
-              onClick={() => {
-                console.log(recepient)
-                setNewRecepient((prevState: any) => ({
-                  ...prevState,
-                  recepientNew: { ...prevState.recepientNew },
-                }))
+              disabled={
+                !(
+                  name.name &&
+                  name.name.length >= 1 &&
+                  pool.pool &&
+                  pool.pool.length >= 1 &&
+                  recepient.userID &&
+                  recepient.userID.length >= 1
+                )
+              }
+              onClick={(e) => {
+                addItem(e)
                 onClose()
               }}
-              className={cn(styles.applyButton, {
-                [styles.applyButtonDisabled]: isApplyDisabled,
+              className={cn(styles.applyButtonDisabled, {
+                [styles.applyButton]:
+                  name.name &&
+                  name.name.length >= 1 &&
+                  pool.pool &&
+                  pool.pool.length >= 1 &&
+                  recepient.userID &&
+                  recepient.userID.length >= 1,
               })}
             >
               Apply

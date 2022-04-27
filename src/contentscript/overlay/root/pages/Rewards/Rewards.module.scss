@@ -10,6 +10,7 @@
   flex: 1 1 auto;
   // max-height: 78vh;
   height: calc(100vh - 140px);
+  margin-top: -7.5px;
 }
 .wrapper::-webkit-scrollbar {
   width: 0;
@@ -86,7 +87,25 @@
   color: $Primary;
 }
 
+.newMessage {
+  h6 {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 28px;
+  }
+  p {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 19px;
+  }
+}
+
 .createRewards {
+  display: block;
   background: inherit;
   font-family: 'Roboto';
 
@@ -95,6 +114,7 @@
   line-height: 19px;
 
   color: $Primary;
+  margin: 3.5px 0px 0px 0px;
   &:hover {
     color: $PrimaryHover;
   }
@@ -128,6 +148,18 @@
   line-height: 149%;
 
   color: $MainGrey;
+}
+
+.inputNewCustomPoolLabel {
+  display: block;
+  background: inherit;
+  font-family: 'Roboto';
+
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: $MainGrey;
+  padding: 0 10px;
 }
 .buttonDeleteNewCustomPool {
   display: block;
@@ -198,7 +230,7 @@
   line-height: 149%;
 
   color: $MainGrey;
-  margin: 0px 0px 0px 2px;
+  margin: 0px 0px 0px 4px;
 }
 
 .rewardPoolBlock {
@@ -230,7 +262,7 @@
   line-height: 149%;
 
   color: $MainGrey;
-  margin: 0px 0px 0px 2px;
+  margin: 0px 0px 0px 4px;
 }
 
 .rewardRecepientBlock {
@@ -418,32 +450,6 @@
   }
 }
 
-.applyButton {
-  display: flex;
-
-  justify-content: center;
-  align-items: center;
-
-  width: 62px;
-  height: 32px;
-
-  background: $Primary;
-  border-radius: 4px;
-
-  font-family: 'Roboto';
-
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
-
-  color: $PureWhite;
-  &:hover {
-    background: $PrimaryHover;
-  }
-  &:active {
-    background: $PrimaryPressed;
-  }
-}
 .applyButtonDisabled {
   cursor: default;
   display: flex;
@@ -472,11 +478,39 @@
     background: $AppBG;
   }
 }
+.applyButton {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  width: 62px;
+  height: 32px;
+
+  background: $Primary;
+  border-radius: 4px;
+
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $PureWhite;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
 
 .createdRewardsWrapper {
   display: flex;
+  // flex-direction: column;
   width: 100%;
   position: relative;
+  margin-bottom: 21px;
 }
 
 .settingWrapperCreatedRewards {
@@ -629,7 +663,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 100%;
-  margin: 28px 0px 0px 0px;
+  margin: -8px 0px 0px 0px;
 
   color: $PureWhite;
   &:hover {
@@ -639,6 +673,13 @@
     background: $PrimaryPressed;
   }
 }
+.newReward {
+  margin: 0px 0px 0px 0px;
+  margin-left: auto;
+  padding: 9px 10px;
+  width: auto;
+}
+
 .wrapperChanges {
   display: flex;
   width: 100%;
