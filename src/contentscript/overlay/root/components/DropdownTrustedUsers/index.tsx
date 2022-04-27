@@ -40,6 +40,20 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
   const [trustedUserInputError, setTrustedUserInputError] = useState(null)
   const [trustedUsers, setTrustedUsers] = useState([])
   const [registries, setRegistries] = useState([])
+
+  const regExpIndexNearTestnet = new RegExp(
+    /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/
+  )
+  const regExpIndexNear = new RegExp(
+    /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/
+  )
+  const regExpIndexENS = new RegExp(
+    /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/
+  )
+  const regExpIndexEthereum = new RegExp(/^0x[a-fA-F0-9]{40}$/)
+  const regExpIndexNEARImplicit = new RegExp(/^[0-9a-z]{64}$/)
+  const regExpIndexNEARDev = new RegExp(/^dev-\d*-\d*$/)
+
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -51,18 +65,49 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
       _isMounted = false
     }
   }, [trustedUserInput])
+
+  const getNumIndex = (value, reg) => {
+    try {
+      let numEl = value.match(reg)
+      console.log(numEl)
+      return numEl
+    } catch {}
+  }
+
   const addTrustedUser = async (account: string, x: () => void) => {
     const { addTrustedUser } = await initBGFunctions(browser)
+    const valueParse = getNumIndex(trustedUserInput, regExpIndexEthereum)
+    const valueParseNEARImplicit = getNumIndex(
+      trustedUserInput,
+      regExpIndexNEARImplicit
+    )
+    const valueParseNEARDev = getNumIndex(trustedUserInput, regExpIndexNEARDev)
+    const valueParseENS = getNumIndex(trustedUserInput, regExpIndexENS)
+    const valueParseNear = getNumIndex(trustedUserInput, regExpIndexNear)
+    const valueParseNearTestnet = getNumIndex(
+      trustedUserInput,
+      regExpIndexNearTestnet
+    )
+    if (
+      valueParse !== null ||
+      valueParseNEARImplicit !== null ||
+      valueParseNEARDev !== null ||
+      valueParseENS !== null ||
+      valueParseNear !== null ||
+      valueParseNearTestnet !== null
+    ) {
+      try {
+        await addTrustedUser(account)
+        setTrustedUserInput(trustedUserInput)
+      } catch (err) {
+        setTrustedUserInputError(err.message)
+      }
 
-    try {
-      await addTrustedUser(account)
-      setTrustedUserInput(trustedUserInput)
-    } catch (err) {
-      setTrustedUserInputError(err.message)
+      loadTrustedUsers()
+      x()
+    } else {
+      setTrustedUserInputError('Enter valid Trusted User')
     }
-
-    loadTrustedUsers()
-    x()
   }
 
   const removeTrustedUser = async (account: string) => {
@@ -118,7 +163,10 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
         className={cn(styles.wrapper, {
           [styles.errorInput]: trustedUserInputError,
         })}
-        onBlur={() => setOpen(false)}
+        onBlur={() => {
+          handleClear()
+          setOpen(false)
+        }}
         tabIndex={0}
       >
         <div className={styles.inputTrustedUsers}>
@@ -126,6 +174,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
             className={styles.inputBlock}
             onSubmit={(e) => {
               e.preventDefault()
+              // getNumIndex(trustedUserInput, regExpIndexEthereum)
               addTrustedUser(trustedUserInput, handleClear)
               console.log('click')
             }}
@@ -187,3 +236,20 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
 
 // registry.dapplet-base.eth
 // dev-1627024020035-70641704943070
+// Ethereum
+// /^0x[a-fA-F0-9]{40}$/
+
+// ENS
+// /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/
+
+// NEAR
+// /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/
+
+// NEAR TESTNET
+// /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/
+
+// NEAR Implicit accounts
+// /^[0-9a-z]{64}$/
+
+// NEAR Dev accounts
+// /^dev-\d*-\d*$/

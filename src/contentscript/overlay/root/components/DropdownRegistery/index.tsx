@@ -36,32 +36,18 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
   const [registryInputError, setRegistryInputError] = useState(null)
   const [registries, setRegistries] = useState([])
 
-  // const ethereumReg = new RegExp(/^0x[a-fA-F0-9]{40}$/)
-  // const ethReg = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/)
-  // const nearReg = new RegExp(
-  //   /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/
-  // )
-  // const nearTestReg = new RegExp(
-  //   /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/
-  // )
-  // const nearImplicitAccountsReg = new RegExp(/^[0-9a-z]{64}$/)
-  // const nearDevAccountsReg = new RegExp(/^dev-\d*-\d*$/)
-
-  // const [testInput, setTestInput] = useState(false)
-  // const getTweetParse = (tweet) => {
-  //   if (
-  //     !ethereumReg.test(tweet) ||
-  //     !ethReg.test(tweet) ||
-  //     !nearReg.test(tweet) ||
-  //     !nearTestReg.test(tweet) ||
-  //     !nearImplicitAccountsReg.test(tweet) ||
-  //     !nearDevAccountsReg.test(tweet)
-  //   ) {
-  //     setTestInput(true)
-  //   } else {
-  //     setTestInput(false)
-  //   }
-  // }
+  const regExpIndexNearTestnet = new RegExp(
+    /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/
+  )
+  const regExpIndexNear = new RegExp(
+    /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/
+  )
+  const regExpIndexENS = new RegExp(
+    /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/
+  )
+  const regExpIndexEthereum = new RegExp(/^0x[a-fA-F0-9]{40}$/)
+  const regExpIndexNEARImplicit = new RegExp(/^[0-9a-z]{64}$/)
+  const regExpIndexNEARDev = new RegExp(/^dev-\d*-\d*$/)
 
   useEffect(() => {
     _isMounted = true
@@ -73,6 +59,13 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
       _isMounted = false
     }
   }, [])
+  const getNumIndex = (value, reg) => {
+    try {
+      let numEl = value.match(reg)
+      console.log(numEl)
+      return numEl
+    } catch {}
+  }
 
   const loadRegistries = async () => {
     const { getRegistries } = await initBGFunctions(browser)
@@ -82,17 +75,39 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
   }
   const addRegistry = async (url: string, x: () => void) => {
     const { addRegistry } = await initBGFunctions(browser)
+    const valueParse = getNumIndex(registryInput, regExpIndexEthereum)
+    const valueParseNEARImplicit = getNumIndex(
+      registryInput,
+      regExpIndexNEARImplicit
+    )
+    const valueParseNEARDev = getNumIndex(registryInput, regExpIndexNEARDev)
+    const valueParseENS = getNumIndex(registryInput, regExpIndexENS)
+    const valueParseNear = getNumIndex(registryInput, regExpIndexNear)
+    const valueParseNearTestnet = getNumIndex(
+      registryInput,
+      regExpIndexNearTestnet
+    )
+    if (
+      valueParse !== null ||
+      valueParseNEARImplicit !== null ||
+      valueParseNEARDev !== null ||
+      valueParseENS !== null ||
+      valueParseNear !== null ||
+      valueParseNearTestnet !== null
+    ) {
+      try {
+        await addRegistry(url, false)
+        setRegistryInput(registryInput)
+        setRegistryInputError(null)
+      } catch (err) {
+        setRegistryInputError(err.message)
+      }
 
-    try {
-      await addRegistry(url, false)
-      setRegistryInput(registryInput)
-      setRegistryInputError(null)
-    } catch (err) {
-      setRegistryInputError(err.message)
+      loadRegistries()
+      x()
+    } else {
+      setRegistryInputError('Enter valid Registry')
     }
-
-    loadRegistries()
-    x()
   }
   const removeRegistry = async (url: string) => {
     const { removeRegistry } = await initBGFunctions(browser)
@@ -130,7 +145,10 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
         className={cn(styles.wrapper, {
           [styles.errorInput]: registryInputError,
         })}
-        onBlur={() => setOpen(false)}
+        onBlur={() => {
+          handleClear()
+          setOpen(false)
+        }}
         tabIndex={0}
       >
         {registries.map(

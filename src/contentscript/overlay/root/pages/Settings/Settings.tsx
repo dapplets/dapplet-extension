@@ -103,6 +103,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const [isPopup, setPopup] = useState(false)
 
+  const regExpUserAgentName = new RegExp(/^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/)
+
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -125,6 +127,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       _isMounted = false
     }
   }, [])
+  const getValidUserAgentName = (value, reg) => {
+    try {
+      let numEl = value.match(reg)
+      console.log(numEl)
+      return numEl
+    } catch {}
+  }
+
   const loadDevMode = async () => {
     const { getDevMode } = await initBGFunctions(browser)
     const devMode = await getDevMode()
@@ -244,11 +254,20 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const setUserAgentName = async (userAgentName: string) => {
     setUserAgentNameLoading(true)
-    const { setUserAgentName } = await initBGFunctions(browser)
-    await setUserAgentName(userAgentName)
-    loadUserAgentName()
-    setUserAgentNameLoading(false)
-    setUserAgentNameEdited(false)
+    const valueParse = getValidUserAgentName(
+      userAgentNameInput,
+      regExpUserAgentName
+    )
+    if (valueParse !== null) {
+      const { setUserAgentName } = await initBGFunctions(browser)
+      await setUserAgentName(userAgentName)
+      loadUserAgentName()
+      setUserAgentNameLoading(false)
+      setUserAgentNameEdited(false)
+    } else {
+      setUserAgentNameInputError('Enter User Agent Name')
+      setUserAgentNameInput('')
+    }
   }
 
   const loadIpfsGateway = async () => {
@@ -449,36 +468,43 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 title="User Agent Name"
                 component={<></>}
                 children={
-                  <form
-                    onBlur={() => {
-                      setUserAgentNameInputError(null)
-                    }}
-                    onSubmit={(e) => {
-                      e.preventDefault()
-                      // console.log('lolo')
+                  <>
+                    <form
+                      onBlur={() => {
+                        setUserAgentNameInputError(null)
+                      }}
+                      onSubmit={(e) => {
+                        e.preventDefault()
+                        // console.log('lolo')
 
-                      !(userAgentNameLoading || !userAgentNameEdited) &&
+                        // !(userAgentNameLoading || !userAgentNameEdited) &&
                         setUserAgentName(userAgentNameInput)
-                    }}
-                    className={cn(styles.formDefault, {
-                      [styles.errorInputDefault]: !!userAgentNameInputError,
-                    })}
-                  >
-                    <input
-                      className={cn(styles.inputDefault, {})}
-                      value={userAgentNameInput}
-                      placeholder="User agent name..."
-                      onFocus={() => {
-                        setUserAgentNameInput('')
-                        setUserAgentNameInputError(null)
                       }}
-                      onChange={(e) => {
-                        setUserAgentNameInput(e.target.value)
-                        setUserAgentNameEdited(true)
-                        setUserAgentNameInputError(null)
-                      }}
-                    />
-                  </form>
+                      className={cn(styles.formDefault, {
+                        [styles.errorInputDefault]: !!userAgentNameInputError,
+                      })}
+                    >
+                      <input
+                        className={cn(styles.inputDefault, {})}
+                        value={userAgentNameInput}
+                        placeholder="User agent name..."
+                        onFocus={() => {
+                          setUserAgentNameInput('')
+                          setUserAgentNameInputError(null)
+                        }}
+                        onChange={(e) => {
+                          setUserAgentNameInput(e.target.value)
+                          setUserAgentNameEdited(true)
+                          setUserAgentNameInputError(null)
+                        }}
+                      />
+                    </form>
+                    {userAgentNameInputError ? (
+                      <div className={styles.errorMessage}>
+                        {userAgentNameInputError}
+                      </div>
+                    ) : null}
+                  </>
                 }
               />
             </>
@@ -765,8 +791,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         }}
                         onSubmit={(e) => {
                           e.preventDefault()
-
-                          setSwarmPostageStampId(swarmPostageStampIdInput)
+                          if (isValidPostageStampId(swarmPostageStampIdInput)) {
+                            setSwarmPostageStampId(swarmPostageStampIdInput)
+                          } else {
+                            setSwarmPostageStampIdInputError(
+                              'Enter valid Swarm Postage Stamp ID'
+                            )
+                            setSwarmPostageStampIdInput('')
+                          }
                         }}
                       >
                         <input
@@ -820,11 +852,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         style={{ width: '100%' }}
                         onBlur={() => {
                           setIpfsGatewayInputError(null)
-                          // !(
-                          //   ipfsGatewayLoading ||
-                          //   !ipfsGatewayEdited ||
-                          //   !isValidHttp(ipfsGatewayInput)
-                          // ) && setIpfsGateway(ipfsGatewayInput)
+                          if (!isValidHttp(ipfsGatewayInput)) {
+                            setSiaPortalInput('')
+                          }
                         }}
                         onFocus={() => {
                           setIpfsGatewayInput('')
@@ -832,7 +862,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         }}
                         onSubmit={(e) => {
                           e.preventDefault()
-
                           setIpfsGateway(ipfsGatewayInput)
                         }}
                       >
@@ -884,11 +913,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         style={{ width: '100%' }}
                         onBlur={() => {
                           setSiaPortalInputError(null)
-                          // !(
-                          //   siaPortalLoading ||
-                          //   !siaPortalEdited ||
-                          //   !isValidHttp(siaPortalInput)
-                          // ) && setIpfsGateway(ipfsGatewayInput)
+                          if (!isValidHttp(siaPortalInput)) {
+                            setSiaPortalInput('')
+                          }
                         }}
                         onFocus={() => {
                           setSiaPortalInput('')
