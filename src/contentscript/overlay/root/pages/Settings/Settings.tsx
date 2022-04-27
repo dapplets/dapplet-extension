@@ -435,7 +435,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   </>
                 }
               />
-              {/* <SettingItem
+              <SettingItem
                 title="Open popup"
                 component={
                   <Switch
@@ -444,7 +444,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     // onChange={() => setErrorReporting(!errorReporting)}
                   />
                 }
-              /> */}
+              />
               <SettingItem
                 title="User Agent Name"
                 component={<></>}
