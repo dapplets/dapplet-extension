@@ -74,6 +74,8 @@ export const SettingsOverlay = () => {
     useState(false)
   const [ModuleInfo, setModuleInfo] = useState([])
   const [ModuleVersion, setModuleVersion] = useState([])
+
+  const [isTokenomics, setTokenomics] = useState(false)
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -286,12 +288,18 @@ export const SettingsOverlay = () => {
                 UnderConstructionDetails.TOKENOMICS && (
                 <Tokenimics
                   setUnderConstructionDetails={setUnderConstructionDetails}
+                  setTokenomics={setTokenomics}
                 />
               )}
               {activeTabUnderConstructionDetails ===
                 UnderConstructionDetails.REWARDS && (
                 <Rewards
                   setUnderConstructionDetails={setUnderConstructionDetails}
+                  isTokenomics={isTokenomics}
+                  // activeTabUnderConstructionDetails={activeTabUnderConstructionDetails}
+                  setActiveTabUnderConstructionDetails={
+                    setActiveTabUnderConstructionDetails
+                  }
                 />
               )}
             </div>

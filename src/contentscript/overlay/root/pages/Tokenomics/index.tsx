@@ -35,12 +35,15 @@ import {
 
 export interface TokenomicsProps {
   setUnderConstructionDetails: (x) => void
+  setTokenomics: (x) => void
   isSupport?: boolean
 }
 let _isMounted = false
 export const Tokenimics: FC<TokenomicsProps> = (props) => {
-  const { setUnderConstructionDetails, isSupport = true } = props
+  const { setUnderConstructionDetails, isSupport = true, setTokenomics } = props
   const [isCreate, SetCreate] = useState(false)
+  const [tokenName, setTokenName] = useState('')
+  const [tokenListing, setTokenListing] = useState('')
 
   const [isModal, setModal] = useState(false)
   const onClose = () => setModal(false)
@@ -88,7 +91,8 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
                     <input
                       placeholder="Enter token name"
                       className={styles.inputTokenName}
-                      onChange={(e) => e.target.value}
+                      value={tokenName}
+                      onChange={(e) => setTokenName(e.target.value)}
                     />
                   }
                 />
@@ -109,7 +113,8 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
                     <input
                       placeholder="Enter token name"
                       className={styles.inputTokenName}
-                      onChange={(e) => e.target.value}
+                      value={tokenListing}
+                      onChange={(e) => setTokenListing(e.target.value)}
                     />
                   }
                 />
@@ -117,8 +122,13 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
             }
           />
           <button
+            disabled={!(tokenName.length >= 1 && tokenListing.length >= 1)}
+            className={cn(styles.applyButtonDisabled, {
+              [styles.createTokenomics]:
+                tokenName.length >= 1 && tokenListing.length >= 1,
+            })}
             onClick={() => setModal(true)}
-            className={styles.createTokenomics}
+            // className={styles.createTokenomics}
           >
             Confirm
           </button>
@@ -133,8 +143,11 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
             footer={
               <div className={styles.footerContentModal}>
                 <button
-                  className={styles.footerContentModalButton}
-                  onClick={onClose}
+                  className={cn(styles.footerContentModalButton)}
+                  onClick={() => {
+                    onClose()
+                    setTokenomics(true)
+                  }}
                 >
                   Yes, i'm super sure
                 </button>

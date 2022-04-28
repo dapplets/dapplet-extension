@@ -34,6 +34,35 @@
   height: 100%;
   flex: 1 1 auto;
 }
+.applyButtonDisabled {
+  cursor: default;
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+
+  width: 73px;
+  height: 32px;
+
+  border-radius: 4px;
+
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $StrokeColor;
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  &:hover {
+    background: $AppBG;
+  }
+  &:active {
+    background: $AppBG;
+  }
+}
 
 .createTokenomics {
   display: flex;

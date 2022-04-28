@@ -245,7 +245,7 @@
 
 .poolInput {
   display: inline-block;
-  padding: 5px 13px;
+  padding: 5px 5px;
 
   width: 46px;
   height: 31px;
@@ -398,7 +398,7 @@
   color: #5ec280;
 }
 .conditionalWrapper {
-  display: flex;
+  display: none;
   flex-direction: column;
 }
 
@@ -551,7 +551,7 @@
   left: 14px;
   display: flex;
   height: 20px;
-  width: 137px;
+  width: 86px;
   background: inherit;
   align-items: center;
   justify-content: center;
@@ -566,6 +566,41 @@
   z-index: 3;
   border: 1px solid $MainGrey;
   border-radius: 4px;
+  &:hover {
+    color: $PrimaryHover;
+  }
+  &:active {
+    color: $PrimaryPressed;
+  }
+}
+
+.deleteReward {
+  position: absolute;
+  bottom: 7px;
+  left: 104px;
+  display: flex;
+  height: 20px;
+  width: 76px;
+  background: inherit;
+  align-items: center;
+  justify-content: center;
+
+  font-family: 'Roboto';
+  background: $AppBG;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $Primary;
+  z-index: 3;
+  border: 1px solid $MainGrey;
+  border-radius: 4px;
+  &:hover {
+    color: $PrimaryHover;
+  }
+  &:active {
+    color: $PrimaryPressed;
+  }
 }
 
 .createdRewardsBlock {
@@ -718,5 +753,24 @@
     &::before {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%232A2A2A'/%3E%3C/svg%3E");
     }
+  }
+}
+.isActive {
+  color: red;
+}
+
+.createTokenomics {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+
+  color: #f26780;
+  &:hover {
+    color: $PrimaryHover;
+  }
+  &:active {
+    color: $Primary;
   }
 }
