@@ -442,14 +442,9 @@ export default class Core {
 
     public storage: AppStorage;
 
-    /**
-     * @deprecated Since version 0.46.0. Will be deleted in version 0.50.0. Use `Core.login()` instead.
-     */
     public async contract(type: 'ethereum', address: string, options: Abi, app?: string): Promise<any>
     public async contract(type: 'near', address: string, options: { viewMethods: string[]; changeMethods: string[], network?: 'mainnet' | 'testnet' }, app?: string): Promise<any>
     public async contract(type: 'near' | 'ethereum', address: string, options: any, app?: string): Promise<any> {
-        console.warn('DEPRECATED: "Core.contract()" is deprecated since version 0.46.1. It will be deleted in version 0.50.0. Use "Core.login()" instead.');
-
         if (type === 'ethereum') {
             return ethereum.createContractWrapper(app, { network: 'goerli'}, address, options);
         } else if (type === 'near') {
