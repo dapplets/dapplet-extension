@@ -501,23 +501,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
 
   return (
     <div className={styles.wrapper}>
-      {!isNotNullCurrentAccount ? (
-        // (
-        // owner ?
-        // (
-        //   <Message
-        //     warning
-        //     header="The wrong wallet"
-        //     content={
-        //       <React.Fragment>
-        //         {/* Change account to {owner} */}
-        //         <br />
-        //         Connect a new wallet{' '}
-        //         <Icon name="chain" link onClick={() => pairWallet()} />
-        //       </React.Fragment>
-        //     }
-        //   />
-        // ) :
+      {/* {!isNotNullCurrentAccount ? (
         <Message
           warning
           header="Wallet is not connected"
@@ -530,9 +514,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
             </React.Fragment>
           }
         />
-      ) : // )
-      null}
-      {/* {message && <div>{message}</div>} */}
+      ) : null} */}
 
       <div className={styles.mainInfoBlock}>
         <SettingWrapper

@@ -205,7 +205,16 @@ export const Rewards: FC<RewardsProps> = (props) => {
                 </span>
               </div>
               {items.items.length !== 0 && (
-                <button className={cn(styles.pushChanges, styles.newReward)}>
+                <button
+                  onClick={() => {
+                    setName({ name: '' })
+                    setPool({ pool: '20' })
+                    setRecepient({ userID: '' })
+                    setCondition({ condition: '' })
+                    setModal(true)
+                  }}
+                  className={cn(styles.pushChanges, styles.newReward)}
+                >
                   Add new reward
                 </button>
               )}

@@ -486,7 +486,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     >
                       <input
                         className={cn(styles.inputDefault, {})}
-                        value={userAgentNameInput}
+                        // value={userAgentNameInput}
                         placeholder="User agent name..."
                         onFocus={() => {
                           setUserAgentNameInput('')

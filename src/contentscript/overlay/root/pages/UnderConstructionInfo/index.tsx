@@ -405,7 +405,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   }
   return (
     <div className={styles.wrapper}>
-      {message ? (
+      {/* {message ? (
         <Message
           positive={message.type === 'positive'}
           negative={message.type === 'negative'}
@@ -486,7 +486,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
             </>
           }
         />
-      ) : null}
+      ) : null} */}
       <div className={styles.mainInfoBlock}>
         <SettingWrapper
           className={styles.wrapperSettings}
