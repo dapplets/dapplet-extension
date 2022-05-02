@@ -1,4 +1,11 @@
-import React, { ReactElement, useState, useEffect, useMemo, FC } from 'react'
+import React, {
+  ReactElement,
+  useState,
+  useEffect,
+  useMemo,
+  FC,
+  useRef,
+} from 'react'
 import cn from 'classnames'
 import styles from './DappletsInfoSettings.module.scss'
 import { SettingWrapper } from '../../components/SettingWrapper'
@@ -52,12 +59,18 @@ export interface DappletsInfoSettings {
   setDappletsDetail: (x) => void
   ModuleInfo: any
   ModuleVersion: any
+  setShowChildrenRegistery: (x) => void
 }
 let _isMounted = false
 
 export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
-  const { isDappletsDetails, setDappletsDetail, ModuleInfo, ModuleVersion } =
-    props
+  const {
+    isDappletsDetails,
+    setDappletsDetail,
+    ModuleInfo,
+    ModuleVersion,
+    setShowChildrenRegistery,
+  } = props
 
   const bus = new Bus()
   const transferOwnershipModal = React.createRef<any>()
@@ -93,6 +106,10 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
     StorageTypes.Sia,
     StorageTypes.Ipfs,
   ])
+  const node = useRef<HTMLButtonElement>()
+  const nodeInput = useRef<HTMLInputElement>()
+  const [contextDeleteNone, setContextDeleteNone] = useState(false)
+  const [isDisabledPush, setDisabledPush] = useState(true)
 
   const newContextObject = ''
   const addButtonClickHandlerContext = () => {
@@ -271,28 +288,51 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
                   />
                 </div>
                 {mi.contextIds.map((x, i) => (
-                  <div key={i} className={styles.blockContext}>
-                    <input
-                      key={i}
-                      className={styles.blockContextTitle}
-                      placeholder={'Context ID (ex: example.com)'}
-                      value={editContextId}
-                      onChange={(e) => {
-                        setEditContextId(e.target.value)
-                      }}
-                      // onBlur={() => {
-                      //   // _addContextId(editContextId)
-                      //   console.log(editContextId)
-                      // }}
-                    />
+                  <div key={i} className={styles.wrapperContext}>
+                    <div className={styles.blockContext}>
+                      <input
+                        key={i}
+                        ref={nodeInput}
+                        className={styles.blockContextTitle}
+                        placeholder={'Context ID (ex: example.com)'}
+                        onChange={(e) => {
+                          // setMi({
+                          //   ...mi,
+                          //   contextIds: [e.target.value],
+                          // })
+                          setEditContextId(e.target.value)
+                          console.log(nodeInput.current?.value)
+                          console.log(mi)
+                        }}
+                        // onBlur={() => {
+                        //   _addContextId(editContextId)
+                        // }}
+                      />
 
+                      <button
+                        ref={node}
+                        onClick={() => {
+                          onDeleteChildContext(i)
+                          setEditContextId('')
+                        }}
+                        className={cn(styles.contextDelete, {
+                          [styles.contextDeleteNone]: contextDeleteNone,
+                        })}
+                      />
+                    </div>
                     <button
+                      disabled={nodeInput.current?.value.length < 2}
                       onClick={() => {
-                        onDeleteChildContext(i)
-                        setEditContextId('')
+                        node.current?.classList.add('valid')
+                        _addContextId(editContextId)
                       }}
-                      className={styles.contextDelete}
-                    />
+                      className={cn(styles.addContext, {
+                        [styles.addContextDisabled]:
+                          nodeInput.current?.value.length < 2,
+                      })}
+                    >
+                      ADD
+                    </button>
                   </div>
                 ))}
               </div>
@@ -302,12 +342,21 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
       </div>
       <div className={styles.linkNavigation}>
         <button
-          onClick={() => setDappletsDetail(false)}
+          onClick={() => {
+            setDappletsDetail(false)
+            setShowChildrenRegistery(true)
+          }}
           className={styles.back}
         >
           Back
         </button>
-        <button onClick={() => saveChanges()} className={styles.push}>
+        <button
+          disabled={isDisabledPush}
+          onClick={() => saveChanges()}
+          className={cn(styles.push, {
+            [styles.pushDisabled]: isDisabledPush,
+          })}
+        >
           Push changes
         </button>
       </div>

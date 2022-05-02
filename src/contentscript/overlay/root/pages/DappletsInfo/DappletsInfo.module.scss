@@ -462,6 +462,16 @@
     color: $PrimaryPressed;
   }
 }
+.pushDisabled {
+  cursor: default;
+  color: $MainGrey;
+  &:hover {
+    color: $MainGrey;
+  }
+  &:active {
+    color: $MainGrey;
+  }
+}
 
 .blockAuthors {
   margin: 0px 0px 10px 0px;

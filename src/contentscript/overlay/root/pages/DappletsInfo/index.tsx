@@ -94,11 +94,17 @@ export interface DappletsMainInfoProps {
   setDappletsDetail: (x) => void
   ModuleInfo: any
   ModuleVersion: any
+  setShowChildrenRegistery: (x) => void
 }
 let _isMounted = false
 export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
-  const { isDappletsDetails, setDappletsDetail, ModuleInfo, ModuleVersion } =
-    props
+  const {
+    isDappletsDetails,
+    setDappletsDetail,
+    ModuleInfo,
+    ModuleVersion,
+    setShowChildrenRegistery,
+  } = props
   const bus = new Bus()
   const transferOwnershipModal = React.createRef<any>()
   const addContextIdModal = React.createRef<any>()
@@ -141,6 +147,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   // ],
   const fileInput = useRef<HTMLInputElement>()
   const [st, setSt] = useState([])
+  const [isDisabledPush, setDisabledPush] = useState(true)
 
   useEffect(() => {
     _isMounted = true
@@ -502,6 +509,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     onChange={(e) => {
                       setMi({ ...mi, title: e.target.value })
                       console.log(mi)
+                      setDisabledPush(false)
                     }}
                     className={styles.inputTitle}
                   />
@@ -518,6 +526,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     onChange={(e) => {
                       setMi({ ...mi, description: e.target.value })
                       console.log(mi)
+                      setDisabledPush(false)
                     }}
                   />
                 }
@@ -555,6 +564,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                       onChange(e)
                       iconInputChangeHandler(e)
                       console.log(mi.icon)
+                      setDisabledPush(false)
                     }}
                   />
                   <label htmlFor="file">Change icon</label>
@@ -611,7 +621,10 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     <input
                       className={styles.authorTitle}
                       placeholder={x.author}
-                      onChange={(e) => e.target.value}
+                      onChange={(e) => {
+                        e.target.value
+                        setDisabledPush(false)
+                      }}
                     />
                     <button
                       onClick={() => onDeleteChild(i)}
@@ -626,12 +639,21 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       </div>
       <div className={styles.linkNavigation}>
         <button
-          onClick={() => setDappletsDetail(false)}
+          onClick={() => {
+            setDappletsDetail(false)
+            setShowChildrenRegistery(true)
+          }}
           className={styles.back}
         >
           Back
         </button>
-        <button onClick={() => saveChanges()} className={styles.push}>
+        <button
+          disabled={isDisabledPush}
+          onClick={() => saveChanges()}
+          className={cn(styles.push, {
+            [styles.pushDisabled]: isDisabledPush,
+          })}
+        >
           Push changes
         </button>
       </div>

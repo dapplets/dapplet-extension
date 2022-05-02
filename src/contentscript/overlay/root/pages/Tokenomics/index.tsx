@@ -46,7 +46,16 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
   const [tokenListing, setTokenListing] = useState('')
 
   const [isModal, setModal] = useState(false)
+  const [isInvalidTokenTicker, setInvalidTokenTicker] = useState(false)
+  const [isInvalidTokenName, setInvalidTokenName] = useState(false)
   const onClose = () => setModal(false)
+
+  useEffect(() => {}, [
+    tokenListing,
+    tokenName,
+    isInvalidTokenTicker,
+    isInvalidTokenName,
+  ])
   return (
     <div className={styles.wrapper}>
       {!isCreate && (
@@ -90,17 +99,28 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
                   children={
                     <input
                       placeholder="Enter token name"
-                      className={styles.inputTokenName}
+                      className={cn(styles.inputTokenName, {
+                        [styles.inputTokenTickerInvalid]: isInvalidTokenName,
+                      })}
                       value={tokenName}
-                      onChange={(e) => setTokenName(e.target.value)}
+                      onChange={(e) => {
+                        setTokenName(e.target.value)
+                        if (tokenName.length < 1 || tokenName.length > 16) {
+                          setInvalidTokenName(true)
+                        } else {
+                          setInvalidTokenName(false)
+                        }
+                      }}
+                      onFocus={() => setInvalidTokenName(false)}
                     />
                   }
                 />
                 <SettingItem
-                  title="Token Listing"
+                  title="Token Ticker"
                   className={styles.titleToken}
                   component={
                     <span
+                      style={{ margin: '0 0 0 1px' }}
                       data-title="for ex. - ETH, USDT, AUGE"
                       className={cn(styles.tokenTitleInfo, {
                         [styles.support]: isSupport,
@@ -112,9 +132,28 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
                   children={
                     <input
                       placeholder="Enter token name"
-                      className={styles.inputTokenName}
+                      className={cn(
+                        styles.inputTokenName,
+                        styles.inputTokenTicker,
+                        {
+                          [styles.inputTokenTickerInvalid]:
+                            isInvalidTokenTicker,
+                        }
+                      )}
                       value={tokenListing}
-                      onChange={(e) => setTokenListing(e.target.value)}
+                      onFocus={() => setInvalidTokenTicker(false)}
+                      onChange={(e) => {
+                        setTokenListing(e.target.value)
+                        console.log(tokenListing)
+                        if (
+                          e.target.value.length <= 2 ||
+                          e.target.value.length >= 5
+                        ) {
+                          setInvalidTokenTicker(true)
+                        } else {
+                          setInvalidTokenTicker(false)
+                        }
+                      }}
                     />
                   }
                 />
@@ -122,10 +161,20 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
             }
           />
           <button
-            disabled={!(tokenName.length >= 1 && tokenListing.length >= 1)}
+            disabled={
+              !(
+                tokenName.length >= 1 &&
+                tokenListing.length >= 1 &&
+                !isInvalidTokenName &&
+                !isInvalidTokenTicker
+              )
+            }
             className={cn(styles.applyButtonDisabled, {
               [styles.createTokenomics]:
-                tokenName.length >= 1 && tokenListing.length >= 1,
+                tokenName.length >= 1 &&
+                tokenListing.length >= 1 &&
+                !isInvalidTokenName &&
+                !isInvalidTokenTicker,
             })}
             onClick={() => setModal(true)}
             // className={styles.createTokenomics}

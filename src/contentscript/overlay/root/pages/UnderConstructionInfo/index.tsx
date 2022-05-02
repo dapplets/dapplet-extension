@@ -122,6 +122,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   const [st, setSt] = useState([])
   const node = useRef<HTMLButtonElement>()
   const nodeInput = useRef<HTMLInputElement>()
+  const [isDisabledPush, setDisabledPush] = useState(true)
 
   useEffect(() => {
     _isMounted = true
@@ -493,6 +494,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                     onChange={(e) => {
                       setMi({ ...mi, title: e.target.value })
                       console.log(mi)
+                      setDisabledPush(false)
                     }}
                     className={styles.inputTitle}
                   />
@@ -509,6 +511,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                     onChange={(e) => {
                       setMi({ ...mi, description: e.target.value })
                       console.log(mi)
+                      setDisabledPush(false)
                     }}
                   />
                 }
@@ -547,6 +550,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                       onChange(e)
                       iconInputChangeHandler(e)
                       console.log(mi.icon)
+                      setDisabledPush(false)
                     }}
                   />
                   <label htmlFor="file">Change icon</label>
@@ -641,7 +645,13 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                       key={i}
                       className={styles.authorTitle}
                       placeholder={x.author}
-                      onChange={(e) => e.target.value}
+                      onChange={(e) => {
+                        // e.target.value
+                        // setAuthor({ ...author, authorForm: [e.target.value] })
+                        newAuthorObject.author = e.target.value
+                        console.log(author)
+                        setDisabledPush(false)
+                      }}
                     />
                     <button
                       onClick={onDeleteChild.bind(null, i)}
@@ -664,7 +674,13 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
         >
           Back
         </button>
-        <button onClick={() => saveChanges()} className={styles.push}>
+        <button
+          disabled={isDisabledPush}
+          onClick={() => saveChanges()}
+          className={cn(styles.push, {
+            [styles.pushDisabled]: isDisabledPush,
+          })}
+        >
           Push changes
         </button>
       </div>

@@ -33,6 +33,8 @@ export interface DeveloperProps {
   setUnderConstructionDetails: (x) => void
   isShowChildrenUnderConstraction: boolean
   setShowChildrenUnderConstraction: (x) => void
+  isShowChildrenRegistery: boolean
+  setShowChildrenRegistery: (x) => void
 }
 export const Developer: //  = ({
 //   isDappletsDetails,
@@ -64,6 +66,8 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
     setUnderConstructionDetails,
     isShowChildrenUnderConstraction,
     setShowChildrenUnderConstraction,
+    isShowChildrenRegistery,
+    setShowChildrenRegistery,
   } = props
   // const [storageRef] = <StorageRef>
 
@@ -347,6 +351,8 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                     <Registry
                       key={registryUrl}
                       label={registryUrl}
+                      isShowChildrenRegistery={isShowChildrenRegistery}
+                      setShowChildrenRegistery={setShowChildrenRegistery}
                       children={
                         <div
                           className={styles.modules}
@@ -359,11 +365,9 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                             onDetailsClick={deployModule.bind(this)}
                             setModuleInfo={setModuleInfo}
                             setModuleVersion={setModuleVersion}
-                            isUnderConstructionDetails={
-                              isUnderConstructionDetails
-                            }
+                            isUnderConstructionDetails={isShowChildrenRegistery}
                             setUnderConstructionDetails={
-                              setUnderConstructionDetails
+                              setShowChildrenRegistery
                             }
                           />
                         </div>

@@ -86,6 +86,7 @@
   color: $PureWhite;
   text-transform: uppercase;
 
+  cursor: pointer;
   &:hover {
     background: $PrimaryHover;
   }
@@ -147,6 +148,12 @@
     background: $MainBlack;
   }
 }
+.inputTokenTicker {
+  text-transform: uppercase;
+  &::placeholder {
+    text-transform: none;
+  }
+}
 
 .support::before {
   content: attr(data-title);
@@ -199,6 +206,10 @@
   font-size: 14px;
   line-height: 149%;
   color: $MainGrey;
+}
+.inputTokenTickerInvalid {
+  border: 1px solid #ff6442;
+  color: #ff6442;
 }
 
 .linkNavigation {

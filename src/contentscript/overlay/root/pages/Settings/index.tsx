@@ -78,6 +78,7 @@ export const SettingsOverlay = () => {
   const [isTokenomics, setTokenomics] = useState(false)
   const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] =
     useState(false)
+  const [isShowChildrenRegistery, setShowChildrenRegistery] = useState(false)
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -172,6 +173,8 @@ export const SettingsOverlay = () => {
                   setShowChildrenUnderConstraction={
                     setShowChildrenUnderConstraction
                   }
+                  isShowChildrenRegistery={isShowChildrenRegistery}
+                  setShowChildrenRegistery={setShowChildrenRegistery}
                   setModuleVersion={setModuleVersion}
                   setModuleInfo={setModuleInfo}
                   isDappletsDetails={isDappletsDetails}
@@ -212,6 +215,7 @@ export const SettingsOverlay = () => {
                   ModuleVersion={ModuleVersion}
                   isDappletsDetails={isDappletsDetails}
                   setDappletsDetail={setDappletsDetail}
+                  setShowChildrenRegistery={setShowChildrenRegistery}
                 />
               )}
               {activeTaDappletsDetails === DappletsDetails.SETTINGS && (
@@ -220,6 +224,7 @@ export const SettingsOverlay = () => {
                   ModuleVersion={ModuleVersion}
                   isDappletsDetails={isDappletsDetails}
                   setDappletsDetail={setDappletsDetail}
+                  setShowChildrenRegistery={setShowChildrenRegistery}
                 />
               )}
             </div>

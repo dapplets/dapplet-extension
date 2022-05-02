@@ -37,18 +37,13 @@ export const UnderConstruction: FC<UnderConstructionProps> = (props) => {
         <label
           onClick={() => {
             setShowChildrenUnderConstraction(!isShowChildren)
-            // onShowDescription()
-            console.log(isShowChildren)
           }}
           className={styles.labelLocalhost}
         >
           {label}
         </label>
-        {/* <button className={styles.closeLocalhost} onClick={closeHost} /> */}
       </div>
-      {isShowChildren &&
-        // && isEnabled && !error
-        children}
+      {isShowChildren && children}
     </div>
   )
 }

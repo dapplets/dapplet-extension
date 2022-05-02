@@ -10,7 +10,9 @@ export interface RegisteryProps {
   // error: string
   // closeHost: () => void
   // onClickButtonLocalhost: () => void
+  isShowChildrenRegistery?: boolean
   label: string
+  setShowChildrenRegistery: (x) => void
 }
 export const Registry: FC<RegisteryProps> = (props) => {
   const {
@@ -18,40 +20,28 @@ export const Registry: FC<RegisteryProps> = (props) => {
     // error,
     // closeHost,
     // onClickButtonLocalhost,
+    isShowChildrenRegistery,
+    setShowChildrenRegistery,
     label,
     children,
   } = props
-  const [isShowDescription, onShowDescription] = useToggle(false)
+
   return (
     <div className={styles.localhost}>
       <div className={styles.hostBlock}>
-        <button
-          disabled
-          // onClick={onClickButtonLocalhost}
-          className={cn(styles.buttonLocalhost, {
-            // [styles.disabled]: !isEnabled && !error,
-            // [styles.error]: isEnabled && error,
-            // [styles.enabled]: isEnabled && !error,
-          })}
-        >
+        <button disabled className={cn(styles.buttonLocalhost, {})}>
           Registry
-          {/* {(!isEnabled && !error && 'Disabled') ||
-            (isEnabled && error && 'Error') ||
-            (isEnabled && !error && 'Enabled')} */}
         </button>
         <label
           onClick={() => {
-            onShowDescription()
+            setShowChildrenRegistery(!isShowChildrenRegistery)
           }}
           className={styles.labelLocalhost}
         >
           {label}
         </label>
-        {/* <button className={styles.closeLocalhost} onClick={closeHost} /> */}
       </div>
-      {isShowDescription &&
-        // && isEnabled && !error
-        children}
+      {isShowChildrenRegistery && children}
     </div>
   )
 }
