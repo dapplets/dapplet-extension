@@ -30,30 +30,8 @@ import {
   ModuleTypes,
   StorageTypes,
 } from '../../../../../common/constants'
-import { Icon, List, Message } from 'semantic-ui-react'
-// const iconInputChangeHandler = async (
-//   event: React.ChangeEvent<HTMLInputElement>
-// ) => {
-//   // const s = this.state
-//   const files = event.target.files
-//   if (files.length > 0) {
-//     const file = files[0]
-//     const base64: string = await new Promise((resolve, reject) => {
-//       const reader = new FileReader()
-//       reader.readAsDataURL(file)
-//       reader.onload = () => resolve(reader.result as string)
-//       reader.onerror = (error) => reject(error)
-//     })
-//     mi.icon = {
-//       hash: null,
-//       uris: [base64],
-//     }
-//   } else {
-//     mi.icon = null
-//   }
-//   // setMi(mi)
-//   // console.log(mi)
-// }
+import './valid.scss'
+
 enum DeploymentStatus {
   Unknown,
   Deployed,
@@ -84,6 +62,7 @@ export interface UnderConstructionInfoProps {
   ModuleInfo: any
   ModuleVersion: any
   setUnderConstructionDetails: (x) => void
+  setShowChildrenUnderConstraction: (x) => void
 }
 
 let _isMounted = false
@@ -91,7 +70,12 @@ let _isMounted = false
 export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   props
 ) => {
-  const { setUnderConstructionDetails, ModuleInfo, ModuleVersion } = props
+  const {
+    setUnderConstructionDetails,
+    ModuleInfo,
+    ModuleVersion,
+    setShowChildrenUnderConstraction,
+  } = props
 
   const bus = new Bus()
   const transferOwnershipModal = React.createRef<any>()
@@ -129,10 +113,15 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   ])
 
   const [author, setAuthor] = useState({ authorForm: [] })
+  const [contextDeleteNone, setContextDeleteNone] = useState(false)
 
   const newAuthorObject = {
     author: 'New admins',
   }
+  const fileInput = useRef<HTMLInputElement>()
+  const [st, setSt] = useState([])
+  const node = useRef<HTMLButtonElement>()
+  const nodeInput = useRef<HTMLInputElement>()
 
   useEffect(() => {
     _isMounted = true
@@ -143,7 +132,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     return () => {
       _isMounted = false
     }
-  }, [mi])
+  }, [mi, st])
   const addButtonClickHandler = () => {
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.push(newAuthorObject)
@@ -159,7 +148,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   }
 
   // const [contextId, setContextId] = useState(mi)
-  const newContextObject = ''
+  let newContextObject = ''
   const addButtonClickHandlerContext = () => {
     const newContext = Object.assign({}, mi)
     newContext.contextIds.push(
@@ -167,6 +156,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
       newContextObject
     )
     setMi(newContext)
+    // setContextDeleteNone(false)
     console.log(mi)
   }
 
@@ -333,7 +323,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     console.log(mi)
   }
   const saveChanges = async () => {
-    _addContextId(editContextId)
     try {
       const { editModuleInfo } = await initBGFunctions(browser)
       await editModuleInfo(targetRegistry, targetStorages, mi)
@@ -391,8 +380,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
       (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
     )
 
-  const fileInput = useRef<HTMLInputElement>()
-  const [st, setSt] = useState([])
   const onChange = (e) => {
     const files = e.target.files
     // console.log(files)
@@ -403,6 +390,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
       ...filesArr,
     ])
   }
+
   return (
     <div className={styles.wrapper}>
       {/* {message ? (
@@ -575,7 +563,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                 <div className={styles.blockContextID}>
                   <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
                   <button
-                    disabled={mi.contextIds.length >= 1}
+                    // disabled={mi.contextIds.length >= 1}
                     onClick={addButtonClickHandlerContext}
                     className={cn(styles.contextIDButton, {
                       [styles.contextIDButtonDisabled]:
@@ -584,27 +572,51 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                   />
                 </div>
                 {mi.contextIds.map((x, i) => (
-                  <div key={i} className={styles.blockContext}>
-                    <input
-                      key={i}
-                      className={styles.blockContextTitle}
-                      placeholder={'Context ID (ex: example.com)'}
-                      value={editContextId}
-                      onChange={(e) => {
-                        setEditContextId(e.target.value)
-                      }}
-                      // onBlur={() => {
-                      //   _addContextId(editContextId)
-                      // }}
-                    />
+                  <div key={i} className={styles.wrapperContext}>
+                    <div className={styles.blockContext}>
+                      <input
+                        key={i}
+                        ref={nodeInput}
+                        className={styles.blockContextTitle}
+                        placeholder={'Context ID (ex: example.com)'}
+                        onChange={(e) => {
+                          // setMi({
+                          //   ...mi,
+                          //   contextIds: [e.target.value],
+                          // })
+                          setEditContextId(e.target.value)
+                          console.log(nodeInput.current?.value)
+                          console.log(mi)
+                        }}
+                        // onBlur={() => {
+                        //   _addContextId(editContextId)
+                        // }}
+                      />
 
+                      <button
+                        ref={node}
+                        onClick={() => {
+                          onDeleteChildContext(i)
+                          setEditContextId('')
+                        }}
+                        className={cn(styles.contextDelete, {
+                          [styles.contextDeleteNone]: contextDeleteNone,
+                        })}
+                      />
+                    </div>
                     <button
+                      disabled={nodeInput.current?.value.length < 2}
                       onClick={() => {
-                        onDeleteChildContext(i)
-                        setEditContextId('')
+                        node.current?.classList.add('valid')
+                        _addContextId(editContextId)
                       }}
-                      className={styles.contextDelete}
-                    />
+                      className={cn(styles.addContext, {
+                        [styles.addContextDisabled]:
+                          nodeInput.current?.value.length < 2,
+                      })}
+                    >
+                      ADD
+                    </button>
                   </div>
                 ))}
               </div>
@@ -644,7 +656,10 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
       </div>
       <div className={styles.linkNavigation}>
         <button
-          onClick={() => setUnderConstructionDetails(false)}
+          onClick={() => {
+            setUnderConstructionDetails(false)
+            setShowChildrenUnderConstraction(true)
+          }}
           className={styles.back}
         >
           Back

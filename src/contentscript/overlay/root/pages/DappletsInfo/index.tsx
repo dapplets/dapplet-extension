@@ -139,6 +139,8 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   //     StorageTypes.Sia,
   //     StorageTypes.Ipfs
   // ],
+  const fileInput = useRef<HTMLInputElement>()
+  const [st, setSt] = useState([])
 
   useEffect(() => {
     _isMounted = true
@@ -149,7 +151,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     return () => {
       _isMounted = false
     }
-  }, [mi])
+  }, [mi, st])
   bus.subscribe(
     'data',
     async ({ mi, vi }: { mi: ModuleInfo; vi: VersionInfo }) => {
@@ -454,8 +456,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const isReuploadButtonDisabled =
     !isAlreadyDeployed || mode === FormMode.Creating || !vi
 
-  const fileInput = useRef<HTMLInputElement>()
-  const [st, setSt] = useState([])
   const onChange = (e) => {
     const files = e.target.files
     // console.log(files)

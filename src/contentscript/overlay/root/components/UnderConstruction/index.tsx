@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC } from 'react'
+import React, { ChangeEvent, FC, useState } from 'react'
 import { HTMLAttributes, DetailedHTMLProps } from 'react'
 import cn from 'classnames'
 import styles from './UnderConstruction.module.scss'
@@ -10,7 +10,9 @@ export interface UnderConstructionProps {
   // error: string
   // closeHost: () => void
   // onClickButtonLocalhost: () => void
+  isShowChildren?: boolean
   label: string
+  setShowChildrenUnderConstraction: (x) => void
 }
 export const UnderConstruction: FC<UnderConstructionProps> = (props) => {
   const {
@@ -18,30 +20,25 @@ export const UnderConstruction: FC<UnderConstructionProps> = (props) => {
     // error,
     // closeHost,
     // onClickButtonLocalhost,
+    // isShowChildren = isShowDescription,
+    setShowChildrenUnderConstraction,
+    isShowChildren,
     label,
     children,
   } = props
-  const [isShowDescription, onShowDescription] = useToggle(false)
+  // const [isShowDescription, onShowDescription] = useToggle(isShowChildren)
+
   return (
     <div className={styles.localhost}>
       <div className={styles.hostBlock}>
-        <button
-          disabled
-          // onClick={onClickButtonLocalhost}
-          className={cn(styles.buttonLocalhost, {
-            // [styles.disabled]: !isEnabled && !error,
-            // [styles.error]: isEnabled && error,
-            // [styles.enabled]: isEnabled && !error,
-          })}
-        >
+        <button disabled className={cn(styles.buttonLocalhost, {})}>
           UC
-          {/* {(!isEnabled && !error && 'Disabled') ||
-            (isEnabled && error && 'Error') ||
-            (isEnabled && !error && 'Enabled')} */}
         </button>
         <label
           onClick={() => {
-            onShowDescription()
+            setShowChildrenUnderConstraction(!isShowChildren)
+            // onShowDescription()
+            console.log(isShowChildren)
           }}
           className={styles.labelLocalhost}
         >
@@ -49,7 +46,7 @@ export const UnderConstruction: FC<UnderConstructionProps> = (props) => {
         </label>
         {/* <button className={styles.closeLocalhost} onClick={closeHost} /> */}
       </div>
-      {isShowDescription &&
+      {isShowChildren &&
         // && isEnabled && !error
         children}
     </div>

@@ -76,6 +76,8 @@ export const SettingsOverlay = () => {
   const [ModuleVersion, setModuleVersion] = useState([])
 
   const [isTokenomics, setTokenomics] = useState(false)
+  const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] =
+    useState(false)
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -164,6 +166,12 @@ export const SettingsOverlay = () => {
 
               {activeTab === SettingsTabs.DEVELOPER && (
                 <Developer
+                  isShowChildrenUnderConstraction={
+                    isShowChildrenUnderConstraction
+                  }
+                  setShowChildrenUnderConstraction={
+                    setShowChildrenUnderConstraction
+                  }
                   setModuleVersion={setModuleVersion}
                   setModuleInfo={setModuleInfo}
                   isDappletsDetails={isDappletsDetails}
@@ -281,6 +289,9 @@ export const SettingsOverlay = () => {
                     ModuleInfo={ModuleInfo}
                     ModuleVersion={ModuleVersion}
                     setUnderConstructionDetails={setUnderConstructionDetails}
+                    setShowChildrenUnderConstraction={
+                      setShowChildrenUnderConstraction
+                    }
                   />
                 </div>
               )}

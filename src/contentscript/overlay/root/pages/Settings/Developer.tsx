@@ -31,6 +31,8 @@ export interface DeveloperProps {
   setUnderConstruction: (x) => void
   isUnderConstructionDetails: boolean
   setUnderConstructionDetails: (x) => void
+  isShowChildrenUnderConstraction: boolean
+  setShowChildrenUnderConstraction: (x) => void
 }
 export const Developer: //  = ({
 //   isDappletsDetails,
@@ -49,6 +51,8 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
   const [modules, setModules] = useState([])
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [dataUri, setDataUri] = useState(null)
+  const [isLoadButton, setLoadButton] = useState(false)
+
   const {
     isDappletsDetails,
     setDappletsDetail,
@@ -58,6 +62,8 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
     setUnderConstruction,
     isUnderConstructionDetails,
     setUnderConstructionDetails,
+    isShowChildrenUnderConstraction,
+    setShowChildrenUnderConstraction,
   } = props
   // const [storageRef] = <StorageRef>
 
@@ -92,6 +98,7 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
     setSwarmGatewayUrl(swarmGatewayUrl)
   }
   const loadRegistries = async () => {
+    setLoadButton(true)
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
 
     const modules: {
@@ -104,6 +111,7 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
     const registries = await getRegistries()
     onLoading(false)
     setRegistries(registries.filter((r) => r.isDev === true))
+    setLoadButton(false)
   }
 
   const loadIntro = async () => {
@@ -119,6 +127,7 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
   }
 
   const addRegistry = async (url: string, x: () => void) => {
+    setLoadButton(true)
     const { addRegistry } = await initBGFunctions(browser)
 
     try {
@@ -130,6 +139,7 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
 
     loadRegistries()
     x()
+    setLoadButton(false)
   }
 
   const removeRegistry = async (url: string) => {
@@ -205,7 +215,10 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
               }
             />
             <button
-              className={styles.buttonInput}
+              disabled={isLoadButton}
+              className={cn(styles.buttonInput, {
+                [styles.buttonInputDisabled]: isLoadButton,
+              })}
               onClick={() => addRegistry(registryInput, handleClear)}
             >
               add
@@ -216,49 +229,53 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
           ) : null}
         </div>
         <div className={styles.host}>
-          {registries.map((r, i) => (
-            <div key={i}>
-              <Localhost
-                error={r.error}
-                isEnabled={r.isEnabled}
-                label={r.url}
-                key={i}
-                closeHost={() => removeRegistry(r.url)}
-                onClickButtonLocalhost={() => {
-                  ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
-                    (r.isEnabled && r.error && disableRegistry(r.url)) ||
-                    (r.isEnabled && !r.error && disableRegistry(r.url))
-                }}
-                children={
-                  <div className={styles.modules}>
-                    {modules.length > 0 &&
-                      Object.entries(groupedModules).map(
-                        ([registryUrl, modules]) => (
-                          <div key={registryUrl}>
-                            {modules.length > 0 && registryUrl === r.url && (
-                              <DevModule
-                                isDappletsDetails={isDappletsDetails}
-                                setDappletsDetail={setDappletsDetail}
-                                modules={modules}
-                                onDetailsClick={deployModule.bind(this)}
-                                setModuleInfo={setModuleInfo}
-                                setModuleVersion={setModuleVersion}
-                                isUnderConstructionDetails={
-                                  isUnderConstructionDetails
-                                }
-                                setUnderConstructionDetails={
-                                  setUnderConstructionDetails
-                                }
-                              />
-                            )}
-                          </div>
-                        )
-                      )}
-                  </div>
-                }
-              />
-            </div>
-          ))}
+          {isLoadButton ? (
+            <div className={styles.miniLoader}></div>
+          ) : (
+            registries.map((r, i) => (
+              <div key={i}>
+                <Localhost
+                  error={r.error}
+                  isEnabled={r.isEnabled}
+                  label={r.url}
+                  key={i}
+                  closeHost={() => removeRegistry(r.url)}
+                  onClickButtonLocalhost={() => {
+                    ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
+                      (r.isEnabled && r.error && disableRegistry(r.url)) ||
+                      (r.isEnabled && !r.error && disableRegistry(r.url))
+                  }}
+                  children={
+                    <div className={styles.modules}>
+                      {modules.length > 0 &&
+                        Object.entries(groupedModules).map(
+                          ([registryUrl, modules]) => (
+                            <div key={registryUrl}>
+                              {modules.length > 0 && registryUrl === r.url && (
+                                <DevModule
+                                  isDappletsDetails={isDappletsDetails}
+                                  setDappletsDetail={setDappletsDetail}
+                                  modules={modules}
+                                  onDetailsClick={deployModule.bind(this)}
+                                  setModuleInfo={setModuleInfo}
+                                  setModuleVersion={setModuleVersion}
+                                  isUnderConstructionDetails={
+                                    isUnderConstructionDetails
+                                  }
+                                  setUnderConstructionDetails={
+                                    setUnderConstructionDetails
+                                  }
+                                />
+                              )}
+                            </div>
+                          )
+                        )}
+                    </div>
+                  }
+                />
+              </div>
+            ))
+          )}
 
           <div className={styles.host}>
             {modules.length > 0
@@ -274,6 +291,10 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                         <UnderConstruction
                           key={isUnderConstruction}
                           label={'Dapplet under constuction'}
+                          isShowChildren={isShowChildrenUnderConstraction}
+                          setShowChildrenUnderConstraction={
+                            setShowChildrenUnderConstraction
+                          }
                           children={
                             <div
                               className={styles.modules}
@@ -305,7 +326,7 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
               : null}
           </div>
           <div className={styles.host}>
-            {modules.length > 0 ? (
+            {modules.length > 0 &&
               Object.entries(groupedModules).map(([registryUrl, modules]) => (
                 // {modules.author}
 
@@ -350,10 +371,7 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                     />
                   )}
                 </div>
-              ))
-            ) : (
-              <div>No available development modules.</div>
-            )}
+              ))}
           </div>
         </div>
       </div>
