@@ -62,7 +62,7 @@ export class OverlayService {
 
         const [error, result] = await browser.tabs.sendMessage(tabId, {
             type,
-            payload: { payload, activeTab }
+            payload: type === "OPEN_SYSTEM_OVERLAY" ? { payload, activeTab } : payload
         });
 
         // ToDo: use native throw in error
