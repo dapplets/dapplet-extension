@@ -109,6 +109,10 @@
   line-height: 149%;
   color: $MainGrey;
 }
+.inputNameDisabled {
+  border: 1px solid #ff6442;
+  color: #ff6442;
+}
 
 .fullDescription {
   display: flex;
@@ -461,53 +465,124 @@
   }
 }
 
-// .wrapper {
-//   width: 100%;
-//   max-width: 300px;
+.modalDefaultContent {
+  font-family: 'Roboto';
+  width: 263px;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
 
-//   text-align: center;
+  color: $MainGrey;
+}
 
-//   color: #747376;
+.modalCreationContent {
+  width: 214px;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
 
-//   font-family: Roboto, sans-serif;
-// }
+  color: $MainGrey;
+}
 
-// .title,
-// .subtitle {
-//   margin-right: auto;
-//   margin-left: auto;
-// }
+.modalCreationContentButton {
+  display: flex;
 
-// .title {
-//   max-width: 220px;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
 
-//   font-size: 22px;
-//   font-weight: 700;
-//   line-height: 26px;
-// }
+  min-width: 157px;
+  height: 32px;
 
-// .subtitle {
-//   top: 57px;
-//   left: 41px;
+  background: $Primary;
+  border-radius: 4px;
 
-//   max-width: 138px;
-//   margin-top: 5px;
+  font-family: 'Roboto';
 
-//   font-size: 14px;
-//   font-weight: 500;
-//   line-height: 16px;
-// }
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
 
-// .link {
-//   display: block;
+  color: $PureWhite;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+.titleModalEndCreation {
+  width: 307px;
 
-//   margin-top: 10px;
+  text-align: center;
+}
 
-//   text-align: center;
+.modalEndCreationContent {
+  width: 263px;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
 
-//   color: #d9304f;
+  color: $MainGrey;
+}
 
-//   font-size: 14px;
-//   font-weight: 500;
-//   line-height: 16px;
-// }
+.modalEndCreationFooterBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.modalEndCreationFooterButton {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+
+  min-width: 157px;
+  height: 32px;
+
+  background: $Primary;
+  border-radius: 4px;
+
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $PureWhite;
+  margin-bottom: 10px;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+
+.modalEndCreationFooterLink {
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $Primary;
+  cursor: pointer;
+  &:hover {
+    color: $PrimaryHover;
+  }
+  &:active {
+    color: $PrimaryPressed;
+  }
+}

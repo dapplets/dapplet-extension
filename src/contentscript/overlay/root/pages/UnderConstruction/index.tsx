@@ -68,14 +68,21 @@ type Message = {
 
 export interface UnderConstruction {
   setUnderConstruction: (x) => void
-  // ModuleInfo: any
-  // ModuleVersion: any
+  setUnderConstructionDetails: (x) => void
+  setModuleInfo: (x) => void
+  setModuleVersion: (x) => void
 }
 let _isMounted = false
 export const UnderConstruction: FC<UnderConstruction> = (
   props: UnderConstruction
 ) => {
-  const { setUnderConstruction } = props
+  // setUnderConstructionDetails: (x)=>void
+  const {
+    setUnderConstruction,
+    setUnderConstructionDetails,
+    setModuleInfo,
+    setModuleVersion,
+  } = props
   const bus = new Bus()
   const transferOwnershipModal = React.createRef<any>()
   const addContextIdModal = React.createRef<any>()
@@ -114,7 +121,18 @@ export const UnderConstruction: FC<UnderConstruction> = (
     StorageTypes.Ipfs,
   ])
   const [isModal, setModal] = useState(false)
+  const [inputNameError, setInputNameError] = useState(null)
+  const [inputTitleError, setInputTitleError] = useState(null)
+  const [inputDescriptionError, setInputDescriptionError] = useState(null)
+  const [inputFullDescriptionError, setFullInputDescriptionError] =
+    useState(null)
   const onClose = () => setModal(false)
+
+  const [isModalCreation, setModalCreation] = useState(false)
+  const onCloseModalCreation = () => setModalCreation(false)
+  const [isModalEndCreation, setModalEndCreation] = useState(false)
+  const onCloseEndModalCreation = () => setModalCreation(false)
+  const [isModalTransaction, setModalTransaction] = useState(false)
 
   useEffect(() => {
     _isMounted = true
@@ -122,6 +140,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
       await _updateData()
     }
     init()
+    console.log(mi)
     return () => {
       _isMounted = false
     }
@@ -161,7 +180,6 @@ export const UnderConstruction: FC<UnderConstruction> = (
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
     await _updateCurrentAccount()
-    setLoading(false)
   }
 
   const _updateCurrentAccount = async () => {
@@ -171,7 +189,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
       targetChain
     )
     setCurrentAccount(currentAccount)
-
+    setLoading(false)
     // console.log(targetChain)
 
     // console.log(currentAccount)
@@ -209,7 +227,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
     mi.type = ModuleTypes.Feature
 
     try {
-      setLoading(true)
+      setModalTransaction(true)
       const isNotNullCurrentAccount = !(
         !currentAccount ||
         currentAccount === '0x0000000000000000000000000000000000000000'
@@ -222,20 +240,17 @@ export const UnderConstruction: FC<UnderConstruction> = (
       if (isNotTrustedUser) {
         await addTrustedUser(currentAccount.toLowerCase())
       }
-
       const result =
         mode === FormMode.Creating &&
         (await deployModule(mi, null, targetStorages, targetRegistry))
-
       setMessage({
         type: 'positive',
         header: 'Module was deployed',
         message: [`Script URL: ${result.scriptUrl}`],
       })
-      setLoading(false)
-      setUnderConstruction(false)
+      setModalTransaction(false)
+      setModalEndCreation(true)
     } catch (err) {
-      setLoading(false)
       setMessage({
         type: 'negative',
         header: 'Publication error',
@@ -244,6 +259,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
       setModal(true)
       console.log([err])
     } finally {
+      setModalTransaction(false)
     }
   }
 
@@ -318,10 +334,6 @@ export const UnderConstruction: FC<UnderConstruction> = (
   const isReuploadButtonDisabled =
     !isAlreadyDeployed || mode === FormMode.Creating
 
-  const [miTitle, setMiTitle] = useState(mi.title)
-  const [miName, setMiName] = useState(mi.name)
-  const [miDescription, setMiDescription] = useState(mi.description)
-
   return (
     <div className={styles.wrapper}>
       {message ? (
@@ -329,7 +341,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
           visible={isModal}
           title={message.header}
           content={
-            <>
+            <div className={styles.modalDefaultContent}>
               {message.message.map((m, i) => (
                 <p key={i} style={{ overflowWrap: 'break-word' }}>
                   {m === `Cannot read properties of null (reading 'length')`
@@ -337,7 +349,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
                     : m}
                 </p>
               ))}
-            </>
+            </div>
           }
           footer={''}
           onClose={() => onClose()}
@@ -350,12 +362,10 @@ export const UnderConstruction: FC<UnderConstruction> = (
             visible={true}
             title={'The wrong wallet'}
             content={
-              <>
+              <div className={styles.modalDefaultContent}>
                 <p>Change account to {owner}</p>
-
-                <br />
                 <p> Connect a new wallet</p>
-              </>
+              </div>
             }
             footer={''}
             onClose={() => setUnderConstruction(false)}
@@ -365,7 +375,10 @@ export const UnderConstruction: FC<UnderConstruction> = (
             visible={true}
             title={'Wallet is not connected'}
             content={
-              'You can not deploy a module without a wallet. Connect a new wallet'
+              <div className={styles.modalDefaultContent}>
+                You can not deploy a module without a wallet. Connect a new
+                wallet
+              </div>
             }
             footer={''}
             onClose={() => setUnderConstruction(false)}
@@ -411,9 +424,17 @@ export const UnderConstruction: FC<UnderConstruction> = (
                     readOnly={mode === FormMode.Editing}
                     placeholder="Module ID like module_name.dapplet-base.eth"
                     onChange={(e) => {
+                      // setInputNameError(null)
                       mi.name = e.target.value
+                      if (mi.name.length < 2) {
+                        setInputNameError('error')
+                      } else {
+                        setInputNameError(null)
+                      }
                     }}
-                    className={styles.inputTitle}
+                    className={cn(styles.inputTitle, {
+                      [styles.inputNameDisabled]: inputNameError !== null,
+                    })}
                   />
                 }
               />
@@ -427,8 +448,15 @@ export const UnderConstruction: FC<UnderConstruction> = (
                     placeholder="A short name of your module"
                     onChange={(e) => {
                       mi.title = e.target.value
+                      if (mi.title.length < 2) {
+                        setInputTitleError('error')
+                      } else {
+                        setInputTitleError(null)
+                      }
                     }}
-                    className={styles.inputTitle}
+                    className={cn(styles.inputTitle, {
+                      [styles.inputNameDisabled]: inputTitleError !== null,
+                    })}
                   />
                 }
               />
@@ -442,8 +470,16 @@ export const UnderConstruction: FC<UnderConstruction> = (
                     placeholder="A small description of what your module does"
                     onChange={(e) => {
                       mi.description = e.target.value
+                      if (mi.description.length < 2) {
+                        setInputDescriptionError('error')
+                      } else {
+                        setInputDescriptionError(null)
+                      }
                     }}
-                    className={styles.inputTitle}
+                    className={cn(styles.inputTitle, {
+                      [styles.inputNameDisabled]:
+                        inputDescriptionError !== null,
+                    })}
                   />
                 }
               />
@@ -451,7 +487,22 @@ export const UnderConstruction: FC<UnderConstruction> = (
                 title="Full description"
                 component={<></>}
                 className={styles.item}
-                children={<textarea className={styles.fullDescription} />}
+                children={
+                  <textarea
+                    onChange={(e) => {
+                      e.target.value
+                      if (e.target.value.length < 2) {
+                        setFullInputDescriptionError('error')
+                      } else {
+                        setFullInputDescriptionError(null)
+                      }
+                    }}
+                    className={cn(styles.fullDescription, {
+                      [styles.inputNameDisabled]:
+                        inputFullDescriptionError !== null,
+                    })}
+                  />
+                }
               />
             </div>
           }
@@ -465,25 +516,104 @@ export const UnderConstruction: FC<UnderConstruction> = (
           Back
         </button>
         <button
-          // disabled={mi.description === null && mi.title === null}
+          disabled={
+            inputNameError !== null ||
+            inputTitleError !== null ||
+            inputDescriptionError !== null ||
+            mi.name === null ||
+            mi.title === null ||
+            mi.description === null
+            // ||
+            // inputFullDescriptionError !== null
+          }
           onClick={() => {
-            deployButtonClickHandler()
+            setModalCreation(true)
+            console.log(loading)
+
+            // deployButtonClickHandler()
           }}
           className={cn(styles.push, {
-            // [styles.pushDisabled]: mi.description === null && mi.title === null,
+            [styles.pushDisabled]:
+              inputNameError !== null ||
+              inputTitleError !== null ||
+              inputDescriptionError !== null ||
+              mi.name === null ||
+              mi.title === null ||
+              mi.description === null,
+            //  ||
+            // inputFullDescriptionError !== null,
           })}
         >
           Done
         </button>
       </div>
       <Modal
-        visible={loading}
-        title={'Loading new Dapplet'}
+        visible={isModalCreation}
+        title={'Initial Stake'}
         content={
-          'This modal window will close automatically after successful change'
+          <div className={styles.modalCreationContent}>
+            To create a Dapplet Under Construction you need to Stake 100 AUGe.
+            You will get this stake back if you deploy this module within 2
+            months. Otherwise you will lose it
+          </div>
         }
+        footer={
+          <button
+            className={styles.modalCreationContentButton}
+            onClick={() => {
+              deployButtonClickHandler()
+              onCloseModalCreation()
+              console.log(mi)
+              console.log(vi)
+
+              console.log(originalMi)
+            }}
+          >
+            Ok, I agree
+          </button>
+        }
+        onClose={() => onCloseModalCreation()}
+      />
+      <Modal
+        visible={isModalTransaction}
+        title={'Transaction confirmation'}
+        content={''}
         footer={''}
-        onClose={() => !loading}
+        onClose={() => !isModalTransaction}
+      />
+      <Modal
+        visible={isModalEndCreation}
+        className={styles.titleModalEndCreation}
+        title={`Congratulations, your "${mi.name}" has been created`}
+        content={
+          <div className={styles.modalEndCreationContent}>
+            You have 2 months to deploy this dapplet. Otherwise, you will lose
+            your Initial Steak.Also now you can add additional details,
+            Tokenomics and Rewards to your dapplet
+          </div>
+        }
+        footer={
+          <div className={styles.modalEndCreationFooterBlock}>
+            <button
+              onClick={() => {
+                setModuleInfo(mi)
+                setUnderConstruction(false)
+
+                setUnderConstructionDetails(true)
+              }}
+              className={styles.modalEndCreationFooterButton}
+            >
+              Go to the Details
+            </button>
+            <a
+              className={styles.modalEndCreationFooterLink}
+              onClick={() => setUnderConstruction(false)}
+            >
+              Remind Later
+            </a>
+          </div>
+        }
+        onClose={() => setUnderConstruction(false)}
       />
     </div>
   )

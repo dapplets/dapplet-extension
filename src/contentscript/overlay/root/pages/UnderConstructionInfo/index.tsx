@@ -538,58 +538,62 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                     onClick={addButtonClickHandlerContext}
                     className={cn(styles.contextIDButton, {
                       [styles.contextIDButtonDisabled]:
+                        mi.contextIds &&
+                        mi.contextIds.length &&
                         mi.contextIds.length >= 1,
                     })}
                   />
                 </div>
-                {mi.contextIds.map((x, i) => (
-                  <div key={i} className={styles.wrapperContext}>
-                    <div className={styles.blockContext}>
-                      <input
-                        key={i}
-                        ref={nodeInput}
-                        className={styles.blockContextTitle}
-                        placeholder={'Context ID (ex: example.com)'}
-                        onChange={(e) => {
-                          // setMi({
-                          //   ...mi,
-                          //   contextIds: [e.target.value],
-                          // })
-                          setEditContextId(e.target.value)
-                          console.log(nodeInput.current?.value)
-                          console.log(mi)
-                        }}
-                        // onBlur={() => {
-                        //   _addContextId(editContextId)
-                        // }}
-                      />
+                {mi &&
+                  mi.contextIds &&
+                  mi.contextIds.map((x, i) => (
+                    <div key={i} className={styles.wrapperContext}>
+                      <div className={styles.blockContext}>
+                        <input
+                          key={i}
+                          ref={nodeInput}
+                          className={styles.blockContextTitle}
+                          placeholder={'Context ID (ex: example.com)'}
+                          onChange={(e) => {
+                            // setMi({
+                            //   ...mi,
+                            //   contextIds: [e.target.value],
+                            // })
+                            setEditContextId(e.target.value)
+                            console.log(nodeInput.current?.value)
+                            console.log(mi)
+                          }}
+                          // onBlur={() => {
+                          //   _addContextId(editContextId)
+                          // }}
+                        />
 
+                        <button
+                          ref={node}
+                          onClick={() => {
+                            onDeleteChildContext(i)
+                            setEditContextId('')
+                          }}
+                          className={cn(styles.contextDelete, {
+                            [styles.contextDeleteNone]: contextDeleteNone,
+                          })}
+                        />
+                      </div>
                       <button
-                        ref={node}
+                        disabled={nodeInput.current?.value.length < 2}
                         onClick={() => {
-                          onDeleteChildContext(i)
-                          setEditContextId('')
+                          node.current?.classList.add('valid')
+                          _addContextId(editContextId)
                         }}
-                        className={cn(styles.contextDelete, {
-                          [styles.contextDeleteNone]: contextDeleteNone,
+                        className={cn(styles.addContext, {
+                          [styles.addContextDisabled]:
+                            nodeInput.current?.value.length < 2,
                         })}
-                      />
+                      >
+                        ADD
+                      </button>
                     </div>
-                    <button
-                      disabled={nodeInput.current?.value.length < 2}
-                      onClick={() => {
-                        node.current?.classList.add('valid')
-                        _addContextId(editContextId)
-                      }}
-                      className={cn(styles.addContext, {
-                        [styles.addContextDisabled]:
-                          nodeInput.current?.value.length < 2,
-                      })}
-                    >
-                      ADD
-                    </button>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           }

@@ -238,6 +238,9 @@ export const SettingsOverlay = () => {
               <UnderConstruction
                 // ModuleInfo={ModuleInfo}
                 // ModuleVersion={ModuleVersion}
+                setModuleVersion={setModuleVersion}
+                setModuleInfo={setModuleInfo}
+                setUnderConstructionDetails={setUnderConstructionDetails}
                 setUnderConstruction={setUnderConstruction}
               />
             </div>
