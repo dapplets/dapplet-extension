@@ -151,6 +151,13 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [st, setSt] = useState([])
   const [isDisabledPush, setDisabledPush] = useState(true)
   const [isDisabledAddOwner, setDisabledAddOwner] = useState(false)
+  const [isModal, setModal] = useState(false)
+  const onClose = () => setModal(false)
+
+  const [isModalPush, setModalPush] = useState(false)
+  const onClosePush = () => setModalPush(false)
+  const [isModalTransaction, setModalTransaction] = useState(false)
+  const onCloseTransaction = () => setModalTransaction(false)
 
   useEffect(() => {
     _isMounted = true
@@ -420,20 +427,25 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setMi(mi)
     console.log(mi)
   }
-
   const saveChanges = async () => {
+    setModalTransaction(true)
     try {
       const { editModuleInfo } = await initBGFunctions(browser)
       await editModuleInfo(targetRegistry, targetStorages, mi)
 
       setOriginalMi(JSON.parse(JSON.stringify(mi)))
-      setDappletsDetail(false)
+      // setUnderConstructionDetails(false)
+      setModalTransaction(false)
+      setModalPush(true)
     } catch (err) {
       setMessage({
         type: 'negative',
         header: 'Publication error',
         message: [err.message],
       })
+      setModalTransaction(false)
+      setModal(true)
+      console.log(err.message)
     } finally {
     }
   }
@@ -502,6 +514,31 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
   return (
     <div className={styles.wrapper}>
+      {message ? (
+        <Modal
+          visible={isModal}
+          title={message.header}
+          content={
+            <div className={styles.modalDefaultContent}>
+              {message.message.map((m, i) => (
+                <p key={i} style={{ overflowWrap: 'break-word' }}>
+                  {m === `Cannot read properties of null (reading 'length')`
+                    ? 'Please fill in the empty fields'
+                    : m}
+                </p>
+              ))}
+              <button
+                onClick={() => onClose()}
+                className={styles.modalDefaultContentButton}
+              >
+                Push Changes again
+              </button>
+            </div>
+          }
+          footer={''}
+          onClose={() => onClose()}
+        />
+      ) : null}
       {!isNotNullCurrentAccount ? (
         owner ? (
           <Modal
@@ -730,6 +767,36 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
           Push changes
         </button>
       </div>
+      <Modal
+        visible={isModalPush}
+        title="Сhanges were accepted"
+        content={
+          <div className={styles.modalDefaultContent}>
+            Your dapplet has been updated
+            <button
+              onClick={() => {
+                setDappletsDetail(false)
+                setShowChildrenRegistery(true)
+              }}
+              className={styles.modalDefaultContentButton}
+            >
+              OK
+            </button>
+          </div>
+        }
+        footer={''}
+        onClose={() => {
+          setDappletsDetail(false)
+          setShowChildrenRegistery(true)
+        }}
+      />
+      <Modal
+        visible={isModalTransaction}
+        title="Transaction confirmation"
+        content={<div className={styles.modalDefaultContent}></div>}
+        footer={''}
+        onClose={() => {}}
+      />
     </div>
   )
 }

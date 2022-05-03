@@ -662,3 +662,47 @@
   display: flex;
   width: 100%;
 }
+
+.modalDefaultContent {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Roboto';
+  width: 263px;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+
+  color: $MainGrey;
+}
+
+.modalDefaultContentButton {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+
+  width: 157px;
+  height: 32px;
+
+  background: $Primary;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $PureWhite;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
+}

@@ -165,7 +165,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     className={styles.dappletsSettingsIsUnderConstruction}
                     onClick={() => {
                       onDetailsClick(m.module, m.versions[0])
-                      // setDappletsDetail(true)
+                      setDappletsDetail(false)
                       setUnderConstructionDetails(true)
                       setModuleInfo(m.module)
                       setModuleVersion(m.versions[0])

@@ -125,6 +125,13 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   const node = useRef<HTMLButtonElement>()
   const nodeInput = useRef<HTMLInputElement>()
   const [isDisabledPush, setDisabledPush] = useState(true)
+  const [isModal, setModal] = useState(false)
+  const onClose = () => setModal(false)
+
+  const [isModalPush, setModalPush] = useState(false)
+  const onClosePush = () => setModalPush(false)
+  const [isModalTransaction, setModalTransaction] = useState(false)
+  const onCloseTransaction = () => setModalTransaction(false)
 
   useEffect(() => {
     _isMounted = true
@@ -326,23 +333,24 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     console.log(mi)
   }
   const saveChanges = async () => {
+    setModalTransaction(true)
     try {
       const { editModuleInfo } = await initBGFunctions(browser)
       await editModuleInfo(targetRegistry, targetStorages, mi)
 
       setOriginalMi(JSON.parse(JSON.stringify(mi)))
-      setUnderConstructionDetails(false)
+      // setUnderConstructionDetails(false)
+      setModalTransaction(false)
+      setModalPush(true)
     } catch (err) {
       setMessage({
         type: 'negative',
         header: 'Publication error',
         message: [err.message],
       })
-
+      setModalTransaction(false)
+      setModal(true)
       console.log(err.message)
-      console.log(mi)
-      console.log(targetRegistry)
-      console.log(targetStorages)
     } finally {
     }
   }
@@ -414,18 +422,43 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
 
   return (
     <div className={styles.wrapper}>
+      {message ? (
+        <Modal
+          visible={isModal}
+          title={message.header}
+          content={
+            <div className={styles.modalDefaultContent}>
+              {message.message.map((m, i) => (
+                <p key={i} style={{ overflowWrap: 'break-word' }}>
+                  {m === `Cannot read properties of null (reading 'length')`
+                    ? 'Please fill in the empty fields'
+                    : m}
+                </p>
+              ))}
+              <button
+                onClick={() => onClose()}
+                className={styles.modalDefaultContentButton}
+              >
+                Push Changes again
+              </button>
+            </div>
+          }
+          footer={''}
+          onClose={() => onClose()}
+        />
+      ) : null}
       {!isNotNullCurrentAccount ? (
         owner ? (
           <Modal
             visible={true}
             title={'The wrong wallet'}
             content={
-              <>
+              <div className={styles.modalDefaultContent}>
                 <p>Change account to {owner}</p>
 
                 <br />
                 <p> Connect a new wallet</p>
-              </>
+              </div>
             }
             footer={''}
             onClose={() => setUnderConstructionDetails(false)}
@@ -435,7 +468,10 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
             visible={true}
             title={'Wallet is not connected'}
             content={
-              'You can not deploy a module without a wallet. Connect a new wallet'
+              <div className={styles.modalDefaultContent}>
+                You can not deploy a module without a wallet. Connect a new
+                wallet
+              </div>
             }
             footer={''}
             onClose={() => setUnderConstructionDetails(false)}
@@ -647,7 +683,9 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
         </button>
         <button
           disabled={isDisabledPush}
-          onClick={() => saveChanges()}
+          onClick={() => {
+            saveChanges()
+          }}
           className={cn(styles.push, {
             [styles.pushDisabled]: isDisabledPush,
           })}
@@ -655,6 +693,36 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
           Push changes
         </button>
       </div>
+      <Modal
+        visible={isModalPush}
+        title="Сhanges were accepted"
+        content={
+          <div className={styles.modalDefaultContent}>
+            Your dapplet has been updated
+            <button
+              onClick={() => {
+                setUnderConstructionDetails(false)
+                setShowChildrenUnderConstraction(true)
+              }}
+              className={styles.modalDefaultContentButton}
+            >
+              OK
+            </button>
+          </div>
+        }
+        footer={''}
+        onClose={() => {
+          setUnderConstructionDetails(false)
+          setShowChildrenUnderConstraction(true)
+        }}
+      />
+      <Modal
+        visible={isModalTransaction}
+        title="Transaction confirmation"
+        content={<div className={styles.modalDefaultContent}></div>}
+        footer={''}
+        onClose={() => {}}
+      />
     </div>
   )
 }
