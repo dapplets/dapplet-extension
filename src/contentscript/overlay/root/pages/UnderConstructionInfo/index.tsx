@@ -31,6 +31,8 @@ import {
   StorageTypes,
 } from '../../../../../common/constants'
 import './valid.scss'
+import { Modal } from '../../components/Modal'
+import { Icon, List, Message } from 'semantic-ui-react'
 
 enum DeploymentStatus {
   Unknown,
@@ -133,7 +135,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     return () => {
       _isMounted = false
     }
-  }, [mi, st])
+  }, [mi, st, targetChain])
   const addButtonClickHandler = () => {
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.push(newAuthorObject)
@@ -252,9 +254,9 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
-    if (mode === FormMode.Creating) {
-      await _updateCurrentAccount()
-    }
+    // if (mode === FormMode.Creating) {
+    await _updateCurrentAccount()
+    // }
   }
 
   const _updateCurrentAccount = async () => {
@@ -365,21 +367,39 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     !currentAccount ||
     currentAccount === '0x0000000000000000000000000000000000000000'
   )
+  const isNotWalletPaired = !isNotNullCurrentAccount && !!owner
   const isNotAnOwner =
     !!owner &&
     isNotNullCurrentAccount &&
     owner.toLowerCase() !== currentAccount.toLowerCase()
   const isAlreadyDeployed =
     !message && deploymentStatus === DeploymentStatus.Deployed
-
-  const isManifestValid = mi?.name && mi?.title && mi?.type
   const isNewModule = deploymentStatus === DeploymentStatus.NewModule
-
   const isNotTrustedUser =
     isNotNullCurrentAccount &&
     !trustedUsers.find(
       (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
     )
+  const isDependenciesExist =
+    dependenciesChecking && dependenciesChecking.length > 0
+      ? dependenciesChecking.every((x) => x.isExists === true)
+      : true
+  const isDependenciesLoading =
+    dependenciesChecking && dependenciesChecking.length > 0
+      ? dependenciesChecking.every((x) => x.isExists === undefined)
+      : false
+  const isManifestValid = mi?.name && mi?.title && mi?.type
+  const isDeployButtonDisabled =
+    loading ||
+    deploymentStatus === DeploymentStatus.Deployed ||
+    !isNotNullCurrentAccount ||
+    isNotAnOwner ||
+    isNoStorage ||
+    isDependenciesLoading ||
+    !isDependenciesExist ||
+    !isManifestValid
+  const isReuploadButtonDisabled =
+    !isAlreadyDeployed || mode === FormMode.Creating || !vi
 
   const onChange = (e) => {
     const files = e.target.files
@@ -394,88 +414,35 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
 
   return (
     <div className={styles.wrapper}>
-      {/* {message ? (
-        <Message
-          positive={message.type === 'positive'}
-          negative={message.type === 'negative'}
-        >
-          <Message.Header>{message.header}</Message.Header>
-          {message.message.map((m, i) => (
-            <p key={i} style={{ overflowWrap: 'break-word' }}>
-              {m}
-            </p>
-          ))}
-        </Message>
+      {!isNotNullCurrentAccount ? (
+        owner ? (
+          <Modal
+            visible={true}
+            title={'The wrong wallet'}
+            content={
+              <>
+                <p>Change account to {owner}</p>
+
+                <br />
+                <p> Connect a new wallet</p>
+              </>
+            }
+            footer={''}
+            onClose={() => setUnderConstructionDetails(false)}
+          />
+        ) : (
+          <Modal
+            visible={true}
+            title={'Wallet is not connected'}
+            content={
+              'You can not deploy a module without a wallet. Connect a new wallet'
+            }
+            footer={''}
+            onClose={() => setUnderConstructionDetails(false)}
+          />
+        )
       ) : null}
 
-      {isNotAnOwner ? (
-        <Message
-          error
-          header="Action Forbidden"
-          content={
-            <React.Fragment>
-              You can not deploy this module to the selected registry, because
-              are not the module's owner.
-              <br />
-              Change account to {owner}
-            </React.Fragment>
-          }
-        />
-      ) : null}
-
-      {isAlreadyDeployed && vi ? (
-        <Message
-          warning
-          header="The Module Already Deployed"
-          content={
-            <React.Fragment>
-              This version of the module has already been deployed to the
-              selected registry. You can choose another registry or increment
-              the module version number.
-            </React.Fragment>
-          }
-        />
-      ) : null}
-
-      {isNewModule ? (
-        <Message
-          info
-          header="New Module"
-          content={
-            <>
-              This module will be published for the first time in the selected
-              registry.
-              {mi.contextIds && mi.contextIds.length > 0 ? (
-                <>
-                  <br />
-                  The following Context IDs will be added by default:
-                  <List as="ul" style={{ marginTop: '4px' }}>
-                    {mi.contextIds.map((x, i) => (
-                      <List.Item key={i} as="li">
-                        {x}
-                      </List.Item>
-                    ))}
-                  </List>
-                </>
-              ) : null}
-            </>
-          }
-        />
-      ) : null}
-
-      {isNotTrustedUser && deploymentStatus !== DeploymentStatus.Deployed ? (
-        <Message
-          info
-          header="Untrusted User"
-          content={
-            <>
-              Your account is not on the list of trusted users.
-              <br />
-              It will be added automatically when the module is deployed.
-            </>
-          }
-        />
-      ) : null} */}
       <div className={styles.mainInfoBlock}>
         <SettingWrapper
           className={styles.wrapperSettings}

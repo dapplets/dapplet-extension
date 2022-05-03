@@ -31,7 +31,8 @@ import {
   ModuleTypes,
   StorageTypes,
 } from '../../../../../common/constants'
-import { Icon, Message } from 'semantic-ui-react'
+// import { Icon, List, Message } from 'semantic-ui-react'
+import { Modal } from '../../components/Modal'
 
 // tracing.startTracing()
 
@@ -58,35 +59,13 @@ type DependencyChecking = {
   type: DependencyType
   isExists?: boolean
 }
-interface IIndexState {
-  originalMi: ModuleInfo
-  mi: ModuleInfo
-  vi: VersionInfo | null
-  dependenciesChecking: DependencyChecking[]
-  loading: boolean
-  targetRegistry: string
-  targetChain: ChainTypes
-  targetStorages: string[]
-  message: {
-    type: 'negative' | 'positive'
-    header: string
-    message: string[]
-  }
-  registryOptions: { key: string; value: string; text: string }[]
-  owner: string
-  currentAccount: string
-  newOwner: string
-  newOwnerLoading: boolean
-  newOwnerDone: boolean
-  editContextId: string
-  editContextIdLoading: boolean
-  editContextIdDone: boolean
-  deploymentStatus: DeploymentStatus
-  trustedUsers: { account: string }[]
-  swarmGatewayUrl: string
-  mode: FormMode
-  isSaving: boolean
+
+type Message = {
+  type: 'negative' | 'positive'
+  header: string
+  message: string[]
 }
+
 export interface UnderConstruction {
   setUnderConstruction: (x) => void
   // ModuleInfo: any
@@ -98,37 +77,30 @@ export const UnderConstruction: FC<UnderConstruction> = (
 ) => {
   const { setUnderConstruction } = props
   const bus = new Bus()
-  // const transferOwnershipModal = React.createRef<any>()
-  // const addContextIdModal = React.createRef<any>()
+  const transferOwnershipModal = React.createRef<any>()
+  const addContextIdModal = React.createRef<any>()
   const fileInputRef = React.createRef<HTMLInputElement>()
   // ???
   const [originalMi, setOriginalMi] = useState<ModuleInfo>(new ModuleInfo())
   // type - FEATURE
   const [mi, setMi] = useState<ModuleInfo>(new ModuleInfo())
-  // const [vi, setVi] = useState<VersionInfo>()
-  // const [dependenciesChecking, setDpendenciesChecking] =
-  //   useState<DependencyChecking[]>()
+  const [vi, setVi] = useState<VersionInfo>()
+  const [dependenciesChecking, setDpendenciesChecking] =
+    useState<DependencyChecking[]>()
   const [loading, setLoading] = useState(false)
   const [targetRegistry, setTargetRegistry] = useState(null)
-  const [targetChain, setTargetChain] = useState<ChainTypes>(
-    ChainTypes.ETHEREUM_GOERLI
-  )
-  const [message, setMessage] = useState(null)
+  const [targetChain, setTargetChain] = useState<ChainTypes>(null)
+  const [message, setMessage] = useState<Message>(null)
   // ???
   const [registryOptions, setRegistryOptions] = useState([])
-  // const [owner, setOwner] = useState(null)
+  const [owner, setOwner] = useState(null)
   // delete wallets
   // ??
   const [currentAccount, setCurrentAccount] = useState(null)
-  // const [newOwner, setNewOwner] = useState('')
-  // const [newOwnerLoading, setNewOwnerLoading] = useState(false)
-  // const [newOwnerDone, setNewOwnerDone] = useState(false)
-  // const [editContextId, setEditContextId] = useState('')
-  // const [editContextIdLoading, setEditContextIdLoading] = useState(false)
-  // const [editContextIdDone, setEditContextIdDone] = useState(false)
-  // const [deploymentStatus, setDeploymentStatus] = useState(
-  //   DeploymentStatus.Unknown
-  // )
+
+  const [deploymentStatus, setDeploymentStatus] = useState(
+    DeploymentStatus.Unknown
+  )
   const [trustedUsers, setTrustedUsers] = useState([])
   // ???
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
@@ -141,79 +113,19 @@ export const UnderConstruction: FC<UnderConstruction> = (
     StorageTypes.Sia,
     StorageTypes.Ipfs,
   ])
+  const [isModal, setModal] = useState(false)
+  const onClose = () => setModal(false)
 
   useEffect(() => {
     _isMounted = true
     const init = async () => {
-      // await _updateOwnership(),
       await _updateData()
-      // await _updateCurrentAccount(),
-      // await _updateDeploymentStatus(), await _checkDependencies()
-      console.log(mi)
-      // console.log(originalMi)
-
-      // console.log(vi)
-      console.log(mode)
     }
     init()
     return () => {
       _isMounted = false
     }
-  }, [mi])
-
-  bus.subscribe(
-    'data',
-    async ({ mi, vi }: { mi: ModuleInfo; vi: VersionInfo }) => {
-      const { getSwarmGateway } = await initBGFunctions(browser)
-      const swarmGatewayUrl = await getSwarmGateway()
-
-      if (
-        mi === null
-        //  && vi === null
-      ) {
-        // New module
-        const mi = new ModuleInfo()
-        setOriginalMi(JSON.parse(JSON.stringify(mi)))
-        setMi(mi)
-        setLoading(false)
-        setSwarmGatewayUrl(swarmGatewayUrl)
-        setMode(FormMode.Creating)
-
-        // await _updateData()
-        // }
-        //  else {
-        // Deploy module
-        // const dependencies = vi?.dependencies
-        //   ? Object.entries(vi.dependencies).map(([name, version]) => ({
-        //       name: name,
-        //       version: version,
-        //       type: DependencyType.Dependency,
-        //     }))
-        //   : []
-        // const interfaces = vi?.interfaces
-        //   ? Object.entries(vi.interfaces).map(([name, version]) => ({
-        //       name: name,
-        //       version: version,
-        //       type: DependencyType.Interface,
-        //     }))
-        //   : []
-        // const dependenciesChecking = [...dependencies, ...interfaces]
-        // setOriginalMi(JSON.parse(JSON.stringify(mi)))
-        // setMi(mi)
-        // setVi(vi)
-        // setDpendenciesChecking(dependenciesChecking)
-        // setLoading(false)
-        // setSwarmGatewayUrl(swarmGatewayUrl)
-
-        //   Object.keys(vi?.overlays ?? {}).length > 0
-        //     ? [StorageTypes.Swarm, StorageTypes.Sia]
-        //     : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs],
-        // mode: FormMode.Deploying,
-
-        // await _updateData()
-      }
-    }
-  )
+  }, [mi, targetChain])
 
   // const _checkDependencies = async () => {
   //   const { getVersionInfo } = await initBGFunctions(browser)
@@ -231,6 +143,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
   // }
 
   const _updateData = async () => {
+    setLoading(true)
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
@@ -246,23 +159,9 @@ export const UnderConstruction: FC<UnderConstruction> = (
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-    // console.log(registries)
-    // console.log(trustedUsers)
-    // console.log(prodRegistries)
-    // console.log(targetChain)
-    console.log(mi)
-    if (mode === FormMode.Creating) {
-      // return Promise.all([_updateCurrentAccount()])
-      await _updateCurrentAccount()
-    }
-    // else {
-    //   return Promise.all([
-    //     // _updateOwnership(),
-    //     _updateCurrentAccount(),
-    //     // _updateDeploymentStatus(),
-    //     // _checkDependencies(),
-    //   ])
-    // }
+
+    await _updateCurrentAccount()
+    setLoading(false)
   }
 
   const _updateCurrentAccount = async () => {
@@ -272,6 +171,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
       targetChain
     )
     setCurrentAccount(currentAccount)
+
     // console.log(targetChain)
 
     // console.log(currentAccount)
@@ -301,48 +201,15 @@ export const UnderConstruction: FC<UnderConstruction> = (
   //   setDeploymentStatus(deploymentStatus)
   // }
 
-  const _transferOwnership = async (newAccount: string) => {
-    // setNewOwnerLoading(true)
-
-    const oldAccount = mi.author
-    const { transferOwnership } = await initBGFunctions(browser)
-    await transferOwnership(mi.registryUrl, mi.name, oldAccount, newAccount)
-    // setNewOwnerLoading(false)
-    // setNewOwnerDone(true)
-    // console.log(mi.author)
-  }
-
-  // const _addContextId = async (contextId: string) => {
-  //   setEditContextIdLoading(true)
-
-  //   const { addContextId } = await initBGFunctions(browser)
-  //   await addContextId(targetRegistry, mi.name, contextId)
-  //   setEditContextIdLoading(false)
-  //   setEditContextIdDone(true)
-  // }
-
-  // const _removeContextId = async (contextId: string) => {
-  //   setEditContextIdLoading(true)
-
-  //   const { removeContextId } = await initBGFunctions(browser)
-  //   await removeContextId(targetRegistry, mi.name, contextId)
-  //   setEditContextIdLoading(false)
-  //   setEditContextIdDone(true)
-  // }
-
   const deployButtonClickHandler = async () => {
-    // setLoading(true)
-
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
-    // const { mi, vi, targetRegistry, targetStorages, currentAccount, mode } =
-    //   this.state
 
     mi.registryUrl = targetRegistry
     mi.author = currentAccount
     mi.type = ModuleTypes.Feature
-    console.log(mi)
-    console.log('lala')
+
     try {
+      setLoading(true)
       const isNotNullCurrentAccount = !(
         !currentAccount ||
         currentAccount === '0x0000000000000000000000000000000000000000'
@@ -359,23 +226,24 @@ export const UnderConstruction: FC<UnderConstruction> = (
       const result =
         mode === FormMode.Creating &&
         (await deployModule(mi, null, targetStorages, targetRegistry))
-      // : await deployModule(mi, vi, targetStorages, targetRegistry)
+
       setMessage({
         type: 'positive',
         header: 'Module was deployed',
         message: [`Script URL: ${result.scriptUrl}`],
       })
-      // setDeploymentStatus(DeploymentStatus.NewModule)
+      setLoading(false)
       setUnderConstruction(false)
     } catch (err) {
+      setLoading(false)
       setMessage({
         type: 'negative',
         header: 'Publication error',
         message: [err.message],
       })
+      setModal(true)
       console.log([err])
     } finally {
-      // setLoading(false)
     }
   }
 
@@ -399,6 +267,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
         message: [err.message],
         // console.log();
       })
+      setModal(true)
     } finally {
       // setLoading(false)
     }
@@ -410,90 +279,44 @@ export const UnderConstruction: FC<UnderConstruction> = (
     await _updateData()
   }
 
-  const iconInputChangeHandler = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    // const s = this.state
-    const files = event.target.files
-    if (files.length > 0) {
-      const file = files[0]
-      const base64: string = await new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onload = () => resolve(reader.result as string)
-        reader.onerror = (error) => reject(error)
-      })
-      mi.icon = {
-        hash: null,
-        uris: [base64],
-      }
-    } else {
-      mi.icon = null
-    }
-    setMi(mi)
-    // console.log(mi)
-  }
-
-  const saveChanges = async () => {
-    try {
-      // isSawing(true)
-
-      const { editModuleInfo } = await initBGFunctions(browser)
-      await editModuleInfo(targetRegistry, targetStorages, mi)
-      // isSawing(false)
-      setOriginalMi(JSON.parse(JSON.stringify(mi)))
-    } catch (err) {
-      setMessage({
-        type: 'negative',
-        header: 'Publication error',
-        message: [err.message],
-      })
-
-      const { editModuleInfo } = await initBGFunctions(browser)
-      await editModuleInfo(targetRegistry, targetStorages, mi)
-      console.log(editModuleInfo, 'lll')
-
-      console.log(err.message)
-    } finally {
-      // isSawing(false)
-    }
-  }
-
   const isNoStorage = targetStorages.length === 0
   const isNotNullCurrentAccount = !(
     !currentAccount ||
     currentAccount === '0x0000000000000000000000000000000000000000'
   )
-  const isNotWalletPaired = !isNotNullCurrentAccount
-  // && !!owner
+  const isNotWalletPaired = !isNotNullCurrentAccount && !!owner
   const isNotAnOwner =
-    // !!owner &&
-    isNotNullCurrentAccount
-  //  &&
-  // owner.toLowerCase() !== currentAccount.toLowerCase()
-  // const isAlreadyDeployed =
-  //   !message && deploymentStatus === DeploymentStatus.Deployed
-  // const isNewModule = deploymentStatus === DeploymentStatus.NewModule
-  // const isNotTrustedUser =
-  //   isNotNullCurrentAccount &&
-  //   !trustedUsers.find(
-  //     (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
-  //   )
-
+    !!owner &&
+    isNotNullCurrentAccount &&
+    owner.toLowerCase() !== currentAccount.toLowerCase()
+  const isAlreadyDeployed =
+    !message && deploymentStatus === DeploymentStatus.Deployed
+  const isNewModule = deploymentStatus === DeploymentStatus.NewModule
+  const isNotTrustedUser =
+    isNotNullCurrentAccount &&
+    !trustedUsers.find(
+      (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
+    )
+  const isDependenciesExist =
+    dependenciesChecking && dependenciesChecking.length > 0
+      ? dependenciesChecking.every((x) => x.isExists === true)
+      : true
+  const isDependenciesLoading =
+    dependenciesChecking && dependenciesChecking.length > 0
+      ? dependenciesChecking.every((x) => x.isExists === undefined)
+      : false
   const isManifestValid = mi?.name && mi?.title && mi?.type
   const isDeployButtonDisabled =
     loading ||
-    // deploymentStatus === DeploymentStatus.Deployed ||
+    deploymentStatus === DeploymentStatus.Deployed ||
     !isNotNullCurrentAccount ||
     isNotAnOwner ||
     isNoStorage ||
-    // isDependenciesLoading ||
-    // !isDependenciesExist ||
+    isDependenciesLoading ||
+    !isDependenciesExist ||
     !isManifestValid
   const isReuploadButtonDisabled =
-    // !isAlreadyDeployed ||
-    mode === FormMode.Creating
-  //  || !vi
+    !isAlreadyDeployed || mode === FormMode.Creating
 
   const [miTitle, setMiTitle] = useState(mi.title)
   const [miName, setMiName] = useState(mi.name)
@@ -501,20 +324,77 @@ export const UnderConstruction: FC<UnderConstruction> = (
 
   return (
     <div className={styles.wrapper}>
-      {/* {!isNotNullCurrentAccount ? (
-        <Message
-          warning
-          header="Wallet is not connected"
+      {message ? (
+        <Modal
+          visible={isModal}
+          title={message.header}
           content={
-            <React.Fragment>
-              You can not deploy a module without a wallet.
-              <br />
-              Connect a new wallet{' '}
-              <Icon name="chain" link onClick={() => pairWallet()} />
-            </React.Fragment>
+            <>
+              {message.message.map((m, i) => (
+                <p key={i} style={{ overflowWrap: 'break-word' }}>
+                  {m === `Cannot read properties of null (reading 'length')`
+                    ? 'Please fill in the empty fields'
+                    : m}
+                </p>
+              ))}
+            </>
           }
+          footer={''}
+          onClose={() => onClose()}
         />
-      ) : null} */}
+      ) : null}
+
+      {!isNotNullCurrentAccount && !loading ? (
+        owner ? (
+          <Modal
+            visible={true}
+            title={'The wrong wallet'}
+            content={
+              <>
+                <p>Change account to {owner}</p>
+
+                <br />
+                <p> Connect a new wallet</p>
+              </>
+            }
+            footer={''}
+            onClose={() => setUnderConstruction(false)}
+          />
+        ) : (
+          <Modal
+            visible={true}
+            title={'Wallet is not connected'}
+            content={
+              'You can not deploy a module without a wallet. Connect a new wallet'
+            }
+            footer={''}
+            onClose={() => setUnderConstruction(false)}
+          />
+        )
+      ) : null}
+
+      {isNotAnOwner ? (
+        <Modal
+          visible={isModal}
+          title={'Action Forbidden'}
+          content={` You can not deploy this module to the selected registry, because
+           are not the module's owner.
+           
+           Change account to ${owner}`}
+          footer={''}
+          onClose={() => onClose()}
+        />
+      ) : null}
+
+      {isNewModule ? (
+        <Modal
+          visible={isModal}
+          title={'New Module'}
+          content={<></>}
+          footer={''}
+          onClose={() => onClose()}
+        />
+      ) : null}
 
       <div className={styles.mainInfoBlock}>
         <SettingWrapper
@@ -528,24 +408,10 @@ export const UnderConstruction: FC<UnderConstruction> = (
                 children={
                   <input
                     required
-                    // label="Module Name"
                     readOnly={mode === FormMode.Editing}
                     placeholder="Module ID like module_name.dapplet-base.eth"
-                    // value={miName ?? ''}
                     onChange={(e) => {
-                      // setMiName(e.target.value)
                       mi.name = e.target.value
-                      // console.log(mi)
-                      // console.log(originalMi)
-                      // // setMi()
-                      // // console.log()
-                      // console.log(trustedUsers)
-                      // console.log(targetRegistry)
-                      // console.log(targetChain)
-                      // setMiName(e.target.value)
-                      // if (vi) vi.name = e.target.value
-                      // setMi()
-                      // setVi(vi)
                     }}
                     className={styles.inputTitle}
                   />
@@ -559,11 +425,8 @@ export const UnderConstruction: FC<UnderConstruction> = (
                   <input
                     required
                     placeholder="A short name of your module"
-                    // value={miTitle ?? ''}
                     onChange={(e) => {
                       mi.title = e.target.value
-                      // setMiTitle(e.target.value)
-                      // setMiTitle(e.target.value)
                     }}
                     className={styles.inputTitle}
                   />
@@ -577,11 +440,8 @@ export const UnderConstruction: FC<UnderConstruction> = (
                   <input
                     required
                     placeholder="A small description of what your module does"
-                    // value={miDescription ?? ''}
                     onChange={(e) => {
                       mi.description = e.target.value
-                      // setMi(mi)
-                      // setMiDescription(e.target.value)
                     }}
                     className={styles.inputTitle}
                   />
@@ -605,38 +465,26 @@ export const UnderConstruction: FC<UnderConstruction> = (
           Back
         </button>
         <button
+          // disabled={mi.description === null && mi.title === null}
           onClick={() => {
             deployButtonClickHandler()
           }}
-          className={styles.push}
+          className={cn(styles.push, {
+            // [styles.pushDisabled]: mi.description === null && mi.title === null,
+          })}
         >
           Done
         </button>
       </div>
+      <Modal
+        visible={loading}
+        title={'Loading new Dapplet'}
+        content={
+          'This modal window will close automatically after successful change'
+        }
+        footer={''}
+        onClose={() => !loading}
+      />
     </div>
   )
 }
-
-// export interface MessageProps {
-//   title: string
-//   subtitle?: string
-//   link?: string
-// }
-
-// export const MessageNew = ({
-//   title,
-//   subtitle = '',
-//   link = '',
-// }: MessageProps): ReactElement => {
-//   return (
-//     <div className={styles.wrapper}>
-//       <h6 className={styles.title}>{title}</h6>
-//       {subtitle?.length > 0 && <p className={styles.subtitle}>{subtitle}</p>}
-//       {link?.length > 0 && (
-//         <a href={link} className={styles.link}>
-//           Go to store
-//         </a>
-//       )}
-//     </div>
-//   )
-// }

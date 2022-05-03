@@ -30,6 +30,8 @@ import {
   ModuleTypes,
   StorageTypes,
 } from '../../../../../common/constants'
+import { Icon, List, Message } from 'semantic-ui-react'
+import { Modal } from '../../components/Modal'
 
 tracing.startTracing()
 
@@ -148,17 +150,22 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const fileInput = useRef<HTMLInputElement>()
   const [st, setSt] = useState([])
   const [isDisabledPush, setDisabledPush] = useState(true)
+  const [isDisabledAddOwner, setDisabledAddOwner] = useState(false)
 
   useEffect(() => {
     _isMounted = true
     const init = async () => {
       await _updateData()
+
+      // await _updateCurrentAccount()
+      console.log(currentAccount)
+      console.log(targetChain)
     }
     init()
     return () => {
       _isMounted = false
     }
-  }, [mi, st])
+  }, [mi, st, targetChain])
   bus.subscribe(
     'data',
     async ({ mi, vi }: { mi: ModuleInfo; vi: VersionInfo }) => {
@@ -241,16 +248,19 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
-    if (mode === FormMode.Creating) {
-      await _updateCurrentAccount()
-    }
+    // if (mode === FormMode.Creating) {
+
+    await _updateCurrentAccount()
+    // }
   }
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
+
     const currentAccount = await getAddress(
       DefaultSigners.EXTENSION,
       targetChain
     )
+
     setCurrentAccount(currentAccount)
   }
   const _updateOwnership = async () => {
@@ -280,10 +290,18 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
   const _transferOwnership = async (newAccount: string) => {
     setNewOwnerLoading(true)
+    try {
+      const oldAccount = mi.author
+      const { transferOwnership } = await initBGFunctions(browser)
+      await transferOwnership(targetRegistry, mi.name, newAccount, oldAccount)
 
-    const oldAccount = mi.author
-    const { transferOwnership } = await initBGFunctions(browser)
-    await transferOwnership(targetRegistry, mi.name, newAccount, oldAccount)
+      setDappletsDetail(false)
+    } catch (error) {
+      console.log('err', error)
+      setDisabledAddOwner(true)
+
+      console.log(isDisabledAddOwner)
+    }
     setNewOwnerLoading(false)
     setNewOwnerDone(true)
     console.log(mi.registryUrl)
@@ -416,11 +434,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
         header: 'Publication error',
         message: [err.message],
       })
-
-      console.log(err.message)
-      console.log(mi)
-      console.log(targetRegistry)
-      console.log(targetStorages)
     } finally {
     }
   }
@@ -442,14 +455,14 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     !trustedUsers.find(
       (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
     )
-  // const isDependenciesExist =
-  //   dependenciesChecking.length > 0
-  //     ? dependenciesChecking.every((x) => x.isExists === true)
-  //     : true
-  // const isDependenciesLoading =
-  //   dependenciesChecking.length > 0
-  //     ? dependenciesChecking.every((x) => x.isExists === undefined)
-  //     : false
+  const isDependenciesExist =
+    dependenciesChecking && dependenciesChecking.length > 0
+      ? dependenciesChecking.every((x) => x.isExists === true)
+      : true
+  const isDependenciesLoading =
+    dependenciesChecking && dependenciesChecking.length > 0
+      ? dependenciesChecking.every((x) => x.isExists === undefined)
+      : false
   const isManifestValid = mi?.name && mi?.title && mi?.type
   const isDeployButtonDisabled =
     loading ||
@@ -457,21 +470,18 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     !isNotNullCurrentAccount ||
     isNotAnOwner ||
     isNoStorage ||
-    // isDependenciesLoading ||
-    // !isDependenciesExist ||
+    isDependenciesLoading ||
+    !isDependenciesExist ||
     !isManifestValid
   const isReuploadButtonDisabled =
     !isAlreadyDeployed || mode === FormMode.Creating || !vi
 
   const onChange = (e) => {
     const files = e.target.files
-    // console.log(files)
+
     const filesArr = Array.prototype.slice.call(files)
-    // console.log(filesArr)
-    setSt([
-      // ...files,
-      ...filesArr,
-    ])
+
+    setSt([...filesArr])
   }
 
   const [author, setAuthor] = useState({ authorForm: [] })
@@ -492,6 +502,60 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
   return (
     <div className={styles.wrapper}>
+      {!isNotNullCurrentAccount ? (
+        owner ? (
+          <Modal
+            visible={true}
+            title={'The wrong wallet'}
+            content={
+              <>
+                <p>Change account to {owner}</p>
+
+                <br />
+                <p> Connect a new wallet</p>
+              </>
+            }
+            footer={''}
+            onClose={() => setDappletsDetail(false)}
+          />
+        ) : (
+          // {/* <Message
+          //   warning
+          //   header="The wrong wallet"
+          //   content={
+          //     <React.Fragment>
+          //       Change account to {owner}
+          //       <br />
+          //       Connect a new wallet{' '}
+          //       <Icon name="chain" link onClick={() => pairWallet()} />
+          //     </React.Fragment>
+          //   }
+          // /> */}
+
+          <Modal
+            visible={true}
+            title={'Wallet is not connected'}
+            content={
+              'You can not deploy a module without a wallet. Connect a new wallet'
+            }
+            footer={''}
+            onClose={() => setDappletsDetail(false)}
+          />
+          // {/* <Message
+          //   warning
+          //   header="Wallet is not connected"
+          //   content={
+          //     <React.Fragment>
+          //       You can not deploy a module without a wallet.
+          //       <br />
+          //       Connect a new wallet{' '}
+          //       <Icon name="chain" link onClick={() => pairWallet()} />
+          //     </React.Fragment>
+          //   }
+          // /> */}
+        )
+      ) : null}
+
       <div className={styles.mainInfoBlock}>
         <SettingWrapper
           className={styles.wrapperSettings}
@@ -585,17 +649,18 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                   <div className={styles.inputOwnershipBlock}>
                     <input
                       value={newOwner}
-                      className={styles.inputOwnership}
+                      className={cn(styles.inputOwnership, {
+                        [styles.inputOwnershipInvalid]: isDisabledAddOwner,
+                      })}
                       placeholder={mi.author || 'New owner adress'}
                       onChange={(e) => {
                         setNewOwner(e.target.value)
-                        // console.log(newOwner)
+                        setDisabledAddOwner(false)
                       }}
                     />
-                    {/* {owner &&
-                    owner?.toLowerCase() === currentAccount?.toLowerCase() ? ( */}
+
                     <button
-                      disabled={newOwnerLoading || newOwnerDone || !newOwner}
+                      // disabled={newOwnerLoading || newOwnerDone || !newOwner}
                       onClick={() => {
                         _transferOwnership(newOwner)
                         console.log(newOwner)
@@ -604,7 +669,15 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     >
                       Change
                     </button>
-                    {/* ) : null} */}
+                    <Modal
+                      visible={newOwnerLoading}
+                      title={'Loading new Owner'}
+                      content={
+                        'This modal window will close automatically after successful change'
+                      }
+                      footer={''}
+                      onClose={() => !newOwnerLoading}
+                    />
                   </div>
                 }
               />

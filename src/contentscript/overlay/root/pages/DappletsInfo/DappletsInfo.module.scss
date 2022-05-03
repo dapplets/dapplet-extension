@@ -291,6 +291,10 @@
 
   color: $MainGrey;
 }
+.inputOwnershipInvalid {
+  border: 1px solid #ff6442;
+  color: #ff6442;
+}
 
 .ownershipButton {
   display: flex;

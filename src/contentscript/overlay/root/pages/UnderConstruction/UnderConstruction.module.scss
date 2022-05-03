@@ -450,6 +450,16 @@
     color: $PrimaryPressed;
   }
 }
+.pushDisabled {
+  cursor: default;
+  color: $MainGrey;
+  &:hover {
+    color: $MainGrey;
+  }
+  &:active {
+    color: $MainGrey;
+  }
+}
 
 // .wrapper {
 //   width: 100%;
