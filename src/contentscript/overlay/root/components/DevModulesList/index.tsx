@@ -66,7 +66,7 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
         setDataUri(uris[0])
       } else {
         const { getResource } = await initBGFunctions(browser)
-        console.log(storageRef)
+        // console.log(storageRef)
 
         if (
           storageRef.hash !==
@@ -85,7 +85,7 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
     return () => {
       _isMounted = false
     }
-  }, [])
+  })
   return (
     <div className={cn(styles.dappletsImg, className)}>
       {dataUri ? <img src={dataUri} /> : <span className={styles.noLogo} />}
@@ -106,6 +106,8 @@ interface PropsDeveloper {
   isUnderConstructionDetails: boolean
   setUnderConstructionDetails: (x) => void
   // deployButtonClickHandler?: () => void
+  setLoadingDeploy?: (x) => void
+  isLoadingDeploy?: boolean
 }
 export const DevModule: FC<PropsDeveloper> = (props) => {
   const {
@@ -118,6 +120,8 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     isUnderConstructionDetails,
     setUnderConstructionDetails,
     // deployButtonClickHandler,
+    setLoadingDeploy,
+    isLoadingDeploy,
   } = props
   // const [dapDet, onDappletsDetails] = useState(isDappletsDetails)
   const nodes = new Map<string, any>()
@@ -141,6 +145,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const [dependenciesChecking, setDpendenciesChecking] = useState<
     DependencyChecking[]
   >([])
+  // const [isLoadingDeploy, setLoadingDeploy] = useState(false)
 
   useEffect(() => {
     _isMounted = true
@@ -153,7 +158,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     return () => {
       _isMounted = false
     }
-  })
+  }, [targetChain, currentAccount])
   modules.forEach((x) => {
     nodes.set(
       x.versions[0]
@@ -212,43 +217,48 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
+    console.log(currentAccount)
+    console.log(targetChain)
 
-    await _updateCurrentAccount()
-
-    // if (mode === FormMode.Creating) {
     // await _updateCurrentAccount()
-    // } else {
-    //   return Promise.all([
-    //     _updateOwnership(),
-    //     _updateCurrentAccount(),
-    //     _updateDeploymentStatus(),
-    //     _checkDependencies(),
-    //   ])
-    // }
+
+    if (mode === FormMode.Creating) {
+      await _updateCurrentAccount()
+    } else {
+      return Promise.all([
+        _updateOwnership(),
+        _updateCurrentAccount(),
+        _updateDeploymentStatus(),
+        _checkDependencies(),
+      ])
+    }
+    console.log(currentAccount)
   }
   const _updateOwnership = async () => {
     const { getOwnership } = await initBGFunctions(browser)
-    const owner = await getOwnership(targetRegistry, mi.name)
+    const owner = await getOwnership(targetRegistry)
+    // console.log('owner', owner)
+    // console.log('name', mi.name)
+    // console.log('targetRegistry', targetRegistry)
     setOwner(owner)
   }
-  // const _updateDeploymentStatus = async () => {
-  //   // const s = this.state
-  //   setDeploymentStatus(DeploymentStatus.NewModule)
+  const _updateDeploymentStatus = async () => {
+    setDeploymentStatus(DeploymentStatus.Unknown)
 
-  //   const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(
-  //     browser
-  //   )
-  //   const miF = await getModuleInfoByName(targetRegistry, mi.name)
-  //   const deployed = vi
-  //     ? await getVersionInfo(targetRegistry, miF.name, vi.branch, vi.version)
-  //     : true
-  //   const deploymentStatus = !miF
-  //     ? DeploymentStatus.NewModule
-  //     : deployed
-  //     ? DeploymentStatus.Deployed
-  //     : DeploymentStatus.NotDeployed
-  //   setDeploymentStatus(deploymentStatus)
-  // }
+    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(
+      browser
+    )
+    const miF = await getModuleInfoByName(targetRegistry, mi.name)
+    const deployed = vi
+      ? await getVersionInfo(targetRegistry, mi.name, vi.branch, vi.version)
+      : true
+    const deploymentStatus = !miF
+      ? DeploymentStatus.NewModule
+      : deployed
+      ? DeploymentStatus.Deployed
+      : DeploymentStatus.NotDeployed
+    setDeploymentStatus(deploymentStatus)
+  }
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
     const currentAccount = await getAddress(
@@ -257,32 +267,37 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     )
     setCurrentAccount(currentAccount)
     // setLoading(false)
-    // console.log(targetChain)
+    console.log(targetChain)
 
-    // console.log(currentAccount)
+    console.log(currentAccount)
   }
-  // const _checkDependencies = async () => {
-  //   const { getVersionInfo } = await initBGFunctions(browser)
-  //   // const { dependenciesChecking } = dependenciesChecking
-  //   // const {targetRegistry} = targetRegistry
-  //   // await Promise.all(
-  //   dependenciesChecking.map((x) =>
-  //     getVersionInfo(
-  //       targetRegistry,
-  //       x.name,
-  //       DEFAULT_BRANCH_NAME,
-  //       x.version
-  //     ).then((y) => (x.isExists = !!y))
-  //   )
-  //   // )
-  // }
+  const _checkDependencies = async () => {
+    const { getVersionInfo } = await initBGFunctions(browser)
+    // const { dependenciesChecking } = dependenciesChecking
+    // const {targetRegistry} = targetRegistry
+    // await Promise.all(
+    // setDpendenciesChecking(dependenciesChecking=deps)
+    // const { dependenciesChecking: deps, targetRegistry } = this.state
+    // DependencyChecking[]>
+    await Promise.all(
+      dependenciesChecking.map((x) =>
+        getVersionInfo(
+          targetRegistry,
+          x.name,
+          DEFAULT_BRANCH_NAME,
+          x.version
+        ).then((y) => (x.isExists = !!y))
+      )
+    )
+  }
 
-  const deployButtonClickHandler = async () => {
+  const deployButtonClickHandler = async (vi) => {
+    setLoadingDeploy(true)
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
 
     mi.registryUrl = targetRegistry
     mi.author = currentAccount
-    mi.type = ModuleTypes.Feature
+    // mi.type = ModuleTypes.Feature
     console.log(targetRegistry)
     console.log(currentAccount)
     console.log(vi)
@@ -311,7 +326,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     } catch (err) {
       console.log(err)
     } finally {
-      // setModalTransaction(false)
+      setLoadingDeploy(false)
     }
   }
 
@@ -338,7 +353,10 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 m.versions[0] &&
                 m.versions[0].branch &&
                 m.versions[0].branch !== 'default' && (
-                  <div className={styles.dappletsBranch}>
+                  <div
+                    style={{ margin: '0 3px 0 0px' }}
+                    className={styles.dappletsBranch}
+                  >
                     {m.versions[0].branch}
                   </div>
                 )}
@@ -403,12 +421,20 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 <button
                   onClick={() => {
                     // if () {
-                    m.isDeployed?.[0] === false && deployButtonClickHandler()
+                    m.isDeployed?.[0] === false &&
+                      deployButtonClickHandler(m.versions[0])
                     // }
                   }}
-                  className={styles.dappletsReupload}
+                  className={cn(styles.dappletsReupload, {
+                    [styles.dappletsIsLoadingDeploy]: isLoadingDeploy,
+                  })}
                 >
-                  {m.isDeployed?.[0] === false ? 'Deploy' : 'Reupload'}
+                  {isLoadingDeploy
+                    ? 'Deploing...'
+                    : m.isDeployed?.[0] === false
+                    ? 'Deploy'
+                    : 'Reupload'}
+                  {/* {} */}
                 </button>
               )}
             </div>

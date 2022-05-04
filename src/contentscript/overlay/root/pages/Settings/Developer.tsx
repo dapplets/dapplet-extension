@@ -54,6 +54,7 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [dataUri, setDataUri] = useState(null)
   const [isLoadButton, setLoadButton] = useState(false)
+  const [isLoadingDeploy, setLoadingDeploy] = useState(false)
 
   const {
     isDappletsDetails,
@@ -180,10 +181,10 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
   const groupedModules2 = groupBy(modules, (x) => x.module.isUnderConstruction)
 
-  console.log(modules)
-  console.log(registries)
-  console.log(groupedModules)
-  console.log('uk', groupedModules2)
+  console.log(modules, 'modules')
+  // console.log(registries)
+  // console.log(groupedModules)
+  // console.log('uk', groupedModules2)
 
   const handleClear = () => {
     setRegistryInput('')
@@ -254,12 +255,18 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                       {modules.length > 0 &&
                         Object.entries(groupedModules).map(
                           ([registryUrl, modules]) => (
-                            <div key={registryUrl}>
+                            <div
+                              key={registryUrl + i}
+                              onClick={() => console.log(registryUrl)}
+                            >
                               {modules.length > 0 && registryUrl === r.url && (
                                 <DevModule
                                   // deployButtonClickHandler={
                                   //   deployButtonClickHandler
                                   // }
+
+                                  isLoadingDeploy={isLoadingDeploy}
+                                  setLoadingDeploy={setLoadingDeploy}
                                   isDappletsDetails={isDappletsDetails}
                                   setDappletsDetail={setDappletsDetail}
                                   modules={modules}
