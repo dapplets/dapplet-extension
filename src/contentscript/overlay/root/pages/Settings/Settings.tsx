@@ -537,6 +537,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       // })}
                       onBlur={() => {
                         setDynamicAdapterInputError(null)
+                        if (dynamicAdapterInput.length === 0) {
+                          getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                        }
                       }}
                       onSubmit={(e) => {
                         e.preventDefault()
@@ -648,7 +651,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       <form
                         style={{ width: '100%' }}
                         onBlur={
-                          () => setProviderInputError(null)
+                          () => {
+                            setProviderInputError(null)
+                            if (providerInput.length === 0) {
+                              getDefaultValueProvider(providerInput)
+                            }
+                          }
                           // !(
                           //   providerLoading ||
                           //   !providerEdited ||
@@ -714,6 +722,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         style={{ width: '100%' }}
                         onBlur={() => {
                           setSwarmGatewayInputError(null)
+                          if (swarmGatewayInput.length === 0) {
+                            getDefaultValueSwarmGateway(swarmGatewayInput)
+                          }
                           // !(
                           //   swarmGatewayLoading ||
                           //   !swarmGatewayEdited ||
@@ -778,6 +789,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         style={{ width: '100%' }}
                         onBlur={() => {
                           setSwarmPostageStampIdInputError(null)
+                          if (swarmPostageStampIdInput.length === 0) {
+                            getDefaultValueSwarmPostageStampId(
+                              swarmPostageStampIdInput
+                            )
+                          }
+                          // if (!isValidPostageStampId(swarmPostageStampIdInput)) {
+                          //   setSiaPortalInput('')
+                          // }
                           // !swarmPostageStampIdLoading ||
                           //   !!swarmPostageStampIdInputEdited ||
                           //   (!!isValidPostageStampId(
@@ -797,7 +816,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                             setSwarmPostageStampIdInputError(
                               'Enter valid Swarm Postage Stamp ID'
                             )
-                            setSwarmPostageStampIdInput('')
+                            // setSwarmPostageStampIdInput('')
                           }
                         }}
                       >
@@ -853,7 +872,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         onBlur={() => {
                           setIpfsGatewayInputError(null)
                           if (!isValidHttp(ipfsGatewayInput)) {
-                            setSiaPortalInput('')
+                            setIpfsGatewayInput('')
+                          }
+                          if (ipfsGatewayInput.length === 0) {
+                            getDefaultValueIpfsGateway(ipfsGatewayInput)
                           }
                         }}
                         onFocus={() => {
@@ -915,6 +937,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           setSiaPortalInputError(null)
                           if (!isValidHttp(siaPortalInput)) {
                             setSiaPortalInput('')
+                          }
+                          if (siaPortalInput.length === 0) {
+                            getDefaultValueSiaPortal(siaPortalInput)
                           }
                         }}
                         onFocus={() => {

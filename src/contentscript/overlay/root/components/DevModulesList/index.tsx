@@ -66,6 +66,8 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
         setDataUri(uris[0])
       } else {
         const { getResource } = await initBGFunctions(browser)
+        console.log(storageRef)
+
         if (
           storageRef.hash !==
             '0x0000000000000000000000000000000000000000000000000000000000000000' ||
@@ -83,7 +85,7 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
     return () => {
       _isMounted = false
     }
-  })
+  }, [])
   return (
     <div className={cn(styles.dappletsImg, className)}>
       {dataUri ? <img src={dataUri} /> : <span className={styles.noLogo} />}
@@ -120,7 +122,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   // const [dapDet, onDappletsDetails] = useState(isDappletsDetails)
   const nodes = new Map<string, any>()
   const [mi, setMi] = useState<ModuleInfo>(modules[0].module)
-  const [vi, setVi] = useState<VersionInfo>()
+  const [vi, setVi] = useState<VersionInfo>(modules[0].versions[0])
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [currentAccount, setCurrentAccount] = useState(null)
   const [trustedUsers, setTrustedUsers] = useState([])
@@ -283,6 +285,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     mi.type = ModuleTypes.Feature
     console.log(targetRegistry)
     console.log(currentAccount)
+    console.log(vi)
 
     try {
       // setModalTransaction(true)
@@ -299,15 +302,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         await addTrustedUser(currentAccount.toLowerCase())
       }
 
-      // setMessage({
-      //   type: 'positive',
-      //   header: 'Module was deployed',
-      //   message: [`Script URL: ${result.scriptUrl}`],
-      // })
-      // setModalTransaction(false)
-      // setModalEndCreation(true)
-      // setDeploymentStatus(DeploymentStatus.Deployed)
-
       const result =
         mode === FormMode.Creating
           ? await deployModule(mi, null, targetStorages, targetRegistry)
@@ -315,12 +309,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
       setDeploymentStatus(DeploymentStatus.Deployed)
     } catch (err) {
-      // setMessage({
-      //   type: 'negative',
-      //   header: 'Publication error',
-      //   message: [err.message],
-      // })
-      // setModal(true)
       console.log(err)
     } finally {
       // setModalTransaction(false)

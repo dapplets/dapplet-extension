@@ -446,7 +446,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
                 children={
                   <input
                     required
-                    placeholder="A short name of your module"
+                    placeholder="A public name of your module"
                     onChange={(e) => {
                       mi.title = e.target.value
                       if (mi.title.length < 2) {
