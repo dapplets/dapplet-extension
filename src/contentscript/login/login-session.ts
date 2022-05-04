@@ -47,7 +47,7 @@ export class LoginSession {
         this.logoutHandler?.call({}, ls);
     }
 
-    async wallet(): Promise<ConnectedWalletAccount | IEtherneumWallet> {
+    async wallet(): Promise<any> {
         if (!await this.isValid()) return null;
         return this._getWalletObject();
     }
@@ -82,7 +82,7 @@ export class LoginSession {
         return clearSessionItems(this.sessionId);
     }
 
-    private async _getWalletObject(): Promise<ConnectedWalletAccount | IEtherneumWallet> {
+    private async _getWalletObject() {
         if (this._network === 'ethereum') {
             // ToDo: events def
             return ethereum.createWalletConnection(this.moduleName, { network: this._chain });

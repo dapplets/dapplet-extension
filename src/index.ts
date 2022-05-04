@@ -1,6 +1,8 @@
-import Core from './contentscript/core';
+import Core, { IEthWallet, INearWallet } from './contentscript/core';
 import { IContentAdapter, IFeature, IResolver, ISharedState } from './contentscript/types';
 import { IConnection, Listener } from './contentscript/connection';
+import { IEtherneumWallet } from './contentscript/ethereum/types';
+import { ConnectedWalletAccount } from "near-api-js";
 
 declare global {
     export function Injectable(constructor: Function);
@@ -14,5 +16,9 @@ export {
     IResolver,
     IConnection,
     Listener,
-    ISharedState
+    ISharedState,
+    IEthWallet,
+    INearWallet,
+    IEtherneumWallet,
+    ConnectedWalletAccount
 }

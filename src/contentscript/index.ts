@@ -6,9 +6,8 @@ import { OverlayManagerIframe } from './overlay/iframe/overlayManager';
 import { OverlayManager } from './overlay/root/overlayManager';
 import { IOverlay } from './overlay/interfaces';
 import { assertFullfilled, tryParseBase64Payload, parseModuleName, timeoutPromise, parseShareLink, ShareLinkPayload } from '../common/helpers';
-import { CONTEXT_ID_WILDCARD } from '../common/constants';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { SystemOverlayTabs } from '../common/types';
+import { SystemOverlayTabs, DefaultSigners } from '../common/types';
 import { GLOBAL_EVENT_BUS_NAME } from '../common/chrome-extension-websocket-wrapper/constants';
 import * as EventBus from "../common/global-event-bus";
 
@@ -121,7 +120,7 @@ if (!IS_OVERLAY_IFRAME) {
         });
 
         jsonrpc.on('pairWalletViaOverlay', () => {
-            return initBGFunctions(browser).then(x => x.pairWalletViaOverlay(null));
+            return initBGFunctions(browser).then(x => x.pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null));
         });
 
         jsonrpc.on('getWalletDescriptors', () => {

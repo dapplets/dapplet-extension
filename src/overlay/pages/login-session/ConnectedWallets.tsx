@@ -81,13 +81,6 @@ export class ConnectedWallets extends React.Component<Props, State> {
         }
     }
 
-    async pairWallet() {
-        const chains = this.props.data.loginRequest.authMethods;
-        const { pairWalletViaOverlay } = await initBGFunctions(browser);
-        await pairWalletViaOverlay(chains);
-        await this.loadData();
-    }
-
     render() {
         const p = this.props,
               s = this.state;
