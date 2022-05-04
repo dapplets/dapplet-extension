@@ -41,7 +41,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
     isTokenomics,
     setActiveTabUnderConstructionDetails,
   } = props
-  const [distributed, onDistributed] = useState('0%')
+  let sumQuantity = 0
+  const [distributed, onDistributed] = useState(`${sumQuantity}%`)
   const newCustomPoolObject = {
     customPool: '2141234124',
   }
@@ -60,14 +61,24 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const [recepient, setRecepient] = useState({ userID: '' })
   const [condition, setCondition] = useState({ condition: '' })
   const node = useRef<HTMLDivElement>()
-  useEffect(
-    () => {
-      console.log(items)
-    },
-    [
-      // name, pool, items, itemsRecepientForm, recepient
-    ]
-  )
+
+  useEffect(() => {
+    console.log(items)
+
+    if (items && items.items) {
+      for (let i = 0; i < items.items.length; i++) {
+        sumQuantity += +items.items[i].pool!
+      }
+
+      console.log(sumQuantity)
+    }
+    console.log(newCustomPool, 'custom pool')
+  }, [
+    sumQuantity,
+    items,
+    newCustomPool,
+    // name, pool, items, itemsRecepientForm, recepient
+  ])
   const booleanNode = node.current?.classList.contains('valid')
   const Num = useMemo(() => {}, [])
 
@@ -145,6 +156,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
     setCondition({ condition: '' })
     setItems(newCustomPoolForm)
   }
+
   return (
     <div className={styles.wrapper}>
       {isTokenomics ? (
@@ -161,7 +173,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
               <div className={styles.customPoolDistributed}>
                 <div className={styles.customPoolLabel}>Distributed</div>
                 <span className={styles.customLabelDistributed}>
-                  {distributed}
+                  {sumQuantity}
                 </span>
               </div>
               {items.items.length !== 0 && (
@@ -201,7 +213,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
               <div className={styles.customPooNewDistributed}>
                 <div className={styles.customPoolLabel}>You Use</div>
                 <span className={styles.customLabelDistributed}>
-                  {distributed}
+                  {sumQuantity}
                 </span>
               </div>
               {items.items.length !== 0 && (

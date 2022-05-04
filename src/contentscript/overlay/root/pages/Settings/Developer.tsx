@@ -257,6 +257,9 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                             <div key={registryUrl}>
                               {modules.length > 0 && registryUrl === r.url && (
                                 <DevModule
+                                  // deployButtonClickHandler={
+                                  //   deployButtonClickHandler
+                                  // }
                                   isDappletsDetails={isDappletsDetails}
                                   setDappletsDetail={setDappletsDetail}
                                   modules={modules}

@@ -11,11 +11,44 @@ import cn from 'classnames'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 // import NO_LOGO from '../../assets/images/no-logo.png'
 import { browser } from 'webextension-polyfill-ts'
+import { ChainTypes, DefaultSigners } from '../../../../../common/types'
+import {
+  // DEFAULT_BRANCH_NAME,
+  ModuleTypes,
+  StorageTypes,
+} from '../../../../../common/constants'
+import { typeOfUri, chainByUri, joinUrls } from '../../../../../common/helpers'
 let _isMounted = true
-
+enum DeploymentStatus {
+  Unknown,
+  Deployed,
+  NotDeployed,
+  NewModule,
+}
 interface PropsStorageRefImage {
   storageRef: StorageRef
   className?: string
+}
+// export const enum ModuleTypes {
+//   Feature = 'FEATURE',
+//   Adapter = 'ADAPTER',
+//   Library = 'LIBRARY',
+//   Interface = 'INTERFACE',
+// }
+enum FormMode {
+  Deploying,
+  Creating,
+  Editing,
+}
+enum DependencyType {
+  Dependency,
+  Interface,
+}
+type DependencyChecking = {
+  name: string
+  version: string
+  type: DependencyType
+  isExists?: boolean
 }
 
 export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
@@ -27,13 +60,23 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
 
     const init = async () => {
       const { hash, uris } = storageRef
+      // console.log(storageRef)
+
       if (!hash && uris.length > 0 && uris[0].indexOf('data:') === 0) {
         setDataUri(uris[0])
       } else {
         const { getResource } = await initBGFunctions(browser)
-        const base64 = await getResource(storageRef)
-        const dataUri = 'data:text/plain;base64,' + base64
-        setDataUri(dataUri)
+        if (
+          storageRef.hash !==
+            '0x0000000000000000000000000000000000000000000000000000000000000000' ||
+          storageRef.uris.length !== 0
+        ) {
+          const base64 = await getResource(storageRef)
+          const dataUri = 'data:text/plain;base64,' + base64
+          setDataUri(dataUri)
+        } else {
+          setDataUri(null)
+        }
       }
     }
     init()
@@ -60,6 +103,7 @@ interface PropsDeveloper {
   setModuleVersion: (x) => void
   isUnderConstructionDetails: boolean
   setUnderConstructionDetails: (x) => void
+  // deployButtonClickHandler?: () => void
 }
 export const DevModule: FC<PropsDeveloper> = (props) => {
   const {
@@ -71,9 +115,43 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setModuleVersion,
     isUnderConstructionDetails,
     setUnderConstructionDetails,
+    // deployButtonClickHandler,
   } = props
   // const [dapDet, onDappletsDetails] = useState(isDappletsDetails)
   const nodes = new Map<string, any>()
+  const [mi, setMi] = useState<ModuleInfo>(modules[0].module)
+  const [vi, setVi] = useState<VersionInfo>()
+  const [targetRegistry, setTargetRegistry] = useState(null)
+  const [currentAccount, setCurrentAccount] = useState(null)
+  const [trustedUsers, setTrustedUsers] = useState([])
+  const [mode, setMode] = useState(FormMode.Deploying)
+  const [targetStorages, setTargetStorages] = useState([
+    StorageTypes.Swarm,
+    StorageTypes.Sia,
+    StorageTypes.Ipfs,
+  ])
+  const [registryOptions, setRegistryOptions] = useState([])
+  const [targetChain, setTargetChain] = useState<ChainTypes>(null)
+  const [deploymentStatus, setDeploymentStatus] = useState(
+    DeploymentStatus.Unknown
+  )
+  const [owner, setOwner] = useState(null)
+  const [dependenciesChecking, setDpendenciesChecking] = useState<
+    DependencyChecking[]
+  >([])
+
+  useEffect(() => {
+    _isMounted = true
+    // loadSwarmGateway()
+
+    const init = async () => {
+      await _updateData()
+    }
+    init()
+    return () => {
+      _isMounted = false
+    }
+  })
   modules.forEach((x) => {
     nodes.set(
       x.versions[0]
@@ -112,6 +190,140 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       return `${firstFourCharacters}...${lastFourCharacters}`
     } else {
       return hash
+    }
+  }
+
+  const _updateData = async () => {
+    // setLoading(true)
+    const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
+
+    const registries = await getRegistries()
+    const trustedUsers = await getTrustedUsers()
+    const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
+    setRegistryOptions(
+      prodRegistries.map((r) => ({
+        key: r.url,
+        text: r.url,
+        value: r.url,
+      }))
+    )
+    setTargetRegistry(prodRegistries[0]?.url || null)
+    setTrustedUsers(trustedUsers)
+    setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
+
+    await _updateCurrentAccount()
+
+    // if (mode === FormMode.Creating) {
+    // await _updateCurrentAccount()
+    // } else {
+    //   return Promise.all([
+    //     _updateOwnership(),
+    //     _updateCurrentAccount(),
+    //     _updateDeploymentStatus(),
+    //     _checkDependencies(),
+    //   ])
+    // }
+  }
+  const _updateOwnership = async () => {
+    const { getOwnership } = await initBGFunctions(browser)
+    const owner = await getOwnership(targetRegistry, mi.name)
+    setOwner(owner)
+  }
+  // const _updateDeploymentStatus = async () => {
+  //   // const s = this.state
+  //   setDeploymentStatus(DeploymentStatus.NewModule)
+
+  //   const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(
+  //     browser
+  //   )
+  //   const miF = await getModuleInfoByName(targetRegistry, mi.name)
+  //   const deployed = vi
+  //     ? await getVersionInfo(targetRegistry, miF.name, vi.branch, vi.version)
+  //     : true
+  //   const deploymentStatus = !miF
+  //     ? DeploymentStatus.NewModule
+  //     : deployed
+  //     ? DeploymentStatus.Deployed
+  //     : DeploymentStatus.NotDeployed
+  //   setDeploymentStatus(deploymentStatus)
+  // }
+  const _updateCurrentAccount = async () => {
+    const { getOwnership, getAddress } = await initBGFunctions(browser)
+    const currentAccount = await getAddress(
+      DefaultSigners.EXTENSION,
+      targetChain
+    )
+    setCurrentAccount(currentAccount)
+    // setLoading(false)
+    // console.log(targetChain)
+
+    // console.log(currentAccount)
+  }
+  // const _checkDependencies = async () => {
+  //   const { getVersionInfo } = await initBGFunctions(browser)
+  //   // const { dependenciesChecking } = dependenciesChecking
+  //   // const {targetRegistry} = targetRegistry
+  //   // await Promise.all(
+  //   dependenciesChecking.map((x) =>
+  //     getVersionInfo(
+  //       targetRegistry,
+  //       x.name,
+  //       DEFAULT_BRANCH_NAME,
+  //       x.version
+  //     ).then((y) => (x.isExists = !!y))
+  //   )
+  //   // )
+  // }
+
+  const deployButtonClickHandler = async () => {
+    const { deployModule, addTrustedUser } = await initBGFunctions(browser)
+
+    mi.registryUrl = targetRegistry
+    mi.author = currentAccount
+    mi.type = ModuleTypes.Feature
+    console.log(targetRegistry)
+    console.log(currentAccount)
+
+    try {
+      // setModalTransaction(true)
+      const isNotNullCurrentAccount = !(
+        !currentAccount ||
+        currentAccount === '0x0000000000000000000000000000000000000000'
+      )
+      const isNotTrustedUser =
+        isNotNullCurrentAccount &&
+        !trustedUsers.find(
+          (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
+        )
+      if (isNotTrustedUser) {
+        await addTrustedUser(currentAccount.toLowerCase())
+      }
+
+      // setMessage({
+      //   type: 'positive',
+      //   header: 'Module was deployed',
+      //   message: [`Script URL: ${result.scriptUrl}`],
+      // })
+      // setModalTransaction(false)
+      // setModalEndCreation(true)
+      // setDeploymentStatus(DeploymentStatus.Deployed)
+
+      const result =
+        mode === FormMode.Creating
+          ? await deployModule(mi, null, targetStorages, targetRegistry)
+          : await deployModule(mi, vi, targetStorages, targetRegistry)
+
+      setDeploymentStatus(DeploymentStatus.Deployed)
+    } catch (err) {
+      // setMessage({
+      //   type: 'negative',
+      //   header: 'Publication error',
+      //   message: [err.message],
+      // })
+      // setModal(true)
+      console.log(err)
+    } finally {
+      // setModalTransaction(false)
     }
   }
 
@@ -201,7 +413,11 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 </button>
               ) : (
                 <button
-                  // onClick={() => console.log(m.module.isUnderConstruction)}
+                  onClick={() => {
+                    // if () {
+                    m.isDeployed?.[0] === false && deployButtonClickHandler()
+                    // }
+                  }}
                   className={styles.dappletsReupload}
                 >
                   {m.isDeployed?.[0] === false ? 'Deploy' : 'Reupload'}

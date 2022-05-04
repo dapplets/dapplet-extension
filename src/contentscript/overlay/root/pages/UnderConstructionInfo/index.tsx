@@ -447,7 +447,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
           onClose={() => onClose()}
         />
       ) : null}
-      {!isNotNullCurrentAccount ? (
+      {!isNotNullCurrentAccount && !loading ? (
         owner ? (
           <Modal
             visible={true}
