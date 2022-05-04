@@ -31,9 +31,18 @@ type OverlayConnection<T> = Connection<T> & {
 };
 
 interface WalletConnection {
+    authMethod: 'ethereum/goerli' | 'near/testnet' | 'near/mainnet'
     isConnected(): Promise<boolean>
     connect(): Promise<void>
     disconnect(): Promise<void>
+}
+
+export interface IEthWallet extends IEtherneumWallet, WalletConnection {
+    authMethod: 'ethereum/goerli'
+}
+
+export interface INearWallet extends NearApi.ConnectedWalletAccount, WalletConnection {
+    authMethod: 'near/testnet' | 'near/mainnet'
 }
 
 type ContentDetector = {
@@ -304,56 +313,82 @@ export default class Core {
         return conn;
     }
 
+    public async wallet(cfg: { authMethods: ['ethereum/goerli'] }): Promise<IEthWallet>
+    public async wallet(cfg: { authMethods: ('near/testnet' | 'near/mainnet')[] }): Promise<INearWallet>
+    public async wallet(cfg: { authMethods: ('ethereum/goerli' | 'near/testnet' | 'near/mainnet')[] }): Promise<IEthWallet | INearWallet>
     public async wallet(cfg: { type: 'ethereum', network: 'goerli', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & IEtherneumWallet>
     public async wallet(cfg: { type: 'near', network: 'testnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
     public async wallet(cfg: { type: 'near', network: 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
-    public async wallet(cfg: { type: 'ethereum' | 'near', network: 'goerli' | 'testnet' | 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
-        if (!cfg || !cfg.type || !cfg.network) throw new Error("\"type\" and \"network\" are required in Core.wallet().");
-        if (cfg.type !== 'near' && cfg.type !== 'ethereum') throw new Error("The \"ethereum\" and \"near\" only are supported in Core.wallet().");
-        if (cfg.type === 'near' && !(cfg.network == 'testnet' || cfg.network == 'mainnet')) throw new Error("\"testnet\" and \"mainnet\" network only is supported in \"near\" type wallet.");
-        if (cfg.type === 'ethereum' && cfg.network !== 'goerli') throw new Error("\"goerli\" network only is supported in \"ethereum\" type wallet.");
+    public async wallet(cfg: { authMethods?: ('ethereum/goerli' | 'near/testnet' | 'near/mainnet')[], type?: 'ethereum' | 'near', network?: 'goerli' | 'testnet' | 'mainnet', username?: string, domainId?: number, fullname?: string, img?: string }, eventDef?: EventDef<any>, app?: string) {
+        if (!cfg || !(cfg.authMethods || (cfg.type && cfg.network))) throw new Error(" \"authMethods\" or \"type\" with \"network\" are required in Core.wallet().");
+        if (cfg.authMethods) {
+            cfg.authMethods.forEach(x => {
+                if (!['ethereum/goerli', 'near/testnet', 'near/mainnet'].includes(x))
+                    throw new Error("The \"ethereum/goerli\",\"near/testnet\" and \"near/mainnet\" only are supported in Core.wallet().");
+            });
+        } else {
+            if (cfg.type !== 'near' && cfg.type !== 'ethereum') throw new Error("The \"ethereum\" and \"near\" only are supported in Core.wallet().");
+            if (cfg.type === 'near' && !(cfg.network == 'testnet' || cfg.network == 'mainnet')) throw new Error("\"testnet\" and \"mainnet\" network only is supported in \"near\" type wallet.");
+            if (cfg.type === 'ethereum' && cfg.network !== 'goerli') throw new Error("\"goerli\" network only is supported in \"ethereum\" type wallet.");          
+        }
 
-        const chainNetwork = cfg.type + '/' + cfg.network;
+        const _authMethods = cfg.authMethods ?? [cfg.type + '/' + cfg.network];
 
         const isConnected = async () => {
             const { getWalletDescriptors } = await initBGFunctions(browser);
+            const sessions = await this.sessions(app);
+            const session = sessions.find(x => _authMethods.includes(x.authMethod));
+            if (!session) return false;
+
+            // ToDo: remove it when subscription on disconnect event will be implemented 
+            //       (see: /background/services/walletService.ts/disconnect())
             const descriptors = await getWalletDescriptors();
-            const suitableWallet = descriptors.find(x => x.chain === chainNetwork && x.apps.indexOf(app) !== -1);
-            return suitableWallet ? suitableWallet.connected : false;
+            const descriptor = descriptors.find(x => x.type == session.walletType);
+            return descriptor ? descriptor.connected : false;
         };
 
-        const getWalletObject = async (): Promise<NearApi.ConnectedWalletAccount | IEtherneumWallet> => {
+        const getSessionObject = async () => {
             const connected = await isConnected();
             if (!connected) return null;
 
-            if (cfg.type === 'ethereum') {
-                return ethereum.createWalletConnection(app, cfg, eventDef);
-            } else if (cfg.type === 'near') {
-                return near.createWalletConnection(app, cfg);
+            const sessions = await this.sessions(app);
+            const session = sessions.find(x => _authMethods.includes(x.authMethod));
+
+            if (!session) {
+                return null;
             } else {
-                throw new Error('Invalid wallet type.');
+                return session;
             }
         };
 
-        const _wallet = await getWalletObject();
+        const session = await getSessionObject();
+        const authMethod = session?.authMethod;
+        const wallet = !session ? null
+            : authMethod === 'ethereum/goerli'
+                ? <IEthWallet>(await session.wallet())
+                : <INearWallet>(await session.wallet());
+        const me = this;
 
         const proxied = {
-            _wallet: _wallet,
+            _wallet: wallet,
+            _session: session,
+            authMethod,
 
             async isConnected(): Promise<boolean> {
                 return isConnected();
             },
 
             async connect(): Promise<void> {
-                const { prepareWalletFor } = await initBGFunctions(browser);
-                await prepareWalletFor(app, chainNetwork, cfg);
-                this._wallet = await getWalletObject();
+                if (this._session && this._wallet) return; // ???
+                this._session = await me.login({ authMethods: _authMethods, secureLogin: 'disabled' }, { }, app);
+                this.authMethod = this._session.authMethod;
+                this._wallet = this.authMethod === 'ethereum/goerli'
+                    ? <IEthWallet>(await this._session.wallet())
+                    : <INearWallet>(await this._session.wallet());
             },
 
             async disconnect(): Promise<void> {
-                const { unsetWalletFor } = await initBGFunctions(browser);
-                await unsetWalletFor(app, chainNetwork);
-                this._wallet = null;
+                return this._session.logout();               
             }
         };
 
@@ -407,14 +442,9 @@ export default class Core {
 
     public storage: AppStorage;
 
-    /**
-     * @deprecated Since version 0.46.0. Will be deleted in version 0.50.0. Use `Core.login()` instead.
-     */
     public async contract(type: 'ethereum', address: string, options: Abi, app?: string): Promise<any>
     public async contract(type: 'near', address: string, options: { viewMethods: string[]; changeMethods: string[], network?: 'mainnet' | 'testnet' }, app?: string): Promise<any>
     public async contract(type: 'near' | 'ethereum', address: string, options: any, app?: string): Promise<any> {
-        console.warn('DEPRECATED: "Core.contract()" is deprecated since version 0.46.1. It will be deleted in version 0.50.0. Use "Core.login()" instead.');
-
         if (type === 'ethereum') {
             return ethereum.createContractWrapper(app, { network: 'goerli'}, address, options);
         } else if (type === 'near') {

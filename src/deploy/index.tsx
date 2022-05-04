@@ -318,88 +318,93 @@ class Index extends React.Component<IIndexProps, IIndexState> {
         await addTrustedUser(currentAccount.toLowerCase())
       }
 
-      const result =
-        mode === FormMode.Creating
-          ? await deployModule(mi, null, targetStorages, targetRegistry)
-          : await deployModule(mi, vi, targetStorages, targetRegistry)
-
+      const result = (mode === FormMode.Creating) 
+          ? await deployModule(mi, null, targetStorages, targetRegistry) 
+          : await deployModule(mi, vi, targetStorages, targetRegistry);
+      
       this.setState({
-        message: {
-          type: 'positive',
-          header: 'Module was deployed',
-          message: [`Script URL: ${result.scriptUrl}`],
-        },
-        deploymentStatus: DeploymentStatus.Deployed,
-      })
+          message: {
+              type: 'positive',
+              header: 'Module was deployed',
+              message: [
+                  `Script URL: ${result.scriptUrl}`
+              ]
+          },
+          deploymentStatus: DeploymentStatus.Deployed
+      });
+
     } catch (err) {
-      this.setState({
-        message: {
-          type: 'negative',
-          header: 'Publication error',
-          message: [err.message],
-        },
-      })
-    } finally {
-      this.setState({ loading: false })
+            this.setState({
+                message: {
+                    type: 'negative',
+                    header: 'Publication error',
+                    message: [err.message]
+                }
+            });
+        } finally {
+            this.setState({ loading: false });
+        }
     }
-  }
 
-  async reuploadButtonClickHandler() {
-    this.setState({ loading: true })
+    async reuploadButtonClickHandler() {
+        this.setState({ loading: true });
 
-    const { uploadModule } = await initBGFunctions(browser)
-    const { mi, vi, targetStorages } = this.state
+        const { uploadModule } = await initBGFunctions(browser);
+        const { mi, vi, targetStorages } = this.state;
 
-    try {
-      const scriptUrl = await uploadModule(mi, vi, targetStorages)
-      this.setState({
-        message: {
-          type: 'positive',
-          header: 'Module was reuploaded',
-          message: [`Script URL: ${scriptUrl}`],
-        },
-        deploymentStatus: DeploymentStatus.Deployed,
-      })
-    } catch (err) {
-      this.setState({
-        message: {
-          type: 'negative',
-          header: 'Publication error',
-          message: [err.message],
-        },
-      })
-    } finally {
-      this.setState({ loading: false })
+        try {
+            const scriptUrl = await uploadModule(mi, vi, targetStorages);
+            this.setState({
+                message: {
+                    type: 'positive',
+                    header: 'Module was reuploaded',
+                    message: [
+                        `Script URL: ${scriptUrl}`
+                    ]
+                },
+                deploymentStatus: DeploymentStatus.Deployed
+            });
+
+        } catch (err) {
+            this.setState({
+                message: {
+                    type: 'negative',
+                    header: 'Publication error',
+                    message: [err.message]
+                }
+            });
+        } finally {
+            this.setState({ loading: false });
+        }
     }
-  }
 
-  async pairWallet() {
-    const { pairWalletViaOverlay } = await initBGFunctions(browser)
-    await pairWalletViaOverlay(this.state.targetChain)
-    await this._updateData()
-  }
+    async pairWallet() {
+        const { pairWalletViaOverlay } = await initBGFunctions(browser);
+        await pairWalletViaOverlay(this.state.targetChain, DefaultSigners.EXTENSION, null);
+        await this._updateData();
+    }
 
-  changeTargetStorage(storage: StorageTypes, checked: boolean) {
-    let { targetStorages } = this.state
-    targetStorages = targetStorages.filter((x) => x !== storage)
-    if (checked) targetStorages.push(storage)
-    this.setState({ targetStorages })
-  }
+    changeTargetStorage(storage: StorageTypes, checked: boolean) {
+        let { targetStorages } = this.state;
+        targetStorages = targetStorages.filter(x => x !== storage);
+        if (checked) targetStorages.push(storage);
+        this.setState({ targetStorages });
+    }
 
-  async iconInputChangeHandler(event: React.ChangeEvent<HTMLInputElement>) {
-    const s = this.state
-    const files = event.target.files
-    if (files.length > 0) {
-      const file = files[0]
-      const base64: string = await new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-        reader.onload = () => resolve(reader.result as string)
-        reader.onerror = (error) => reject(error)
-      })
-      s.mi.icon = {
-        hash: null,
-        uris: [base64],
+    async iconInputChangeHandler(event: React.ChangeEvent<HTMLInputElement>) {
+        const s = this.state;
+        const files = event.target.files;
+        if (files.length > 0) {
+            const file = files[0];
+            const base64: string = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result as string);
+                reader.onerror = error => reject(error);
+            });
+            s.mi.icon = {
+                hash: null,
+                uris: [base64]
       }
     } else {
       s.mi.icon = null
