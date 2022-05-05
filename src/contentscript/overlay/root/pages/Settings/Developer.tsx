@@ -54,7 +54,6 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [dataUri, setDataUri] = useState(null)
   const [isLoadButton, setLoadButton] = useState(false)
-  const [isLoadingDeploy, setLoadingDeploy] = useState(false)
 
   const {
     isDappletsDetails,
@@ -265,8 +264,8 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                                   //   deployButtonClickHandler
                                   // }
 
-                                  isLoadingDeploy={isLoadingDeploy}
-                                  setLoadingDeploy={setLoadingDeploy}
+                                  // isLoadingDeploy={isLoadingDeploy}
+                                  // setLoadingDeploy={setLoadingDeploy}
                                   isDappletsDetails={isDappletsDetails}
                                   setDappletsDetail={setDappletsDetail}
                                   modules={modules}

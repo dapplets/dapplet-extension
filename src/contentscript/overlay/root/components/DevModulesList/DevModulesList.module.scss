@@ -120,7 +120,7 @@
 .dappletsSettings {
   position: absolute;
   top: 15px;
-  right: 115px;
+  right: 113px;
   display: block;
   padding: 0px 5px 0px 0px;
   // margin: 12px 0px 0px 0px;
@@ -295,11 +295,66 @@
 
 .dappletsIsLoadingDeploy {
   // content: 'Deploing...';
-  padding: 4px 10px;
-  // justify-content: flex-end;
+  padding: 4px 15px 4px 10px;
+  justify-content: flex-end;
   width: 90px;
   height: 20px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Ccircle cx='6' cy='6' r='6' fill='%2336FE9E'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: 10px 4px;
+  &:hover {
+    background-color: $Primary;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Ccircle cx='6' cy='6' r='6' fill='%2336FE9E'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 10px 4px;
+  }
+  &:active {
+    background-color: $Primary;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Ccircle cx='6' cy='6' r='6' fill='%2336FE9E'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 10px 4px;
+  }
+}
+.modalDefaultContent {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Roboto';
+  width: 263px;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+
+  color: $MainGrey;
+}
+
+.modalDefaultContentButton {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+
+  width: 157px;
+  height: 32px;
+
+  background: $Primary;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $PureWhite;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC, useRef } from 'react'
+import React, { useState, useEffect, FC, useRef, useMemo } from 'react'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
 // import { StorageRefImage } from '../../../../../popup/components/StorageRefImage'
@@ -18,6 +18,8 @@ import {
   StorageTypes,
 } from '../../../../../common/constants'
 import { typeOfUri, chainByUri, joinUrls } from '../../../../../common/helpers'
+import { Modal } from '../Modal'
+import { xhrCallback } from '@sentry/tracing/types/browser/request'
 let _isMounted = true
 enum DeploymentStatus {
   Unknown,
@@ -106,8 +108,6 @@ interface PropsDeveloper {
   isUnderConstructionDetails: boolean
   setUnderConstructionDetails: (x) => void
   // deployButtonClickHandler?: () => void
-  setLoadingDeploy?: (x) => void
-  isLoadingDeploy?: boolean
 }
 export const DevModule: FC<PropsDeveloper> = (props) => {
   const {
@@ -120,8 +120,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     isUnderConstructionDetails,
     setUnderConstructionDetails,
     // deployButtonClickHandler,
-    setLoadingDeploy,
-    isLoadingDeploy,
   } = props
   // const [dapDet, onDappletsDetails] = useState(isDappletsDetails)
   const nodes = new Map<string, any>()
@@ -146,19 +144,13 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     DependencyChecking[]
   >([])
   const nodeButton = useRef<HTMLButtonElement>()
+  const [textButtonDeploy, setTextButtonDeploy] = useState('Deploy')
+  const [textButtonReupload, setTextButtonReupload] = useState('Reapload')
+  const [isLoadingDeploy, setLoadingDeploy] = useState(false)
+  const [messageError, setMessageError] = useState(null)
+  const [isModalError, setModalError] = useState(false)
+  const onCloseError = () => setModalError(false)
 
-  useEffect(() => {
-    _isMounted = true
-    // loadSwarmGateway()
-
-    const init = async () => {
-      await _updateData()
-    }
-    init()
-    return () => {
-      _isMounted = false
-    }
-  }, [targetChain, currentAccount])
   modules.forEach((x) => {
     nodes.set(
       x.versions[0]
@@ -200,6 +192,19 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     }
   }
 
+  useEffect(() => {
+    _isMounted = true
+    // loadSwarmGateway()
+
+    const init = async () => {
+      await _updateData()
+    }
+    init()
+    return () => {
+      _isMounted = false
+    }
+  }, [targetChain, currentAccount, isLoadingDeploy, modules[0]])
+
   const _updateData = async () => {
     // setLoading(true)
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
@@ -217,8 +222,8 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-    console.log(currentAccount)
-    console.log(targetChain)
+    // console.log(currentAccount)
+    // console.log(targetChain)
 
     // await _updateCurrentAccount()
 
@@ -232,7 +237,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         _checkDependencies(),
       ])
     }
-    console.log(currentAccount)
+    // console.log(currentAccount)
   }
   const _updateOwnership = async () => {
     const { getOwnership } = await initBGFunctions(browser)
@@ -267,9 +272,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     )
     setCurrentAccount(currentAccount)
     // setLoading(false)
-    console.log(targetChain)
+    // console.log(targetChain)
 
-    console.log(currentAccount)
+    // console.log(currentAccount)
   }
   const _checkDependencies = async () => {
     const { getVersionInfo } = await initBGFunctions(browser)
@@ -291,17 +296,20 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     )
   }
 
-  const deployButtonClickHandler = async (vi) => {
-    setLoadingDeploy(true)
+  const deployButtonClickHandler = async (vi, e) => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
 
     mi.registryUrl = targetRegistry
     mi.author = currentAccount
     // mi.type = ModuleTypes.Feature
-    console.log(targetRegistry)
-    console.log(currentAccount)
-    console.log(vi)
-
+    // console.log(targetRegistry)
+    // console.log(currentAccount)
+    console.log(modules)
+    setLoadingDeploy(true)
+    // console.log(isLoadingDeploy)
+    // onSelectItem(e)
+    e.target.classList.add(styles.dappletsIsLoadingDeploy)
+    setTextButtonDeploy('Deploing...')
     try {
       // setModalTransaction(true)
       // nodeButton &&
@@ -327,15 +335,31 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           : await deployModule(mi, vi, targetStorages, targetRegistry)
 
       setDeploymentStatus(DeploymentStatus.Deployed)
+      // setLoadingDeploy(false)
+
+      e.target.classList.remove(styles.dappletsIsLoadingDeploy)
+      setTextButtonDeploy('Reapload')
     } catch (err) {
-      console.log(err)
+      // console.log(err)
+
+      setMessageError({
+        type: 'negative',
+        header: 'Publication error',
+        message: [err.message],
+      })
+      setModalError(true)
+      e.target.classList.remove(styles.dappletsIsLoadingDeploy)
+      setTextButtonDeploy('Deploy')
     } finally {
-      setLoadingDeploy(false)
+      //
     }
+    // setLoadingDeploy(false)
   }
-  const onSelectItem = (e) => {
-    e.target.classList.add(styles.dappletsIsLoadingDeploy)
-  }
+  // const onSelectItem = (e) => {
+  //   e.target.classList.add(styles.dappletsIsLoadingDeploy)
+  //   setTextButtonDeploy('Deploing...')
+  // }
+  // const Num = useMemo(() => {}, [sorted])
 
   return (
     <>
@@ -431,8 +455,8 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   onClick={(e) => {
                     // if () {
                     m.isDeployed?.[0] === false &&
-                      deployButtonClickHandler(m.versions[0])
-                    onSelectItem(e)
+                      deployButtonClickHandler(m.versions[0], e)
+                    // isLoadingDeploy && onSelectItem(e)
 
                     // if (e.currentTarget.value) {
 
@@ -442,7 +466,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     // [styles.dappletsIsLoadingDeploy]: m.isActive,
                   })}
                 >
-                  {m.isDeployed?.[0] === false ? 'Deploy' : 'Reupload'}
+                  {m.isDeployed?.[0] === false
+                    ? textButtonDeploy
+                    : textButtonReupload}
 
                   {/* {} */}
                 </button>
@@ -519,6 +545,32 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           </div>
         </div>
       ))}
+
+      {messageError ? (
+        <Modal
+          visible={isModalError}
+          title={messageError.header}
+          content={
+            <div className={styles.modalDefaultContent}>
+              {messageError.message.map((m, i) => (
+                <p key={i} style={{ overflowWrap: 'break-word' }}>
+                  {m === `Cannot read properties of null (reading 'length')`
+                    ? 'Please fill in the empty fields'
+                    : m}
+                </p>
+              ))}
+              <button
+                onClick={() => onCloseError()}
+                className={styles.modalDefaultContentButton}
+              >
+                Ok
+              </button>
+            </div>
+          }
+          footer={''}
+          onClose={() => onCloseError()}
+        />
+      ) : null}
     </>
   )
 }
