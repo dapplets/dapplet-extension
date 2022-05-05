@@ -487,7 +487,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       <input
                         className={cn(styles.inputDefault, {})}
                         // value={userAgentNameInput}
-                        placeholder="User agent name..."
+                        placeholder={userAgentNameInput}
                         onFocus={() => {
                           setUserAgentNameInput('')
                           setUserAgentNameInputError(null)
@@ -537,6 +537,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       // })}
                       onBlur={() => {
                         setDynamicAdapterInputError(null)
+                        getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                        if (dynamicAdapterInputError) {
+                          getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                        }
                         if (dynamicAdapterInput.length === 0) {
                           getDefaultValueDynamicAdapter(dynamicAdapterInput)
                         }
@@ -653,6 +657,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         onBlur={
                           () => {
                             setProviderInputError(null)
+                            if (!isValidHttp(providerInput)) {
+                              getDefaultValueProvider(providerInput)
+                            }
                             if (providerInput.length === 0) {
                               getDefaultValueProvider(providerInput)
                             }
@@ -677,7 +684,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={providerInput || ''}
-                          placeholder={'Provider URL'}
+                          // placeholder={'Provider URL'}
                           onChange={(e) => {
                             setProviderInput(e.target.value)
                             setProviderEdited(true)
@@ -722,6 +729,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         style={{ width: '100%' }}
                         onBlur={() => {
                           setSwarmGatewayInputError(null)
+                          if (!isValidHttp(swarmGatewayInput)) {
+                            getDefaultValueSwarmGateway(swarmGatewayInput)
+                          }
                           if (swarmGatewayInput.length === 0) {
                             getDefaultValueSwarmGateway(swarmGatewayInput)
                           }
@@ -744,7 +754,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={swarmGatewayInput}
-                          placeholder={'Gateway URL'}
+                          // placeholder={'Gateway URL'}
                           onChange={(e) => {
                             setSwarmGatewayInput(e.target.value)
                             setSwarmGatewayInputError(null)
@@ -789,6 +799,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         style={{ width: '100%' }}
                         onBlur={() => {
                           setSwarmPostageStampIdInputError(null)
+                          if (
+                            !isValidPostageStampId(swarmPostageStampIdInput)
+                          ) {
+                            // setIpfsGatewayInput('')
+                            getDefaultValueSwarmPostageStampId(
+                              swarmPostageStampIdInput
+                            )
+                          }
                           if (swarmPostageStampIdInput.length === 0) {
                             getDefaultValueSwarmPostageStampId(
                               swarmPostageStampIdInput
@@ -823,7 +841,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={swarmPostageStampIdInput}
-                          placeholder="Postage Stamp ID"
+                          // placeholder="Postage Stamp ID"
                           onChange={(e) => {
                             setSwarmPostageStampIdInput(e.target.value)
                             setSwarmPostageStampIdInputError(null)
@@ -872,7 +890,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         onBlur={() => {
                           setIpfsGatewayInputError(null)
                           if (!isValidHttp(ipfsGatewayInput)) {
-                            setIpfsGatewayInput('')
+                            // setIpfsGatewayInput('')
+                            getDefaultValueIpfsGateway(ipfsGatewayInput)
                           }
                           if (ipfsGatewayInput.length === 0) {
                             getDefaultValueIpfsGateway(ipfsGatewayInput)
@@ -890,7 +909,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={ipfsGatewayInput}
-                          placeholder="Gateway URL"
+                          // placeholder="Gateway URL"
                           onChange={(e) => {
                             setIpfsGatewayInput(e.target.value)
                             setIpfsGatewayEdited(true)
@@ -933,10 +952,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     >
                       <form
                         style={{ width: '100%' }}
-                        onBlur={() => {
+                        onBlur={(e) => {
+                          // setSiaPortalInput(e.target.value)
                           setSiaPortalInputError(null)
+                          // console.log(siaPortalInput)
+
                           if (!isValidHttp(siaPortalInput)) {
-                            setSiaPortalInput('')
+                            // setSiaPortalInput('')
+                            getDefaultValueSiaPortal(siaPortalInput)
                           }
                           if (siaPortalInput.length === 0) {
                             getDefaultValueSiaPortal(siaPortalInput)
@@ -955,7 +978,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={siaPortalInput}
-                          placeholder="Gateway URL"
+                          // placeholder="Gateway URL"
                           onChange={(e) => {
                             setSiaPortalInput(e.target.value)
                             setSiaPortalEdited(true)

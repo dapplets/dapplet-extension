@@ -333,9 +333,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       setLoadingDeploy(false)
     }
   }
-  // const onSelectItem = (item, index) => {
-  //   setVi(vi.map((v, idx)=>index===idx ? {...v, isActive: true} : v ))
-  // }
+  const onSelectItem = (e) => {
+    e.target.classList.add(styles.dappletsIsLoadingDeploy)
+  }
 
   return (
     <>
@@ -432,15 +432,14 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     // if () {
                     m.isDeployed?.[0] === false &&
                       deployButtonClickHandler(m.versions[0])
-                    // console.log(m.module)
-                    console.log(i)
+                    onSelectItem(e)
 
                     // if (e.currentTarget.value) {
 
                     // }
                   }}
                   className={cn(styles.dappletsReupload, {
-                    // [styles.dappletsIsLoadingDeploy]: ClipboardEvent,
+                    // [styles.dappletsIsLoadingDeploy]: m.isActive,
                   })}
                 >
                   {m.isDeployed?.[0] === false ? 'Deploy' : 'Reupload'}
