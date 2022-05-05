@@ -122,9 +122,9 @@ export const SettingsOverlay = () => {
     await setErrorReporting(isActive)
     loadErrorReporting()
   }
-  console.log(isUnderConstruction)
-  console.log(isUnderConstructionDetails)
-  console.log(isDappletsDetails)
+  // console.log(isUnderConstruction)
+  // console.log(isUnderConstructionDetails)
+  // console.log(isDappletsDetails)
 
   return (
     <>

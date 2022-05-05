@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC } from 'react'
+import React, { useState, useEffect, FC, useRef } from 'react'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
 // import { StorageRefImage } from '../../../../../popup/components/StorageRefImage'
@@ -145,7 +145,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const [dependenciesChecking, setDpendenciesChecking] = useState<
     DependencyChecking[]
   >([])
-  // const [isLoadingDeploy, setLoadingDeploy] = useState(false)
+  const nodeButton = useRef<HTMLButtonElement>()
 
   useEffect(() => {
     _isMounted = true
@@ -304,6 +304,10 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
     try {
       // setModalTransaction(true)
+      nodeButton &&
+        nodeButton.current?.classList.add(styles.dappletsIsLoadingDeploy)
+      console.log(nodeButton.current.id, 'node')
+
       const isNotNullCurrentAccount = !(
         !currentAccount ||
         currentAccount === '0x0000000000000000000000000000000000000000'
@@ -419,21 +423,21 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 </button>
               ) : (
                 <button
-                  onClick={() => {
+                  ref={nodeButton}
+                  onClick={(e) => {
                     // if () {
                     m.isDeployed?.[0] === false &&
                       deployButtonClickHandler(m.versions[0])
+                    // if (e.currentTarget.value) {
+
                     // }
                   }}
                   className={cn(styles.dappletsReupload, {
-                    [styles.dappletsIsLoadingDeploy]: isLoadingDeploy,
+                    // [styles.dappletsIsLoadingDeploy]: isLoadingDeploy,
                   })}
                 >
-                  {isLoadingDeploy
-                    ? 'Deploing...'
-                    : m.isDeployed?.[0] === false
-                    ? 'Deploy'
-                    : 'Reupload'}
+                  {m.isDeployed?.[0] === false ? 'Deploy' : 'Reupload'}
+
                   {/* {} */}
                 </button>
               )}
