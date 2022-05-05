@@ -85,7 +85,7 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
     return () => {
       _isMounted = false
     }
-  }, [])
+  }, [storageRef])
   return (
     <div className={cn(styles.dappletsImg, className)}>
       {dataUri ? <img src={dataUri} /> : <span className={styles.noLogo} />}
@@ -304,9 +304,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
     try {
       // setModalTransaction(true)
-      nodeButton &&
-        nodeButton.current?.classList.add(styles.dappletsIsLoadingDeploy)
-      console.log(nodeButton.current.id, 'node')
+      // nodeButton &&
+      //   nodeButton.current?.classList.add(styles.dappletsIsLoadingDeploy)
+      // console.log(nodeButton.current.id, 'node')
 
       const isNotNullCurrentAccount = !(
         !currentAccount ||
@@ -333,11 +333,14 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       setLoadingDeploy(false)
     }
   }
+  // const onSelectItem = (item, index) => {
+  //   setVi(vi.map((v, idx)=>index===idx ? {...v, isActive: true} : v ))
+  // }
 
   return (
     <>
       {sorted.map((m, i) => (
-        <div className={styles.dappletsBlock} key={i}>
+        <div id={String(i)} className={styles.dappletsBlock} key={i}>
           <StorageRefImage storageRef={m.module.icon} />
           {/* {m.isDeployed?.[0] === true ? <span /> : null} */}
           <div className={styles.dappletsInfo}>
@@ -423,17 +426,21 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 </button>
               ) : (
                 <button
+                  id={String(i)}
                   ref={nodeButton}
                   onClick={(e) => {
                     // if () {
                     m.isDeployed?.[0] === false &&
                       deployButtonClickHandler(m.versions[0])
+                    // console.log(m.module)
+                    console.log(i)
+
                     // if (e.currentTarget.value) {
 
                     // }
                   }}
                   className={cn(styles.dappletsReupload, {
-                    // [styles.dappletsIsLoadingDeploy]: isLoadingDeploy,
+                    // [styles.dappletsIsLoadingDeploy]: ClipboardEvent,
                   })}
                 >
                   {m.isDeployed?.[0] === false ? 'Deploy' : 'Reupload'}

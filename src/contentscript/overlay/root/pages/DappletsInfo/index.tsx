@@ -659,7 +659,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     type="file"
                     name="file"
                     id="file"
-                    accept=".png, .svg"
+                    accept=".png"
                     className={styles.inputfile}
                     onChange={(e) => {
                       onChange(e)
