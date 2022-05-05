@@ -85,7 +85,7 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
     return () => {
       _isMounted = false
     }
-  })
+  }, [])
   return (
     <div className={cn(styles.dappletsImg, className)}>
       {dataUri ? <img src={dataUri} /> : <span className={styles.noLogo} />}

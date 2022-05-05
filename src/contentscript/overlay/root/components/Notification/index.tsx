@@ -37,20 +37,24 @@ export const Notification = (props: NotificationProps): ReactElement => {
   const [isOpen, onOpen] = useState(false)
   const [isDelete, onDelete] = useState(false)
   const [isMoreInformation, onMoreInformation] = useToggle(false)
+  const [newDescription, setDescription] = useState(description)
 
   const booleanNode = refComponent.current?.classList.contains('more')
   useEffect(() => {
-    if (description.length > 71) {
+    if (description.length > 235) {
       if (refComponent && refComponent.current) {
-        refComponent.current?.classList.add('more')
+        refComponent.current?.classList.add(styles.more)
         // if (booleanNode === true) {
-        onOpen(true)
+        // onOpen(true)
         // }
+
+        setDescription(refComponent.current?.innerText.slice(0, 235))
       }
     } else {
       if (refComponent && refComponent.current) {
-        refComponent.current?.classList.remove('more')
-        onOpen(false)
+        refComponent.current?.classList.remove(styles.more)
+        // onOpen(false)
+        setDescription(description)
       }
     }
   }, [refComponent, booleanNode])
@@ -78,16 +82,16 @@ export const Notification = (props: NotificationProps): ReactElement => {
         <p
           ref={refComponent}
           className={cn(styles.description, {
-            [styles.descriptionMore]: isOpen,
-            [styles.moreInformation]: isMoreInformation,
+            // [styles.descriptionMore]: isOpen,
+            // [styles.moreInformation]: isMoreInformation,
           })}
-          onClick={() => {
-            isMoreInformation && onMoreInformation()
-          }}
+          // onClick={() => {
+          //   isMoreInformation && onMoreInformation()
+          // }}
         >
-          {description}
-        </p>{' '}
-        {isOpen && (
+          {newDescription}
+        </p>
+        {/* {isOpen && (
           <span
             className={cn(styles.moreDescription, {
               [styles.deleteEllipsis]: isMoreInformation,
@@ -96,7 +100,7 @@ export const Notification = (props: NotificationProps): ReactElement => {
           >
             ...
           </span>
-        )}
+        )} */}
       </div>
 
       {href && (
