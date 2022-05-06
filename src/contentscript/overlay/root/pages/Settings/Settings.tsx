@@ -1,4 +1,11 @@
-import React, { ReactElement, useState, useEffect, useMemo, FC } from 'react'
+import React, {
+  ReactElement,
+  useState,
+  useEffect,
+  useMemo,
+  FC,
+  useRef,
+} from 'react'
 import cn from 'classnames'
 import styles from './Settings.module.scss'
 import {
@@ -104,6 +111,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [isPopup, setPopup] = useState(false)
 
   const regExpUserAgentName = new RegExp(/^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/)
+  const inputOfFocusIPFS = useRef<HTMLInputElement>()
+  const inputOfFocusSia = useRef<HTMLInputElement>()
+  const inputOfFocusSwarmId = useRef<HTMLInputElement>()
+  const inputOfFocusSwarm = useRef<HTMLInputElement>()
+  const inputOfFocusEtn = useRef<HTMLInputElement>()
+  const inputOfFocusAdapter = useRef<HTMLInputElement>()
+  const inputOfFocusAgentName = useRef<HTMLInputElement>()
 
   useEffect(() => {
     _isMounted = true
@@ -383,9 +397,11 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     loadPopupInOverlay()
   }
 
-  // const handleClear = () => {
-  //   setRegistryInput('')
-  // }
+  const onPress = (e, ref) => {
+    ref.current?.blur()
+    // searchInput.blur()
+    // this.refs.searchInput.setNativeProps({text: ''})
+  }
 
   return (
     <div className={styles.blockSettings}>
@@ -479,6 +495,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
                         // !(userAgentNameLoading || !userAgentNameEdited) &&
                         setUserAgentName(userAgentNameInput)
+                        onPress(e, inputOfFocusAgentName)
                       }}
                       className={cn(styles.formDefault, {
                         [styles.errorInputDefault]: !!userAgentNameInputError,
@@ -488,6 +505,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         className={cn(styles.inputDefault, {})}
                         // value={userAgentNameInput}
                         placeholder={userAgentNameInput}
+                        ref={inputOfFocusAgentName}
                         onFocus={() => {
                           setUserAgentNameInput('')
                           setUserAgentNameInputError(null)
@@ -549,6 +567,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         e.preventDefault()
 
                         setDynamicAdapter(dynamicAdapterInput)
+                        onPress(e, inputOfFocusAdapter)
                       }}
                     >
                       <input
@@ -559,6 +578,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           setDynamicAdapterInput('')
                           setDynamicAdapterInputError(null)
                         }}
+                        ref={inputOfFocusAdapter}
                         onChange={(e) => {
                           // e.preventDefault()
                           setDynamicAdapterInput(e.target.value)
@@ -676,15 +696,16 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         }}
                         onSubmit={(e) => {
                           e.preventDefault()
-                          console.log('lala')
 
                           setProvider(providerInput)
+                          onPress(e, inputOfFocusEtn)
                         }}
                       >
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={providerInput || ''}
                           // placeholder={'Provider URL'}
+                          ref={inputOfFocusEtn}
                           onChange={(e) => {
                             setProviderInput(e.target.value)
                             setProviderEdited(true)
@@ -749,12 +770,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           e.preventDefault()
 
                           setSwarmGateway(swarmGatewayInput)
+                          onPress(e, inputOfFocusSwarm)
                         }}
                       >
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={swarmGatewayInput}
                           // placeholder={'Gateway URL'}
+                          ref={inputOfFocusSwarm}
                           onChange={(e) => {
                             setSwarmGatewayInput(e.target.value)
                             setSwarmGatewayInputError(null)
@@ -836,12 +859,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                             )
                             // setSwarmPostageStampIdInput('')
                           }
+                          onPress(e, inputOfFocusSwarmId)
                         }}
                       >
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={swarmPostageStampIdInput}
                           // placeholder="Postage Stamp ID"
+                          ref={inputOfFocusSwarmId}
                           onChange={(e) => {
                             setSwarmPostageStampIdInput(e.target.value)
                             setSwarmPostageStampIdInputError(null)
@@ -904,11 +929,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         onSubmit={(e) => {
                           e.preventDefault()
                           setIpfsGateway(ipfsGatewayInput)
+                          onPress(e, inputOfFocusIPFS)
                         }}
                       >
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={ipfsGatewayInput}
+                          ref={inputOfFocusIPFS}
                           // placeholder="Gateway URL"
                           onChange={(e) => {
                             setIpfsGatewayInput(e.target.value)
@@ -973,16 +1000,22 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           e.preventDefault()
 
                           setSiaPortal(siaPortalInput)
+                          onPress(e, inputOfFocusSia)
                         }}
                       >
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={siaPortalInput}
                           // placeholder="Gateway URL"
+                          ref={inputOfFocusSia}
+                          // onClick={(e) => onPress(e)}
                           onChange={(e) => {
+                            // e.preventDefault()
+
                             setSiaPortalInput(e.target.value)
                             setSiaPortalEdited(true)
                             setSiaPortalInputError(null)
+                            // onPress(e)
                           }}
                         />
                       </form>

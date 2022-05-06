@@ -157,6 +157,11 @@ export const Rewards: FC<RewardsProps> = (props) => {
     setItems(newCustomPoolForm)
   }
 
+  const onSelectItem = (e) => {
+    e.currentTarget.classList.add(styles.conditionalVisible)
+    // e.currentTarget.
+  }
+
   return (
     <div className={styles.wrapper}>
       {isTokenomics ? (
@@ -369,7 +374,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                               }
                               break
                             case 'deleteContentBackward':
-                              const newValue = pool.pool.slice(0, -1)
+                              const newValue = pool.pool.slice(0, -2)
                               if (newValue.length === 0) setPool({ pool: '1' })
                               else setPool({ pool: newValue })
                               break
@@ -415,14 +420,22 @@ export const Rewards: FC<RewardsProps> = (props) => {
                             />
                           </div>
 
-                          <div className={styles.recepientConditionalBlock}>
+                          <div
+                            onClick={(e) => {
+                              // onSelectItem(e)
+                              e.currentTarget.firstElementChild.classList.add(
+                                styles.noneVisible
+                              )
+                              e.currentTarget.lastElementChild.classList.add(
+                                styles.conditionalVisible
+                              )
+                              console.log(e.currentTarget.childNodes)
+                            }}
+                            className={styles.recepientConditionalBlock}
+                          >
                             <div className={styles.recepientChangeBlock}>
                               <button
                                 type="button"
-                                onClick={() => {
-                                  node.current?.classList.add('valid')
-                                  console.log(booleanNode)
-                                }}
                                 className={styles.recepientConditionalButton}
                               />
                               <span
@@ -432,10 +445,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                               </span>
                             </div>
 
-                            <div
-                              ref={node}
-                              className={styles.conditionalWrapper}
-                            >
+                            <div className={styles.conditionalWrapper}>
                               <span className={styles.conditionalLabel}>
                                 condition: if this dapplet has dependency to
                               </span>
@@ -452,10 +462,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                 />
                                 <button
                                   type="button"
-                                  onClick={() => {
-                                    node.current?.classList.remove('valid')
-                                    console.log(booleanNode)
-                                  }}
+                                  onClick={(e) => {}}
                                   className={styles.inputConditionalDelete}
                                 />
                               </div>

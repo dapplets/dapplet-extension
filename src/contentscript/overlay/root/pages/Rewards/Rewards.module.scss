@@ -401,6 +401,20 @@
   display: none;
   flex-direction: column;
 }
+// .conditionalVisible {
+//   .conditionalWrapper {
+//     display: flex !important;
+//   }
+//   .recepientChangeBlock {
+//     display: none;
+//   }
+// }
+.conditionalVisible {
+  display: flex !important;
+}
+.noneVisible {
+  display: none;
+}
 
 .conditionalInputBlock {
   display: flex;

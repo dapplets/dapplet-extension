@@ -29,6 +29,7 @@ import { UnderConstruction } from '../UnderConstruction'
 import { DappletsInfoSettings } from '../DappletsInfoSettings'
 import { Tokenimics } from '../Tokenomics'
 import { Rewards } from '../Rewards'
+import { async } from 'rxjs'
 
 enum SettingsTabs {
   // MAIN = 0,
@@ -82,6 +83,7 @@ export const SettingsOverlay = () => {
   useEffect(() => {
     _isMounted = true
     const init = async () => {
+      // setTimeout(() => loadDevMode(), 1500)
       await loadDevMode()
       await loadErrorReporting()
       // console.log(devMode)
@@ -93,29 +95,31 @@ export const SettingsOverlay = () => {
     // devMode
   }, [])
   const loadDevMode = async () => {
-    console.log('load settings')
+    // console.log('load settings')
+
     setSvgLoaderDevMode(true)
+
     const { getDevMode } = await initBGFunctions(browser)
     const devMode = await getDevMode()
     setMode(devMode)
-    console.log('load of settings')
-    setSvgLoaderDevMode(false)
+    setTimeout(() => setSvgLoaderDevMode(false), 500)
+    // console.log('load of settings')
   }
   const setDevmode = async (isActive: boolean) => {
-    console.log('load settings 1')
     const { setDevMode } = await initBGFunctions(browser)
     await setDevMode(isActive)
     loadDevMode()
-    console.log('load of settings 1')
+
     // TODO: ???
     // await this.props.updateTabs()
   }
   const loadErrorReporting = async () => {
     setSvgErrorReporting(true)
+
     const { getErrorReporting } = await initBGFunctions(browser)
     const errorReporting = await getErrorReporting()
     onErrorReporting(errorReporting)
-    setSvgErrorReporting(false)
+    setTimeout(() => setSvgErrorReporting(false), 500)
   }
   const setErrorReporting = async (isActive: boolean) => {
     const { setErrorReporting } = await initBGFunctions(browser)
