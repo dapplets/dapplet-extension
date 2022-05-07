@@ -176,6 +176,54 @@
   }
 }
 
+.pushChanges {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  width: 108px;
+  height: 32px;
+  padding: 9px 0px;
+
+  background: $Primary;
+  border-radius: 4px;
+  font-family: 'Roboto';
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+  margin: -8px 0px 0px 0px;
+
+  color: $PureWhite;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+.newReward {
+  margin: 0px 0px 0px 0px;
+  margin-left: auto;
+  padding: 9px 10px;
+  width: auto;
+}
+
+.newRewardDisabled {
+  cursor: default;
+  display: flex;
+
+  color: $StrokeColor;
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  &:hover {
+    background: $AppBG;
+  }
+  &:active {
+    background: $AppBG;
+  }
+}
+
 .customPooNewDistributed {
   display: flex;
   min-width: 80px;
@@ -263,6 +311,24 @@
 
   color: $MainGrey;
   margin: 0px 0px 0px 4px;
+}
+.poolInputInvalid {
+  color: #ff6442;
+  border: 1px solid #ff6442;
+}
+
+.poolInputInvalidText {
+  width: 100%;
+  text-align: right;
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+
+  color: #ff6442;
+  // margin: 0px 0px 0px 4px;
+  margin-top: 5px;
 }
 
 .rewardRecepientBlock {
@@ -398,7 +464,7 @@
   color: #5ec280;
 }
 .conditionalWrapper {
-  display: none;
+  display: flex;
   flex-direction: column;
 }
 // .conditionalVisible {
@@ -409,9 +475,9 @@
 //     display: none;
 //   }
 // }
-.conditionalVisible {
-  display: flex !important;
-}
+// .conditionalVisible {
+//   display: flex !important;
+// }
 .noneVisible {
   display: none;
 }
@@ -695,38 +761,6 @@
     height: 2px;
     background: $WebBG;
   }
-}
-.pushChanges {
-  display: flex;
-
-  justify-content: center;
-  align-items: center;
-
-  width: 108px;
-  height: 32px;
-  padding: 9px 0px;
-
-  background: $Primary;
-  border-radius: 4px;
-  font-family: 'Roboto';
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
-  margin: -8px 0px 0px 0px;
-
-  color: $PureWhite;
-  &:hover {
-    background: $PrimaryHover;
-  }
-  &:active {
-    background: $PrimaryPressed;
-  }
-}
-.newReward {
-  margin: 0px 0px 0px 0px;
-  margin-left: auto;
-  padding: 9px 10px;
-  width: auto;
 }
 
 .wrapperChanges {

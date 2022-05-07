@@ -16,6 +16,7 @@ interface ModalProps {
   footer: ReactElement | string
   onClose: () => void
   className?: string
+  id?: any
 }
 
 export const Modal = ({
