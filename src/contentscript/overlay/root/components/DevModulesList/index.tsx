@@ -30,6 +30,7 @@ enum DeploymentStatus {
 interface PropsStorageRefImage {
   storageRef: StorageRef
   className?: string
+  onClick?: (x) => void
 }
 // export const enum ModuleTypes {
 //   Feature = 'FEATURE',

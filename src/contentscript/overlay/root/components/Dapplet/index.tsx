@@ -1,4 +1,10 @@
-import React, { FC, DetailedHTMLProps, HTMLAttributes } from 'react'
+import React, {
+  FC,
+  DetailedHTMLProps,
+  HTMLAttributes,
+  useEffect,
+  useState,
+} from 'react'
 import cn from 'classnames'
 import styles from './Dapplet.module.scss'
 import { DappletImage } from '../DappletImage'
@@ -34,10 +40,12 @@ export interface DappletProps
   onRemoveMyDapplet?: Function
   onDeployDapplet: Function
   onOpenStore: Function
+  loadShowButton: boolean
 }
 
 export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const [isShowDescription, onShowDescription] = useToggle(false)
+  // const [loadShowButton, setLoadShowButton] = useState(false)
   const {
     dapplet,
     className,
@@ -47,6 +55,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     onRemoveMyDapplet: onRemoveDapplet,
     onDeployDapplet,
     onOpenStore,
+    loadShowButton,
     ...anotherProps
   } = props
   const {
@@ -62,6 +71,10 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     isUnderConstruction,
     sourceRegistry,
   } = dapplet
+  // console.log(isActionHandler)
+  useEffect(() => {
+    loadShowButton
+  }, [])
 
   return (
     <div className={cn(styles.wrapperCard, className)} {...anotherProps}>
@@ -130,15 +143,20 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
         <div className={cn(styles.blockBottom)}>
           <div className={cn(styles.firstButtons)}>
-            {isActive && isActionHandler && (
-              <SquaredButton
-                appearance="smail"
-                icon={HomeIcon}
-                className={styles.squareButton}
-                title="Home"
-                onClick={() => onOpenDappletAction(dapplet)}
-              />
-            )}
+            {isActive &&
+              isActionHandler &&
+              (loadShowButton ? (
+                <div className={styles.loadingDappletsHome}></div>
+              ) : (
+                <SquaredButton
+                  // loadShowButton={loadShowButton}
+                  appearance="smail"
+                  icon={HomeIcon}
+                  className={styles.squareButton}
+                  title="Home"
+                  onClick={() => onOpenDappletAction(dapplet)}
+                />
+              ))}
             {!isUnderConstruction && (
               <SquaredButton
                 appearance="smail"
@@ -148,7 +166,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 onClick={() => onSettingsModule(dapplet)}
               />
             )}
-          
+
             <SquaredButton
               appearance="smail"
               icon={SearchIcon}

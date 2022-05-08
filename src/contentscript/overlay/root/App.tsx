@@ -182,10 +182,10 @@ export class App extends React.Component<P, S> {
                     avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
                     hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
                   />
-                  <div className={styles.balance}>
+                  {/* <div className={styles.balance}>
                     <Icon icon={EthereumIcon} size="big" />
                     <p className={styles.amount}>25.1054</p>
-                  </div>
+                  </div> */}
                 </div>
                 <div className={styles.right}>
                   <SquaredButton

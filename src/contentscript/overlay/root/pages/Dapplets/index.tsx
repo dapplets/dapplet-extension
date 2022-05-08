@@ -27,21 +27,35 @@ let _isMounted = false
 export const Dapplets = () => {
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
   const [isLoading, setLoading] = useState<boolean>(null)
+  const [isLoadingListDapplets, setLoadingLoadingListDapplets] = useState(false)
   const [error, setError] = useState<string>(null)
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
   const [devMessage, setDevMessage] = useState<string>(null)
+  const [loadShowButton, setLoadShowButton] = useState(false)
 
   useEffect(() => {
     _isMounted = true
     const init = async () => {
+      // setLoadingLoadingListDapplets(true)
       const { getFeaturesByHostnames, getCurrentContextIds, getThisTab } =
         await initBGFunctions(browser)
+
       const currentTab = await getThisTab()
+
       const ids = await getCurrentContextIds(currentTab)
+
       const d = await getFeaturesByHostnames(ids)
+
       setDapplets(d)
+
+      setLoadingLoadingListDapplets(false)
     }
     init()
+    if (dapplets.length === 0) {
+      setLoadingLoadingListDapplets(true)
+    } else {
+      setLoadingLoadingListDapplets(false)
+    }
 
     EventBus.on('mydapplets_changed', init)
     EventBus.on('context_started', init)
@@ -50,12 +64,12 @@ export const Dapplets = () => {
     EventBus.on('dapplet_deactivated', init)
 
     return () => {
-      _isMounted = false
       EventBus.off('mydapplets_changed', init)
       EventBus.off('context_started', init)
       EventBus.off('context_finished', init)
       EventBus.off('dapplet_activated', init)
       EventBus.off('dapplet_deactivated', init)
+      _isMounted = false
     }
   }, [])
 
@@ -65,6 +79,7 @@ export const Dapplets = () => {
     order?,
     selectVersions?: boolean
   ) => {
+    setLoadShowButton(true)
     const { name } = module
 
     if (selectVersions && isActive) {
@@ -79,6 +94,7 @@ export const Dapplets = () => {
     } else {
       await toggleFeature(module, null, isActive, order, null)
     }
+    setLoadShowButton(false)
   }
 
   const toggleFeature = async (
@@ -201,6 +217,7 @@ export const Dapplets = () => {
     }
 
     if (_isMounted) {
+      // setLoadingLoadingListDapplets(false)
       const d = features
         .filter((f) => f.type === ModuleTypes.Feature)
         .map((f) => ({
@@ -272,30 +289,38 @@ export const Dapplets = () => {
         />
         <Dropdown list={DROPDOWN_LIST} title="Worklist:" />
       </div>
-      <div className={styles.dappletsBlock}>
-        {dapplets &&
-          dapplets.map((dapplet) => {
-            return (
-              <Dapplet
-                key={dapplet.name}
-                dapplet={{
-                  ...dapplet,
-                  isFavourites: false,
-                  website: 'dapplets.com',
-                  users: [],
-                }}
-                onSwitchChange={onSwitchChange}
-                onSettingsModule={onOpenSettingsModule}
-                onOpenDappletAction={onOpenDappletAction}
-                onRemoveMyDapplet={
-                  dapplet.isMyDapplet ? onRemoveMyDapplet : undefined
-                }
-                onDeployDapplet={onDeployDapplet}
-                onOpenStore={onOpenStore}
-              />
-            )
-          })}
-      </div>
+      {isLoadingListDapplets ? (
+        <div className={styles.loadingListDapplets}></div>
+      ) : (
+        <div className={styles.dappletsBlock}>
+          {dapplets &&
+            dapplets.map((dapplet) => {
+              if (dapplet.type !== 'FEATURE') {
+                return
+              } else
+                return (
+                  <Dapplet
+                    key={dapplet.name}
+                    dapplet={{
+                      ...dapplet,
+                      isFavourites: false,
+                      website: 'dapplets.com',
+                      users: [],
+                    }}
+                    loadShowButton={loadShowButton}
+                    onSwitchChange={onSwitchChange}
+                    onSettingsModule={onOpenSettingsModule}
+                    onOpenDappletAction={onOpenDappletAction}
+                    onRemoveMyDapplet={
+                      dapplet.isMyDapplet ? onRemoveMyDapplet : undefined
+                    }
+                    onDeployDapplet={onDeployDapplet}
+                    onOpenStore={onOpenStore}
+                  />
+                )
+            })}
+        </div>
+      )}
     </>
   )
 }

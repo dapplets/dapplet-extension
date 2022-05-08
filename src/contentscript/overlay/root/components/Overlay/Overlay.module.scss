@@ -7,7 +7,7 @@
   min-width: 468px;
   // width: 320px;
   transition: transform 0.3s ease;
-  filter: drop-shadow(-4px 8px 10px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(-4px 0px 4px rgb(0 0 0 / 25%));
 }
 .overlay::-webkit-scrollbar {
   width: 0;

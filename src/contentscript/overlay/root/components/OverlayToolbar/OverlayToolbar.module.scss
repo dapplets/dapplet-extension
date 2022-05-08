@@ -17,6 +17,7 @@
 
 .inner {
   margin-right: 16px;
+  margin-top: 6px;
 }
 
 .toggleOverlay {
@@ -35,6 +36,7 @@
   background: transparent;
 
   background: $AppBG;
+  // box-shadow: -4px 0px 4px rgb(0 0 0 / 25%);
 
   svg path {
     fill: $Secondary;

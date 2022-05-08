@@ -14,7 +14,10 @@ import { ReactComponent as Coolicon } from '../../assets/svg/coolicon.svg'
 import { ITab } from '../../types/tab'
 import { IMenu } from '../../models/menu.model'
 import { Overlay } from '../../overlay'
-
+import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import { browser } from 'webextension-polyfill-ts'
+import { loadJsonFile } from 'near-api-js/lib/key_stores/unencrypted_file_system_keystore'
 // TODO: change element hiding from Margin to transform
 export interface OverlayToolbarProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -56,7 +59,7 @@ TToggleOverlay): ReactElement => {
     </button>
   )
 }
-
+let _isMounted = false
 export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
   const {
     tabs,
@@ -72,20 +75,37 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
     onOverlayTab,
     onSelectedTab,
     onRemoveTab,
+
     ...anotherProps
   } = props
+
+  const [allDapplet, setAllDapplet] = useState<ManifestAndDetails[]>([])
 
   const handlerSelectedTab = (id: string) => (): void => onSelectedTab(id)
   const handlerRemoveTab = (id: string) => (): void => onRemoveTab(id)
   const nonSystemTabs = tabs.filter((x) => !x.uri.includes('/popup.html#'))
-  // console.log(nonSystemTabs)
 
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
+
   useEffect(() => {
+    _isMounted = true
+    const init = async () => {
+      const { getFeaturesByHostnames, getCurrentContextIds, getThisTab } =
+        await initBGFunctions(browser)
+      const currentTab = await getThisTab()
+      const ids = await getCurrentContextIds(currentTab)
+      const d = await getFeaturesByHostnames(ids)
+      setAllDapplet(d)
+    }
+    init()
+
     if (!activeOverlay) return
     const noSystem = !activeOverlay.uri.includes('/popup.html#')
     if (noSystem) onOverlayTab()
+    return () => {
+      _isMounted = false
+    }
   }, [activeOverlay, nodeOverlayToolbar, isNodeOverlayToolbar])
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
@@ -112,6 +132,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
     nodeOverlayToolbar,
     isNodeOverlayToolbar,
   ])
+
   return (
     <div
       ref={nodeOverlayToolbar}
@@ -134,6 +155,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
         <div className={styles.tabs}>
           <OverlayTab
             id="system"
+            dap={allDapplet}
             menu={menu}
             nameSelectedMenu={nameSelectedMenu}
             activeTab={true}
@@ -146,11 +168,13 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 
           <div className={styles.TabList}>
             {nonSystemTabs.length > 0 &&
-              nonSystemTabs.map(({ id, title }) => {
+              nonSystemTabs.map(({ id, title, source }) => {
                 const active = id === idActiveTab
 
                 return (
                   <OverlayTab
+                    dap={allDapplet}
+                    source={source}
                     id={id}
                     menu={[]}
                     key={id}
@@ -163,6 +187,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
                     className={cn({ [styles.active]: active })}
                     notification={false}
                     title={title}
+                    // image={uri}
                   />
                 )
               })}
