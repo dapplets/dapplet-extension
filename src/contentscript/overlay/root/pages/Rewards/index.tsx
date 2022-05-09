@@ -76,6 +76,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
 
   const [itemIndex, setItemInex] = useState(0)
 
+  const [newItem, setNewItem] = useState({ newItem: [] })
+
   useEffect(() => {
     if (items && items.items) {
       for (let i = 0; i < items.items.length; i++) {
@@ -92,11 +94,12 @@ export const Rewards: FC<RewardsProps> = (props) => {
         setAddRecepientDisabled(false)
       }
     }
-
+    // setNewItem()
+    console.log(newItem)
     onDistributed(`${sumQuantity}%`)
     console.log(items)
-    console.log(itemsRecepientForm)
-    console.log(name)
+    // console.log(itemsRecepientForm)
+    // console.log(name)
   }, [
     sumQuantity,
     items,
@@ -106,8 +109,27 @@ export const Rewards: FC<RewardsProps> = (props) => {
     itemsRecepientForm,
     name,
     itemIndex,
+    newItem,
   ])
-
+  const handleAgeChange = (event) => {
+    // setUser({name: user.name, age: event.target.value});
+    // setItems((prevState) => ({
+    //   ...prevState,
+    //   // [items &&
+    //   // items[itemIndex] &&
+    //   // items[itemIndex].name]: newValue,
+    //   name: { newValue },
+    // }))
+    // setItems({
+    //   ...items.items,
+    //   items: [{ name: newValue }],
+    // })
+    // items.items[itemIndex].name = newValue
+    // setItems((prevState) => ({
+    //   ...prevState,
+    //   items: [{ name: newValue }],
+    // }))
+  }
   const onClose = () => setModal(false)
   const onCloseChange = () => setModalChange(false)
 
@@ -325,6 +347,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                   <button
                     onClick={() => {
                       setItemInex(index)
+                      setNewItem({ newItem: [item] })
                       setModalChange(true)
                     }}
                     className={styles.changeReward}
@@ -583,8 +606,10 @@ export const Rewards: FC<RewardsProps> = (props) => {
         // id={i}
         content={
           <>
-            {items && items.items && items.items[itemIndex] && (
-              <>
+            {newItem &&
+              newItem.newItem &&
+              newItem.newItem.length !== 0 &&
+              newItem.newItem.map((x, i) => (
                 <form
                   onClick={(e) => {
                     e.preventDefault()
@@ -592,235 +617,40 @@ export const Rewards: FC<RewardsProps> = (props) => {
                   onChange={(e) => {
                     e.preventDefault()
                   }}
+                  key={i}
                   className={styles.creationWrapper}
                 >
                   <div className={styles.creationFirstBlock}>
                     <div className={styles.rewardNameBlock}>
                       <span className={styles.nameLabel}>Reward name</span>
                       <input
-                        value={
-                          // items && items.items
-                          items.items[itemIndex].name
-                        }
+                        // value={
+                        //   (newItem &&
+                        //     newItem.newItem &&
+                        //     newItem.newItem[i].name) ||
+                        //   ''
+                        // }
+                        defaultValue={newItem.newItem[i].name}
+                        onChange={(e) => {
+                          e.preventDefault()
+                          const newName = e.target.value
+                          newItem.newItem[i].name = newName
+
+                          console.log(
+                            setNewItem((prevState) => ({
+                              newItem: prevState.newItem.map(
+                                (x, i) => newItem[(x.name = e.target.value)]
+                              ),
+                            }))
+                          )
+                        }}
                         name="rewardName"
                         className={styles.nameInput}
-                        onChange={(e: any) => {
-                          e.preventDefault()
-
-                          const { data, inputType } = e.nativeEvent
-                          switch (inputType) {
-                            case 'insertText':
-                              // items.items[itemIndex].name =
-                              //   data + items.items[itemIndex].name
-                              const newValueNum = data + items[itemIndex].name
-                              // setItems({
-                              //   ...items.items,
-                              //   items: [{ name: newValueNum }],
-                              // })
-                              setItems((prevState) => ({
-                                ...prevState,
-                                items: [{ name: newValueNum }],
-                              }))
-                              // setItems((prevState) => ({
-                              //   ...prevState,
-                              //   // [items &&
-                              //   // items[itemIndex] &&
-                              //   // items[itemIndex].name]: newValueNum,
-                              //   name: { newValueNum },
-                              // }))
-
-                              break
-                            case 'deleteContentBackward':
-                              const newValue = items.items[
-                                itemIndex
-                              ].name.slice(0, -1)
-
-                              // setItems((prevState) => ({
-                              //   ...prevState,
-                              //   // [items &&
-                              //   // items[itemIndex] &&
-                              //   // items[itemIndex].name]: newValue,
-                              //   name: { newValue },
-                              // }))
-                              // setItems({
-                              //   ...items.items,
-                              //   items: [{ name: newValue }],
-                              // })
-                              // items.items[itemIndex].name = newValue
-                              setItems((prevState) => ({
-                                ...prevState,
-                                items: [{ name: newValue }],
-                              }))
-                              break
-
-                            default:
-                              break
-                          }
-                          console.log(items)
-
-                          console.log(items.items[itemIndex].name)
-                          console.log(data)
-                        }}
                       />
                     </div>
-                    {/* <div className={styles.rewardPoolBlock}>
-                      <span className={styles.nameLabel}>Pool</span>
-                      <input
-                        name="pool"
-                        value={
-                          // items && items.items
-                          // ?
-                          items.items[itemIndex].pool
-                          // : ''
-                        }
-                        // onBlur={() => {
-                        //   items.items[itemIndex].pool <= 0
-                        //     ? setItems({
-                        //         ...items.items,
-                        //         items: [{ pool: '20' }],
-                        //       })
-                        //     : setItems({
-                        //         ...items.items,
-                        //         items: [{ pool: items.items[itemIndex].pool }],
-                        //       })
-                        // }}
-                        onChange={(e: any) => {
-                          const { data, inputType } = e.nativeEvent
-
-                          switch (inputType) {
-                            case 'insertText':
-                              if (isNaN(+data) === false && data !== ' ') {
-                                const newValue =
-                                  items.items[itemIndex].pool === '0'
-                                    ? data
-                                    : items.items[itemIndex].pool + data
-                                if (+newValue > 100)
-                                  setItems({
-                                    ...items.items,
-                                    items: [{ pool: '100' }],
-                                  })
-                                else
-                                  setItems({
-                                    ...items.items,
-                                    items: [{ pool: newValue }],
-                                  })
-                              }
-                              break
-                            case 'deleteContentBackward':
-                              const newValue = items.items[
-                                itemIndex
-                              ].pool.slice(0, 0)
-
-                              setItems({
-                                ...items.items,
-                                items: [{ pool: newValue }],
-                              })
-                              break
-
-                            default:
-                              break
-                          }
-                        }}
-                        className={cn(styles.poolInput, {
-                          [styles.poolInputInvalid]: poolInputInvalid,
-                        })}
-                      />
-                    </div> */}
                   </div>
-                  {/* {poolInputInvalid && (
-                    <div className={styles.poolInputInvalidText}>
-                      Distributed must not exceed 100%
-                    </div>
-                  )} */}
-                  {/* <div className={styles.rewardRecepientBlock}>
-                    <div className={styles.recepientBlock}>
-                      <span className={styles.nameLabel}>Recipient</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          addButtonClickRecepient()
-                        }}
-                        className={styles.customPoolButton}
-                      />
-                    </div>
-                    {itemsRecepientForm &&
-                      itemsRecepientForm.recepientForm &&
-                      itemsRecepientForm.recepientForm.length !== 0 &&
-                      itemsRecepientForm.recepientForm.map((x, i) => (
-                        <div key={i} className={styles.newRewardRecepientBlock}>
-                          <div className={styles.recepientInputBlock}>
-                            <input
-                              name="userId"
-                              className={styles.recepientInput}
-                              onChange={(e) => {
-                                handleChangeRecepient(e)
-                                itemsRecepientForm.recepientForm[i].userID =
-                                  e.target.value
-                              }}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => onDeleteChildRecepient(i)}
-                              className={styles.recepientInputButton}
-                            />
-                          </div>
-
-                          <div className={styles.recepientConditionalBlock}>
-                            {!itemsRecepientForm.recepientForm[i].isActive && (
-                              <div className={styles.recepientChangeBlock}>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    addButtonClickConditional(i)
-                                  }}
-                                  className={styles.recepientConditionalButton}
-                                />
-                                <span
-                                  className={styles.recepientConditionalLabel}
-                                >
-                                  conditional
-                                </span>
-                              </div>
-                            )}
-
-                            {itemsRecepientForm.recepientForm[i].isActive && (
-                              <div
-                                key={i}
-                                className={cn(styles.conditionalWrapper, {})}
-                              >
-                                <span className={styles.conditionalLabel}>
-                                  condition: if this dapplet has dependency to
-                                </span>
-                                <div className={styles.conditionalInputBlock}>
-                                  <input
-                                    name="condition"
-                                    className={styles.inputConditional}
-                                    onChange={(e) => {
-                                      itemsRecepientForm.recepientForm[
-                                        i
-                                      ].condition = e.target.value
-                                    }}
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      itemsRecepientForm.recepientForm[
-                                        i
-                                      ].condition = null
-                                      onDeleteChildConditional(i)
-                                    }}
-                                    className={styles.inputConditionalDelete}
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                  </div> */}
                 </form>
-              </>
-            )}
+              ))}
           </>
         }
         footer={''}

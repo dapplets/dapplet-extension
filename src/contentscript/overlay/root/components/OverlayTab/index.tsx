@@ -68,7 +68,7 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
     return () => {
       _isMounted = false
     }
-  }, [])
+  }, [imgActiveTab])
 
   const handlerClick = (title: string) => (): void =>
     nameSelectedMenu !== title && onSelectedMenu(title)
@@ -79,8 +79,19 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
   const showMenu = activeTab && !isSystemDapplets && menu && menu.length > 0
 
   return (
-    <div className={cn(styles.tab, className)} {...anotherProps}>
+    <div
+      className={cn(styles.tab, className, {
+        [styles.tabNotActive]: !activeTab,
+      })}
+      {...anotherProps}
+      onClick={() => {
+        // console.log(imgActiveTab)
+        // console.log(dap)
+        console.log(activeTab)
+      }}
+    >
       <div className={styles.top}>
+        {/* {imgActiveTab === null? } */}
         <StorageRefImage
           onClick={onClick}
           className={cn(styles.image, { [styles.cursor]: !activeTab })}
@@ -114,13 +125,4 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
       )}
     </div>
   )
-}
-function initBGFunctions(browser: any):
-  | { getFeaturesByHostnames: any; getCurrentContextIds: any; getThisTab: any }
-  | PromiseLike<{
-      getFeaturesByHostnames: any
-      getCurrentContextIds: any
-      getThisTab: any
-    }> {
-  throw new Error('Function not implemented.')
 }

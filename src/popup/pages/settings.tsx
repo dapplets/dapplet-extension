@@ -519,7 +519,10 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
       <React.Fragment>
         <Segment.Group
           className={this.props.isOverlay ? undefined : 'internalTabSettings'}
-          style={{ marginTop: this.props.isOverlay ? 0 : undefined }}
+          style={{
+            marginTop: this.props.isOverlay ? 0 : undefined,
+            // display: 'none',
+          }}
         >
           <Segment loading={isLoading}>
             <Header as="h4">Profile</Header>

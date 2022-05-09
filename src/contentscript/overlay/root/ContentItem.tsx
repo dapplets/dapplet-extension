@@ -1,189 +1,203 @@
-import * as React from "react";
-import { Overlay } from "./overlay";
-import cn from "classnames";
-import { OverlayManager } from "./overlayManager";
-import { PopupItem } from './PopupItem';
+import * as React from 'react'
+import { Overlay } from './overlay'
+import cn from 'classnames'
+import { OverlayManager } from './overlayManager'
+import { PopupItem } from './PopupItem'
 
-const OVERLAY_LOADING_TIMEOUT = 5000;
+const OVERLAY_LOADING_TIMEOUT = 5000
 
 enum LoadingMode {
-    NotLoading = 0,
-    Loading = 1,
-    SlowLoading = 2,
-    NetworkError = 3,
-    ServerError = 4,
-    SslError = 5
+  NotLoading = 0,
+  Loading = 1,
+  SlowLoading = 2,
+  NetworkError = 3,
+  ServerError = 4,
+  SslError = 5,
 }
 
 interface P {
-    overlay: Overlay;
-    isActive: boolean;
-    overlayManager: OverlayManager;
+  overlay: Overlay
+  isActive: boolean
+  overlayManager: OverlayManager
 }
 
 interface S {
-    loadingMode: LoadingMode;
+  loadingMode: LoadingMode
 }
 
 export class ContentItem extends React.Component<P, S> {
-    ref = React.createRef<HTMLDivElement>();
+  ref = React.createRef<HTMLDivElement>()
 
-    constructor(props: P) {
-        super(props);
+  constructor(props: P) {
+    super(props)
 
-        this.state = {
-            loadingMode: LoadingMode.Loading,
-        };
+    this.state = {
+      loadingMode: LoadingMode.Loading,
     }
+  }
 
-    componentDidMount() {
-        this.loadFrame();
+  componentDidMount() {
+    this.loadFrame()
+  }
+
+  loadFrame() {
+    const timeoutId = setTimeout(
+      () => this.setState({ loadingMode: LoadingMode.SlowLoading }),
+      OVERLAY_LOADING_TIMEOUT
+    )
+
+    const overlay = this.props.overlay
+    overlay.checkAvailability()
+
+    this.setState({ loadingMode: LoadingMode.Loading })
+
+    this.ref.current.appendChild(overlay.frame)
+
+    const loadHandler = () => {
+      clearTimeout(timeoutId)
+      if (!overlay.isError) {
+        this.setState({ loadingMode: LoadingMode.NotLoading })
+      }
+      overlay.frame.removeEventListener('load', loadHandler)
     }
+    overlay.frame.addEventListener('load', loadHandler)
 
-    loadFrame() {
-        const timeoutId = setTimeout(
-            () => this.setState({ loadingMode: LoadingMode.SlowLoading }),
-            OVERLAY_LOADING_TIMEOUT
-        );
+    const networkErrorHandler = () => {
+      clearTimeout(timeoutId)
+      overlay.frame.remove()
 
-        const overlay = this.props.overlay;
-        overlay.checkAvailability();
+      const { protocol, hostname } = new URL(overlay.uri)
+      if (
+        protocol === 'https:' &&
+        (hostname === 'localhost' || hostname === '127.0.0.1')
+      ) {
+        this.setState({ loadingMode: LoadingMode.SslError })
+      } else {
+        this.setState({ loadingMode: LoadingMode.NetworkError })
+      }
 
-        this.setState({ loadingMode: LoadingMode.Loading });
-
-        this.ref.current.appendChild(overlay.frame);
-
-        const loadHandler = () => {
-            clearTimeout(timeoutId);
-            if (!overlay.isError) {
-                this.setState({ loadingMode: LoadingMode.NotLoading });
-            }
-            overlay.frame.removeEventListener("load", loadHandler);
-        };
-        overlay.frame.addEventListener("load", loadHandler);
-
-        const networkErrorHandler = () => {
-            clearTimeout(timeoutId);
-            overlay.frame.remove();
-
-            const { protocol, hostname } = new URL(overlay.uri);
-            if (protocol === 'https:' && (hostname === 'localhost' || hostname === '127.0.0.1')) {
-                this.setState({ loadingMode: LoadingMode.SslError });
-            } else {
-                this.setState({ loadingMode: LoadingMode.NetworkError });
-            }
-
-            overlay.frame.removeEventListener("error_network", networkErrorHandler);
-        };
-        overlay.frame.addEventListener("error_network", networkErrorHandler);
-
-        const serverErrorHandler = () => {
-            clearTimeout(timeoutId);
-            overlay.frame.remove();
-            this.setState({ loadingMode: LoadingMode.ServerError });
-            overlay.frame.removeEventListener("error_server", serverErrorHandler);
-        };
-        overlay.frame.addEventListener("error_server", serverErrorHandler);
+      overlay.frame.removeEventListener('error_network', networkErrorHandler)
     }
+    overlay.frame.addEventListener('error_network', networkErrorHandler)
 
-    openOverlayInTab() {
-        const overlay = this.props.overlay;
-        window.open(overlay.uri, '_blank');
+    const serverErrorHandler = () => {
+      clearTimeout(timeoutId)
+      overlay.frame.remove()
+      this.setState({ loadingMode: LoadingMode.ServerError })
+      overlay.frame.removeEventListener('error_server', serverErrorHandler)
     }
+    overlay.frame.addEventListener('error_server', serverErrorHandler)
+  }
 
-    render() {
-        const s = this.state;
-        const p = this.props;
-        const x = this.props.overlay;
+  openOverlayInTab() {
+    const overlay = this.props.overlay
+    window.open(overlay.uri, '_blank')
+  }
 
-        const childrenOverlays = p.overlayManager.getOverlays().filter(x => x.parent === p.overlay);
+  render() {
+    const s = this.state
+    const p = this.props
+    const x = this.props.overlay
 
-        return (
-            <div
-                className={cn("dapplets-overlay-nav-content-item", {
-                    "dapplets-overlay-nav-content-item-active": p.isActive,
-                })}
-            >
-                {s.loadingMode === LoadingMode.Loading && (
-                    <div className="loader-container">
-                        <div className="flex">
-                            <div className="loader"></div>
-                        </div>
-                        <div className="load-text">Loading Overlay...</div>
-                        <div className="load-text">
-                            Downloading from decentralized sources like Swarm or IPFS can take
-                            some time
-                        </div>
-                    </div>
-                )}
+    const childrenOverlays = p.overlayManager
+      .getOverlays()
+      .filter((x) => x.parent === p.overlay)
 
-                {s.loadingMode === LoadingMode.SlowLoading && (
-                    <div className="loader-container">
-                        <div className="flex">
-                            <div className="loader"></div>
-                        </div>
-                        <div className="load-text">Loading Overlay...</div>
-                        <div className="load-text">
-                            The overlay it is taking a while to load.
-                        </div>
-                        <div className="load-text-desc">
-                            If the overlay does not load, try changing your preferred overlay
-                            storage in the extension settings.
-                        </div>
-                    </div>
-                )}
-
-                {s.loadingMode === LoadingMode.NetworkError && (
-                    <div className="loader-container" style={{ zIndex: 1 }}>
-                        <div className="load-text">No Internet Connection</div>
-                        <div className="load-text">
-                            Please check your internet connection and try again
-                        </div>
-                        <div className="load-text">
-                            <button onClick={this.loadFrame.bind(this)}>Try again</button>
-                        </div>
-                    </div>
-                )}
-
-                {s.loadingMode === LoadingMode.ServerError && (
-                    <div className="loader-container" style={{ zIndex: 1 }}>
-                        <div className="load-text">Internal Server Error</div>
-                        <div className="load-text">
-                            Sorry, there were some technical issues while processing your request.
-                            You can change preferred overlay storage and try again.
-                        </div>
-                        <div className="load-text">
-                            <button onClick={this.loadFrame.bind(this)}>Try again</button>
-                        </div>
-                    </div>
-                )}
-
-                {s.loadingMode === LoadingMode.SslError && (
-                    <div className="loader-container" style={{ zIndex: 1 }}>
-                        <div className="load-text">Unverified SSL Certificate</div>
-                        <div className="load-text">
-                            <p>
-                                If you are a dapplet developer and you are running the overlay
-                                over HTTPS, you may encounter an untrusted SSL certificate error.
-                                Open the overlay in a new browser tab and accept the self-signed certificate.
-                            </p>
-                        </div>
-                        <div className="load-text">
-                            <button onClick={this.openOverlayInTab.bind(this)}>Accept SSL</button>
-                        </div>
-                        <div className="load-text">
-                            <p>If you are not developing dapplets, then you should beware, your Internet connection may be broken.</p>
-                        </div>
-                        <div className="load-text">
-                            <button onClick={this.loadFrame.bind(this)}>Try again</button>
-                        </div>
-                    </div>
-                )}
-
-                <div className="frame-container" ref={this.ref}></div>
-
-                {childrenOverlays.map(x => <PopupItem key={x.id} overlay={x} />)}
+    return (
+      <div
+        // style={{ display: 'none' }}
+        className={cn('dapplets-overlay-nav-content-item', {
+          'dapplets-overlay-nav-content-item-active': p.isActive,
+        })}
+      >
+        {s.loadingMode === LoadingMode.Loading && (
+          <div className="loader-container">
+            <div className="flex">
+              <div className="loader"></div>
             </div>
-        );
-    }
+            <div className="load-text">Loading Overlay...</div>
+            <div className="load-text">
+              Downloading from decentralized sources like Swarm or IPFS can take
+              some time
+            </div>
+          </div>
+        )}
+
+        {s.loadingMode === LoadingMode.SlowLoading && (
+          <div className="loader-container">
+            <div className="flex">
+              <div className="loader"></div>
+            </div>
+            <div className="load-text">Loading Overlay...</div>
+            <div className="load-text">
+              The overlay it is taking a while to load.
+            </div>
+            <div className="load-text-desc">
+              If the overlay does not load, try changing your preferred overlay
+              storage in the extension settings.
+            </div>
+          </div>
+        )}
+
+        {s.loadingMode === LoadingMode.NetworkError && (
+          <div className="loader-container" style={{ zIndex: 1 }}>
+            <div className="load-text">No Internet Connection</div>
+            <div className="load-text">
+              Please check your internet connection and try again
+            </div>
+            <div className="load-text">
+              <button onClick={this.loadFrame.bind(this)}>Try again</button>
+            </div>
+          </div>
+        )}
+
+        {s.loadingMode === LoadingMode.ServerError && (
+          <div className="loader-container" style={{ zIndex: 1 }}>
+            <div className="load-text">Internal Server Error</div>
+            <div className="load-text">
+              Sorry, there were some technical issues while processing your
+              request. You can change preferred overlay storage and try again.
+            </div>
+            <div className="load-text">
+              <button onClick={this.loadFrame.bind(this)}>Try again</button>
+            </div>
+          </div>
+        )}
+
+        {s.loadingMode === LoadingMode.SslError && (
+          <div className="loader-container" style={{ zIndex: 1 }}>
+            <div className="load-text">Unverified SSL Certificate</div>
+            <div className="load-text">
+              <p>
+                If you are a dapplet developer and you are running the overlay
+                over HTTPS, you may encounter an untrusted SSL certificate
+                error. Open the overlay in a new browser tab and accept the
+                self-signed certificate.
+              </p>
+            </div>
+            <div className="load-text">
+              <button onClick={this.openOverlayInTab.bind(this)}>
+                Accept SSL
+              </button>
+            </div>
+            <div className="load-text">
+              <p>
+                If you are not developing dapplets, then you should beware, your
+                Internet connection may be broken.
+              </p>
+            </div>
+            <div className="load-text">
+              <button onClick={this.loadFrame.bind(this)}>Try again</button>
+            </div>
+          </div>
+        )}
+
+        <div className="frame-container" ref={this.ref}></div>
+
+        {childrenOverlays.map((x) => (
+          <PopupItem key={x.id} overlay={x} />
+        ))}
+      </div>
+    )
+  }
 }

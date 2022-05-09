@@ -110,7 +110,8 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
   const nodeInput = useRef<HTMLInputElement>()
   const [contextDeleteNone, setContextDeleteNone] = useState(false)
   const [isDisabledPush, setDisabledPush] = useState(true)
-
+  const [visibleContextId, setVisibleContextId] = useState('')
+  const [addDisabled, setAddDisabled] = useState(false)
   const newContextObject = ''
   const addButtonClickHandlerContext = () => {
     const newContext = Object.assign({}, mi)
@@ -129,6 +130,7 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
     console.log(mi)
     console.log(id)
   }
+  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
     _isMounted = true
@@ -139,7 +141,7 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
     return () => {
       _isMounted = false
     }
-  }, [mi])
+  }, [mi, visible, editContextId])
 
   bus.subscribe(
     'data',
@@ -239,11 +241,13 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
 
   const _addContextId = async (contextId: string) => {
     setEditContextIdLoading(true)
-
+    setAddDisabled(true)
     const { addContextId } = await initBGFunctions(browser)
     await addContextId(targetRegistry, mi.name, contextId)
-    setEditContextIdLoading(false)
     setEditContextIdDone(true)
+    setVisible(true)
+    setEditContextId('')
+    setEditContextIdLoading(false)
   }
   const saveChanges = async () => {
     _addContextId(editContextId)
@@ -294,6 +298,7 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
                         key={i}
                         ref={nodeInput}
                         className={styles.blockContextTitle}
+                        value={editContextId}
                         placeholder={'Context ID (ex: example.com)'}
                         onChange={(e) => {
                           // setMi({
@@ -301,6 +306,9 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
                           //   contextIds: [e.target.value],
                           // })
                           setEditContextId(e.target.value)
+                          setVisibleContextId(e.target.value) //readonly
+                          console.log(editContextId)
+
                           console.log(nodeInput.current?.value)
                           console.log(mi)
                         }}
@@ -321,20 +329,36 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
                       />
                     </div>
                     <button
-                      disabled={nodeInput.current?.value.length < 2}
+                      disabled={
+                        nodeInput.current?.value.length < 2 || addDisabled
+                      }
                       onClick={() => {
                         node.current?.classList.add('valid')
                         _addContextId(editContextId)
+                        setEditContextId('')
                       }}
                       className={cn(styles.addContext, {
                         [styles.addContextDisabled]:
-                          nodeInput.current?.value.length < 2,
+                          nodeInput.current?.value.length < 2 || addDisabled,
                       })}
                     >
                       ADD
                     </button>
                   </div>
                 ))}
+                {editContextIdLoading ? (
+                  <div className={styles.editContextIdLoading}></div>
+                ) : (
+                  <>
+                    {visible ? (
+                      <input
+                        className={styles.blockContext}
+                        placeholder={visibleContextId}
+                        readOnly
+                      />
+                    ) : null}
+                  </>
+                )}
               </div>
             </div>
           }

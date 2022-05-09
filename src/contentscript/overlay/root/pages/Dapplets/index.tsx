@@ -79,10 +79,10 @@ export const Dapplets = () => {
     order?,
     selectVersions?: boolean
   ) => {
-    setLoadShowButton(true)
     const { name } = module
 
     if (selectVersions && isActive) {
+      setLoadShowButton(true)
       _updateFeatureState(name, { isLoading: true })
       const { getVersions } = await initBGFunctions(browser)
       const allVersions = await getVersions(
@@ -90,11 +90,12 @@ export const Dapplets = () => {
         module.name
       )
       _updateFeatureState(name, { versions: allVersions, isLoading: false })
-      return
+      return setLoadShowButton(false)
     } else {
+      setLoadShowButton(true)
       await toggleFeature(module, null, isActive, order, null)
+      setLoadShowButton(false)
     }
-    setLoadShowButton(false)
   }
 
   const toggleFeature = async (

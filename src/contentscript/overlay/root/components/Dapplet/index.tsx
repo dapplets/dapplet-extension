@@ -74,6 +74,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   // console.log(isActionHandler)
   useEffect(() => {
     loadShowButton
+    // onSwitchChange(dapplet, !isActive)
   }, [])
 
   return (
@@ -90,12 +91,20 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
               <Icon size="small" icon={Update} />
             </div>
 
-            {!isUnderConstruction && (
-              <Switch
-                checked={isActive}
-                onChange={() => onSwitchChange(dapplet, !isActive)}
-              />
-            )}
+            {
+              // loadShowButton ? (
+              //   <div className={styles.loadingDappletsHome}></div>
+              // ) : (
+              !isUnderConstruction && (
+                <Switch
+                  // isLoad={loadShowButton}
+                  checked={isActive}
+                  onChange={() => {
+                    onSwitchChange(dapplet, !isActive)
+                  }}
+                />
+              )
+            }
           </div>
 
           <div className={cn(styles.blockText)}>{description}</div>
@@ -143,20 +152,16 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
         <div className={cn(styles.blockBottom)}>
           <div className={cn(styles.firstButtons)}>
-            {isActive &&
-              isActionHandler &&
-              (loadShowButton ? (
-                <div className={styles.loadingDappletsHome}></div>
-              ) : (
-                <SquaredButton
-                  // loadShowButton={loadShowButton}
-                  appearance="smail"
-                  icon={HomeIcon}
-                  className={styles.squareButton}
-                  title="Home"
-                  onClick={() => onOpenDappletAction(dapplet)}
-                />
-              ))}
+            {isActive && isActionHandler ? (
+              <SquaredButton
+                // loadShowButton={loadShowButton}
+                appearance="smail"
+                icon={HomeIcon}
+                className={styles.squareButton}
+                title="Home"
+                onClick={() => onOpenDappletAction(dapplet)}
+              />
+            ) : null}
             {!isUnderConstruction && (
               <SquaredButton
                 appearance="smail"

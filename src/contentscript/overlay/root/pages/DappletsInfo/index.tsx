@@ -32,6 +32,7 @@ import {
 } from '../../../../../common/constants'
 import { Icon, List, Message } from 'semantic-ui-react'
 import { Modal } from '../../components/Modal'
+import ReactDOM from 'react-dom'
 
 tracing.startTracing()
 
@@ -158,6 +159,11 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const onClosePush = () => setModalPush(false)
   const [isModalTransaction, setModalTransaction] = useState(false)
   const onCloseTransaction = () => setModalTransaction(false)
+  const [autorDisabled, setAuthorDisabled] = useState(false)
+  const [author, setAuthor] = useState({ authorForm: [] })
+  const newAuthorObject = {
+    author: '',
+  }
 
   useEffect(() => {
     _isMounted = true
@@ -165,14 +171,17 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       await _updateData()
 
       // await _updateCurrentAccount()
-      console.log(currentAccount)
-      console.log(targetChain)
     }
     init()
+    if (author.authorForm.length === 0) {
+      setAuthorDisabled(false)
+    }
+    console.log(autorDisabled)
+
     return () => {
       _isMounted = false
     }
-  }, [mi, st, targetChain])
+  }, [mi, st, targetChain, autorDisabled, author])
   bus.subscribe(
     'data',
     async ({ mi, vi }: { mi: ModuleInfo; vi: VersionInfo }) => {
@@ -496,15 +505,17 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setSt([...filesArr])
   }
 
-  const [author, setAuthor] = useState({ authorForm: [] })
-  const newAuthorObject = {
-    author: 'New admins',
-  }
-  const addButtonClickHandler = () => {
+  const addButtonClickHandler = (e) => {
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.push(newAuthorObject)
     setAuthor(newAuthor)
+    // e.currentTarget.scrollIntoView({
+    //   block: 'center',
+    //   behavior: 'smooth',
+    // })
+    // e.currentT
   }
+  let messagesContainer = useRef<HTMLDivElement>()
 
   const onDeleteChild = (id: number) => {
     const newAuthor = Object.assign({}, author)
@@ -722,18 +733,47 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 <div className={styles.blockAdmins}>
                   <h3 className={styles.adminsTitle}>Admins</h3>
                   <button
-                    onClick={addButtonClickHandler}
-                    className={styles.adminsButton}
+                    disabled={
+                      autorDisabled
+                      // // author &&
+                      // // author.authorForm &&
+                      // author.authorForm.length !== 0
+                    }
+                    onClick={(e) => {
+                      addButtonClickHandler(e)
+                      setAuthorDisabled(true)
+                      // e.currentTarget.scrollIntoView()
+                    }}
+                    className={cn(styles.adminsButton, {
+                      [styles.adminsButtonDisabled]: autorDisabled,
+                    })}
                   />
                 </div>
                 {author.authorForm.map((x, i) => (
-                  <div key={i} className={styles.blockAuthors}>
+                  <div
+                    ref={messagesContainer}
+                    key={i}
+                    className={styles.blockAuthors}
+                  >
                     <input
                       className={styles.authorTitle}
                       placeholder={x.author}
+                      // onFocus={(e) => {}}
                       onChange={(e) => {
-                        e.target.value
-                        setDisabledPush(false)
+                        // setDisabledPush(false)
+                        author.authorForm[i].author = e.target.value
+                        if (e.target.value.length !== 0) {
+                          setAuthorDisabled(false)
+                        }
+
+                        // author.authorForm.map((x, i) => {
+                        //   if (author.authorForm[i].author.length === 0) {
+                        //     return setAuthorDisabled(false)
+                        //   } else if (author.authorForm[i].author.length !== 0) {
+                        //     return setAuthorDisabled(true)
+                        //   }
+                        //   // author.authorForm[i].author = e.target.value
+                        // })
                       }}
                     />
                     <button

@@ -132,6 +132,17 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
     nodeOverlayToolbar,
     isNodeOverlayToolbar,
   ])
+  const getImgNoSystmTab = () => {
+    if (nonSystemTabs.length > 0) {
+      const num = nonSystemTabs.map((x, i) => {
+        return x.source
+      })
+      return String(num)
+    } else {
+      return
+    }
+  }
+  console.log(getImgNoSystmTab())
 
   return (
     <div
@@ -156,6 +167,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
           <OverlayTab
             id="system"
             dap={allDapplet}
+            source={getImgNoSystmTab()}
             menu={menu}
             nameSelectedMenu={nameSelectedMenu}
             activeTab={true}
@@ -173,9 +185,9 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 
                 return (
                   <OverlayTab
+                    id={id}
                     dap={allDapplet}
                     source={source}
-                    id={id}
                     menu={[]}
                     key={id}
                     nameSelectedMenu={nameSelectedMenu}
