@@ -10,9 +10,16 @@
   border-radius: 10px 0 0 10px;
   background: #f5f5f5;
   // box-shadow: -4px 0px 4px rgb(0 0 0 / 25%);
+  img {
+    width: 30px !important;
+    height: 30px !important;
+  }
 }
 .tabNotActive {
   background: #eaf0f0;
+  // filter: drop-shadow(4px 0px 4px rgba(0, 0, 0, 0.25));
+  box-shadow: inset -2px 0px 4px rgb(0 0 0 / 25%);
+
   img {
     -webkit-filter: grayscale(100%);
   }
@@ -45,15 +52,15 @@
 .image {
   display: block;
 
-  width: 32px;
-  height: 32px;
+  width: 30px !important;
+  height: 30px !important;
   margin-right: auto;
   margin-left: auto;
 
   background: #f00;
   span {
-    width: 32px;
-    height: 32px;
+    width: 30px !important;
+    height: 30px !important;
   }
 }
 

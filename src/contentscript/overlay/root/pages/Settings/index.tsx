@@ -38,7 +38,7 @@ enum SettingsTabs {
 }
 enum DappletsDetails {
   MAININFO = 0,
-  SETTINGS = 1,
+  // SETTINGS = 1,
 }
 
 enum UnderConstructionDetails {
@@ -206,13 +206,13 @@ export const SettingsOverlay = () => {
                 }
                 isActive={activeTaDappletsDetails === DappletsDetails.MAININFO}
               />
-              <SettingTitle
+              {/* <SettingTitle
                 title="Settings"
                 onClick={() =>
                   setActiveTabDappletsDetails(DappletsDetails.SETTINGS)
                 }
                 isActive={activeTaDappletsDetails === DappletsDetails.SETTINGS}
-              />
+              /> */}
             </div>
             <div className={styles.settingMain}>
               {activeTaDappletsDetails === DappletsDetails.MAININFO && (
@@ -224,7 +224,7 @@ export const SettingsOverlay = () => {
                   setShowChildrenRegistery={setShowChildrenRegistery}
                 />
               )}
-              {activeTaDappletsDetails === DappletsDetails.SETTINGS && (
+              {/* {activeTaDappletsDetails === DappletsDetails.SETTINGS && (
                 <DappletsInfoSettings
                   ModuleInfo={ModuleInfo}
                   ModuleVersion={ModuleVersion}
@@ -232,7 +232,7 @@ export const SettingsOverlay = () => {
                   setDappletsDetail={setDappletsDetail}
                   setShowChildrenRegistery={setShowChildrenRegistery}
                 />
-              )}
+              )} */}
             </div>
           </div>
         )}

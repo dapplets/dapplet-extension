@@ -115,15 +115,15 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   ])
 
   const [author, setAuthor] = useState({ authorForm: [] })
-  const [contextDeleteNone, setContextDeleteNone] = useState(false)
+  // const [contextDeleteNone, setContextDeleteNone] = useState(false)
 
   const newAuthorObject = {
     author: 'New admins',
   }
   const fileInput = useRef<HTMLInputElement>()
   const [st, setSt] = useState([])
-  const node = useRef<HTMLButtonElement>()
-  const nodeInput = useRef<HTMLInputElement>()
+  // const node = useRef<HTMLButtonElement>()
+  // const nodeInput = useRef<HTMLInputElement>()
   const [isDisabledPush, setDisabledPush] = useState(true)
   const [isModal, setModal] = useState(false)
   const onClose = () => setModal(false)
@@ -158,25 +158,25 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   }
 
   // const [contextId, setContextId] = useState(mi)
-  let newContextObject = ''
-  const addButtonClickHandlerContext = () => {
-    const newContext = Object.assign({}, mi)
-    newContext.contextIds.push(
-      // ...mi.contextIds,
-      newContextObject
-    )
-    setMi(newContext)
-    // setContextDeleteNone(false)
-    console.log(mi)
-  }
+  // let newContextObject = ''
+  // const addButtonClickHandlerContext = () => {
+  //   const newContext = Object.assign({}, mi)
+  //   newContext.contextIds.push(
+  //     // ...mi.contextIds,
+  //     newContextObject
+  //   )
+  //   setMi(newContext)
+  //   // setContextDeleteNone(false)
+  //   console.log(mi)
+  // }
 
-  const onDeleteChildContext = (id: number) => {
-    const newContext = Object.assign({}, mi)
-    newContext.contextIds.splice(id, 1)
-    setMi(newContext)
-    console.log(mi)
-    console.log(id)
-  }
+  // const onDeleteChildContext = (id: number) => {
+  //   const newContext = Object.assign({}, mi)
+  //   newContext.contextIds.splice(id, 1)
+  //   setMi(newContext)
+  //   console.log(mi)
+  //   console.log(id)
+  // }
 
   // ===
   bus.subscribe(
@@ -361,13 +361,57 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     await _updateData()
   }
 
+  const newContextObject = ''
+  const addButtonClickHandlerContext = () => {
+    const newContext = Object.assign({}, mi)
+    newContext.contextIds.push(
+      // ...mi.contextIds,
+      newContextObject
+    )
+    setMi(newContext)
+    console.log(mi)
+  }
+
+  const onDeleteChildContext = (id: number) => {
+    const newContext = Object.assign({}, mi)
+    newContext.contextIds.splice(id, 1)
+    setMi(newContext)
+    console.log(mi)
+    console.log(id)
+  }
+  const [visible, setVisible] = useState(false)
+  const node = useRef<HTMLButtonElement>()
+  const nodeInput = useRef<HTMLInputElement>()
+  const [visibleContextId, setVisibleContextId] = useState({
+    visibleContext: [],
+  })
+  const [contextDeleteNone, setContextDeleteNone] = useState(false)
+  const [addDisabled, setAddDisabled] = useState(false)
   const _addContextId = async (contextId: string) => {
     setEditContextIdLoading(true)
+    setAddDisabled(true)
 
-    const { addContextId } = await initBGFunctions(browser)
-    await addContextId(targetRegistry, mi.name, contextId)
-    setEditContextIdLoading(false)
-    setEditContextIdDone(true)
+    try {
+      const { addContextId } = await initBGFunctions(browser)
+      await addContextId(targetRegistry, mi.name, contextId)
+      const newForm = Object.assign({}, visibleContextId)
+
+      newForm.visibleContext.push(editContextId)
+      setVisibleContextId(newForm)
+
+      setEditContextIdDone(true)
+      setVisible(true)
+      setEditContextId('')
+      setEditContextIdLoading(false)
+      setAddDisabled(false)
+      node.current?.classList.remove('valid')
+    } catch (error) {
+      setEditContextIdDone(true)
+      setVisible(false)
+      setEditContextIdLoading(false)
+      setAddDisabled(false)
+      node.current?.classList.remove('valid')
+    }
   }
 
   const isNoStorage = targetStorages.length === 0
@@ -570,66 +614,81 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                 <div className={styles.blockContextID}>
                   <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
                   <button
-                    // disabled={mi.contextIds.length >= 1}
+                    disabled={mi.contextIds.length >= 1}
                     onClick={addButtonClickHandlerContext}
                     className={cn(styles.contextIDButton, {
                       [styles.contextIDButtonDisabled]:
-                        mi.contextIds &&
-                        mi.contextIds.length &&
                         mi.contextIds.length >= 1,
                     })}
                   />
                 </div>
-                {mi &&
-                  mi.contextIds &&
-                  mi.contextIds.map((x, i) => (
-                    <div key={i} className={styles.wrapperContext}>
-                      <div className={styles.blockContext}>
+                {mi.contextIds.map((x, i) => (
+                  <div key={i} className={styles.wrapperContext}>
+                    <div className={styles.blockContext}>
+                      <input
+                        key={i}
+                        ref={nodeInput}
+                        className={styles.blockContextTitle}
+                        value={editContextId}
+                        placeholder={'Context ID (ex: example.com)'}
+                        onChange={(e) => {
+                          setEditContextId(e.target.value)
+
+                          console.log(nodeInput.current?.value)
+                          console.log(mi)
+                        }}
+                        // onBlur={() => {
+                        //   _addContextId(editContextId)
+                        // }}
+                      />
+
+                      <button
+                        ref={node}
+                        onClick={() => {
+                          onDeleteChildContext(i)
+                          setEditContextId('')
+                        }}
+                        className={cn(styles.contextDelete, {
+                          [styles.contextDeleteNone]: contextDeleteNone,
+                        })}
+                      />
+                    </div>
+                    <button
+                      disabled={
+                        nodeInput.current?.value.length < 2 || addDisabled
+                      }
+                      onClick={() => {
+                        node.current?.classList.add('valid')
+                        _addContextId(editContextId)
+
+                        setEditContextId('')
+                      }}
+                      className={cn(styles.addContext, {
+                        [styles.addContextDisabled]:
+                          nodeInput.current?.value.length < 2 || addDisabled,
+                      })}
+                    >
+                      ADD
+                    </button>
+                  </div>
+                ))}
+                {editContextIdLoading ? (
+                  <div className={styles.editContextIdLoading}></div>
+                ) : (
+                  <>
+                    {visible &&
+                      visibleContextId &&
+                      visibleContextId.visibleContext.map((x, i) => (
                         <input
                           key={i}
-                          ref={nodeInput}
-                          className={styles.blockContextTitle}
-                          placeholder={'Context ID (ex: example.com)'}
-                          onChange={(e) => {
-                            // setMi({
-                            //   ...mi,
-                            //   contextIds: [e.target.value],
-                            // })
-                            setEditContextId(e.target.value)
-                            console.log(nodeInput.current?.value)
-                            console.log(mi)
-                          }}
-                          // onBlur={() => {
-                          //   _addContextId(editContextId)
-                          // }}
+                          className={styles.blockContext}
+                          placeholder={x}
+                          value={x}
+                          readOnly
                         />
-
-                        <button
-                          ref={node}
-                          onClick={() => {
-                            onDeleteChildContext(i)
-                            setEditContextId('')
-                          }}
-                          className={cn(styles.contextDelete, {
-                            [styles.contextDeleteNone]: contextDeleteNone,
-                          })}
-                        />
-                      </div>
-                      <button
-                        disabled={nodeInput.current?.value.length < 2}
-                        onClick={() => {
-                          node.current?.classList.add('valid')
-                          _addContextId(editContextId)
-                        }}
-                        className={cn(styles.addContext, {
-                          [styles.addContextDisabled]:
-                            nodeInput.current?.value.length < 2,
-                        })}
-                      >
-                        ADD
-                      </button>
-                    </div>
-                  ))}
+                      ))}
+                  </>
+                )}
               </div>
             </div>
           }

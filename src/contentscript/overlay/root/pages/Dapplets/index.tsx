@@ -58,6 +58,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
       setDapplets(d)
       setLoadingListDapplets(false)
+      const features = await _getFilteredDapplets()
+      setFeatures(features)
     }
 
     init()
@@ -73,13 +75,17 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     } else {
       setLoadingListDapplets(false)
     }
+
+    if (features) {
+      setDapplets(features)
+    }
     // refresh()
     EventBus.on('mydapplets_changed', init)
     EventBus.on('context_started', init)
     EventBus.on('context_finished', init)
     EventBus.on('dapplet_activated', init)
     EventBus.on('dapplet_deactivated', init)
-    _getFilteredDapplets()
+    // _getFilteredDapplets()
     return () => {
       EventBus.off('mydapplets_changed', init)
       EventBus.off('context_started', init)
@@ -208,15 +214,13 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const _getFilteredDapplets = async () => {
     // const { features, search } = this.state
 
-    if (!search || search.length === 0) return setDapplets(dapplets)
+    if (!search || search.length === 0) return dapplets
 
     const find = (a: string) =>
       (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1
-    return setDapplets(
-      dapplets.filter(
-        (x: ManifestAndDetails) =>
-          find(x.name) || find(x.title) || find(x.description) || find(x.author)
-      )
+    return dapplets.filter(
+      (x: ManifestAndDetails) =>
+        find(x.name) || find(x.title) || find(x.description) || find(x.author)
     )
   }
 
@@ -379,10 +383,10 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                   )
               })
             ) : (
-              <div>lalal</div>
+              <div>No available features for current site.</div>
             )
           ) : (
-            <div>lololo</div>
+            <div>No connection with context webpage.</div>
           )}
         </div>
       )}
