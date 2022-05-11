@@ -165,3 +165,11 @@
     left: 0;
   }
 }
+
+.searchBlock {
+  position: absolute;
+  top: 16px;
+  right: 15px;
+  z-index: 3;
+  width: 84%;
+}

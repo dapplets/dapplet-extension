@@ -1,4 +1,4 @@
-@import "../../assets/styles/color.variables.scss";
+@import '../../assets/styles/color.variables.scss';
 
 .button {
   display: flex;
@@ -27,4 +27,11 @@
 
   border-radius: 10px;
   background: $PureWhite;
+
+  &:hover {
+    background: $OverlayBG;
+  }
+  &:active {
+    background: $AppBG;
+  }
 }

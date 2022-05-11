@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
@@ -15,23 +15,30 @@ import {
   ModuleTypes,
   DAPPLETS_STORE_URL,
 } from '../../../../../common/constants'
+import { features } from 'process'
 
 export type Module = ManifestDTO & {
   isLoading: boolean
   error: string
   versions: string[]
 }
+export interface DappletsProps {
+  search: string
+}
 
 let _isMounted = false
 
-export const Dapplets = () => {
+export const Dapplets: FC<DappletsProps> = (props) => {
+  const { search } = props
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
   const [isLoading, setLoading] = useState<boolean>(null)
-  const [isLoadingListDapplets, setLoadingLoadingListDapplets] = useState(false)
+  const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
   const [error, setError] = useState<string>(null)
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
   const [devMessage, setDevMessage] = useState<string>(null)
   const [loadShowButton, setLoadShowButton] = useState(false)
+  const [contextId, setContextIds] = useState<string[]>([])
+  const [features, setFeatures] = useState<ManifestAndDetails[]>([])
 
   useEffect(() => {
     _isMounted = true
@@ -46,23 +53,33 @@ export const Dapplets = () => {
 
       const d = await getFeaturesByHostnames(ids)
 
+      setContextIds(ids)
+      await _refreshDataByContext(ids)
+
       setDapplets(d)
-
-      setLoadingLoadingListDapplets(false)
+      setLoadingListDapplets(false)
     }
+
     init()
-    if (dapplets.length === 0) {
-      setLoadingLoadingListDapplets(true)
-    } else {
-      setLoadingLoadingListDapplets(false)
-    }
 
+    // const initSearch = async () => {
+    //   const features = await _getFilteredDapplets()
+    //   setDapplets(features)
+    // }
+    // initSearch()
+
+    if (dapplets.length === 0) {
+      setLoadingListDapplets(true)
+    } else {
+      setLoadingListDapplets(false)
+    }
+    // refresh()
     EventBus.on('mydapplets_changed', init)
     EventBus.on('context_started', init)
     EventBus.on('context_finished', init)
     EventBus.on('dapplet_activated', init)
     EventBus.on('dapplet_deactivated', init)
-
+    _getFilteredDapplets()
     return () => {
       EventBus.off('mydapplets_changed', init)
       EventBus.off('context_started', init)
@@ -71,7 +88,137 @@ export const Dapplets = () => {
       EventBus.off('dapplet_deactivated', init)
       _isMounted = false
     }
-  }, [])
+  }, [search])
+  // console.log(search)
+
+  // const refresh = async () => {
+  //   const { getCurrentContextIds } = await initBGFunctions(browser)
+  //   const contextIds = await getCurrentContextIds(currentTab)
+  //   if (_isMounted) {
+  //     setContextIds(contextIds)
+  //     await _refreshDataByContext(contextIds)
+  //   }
+  // }
+
+  const _refreshDataByContext = async (contextIds: Promise<string[]>) => {
+    let contextIdsValues = undefined
+
+    try {
+      contextIdsValues = await contextIds
+    } catch (err) {
+      console.error(err)
+      setNoContentScript(true)
+      setLoading(false)
+      return
+    }
+
+    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(
+      browser
+    )
+
+    const features: ManifestDTO[] = contextIdsValues
+      ? await getFeaturesByHostnames(contextIdsValues)
+      : []
+
+    const registries = await getRegistries()
+    const regsWithErrors = registries.filter(
+      (r) => !r.isDev && !!r.isEnabled && !!r.error
+    )
+    if (regsWithErrors.length > 0) {
+      const isProviderProblems =
+        regsWithErrors.filter(
+          ({ error }) =>
+            error.includes('missing response') ||
+            error.includes('could not detect network') ||
+            error.includes('resolver or addr is not configured for ENS name') ||
+            error.includes('invalid contract address or ENS name')
+        ).length > 0
+
+      const description = isProviderProblems
+        ? 'It looks like the blockchain provider is not available. Check provider addresses in the settings, or try again later.'
+        : 'Please check the settings.'
+
+      setError(
+        `Cannot connect to the Dapplet Registry (${regsWithErrors
+          .map((x) => x.url)
+          .join(', ')}).\n${description}`
+      )
+    }
+
+    if (_isMounted) {
+      // setLoadingLoadingListDapplets(false)
+      const d = features
+        .filter((f) => f.type === ModuleTypes.Feature)
+        .map((f) => ({
+          ...f,
+          isLoading: false,
+          isActionLoading: false,
+          isHomeLoading: false,
+          error: null,
+          versions: [],
+        }))
+
+      setDapplets(d)
+      setLoading(false)
+    }
+  }
+
+  const _updateFeatureState = (name: string, f: any) => {
+    const newDapplets = dapplets.map((feature) => {
+      if (feature.name == name) {
+        Object.entries(f).forEach(([k, v]) => (feature[k] = v))
+      }
+      return feature
+    })
+
+    setDapplets(newDapplets)
+  }
+
+  const refreshContextPage = async () => {
+    const { getCurrentTab, getCurrentContextIds, reloadCurrentPage } =
+      await initBGFunctions(browser)
+    const tab = await getCurrentTab()
+    if (!tab) return
+    await reloadCurrentPage()
+    setNoContentScript(false)
+
+    setTimeout(
+      () => _refreshDataByContext(getCurrentContextIds(dapplets)),
+      4000
+    ) // ToDo: get rid of timeout
+  }
+
+  const onOpenDappletAction = async (f: ManifestAndDetails) => {
+    try {
+      _updateFeatureState(f.name, { isActionLoading: true })
+      const { openDappletAction, getCurrentTab } = await initBGFunctions(
+        browser
+      )
+      const tab = await getCurrentTab()
+      if (!tab) return
+      await openDappletAction(f.name, tab.id)
+      window.close()
+    } catch (err) {
+      console.error(err)
+    } finally {
+      _updateFeatureState(f.name, { isActionLoading: false })
+    }
+  }
+
+  const _getFilteredDapplets = async () => {
+    // const { features, search } = this.state
+
+    if (!search || search.length === 0) return setDapplets(dapplets)
+
+    const find = (a: string) =>
+      (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1
+    return setDapplets(
+      dapplets.filter(
+        (x: ManifestAndDetails) =>
+          find(x.name) || find(x.title) || find(x.description) || find(x.author)
+      )
+    )
+  }
 
   const onSwitchChange = async (
     module: Module,
@@ -161,103 +308,12 @@ export const Dapplets = () => {
     _updateFeatureState(name, { isLoading: false })
   }
 
-  const _updateFeatureState = (name: string, f: any) => {
-    const newDapplets = dapplets.map((feature) => {
-      if (feature.name == name) {
-        Object.entries(f).forEach(([k, v]) => (feature[k] = v))
-      }
-      return feature
-    })
-
-    setDapplets(newDapplets)
-  }
-
-  const _refreshDataByContext = async (contextIds: Promise<string[]>) => {
-    let contextIdsValues = undefined
-
-    try {
-      contextIdsValues = await contextIds
-    } catch (err) {
-      console.error(err)
-      setNoContentScript(true)
-      setLoading(false)
-      return
-    }
-
-    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(
-      browser
-    )
-
-    const features: ManifestDTO[] = contextIdsValues
-      ? await getFeaturesByHostnames(contextIdsValues)
-      : []
-
-    const registries = await getRegistries()
-    const regsWithErrors = registries.filter(
-      (r) => !r.isDev && !!r.isEnabled && !!r.error
-    )
-    if (regsWithErrors.length > 0) {
-      const isProviderProblems =
-        regsWithErrors.filter(
-          ({ error }) =>
-            error.includes('missing response') ||
-            error.includes('could not detect network') ||
-            error.includes('resolver or addr is not configured for ENS name') ||
-            error.includes('invalid contract address or ENS name')
-        ).length > 0
-
-      const description = isProviderProblems
-        ? 'It looks like the blockchain provider is not available. Check provider addresses in the settings, or try again later.'
-        : 'Please check the settings.'
-
-      setError(
-        `Cannot connect to the Dapplet Registry (${regsWithErrors
-          .map((x) => x.url)
-          .join(', ')}).\n${description}`
-      )
-    }
-
-    if (_isMounted) {
-      // setLoadingLoadingListDapplets(false)
-      const d = features
-        .filter((f) => f.type === ModuleTypes.Feature)
-        .map((f) => ({
-          ...f,
-          isLoading: false,
-          isActionLoading: false,
-          isHomeLoading: false,
-          error: null,
-          versions: [],
-        }))
-
-      setDapplets(d)
-      setLoading(false)
-    }
-  }
-
   const onOpenSettingsModule = async (mi: ManifestDTO) => {
     const { openSettingsOverlay } = await initBGFunctions(browser)
     await openSettingsOverlay(mi)
     console.log(mi)
 
     window.close()
-  }
-
-  const onOpenDappletAction = async (f: ManifestAndDetails) => {
-    try {
-      _updateFeatureState(f.name, { isActionLoading: true })
-      const { openDappletAction, getCurrentTab } = await initBGFunctions(
-        browser
-      )
-      const tab = await getCurrentTab()
-      if (!tab) return
-      await openDappletAction(f.name, tab.id)
-      window.close()
-    } catch (err) {
-      console.error(err)
-    } finally {
-      _updateFeatureState(f.name, { isActionLoading: false })
-    }
   }
 
   const onRemoveMyDapplet = async (f: ManifestAndDetails) => {
@@ -279,6 +335,7 @@ export const Dapplets = () => {
     const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f.name}`
     window.open(url, '_blank')
   }
+  // setDapplets(features)
 
   return (
     <>
@@ -294,32 +351,39 @@ export const Dapplets = () => {
         <div className={styles.loadingListDapplets}></div>
       ) : (
         <div className={styles.dappletsBlock}>
-          {dapplets &&
-            dapplets.map((dapplet) => {
-              if (dapplet.type !== 'FEATURE') {
-                return
-              } else
-                return (
-                  <Dapplet
-                    key={dapplet.name}
-                    dapplet={{
-                      ...dapplet,
-                      isFavourites: false,
-                      website: 'dapplets.com',
-                      users: [],
-                    }}
-                    loadShowButton={loadShowButton}
-                    onSwitchChange={onSwitchChange}
-                    onSettingsModule={onOpenSettingsModule}
-                    onOpenDappletAction={onOpenDappletAction}
-                    onRemoveMyDapplet={
-                      dapplet.isMyDapplet ? onRemoveMyDapplet : undefined
-                    }
-                    onDeployDapplet={onDeployDapplet}
-                    onOpenStore={onOpenStore}
-                  />
-                )
-            })}
+          {!isNoContentScript ? (
+            dapplets.length > 0 ? (
+              dapplets.map((dapplet) => {
+                if (dapplet.type !== 'FEATURE') {
+                  return
+                } else
+                  return (
+                    <Dapplet
+                      key={dapplet.name}
+                      dapplet={{
+                        ...dapplet,
+                        isFavourites: false,
+                        website: 'dapplets.com',
+                        users: [],
+                      }}
+                      loadShowButton={loadShowButton}
+                      onSwitchChange={onSwitchChange}
+                      onSettingsModule={onOpenSettingsModule}
+                      onOpenDappletAction={onOpenDappletAction}
+                      onRemoveMyDapplet={
+                        dapplet.isMyDapplet ? onRemoveMyDapplet : undefined
+                      }
+                      onDeployDapplet={onDeployDapplet}
+                      onOpenStore={onOpenStore}
+                    />
+                  )
+              })
+            ) : (
+              <div>lalal</div>
+            )
+          ) : (
+            <div>lololo</div>
+          )}
         </div>
       )}
     </>

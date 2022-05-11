@@ -3,7 +3,7 @@ import styles from './components/Overlay/Overlay.module.scss'
 import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { ContentItem } from './ContentItem'
-import { DAPPLETS_STORE_URL } from '../../../common/constants'
+import { DAPPLETS_STORE_URL, ModuleTypes } from '../../../common/constants'
 import { OverlayManager } from './overlayManager'
 import { OverlayToolbar } from './components/OverlayToolbar'
 import cn from 'classnames'
@@ -27,6 +27,9 @@ import { Notifications } from './pages/Notifications'
 import { SettingsOverlay } from './pages/Settings'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
+import { Search } from './components/Search'
+import { ManifestAndDetails } from '../../../popup/components/dapplet'
+import ManifestDTO from '../../../background/dto/manifestDTO'
 TimeAgo.addLocale(en)
 
 export type TSelectedSettings =
@@ -54,6 +57,11 @@ interface S {
   isDevMode: boolean
   selectedMenu: TSelectedSettings | null
   isSystemDapplets: boolean
+  isOpenSearch: boolean
+  search: string
+  // features: ManifestAndDetails[]
+  // isNoContentScript: boolean
+  // contextIds: string[]
 }
 
 export interface OverlayProps {
@@ -62,6 +70,7 @@ export interface OverlayProps {
 }
 
 export class App extends React.Component<P, S> {
+  private _isMounted: boolean = false
   state: S = {
     isLoadingMap: Object.fromEntries(
       this.getOverlays().map((x) => [x.id, true])
@@ -70,9 +79,15 @@ export class App extends React.Component<P, S> {
     selectedMenu: 'Dapplets',
 
     isSystemDapplets: true,
+    isOpenSearch: false,
+    search: '',
+    // features: [],
+    // isNoContentScript: false,
+    // contextIds: [],
   }
 
   async componentDidMount() {
+    this._isMounted = true
     const { getDevMode } = await initBGFunctions(browser)
     const isDevMode = await getDevMode()
 
@@ -145,6 +160,21 @@ export class App extends React.Component<P, S> {
     })
   }
 
+  onOpenSearch = () => {
+    this.setState({
+      isOpenSearch: true,
+    })
+  }
+  onCloseSearch = () => {
+    this.setState({
+      isOpenSearch: false,
+    })
+  }
+
+  _searchChangeHandler(value: string) {
+    this.setState({ search: value })
+  }
+
   render() {
     const p = this.props
     const s = this.state
@@ -154,6 +184,7 @@ export class App extends React.Component<P, S> {
     // TODO: naming wallets is the notification
     const isNotification = s.selectedMenu === 'Notifications'
     const isSettings = s.selectedMenu === 'Settings'
+    // const features = this._getFilteredDapplets()
 
     return (
       <>
@@ -193,7 +224,27 @@ export class App extends React.Component<P, S> {
                     icon={StoreIcon}
                     onClick={this.storeButtonClickHandler}
                   />
-                  <SquaredButton appearance="big" icon={SearchIcon} />
+                  {!s.isOpenSearch && (
+                    <SquaredButton
+                      onClick={this.onOpenSearch}
+                      appearance="big"
+                      icon={SearchIcon}
+                    />
+                  )}
+
+                  {s.isOpenSearch && (
+                    <div className={styles.searchBlock}>
+                      <Search
+                        value={s.search}
+                        onChange={(e) =>
+                          this._searchChangeHandler(e.target.value)
+                        }
+                        onClick={() => this._searchChangeHandler('')}
+                        onClearValue={() => this._searchChangeHandler('')}
+                        onCloseSearch={this.onCloseSearch}
+                      />
+                    </div>
+                  )}
                 </div>
               </header>
 
@@ -203,7 +254,7 @@ export class App extends React.Component<P, S> {
                   'dapplets-overlay-nav-content-list'
                 )}
               >
-                {s.isSystemDapplets && <Dapplets />}
+                {s.isSystemDapplets && <Dapplets search={s.search} />}
 
                 {isNotification && <Notifications />}
 

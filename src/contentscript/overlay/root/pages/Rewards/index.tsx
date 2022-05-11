@@ -352,7 +352,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     // }}
                     className={styles.changeReward}
                   >
-                    Change
+                    Edit
                   </button>
                   <button
                     onClick={() => {

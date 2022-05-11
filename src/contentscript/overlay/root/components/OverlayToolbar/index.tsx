@@ -142,7 +142,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
       return
     }
   }
-  console.log(getImgNoSystmTab())
+  // console.log(getImgNoSystmTab())
 
   return (
     <div
