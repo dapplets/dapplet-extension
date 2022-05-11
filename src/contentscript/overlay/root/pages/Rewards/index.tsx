@@ -345,11 +345,11 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     className={styles.percentReward}
                   >{`Reward ${item.pool}%`}</span>
                   <button
-                    onClick={() => {
-                      setItemInex(index)
-                      setNewItem({ newItem: [item] })
-                      setModalChange(true)
-                    }}
+                    // onClick={() => {
+                    //   setItemInex(index)
+                    //   setNewItem({ newItem: [item] })
+                    //   setModalChange(true)
+                    // }}
                     className={styles.changeReward}
                   >
                     Change
