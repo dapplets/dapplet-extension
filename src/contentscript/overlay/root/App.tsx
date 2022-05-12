@@ -30,6 +30,14 @@ import en from 'javascript-time-ago/locale/en'
 import { Search } from './components/Search'
 import { ManifestAndDetails } from '../../../popup/components/dapplet'
 import ManifestDTO from '../../../background/dto/manifestDTO'
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useParams,
+  MemoryRouter,
+} from 'react-router-dom'
 TimeAgo.addLocale(en)
 
 export type TSelectedSettings =
@@ -187,7 +195,7 @@ export class App extends React.Component<P, S> {
     // const features = this._getFilteredDapplets()
 
     return (
-      <>
+      <MemoryRouter>
         <div className={cn(styles.overlay)}>
           <div className={styles.wrapper}>
             <OverlayToolbar
@@ -206,89 +214,96 @@ export class App extends React.Component<P, S> {
               toggle={this.props.onToggle}
             />
 
-            <div className={styles.inner}>
-              <header className={styles.header}>
-                <div className={styles.left}>
-                  <Profile
-                    avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
-                    hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
-                  />
-                  {/* <div className={styles.balance}>
-                    <Icon icon={EthereumIcon} size="big" />
-                    <p className={styles.amount}>25.1054</p>
-                  </div> */}
-                </div>
-                <div className={styles.right}>
-                  <SquaredButton
-                    appearance="big"
-                    icon={StoreIcon}
-                    onClick={this.storeButtonClickHandler}
-                  />
-                  {!s.isOpenSearch && (
-                    <SquaredButton
-                      onClick={this.onOpenSearch}
-                      appearance="big"
-                      icon={SearchIcon}
-                    />
-                  )}
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <div className={styles.inner}>
+                    <header className={styles.header}>
+                      <div className={styles.left}>
+                        <Profile
+                          avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
+                          hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
+                        />
+                        {/* <div className={styles.balance}>
+                      <Icon icon={EthereumIcon} size="big" />
+                      <p className={styles.amount}>25.1054</p>
+                    </div> */}
+                      </div>
+                      <div className={styles.right}>
+                        <SquaredButton
+                          appearance="big"
+                          icon={StoreIcon}
+                          onClick={this.storeButtonClickHandler}
+                        />
+                        {!s.isOpenSearch && (
+                          <SquaredButton
+                            onClick={this.onOpenSearch}
+                            appearance="big"
+                            icon={SearchIcon}
+                          />
+                        )}
 
-                  {s.isOpenSearch && (
-                    <div className={styles.searchBlock}>
-                      <Search
-                        value={s.search}
-                        onChange={(e) =>
-                          this._searchChangeHandler(e.target.value)
-                        }
-                        onClick={() => this._searchChangeHandler('')}
-                        onClearValue={() => this._searchChangeHandler('')}
-                        onCloseSearch={this.onCloseSearch}
-                      />
+                        {s.isOpenSearch && (
+                          <div className={styles.searchBlock}>
+                            <Search
+                              value={s.search}
+                              onChange={(e) =>
+                                this._searchChangeHandler(e.target.value)
+                              }
+                              onClick={() => this._searchChangeHandler('')}
+                              onClearValue={() => this._searchChangeHandler('')}
+                              onCloseSearch={this.onCloseSearch}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </header>
+
+                    <div
+                      className={cn(
+                        styles.children,
+                        'dapplets-overlay-nav-content-list'
+                      )}
+                    >
+                      {s.isSystemDapplets && <Dapplets search={s.search} />}
+
+                      {isNotification && <Notifications />}
+
+                      {isSettings && (
+                        // <div className={styles.settingsBlock}>
+                        <SettingsOverlay />
+                        // </div>
+                      )}
+
+                      {overlays.map((x) => (
+                        <div
+                          key={x.id}
+                          className={cn(styles.noSystemDapplets, {
+                            // positionAbsolute hidden other content
+                            [styles.hideContent]: s.isSystemDapplets,
+                            // [styles.hideContent]: s.isSystemDapplets,
+
+                            [styles.overlayActive]:
+                              !s.isSystemDapplets && x.id === activeOverlayId,
+                            // !isSettings && x.id === activeOverlayId,
+                          })}
+                        >
+                          <ContentItem
+                            overlay={x}
+                            isActive={x.id === activeOverlayId}
+                            overlayManager={p.overlayManager}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  )}
-                </div>
-              </header>
-
-              <div
-                className={cn(
-                  styles.children,
-                  'dapplets-overlay-nav-content-list'
-                )}
-              >
-                {s.isSystemDapplets && <Dapplets search={s.search} />}
-
-                {isNotification && <Notifications />}
-
-                {isSettings && (
-                  // <div className={styles.settingsBlock}>
-                  <SettingsOverlay />
-                  // </div>
-                )}
-
-                {overlays.map((x) => (
-                  <div
-                    key={x.id}
-                    className={cn(styles.noSystemDapplets, {
-                      // positionAbsolute hidden other content
-                      [styles.hideContent]: s.isSystemDapplets,
-                      // [styles.hideContent]: s.isSystemDapplets,
-
-                      [styles.overlayActive]:
-                        !s.isSystemDapplets && x.id === activeOverlayId,
-                      // !isSettings && x.id === activeOverlayId,
-                    })}
-                  >
-                    <ContentItem
-                      overlay={x}
-                      isActive={x.id === activeOverlayId}
-                      overlayManager={p.overlayManager}
-                    />
                   </div>
-                ))}
-              </div>
-            </div>
+                }
+              ></Route>
+            </Routes>
           </div>
         </div>
-      </>
+      </MemoryRouter>
     )
   }
 }

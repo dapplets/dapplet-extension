@@ -787,7 +787,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     onClick={(e) => {
                       addButtonClickHandler(e)
                       setAuthorDisabled(true)
-                      // e.currentTarget.scrollIntoView()
+                      e.currentTarget.scrollIntoView()
                     }}
                     className={cn(styles.adminsButton, {
                       [styles.adminsButtonDisabled]: autorDisabled,

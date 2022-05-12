@@ -54,16 +54,21 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
 
   useEffect(() => {
     _isMounted = true
-    const init = async () => {
-      await dap.map((x, i) => {
-        if (x.name === source) {
-          setImgActiveTab(x.icon)
-        } else {
-          return
-        }
-      })
+    // const init = async () => {
+    const dapplet = dap.find((x) => x.name === source)
+    if (dapplet) {
+      setImgActiveTab(dapplet.icon)
     }
-    init()
+
+    // dap.map((x, i) => {
+    //   if (x.name === source) {
+    //     setImgActiveTab(x.icon)
+    //   } else {
+    //     return
+    //   }
+    // })
+    // }
+    // init()
 
     return () => {
       _isMounted = false

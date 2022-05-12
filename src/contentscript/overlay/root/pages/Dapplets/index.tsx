@@ -53,13 +53,19 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
       const d = await getFeaturesByHostnames(ids)
 
+      console.log('d', d)
+
       setContextIds(ids)
       await _refreshDataByContext(ids)
 
       setDapplets(d)
       setLoadingListDapplets(false)
-      const features = await _getFilteredDapplets()
-      setFeatures(features)
+      const features = await _getFilteredDapplets(d)
+      // setFeatures(features)
+
+      console.log('features', features)
+
+      setDapplets(features)
     }
 
     init()
@@ -76,25 +82,29 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       setLoadingListDapplets(false)
     }
 
-    if (features) {
-      setDapplets(features)
-    }
+    // if (features) {
+    //   setDapplets(features)
+    // }
     // refresh()
-    EventBus.on('mydapplets_changed', init)
-    EventBus.on('context_started', init)
-    EventBus.on('context_finished', init)
-    EventBus.on('dapplet_activated', init)
-    EventBus.on('dapplet_deactivated', init)
+    // EventBus.on('mydapplets_changed', init)
+    // EventBus.on('context_started', init)
+    // EventBus.on('context_finished', init)
+    // EventBus.on('dapplet_activated', init)
+    // EventBus.on('dapplet_deactivated', init)
     // _getFilteredDapplets()
     return () => {
-      EventBus.off('mydapplets_changed', init)
-      EventBus.off('context_started', init)
-      EventBus.off('context_finished', init)
-      EventBus.off('dapplet_activated', init)
-      EventBus.off('dapplet_deactivated', init)
+      // EventBus.off('mydapplets_changed', init)
+      // EventBus.off('context_started', init)
+      // EventBus.off('context_finished', init)
+      // EventBus.off('dapplet_activated', init)
+      // EventBus.off('dapplet_deactivated', init)
       _isMounted = false
     }
   }, [search])
+
+  useEffect(() => {
+    dapplets
+  }, [dapplets])
   // console.log(search)
 
   // const refresh = async () => {
@@ -211,13 +221,16 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
   }
 
-  const _getFilteredDapplets = async () => {
+  const _getFilteredDapplets = async (dapplets) => {
     // const { features, search } = this.state
 
     if (!search || search.length === 0) return dapplets
 
     const find = (a: string) =>
       (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1
+
+    console.log('dapplets', dapplets)
+
     return dapplets.filter(
       (x: ManifestAndDetails) =>
         find(x.name) || find(x.title) || find(x.description) || find(x.author)
@@ -231,9 +244,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     selectVersions?: boolean
   ) => {
     const { name } = module
-
+    // TODO : try catch
+    setLoadShowButton(true)
     if (selectVersions && isActive) {
-      setLoadShowButton(true)
       _updateFeatureState(name, { isLoading: true })
       const { getVersions } = await initBGFunctions(browser)
       const allVersions = await getVersions(
@@ -241,12 +254,10 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         module.name
       )
       _updateFeatureState(name, { versions: allVersions, isLoading: false })
-      return setLoadShowButton(false)
     } else {
-      setLoadShowButton(true)
       await toggleFeature(module, null, isActive, order, null)
-      setLoadShowButton(false)
     }
+    setLoadShowButton(false)
   }
 
   const toggleFeature = async (
