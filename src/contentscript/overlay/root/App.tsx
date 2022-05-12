@@ -45,14 +45,12 @@ export type TSelectedSettings =
   | 'Notifications'
   | 'Settings'
   | 'Developer'
-// | 'Notifications'
 
 const MENU: IMenu[] = [
   { _id: '0', icon: Home, title: 'Dapplets' },
   { _id: '1', icon: Notification, title: 'Notifications' },
   { _id: '2', icon: Settings, title: 'Settings' },
   { _id: '3', icon: Airplay, title: 'Developer' },
-  // { _id: '4', icon: Notification, title: 'Notifications' },
 ]
 
 interface P {
@@ -67,9 +65,6 @@ interface S {
   isSystemDapplets: boolean
   isOpenSearch: boolean
   search: string
-  // features: ManifestAndDetails[]
-  // isNoContentScript: boolean
-  // contextIds: string[]
 }
 
 export interface OverlayProps {
@@ -192,7 +187,6 @@ export class App extends React.Component<P, S> {
     // TODO: naming wallets is the notification
     const isNotification = s.selectedMenu === 'Notifications'
     const isSettings = s.selectedMenu === 'Settings'
-    // const features = this._getFilteredDapplets()
 
     return (
       <MemoryRouter>
@@ -225,10 +219,6 @@ export class App extends React.Component<P, S> {
                           avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
                           hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
                         />
-                        {/* <div className={styles.balance}>
-                      <Icon icon={EthereumIcon} size="big" />
-                      <p className={styles.amount}>25.1054</p>
-                    </div> */}
                       </div>
                       <div className={styles.right}>
                         <SquaredButton
@@ -270,19 +260,13 @@ export class App extends React.Component<P, S> {
 
                       {isNotification && <Notifications />}
 
-                      {isSettings && (
-                        // <div className={styles.settingsBlock}>
-                        <SettingsOverlay />
-                        // </div>
-                      )}
+                      {isSettings && <SettingsOverlay />}
 
                       {overlays.map((x) => (
                         <div
                           key={x.id}
                           className={cn(styles.noSystemDapplets, {
-                            // positionAbsolute hidden other content
                             [styles.hideContent]: s.isSystemDapplets,
-                            // [styles.hideContent]: s.isSystemDapplets,
 
                             [styles.overlayActive]:
                               !s.isSystemDapplets && x.id === activeOverlayId,

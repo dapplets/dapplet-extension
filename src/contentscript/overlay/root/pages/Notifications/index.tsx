@@ -15,11 +15,6 @@ import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 TimeAgo.addLocale(en)
 
-import {
-  CONTEXT_ID_WILDCARD,
-  ModuleTypes,
-} from '../../../../../common/constants'
-
 let _isMounted = false
 
 export const Notifications = () => {
@@ -32,30 +27,23 @@ export const Notifications = () => {
       const { getEvents, setRead } = backgroundFunctions
       const events: Event[] = await getEvents()
       setEvent(events)
-      // setRead(events.map((e) => e.id))
-      // console.log(events.map((e) => e.created))
-      // onRemoveEventsAll(setEvent)
     }
     init()
 
     return () => {
       _isMounted = false
-      // setEvent([])
     }
   }, [event])
 
   const onRemoveEvent = async (f) => {
     const { deleteEvent, getCurrentContextIds } = await initBGFunctions(browser)
-    // const { deleteEvents } = deleteEvent
+
     const contextIds = await getCurrentContextIds(null)
-    // const events: Event[] = await deleteEvent(contextIds)
 
     await deleteEvent(f.id, contextIds)
 
     const d = event.filter((x) => x.id !== f.id)
     setEvent(d)
-
-    // setEvent(d)
   }
   const onRemoveEventsAll = async (f) => {
     const { deleteAllEvents } = await initBGFunctions(browser)

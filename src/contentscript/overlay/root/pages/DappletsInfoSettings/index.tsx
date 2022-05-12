@@ -183,11 +183,6 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
         setLoading(false)
         setSwarmGatewayUrl(swarmGatewayUrl)
 
-        //   Object.keys(vi?.overlays ?? {}).length > 0
-        //     ? [StorageTypes.Swarm, StorageTypes.Sia]
-        //     : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs],
-        // mode: FormMode.Deploying,
-
         await _updateData()
       }
     }
@@ -195,7 +190,7 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
 
   const _checkDependencies = async () => {
     const { getVersionInfo } = await initBGFunctions(browser)
-    // const { dependenciesChecking deps, targetRegistry } = dependenciesChecking
+
     await Promise.all(
       dependenciesChecking.map((x) =>
         getVersionInfo(
@@ -263,11 +258,6 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
         header: 'Publication error',
         message: [err.message],
       })
-
-      console.log(err.message)
-      console.log(mi)
-      console.log(targetRegistry)
-      console.log(targetStorages)
     } finally {
     }
   }
@@ -301,10 +291,6 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
                         value={editContextId}
                         placeholder={'Context ID (ex: example.com)'}
                         onChange={(e) => {
-                          // setMi({
-                          //   ...mi,
-                          //   contextIds: [e.target.value],
-                          // })
                           setEditContextId(e.target.value)
                           setVisibleContextId(e.target.value) //readonly
                           console.log(editContextId)
@@ -312,9 +298,6 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
                           console.log(nodeInput.current?.value)
                           console.log(mi)
                         }}
-                        // onBlur={() => {
-                        //   _addContextId(editContextId)
-                        // }}
                       />
 
                       <button

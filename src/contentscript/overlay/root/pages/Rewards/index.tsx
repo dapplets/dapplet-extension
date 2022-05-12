@@ -94,12 +94,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
         setAddRecepientDisabled(false)
       }
     }
-    // setNewItem()
-    console.log(newItem)
+
     onDistributed(`${sumQuantity}%`)
-    console.log(items)
-    // console.log(itemsRecepientForm)
-    // console.log(name)
   }, [
     sumQuantity,
     items,
@@ -111,25 +107,9 @@ export const Rewards: FC<RewardsProps> = (props) => {
     itemIndex,
     newItem,
   ])
-  const handleAgeChange = (event) => {
-    // setUser({name: user.name, age: event.target.value});
-    // setItems((prevState) => ({
-    //   ...prevState,
-    //   // [items &&
-    //   // items[itemIndex] &&
-    //   // items[itemIndex].name]: newValue,
-    //   name: { newValue },
-    // }))
-    // setItems({
-    //   ...items.items,
-    //   items: [{ name: newValue }],
-    // })
-    // items.items[itemIndex].name = newValue
-    // setItems((prevState) => ({
-    //   ...prevState,
-    //   items: [{ name: newValue }],
-    // }))
-  }
+  // const handleAgeChange = (event) => {
+
+  // }
   const onClose = () => setModal(false)
   const onCloseChange = () => setModalChange(false)
 
@@ -162,13 +142,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const handleChangeName = (event) => {
     setName({ name: event.target.value })
   }
-  // const handleChangeUserId = (event) => {
-  //   setName({ name: event.target.value })
-  // }
-  // const handleChangeNum = (event) => {
-  //   setPool({ pool: String(sumQuantity) })
-  //   console.log(setPool)
-  // }
 
   // ====
 
@@ -258,7 +231,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     className={styles.inputNewCustomPool}
                     onChange={(e) => e.target.value}
                   />
-                  {/* <span className={styles.inputNewCustomPoolLabel}>AUG</span> */}
+
                   <button
                     onClick={() => onDeleteChild(i)}
                     className={styles.buttonDeleteNewCustomPool}
@@ -373,8 +346,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
             <Message
               title="No rewards yet"
               subtitle="Click below to create first reward"
-              // link="F.A.Q"
-              // linkText="F.A.Q"
               className={styles.newMessage}
               children={
                 <button
@@ -574,9 +545,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
         <Message
           title="There are no rewards without tokenomics"
           subtitle="Let's create tokenomics first"
-          // link="Create"
-          // linkText="Create"
-          // className={styles.newMessage}
           children={
             <a
               onClick={() => {
@@ -603,7 +571,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
       <Modal
         visible={isModalChange}
         title={''}
-        // id={i}
         content={
           <>
             {newItem &&
@@ -624,25 +591,11 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     <div className={styles.rewardNameBlock}>
                       <span className={styles.nameLabel}>Reward name</span>
                       <input
-                        // value={
-                        //   (newItem &&
-                        //     newItem.newItem &&
-                        //     newItem.newItem[i].name) ||
-                        //   ''
-                        // }
                         defaultValue={newItem.newItem[i].name}
                         onChange={(e) => {
                           e.preventDefault()
                           const newName = e.target.value
                           newItem.newItem[i].name = newName
-
-                          console.log(
-                            setNewItem((prevState) => ({
-                              newItem: prevState.newItem.map(
-                                (x, i) => newItem[(x.name = e.target.value)]
-                              ),
-                            }))
-                          )
                         }}
                         name="rewardName"
                         className={styles.nameInput}

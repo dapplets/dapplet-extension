@@ -1,22 +1,18 @@
 import React, { useState, useEffect, FC, useRef, useMemo } from 'react'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
-// import { StorageRefImage } from '../../../../../popup/components/StorageRefImage'
+
 import { StorageRef } from '../../../../../background/registries/registry'
-// import { StorageRefImage } from './StorageRefImage'
+
 import { DEFAULT_BRANCH_NAME } from '../../../../../common/constants'
 import TopologicalSort from 'topological-sort'
 import styles from './DevModulesList.module.scss'
 import cn from 'classnames'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-// import NO_LOGO from '../../assets/images/no-logo.png'
+
 import { browser } from 'webextension-polyfill-ts'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import {
-  // DEFAULT_BRANCH_NAME,
-  ModuleTypes,
-  StorageTypes,
-} from '../../../../../common/constants'
+import { ModuleTypes, StorageTypes } from '../../../../../common/constants'
 import { typeOfUri, chainByUri, joinUrls } from '../../../../../common/helpers'
 import { Modal } from '../Modal'
 import { xhrCallback } from '@sentry/tracing/types/browser/request'
@@ -32,12 +28,7 @@ interface PropsStorageRefImage {
   className?: string
   onClick?: (x) => void
 }
-// export const enum ModuleTypes {
-//   Feature = 'FEATURE',
-//   Adapter = 'ADAPTER',
-//   Library = 'LIBRARY',
-//   Interface = 'INTERFACE',
-// }
+
 enum FormMode {
   Deploying,
   Creating,
@@ -59,17 +50,14 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
   const [dataUri, setDataUri] = useState(null)
   useEffect(() => {
     _isMounted = true
-    // loadSwarmGateway()
 
     const init = async () => {
       const { hash, uris } = storageRef
-      // console.log(storageRef)
 
       if (!hash && uris.length > 0 && uris[0].indexOf('data:') === 0) {
         setDataUri(uris[0])
       } else {
         const { getResource } = await initBGFunctions(browser)
-        // console.log(storageRef)
 
         if (
           storageRef.hash !==
@@ -108,7 +96,6 @@ interface PropsDeveloper {
   setModuleVersion: (x) => void
   isUnderConstructionDetails: boolean
   setUnderConstructionDetails: (x) => void
-  // deployButtonClickHandler?: () => void
 }
 export const DevModule: FC<PropsDeveloper> = (props) => {
   const {
@@ -120,9 +107,8 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setModuleVersion,
     isUnderConstructionDetails,
     setUnderConstructionDetails,
-    // deployButtonClickHandler,
   } = props
-  // const [dapDet, onDappletsDetails] = useState(isDappletsDetails)
+
   const nodes = new Map<string, any>()
   const [mi, setMi] = useState<ModuleInfo>(modules[0].module)
   const [vi, setVi] = useState<VersionInfo>(modules[0].versions[0])
@@ -159,7 +145,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         : x.module.name,
       x
     )
-    // console.log(x)
   })
   const sorting = new TopologicalSort(nodes)
   modules.forEach((x) => {
@@ -174,7 +159,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           x.module.name + '#' + x.versions[0]?.branch
         )
       }
-      // console.log(x)
     })
   })
   const sorted = [...sorting.sort().values()].map((x) => x.node)
@@ -207,7 +191,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   }, [targetChain, currentAccount, isLoadingDeploy, modules[0]])
 
   const _updateData = async () => {
-    // setLoading(true)
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
@@ -223,10 +206,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-    // console.log(currentAccount)
-    // console.log(targetChain)
-
-    // await _updateCurrentAccount()
 
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
@@ -238,14 +217,11 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         _checkDependencies(),
       ])
     }
-    // console.log(currentAccount)
   }
   const _updateOwnership = async () => {
     const { getOwnership } = await initBGFunctions(browser)
     const owner = await getOwnership(targetRegistry)
-    // console.log('owner', owner)
-    // console.log('name', mi.name)
-    // console.log('targetRegistry', targetRegistry)
+
     setOwner(owner)
   }
   const _updateDeploymentStatus = async () => {
@@ -272,19 +248,10 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       targetChain
     )
     setCurrentAccount(currentAccount)
-    // setLoading(false)
-    // console.log(targetChain)
-
-    // console.log(currentAccount)
   }
   const _checkDependencies = async () => {
     const { getVersionInfo } = await initBGFunctions(browser)
-    // const { dependenciesChecking } = dependenciesChecking
-    // const {targetRegistry} = targetRegistry
-    // await Promise.all(
-    // setDpendenciesChecking(dependenciesChecking=deps)
-    // const { dependenciesChecking: deps, targetRegistry } = this.state
-    // DependencyChecking[]>
+
     await Promise.all(
       dependenciesChecking.map((x) =>
         getVersionInfo(
@@ -302,21 +269,12 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
     mi.registryUrl = targetRegistry
     mi.author = currentAccount
-    // mi.type = ModuleTypes.Feature
-    // console.log(targetRegistry)
-    // console.log(currentAccount)
-    console.log(modules)
+
     setLoadingDeploy(true)
-    // console.log(isLoadingDeploy)
-    // onSelectItem(e)
+
     e.target.classList.add(styles.dappletsIsLoadingDeploy)
     setTextButtonDeploy('Deploing...')
     try {
-      // setModalTransaction(true)
-      // nodeButton &&
-      //   nodeButton.current?.classList.add(styles.dappletsIsLoadingDeploy)
-      // console.log(nodeButton.current.id, 'node')
-
       const isNotNullCurrentAccount = !(
         !currentAccount ||
         currentAccount === '0x0000000000000000000000000000000000000000'
@@ -336,13 +294,10 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           : await deployModule(mi, vi, targetStorages, targetRegistry)
 
       setDeploymentStatus(DeploymentStatus.Deployed)
-      // setLoadingDeploy(false)
 
       e.target.classList.remove(styles.dappletsIsLoadingDeploy)
       setTextButtonDeploy('Reapload')
     } catch (err) {
-      // console.log(err)
-
       setMessageError({
         type: 'negative',
         header: 'Publication error',
@@ -352,34 +307,22 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       e.target.classList.remove(styles.dappletsIsLoadingDeploy)
       setTextButtonDeploy('Deploy')
     } finally {
-      //
     }
-    // setLoadingDeploy(false)
   }
-  // const onSelectItem = (e) => {
-  //   e.target.classList.add(styles.dappletsIsLoadingDeploy)
-  //   setTextButtonDeploy('Deploing...')
-  // }
-  // const Num = useMemo(() => {}, [sorted])
 
   return (
     <>
       {sorted.map((m, i) => (
         <div id={String(i)} className={styles.dappletsBlock} key={i}>
           <StorageRefImage storageRef={m.module.icon} />
-          {/* {m.isDeployed?.[0] === true ? <span /> : null} */}
+
           <div className={styles.dappletsInfo}>
             <div className={styles.dappletsTegs}>
-              {
-                m.versions && m.versions[0] && m.versions[0].version ? (
-                  <div className={styles.dappletsVersion}>
-                    {m.versions[0].version}
-                  </div>
-                ) : null
-                //  (
-                //   <div className={styles.dappletsVersion}>UK</div>
-                // )
-              }
+              {m.versions && m.versions[0] && m.versions[0].version ? (
+                <div className={styles.dappletsVersion}>
+                  {m.versions[0].version}
+                </div>
+              ) : null}
 
               {m.versions &&
                 m.versions[0] &&
@@ -419,7 +362,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                       setUnderConstructionDetails(true)
                       setModuleInfo(m.module)
                       setModuleVersion(m.versions[0])
-                      // console.log(m.module, m.versions[0])
                     }}
                   />
                   <span className={styles.dappletsSettingsIsTocenomics} />
@@ -432,13 +374,11 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     setDappletsDetail(true)
                     setModuleInfo(m.module)
                     setModuleVersion(m.versions[0])
-                    // console.log(m.module, m.versions[0])
                   }}
                 />
               )}
               {m.module.isUnderConstruction ? (
                 <button
-                  // onClick={() => console.log(m.module.isUnderConstruction)}
                   className={cn(
                     styles.dappletsReuploadisUnderConstructionPublish,
                     {
@@ -454,24 +394,14 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   id={String(i)}
                   ref={nodeButton}
                   onClick={(e) => {
-                    // if () {
                     m.isDeployed?.[0] === false &&
                       deployButtonClickHandler(m.versions[0], e)
-                    // isLoadingDeploy && onSelectItem(e)
-
-                    // if (e.currentTarget.value) {
-
-                    // }
                   }}
-                  className={cn(styles.dappletsReupload, {
-                    // [styles.dappletsIsLoadingDeploy]: m.isActive,
-                  })}
+                  className={cn(styles.dappletsReupload, {})}
                 >
                   {m.isDeployed?.[0] === false
                     ? textButtonDeploy
                     : textButtonReupload}
-
-                  {/* {} */}
                 </button>
               )}
             </div>

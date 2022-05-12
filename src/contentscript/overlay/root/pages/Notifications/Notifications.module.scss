@@ -7,7 +7,7 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  // height: calc(100% - 75px);
+
   padding: 20px 0px 0px 0px;
   overflow: hidden;
 }
@@ -33,30 +33,20 @@
 .block {
   display: flex;
   flex-direction: column;
-  // height: 85vh;
+
   height: calc(100% - 75px);
-  // height: 100%;
+
   overflow: hidden;
   padding: 0px 0px 0px 1px;
 }
-// .block::-webkit-scrollbar {
-//   width: 0;
-// }
-// .block {
-//   -ms-overflow-style: none;
-// }
-// .block {
-//   overflow: -moz-scrollbars-none;
-// }
 
 .notification {
   display: flex;
   width: 100%;
   flex: 1 1 auto;
-  // height: calc(100% - 120px);
+
   height: 50vh;
-  // height: calc(100vh - 120px);
-  // max-height: 83vh;
+
   flex-direction: column;
   padding: 8px 0px 0px 0px;
   overflow-y: scroll;
@@ -107,8 +97,7 @@
 
 .noNot {
   position: absolute;
-  // top: 0;
-  // left: 0;
+
   width: 100%;
   height: 80%;
   display: flex;
@@ -126,23 +115,15 @@
 }
 @media (max-width: 640px) and (min-width: 320px) {
   .wrapper {
-    // &::-webkit-scrollbar {
-    //   width: 0;
-    // }
-    // max-height: 100vh;
-    // flex: 1 1 auto;
     padding: 0px 0px 0px 0px;
   }
   .block {
-    // height: 79vh;
     height: calc(100% - 145px);
   }
   .notificationClose {
-    // display: none;
     padding: 10px 0px 0px 0px;
   }
   .notification {
     flex: 1 1 auto;
-    // max-height: 70vh;
   }
 }

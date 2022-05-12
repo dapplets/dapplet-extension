@@ -10,18 +10,14 @@ import cn from 'classnames'
 import styles from './UnderConstructionInfo.module.scss'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { SettingItem } from '../../components/SettingItem'
-import {
-  isValidHttp,
-  isValidUrl,
-  isValidPostageStampId,
-} from '../../../../../popup/helpers'
+
 import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { useToggle } from '../../hooks/useToggle'
+
 import { Bus } from '../../../../../common/bus'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
-import * as tracing from '../../../../../common/tracing'
+
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
 import { typeOfUri, chainByUri, joinUrls } from '../../../../../common/helpers'
 import { StorageRefImage } from '../../components/DevModulesList'
@@ -32,7 +28,6 @@ import {
 } from '../../../../../common/constants'
 import './valid.scss'
 import { Modal } from '../../components/Modal'
-import { Icon, List, Message } from 'semantic-ui-react'
 
 enum DeploymentStatus {
   Unknown,
@@ -59,8 +54,6 @@ type DependencyChecking = {
 }
 
 export interface UnderConstructionInfoProps {
-  // isDappletsDetails: boolean
-  // setDappletsDetail: (x) => void
   ModuleInfo: any
   ModuleVersion: any
   setUnderConstructionDetails: (x) => void
@@ -80,9 +73,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   } = props
 
   const bus = new Bus()
-  const transferOwnershipModal = React.createRef<any>()
-  const addContextIdModal = React.createRef<any>()
-  const fileInputRef = React.createRef<HTMLInputElement>()
+
   const [originalMi, setOriginalMi] = useState(null)
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
   const [vi, setVi] = useState<VersionInfo>(ModuleVersion)
@@ -95,9 +86,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   const [registryOptions, setRegistryOptions] = useState([])
   const [owner, setOwner] = useState(null)
   const [currentAccount, setCurrentAccount] = useState(null)
-  const [newOwner, setNewOwner] = useState('')
-  const [newOwnerLoading, setNewOwnerLoading] = useState(false)
-  const [newOwnerDone, setNewOwnerDone] = useState(false)
+
   const [editContextId, setEditContextId] = useState('')
   const [editContextIdLoading, setEditContextIdLoading] = useState(false)
   const [editContextIdDone, setEditContextIdDone] = useState(false)
@@ -105,7 +94,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     DeploymentStatus.Unknown
   )
   const [trustedUsers, setTrustedUsers] = useState([])
-  const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
+
   const [mode, setMode] = useState(null)
   const [sawing, isSawing] = useState(false)
   const [targetStorages, setTargetStorages] = useState([
@@ -115,15 +104,13 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   ])
 
   const [author, setAuthor] = useState({ authorForm: [] })
-  // const [contextDeleteNone, setContextDeleteNone] = useState(false)
 
   const newAuthorObject = {
     author: 'New admins',
   }
   const fileInput = useRef<HTMLInputElement>()
   const [st, setSt] = useState([])
-  // const node = useRef<HTMLButtonElement>()
-  // const nodeInput = useRef<HTMLInputElement>()
+
   const [isDisabledPush, setDisabledPush] = useState(true)
   const [isModal, setModal] = useState(false)
   const onClose = () => setModal(false)
@@ -157,93 +144,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     console.log(author)
   }
 
-  // const [contextId, setContextId] = useState(mi)
-  // let newContextObject = ''
-  // const addButtonClickHandlerContext = () => {
-  //   const newContext = Object.assign({}, mi)
-  //   newContext.contextIds.push(
-  //     // ...mi.contextIds,
-  //     newContextObject
-  //   )
-  //   setMi(newContext)
-  //   // setContextDeleteNone(false)
-  //   console.log(mi)
-  // }
-
-  // const onDeleteChildContext = (id: number) => {
-  //   const newContext = Object.assign({}, mi)
-  //   newContext.contextIds.splice(id, 1)
-  //   setMi(newContext)
-  //   console.log(mi)
-  //   console.log(id)
-  // }
-
-  // ===
-  bus.subscribe(
-    'data',
-    async ({ mi, vi }: { mi: ModuleInfo; vi: VersionInfo }) => {
-      const { getSwarmGateway } = await initBGFunctions(browser)
-      const swarmGatewayUrl = await getSwarmGateway()
-
-      if (mi === null && vi === null) {
-        // New module
-        const mi = new ModuleInfo()
-        setOriginalMi(JSON.parse(JSON.stringify(mi)))
-        setMi(mi)
-        setLoading(false)
-        setSwarmGatewayUrl(swarmGatewayUrl)
-        setMode(FormMode.Creating)
-
-        await _updateData()
-      } else {
-        // Deploy module
-        const dependencies = vi?.dependencies
-          ? Object.entries(vi.dependencies).map(([name, version]) => ({
-              name: name,
-              version: version,
-              type: DependencyType.Dependency,
-            }))
-          : []
-        const interfaces = vi?.interfaces
-          ? Object.entries(vi.interfaces).map(([name, version]) => ({
-              name: name,
-              version: version,
-              type: DependencyType.Interface,
-            }))
-          : []
-        const dependenciesChecking = [...dependencies, ...interfaces]
-        setOriginalMi(JSON.parse(JSON.stringify(mi)))
-        setMi(mi)
-        setVi(vi)
-        setDpendenciesChecking(dependenciesChecking)
-        setLoading(false)
-        setSwarmGatewayUrl(swarmGatewayUrl)
-
-        //   Object.keys(vi?.overlays ?? {}).length > 0
-        //     ? [StorageTypes.Swarm, StorageTypes.Sia]
-        //     : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs],
-        // mode: FormMode.Deploying,
-
-        await _updateData()
-      }
-    }
-  )
-
-  const _checkDependencies = async () => {
-    const { getVersionInfo } = await initBGFunctions(browser)
-    // const { dependenciesChecking deps, targetRegistry } = dependenciesChecking
-    await Promise.all(
-      dependenciesChecking.map((x) =>
-        getVersionInfo(
-          targetRegistry,
-          x.name,
-          DEFAULT_BRANCH_NAME,
-          x.version
-        ).then((y) => (x.isExists = !!y))
-      )
-    )
-  }
-
   const _updateData = async () => {
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
 
@@ -261,9 +161,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
-    // if (mode === FormMode.Creating) {
     await _updateCurrentAccount()
-    // }
   }
 
   const _updateCurrentAccount = async () => {
@@ -274,41 +172,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     )
     setCurrentAccount(currentAccount)
   }
-  const _updateOwnership = async () => {
-    const { getOwnership } = await initBGFunctions(browser)
-    const owner = await getOwnership(targetRegistry, mi.name)
-    setOwner(owner)
-  }
 
-  const _updateDeploymentStatus = async () => {
-    // const s = this.state
-    setDeploymentStatus(DeploymentStatus.Unknown)
-
-    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(
-      browser
-    )
-    const miF = await getModuleInfoByName(targetRegistry, mi.name)
-    const deployed = vi
-      ? await getVersionInfo(targetRegistry, miF.name, vi.branch, vi.version)
-      : true
-    const deploymentStatus = !miF
-      ? DeploymentStatus.NewModule
-      : deployed
-      ? DeploymentStatus.Deployed
-      : DeploymentStatus.NotDeployed
-    setDeploymentStatus(deploymentStatus)
-  }
-
-  const _transferOwnership = async (newAccount: string) => {
-    setNewOwnerLoading(true)
-
-    const oldAccount = mi.author
-    const { transferOwnership } = await initBGFunctions(browser)
-    await transferOwnership(mi.registryUrl, mi.name, oldAccount, newAccount)
-    setNewOwnerLoading(false)
-    setNewOwnerDone(true)
-    // console.log(mi.author)
-  }
   const iconInputChangeHandler = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -339,7 +203,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
       await editModuleInfo(targetRegistry, targetStorages, mi)
 
       setOriginalMi(JSON.parse(JSON.stringify(mi)))
-      // setUnderConstructionDetails(false)
+
       setModalTransaction(false)
       setModalPush(true)
     } catch (err) {
@@ -355,29 +219,17 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     }
   }
 
-  const pairWallet = async () => {
-    const { pairWalletViaOverlay } = await initBGFunctions(browser)
-    await pairWalletViaOverlay(targetChain)
-    await _updateData()
-  }
-
   const newContextObject = ''
   const addButtonClickHandlerContext = () => {
     const newContext = Object.assign({}, mi)
-    newContext.contextIds.push(
-      // ...mi.contextIds,
-      newContextObject
-    )
+    newContext.contextIds.push(newContextObject)
     setMi(newContext)
-    console.log(mi)
   }
 
   const onDeleteChildContext = (id: number) => {
     const newContext = Object.assign({}, mi)
     newContext.contextIds.splice(id, 1)
     setMi(newContext)
-    console.log(mi)
-    console.log(id)
   }
   const [visible, setVisible] = useState(false)
   const node = useRef<HTMLButtonElement>()
@@ -455,13 +307,10 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
 
   const onChange = (e) => {
     const files = e.target.files
-    // console.log(files)
+
     const filesArr = Array.prototype.slice.call(files)
-    // console.log(filesArr)
-    setSt([
-      // ...files,
-      ...filesArr,
-    ])
+
+    setSt([...filesArr])
   }
 
   return (
@@ -576,7 +425,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                     className={styles.img}
                     storageRef={mi.icon}
                   />
-                  {/* <div className={styles.img}></div> */}
 
                   {st.map((x, i) => (
                     <span className={styles.imgTitle} key={i}>
@@ -637,9 +485,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                           console.log(nodeInput.current?.value)
                           console.log(mi)
                         }}
-                        // onBlur={() => {
-                        //   _addContextId(editContextId)
-                        // }}
                       />
 
                       <button
@@ -712,8 +557,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                       className={styles.authorTitle}
                       placeholder={x.author}
                       onChange={(e) => {
-                        // e.target.value
-                        // setAuthor({ ...author, authorForm: [e.target.value] })
                         newAuthorObject.author = e.target.value
                         console.log(author)
                         setDisabledPush(false)

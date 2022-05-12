@@ -7,9 +7,9 @@
   flex-direction: column;
   overflow: hidden;
   width: 100%;
-  // height: 100%;
+
   flex: 1 1 auto;
-  // max-height: 78vh;
+
   height: calc(100vh - 140px);
 }
 .wrapper::-webkit-scrollbar {
@@ -158,7 +158,7 @@
 .support::before {
   content: attr(data-title);
 }
-// span.support::before,
+
 .support::before {
   content: attr(data-title);
   display: none;
@@ -188,7 +188,7 @@
 .support:hover::before,
 .support:focus::before {
   display: flex;
-  // justify-content: center;
+
   align-items: center;
 }
 

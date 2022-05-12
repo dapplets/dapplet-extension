@@ -8,16 +8,8 @@ import {
 } from '../../../../../popup/helpers'
 import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { useToggle } from '../../hooks/useToggle'
 
 import { SettingTitle } from '../../components/SettingTitle'
-import { SettingItem } from '../../components/SettingItem'
-import { Switch } from '../../components/Switch'
-import { Dropdown } from '../../components/Dropdown'
-import { SettingWrapper } from '../../components/SettingWrapper'
-import { Checkbox } from '../../components/Checkbox'
-import { InputPanel } from '../../components/InputPanel'
-// import { CheckboxList } from '../Notifications'
 
 import { Developer } from './Developer'
 import { SettingsList } from './Settings'
@@ -29,7 +21,6 @@ import { UnderConstruction } from '../UnderConstruction'
 import { DappletsInfoSettings } from '../DappletsInfoSettings'
 import { Tokenimics } from '../Tokenomics'
 import { Rewards } from '../Rewards'
-import { async } from 'rxjs'
 
 enum SettingsTabs {
   // MAIN = 0,
@@ -38,7 +29,6 @@ enum SettingsTabs {
 }
 enum DappletsDetails {
   MAININFO = 0,
-  // SETTINGS = 1,
 }
 
 enum UnderConstructionDetails {
@@ -83,27 +73,21 @@ export const SettingsOverlay = () => {
   useEffect(() => {
     _isMounted = true
     const init = async () => {
-      // setTimeout(() => loadDevMode(), 1500)
       await loadDevMode()
       await loadErrorReporting()
-      // console.log(devMode)
     }
     init()
     return () => {
       _isMounted = false
     }
-    // devMode
   }, [])
   const loadDevMode = async () => {
-    // console.log('load settings')
-
     setSvgLoaderDevMode(true)
 
     const { getDevMode } = await initBGFunctions(browser)
     const devMode = await getDevMode()
     setMode(devMode)
     setTimeout(() => setSvgLoaderDevMode(false), 500)
-    // console.log('load of settings')
   }
   const setDevmode = async (isActive: boolean) => {
     const { setDevMode } = await initBGFunctions(browser)
@@ -126,9 +110,6 @@ export const SettingsOverlay = () => {
     await setErrorReporting(isActive)
     loadErrorReporting()
   }
-  // console.log(isUnderConstruction)
-  // console.log(isUnderConstructionDetails)
-  // console.log(isDappletsDetails)
 
   return (
     <>
@@ -206,13 +187,6 @@ export const SettingsOverlay = () => {
                 }
                 isActive={activeTaDappletsDetails === DappletsDetails.MAININFO}
               />
-              {/* <SettingTitle
-                title="Settings"
-                onClick={() =>
-                  setActiveTabDappletsDetails(DappletsDetails.SETTINGS)
-                }
-                isActive={activeTaDappletsDetails === DappletsDetails.SETTINGS}
-              /> */}
             </div>
             <div className={styles.settingMain}>
               {activeTaDappletsDetails === DappletsDetails.MAININFO && (
@@ -224,15 +198,6 @@ export const SettingsOverlay = () => {
                   setShowChildrenRegistery={setShowChildrenRegistery}
                 />
               )}
-              {/* {activeTaDappletsDetails === DappletsDetails.SETTINGS && (
-                <DappletsInfoSettings
-                  ModuleInfo={ModuleInfo}
-                  ModuleVersion={ModuleVersion}
-                  isDappletsDetails={isDappletsDetails}
-                  setDappletsDetail={setDappletsDetail}
-                  setShowChildrenRegistery={setShowChildrenRegistery}
-                />
-              )} */}
             </div>
           </div>
         )}
@@ -242,8 +207,6 @@ export const SettingsOverlay = () => {
           <div className={styles.wrapper}>
             <div className={styles.settingMain}>
               <UnderConstruction
-                // ModuleInfo={ModuleInfo}
-                // ModuleVersion={ModuleVersion}
                 setModuleVersion={setModuleVersion}
                 setModuleInfo={setModuleInfo}
                 setUnderConstructionDetails={setUnderConstructionDetails}
@@ -321,7 +284,6 @@ export const SettingsOverlay = () => {
                 <Rewards
                   setUnderConstructionDetails={setUnderConstructionDetails}
                   isTokenomics={isTokenomics}
-                  // activeTabUnderConstructionDetails={activeTabUnderConstructionDetails}
                   setActiveTabUnderConstructionDetails={
                     setActiveTabUnderConstructionDetails
                   }
@@ -333,6 +295,3 @@ export const SettingsOverlay = () => {
     </>
   )
 }
-
-// https://goerli.mooo.com/
-// 0x141442f8DC04E962478404ba6704fDDDE531D60e

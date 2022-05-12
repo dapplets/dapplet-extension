@@ -15,7 +15,7 @@ import { IDropdown } from '../../models/dropdown.model'
 import { useToggle } from '../../hooks/useToggle'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { browser } from 'webextension-polyfill-ts'
-// import { isValidUrl,typeOfUri } from '../../../../../popup/helpers'
+
 import { isValidUrl } from '../../../../../popup/helpers'
 import { typeOfUri, UriTypes } from '../../../../../common/helpers'
 
@@ -174,7 +174,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
             className={styles.inputBlock}
             onSubmit={(e) => {
               e.preventDefault()
-              // getNumIndex(trustedUserInput, regExpIndexEthereum)
+
               addTrustedUser(trustedUserInput, handleClear)
               console.log('click')
             }}
@@ -233,23 +233,3 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
     </>
   )
 }
-
-// registry.dapplet-base.eth
-// dev-1627024020035-70641704943070
-// Ethereum
-// /^0x[a-fA-F0-9]{40}$/
-
-// ENS
-// /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/
-
-// NEAR
-// /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/
-
-// NEAR TESTNET
-// /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/
-
-// NEAR Implicit accounts
-// /^[0-9a-z]{64}$/
-
-// NEAR Dev accounts
-// /^dev-\d*-\d*$/

@@ -44,9 +44,7 @@ const ToggleOverlay = ({
   toggle,
   className,
   getNode,
-}: // clN,
-
-TToggleOverlay): ReactElement => {
+}: TToggleOverlay): ReactElement => {
   return (
     <button
       className={cn(styles.toggleOverlay, className)}
@@ -110,11 +108,10 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
       nodeOverlayToolbar.current.value = ''
-      // const parent = nodeOverlayToolbar.current.getBoundingClientRect()
+
       const element = nodeOverlayToolbar.current.getBoundingClientRect()
 
       const x = element.x
-      // const y = element.top - parent.top
 
       console.log(x)
       if (x > 10 && x < 100) {
@@ -173,7 +170,6 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
             {nonSystemTabs.length > 0 &&
               nonSystemTabs.map(({ id, title, source }) => {
                 const active = id === idActiveTab
-                // console.log(active)
 
                 return (
                   <OverlayTab
@@ -191,7 +187,6 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
                     className={cn({ [styles.active]: active })}
                     notification={false}
                     title={title}
-                    // image={uri}
                   />
                 )
               })}

@@ -54,21 +54,11 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
 
   useEffect(() => {
     _isMounted = true
-    // const init = async () => {
+
     const dapplet = dap.find((x) => x.name === source)
     if (dapplet) {
       setImgActiveTab(dapplet.icon)
     }
-
-    // dap.map((x, i) => {
-    //   if (x.name === source) {
-    //     setImgActiveTab(x.icon)
-    //   } else {
-    //     return
-    //   }
-    // })
-    // }
-    // init()
 
     return () => {
       _isMounted = false
@@ -90,13 +80,10 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
       })}
       {...anotherProps}
       onClick={() => {
-        // console.log(imgActiveTab)
-        // console.log(dap)
         console.log(activeTab)
       }}
     >
       <div className={styles.top}>
-        {/* {imgActiveTab === null? } */}
         <StorageRefImage
           onClick={onClick}
           className={cn(styles.image, { [styles.cursor]: !activeTab })}

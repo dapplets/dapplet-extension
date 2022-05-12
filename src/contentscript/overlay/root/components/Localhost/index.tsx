@@ -2,7 +2,7 @@ import React, { ChangeEvent, FC } from 'react'
 import { HTMLAttributes, DetailedHTMLProps } from 'react'
 import cn from 'classnames'
 import styles from './Localhost.module.scss'
-import { on } from '../../../../../common/global-event-bus'
+
 import { useToggle } from '../../hooks/useToggle'
 
 export interface LocalhostProps {

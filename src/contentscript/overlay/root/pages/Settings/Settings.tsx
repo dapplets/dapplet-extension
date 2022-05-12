@@ -123,13 +123,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     _isMounted = true
     const init = async () => {
       await checkUpdates()
-      // await loadDevMode()
+
       await loadProvider()
       await loadSwarmGateway()
       await loadErrorReporting()
       await loadSwarmPostageStampId()
       await loadDynamicAdapter()
-      // await loadRegistries()
+
       await loadUserAgentId()
       await loadUserAgentName()
       await loadIpfsGateway()
@@ -245,12 +245,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     setDynamicAdapterLoading(false)
     setDynamicAdapterInputEdited(false)
   }
-  // const loadRegistries = async () => {
-  //   const { getRegistries } = await initBGFunctions(browser)
-  //   const registries = await getRegistries()
-
-  //   setRegistries(registries.filter((r) => r.isDev === false))
-  // }
 
   const loadUserAgentId = async () => {
     const { getUserAgentId } = await initBGFunctions(browser)
@@ -388,7 +382,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     const { getPopupInOverlay } = await initBGFunctions(browser)
     const popupInOverlay = await getPopupInOverlay()
     setPopup(popupInOverlay)
-    // setState({ popupInOverlay });
   }
 
   const setPopupInOverlay = async (isActive: boolean) => {
@@ -399,8 +392,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const onPress = (e, ref) => {
     ref.current?.blur()
-    // searchInput.blur()
-    // this.refs.searchInput.setNativeProps({text: ''})
   }
 
   return (
@@ -439,7 +430,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 component={<></>}
                 children={<DropdownTrustedUsers />}
               />
-              {/* Todo : on Parameters */}
+
               <SettingItem
                 title="Developer mode"
                 component={
@@ -476,7 +467,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   <Switch
                     onChange={() => setPopupInOverlay(!isPopup)}
                     checked={isPopup}
-                    // onChange={() => setErrorReporting(!errorReporting)}
                   />
                 }
               />
@@ -491,7 +481,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       }}
                       onSubmit={(e) => {
                         e.preventDefault()
-                        // console.log('lolo')
 
                         // !(userAgentNameLoading || !userAgentNameEdited) &&
                         setUserAgentName(userAgentNameInput)
@@ -503,7 +492,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     >
                       <input
                         className={cn(styles.inputDefault, {})}
-                        // value={userAgentNameInput}
                         placeholder={userAgentNameInput}
                         ref={inputOfFocusAgentName}
                         onFocus={() => {
@@ -550,9 +538,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   >
                     <form
                       style={{ width: '100%' }}
-                      // className={cn(styles.formDefault, styles.formAbsolute, {
-                      //   [styles.errorInputDefault]: !!dynamicAdapterInputError,
-                      // })}
                       onBlur={() => {
                         setDynamicAdapterInputError(null)
                         getDefaultValueDynamicAdapter(dynamicAdapterInput)
@@ -590,7 +575,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <button
                       onClick={(e) => {
                         e.preventDefault()
-                        // e.stopPropagation()
+
                         getDefaultValueDynamicAdapter(dynamicAdapterInput)
                       }}
                       className={cn(
@@ -627,16 +612,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         changeTargetStorage(StorageTypes.Ipfs, e.target.checked)
                       }
                     />
-                    {/* <input
-                      type="checkbox"
-                      checked={targetStorages.includes(StorageTypes.Swarm)}
-                      onChange={(e) =>
-                        changeTargetStorage(
-                          StorageTypes.Swarm,
-                          e.target.checked
-                        )
-                      }
-                    /> */}
 
                     <Checkbox
                       title="Swarm"
@@ -674,22 +649,15 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     >
                       <form
                         style={{ width: '100%' }}
-                        onBlur={
-                          () => {
-                            setProviderInputError(null)
-                            if (!isValidHttp(providerInput)) {
-                              getDefaultValueProvider(providerInput)
-                            }
-                            if (providerInput.length === 0) {
-                              getDefaultValueProvider(providerInput)
-                            }
+                        onBlur={() => {
+                          setProviderInputError(null)
+                          if (!isValidHttp(providerInput)) {
+                            getDefaultValueProvider(providerInput)
                           }
-                          // !(
-                          //   providerLoading ||
-                          //   !providerEdited ||
-                          //   !isValidHttp(providerInput)
-                          // ) && setProvider(providerInput)
-                        }
+                          if (providerInput.length === 0) {
+                            getDefaultValueProvider(providerInput)
+                          }
+                        }}
                         onFocus={() => {
                           setProviderInput('')
                           setProviderInputError(null)
@@ -704,7 +672,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={providerInput || ''}
-                          // placeholder={'Provider URL'}
                           ref={inputOfFocusEtn}
                           onChange={(e) => {
                             setProviderInput(e.target.value)
@@ -716,7 +683,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       <button
                         onClick={(e) => {
                           e.preventDefault()
-                          // e.stopPropagation()
+
                           getDefaultValueProvider(providerInput)
                         }}
                         className={cn(
@@ -756,11 +723,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           if (swarmGatewayInput.length === 0) {
                             getDefaultValueSwarmGateway(swarmGatewayInput)
                           }
-                          // !(
-                          //   swarmGatewayLoading ||
-                          //   !swarmGatewayEdited ||
-                          //   !isValidHttp(swarmGatewayInput)
-                          // ) && setSwarmGateway(swarmGatewayInput)
                         }}
                         onFocus={() => {
                           setSwarmGatewayInput('')
@@ -776,7 +738,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={swarmGatewayInput}
-                          // placeholder={'Gateway URL'}
                           ref={inputOfFocusSwarm}
                           onChange={(e) => {
                             setSwarmGatewayInput(e.target.value)
@@ -789,7 +750,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         onClick={(e) => {
                           e.preventDefault()
                           getDefaultValueSwarmGateway(swarmGatewayInput)
-                          // setSwarmGatewayInputError(null)
                         }}
                         className={cn(
                           styles.buttonInputDefault,
@@ -825,7 +785,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           if (
                             !isValidPostageStampId(swarmPostageStampIdInput)
                           ) {
-                            // setIpfsGatewayInput('')
                             getDefaultValueSwarmPostageStampId(
                               swarmPostageStampIdInput
                             )
@@ -835,15 +794,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                               swarmPostageStampIdInput
                             )
                           }
-                          // if (!isValidPostageStampId(swarmPostageStampIdInput)) {
-                          //   setSiaPortalInput('')
-                          // }
-                          // !swarmPostageStampIdLoading ||
-                          //   !!swarmPostageStampIdInputEdited ||
-                          //   (!!isValidPostageStampId(
-                          //     swarmPostageStampIdInput
-                          //   ) &&
-                          //     setSwarmPostageStampId(swarmPostageStampIdInput))
                         }}
                         onFocus={() => {
                           setSwarmPostageStampIdInput('')
@@ -857,7 +807,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                             setSwarmPostageStampIdInputError(
                               'Enter valid Swarm Postage Stamp ID'
                             )
-                            // setSwarmPostageStampIdInput('')
                           }
                           onPress(e, inputOfFocusSwarmId)
                         }}
@@ -865,14 +814,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={swarmPostageStampIdInput}
-                          // placeholder="Postage Stamp ID"
                           ref={inputOfFocusSwarmId}
                           onChange={(e) => {
                             setSwarmPostageStampIdInput(e.target.value)
                             setSwarmPostageStampIdInputError(null)
                             setSwarmPostageStampIdInputEdited(true)
                           }}
-                          // tabIndex={0}
                         />
                       </form>
                       <button
@@ -881,7 +828,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           getDefaultValueSwarmPostageStampId(
                             swarmPostageStampIdInput
                           )
-                          // setSwarmGatewayInputError(null)
                         }}
                         className={cn(
                           styles.buttonInputDefault,
@@ -915,7 +861,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         onBlur={() => {
                           setIpfsGatewayInputError(null)
                           if (!isValidHttp(ipfsGatewayInput)) {
-                            // setIpfsGatewayInput('')
                             getDefaultValueIpfsGateway(ipfsGatewayInput)
                           }
                           if (ipfsGatewayInput.length === 0) {
@@ -936,7 +881,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           className={cn(styles.inputDefault, {})}
                           value={ipfsGatewayInput}
                           ref={inputOfFocusIPFS}
-                          // placeholder="Gateway URL"
                           onChange={(e) => {
                             setIpfsGatewayInput(e.target.value)
                             setIpfsGatewayEdited(true)
@@ -947,7 +891,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       <button
                         onClick={(e) => {
                           e.preventDefault()
-                          // e.stopPropagation()
+
                           getDefaultValueIpfsGateway(ipfsGatewayInput)
                         }}
                         className={cn(
@@ -980,12 +924,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       <form
                         style={{ width: '100%' }}
                         onBlur={(e) => {
-                          // setSiaPortalInput(e.target.value)
                           setSiaPortalInputError(null)
-                          // console.log(siaPortalInput)
 
                           if (!isValidHttp(siaPortalInput)) {
-                            // setSiaPortalInput('')
                             getDefaultValueSiaPortal(siaPortalInput)
                           }
                           if (siaPortalInput.length === 0) {
@@ -1006,23 +947,18 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={siaPortalInput}
-                          // placeholder="Gateway URL"
                           ref={inputOfFocusSia}
-                          // onClick={(e) => onPress(e)}
                           onChange={(e) => {
-                            // e.preventDefault()
-
                             setSiaPortalInput(e.target.value)
                             setSiaPortalEdited(true)
                             setSiaPortalInputError(null)
-                            // onPress(e)
                           }}
                         />
                       </form>
                       <button
                         onClick={(e) => {
                           e.preventDefault()
-                          // e.stopPropagation()
+
                           getDefaultValueSiaPortal(siaPortalInput)
                         }}
                         className={cn(
@@ -1046,9 +982,3 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     </div>
   )
 }
-// https://goerli.mooo.com
-// https://goerli.infura.io/v3/9ded73debfaf4834ac186320de4f85fd
-// https://goerli.infura.io/v3/6b34a47d1ef24f5b9cfff55d32685ad9
-// https://rpc.goerli.mudit.blog/
-// invalid
-// https://goerli.infura.io/v3/123123123

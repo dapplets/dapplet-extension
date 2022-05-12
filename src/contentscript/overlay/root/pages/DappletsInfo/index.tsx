@@ -30,7 +30,7 @@ import {
   ModuleTypes,
   StorageTypes,
 } from '../../../../../common/constants'
-import { Icon, List, Message } from 'semantic-ui-react'
+
 import { Modal } from '../../components/Modal'
 import ReactDOM from 'react-dom'
 
@@ -61,37 +61,6 @@ type DependencyChecking = {
   isExists?: boolean
 }
 
-interface IIndexProps {}
-
-interface IIndexState {
-  originalMi: ModuleInfo
-  mi: ModuleInfo
-  vi: VersionInfo | null
-  dependenciesChecking: DependencyChecking[]
-  loading: boolean
-  targetRegistry: string
-  targetChain: ChainTypes
-  targetStorages: string[]
-  message: {
-    type: 'negative' | 'positive'
-    header: string
-    message: string[]
-  }
-  registryOptions: { key: string; value: string; text: string }[]
-  owner: string
-  currentAccount: string
-  newOwner: string
-  newOwnerLoading: boolean
-  newOwnerDone: boolean
-  editContextId: string
-  editContextIdLoading: boolean
-  editContextIdDone: boolean
-  deploymentStatus: DeploymentStatus
-  trustedUsers: { account: string }[]
-  swarmGatewayUrl: string
-  mode: FormMode
-  isSaving: boolean
-}
 export interface DappletsMainInfoProps {
   isDappletsDetails: boolean
   setDappletsDetail: (x) => void
@@ -142,12 +111,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     StorageTypes.Sia,
     StorageTypes.Ipfs,
   ])
-  // targetChain: null,
-  // targetStorages: [
-  //     StorageTypes.Swarm,
-  //     StorageTypes.Sia,
-  //     StorageTypes.Ipfs
-  // ],
+
   const fileInput = useRef<HTMLInputElement>()
   const [st, setSt] = useState([])
   const [isDisabledPush, setDisabledPush] = useState(true)
@@ -169,8 +133,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     _isMounted = true
     const init = async () => {
       await _updateData()
-
-      // await _updateCurrentAccount()
     }
     init()
     if (author.authorForm.length === 0) {
@@ -199,7 +161,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
         await _updateData()
       } else {
-        // Deploy module
         const dependencies = vi?.dependencies
           ? Object.entries(vi.dependencies).map(([name, version]) => ({
               name: name,
@@ -222,11 +183,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
         setLoading(false)
         setSwarmGatewayUrl(swarmGatewayUrl)
 
-        //   Object.keys(vi?.overlays ?? {}).length > 0
-        //     ? [StorageTypes.Swarm, StorageTypes.Sia]
-        //     : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs],
-        // mode: FormMode.Deploying,
-
         await _updateData()
       }
     }
@@ -234,7 +190,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
   const _checkDependencies = async () => {
     const { getVersionInfo } = await initBGFunctions(browser)
-    // const { dependenciesChecking deps, targetRegistry } = dependenciesChecking
+
     await Promise.all(
       dependenciesChecking.map((x) =>
         getVersionInfo(
@@ -264,10 +220,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
-    // if (mode === FormMode.Creating) {
-
     await _updateCurrentAccount()
-    // }
   }
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
@@ -286,7 +239,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
 
   const _updateDeploymentStatus = async () => {
-    // const s = this.state
     setDeploymentStatus(DeploymentStatus.Unknown)
 
     const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(
@@ -336,8 +288,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setLoading(true)
 
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
-    // const { mi, vi, targetRegistry, targetStorages, currentAccount, mode } =
-    //   this.state
 
     try {
       const isNotNullCurrentAccount = !(
@@ -434,7 +384,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       await editModuleInfo(targetRegistry, targetStorages, mi)
 
       setOriginalMi(JSON.parse(JSON.stringify(mi)))
-      // setUnderConstructionDetails(false)
+
       setModalTransaction(false)
       setModalPush(true)
     } catch (err) {
@@ -500,11 +450,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.push(newAuthorObject)
     setAuthor(newAuthor)
-    // e.currentTarget.scrollIntoView({
-    //   block: 'center',
-    //   behavior: 'smooth',
-    // })
-    // e.currentT
   }
   let messagesContainer = useRef<HTMLDivElement>()
 
@@ -514,14 +459,10 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setAuthor(newAuthor)
   }
 
-  // ===
   const newContextObject = ''
   const addButtonClickHandlerContext = () => {
     const newContext = Object.assign({}, mi)
-    newContext.contextIds.push(
-      // ...mi.contextIds,
-      newContextObject
-    )
+    newContext.contextIds.push(newContextObject)
     setMi(newContext)
     console.log(mi)
   }
@@ -612,19 +553,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
             onClose={() => setDappletsDetail(false)}
           />
         ) : (
-          // {/* <Message
-          //   warning
-          //   header="The wrong wallet"
-          //   content={
-          //     <React.Fragment>
-          //       Change account to {owner}
-          //       <br />
-          //       Connect a new wallet{' '}
-          //       <Icon name="chain" link onClick={() => pairWallet()} />
-          //     </React.Fragment>
-          //   }
-          // /> */}
-
           <Modal
             visible={true}
             title={'Wallet is not connected'}
@@ -634,18 +562,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
             footer={''}
             onClose={() => setDappletsDetail(false)}
           />
-          // {/* <Message
-          //   warning
-          //   header="Wallet is not connected"
-          //   content={
-          //     <React.Fragment>
-          //       You can not deploy a module without a wallet.
-          //       <br />
-          //       Connect a new wallet{' '}
-          //       <Icon name="chain" link onClick={() => pairWallet()} />
-          //     </React.Fragment>
-          //   }
-          // /> */}
         )
       ) : null}
 
@@ -753,7 +669,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     />
 
                     <button
-                      // disabled={newOwnerLoading || newOwnerDone || !newOwner}
                       onClick={() => {
                         _transferOwnership(newOwner)
                         console.log(newOwner)
@@ -778,12 +693,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 <div className={styles.blockAdmins}>
                   <h3 className={styles.adminsTitle}>Admins</h3>
                   <button
-                    disabled={
-                      autorDisabled
-                      // // author &&
-                      // // author.authorForm &&
-                      // author.authorForm.length !== 0
-                    }
+                    disabled={autorDisabled}
                     onClick={(e) => {
                       addButtonClickHandler(e)
                       setAuthorDisabled(true)
@@ -803,22 +713,11 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     <input
                       className={styles.authorTitle}
                       placeholder={x.author}
-                      // onFocus={(e) => {}}
                       onChange={(e) => {
-                        // setDisabledPush(false)
                         author.authorForm[i].author = e.target.value
                         if (e.target.value.length !== 0) {
                           setAuthorDisabled(false)
                         }
-
-                        // author.authorForm.map((x, i) => {
-                        //   if (author.authorForm[i].author.length === 0) {
-                        //     return setAuthorDisabled(false)
-                        //   } else if (author.authorForm[i].author.length !== 0) {
-                        //     return setAuthorDisabled(true)
-                        //   }
-                        //   // author.authorForm[i].author = e.target.value
-                        // })
                       }}
                     />
                     <button

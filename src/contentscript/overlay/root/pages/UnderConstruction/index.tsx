@@ -1,40 +1,26 @@
-import React, {
-  ReactElement,
-  useState,
-  useEffect,
-  useMemo,
-  FC,
-  useRef,
-} from 'react'
+import React, { useState, useEffect, FC } from 'react'
 import cn from 'classnames'
 import styles from './UnderConstruction.module.scss'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 
-import {
-  isValidHttp,
-  isValidUrl,
-  isValidPostageStampId,
-} from '../../../../../popup/helpers'
 import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { useToggle } from '../../hooks/useToggle'
+
 import { Bus } from '../../../../../common/bus'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
-import * as tracing from '../../../../../common/tracing'
+
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
 import { typeOfUri, chainByUri, joinUrls } from '../../../../../common/helpers'
-import { StorageRefImage } from '../../components/DevModulesList'
+
 import {
   DEFAULT_BRANCH_NAME,
   ModuleTypes,
   StorageTypes,
 } from '../../../../../common/constants'
-// import { Icon, List, Message } from 'semantic-ui-react'
-import { Modal } from '../../components/Modal'
 
-// tracing.startTracing()
+import { Modal } from '../../components/Modal'
 
 enum DeploymentStatus {
   Unknown,
@@ -76,20 +62,15 @@ let _isMounted = false
 export const UnderConstruction: FC<UnderConstruction> = (
   props: UnderConstruction
 ) => {
-  // setUnderConstructionDetails: (x)=>void
   const {
     setUnderConstruction,
     setUnderConstructionDetails,
     setModuleInfo,
     setModuleVersion,
   } = props
-  const bus = new Bus()
-  const transferOwnershipModal = React.createRef<any>()
-  const addContextIdModal = React.createRef<any>()
-  const fileInputRef = React.createRef<HTMLInputElement>()
-  // ???
+
   const [originalMi, setOriginalMi] = useState<ModuleInfo>(new ModuleInfo())
-  // type - FEATURE
+
   const [mi, setMi] = useState<ModuleInfo>(new ModuleInfo())
   const [vi, setVi] = useState<VersionInfo>()
   const [dependenciesChecking, setDpendenciesChecking] = useState<
@@ -99,23 +80,19 @@ export const UnderConstruction: FC<UnderConstruction> = (
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
   const [message, setMessage] = useState<Message>(null)
-  // ???
+
   const [registryOptions, setRegistryOptions] = useState([])
   const [owner, setOwner] = useState(null)
-  // delete wallets
-  // ??
+
   const [currentAccount, setCurrentAccount] = useState(null)
 
   const [deploymentStatus, setDeploymentStatus] = useState(
     DeploymentStatus.Unknown
   )
   const [trustedUsers, setTrustedUsers] = useState([])
-  // ???
-  const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
-  // if form onli create - ?
+
   const [mode, setMode] = useState(FormMode.Creating)
-  // ???
-  const [saving, isSaving] = useState(false)
+
   const [targetStorages, setTargetStorages] = useState([
     StorageTypes.Swarm,
     StorageTypes.Sia,
@@ -147,21 +124,6 @@ export const UnderConstruction: FC<UnderConstruction> = (
     }
   }, [mi, targetChain])
 
-  // const _checkDependencies = async () => {
-  //   const { getVersionInfo } = await initBGFunctions(browser)
-  //   // const { dependenciesChecking deps, targetRegistry } = dependenciesChecking
-  //   await Promise.all(
-  //     dependenciesChecking.map((x) =>
-  //       getVersionInfo(
-  //         targetRegistry,
-  //         x.name,
-  //         DEFAULT_BRANCH_NAME,
-  //         x.version
-  //       ).then((y) => (x.isExists = !!y))
-  //     )
-  //   )
-  // }
-
   const _updateData = async () => {
     setLoading(true)
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
@@ -191,34 +153,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
     )
     setCurrentAccount(currentAccount)
     setLoading(false)
-    // console.log(targetChain)
-
-    // console.log(currentAccount)
   }
-  // const _updateOwnership = async () => {
-  //   const { getOwnership } = await initBGFunctions(browser)
-  //   const owner = await getOwnership(targetRegistry, mi.name)
-  //   setOwner(owner)
-  // }
-
-  // const _updateDeploymentStatus = async () => {
-  //   // const s = this.state
-  //   // setDeploymentStatus(DeploymentStatus.NewModule)
-
-  //   const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(
-  //     browser
-  //   )
-  //   const miF = await getModuleInfoByName(targetRegistry, mi.name)
-  //   const deployed = vi
-  //     ? await getVersionInfo(targetRegistry, miF.name, vi.branch, vi.version)
-  //     : true
-  //   const deploymentStatus = !miF
-  //     ? DeploymentStatus.NewModule
-  //     : deployed
-  //     // ? DeploymentStatus.Deployed
-  //     // : DeploymentStatus.NotDeployed
-  //   setDeploymentStatus(deploymentStatus)
-  // }
 
   const deployButtonClickHandler = async () => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
@@ -262,38 +197,6 @@ export const UnderConstruction: FC<UnderConstruction> = (
     } finally {
       setModalTransaction(false)
     }
-  }
-
-  const reuploadButtonClickHandler = async () => {
-    // setLoading(true)
-
-    const { uploadModule } = await initBGFunctions(browser)
-
-    try {
-      const scriptUrl = await uploadModule(mi, targetStorages)
-      setMessage({
-        type: 'positive',
-        header: 'Module was reuploaded',
-        message: [`Script URL: ${scriptUrl}`],
-      })
-      // setDeploymentStatus(DeploymentStatus.Deployed)
-    } catch (err) {
-      setMessage({
-        type: 'negative',
-        header: 'Publication error',
-        message: [err.message],
-        // console.log();
-      })
-      setModal(true)
-    } finally {
-      // setLoading(false)
-    }
-  }
-
-  const pairWallet = async () => {
-    const { pairWalletViaOverlay } = await initBGFunctions(browser)
-    await pairWalletViaOverlay(targetChain)
-    await _updateData()
   }
 
   const isNoStorage = targetStorages.length === 0
@@ -425,7 +328,6 @@ export const UnderConstruction: FC<UnderConstruction> = (
                     readOnly={mode === FormMode.Editing}
                     placeholder="Module ID like module_name.dapplet-base.eth"
                     onChange={(e) => {
-                      // setInputNameError(null)
                       mi.name = e.target.value
                       if (mi.name.length < 2) {
                         setInputNameError('error')
@@ -524,14 +426,9 @@ export const UnderConstruction: FC<UnderConstruction> = (
             mi.name === null ||
             mi.title === null ||
             mi.description === null
-            // ||
-            // inputFullDescriptionError !== null
           }
           onClick={() => {
             setModalCreation(true)
-            console.log(loading)
-
-            // deployButtonClickHandler()
           }}
           className={cn(styles.push, {
             [styles.pushDisabled]:
@@ -541,8 +438,6 @@ export const UnderConstruction: FC<UnderConstruction> = (
               mi.name === null ||
               mi.title === null ||
               mi.description === null,
-            //  ||
-            // inputFullDescriptionError !== null,
           })}
         >
           Done
@@ -564,10 +459,6 @@ export const UnderConstruction: FC<UnderConstruction> = (
             onClick={() => {
               deployButtonClickHandler()
               onCloseModalCreation()
-              console.log(mi)
-              console.log(vi)
-
-              console.log(originalMi)
             }}
           >
             Ok, I agree

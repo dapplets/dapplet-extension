@@ -45,7 +45,7 @@ export interface DappletProps
 
 export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const [isShowDescription, onShowDescription] = useToggle(false)
-  // const [loadShowButton, setLoadShowButton] = useState(false)
+
   const {
     dapplet,
     className,
@@ -71,10 +71,9 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     isUnderConstruction,
     sourceRegistry,
   } = dapplet
-  // console.log(isActionHandler)
+
   useEffect(() => {
     loadShowButton
-    // onSwitchChange(dapplet, !isActive)
   }, [])
 
   return (
@@ -91,20 +90,14 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
               <Icon size="small" icon={Update} />
             </div>
 
-            {
-              // loadShowButton ? (
-              //   <div className={styles.loadingDappletsHome}></div>
-              // ) : (
-              !isUnderConstruction && (
-                <Switch
-                  // isLoad={loadShowButton}
-                  checked={isActive}
-                  onChange={() => {
-                    onSwitchChange(dapplet, !isActive)
-                  }}
-                />
-              )
-            }
+            {!isUnderConstruction && (
+              <Switch
+                checked={isActive}
+                onChange={() => {
+                  onSwitchChange(dapplet, !isActive)
+                }}
+              />
+            )}
           </div>
 
           <div className={cn(styles.blockText)}>{description}</div>
@@ -154,7 +147,6 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
           <div className={cn(styles.firstButtons)}>
             {isActive && isActionHandler ? (
               <SquaredButton
-                // loadShowButton={loadShowButton}
                 appearance="smail"
                 icon={HomeIcon}
                 className={styles.squareButton}
@@ -190,7 +182,6 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
               />
             )}
 
-            {/* NO BUTTON */}
             {!isShowDescription && (
               <DappletInfo
                 title="Author"

@@ -16,21 +16,12 @@ import { browser } from 'webextension-polyfill-ts'
 import { isValidUrl } from '../../../../../popup/helpers'
 
 export interface DropdownRegisteryProps
-  extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
-  // list?: IDropdown[]
-  // value?: IDropdown | null
-}
+  extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {}
 let _isMounted = false
 export const DropdownRegistery: FC<DropdownRegisteryProps> = (
   props: DropdownRegisteryProps
 ) => {
-  const {
-    // list,
-    // className,
-    // value = null,
-
-    ...anotherProps
-  } = props
+  const { ...anotherProps } = props
   const [isOpen, setOpen] = useState(false)
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
@@ -159,7 +150,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
                   className={cn(styles.inputBlock)}
                   onSubmit={(e) => {
                     e.preventDefault()
-                    // setRegistryInputError(null)
+
                     addRegistry(registryInput, handleClear)
                   }}
                   onBlur={() => setRegistryInputError(null)}
@@ -176,11 +167,6 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
                       setRegistryInput(e.target.value)
                       setRegistryInputError(null)
                     }}
-                    // onClick={() => {
-                    //   // setRegistryInputError(null)
-                    //   addRegistry(registryInput, handleClear)
-                    // }}
-                    // onBlur={() => setRegistryInputError(null)}
                   />
 
                   <span
@@ -210,7 +196,6 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
                   })}
                   onClick={() => {
                     enableRegistry(r.url, setOpen)
-                    // setOpen()
                   }}
                 >
                   {visible(r.url)}

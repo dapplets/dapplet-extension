@@ -18,7 +18,6 @@ export const Switch: FC<SwitchProps> = ({
   isLoad,
   ...props
 }) => {
-  // useEffect(() => {}, [])
   return (
     <label className={cn(styles.wrapper)}>
       <input

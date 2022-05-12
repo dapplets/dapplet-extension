@@ -1,44 +1,20 @@
-import React, {
-  ReactElement,
-  useState,
-  useEffect,
-  useMemo,
-  FC,
-  useRef,
-} from 'react'
+import React, { useState, useEffect, FC } from 'react'
 import cn from 'classnames'
 import styles from './Tokenomics.module.scss'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { SettingItem } from '../../components/SettingItem'
-import {
-  isValidHttp,
-  isValidUrl,
-  isValidPostageStampId,
-} from '../../../../../popup/helpers'
-import { browser } from 'webextension-polyfill-ts'
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { useToggle } from '../../hooks/useToggle'
-import { Bus } from '../../../../../common/bus'
-import ModuleInfo from '../../../../../background/models/moduleInfo'
-import VersionInfo from '../../../../../background/models/versionInfo'
-import * as tracing from '../../../../../common/tracing'
-import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { typeOfUri, chainByUri, joinUrls } from '../../../../../common/helpers'
-import { StorageRefImage } from '../../components/DevModulesList'
+
 import { Message } from '../../components/Message'
 import { Modal } from '../../components/Modal'
-import {
-  DEFAULT_BRANCH_NAME,
-  ModuleTypes,
-  StorageTypes,
-} from '../../../../../common/constants'
 
 export interface TokenomicsProps {
   setUnderConstructionDetails: (x) => void
   setTokenomics: (x) => void
   isSupport?: boolean
 }
+
 let _isMounted = false
+
 export const Tokenimics: FC<TokenomicsProps> = (props) => {
   const { setUnderConstructionDetails, isSupport = true, setTokenomics } = props
   const [isCreate, SetCreate] = useState(false)
@@ -177,7 +153,6 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
                 !isInvalidTokenTicker,
             })}
             onClick={() => setModal(true)}
-            // className={styles.createTokenomics}
           >
             Confirm
           </button>

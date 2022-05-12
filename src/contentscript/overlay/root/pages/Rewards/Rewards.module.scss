@@ -6,9 +6,9 @@
   flex-direction: column;
   overflow: hidden;
   width: 100%;
-  // height: 100%;
+
   flex: 1 1 auto;
-  // max-height: 78vh;
+
   height: calc(100vh - 132px);
   margin-top: -7.5px;
 }
@@ -28,7 +28,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  // justify-content: center;
+
   align-items: center;
   width: 100%;
   height: 100%;
@@ -470,17 +470,7 @@
   display: flex;
   flex-direction: column;
 }
-// .conditionalVisible {
-//   .conditionalWrapper {
-//     display: flex !important;
-//   }
-//   .recepientChangeBlock {
-//     display: none;
-//   }
-// }
-// .conditionalVisible {
-//   display: flex !important;
-// }
+
 .noneVisible {
   display: none;
 }
@@ -490,7 +480,6 @@
   width: 100%;
   align-items: center;
   justify-content: flex-end;
-  // flex-direction: column;
 }
 .inputConditional {
   display: inline-block;
@@ -590,7 +579,7 @@
 
 .createdRewardsWrapper {
   display: flex;
-  // flex-direction: column;
+
   width: 100%;
   position: relative;
   margin-bottom: 21px;
@@ -700,7 +689,6 @@
     margin: 0px 0px 0px 0px;
   }
 }
-// .createdRewardsBlock:last-child
 
 .createdRewardsBlockUser {
   display: flex;

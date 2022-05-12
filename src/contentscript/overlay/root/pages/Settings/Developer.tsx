@@ -7,9 +7,7 @@ import {
   isValidPostageStampId,
 } from '../../../../../popup/helpers'
 import { checkUrlAvailability, groupBy } from '../../../../../common/helpers'
-import { StorageRef } from '../../../../../background/registries/registry'
-import { InputPanel } from '../../components/InputPanel'
-// import { CheckboxList } from '../Notifications'
+
 import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 
@@ -36,15 +34,7 @@ export interface DeveloperProps {
   isShowChildrenRegistery: boolean
   setShowChildrenRegistery: (x) => void
 }
-export const Developer: //  = ({
-//   isDappletsDetails,
-//   setDappletsDetail,
-//   setModuleInfo,
-//   setModuleVersion,
-//   isUnderConstruction,
-//   setUnderConstruction,
-// }: DeveloperProps) =>
-FC<DeveloperProps> = (props: DeveloperProps) => {
+export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [isLoading, onLoading] = useState(true)
   const [registries, setRegistries] = useState([])
   const [registryInput, setRegistryInput] = useState('')
@@ -69,11 +59,9 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
     isShowChildrenRegistery,
     setShowChildrenRegistery,
   } = props
-  // const [storageRef] = <StorageRef>
 
   useEffect(() => {
     _isMounted = true
-    // loadSwarmGateway()
 
     const init = async () => {
       await loadSwarmGateway()
@@ -180,11 +168,6 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
   const groupedModules2 = groupBy(modules, (x) => x.module.isUnderConstruction)
 
-  console.log(modules, 'modules')
-  // console.log(registries)
-  // console.log(groupedModules)
-  // console.log('uk', groupedModules2)
-
   const handleClear = () => {
     setRegistryInput('')
   }
@@ -204,9 +187,6 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
               className={cn(styles.input, {
                 [styles.errorInput]: !!registryInputError,
               })}
-              //  error={!!registryInputError}
-              // buttonDefault
-
               value={registryInput}
               onChange={(e) => {
                 setRegistryInput(e.target.value)
@@ -260,12 +240,6 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                             >
                               {modules.length > 0 && registryUrl === r.url && (
                                 <DevModule
-                                  // deployButtonClickHandler={
-                                  //   deployButtonClickHandler
-                                  // }
-
-                                  // isLoadingDeploy={isLoadingDeploy}
-                                  // setLoadingDeploy={setLoadingDeploy}
                                   isDappletsDetails={isDappletsDetails}
                                   setDappletsDetail={setDappletsDetail}
                                   modules={modules}
@@ -294,8 +268,6 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
             {modules.length > 0
               ? Object.entries(groupedModules2).map(
                   ([isUnderConstruction, modules]) => (
-                    // {modules.author}
-
                     <div
                       key={isUnderConstruction}
                       onClick={() => console.log(modules)}
@@ -309,12 +281,7 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                             setShowChildrenUnderConstraction
                           }
                           children={
-                            <div
-                              className={styles.modules}
-                              onClick={() =>
-                                console.log(modules[0].module.author)
-                              }
-                            >
+                            <div className={styles.modules}>
                               <DevModule
                                 setDappletsDetail={setDappletsDetail}
                                 isDappletsDetails={isDappletsDetails}
@@ -341,21 +308,7 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
           <div className={styles.host}>
             {modules.length > 0 &&
               Object.entries(groupedModules).map(([registryUrl, modules]) => (
-                // {modules.author}
-
-                <div
-                  key={registryUrl}
-                  // onClick={() => console.log(modules[0].author)}
-                >
-                  {/* && registryUrl === r.url */}
-                  {/* {modules.length > 0  ? (
-                          <DevModule
-                            modules={modules}
-                            onDetailsClick={() => deployModule}
-                          />
-                        ) : (
-                          <div>No available development modules.</div>
-                        )} */}
+                <div key={registryUrl}>
                   {modules.length > 0 && modules[0].module.author !== null && (
                     <Registry
                       key={registryUrl}
@@ -392,12 +345,9 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
         <button
           className={styles.btnCreate}
           onClick={() => {
-            // onCreateModuleHandler()
             setUnderConstruction(true)
             setDappletsDetail(false)
             setUnderConstructionDetails(false)
-
-            // console.log(isUnderConstruction)
           }}
         >
           Create under construction dapplet

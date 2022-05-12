@@ -15,7 +15,6 @@ import {
   ModuleTypes,
   DAPPLETS_STORE_URL,
 } from '../../../../../common/constants'
-import { features } from 'process'
 
 export type Module = ManifestDTO & {
   isLoading: boolean
@@ -38,12 +37,10 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [devMessage, setDevMessage] = useState<string>(null)
   const [loadShowButton, setLoadShowButton] = useState(false)
   const [contextId, setContextIds] = useState<string[]>([])
-  const [features, setFeatures] = useState<ManifestAndDetails[]>([])
 
   useEffect(() => {
     _isMounted = true
     const init = async () => {
-      // setLoadingLoadingListDapplets(true)
       const { getFeaturesByHostnames, getCurrentContextIds, getThisTab } =
         await initBGFunctions(browser)
 
@@ -53,28 +50,17 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
       const d = await getFeaturesByHostnames(ids)
 
-      console.log('d', d)
-
       setContextIds(ids)
       await _refreshDataByContext(ids)
 
       setDapplets(d)
       setLoadingListDapplets(false)
       const features = await _getFilteredDapplets(d)
-      // setFeatures(features)
-
-      console.log('features', features)
 
       setDapplets(features)
     }
 
     init()
-
-    // const initSearch = async () => {
-    //   const features = await _getFilteredDapplets()
-    //   setDapplets(features)
-    // }
-    // initSearch()
 
     if (dapplets.length === 0) {
       setLoadingListDapplets(true)
@@ -82,39 +68,10 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       setLoadingListDapplets(false)
     }
 
-    // if (features) {
-    //   setDapplets(features)
-    // }
-    // refresh()
-    // EventBus.on('mydapplets_changed', init)
-    // EventBus.on('context_started', init)
-    // EventBus.on('context_finished', init)
-    // EventBus.on('dapplet_activated', init)
-    // EventBus.on('dapplet_deactivated', init)
-    // _getFilteredDapplets()
     return () => {
-      // EventBus.off('mydapplets_changed', init)
-      // EventBus.off('context_started', init)
-      // EventBus.off('context_finished', init)
-      // EventBus.off('dapplet_activated', init)
-      // EventBus.off('dapplet_deactivated', init)
       _isMounted = false
     }
   }, [search])
-
-  useEffect(() => {
-    dapplets
-  }, [dapplets])
-  // console.log(search)
-
-  // const refresh = async () => {
-  //   const { getCurrentContextIds } = await initBGFunctions(browser)
-  //   const contextIds = await getCurrentContextIds(currentTab)
-  //   if (_isMounted) {
-  //     setContextIds(contextIds)
-  //     await _refreshDataByContext(contextIds)
-  //   }
-  // }
 
   const _refreshDataByContext = async (contextIds: Promise<string[]>) => {
     let contextIdsValues = undefined
@@ -162,7 +119,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
 
     if (_isMounted) {
-      // setLoadingLoadingListDapplets(false)
       const d = features
         .filter((f) => f.type === ModuleTypes.Feature)
         .map((f) => ({
@@ -222,8 +178,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   }
 
   const _getFilteredDapplets = async (dapplets) => {
-    // const { features, search } = this.state
-
     if (!search || search.length === 0) return dapplets
 
     const find = (a: string) =>

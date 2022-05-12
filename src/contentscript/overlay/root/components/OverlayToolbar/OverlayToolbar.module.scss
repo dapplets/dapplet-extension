@@ -36,7 +36,6 @@
   background: transparent;
 
   background: $AppBG;
-  // box-shadow: -4px 0px 4px rgb(0 0 0 / 25%);
 
   svg path {
     fill: $Secondary;
@@ -61,7 +60,6 @@
     display: flex;
   }
   .toggleOverlay {
-    // margin: 10px 5px 0px 20px;
     margin: 0px 5px 0px 0px;
     background: $PureWhite;
     border-radius: 10px;

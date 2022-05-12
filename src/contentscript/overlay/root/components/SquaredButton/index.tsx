@@ -11,7 +11,6 @@ export interface ButtonProps
   disabled?: boolean
   appearance: 'smail' | 'big'
   icon: FunctionComponent
-  // loadShowButton?: boolean
 }
 
 export const SquaredButton: FC<ButtonProps> = (props: ButtonProps) => {
@@ -20,7 +19,7 @@ export const SquaredButton: FC<ButtonProps> = (props: ButtonProps) => {
     appearance,
     className,
     icon: Icon,
-    // loadShowButton,
+
     ...anotherProps
   } = props
   return (
