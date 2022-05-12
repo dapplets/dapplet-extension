@@ -144,7 +144,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const getValidUserAgentName = (value, reg) => {
     try {
       let numEl = value.match(reg)
-      console.log(numEl)
+
       return numEl
     } catch {}
   }
@@ -203,7 +203,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSwarmGatewayEdited(false)
       setSwarmGatewayLoading(false)
       setSwarmGatewayInputError(err.message)
-      console.log(err.message)
     }
   }
 
@@ -325,8 +324,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
     if (checked) newTarget.push(storage)
     setTargetStorages(newTarget)
-    console.log(targetStorages)
-    console.log(newTarget)
   }
 
   const getDefaultValueDynamicAdapter = async (inputValue: string) => {
@@ -601,28 +598,31 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <Checkbox
                       isCheckbox={targetStorages.includes(StorageTypes.Sia)}
                       title="SIA"
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        console.log('change')
                         changeTargetStorage(StorageTypes.Sia, e.target.checked)
-                      }
+                      }}
                     />
                     <Checkbox
                       isCheckbox={targetStorages.includes(StorageTypes.Ipfs)}
                       title="IPFS"
-                      onChange={(e) =>
+                      onChange={(e) => {
                         changeTargetStorage(StorageTypes.Ipfs, e.target.checked)
-                      }
+                      }}
                     />
 
                     <Checkbox
                       title="Swarm"
                       isCheckbox={targetStorages.includes(StorageTypes.Swarm)}
                       // checked={isPopup}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        console.log('change')
+
                         changeTargetStorage(
                           StorageTypes.Swarm,
                           e.target.checked
                         )
-                      }
+                      }}
                     />
                   </div>
                 }

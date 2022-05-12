@@ -53,7 +53,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
   const getNumIndex = (value, reg) => {
     try {
       let numEl = value.match(reg)
-      console.log(numEl)
+
       return numEl
     } catch {}
   }

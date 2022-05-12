@@ -234,10 +234,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                       {modules.length > 0 &&
                         Object.entries(groupedModules).map(
                           ([registryUrl, modules]) => (
-                            <div
-                              key={registryUrl + i}
-                              onClick={() => console.log(registryUrl)}
-                            >
+                            <div key={registryUrl + i}>
                               {modules.length > 0 && registryUrl === r.url && (
                                 <DevModule
                                   isDappletsDetails={isDappletsDetails}
@@ -268,10 +265,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
             {modules.length > 0
               ? Object.entries(groupedModules2).map(
                   ([isUnderConstruction, modules]) => (
-                    <div
-                      key={isUnderConstruction}
-                      onClick={() => console.log(modules)}
-                    >
+                    <div key={isUnderConstruction}>
                       {isUnderConstruction == 'true' && modules.length > 0 && (
                         <UnderConstruction
                           key={isUnderConstruction}
@@ -316,10 +310,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                       isShowChildrenRegistery={isShowChildrenRegistery}
                       setShowChildrenRegistery={setShowChildrenRegistery}
                       children={
-                        <div
-                          className={styles.modules}
-                          onClick={() => console.log(modules[0].module.author)}
-                        >
+                        <div className={styles.modules}>
                           <DevModule
                             setDappletsDetail={setDappletsDetail}
                             isDappletsDetails={isDappletsDetails}

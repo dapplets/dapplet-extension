@@ -48,7 +48,6 @@ export class DevModulesList extends React.Component<Props, State> {
     })
 
     const sorted = [...sorting.sort().values()].map((x) => x.node)
-    console.log(sorted)
 
     return (
       <List divided relaxed verticalAlign="middle" size="small">

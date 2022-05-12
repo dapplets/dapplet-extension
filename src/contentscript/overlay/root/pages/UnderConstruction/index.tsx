@@ -118,7 +118,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
       await _updateData()
     }
     init()
-    console.log(mi)
+
     return () => {
       _isMounted = false
     }
@@ -193,7 +193,6 @@ export const UnderConstruction: FC<UnderConstruction> = (
         message: [err.message],
       })
       setModal(true)
-      console.log([err])
     } finally {
       setModalTransaction(false)
     }

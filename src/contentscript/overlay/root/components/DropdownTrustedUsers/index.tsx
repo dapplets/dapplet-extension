@@ -69,7 +69,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
   const getNumIndex = (value, reg) => {
     try {
       let numEl = value.match(reg)
-      console.log(numEl)
+
       return numEl
     } catch {}
   }
@@ -176,7 +176,6 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
               e.preventDefault()
 
               addTrustedUser(trustedUserInput, handleClear)
-              console.log('click')
             }}
           >
             <input
@@ -187,7 +186,6 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
               onChange={(e) => {
                 setTrustedUserInput(e.target.value)
                 setTrustedUserInputError(null)
-                console.log('change')
               }}
               disabled={
                 !isValidUrl(trustedUserInput) &&

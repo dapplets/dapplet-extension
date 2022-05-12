@@ -79,9 +79,6 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
         [styles.tabNotActive]: !activeTab,
       })}
       {...anotherProps}
-      onClick={() => {
-        console.log(activeTab)
-      }}
     >
       <div className={styles.top}>
         <StorageRefImage

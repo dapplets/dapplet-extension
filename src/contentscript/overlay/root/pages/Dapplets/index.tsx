@@ -183,8 +183,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const find = (a: string) =>
       (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1
 
-    console.log('dapplets', dapplets)
-
     return dapplets.filter(
       (x: ManifestAndDetails) =>
         find(x.name) || find(x.title) || find(x.description) || find(x.author)
@@ -280,7 +278,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const onOpenSettingsModule = async (mi: ManifestDTO) => {
     const { openSettingsOverlay } = await initBGFunctions(browser)
     await openSettingsOverlay(mi)
-    console.log(mi)
 
     window.close()
   }

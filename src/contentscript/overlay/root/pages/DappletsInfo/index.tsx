@@ -138,7 +138,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     if (author.authorForm.length === 0) {
       setAuthorDisabled(false)
     }
-    console.log(autorDisabled)
 
     return () => {
       _isMounted = false
@@ -265,14 +264,10 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
       setDappletsDetail(false)
     } catch (error) {
-      console.log('err', error)
       setDisabledAddOwner(true)
-
-      console.log(isDisabledAddOwner)
     }
     setNewOwnerLoading(false)
     setNewOwnerDone(true)
-    console.log(mi.registryUrl)
   }
 
   const _removeContextId = async (contextId: string) => {
@@ -375,7 +370,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       mi.icon = null
     }
     setMi(mi)
-    console.log(mi)
   }
   const saveChanges = async () => {
     setModalTransaction(true)
@@ -395,7 +389,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       })
       setModalTransaction(false)
       setModal(true)
-      console.log(err.message)
     } finally {
     }
   }
@@ -464,15 +457,12 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     const newContext = Object.assign({}, mi)
     newContext.contextIds.push(newContextObject)
     setMi(newContext)
-    console.log(mi)
   }
 
   const onDeleteChildContext = (id: number) => {
     const newContext = Object.assign({}, mi)
     newContext.contextIds.splice(id, 1)
     setMi(newContext)
-    console.log(mi)
-    console.log(id)
   }
   const [visible, setVisible] = useState(false)
   const node = useRef<HTMLButtonElement>()
@@ -581,7 +571,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     value={mi.title ?? ''}
                     onChange={(e) => {
                       setMi({ ...mi, title: e.target.value })
-                      console.log(mi)
+
                       setDisabledPush(false)
                     }}
                     className={styles.inputTitle}
@@ -598,7 +588,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     value={mi.description ?? ''}
                     onChange={(e) => {
                       setMi({ ...mi, description: e.target.value })
-                      console.log(mi)
+
                       setDisabledPush(false)
                     }}
                   />
@@ -636,7 +626,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     onChange={(e) => {
                       onChange(e)
                       iconInputChangeHandler(e)
-                      console.log(mi.icon)
+
                       setDisabledPush(false)
                     }}
                   />
@@ -671,7 +661,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     <button
                       onClick={() => {
                         _transferOwnership(newOwner)
-                        console.log(newOwner)
                       }}
                       className={styles.ownershipButton}
                     >
@@ -697,7 +686,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     onClick={(e) => {
                       addButtonClickHandler(e)
                       setAuthorDisabled(true)
-                      e.currentTarget.scrollIntoView()
+                      // e.currentTarget.scrollIntoView()
                     }}
                     className={cn(styles.adminsButton, {
                       [styles.adminsButtonDisabled]: autorDisabled,
@@ -758,9 +747,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                         placeholder={'Context ID (ex: example.com)'}
                         onChange={(e) => {
                           setEditContextId(e.target.value)
-
-                          console.log(nodeInput.current?.value)
-                          console.log(mi)
                         }}
                         // onBlur={() => {
                         //   _addContextId(editContextId)

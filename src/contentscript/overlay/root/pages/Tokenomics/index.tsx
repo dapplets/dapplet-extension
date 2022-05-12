@@ -120,7 +120,7 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
                       onFocus={() => setInvalidTokenTicker(false)}
                       onChange={(e) => {
                         setTokenListing(e.target.value)
-                        console.log(tokenListing)
+
                         if (
                           e.target.value.length <= 2 ||
                           e.target.value.length >= 5

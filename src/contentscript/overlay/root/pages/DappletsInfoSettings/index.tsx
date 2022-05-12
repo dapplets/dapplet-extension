@@ -120,15 +120,12 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
       newContextObject
     )
     setMi(newContext)
-    console.log(mi)
   }
 
   const onDeleteChildContext = (id: number) => {
     const newContext = Object.assign({}, mi)
     newContext.contextIds.splice(id, 1)
     setMi(newContext)
-    console.log(mi)
-    console.log(id)
   }
   const [visible, setVisible] = useState(false)
 
@@ -293,10 +290,6 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
                         onChange={(e) => {
                           setEditContextId(e.target.value)
                           setVisibleContextId(e.target.value) //readonly
-                          console.log(editContextId)
-
-                          console.log(nodeInput.current?.value)
-                          console.log(mi)
                         }}
                       />
 

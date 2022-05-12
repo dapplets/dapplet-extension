@@ -341,15 +341,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
             </div>
 
             <div className={styles.blockInfo}>
-              <h3
-                onClick={() => {
-                  console.log(m.module)
-                  console.log(m.versions[0])
-                }}
-                className={styles.dappletsTitle}
-              >
-                {m.module.title}
-              </h3>
+              <h3 className={styles.dappletsTitle}>{m.module.title}</h3>
               {m.module.isUnderConstruction ? (
                 <span
                   className={styles.dappletsSettingsIsUnderConstructionBlock}

@@ -113,15 +113,10 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 
       const x = element.x
 
-      console.log(x)
       if (x > 10 && x < 100) {
         setNodeOverlayToolbar(true)
-        console.log(isNodeOverlayToolbar)
-        console.log(element)
       } else {
         setNodeOverlayToolbar(false)
-        console.log(isNodeOverlayToolbar)
-        console.log(element)
       }
     }
   }
@@ -129,8 +124,6 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
     nodeOverlayToolbar,
     isNodeOverlayToolbar,
   ])
-
-  console.log(nonSystemTabs)
 
   return (
     <div

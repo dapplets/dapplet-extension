@@ -134,14 +134,12 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.push(newAuthorObject)
     setAuthor(newAuthor)
-    console.log(author)
   }
 
   const onDeleteChild = (id: number) => {
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.splice(id, 1)
     setAuthor(newAuthor)
-    console.log(author)
   }
 
   const _updateData = async () => {
@@ -194,7 +192,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
       mi.icon = null
     }
     setMi(mi)
-    console.log(mi)
   }
   const saveChanges = async () => {
     setModalTransaction(true)
@@ -214,7 +211,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
       })
       setModalTransaction(false)
       setModal(true)
-      console.log(err.message)
     } finally {
     }
   }
@@ -389,7 +385,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                     value={mi.title ?? ''}
                     onChange={(e) => {
                       setMi({ ...mi, title: e.target.value })
-                      console.log(mi)
+
                       setDisabledPush(false)
                     }}
                     className={styles.inputTitle}
@@ -406,7 +402,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                     value={mi.description ?? ''}
                     onChange={(e) => {
                       setMi({ ...mi, description: e.target.value })
-                      console.log(mi)
+
                       setDisabledPush(false)
                     }}
                   />
@@ -444,7 +440,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                     onChange={(e) => {
                       onChange(e)
                       iconInputChangeHandler(e)
-                      console.log(mi.icon)
+
                       setDisabledPush(false)
                     }}
                   />
@@ -481,9 +477,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                         placeholder={'Context ID (ex: example.com)'}
                         onChange={(e) => {
                           setEditContextId(e.target.value)
-
-                          console.log(nodeInput.current?.value)
-                          console.log(mi)
                         }}
                       />
 
@@ -558,7 +551,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                       placeholder={x.author}
                       onChange={(e) => {
                         newAuthorObject.author = e.target.value
-                        console.log(author)
+
                         setDisabledPush(false)
                       }}
                     />
