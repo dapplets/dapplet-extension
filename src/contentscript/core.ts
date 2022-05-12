@@ -41,7 +41,7 @@ export interface IEthWallet extends IEtherneumWallet, WalletConnection {
     authMethod: 'ethereum/goerli'
 }
 
-export interface INearWallet extends NearApi.ConnectedWalletAccount, WalletConnection {
+export type INearWallet = NearApi.ConnectedWalletAccount & WalletConnection & {
     authMethod: 'near/testnet' | 'near/mainnet'
 }
 
