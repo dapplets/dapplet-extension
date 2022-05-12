@@ -262,44 +262,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
           )}
 
           <div className={styles.host}>
-            {modules.length > 0
-              ? Object.entries(groupedModules2).map(
-                  ([isUnderConstruction, modules]) => (
-                    <div key={isUnderConstruction}>
-                      {isUnderConstruction == 'true' && modules.length > 0 && (
-                        <UnderConstruction
-                          key={isUnderConstruction}
-                          label={'Dapplet under constuction'}
-                          isShowChildren={isShowChildrenUnderConstraction}
-                          setShowChildrenUnderConstraction={
-                            setShowChildrenUnderConstraction
-                          }
-                          children={
-                            <div className={styles.modules}>
-                              <DevModule
-                                setDappletsDetail={setDappletsDetail}
-                                isDappletsDetails={isDappletsDetails}
-                                modules={modules}
-                                onDetailsClick={deployModule.bind(this)}
-                                setModuleInfo={setModuleInfo}
-                                setModuleVersion={setModuleVersion}
-                                isUnderConstructionDetails={
-                                  isUnderConstructionDetails
-                                }
-                                setUnderConstructionDetails={
-                                  setUnderConstructionDetails
-                                }
-                              />
-                            </div>
-                          }
-                        />
-                      )}
-                    </div>
-                  )
-                )
-              : null}
-          </div>
-          <div className={styles.host}>
             {modules.length > 0 &&
               Object.entries(groupedModules).map(([registryUrl, modules]) => (
                 <div key={registryUrl}>
@@ -319,8 +281,14 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                             setModuleInfo={setModuleInfo}
                             setModuleVersion={setModuleVersion}
                             isUnderConstructionDetails={isShowChildrenRegistery}
+                            // setUnderConstructionDetails={
+                            //   setShowChildrenRegistery
+                            // }
+                            // isUnderConstructionDetails={
+                            //   isUnderConstructionDetails
+                            // }
                             setUnderConstructionDetails={
-                              setShowChildrenRegistery
+                              setUnderConstructionDetails
                             }
                           />
                         </div>

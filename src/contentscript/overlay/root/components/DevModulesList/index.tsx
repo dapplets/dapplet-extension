@@ -132,7 +132,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   >([])
   const nodeButton = useRef<HTMLButtonElement>()
   const [textButtonDeploy, setTextButtonDeploy] = useState('Deploy')
-  const [textButtonReupload, setTextButtonReupload] = useState('Reapload')
+  const [textButtonReupload, setTextButtonReupload] = useState('Deploy')
   const [isLoadingDeploy, setLoadingDeploy] = useState(false)
   const [messageError, setMessageError] = useState(null)
   const [isModalError, setModalError] = useState(false)
@@ -322,7 +322,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 <div className={styles.dappletsVersion}>
                   {m.versions[0].version}
                 </div>
-              ) : null}
+              ) : (
+                <div className={styles.dappletsVersionUC}>UC</div>
+              )}
 
               {m.versions &&
                 m.versions[0] &&
@@ -350,7 +352,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     className={styles.dappletsSettingsIsUnderConstruction}
                     onClick={() => {
                       onDetailsClick(m.module, m.versions[0])
-                      setDappletsDetail(false)
+                      // setDappletsDetail(false)
                       setUnderConstructionDetails(true)
                       setModuleInfo(m.module)
                       setModuleVersion(m.versions[0])
@@ -364,24 +366,24 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   onClick={() => {
                     onDetailsClick(m.module, m.versions[0])
                     setDappletsDetail(true)
+                    // setUnderConstructionDetails(false)
                     setModuleInfo(m.module)
                     setModuleVersion(m.versions[0])
                   }}
                 />
               )}
-              {m.module.isUnderConstruction ? (
-                <button
-                  className={cn(
-                    styles.dappletsReuploadisUnderConstructionPublish,
-                    {
-                      [styles.dappletsReuploadisUnderConstructionDeploy]:
-                        m.isDeployed?.[0] === false,
-                    }
-                  )}
-                >
-                  {m.isDeployed?.[0] === false ? 'Deploy' : 'Publish'}
-                </button>
-              ) : (
+              {m.module.isUnderConstruction ? null : (
+                // <button
+                //   className={cn(
+                //     styles.dappletsReuploadisUnderConstructionPublish,
+                //     {
+                //       [styles.dappletsReuploadisUnderConstructionDeploy]:
+                //         m.isDeployed?.[0] === false,
+                //     }
+                //   )}
+                // >
+                //   {m.isDeployed?.[0] === false ? 'Deploy' : 'Publish'}
+                // </button>
                 <button
                   id={String(i)}
                   ref={nodeButton}
@@ -389,7 +391,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     m.isDeployed?.[0] === false &&
                       deployButtonClickHandler(m.versions[0], e)
                   }}
-                  className={cn(styles.dappletsReupload, {})}
+                  className={cn(styles.dappletsReupload, {
+                    [styles.dapDeploy]: m.isDeployed?.[0] !== false,
+                  })}
                 >
                   {m.isDeployed?.[0] === false
                     ? textButtonDeploy
@@ -425,7 +429,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   </label>
                 </div>
               )}
-              {m.module.registryUrl && (
+              {/* {m.module.registryUrl && (
                 <div>
                   <span className={styles.dappletsLabelSpan}>Registry:</span>
                   <label
@@ -437,8 +441,8 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     {visible(`${m.module.registryUrl}`)}
                   </label>
                 </div>
-              )}
-              {m.versions && m.versions[0] && m.versions[0].version && (
+              )} */}
+              {/* {m.versions && m.versions[0] && m.versions[0].version && (
                 <div>
                   <span className={styles.dappletsLabelSpan}>
                     Version in registry:
@@ -452,7 +456,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     {m.versions[0].version}
                   </label>
                 </div>
-              )}
+              )} */}
               <div>
                 <span className={styles.dappletsLabelSpan}>Type:</span>
                 <label
