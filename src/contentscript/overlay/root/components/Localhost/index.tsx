@@ -11,6 +11,7 @@ export interface LocalhostProps {
   closeHost: () => void
   onClickButtonLocalhost: () => void
   label: string
+  isLoadButtonLocalhost?: boolean
 }
 
 export const Localhost: FC<LocalhostProps> = (props) => {
@@ -21,23 +22,35 @@ export const Localhost: FC<LocalhostProps> = (props) => {
     onClickButtonLocalhost,
     label,
     children,
+    isLoadButtonLocalhost,
   } = props
   const [isShowDescription, onShowDescription] = useToggle(false)
   return (
     <div className={styles.localhost}>
       <div className={styles.hostBlock}>
-        <button
-          onClick={onClickButtonLocalhost}
-          className={cn(styles.buttonLocalhost, {
-            [styles.disabled]: !isEnabled && !error,
-            [styles.error]: isEnabled && error,
-            [styles.enabled]: isEnabled && !error,
-          })}
-        >
-          {(!isEnabled && !error && 'Disabled') ||
-            (isEnabled && error && 'Error') ||
-            (isEnabled && !error && 'Enabled')}
-        </button>
+        {isLoadButtonLocalhost ? (
+          <div
+            className={cn(styles.buttonLocalhostLoad, {
+              [styles.disabledLoad]: !isEnabled && !error,
+              [styles.errorLoad]: isEnabled && error,
+              [styles.enabledLoad]: isEnabled && !error,
+            })}
+          ></div>
+        ) : (
+          <button
+            onClick={onClickButtonLocalhost}
+            className={cn(styles.buttonLocalhost, {
+              [styles.disabled]: !isEnabled && !error,
+              [styles.error]: isEnabled && error,
+              [styles.enabled]: isEnabled && !error,
+            })}
+          >
+            {(!isEnabled && !error && 'Disabled') ||
+              (isEnabled && error && 'Error') ||
+              (isEnabled && !error && 'Enabled')}
+          </button>
+        )}
+
         <label
           onClick={() => {
             onShowDescription()

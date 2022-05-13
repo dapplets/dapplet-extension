@@ -44,6 +44,9 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [dataUri, setDataUri] = useState(null)
   const [isLoadButton, setLoadButton] = useState(false)
+  const [isLocalhost, setLocalhost] = useState(true)
+  const [isLoadButtonLocalhost, setLoadButtonLocalhost] = useState(false)
+  const [isLoadAdd, setLoadAdd] = useState(false)
 
   const {
     isDappletsDetails,
@@ -64,6 +67,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     _isMounted = true
 
     const init = async () => {
+      setLoadButton(true)
       await loadSwarmGateway()
       await loadRegistries()
       await loadIntro()
@@ -76,6 +80,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       if (['index.json', 'dapplet.json'].includes(urlEnding)) {
         setRegistryInput(currentUrl)
       }
+      setLoadButton(false)
     }
     init()
 
@@ -90,7 +95,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     setSwarmGatewayUrl(swarmGatewayUrl)
   }
   const loadRegistries = async () => {
-    setLoadButton(true)
+    // setLoadButton(true)
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
 
     const modules: {
@@ -101,15 +106,17 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     setModules(modules)
 
     const registries = await getRegistries()
-    onLoading(false)
+    // onLoading(false)
     setRegistries(registries.filter((r) => r.isDev === true))
-    setLoadButton(false)
+    // setLoadButton(false)
   }
 
   const loadIntro = async () => {
+    // setLoadButton(true)
     const { getIntro } = await initBGFunctions(browser)
     const intro = await getIntro()
     setIntro(intro)
+    // setLoadButton(false)
   }
 
   const closeWelcomeIntro = async () => {
@@ -119,6 +126,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   }
 
   const addRegistry = async (url: string, x: () => void) => {
+    setLoadAdd(true)
     setLoadButton(true)
     const { addRegistry } = await initBGFunctions(browser)
 
@@ -132,13 +140,15 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     loadRegistries()
     x()
     setLoadButton(false)
+    setTimeout(() => setLoadAdd(false), 1500)
   }
 
   const removeRegistry = async (url: string) => {
-    onLoading(true)
+    setLoadAdd(true)
     const { removeRegistry } = await initBGFunctions(browser)
     await removeRegistry(url)
     loadRegistries()
+    setTimeout(() => setLoadAdd(false), 1500)
   }
 
   const deployModule = async (mi: ModuleInfo, vi: VersionInfo) => {
@@ -147,17 +157,25 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     // window.close()
   }
   const enableRegistry = async (url: string) => {
-    onLoading(true)
+    // onLoading(true)
+
+    setLoadButtonLocalhost(true)
     const { enableRegistry } = await initBGFunctions(browser)
     await enableRegistry(url)
+
     loadRegistries()
+    setTimeout(() => setLoadButtonLocalhost(false), 1500)
   }
 
   const disableRegistry = async (url: string) => {
-    onLoading(true)
+    // onLoading(true)
+
+    setLoadButtonLocalhost(true)
     const { disableRegistry } = await initBGFunctions(browser)
     await disableRegistry(url)
+
     loadRegistries()
+    setTimeout(() => setLoadButtonLocalhost(false), 1500)
   }
 
   // const onCreateModuleHandler = async () => {
@@ -198,22 +216,26 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                 !!registries.find((r) => r.url === registryInput)
               }
             />
-            <button
-              disabled={isLoadButton}
-              className={cn(styles.buttonInput, {
-                [styles.buttonInputDisabled]: isLoadButton,
-              })}
-              onClick={() => addRegistry(registryInput, handleClear)}
-            >
-              add
-            </button>
+            {isLoadAdd ? (
+              <div className={styles.loadAdd}></div>
+            ) : (
+              <button
+                disabled={isLoadButton}
+                className={cn(styles.buttonInput, {
+                  [styles.buttonInputDisabled]: isLoadButton,
+                })}
+                onClick={() => addRegistry(registryInput, handleClear)}
+              >
+                add
+              </button>
+            )}
           </div>
           {registryInputError ? (
             <div className={styles.errorMessage}>{registryInputError}</div>
           ) : null}
         </div>
         <div className={styles.host}>
-          {isLoadButton ? (
+          {isLoadButton && !isLoadButtonLocalhost ? (
             <div className={styles.miniLoader}></div>
           ) : (
             registries.map((r, i) => (
@@ -224,7 +246,11 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                   label={r.url}
                   key={i}
                   closeHost={() => removeRegistry(r.url)}
+                  isLoadButtonLocalhost={isLoadButtonLocalhost}
                   onClickButtonLocalhost={() => {
+                    setLoadButtonLocalhost(true)
+                    // console.log(isLoadButton)
+                    // console.log(isLoadButtonLocalhost)
                     ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
                       (r.isEnabled && r.error && disableRegistry(r.url)) ||
                       (r.isEnabled && !r.error && disableRegistry(r.url))
@@ -237,6 +263,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                             <div key={registryUrl + i}>
                               {modules.length > 0 && registryUrl === r.url && (
                                 <DevModule
+                                  isLocalhost={isLocalhost}
                                   isDappletsDetails={isDappletsDetails}
                                   setDappletsDetail={setDappletsDetail}
                                   modules={modules}

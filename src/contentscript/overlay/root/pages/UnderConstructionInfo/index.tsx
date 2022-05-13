@@ -120,10 +120,17 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   const [isModalTransaction, setModalTransaction] = useState(false)
   const onCloseTransaction = () => setModalTransaction(false)
 
+  const [isNotAccountModal, setNotAccountModal] = useState(false)
+
   useEffect(() => {
     _isMounted = true
     const init = async () => {
       await _updateData()
+      if (!isNotNullCurrentAccount) {
+        setNotAccountModal(true)
+      } else {
+        setNotAccountModal(false)
+      }
     }
     init()
     return () => {
@@ -339,7 +346,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
       {!isNotNullCurrentAccount && !loading ? (
         owner ? (
           <Modal
-            visible={true}
+            visible={isNotAccountModal}
             title={'The wrong wallet'}
             content={
               <div className={styles.modalDefaultContent}>
@@ -350,11 +357,11 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
               </div>
             }
             footer={''}
-            onClose={() => setUnderConstructionDetails(false)}
+            onClose={() => setNotAccountModal(false)}
           />
         ) : (
           <Modal
-            visible={true}
+            visible={isNotAccountModal}
             title={'Wallet is not connected'}
             content={
               <div className={styles.modalDefaultContent}>
@@ -363,7 +370,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
               </div>
             }
             footer={''}
-            onClose={() => setUnderConstructionDetails(false)}
+            onClose={() => setNotAccountModal(false)}
           />
         )
       ) : null}
@@ -451,6 +458,40 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
           }
         />
         <SettingWrapper
+          title="Team"
+          children={
+            <div className={styles.ownershipBlock}>
+              <div className={styles.wrapperAdmins}>
+                <div className={styles.blockAdmins}>
+                  <h3 className={styles.adminsTitle}>Admins</h3>
+                  <button
+                    onClick={addButtonClickHandler}
+                    className={styles.adminsButton}
+                  />
+                </div>
+                {author.authorForm.map((x, i) => (
+                  <div key={i} className={styles.blockAuthors}>
+                    <input
+                      key={i}
+                      className={styles.authorTitle}
+                      placeholder={x.author}
+                      onChange={(e) => {
+                        newAuthorObject.author = e.target.value
+
+                        setDisabledPush(false)
+                      }}
+                    />
+                    <button
+                      onClick={onDeleteChild.bind(null, i)}
+                      className={styles.authorDelete}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          }
+        />
+        <SettingWrapper
           title="Parameters"
           children={
             <div className={styles.parametersBlock}>
@@ -531,40 +572,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
             </div>
           }
         />
-        <SettingWrapper
-          title="Team"
-          children={
-            <div className={styles.ownershipBlock}>
-              <div className={styles.wrapperAdmins}>
-                <div className={styles.blockAdmins}>
-                  <h3 className={styles.adminsTitle}>Admins</h3>
-                  <button
-                    onClick={addButtonClickHandler}
-                    className={styles.adminsButton}
-                  />
-                </div>
-                {author.authorForm.map((x, i) => (
-                  <div key={i} className={styles.blockAuthors}>
-                    <input
-                      key={i}
-                      className={styles.authorTitle}
-                      placeholder={x.author}
-                      onChange={(e) => {
-                        newAuthorObject.author = e.target.value
-
-                        setDisabledPush(false)
-                      }}
-                    />
-                    <button
-                      onClick={onDeleteChild.bind(null, i)}
-                      className={styles.authorDelete}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          }
-        />
       </div>
       <div className={styles.linkNavigation}>
         <button
@@ -577,12 +584,12 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
           Back
         </button>
         <button
-          disabled={isDisabledPush}
+          disabled={isDisabledPush || !isNotNullCurrentAccount}
           onClick={() => {
             saveChanges()
           }}
           className={cn(styles.push, {
-            [styles.pushDisabled]: isDisabledPush,
+            [styles.pushDisabled]: isDisabledPush || !isNotNullCurrentAccount,
           })}
         >
           Push changes

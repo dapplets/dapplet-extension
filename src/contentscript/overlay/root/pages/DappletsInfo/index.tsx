@@ -128,11 +128,17 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const newAuthorObject = {
     author: '',
   }
+  const [isNotAccountModal, setNotAccountModal] = useState(false)
 
   useEffect(() => {
     _isMounted = true
     const init = async () => {
       await _updateData()
+      if (!isNotNullCurrentAccount) {
+        setNotAccountModal(true)
+      } else {
+        setNotAccountModal(false)
+      }
     }
     init()
     if (author.authorForm.length === 0) {
@@ -529,7 +535,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       {!isNotNullCurrentAccount ? (
         owner ? (
           <Modal
-            visible={true}
+            visible={isNotAccountModal}
             title={'The wrong wallet'}
             content={
               <>
@@ -540,17 +546,17 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
               </>
             }
             footer={''}
-            onClose={() => setDappletsDetail(false)}
+            onClose={() => setNotAccountModal(false)}
           />
         ) : (
           <Modal
-            visible={true}
+            visible={isNotAccountModal}
             title={'Wallet is not connected'}
             content={
               'You can not deploy a module without a wallet. Connect a new wallet'
             }
             footer={''}
-            onClose={() => setDappletsDetail(false)}
+            onClose={() => setNotAccountModal(false)}
           />
         )
       ) : null}
@@ -816,10 +822,10 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
           Back
         </button>
         <button
-          disabled={isDisabledPush}
+          disabled={isDisabledPush || !isNotNullCurrentAccount}
           onClick={() => saveChanges()}
           className={cn(styles.push, {
-            [styles.pushDisabled]: isDisabledPush,
+            [styles.pushDisabled]: isDisabledPush || !isNotNullCurrentAccount,
           })}
         >
           Push changes

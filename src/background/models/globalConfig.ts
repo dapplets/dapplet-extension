@@ -1,75 +1,75 @@
-import Base from '../../common/models/base';
-import { WalletInfo } from '../../common/constants';
-import SiteConfig from './siteConfig';
-import { EthereumNetwrokConfig, NearNetworkConfig } from '../../common/types';
+import Base from '../../common/models/base'
+import { StorageTypes, WalletInfo } from '../../common/constants'
+import SiteConfig from './siteConfig'
+import { EthereumNetwrokConfig, NearNetworkConfig } from '../../common/types'
 
 export class GlobalConfig extends Base {
+  getId = () => this.id
 
-    getId = () => this.id;
-    
-    id: string = 'default';
-    
-    isActive: boolean = false;
+  id: string = 'default'
 
-    suspended: boolean = false;
+  isActive: boolean = false
 
-    walletInfo: WalletInfo = null;
+  suspended: boolean = false
 
-    registries: { url: string, isDev: boolean, isEnabled: boolean }[] = [];
+  walletInfo: WalletInfo = null
 
-    intro = {
-        popupDeveloperWelcome: true
-    };
+  registries: { url: string; isDev: boolean; isEnabled: boolean }[] = []
 
-    devMode: boolean = false;
+  intro = {
+    popupDeveloperWelcome: true,
+  }
 
-    trustedUsers: { account: string }[] = [];
+  devMode: boolean = false
 
-    userSettings: {
-        [moduleName: string]: { [key: string]: any }
-    } = {};
+  trustedUsers: { account: string }[] = []
 
-    errorReporting: boolean = true; // indirectly affects on '/src/common/logger.ts'
+  userSettings: {
+    [moduleName: string]: { [key: string]: any }
+  } = {}
+  targetStorages: StorageTypes[] = null
 
-    userAgentId: string = null;
+  errorReporting: boolean = true // indirectly affects on '/src/common/logger.ts'
 
-    userAgentName: string = null;
+  userAgentId: string = null
 
-    autoBackup: boolean = true;
+  userAgentName: string = null
 
-    providerUrl: string = null;
+  autoBackup: boolean = true
 
-    swarmGatewayUrl: string = null;
+  providerUrl: string = null
 
-    walletsUsage: { [moduleName: string]: { [chain: string]: string } } = {}; // { 'extension': { 'ethereum': 'metamask', 'near': 'near' }}
+  swarmGatewayUrl: string = null
 
-    identityContract: string = null;
+  walletsUsage: { [moduleName: string]: { [chain: string]: string } } = {} // { 'extension': { 'ethereum': 'metamask', 'near': 'near' }}
 
-    popupInOverlay: boolean = false;
+  identityContract: string = null
 
-    hostnames: {
-        [hostname: string]: SiteConfig;
-    } = {}
+  popupInOverlay: boolean = false
 
-    lastDevMessageHash: string = null;
+  hostnames: {
+    [hostname: string]: SiteConfig
+  } = {}
 
-    ignoredUpdate: string = null;
+  lastDevMessageHash: string = null
 
-    lastMessageSeenTimestamp: string = null;
+  ignoredUpdate: string = null
 
-    dynamicAdapter: string = null;
+  lastMessageSeenTimestamp: string = null
 
-    preferedOverlayStorage: string = null;
+  dynamicAdapter: string = null
 
-    swarmPostageStampId: string = null;
+  preferedOverlayStorage: string = null
 
-    ipfsGatewayUrl: string = null;
+  swarmPostageStampId: string = null
 
-    siaPortalUrl: string = null;
+  ipfsGatewayUrl: string = null
 
-    ethereumNetworks: EthereumNetwrokConfig[] = [];
+  siaPortalUrl: string = null
 
-    nearNetworks: NearNetworkConfig[] = [];
+  ethereumNetworks: EthereumNetwrokConfig[] = []
 
-    myDapplets: { registryUrl: string, name: string }[] = [];
+  nearNetworks: NearNetworkConfig[] = []
+
+  myDapplets: { registryUrl: string; name: string }[] = []
 }

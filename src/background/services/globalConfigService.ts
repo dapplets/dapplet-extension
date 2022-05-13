@@ -12,6 +12,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { generateGuid } from '../../common/helpers'
 import SiteConfig from '../models/siteConfig'
 import * as EventBus from '../../common/global-event-bus'
+import { StorageTypes } from '../../common/constants'
 
 const EXPORTABLE_PROPERTIES = [
   'id',
@@ -252,6 +253,11 @@ export default class GlobalConfigService {
       { account: '0xf64849376812667bda7d902666229f8b8dd90687' },
       { account: 'team.dapplet-base.eth' },
     ]
+    config.targetStorages = [
+      StorageTypes.Ipfs,
+      StorageTypes.Sia,
+      StorageTypes.Swarm,
+    ]
     config.userSettings = {}
     config.providerUrl = 'https://goerli.mooo.com/'
     config.swarmGatewayUrl = 'https://swarmgateway.mooo.com/'
@@ -446,6 +452,14 @@ export default class GlobalConfigService {
     const config = await this.get()
     callback(config)
     await this.set(config)
+  }
+
+  async updateTargetStorages(storage: any) {
+    const config = await this.get()
+    config.targetStorages = storage
+    // await this.set(config)
+
+    return config.targetStorages
   }
 
   async getTrustedUsers() {

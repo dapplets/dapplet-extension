@@ -116,7 +116,7 @@
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
-
+  cursor: pointer;
   color: $Primary;
   margin: 3.5px 0px 0px 0px;
   &:hover {
@@ -296,7 +296,10 @@
 }
 
 .poolInput {
-  display: inline-block;
+  // display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 5px 5px;
 
   width: 46px;
@@ -588,14 +591,18 @@
 
 .settingWrapperCreatedRewards {
   h5 {
-    display: flex;
+    display: inline-block;
     height: 20px;
-    align-items: center;
+    text-align: center;
     font-style: italic;
     font-size: 14px;
     left: 14px;
     color: $MainGrey;
     padding: 0px 10px;
+    max-width: 50%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 .percentReward {
@@ -807,6 +814,7 @@
   line-height: 19px;
 
   color: #f26780;
+  cursor: pointer;
   &:hover {
     color: $PrimaryHover;
   }

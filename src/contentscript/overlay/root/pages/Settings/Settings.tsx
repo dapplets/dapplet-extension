@@ -99,11 +99,16 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [siaPortalLoading, setSiaPortalLoading] = useState(false)
   const [siaPortalEdited, setSiaPortalEdited] = useState(false)
 
-  const [targetStorages, setTargetStorages] = useState([
-    StorageTypes.Swarm,
-    StorageTypes.Sia,
-    StorageTypes.Ipfs,
+  const [targetStorages, setTargetStorages] = useState<StorageTypes[]>([
+    // StorageTypes.Swarm,
+    // StorageTypes.Sia,
+    // StorageTypes.Ipfs,
   ])
+  //   [
+  //   StorageTypes.Swarm,
+  //   StorageTypes.Sia,
+  //   StorageTypes.Ipfs,
+  // ]
   const [checkedSia, setCheckedSia] = useState(true)
   const [checkedIPFS, setCheckedIPFS] = useState(true)
   const [checkedSwarm, setCheckedSwarm] = useState(true)
@@ -137,10 +142,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       await loadPopupInOverlay()
     }
     init()
+    console.log(targetStorages)
+
     return () => {
       _isMounted = false
     }
-  }, [])
+  }, [targetStorages])
   const getValidUserAgentName = (value, reg) => {
     try {
       let numEl = value.match(reg)
@@ -319,11 +326,18 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSiaPortalInputError(err.message)
     }
   }
-  const changeTargetStorage = (storage: StorageTypes, checked: boolean) => {
+  const changeTargetStorage = async (
+    storage: StorageTypes,
+    checked: boolean
+  ) => {
+    const { updateTargetStorages } = await initBGFunctions(browser)
+
     const newTarget = targetStorages.filter((x) => x !== storage)
 
     if (checked) newTarget.push(storage)
-    setTargetStorages(newTarget)
+    await updateTargetStorages(newTarget).then((x) => {
+      setTargetStorages(x)
+    })
   }
 
   const getDefaultValueDynamicAdapter = async (inputValue: string) => {
@@ -596,7 +610,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <Checkbox isSupport isCheckbox title="Centralized" />
 
                     <Checkbox
-                      isCheckbox={targetStorages.includes(StorageTypes.Sia)}
+                      isCheckbox={
+                        targetStorages.includes(StorageTypes.Sia) ? false : true
+                        // recurs
+                      }
                       title="SIA"
                       onChange={(e) => {
                         console.log('change')
@@ -604,7 +621,11 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       }}
                     />
                     <Checkbox
-                      isCheckbox={targetStorages.includes(StorageTypes.Ipfs)}
+                      isCheckbox={
+                        targetStorages.includes(StorageTypes.Ipfs)
+                          ? false
+                          : true
+                      }
                       title="IPFS"
                       onChange={(e) => {
                         changeTargetStorage(StorageTypes.Ipfs, e.target.checked)
@@ -613,7 +634,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
                     <Checkbox
                       title="Swarm"
-                      isCheckbox={targetStorages.includes(StorageTypes.Swarm)}
+                      isCheckbox={
+                        // targetStorages &&
+                        // targetStorages.length !== 0 &&
+                        targetStorages.includes(StorageTypes.Swarm)
+                          ? false
+                          : true
+                      }
                       // checked={isPopup}
                       onChange={(e) => {
                         console.log('change')

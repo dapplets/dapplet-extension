@@ -96,6 +96,7 @@ interface PropsDeveloper {
   setModuleVersion: (x) => void
   isUnderConstructionDetails: boolean
   setUnderConstructionDetails: (x) => void
+  isLocalhost?: boolean
 }
 export const DevModule: FC<PropsDeveloper> = (props) => {
   const {
@@ -107,6 +108,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setModuleVersion,
     isUnderConstructionDetails,
     setUnderConstructionDetails,
+    isLocalhost = false,
   } = props
 
   const nodes = new Map<string, any>()
@@ -309,6 +311,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     } finally {
     }
   }
+  // console.log(isLocalhost)
 
   return (
     <>
@@ -379,7 +382,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   }}
                 />
               )}
-              {m.module.isUnderConstruction || m.module.author ? null : (
+              {m.module.isUnderConstruction || !isLocalhost ? null : (
                 // <button
                 //   className={cn(
                 //     styles.dappletsReuploadisUnderConstructionPublish,

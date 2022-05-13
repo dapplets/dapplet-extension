@@ -388,33 +388,40 @@ export const Rewards: FC<RewardsProps> = (props) => {
                       <span className={styles.nameLabel}>Pool</span>
                       <input
                         name="pool"
-                        value={`${pool.pool}%`}
+                        value={pool.pool}
                         onBlur={() => {
                           pool.pool.length <= 0
                             ? setPool({ pool: '20' })
                             : setPool({ pool: pool.pool })
                         }}
-                        onChange={(e: any) => {
-                          const { data, inputType } = e.nativeEvent
+                        onChange={(e) => {
+                          // const { data, inputType } = e.nativeEvent
 
-                          switch (inputType) {
-                            case 'insertText':
-                              if (isNaN(+data) === false && data !== ' ') {
-                                const newValue =
-                                  pool.pool === '0' ? data : pool.pool + data
-                                if (+newValue > 100) setPool({ pool: '100' })
-                                else setPool({ pool: newValue })
-                              }
-                              break
-                            case 'deleteContentBackward':
-                              const newValue = pool.pool.slice(0, -2)
+                          // switch (inputType) {
+                          //   case 'insertText':
+                          //     if (isNaN(+data) === false && data !== ' ') {
+                          //       const newValue =
+                          //         pool.pool === '0' ? data : pool.pool + data
+                          //       if (+newValue > 100) setPool({ pool: '100' })
+                          //       else setPool({ pool: newValue })
+                          //     }
+                          //     break
+                          //   case 'deleteContentBackward':
+                          //     const newValue = pool.pool.slice(0, -2)
 
-                              setPool({ pool: newValue })
-                              break
+                          //     setPool({ pool: newValue })
+                          //     break
 
-                            default:
-                              break
+                          //   default:
+                          //     break
+                          if (isNaN(+e.target.value) === false) {
+                            setPool({ pool: e.target.value })
                           }
+                          if (e.target.value === '0') {
+                            setPool({ pool: '20' })
+                          }
+
+                          // }
                         }}
                         className={cn(styles.poolInput, {
                           [styles.poolInputInvalid]: poolInputInvalid,
@@ -525,6 +532,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     name.name.length >= 1 &&
                     pool.pool &&
                     pool.pool.length >= 1 &&
+                    Number(pool.pool) < 100 &&
                     recepient.userID &&
                     recepient.userID.length >= 1
                   )
@@ -539,6 +547,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     name.name.length >= 1 &&
                     pool.pool &&
                     pool.pool.length >= 1 &&
+                    Number(pool.pool) <= 100 &&
                     recepient.userID &&
                     recepient.userID.length >= 1,
                 })}
@@ -562,7 +571,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
               }}
               className={styles.createTokenomics}
             >
-              Create
+              Go to Tokenomics
             </a>
           }
         />
