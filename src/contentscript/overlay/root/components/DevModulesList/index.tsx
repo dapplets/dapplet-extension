@@ -132,7 +132,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   >([])
   const nodeButton = useRef<HTMLButtonElement>()
   const [textButtonDeploy, setTextButtonDeploy] = useState('Deploy')
-  const [textButtonReupload, setTextButtonReupload] = useState('Deploy')
+  // const [textButtonReupload, setTextButtonReupload] = useState('Deploy')
   const [isLoadingDeploy, setLoadingDeploy] = useState(false)
   const [messageError, setMessageError] = useState(null)
   const [isModalError, setModalError] = useState(false)
@@ -296,7 +296,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       setDeploymentStatus(DeploymentStatus.Deployed)
 
       e.target.classList.remove(styles.dappletsIsLoadingDeploy)
-      setTextButtonDeploy('Reapload')
+      setTextButtonDeploy('Deploy')
     } catch (err) {
       setMessageError({
         type: 'negative',
@@ -319,7 +319,10 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           <div className={styles.dappletsInfo}>
             <div className={styles.dappletsTegs}>
               {m.versions && m.versions[0] && m.versions[0].version ? (
-                <div className={styles.dappletsVersion}>
+                <div
+                  className={styles.dappletsVersion}
+                  onClick={() => console.log(m)}
+                >
                   {m.versions[0].version}
                 </div>
               ) : (
@@ -362,7 +365,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 </span>
               ) : (
                 <button
-                  className={styles.dappletsSettings}
+                  className={cn(styles.dappletsSettings, {
+                    [styles.dappletsSettingsRegistry]: m.module.author !== null,
+                  })}
                   onClick={() => {
                     onDetailsClick(m.module, m.versions[0])
                     setDappletsDetail(true)
@@ -372,7 +377,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   }}
                 />
               )}
-              {m.module.isUnderConstruction ? null : (
+              {m.module.isUnderConstruction || m.module.author ? null : (
                 // <button
                 //   className={cn(
                 //     styles.dappletsReuploadisUnderConstructionPublish,
@@ -395,9 +400,10 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     [styles.dapDeploy]: m.isDeployed?.[0] !== false,
                   })}
                 >
-                  {m.isDeployed?.[0] === false
-                    ? textButtonDeploy
-                    : textButtonReupload}
+                  {/* {m.isDeployed?.[0] === false */}
+                  {/* ?  */}
+                  {textButtonDeploy}
+                  {/* textButtonReupload */}
                 </button>
               )}
             </div>
