@@ -326,7 +326,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   {m.versions[0].version}
                 </div>
               ) : (
-                <div className={styles.dappletsVersionUC}>UC</div>
+                <div className={styles.dappletsVersionUC}>
+                  Under Construction
+                </div>
               )}
 
               {m.versions &&
