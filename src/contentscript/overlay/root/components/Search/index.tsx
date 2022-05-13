@@ -34,10 +34,14 @@ export const Search = (props: SearchProps): ReactElement => {
       </div>
       <label className={styles.label}>
         <input
+          onBlur={() => {
+            onCloseSearch()
+          }}
           type="text"
           className={styles.input}
           value={value}
           onChange={onChange}
+          placeholder="_"
           {...otherProps}
         />
       </label>

@@ -171,6 +171,7 @@ export class App extends React.Component<P, S> {
   onCloseSearch = () => {
     this.setState({
       isOpenSearch: false,
+      search: '',
     })
   }
 
@@ -235,7 +236,7 @@ export class App extends React.Component<P, S> {
                         )}
 
                         {s.isOpenSearch && (
-                          <div className={styles.searchBlock}>
+                          <div className={styles.searchBlock} tabIndex={1}>
                             <Search
                               value={s.search}
                               onChange={(e) =>

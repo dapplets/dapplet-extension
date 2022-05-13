@@ -46,7 +46,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const newCustomPoolObject = {
     customPool: '',
   }
-  const [newCustomPool, setCustomPool] = useState({ customPoolForm: [] })
+  // const [newCustomPool, setCustomPool] = useState({ customPoolForm: [] })
 
   const [items, setItems] = useState({
     items: [],
@@ -77,6 +77,10 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const [itemIndex, setItemInex] = useState(0)
 
   const [newItem, setNewItem] = useState({ newItem: [] })
+  const [inputValueCustomPool, setDefaultValueCustomPool] = useState('')
+  // const [defaultCustomPool, setDefaultCustomPool] = useState(
+  //   `${inputValueCustomPool} Auge`
+  // )
 
   useEffect(() => {
     if (items && items.items) {
@@ -106,6 +110,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
     name,
     itemIndex,
     newItem,
+    // defaultCustomPool,
   ])
   // const handleAgeChange = (event) => {
 
@@ -113,17 +118,17 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const onClose = () => setModal(false)
   const onCloseChange = () => setModalChange(false)
 
-  const addButtonClickHandler = () => {
-    const newCustomPoolForm = Object.assign({}, newCustomPool)
-    newCustomPool.customPoolForm.push(newCustomPoolObject)
-    setCustomPool(newCustomPoolForm)
-  }
+  // const addButtonClickHandler = () => {
+  //   const newCustomPoolForm = Object.assign({}, newCustomPool)
+  //   newCustomPool.customPoolForm.push(newCustomPoolObject)
+  //   setCustomPool(newCustomPoolForm)
+  // }
 
-  const onDeleteChild = (id: number) => {
-    const newCustomPoolForm = Object.assign({}, newCustomPool)
-    newCustomPoolForm.customPoolForm.splice(id, 1)
-    setCustomPool(newCustomPoolForm)
-  }
+  // const onDeleteChild = (id: number) => {
+  //   const newCustomPoolForm = Object.assign({}, newCustomPool)
+  //   newCustomPoolForm.customPoolForm.splice(id, 1)
+  //   setCustomPool(newCustomPoolForm)
+  // }
 
   const addItem = (event) => {
     event.preventDefault()
@@ -188,7 +193,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
     <div className={styles.wrapper}>
       {isTokenomics ? (
         <div className={styles.blockRewards}>
-          {newCustomPool.customPoolForm.length === 0 && (
+          {/* {newCustomPool.customPoolForm.length === 0 && (
             <div className={styles.customPoolBlock}>
               <div className={styles.customPool}>
                 <div className={styles.customPoolLabel}>Create pool</div>
@@ -220,48 +225,51 @@ export const Rewards: FC<RewardsProps> = (props) => {
                 </button>
               )}
             </div>
-          )}
+          )} */}
 
-          {newCustomPool.customPoolForm.map((x, i) => (
-            <div key={i} className={styles.customPoolBlock}>
-              <div className={styles.customPool}>
-                <div className={styles.customPoolLabel}>Custom pool</div>
-                <div className={styles.blockNewCustomPool}>
-                  <input
-                    className={styles.inputNewCustomPool}
-                    onChange={(e) => e.target.value}
-                  />
+          {/* {newCustomPool.customPoolForm.map((x, i) => ( */}
+          <div className={styles.customPoolBlock}>
+            <div className={styles.customPool}>
+              <div className={styles.customPoolLabel}>Custom pool</div>
+              <div className={styles.blockNewCustomPool}>
+                <input
+                  className={styles.inputNewCustomPool}
+                  // value={}
+                  onChange={(e) => {
+                    setDefaultValueCustomPool(e.target.value)
+                  }}
+                />
 
-                  <button
+                {/* <button
                     onClick={() => onDeleteChild(i)}
                     className={styles.buttonDeleteNewCustomPool}
-                  />
-                </div>
+                  /> */}
               </div>
-              <div className={styles.customPooNewDistributed}>
-                <div className={styles.customPoolLabel}>You Use</div>
-                <span className={styles.customLabelDistributed}>
-                  {distributed}
-                </span>
-              </div>
-              {items && items.items && items.items.length !== 0 && (
-                <button
-                  disabled={addRecepientDisabled}
-                  onClick={() => {
-                    setName({ name: '' })
-                    setPool({ pool: '20' })
-
-                    setModal(true)
-                  }}
-                  className={cn(styles.pushChanges, styles.newReward, {
-                    [styles.newRewardDisabled]: addRecepientDisabled,
-                  })}
-                >
-                  Add new reward
-                </button>
-              )}
             </div>
-          ))}
+            <div className={styles.customPooNewDistributed}>
+              <div className={styles.customPoolLabel}>{`You Use `}</div>
+              <span className={styles.customLabelDistributed}>
+                {distributed}
+              </span>
+            </div>
+            {items && items.items && items.items.length !== 0 && (
+              <button
+                disabled={addRecepientDisabled}
+                onClick={() => {
+                  setName({ name: '' })
+                  setPool({ pool: '20' })
+
+                  setModal(true)
+                }}
+                className={cn(styles.pushChanges, styles.newReward, {
+                  [styles.newRewardDisabled]: addRecepientDisabled,
+                })}
+              >
+                Add new reward
+              </button>
+            )}
+          </div>
+          {/* ))} */}
 
           <div className={styles.wrapperChanges}>
             {items.items &&

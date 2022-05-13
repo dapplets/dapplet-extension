@@ -346,17 +346,17 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
               <h3 className={styles.dappletsTitle}>{m.module.title}</h3>
               {m.module.isUnderConstruction ? (
                 <span
+                  onClick={() => {
+                    onDetailsClick(m.module, m.versions[0])
+                    // setDappletsDetail(false)
+                    setUnderConstructionDetails(true)
+                    setModuleInfo(m.module)
+                    setModuleVersion(m.versions[0])
+                  }}
                   className={styles.dappletsSettingsIsUnderConstructionBlock}
                 >
                   <button
                     className={styles.dappletsSettingsIsUnderConstruction}
-                    onClick={() => {
-                      onDetailsClick(m.module, m.versions[0])
-                      // setDappletsDetail(false)
-                      setUnderConstructionDetails(true)
-                      setModuleInfo(m.module)
-                      setModuleVersion(m.versions[0])
-                    }}
                   />
                   <span className={styles.dappletsSettingsIsTocenomics} />
                 </span>
