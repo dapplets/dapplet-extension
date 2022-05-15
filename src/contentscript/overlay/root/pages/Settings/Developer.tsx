@@ -184,7 +184,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   //   // window.close()
   // }
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
-  const groupedModules2 = groupBy(modules, (x) => x.module.isUnderConstruction)
+  // const groupedModules2 = groupBy(modules, (x) => x.module.isUnderConstruction)
 
   const handleClear = () => {
     setRegistryInput('')

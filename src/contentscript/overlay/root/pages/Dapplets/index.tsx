@@ -4,7 +4,7 @@ import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import styles from './Dapplets.module.scss'
 import * as EventBus from '../../../../../common/global-event-bus'
-
+import { checkUrlAvailability, groupBy } from '../../../../../common/helpers'
 import { Dapplet } from '../../components/Dapplet'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
 import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
@@ -15,6 +15,7 @@ import {
   ModuleTypes,
   DAPPLETS_STORE_URL,
 } from '../../../../../common/constants'
+import { xhrCallback } from '@sentry/tracing/types/browser/request'
 
 export type Module = ManifestDTO & {
   isLoading: boolean
@@ -38,6 +39,10 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [loadShowButton, setLoadShowButton] = useState(false)
   const [contextId, setContextIds] = useState<string[]>([])
 
+  const [trustedUsers, setTrustedUsers] = useState([])
+
+  const [dropdownListValue, setDropdownListValue] = useState('All')
+
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -58,6 +63,12 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       const features = await _getFilteredDapplets(d)
 
       setDapplets(features)
+      await loadTrustedUsers()
+
+      const sortedDapplets = await _getSortedDapplets(d)
+      // console.log(sortedDapplets)
+
+      setDapplets(sortedDapplets)
     }
 
     init()
@@ -71,7 +82,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     return () => {
       _isMounted = false
     }
-  }, [search])
+  }, [search, dropdownListValue])
+  // console.log(dropdownListValue)
 
   const _refreshDataByContext = async (contextIds: Promise<string[]>) => {
     let contextIdsValues = undefined
@@ -301,7 +313,59 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f.name}`
     window.open(url, '_blank')
   }
+
+  const loadTrustedUsers = async () => {
+    const { getTrustedUsers } = await initBGFunctions(browser)
+    const trustedUsers = await getTrustedUsers()
+    setTrustedUsers(trustedUsers)
+  }
   // setDapplets(features)
+
+  const _getSortedDapplets = async (dapplets) => {
+    if (dropdownListValue === 'All') return dapplets
+
+    if (dropdownListValue === 'Extension') {
+      const find = (a: string) =>
+        (a ?? '')
+          .toLowerCase()
+          .indexOf(
+            '0xF64849376812667BDa7D902666229f8b8dd90687'.toLowerCase()
+          ) !== -1
+      return dapplets.filter((x: ManifestAndDetails) => find(x.author))
+    }
+    if (dropdownListValue === 'Trusted Users') {
+      const find = (a: string) =>
+        (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
+      return dapplets.filter((x: ManifestAndDetails) => {
+        if (x.author !== null) return find(x.author)
+      })
+    }
+    if (dropdownListValue === 'Public') {
+      const find = (a: string) =>
+        (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
+      return dapplets.filter((x: ManifestAndDetails) => {
+        if (x.isUnderConstruction !== true) return find(x.author)
+      })
+    }
+    // const find = (a: string) =>
+    //   (a ?? '').toLowerCase().indexOf(dropdownListValue.toLowerCase()) !== -1
+
+    // return dapplets.filter(
+    //   (x: ManifestAndDetails) =>
+    //     find(x.name) || find(x.title) || find(x.description) || find(x.author)
+    // )
+
+    // if (isTrustedSort && !isNotDapplet)
+    //   sortedList = sortedList.filter(({ trustedUsers }) =>
+    //     trustedUsersList.some((user) => trustedUsers.includes(user)),
+    //   );
+  }
+  // const groupedModules = groupBy(dapplets, (x) => x.author)
+  // console.log(groupedModules, 'gm')
+
+  console.log(dapplets, 'd')
+  console.log(trustedUsers, 'tu')
+  // console.log();
 
   return (
     <>
@@ -310,8 +374,14 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           list={DROPDOWN_LIST}
           title="Sort by:"
           style={{ marginRight: 10 }}
+          value={{ label: 'All' }}
         />
-        <Dropdown list={DROPDOWN_LIST} title="Worklist:" />
+        <Dropdown
+          list={DROPDOWN_LIST}
+          title="List:"
+          value={{ label: dropdownListValue }}
+          setDropdownListValue={setDropdownListValue}
+        />
       </div>
       {isLoadingListDapplets ? (
         <div className={styles.loadingListDapplets}></div>
