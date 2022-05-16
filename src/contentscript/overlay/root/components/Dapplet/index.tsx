@@ -15,10 +15,10 @@ import { DappletTitle } from '../DappletTitle'
 import { DappletInfo } from '../DappletInfo'
 import { ReactComponent as Installed } from '../../assets/icons/installed.svg'
 import { ReactComponent as Update } from '../../assets/icons/update.svg'
-import { ReactComponent as HomeIcon } from '../../assets/svg/home.svg'
-import { ReactComponent as SettingsIcon } from '../../assets/svg/settings.svg'
-import { ReactComponent as CloudsIcon } from '../../assets/svg/clouds.svg'
-import { ReactComponent as SearchIcon } from '../../assets/svg/search.svg'
+import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
+import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
+// import { ReactComponent as CloudsIcon } from '../../assets/svg/clouds.svg'
+import { ReactComponent as SearchIcon } from '../../assets/svg/newLinks.svg'
 import { ReactComponent as DeleteIcon } from '../../assets/svg/delete.svg'
 import { useToggle } from '../../hooks/useToggle'
 import { Avatar } from '../Avatar'
@@ -172,7 +172,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
               onClick={() => onOpenStore(dapplet)}
             />
 
-            {isActive && sourceRegistry?.isDev && (
+            {/* {isActive && sourceRegistry?.isDev && (
               <SquaredButton
                 appearance="smail"
                 icon={CloudsIcon}
@@ -180,7 +180,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 title="Clouds"
                 onClick={() => onDeployDapplet(dapplet)}
               />
-            )}
+            )} */}
 
             {!isShowDescription && (
               <DappletInfo

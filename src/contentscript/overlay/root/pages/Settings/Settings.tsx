@@ -579,27 +579,46 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       <form
                         style={{ width: '100%' }}
                         onBlur={() => {
-                          // setDynamicAdapterInputError(null)
+                          setDynamicAdapterInputError(null)
                           // getDefaultValueDynamicAdapter(dynamicAdapterInput)
-                          if (parseModuleName(dynamicAdapterInput) === null) {
+                          if (
+                            parseModuleName(dynamicAdapterInput).branch ===
+                              null ||
+                            parseModuleName(dynamicAdapterInput).name ===
+                              null ||
+                            parseModuleName(dynamicAdapterInput).version ===
+                              null
+                          ) {
                             getDefaultValueDynamicAdapter(dynamicAdapterInput)
-                            setTimeout(() => {
-                              setDynamicAdapterInputError(null)
-                            }, 3000)
+                            // setTimeout(() => {
+                            //   setDynamicAdapterInputError(null)
+                            // }, 3000)
                           }
                           if (dynamicAdapterInput.length === 0) {
                             getDefaultValueDynamicAdapter(dynamicAdapterInput)
                           }
-                          console.log(parseModuleName(dynamicAdapterInput))
+                          // console.log(parseModuleName(dynamicAdapterInput))
                         }}
                         onSubmit={(e) => {
                           e.preventDefault()
 
                           setDynamicAdapter(dynamicAdapterInput)
-                          if (parseModuleName(dynamicAdapterInput) !== null) {
+                          if (
+                            parseModuleName(dynamicAdapterInput).branch !==
+                              null &&
+                            parseModuleName(dynamicAdapterInput).name !==
+                              null &&
+                            parseModuleName(dynamicAdapterInput).version !==
+                              null
+                          ) {
                             setDynamicAdapter(dynamicAdapterInput)
                           } else if (
-                            parseModuleName(dynamicAdapterInput) === null
+                            parseModuleName(dynamicAdapterInput).branch ===
+                              null ||
+                            parseModuleName(dynamicAdapterInput).name ===
+                              null ||
+                            parseModuleName(dynamicAdapterInput).version ===
+                              null
                           ) {
                             setDynamicAdapterInputError('Enter a valid value')
                           }
