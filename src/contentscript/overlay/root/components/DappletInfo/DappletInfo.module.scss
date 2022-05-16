@@ -33,12 +33,12 @@
   line-height: 149%;
   text-decoration-line: underline;
   cursor: pointer;
-  // &:hover {
-  //   font-size: 0;
-  // }
-  // &:active {
-  //   font-size: 0;
-  // }
+  &:hover {
+    color: $MainGrey;
+  }
+  &:active {
+    color: $ContentBlack;
+  }
 }
 
 span.value::before {
@@ -52,7 +52,7 @@ span.value::before {
   position: absolute;
   /* z-index: 9998; */
   top: -20px;
-  left: -46px;
+  right: 0;
   background: #f4f4f4;
   border-radius: 3px;
   border: 1px solid #ccc;

@@ -52,7 +52,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     onSwitchChange,
     onSettingsModule,
     onOpenDappletAction,
-    onRemoveMyDapplet: onRemoveDapplet,
+    onRemoveMyDapplet,
     onDeployDapplet,
     onOpenStore,
     loadShowButton,
@@ -194,12 +194,15 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
           <div className={cn(styles.lastButton)}>
             {/* {onRemoveDapplet && ( */}
-            <SquaredButton
-              appearance="smail"
-              icon={DeleteIcon}
-              title="Delete"
-              onClick={() => onRemoveDapplet(dapplet)}
-            />
+            {dapplet.isMyDapplet && (
+              <SquaredButton
+                appearance="smail"
+                icon={DeleteIcon}
+                title="Delete"
+                onClick={() => onRemoveMyDapplet(dapplet)}
+              />
+            )}
+
             {/* )} */}
           </div>
         </div>

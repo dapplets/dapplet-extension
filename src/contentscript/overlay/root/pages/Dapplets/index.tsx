@@ -299,6 +299,13 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     await removeMyDapplet(f.sourceRegistry.url, f.name)
     const d = dapplets.filter((x) => x.name !== f.name)
     setDapplets(d)
+
+    // const { removeDapplet } = await initBGFunctions(browser)
+    // const contextIds = await contextIds
+    // await removeDapplet(f.name, contextIds)
+    // this.setState({
+    //   features: this.state.features.filter((x) => x.name !== f.name),
+    // })
   }
 
   const onDeployDapplet = async (f: ManifestAndDetails) => {
@@ -326,12 +333,10 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     if (dropdownListValue === 'Extension') {
       const find = (a: string) =>
-        (a ?? '')
-          .toLowerCase()
-          .indexOf(
-            '0xF64849376812667BDa7D902666229f8b8dd90687'.toLowerCase()
-          ) !== -1
-      return dapplets.filter((x: ManifestAndDetails) => find(x.author))
+        (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
+      return dapplets.filter((x: ManifestAndDetails) => {
+        if (x.isMyDapplet === true) return find(x.author)
+      })
     }
     if (dropdownListValue === 'Trusted Users') {
       const find = (a: string) =>
