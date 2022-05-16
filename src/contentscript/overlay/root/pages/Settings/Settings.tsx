@@ -189,6 +189,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setProviderLoading(false)
       setProviderEdited(false)
       setProviderInputError(err.message)
+      setTimeout(() => {
+        setProviderInputError(null)
+      }, 3000)
     }
   }
 
@@ -210,6 +213,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSwarmGatewayEdited(false)
       setSwarmGatewayLoading(false)
       setSwarmGatewayInputError(err.message)
+      setTimeout(() => {
+        setSwarmGatewayInputError(null)
+      }, 3000)
     }
   }
 
@@ -232,6 +238,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSwarmPostageStampIdLoading(false)
       setSwarmPostageStampIdInputEdited(false)
       setSwarmPostageStampIdInputError(err.message)
+      setTimeout(() => {
+        setSwarmPostageStampIdInputError(null)
+      }, 3000)
     }
   }
 
@@ -281,6 +290,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     } else {
       setUserAgentNameInputError('Enter User Agent Name')
       setUserAgentNameInput('')
+      setTimeout(() => {
+        setUserAgentNameInputError(null)
+      }, 3000)
     }
   }
 
@@ -302,6 +314,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setIpfsGatewayLoading(false)
       setIpfsGatewayEdited(false)
       setIpfsGatewayInputError(err.message)
+      setTimeout(() => {
+        setIpfsGatewayInputError(null)
+      }, 3000)
     }
   }
 
@@ -324,6 +339,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSiaPortalLoading(false)
       setSiaPortalEdited(false)
       setSiaPortalInputError(err.message)
+      setTimeout(() => {
+        setSiaPortalInputError(null)
+      }, 3000)
     }
   }
   const changeTargetStorage = async (

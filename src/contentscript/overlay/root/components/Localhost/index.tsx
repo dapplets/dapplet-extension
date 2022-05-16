@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC } from 'react'
+import React, { ChangeEvent, FC, useRef } from 'react'
 import { HTMLAttributes, DetailedHTMLProps } from 'react'
 import cn from 'classnames'
 import styles from './Localhost.module.scss'
@@ -12,6 +12,7 @@ export interface LocalhostProps {
   onClickButtonLocalhost: () => void
   label: string
   isLoadButtonLocalhost?: boolean
+  setLoadButtonLocalhost?: (x) => void
 }
 
 export const Localhost: FC<LocalhostProps> = (props) => {
@@ -23,12 +24,14 @@ export const Localhost: FC<LocalhostProps> = (props) => {
     label,
     children,
     isLoadButtonLocalhost,
+    setLoadButtonLocalhost,
   } = props
   const [isShowDescription, onShowDescription] = useToggle(false)
+  const nodeBtn = useRef<HTMLButtonElement>()
   return (
     <div className={styles.localhost}>
       <div className={styles.hostBlock}>
-        {isLoadButtonLocalhost ? (
+        {/* {isLoadButtonLocalhost ? (
           <div
             className={cn(styles.buttonLocalhostLoad, {
               [styles.disabledLoad]: !isEnabled && !error,
@@ -36,20 +39,32 @@ export const Localhost: FC<LocalhostProps> = (props) => {
               [styles.enabledLoad]: isEnabled && !error,
             })}
           ></div>
-        ) : (
-          <button
-            onClick={onClickButtonLocalhost}
-            className={cn(styles.buttonLocalhost, {
-              [styles.disabled]: !isEnabled && !error,
-              [styles.error]: isEnabled && error,
-              [styles.enabled]: isEnabled && !error,
-            })}
-          >
-            {(!isEnabled && !error && 'Disabled') ||
-              (isEnabled && error && 'Error') ||
-              (isEnabled && !error && 'Enabled')}
-          </button>
-        )}
+        ) : ( */}
+        <button
+          ref={nodeBtn}
+          onClick={(e) => {
+            onClickButtonLocalhost()
+            if (e) {
+              setLoadButtonLocalhost(true)
+            }
+
+            console.log(e)
+            console.log(nodeBtn)
+          }}
+          className={cn(styles.buttonLocalhost, {
+            [styles.disabled]: !isEnabled && !error,
+            [styles.error]: isEnabled && error,
+            [styles.enabled]: isEnabled && !error,
+
+            [styles.disabledLoad]:
+              !isEnabled && !error && isLoadButtonLocalhost,
+          })}
+        >
+          {(!isEnabled && !error && 'Disabled') ||
+            (isEnabled && error && 'Error') ||
+            (isEnabled && !error && 'Enabled')}
+        </button>
+        {/* )} */}
 
         <label
           onClick={() => {

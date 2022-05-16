@@ -348,6 +348,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       })
     }
   }
+  console.log(dapplets)
 
   return (
     <>

@@ -247,10 +247,8 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                   key={i}
                   closeHost={() => removeRegistry(r.url)}
                   isLoadButtonLocalhost={isLoadButtonLocalhost}
+                  setLoadButtonLocalhost={setLoadButtonLocalhost}
                   onClickButtonLocalhost={() => {
-                    setLoadButtonLocalhost(true)
-                    // console.log(isLoadButton)
-                    // console.log(isLoadButtonLocalhost)
                     ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
                       (r.isEnabled && r.error && disableRegistry(r.url)) ||
                       (r.isEnabled && !r.error && disableRegistry(r.url))
@@ -308,12 +306,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                             setModuleInfo={setModuleInfo}
                             setModuleVersion={setModuleVersion}
                             isUnderConstructionDetails={isShowChildrenRegistery}
-                            // setUnderConstructionDetails={
-                            //   setShowChildrenRegistery
-                            // }
-                            // isUnderConstructionDetails={
-                            //   isUnderConstructionDetails
-                            // }
                             setUnderConstructionDetails={
                               setUnderConstructionDetails
                             }
