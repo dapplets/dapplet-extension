@@ -347,25 +347,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         if (x.isUnderConstruction !== true) return find(x.author)
       })
     }
-    // const find = (a: string) =>
-    //   (a ?? '').toLowerCase().indexOf(dropdownListValue.toLowerCase()) !== -1
-
-    // return dapplets.filter(
-    //   (x: ManifestAndDetails) =>
-    //     find(x.name) || find(x.title) || find(x.description) || find(x.author)
-    // )
-
-    // if (isTrustedSort && !isNotDapplet)
-    //   sortedList = sortedList.filter(({ trustedUsers }) =>
-    //     trustedUsersList.some((user) => trustedUsers.includes(user)),
-    //   );
   }
-  // const groupedModules = groupBy(dapplets, (x) => x.author)
-  // console.log(groupedModules, 'gm')
-
-  console.log(dapplets, 'd')
-  console.log(trustedUsers, 'tu')
-  // console.log();
 
   return (
     <>

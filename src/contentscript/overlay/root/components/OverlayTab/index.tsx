@@ -72,6 +72,7 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
     (!activeTab || (activeTab && isSystemDapplets)) &&
     typeof removeTab !== 'undefined'
   const showMenu = activeTab && !isSystemDapplets && menu && menu.length > 0
+  // console.log();
 
   return (
     <div

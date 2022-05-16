@@ -227,7 +227,7 @@ export class App extends React.Component<P, S> {
                           icon={StoreIcon}
                           onClick={this.storeButtonClickHandler}
                         />
-                        {!s.isOpenSearch && (
+                        {!s.isOpenSearch && !isNotification && !isSettings && (
                           <SquaredButton
                             onClick={this.onOpenSearch}
                             appearance="big"
@@ -235,7 +235,7 @@ export class App extends React.Component<P, S> {
                           />
                         )}
 
-                        {s.isOpenSearch && (
+                        {s.isOpenSearch && !isNotification && !isSettings && (
                           <div className={styles.searchBlock} tabIndex={1}>
                             <Search
                               value={s.search}

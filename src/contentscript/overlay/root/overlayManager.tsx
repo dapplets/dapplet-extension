@@ -104,6 +104,10 @@ export class OverlayManager implements IOverlayManager {
   public show() {
     this._panel.classList.remove(HiddenOverlayClass)
   }
+  public togglePanel() {
+    this._panel.classList.toggle(HiddenOverlayClass)
+    this._panel.classList.toggle(CollapsedOverlayClass)
+  }
 
   /**
    * Hides the panel.
@@ -203,8 +207,9 @@ export class OverlayManager implements IOverlayManager {
       .then((x) => x.getThisTab())
       .then((x) => overlay.send('changeTab', [path, x]))
     this.activate(overlay)
-    this.show()
-    this.open()
+    // this.show()
+    // this.open()
+    this.togglePanel()
   }
 
   public destroy() {
