@@ -19,7 +19,7 @@ import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
 // import { ReactComponent as CloudsIcon } from '../../assets/svg/clouds.svg'
 import { ReactComponent as SearchIcon } from '../../assets/svg/newLinks.svg'
-import { ReactComponent as DeleteIcon } from '../../assets/svg/delete.svg'
+import { ReactComponent as DeleteIcon } from '../../assets/svg/newDelete.svg'
 import { useToggle } from '../../hooks/useToggle'
 import { Avatar } from '../Avatar'
 import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
@@ -193,14 +193,14 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
           </div>
 
           <div className={cn(styles.lastButton)}>
-            {onRemoveDapplet && (
-              <SquaredButton
-                appearance="smail"
-                icon={DeleteIcon}
-                title="Delete"
-                onClick={() => onRemoveDapplet(dapplet)}
-              />
-            )}
+            {/* {onRemoveDapplet && ( */}
+            <SquaredButton
+              appearance="smail"
+              icon={DeleteIcon}
+              title="Delete"
+              onClick={() => onRemoveDapplet(dapplet)}
+            />
+            {/* )} */}
           </div>
         </div>
       </div>

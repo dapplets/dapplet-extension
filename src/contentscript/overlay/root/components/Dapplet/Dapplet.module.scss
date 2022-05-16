@@ -20,7 +20,7 @@
 .wrapperBlock {
   display: flex;
   flex-direction: column;
-
+  flex: 1 1 auto;
   padding: 0 0 0 13px;
 }
 
@@ -40,7 +40,7 @@
   display: flex;
 
   width: 277px;
-  padding: 0 0 13px;
+  padding: 5px 0 13px 0px;
 
   text-transform: lowercase;
 
@@ -55,6 +55,8 @@
 .blockBottom {
   display: flex;
   justify-content: space-between;
+  position: relative;
+  // padding: 0 10px 0 0;
 }
 
 .firstButtons {
