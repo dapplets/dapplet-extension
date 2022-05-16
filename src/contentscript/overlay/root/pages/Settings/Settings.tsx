@@ -238,6 +238,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSwarmPostageStampIdLoading(false)
       setSwarmPostageStampIdInputEdited(false)
       setSwarmPostageStampIdInputError(err.message)
+
       setTimeout(() => {
         setSwarmPostageStampIdInputError(null)
       }, 3000)
@@ -252,13 +253,20 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const setDynamicAdapter = async (dynamicAdapter: string) => {
-    setDynamicAdapterLoading(true)
+    try {
+      setDynamicAdapterLoading(true)
 
-    const { setDynamicAdapter } = await initBGFunctions(browser)
-    await setDynamicAdapter(dynamicAdapter)
-    loadDynamicAdapter()
-    setDynamicAdapterLoading(false)
-    setDynamicAdapterInputEdited(false)
+      const { setDynamicAdapter } = await initBGFunctions(browser)
+      await setDynamicAdapter(dynamicAdapter)
+      loadDynamicAdapter()
+      setDynamicAdapterLoading(false)
+      setDynamicAdapterInputEdited(false)
+    } catch (error) {
+      setDynamicAdapterLoading(false)
+      setDynamicAdapterInputEdited(false)
+      setDynamicAdapterInputError(error.message)
+      console.log(error.message)
+    }
   }
 
   const loadUserAgentId = async () => {
@@ -560,59 +568,78 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 title="Dynamic Adapter"
                 component={<></>}
                 children={
-                  <div
-                    className={cn(styles.formDefault, styles.formAbsolute, {
-                      [styles.errorInputDefault]: !!dynamicAdapterInputError,
-                    })}
-                  >
-                    <form
-                      style={{ width: '100%' }}
-                      onBlur={() => {
-                        setDynamicAdapterInputError(null)
-                        getDefaultValueDynamicAdapter(dynamicAdapterInput)
-                        if (dynamicAdapterInputError) {
-                          getDefaultValueDynamicAdapter(dynamicAdapterInput)
-                        }
-                        if (dynamicAdapterInput.length === 0) {
-                          getDefaultValueDynamicAdapter(dynamicAdapterInput)
-                        }
-                      }}
-                      onSubmit={(e) => {
-                        e.preventDefault()
-
-                        setDynamicAdapter(dynamicAdapterInput)
-                        onPress(e, inputOfFocusAdapter)
-                      }}
+                  <>
+                    <div
+                      className={cn(styles.formDefault, styles.formAbsolute, {
+                        [styles.errorInputDefault]: dynamicAdapterInputError,
+                        //  ||
+                        // !parseModuleName(dynamicAdapterInput),
+                      })}
                     >
-                      <input
-                        className={cn(styles.inputDefault, {})}
-                        value={dynamicAdapterInput}
-                        placeholder={dynamicAdapterInput}
-                        onFocus={() => {
-                          setDynamicAdapterInput('')
-                          setDynamicAdapterInputError(null)
+                      <form
+                        style={{ width: '100%' }}
+                        onBlur={() => {
+                          // setDynamicAdapterInputError(null)
+                          // getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                          if (parseModuleName(dynamicAdapterInput) === null) {
+                            getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                            setTimeout(() => {
+                              setDynamicAdapterInputError(null)
+                            }, 3000)
+                          }
+                          if (dynamicAdapterInput.length === 0) {
+                            getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                          }
+                          console.log(parseModuleName(dynamicAdapterInput))
                         }}
-                        ref={inputOfFocusAdapter}
-                        onChange={(e) => {
-                          // e.preventDefault()
-                          setDynamicAdapterInput(e.target.value)
-                          setDynamicAdapterInputError(null)
-                          setDynamicAdapterInputEdited(true)
-                        }}
-                      />
-                    </form>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault()
+                        onSubmit={(e) => {
+                          e.preventDefault()
 
-                        getDefaultValueDynamicAdapter(dynamicAdapterInput)
-                      }}
-                      className={cn(
-                        styles.buttonInputDefault,
-                        styles.btnAbsolute
-                      )}
-                    />
-                  </div>
+                          setDynamicAdapter(dynamicAdapterInput)
+                          if (parseModuleName(dynamicAdapterInput) !== null) {
+                            setDynamicAdapter(dynamicAdapterInput)
+                          } else if (
+                            parseModuleName(dynamicAdapterInput) === null
+                          ) {
+                            setDynamicAdapterInputError('Enter a valid value')
+                          }
+                        }}
+                      >
+                        <input
+                          className={cn(styles.inputDefault, {})}
+                          value={dynamicAdapterInput}
+                          placeholder={dynamicAdapterInput}
+                          onFocus={() => {
+                            setDynamicAdapterInput('')
+                            setDynamicAdapterInputError(null)
+                          }}
+                          ref={inputOfFocusAdapter}
+                          onChange={(e) => {
+                            // e.preventDefault()
+                            setDynamicAdapterInput(e.target.value)
+                            setDynamicAdapterInputError(null)
+                            setDynamicAdapterInputEdited(true)
+                          }}
+                        />
+                      </form>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+
+                          getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                        }}
+                        className={cn(
+                          styles.buttonInputDefault,
+                          styles.btnAbsolute
+                        )}
+                      />
+                    </div>
+                    {dynamicAdapterInputError ? (
+                      <div className={styles.errorMessage}>
+                        {dynamicAdapterInputError}
+                      </div>
+                    ) : null}
+                  </>
                 }
               />
               <SettingItem
@@ -818,23 +845,27 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          (!!swarmPostageStampIdInputError &&
-                            !isValidPostageStampId(swarmPostageStampIdInput)) ||
+                          // (
                           swarmPostageStampIdInputError,
+                        //  &&
+                        // !isValidPostageStampId(swarmPostageStampIdInput)) ||
+                        // swarmPostageStampIdInputError,
                       })}
                     >
                       <form
                         style={{ width: '100%' }}
                         onBlur={() => {
-                          setSwarmPostageStampIdInputError(null)
+                          // setSwarmPostageStampIdInputError(null)
                           if (
                             !isValidPostageStampId(swarmPostageStampIdInput)
                           ) {
                             getDefaultValueSwarmPostageStampId(
                               swarmPostageStampIdInput
                             )
+                            setSwarmPostageStampIdInputError(null)
                           }
                           if (swarmPostageStampIdInput.length === 0) {
+                            setSwarmPostageStampIdInputError(null)
                             getDefaultValueSwarmPostageStampId(
                               swarmPostageStampIdInput
                             )
@@ -848,12 +879,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           e.preventDefault()
                           if (isValidPostageStampId(swarmPostageStampIdInput)) {
                             setSwarmPostageStampId(swarmPostageStampIdInput)
-                          } else {
+                          } else if (
+                            !isValidPostageStampId(swarmPostageStampIdInput)
+                          ) {
                             setSwarmPostageStampIdInputError(
                               'Enter valid Swarm Postage Stamp ID'
                             )
                           }
-                          onPress(e, inputOfFocusSwarmId)
+                          // onPress(e, inputOfFocusSwarmId)
                         }}
                       >
                         <input
