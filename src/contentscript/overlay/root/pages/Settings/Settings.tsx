@@ -604,8 +604,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
                           setDynamicAdapter(dynamicAdapterInput)
                           if (
-                            parseModuleName(dynamicAdapterInput).branch !==
-                              null &&
+                            // parseModuleName(dynamicAdapterInput).branch !==
+                            //   null &&
                             parseModuleName(dynamicAdapterInput).name !==
                               null &&
                             parseModuleName(dynamicAdapterInput).version !==
@@ -621,6 +621,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                               null
                           ) {
                             setDynamicAdapterInputError('Enter a valid value')
+                            getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                            setTimeout(() => {
+                              setDynamicAdapterInputError(null)
+                            }, 3000)
                           }
                         }}
                       >
@@ -904,6 +908,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                             setSwarmPostageStampIdInputError(
                               'Enter valid Swarm Postage Stamp ID'
                             )
+                            getDefaultValueSwarmPostageStampId(
+                              swarmPostageStampIdInput
+                            )
+                            setTimeout(() => {
+                              setSwarmPostageStampIdInputError(null)
+                            }, 3000)
                           }
                           // onPress(e, inputOfFocusSwarmId)
                         }}

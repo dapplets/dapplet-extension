@@ -81,13 +81,20 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
       <DappletImage isFavourites={isFavourites} storageRef={icon} />
 
       <div className={cn(styles.wrapperBlock)}>
-        <div className={styles.header} onClick={onShowDescription}>
+        <div
+          className={styles.header}
+          // onClick={onShowDescription}
+        >
           <div className={cn(styles.blockTop)}>
-            <DappletTitle isShowDescription={isShowDescription} title={title} />
+            <DappletTitle
+              //  isShowDescription={isShowDescription}
+              isShowDescription={false}
+              title={title}
+            />
 
             <div className={cn(styles.blockIcons)}>
-              <Icon size="small" icon={Installed} />
-              <Icon size="small" icon={Update} />
+              {/* <Icon size="small" icon={Installed} />
+              <Icon size="small" icon={Update} /> */}
             </div>
 
             {!isUnderConstruction && (
@@ -103,45 +110,39 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
           <div className={cn(styles.blockText)}>{description}</div>
         </div>
 
-        {isShowDescription && (
-          <div className={styles.description}>
-            <div className={styles.descriptionTop}>
-              {users && (
-                <>
-                  <div className={styles.avatars}>
-                    <ul className={styles.avatarsList}>
-                      {users.slice(0, 3).map(({ _id, avatar }) => {
-                        return (
-                          <li className={styles.avatarsItem} key={_id}>
-                            <Avatar avatar={avatar} size="small" />
-                          </li>
-                        )
-                      })}
-                    </ul>
-                    <span className={styles.avatarsAnother}>
-                      +{users.length} more lists
-                    </span>
-                  </div>
-                </>
-              )}
-              {users && (
-                <p className={styles.activeUsers}>
-                  {users.length} active users
-                </p>
-              )}
-            </div>
-            <div className={styles.descriptionBottom}>
-              {author && <DappletInfo title="Author" value={author} />}
-              {website && (
-                <DappletInfo
-                  title="Website"
-                  value={website}
-                  appearance="link"
-                />
-              )}
-            </div>
+        {/* {isShowDescription && ( */}
+        {/* <div className={styles.description}>
+          <div className={styles.descriptionTop}>
+            {users && (
+              <>
+                <div className={styles.avatars}>
+                  <ul className={styles.avatarsList}>
+                    {users.slice(0, 3).map(({ _id, avatar }) => {
+                      return (
+                        <li className={styles.avatarsItem} key={_id}>
+                          <Avatar avatar={avatar} size="small" />
+                        </li>
+                      )
+                    })}
+                  </ul>
+                  <span className={styles.avatarsAnother}>
+                    +{users.length} more lists
+                  </span>
+                </div>
+              </>
+            )}
+            {users && (
+              <p className={styles.activeUsers}>{users.length} active users</p>
+            )}
           </div>
-        )}
+          <div className={styles.descriptionBottom}>
+            {author && <DappletInfo title="Author" value={author} />}
+            {website && (
+              <DappletInfo title="Website" value={website} appearance="link" />
+            )}
+          </div>
+        </div> */}
+        {/* )} */}
 
         <div className={cn(styles.blockBottom)}>
           <div className={cn(styles.firstButtons)}>
