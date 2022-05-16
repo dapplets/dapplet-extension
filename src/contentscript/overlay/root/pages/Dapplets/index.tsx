@@ -320,6 +320,11 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f.name}`
     window.open(url, '_blank')
   }
+  const onOpenStoreAuthor = async (f: ManifestAndDetails) => {
+    const url = `${DAPPLETS_STORE_URL}/#sortType=Sort%20A-Z&addressFilter=${f.author}`
+    // https://stoic-bartik-42e9f3.netlify.app/#sortType=Sort%20A-Z&addressFilter=0xF64849376812667BDa7D902666229f8b8dd90687&searchQuery=&isTrustedSort=false&selectedList=undefined
+    window.open(url, '_blank')
+  }
 
   const loadTrustedUsers = async () => {
     const { getTrustedUsers } = await initBGFunctions(browser)
@@ -399,6 +404,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                       }
                       onDeployDapplet={onDeployDapplet}
                       onOpenStore={onOpenStore}
+                      onOpenStoreAuthor={onOpenStoreAuthor}
                     />
                   )
               })

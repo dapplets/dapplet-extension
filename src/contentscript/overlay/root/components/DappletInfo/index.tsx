@@ -7,6 +7,7 @@ export interface DappletInfoProps {
   value: string
   appearance?: 'text' | 'hash' | 'link'
   className?: string
+  onClick?: (x) => void
 }
 
 export const DappletInfo: FC<DappletInfoProps> = ({
@@ -14,6 +15,7 @@ export const DappletInfo: FC<DappletInfoProps> = ({
   value,
   appearance = 'hash',
   className,
+  onClick,
 }: DappletInfoProps) => {
   const visible = ({
     value,
@@ -46,9 +48,9 @@ export const DappletInfo: FC<DappletInfoProps> = ({
           {visible({ appearance, value })}
         </a>
       ) : (
-        <span data-title={value} className={styles.value}>
+        <a onClick={onClick} data-title={value} className={styles.value}>
           {visible({ appearance, value })}
-        </span>
+        </a>
       )}
     </div>
   )

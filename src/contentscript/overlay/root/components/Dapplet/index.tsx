@@ -41,6 +41,7 @@ export interface DappletProps
   onDeployDapplet: Function
   onOpenStore: Function
   loadShowButton: boolean
+  onOpenStoreAuthor: Function
 }
 
 export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
@@ -56,6 +57,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     onDeployDapplet,
     onOpenStore,
     loadShowButton,
+    onOpenStoreAuthor,
     ...anotherProps
   } = props
   const {
@@ -188,6 +190,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 title="Author"
                 value={author}
                 className={styles.cardInfo}
+                onClick={() => onOpenStoreAuthor(dapplet)}
               />
             )}
           </div>
@@ -199,7 +202,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 appearance="smail"
                 icon={DeleteIcon}
                 title="Delete"
-                onClick={() => onRemoveMyDapplet(dapplet)}
+                onClick={onRemoveMyDapplet(dapplet)}
               />
             )}
 
