@@ -363,12 +363,12 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   return (
     <>
       <div className={styles.wrapper}>
-        <Dropdown
+        {/* <Dropdown
           list={DROPDOWN_LIST}
           title="Sort by:"
           style={{ marginRight: 10 }}
           value={{ label: 'All' }}
-        />
+        /> */}
         <Dropdown
           list={DROPDOWN_LIST}
           title="List:"

@@ -130,6 +130,15 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
   const [isNotAccountModal, setNotAccountModal] = useState(false)
 
+  const [visible, setVisible] = useState(false)
+  const node = useRef<HTMLButtonElement>()
+  const nodeInput = useRef<HTMLInputElement>()
+  const [visibleContextId, setVisibleContextId] = useState({
+    visibleContext: [],
+  })
+  const [contextDeleteNone, setContextDeleteNone] = useState(false)
+  const [addDisabled, setAddDisabled] = useState(false)
+
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -144,54 +153,60 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     if (author.authorForm.length === 0) {
       setAuthorDisabled(false)
     }
+    // TODO: DELETE
+
+    console.log(visible, 'v')
+    console.log(visibleContextId, 'ci')
+    console.log(mi.contextIds, 'mc')
 
     return () => {
       _isMounted = false
     }
   }, [mi, st, targetChain, autorDisabled, author, editContextId])
-  bus.subscribe(
-    'data',
-    async ({ mi, vi }: { mi: ModuleInfo; vi: VersionInfo }) => {
-      const { getSwarmGateway } = await initBGFunctions(browser)
-      const swarmGatewayUrl = await getSwarmGateway()
 
-      if (mi === null && vi === null) {
-        // New module
-        const mi = new ModuleInfo()
-        setOriginalMi(JSON.parse(JSON.stringify(mi)))
-        setMi(mi)
-        setLoading(false)
-        setSwarmGatewayUrl(swarmGatewayUrl)
-        setMode(FormMode.Creating)
+  // bus.subscribe(
+  //   'data',
+  //   async ({ mi, vi }: { mi: ModuleInfo; vi: VersionInfo }) => {
+  //     const { getSwarmGateway } = await initBGFunctions(browser)
+  //     const swarmGatewayUrl = await getSwarmGateway()
 
-        await _updateData()
-      } else {
-        const dependencies = vi?.dependencies
-          ? Object.entries(vi.dependencies).map(([name, version]) => ({
-              name: name,
-              version: version,
-              type: DependencyType.Dependency,
-            }))
-          : []
-        const interfaces = vi?.interfaces
-          ? Object.entries(vi.interfaces).map(([name, version]) => ({
-              name: name,
-              version: version,
-              type: DependencyType.Interface,
-            }))
-          : []
-        const dependenciesChecking = [...dependencies, ...interfaces]
-        setOriginalMi(JSON.parse(JSON.stringify(mi)))
-        setMi(mi)
-        setVi(vi)
-        setDpendenciesChecking(dependenciesChecking)
-        setLoading(false)
-        setSwarmGatewayUrl(swarmGatewayUrl)
+  //     if (mi === null && vi === null) {
+  //       // New module
+  //       const mi = new ModuleInfo()
+  //       setOriginalMi(JSON.parse(JSON.stringify(mi)))
+  //       setMi(mi)
+  //       setLoading(false)
+  //       setSwarmGatewayUrl(swarmGatewayUrl)
+  //       setMode(FormMode.Creating)
 
-        await _updateData()
-      }
-    }
-  )
+  //       await _updateData()
+  //     } else {
+  //       const dependencies = vi?.dependencies
+  //         ? Object.entries(vi.dependencies).map(([name, version]) => ({
+  //             name: name,
+  //             version: version,
+  //             type: DependencyType.Dependency,
+  //           }))
+  //         : []
+  //       const interfaces = vi?.interfaces
+  //         ? Object.entries(vi.interfaces).map(([name, version]) => ({
+  //             name: name,
+  //             version: version,
+  //             type: DependencyType.Interface,
+  //           }))
+  //         : []
+  //       const dependenciesChecking = [...dependencies, ...interfaces]
+  //       setOriginalMi(JSON.parse(JSON.stringify(mi)))
+  //       setMi(mi)
+  //       setVi(vi)
+  //       setDpendenciesChecking(dependenciesChecking)
+  //       setLoading(false)
+  //       setSwarmGatewayUrl(swarmGatewayUrl)
+
+  //       await _updateData()
+  //     }
+  //   }
+  // )
 
   const _checkDependencies = async () => {
     const { getVersionInfo } = await initBGFunctions(browser)
@@ -236,6 +251,9 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     )
 
     setCurrentAccount(currentAccount)
+    if (mi.contextIds) {
+      visibleContextId.visibleContext.push(mi.contextIds)
+    }
   }
   const _updateOwnership = async () => {
     const { getOwnership } = await initBGFunctions(browser)
@@ -470,14 +488,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     newContext.contextIds.splice(id, 1)
     setMi(newContext)
   }
-  const [visible, setVisible] = useState(false)
-  const node = useRef<HTMLButtonElement>()
-  const nodeInput = useRef<HTMLInputElement>()
-  const [visibleContextId, setVisibleContextId] = useState({
-    visibleContext: [],
-  })
-  const [contextDeleteNone, setContextDeleteNone] = useState(false)
-  const [addDisabled, setAddDisabled] = useState(false)
+
   const _addContextId = async (contextId: string) => {
     setEditContextIdLoading(true)
     setAddDisabled(true)
