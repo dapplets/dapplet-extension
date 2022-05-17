@@ -17,12 +17,12 @@ export class OverlayService {
         return this._openOverlay("OPEN_SYSTEM_OVERLAY", { app, loginRequest}, tabId, SystemOverlayTabs.LOGIN_SESSION); 
     }
 
-    public loginViaOverlay(app: string | DefaultSigners, loginRequest: LoginRequest, tabId: number): Promise<void> {
-        return this._openOverlay("OPEN_SYSTEM_OVERLAY", { app, loginRequest}, tabId, SystemOverlayTabs.LOGIN_SESSION );
+    public loginViaOverlay(payload: any, tabId: number): Promise<void> {
+        return this._openOverlay("OPEN_SYSTEM_OVERLAY", payload, tabId, SystemOverlayTabs.LOGIN_SESSION );
     }
 
-    public selectWalletViaOverlay(app: string | DefaultSigners, loginRequest: LoginRequest, tabId: number): Promise<void> {
-        return this._openOverlay("OPEN_SYSTEM_OVERLAY", { app, loginRequest}, tabId, SystemOverlayTabs.LOGIN_SESSION);
+    public selectWalletViaOverlay(payload: any, tabId: number): Promise<void> {
+        return this._openOverlay("OPEN_SYSTEM_OVERLAY", payload, tabId, SystemOverlayTabs.LOGIN_SESSION);
     }
 
     public openLoginSessionOverlay(app: string | DefaultSigners, loginRequest: LoginRequest, tabId: number): Promise<{ wallet: WalletTypes, chain: ChainTypes, confirmationId?: string }> {
@@ -62,7 +62,7 @@ export class OverlayService {
 
         const [error, result] = await browser.tabs.sendMessage(tabId, {
             type,
-            payload: type === "OPEN_SYSTEM_OVERLAY" ? { payload, activeTab } : payload
+            payload: (type === "OPEN_SYSTEM_OVERLAY" && payload.loginRequest) ? { payload, activeTab } : payload
         });
 
         // ToDo: use native throw in error
