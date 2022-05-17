@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, useRef } from 'react'
+import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
 import { HTMLAttributes, DetailedHTMLProps } from 'react'
 import cn from 'classnames'
 import styles from './Localhost.module.scss'
@@ -28,6 +28,8 @@ export const Localhost: FC<LocalhostProps> = (props) => {
   } = props
   const [isShowDescription, onShowDescription] = useToggle(false)
   const nodeBtn = useRef<HTMLButtonElement>()
+  useEffect(() => {}, [isLoadButtonLocalhost, nodeBtn])
+
   return (
     <div className={styles.localhost}>
       <div className={styles.hostBlock}>
@@ -44,20 +46,29 @@ export const Localhost: FC<LocalhostProps> = (props) => {
           ref={nodeBtn}
           onClick={(e) => {
             onClickButtonLocalhost()
-            if (e) {
-              setLoadButtonLocalhost(true)
+            if (e && !isEnabled && !error) {
+              nodeBtn.current.classList.add(styles.disabledLoad)
+              console.log(nodeBtn)
+            } else if (e && isEnabled && error) {
+              nodeBtn.current.classList.add(styles.errorLoad)
+              console.log(nodeBtn)
+            } else if (e && isEnabled && !error) {
+              nodeBtn.current.classList.add(styles.enabledLoad)
+              console.log(nodeBtn)
             }
 
-            console.log(e)
-            console.log(nodeBtn)
+            // console.log(e)
+            // console.log(nodeBtn)
           }}
           className={cn(styles.buttonLocalhost, {
             [styles.disabled]: !isEnabled && !error,
             [styles.error]: isEnabled && error,
             [styles.enabled]: isEnabled && !error,
 
-            [styles.disabledLoad]:
-              !isEnabled && !error && isLoadButtonLocalhost,
+            // [styles.disabledLoad]:
+            //   !isEnabled && !error && isLoadButtonLocalhost,
+            // [styles.errorLoad]: isEnabled && error && isLoadButtonLocalhost,
+            // [styles.enabledLoad]: isEnabled && !error && isLoadButtonLocalhost,
           })}
         >
           {(!isEnabled && !error && 'Disabled') ||

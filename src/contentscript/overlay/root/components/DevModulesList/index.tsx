@@ -374,6 +374,8 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     [styles.dappletsSettingsRegistry]: m.module.author !== null,
                   })}
                   onClick={() => {
+                    // TODO: DELETE J add contextID
+                    m.module.contextIds = []
                     onDetailsClick(m.module, m.versions[0])
                     setDappletsDetail(true)
                     // setUnderConstructionDetails(false)

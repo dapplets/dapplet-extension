@@ -235,7 +235,9 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
           ) : null}
         </div>
         <div className={styles.host}>
-          {isLoadButton && !isLoadButtonLocalhost ? (
+          {isLoadButton ? (
+            // &&
+            // !isLoadButtonLocalhost
             <div className={styles.miniLoader}></div>
           ) : (
             registries.map((r, i) => (
@@ -249,9 +251,11 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                   isLoadButtonLocalhost={isLoadButtonLocalhost}
                   setLoadButtonLocalhost={setLoadButtonLocalhost}
                   onClickButtonLocalhost={() => {
+                    // setLoadButtonLocalhost(true)
                     ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
                       (r.isEnabled && r.error && disableRegistry(r.url)) ||
                       (r.isEnabled && !r.error && disableRegistry(r.url))
+                    // setLoadButtonLocalhost(false)
                   }}
                   children={
                     <div className={styles.modules}>

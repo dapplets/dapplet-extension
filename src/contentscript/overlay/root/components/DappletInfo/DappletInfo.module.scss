@@ -41,11 +41,11 @@
   }
 }
 
-span.value::before {
+a.value::before {
   content: attr(data-title);
 }
 // span.support::before,
-span.value::before {
+a.value::before {
   content: attr(data-title);
 
   display: none;
@@ -71,8 +71,8 @@ span.value::before {
   // min-height: 50px;
 }
 
-span.value:hover::before,
-span.value:focus::before {
+a.value:hover::before,
+a.value:focus::before {
   display: inline-block;
   flex: 1 1 auto;
   justify-content: center;

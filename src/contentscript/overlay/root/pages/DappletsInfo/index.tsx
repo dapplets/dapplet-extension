@@ -153,11 +153,10 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     if (author.authorForm.length === 0) {
       setAuthorDisabled(false)
     }
-    // TODO: DELETE
 
-    console.log(visible, 'v')
-    console.log(visibleContextId, 'ci')
-    console.log(mi.contextIds, 'mc')
+    // console.log(visible, 'v')
+    // console.log(visibleContextId, 'ci')
+    // console.log(mi.contextIds, 'mc')
 
     return () => {
       _isMounted = false
@@ -251,9 +250,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     )
 
     setCurrentAccount(currentAccount)
-    if (mi.contextIds) {
-      visibleContextId.visibleContext.push(mi.contextIds)
-    }
   }
   const _updateOwnership = async () => {
     const { getOwnership } = await initBGFunctions(browser)
@@ -515,6 +511,12 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       node.current?.classList.remove('valid')
     }
   }
+  const visibleNameFile = (hash: string): string => {
+    const firstFourCharacters = hash.substring(0, 6)
+    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 5)
+
+    return `${firstFourCharacters}...${lastFourCharacters}`
+  }
 
   return (
     <div className={styles.wrapper}>
@@ -627,7 +629,8 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
                   {st.map((x, i) => (
                     <span className={styles.imgTitle} key={i}>
-                      {x.name}
+                      {visibleNameFile(x.name)}
+                      {/* {x.name} */}
                     </span>
                   ))}
                 </div>

@@ -315,6 +315,12 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
 
     setSt([...filesArr])
   }
+  const visibleNameFile = (hash: string): string => {
+    const firstFourCharacters = hash.substring(0, 6)
+    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 5)
+
+    return `${firstFourCharacters}...${lastFourCharacters}`
+  }
 
   return (
     <div className={styles.wrapper}>
@@ -431,7 +437,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
 
                   {st.map((x, i) => (
                     <span className={styles.imgTitle} key={i}>
-                      {x.name}
+                      {visibleNameFile(x.name)}
                     </span>
                   ))}
                 </div>
@@ -442,7 +448,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                     type="file"
                     name="file"
                     id="file"
-                    accept=".png, .svg"
+                    accept=".png"
                     className={styles.inputfile}
                     onChange={(e) => {
                       onChange(e)
