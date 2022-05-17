@@ -291,7 +291,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const { openSettingsOverlay } = await initBGFunctions(browser)
     await openSettingsOverlay(mi)
 
-    window.close()
+    // window.close()
   }
 
   const onRemoveMyDapplet = async (f: ManifestAndDetails) => {

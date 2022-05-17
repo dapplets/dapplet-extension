@@ -202,7 +202,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 appearance="smail"
                 icon={DeleteIcon}
                 title="Delete"
-                onClick={onRemoveMyDapplet(dapplet)}
+                onClick={() => onRemoveMyDapplet(dapplet)}
               />
             )}
 

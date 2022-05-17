@@ -25,6 +25,7 @@ import '@fontsource/montserrat'
 import { Dapplets } from './pages/Dapplets'
 import { Notifications } from './pages/Notifications'
 import { SettingsOverlay } from './pages/Settings'
+import { UserSettings } from './pages/UserSettings'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import { Search } from './components/Search'
@@ -52,6 +53,13 @@ const MENU: IMenu[] = [
   { _id: '2', icon: Settings, title: 'Settings' },
   { _id: '3', icon: Airplay, title: 'Developer' },
 ]
+const MENUACTIVETABS: IMenu[] = [
+  // { _id: '0', icon: Home, title: 'Dapplets' },
+  // { _id: '1', icon: Notification, title: 'Notifications' },
+  { _id: '0', icon: Settings, title: 'User Settings' },
+  // { _id: '3', icon: Airplay, title: 'Developer' },
+]
+export type TabsActiveSettings = 'User Settings'
 
 interface P {
   onToggle: () => void
@@ -65,6 +73,7 @@ interface S {
   isSystemDapplets: boolean
   isOpenSearch: boolean
   search: string
+  tabsMenu: TabsActiveSettings | null
 }
 
 export interface OverlayProps {
@@ -84,6 +93,7 @@ export class App extends React.Component<P, S> {
     isSystemDapplets: true,
     isOpenSearch: false,
     search: '',
+    tabsMenu: null,
     // features: [],
     // isNoContentScript: false,
     // contextIds: [],
@@ -188,6 +198,11 @@ export class App extends React.Component<P, S> {
     // TODO: naming wallets is the notification
     const isNotification = s.selectedMenu === 'Notifications'
     const isSettings = s.selectedMenu === 'Settings'
+    const isUserSettings = s.tabsMenu === 'User Settings'
+    // const isUserSettings = MENUACTIVETABS.filter((x) => {
+    //   return x.title === 'Settings'
+    // })
+    // console.log(isUserSettings)
 
     return (
       <MemoryRouter>
@@ -199,6 +214,7 @@ export class App extends React.Component<P, S> {
               menu={MENU}
               className={styles.toolbar}
               nameSelectedMenu={s.selectedMenu}
+              nameActiveTab={s.tabsMenu}
               idActiveTab={activeOverlayId}
               onOverlayTab={this.noSystemOverlay}
               activeOverlay={activeOverlay}
@@ -207,6 +223,7 @@ export class App extends React.Component<P, S> {
               onSelectedTab={this.tabClickHandler}
               onRemoveTab={this.closeClickHandler}
               toggle={this.props.onToggle}
+              menuActiveTabs={MENUACTIVETABS}
             />
 
             <Routes>
@@ -262,6 +279,8 @@ export class App extends React.Component<P, S> {
                       {isNotification && <Notifications />}
 
                       {isSettings && <SettingsOverlay />}
+
+                      {isUserSettings && <UserSettings />}
 
                       {overlays.map((x) => (
                         <div

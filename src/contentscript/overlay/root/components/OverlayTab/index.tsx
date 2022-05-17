@@ -23,6 +23,7 @@ export interface OverlayTabProps
   image?: any
   notification?: boolean
   menu: IMenu[]
+  menuActiveTabs?: IMenu[]
   notificationSetting?: boolean
   isSystemDapplets?: boolean
   onSelectedMenu: (selected: string) => void
@@ -47,6 +48,7 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
     removeTab,
     source,
     dap,
+    menuActiveTabs,
     ...anotherProps
   } = props
 
@@ -59,7 +61,8 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
     if (dapplet) {
       setImgActiveTab(dapplet.icon)
     }
-
+    console.log(activeTab)
+    console.log(isSystemDapplets)
     return () => {
       _isMounted = false
     }
@@ -72,7 +75,8 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
     (!activeTab || (activeTab && isSystemDapplets)) &&
     typeof removeTab !== 'undefined'
   const showMenu = activeTab && !isSystemDapplets && menu && menu.length > 0
-  // console.log();
+  // console.log(activeTab)
+  // console.log(isSystemDapplets)
 
   return (
     <div
@@ -91,6 +95,27 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
           <Close className={styles.close} onClick={removeTab} />
         )}
       </div>
+      {id !== 'system' && (
+        <ul className={styles.list}>
+          {menuActiveTabs &&
+            menuActiveTabs.map(({ _id, icon: Icon, title }) => {
+              return (
+                <li
+                  key={_id}
+                  title={title}
+                  // onClick={handlerClick(title)}
+                  className={cn(styles.item, {
+                    [styles.notification]: notification,
+                    [styles.notificationSetting]: notificationSetting,
+                    [styles.selected]: nameSelectedMenu === title,
+                  })}
+                >
+                  <Icon className={styles.icon} />
+                </li>
+              )
+            })}
+        </ul>
+      )}
 
       {showMenu && (
         <ul className={styles.list}>
