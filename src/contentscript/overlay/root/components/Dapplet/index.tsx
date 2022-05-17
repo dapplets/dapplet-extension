@@ -190,7 +190,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 title="Author"
                 value={author}
                 className={styles.cardInfo}
-                onClick={() => onOpenStoreAuthor(dapplet)}
+                // onClick={() => onOpenStoreAuthor(dapplet)}
               />
             )}
           </div>
