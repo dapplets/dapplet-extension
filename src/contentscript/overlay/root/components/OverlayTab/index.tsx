@@ -133,9 +133,15 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
             className={cn(styles.image, { [styles.cursor]: !activeTab })}
             storageRef={imgActiveTab}
           />
-          {showRemoveTab && (
-            <Close className={styles.close} onClick={removeTab} />
-          )}
+          {/* {showRemoveTab && ( */}
+          <Close
+            className={styles.close}
+            onClick={() => {
+              removeTab()
+              navigate(`/`)
+            }}
+          />
+          {/* )} */}
         </div>
       ) : (
         <div
