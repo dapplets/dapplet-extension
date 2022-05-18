@@ -18,6 +18,7 @@ import { ReactComponent as Home } from './assets/svg/home-toolbar.svg'
 import { ReactComponent as Settings } from './assets/svg/setting-toolbar.svg'
 import { ReactComponent as Notification } from './assets/svg/notification.svg'
 import { ReactComponent as Airplay } from './assets/svg/airplay.svg'
+import { ReactComponent as Card } from './assets/svg/card.svg'
 import { IMenu } from './models/menu.model'
 
 import '@fontsource/roboto'
@@ -31,6 +32,7 @@ import en from 'javascript-time-ago/locale/en'
 import { Search } from './components/Search'
 import { ManifestAndDetails } from '../../../popup/components/dapplet'
 import ManifestDTO from '../../../background/dto/manifestDTO'
+
 import {
   BrowserRouter,
   Routes,
@@ -54,6 +56,7 @@ const MENU: IMenu[] = [
   { _id: '1', icon: Notification, title: 'Notifications' },
   { _id: '2', icon: Settings, title: 'Settings' },
   // { _id: '3', icon: Airplay, title: 'Developer' },
+  { _id: '4', icon: Card, title: 'Wallet' },
 ]
 const MENUACTIVETABS: IMenu[] = [
   // { _id: '0', icon: Home, title: 'Dapplets' },
@@ -324,13 +327,13 @@ export class App extends React.Component<P, S> {
                     element={<Notifications />}
                   ></Route>
                   <Route path="/settings" element={<SettingsOverlay />}></Route>
-                  {/* <Route path="/developer" element={<Developer />}></Route> */}
-                  <Route
+                  <Route path="/card" element={<></>}></Route>
+                  {/* <Route
                     path="/:dapplet_id/settings"
                     element={
                       <UserSettings userSettings={s.dappletUserSettings} />
                     }
-                  ></Route>
+                  ></Route> */}
                   <Route
                     path="/:dapplet_id"
                     element={

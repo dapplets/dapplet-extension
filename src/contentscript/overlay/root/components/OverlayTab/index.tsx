@@ -124,9 +124,10 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
               // setToggleSystemMenu(false)
               if (imgActiveTab !== null) {
                 navigate(`/:dapplet_id`)
-              } else if (imgActiveTab === null) {
-                navigate(`/:dapplet_id/settings`)
               }
+              //  else if (imgActiveTab === null) {
+              //   navigate(`/:dapplet_id/settings`)
+              // }
 
               // }
             }}
