@@ -276,18 +276,20 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
 
   const _transferOwnership = async (newAccount: string) => {
+    console.log(mi.author)
     try {
-      setNewOwnerLoading(true)
       const oldAccount = mi.author
       const { transferOwnership } = await initBGFunctions(browser)
+      setNewOwnerLoading(true)
       await transferOwnership(targetRegistry, mi.name, newAccount, oldAccount)
+
       setNewOwnerLoading(false)
       setDappletsDetail(false)
+      setNewOwnerDone(true)
     } catch (error) {
       setDisabledAddOwner(true)
+      setNewOwnerLoading(false)
     }
-
-    setNewOwnerDone(true)
   }
 
   const _removeContextId = async (contextId: string) => {
@@ -503,6 +505,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       setEditContextIdLoading(false)
       setAddDisabled(false)
       node.current?.classList.remove('valid')
+      setEditContextId('')
     } catch (error) {
       setEditContextIdDone(true)
       setVisible(false)
@@ -537,7 +540,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 onClick={() => onClose()}
                 className={styles.modalDefaultContentButton}
               >
-                Push Changes again
+                OK
               </button>
             </div>
           }
@@ -676,13 +679,17 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                         setNewOwner(e.target.value)
                         setDisabledAddOwner(false)
                       }}
+                      onBlur={() => setDisabledAddOwner(false)}
                     />
 
                     <button
+                      disabled={newOwner.length <= 0}
                       onClick={() => {
                         _transferOwnership(newOwner)
                       }}
-                      className={styles.ownershipButton}
+                      className={cn(styles.ownershipButton, {
+                        [styles.ownershipButtonDisabled]: newOwner.length <= 0,
+                      })}
                     >
                       Change
                     </button>
@@ -693,7 +700,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                         'This modal window will close automatically after successful change'
                       }
                       footer={''}
-                      onClose={() => !newOwnerLoading}
+                      onClose={() => setNewOwnerLoading(false)}
                     />
                   </div>
                 }
@@ -791,8 +798,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                       onClick={() => {
                         node.current?.classList.add('valid')
                         _addContextId(editContextId)
-
-                        setEditContextId('')
                       }}
                       className={cn(styles.addContext, {
                         [styles.addContextDisabled]:
@@ -873,7 +878,9 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
         title="Transaction confirmation"
         content={<div className={styles.modalDefaultContent}></div>}
         footer={''}
-        onClose={() => {}}
+        onClose={() => {
+          setModalTransaction(false)
+        }}
       />
     </div>
   )

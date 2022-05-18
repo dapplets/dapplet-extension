@@ -284,7 +284,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setLoadingDeploy(true)
 
     e.target.classList.add(styles.dappletsIsLoadingDeploy)
-    setTextButtonDeploy('Deploing...')
+    setTextButtonDeploy('')
     try {
       const isNotNullCurrentAccount = !(
         !currentAccount ||
@@ -319,6 +319,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       e.target.classList.remove(styles.dappletsIsLoadingDeploy)
       setTextButtonDeploy('Deploy')
     } finally {
+      setLoadingDeploy(false)
       await _updateData()
     }
   }
@@ -387,6 +388,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 <button
                   className={cn(styles.dappletsSettings, {
                     [styles.dappletsSettingsRegistry]: m.module.author !== null,
+                    [styles.noneVisible]: isLocalhost,
                   })}
                   onClick={() => {
                     // TODO: DELETE J add contextID
@@ -414,7 +416,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 <button
                   id={String(i)}
                   ref={nodeButton}
-                  disabled={!isNotNullCurrentAccount}
+                  disabled={!isNotNullCurrentAccount || isLoadingDeploy}
                   onClick={(e) => {
                     m.isDeployed?.[0] === false &&
                       deployButtonClickHandler(m.versions[0], e)

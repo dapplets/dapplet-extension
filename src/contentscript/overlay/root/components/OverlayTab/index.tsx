@@ -112,24 +112,11 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
         <div className={styles.top}>
           <StorageRefImage
             onClick={() => {
-              // handlerClick(id)
-              // if (id !== 'Dapplets') {
-              //   navigate(`/${id.toLowerCase()}`)
-              // } else if (id === 'Dapplets') {
-              //   navigate(`/`)
-              // } else if (id === 'User Settings') {
-              //   navigate(`/:dapplet_id/settings`)
-              // } else {
               console.log(imgActiveTab)
-              // setToggleSystemMenu(false)
+
               if (imgActiveTab !== null) {
                 navigate(`/:dapplet_id`)
               }
-              // else if (imgActiveTab === null) {
-              //   navigate(`/:dapplet_id/system`)
-              // }
-
-              // }
             }}
             className={cn(styles.image, { [styles.cursor]: !activeTab })}
             storageRef={imgActiveTab}

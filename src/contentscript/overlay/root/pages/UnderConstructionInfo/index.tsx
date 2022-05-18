@@ -260,6 +260,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
       setEditContextIdLoading(false)
       setAddDisabled(false)
       node.current?.classList.remove('valid')
+      setEditContextId('')
     } catch (error) {
       setEditContextIdDone(true)
       setVisible(false)
@@ -342,7 +343,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                 onClick={() => onClose()}
                 className={styles.modalDefaultContentButton}
               >
-                Push Changes again
+                OK
               </button>
             </div>
           }
@@ -548,8 +549,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                       onClick={() => {
                         node.current?.classList.add('valid')
                         _addContextId(editContextId)
-
-                        setEditContextId('')
                       }}
                       className={cn(styles.addContext, {
                         [styles.addContextDisabled]:
@@ -631,10 +630,12 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
       <Modal
         classNameWrapper={styles.newModalTransaction}
         visible={isModalTransaction}
-        // title="Transaction confirmation"
+        title="Transaction confirmation"
         content={<div className={styles.modalDefaultContent}></div>}
         footer={''}
-        // onClose={() => {}}
+        onClose={() => {
+          setModalTransaction(false)
+        }}
       />
     </div>
   )

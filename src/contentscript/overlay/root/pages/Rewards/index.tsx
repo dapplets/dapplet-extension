@@ -555,7 +555,11 @@ export const Rewards: FC<RewardsProps> = (props) => {
                 Apply
               </button>
             }
-            onClose={onClose}
+            onClose={() => {
+              setName({ name: '' })
+              setPool({ pool: '20' })
+              onClose()
+            }}
           />
         </div>
       ) : (

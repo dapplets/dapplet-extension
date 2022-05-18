@@ -328,10 +328,10 @@ export class App extends React.Component<P, S> {
                     element={<Notifications />}
                   ></Route>
                   <Route path="/settings" element={<SettingsOverlay />}></Route>
-                  {/* <Route
+                  <Route
                     path="/wallet"
-                    // element={<Wallets isOverlay={true} />}
-                  ></Route> */}
+                    element={<Wallets isOverlay={true} />}
+                  ></Route>
                   {/* <Route
                     path="/:dapplet_id/settings"
                     element={

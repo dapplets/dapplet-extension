@@ -319,6 +319,19 @@
     background: $PrimaryPressed;
   }
 }
+.ownershipButtonDisabled {
+  background: $AppBG;
+
+  border: 1px solid $StrokeColor;
+  color: $StrokeColor;
+  &:hover {
+    background: $AppBG;
+  }
+  &:active {
+    background: $AppBG;
+  }
+}
+
 .wrapperAdmins {
   display: flex;
   width: 100%;
