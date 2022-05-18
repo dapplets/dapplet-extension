@@ -38,7 +38,9 @@ import {
   Link,
   useParams,
   MemoryRouter,
+  useNavigate,
 } from 'react-router-dom'
+import { Developer } from './pages/Settings/Developer'
 TimeAgo.addLocale(en)
 
 export type TSelectedSettings =
@@ -51,13 +53,11 @@ const MENU: IMenu[] = [
   { _id: '0', icon: Home, title: 'Dapplets' },
   { _id: '1', icon: Notification, title: 'Notifications' },
   { _id: '2', icon: Settings, title: 'Settings' },
-  { _id: '3', icon: Airplay, title: 'Developer' },
+  // { _id: '3', icon: Airplay, title: 'Developer' },
 ]
 const MENUACTIVETABS: IMenu[] = [
   // { _id: '0', icon: Home, title: 'Dapplets' },
-  // { _id: '1', icon: Notification, title: 'Notifications' },
-  { _id: '0', icon: Settings, title: 'User Settings' },
-  // { _id: '3', icon: Airplay, title: 'Developer' },
+  // { _id: '1', icon: null, title: 'User Settings' },
 ]
 export type TabsActiveSettings = 'User Settings'
 
@@ -73,7 +73,12 @@ interface S {
   isSystemDapplets: boolean
   isOpenSearch: boolean
   search: string
-  tabsMenu: TabsActiveSettings | null
+  dappletUserSettings: ManifestAndDetails & {
+    users: any[]
+    website: string
+    isFavourites: boolean
+  }
+  // tabsMenu: TabsActiveSettings | null
 }
 
 export interface OverlayProps {
@@ -93,7 +98,8 @@ export class App extends React.Component<P, S> {
     isSystemDapplets: true,
     isOpenSearch: false,
     search: '',
-    tabsMenu: null,
+    dappletUserSettings: null,
+    // tabsMenu: null,
     // features: [],
     // isNoContentScript: false,
     // contextIds: [],
@@ -141,8 +147,14 @@ export class App extends React.Component<P, S> {
   }
 
   onSelectedMenu = (name: string) => {
-    if (name === 'Dapplets') return this.systemOverlays()
-    if (name !== 'Dapplets') this.setState({ isSystemDapplets: false })
+    if (name === 'Dapplets') {
+      this.systemOverlays()
+      // navigate(`/`)
+    }
+    if (name !== 'Dapplets') {
+      this.setState({ isSystemDapplets: false })
+      // navigate(`/${name.toLowerCase()}`)
+    }
 
     this.setState({ selectedMenu: name as TSelectedSettings })
 
@@ -150,6 +162,21 @@ export class App extends React.Component<P, S> {
     const overlay = overlays.find((item) => item.title === name)
 
     if (!overlay) return this.createTab(name.toLowerCase())
+
+    return this.props.overlayManager.activate(overlay)
+  }
+  onSelectedActiveMenu = (name: string) => {
+    if (name === 'User Settings') return this.systemOverlays()
+    if (name !== 'User Settings') this.setState({ isSystemDapplets: false })
+
+    // this.setState({ tabsMenu: name as TabsActiveSettings })
+
+    const overlays = this.getOverlays()
+    const overlay = overlays.find((item) => item.title === name)
+
+    if (!overlay) return this.createTab(name.toLowerCase())
+    // console.log(name)
+
     return this.props.overlayManager.activate(overlay)
   }
 
@@ -188,6 +215,16 @@ export class App extends React.Component<P, S> {
   _searchChangeHandler(value: string) {
     this.setState({ search: value })
   }
+  _getNewUserSettings = async (
+    value: ManifestAndDetails & {
+      users: any[]
+      website: string
+      isFavourites: boolean
+    }
+  ) => {
+    if (!value) return
+    this.setState({ dappletUserSettings: value })
+  }
 
   render() {
     const p = this.props
@@ -198,12 +235,12 @@ export class App extends React.Component<P, S> {
     // TODO: naming wallets is the notification
     const isNotification = s.selectedMenu === 'Notifications'
     const isSettings = s.selectedMenu === 'Settings'
-    const isUserSettings = s.tabsMenu === 'User Settings'
+    // const isUserSettings = s.tabsMenu === 'User Settings'
     // const isUserSettings = MENUACTIVETABS.filter((x) => {
     //   return x.title === 'Settings'
     // })
     // console.log(isUserSettings)
-
+    // console.log(s.dappletUserSettings)
     return (
       <MemoryRouter>
         <div className={cn(styles.overlay)}>
@@ -214,97 +251,138 @@ export class App extends React.Component<P, S> {
               menu={MENU}
               className={styles.toolbar}
               nameSelectedMenu={s.selectedMenu}
-              nameActiveTab={s.tabsMenu}
+              // nameActiveTab={s.tabsMenu}
               idActiveTab={activeOverlayId}
               onOverlayTab={this.noSystemOverlay}
               activeOverlay={activeOverlay}
               isDevMode={s.isDevMode}
               onSelectedMenu={this.onSelectedMenu}
+              // onSelectedActiveMenu={this.onSelectedActiveMenu}
               onSelectedTab={this.tabClickHandler}
               onRemoveTab={this.closeClickHandler}
               toggle={this.props.onToggle}
-              menuActiveTabs={MENUACTIVETABS}
+              // menuActiveTabs={MENUACTIVETABS}
             />
 
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <div className={styles.inner}>
-                    <header className={styles.header}>
-                      <div className={styles.left}>
-                        <Profile
-                          avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
-                          hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
-                        />
-                      </div>
-                      <div className={styles.right}>
-                        <SquaredButton
-                          appearance="big"
-                          icon={StoreIcon}
-                          onClick={this.storeButtonClickHandler}
-                        />
-                        {!s.isOpenSearch && !isNotification && !isSettings && (
-                          <SquaredButton
-                            onClick={this.onOpenSearch}
-                            appearance="big"
-                            icon={SearchIcon}
-                          />
-                        )}
+            <div className={styles.inner}>
+              <header className={styles.header}>
+                <div className={styles.left}>
+                  <Profile
+                    avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
+                    hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
+                  />
+                </div>
+                <div className={styles.right}>
+                  <SquaredButton
+                    appearance="big"
+                    icon={StoreIcon}
+                    onClick={this.storeButtonClickHandler}
+                  />
+                  {!s.isOpenSearch && !isNotification && !isSettings && (
+                    <SquaredButton
+                      onClick={this.onOpenSearch}
+                      appearance="big"
+                      icon={SearchIcon}
+                    />
+                  )}
 
-                        {s.isOpenSearch && !isNotification && !isSettings && (
-                          <div className={styles.searchBlock} tabIndex={1}>
-                            <Search
-                              value={s.search}
-                              onChange={(e) =>
-                                this._searchChangeHandler(e.target.value)
-                              }
-                              onClick={() => this._searchChangeHandler('')}
-                              onClearValue={() => this._searchChangeHandler('')}
-                              onCloseSearch={this.onCloseSearch}
+                  {s.isOpenSearch && !isNotification && !isSettings && (
+                    <div className={styles.searchBlock} tabIndex={1}>
+                      <Search
+                        value={s.search}
+                        onChange={(e) =>
+                          this._searchChangeHandler(e.target.value)
+                        }
+                        onClick={() => this._searchChangeHandler('')}
+                        onClearValue={() => this._searchChangeHandler('')}
+                        onCloseSearch={this.onCloseSearch}
+                      />
+                    </div>
+                  )}
+                </div>
+              </header>
+
+              <div
+                className={cn(
+                  styles.children,
+                  'dapplets-overlay-nav-content-list'
+                )}
+              >
+                <Routes>
+                  <Route
+                    path="/"
+                    element={
+                      <Dapplets
+                        search={s.search}
+                        userSettings={s.dappletUserSettings}
+                        _getNewUserSettings={this._getNewUserSettings}
+                      />
+                    }
+                  ></Route>
+                  <Route
+                    path="/notifications"
+                    element={<Notifications />}
+                  ></Route>
+                  <Route path="/settings" element={<SettingsOverlay />}></Route>
+                  {/* <Route path="/developer" element={<Developer />}></Route> */}
+                  <Route
+                    path="/:dapplet_id/settings"
+                    element={
+                      <UserSettings userSettings={s.dappletUserSettings} />
+                    }
+                  ></Route>
+                  <Route
+                    path="/:dapplet_id"
+                    element={
+                      <>
+                        {overlays.map((x) => (
+                          <div
+                            key={x.id}
+                            className={cn(styles.noSystemDapplets, {
+                              [styles.hideContent]: s.isSystemDapplets,
+
+                              [styles.overlayActive]:
+                                !s.isSystemDapplets && x.id === activeOverlayId,
+                              // !isSettings && x.id === activeOverlayId,
+                            })}
+                          >
+                            <ContentItem
+                              overlay={x}
+                              isActive={x.id === activeOverlayId}
+                              overlayManager={p.overlayManager}
                             />
                           </div>
-                        )}
-                      </div>
-                    </header>
+                        ))}
+                      </>
+                    }
+                  />
 
+                  {/* {overlays.map((x) => (
                     <div
-                      className={cn(
-                        styles.children,
-                        'dapplets-overlay-nav-content-list'
-                      )}
+                      key={x.id}
+                      className={cn(styles.noSystemDapplets, {
+                        [styles.hideContent]: s.isSystemDapplets,
+
+                        [styles.overlayActive]:
+                          !s.isSystemDapplets && x.id === activeOverlayId,
+                        // !isSettings && x.id === activeOverlayId,
+                      })}
                     >
-                      {s.isSystemDapplets && <Dapplets search={s.search} />}
-
-                      {isNotification && <Notifications />}
-
-                      {isSettings && <SettingsOverlay />}
-
-                      {isUserSettings && <UserSettings />}
-
-                      {overlays.map((x) => (
-                        <div
-                          key={x.id}
-                          className={cn(styles.noSystemDapplets, {
-                            [styles.hideContent]: s.isSystemDapplets,
-
-                            [styles.overlayActive]:
-                              !s.isSystemDapplets && x.id === activeOverlayId,
-                            // !isSettings && x.id === activeOverlayId,
-                          })}
-                        >
+                      <Route
+                        path="/:dapplet_id/settings"
+                        element={
                           <ContentItem
                             overlay={x}
                             isActive={x.id === activeOverlayId}
                             overlayManager={p.overlayManager}
                           />
-                        </div>
-                      ))}
+                        }
+                      ></Route>
                     </div>
-                  </div>
-                }
-              ></Route>
-            </Routes>
+                  ))} */}
+                </Routes>
+              </div>
+            </div>
           </div>
         </div>
       </MemoryRouter>

@@ -24,12 +24,14 @@ export type Module = ManifestDTO & {
 }
 export interface DappletsProps {
   search: string
+  userSettings?: any
+  _getNewUserSettings?: (x) => void
 }
 
 let _isMounted = false
 
 export const Dapplets: FC<DappletsProps> = (props) => {
-  const { search } = props
+  const { search, userSettings, _getNewUserSettings } = props
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
   const [isLoading, setLoading] = useState<boolean>(null)
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
@@ -395,6 +397,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                         website: 'dapplets.com',
                         users: [],
                       }}
+                      _getNewUserSettings={_getNewUserSettings}
+                      userSettings={userSettings}
                       loadShowButton={loadShowButton}
                       onSwitchChange={onSwitchChange}
                       onSettingsModule={onOpenSettingsModule}

@@ -27,6 +27,7 @@ interface PropsStorageRefImage {
   storageRef: StorageRef
   className?: string
   onClick?: (x) => void
+  title?: string
 }
 
 enum FormMode {
@@ -46,7 +47,7 @@ type DependencyChecking = {
 }
 
 export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
-  const { storageRef, className } = props
+  const { storageRef, className, title, onClick } = props
   const [dataUri, setDataUri] = useState(null)
   useEffect(() => {
     _isMounted = true
@@ -78,7 +79,7 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
     }
   }, [storageRef])
   return (
-    <div className={cn(styles.dappletsImg, className)}>
+    <div className={cn(styles.dappletsImg, className)} onClick={onClick}>
       {dataUri ? <img src={dataUri} /> : <span className={styles.noLogo} />}
     </div>
   )

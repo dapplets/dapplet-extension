@@ -35,6 +35,7 @@ export interface OverlayToolbarProps
   onSelectedTab: (id: string) => void
   menuActiveTabs?: IMenu[]
   nameActiveTab?: string
+  onSelectedActiveMenu?: (selected: string) => void
 }
 
 type TToggleOverlay = Pick<OverlayToolbarProps, 'toggle'> & {
@@ -77,6 +78,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
     onRemoveTab,
     menuActiveTabs,
     nameActiveTab,
+    onSelectedActiveMenu,
     ...anotherProps
   } = props
 
@@ -107,7 +109,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
     return () => {
       _isMounted = false
     }
-  }, [activeOverlay, nodeOverlayToolbar, isNodeOverlayToolbar])
+  }, [activeOverlay, nodeOverlayToolbar, isNodeOverlayToolbar, nameActiveTab])
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
       nodeOverlayToolbar.current.value = ''
@@ -127,6 +129,8 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
     nodeOverlayToolbar,
     isNodeOverlayToolbar,
   ])
+  console.log(nameActiveTab)
+  console.log(idActiveTab)
 
   return (
     <div
@@ -172,11 +176,13 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
                     id={id}
                     dap={allDapplet}
                     source={source}
-                    menu={menuActiveTabs}
+                    menu={[]}
                     key={id}
                     nameSelectedMenu={nameSelectedMenu}
                     activeTab={active}
                     isSystemDapplets={isSystemDapplets}
+                    // nameActiveTab={nameActiveTab}
+                    // onSelectedActiveMenu={onSelectedActiveMenu}
                     onSelectedMenu={onSelectedMenu}
                     removeTab={handlerRemoveTab(id)}
                     onClick={handlerSelectedTab(id)}

@@ -23,6 +23,15 @@ import { ReactComponent as DeleteIcon } from '../../assets/svg/newDelete.svg'
 import { useToggle } from '../../hooks/useToggle'
 import { Avatar } from '../Avatar'
 import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useParams,
+  MemoryRouter,
+  useNavigate,
+} from 'react-router-dom'
 
 // TODO: How will the dapplets be displayed during development?
 
@@ -42,11 +51,11 @@ export interface DappletProps
   onOpenStore: Function
   loadShowButton: boolean
   onOpenStoreAuthor: Function
+  userSettings: any
+  _getNewUserSettings?: (x) => void
 }
 
 export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
-  const [isShowDescription, onShowDescription] = useToggle(false)
-
   const {
     dapplet,
     className,
@@ -58,6 +67,8 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     onOpenStore,
     loadShowButton,
     onOpenStoreAuthor,
+    userSettings,
+    _getNewUserSettings,
     ...anotherProps
   } = props
   const {
@@ -73,11 +84,21 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     isUnderConstruction,
     sourceRegistry,
   } = dapplet
-
+  const [isShowDescription, onShowDescription] = useToggle(false)
+  const navigate = useNavigate()
+  // const [newDapplets, setNewDapplets] = useState(userSettings)
   useEffect(() => {
     loadShowButton
+    const init = async () => {
+      await _getNewUserSettings(dapplet)
+    }
+    init()
   }, [])
-
+  // const newGetUserSettings = async (value: any) => {
+  //   await _getNewUserSettings(value)
+  // }
+  // console.log(userSettings)
+  console.log(dapplet)
   return (
     <div className={cn(styles.wrapperCard, className)} {...anotherProps}>
       <DappletImage isFavourites={isFavourites} storageRef={icon} />
@@ -154,7 +175,10 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 icon={HomeIcon}
                 className={styles.squareButton}
                 title="Home"
-                onClick={() => onOpenDappletAction(dapplet)}
+                onClick={() => {
+                  onOpenDappletAction(dapplet)
+                  navigate(`/:dapplet_id`)
+                }}
               />
             ) : null}
             {!isUnderConstruction && (
@@ -163,7 +187,11 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 icon={SettingsIcon}
                 className={styles.squareButton}
                 title="Settings"
-                onClick={() => onSettingsModule(dapplet)}
+                onClick={() => {
+                  onSettingsModule(dapplet)
+
+                  navigate(`/:dapplet_id/settings`)
+                }}
               />
             )}
 
@@ -172,7 +200,9 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
               icon={SearchIcon}
               className={styles.squareButton}
               title="Search"
-              onClick={() => onOpenStore(dapplet)}
+              onClick={() => {
+                onOpenStore(dapplet)
+              }}
             />
 
             {/* {isActive && sourceRegistry?.isDev && (
