@@ -326,6 +326,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     <div className={styles.wrapper}>
       {message ? (
         <Modal
+          classNameWrapper=""
           visible={isModal}
           title={message.header}
           content={
@@ -352,6 +353,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
       {!isNotNullCurrentAccount && !loading ? (
         owner ? (
           <Modal
+            classNameWrapper=""
             visible={isNotAccountModal}
             title={'The wrong wallet'}
             content={
@@ -367,6 +369,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
           />
         ) : (
           <Modal
+            classNameWrapper=""
             visible={isNotAccountModal}
             title={'Wallet is not connected'}
             content={
@@ -602,6 +605,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
         </button>
       </div>
       <Modal
+        classNameWrapper={styles.modalDialog}
         visible={isModalPush}
         title="Сhanges were accepted"
         content={
@@ -625,11 +629,12 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
         }}
       />
       <Modal
+        classNameWrapper={styles.newModalTransaction}
         visible={isModalTransaction}
-        title="Transaction confirmation"
+        // title="Transaction confirmation"
         content={<div className={styles.modalDefaultContent}></div>}
         footer={''}
-        onClose={() => {}}
+        // onClose={() => {}}
       />
     </div>
   )

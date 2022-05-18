@@ -11,11 +11,12 @@ import styles from './Modal.module.scss'
 
 interface ModalProps {
   visible: boolean
-  title: string
+  title?: string
   content: ReactElement | string
   footer: ReactElement | string
-  onClose: () => void
+  onClose?: () => void
   className?: string
+  classNameWrapper?: string
   id?: any
 }
 
@@ -26,6 +27,7 @@ export const Modal = ({
   footer = '',
   onClose,
   className,
+  classNameWrapper,
 }: ModalProps) => {
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -44,10 +46,15 @@ export const Modal = ({
 
   return (
     <div className={styles.modal} onClick={onClose}>
-      <div className={styles.modalDialog} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={cn(styles.modalDialog, classNameWrapper)}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className={styles.modalHeader}>
           <h3 className={cn(styles.modalTitle, className)}>{title}</h3>
-          <span className={styles.modalClose} onClick={onClose} />
+          {onClose ? (
+            <span className={styles.modalClose} onClick={onClose} />
+          ) : null}
         </div>
         <div className={styles.modalBody}>
           <div className={styles.modalContent}>{content}</div>
