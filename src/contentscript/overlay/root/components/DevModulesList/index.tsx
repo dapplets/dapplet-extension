@@ -140,6 +140,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const [messageError, setMessageError] = useState(null)
   const [isModalError, setModalError] = useState(false)
   const onCloseError = () => setModalError(false)
+  const [isNotAccountModal, setNotAccountModal] = useState(false)
 
   modules.forEach((x) => {
     nodes.set(
@@ -186,6 +187,11 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
     const init = async () => {
       await _updateData()
+      if (!isNotNullCurrentAccount) {
+        setNotAccountModal(true)
+      } else {
+        setNotAccountModal(false)
+      }
     }
     init()
     return () => {
@@ -313,6 +319,10 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     }
   }
   // console.log(isLocalhost)
+  const isNotNullCurrentAccount = !(
+    !currentAccount ||
+    currentAccount === '0x0000000000000000000000000000000000000000'
+  )
 
   return (
     <>
@@ -400,12 +410,14 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 <button
                   id={String(i)}
                   ref={nodeButton}
+                  disabled={!isNotNullCurrentAccount}
                   onClick={(e) => {
                     m.isDeployed?.[0] === false &&
                       deployButtonClickHandler(m.versions[0], e)
                   }}
                   className={cn(styles.dappletsReupload, {
-                    [styles.dapDeploy]: m.isDeployed?.[0] !== false,
+                    [styles.dapDeploy]:
+                      m.isDeployed?.[0] !== false || !isNotNullCurrentAccount,
                   })}
                 >
                   {/* {m.isDeployed?.[0] === false */}
@@ -486,6 +498,34 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           </div>
         </div>
       ))}
+      {!isNotNullCurrentAccount ? (
+        owner ? (
+          <Modal
+            visible={isNotAccountModal}
+            title={'The wrong wallet'}
+            content={
+              <>
+                <p>Change account to {owner}</p>
+
+                <br />
+                <p> Connect a new wallet</p>
+              </>
+            }
+            footer={''}
+            onClose={() => setNotAccountModal(false)}
+          />
+        ) : (
+          <Modal
+            visible={isNotAccountModal}
+            title={'Wallet is not connected'}
+            content={
+              'You can not deploy a module without a wallet. Connect a new wallet'
+            }
+            footer={''}
+            onClose={() => setNotAccountModal(false)}
+          />
+        )
+      ) : null}
 
       {messageError ? (
         <Modal
