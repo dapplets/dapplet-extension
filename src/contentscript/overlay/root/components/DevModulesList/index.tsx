@@ -98,6 +98,7 @@ interface PropsDeveloper {
   isUnderConstructionDetails: boolean
   setUnderConstructionDetails: (x) => void
   isLocalhost?: boolean
+  setUpdate?: (x) => void
 }
 export const DevModule: FC<PropsDeveloper> = (props) => {
   const {
@@ -110,6 +111,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     isUnderConstructionDetails,
     setUnderConstructionDetails,
     isLocalhost = false,
+    setUpdate,
   } = props
 
   const nodes = new Map<string, any>()
@@ -306,6 +308,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
       e.target.classList.remove(styles.dappletsIsLoadingDeploy)
       setTextButtonDeploy('Deploy')
+      setUpdate(true)
     } catch (err) {
       setMessageError({
         type: 'negative',
@@ -316,6 +319,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       e.target.classList.remove(styles.dappletsIsLoadingDeploy)
       setTextButtonDeploy('Deploy')
     } finally {
+      await _updateData()
     }
   }
   // console.log(isLocalhost)

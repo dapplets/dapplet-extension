@@ -31,6 +31,7 @@ import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import { Search } from './components/Search'
 import { ManifestAndDetails } from '../../../popup/components/dapplet'
+import Wallets from '../../../popup/pages/wallets'
 import ManifestDTO from '../../../background/dto/manifestDTO'
 
 import {
@@ -327,7 +328,10 @@ export class App extends React.Component<P, S> {
                     element={<Notifications />}
                   ></Route>
                   <Route path="/settings" element={<SettingsOverlay />}></Route>
-                  <Route path="/card" element={<></>}></Route>
+                  {/* <Route
+                    path="/wallet"
+                    // element={<Wallets isOverlay={true} />}
+                  ></Route> */}
                   {/* <Route
                     path="/:dapplet_id/settings"
                     element={

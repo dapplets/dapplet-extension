@@ -532,7 +532,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     name.name.length >= 1 &&
                     pool.pool &&
                     pool.pool.length >= 1 &&
-                    Number(pool.pool) < 100 &&
+                    Number(pool.pool) <= 100 &&
                     recepient.userID &&
                     recepient.userID.length >= 1
                   )

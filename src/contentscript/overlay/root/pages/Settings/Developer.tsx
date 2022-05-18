@@ -47,6 +47,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [isLocalhost, setLocalhost] = useState(true)
   const [isLoadButtonLocalhost, setLoadButtonLocalhost] = useState(false)
   const [isLoadAdd, setLoadAdd] = useState(false)
+  const [isUpdate, setUpdate] = useState(false)
 
   const {
     isDappletsDetails,
@@ -81,13 +82,20 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
         setRegistryInput(currentUrl)
       }
       setLoadButton(false)
+      if (isUpdate) {
+        await loadSwarmGateway()
+        await loadRegistries()
+        await loadIntro()
+        setUpdate(false)
+      }
     }
     init()
 
     return () => {
       _isMounted = false
     }
-  }, [])
+  }, [isUpdate])
+  console.log(isUpdate)
 
   const loadSwarmGateway = async () => {
     const { getSwarmGateway } = await initBGFunctions(browser)
@@ -265,6 +273,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                             <div key={registryUrl + i}>
                               {modules.length > 0 && registryUrl === r.url && (
                                 <DevModule
+                                  setUpdate={setUpdate}
                                   isLocalhost={isLocalhost}
                                   isDappletsDetails={isDappletsDetails}
                                   setDappletsDetail={setDappletsDetail}

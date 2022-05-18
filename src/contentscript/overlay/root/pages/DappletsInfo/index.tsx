@@ -276,17 +276,17 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
 
   const _transferOwnership = async (newAccount: string) => {
-    setNewOwnerLoading(true)
     try {
+      setNewOwnerLoading(true)
       const oldAccount = mi.author
       const { transferOwnership } = await initBGFunctions(browser)
       await transferOwnership(targetRegistry, mi.name, newAccount, oldAccount)
-
+      setNewOwnerLoading(false)
       setDappletsDetail(false)
     } catch (error) {
       setDisabledAddOwner(true)
     }
-    setNewOwnerLoading(false)
+
     setNewOwnerDone(true)
   }
 
