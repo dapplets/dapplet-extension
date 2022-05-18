@@ -177,7 +177,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 title="Home"
                 onClick={() => {
                   onOpenDappletAction(dapplet)
-                  navigate(`/:dapplet_id`)
+                  // navigate(`/tab`)
                 }}
               />
             ) : null}
@@ -190,7 +190,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 onClick={() => {
                   onSettingsModule(dapplet)
 
-                  navigate(`/:dapplet_id/settings`)
+                  // navigate(`/tab`)
                 }}
               />
             )}

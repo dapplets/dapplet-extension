@@ -24,6 +24,7 @@ import {
   useParams,
   MemoryRouter,
   useNavigate,
+  useLocation,
 } from 'react-router-dom'
 
 export interface OverlayTabProps
@@ -39,6 +40,7 @@ export interface OverlayTabProps
   removeTab?: () => void
   source?: string
   dap?: any
+  idActiveTab?: string
 }
 let _isMounted = false
 export const OverlayTab = (props: OverlayTabProps): ReactElement => {
@@ -57,12 +59,15 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
     removeTab,
     source,
     dap,
+    idActiveTab,
     ...anotherProps
   } = props
 
   const [imgActiveTab, setImgActiveTab] = useState<StorageRef>(null)
   const navigate = useNavigate()
   const [devMode, setMode] = useState(false)
+  const location = useLocation()
+
   // const [toggleSystemMenu, setToggleSystemMenu] = useState(true)
   useEffect(() => {
     _isMounted = true
@@ -99,8 +104,6 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
     typeof removeTab !== 'undefined'
   const showMenu = activeTab && !isSystemDapplets && menu && menu.length > 0
 
-  // console.log();
-
   return (
     <div
       className={cn(styles.tab, className, {
@@ -112,7 +115,15 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
         <div className={styles.top}>
           <StorageRefImage
             onClick={() => {
-              console.log(imgActiveTab)
+              console.log(location, 'l')
+
+              console.log(id, 'id')
+              console.log(idActiveTab, 'at')
+
+              if (location.pathname !== `/tab/${id}`) {
+                navigate(`/tab/${id}`)
+                console.log('lalala')
+              }
 
               // if (imgActiveTab !== null) {
               //   navigate(`/:dapplet_id`)
@@ -124,19 +135,24 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
             className={cn(styles.image, { [styles.cursor]: !activeTab })}
             storageRef={imgActiveTab}
           />
-          {/* {showRemoveTab && ( */}
-          <Close
-            className={styles.close}
-            onClick={() => {
-              removeTab()
-              navigate(`/`)
-            }}
-          />
-          {/* )} */}
+          {showRemoveTab && (
+            <Close
+              className={styles.close}
+              onClick={() => {
+                // navigate(`/`)
+                removeTab()
+              }}
+            />
+          )}
         </div>
       ) : (
         <div
-          // onClick={() => setToggleSystemMenu(true)}
+          onClick={() => {
+            console.log(location, 'l')
+
+            console.log(id, 'id')
+            console.log(idActiveTab, 'at')
+          }}
           className={cn(styles.image, { [styles.cursor]: !activeTab })}
         ></div>
       )}
@@ -144,7 +160,7 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
       {showMenu && (
         <ul className={styles.list}>
           {menu &&
-            menu.map(({ _id, icon: Icon, title }) => {
+            menu.map(({ _id, icon: Icon, title, route }) => {
               return (
                 <li
                   key={_id}
@@ -165,7 +181,7 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
                   className={cn(styles.item, {
                     [styles.notification]: notification,
                     [styles.notificationSetting]: notificationSetting,
-                    [styles.selected]: nameSelectedMenu === title,
+                    [styles.selected]: route === location.pathname,
                   })}
                 >
                   <Icon className={styles.icon} />

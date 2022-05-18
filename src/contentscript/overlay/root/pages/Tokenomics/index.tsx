@@ -25,12 +25,14 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
   const [isInvalidTokenTicker, setInvalidTokenTicker] = useState(false)
   const [isInvalidTokenName, setInvalidTokenName] = useState(false)
   const onClose = () => setModal(false)
+  const [visibleConfirm, setVisibleConfirm] = useState(true)
 
   useEffect(() => {}, [
     tokenListing,
     tokenName,
     isInvalidTokenTicker,
     isInvalidTokenName,
+    visibleConfirm,
   ])
   return (
     <div className={styles.wrapper}>
@@ -136,26 +138,29 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
               </div>
             }
           />
-          <button
-            disabled={
-              !(
-                tokenName.length >= 1 &&
-                tokenListing.length >= 1 &&
-                !isInvalidTokenName &&
-                !isInvalidTokenTicker
-              )
-            }
-            className={cn(styles.applyButtonDisabled, {
-              [styles.createTokenomics]:
-                tokenName.length >= 1 &&
-                tokenListing.length >= 1 &&
-                !isInvalidTokenName &&
-                !isInvalidTokenTicker,
-            })}
-            onClick={() => setModal(true)}
-          >
-            Confirm
-          </button>
+          {visibleConfirm && (
+            <button
+              disabled={
+                !(
+                  tokenName.length >= 1 &&
+                  tokenListing.length >= 1 &&
+                  !isInvalidTokenName &&
+                  !isInvalidTokenTicker
+                )
+              }
+              className={cn(styles.applyButtonDisabled, {
+                [styles.createTokenomics]:
+                  tokenName.length >= 1 &&
+                  tokenListing.length >= 1 &&
+                  !isInvalidTokenName &&
+                  !isInvalidTokenTicker,
+              })}
+              onClick={() => setModal(true)}
+            >
+              Confirm
+            </button>
+          )}
+
           <Modal
             visible={isModal}
             title="Create Tokenomy"
@@ -171,6 +176,7 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
                   onClick={() => {
                     onClose()
                     setTokenomics(true)
+                    setVisibleConfirm(false)
                   }}
                 >
                   Yes, i'm super sure

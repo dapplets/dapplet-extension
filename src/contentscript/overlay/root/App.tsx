@@ -34,6 +34,16 @@ import { ManifestAndDetails } from '../../../popup/components/dapplet'
 import Wallets from '../../../popup/pages/wallets'
 import ManifestDTO from '../../../background/dto/manifestDTO'
 
+export const withRouter = (Component) => {
+  const Wrapper = (props) => {
+    const navigate = useNavigate()
+
+    return <Component navigate={navigate} {...props} />
+  }
+
+  return Wrapper
+}
+
 import {
   BrowserRouter,
   Routes,
@@ -53,11 +63,16 @@ export type TSelectedSettings =
   | 'Developer'
 
 const MENU: IMenu[] = [
-  { _id: '0', icon: Home, title: 'Dapplets' },
-  { _id: '1', icon: Notification, title: 'Notifications' },
-  { _id: '2', icon: Settings, title: 'Settings' },
+  { _id: '0', icon: Home, title: 'Dapplets', route: '/' },
+  {
+    _id: '1',
+    icon: Notification,
+    title: 'Notifications',
+    route: '/notifications',
+  },
+  { _id: '2', icon: Settings, title: 'Settings', route: '/settings' },
   // { _id: '3', icon: Airplay, title: 'Developer' },
-  { _id: '4', icon: Card, title: 'Wallet' },
+  { _id: '4', icon: Card, title: 'Wallet', route: '/wallet' },
 ]
 const MENUACTIVETABS: IMenu[] = [
   // { _id: '0', icon: Home, title: 'Dapplets' },
@@ -82,6 +97,7 @@ interface S {
     website: string
     isFavourites: boolean
   }
+  activeOverlayId: string
   // tabsMenu: TabsActiveSettings | null
 }
 
@@ -90,7 +106,7 @@ export interface OverlayProps {
   baseNameSelectedSetting?: TSelectedSettings
 }
 
-export class App extends React.Component<P, S> {
+class _App extends React.Component<P, S> {
   private _isMounted: boolean = false
   state: S = {
     isLoadingMap: Object.fromEntries(
@@ -103,10 +119,21 @@ export class App extends React.Component<P, S> {
     isOpenSearch: false,
     search: '',
     dappletUserSettings: null,
+    activeOverlayId: null,
     // tabsMenu: null,
     // features: [],
     // isNoContentScript: false,
     // contextIds: [],
+  }
+
+  constructor(props: P) {
+    super(props)
+    props.overlayManager.onActiveOverlayChanged = (activeOverlayId: string) => {
+      this.setState({ activeOverlayId })
+      console.log(activeOverlayId)
+      ;(this.props as any).navigate('/tab/' + activeOverlayId)
+      console.log(this.props.overlayManager)
+    }
   }
 
   async componentDidMount() {
@@ -246,125 +273,124 @@ export class App extends React.Component<P, S> {
     // console.log(isUserSettings)
     // console.log(s.dappletUserSettings)
     return (
-      <MemoryRouter>
-        <div className={cn(styles.overlay)}>
-          <div className={styles.wrapper}>
-            <OverlayToolbar
-              tabs={overlays}
-              isSystemDapplets={s.isSystemDapplets}
-              menu={MENU}
-              className={styles.toolbar}
-              nameSelectedMenu={s.selectedMenu}
-              // nameActiveTab={s.tabsMenu}
-              idActiveTab={activeOverlayId}
-              onOverlayTab={this.noSystemOverlay}
-              activeOverlay={activeOverlay}
-              isDevMode={s.isDevMode}
-              onSelectedMenu={this.onSelectedMenu}
-              // onSelectedActiveMenu={this.onSelectedActiveMenu}
-              onSelectedTab={this.tabClickHandler}
-              onRemoveTab={this.closeClickHandler}
-              toggle={this.props.onToggle}
-              // menuActiveTabs={MENUACTIVETABS}
-            />
+      <div className={cn(styles.overlay)}>
+        <div className={styles.wrapper}>
+          <OverlayToolbar
+            tabs={overlays}
+            isSystemDapplets={s.isSystemDapplets}
+            menu={MENU}
+            className={styles.toolbar}
+            nameSelectedMenu={s.selectedMenu}
+            // nameActiveTab={s.tabsMenu}
+            idActiveTab={activeOverlayId}
+            onOverlayTab={this.noSystemOverlay}
+            activeOverlay={activeOverlay}
+            isDevMode={s.isDevMode}
+            onSelectedMenu={this.onSelectedMenu}
+            // onSelectedActiveMenu={this.onSelectedActiveMenu}
+            onSelectedTab={this.tabClickHandler}
+            onRemoveTab={this.closeClickHandler}
+            toggle={this.props.onToggle}
+            // menuActiveTabs={MENUACTIVETABS}
+          />
 
-            <div className={styles.inner}>
-              <header className={styles.header}>
-                <div className={styles.left}>
-                  <Profile
-                    avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
-                    hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
-                  />
-                </div>
-                <div className={styles.right}>
+          <div className={styles.inner}>
+            <header className={styles.header}>
+              <div className={styles.left}>
+                <Profile
+                  avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
+                  hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
+                />
+              </div>
+              <div className={styles.right}>
+                <SquaredButton
+                  appearance="big"
+                  icon={StoreIcon}
+                  onClick={this.storeButtonClickHandler}
+                />
+                {!s.isOpenSearch && !isNotification && !isSettings && (
                   <SquaredButton
+                    onClick={this.onOpenSearch}
                     appearance="big"
-                    icon={StoreIcon}
-                    onClick={this.storeButtonClickHandler}
+                    icon={SearchIcon}
                   />
-                  {!s.isOpenSearch && !isNotification && !isSettings && (
-                    <SquaredButton
-                      onClick={this.onOpenSearch}
-                      appearance="big"
-                      icon={SearchIcon}
-                    />
-                  )}
-
-                  {s.isOpenSearch && !isNotification && !isSettings && (
-                    <div className={styles.searchBlock} tabIndex={1}>
-                      <Search
-                        value={s.search}
-                        onChange={(e) =>
-                          this._searchChangeHandler(e.target.value)
-                        }
-                        onClick={() => this._searchChangeHandler('')}
-                        onClearValue={() => this._searchChangeHandler('')}
-                        onCloseSearch={this.onCloseSearch}
-                      />
-                    </div>
-                  )}
-                </div>
-              </header>
-
-              <div
-                className={cn(
-                  styles.children,
-                  'dapplets-overlay-nav-content-list'
                 )}
-              >
-                <Routes>
-                  <Route
-                    path="/"
-                    element={
-                      <Dapplets
-                        search={s.search}
-                        userSettings={s.dappletUserSettings}
-                        _getNewUserSettings={this._getNewUserSettings}
-                      />
-                    }
-                  ></Route>
-                  <Route
-                    path="/notifications"
-                    element={<Notifications />}
-                  ></Route>
-                  <Route path="/settings" element={<SettingsOverlay />}></Route>
-                  <Route
-                    path="/wallet"
-                    element={<Wallets isOverlay={true} />}
-                  ></Route>
-                  {/* <Route
+
+                {s.isOpenSearch && !isNotification && !isSettings && (
+                  <div className={styles.searchBlock} tabIndex={1}>
+                    <Search
+                      value={s.search}
+                      onChange={(e) =>
+                        this._searchChangeHandler(e.target.value)
+                      }
+                      onClick={() => this._searchChangeHandler('')}
+                      onClearValue={() => this._searchChangeHandler('')}
+                      onCloseSearch={this.onCloseSearch}
+                    />
+                  </div>
+                )}
+              </div>
+            </header>
+
+            <div
+              className={cn(
+                styles.children,
+                'dapplets-overlay-nav-content-list'
+              )}
+            >
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <Dapplets
+                      search={s.search}
+                      userSettings={s.dappletUserSettings}
+                      _getNewUserSettings={this._getNewUserSettings}
+                    />
+                  }
+                ></Route>
+                <Route
+                  path="/notifications"
+                  element={<Notifications />}
+                ></Route>
+                <Route path="/settings" element={<SettingsOverlay />}></Route>
+                <Route
+                  path="/wallet"
+                  element={<Wallets isOverlay={true} />}
+                ></Route>
+                {/* <Route
                     path="/:dapplet_id/settings"
                     element={
                       <UserSettings userSettings={s.dappletUserSettings} />
                     }
                   ></Route> */}
-                  <Route
-                    path="/:dapplet_id"
-                    element={
-                      <>
-                        {overlays.map((x) => (
-                          <div
-                            key={x.id}
-                            className={cn(styles.noSystemDapplets, {
-                              [styles.hideContent]: s.isSystemDapplets,
 
-                              [styles.overlayActive]:
-                                !s.isSystemDapplets && x.id === activeOverlayId,
-                              // !isSettings && x.id === activeOverlayId,
-                            })}
-                          >
-                            <ContentItem
-                              overlay={x}
-                              isActive={x.id === activeOverlayId}
-                              overlayManager={p.overlayManager}
-                            />
-                          </div>
-                        ))}
-                      </>
+                {overlays.map((x) => (
+                  <Route
+                    key={x.id}
+                    path={'/tab/' + x.id}
+                    element={
+                      <div
+                        key={x.id}
+                        className={cn(styles.noSystemDapplets, {
+                          [styles.hideContent]: s.isSystemDapplets,
+
+                          [styles.overlayActive]:
+                            !s.isSystemDapplets && x.id === activeOverlayId,
+                          // !isSettings && x.id === activeOverlayId,
+                        })}
+                      >
+                        <ContentItem
+                          overlay={x}
+                          isActive={x.id === activeOverlayId}
+                          overlayManager={p.overlayManager}
+                        />
+                      </div>
                     }
                   />
+                ))}
 
-                  {/* {overlays.map((x) => (
+                {/* {overlays.map((x) => (
                     <div
                       key={x.id}
                       className={cn(styles.noSystemDapplets, {
@@ -387,12 +413,19 @@ export class App extends React.Component<P, S> {
                       ></Route>
                     </div>
                   ))} */}
-                </Routes>
-              </div>
+              </Routes>
             </div>
           </div>
         </div>
-      </MemoryRouter>
+      </div>
     )
   }
 }
+
+const __App = withRouter(_App)
+
+export const App = (props: any) => (
+  <MemoryRouter>
+    <__App {...props} />
+  </MemoryRouter>
+)

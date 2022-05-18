@@ -5,7 +5,7 @@
 .wrapper {
   width: 100%;
   height: 100%;
-  padding: 27.5px 0px 0px 0px;
+  // padding: 27.5px 0px 0px 0px;
   overflow: hidden;
 }
 .wrapper::-webkit-scrollbar {
@@ -39,7 +39,7 @@
   overflow: hidden;
   width: 100%;
   flex: 1 1 auto;
-  max-height: 79vh;
+  max-height: 82vh;
 }
 .scrollBlock {
   overflow: hidden;

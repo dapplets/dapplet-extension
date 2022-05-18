@@ -3,6 +3,7 @@ import { ReactComponent as Home } from '../../assets/svg/home-toolbar.svg'
 import { ReactComponent as Settings } from '../../assets/svg/setting-toolbar.svg'
 import { ReactComponent as Notification } from '../../assets/svg/notification.svg'
 import { ReactComponent as Airplay } from '../../assets/svg/airplay.svg'
+import { ReactComponent as Card } from '../../assets/svg/card.svg'
 import { IMenu } from '../../models/menu.model'
 
 // export const NAVIGATION_LIST = [
@@ -12,8 +13,14 @@ import { IMenu } from '../../models/menu.model'
 // ];
 
 export const MENU: IMenu[] = [
-  { _id: '0', icon: Home, title: 'Dapplets' },
-  { _id: '1', icon: Notification, title: 'Wallets' },
-  { _id: '2', icon: Settings, title: 'Settings' },
-  { _id: '3', icon: Airplay, title: 'Developer' },
+  { _id: '0', icon: Home, title: 'Dapplets', route: '/' },
+  {
+    _id: '1',
+    icon: Notification,
+    title: 'Notifications',
+    route: '/notifications',
+  },
+  { _id: '2', icon: Settings, title: 'Settings', route: '/settings' },
+  // { _id: '3', icon: Airplay, title: 'Developer' },
+  { _id: '4', icon: Card, title: 'Wallet', route: '/wallet' },
 ]

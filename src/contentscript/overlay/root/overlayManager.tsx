@@ -18,6 +18,8 @@ const OverlayFrameClass = 'dapplets-overlay-frame'
 export class OverlayManager implements IOverlayManager {
   private _panel: HTMLElement = null
   public activeOverlay: Overlay = null
+  public onActiveOverlayChanged: (overlayId: string | null) => void | null =
+    null
 
   private _root = null
 
@@ -184,12 +186,17 @@ export class OverlayManager implements IOverlayManager {
 
     this.activeOverlay = overlay
 
+    this.onActiveOverlayChanged?.(this.activeOverlay.id)
+
     this._render()
   }
 
   public deactivate(overlay: Overlay) {
     const tab = this._tabsRegistry.filter((t) => t.overlay === overlay)[0]
-    if (this.activeOverlay === tab.overlay) this.activeOverlay = null
+    if (this.activeOverlay === tab.overlay) {
+      this.activeOverlay = null
+      this.onActiveOverlayChanged?.(null)
+    }
     this._render()
   }
 
@@ -198,15 +205,16 @@ export class OverlayManager implements IOverlayManager {
   }
 
   public openPopup(path: string) {
-    const url = browser.runtime.getURL('popup.html') + `#/${path}`
-    const overlays = this.getOverlays()
-    const overlay =
-      overlays.find((x) => x.uri === url) ??
-      this.createOverlay(url, capitalizeFirstLetter(path))
-    initBGFunctions(browser)
-      .then((x) => x.getThisTab())
-      .then((x) => overlay.send('changeTab', [path, x]))
-    this.activate(overlay)
+    // const url = browser.runtime.getURL('popup.html') + `#/${path}`
+    // const overlays = this.getOverlays()
+    // const overlay =
+    //   overlays.find((x) => x.uri === url) ??
+    //   this.createOverlay(url, capitalizeFirstLetter(path))
+    // initBGFunctions(browser)
+    //   .then((x) => x.getThisTab())
+    //   .then((x) => overlay.send('changeTab', [path, x]))
+    // this.activate(overlay)
+
     // this.show()
     // this.open()
     this.togglePanel()

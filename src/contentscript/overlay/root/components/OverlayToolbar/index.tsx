@@ -86,7 +86,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 
   const handlerSelectedTab = (id: string) => (): void => onSelectedTab(id)
   const handlerRemoveTab = (id: string) => (): void => onRemoveTab(id)
-  const nonSystemTabs = tabs.filter((x) => !x.uri.includes('/popup.html#'))
+  const nonSystemTabs = tabs //.filter((x) => !x.uri.includes('/popup.html#'))
 
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
@@ -129,8 +129,8 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
     nodeOverlayToolbar,
     isNodeOverlayToolbar,
   ])
-  console.log(nameActiveTab)
-  console.log(idActiveTab)
+  // console.log(nameActiveTab)
+  // console.log(idActiveTab)
 
   return (
     <div
@@ -178,6 +178,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
                     source={source}
                     menu={[]}
                     key={id}
+                    idActiveTab={idActiveTab}
                     nameSelectedMenu={nameSelectedMenu}
                     activeTab={active}
                     isSystemDapplets={isSystemDapplets}
