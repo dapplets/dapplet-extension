@@ -114,9 +114,12 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
             onClick={() => {
               console.log(imgActiveTab)
 
-              if (imgActiveTab !== null) {
-                navigate(`/:dapplet_id`)
-              }
+              // if (imgActiveTab !== null) {
+              //   navigate(`/:dapplet_id`)
+              // }
+              // if (imgActiveTab !== null) {
+              //   navigate(`/:dapplet_id/system`)
+              // }
             }}
             className={cn(styles.image, { [styles.cursor]: !activeTab })}
             storageRef={imgActiveTab}

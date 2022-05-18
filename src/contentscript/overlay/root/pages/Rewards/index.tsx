@@ -230,7 +230,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
           {/* {newCustomPool.customPoolForm.map((x, i) => ( */}
           <div className={styles.customPoolBlock}>
             <div className={styles.customPool}>
-              <div className={styles.customPoolLabel}>Custom pool</div>
+              <div className={styles.customPoolLabel}>Pool</div>
               <div className={styles.blockNewCustomPool}>
                 <input
                   className={styles.inputNewCustomPool}
@@ -245,9 +245,10 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     className={styles.buttonDeleteNewCustomPool}
                   /> */}
               </div>
+              <div className={styles.customPoolLabel}>AUGe</div>
             </div>
             <div className={styles.customPooNewDistributed}>
-              <div className={styles.customPoolLabel}>{`You Use `}</div>
+              <div className={styles.customPoolLabel}>{`Distributed `}</div>
               <span className={styles.customLabelDistributed}>
                 {distributed}
               </span>

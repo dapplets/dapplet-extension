@@ -130,16 +130,16 @@
 .blockNewCustomPool {
   display: flex;
 
-  min-width: 127px;
+  width: 110px;
   justify-content: space-between;
   align-items: center;
-  margin: 0px 0px 0px 10px;
+  margin: 0px 5px 0px 5px;
 }
 
 .inputNewCustomPool {
   height: 31px;
   display: block;
-  width: 106px;
+  width: 100%;
   padding: 5px 13px;
   background: $AppBG;
   border: 1px solid $StrokeColor;
@@ -233,7 +233,7 @@
   min-width: 80px;
   justify-content: space-between;
   align-items: center;
-  // margin: 0px 0px 0px 16px;
+  margin: 0px 0px 0px 10px;
 }
 
 .creationFirstBlock {
