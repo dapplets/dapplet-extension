@@ -30,9 +30,9 @@ export const Search = (props: SearchProps): ReactElement => {
   return (
     <div
       className={cn(styles.wrapper, className)}
-      // onBlur={() => {
-      //   onCloseSearch()
-      // }}
+      onBlur={() => {
+        onCloseSearch()
+      }}
     >
       <div className={styles.searchIcon}>
         <SearchIcon onClick={() => onCloseSearch()} />
@@ -47,7 +47,7 @@ export const Search = (props: SearchProps): ReactElement => {
           {...otherProps}
         />
       </label>
-      <MiniIcon className={styles.close} onClick={() => onClearValue()} />
+      <MiniIcon className={styles.close} onClick={onClearValue} />
     </div>
   )
 }

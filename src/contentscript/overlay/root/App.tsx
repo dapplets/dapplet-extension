@@ -330,7 +330,7 @@ class _App extends React.Component<P, S> {
                         this._searchChangeHandler(e.target.value)
                       }
                       // onClick={() => this._searchChangeHandler('')}
-                      onClearValue={this._searchChangeHandlerDelete}
+                      onClearValue={() => this._searchChangeHandler('')}
                       onCloseSearch={this.onCloseSearch}
                     />
                   </div>
