@@ -144,9 +144,11 @@ class _App extends React.Component<P, S> {
     this.setState({ isDevMode })
   }
 
-  closeClickHandler = (overlayId: string) => {
+  closeClickHandler = async (overlayId: string) => {
     const overlay = this.getOverlays().find((x) => x.id === overlayId)
+    // return this.props.overlayManager.removeTab(overlayId)
     overlay.close()
+    this.props.overlayManager.show()
   }
 
   tabClickHandler = (overlayId: string) => {
@@ -246,6 +248,9 @@ class _App extends React.Component<P, S> {
   _searchChangeHandler(value: string) {
     this.setState({ search: value })
   }
+  _searchChangeHandlerDelete() {
+    this.setState({ search: '' })
+  }
   _getNewUserSettings = async (
     value: ManifestAndDetails & {
       users: any[]
@@ -298,6 +303,7 @@ class _App extends React.Component<P, S> {
             <header className={styles.header}>
               <div className={styles.left}>
                 <Profile
+                  mini
                   avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
                   hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
                 />
@@ -323,8 +329,8 @@ class _App extends React.Component<P, S> {
                       onChange={(e) =>
                         this._searchChangeHandler(e.target.value)
                       }
-                      onClick={() => this._searchChangeHandler('')}
-                      onClearValue={() => this._searchChangeHandler('')}
+                      // onClick={() => this._searchChangeHandler('')}
+                      onClearValue={this._searchChangeHandlerDelete}
                       onCloseSearch={this.onCloseSearch}
                     />
                   </div>

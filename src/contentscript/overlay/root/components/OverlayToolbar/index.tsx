@@ -18,6 +18,7 @@ import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { browser } from 'webextension-polyfill-ts'
 import { loadJsonFile } from 'near-api-js/lib/key_stores/unencrypted_file_system_keystore'
+import { useNavigate } from 'react-router-dom'
 // TODO: change element hiding from Margin to transform
 export interface OverlayToolbarProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -86,6 +87,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 
   const handlerSelectedTab = (id: string) => (): void => onSelectedTab(id)
   const handlerRemoveTab = (id: string) => (): void => onRemoveTab(id)
+
   const nonSystemTabs = tabs //.filter((x) => !x.uri.includes('/popup.html#'))
 
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
@@ -100,6 +102,8 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
       const ids = await getCurrentContextIds(currentTab)
       const d = await getFeaturesByHostnames(ids)
       setAllDapplet(d)
+      // console.log(location.pathname.includes('/tab', 0))
+      // console.log(location.pathname)
     }
     init()
 
@@ -109,7 +113,13 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
     return () => {
       _isMounted = false
     }
-  }, [activeOverlay, nodeOverlayToolbar, isNodeOverlayToolbar, nameActiveTab])
+  }, [
+    activeOverlay,
+    nodeOverlayToolbar,
+    isNodeOverlayToolbar,
+    nameActiveTab,
+    // location.pathname,
+  ])
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
       nodeOverlayToolbar.current.value = ''
@@ -151,7 +161,11 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
           className="toggleOverlay"
         />
 
-        <div className={styles.tabs}>
+        <div
+          className={cn(styles.tabs, {
+            [styles.noActive]: location.pathname.indexOf('/tab/') !== -1,
+          })}
+        >
           <OverlayTab
             id="system"
             dap={allDapplet}

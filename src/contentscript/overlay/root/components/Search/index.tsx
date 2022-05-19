@@ -28,24 +28,26 @@ export const Search = (props: SearchProps): ReactElement => {
   } = props
 
   return (
-    <div className={cn(styles.wrapper, className)}>
+    <div
+      className={cn(styles.wrapper, className)}
+      // onBlur={() => {
+      //   onCloseSearch()
+      // }}
+    >
       <div className={styles.searchIcon}>
-        <SearchIcon onClick={onCloseSearch} />
+        <SearchIcon onClick={() => onCloseSearch()} />
       </div>
       <label className={styles.label}>
         <input
-          onBlur={() => {
-            onCloseSearch()
-          }}
+          autoFocus
           type="text"
           className={styles.input}
           value={value}
           onChange={onChange}
-          placeholder="_"
           {...otherProps}
         />
       </label>
-      <MiniIcon className={styles.close} onClick={onClearValue} />
+      <MiniIcon className={styles.close} onClick={() => onClearValue()} />
     </div>
   )
 }

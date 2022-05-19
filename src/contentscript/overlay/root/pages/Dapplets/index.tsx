@@ -64,6 +64,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       setLoadingListDapplets(false)
       const features = await _getFilteredDapplets(d)
       console.log(features, 'feat')
+
       setDapplets(features)
 
       const sortedDapplets = await _getSortedDapplets(features)
@@ -300,8 +301,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const { removeMyDapplet } = await initBGFunctions(browser)
     await removeMyDapplet(f.sourceRegistry.url, f.name)
     const d = dapplets.filter((x) => x.name !== f.name)
-    setDapplets(d)
 
+    setDapplets(d)
     // const { removeDapplet } = await initBGFunctions(browser)
     // const contextIds = await contextIds
     // await removeDapplet(f.name, contextIds)
