@@ -120,10 +120,10 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
               console.log(id, 'id')
               console.log(idActiveTab, 'at')
 
-              if (location.pathname !== `/tab/${id}`) {
-                navigate(`/tab/${id}`)
-                console.log('lalala')
-              }
+              // if (location.pathname !== `/tab/${id}`) {
+              navigate(`/tab/${id}`)
+              console.log(navigate(`/tab/${id}`))
+              // }
 
               // if (imgActiveTab !== null) {
               //   navigate(`/:dapplet_id`)
