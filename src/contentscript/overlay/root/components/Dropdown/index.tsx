@@ -19,7 +19,7 @@ export interface DropdownProps
     label: string
   }
   handlerChangeValue?: (value: IDropdown | null) => void
-  setDropdownListValue?: (x) => void
+  setDropdownListValue: (x: any) => void
 }
 
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {

@@ -98,7 +98,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   //   await _getNewUserSettings(value)
   // }
   // console.log(userSettings)
-  console.log(dapplet)
+  // console.log(dapplet)
   return (
     <div className={cn(styles.wrapperCard, className)} {...anotherProps}>
       <DappletImage isFavourites={false} storageRef={icon} />
