@@ -151,6 +151,17 @@ export const Rewards: FC<RewardsProps> = (props) => {
   console.log(recepient.userID)
   console.log(newRewardUserIdBlock)
   console.log(poolNewInput.current?.value)
+  const getInputInvalid = useMemo(() => {
+    if (
+      +poolNewInput.current?.value > 100 ||
+      +poolNewInput.current?.value <= 0
+    ) {
+      setPoolInputInvalid(true)
+    } else {
+      setPoolInputInvalid(false)
+    }
+    console.log(poolNewInput.current?.value)
+  }, [poolNewInput])
 
   const onClose = () => setModal(false)
   const onCloseChange = () => setModalChange(false)
@@ -734,26 +745,23 @@ export const Rewards: FC<RewardsProps> = (props) => {
                           }
                         }}
                         // tabIndex={0}
-                        onChange={(e: any) => {
+                        onFocus={(e) => {
                           if (+e.target.value <= 0 || +e.target.value > 100) {
-                            // setPoolInputInvalid(true)
-                            // console.log(poolInputInvalid)
-
-                            newItem.newItem[i].pool =
-                              items.items[itemIndex].pool
+                            setPoolInputInvalid(true)
                           } else {
                             setPoolInputInvalid(false)
-                            // console.log(poolInputInvalid)
+
                             newItem.newItem[i].pool = e.target.value
                           }
+                        }}
+                        onChange={(e: any) => {
+                          if (+e.target.value <= 0 || +e.target.value > 100) {
+                            setPoolInputInvalid(true)
+                          } else {
+                            setPoolInputInvalid(false)
 
-                          console.log(
-                            Number(newItem.newItem[i].pool) +
-                              (sumQuantity -
-                                Number(items.items[itemIndex].pool))
-                          )
-
-                          // }
+                            newItem.newItem[i].pool = e.target.value
+                          }
                         }}
                         className={cn(styles.poolInput, styles.newPoolInput, {
                           [styles.poolInputInvalid]: poolInputInvalid,
@@ -892,7 +900,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         //     sumQuantity -
                         //     items.items[itemIndex].pool
                         // ) <= 100 &&
-                        poolInputInvalid &&
+                        !poolInputInvalid &&
                         newItem.newItem[i].recepientForm
                       )
                       // newItem.newItem[i].recepientForm.lendth >= 1
