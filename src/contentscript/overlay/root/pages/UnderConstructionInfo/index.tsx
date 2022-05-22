@@ -114,7 +114,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   const [isDisabledPush, setDisabledPush] = useState(true)
   const [isModal, setModal] = useState(false)
   const onClose = () => setModal(false)
-
+  const [autorDisabled, setAuthorDisabled] = useState(false)
   const [isModalPush, setModalPush] = useState(false)
   const onClosePush = () => setModalPush(false)
   const [isModalTransaction, setModalTransaction] = useState(false)
@@ -133,6 +133,9 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
       }
     }
     init()
+    if (author.authorForm.length === 0) {
+      setAuthorDisabled(false)
+    }
     return () => {
       _isMounted = false
     }
@@ -475,8 +478,14 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                 <div className={styles.blockAdmins}>
                   <h3 className={styles.adminsTitle}>Admins</h3>
                   <button
-                    onClick={addButtonClickHandler}
-                    className={styles.adminsButton}
+                    disabled={autorDisabled}
+                    onClick={() => {
+                      addButtonClickHandler()
+                      setAuthorDisabled(true)
+                    }}
+                    className={cn(styles.adminsButton, {
+                      [styles.adminsButtonDisabled]: autorDisabled,
+                    })}
                   />
                 </div>
                 {author.authorForm.map((x, i) => (
@@ -486,8 +495,10 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                       className={styles.authorTitle}
                       placeholder={x.author}
                       onChange={(e) => {
-                        newAuthorObject.author = e.target.value
-
+                        author.authorForm[i].author = e.target.value
+                        if (e.target.value.length !== 0) {
+                          setAuthorDisabled(false)
+                        }
                         setDisabledPush(false)
                       }}
                     />

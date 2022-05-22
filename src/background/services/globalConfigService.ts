@@ -71,6 +71,8 @@ export default class GlobalConfigService {
         config.ethereumNetworks = this.getInitialConfig().ethereumNetworks
       if (!config.myDapplets)
         config.myDapplets = this.getInitialConfig().myDapplets
+      if (!config.targetStorages)
+        config.targetStorages = this.getInitialConfig().targetStorages
     }
 
     return config ?? this.getInitialConfig()

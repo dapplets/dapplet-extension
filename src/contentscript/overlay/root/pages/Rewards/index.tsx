@@ -1,21 +1,12 @@
-import React, {
-  ReactElement,
-  useState,
-  useEffect,
-  useMemo,
-  FC,
-  useRef,
-  ChangeEvent,
-} from 'react'
+import React, { useState, useEffect, FC, useRef } from 'react'
 import cn from 'classnames'
 import styles from './Rewards.module.scss'
 import { SettingWrapper } from '../../components/SettingWrapper'
-import { SettingItem } from '../../components/SettingItem'
+
 import { Message } from '../../components/Message'
-import { Modal } from '../../components/Modal'
+
 import { ModalReward } from '../../components/ModalReward'
 import './rewards.scss'
-import { ItemContent } from 'semantic-ui-react'
 
 export interface RewardsProps {
   setUnderConstructionDetails: (x) => void
@@ -59,7 +50,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const [addRecepientDisabled, setAddRecepientDisabled] = useState(false)
 
   const [isModal, setModal] = useState(false)
-  const [selectedUser, setSelectedUser] = useState(null)
 
   const [isModalChange, setModalChange] = useState(false)
 
@@ -68,9 +58,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const [newItem, setNewItem] = useState({ newItem: [] })
 
   const [inputValueCustomPool, setDefaultValueCustomPool] = useState('')
-  // const [defaultCustomPool, setDefaultCustomPool] = useState(
-  //   `${inputValueCustomPool} Auge`
-  // )
+
   const [isCondition, setCondition] = useState(false)
   const poolNewInput = useRef<HTMLInputElement>()
   const revardUserIdInput = useRef<HTMLInputElement>()
@@ -115,6 +103,11 @@ export const Rewards: FC<RewardsProps> = (props) => {
     } else {
       setNewUserIdDisabled(false)
     }
+    if (+pool.pool + Number(sumQuantity) > 100) {
+      setPoolInputInvalid(true)
+    } else if (+pool.pool + Number(sumQuantity) <= 100) {
+      setPoolInputInvalid(false)
+    }
 
     if (
       +poolNewInput.current?.value > 100 ||
@@ -126,6 +119,10 @@ export const Rewards: FC<RewardsProps> = (props) => {
     }
 
     onDistributed(`${sumQuantity}%`)
+
+    // console.log(items, 'items')
+    // console.log(newItem, 'newItem')
+    // console.log(itemIndex, 'itemIndex')
   }, [
     sumQuantity,
     items,
@@ -146,23 +143,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
     newRewardUserIdBlock,
   ])
 
-  console.log(userIdDisabled)
-  // console.log(itemsRecepientForm.recepientForm.length)
-  console.log(recepient.userID)
-  console.log(newRewardUserIdBlock)
-  console.log(poolNewInput.current?.value)
-  const getInputInvalid = useMemo(() => {
-    if (
-      +poolNewInput.current?.value > 100 ||
-      +poolNewInput.current?.value <= 0
-    ) {
-      setPoolInputInvalid(true)
-    } else {
-      setPoolInputInvalid(false)
-    }
-    console.log(poolNewInput.current?.value)
-  }, [poolNewInput])
-
   const onClose = () => setModal(false)
   const onCloseChange = () => setModalChange(false)
 
@@ -180,18 +160,13 @@ export const Rewards: FC<RewardsProps> = (props) => {
     itemsRecepientForm.recepientForm = []
   }
 
-  const addItemEdit = (event, id) => {
+  const addItemEdit = (event, i) => {
     event.preventDefault()
 
-    const newForm = Object.assign({}, items.items[id])
+    const newForm = Object.assign({}, items)
 
-    const pushForm = Object.assign({}, newItem.newItem[id])
-
-    newForm.push(pushForm)
-
-    setItems(newForm)
-
-    itemsRecepientForm.recepientForm = []
+    const pushForm = Object.assign({}, newItem.newItem)
+    newForm.items
   }
 
   const handleChangeName = (event) => {
@@ -201,11 +176,12 @@ export const Rewards: FC<RewardsProps> = (props) => {
   // ====
 
   const addButtonClickRecepient = () => {
+    setItemsRecepient({
+      recepientForm: [],
+    })
     const newForm = Object.assign({}, itemsRecepientForm)
-    setSelectedUser(null)
 
     const pushForm = Object.assign({}, recepient)
-    console.log(newForm)
 
     newForm.recepientForm.push(pushForm)
     setItemsRecepient(newForm)
@@ -221,8 +197,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
     const newForm = newItem.newItem[i].recepientForm.push(pushForm)
 
     setItemsRecepient(newForm)
-
-    console.log(pushForm)
   }
 
   const onDeleteChildRecepient = (id: number) => {
@@ -235,32 +209,32 @@ export const Rewards: FC<RewardsProps> = (props) => {
     setItemsRecepient(newForm)
   }
 
-  const addButtonClickConditional = (id: number) => {
-    const newForm = Object.assign({}, itemsRecepientForm)
-    newForm.recepientForm[id].isActive = true
-    setItemsRecepient(newForm)
-  }
+  // const addButtonClickConditional = (id: number) => {
+  //   const newForm = Object.assign({}, itemsRecepientForm)
+  //   newForm.recepientForm[id].isActive = true
+  //   setItemsRecepient(newForm)
+  // }
 
-  const addButtonClickConditionalEdit = (id: number, i?: number) => {
-    const newForm = newItem.newItem[id].recepientForm
-    newForm[i].isActive = true
-    console.log(newForm, 'tr')
+  // const addButtonClickConditionalEdit = (id: number, i?: number) => {
+  //   const newForm = newItem.newItem[id].recepientForm
+  //   newForm[i].isActive = true
+  //   console.log(newForm, 'tr')
 
-    setItemsRecepient(newForm)
-  }
+  //   setItemsRecepient(newForm)
+  // }
 
-  const onDeleteChildConditional = (id: number) => {
-    const newForm = Object.assign({}, itemsRecepientForm)
-    newForm.recepientForm[id].isActive = false
-    setItemsRecepient(newForm)
-  }
+  // const onDeleteChildConditional = (id: number) => {
+  //   const newForm = Object.assign({}, itemsRecepientForm)
+  //   newForm.recepientForm[id].isActive = false
+  //   setItemsRecepient(newForm)
+  // }
 
-  const onDeleteChildConditionalEdit = (id: number, i?: number) => {
-    const newForm = newItem.newItem[id].recepientForm
-    newForm[i].isActive = false
-    console.log(newForm, 'fl')
-    setItemsRecepient(newForm)
-  }
+  // const onDeleteChildConditionalEdit = (id: number, i?: number) => {
+  //   const newForm = newItem.newItem[id].recepientForm
+  //   newForm[i].isActive = false
+  //   console.log(newForm, 'fl')
+  //   setItemsRecepient(newForm)
+  // }
 
   const handleChangeRecepient = (event) => {
     setRecepient({ ...recepient, userID: event.target.value })
@@ -272,15 +246,11 @@ export const Rewards: FC<RewardsProps> = (props) => {
     newCustomPoolForm.items.splice(id, 1)
     setName({ name: '' })
     setPool({ pool: '20' })
-    // recepient.condition = ''
-    // recepient.isActive = false
-    // recepient.userID = ''
+
     setRecepient({ userID: null, condition: null, isActive: false })
 
     setItems(newCustomPoolForm)
   }
-  // console.log(poolNewInput.current?.value)
-  console.log(poolInputInvalid)
 
   return (
     <div className={styles.wrapper}>
@@ -464,15 +434,28 @@ export const Rewards: FC<RewardsProps> = (props) => {
                             ? setPool({ pool: '20' })
                             : setPool({ pool: pool.pool })
                         }}
+                        onFocus={(e) => {
+                          if (+e.target.value <= 0 || +e.target.value > 100) {
+                            setPoolInputInvalid(true)
+                          } else {
+                            setPoolInputInvalid(false)
+
+                            setPool({ pool: e.target.value })
+                          }
+                        }}
                         onChange={(e) => {
                           if (isNaN(+e.target.value) === false) {
                             setPool({ pool: e.target.value })
+                            setPoolInputInvalid(false)
                           }
-                          if (e.target.value === '0') {
-                            setPool({ pool: '20' })
+                          if (+e.target.value <= 0 || +e.target.value > 100) {
+                            // setPool({ pool: '20' })
+                            setPoolInputInvalid(true)
+                            console.log(poolInputInvalid)
                           }
 
                           // }
+                          console.log(poolInputInvalid)
                         }}
                         className={cn(styles.poolInput, {
                           [styles.poolInputInvalid]: poolInputInvalid,
@@ -493,7 +476,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         disabled={userIdDisabled}
                         onClick={() => {
                           addButtonClickRecepient()
-                          console.log(revardUserIdInput.current?.value, 'rui')
+                          // console.log(revardUserIdInput.current?.value, 'rui')
                         }}
                         className={styles.customPoolButton}
                       />
@@ -524,10 +507,10 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                 handleChangeRecepient(e)
                                 itemsRecepientForm.recepientForm[i].userID =
                                   e.target.value
-                                console.log(
-                                  itemsRecepientForm.recepientForm[i].userID
-                                    .length
-                                )
+                                // console.log(
+                                //   itemsRecepientForm.recepientForm[i].userID
+                                //     .length
+                                // )
                                 if (
                                   itemsRecepientForm.recepientForm[i].userID
                                     .length === 0 ||
@@ -538,7 +521,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                 } else {
                                   setUserIdDisabled(false)
                                 }
-                                console.log(e.target.value.length)
+                                // console.log(e.target.value.length)
                               }}
                             />
                             <button
@@ -626,7 +609,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     pool.pool.length >= 1 &&
                     Number(pool.pool) <= 100 &&
                     recepient.userID &&
-                    recepient.userID.length >= 1
+                    recepient.userID.length >= 1 &&
+                    !poolInputInvalid
                   )
                 }
                 onClick={(e) => {
@@ -642,7 +626,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     pool.pool.length >= 1 &&
                     Number(pool.pool) <= 100 &&
                     recepient.userID &&
-                    recepient.userID.length >= 1,
+                    recepient.userID.length >= 1 &&
+                    !poolInputInvalid,
                 })}
               >
                 Apply
@@ -652,6 +637,12 @@ export const Rewards: FC<RewardsProps> = (props) => {
               setName({ name: '' })
               setPool({ pool: '20' })
               setCondition(false)
+              setRecepient({
+                userID: null,
+                condition: null,
+                isActive: false,
+              })
+              itemsRecepientForm.recepientForm = []
               onClose()
             }}
           />
@@ -907,15 +898,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     )
                   }
                   onClick={(e) => {
-                    // addItemEdit(e, itemIndex)
-                    items.items[itemIndex] = newItem.newItem[i]
-                    // itemsRecepientForm.recepientForm = []
-                    // console.log(
-                    //   sumQuantity - Number(items.items[itemIndex].pool)
-                    // )
-                    // Number(newItem.newItem[i].pool) +
-                    // sumQuantity -
-                    // Number(items.items[itemIndex].pool)
+                    // items.items[i] = newItem.newItem[i]
+                    addItemEdit(e, i)
 
                     onCloseChange()
                   }}
