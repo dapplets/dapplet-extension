@@ -674,17 +674,10 @@ export const Rewards: FC<RewardsProps> = (props) => {
                           if (e.target.value === '0') {
                             newItem.newItem[i].pool = '20'
                           }
-                          if (
-                            +newItem.newItem[i].pool + Number(sumQuantity) >
-                            100
-                          ) {
-                            setPoolInputInvalid(true)
-                          } else if (
-                            +newItem.newItem[i].pool + Number(sumQuantity) <=
-                            100
-                          ) {
-                            setPoolInputInvalid(false)
+                          if (+e.target.value > 100) {
+                            newItem.newItem[i].pool = '100'
                           }
+
                           // }
                         }}
                         className={cn(styles.poolInput, {
@@ -693,12 +686,11 @@ export const Rewards: FC<RewardsProps> = (props) => {
                       />
                     </div>
                   </div>
-                  {poolInputInvalid ||
-                    (newItem.newItem[i].pool + sumQuantity > 100 && (
-                      <div className={styles.poolInputInvalidText}>
-                        Distributed must not exceed 100%
-                      </div>
-                    ))}
+                  {poolInputInvalid && (
+                    <div className={styles.poolInputInvalidText}>
+                      Distributed must not exceed 100%
+                    </div>
+                  )}
                   <div className={styles.rewardRecepientBlock}>
                     <div className={styles.recepientBlock}>
                       <span className={styles.nameLabel}>Recipient</span>
@@ -809,7 +801,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                       newItem.newItem[i].name.length >= 1 &&
                       newItem.newItem[i].pool &&
                       newItem.newItem[i].pool.length >= 1 &&
-                      Number(newItem.newItem[i].pool + sumQuantity) <= 100 &&
+                      Number(newItem.newItem[i].pool) <= 100 &&
                       newItem.newItem[i].recepientForm[i].userID &&
                       newItem.newItem[i].recepientForm[i].userID.length >= 1
                     )
@@ -817,19 +809,29 @@ export const Rewards: FC<RewardsProps> = (props) => {
                   onClick={(e) => {
                     // addItemEdit(e, itemIndex)
                     items.items[itemIndex] = newItem.newItem[i]
-                    console.log(items)
 
-                    // onCloseChange()
+                    // console.log(
+                    //   sumQuantity - Number(items.items[itemIndex].pool)
+                    // )
+                    // Number(newItem.newItem[i].pool) +
+                    // sumQuantity -
+                    // Number(items.items[itemIndex].pool)
+
+                    onCloseChange()
                   }}
-                  className={cn(styles.applyButtonDisabled, {
-                    [styles.applyButton]:
-                      newItem.newItem[i].name &&
-                      newItem.newItem[i].name.length >= 1 &&
-                      newItem.newItem[i].pool &&
-                      newItem.newItem[i].pool.length >= 1 &&
-                      Number(newItem.newItem[i].pool + sumQuantity) <= 100 &&
-                      newItem.newItem[i].recepientForm[i].userID &&
-                      newItem.newItem[i].recepientForm[i].userID.length >= 1,
+                  className={cn(styles.applyButton, {
+                    // [styles.applyButtonDisabled]:
+                    //   newItem.newItem[i].name &&
+                    //   newItem.newItem[i].name.length >= 1 &&
+                    //   newItem.newItem[i].pool &&
+                    //   +newItem.newItem[i].pool.length >= 1 &&
+                    //   Number(
+                    //     newItem.newItem[i].pool +
+                    //       sumQuantity -
+                    //       items.items[itemIndex].pool
+                    //   ) <= 100 &&
+                    //   newItem.newItem[i].recepientForm[i].userID &&
+                    //   newItem.newItem[i].recepientForm[i].userID.length >= 1,
                   })}
                 >
                   Edit
