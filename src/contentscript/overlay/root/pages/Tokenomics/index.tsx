@@ -179,7 +179,7 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
                     setVisibleConfirm(false)
                   }}
                 >
-                  Yes, i'm super sure
+                  Yes, i'm over sure
                 </button>
                 <a className={styles.footerContentModalLink}>F.A.Q.</a>
               </div>
