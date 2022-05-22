@@ -27,7 +27,7 @@ export class GlobalConfig extends Base {
   userSettings: {
     [moduleName: string]: { [key: string]: any }
   } = {}
-  targetStorages: StorageTypes[] = null
+  targetStorages: StorageTypes[] = []
 
   errorReporting: boolean = true // indirectly affects on '/src/common/logger.ts'
 

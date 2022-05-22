@@ -249,6 +249,9 @@ browser.runtime.onMessage.addListener(
     updateTargetStorages:
       globalConfigService.updateTargetStorages.bind(globalConfigService),
 
+    getTargetStorages:
+      globalConfigService.getTargetStorages.bind(globalConfigService),
+
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) =>
       globalConfigService.getUserSettings(moduleName, key),

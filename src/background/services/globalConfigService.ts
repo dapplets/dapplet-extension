@@ -454,11 +454,15 @@ export default class GlobalConfigService {
     await this.set(config)
   }
 
-  async updateTargetStorages(storage: any) {
+  async updateTargetStorages(storages: StorageTypes[]) {
+    console.log('storages', storages)
     const config = await this.get()
-    config.targetStorages = storage
-    // await this.set(config)
+    config.targetStorages = storages
+    await this.set(config)
+  }
 
+  async getTargetStorages() {
+    const config = await this.get()
     return config.targetStorages
   }
 

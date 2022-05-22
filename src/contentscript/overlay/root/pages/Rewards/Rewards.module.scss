@@ -35,6 +35,10 @@
   flex: 1 1 auto;
 }
 
+// .blockRewards > * {
+//   direction: ltr;
+// }
+
 .customPoolBlock {
   display: flex;
   width: 100%;
@@ -573,6 +577,7 @@
   line-height: 100%;
 
   color: $PureWhite;
+  margin-top: 10px;
   &:hover {
     background: $PrimaryHover;
   }
@@ -583,8 +588,8 @@
 
 .createdRewardsWrapper {
   display: flex;
-
-  width: 100%;
+  margin-top: 15px;
+  width: 97%;
   position: relative;
   margin-bottom: 21px;
 }
@@ -769,6 +774,34 @@
   flex-direction: column;
   align-items: center;
   margin: 20px 0px 0px 0px;
+
+  overflow-y: scroll;
+  direction: rtl;
+  &::-webkit-scrollbar {
+    width: 4px;
+    cursor: pointer;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgb(244, 244, 244);
+    background: rgb(244, 244, 244);
+    background: linear-gradient(
+      90deg,
+      rgba(244, 244, 244, 0) 10%,
+      rgba(227, 227, 227, 1) 50%,
+      rgba(244, 244, 244, 0) 90%
+    );
+  }
+  &::-webkit-scrollbar-thumb {
+    width: 4px;
+    height: 2px;
+    background: $Primary;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.09),
+      0px 2px 2px rgba(38, 117, 209, 0.04);
+    border-radius: 2px;
+  }
+}
+.wrapperChanges > * {
+  direction: ltr;
 }
 
 .back {

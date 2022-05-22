@@ -23,12 +23,6 @@ export interface RewardsProps {
   setActiveTabUnderConstructionDetails: any
 }
 let _isMounted = false
-const RECEPIENT_CREATE = {
-  rewardName: '',
-  rewardPool: 20,
-  recepient: [],
-  conditional: [],
-}
 
 enum UnderConstructionDetails {
   INFO = 0,
@@ -44,10 +38,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
   } = props
   let sumQuantity = 0
   const [distributed, onDistributed] = useState(`${sumQuantity}%`)
-  const newCustomPoolObject = {
-    customPool: '',
-  }
-  // const [newCustomPool, setCustomPool] = useState({ customPoolForm: [] })
 
   const [items, setItems] = useState({
     items: [],
@@ -60,8 +50,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
   })
 
   const [recepient, setRecepient] = useState({
-    userID: '',
-    condition: '',
+    userID: null,
+    condition: null,
     isActive: false,
   })
 
@@ -70,21 +60,24 @@ export const Rewards: FC<RewardsProps> = (props) => {
 
   const [isModal, setModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
-  const [isApplyDisabled, setApplyDisabled] = useState(false)
-  const [isApplyChanges, setApplyChanges] = useState(false)
 
   const [isModalChange, setModalChange] = useState(false)
 
   const [itemIndex, setItemInex] = useState(0)
 
   const [newItem, setNewItem] = useState({ newItem: [] })
-  const [oldItem, setOldItem] = useState({ oldItem: [] })
+
   const [inputValueCustomPool, setDefaultValueCustomPool] = useState('')
   // const [defaultCustomPool, setDefaultCustomPool] = useState(
   //   `${inputValueCustomPool} Auge`
   // )
   const [isCondition, setCondition] = useState(false)
   const poolNewInput = useRef<HTMLInputElement>()
+  const revardUserIdInput = useRef<HTMLInputElement>()
+  const newRewardUserIdInput = useRef<HTMLInputElement>()
+  const newRewardUserIdBlock = useRef<HTMLDivElement>()
+  const [userIdDisabled, setUserIdDisabled] = useState(false)
+  const [newUserIdDisabled, setNewUserIdDisabled] = useState(false)
 
   useEffect(() => {
     if (items && items.items) {
@@ -102,30 +95,35 @@ export const Rewards: FC<RewardsProps> = (props) => {
         setAddRecepientDisabled(false)
       }
     }
+    if (
+      itemsRecepientForm &&
+      itemsRecepientForm.recepientForm &&
+      itemsRecepientForm.recepientForm.length >= 1 &&
+      !revardUserIdInput.current?.value
+    ) {
+      setUserIdDisabled(true)
+    } else {
+      setUserIdDisabled(false)
+    }
 
-    // if (newItem && newItem.newItem) {
-    //   for (let i = 0; i < newItem.newItem.length; i++) {
-    //     sumQuantity += +newItem.newItem[i].pool!
-    //     if (+newItem.newItem[i].pool + Number(sumQuantity) > 100) {
-    //       setPoolInputInvalid(true)
-    //       console.log('true')
-    //     } else if (+newItem.newItem[i].pool + Number(sumQuantity) <= 100) {
-    //       setPoolInputInvalid(false)
-    //       console.log('false')
-    //     }
-    //   }
+    if (
+      newRewardUserIdBlock &&
+      newRewardUserIdBlock.current !== null &&
+      !newRewardUserIdInput.current?.value
+    ) {
+      setNewUserIdDisabled(true)
+    } else {
+      setNewUserIdDisabled(false)
+    }
 
-    //   // if (sumQuantity >= 100) {
-    //   //   setAddRecepientDisabled(true)
-    //   // } else if (sumQuantity <= 100) {
-    //   //   setAddRecepientDisabled(false)
-    //   // }
-    // }
-    console.log(items)
-    // console.log(newItem)
-    // console.log(itemIndex)
-    console.log(sumQuantity)
-    console.log(itemsRecepientForm)
+    if (
+      +poolNewInput.current?.value > 100 ||
+      +poolNewInput.current?.value <= 0
+    ) {
+      setPoolInputInvalid(true)
+    } else {
+      setPoolInputInvalid(false)
+    }
 
     onDistributed(`${sumQuantity}%`)
   }, [
@@ -141,12 +139,19 @@ export const Rewards: FC<RewardsProps> = (props) => {
     newItem,
     isCondition,
     poolNewInput,
-
-    // defaultCustomPool,
+    userIdDisabled,
+    recepient,
+    revardUserIdInput,
+    newRewardUserIdInput,
+    newRewardUserIdBlock,
   ])
-  // const handleAgeChange = (event) => {
 
-  // }
+  console.log(userIdDisabled)
+  // console.log(itemsRecepientForm.recepientForm.length)
+  console.log(recepient.userID)
+  console.log(newRewardUserIdBlock)
+  console.log(poolNewInput.current?.value)
+
   const onClose = () => setModal(false)
   const onCloseChange = () => setModalChange(false)
 
@@ -157,7 +162,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
 
     const pushForm = Object.assign({}, name, pool, itemsRecepientForm)
 
-    newForm.items.push(pushForm)
+    if (itemsRecepientForm.recepientForm) newForm.items.push(pushForm)
 
     setItems(newForm)
 
@@ -189,6 +194,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
     setSelectedUser(null)
 
     const pushForm = Object.assign({}, recepient)
+    console.log(newForm)
+
     newForm.recepientForm.push(pushForm)
     setItemsRecepient(newForm)
   }
@@ -196,9 +203,9 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const addButtonClickRecepientEdit = (i) => {
     const pushForm = Object.assign({}, recepient)
     console.log(pushForm)
-    pushForm.condition = ''
+    pushForm.condition = null
     pushForm.isActive = false
-    pushForm.userID = ''
+    pushForm.userID = null
 
     const newForm = newItem.newItem[i].recepientForm.push(pushForm)
 
@@ -257,7 +264,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
     // recepient.condition = ''
     // recepient.isActive = false
     // recepient.userID = ''
-    setRecepient({ userID: '', condition: '', isActive: false })
+    setRecepient({ userID: null, condition: null, isActive: false })
 
     setItems(newCustomPoolForm)
   }
@@ -319,42 +326,52 @@ export const Rewards: FC<RewardsProps> = (props) => {
                       <>
                         {item.recepientForm &&
                           item.recepientForm.map((x, i) => (
-                            <div key={i} className={styles.createdRewardsBlock}>
-                              <div className={styles.createdRewardsBlockUser}>
-                                <span
-                                  className={styles.createdRewardsBlockLabel}
-                                >
-                                  User:
-                                </span>
-                                <span
-                                  className={
-                                    styles.createdRewardsBlockLabelUser
-                                  }
-                                >
-                                  {x.userID}
-                                </span>
-                              </div>
-                              {x.condition && typeof x.condition === 'string' && (
-                                <div
-                                  className={
-                                    styles.createdRewardsBlockConditions
-                                  }
-                                >
+                            <>
+                              {/* {x !== null ? ( */}
+                              <div
+                                key={i}
+                                className={styles.createdRewardsBlock}
+                              >
+                                <div className={styles.createdRewardsBlockUser}>
                                   <span
                                     className={styles.createdRewardsBlockLabel}
                                   >
-                                    Conditions :
+                                    User:
                                   </span>
                                   <span
                                     className={
-                                      styles.createdRewardsBlockLabelAdapter
+                                      styles.createdRewardsBlockLabelUser
                                     }
                                   >
-                                    {x.condition}
+                                    {x.userID}
                                   </span>
                                 </div>
-                              )}
-                            </div>
+                                {x.condition &&
+                                  typeof x.condition === 'string' && (
+                                    <div
+                                      className={
+                                        styles.createdRewardsBlockConditions
+                                      }
+                                    >
+                                      <span
+                                        className={
+                                          styles.createdRewardsBlockLabel
+                                        }
+                                      >
+                                        Conditions :
+                                      </span>
+                                      <span
+                                        className={
+                                          styles.createdRewardsBlockLabelAdapter
+                                        }
+                                      >
+                                        {x.condition}
+                                      </span>
+                                    </div>
+                                  )}
+                              </div>
+                              {/* ) : null} */}
+                            </>
                           ))}
                       </>
                     }
@@ -462,8 +479,10 @@ export const Rewards: FC<RewardsProps> = (props) => {
                       <span className={styles.nameLabel}>Recipient</span>
                       <button
                         type="button"
+                        disabled={userIdDisabled}
                         onClick={() => {
                           addButtonClickRecepient()
+                          console.log(revardUserIdInput.current?.value, 'rui')
                         }}
                         className={styles.customPoolButton}
                       />
@@ -475,12 +494,40 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         <div key={i} className={styles.newRewardRecepientBlock}>
                           <div className={styles.recepientInputBlock}>
                             <input
+                              onBlur={() => {
+                                if (
+                                  itemsRecepientForm.recepientForm[i].userID
+                                    .length === 0 ||
+                                  // e.target.value.length === 0 ||
+                                  !revardUserIdInput.current?.value
+                                ) {
+                                  setUserIdDisabled(true)
+                                } else {
+                                  setUserIdDisabled(false)
+                                }
+                              }}
+                              ref={revardUserIdInput}
                               name="userId"
                               className={styles.recepientInput}
                               onChange={(e) => {
                                 handleChangeRecepient(e)
                                 itemsRecepientForm.recepientForm[i].userID =
                                   e.target.value
+                                console.log(
+                                  itemsRecepientForm.recepientForm[i].userID
+                                    .length
+                                )
+                                if (
+                                  itemsRecepientForm.recepientForm[i].userID
+                                    .length === 0 ||
+                                  e.target.value.length === 0 ||
+                                  !revardUserIdInput.current?.value
+                                ) {
+                                  setUserIdDisabled(true)
+                                } else {
+                                  setUserIdDisabled(false)
+                                }
+                                console.log(e.target.value.length)
                               }}
                             />
                             <button
@@ -654,9 +701,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                           e.preventDefault()
                           const newName = e.target.value
                           newItem.newItem[i].name = newName
-                          //   setValue(objArr.map(obj =>
-                          //     obj.id == idToEdit ? {...obj, [prop]: event.target.value} : obj
-                          //  ));
                         }}
                         name="rewardName"
                         className={styles.nameInput}
@@ -678,7 +722,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         defaultValue={newItem.newItem[i].pool}
                         // value={poolNewInput.current?.value}
                         ref={poolNewInput}
-                        // placeholder={newItem.newItem[i].pool}
                         onBlur={() => {
                           if (
                             +newItem.newItem[i].pool <= 0 ||
@@ -686,69 +729,23 @@ export const Rewards: FC<RewardsProps> = (props) => {
                           ) {
                             newItem.newItem[i].pool =
                               items.items[itemIndex].pool
-                            // setPoolInputInvalid(true)
-                            // console.log(poolInputInvalid)
-                            console.log('lalala')
                           } else {
                             newItem.newItem[i].pool = newItem.newItem[i].pool
-                            console.log('lolo')
-
-                            // setPoolInputInvalid(false)
-                            // console.log(poolInputInvalid)
                           }
                         }}
                         // tabIndex={0}
                         onChange={(e: any) => {
-                          // const { data, inputType } = e.nativeEvent
-
-                          // console.log({ data, inputType, e })
-                          // switch (inputType) {
-                          //   case 'insertText':
-                          //     if (isNaN(+data) === false && data !== ' ') {
-                          //       const newValue = items.items[itemIndex].pool
-                          //         ? data
-                          //         : newItem.newItem[i].pool + data
-                          //       if (+newValue > 100) {
-                          //         items.items[itemIndex].pool === '100'
-                          //       } else newItem.newItem[i].pool = newValue
-                          //     }
-                          //     break
-                          //   case 'deleteContentBackward':
-                          //     const newValue = newItem.newItem[i].pool.slice(
-                          //       0,
-                          //       0
-                          //     )
-                          //     if (newValue.length === 0)
-                          //       items.items[itemIndex].pool
-                          //     else newItem.newItem[i].pool = newValue
-                          //     break
-
-                          //   default:
-                          //     break
-                          // }
-
-                          // if(+e.target.value > 100){
-                          //   newItem.newItem[i].pool
-                          // }
-                          // if (isNaN(+e.target.value) === false) {
-                          //   newItem.newItem[i].pool = e.target.value
-                          //   // poolNewInput.current.value = newItem.newItem[i].pool
-                          // }
                           if (+e.target.value <= 0 || +e.target.value > 100) {
-                            newItem.newItem[i].pool =
-                              items.items[itemIndex].pool
                             // setPoolInputInvalid(true)
                             // console.log(poolInputInvalid)
-                            // poolNewInput.current.value =
-                            //   items.items[itemIndex].pool
+
+                            newItem.newItem[i].pool =
+                              items.items[itemIndex].pool
                           } else {
-                            newItem.newItem[i].pool = e.target.value
-                            // setPoolInputInvalid(false)
+                            setPoolInputInvalid(false)
                             // console.log(poolInputInvalid)
+                            newItem.newItem[i].pool = e.target.value
                           }
-                          // console.log(newItem.newItem[i].pool)
-                          // console.log(poolNewInput.current?.value)
-                          // console.log(poolNewInput.current?.value)
 
                           console.log(
                             Number(newItem.newItem[i].pool) +
@@ -764,16 +761,19 @@ export const Rewards: FC<RewardsProps> = (props) => {
                       />
                     </div>
                   </div>
-                  {poolInputInvalid && (
+                  {poolInputInvalid ||
+                  +poolNewInput.current?.value > 100 ||
+                  +poolNewInput.current?.value <= 0 ? (
                     <div className={styles.poolInputInvalidText}>
                       Distributed must not exceed 100% or be negative
                     </div>
-                  )}
+                  ) : null}
                   <div className={styles.rewardRecepientBlock}>
                     <div className={styles.recepientBlock}>
                       <span className={styles.nameLabel}>Recipient</span>
                       <button
                         type="button"
+                        disabled={newUserIdDisabled}
                         onClick={() => {
                           addButtonClickRecepientEdit(i)
                         }}
@@ -786,10 +786,12 @@ export const Rewards: FC<RewardsProps> = (props) => {
                       newItem.newItem[i].recepientForm.map((x, item) => (
                         <div
                           key={item}
+                          ref={newRewardUserIdBlock}
                           className={styles.newRewardRecepientBlock}
                         >
                           <div className={styles.recepientInputBlock}>
                             <input
+                              ref={newRewardUserIdInput}
                               name="userId"
                               className={styles.recepientInput}
                               defaultValue={
@@ -898,7 +900,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                   onClick={(e) => {
                     // addItemEdit(e, itemIndex)
                     items.items[itemIndex] = newItem.newItem[i]
-
+                    // itemsRecepientForm.recepientForm = []
                     // console.log(
                     //   sumQuantity - Number(items.items[itemIndex].pool)
                     // )

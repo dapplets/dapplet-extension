@@ -38,6 +38,7 @@ export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
             className={cn(styles.input)}
             type="checkbox"
             onChange={onChange}
+            checked={isCheckbox}
             {...anotherProps}
           />
           <span
