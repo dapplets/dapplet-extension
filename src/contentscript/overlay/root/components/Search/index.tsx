@@ -30,15 +30,22 @@ export const Search = (props: SearchProps): ReactElement => {
   return (
     <div
       className={cn(styles.wrapper, className)}
-      onBlur={() => {
-        onCloseSearch()
-      }}
+      // onBlur={() => {
+      //   onCloseSearch()
+      // }}
     >
       <div className={styles.searchIcon}>
         <SearchIcon onClick={() => onCloseSearch()} />
       </div>
-      <label className={styles.label}>
+      <label
+        className={styles.label}
+        //  style={{ background: 'red' }}
+        // onBlur={() => {
+        //   onCloseSearch()
+        // }}
+      >
         <input
+          // style={{ background: 'green' }}
           autoFocus
           type="text"
           className={styles.input}
@@ -46,8 +53,15 @@ export const Search = (props: SearchProps): ReactElement => {
           onChange={onChange}
           {...otherProps}
         />
+        <MiniIcon
+          className={styles.close}
+          onClick={() => {
+            onClearValue()
+            console.log('lolo')
+          }}
+          // style={{ background: 'black' }}
+        />
       </label>
-      <MiniIcon className={styles.close} onClick={onClearValue} />
     </div>
   )
 }

@@ -239,6 +239,8 @@ class _App extends React.Component<P, S> {
     })
   }
   onCloseSearch = () => {
+    console.log('lala')
+
     this.setState({
       isOpenSearch: false,
       search: '',
@@ -246,7 +248,9 @@ class _App extends React.Component<P, S> {
   }
 
   _searchChangeHandler(value: string) {
+    // setTimeout(() => {
     this.setState({ search: value })
+    // }, 500)
   }
   _searchChangeHandlerDelete() {
     this.setState({ search: '' })
@@ -326,8 +330,11 @@ class _App extends React.Component<P, S> {
                   <div className={styles.searchBlock} tabIndex={1}>
                     <Search
                       value={s.search}
-                      onChange={(e) =>
-                        this._searchChangeHandler(e.target.value)
+                      onChange={
+                        (e) =>
+                          // setTimeout(() => {
+                          this._searchChangeHandler(e.target.value)
+                        // }, 500)
                       }
                       // onClick={() => this._searchChangeHandler('')}
                       onClearValue={() => this._searchChangeHandler('')}
@@ -339,6 +346,7 @@ class _App extends React.Component<P, S> {
             </header>
 
             <div
+              onClick={() => this.onCloseSearch()}
               className={cn(
                 styles.children,
                 'dapplets-overlay-nav-content-list'
