@@ -41,6 +41,7 @@ export interface OverlayTabProps
   source?: string
   dap?: any
   idActiveTab?: string
+  setActiveSystemTabs?: (x) => void
 }
 let _isMounted = false
 export const OverlayTab = (props: OverlayTabProps): ReactElement => {
@@ -60,12 +61,14 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
     source,
     dap,
     idActiveTab,
+    setActiveSystemTabs,
     ...anotherProps
   } = props
 
   const [imgActiveTab, setImgActiveTab] = useState<StorageRef>(null)
   const navigate = useNavigate()
   const [devMode, setMode] = useState(false)
+  const [isStylesNotActive, setStylesNotActive] = useState(false)
   const location = useLocation()
 
   // const [toggleSystemMenu, setToggleSystemMenu] = useState(true)
@@ -76,6 +79,17 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
     if (dapplet) {
       setImgActiveTab(dapplet.icon)
     }
+    if (
+      // location.pathname.includes(idActiveTab) ||
+      location.pathname.includes(id)
+    ) {
+      setActiveSystemTabs(true)
+      // setStylesNotActive(true)
+      // console.log(location.pathname.includes(idActiveTab), 'idActiveTab')
+      // console.log(location.pathname.includes(id), 'id')
+    } else {
+      setActiveSystemTabs(false)
+    }
     // await loadDevMode()
     // setToggleSystemMenu(!showMenu)
     // }
@@ -84,8 +98,10 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
     return () => {
       _isMounted = false
     }
-  }, [imgActiveTab])
+  }, [imgActiveTab, idActiveTab, location.pathname, id])
   // console.log(toggleSystemMenu)
+  // console.log(idActiveTab, 'idActiveTab')
+  // console.log(location.pathname.includes(idActiveTab), 'locat')
 
   const loadDevMode = async () => {
     // setSvgLoaderDevMode(true)
@@ -108,21 +124,17 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
   return (
     <div
       className={cn(styles.tab, className, {
-        [styles.tabNotActive]: !activeTab,
+        [styles.tabNotActive]:
+          location.pathname !== `/tab/${id}` && id !== 'system',
       })}
       {...anotherProps}
+      // onClick={() => console.log(id)}
     >
       {id !== 'system' ? (
         <div className={styles.top}>
           <StorageRefImage
             onClick={() => {
-              console.log(location, 'l')
-
-              console.log(id, 'id')
-              console.log(idActiveTab, 'at')
-
               navigate(`/tab/${id}`)
-              console.log(navigate(`/tab/${id}`))
             }}
             className={cn(styles.image, { [styles.cursor]: !activeTab })}
             storageRef={imgActiveTab}
@@ -140,10 +152,9 @@ export const OverlayTab = (props: OverlayTabProps): ReactElement => {
       ) : (
         <div
           onClick={() => {
-            console.log(location, 'l')
-
-            console.log(id, 'id')
-            console.log(idActiveTab, 'at')
+            // console.log(location, 'l')
+            // console.log(id, 'id')
+            // console.log(idActiveTab, 'at')s
           }}
           className={cn(styles.image, { [styles.cursor]: !activeTab })}
         ></div>

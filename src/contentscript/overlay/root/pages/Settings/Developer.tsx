@@ -95,7 +95,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       _isMounted = false
     }
   }, [isUpdate])
-  console.log(isUpdate)
+  // console.log(isUpdate)
 
   const loadSwarmGateway = async () => {
     const { getSwarmGateway } = await initBGFunctions(browser)

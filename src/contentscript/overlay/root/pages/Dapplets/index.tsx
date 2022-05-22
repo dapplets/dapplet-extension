@@ -63,12 +63,12 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       setDapplets(d)
       setLoadingListDapplets(false)
       const features = await _getFilteredDapplets(d)
-      console.log(features, 'feat')
+      // console.log(features, 'feat')
 
       setDapplets(features)
 
       const sortedDapplets = await _getSortedDapplets(features)
-      console.log(sortedDapplets, 'dap')
+      // console.log(sortedDapplets, 'dap')
 
       setDapplets(sortedDapplets)
       await loadTrustedUsers()

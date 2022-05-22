@@ -142,7 +142,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       await loadPopupInOverlay()
     }
     init()
-    console.log(targetStorages)
+    // console.log(targetStorages)
 
     return () => {
       _isMounted = false
@@ -265,7 +265,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setDynamicAdapterLoading(false)
       setDynamicAdapterInputEdited(false)
       setDynamicAdapterInputError(error.message)
-      console.log(error.message)
+      // console.log(error.message)
     }
   }
 
@@ -684,7 +684,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       }
                       title="SIA"
                       onChange={(e) => {
-                        console.log('change')
+                        // console.log('change')
                         changeTargetStorage(StorageTypes.Sia, e.target.checked)
                       }}
                     />
@@ -711,7 +711,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       }
                       // checked={isPopup}
                       onChange={(e) => {
-                        console.log('change')
+                        // console.log('change')
 
                         changeTargetStorage(
                           StorageTypes.Swarm,

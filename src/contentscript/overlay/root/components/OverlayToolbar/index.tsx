@@ -92,6 +92,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
 
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
+  const [isActiveSystemTabs, setActiveSystemTabs] = useState(false)
 
   useEffect(() => {
     _isMounted = true
@@ -106,6 +107,9 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
       // console.log(location.pathname)
     }
     init()
+    // console.log(isActiveSystemTabs, 'iast')
+    // console.log(location.pathname, 'lp')
+    // console.log(isSystemDapplets, 'isD')
 
     if (!activeOverlay) return
     const noSystem = !activeOverlay.uri.includes('/popup.html#')
@@ -118,8 +122,12 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
     nodeOverlayToolbar,
     isNodeOverlayToolbar,
     nameActiveTab,
-    // location.pathname,
+    idActiveTab,
+    isActiveSystemTabs,
+    location.pathname,
   ])
+  // console.log(location.pathname.includes(idActiveTab), 'locat')
+
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
       nodeOverlayToolbar.current.value = ''
@@ -161,11 +169,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
           className="toggleOverlay"
         />
 
-        <div
-          className={cn(styles.tabs, {
-            [styles.noActive]: location.pathname.indexOf('/tab/') !== -1,
-          })}
-        >
+        <div className={cn(styles.tabs, {})}>
           <OverlayTab
             id="system"
             dap={allDapplet}
@@ -173,11 +177,17 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
             menu={menu}
             nameSelectedMenu={nameSelectedMenu}
             activeTab={true}
+            idActiveTab={idActiveTab}
             onSelectedMenu={onSelectedMenu}
             onClick={handlerSelectedTab('system')}
-            className={cn({ [styles.active]: true })}
+            className={cn({
+              [styles.active]: true,
+              [styles.noActive]:
+                isActiveSystemTabs && location.pathname !== '/',
+            })}
             notification={false}
             title="System"
+            setActiveSystemTabs={setActiveSystemTabs}
           />
 
           <div className={styles.TabList}>
@@ -204,6 +214,7 @@ export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
                     className={cn({ [styles.active]: active })}
                     notification={false}
                     title={title}
+                    setActiveSystemTabs={setActiveSystemTabs}
                   />
                 )
               })}

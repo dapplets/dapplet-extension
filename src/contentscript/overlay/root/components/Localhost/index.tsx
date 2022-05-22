@@ -48,13 +48,13 @@ export const Localhost: FC<LocalhostProps> = (props) => {
             onClickButtonLocalhost()
             if (e && !isEnabled && !error) {
               nodeBtn.current.classList.add(styles.disabledLoad)
-              console.log(nodeBtn)
+              // console.log(nodeBtn)
             } else if (e && isEnabled && error) {
               nodeBtn.current.classList.add(styles.errorLoad)
-              console.log(nodeBtn)
+              // console.log(nodeBtn)
             } else if (e && isEnabled && !error) {
               nodeBtn.current.classList.add(styles.enabledLoad)
-              console.log(nodeBtn)
+              // console.log(nodeBtn)
             }
 
             // console.log(e)

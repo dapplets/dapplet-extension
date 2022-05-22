@@ -130,9 +130,9 @@ class _App extends React.Component<P, S> {
     super(props)
     props.overlayManager.onActiveOverlayChanged = (activeOverlayId: string) => {
       this.setState({ activeOverlayId })
-      console.log(activeOverlayId)
+      // console.log(activeOverlayId)
       ;(this.props as any).navigate('/tab/' + activeOverlayId)
-      console.log(this.props.overlayManager)
+      // console.log(this.props.overlayManager)
     }
   }
 

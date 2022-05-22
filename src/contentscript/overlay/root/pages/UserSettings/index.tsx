@@ -93,7 +93,7 @@ export const UserSettings = (props: UserSettingsProps): ReactElement => {
       _isMounted = false
     }
   }, [])
-  console.log(mi)
+  // console.log(mi)
 
   const _refreshData = async () => {
     const { getAllUserSettings } = await initBGFunctions(browser)

@@ -340,7 +340,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
               {m.versions && m.versions[0] && m.versions[0].version ? (
                 <div
                   className={styles.dappletsVersion}
-                  onClick={() => console.log(m)}
+                  // onClick={() => console.log(m)}
                 >
                   {m.versions[0].version}
                 </div>

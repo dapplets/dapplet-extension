@@ -15,6 +15,7 @@ import { Message } from '../../components/Message'
 import { Modal } from '../../components/Modal'
 import { ModalReward } from '../../components/ModalReward'
 import './rewards.scss'
+import { ItemContent } from 'semantic-ui-react'
 
 export interface RewardsProps {
   setUnderConstructionDetails: (x) => void
@@ -77,6 +78,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const [itemIndex, setItemInex] = useState(0)
 
   const [newItem, setNewItem] = useState({ newItem: [] })
+  const [oldItem, setOldItem] = useState({ oldItem: [] })
   const [inputValueCustomPool, setDefaultValueCustomPool] = useState('')
   // const [defaultCustomPool, setDefaultCustomPool] = useState(
   //   `${inputValueCustomPool} Auge`
@@ -98,6 +100,9 @@ export const Rewards: FC<RewardsProps> = (props) => {
         setAddRecepientDisabled(false)
       }
     }
+    console.log(items)
+    console.log(newItem)
+    console.log(itemIndex)
 
     onDistributed(`${sumQuantity}%`)
   }, [
@@ -109,6 +114,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
     itemsRecepientForm,
     name,
     itemIndex,
+    isModalChange,
     newItem,
     // defaultCustomPool,
   ])
@@ -118,18 +124,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const onClose = () => setModal(false)
   const onCloseChange = () => setModalChange(false)
 
-  // const addButtonClickHandler = () => {
-  //   const newCustomPoolForm = Object.assign({}, newCustomPool)
-  //   newCustomPool.customPoolForm.push(newCustomPoolObject)
-  //   setCustomPool(newCustomPoolForm)
-  // }
-
-  // const onDeleteChild = (id: number) => {
-  //   const newCustomPoolForm = Object.assign({}, newCustomPool)
-  //   newCustomPoolForm.customPoolForm.splice(id, 1)
-  //   setCustomPool(newCustomPoolForm)
-  // }
-
   const addItem = (event) => {
     event.preventDefault()
 
@@ -138,6 +132,20 @@ export const Rewards: FC<RewardsProps> = (props) => {
     const pushForm = Object.assign({}, name, pool, itemsRecepientForm)
 
     newForm.items.push(pushForm)
+
+    setItems(newForm)
+
+    itemsRecepientForm.recepientForm = []
+  }
+
+  const addItemEdit = (event, id) => {
+    event.preventDefault()
+
+    const newForm = Object.assign({}, items.items[id])
+
+    const pushForm = Object.assign({}, newItem.newItem[id])
+
+    newForm.push(pushForm)
 
     setItems(newForm)
 
@@ -158,9 +166,28 @@ export const Rewards: FC<RewardsProps> = (props) => {
     newForm.recepientForm.push(pushForm)
     setItemsRecepient(newForm)
   }
+
+  const addButtonClickRecepientEdit = (i) => {
+    const pushForm = Object.assign({}, recepient)
+    console.log(pushForm)
+    pushForm.condition = ''
+    pushForm.isActive = false
+    pushForm.userID = ''
+
+    const newForm = newItem.newItem[i].recepientForm.push(pushForm)
+
+    setItemsRecepient(newForm)
+
+    console.log(pushForm)
+  }
+
   const onDeleteChildRecepient = (id: number) => {
     const newForm = Object.assign({}, itemsRecepientForm)
     newForm.recepientForm.splice(id, 1)
+    setItemsRecepient(newForm)
+  }
+  const onDeleteChildRecepientEdit = (i: number, id: number) => {
+    const newForm = newItem.newItem[i].recepientForm.splice(id, 1)
     setItemsRecepient(newForm)
   }
 
@@ -169,11 +196,28 @@ export const Rewards: FC<RewardsProps> = (props) => {
     newForm.recepientForm[id].isActive = true
     setItemsRecepient(newForm)
   }
+
+  const addButtonClickConditionalEdit = (id: number, i?: number) => {
+    const newForm = newItem.newItem[id].recepientForm
+    newForm[i].isActive = true
+    console.log(newForm, 'tr')
+
+    setItemsRecepient(newForm)
+  }
+
   const onDeleteChildConditional = (id: number) => {
     const newForm = Object.assign({}, itemsRecepientForm)
     newForm.recepientForm[id].isActive = false
     setItemsRecepient(newForm)
   }
+
+  const onDeleteChildConditionalEdit = (id: number, i?: number) => {
+    const newForm = newItem.newItem[id].recepientForm
+    newForm[i].isActive = false
+    console.log(newForm, 'fl')
+    setItemsRecepient(newForm)
+  }
+
   const handleChangeRecepient = (event) => {
     setRecepient({ ...recepient, userID: event.target.value })
   }
@@ -182,9 +226,12 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const onDeleteChildItems = (id: number) => {
     const newCustomPoolForm = Object.assign({}, items)
     newCustomPoolForm.items.splice(id, 1)
-    setName({ name: '' })
-    setPool({ pool: '20' })
-    setRecepient({ userID: '', condition: '', isActive: false })
+    // setName({ name: '' })
+    // setPool({ pool: '20' })
+    // recepient.condition = ''
+    // recepient.isActive = false
+    // recepient.userID = ''
+    // setRecepient({ userID: '', condition: '', isActive: false })
 
     setItems(newCustomPoolForm)
   }
@@ -327,11 +374,13 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     className={styles.percentReward}
                   >{`Reward ${item.pool}%`}</span>
                   <button
-                    // onClick={() => {
-                    //   setItemInex(index)
-                    //   setNewItem({ newItem: [item] })
-                    //   setModalChange(true)
-                    // }}
+                    onClick={() => {
+                      setItemInex(index)
+                      const newItemForm = Object.assign({}, item)
+                      setNewItem({ newItem: [newItemForm] })
+                      setModalChange(true)
+                      // setOldItem({ oldItem: [item] })
+                    }}
                     className={styles.changeReward}
                   >
                     Edit
@@ -396,25 +445,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                             : setPool({ pool: pool.pool })
                         }}
                         onChange={(e) => {
-                          // const { data, inputType } = e.nativeEvent
-
-                          // switch (inputType) {
-                          //   case 'insertText':
-                          //     if (isNaN(+data) === false && data !== ' ') {
-                          //       const newValue =
-                          //         pool.pool === '0' ? data : pool.pool + data
-                          //       if (+newValue > 100) setPool({ pool: '100' })
-                          //       else setPool({ pool: newValue })
-                          //     }
-                          //     break
-                          //   case 'deleteContentBackward':
-                          //     const newValue = pool.pool.slice(0, -2)
-
-                          //     setPool({ pool: newValue })
-                          //     break
-
-                          //   default:
-                          //     break
                           if (isNaN(+e.target.value) === false) {
                             setPool({ pool: e.target.value })
                           }
@@ -590,15 +620,17 @@ export const Rewards: FC<RewardsProps> = (props) => {
           Back
         </button>
       </div>
-      <Modal
-        visible={isModalChange}
-        title={''}
-        content={
-          <>
-            {newItem &&
-              newItem.newItem &&
-              newItem.newItem.length !== 0 &&
-              newItem.newItem.map((x, i) => (
+
+      <>
+        {newItem &&
+          newItem.newItem &&
+          newItem.newItem.length !== 0 &&
+          newItem.newItem.map((x, i) => (
+            <ModalReward
+              key={i}
+              visible={isModalChange}
+              title={'Reward edit'}
+              content={
                 <form
                   onClick={(e) => {
                     e.preventDefault()
@@ -606,7 +638,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                   onChange={(e) => {
                     e.preventDefault()
                   }}
-                  key={i}
                   className={styles.creationWrapper}
                 >
                   <div className={styles.creationFirstBlock}>
@@ -618,21 +649,196 @@ export const Rewards: FC<RewardsProps> = (props) => {
                           e.preventDefault()
                           const newName = e.target.value
                           newItem.newItem[i].name = newName
+                          //   setValue(objArr.map(obj =>
+                          //     obj.id == idToEdit ? {...obj, [prop]: event.target.value} : obj
+                          //  ));
                         }}
                         name="rewardName"
                         className={styles.nameInput}
                       />
                     </div>
+                    <div className={styles.rewardPoolBlock}>
+                      <span className={styles.nameLabel}>Pool</span>
+                      <input
+                        name="pool"
+                        defaultValue={newItem.newItem[i].pool}
+                        onBlur={() => {
+                          newItem.newItem[i].pool.length <= 0
+                            ? (newItem.newItem[i].pool = '20')
+                            : newItem.newItem[i].pool
+                        }}
+                        onChange={(e) => {
+                          if (isNaN(+e.target.value) === false) {
+                            newItem.newItem[i].pool = e.target.value
+                          }
+                          if (e.target.value === '0') {
+                            newItem.newItem[i].pool = '20'
+                          }
+                          if (
+                            +newItem.newItem[i].pool + Number(sumQuantity) >
+                            100
+                          ) {
+                            setPoolInputInvalid(true)
+                          } else if (
+                            +newItem.newItem[i].pool + Number(sumQuantity) <=
+                            100
+                          ) {
+                            setPoolInputInvalid(false)
+                          }
+                          // }
+                        }}
+                        className={cn(styles.poolInput, {
+                          [styles.poolInputInvalid]: poolInputInvalid,
+                        })}
+                      />
+                    </div>
+                  </div>
+                  {poolInputInvalid ||
+                    (newItem.newItem[i].pool + sumQuantity > 100 && (
+                      <div className={styles.poolInputInvalidText}>
+                        Distributed must not exceed 100%
+                      </div>
+                    ))}
+                  <div className={styles.rewardRecepientBlock}>
+                    <div className={styles.recepientBlock}>
+                      <span className={styles.nameLabel}>Recipient</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          addButtonClickRecepientEdit(i)
+                        }}
+                        className={styles.customPoolButton}
+                      />
+                    </div>
+                    {newItem.newItem[i] &&
+                      newItem.newItem[i].recepientForm &&
+                      newItem.newItem[i].recepientForm.length !== 0 &&
+                      newItem.newItem[i].recepientForm.map((x, item) => (
+                        <div
+                          key={item}
+                          className={styles.newRewardRecepientBlock}
+                        >
+                          <div className={styles.recepientInputBlock}>
+                            <input
+                              name="userId"
+                              className={styles.recepientInput}
+                              defaultValue={
+                                newItem.newItem[i].recepientForm[item].userID
+                              }
+                              onChange={(e) => {
+                                handleChangeRecepient(e)
+                                newItem.newItem[i].recepientForm[item].userID =
+                                  e.target.value
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                onDeleteChildRecepientEdit(i, item)
+                              }
+                              className={styles.recepientInputButton}
+                            />
+                          </div>
+
+                          <div className={styles.recepientConditionalBlock}>
+                            {newItem.newItem[i].recepientForm[item].isActive ===
+                              false && (
+                              <div className={styles.recepientChangeBlock}>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    addButtonClickConditionalEdit(i, item)
+                                  }}
+                                  className={styles.recepientConditionalButton}
+                                />
+                                <span
+                                  className={styles.recepientConditionalLabel}
+                                >
+                                  conditional
+                                </span>
+                              </div>
+                            )}
+
+                            {newItem.newItem[i].recepientForm[item].isActive ===
+                              true && (
+                              <div
+                                // key={item}
+                                className={cn(styles.conditionalWrapper, {})}
+                              >
+                                <span className={styles.conditionalLabel}>
+                                  condition: if this dapplet has dependency to
+                                </span>
+                                <div className={styles.conditionalInputBlock}>
+                                  <input
+                                    name="condition"
+                                    defaultValue={
+                                      newItem.newItem[i].recepientForm[item]
+                                        .condition
+                                    }
+                                    className={styles.inputConditional}
+                                    onChange={(e) => {
+                                      newItem.newItem[i].recepientForm[
+                                        item
+                                      ].condition = e.target.value
+                                    }}
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      newItem.newItem[i].recepientForm[
+                                        item
+                                      ].condition = null
+                                      onDeleteChildConditionalEdit(i, item)
+                                    }}
+                                    className={styles.inputConditionalDelete}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                   </div>
                 </form>
-              ))}
-          </>
-        }
-        footer={''}
-        onClose={() => {
-          setModalChange(false)
-        }}
-      />
+              }
+              footer={
+                <button
+                  disabled={
+                    !(
+                      newItem.newItem[i].name &&
+                      newItem.newItem[i].name.length >= 1 &&
+                      newItem.newItem[i].pool &&
+                      newItem.newItem[i].pool.length >= 1 &&
+                      Number(newItem.newItem[i].pool + sumQuantity) <= 100 &&
+                      newItem.newItem[i].recepientForm[i].userID &&
+                      newItem.newItem[i].recepientForm[i].userID.length >= 1
+                    )
+                  }
+                  onClick={(e) => {
+                    // addItemEdit(e, itemIndex)
+                    items.items[itemIndex] = newItem.newItem[i]
+                    console.log(items)
+
+                    // onCloseChange()
+                  }}
+                  className={cn(styles.applyButtonDisabled, {
+                    [styles.applyButton]:
+                      newItem.newItem[i].name &&
+                      newItem.newItem[i].name.length >= 1 &&
+                      newItem.newItem[i].pool &&
+                      newItem.newItem[i].pool.length >= 1 &&
+                      Number(newItem.newItem[i].pool + sumQuantity) <= 100 &&
+                      newItem.newItem[i].recepientForm[i].userID &&
+                      newItem.newItem[i].recepientForm[i].userID.length >= 1,
+                  })}
+                >
+                  Edit
+                </button>
+              }
+              onClose={() => onCloseChange()}
+            />
+          ))}
+      </>
     </div>
   )
 }
