@@ -892,6 +892,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         //     sumQuantity -
                         //     items.items[itemIndex].pool
                         // ) <= 100 &&
+                        poolInputInvalid &&
                         newItem.newItem[i].recepientForm
                       )
                       // newItem.newItem[i].recepientForm.lendth >= 1
