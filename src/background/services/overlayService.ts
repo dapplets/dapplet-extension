@@ -60,13 +60,15 @@ export class OverlayService {
             tabId = currentTab.id;
         }
 
+        const hasLoginRequest = type === "OPEN_SYSTEM_OVERLAY" && !!payload.loginRequest;
+
         const response = await browser.tabs.sendMessage(tabId, {
             type,
-            payload: (type === "OPEN_SYSTEM_OVERLAY" && payload.loginRequest) ? ({ payload, activeTab }) : payload,
+            payload: hasLoginRequest ? ({ payload, activeTab }) : payload,
         });
 
         // ToDo: use native throw in error
-        if (response && response.error) throw new Error(response.error);
-        return response && response.result;
+        if (response && response[0]) throw new Error(response[0]);
+        return response && response[1];
     }
 }
