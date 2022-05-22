@@ -105,8 +105,10 @@ export const Rewards: FC<RewardsProps> = (props) => {
     }
     if (+pool.pool + Number(sumQuantity) > 100) {
       setPoolInputInvalid(true)
+      console.log(+pool.pool + Number(sumQuantity))
     } else if (+pool.pool + Number(sumQuantity) <= 100) {
       setPoolInputInvalid(false)
+      console.log(+pool.pool + Number(sumQuantity))
     }
 
     if (
@@ -463,11 +465,11 @@ export const Rewards: FC<RewardsProps> = (props) => {
                       />
                     </div>
                   </div>
-                  {poolInputInvalid && (
+                  {poolInputInvalid || +pool.pool > 100 || +pool.pool <= 0 ? (
                     <div className={styles.poolInputInvalidText}>
                       Distributed must not exceed 100%
                     </div>
-                  )}
+                  ) : null}
                   <div className={styles.rewardRecepientBlock}>
                     <div className={styles.recepientBlock}>
                       <span className={styles.nameLabel}>Recipient</span>
