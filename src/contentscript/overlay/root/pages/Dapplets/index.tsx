@@ -37,7 +37,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
   const [error, setError] = useState<string>(null)
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
-  const [devMessage, setDevMessage] = useState<string>(null)
+  // const [devMessage, setDevMessage] = useState<string>(null)npm
   const [loadShowButton, setLoadShowButton] = useState(false)
   const [contextId, setContextIds] = useState<string[]>([])
 

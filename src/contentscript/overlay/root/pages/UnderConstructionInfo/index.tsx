@@ -139,7 +139,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     return () => {
       _isMounted = false
     }
-  }, [mi, st, targetChain])
+  }, [mi, st, targetChain, autorDisabled, author, editContextId])
   const addButtonClickHandler = () => {
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.push(newAuthorObject)
@@ -321,7 +321,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   }
   const visibleNameFile = (hash: string): string => {
     const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 5)
+    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 6)
 
     return `${firstFourCharacters}...${lastFourCharacters}`
   }
