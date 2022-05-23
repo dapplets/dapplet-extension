@@ -427,7 +427,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                       />
                     </div>
                     <div className={styles.rewardPoolBlock}>
-                      <span className={styles.nameLabel}>Pool</span>
+                      <span className={styles.nameLabel}>% of Pool</span>
                       <input
                         name="pool"
                         value={pool.pool}
@@ -717,7 +717,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         console.log(itemIndex)
                       }}
                     >
-                      <span className={styles.nameLabel}>Pool</span>
+                      <span className={styles.nameLabel}>% of Pool</span>
                       <input
                         name="pool"
                         type="number"
