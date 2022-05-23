@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
@@ -62,15 +62,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
       setDapplets(d)
       setLoadingListDapplets(false)
-      const features = await _getFilteredDapplets(d)
-      // console.log(features, 'feat')
 
-      setDapplets(features)
-
-      const sortedDapplets = await _getSortedDapplets(features)
-      // console.log(sortedDapplets, 'dap')
-
-      setDapplets(sortedDapplets)
       await loadTrustedUsers()
     }
 
@@ -85,7 +77,10 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     return () => {
       _isMounted = false
     }
-  }, [search, dropdownListValue])
+  }, [
+    // search
+    dropdownListValue,
+  ])
   // console.log(dropdownListValue)
 
   const _refreshDataByContext = async (contextIds: Promise<string[]>) => {
@@ -192,7 +187,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
   }
 
-  const _getFilteredDapplets = async (dapplets) => {
+  const _getFilteredDapplets = (dapplets) => {
     if (!search || search.length === 0) return dapplets
 
     const find = (a: string) =>
@@ -336,7 +331,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   }
   // setDapplets(features)
 
-  const _getSortedDapplets = async (dapplets) => {
+  const _getSortedDapplets = (dapplets) => {
     if (dropdownListValue === 'All') return dapplets
 
     if (dropdownListValue === 'Extension') {
@@ -361,7 +356,12 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       })
     }
   }
-  // console.log(dapplets)
+
+  // const filteredDapplets = _getSortedDapplets(_getFilteredDapplets(dapplets))
+  const filteredDapplets = useMemo(() => {
+    console.log('fd')
+    return _getSortedDapplets(_getFilteredDapplets(dapplets))
+  }, [search, dapplets])
 
   return (
     <>
@@ -384,8 +384,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       ) : (
         <div className={styles.dappletsBlock}>
           {!isNoContentScript ? (
-            dapplets.length > 0 ? (
-              dapplets.map((dapplet) => {
+            filteredDapplets.length > 0 ? (
+              filteredDapplets.map((dapplet) => {
                 if (dapplet.type !== 'FEATURE') {
                   return
                 } else
