@@ -30,6 +30,7 @@
         "https://*/*"
       ],
       "js": [
+        "custom-elements.min.js",
         "common.js",
       	"contentscript.js"
       ],

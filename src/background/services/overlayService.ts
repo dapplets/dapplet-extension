@@ -17,12 +17,12 @@ export class OverlayService {
         return this._openOverlay("OPEN_SYSTEM_OVERLAY", { app, loginRequest}, tabId, SystemOverlayTabs.LOGIN_SESSION); 
     }
 
-    public loginViaOverlay(app: string | DefaultSigners, loginRequest: LoginRequest, tabId: number): Promise<void> {
-        return this._openOverlay("OPEN_SYSTEM_OVERLAY", { app, loginRequest}, tabId, SystemOverlayTabs.LOGIN_SESSION );
+    public loginViaOverlay(payload: any, tabId: number): Promise<void> {
+        return this._openOverlay("OPEN_SYSTEM_OVERLAY", payload, tabId, SystemOverlayTabs.LOGIN_SESSION );
     }
 
-    public selectWalletViaOverlay(app: string | DefaultSigners, loginRequest: LoginRequest, tabId: number): Promise<void> {
-        return this._openOverlay("OPEN_SYSTEM_OVERLAY", { app, loginRequest}, tabId, SystemOverlayTabs.LOGIN_SESSION);
+    public selectWalletViaOverlay(payload: any, tabId: number): Promise<void> {
+        return this._openOverlay("OPEN_SYSTEM_OVERLAY", payload, tabId, SystemOverlayTabs.LOGIN_SESSION);
     }
 
     public openLoginSessionOverlay(app: string | DefaultSigners, loginRequest: LoginRequest, tabId: number): Promise<{ wallet: WalletTypes, chain: ChainTypes, confirmationId?: string }> {
@@ -60,13 +60,15 @@ export class OverlayService {
             tabId = currentTab.id;
         }
 
-        const [error, result] = await browser.tabs.sendMessage(tabId, {
+        const hasLoginRequest = type === "OPEN_SYSTEM_OVERLAY" && !!payload.loginRequest;
+
+        const response = await browser.tabs.sendMessage(tabId, {
             type,
-            payload: type === "OPEN_SYSTEM_OVERLAY" ? { payload, activeTab } : payload
+            payload: hasLoginRequest ? ({ payload, activeTab }) : payload,
         });
 
         // ToDo: use native throw in error
-        if (error) throw new Error(error);
-        return result;
+        if (response && response[0]) throw new Error(response[0]);
+        return response && response[1];
     }
 }

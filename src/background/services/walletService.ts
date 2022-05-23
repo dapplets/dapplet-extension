@@ -156,12 +156,14 @@ export class WalletService {
         const defaults = await this._getWalletFor(app);
         const defaultWallet = defaults[chain];
 
+        const payload = { app, loginRequest: request || { authMethods: [chain], secureLogin: 'disabled' } };
+
         if (!defaultWallet) {
             // is login required?
             if (cfg && cfg.username && cfg.domainId) {
-                return this._overlayService.loginViaOverlay(app, request, tabId);
+                return this._overlayService.loginViaOverlay(payload, tabId);
             } else {
-                return this._overlayService.selectWalletViaOverlay(app, request, tabId);
+                return this._overlayService.selectWalletViaOverlay(payload, tabId);
             }
         }
 
@@ -171,9 +173,9 @@ export class WalletService {
         if (!suitableWallet || !suitableWallet.connected) {
             // is login required?
             if (cfg && cfg.username && cfg.domainId) {
-                return this._overlayService.loginViaOverlay(app, request, tabId);
+                return this._overlayService.loginViaOverlay(payload, tabId);
             } else {
-                return this._overlayService.selectWalletViaOverlay(app, request, tabId);
+                return this._overlayService.selectWalletViaOverlay(payload, tabId);
             }
         }
     }
