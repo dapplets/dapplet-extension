@@ -30,14 +30,14 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             })}
         >
             <div className={styles.top}>
-                {typeof p.icon === "function" ? (
+                {p.icon && typeof p.icon === "function" ? (
                     <p.icon
                         onClick={p.onTabClick}
                         className={cn(styles.image, {
                             [styles.cursor]: !p.isActive,
                         })}
                     />
-                ) : (typeof p.icon === 'object' && 'moduleName' in p.icon) ? (
+                ) : (p.icon && typeof p.icon === 'object' && 'moduleName' in p.icon) ? (
                     <ModuleIcon
                         onClick={p.onTabClick}
                         className={cn(styles.image, {
@@ -52,7 +52,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                         className={cn(styles.image, {
                             [styles.cursor]: !p.isActive,
                         })}
-                        storageRef={p.icon}
+                        storageRef={p.icon as any}
                     />
                 )}
                 {!p.pinned && (
@@ -73,12 +73,12 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                                         p.activeTabMenuId === menu.id,
                                 })}
                             >
-                                {typeof menu.icon === "function" ? (
+                                {menu.icon && typeof menu.icon === "function" ? (
                                     <menu.icon />
-                                ) : (typeof menu.icon === 'object' && 'moduleName' in menu.icon) ? (
+                                ) : (menu.icon && typeof menu.icon === 'object' && 'moduleName' in menu.icon) ? (
                                     <ModuleIcon moduleName={menu.icon.moduleName} registryUrl={menu.icon.registryUrl} />
                                 ) : (
-                                    <StorageRefImage storageRef={menu.icon} />
+                                    <StorageRefImage storageRef={menu.icon as any} />
                                 )}
                             </li>
                         );

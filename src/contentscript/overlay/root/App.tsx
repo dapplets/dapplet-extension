@@ -113,7 +113,7 @@ class _App extends React.Component<P, S> {
             overlay: Overlay
         ) => {
             const route = overlay
-                ? `/${overlay.source}/${overlay.id}`
+                ? `/${(overlay.source) ? overlay.source : overlay.id}/${overlay.id}`
                 : "/system/dapplets";
             this.props.navigate!(route);
         };
@@ -136,39 +136,52 @@ class _App extends React.Component<P, S> {
 
         for (const source in overlayGroups) {
             const group = overlayGroups[source];
-            const tab: ToolbarTab = {
-                id: source,
-                icon: {
-                    moduleName: group[0]?.module?.name,
-                    registryUrl: group[0]?.module?.registryUrl
-                },
-                pinned: false,
-                title: "",
-                menus: (source !== 'null') ? [
-                    ...group.map((x) => ({
-                        id: x.id,
-                        title: x.title,
-                        icon: Home,
-                    })),
-                    {
-                        id: "settings",
-                        icon: Settings,
-                        title: "User Settings",
-                        props: {
-                            moduleName: group[0]?.module?.name,
-                            registryUrl: group[0]?.module?.registryUrl
-                        }
+
+            // system legacy tab
+            if (source === 'null') {
+                for (const overlay of group) {
+                    const tab: ToolbarTab = {
+                        id: overlay.id,
+                        icon: null,
+                        pinned: false,
+                        title: overlay.title,
+                        menus: [{
+                            id: overlay.id,
+                            icon: null,
+                            title: overlay.title,
+                            hidden: true
+                        }],
+                    };
+                    tabs.push(tab);
+                }
+            } else {
+                const tab: ToolbarTab = {
+                    id: source,
+                    icon: {
+                        moduleName: group[0]?.module?.name,
+                        registryUrl: group[0]?.module?.registryUrl
                     },
-                ] : [
-                    ...group.map((x) => ({
-                        id: x.id,
-                        title: x.title,
-                        icon: Home,
-                        hidden: true
-                    }))
-                ],
-            };
-            tabs.push(tab);
+                    pinned: false,
+                    title: "",
+                    menus: [
+                        ...group.map((x) => ({
+                            id: x.id,
+                            title: x.title,
+                            icon: Home,
+                        })),
+                        {
+                            id: "settings",
+                            icon: Settings,
+                            title: "User Settings",
+                            props: {
+                                moduleName: group[0]?.module?.name,
+                                registryUrl: group[0]?.module?.registryUrl
+                            }
+                        },
+                    ],
+                };
+                tabs.push(tab);
+            }            
         }
 
         tabs.push(...this.state.internalTabs);
@@ -361,7 +374,7 @@ class _App extends React.Component<P, S> {
                                 <ContentItem
                                     overlay={x}
                                     isActive={
-                                        pathname === `/${x.source}/${x.id}`
+                                        pathname === `/${(x.source) ? x.source : x.id}/${x.id}`
                                     }
                                     overlayManager={p.overlayManager}
                                     key={x.id}
