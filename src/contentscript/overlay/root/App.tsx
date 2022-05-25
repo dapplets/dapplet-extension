@@ -8,13 +8,7 @@ import { OverlayManager } from './overlayManager'
 import { OverlayToolbar } from './components/OverlayToolbar'
 import cn from 'classnames'
 import { ReactNode } from 'react'
-import {
-  Profile,
-  ProfileImg,
-  ProfileLabel,
-  ProfileOneImg,
-  ProfileText,
-} from './components/Profile'
+import { Profile } from './components/Profile'
 import { SquaredButton } from './components/SquaredButton'
 import { Icon } from './components/Icon'
 import { ReactComponent as StoreIcon } from './assets/svg/store.svg'
@@ -188,15 +182,10 @@ export class App extends React.Component<P, S> {
                   style={{ flexDirection: 'column', alignItems: 'flex-start' }}
                 >
                   <Profile
-                    // avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
+                    avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
                     hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
                   />
-                  <ProfileImg />
-                  <ProfileText hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa" />
-                  <ProfileOneImg
-                  //  hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
-                  />
-                  <ProfileLabel />
+
                   {/* <div className={styles.balance}>
                     <Icon icon={EthereumIcon} size="big" />
                     <p className={styles.amount}>25.1054</p>
