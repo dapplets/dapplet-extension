@@ -1,11 +1,18 @@
 import { generateGuid } from '../../../common/helpers';
-import { IOverlay } from '../interfaces';
+import { IOverlay, OverlayConfig, OverlaySourceModule } from '../interfaces';
 import { OverlayManager } from './overlayManager';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
 import { browser } from "webextension-polyfill-ts";
 import { UrlAvailability } from '../../../common/types';
 
 export class Overlay implements IOverlay {
+    public url: string
+    public title: string
+    public source: string = null
+    public hidden: boolean = false
+    public parent: IOverlay = null
+    public module: OverlaySourceModule = null
+
     public _queue: any[] = [];
     public _isFrameLoaded: boolean = false;
     private _msgCount: number = 0;
@@ -20,12 +27,14 @@ export class Overlay implements IOverlay {
 
     constructor(
         private _manager: OverlayManager,
-        public uri: string,
-        public title: string,
-        public source: string = null,
-        public hidden: boolean = false,
-        public parent: Overlay = null
+        config: OverlayConfig
     ) {
+        this.url = config.url;
+        this.title = config.title;
+        this.source = config.source ?? null;
+        this.hidden = config.hidden ?? false;
+        this.parent = config.parent ?? null;
+        this.module = config.module ?? null;
 
         // // disable cache
         // const url = new URL(uri);
@@ -38,7 +47,7 @@ export class Overlay implements IOverlay {
         // this.frame.sandbox.add('allow-scripts'); // to use js frameworks in overlays
         // this.frame.sandbox.add('allow-forms'); // ToDo: rjsf uses forms in settings overlay. disallow it
         // this.frame.sandbox.add('allow-popups'); // ToDo: links depend on it. disallow it.
-        this.frame.src = uri;
+        this.frame.src = this.url;
         this.frame.allowFullscreen = true;
         this.frame.addEventListener('load', () => {
             // this.loader?.remove();
@@ -158,7 +167,7 @@ export class Overlay implements IOverlay {
 
     public async checkAvailability() {
         const { checkUrlAvailability } = await initBGFunctions(browser);
-        const availability: UrlAvailability = await checkUrlAvailability(this.uri);
+        const availability: UrlAvailability = await checkUrlAvailability(this.url);
 
         if (availability === UrlAvailability.AVAILABLE) {
             this.isError = false;

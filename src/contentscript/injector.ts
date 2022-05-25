@@ -241,6 +241,7 @@ export class Injector {
                 connect: core.connect.bind(core),
                 overlay: (cfg, eventDef) => {
                     cfg.source = manifest.name;
+                    cfg.module = { name: manifest.name, registryUrl: manifest.registryUrl };
                     if (cfg.name) {
                         const overlay = manifest.overlays?.[cfg.name];
                         if (!overlay) throw new Error(`Cannot find overlay with name "${cfg.name}" in the manifest.`);

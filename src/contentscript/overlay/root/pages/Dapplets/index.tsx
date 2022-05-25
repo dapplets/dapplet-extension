@@ -3,8 +3,6 @@ import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import styles from './Dapplets.module.scss'
-import * as EventBus from '../../../../../common/global-event-bus'
-import { checkUrlAvailability, groupBy } from '../../../../../common/helpers'
 import { Dapplet } from '../../components/Dapplet'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
 import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
@@ -15,7 +13,6 @@ import {
   ModuleTypes,
   DAPPLETS_STORE_URL,
 } from '../../../../../common/constants'
-import { xhrCallback } from '@sentry/tracing/types/browser/request'
 
 export type Module = ManifestDTO & {
   isLoading: boolean
@@ -24,14 +21,13 @@ export type Module = ManifestDTO & {
 }
 export interface DappletsProps {
   search: string
-  userSettings?: any
-  _getNewUserSettings?: (x) => void
+  onUserSettingsClick: (mi: ManifestDTO) => void;
 }
 
 let _isMounted = false
 
 export const Dapplets: FC<DappletsProps> = (props) => {
-  const { search, userSettings, _getNewUserSettings } = props
+  const { search, onUserSettingsClick } = props
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
   const [isLoading, setLoading] = useState<boolean>(null)
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
@@ -285,13 +281,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     _updateFeatureState(name, { isLoading: false })
   }
 
-  const onOpenSettingsModule = async (mi: ManifestDTO) => {
-    const { openSettingsOverlay } = await initBGFunctions(browser)
-    await openSettingsOverlay(mi)
-
-    // window.close()
-  }
-
   const onRemoveMyDapplet = async (f: ManifestAndDetails) => {
     const { removeMyDapplet } = await initBGFunctions(browser)
     await removeMyDapplet(f.sourceRegistry.url, f.name)
@@ -398,11 +387,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                         website: 'dapplets.com',
                         users: [],
                       }}
-                      _getNewUserSettings={_getNewUserSettings}
-                      userSettings={userSettings}
                       loadShowButton={loadShowButton}
                       onSwitchChange={onSwitchChange}
-                      onSettingsModule={onOpenSettingsModule}
+                      onSettingsModule={onUserSettingsClick}
                       onOpenDappletAction={onOpenDappletAction}
                       onRemoveMyDapplet={
                         dapplet.isMyDapplet ? onRemoveMyDapplet : undefined

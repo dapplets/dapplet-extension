@@ -88,8 +88,8 @@ if (!IS_OVERLAY_IFRAME) {
 
         jsonrpc.on('CURRENT_CONTEXT_IDS', getAllContextIds);
 
-        jsonrpc.on('OVERLAY_CREATE', (id: string, uri: string, title: string, source: string, hidden: boolean, sourceWindow: any) => {
-            const overlay = overlayManager.createOverlay(uri, title, source, hidden);
+        jsonrpc.on('OVERLAY_CREATE', (id: string, url: string, title: string, source: string, hidden: boolean, sourceWindow: any) => {
+            const overlay = overlayManager.createOverlay({ url, title, source, hidden });
             overlay.onregisteredchange = (v) => jsonrpc.call('OVERLAY_REGISTERED_CHANGE', [id, v], sourceWindow);
             overlay.onMessage((topic, message) => jsonrpc.call('OVERLAY_EXEC', [id, topic, message], sourceWindow));
             overlayMap.set(id, overlay);

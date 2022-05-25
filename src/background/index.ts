@@ -155,6 +155,7 @@ browser.runtime.onMessage.addListener(
     getResource: (hashUris) => featureService.getResource(hashUris),
     openDeployOverlayById:
       featureService.openDeployOverlayById.bind(featureService),
+    getUserSettingsForOverlay: featureService.getUserSettingsForOverlay.bind(featureService),
 
     // GlobalConfigService
     getProfiles: globalConfigService.getProfiles.bind(globalConfigService),

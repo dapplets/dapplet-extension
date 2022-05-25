@@ -144,9 +144,12 @@ export default class Core {
       const pairingUrl = browser.runtime.getURL('pairing.html')
       let overlay = me.overlayManager
         .getOverlays()
-        .find((x) => x.uri === pairingUrl)
+        .find((x) => x.url === pairingUrl)
       if (!overlay)
-        overlay = me.overlayManager.createOverlay(pairingUrl, 'Wallet')
+        overlay = me.overlayManager.createOverlay({
+          url: pairingUrl, 
+          title: 'Wallet'
+        })
 
       overlay.open()
 
@@ -175,7 +178,10 @@ export default class Core {
     return new Promise<void>((resolve, reject) => {
       const url = browser.runtime.getURL('login.html')
       //let overlay = this.overlayManager.getOverlays().find(x => x.uri === pairingUrl);
-      const overlay = me.overlayManager.createOverlay(url, 'Login')
+      const overlay = me.overlayManager.createOverlay({
+        url, 
+        title: 'Login'
+      })
 
       overlay.open()
 
@@ -204,7 +210,10 @@ export default class Core {
     const me = this
     return new Promise<void>((resolve, reject) => {
       const pairingUrl = browser.runtime.getURL('deploy.html')
-      const overlay = me.overlayManager.createOverlay(pairingUrl, 'Deploy')
+      const overlay = me.overlayManager.createOverlay({
+        url: pairingUrl, 
+        title: 'Deploy'
+      })
       overlay.open(() => overlay.send('data', [payload]))
 
       // ToDo: add overlay.onclose
@@ -227,10 +236,10 @@ export default class Core {
     const me = this
     return new Promise<void>((resolve, reject) => {
       const pairingUrl = browser.runtime.getURL('settings.html')
-      const overlay = me.overlayManager.createOverlay(
-        pairingUrl,
-        'User Settings'
-      )
+      const overlay = me.overlayManager.createOverlay({
+        url: pairingUrl,
+        title: 'User Settings'
+      })
       overlay.open(() => overlay.send('data', [payload]))
 
       // ToDo: add overlay.onclose
@@ -251,10 +260,10 @@ export default class Core {
 
   public async waitGuideOverlay(payload: any): Promise<void> {
     const pairingUrl = browser.runtime.getURL('guide.html')
-    const overlay = this.overlayManager.createOverlay(
-      pairingUrl,
-      'Upgrade Guide'
-    )
+    const overlay = this.overlayManager.createOverlay({
+      url: pairingUrl,
+      title: 'Upgrade Guide'
+    })
     overlay.open(() => overlay.send('data', [payload]))
   }
 
@@ -288,13 +297,13 @@ export default class Core {
         : null
       const overlay =
         popupOverlay ??
-        this.overlayManager.createOverlay(
-          pairingUrl,
-          'System',
-          null,
-          null,
-          parentOverlay
-        )
+        this.overlayManager.createOverlay({
+          url: pairingUrl,
+          title: 'System',
+          source: null,
+          hidden: null,
+          parent: parentOverlay
+        })
 
       overlay.open(() => overlay.send('data', [frameRequestId, data]))
       overlay.onMessage((topic, data) => {
@@ -318,12 +327,12 @@ export default class Core {
   public toggleOverlay() {
     if (!this._popupOverlay?.registered) {
       const pairingUrl = browser.runtime.getURL('popup.html')
-      this._popupOverlay = this.overlayManager.createOverlay(
-        pairingUrl,
-        'Dapplets',
-        null,
-        true
-      )
+      this._popupOverlay = this.overlayManager.createOverlay({
+        url: pairingUrl,
+        title: 'Dapplets',
+        source: null,
+        hidden: true
+      })
       this._popupOverlay.open()
     } else {
       this.overlayManager.toggle()
@@ -347,7 +356,10 @@ export default class Core {
 
     return new Promise<void>((resolve, reject) => {
       const pairingUrl = browser.runtime.getURL('sowa.html')
-      const overlay = me.overlayManager.createOverlay(pairingUrl, 'SOWA')
+      const overlay = me.overlayManager.createOverlay({
+        url: pairingUrl, 
+        title: 'SOWA'
+      })
       // ToDo: implement multiframe
       overlay.open(() => overlay.send('txmeta', [sowaId, metadata]))
       // ToDo: add timeout?
@@ -539,26 +551,27 @@ export default class Core {
   }
 
   public overlay<T>(
-    cfg: { name: string; url?: string; title: string; source?: string },
+    cfg: { name: string; url?: string; title: string; source?: string, module?: any },
     eventDef?: EventDef<any>
   ): OverlayConnection<any>
   public overlay<T>(
-    cfg: { name: string; url?: string; title: string; source?: string },
+    cfg: { name: string; url?: string; title: string; source?: string, module?: any },
     eventDef?: EventDef<any>
   ): OverlayConnection<T>
   public overlay<T>(
-    cfg: { name?: string; url: string; title: string; source?: string },
+    cfg: { name?: string; url: string; title: string; source?: string, module?: any },
     eventDef?: EventDef<any>
   ): OverlayConnection<T>
   public overlay<T>(
-    cfg: { name: string; url: string; title: string; source?: string },
+    cfg: { name: string; url: string; title: string; source?: string, module?: any },
     eventDef?: EventDef<any>
   ): OverlayConnection<T | any> {
-    const _overlay = this.overlayManager.createOverlay(
-      cfg.url,
-      cfg.title,
-      cfg.source
-    )
+    const _overlay = this.overlayManager.createOverlay({
+        url: cfg.url,
+        title: cfg.title,
+        source: cfg.source,
+        module: cfg.module
+    })
     const conn = new Connection<T>(_overlay, eventDef)
     let overridedConn: OverlayConnection<T>
     const overrides = {

@@ -1,8 +1,9 @@
 import * as React from 'react'
-import { Overlay } from './overlay'
+import { Overlay } from '../../overlay'
 import cn from 'classnames'
-import { OverlayManager } from './overlayManager'
-import { PopupItem } from './PopupItem'
+import { OverlayManager } from '../../overlayManager'
+import { PopupItem } from '../../PopupItem'
+import styles from './ContentItem.module.scss'
 
 const OVERLAY_LOADING_TIMEOUT = 5000
 
@@ -19,6 +20,7 @@ interface P {
   overlay: Overlay
   isActive: boolean
   overlayManager: OverlayManager
+  // className: string
 }
 
 interface S {
@@ -66,7 +68,7 @@ export class ContentItem extends React.Component<P, S> {
       clearTimeout(timeoutId)
       overlay.frame.remove()
 
-      const { protocol, hostname } = new URL(overlay.uri)
+      const { protocol, hostname } = new URL(overlay.url)
       if (
         protocol === 'https:' &&
         (hostname === 'localhost' || hostname === '127.0.0.1')
@@ -91,7 +93,7 @@ export class ContentItem extends React.Component<P, S> {
 
   openOverlayInTab() {
     const overlay = this.props.overlay
-    window.open(overlay.uri, '_blank')
+    window.open(overlay.url, '_blank')
   }
 
   render() {
@@ -106,9 +108,12 @@ export class ContentItem extends React.Component<P, S> {
     return (
       <div
         // style={{ display: 'none' }}
-        className={cn('dapplets-overlay-nav-content-item', {
-          'dapplets-overlay-nav-content-item-active': p.isActive,
-        })}
+        className={cn(
+          styles.contentItem, 
+          {
+            [styles.contentItemActive]: p.isActive,
+          }
+        )}
       >
         {s.loadingMode === LoadingMode.Loading && (
           <div className="loader-container">
@@ -192,7 +197,7 @@ export class ContentItem extends React.Component<P, S> {
           </div>
         )}
 
-        <div className="frame-container" ref={this.ref}></div>
+        <div className={styles.frameContainer} ref={this.ref}></div>
 
         {childrenOverlays.map((x) => (
           <PopupItem key={x.id} overlay={x} />

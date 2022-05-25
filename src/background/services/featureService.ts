@@ -1013,6 +1013,32 @@ export default class FeatureService {
     )
   }
 
+  public async getUserSettingsForOverlay(registryUrl: string, moduleName: string) {
+    const mi = await this.getModuleInfoByName(registryUrl, moduleName);
+    const versions = await this.getVersions(registryUrl, moduleName);
+    const version = versions.sort(rcompare)[0] // Last version by SemVer
+    const vi = await this._moduleManager.registryAggregator.getVersionInfo(
+      mi.name,
+      DEFAULT_BRANCH_NAME,
+      version
+    )
+    const dist = await this._moduleManager.loadModule(vi)
+    const configRegistries = await this._globalConfigService.getRegistries()
+    
+    return {
+      mi: { 
+        ...mi, 
+        sourceRegistry: {
+          url: registryUrl,
+          isDev: configRegistries.find((r) => r.url === registryUrl).isDev,
+        }
+      },
+      vi,
+      schemaConfig: dist.schemaConfig,
+      defaultConfig: dist.defaultConfig
+    }
+  }
+
   public async getResource(hashUris: StorageRef) {
     const arr = await this._storageAggregator.getResource(hashUris)
     const base64 = base64ArrayBuffer(arr)

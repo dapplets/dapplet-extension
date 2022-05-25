@@ -24,7 +24,7 @@ enum DeploymentStatus {
   NewModule,
 }
 interface PropsStorageRefImage {
-  storageRef: StorageRef
+  storageRef: StorageRef | string
   className?: string
   onClick?: (x) => void
   title?: string
@@ -53,25 +53,31 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
     _isMounted = true
 
     const init = async () => {
-      const { hash, uris } = storageRef
-
-      if (!hash && uris.length > 0 && uris[0].indexOf('data:') === 0) {
-        setDataUri(uris[0])
+      if (!storageRef) return;
+      
+      if (typeof storageRef === 'string') {
+        setDataUri(storageRef)
       } else {
-        const { getResource } = await initBGFunctions(browser)
+        const { hash, uris } = storageRef
 
-        if (
-          storageRef.hash !==
-            '0x0000000000000000000000000000000000000000000000000000000000000000' ||
-          storageRef.uris.length !== 0
-        ) {
-          const base64 = await getResource(storageRef)
-          const dataUri = 'data:text/plain;base64,' + base64
-          setDataUri(dataUri)
+        if (!hash && uris.length > 0 && uris[0].indexOf('data:') === 0) {
+          setDataUri(uris[0])
         } else {
-          setDataUri(null)
-        }
+          const { getResource } = await initBGFunctions(browser)
+
+          if (
+            storageRef.hash !==
+              '0x0000000000000000000000000000000000000000000000000000000000000000' ||
+            storageRef.uris.length !== 0
+          ) {
+            const base64 = await getResource(storageRef)
+            const dataUri = 'data:text/plain;base64,' + base64
+            setDataUri(dataUri)
+          } else {
+            setDataUri(null)
+          }
       }
+    } 
     }
     init()
     return () => {

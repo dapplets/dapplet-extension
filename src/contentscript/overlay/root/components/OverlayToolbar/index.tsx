@@ -1,226 +1,134 @@
 import React, {
-  DetailedHTMLProps,
-  HTMLAttributes,
-  ReactElement,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
-import styles from './OverlayToolbar.module.scss'
-import { OverlayTab } from '../OverlayTab'
-import cn from 'classnames'
-import { ReactComponent as Coolicon } from '../../assets/svg/coolicon.svg'
-import { ITab } from '../../types/tab'
-import { IMenu } from '../../models/menu.model'
-import { Overlay } from '../../overlay'
-import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
-import { loadJsonFile } from 'near-api-js/lib/key_stores/unencrypted_file_system_keystore'
-import { useNavigate } from 'react-router-dom'
+    DetailedHTMLProps,
+    HTMLAttributes,
+    ReactElement,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
+import styles from "./OverlayToolbar.module.scss";
+import { OverlayTab } from "../OverlayTab";
+import cn from "classnames";
+import { ReactComponent as Coolicon } from "../../assets/svg/coolicon.svg";
+import { ITab } from "../../types/tab";
+import { IMenu } from "../../models/menu.model";
+import { Overlay } from "../../overlay";
+import { ManifestAndDetails } from "../../../../../popup/components/dapplet";
+import { initBGFunctions } from "chrome-extension-message-wrapper";
+import { browser } from "webextension-polyfill-ts";
+import { loadJsonFile } from "near-api-js/lib/key_stores/unencrypted_file_system_keystore";
+import { useNavigate } from "react-router-dom";
+import { ToolbarTab, ToolbarTabMenu } from "../../types";
+
 // TODO: change element hiding from Margin to transform
-export interface OverlayToolbarProps
-  extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
-  tabs: ITab[]
-  menu: IMenu[]
-  nameSelectedMenu?: string
-  activeOverlay: Overlay
-  idActiveTab: string
-  isDevMode: boolean
-  isSystemDapplets: boolean
-  toggle: () => void
-  onOverlayTab: () => void
-  onSelectedMenu: (selected: string) => void
-  onRemoveTab: (id: string) => void
-  onSelectedTab: (id: string) => void
-  menuActiveTabs?: IMenu[]
-  nameActiveTab?: string
-  onSelectedActiveMenu?: (selected: string) => void
+export interface OverlayToolbarProps {
+    tabs: ToolbarTab[];
+    className: string;
+    activeTabId: string;
+    activeTabMenuId: string;
+
+    onTabClick: (tab: ToolbarTab) => void;
+    onCloseClick: (tab: ToolbarTab) => void;
+    onMenuClick: (tab: ToolbarTab, menu: ToolbarTabMenu) => void;
+    onToggleClick: () => void;
+
+    // tabs: ITab[];
+    // menu: IMenu[];
+    // nameSelectedMenu?: string;
+    // activeOverlay: Overlay;
+    // idActiveTab: string;
+    // isDevMode: boolean;
+    // isSystemDapplets: boolean;
+    // onOverlayTab: () => void;
+    // onSelectedMenu: (selected: string) => void;
+    // onRemoveTab: (id: string) => void;
+    // onSelectedTab: (id: string) => void;
+    // menuActiveTabs?: IMenu[];
+    // nameActiveTab?: string;
+    // onSelectedActiveMenu?: (selected: string) => void;
 }
 
-type TToggleOverlay = Pick<OverlayToolbarProps, 'toggle'> & {
-  className?: string
-  getNode?: () => void
-}
+type TToggleOverlay = {
+    onClick: () => void;
+    className?: string;
+    getNode?: () => void;
+};
 
 const ToggleOverlay = ({
-  toggle,
-  className,
-  getNode,
-}: TToggleOverlay): ReactElement => {
-  return (
-    <button
-      className={cn(styles.toggleOverlay, className)}
-      onClick={() => {
-        toggle()
-        getNode()
-      }}
-    >
-      <Coolicon />
-    </button>
-  )
-}
-let _isMounted = false
-export const OverlayToolbar = (props: OverlayToolbarProps): ReactElement => {
-  const {
-    tabs,
-    nameSelectedMenu,
-    idActiveTab,
+    onClick,
     className,
-    isDevMode,
-    isSystemDapplets,
-    activeOverlay,
-    menu,
-    toggle,
-    onSelectedMenu,
-    onOverlayTab,
-    onSelectedTab,
-    onRemoveTab,
-    menuActiveTabs,
-    nameActiveTab,
-    onSelectedActiveMenu,
-    ...anotherProps
-  } = props
+    getNode,
+}: TToggleOverlay): ReactElement => {
+    return (
+        <button
+            className={cn(styles.toggleOverlay, className)}
+            onClick={() => {
+                onClick();
+                getNode();
+            }}
+        >
+            <Coolicon />
+        </button>
+    );
+};
 
-  const [allDapplet, setAllDapplet] = useState<ManifestAndDetails[]>([])
+export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
-  const handlerSelectedTab = (id: string) => (): void => onSelectedTab(id)
-  const handlerRemoveTab = (id: string) => (): void => onRemoveTab(id)
+    const nodeOverlayToolbar = useRef<HTMLInputElement>();
+    const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false);
 
-  const nonSystemTabs = tabs //.filter((x) => !x.uri.includes('/popup.html#'))
+    const handleClickGetNodeOverlayToolbar = () => {
+        if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
+            nodeOverlayToolbar.current.value = "";
 
-  const nodeOverlayToolbar = useRef<HTMLInputElement>()
-  const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
-  const [isActiveSystemTabs, setActiveSystemTabs] = useState(false)
+            const element = nodeOverlayToolbar.current.getBoundingClientRect();
 
-  useEffect(() => {
-    _isMounted = true
-    const init = async () => {
-      const { getFeaturesByHostnames, getCurrentContextIds, getThisTab } =
-        await initBGFunctions(browser)
-      const currentTab = await getThisTab()
-      const ids = await getCurrentContextIds(currentTab)
-      const d = await getFeaturesByHostnames(ids)
-      setAllDapplet(d)
-      // console.log(location.pathname.includes('/tab', 0))
-      // console.log(location.pathname)
-    }
-    init()
-    // console.log(isActiveSystemTabs, 'iast')
-    // console.log(location.pathname, 'lp')
-    // console.log(isSystemDapplets, 'isD')
+            const x = element.x;
 
-    if (!activeOverlay) return
-    const noSystem = !activeOverlay.uri.includes('/popup.html#')
-    if (noSystem) onOverlayTab()
-    return () => {
-      _isMounted = false
-    }
-  }, [
-    activeOverlay,
-    nodeOverlayToolbar,
-    isNodeOverlayToolbar,
-    nameActiveTab,
-    idActiveTab,
-    isActiveSystemTabs,
-    location.pathname,
-  ])
-  // console.log(location.pathname.includes(idActiveTab), 'locat')
+            if (x > 10 && x < 100) {
+                setNodeOverlayToolbar(true);
+            } else {
+                setNodeOverlayToolbar(false);
+            }
+        }
+    };
 
-  const handleClickGetNodeOverlayToolbar = () => {
-    if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
-      nodeOverlayToolbar.current.value = ''
+    return (
+        <div
+            ref={nodeOverlayToolbar}
+            className={cn(
+                styles.overlayToolbar,
+                {
+                    [styles.mobileToolbar]: isNodeOverlayToolbar,
+                },
+                p.className
+            )}
+        >
+            <div className={styles.inner}>
+                <ToggleOverlay
+                    getNode={handleClickGetNodeOverlayToolbar}
+                    onClick={p.onToggleClick}
+                    className="toggleOverlay"
+                />
 
-      const element = nodeOverlayToolbar.current.getBoundingClientRect()
-
-      const x = element.x
-
-      if (x > 10 && x < 100) {
-        setNodeOverlayToolbar(true)
-      } else {
-        setNodeOverlayToolbar(false)
-      }
-    }
-  }
-  const nodeButtonMemo = useMemo(() => {}, [
-    nodeOverlayToolbar,
-    isNodeOverlayToolbar,
-  ])
-  // console.log(nameActiveTab)
-  // console.log(idActiveTab)
-
-  return (
-    <div
-      ref={nodeOverlayToolbar}
-      className={cn(
-        styles.overlayToolbar,
-        {
-          [styles.mobileToolbar]: isNodeOverlayToolbar,
-        },
-        className
-      )}
-      {...anotherProps}
-    >
-      <div className={styles.inner}>
-        <ToggleOverlay
-          getNode={handleClickGetNodeOverlayToolbar}
-          toggle={toggle}
-          className="toggleOverlay"
-        />
-
-        <div className={cn(styles.tabs, {})}>
-          <OverlayTab
-            id="system"
-            dap={allDapplet}
-            source={nonSystemTabs[0]?.source}
-            menu={menu}
-            nameSelectedMenu={nameSelectedMenu}
-            activeTab={true}
-            idActiveTab={idActiveTab}
-            onSelectedMenu={onSelectedMenu}
-            onClick={handlerSelectedTab('system')}
-            className={cn({
-              [styles.active]: true,
-              [styles.noActive]:
-                isActiveSystemTabs && location.pathname !== '/',
-            })}
-            notification={false}
-            title="System"
-            setActiveSystemTabs={setActiveSystemTabs}
-          />
-
-          <div className={styles.TabList}>
-            {nonSystemTabs.length > 0 &&
-              nonSystemTabs.map(({ id, title, source }) => {
-                const active = id === idActiveTab
-
-                return (
-                  <OverlayTab
-                    id={id}
-                    dap={allDapplet}
-                    source={source}
-                    menu={[]}
-                    key={id}
-                    idActiveTab={idActiveTab}
-                    nameSelectedMenu={nameSelectedMenu}
-                    activeTab={active}
-                    isSystemDapplets={isSystemDapplets}
-                    // nameActiveTab={nameActiveTab}
-                    // onSelectedActiveMenu={onSelectedActiveMenu}
-                    onSelectedMenu={onSelectedMenu}
-                    removeTab={handlerRemoveTab(id)}
-                    onClick={handlerSelectedTab(id)}
-                    className={cn({ [styles.active]: active })}
-                    notification={false}
-                    title={title}
-                    setActiveSystemTabs={setActiveSystemTabs}
-                  />
-                )
-              })}
-          </div>
+                <div className={cn(styles.tabs, {})}>
+                    <div className={styles.TabList}>
+                        {p.tabs.length > 0 &&
+                            p.tabs.map((tab) => (
+                                <OverlayTab
+                                    key={tab.id}
+                                    {...tab}
+                                    isActive={p.activeTabId === tab.id}
+                                    activeTabMenuId={p.activeTabMenuId}
+                                    onCloseClick={() => p.onCloseClick(tab)}
+                                    onMenuClick={(menu) => p.onMenuClick(tab, menu)}
+                                    onTabClick={() => p.onTabClick(tab)}
+                                />
+                            ))}
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  )
-}
+    );
+};
