@@ -7,83 +7,68 @@ import VersionInfo from "../models/versionInfo";
 
 export class OverlayService {
 
-    public async openDeployOverlay(mi: ModuleInfo, vi: VersionInfo) {
-        return await this._openLegacyOverlay("OPEN_DEPLOY_OVERLAY", { mi, vi });
+    public openDeployOverlay(mi: ModuleInfo, vi: VersionInfo) {
+        return this._openOverlay("OPEN_DEPLOY_OVERLAY", { mi, vi });
     }
 
-    public async pairWalletViaOverlay(chains: ChainTypes | ChainTypes[] | null): Promise<void> {
-        const arr = !chains ? [] : Array.isArray(chains) ? chains : [chains];
-        return await this._openLegacyOverlay("OPEN_PAIRING_OVERLAY", { topic: 'pair', args: [arr] });
+    public pairWalletViaOverlay(chains: ChainTypes | ChainTypes[] | null, app: string | DefaultSigners, tabId: number): Promise<void> {
+        const arr = !chains ? [ChainTypes.ETHEREUM_GOERLI, ChainTypes.NEAR_MAINNET, ChainTypes.NEAR_TESTNET] : Array.isArray(chains) ? chains : [chains];
+        const loginRequest = { authMethods: arr, secureLogin: 'disabled' };
+        return this._openOverlay("OPEN_SYSTEM_OVERLAY", { app, loginRequest}, tabId, SystemOverlayTabs.LOGIN_SESSION); 
     }
 
-    public async loginViaOverlay(app: string | DefaultSigners, chain: ChainTypes, cfg?: { username: string, domainId: number, fullname?: string, img?: string }): Promise<void> {
-        return await this._openLegacyOverlay("OPEN_LOGIN_OVERLAY", { topic: 'login', args: [app, chain, cfg] });
+    public loginViaOverlay(payload: any, tabId: number): Promise<void> {
+        return this._openOverlay("OPEN_SYSTEM_OVERLAY", payload, tabId, SystemOverlayTabs.LOGIN_SESSION );
     }
 
-    public async selectWalletViaOverlay(app: string | DefaultSigners, chain: ChainTypes): Promise<void> {
-        return await this._openLegacyOverlay("OPEN_LOGIN_OVERLAY", { topic: 'login', args: [app, chain] });
+    public selectWalletViaOverlay(payload: any, tabId: number): Promise<void> {
+        return this._openOverlay("OPEN_SYSTEM_OVERLAY", payload, tabId, SystemOverlayTabs.LOGIN_SESSION);
     }
 
-    public async openLoginSessionOverlay(app: string | DefaultSigners, loginRequest: LoginRequest, tabId: number): Promise<{ wallet: WalletTypes, chain: ChainTypes, confirmationId?: string }> {
-        return await this._openSystemOverlay(SystemOverlayTabs.LOGIN_SESSION, { app, loginRequest }, tabId);
+    public openLoginSessionOverlay(app: string | DefaultSigners, loginRequest: LoginRequest, tabId: number): Promise<{ wallet: WalletTypes, chain: ChainTypes, confirmationId?: string }> {
+        return this._openOverlay("OPEN_SYSTEM_OVERLAY", { app, loginRequest}, tabId, SystemOverlayTabs.LOGIN_SESSION);
     }
 
-    public async openPopupOverlay(path: string) {
-        return await this._openLegacyOverlay('OPEN_POPUP_OVERLAY', { path });
+    public openPopupOverlay(path: string) {
+        return this._openOverlay('OPEN_POPUP_OVERLAY', { path });
     }
 
-    public async openDappletHome(moduleName: string, tabId: number) {
-        return await this._openLegacyOverlay('OPEN_DAPPLET_HOME', { moduleName }, tabId);
+    public openDappletHome(moduleName: string, tabId: number) {
+        return this._openOverlay('OPEN_DAPPLET_HOME', { moduleName }, tabId);
     }
 
-    public async openDappletAction(moduleName: string, tabId: number) {
-        return await this._openLegacyOverlay('OPEN_DAPPLET_ACTION', { moduleName }, tabId);
+    public openDappletAction(moduleName: string, tabId: number) {
+        return this._openOverlay('OPEN_DAPPLET_ACTION', { moduleName }, tabId);
     }
 
-    public async openSettingsOverlay(mi: ManifestDTO, vi: VersionInfo, schemaConfig: any, defaultConfig: DefaultConfig) {
-        return await this._openLegacyOverlay('OPEN_SETTINGS_OVERLAY', { mi, vi, schemaConfig, defaultConfig });
+    public openSettingsOverlay(mi: ManifestDTO, vi: VersionInfo, schemaConfig: any, defaultConfig: DefaultConfig) {
+        return this._openOverlay('OPEN_SETTINGS_OVERLAY', { mi, vi, schemaConfig, defaultConfig });
     }
 
-    public async openGuideOverlay(): Promise<void> {
-        return await this._openLegacyOverlay('OPEN_GUIDE_OVERLAY', { topic: 'pair', args: [] });
+    public openGuideOverlay(): Promise<void> {
+        return this._openOverlay('OPEN_GUIDE_OVERLAY', { topic: 'pair', args: [] });
     }
 
-    public async sendDataToPairingOverlay(topic: string, args: any[]) {
-        return await this._openLegacyOverlay('OPEN_PAIRING_OVERLAY', { topic, args });
+    public sendDataToPairingOverlay(topic: string, args: any[]) {
+        return this._openOverlay('OPEN_PAIRING_OVERLAY', { topic, args });
     }
 
-    private async _openLegacyOverlay(type: string, payload: any, tabId?: number) {
-        if (tabId === undefined) {
-            const activeTab = await getCurrentTab();
-            if (!activeTab) return;
-            tabId = activeTab.id;
+    private async _openOverlay(type: string, payload: any, tabId: number = null, activeTab?: SystemOverlayTabs) {
+        if (tabId === null) {
+            const currentTab = await getCurrentTab();
+            if (!currentTab) return;
+            tabId = currentTab.id;
         }
 
-        const response = await browser.tabs.sendMessage(tabId, { type, payload });
+        const hasLoginRequest = type === "OPEN_SYSTEM_OVERLAY" && !!payload.loginRequest;
 
-        if (response) {
-            const [error, result] = response;
-
-            // ToDo: use native throw in error
-            if (error) throw new Error(error);
-            return result;
-        }
-    }
-
-    private async _openSystemOverlay(activeTab: SystemOverlayTabs, payload: any, targetTabId: number = null) {
-        if (targetTabId === null) {
-            const tab = await getCurrentTab();
-            if (!tab) return;
-            targetTabId = tab.id;
-        }
-
-        const [error, result] = await browser.tabs.sendMessage(targetTabId, {
-            type: "OPEN_SYSTEM_OVERLAY",
-            payload: { activeTab, payload }
+        const response = await browser.tabs.sendMessage(tabId, {
+            type,
+            payload: hasLoginRequest ? ({ payload, activeTab }) : payload,
         });
 
         // ToDo: use native throw in error
-        if (error) throw new Error(error);
-        return result;
+        if (response && response[0]) throw new Error(response[0]);
+        return response && response[1];
     }
 }

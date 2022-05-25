@@ -124,7 +124,8 @@
   // top: 0;
   // right: 0;
   display: block;
-  padding: 0px 0px 5px 0px;
+  padding: 0px 0px 4px 0px;
+  font-size: 20px;
   cursor: pointer;
   &:hover {
     color: $SecondaryHover;
@@ -136,7 +137,7 @@
 
 .descriptionMore {
   display: inline-block;
-  height: 25px;
+  height: 23px;
   overflow: hidden;
   text-overflow: clip;
   position: relative;

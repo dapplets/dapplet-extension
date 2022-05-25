@@ -64,6 +64,11 @@ export class SessionService {
         await this._loginSessionBrowserStorage.deleteById(sessionId);
     }
 
+    async killSessionsByWallet(walletType: string): Promise<void> {
+        const sessions = await this._loginSessionBrowserStorage.getAll(x => x.walletType === walletType);
+        await Promise.all(sessions.map(x => this.killSession(x.sessionId)));
+    }
+
     async createSession(moduleName: string, request: LoginRequest, tabId: number): Promise<LoginSession> {
         request.timeout = request.timeout ?? DEFAULT_REQUEST_TIMEOUT;
         request.secureLogin = request.secureLogin ?? 'disabled';

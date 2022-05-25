@@ -7,16 +7,14 @@ import {
   isValidPostageStampId,
 } from '../../../../../popup/helpers'
 import { checkUrlAvailability, groupBy } from '../../../../../common/helpers'
-import { StorageRef } from '../../../../../background/registries/registry'
-import { InputPanel } from '../../components/InputPanel'
-// import { CheckboxList } from '../Notifications'
+
 import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
 import { Localhost } from '../../components/Localhost'
-
+import { UnderConstruction } from '../../components/UnderConstruction'
 import { DevModule } from '../../components/DevModulesList'
 import { Registry } from '../../components/Registery'
 import TopologicalSort from 'topological-sort'
@@ -29,16 +27,14 @@ export interface DeveloperProps {
   setModuleVersion: any
   isUnderConstruction: boolean
   setUnderConstruction: (x) => void
+  isUnderConstructionDetails: boolean
+  setUnderConstructionDetails: (x) => void
+  isShowChildrenUnderConstraction: boolean
+  setShowChildrenUnderConstraction: (x) => void
+  isShowChildrenRegistery: boolean
+  setShowChildrenRegistery: (x) => void
 }
-export const Developer: //  = ({
-//   isDappletsDetails,
-//   setDappletsDetail,
-//   setModuleInfo,
-//   setModuleVersion,
-//   isUnderConstruction,
-//   setUnderConstruction,
-// }: DeveloperProps) =>
-FC<DeveloperProps> = (props: DeveloperProps) => {
+export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [isLoading, onLoading] = useState(true)
   const [registries, setRegistries] = useState([])
   const [registryInput, setRegistryInput] = useState('')
@@ -47,6 +43,12 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
   const [modules, setModules] = useState([])
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [dataUri, setDataUri] = useState(null)
+  const [isLoadButton, setLoadButton] = useState(false)
+  const [isLocalhost, setLocalhost] = useState(true)
+  const [isLoadButtonLocalhost, setLoadButtonLocalhost] = useState(false)
+  const [isLoadAdd, setLoadAdd] = useState(false)
+  const [isUpdate, setUpdate] = useState(false)
+
   const {
     isDappletsDetails,
     setDappletsDetail,
@@ -54,14 +56,19 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
     setModuleVersion,
     isUnderConstruction,
     setUnderConstruction,
+    isUnderConstructionDetails,
+    setUnderConstructionDetails,
+    isShowChildrenUnderConstraction,
+    setShowChildrenUnderConstraction,
+    isShowChildrenRegistery,
+    setShowChildrenRegistery,
   } = props
-  // const [storageRef] = <StorageRef>
 
   useEffect(() => {
     _isMounted = true
-    // loadSwarmGateway()
 
     const init = async () => {
+      setLoadButton(true)
       await loadSwarmGateway()
       await loadRegistries()
       await loadIntro()
@@ -74,13 +81,21 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
       if (['index.json', 'dapplet.json'].includes(urlEnding)) {
         setRegistryInput(currentUrl)
       }
+      setLoadButton(false)
+      if (isUpdate) {
+        await loadSwarmGateway()
+        await loadRegistries()
+        await loadIntro()
+        setUpdate(false)
+      }
     }
     init()
 
     return () => {
       _isMounted = false
     }
-  }, [])
+  }, [isUpdate])
+  // console.log(isUpdate)
 
   const loadSwarmGateway = async () => {
     const { getSwarmGateway } = await initBGFunctions(browser)
@@ -88,6 +103,7 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
     setSwarmGatewayUrl(swarmGatewayUrl)
   }
   const loadRegistries = async () => {
+    // setLoadButton(true)
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
 
     const modules: {
@@ -98,14 +114,17 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
     setModules(modules)
 
     const registries = await getRegistries()
-    onLoading(false)
+    // onLoading(false)
     setRegistries(registries.filter((r) => r.isDev === true))
+    // setLoadButton(false)
   }
 
   const loadIntro = async () => {
+    // setLoadButton(true)
     const { getIntro } = await initBGFunctions(browser)
     const intro = await getIntro()
     setIntro(intro)
+    // setLoadButton(false)
   }
 
   const closeWelcomeIntro = async () => {
@@ -115,6 +134,8 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
   }
 
   const addRegistry = async (url: string, x: () => void) => {
+    setLoadAdd(true)
+    setLoadButton(true)
     const { addRegistry } = await initBGFunctions(browser)
 
     try {
@@ -126,13 +147,16 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
 
     loadRegistries()
     x()
+    setLoadButton(false)
+    setTimeout(() => setLoadAdd(false), 1500)
   }
 
   const removeRegistry = async (url: string) => {
-    onLoading(true)
+    setLoadAdd(true)
     const { removeRegistry } = await initBGFunctions(browser)
     await removeRegistry(url)
     loadRegistries()
+    setTimeout(() => setLoadAdd(false), 1500)
   }
 
   const deployModule = async (mi: ModuleInfo, vi: VersionInfo) => {
@@ -141,29 +165,34 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
     // window.close()
   }
   const enableRegistry = async (url: string) => {
-    onLoading(true)
+    // onLoading(true)
+
+    setLoadButtonLocalhost(true)
     const { enableRegistry } = await initBGFunctions(browser)
     await enableRegistry(url)
+
     loadRegistries()
+    setTimeout(() => setLoadButtonLocalhost(false), 1500)
   }
 
   const disableRegistry = async (url: string) => {
-    onLoading(true)
+    // onLoading(true)
+
+    setLoadButtonLocalhost(true)
     const { disableRegistry } = await initBGFunctions(browser)
     await disableRegistry(url)
+
     loadRegistries()
+    setTimeout(() => setLoadButtonLocalhost(false), 1500)
   }
 
-  const onCreateModuleHandler = async () => {
-    const { openDeployOverlay } = await initBGFunctions(browser)
-    await openDeployOverlay(null, null)
-    window.close()
-  }
+  // const onCreateModuleHandler = async () => {
+  //   const { openDeployOverlay } = await initBGFunctions(browser)
+  //   await openDeployOverlay(null, null)
+  //   // window.close()
+  // }
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
-
-  console.log(modules)
-  console.log(registries)
-  console.log(groupedModules)
+  // const groupedModules2 = groupBy(modules, (x) => x.module.isUnderConstruction)
 
   const handleClear = () => {
     setRegistryInput('')
@@ -184,9 +213,6 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
               className={cn(styles.input, {
                 [styles.errorInput]: !!registryInputError,
               })}
-              //  error={!!registryInputError}
-              // buttonDefault
-
               value={registryInput}
               onChange={(e) => {
                 setRegistryInput(e.target.value)
@@ -198,99 +224,93 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                 !!registries.find((r) => r.url === registryInput)
               }
             />
-            <button
-              className={styles.buttonInput}
-              onClick={() => addRegistry(registryInput, handleClear)}
-            >
-              add
-            </button>
+            {isLoadAdd ? (
+              <div className={styles.loadAdd}></div>
+            ) : (
+              <button
+                disabled={isLoadButton}
+                className={cn(styles.buttonInput, {
+                  [styles.buttonInputDisabled]: isLoadButton,
+                })}
+                onClick={() => addRegistry(registryInput, handleClear)}
+              >
+                add
+              </button>
+            )}
           </div>
           {registryInputError ? (
             <div className={styles.errorMessage}>{registryInputError}</div>
           ) : null}
         </div>
         <div className={styles.host}>
-          {registries.map((r, i) => (
-            <div key={i}>
-              <Localhost
-                error={r.error}
-                isEnabled={r.isEnabled}
-                label={r.url}
-                key={i}
-                closeHost={() => removeRegistry(r.url)}
-                onClickButtonLocalhost={() => {
-                  ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
-                    (r.isEnabled && r.error && disableRegistry(r.url)) ||
-                    (r.isEnabled && !r.error && disableRegistry(r.url))
-                  // console.log(r.error, r.isEnabled)
-                  // console.log(r)
-                }}
-                children={
-                  <div className={styles.modules}>
-                    {
-                      modules.length > 0 &&
+          {isLoadButton ? (
+            // &&
+            // !isLoadButtonLocalhost
+            <div className={styles.miniLoader}></div>
+          ) : (
+            registries.map((r, i) => (
+              <div key={i}>
+                <Localhost
+                  error={r.error}
+                  isEnabled={r.isEnabled}
+                  label={r.url}
+                  key={i}
+                  closeHost={() => removeRegistry(r.url)}
+                  isLoadButtonLocalhost={isLoadButtonLocalhost}
+                  setLoadButtonLocalhost={setLoadButtonLocalhost}
+                  onClickButtonLocalhost={() => {
+                    // setLoadButtonLocalhost(true)
+                    ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
+                      (r.isEnabled && r.error && disableRegistry(r.url)) ||
+                      (r.isEnabled && !r.error && disableRegistry(r.url))
+                    // setLoadButtonLocalhost(false)
+                  }}
+                  children={
+                    <div className={styles.modules}>
+                      {modules.length > 0 &&
                         Object.entries(groupedModules).map(
                           ([registryUrl, modules]) => (
-                            <div key={registryUrl}>
-                              {/* && registryUrl === r.url */}
-                              {/* {modules.length > 0  ? (
-                          <DevModule
-                            modules={modules}
-                            onDetailsClick={() => deployModule}
-                          />
-                        ) : (
-                          <div>No available development modules.</div>
-                        )} */}
+                            <div key={registryUrl + i}>
                               {modules.length > 0 && registryUrl === r.url && (
                                 <DevModule
+                                  setUpdate={setUpdate}
+                                  isLocalhost={isLocalhost}
                                   isDappletsDetails={isDappletsDetails}
                                   setDappletsDetail={setDappletsDetail}
                                   modules={modules}
                                   onDetailsClick={deployModule.bind(this)}
                                   setModuleInfo={setModuleInfo}
                                   setModuleVersion={setModuleVersion}
+                                  isUnderConstructionDetails={
+                                    isUnderConstructionDetails
+                                  }
+                                  setUnderConstructionDetails={
+                                    setUnderConstructionDetails
+                                  }
                                 />
                               )}
                             </div>
                           )
-                        )
-                      // : (
-                      //   <div>No available development modules.</div>
-                      // )
-                    }
-                  </div>
-                }
-              />
-            </div>
-          ))}
+                        )}
+                    </div>
+                  }
+                />
+              </div>
+            ))
+          )}
 
           <div className={styles.host}>
-            {modules.length > 0 ? (
+            {modules.length > 0 &&
               Object.entries(groupedModules).map(([registryUrl, modules]) => (
-                // {modules.author}
-
-                <div
-                  key={registryUrl}
-                  // onClick={() => console.log(modules[0].author)}
-                >
-                  {/* && registryUrl === r.url */}
-                  {/* {modules.length > 0  ? (
-                          <DevModule
-                            modules={modules}
-                            onDetailsClick={() => deployModule}
-                          />
-                        ) : (
-                          <div>No available development modules.</div>
-                        )} */}
+                <div key={registryUrl}>
                   {modules.length > 0 && modules[0].module.author !== null && (
                     <Registry
                       key={registryUrl}
                       label={registryUrl}
+                      isShowChildrenRegistery={isShowChildrenRegistery}
+                      setShowChildrenRegistery={setShowChildrenRegistery}
                       children={
-                        <div
-                          className={styles.modules}
-                          onClick={() => console.log(modules[0].module.author)}
-                        >
+                        <div className={styles.modules}>
                           <DevModule
                             setDappletsDetail={setDappletsDetail}
                             isDappletsDetails={isDappletsDetails}
@@ -298,16 +318,17 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
                             onDetailsClick={deployModule.bind(this)}
                             setModuleInfo={setModuleInfo}
                             setModuleVersion={setModuleVersion}
+                            isUnderConstructionDetails={isShowChildrenRegistery}
+                            setUnderConstructionDetails={
+                              setUnderConstructionDetails
+                            }
                           />
                         </div>
                       }
                     />
                   )}
                 </div>
-              ))
-            ) : (
-              <div>No available development modules.</div>
-            )}
+              ))}
           </div>
         </div>
       </div>
@@ -315,10 +336,9 @@ FC<DeveloperProps> = (props: DeveloperProps) => {
         <button
           className={styles.btnCreate}
           onClick={() => {
-            onCreateModuleHandler()
             setUnderConstruction(true)
             setDappletsDetail(false)
-            // console.log(isUnderConstruction)
+            setUnderConstructionDetails(false)
           }}
         >
           Create under construction dapplet

@@ -39,7 +39,7 @@
   overflow: hidden;
   width: 100%;
   flex: 1 1 auto;
-  max-height: 79vh;
+  max-height: 82vh;
 }
 .scrollBlock {
   overflow: hidden;
@@ -146,7 +146,7 @@
   width: 100%;
   height: 31px;
   align-items: center;
-  padding: 5px 13px;
+  padding: 5px 7px 5px 13px;
 
   background: $AppBG;
 
@@ -187,20 +187,24 @@
   display: flex;
   width: 100%;
   font-family: 'Roboto';
-  padding: 10px 0px 0px 0px;
+  padding: 5px 0px 0px 0px;
 
   font-weight: 400;
   font-size: 10px;
   line-height: 100%;
 
-  text-transform: uppercase;
-
   color: #d9304f;
+  margin: 0px 0px -10px 0px;
 }
 .formAbsolute {
-  // position: relative;
 }
 
 .wrapperSettings {
   margin: 0px 0px 30px 0px !important;
+}
+.loader {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' id='enmvdj1tPVl1' viewBox='0 0 18 18' shape-rendering='geometricPrecision' text-rendering='geometricPrecision'%3E%3Cstyle%3E%3C!%5BCDATA%5B%23enmvdj1tPVl3_tr %7Banimation: enmvdj1tPVl3_tr__tr 1000ms linear infinite normal forwards%7D@keyframes enmvdj1tPVl3_tr__tr %7B 0%25 %7Btransform: translate(9px,9.080632px) rotate(0deg)%7D 100%25 %7Btransform: translate(9px,9.080632px) rotate(180deg)%7D%7D%5D%5D%3E%3C/style%3E%3Cellipse rx='8.550768' ry='8.550768' transform='matrix(.907954 0 0 0.907954 9 9)' fill='none' stroke='%23919191' stroke-width='2'/%3E%3Cg id='enmvdj1tPVl3_tr' transform='translate(9,9.080632) rotate(0)'%3E%3Crect width='18' height='2.879693' rx='0' ry='0' transform='translate(-9,-1.439846)' fill='%23fff' stroke-width='0'/%3E%3C/g%3E%3C/svg%3E");
 }

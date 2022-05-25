@@ -23,9 +23,15 @@
   line-height: 16px;
   &:hover {
     color: $ContentBlack;
+    &::before {
+      background-color: $ContentBlack;
+    }
   }
   &:active {
     color: $MainBlack;
+    &::before {
+      background-color: $MainBlack;
+    }
   }
 
   &::before {
@@ -71,9 +77,15 @@
 
   &:hover {
     color: $PrimaryHover;
+    &::before {
+      background-color: $PrimaryHover;
+    }
   }
   &:active {
     color: $PrimaryPressed;
+    &::before {
+      background-color: $PrimaryPressed;
+    }
   }
 
   .found {

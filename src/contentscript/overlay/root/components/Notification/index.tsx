@@ -7,7 +7,7 @@ import React, {
   useRef,
   useEffect,
 } from 'react'
-import { INotification } from '../../models/notification.model'
+
 import cn from 'classnames'
 import styles from './Notification.module.scss'
 import { useToggle } from '../../hooks/useToggle'
@@ -20,7 +20,7 @@ TimeAgo.addLocale(en)
 
 export interface NotificationProps {
   label: string
-  // message: INotification
+
   title: string
   date: any
   onClear?: Function
@@ -37,20 +37,21 @@ export const Notification = (props: NotificationProps): ReactElement => {
   const [isOpen, onOpen] = useState(false)
   const [isDelete, onDelete] = useState(false)
   const [isMoreInformation, onMoreInformation] = useToggle(false)
+  const [newDescription, setDescription] = useState(description)
 
   const booleanNode = refComponent.current?.classList.contains('more')
   useEffect(() => {
-    if (description.length > 71) {
+    if (description.length > 235) {
       if (refComponent && refComponent.current) {
-        refComponent.current?.classList.add('more')
-        // if (booleanNode === true) {
-        onOpen(true)
-        // }
+        refComponent.current?.classList.add(styles.more)
+
+        setDescription(refComponent.current?.innerText.slice(0, 235))
       }
     } else {
       if (refComponent && refComponent.current) {
-        refComponent.current?.classList.remove('more')
-        onOpen(false)
+        refComponent.current?.classList.remove(styles.more)
+
+        setDescription(description)
       }
     }
   }, [refComponent, booleanNode])
@@ -75,28 +76,9 @@ export const Notification = (props: NotificationProps): ReactElement => {
         <ReactTimeAgo date={newDateNum} locale="en-US" />
       </span>
       <div className={styles.blockInfo}>
-        <p
-          ref={refComponent}
-          className={cn(styles.description, {
-            [styles.descriptionMore]: isOpen,
-            [styles.moreInformation]: isMoreInformation,
-          })}
-          onClick={() => {
-            isMoreInformation && onMoreInformation()
-          }}
-        >
-          {description}
-        </p>{' '}
-        {isOpen && (
-          <span
-            className={cn(styles.moreDescription, {
-              [styles.deleteEllipsis]: isMoreInformation,
-            })}
-            onClick={onMoreInformation}
-          >
-            ...
-          </span>
-        )}
+        <p ref={refComponent} className={cn(styles.description, {})}>
+          {newDescription}
+        </p>
       </div>
 
       {href && (

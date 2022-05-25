@@ -55,8 +55,9 @@ export class SelectWallet extends React.Component<Props, State> {
     }
 
     async pairWallet() {
+        const { app, chain } = this.props;
         const { pairWalletViaOverlay } = await initBGFunctions(browser);
-        await pairWalletViaOverlay(this.props.chain);
+        await pairWalletViaOverlay(chain, app, null);
         await this.loadData();
     }
 

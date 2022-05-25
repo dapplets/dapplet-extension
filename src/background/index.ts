@@ -155,6 +155,7 @@ browser.runtime.onMessage.addListener(
     getResource: (hashUris) => featureService.getResource(hashUris),
     openDeployOverlayById:
       featureService.openDeployOverlayById.bind(featureService),
+    getUserSettingsForOverlay: featureService.getUserSettingsForOverlay.bind(featureService),
 
     // GlobalConfigService
     getProfiles: globalConfigService.getProfiles.bind(globalConfigService),
@@ -245,6 +246,12 @@ browser.runtime.onMessage.addListener(
     addMyDapplet: globalConfigService.addMyDapplet.bind(globalConfigService),
     removeMyDapplet:
       globalConfigService.removeMyDapplet.bind(globalConfigService),
+
+    updateTargetStorages:
+      globalConfigService.updateTargetStorages.bind(globalConfigService),
+
+    getTargetStorages:
+      globalConfigService.getTargetStorages.bind(globalConfigService),
 
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) =>

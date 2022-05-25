@@ -25,19 +25,14 @@ export const InputPanel: FC<InputPanelProps> = (props) => {
     error = false,
     buttonDefault = false,
     isVisibleButton = true,
-    // onClick,
+
     ...anotherProps
   } = props
-  // const [baseState, setBaseState] = useState(value)
+
   const handlerSubmit = (event: ChangeEvent<HTMLFormElement>): void => {
     event.preventDefault()
     onSubmit && onSubmit()
   }
-
-  // const returnValue = (baseStat) => {
-  //   const baseState = JSON.stringify(value)
-  //   setBaseState(baseState)
-  // }
 
   return (
     <form
@@ -49,8 +44,6 @@ export const InputPanel: FC<InputPanelProps> = (props) => {
           [styles.inputDefault]: buttonDefault,
         })}
         onChange={onChange}
-        // type="text"
-        //  value={value}
         placeholder={placeholder}
         {...anotherProps}
       />
@@ -59,8 +52,6 @@ export const InputPanel: FC<InputPanelProps> = (props) => {
           className={cn(styles.inputButton, {
             [styles.buttonDefault]: buttonDefault,
           })}
-          // onClick={() => returnValue(baseState)}
-          // type="button"
           type="submit"
         >
           {buttonDefault && 'ADD'}

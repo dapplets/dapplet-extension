@@ -1,4 +1,11 @@
-import React, { ReactElement, useState, useEffect, useMemo, FC } from 'react'
+import React, {
+  ReactElement,
+  useState,
+  useEffect,
+  useMemo,
+  FC,
+  useRef,
+} from 'react'
 import cn from 'classnames'
 import styles from './Settings.module.scss'
 import {
@@ -34,9 +41,18 @@ export interface SettingsListProps {
   setDevMode: (x) => void
   errorReporting: boolean
   setErrorReporting: (x) => void
+  isSvgLoaderDevMode: boolean
+  isSvgErrorReporting: boolean
 }
 export const SettingsList: FC<SettingsListProps> = (props) => {
-  const { devModeProps, setDevMode, errorReporting, setErrorReporting } = props
+  const {
+    devModeProps,
+    setDevMode,
+    errorReporting,
+    setErrorReporting,
+    isSvgLoaderDevMode,
+    isSvgErrorReporting,
+  } = props
   const [isUpdateAvailable, onUpdateAvailable] = useState(false)
 
   const [providerInput, setProviderInput] = useState('')
@@ -84,38 +100,63 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [siaPortalEdited, setSiaPortalEdited] = useState(false)
 
   const [targetStorages, setTargetStorages] = useState([
-    StorageTypes.Swarm,
-    StorageTypes.Sia,
-    StorageTypes.Ipfs,
+    // StorageTypes.Swarm,
+    // StorageTypes.Sia,
+    // StorageTypes.Ipfs,
   ])
+  //   [
+  //   StorageTypes.Swarm,
+  //   StorageTypes.Sia,
+  //   StorageTypes.Ipfs,
+  // ]
   const [checkedSia, setCheckedSia] = useState(true)
   const [checkedIPFS, setCheckedIPFS] = useState(true)
   const [checkedSwarm, setCheckedSwarm] = useState(true)
 
   const [isPopup, setPopup] = useState(false)
 
+  const regExpUserAgentName = new RegExp(/^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/)
+  const inputOfFocusIPFS = useRef<HTMLInputElement>()
+  const inputOfFocusSia = useRef<HTMLInputElement>()
+  const inputOfFocusSwarmId = useRef<HTMLInputElement>()
+  const inputOfFocusSwarm = useRef<HTMLInputElement>()
+  const inputOfFocusEtn = useRef<HTMLInputElement>()
+  const inputOfFocusAdapter = useRef<HTMLInputElement>()
+  const inputOfFocusAgentName = useRef<HTMLInputElement>()
+
   useEffect(() => {
     _isMounted = true
     const init = async () => {
       await checkUpdates()
-      await loadDevMode()
+
       await loadProvider()
       await loadSwarmGateway()
       await loadErrorReporting()
       await loadSwarmPostageStampId()
       await loadDynamicAdapter()
-      // await loadRegistries()
+
       await loadUserAgentId()
       await loadUserAgentName()
       await loadIpfsGateway()
       await loadSiaPortal()
       await loadPopupInOverlay()
+      await loadTargetStorages()
     }
     init()
+
     return () => {
       _isMounted = false
     }
   }, [])
+
+  const getValidUserAgentName = (value, reg) => {
+    try {
+      let numEl = value.match(reg)
+
+      return numEl
+    } catch {}
+  }
+
   const loadDevMode = async () => {
     const { getDevMode } = await initBGFunctions(browser)
     const devMode = await getDevMode()
@@ -149,6 +190,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setProviderLoading(false)
       setProviderEdited(false)
       setProviderInputError(err.message)
+      setTimeout(() => {
+        setProviderInputError(null)
+      }, 3000)
     }
   }
 
@@ -170,7 +214,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSwarmGatewayEdited(false)
       setSwarmGatewayLoading(false)
       setSwarmGatewayInputError(err.message)
-      console.log(err.message)
+      setTimeout(() => {
+        setSwarmGatewayInputError(null)
+      }, 3000)
     }
   }
 
@@ -193,6 +239,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSwarmPostageStampIdLoading(false)
       setSwarmPostageStampIdInputEdited(false)
       setSwarmPostageStampIdInputError(err.message)
+
+      setTimeout(() => {
+        setSwarmPostageStampIdInputError(null)
+      }, 3000)
     }
   }
 
@@ -204,20 +254,20 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const setDynamicAdapter = async (dynamicAdapter: string) => {
-    setDynamicAdapterLoading(true)
+    try {
+      setDynamicAdapterLoading(true)
 
-    const { setDynamicAdapter } = await initBGFunctions(browser)
-    await setDynamicAdapter(dynamicAdapter)
-    loadDynamicAdapter()
-    setDynamicAdapterLoading(false)
-    setDynamicAdapterInputEdited(false)
+      const { setDynamicAdapter } = await initBGFunctions(browser)
+      await setDynamicAdapter(dynamicAdapter)
+      loadDynamicAdapter()
+      setDynamicAdapterLoading(false)
+      setDynamicAdapterInputEdited(false)
+    } catch (error) {
+      setDynamicAdapterLoading(false)
+      setDynamicAdapterInputEdited(false)
+      setDynamicAdapterInputError(error.message)
+    }
   }
-  // const loadRegistries = async () => {
-  //   const { getRegistries } = await initBGFunctions(browser)
-  //   const registries = await getRegistries()
-
-  //   setRegistries(registries.filter((r) => r.isDev === false))
-  // }
 
   const loadUserAgentId = async () => {
     const { getUserAgentId } = await initBGFunctions(browser)
@@ -235,11 +285,23 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const setUserAgentName = async (userAgentName: string) => {
     setUserAgentNameLoading(true)
-    const { setUserAgentName } = await initBGFunctions(browser)
-    await setUserAgentName(userAgentName)
-    loadUserAgentName()
-    setUserAgentNameLoading(false)
-    setUserAgentNameEdited(false)
+    const valueParse = getValidUserAgentName(
+      userAgentNameInput,
+      regExpUserAgentName
+    )
+    if (valueParse !== null) {
+      const { setUserAgentName } = await initBGFunctions(browser)
+      await setUserAgentName(userAgentName)
+      loadUserAgentName()
+      setUserAgentNameLoading(false)
+      setUserAgentNameEdited(false)
+    } else {
+      setUserAgentNameInputError('Enter User Agent Name')
+      setUserAgentNameInput('')
+      setTimeout(() => {
+        setUserAgentNameInputError(null)
+      }, 3000)
+    }
   }
 
   const loadIpfsGateway = async () => {
@@ -260,6 +322,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setIpfsGatewayLoading(false)
       setIpfsGatewayEdited(false)
       setIpfsGatewayInputError(err.message)
+      setTimeout(() => {
+        setIpfsGatewayInputError(null)
+      }, 3000)
     }
   }
 
@@ -282,15 +347,28 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       setSiaPortalLoading(false)
       setSiaPortalEdited(false)
       setSiaPortalInputError(err.message)
+      setTimeout(() => {
+        setSiaPortalInputError(null)
+      }, 3000)
     }
   }
-  const changeTargetStorage = (storage: StorageTypes, checked: boolean) => {
+  const changeTargetStorage = async (
+    storage: StorageTypes,
+    checked: boolean
+  ) => {
+    const { updateTargetStorages } = await initBGFunctions(browser)
+
     const newTarget = targetStorages.filter((x) => x !== storage)
 
     if (checked) newTarget.push(storage)
-    setTargetStorages(newTarget)
-    console.log(targetStorages)
-    console.log(newTarget)
+    await updateTargetStorages(newTarget)
+    loadTargetStorages()
+  }
+  const loadTargetStorages = async () => {
+    const { getTargetStorages } = await initBGFunctions(browser)
+    const loadTarget = await getTargetStorages()
+
+    setTargetStorages(loadTarget)
   }
 
   const getDefaultValueDynamicAdapter = async (inputValue: string) => {
@@ -346,7 +424,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     const { getPopupInOverlay } = await initBGFunctions(browser)
     const popupInOverlay = await getPopupInOverlay()
     setPopup(popupInOverlay)
-    // setState({ popupInOverlay });
   }
 
   const setPopupInOverlay = async (isActive: boolean) => {
@@ -355,9 +432,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     loadPopupInOverlay()
   }
 
-  // const handleClear = () => {
-  //   setRegistryInput('')
-  // }
+  const onPress = (e, ref) => {
+    ref.current?.blur()
+  }
 
   return (
     <div className={styles.blockSettings}>
@@ -395,23 +472,35 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 component={<></>}
                 children={<DropdownTrustedUsers />}
               />
-              {/* Todo : on Parameters */}
+
               <SettingItem
                 title="Developer mode"
                 component={
-                  <Switch
-                    checked={devModeProps}
-                    onChange={() => setDevMode(!devModeProps)}
-                  />
+                  <>
+                    {isSvgLoaderDevMode ? (
+                      <span className={styles.loader}></span>
+                    ) : (
+                      <Switch
+                        checked={devModeProps}
+                        onChange={() => setDevMode(!devModeProps)}
+                      />
+                    )}
+                  </>
                 }
               />
               <SettingItem
                 title="Bug reports"
                 component={
-                  <Switch
-                    checked={errorReporting}
-                    onChange={() => setErrorReporting(!errorReporting)}
-                  />
+                  <>
+                    {isSvgErrorReporting ? (
+                      <span className={styles.loader}></span>
+                    ) : (
+                      <Switch
+                        checked={errorReporting}
+                        onChange={() => setErrorReporting(!errorReporting)}
+                      />
+                    )}
+                  </>
                 }
               />
               <SettingItem
@@ -420,7 +509,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   <Switch
                     onChange={() => setPopupInOverlay(!isPopup)}
                     checked={isPopup}
-                    // onChange={() => setErrorReporting(!errorReporting)}
                   />
                 }
               />
@@ -428,36 +516,43 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 title="User Agent Name"
                 component={<></>}
                 children={
-                  <form
-                    onBlur={() => {
-                      setUserAgentNameInputError(null)
-                    }}
-                    onSubmit={(e) => {
-                      e.preventDefault()
-                      // console.log('lolo')
+                  <>
+                    <form
+                      onBlur={() => {
+                        setUserAgentNameInputError(null)
+                      }}
+                      onSubmit={(e) => {
+                        e.preventDefault()
 
-                      !(userAgentNameLoading || !userAgentNameEdited) &&
+                        // !(userAgentNameLoading || !userAgentNameEdited) &&
                         setUserAgentName(userAgentNameInput)
-                    }}
-                    className={cn(styles.formDefault, {
-                      [styles.errorInputDefault]: !!userAgentNameInputError,
-                    })}
-                  >
-                    <input
-                      className={cn(styles.inputDefault, {})}
-                      value={userAgentNameInput}
-                      placeholder="User agent name..."
-                      onFocus={() => {
-                        setUserAgentNameInput('')
-                        setUserAgentNameInputError(null)
+                        onPress(e, inputOfFocusAgentName)
                       }}
-                      onChange={(e) => {
-                        setUserAgentNameInput(e.target.value)
-                        setUserAgentNameEdited(true)
-                        setUserAgentNameInputError(null)
-                      }}
-                    />
-                  </form>
+                      className={cn(styles.formDefault, {
+                        [styles.errorInputDefault]: !!userAgentNameInputError,
+                      })}
+                    >
+                      <input
+                        className={cn(styles.inputDefault, {})}
+                        placeholder={userAgentNameInput}
+                        ref={inputOfFocusAgentName}
+                        onFocus={() => {
+                          setUserAgentNameInput('')
+                          setUserAgentNameInputError(null)
+                        }}
+                        onChange={(e) => {
+                          setUserAgentNameInput(e.target.value)
+                          setUserAgentNameEdited(true)
+                          setUserAgentNameInputError(null)
+                        }}
+                      />
+                    </form>
+                    {userAgentNameInputError ? (
+                      <div className={styles.errorMessage}>
+                        {userAgentNameInputError}
+                      </div>
+                    ) : null}
+                  </>
                 }
               />
             </>
@@ -478,53 +573,101 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 title="Dynamic Adapter"
                 component={<></>}
                 children={
-                  <div
-                    className={cn(styles.formDefault, styles.formAbsolute, {
-                      [styles.errorInputDefault]: !!dynamicAdapterInputError,
-                    })}
-                  >
-                    <form
-                      style={{ width: '100%' }}
-                      // className={cn(styles.formDefault, styles.formAbsolute, {
-                      //   [styles.errorInputDefault]: !!dynamicAdapterInputError,
-                      // })}
-                      onBlur={() => {
-                        setDynamicAdapterInputError(null)
-                      }}
-                      onSubmit={(e) => {
-                        e.preventDefault()
-
-                        setDynamicAdapter(dynamicAdapterInput)
-                      }}
+                  <>
+                    <div
+                      className={cn(styles.formDefault, styles.formAbsolute, {
+                        [styles.errorInputDefault]: dynamicAdapterInputError,
+                        //  ||
+                        // !parseModuleName(dynamicAdapterInput),
+                      })}
                     >
-                      <input
-                        className={cn(styles.inputDefault, {})}
-                        value={dynamicAdapterInput}
-                        placeholder={dynamicAdapterInput}
-                        onFocus={() => {
-                          setDynamicAdapterInput('')
+                      <form
+                        style={{ width: '100%' }}
+                        onBlur={() => {
                           setDynamicAdapterInputError(null)
+                          // getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                          if (
+                            parseModuleName(dynamicAdapterInput).branch ===
+                              null ||
+                            parseModuleName(dynamicAdapterInput).name ===
+                              null ||
+                            parseModuleName(dynamicAdapterInput).version ===
+                              null
+                          ) {
+                            getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                            // setTimeout(() => {
+                            //   setDynamicAdapterInputError(null)
+                            // }, 3000)
+                          }
+                          if (dynamicAdapterInput.length === 0) {
+                            getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                          }
+                          // console.log(parseModuleName(dynamicAdapterInput))
                         }}
-                        onChange={(e) => {
-                          // e.preventDefault()
-                          setDynamicAdapterInput(e.target.value)
-                          setDynamicAdapterInputError(null)
-                          setDynamicAdapterInputEdited(true)
+                        onSubmit={(e) => {
+                          e.preventDefault()
+
+                          setDynamicAdapter(dynamicAdapterInput)
+                          if (
+                            // parseModuleName(dynamicAdapterInput).branch !==
+                            //   null &&
+                            parseModuleName(dynamicAdapterInput).name !==
+                              null &&
+                            parseModuleName(dynamicAdapterInput).version !==
+                              null
+                          ) {
+                            setDynamicAdapter(dynamicAdapterInput)
+                          } else if (
+                            parseModuleName(dynamicAdapterInput).branch ===
+                              null ||
+                            parseModuleName(dynamicAdapterInput).name ===
+                              null ||
+                            parseModuleName(dynamicAdapterInput).version ===
+                              null
+                          ) {
+                            setDynamicAdapterInputError('Enter a valid value')
+                            getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                            setTimeout(() => {
+                              setDynamicAdapterInputError(null)
+                            }, 3000)
+                          }
                         }}
+                      >
+                        <input
+                          className={cn(styles.inputDefault, {})}
+                          value={dynamicAdapterInput}
+                          placeholder={dynamicAdapterInput}
+                          onFocus={() => {
+                            setDynamicAdapterInput('')
+                            setDynamicAdapterInputError(null)
+                          }}
+                          ref={inputOfFocusAdapter}
+                          onChange={(e) => {
+                            // e.preventDefault()
+                            setDynamicAdapterInput(e.target.value)
+                            setDynamicAdapterInputError(null)
+                            setDynamicAdapterInputEdited(true)
+                          }}
+                        />
+                      </form>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+
+                          getDefaultValueDynamicAdapter(dynamicAdapterInput)
+                        }}
+                        className={cn(
+                          styles.buttonInputDefault,
+                          styles.btnAbsolute
+                        )}
                       />
-                    </form>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault()
-                        // e.stopPropagation()
-                        getDefaultValueDynamicAdapter(dynamicAdapterInput)
-                      }}
-                      className={cn(
-                        styles.buttonInputDefault,
-                        styles.btnAbsolute
-                      )}
-                    />
-                  </div>
+                    </div>
+                    {dynamicAdapterInputError ? (
+                      <div className={styles.errorMessage}>
+                        {dynamicAdapterInputError}
+                      </div>
+                    ) : null}
+                  </>
                 }
               />
               <SettingItem
@@ -540,40 +683,29 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <Checkbox isSupport isCheckbox title="Centralized" />
 
                     <Checkbox
-                      isCheckbox={targetStorages.includes(StorageTypes.Sia)}
+                      isCheckbox={targetStorages?.includes(StorageTypes.Sia)}
                       title="SIA"
-                      onChange={(e) =>
+                      onChange={(e) => {
                         changeTargetStorage(StorageTypes.Sia, e.target.checked)
-                      }
+                      }}
                     />
                     <Checkbox
-                      isCheckbox={targetStorages.includes(StorageTypes.Ipfs)}
+                      isCheckbox={targetStorages?.includes(StorageTypes.Ipfs)}
                       title="IPFS"
-                      onChange={(e) =>
+                      onChange={(e) => {
                         changeTargetStorage(StorageTypes.Ipfs, e.target.checked)
-                      }
+                      }}
                     />
-                    {/* <input
-                      type="checkbox"
-                      checked={targetStorages.includes(StorageTypes.Swarm)}
-                      onChange={(e) =>
-                        changeTargetStorage(
-                          StorageTypes.Swarm,
-                          e.target.checked
-                        )
-                      }
-                    /> */}
 
                     <Checkbox
                       title="Swarm"
-                      isCheckbox={targetStorages.includes(StorageTypes.Swarm)}
-                      // checked={isPopup}
-                      onChange={(e) =>
+                      isCheckbox={targetStorages?.includes(StorageTypes.Swarm)}
+                      onChange={(e) => {
                         changeTargetStorage(
                           StorageTypes.Swarm,
                           e.target.checked
                         )
-                      }
+                      }}
                     />
                   </div>
                 }
@@ -593,34 +725,37 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!providerInputError && !isValidHttp(providerInput),
+                          (!!providerInputError &&
+                            !isValidHttp(providerInput)) ||
+                          providerInputError,
                       })}
                     >
                       <form
                         style={{ width: '100%' }}
-                        onBlur={
-                          () => setProviderInputError(null)
-                          // !(
-                          //   providerLoading ||
-                          //   !providerEdited ||
-                          //   !isValidHttp(providerInput)
-                          // ) && setProvider(providerInput)
-                        }
+                        onBlur={() => {
+                          setProviderInputError(null)
+                          if (!isValidHttp(providerInput)) {
+                            getDefaultValueProvider(providerInput)
+                          }
+                          if (providerInput.length === 0) {
+                            getDefaultValueProvider(providerInput)
+                          }
+                        }}
                         onFocus={() => {
                           setProviderInput('')
                           setProviderInputError(null)
                         }}
                         onSubmit={(e) => {
                           e.preventDefault()
-                          console.log('lala')
 
                           setProvider(providerInput)
+                          onPress(e, inputOfFocusEtn)
                         }}
                       >
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={providerInput || ''}
-                          placeholder={'Provider URL'}
+                          ref={inputOfFocusEtn}
                           onChange={(e) => {
                             setProviderInput(e.target.value)
                             setProviderEdited(true)
@@ -631,7 +766,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       <button
                         onClick={(e) => {
                           e.preventDefault()
-                          // e.stopPropagation()
+
                           getDefaultValueProvider(providerInput)
                         }}
                         className={cn(
@@ -656,19 +791,21 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!swarmGatewayInputError &&
-                          !isValidHttp(swarmGatewayInput),
+                          (!!swarmGatewayInputError &&
+                            !isValidHttp(swarmGatewayInput)) ||
+                          swarmGatewayInputError,
                       })}
                     >
                       <form
                         style={{ width: '100%' }}
                         onBlur={() => {
                           setSwarmGatewayInputError(null)
-                          // !(
-                          //   swarmGatewayLoading ||
-                          //   !swarmGatewayEdited ||
-                          //   !isValidHttp(swarmGatewayInput)
-                          // ) && setSwarmGateway(swarmGatewayInput)
+                          if (!isValidHttp(swarmGatewayInput)) {
+                            getDefaultValueSwarmGateway(swarmGatewayInput)
+                          }
+                          if (swarmGatewayInput.length === 0) {
+                            getDefaultValueSwarmGateway(swarmGatewayInput)
+                          }
                         }}
                         onFocus={() => {
                           setSwarmGatewayInput('')
@@ -678,12 +815,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           e.preventDefault()
 
                           setSwarmGateway(swarmGatewayInput)
+                          onPress(e, inputOfFocusSwarm)
                         }}
                       >
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={swarmGatewayInput}
-                          placeholder={'Gateway URL'}
+                          ref={inputOfFocusSwarm}
                           onChange={(e) => {
                             setSwarmGatewayInput(e.target.value)
                             setSwarmGatewayInputError(null)
@@ -695,7 +833,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         onClick={(e) => {
                           e.preventDefault()
                           getDefaultValueSwarmGateway(swarmGatewayInput)
-                          // setSwarmGatewayInputError(null)
                         }}
                         className={cn(
                           styles.buttonInputDefault,
@@ -719,20 +856,31 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!swarmPostageStampIdInputError &&
-                          !isValidPostageStampId(swarmPostageStampIdInput),
+                          // (
+                          swarmPostageStampIdInputError,
+                        //  &&
+                        // !isValidPostageStampId(swarmPostageStampIdInput)) ||
+                        // swarmPostageStampIdInputError,
                       })}
                     >
                       <form
                         style={{ width: '100%' }}
                         onBlur={() => {
-                          setSwarmPostageStampIdInputError(null)
-                          // !swarmPostageStampIdLoading ||
-                          //   !!swarmPostageStampIdInputEdited ||
-                          //   (!!isValidPostageStampId(
-                          //     swarmPostageStampIdInput
-                          //   ) &&
-                          //     setSwarmPostageStampId(swarmPostageStampIdInput))
+                          // setSwarmPostageStampIdInputError(null)
+                          if (
+                            !isValidPostageStampId(swarmPostageStampIdInput)
+                          ) {
+                            getDefaultValueSwarmPostageStampId(
+                              swarmPostageStampIdInput
+                            )
+                            setSwarmPostageStampIdInputError(null)
+                          }
+                          if (swarmPostageStampIdInput.length === 0) {
+                            setSwarmPostageStampIdInputError(null)
+                            getDefaultValueSwarmPostageStampId(
+                              swarmPostageStampIdInput
+                            )
+                          }
                         }}
                         onFocus={() => {
                           setSwarmPostageStampIdInput('')
@@ -740,20 +888,33 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         }}
                         onSubmit={(e) => {
                           e.preventDefault()
-
-                          setSwarmPostageStampId(swarmPostageStampIdInput)
+                          if (isValidPostageStampId(swarmPostageStampIdInput)) {
+                            setSwarmPostageStampId(swarmPostageStampIdInput)
+                          } else if (
+                            !isValidPostageStampId(swarmPostageStampIdInput)
+                          ) {
+                            setSwarmPostageStampIdInputError(
+                              'Enter valid Swarm Postage Stamp ID'
+                            )
+                            getDefaultValueSwarmPostageStampId(
+                              swarmPostageStampIdInput
+                            )
+                            setTimeout(() => {
+                              setSwarmPostageStampIdInputError(null)
+                            }, 3000)
+                          }
+                          // onPress(e, inputOfFocusSwarmId)
                         }}
                       >
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={swarmPostageStampIdInput}
-                          placeholder="Postage Stamp ID"
+                          ref={inputOfFocusSwarmId}
                           onChange={(e) => {
                             setSwarmPostageStampIdInput(e.target.value)
                             setSwarmPostageStampIdInputError(null)
                             setSwarmPostageStampIdInputEdited(true)
                           }}
-                          // tabIndex={0}
                         />
                       </form>
                       <button
@@ -762,7 +923,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           getDefaultValueSwarmPostageStampId(
                             swarmPostageStampIdInput
                           )
-                          // setSwarmGatewayInputError(null)
                         }}
                         className={cn(
                           styles.buttonInputDefault,
@@ -786,19 +946,21 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!ipfsGatewayInputError &&
-                          !isValidHttp(ipfsGatewayInput),
+                          (!!ipfsGatewayInputError &&
+                            !isValidHttp(ipfsGatewayInput)) ||
+                          ipfsGatewayInputError,
                       })}
                     >
                       <form
                         style={{ width: '100%' }}
                         onBlur={() => {
                           setIpfsGatewayInputError(null)
-                          // !(
-                          //   ipfsGatewayLoading ||
-                          //   !ipfsGatewayEdited ||
-                          //   !isValidHttp(ipfsGatewayInput)
-                          // ) && setIpfsGateway(ipfsGatewayInput)
+                          if (!isValidHttp(ipfsGatewayInput)) {
+                            getDefaultValueIpfsGateway(ipfsGatewayInput)
+                          }
+                          if (ipfsGatewayInput.length === 0) {
+                            getDefaultValueIpfsGateway(ipfsGatewayInput)
+                          }
                         }}
                         onFocus={() => {
                           setIpfsGatewayInput('')
@@ -806,14 +968,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         }}
                         onSubmit={(e) => {
                           e.preventDefault()
-
                           setIpfsGateway(ipfsGatewayInput)
+                          onPress(e, inputOfFocusIPFS)
                         }}
                       >
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={ipfsGatewayInput}
-                          placeholder="Gateway URL"
+                          ref={inputOfFocusIPFS}
                           onChange={(e) => {
                             setIpfsGatewayInput(e.target.value)
                             setIpfsGatewayEdited(true)
@@ -824,7 +986,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       <button
                         onClick={(e) => {
                           e.preventDefault()
-                          // e.stopPropagation()
+
                           getDefaultValueIpfsGateway(ipfsGatewayInput)
                         }}
                         className={cn(
@@ -849,18 +1011,22 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          !!siaPortalInputError && !isValidHttp(siaPortalInput),
+                          (!!siaPortalInputError &&
+                            !isValidHttp(siaPortalInput)) ||
+                          siaPortalInputError,
                       })}
                     >
                       <form
                         style={{ width: '100%' }}
-                        onBlur={() => {
+                        onBlur={(e) => {
                           setSiaPortalInputError(null)
-                          // !(
-                          //   siaPortalLoading ||
-                          //   !siaPortalEdited ||
-                          //   !isValidHttp(siaPortalInput)
-                          // ) && setIpfsGateway(ipfsGatewayInput)
+
+                          if (!isValidHttp(siaPortalInput)) {
+                            getDefaultValueSiaPortal(siaPortalInput)
+                          }
+                          if (siaPortalInput.length === 0) {
+                            getDefaultValueSiaPortal(siaPortalInput)
+                          }
                         }}
                         onFocus={() => {
                           setSiaPortalInput('')
@@ -870,12 +1036,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           e.preventDefault()
 
                           setSiaPortal(siaPortalInput)
+                          onPress(e, inputOfFocusSia)
                         }}
                       >
                         <input
                           className={cn(styles.inputDefault, {})}
                           value={siaPortalInput}
-                          placeholder="Gateway URL"
+                          ref={inputOfFocusSia}
                           onChange={(e) => {
                             setSiaPortalInput(e.target.value)
                             setSiaPortalEdited(true)
@@ -886,7 +1053,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       <button
                         onClick={(e) => {
                           e.preventDefault()
-                          // e.stopPropagation()
+
                           getDefaultValueSiaPortal(siaPortalInput)
                         }}
                         className={cn(
@@ -910,9 +1077,3 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     </div>
   )
 }
-// https://goerli.mooo.com
-// https://goerli.infura.io/v3/9ded73debfaf4834ac186320de4f85fd
-// https://goerli.infura.io/v3/6b34a47d1ef24f5b9cfff55d32685ad9
-// https://rpc.goerli.mudit.blog/
-// invalid
-// https://goerli.infura.io/v3/123123123

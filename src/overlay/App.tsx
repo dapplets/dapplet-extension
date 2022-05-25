@@ -34,7 +34,7 @@ export class App extends React.Component<Props, State> {
             onCloseClick={popup ? this.closeClickHandler : null}
             title={`Login to "${payload.app}"`}
             subtitle={
-              payload.loginRequest.role ? `as "${payload.loginRequest.role}"` : null
+              payload.loginRequest?.role ? `as "${payload.loginRequest?.role}"` : null
             }
           >
             {requests.map((x, i) => <LoginSession bus={bus} request={x} key={x.frameId}/>)}

@@ -31,6 +31,7 @@
   border: 1px solid $MainGrey;
   border-radius: 4px;
   background: $PureWhite;
+  cursor: pointer;
 }
 
 .checkboxNotification {
@@ -79,6 +80,11 @@
 .supportBlock {
   position: relative;
 }
+.support {
+  .inputCheckbox {
+    background: $MainGrey;
+  }
+}
 
 div.support::before {
   content: attr(data-title);
@@ -100,7 +106,7 @@ div.support::before {
   font-family: Roboto, sans-serif;
   font-weight: 500;
   color: $PureBlack;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 100%;
   opacity: 0.9;
   cursor: default;

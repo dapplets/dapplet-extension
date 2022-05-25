@@ -1,0 +1,331 @@
+@import '../../assets/styles/null.scss';
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+
+  flex: 1 1 auto;
+
+  height: calc(100vh - 130px);
+}
+.wrapper::-webkit-scrollbar {
+  width: 0;
+}
+
+.wrapper {
+  -ms-overflow-style: none;
+}
+
+.wrapper {
+  overflow: -moz-scrollbars-none;
+}
+
+.blockMessage {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+}
+.applyButtonDisabled {
+  cursor: default;
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+
+  width: 73px;
+  height: 32px;
+
+  border-radius: 4px;
+
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $StrokeColor;
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  &:hover {
+    background: $AppBG;
+  }
+  &:active {
+    background: $AppBG;
+  }
+}
+
+.createTokenomics {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+
+  width: 73px;
+  height: 32px;
+
+  background: $Primary;
+  border-radius: 4px;
+
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $PureWhite;
+  text-transform: uppercase;
+
+  cursor: pointer;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+
+.blockTokenParameters {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  // justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+}
+
+.wrapperSettings {
+  margin: 15px 0px 118px 0px;
+}
+
+.blockTokenInfo {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+.titleToken {
+  position: relative;
+}
+.tokenTitleInfo {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 11px;
+  left: 95px;
+  padding: 2px;
+
+  width: 14px;
+  height: 14px;
+
+  background: $MainGrey;
+  border-radius: 50%;
+
+  font-family: 'Roboto';
+
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 10px;
+  cursor: pointer;
+  color: $PureWhite;
+
+  &:hover {
+    background: $StrokeColor;
+  }
+  &:active {
+    background: $MainBlack;
+  }
+}
+.inputTokenTicker {
+  text-transform: uppercase;
+  &::placeholder {
+    text-transform: none;
+  }
+}
+
+.support::before {
+  content: attr(data-title);
+}
+
+.support::before {
+  content: attr(data-title);
+  display: none;
+  position: absolute;
+  z-index: 9998;
+  top: 0px;
+  left: 0;
+  background: #fff;
+  border-radius: 10px 10px 10px 0px;
+  border: 1px solid #e3e3e3;
+  box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
+  text-align: left;
+  color: #000;
+  font-family: Roboto, sans-serif;
+  font-weight: 500;
+  color: #000;
+  font-size: 10px;
+  line-height: 100%;
+  opacity: 0.9;
+  cursor: default;
+  padding: 5px;
+  margin: -15px 0 0 10px;
+  width: 150px;
+  min-height: 20px;
+  height: auto;
+}
+.support:hover::before,
+.support:focus::before {
+  display: flex;
+
+  align-items: center;
+}
+
+.inputTokenName {
+  display: flex;
+  padding: 5px 13px;
+  width: 100%;
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
+
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+  color: $MainGrey;
+}
+.inputTokenTickerInvalid {
+  border: 1px solid #ff6442;
+  color: #ff6442;
+}
+
+.linkNavigation {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  margin: 20px 0px 0px 0px;
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: $WebBG;
+  }
+}
+
+.back {
+  display: block;
+  background: inherit;
+  font-family: 'Roboto';
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+  position: relative;
+  color: $MainGrey;
+  margin: 0px 0px 0px 14.5px;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -14.5px;
+    width: 11px;
+    height: 14px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%23919191'/%3E%3C/svg%3E");
+  }
+  &:hover {
+    color: $ContentBlack;
+    &::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill=' %23747376'/%3E%3C/svg%3E");
+    }
+  }
+  &:active {
+    color: $MainBlack;
+    &::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%232A2A2A'/%3E%3C/svg%3E");
+    }
+  }
+}
+
+// ===
+
+.finalWarning {
+  font-family: 'Roboto';
+
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+
+  color: $MainGrey;
+}
+
+.footerContentModal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footerContentModalButton {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+
+  width: 140px;
+  height: 32px;
+
+  background: $Primary;
+  border-radius: 4px;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
+
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $PureWhite;
+  margin: 0px 0px 9px 0px;
+}
+
+.footerContentModalLink {
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $Primary;
+  // background: $WebBG;
+  &:hover {
+    color: $PrimaryHover;
+    // background: $WebBG;
+  }
+  &:active {
+    color: $PrimaryPressed;
+    // background: $WebBG;
+  }
+}

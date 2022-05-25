@@ -4,9 +4,10 @@ import GlobalConfigService from './globalConfigService';
 import { GenericWallet } from '../wallets/interface';
 import { EthereumWallet } from '../wallets/ethereum/interface';
 import { NearWallet } from '../wallets/near/interface';
-import { ChainTypes, DefaultSigners, WalletDescriptor, WalletTypes } from '../../common/types';
+import { ChainTypes, DefaultSigners, WalletDescriptor, WalletTypes, LoginRequest } from '../../common/types';
 import { OverlayService } from './overlayService';
 import { SessionService } from './sessionService';
+import * as EventBus from "../../common/global-event-bus";
 
 export class WalletService {
 
@@ -25,7 +26,8 @@ export class WalletService {
         // ToDo: is need chain argument?
         // const chain = (await this._getWalletsArray()).find(x => x.wallet === wallet).chain;
         const map = await this._getWalletsMap();
-        return map[chain][wallet].connectWallet(params);
+        await map[chain][wallet].connectWallet(params);
+        EventBus.emit('wallet_changed');
     }
 
     async disconnectWallet(chain: ChainTypes, wallet: WalletTypes) {
@@ -43,6 +45,9 @@ export class WalletService {
         }
 
         await this._globalConfigService.setWalletsUsage(usage);
+        this.sessionService.killSessionsByWallet(wallet);
+        // ToDo: subscribe on disconnect event from wallet to kill sessions.
+        EventBus.emit('wallet_changed');
     }
 
     async getWalletDescriptors(): Promise<WalletDescriptor[]> {
@@ -132,7 +137,7 @@ export class WalletService {
         await this._globalConfigService.setWalletsUsage(wallets);
     }
 
-    public async prepareWalletFor(app: string | DefaultSigners, chain: ChainTypes, cfg?: { username: string, domainId: number, fullname?: string, img?: string }) {
+    public async prepareWalletFor(app: string | DefaultSigners, chain: ChainTypes, cfg: { username: string, domainId: number, fullname?: string, img?: string }, request: LoginRequest, tabId: number) {
         const isLoginSession = /[a-f0-9]{32}/gm.test(app);
 
         if (isLoginSession) {
@@ -147,16 +152,18 @@ export class WalletService {
 
             return;
         }
-        
+
         const defaults = await this._getWalletFor(app);
         const defaultWallet = defaults[chain];
+
+        const payload = { app, loginRequest: request || { authMethods: [chain], secureLogin: 'disabled' } };
 
         if (!defaultWallet) {
             // is login required?
             if (cfg && cfg.username && cfg.domainId) {
-                return this._overlayService.loginViaOverlay(app, chain, cfg);
+                return this._overlayService.loginViaOverlay(payload, tabId);
             } else {
-                return this._overlayService.selectWalletViaOverlay(app, chain);
+                return this._overlayService.selectWalletViaOverlay(payload, tabId);
             }
         }
 
@@ -166,9 +173,9 @@ export class WalletService {
         if (!suitableWallet || !suitableWallet.connected) {
             // is login required?
             if (cfg && cfg.username && cfg.domainId) {
-                return this._overlayService.loginViaOverlay(app, chain, cfg);
+                return this._overlayService.loginViaOverlay(payload, tabId);
             } else {
-                return this._overlayService.selectWalletViaOverlay(app, chain);
+                return this._overlayService.selectWalletViaOverlay(payload, tabId);
             }
         }
     }
@@ -258,7 +265,7 @@ export class WalletService {
 
     private async _pairSignerFor(app: string | DefaultSigners, chain: ChainTypes): Promise<GenericWallet> {
         // pairing
-        await this._overlayService.pairWalletViaOverlay(chain);
+        await this._overlayService.pairWalletViaOverlay(chain, app, null); // ToDo: set tabId
 
         const map = await this._getWalletsMap();
 

@@ -12,6 +12,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { generateGuid } from '../../common/helpers'
 import SiteConfig from '../models/siteConfig'
 import * as EventBus from '../../common/global-event-bus'
+import { StorageTypes } from '../../common/constants'
 
 const EXPORTABLE_PROPERTIES = [
   'id',
@@ -70,6 +71,8 @@ export default class GlobalConfigService {
         config.ethereumNetworks = this.getInitialConfig().ethereumNetworks
       if (!config.myDapplets)
         config.myDapplets = this.getInitialConfig().myDapplets
+      if (!config.targetStorages)
+        config.targetStorages = this.getInitialConfig().targetStorages
     }
 
     return config ?? this.getInitialConfig()
@@ -251,6 +254,11 @@ export default class GlobalConfigService {
       { account: '0x9126d36880905fcb9e5f2a7f7c4f19703d52bc62' },
       { account: '0xf64849376812667bda7d902666229f8b8dd90687' },
       { account: 'team.dapplet-base.eth' },
+    ]
+    config.targetStorages = [
+      StorageTypes.Ipfs,
+      StorageTypes.Sia,
+      StorageTypes.Swarm,
     ]
     config.userSettings = {}
     config.providerUrl = 'https://goerli.mooo.com/'
@@ -446,6 +454,18 @@ export default class GlobalConfigService {
     const config = await this.get()
     callback(config)
     await this.set(config)
+  }
+
+  async updateTargetStorages(storages: StorageTypes[]) {
+    console.log('storages', storages)
+    const config = await this.get()
+    config.targetStorages = storages
+    await this.set(config)
+  }
+
+  async getTargetStorages() {
+    const config = await this.get()
+    return config.targetStorages
   }
 
   async getTrustedUsers() {

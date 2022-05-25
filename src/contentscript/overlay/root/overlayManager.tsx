@@ -5,7 +5,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { capitalizeFirstLetter } from '../../../common/helpers'
 import { Overlay } from './overlay'
-import { IOverlayManager } from '../interfaces'
+import { IOverlayManager, OverlayConfig } from '../interfaces'
 import { JsonRpc } from '../../../common/jsonrpc'
 import { App } from './App'
 import INNER_STYLE from '!raw-loader!./overlayManager.css'
@@ -18,6 +18,8 @@ const OverlayFrameClass = 'dapplets-overlay-frame'
 export class OverlayManager implements IOverlayManager {
   private _panel: HTMLElement = null
   public activeOverlay: Overlay = null
+  public onActiveOverlayChanged: (overlay: Overlay | null) => void | null =
+    null
 
   private _root = null
 
@@ -104,6 +106,10 @@ export class OverlayManager implements IOverlayManager {
   public show() {
     this._panel.classList.remove(HiddenOverlayClass)
   }
+  public togglePanel() {
+    this._panel.classList.toggle(HiddenOverlayClass)
+    this._panel.classList.toggle(CollapsedOverlayClass)
+  }
 
   /**
    * Hides the panel.
@@ -156,9 +162,11 @@ export class OverlayManager implements IOverlayManager {
       }
     }
 
-    if (this._tabsRegistry.length == 0) {
-      this.hide()
-    }
+    // if (this._tabsRegistry.length == 0) {
+    //   this.hide()
+    // }
+
+    this.onActiveOverlayChanged?.(this.activeOverlay)
 
     this._render()
   }
@@ -171,7 +179,7 @@ export class OverlayManager implements IOverlayManager {
   }
 
   public activate(overlay: Overlay) {
-    if (overlay.parent) return this.activate(overlay.parent)
+    if (overlay.parent) return this.activate(overlay.parent as Overlay)
     if (this.activeOverlay == overlay) return
 
     if (this.activeOverlay) {
@@ -180,12 +188,17 @@ export class OverlayManager implements IOverlayManager {
 
     this.activeOverlay = overlay
 
+    this.onActiveOverlayChanged?.(this.activeOverlay)
+
     this._render()
   }
 
   public deactivate(overlay: Overlay) {
     const tab = this._tabsRegistry.filter((t) => t.overlay === overlay)[0]
-    if (this.activeOverlay === tab.overlay) this.activeOverlay = null
+    if (this.activeOverlay === tab.overlay) {
+      this.activeOverlay = null
+      this.onActiveOverlayChanged?.(null)
+    }
     this._render()
   }
 
@@ -194,17 +207,7 @@ export class OverlayManager implements IOverlayManager {
   }
 
   public openPopup(path: string) {
-    const url = browser.runtime.getURL('popup.html') + `#/${path}`
-    const overlays = this.getOverlays()
-    const overlay =
-      overlays.find((x) => x.uri === url) ??
-      this.createOverlay(url, capitalizeFirstLetter(path))
-    initBGFunctions(browser)
-      .then((x) => x.getThisTab())
-      .then((x) => overlay.send('changeTab', [path, x]))
-    this.activate(overlay)
-    this.show()
-    this.open()
+    this.togglePanel()
   }
 
   public destroy() {
@@ -212,14 +215,8 @@ export class OverlayManager implements IOverlayManager {
     this._panel.remove()
   }
 
-  public createOverlay(
-    uri: string,
-    title: string,
-    source: string = null,
-    hidden: boolean = false,
-    parent: Overlay = null
-  ): Overlay {
-    const overlay = new Overlay(this, uri, title, source, hidden, parent)
+  public createOverlay(config: OverlayConfig): Overlay {
+    const overlay = new Overlay(this, config)
     return overlay
   }
 

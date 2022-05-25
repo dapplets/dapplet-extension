@@ -31,6 +31,9 @@ import {
   StorageTypes,
 } from '../../../../../common/constants'
 
+import { Modal } from '../../components/Modal'
+import ReactDOM from 'react-dom'
+
 tracing.startTracing()
 
 enum DeploymentStatus {
@@ -58,47 +61,22 @@ type DependencyChecking = {
   isExists?: boolean
 }
 
-interface IIndexProps {}
-
-interface IIndexState {
-  originalMi: ModuleInfo
-  mi: ModuleInfo
-  vi: VersionInfo | null
-  dependenciesChecking: DependencyChecking[]
-  loading: boolean
-  targetRegistry: string
-  targetChain: ChainTypes
-  targetStorages: string[]
-  message: {
-    type: 'negative' | 'positive'
-    header: string
-    message: string[]
-  }
-  registryOptions: { key: string; value: string; text: string }[]
-  owner: string
-  currentAccount: string
-  newOwner: string
-  newOwnerLoading: boolean
-  newOwnerDone: boolean
-  editContextId: string
-  editContextIdLoading: boolean
-  editContextIdDone: boolean
-  deploymentStatus: DeploymentStatus
-  trustedUsers: { account: string }[]
-  swarmGatewayUrl: string
-  mode: FormMode
-  isSaving: boolean
-}
 export interface DappletsMainInfoProps {
   isDappletsDetails: boolean
   setDappletsDetail: (x) => void
   ModuleInfo: any
   ModuleVersion: any
+  setShowChildrenRegistery: (x) => void
 }
 let _isMounted = false
 export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
-  const { isDappletsDetails, setDappletsDetail, ModuleInfo, ModuleVersion } =
-    props
+  const {
+    isDappletsDetails,
+    setDappletsDetail,
+    ModuleInfo,
+    ModuleVersion,
+    setShowChildrenRegistery,
+  } = props
   const bus = new Bus()
   const transferOwnershipModal = React.createRef<any>()
   const addContextIdModal = React.createRef<any>()
@@ -133,81 +111,105 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     StorageTypes.Sia,
     StorageTypes.Ipfs,
   ])
-  // targetChain: null,
-  // targetStorages: [
-  //     StorageTypes.Swarm,
-  //     StorageTypes.Sia,
-  //     StorageTypes.Ipfs
-  // ],
+
+  const fileInput = useRef<HTMLInputElement>()
+  const [st, setSt] = useState([])
+  const [isDisabledPush, setDisabledPush] = useState(true)
+  const [isDisabledAddOwner, setDisabledAddOwner] = useState(false)
+  const [isModal, setModal] = useState(false)
+  const onClose = () => setModal(false)
+
+  const [isModalPush, setModalPush] = useState(false)
+  const onClosePush = () => setModalPush(false)
+  const [isModalTransaction, setModalTransaction] = useState(false)
+  const onCloseTransaction = () => setModalTransaction(false)
+  const [autorDisabled, setAuthorDisabled] = useState(false)
+  const [author, setAuthor] = useState({ authorForm: [] })
+  const newAuthorObject = {
+    author: '',
+  }
+  const [isNotAccountModal, setNotAccountModal] = useState(false)
+
+  const [visible, setVisible] = useState(false)
+  const node = useRef<HTMLButtonElement>()
+  const nodeInput = useRef<HTMLInputElement>()
+  const [visibleContextId, setVisibleContextId] = useState({
+    visibleContext: [],
+  })
+  const [contextDeleteNone, setContextDeleteNone] = useState(false)
+  const [addDisabled, setAddDisabled] = useState(false)
 
   useEffect(() => {
     _isMounted = true
     const init = async () => {
-      // await _updateOwnership(),
-      //   await _updateCurrentAccount(),
-      //   await _updateDeploymentStatus(),
-      //   await _checkDependencies()
-      console.log(mi)
-      console.log(vi)
+      await _updateData()
+      if (!isNotNullCurrentAccount) {
+        setNotAccountModal(true)
+      } else {
+        setNotAccountModal(false)
+      }
     }
     init()
+    if (author.authorForm.length === 0) {
+      setAuthorDisabled(false)
+    }
+
+    // console.log(visible, 'v')
+    // console.log(visibleContextId, 'ci')
+    // console.log(mi.contextIds, 'mc')
+
     return () => {
       _isMounted = false
     }
-  }, [])
-  bus.subscribe(
-    'data',
-    async ({ mi, vi }: { mi: ModuleInfo; vi: VersionInfo }) => {
-      const { getSwarmGateway } = await initBGFunctions(browser)
-      const swarmGatewayUrl = await getSwarmGateway()
+  }, [mi, st, targetChain, autorDisabled, author, editContextId])
 
-      if (mi === null && vi === null) {
-        // New module
-        const mi = new ModuleInfo()
-        setOriginalMi(JSON.parse(JSON.stringify(mi)))
-        setMi(mi)
-        setLoading(false)
-        setSwarmGatewayUrl(swarmGatewayUrl)
-        setMode(FormMode.Creating)
+  // bus.subscribe(
+  //   'data',
+  //   async ({ mi, vi }: { mi: ModuleInfo; vi: VersionInfo }) => {
+  //     const { getSwarmGateway } = await initBGFunctions(browser)
+  //     const swarmGatewayUrl = await getSwarmGateway()
 
-        await _updateData()
-      } else {
-        // Deploy module
-        const dependencies = vi?.dependencies
-          ? Object.entries(vi.dependencies).map(([name, version]) => ({
-              name: name,
-              version: version,
-              type: DependencyType.Dependency,
-            }))
-          : []
-        const interfaces = vi?.interfaces
-          ? Object.entries(vi.interfaces).map(([name, version]) => ({
-              name: name,
-              version: version,
-              type: DependencyType.Interface,
-            }))
-          : []
-        const dependenciesChecking = [...dependencies, ...interfaces]
-        setOriginalMi(JSON.parse(JSON.stringify(mi)))
-        setMi(mi)
-        setVi(vi)
-        setDpendenciesChecking(dependenciesChecking)
-        setLoading(false)
-        setSwarmGatewayUrl(swarmGatewayUrl)
+  //     if (mi === null && vi === null) {
+  //       // New module
+  //       const mi = new ModuleInfo()
+  //       setOriginalMi(JSON.parse(JSON.stringify(mi)))
+  //       setMi(mi)
+  //       setLoading(false)
+  //       setSwarmGatewayUrl(swarmGatewayUrl)
+  //       setMode(FormMode.Creating)
 
-        //   Object.keys(vi?.overlays ?? {}).length > 0
-        //     ? [StorageTypes.Swarm, StorageTypes.Sia]
-        //     : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs],
-        // mode: FormMode.Deploying,
+  //       await _updateData()
+  //     } else {
+  //       const dependencies = vi?.dependencies
+  //         ? Object.entries(vi.dependencies).map(([name, version]) => ({
+  //             name: name,
+  //             version: version,
+  //             type: DependencyType.Dependency,
+  //           }))
+  //         : []
+  //       const interfaces = vi?.interfaces
+  //         ? Object.entries(vi.interfaces).map(([name, version]) => ({
+  //             name: name,
+  //             version: version,
+  //             type: DependencyType.Interface,
+  //           }))
+  //         : []
+  //       const dependenciesChecking = [...dependencies, ...interfaces]
+  //       setOriginalMi(JSON.parse(JSON.stringify(mi)))
+  //       setMi(mi)
+  //       setVi(vi)
+  //       setDpendenciesChecking(dependenciesChecking)
+  //       setLoading(false)
+  //       setSwarmGatewayUrl(swarmGatewayUrl)
 
-        await _updateData()
-      }
-    }
-  )
+  //       await _updateData()
+  //     }
+  //   }
+  // )
 
   const _checkDependencies = async () => {
     const { getVersionInfo } = await initBGFunctions(browser)
-    // const { dependenciesChecking deps, targetRegistry } = dependenciesChecking
+
     await Promise.all(
       dependenciesChecking.map((x) =>
         getVersionInfo(
@@ -237,23 +239,16 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
-    if (mode === FormMode.Creating) {
-      return Promise.all([_updateCurrentAccount()])
-    } else {
-      return Promise.all([
-        _updateOwnership(),
-        _updateCurrentAccount(),
-        _updateDeploymentStatus(),
-        _checkDependencies(),
-      ])
-    }
+    await _updateCurrentAccount()
   }
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
+
     const currentAccount = await getAddress(
       DefaultSigners.EXTENSION,
       targetChain
     )
+
     setCurrentAccount(currentAccount)
   }
   const _updateOwnership = async () => {
@@ -263,7 +258,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
 
   const _updateDeploymentStatus = async () => {
-    // const s = this.state
     setDeploymentStatus(DeploymentStatus.Unknown)
 
     const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(
@@ -282,23 +276,20 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
 
   const _transferOwnership = async (newAccount: string) => {
-    setNewOwnerLoading(true)
-
-    const oldAccount = mi.author
-    const { transferOwnership } = await initBGFunctions(browser)
-    await transferOwnership(mi.registryUrl, mi.name, oldAccount, newAccount)
-    setNewOwnerLoading(false)
-    setNewOwnerDone(true)
     // console.log(mi.author)
-  }
+    try {
+      const oldAccount = mi.author
+      const { transferOwnership } = await initBGFunctions(browser)
+      setNewOwnerLoading(true)
+      await transferOwnership(targetRegistry, mi.name, newAccount, oldAccount)
 
-  const _addContextId = async (contextId: string) => {
-    setEditContextIdLoading(true)
-
-    const { addContextId } = await initBGFunctions(browser)
-    await addContextId(targetRegistry, mi.name, contextId)
-    setEditContextIdLoading(false)
-    setEditContextIdDone(true)
+      setNewOwnerLoading(false)
+      setDappletsDetail(false)
+      setNewOwnerDone(true)
+    } catch (error) {
+      setDisabledAddOwner(true)
+      setNewOwnerLoading(false)
+    }
   }
 
   const _removeContextId = async (contextId: string) => {
@@ -314,8 +305,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setLoading(true)
 
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
-    // const { mi, vi, targetRegistry, targetStorages, currentAccount, mode } =
-    //   this.state
 
     try {
       const isNotNullCurrentAccount = !(
@@ -403,25 +392,26 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       mi.icon = null
     }
     setMi(mi)
-    console.log(mi)
   }
-
   const saveChanges = async () => {
+    setModalTransaction(true)
     try {
-      isSawing(true)
-
       const { editModuleInfo } = await initBGFunctions(browser)
       await editModuleInfo(targetRegistry, targetStorages, mi)
-      isSawing(false)
+
       setOriginalMi(JSON.parse(JSON.stringify(mi)))
+
+      setModalTransaction(false)
+      setModalPush(true)
     } catch (err) {
       setMessage({
         type: 'negative',
         header: 'Publication error',
         message: [err.message],
       })
+      setModalTransaction(false)
+      setModal(true)
     } finally {
-      isSawing(false)
     }
   }
   const isNoStorage = targetStorages.length === 0
@@ -442,14 +432,14 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     !trustedUsers.find(
       (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
     )
-  // const isDependenciesExist =
-  //   dependenciesChecking.length > 0
-  //     ? dependenciesChecking.every((x) => x.isExists === true)
-  //     : true
-  // const isDependenciesLoading =
-  //   dependenciesChecking.length > 0
-  //     ? dependenciesChecking.every((x) => x.isExists === undefined)
-  //     : false
+  const isDependenciesExist =
+    dependenciesChecking && dependenciesChecking.length > 0
+      ? dependenciesChecking.every((x) => x.isExists === true)
+      : true
+  const isDependenciesLoading =
+    dependenciesChecking && dependenciesChecking.length > 0
+      ? dependenciesChecking.every((x) => x.isExists === undefined)
+      : false
   const isManifestValid = mi?.name && mi?.title && mi?.type
   const isDeployButtonDisabled =
     loading ||
@@ -457,36 +447,26 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     !isNotNullCurrentAccount ||
     isNotAnOwner ||
     isNoStorage ||
-    // isDependenciesLoading ||
-    // !isDependenciesExist ||
+    isDependenciesLoading ||
+    !isDependenciesExist ||
     !isManifestValid
   const isReuploadButtonDisabled =
     !isAlreadyDeployed || mode === FormMode.Creating || !vi
-  const [miTitle = '', setMiTitle] = useState(mi.title)
-  const [miDescription = '', setMiDescription] = useState(mi.description)
 
-  const fileInput = useRef<HTMLInputElement>()
-  const [st, setSt] = useState([])
   const onChange = (e) => {
     const files = e.target.files
-    // console.log(files)
+
     const filesArr = Array.prototype.slice.call(files)
-    // console.log(filesArr)
-    setSt([
-      // ...files,
-      ...filesArr,
-    ])
+
+    setSt([...filesArr])
   }
 
-  const [author, setAuthor] = useState({ authorForm: [] })
-  const newAuthorObject = {
-    author: 'New admins',
-  }
-  const addButtonClickHandler = () => {
+  const addButtonClickHandler = (e) => {
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.push(newAuthorObject)
     setAuthor(newAuthor)
   }
+  let messagesContainer = useRef<HTMLDivElement>()
 
   const onDeleteChild = (id: number) => {
     const newAuthor = Object.assign({}, author)
@@ -494,8 +474,109 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setAuthor(newAuthor)
   }
 
+  const newContextObject = ''
+  const addButtonClickHandlerContext = () => {
+    const newContext = Object.assign({}, mi)
+    newContext.contextIds.push(newContextObject)
+    setMi(newContext)
+  }
+
+  const onDeleteChildContext = (id: number) => {
+    const newContext = Object.assign({}, mi)
+    newContext.contextIds.splice(id, 1)
+    setMi(newContext)
+  }
+
+  const _addContextId = async (contextId: string) => {
+    setEditContextIdLoading(true)
+    setAddDisabled(true)
+
+    try {
+      const { addContextId } = await initBGFunctions(browser)
+      await addContextId(targetRegistry, mi.name, contextId)
+      const newForm = Object.assign({}, visibleContextId)
+
+      newForm.visibleContext.push(editContextId)
+      setVisibleContextId(newForm)
+
+      setEditContextIdDone(true)
+      setVisible(true)
+      setEditContextId('')
+      setEditContextIdLoading(false)
+      setAddDisabled(false)
+      node.current?.classList.remove('valid')
+      setEditContextId('')
+    } catch (error) {
+      setEditContextIdDone(true)
+      setVisible(false)
+      setEditContextIdLoading(false)
+      setAddDisabled(false)
+      node.current?.classList.remove('valid')
+    }
+  }
+  const visibleNameFile = (hash: string): string => {
+    const firstFourCharacters = hash.substring(0, 6)
+    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 5)
+
+    return `${firstFourCharacters}...${lastFourCharacters}`
+  }
+
   return (
     <div className={styles.wrapper}>
+      {message ? (
+        <Modal
+          visible={isModal}
+          title={message.header}
+          content={
+            <div className={styles.modalDefaultContent}>
+              {message.message.map((m, i) => (
+                <p key={i} style={{ overflowWrap: 'break-word' }}>
+                  {m === `Cannot read properties of null (reading 'length')`
+                    ? 'Please fill in the empty fields'
+                    : m}
+                </p>
+              ))}
+              <button
+                onClick={() => onClose()}
+                className={styles.modalDefaultContentButton}
+              >
+                OK
+              </button>
+            </div>
+          }
+          footer={''}
+          onClose={() => onClose()}
+        />
+      ) : null}
+      {!isNotNullCurrentAccount ? (
+        owner ? (
+          <Modal
+            visible={isNotAccountModal}
+            title={'The wrong wallet'}
+            content={
+              <>
+                <p>Change account to {owner}</p>
+
+                <br />
+                <p> Connect a new wallet</p>
+              </>
+            }
+            footer={''}
+            onClose={() => setNotAccountModal(false)}
+          />
+        ) : (
+          <Modal
+            visible={isNotAccountModal}
+            title={'Wallet is not connected'}
+            content={
+              'You can not deploy a module without a wallet. Connect a new wallet'
+            }
+            footer={''}
+            onClose={() => setNotAccountModal(false)}
+          />
+        )
+      ) : null}
+
       <div className={styles.mainInfoBlock}>
         <SettingWrapper
           className={styles.wrapperSettings}
@@ -509,9 +590,11 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 component={<></>}
                 children={
                   <input
-                    value={miTitle}
+                    value={mi.title ?? ''}
                     onChange={(e) => {
-                      setMiTitle(e.target.value)
+                      setMi({ ...mi, title: e.target.value })
+
+                      setDisabledPush(false)
                     }}
                     className={styles.inputTitle}
                   />
@@ -524,9 +607,11 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 children={
                   <input
                     className={styles.inputTitle}
-                    value={miDescription}
+                    value={mi.description ?? ''}
                     onChange={(e) => {
-                      setMiDescription(e.target.value)
+                      setMi({ ...mi, description: e.target.value })
+
+                      setDisabledPush(false)
                     }}
                   />
                 }
@@ -547,7 +632,8 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
                   {st.map((x, i) => (
                     <span className={styles.imgTitle} key={i}>
-                      {x.name}
+                      {visibleNameFile(x.name)}
+                      {/* {x.name} */}
                     </span>
                   ))}
                 </div>
@@ -558,12 +644,13 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     type="file"
                     name="file"
                     id="file"
-                    accept=".png, .svg"
+                    accept=".png"
                     className={styles.inputfile}
                     onChange={(e) => {
                       onChange(e)
                       iconInputChangeHandler(e)
-                      console.log(mi.icon)
+
+                      setDisabledPush(false)
                     }}
                   />
                   <label htmlFor="file">Change icon</label>
@@ -584,26 +671,37 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                   <div className={styles.inputOwnershipBlock}>
                     <input
                       value={newOwner}
-                      className={styles.inputOwnership}
+                      className={cn(styles.inputOwnership, {
+                        [styles.inputOwnershipInvalid]: isDisabledAddOwner,
+                      })}
                       placeholder={mi.author || 'New owner adress'}
                       onChange={(e) => {
                         setNewOwner(e.target.value)
-                        // console.log(newOwner)
+                        setDisabledAddOwner(false)
                       }}
+                      onBlur={() => setDisabledAddOwner(false)}
                     />
-                    {/* {owner &&
-                    owner?.toLowerCase() === currentAccount?.toLowerCase() ? ( */}
+
                     <button
-                      disabled={newOwnerLoading || newOwnerDone || !newOwner}
+                      disabled={newOwner.length <= 0}
                       onClick={() => {
                         _transferOwnership(newOwner)
-                        console.log(newOwner)
                       }}
-                      className={styles.ownershipButton}
+                      className={cn(styles.ownershipButton, {
+                        [styles.ownershipButtonDisabled]: newOwner.length <= 0,
+                      })}
                     >
                       Change
                     </button>
-                    {/* ) : null} */}
+                    <Modal
+                      visible={newOwnerLoading}
+                      title={'Loading new Owner'}
+                      content={
+                        'This modal window will close automatically after successful change'
+                      }
+                      footer={''}
+                      onClose={() => setNewOwnerLoading(false)}
+                    />
                   </div>
                 }
               />
@@ -611,13 +709,33 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 <div className={styles.blockAdmins}>
                   <h3 className={styles.adminsTitle}>Admins</h3>
                   <button
-                    onClick={addButtonClickHandler}
-                    className={styles.adminsButton}
+                    disabled={autorDisabled}
+                    onClick={(e) => {
+                      addButtonClickHandler(e)
+                      setAuthorDisabled(true)
+                      // e.currentTarget.scrollIntoView()
+                    }}
+                    className={cn(styles.adminsButton, {
+                      [styles.adminsButtonDisabled]: autorDisabled,
+                    })}
                   />
                 </div>
                 {author.authorForm.map((x, i) => (
-                  <div key={i} className={styles.blockAuthors}>
-                    <h3 className={styles.authorTitle}>{x.author}</h3>
+                  <div
+                    ref={messagesContainer}
+                    key={i}
+                    className={styles.blockAuthors}
+                  >
+                    <input
+                      className={styles.authorTitle}
+                      placeholder={x.author}
+                      onChange={(e) => {
+                        author.authorForm[i].author = e.target.value
+                        if (e.target.value.length !== 0) {
+                          setAuthorDisabled(false)
+                        }
+                      }}
+                    />
                     <button
                       onClick={() => onDeleteChild(i)}
                       className={styles.authorDelete}
@@ -628,16 +746,142 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
             </div>
           }
         />
+
+        <SettingWrapper
+          title="Parameters"
+          children={
+            <div className={styles.parametersBlock}>
+              <div className={styles.wrapperContextID}>
+                <div className={styles.blockContextID}>
+                  <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
+                  <button
+                    disabled={mi.contextIds.length >= 1}
+                    onClick={addButtonClickHandlerContext}
+                    className={cn(styles.contextIDButton, {
+                      [styles.contextIDButtonDisabled]:
+                        mi.contextIds.length >= 1,
+                    })}
+                  />
+                </div>
+                {mi.contextIds.map((x, i) => (
+                  <div key={i} className={styles.wrapperContext}>
+                    <div className={styles.blockContext}>
+                      <input
+                        key={i}
+                        ref={nodeInput}
+                        className={styles.blockContextTitle}
+                        value={editContextId}
+                        placeholder={'Context ID (ex: example.com)'}
+                        onChange={(e) => {
+                          setEditContextId(e.target.value)
+                        }}
+                        // onBlur={() => {
+                        //   _addContextId(editContextId)
+                        // }}
+                      />
+
+                      <button
+                        ref={node}
+                        onClick={() => {
+                          onDeleteChildContext(i)
+                          setEditContextId('')
+                        }}
+                        className={cn(styles.contextDelete, {
+                          [styles.contextDeleteNone]: contextDeleteNone,
+                        })}
+                      />
+                    </div>
+                    <button
+                      disabled={
+                        nodeInput.current?.value.length < 2 || addDisabled
+                      }
+                      onClick={() => {
+                        node.current?.classList.add('valid')
+                        _addContextId(editContextId)
+                      }}
+                      className={cn(styles.addContext, {
+                        [styles.addContextDisabled]:
+                          nodeInput.current?.value.length < 2 || addDisabled,
+                      })}
+                    >
+                      ADD
+                    </button>
+                  </div>
+                ))}
+                {editContextIdLoading ? (
+                  <div className={styles.editContextIdLoading}></div>
+                ) : (
+                  <>
+                    {visible &&
+                      visibleContextId &&
+                      visibleContextId.visibleContext.map((x, i) => (
+                        <input
+                          key={i}
+                          className={styles.blockContext}
+                          placeholder={x}
+                          value={x}
+                          readOnly
+                        />
+                      ))}
+                  </>
+                )}
+              </div>
+            </div>
+          }
+        />
       </div>
       <div className={styles.linkNavigation}>
         <button
-          onClick={() => setDappletsDetail(false)}
+          onClick={() => {
+            setDappletsDetail(false)
+            setShowChildrenRegistery(true)
+          }}
           className={styles.back}
         >
           Back
         </button>
-        <a className={styles.push}>Push changes</a>
+        <button
+          disabled={isDisabledPush || !isNotNullCurrentAccount}
+          onClick={() => saveChanges()}
+          className={cn(styles.push, {
+            [styles.pushDisabled]: isDisabledPush || !isNotNullCurrentAccount,
+          })}
+        >
+          Push changes
+        </button>
       </div>
+      <Modal
+        visible={isModalPush}
+        title="Сhanges were accepted"
+        content={
+          <div className={styles.modalDefaultContent}>
+            Your dapplet has been updated
+            <button
+              onClick={() => {
+                setDappletsDetail(false)
+                setShowChildrenRegistery(true)
+              }}
+              className={styles.modalDefaultContentButton}
+            >
+              OK
+            </button>
+          </div>
+        }
+        footer={''}
+        onClose={() => {
+          setDappletsDetail(false)
+          setShowChildrenRegistery(true)
+        }}
+      />
+      <Modal
+        visible={isModalTransaction}
+        title="Transaction confirmation"
+        content={<div className={styles.modalDefaultContent}></div>}
+        footer={''}
+        onClose={() => {
+          setModalTransaction(false)
+        }}
+      />
     </div>
   )
 }

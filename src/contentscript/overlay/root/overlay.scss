@@ -33,7 +33,7 @@
 }
 .dapplets-overlay-frame-button {
   transition: background-color 0.25s 0.25s;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  // box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   background: #fff;
   border: solid 1px #d3d3d3;
   border-radius: 4px;
@@ -65,7 +65,7 @@
   height: 40px;
 }
 .dapplets-overlay-frame-button--sidebar_close {
-  box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.5);
+  // box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.5);
   border-radius: 0px;
   border-style: solid none solid solid;
   width: 27px;
@@ -161,7 +161,7 @@
   background-color: #fff;
   min-width: 160px;
   z-index: 99999;
-  box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+  // box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
   border: 1px solid rgba(34, 36, 38, 0.15);
   border-radius: 4px;
 }

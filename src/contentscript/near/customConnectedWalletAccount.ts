@@ -4,7 +4,6 @@ import { baseDecode } from 'borsh';
 import { browser } from 'webextension-polyfill-ts';
 import { generateGuid } from '../../common/helpers';
 import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { ChainTypes } from '../../common/types';
 
 export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
 
@@ -18,12 +17,12 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
         //if (!this.accountId) {
         const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser);
         // ToDo: remove it?
-        await prepareWalletFor(this._app, 'near/' + this._network, null);
+        // await prepareWalletFor(this._app, 'near/' + this._network, null);
 
         const authDataKey = this._network + '_wallet_auth_key';
         let authData = JSON.parse(await localStorage_getItem(authDataKey));
         if (!authData) {
-            await prepareWalletFor(this._app, 'near/' + this._network, null);
+            await prepareWalletFor(this._app, 'near/' + this._network, null, null, null);
             authData = JSON.parse(await localStorage_getItem(authDataKey));
         }
 

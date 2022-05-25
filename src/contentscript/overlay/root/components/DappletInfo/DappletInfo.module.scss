@@ -1,35 +1,91 @@
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
+@import '../../assets/styles/color.variables.scss';
+@import '../../assets/styles/null.scss';
+@import '../../assets/styles/fonts.scss';
 
 .wrapper {
-	display: flex;
-	align-items: end;
+  display: flex;
+  align-items: end;
 }
 
 .title {
-	display: flex;
-	align-items: center;
+  display: flex;
+  align-items: center;
 
-	color: $MainGrey;
+  color: $MainGrey;
 
-	font-family: Montserrat, sans-serif;
-	font-size: 8px;
-	font-weight: 400;
-	line-height: 149%;
+  font-family: Montserrat, sans-serif;
+  font-size: 8px;
+  font-weight: 400;
+  line-height: 149%;
 }
 
 .value {
-	position: relative;
+  // position: relative;
+  display: inline-block;
+  padding-left: 5px;
 
-	padding-left: 5px;
+  color: $Secondary;
 
-	color: $Secondary;
-
-	font-family: Montserrat, sans-serif;
-	font-size: 10px;
-	font-weight: 400;
-	font-style: normal;
-	line-height: 149%;
-	text-decoration-line: underline;
+  font-family: Montserrat, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 149%;
+  text-decoration-line: underline;
+  cursor: pointer;
+  &:hover {
+    color: $MainGrey;
+  }
+  &:active {
+    color: $ContentBlack;
+  }
 }
+
+a.value::before {
+  content: attr(data-title);
+}
+// span.support::before,
+a.value::before {
+  content: attr(data-title);
+
+  display: none;
+  position: absolute;
+  /* z-index: 9998; */
+  top: -20px;
+  right: 0;
+  background: #f4f4f4;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
+  text-align: right;
+  font-family: Roboto, sans-serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 12px;
+  line-height: 16px;
+  opacity: 0.9;
+  cursor: default;
+  padding: 5px 10px;
+  /* margin: -15px 0 0 10px; */
+  width: auto;
+  // min-height: 50px;
+}
+
+a.value:hover::before,
+a.value:focus::before {
+  display: inline-block;
+  flex: 1 1 auto;
+  justify-content: center;
+  align-items: center;
+  // opacity: 1;
+}
+// .supportHover {
+//   display: inline-block;
+//   position: relative;
+//   display: inline-block;
+//   border-radius: 50%;
+//   width: 14.17px;
+//   height: 14.17px;
+//   background: url('../../../icons/Input/question.svg');
+//   cursor: pointer;
+// }

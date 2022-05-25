@@ -1,8 +1,14 @@
 import { generateGuid } from "../../../common/helpers";
 import { JsonRpc } from "../../../common/jsonrpc";
-import { IOverlay } from "../interfaces";
+import { IOverlay, OverlayConfig } from "../interfaces";
 
 export class OverlayIframe implements IOverlay {
+    public url: string
+    public title: string
+    public source: string = null
+    public hidden: boolean = false
+    public parent: IOverlay
+
     frame: HTMLIFrameElement;
     registered: boolean = false;
     onmessage: (topic: string, message: any) => void;
@@ -14,14 +20,16 @@ export class OverlayIframe implements IOverlay {
     private _callbacks = new Set<Function>();
 
     constructor(
-        public uri: string, 
-        public title: string, 
-        public source: string = null, 
-        public hidden: boolean = false, 
         private _iframeMessenger: JsonRpc,
-        public parent: IOverlay
+        config: OverlayConfig
     ) {
-        this._iframeMessenger.call('OVERLAY_CREATE', [this.id, uri, title, source, hidden], window.top);
+        this.url = config.url;
+        this.title = config.title;
+        this.source = config.source ?? null;
+        this.hidden = config.hidden ?? false;
+        this.parent = config.parent ?? null;
+
+        this._iframeMessenger.call('OVERLAY_CREATE', [this.id, this.url, this.title, this.source, this.hidden], window.top);
         this._iframeMessenger.on('OVERLAY_EXEC', (id: string, topic: string, message: string) => {
             if (id !== this.id) return;
             this._callbacks.forEach(x => x(topic, message));

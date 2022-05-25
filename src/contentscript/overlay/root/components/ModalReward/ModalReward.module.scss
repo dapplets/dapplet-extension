@@ -1,0 +1,111 @@
+@import '../../assets/styles/null.scss';
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
+
+// ===
+.modal {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(196, 196, 196, 0.1);
+  backdrop-filter: blur(2px);
+  animation-name: appear;
+  animation-duration: 300ms;
+}
+
+.modalDialog {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  overflow: hidden;
+
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: slide-in;
+  animation-duration: 0.5s;
+  padding: 22px 15px 16px 15px;
+
+  width: 94%;
+
+  background: $PureWhite;
+  border-radius: 10px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+
+  // ??
+  height: 542px;
+}
+.modalHeader {
+  display: flex;
+}
+
+.modalClose {
+  position: absolute;
+  display: block;
+  top: 15px;
+  right: 14px;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: $Primary;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 7 7' fill='none'%3E%3Cpath d='M5.74375 0.695312L3.5 2.93906L1.25625 0.695312L0.375 1.57656L2.61875 3.82031L0.375 6.06406L1.25625 6.94531L3.5 4.70156L5.74375 6.94531L6.625 6.06406L4.38125 3.82031L6.625 1.57656L5.74375 0.695312Z' fill='white'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  &:hover {
+    background-color: $PrimaryHover;
+  }
+  &:active {
+    background-color: $PrimaryPressed;
+  }
+}
+.modalBody {
+  overflow: auto;
+  padding: 0px 0px 20px 0px;
+  width: 100%;
+  display: flex;
+  flex: 1 1 auto;
+}
+.modalContent {
+  width: 100%;
+}
+
+.modalTitle {
+  display: block;
+  font-family: 'Roboto';
+
+  font-weight: 700;
+  font-size: 10px;
+  line-height: 100%;
+
+  text-transform: uppercase;
+
+  color: $PureBlack;
+  padding: 0px 0px 24px 0px;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slide-in {
+  from {
+    transform: translateY(-150px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

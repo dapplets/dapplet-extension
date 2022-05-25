@@ -8,7 +8,7 @@
   overflow: hidden;
   width: 100%;
   flex: 1 1 auto;
-  max-height: 86vh;
+  height: calc(100vh - 100px);
 }
 .wrapper::-webkit-scrollbar {
   width: 0;
@@ -27,8 +27,7 @@
   flex-direction: column;
   width: 100%;
   height: 80vh;
-  // height: calc(100% - 75px);
-  // padding: 20px 0px 0px 0px;
+
   overflow: hidden;
   padding: 15px 0px 0px 15px;
 
@@ -108,6 +107,10 @@
   font-size: 14px;
   line-height: 149%;
   color: $MainGrey;
+}
+.inputNameDisabled {
+  border: 1px solid #ff6442;
+  color: #ff6442;
 }
 
 .fullDescription {
@@ -433,6 +436,7 @@
 }
 
 .push {
+  background: inherit;
   display: inline-block;
   font-family: 'Roboto';
   font-weight: 400;
@@ -442,6 +446,138 @@
   margin: 0 auto;
   cursor: pointer;
   padding: 0 30.36px 0 0;
+  &:hover {
+    color: $PrimaryHover;
+  }
+  &:active {
+    color: $PrimaryPressed;
+  }
+}
+.pushDisabled {
+  cursor: default;
+  color: $MainGrey;
+  &:hover {
+    color: $MainGrey;
+  }
+  &:active {
+    color: $MainGrey;
+  }
+}
+
+.modalDefaultContent {
+  font-family: 'Roboto';
+  width: 263px;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+
+  color: $MainGrey;
+}
+
+.modalCreationContent {
+  width: 214px;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+
+  color: $MainGrey;
+}
+
+.modalCreationContentButton {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+
+  min-width: 157px;
+  height: 32px;
+
+  background: $Primary;
+  border-radius: 4px;
+
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $PureWhite;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+.titleModalEndCreation {
+  width: 307px;
+
+  text-align: center;
+}
+
+.modalEndCreationContent {
+  width: 263px;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+
+  color: $MainGrey;
+}
+
+.modalEndCreationFooterBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.modalEndCreationFooterButton {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+
+  min-width: 157px;
+  height: 32px;
+
+  background: $Primary;
+  border-radius: 4px;
+
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $PureWhite;
+  margin-bottom: 10px;
+  &:hover {
+    background: $PrimaryHover;
+  }
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+
+.modalEndCreationFooterLink {
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  color: $Primary;
+  cursor: pointer;
   &:hover {
     color: $PrimaryHover;
   }

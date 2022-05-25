@@ -67,8 +67,9 @@ export class Login extends React.Component<Props, State> {
     }
 
     async pairWallet() {
+        const { app } = this.props;
         const { pairWalletViaOverlay } = await initBGFunctions(browser);
-        await pairWalletViaOverlay(ChainTypes.ETHEREUM_GOERLI);
+        await pairWalletViaOverlay(ChainTypes.ETHEREUM_GOERLI, app, null);
         await this.loadData();
     }
 

@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect } from 'react'
 import { InputHTMLAttributes, DetailedHTMLProps } from 'react'
 import cn from 'classnames'
 import styles from './Switch.module.scss'
@@ -9,11 +9,13 @@ export interface SwitchProps
     HTMLInputElement
   > {
   checked?: boolean
+  isLoad?: boolean
 }
 
 export const Switch: FC<SwitchProps> = ({
   checked = false,
   onChange,
+  isLoad,
   ...props
 }) => {
   return (

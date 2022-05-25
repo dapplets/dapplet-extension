@@ -1,4 +1,10 @@
-import React, { FC, DetailedHTMLProps, HTMLAttributes } from 'react'
+import React, {
+  FC,
+  DetailedHTMLProps,
+  HTMLAttributes,
+  useEffect,
+  useMemo,
+} from 'react'
 import cn from 'classnames'
 import styles from './Checkbox.module.scss'
 
@@ -8,15 +14,15 @@ export interface CheckboxProps
     HTMLInputElement
   > {
   title: string
-  isCheckbox: Boolean
-  isSupport?: Boolean
+  isCheckbox?: boolean
+  isSupport?: boolean
   onChange?: (x) => void
 }
 export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
   const {
     title,
     isSupport = false,
-    isCheckbox = true,
+    isCheckbox,
     onChange,
     ...anotherProps
   } = props
@@ -32,6 +38,7 @@ export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
             className={cn(styles.input)}
             type="checkbox"
             onChange={onChange}
+            checked={isCheckbox}
             {...anotherProps}
           />
           <span
