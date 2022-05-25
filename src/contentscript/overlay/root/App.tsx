@@ -86,6 +86,7 @@ const SYSTEM_TAB: ToolbarTab = {
 };
 
 interface P {
+    hidden: boolean;
     onToggle: () => void;
     overlayManager: OverlayManager;
     navigate?: NavigateFunction;
@@ -256,9 +257,12 @@ class _App extends React.Component<P, S> {
         this.props.navigate!(`/${mi.name}/settings`);
     }
 
-    render() {
+    render() {        
         const p = this.props;
         const s = this.state;
+
+        if (p.hidden) return null;
+
         const overlays = this.getOverlays();
         // TODO: naming wallets is the notification
         const { pathname } = this.props.location!;

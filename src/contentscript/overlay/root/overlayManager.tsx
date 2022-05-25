@@ -91,6 +91,7 @@ export class OverlayManager implements IOverlayManager {
    */
   public open() {
     this._panel.classList.remove(CollapsedOverlayClass)
+    this._render()
   }
 
   /**
@@ -98,6 +99,7 @@ export class OverlayManager implements IOverlayManager {
    */
   public close() {
     this._panel.classList.add(CollapsedOverlayClass)
+    this._render()
   }
 
   /**
@@ -105,10 +107,13 @@ export class OverlayManager implements IOverlayManager {
    */
   public show() {
     this._panel.classList.remove(HiddenOverlayClass)
+    this._render()
   }
+
   public togglePanel() {
     this._panel.classList.toggle(HiddenOverlayClass)
     this._panel.classList.toggle(CollapsedOverlayClass)
+    this._render()
   }
 
   /**
@@ -116,10 +121,12 @@ export class OverlayManager implements IOverlayManager {
    */
   public hide() {
     this._panel.classList.add(HiddenOverlayClass)
+    this._render()
   }
 
   public toggle() {
     this._panel.classList.toggle(CollapsedOverlayClass)
+    this._render()
   }
 
   public register(overlay: Overlay) {
@@ -223,6 +230,7 @@ export class OverlayManager implements IOverlayManager {
   private _render() {
     ReactDOM.render(
       <App
+        hidden={this._panel.classList.contains(HiddenOverlayClass)}
         overlayManager={this}
         onToggle={this.toggle.bind(this)}
         ref={this.ref}
