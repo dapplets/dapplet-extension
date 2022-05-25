@@ -348,7 +348,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
   // const filteredDapplets = _getSortedDapplets(_getFilteredDapplets(dapplets))
   const filteredDapplets = useMemo(() => {
-    console.log('fd')
     return _getSortedDapplets(_getFilteredDapplets(dapplets))
   }, [search, dapplets])
 

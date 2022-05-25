@@ -21,6 +21,8 @@ export interface OverlayTabProps {
 }
 
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
+    const visibleMenus = p.menus.filter(x => x.hidden !== true);
+
     return (
         <div
             className={cn(styles.tab, {
@@ -58,9 +60,9 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                 )}
             </div>
 
-            {p.isActive && p.menus.length > 0 && (
+            {p.isActive && visibleMenus.length > 0 && (
                 <ul className={styles.list}>
-                    {p.menus.map((menu) => {
+                    {visibleMenus.map((menu) => {
                         return (
                             <li
                                 key={menu.id}

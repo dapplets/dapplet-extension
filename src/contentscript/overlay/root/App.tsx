@@ -143,7 +143,7 @@ class _App extends React.Component<P, S> {
                 },
                 pinned: false,
                 title: "",
-                menus: [
+                menus: (source !== 'null') ? [
                     ...group.map((x) => ({
                         id: x.id,
                         title: x.title,
@@ -158,6 +158,13 @@ class _App extends React.Component<P, S> {
                             registryUrl: group[0]?.module?.registryUrl
                         }
                     },
+                ] : [
+                    ...group.map((x) => ({
+                        id: x.id,
+                        title: x.title,
+                        icon: Home,
+                        hidden: true
+                    }))
                 ],
             };
             tabs.push(tab);

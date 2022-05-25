@@ -21,7 +21,7 @@ export const ModuleIcon: React.FC<ModuleIconProps> = (props) => {
         (async () => {
             const { getModuleInfoByName } = await initBGFunctions(browser);
             const mi = await getModuleInfoByName(registryUrl, moduleName);
-            setStorageRef(mi.icon);
+            setStorageRef(mi?.icon);
         })();
     }, []);
 

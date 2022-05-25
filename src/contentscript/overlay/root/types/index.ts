@@ -6,6 +6,7 @@ export type ToolbarTabMenu = {
     title: string;
     icon: string | StorageRef | React.FC<React.SVGProps<SVGSVGElement>> | ModuleIconProps;
     props?: any;
+    hidden?: boolean;
 };
 
 export type ToolbarTab = {

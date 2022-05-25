@@ -1,3 +1,5 @@
+import '../common/semantic-ui-css/semantic.min.css';
+import './index.scss';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Bus } from "../common/bus";
@@ -19,5 +21,3 @@ bus.subscribe("data", async ({ mi, vi, schemaConfig, defaultConfig }) => {
         document.querySelector("#app")
     );
 });
-
-ReactDOM.render(<SettingsPage />, document.querySelector("#app"));

@@ -3,8 +3,6 @@ import { initBGFunctions } from "chrome-extension-message-wrapper";
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Card, Image, Button, Dimmer, Loader, Message } from 'semantic-ui-react';
-import '../common/semantic-ui-css/semantic.min.css';
-import './index.scss';
 import { Bus } from '../common/bus';
 import ModuleInfo from '../background/models/moduleInfo';
 import { DefaultConfig, SchemaConfig } from '../common/types';
@@ -88,8 +86,8 @@ export class SettingsPage extends React.Component<Props, State> {
 
     private async _refreshData() {
         const { getAllUserSettings } = await initBGFunctions(browser);
-        const defaultData = this.props.defaultConfig && this.props.defaultConfig[this.props.vi.environment] || {};
         const customData = await getAllUserSettings(this.props.mi.name);
+        const defaultData = this.props.defaultConfig && this.props.defaultConfig[this.props.vi.environment] || {};
         const data = { ...defaultData, ...customData };
         this.setState({ data });
     }
