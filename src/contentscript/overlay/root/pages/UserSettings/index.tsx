@@ -40,20 +40,21 @@ export interface UserSettingsProps {
     registryUrl: string;
 }
 
-export const UserSettings = (props: UserSettingsProps): ReactElement => {
+export const UserSettings = ({
+    dappletName,
+    registryUrl,
+}: UserSettingsProps): ReactElement => {
     const [settingsContext, setSettingsContext] = useState(null);
 
     useEffect(() => {
         (async () => {
+            setSettingsContext(null);
             const { getUserSettingsForOverlay } = await initBGFunctions(
                 browser
             );
 
             const { mi, vi, schemaConfig, defaultConfig } =
-                await getUserSettingsForOverlay(
-                    props.registryUrl,
-                    props.dappletName
-                );
+                await getUserSettingsForOverlay(registryUrl, dappletName);
 
             setSettingsContext({ mi, vi, schemaConfig, defaultConfig });
         })();
@@ -61,11 +62,10 @@ export const UserSettings = (props: UserSettingsProps): ReactElement => {
         return () => {
             // _isMounted = false;
         };
-    }, []);
+    }, [dappletName, registryUrl]);
 
     if (!settingsContext) return null;
     const { mi, vi, schemaConfig, defaultConfig } = settingsContext;
-
 
     return (
         <SettingsPage
