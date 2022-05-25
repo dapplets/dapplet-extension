@@ -51,12 +51,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
       const ids = await getCurrentContextIds(currentTab)
 
-      const d = await getFeaturesByHostnames(ids)
-
       setContextIds(ids)
       await _refreshDataByContext(ids)
 
-      setDapplets(d)
       setLoadingListDapplets(false)
 
       await loadTrustedUsers()
@@ -73,10 +70,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     return () => {
       _isMounted = false
     }
-  }, [
-    // search
-    dropdownListValue,
-  ])
+  }, [])
   // console.log(dropdownListValue)
 
   const _refreshDataByContext = async (contextIds: Promise<string[]>) => {
@@ -349,7 +343,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   // const filteredDapplets = _getSortedDapplets(_getFilteredDapplets(dapplets))
   const filteredDapplets = useMemo(() => {
     return _getSortedDapplets(_getFilteredDapplets(dapplets))
-  }, [search, dapplets])
+  }, [search, dapplets, dropdownListValue])
 
   return (
     <>
