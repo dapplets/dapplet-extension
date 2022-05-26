@@ -1,0 +1,35 @@
+@import '../../../assets/styles/null.scss';
+@import '../../../assets/styles/fonts.scss';
+@import '../../../assets/styles/color.variables.scss';
+
+.buttonLogin {
+  // display: flex;
+
+  // align-items: center;
+  // justify-content: center;
+  display: inline-block;
+  text-align: center;
+  padding: 10px 20px;
+
+  // width: 65px;
+  // height: 30px;
+
+  background: #ffffff;
+  border-radius: 200px;
+
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 100%;
+
+  text-transform: capitalize;
+
+  color: $Primary;
+  &:hover {
+    color: $PrimaryHover;
+  }
+  &:active {
+    color: $PrimaryPressed;
+  }
+}

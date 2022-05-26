@@ -2,77 +2,40 @@
 @import '../../assets/styles/fonts.scss';
 @import '../../assets/styles/color.variables.scss';
 
-.wrapper {
-  display: inline-block;
-
-  font-family: Roboto, sans-serif;
+.wrapperModalWallets {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  min-width: 160px;
 }
 
-.header {
-  position: relative;
-  z-index: 2;
-
-  display: flex;
-  align-items: center;
-
-  padding: 2px;
-  padding-right: 14px;
-
+.walletBlock {
+  width: 77px;
+  height: 77px;
+  background: #c4c4c4;
+  border-radius: 5px;
   cursor: pointer;
-
-  border-radius: 100px;
-  background: $PureWhite;
-
-  &.mini {
-    padding: 2px;
+  &:hover {
+    background: $MainGrey;
+    box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.09),
+      0px 10px 8px rgba(38, 117, 209, 0.04);
+  }
+  &:active {
+    background: $ContentBlack;
+    box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.09),
+      0px 10px 8px rgba(38, 117, 209, 0.04);
   }
 }
-
-.avatar {
-  width: 29px;
-  height: 29px;
-
-  border: 1px solid $StrokeColor;
-}
-
-.hash {
-  margin-right: 5px;
-  margin-left: 6px;
-
-  text-transform: uppercase;
-
-  font-size: 10px;
-  line-height: 100%;
-}
-
-.list {
-  position: relative;
-  z-index: 0;
-
-  display: flex;
-  justify-content: center;
-
-  min-height: 45px;
-  margin-top: -20px;
-  margin-bottom: 0;
-  padding: 3.5px 0 7px;
-
-  border-radius: 0 0 10px 10px;
-  background: #fff;
-  box-shadow: 0 0 10px 1px rgba(0, 0, 0, 0.25);
-
-  font-size: 14px;
-  line-height: 16px;
-}
-
-.item {
-  margin-top: auto;
-
-  cursor: pointer;
-
-  color: $Primary;
-}
-
-.isOpen {
-  border-radius: 7px 7px 10px 10px;
+.ens {
+  background: #5ec280;
+  &:hover {
+    background: #72d694;
+    box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.09),
+      0px 10px 8px rgba(38, 117, 209, 0.04);
+  }
+  &:active {
+    background: #26a651;
+    box-shadow: 0px 3px 4px rgba(0, 0, 0, 0.09),
+      0px 10px 8px rgba(38, 117, 209, 0.04);
+  }
 }

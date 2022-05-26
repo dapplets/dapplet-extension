@@ -1,20 +1,39 @@
-import React, { FC } from 'react'
+import React, { FC, useEffect } from 'react'
 import styles from './Profile.module.scss'
 import cn from 'classnames'
 import { Avatar } from '../Avatar'
 import { ReactComponent as Down } from '../../assets/icons/down.svg'
+import { useToggle } from '../../hooks/useToggle'
+import { useState } from 'react'
+import { LogInButton } from './LoginButtons'
+import { Modal } from './ModalConnectedAccounts'
+import { HeaderLogIn } from './HeaderLogIn'
 
 export interface ProfileProps {
-  avatar: string
-  hash: string
-  isOpen?: boolean
-  open?: () => void
-  onLogout?: () => void
-  mini?: boolean
+  avatar?: string
+  hash?: string
 }
+const TEST_WALLET = [
+  { id: '1', title: 'ENS' },
+  { id: '1', title: 'NOT_ENS' },
+]
 
 export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
-  const { avatar, hash, isOpen, onLogout, open, mini = false } = props
+  const {
+    avatar,
+    hash,
+    //  isOpen, onLogout, open, mini = false
+  } = props
+  const [isOpen, setOpen] = useToggle(false)
+  const [isNotLogIn, setNotLogIn] = useState(true)
+  const [isModalWalletConnect, setModalWalletConnect] = useState(false)
+  const [isMini, setMini] = useToggle(false)
+  const [isEns, setEns] = useState(false)
+
+  const onCloseModalWalletConnect = () => setModalWalletConnect(false)
+  useEffect(() => {
+    console.log(isNotLogIn)
+  }, [isNotLogIn])
 
   const visible = (hash: string): string => {
     const firstFourCharacters = hash.substring(0, 6)
@@ -24,26 +43,48 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
   }
 
   return (
-    <div className={styles.wrapper}>
-      <header
-        className={cn(styles.header, { [styles.mini]: mini })}
-        onClick={open}
-      >
-        <Avatar avatar={avatar} size="big" className={styles.avatar} />
-        {!mini && <p className={styles.hash}>{visible(hash)}</p>}
-        {!mini && <Down />}
-      </header>
-      {isOpen && !mini && (
-        <ul
-          className={cn(styles.list, {
-            [styles.isOpen]: isOpen,
-          })}
-        >
-          <li onClick={onLogout} className={styles.item}>
-            Log out
-          </li>
-        </ul>
+    <>
+      {isNotLogIn ? (
+        <LogInButton
+          label="Login"
+          onClick={() => setModalWalletConnect(true)}
+        />
+      ) : (
+        <HeaderLogIn
+          isMini={isMini}
+          setOpen={setOpen}
+          setMini={setMini}
+          isOpen={isOpen}
+          setNotLogIn={setNotLogIn}
+          hash={hash}
+          avatar={avatar}
+          isEns={isEns}
+          setEns={setEns}
+          // isNotLogin={isNotLogIn}
+        />
       )}
-    </div>
+      <Modal
+        visible={isModalWalletConnect}
+        title="Connect new wallet"
+        content={'select connection type '}
+        footer={
+          <div className={cn(styles.wrapperModalWallets)}>
+            {TEST_WALLET.map((x, i) => (
+              <div
+                className={cn(styles.walletBlock, {
+                  [styles.ens]: x.title === 'ENS',
+                })}
+                onClick={() => {
+                  setNotLogIn(false)
+                  onCloseModalWalletConnect()
+                  x.title === 'ENS' ? setEns(true) : setEns(false)
+                }}
+              ></div>
+            ))}
+          </div>
+        }
+        onClose={() => onCloseModalWalletConnect()}
+      />
+    </>
   )
 }
