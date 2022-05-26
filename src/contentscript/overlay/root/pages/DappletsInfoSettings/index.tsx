@@ -1,34 +1,15 @@
-import React, {
-  ReactElement,
-  useState,
-  useEffect,
-  useMemo,
-  FC,
-  useRef,
-} from 'react'
-import cn from 'classnames'
-import styles from './DappletsInfoSettings.module.scss'
-import { SettingWrapper } from '../../components/SettingWrapper'
-import { SettingItem } from '../../components/SettingItem'
-import {
-  isValidHttp,
-  isValidUrl,
-  isValidPostageStampId,
-} from '../../../../../popup/helpers'
-import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { useToggle } from '../../hooks/useToggle'
-import { Bus } from '../../../../../common/bus'
+import cn from 'classnames'
+import React, { FC, useEffect, useRef, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
-import * as tracing from '../../../../../common/tracing'
+import { Bus } from '../../../../../common/bus'
+import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
+import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { typeOfUri, chainByUri, joinUrls } from '../../../../../common/helpers'
-import {
-  DEFAULT_BRANCH_NAME,
-  ModuleTypes,
-  StorageTypes,
-} from '../../../../../common/constants'
+import { SettingWrapper } from '../../components/SettingWrapper'
+import styles from './DappletsInfoSettings.module.scss'
 
 enum DeploymentStatus {
   Unknown,
@@ -79,8 +60,7 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
   const [originalMi, setOriginalMi] = useState(null)
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
   const [vi, setVi] = useState<VersionInfo>(ModuleVersion)
-  const [dependenciesChecking, setDpendenciesChecking] =
-    useState<DependencyChecking[]>()
+  const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>()
   const [loading, setLoading] = useState(false)
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
@@ -94,9 +74,7 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
   const [editContextId, setEditContextId] = useState('')
   const [editContextIdLoading, setEditContextIdLoading] = useState(false)
   const [editContextIdDone, setEditContextIdDone] = useState(false)
-  const [deploymentStatus, setDeploymentStatus] = useState(
-    DeploymentStatus.Unknown
-  )
+  const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
   const [trustedUsers, setTrustedUsers] = useState([])
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [mode, setMode] = useState(null)
@@ -140,62 +118,56 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
     }
   }, [mi, visible, editContextId])
 
-  bus.subscribe(
-    'data',
-    async ({ mi, vi }: { mi: ModuleInfo; vi: VersionInfo }) => {
-      const { getSwarmGateway } = await initBGFunctions(browser)
-      const swarmGatewayUrl = await getSwarmGateway()
+  bus.subscribe('data', async ({ mi, vi }: { mi: ModuleInfo; vi: VersionInfo }) => {
+    const { getSwarmGateway } = await initBGFunctions(browser)
+    const swarmGatewayUrl = await getSwarmGateway()
 
-      if (mi === null && vi === null) {
-        // New module
-        const mi = new ModuleInfo()
-        setOriginalMi(JSON.parse(JSON.stringify(mi)))
-        setMi(mi)
-        setLoading(false)
-        setSwarmGatewayUrl(swarmGatewayUrl)
-        setMode(FormMode.Creating)
+    if (mi === null && vi === null) {
+      // New module
+      const mi = new ModuleInfo()
+      setOriginalMi(JSON.parse(JSON.stringify(mi)))
+      setMi(mi)
+      setLoading(false)
+      setSwarmGatewayUrl(swarmGatewayUrl)
+      setMode(FormMode.Creating)
 
-        await _updateData()
-      } else {
-        // Deploy module
-        const dependencies = vi?.dependencies
-          ? Object.entries(vi.dependencies).map(([name, version]) => ({
-              name: name,
-              version: version,
-              type: DependencyType.Dependency,
-            }))
-          : []
-        const interfaces = vi?.interfaces
-          ? Object.entries(vi.interfaces).map(([name, version]) => ({
-              name: name,
-              version: version,
-              type: DependencyType.Interface,
-            }))
-          : []
-        const dependenciesChecking = [...dependencies, ...interfaces]
-        setOriginalMi(JSON.parse(JSON.stringify(mi)))
-        setMi(mi)
-        setVi(vi)
-        setDpendenciesChecking(dependenciesChecking)
-        setLoading(false)
-        setSwarmGatewayUrl(swarmGatewayUrl)
+      await _updateData()
+    } else {
+      // Deploy module
+      const dependencies = vi?.dependencies
+        ? Object.entries(vi.dependencies).map(([name, version]) => ({
+            name: name,
+            version: version,
+            type: DependencyType.Dependency,
+          }))
+        : []
+      const interfaces = vi?.interfaces
+        ? Object.entries(vi.interfaces).map(([name, version]) => ({
+            name: name,
+            version: version,
+            type: DependencyType.Interface,
+          }))
+        : []
+      const dependenciesChecking = [...dependencies, ...interfaces]
+      setOriginalMi(JSON.parse(JSON.stringify(mi)))
+      setMi(mi)
+      setVi(vi)
+      setDpendenciesChecking(dependenciesChecking)
+      setLoading(false)
+      setSwarmGatewayUrl(swarmGatewayUrl)
 
-        await _updateData()
-      }
+      await _updateData()
     }
-  )
+  })
 
   const _checkDependencies = async () => {
     const { getVersionInfo } = await initBGFunctions(browser)
 
     await Promise.all(
       dependenciesChecking.map((x) =>
-        getVersionInfo(
-          targetRegistry,
-          x.name,
-          DEFAULT_BRANCH_NAME,
-          x.version
-        ).then((y) => (x.isExists = !!y))
+        getVersionInfo(targetRegistry, x.name, DEFAULT_BRANCH_NAME, x.version).then(
+          (y) => (x.isExists = !!y)
+        )
       )
     )
   }
@@ -224,10 +196,7 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
 
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
-    const currentAccount = await getAddress(
-      DefaultSigners.EXTENSION,
-      targetChain
-    )
+    const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
     setCurrentAccount(currentAccount)
   }
 
@@ -273,8 +242,7 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
                     disabled={mi.contextIds.length >= 1}
                     onClick={addButtonClickHandlerContext}
                     className={cn(styles.contextIDButton, {
-                      [styles.contextIDButtonDisabled]:
-                        mi.contextIds.length >= 1,
+                      [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
                     })}
                   />
                 </div>
@@ -305,9 +273,7 @@ export const DappletsInfoSettings: FC<DappletsInfoSettings> = (props) => {
                       />
                     </div>
                     <button
-                      disabled={
-                        nodeInput.current?.value.length < 2 || addDisabled
-                      }
+                      disabled={nodeInput.current?.value.length < 2 || addDisabled}
                       onClick={() => {
                         node.current?.classList.add('valid')
                         _addContextId(editContextId)

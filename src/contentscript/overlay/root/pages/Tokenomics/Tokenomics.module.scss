@@ -4,14 +4,16 @@
 
 .wrapper {
   display: flex;
-  flex-direction: column;
   overflow: hidden;
-  width: 100%;
 
   flex: 1 1 auto;
+  flex-direction: column;
+
+  width: 100%;
 
   height: calc(100vh - 130px);
 }
+
 .wrapper::-webkit-scrollbar {
   width: 0;
 }
@@ -26,39 +28,44 @@
 
 .blockMessage {
   display: flex;
-  flex-direction: column;
   overflow: hidden;
-  justify-content: center;
   align-items: center;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+
   width: 100%;
   height: 100%;
-  flex: 1 1 auto;
 }
+
 .applyButtonDisabled {
-  cursor: default;
   display: flex;
+  align-items: center;
 
   justify-content: center;
-  align-items: center;
-  padding: 0px 10px;
 
   width: 73px;
   height: 32px;
+  padding: 0 10px;
 
-  border-radius: 4px;
-
-  font-family: 'Roboto';
-
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
+  cursor: default;
 
   color: $StrokeColor;
-  background: $AppBG;
   border: 1px solid $StrokeColor;
+
+  border-radius: 4px;
+  background: $AppBG;
+
+  font-family: Roboto;
+  font-size: 14px;
+
+  font-weight: 400;
+  line-height: 100%;
+
   &:hover {
     background: $AppBG;
   }
+
   &:active {
     background: $AppBG;
   }
@@ -66,30 +73,32 @@
 
 .createTokenomics {
   display: flex;
+  align-items: center;
 
   justify-content: center;
-  align-items: center;
-  padding: 0px 10px;
 
   width: 73px;
   height: 32px;
-
-  background: $Primary;
-  border-radius: 4px;
-
-  font-family: 'Roboto';
-
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
-
-  color: $PureWhite;
-  text-transform: uppercase;
+  padding: 0 10px;
 
   cursor: pointer;
+  text-transform: uppercase;
+
+  color: $PureWhite;
+  border-radius: 4px;
+
+  background: $Primary;
+
+  font-family: Roboto;
+  font-size: 14px;
+
+  font-weight: 400;
+  line-height: 100%;
+
   &:hover {
     background: $PrimaryHover;
   }
+
   &:active {
     background: $PrimaryPressed;
   }
@@ -97,59 +106,70 @@
 
 .blockTokenParameters {
   display: flex;
-  flex-direction: column;
   overflow: hidden;
+
   // justify-content: center;
   align-items: center;
+  flex: 1 1 auto;
+  flex-direction: column;
+
   width: 100%;
   height: 100%;
-  flex: 1 1 auto;
 }
 
 .wrapperSettings {
-  margin: 15px 0px 118px 0px;
+  margin: 15px 0 118px;
 }
 
 .blockTokenInfo {
   display: flex;
-  width: 100%;
   flex-direction: column;
+
+  width: 100%;
 }
+
 .titleToken {
   position: relative;
 }
+
 .tokenTitleInfo {
   position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   top: 11px;
   left: 95px;
-  padding: 2px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   width: 14px;
   height: 14px;
+  padding: 2px;
 
-  background: $MainGrey;
+  cursor: pointer;
+
+  color: $PureWhite;
   border-radius: 50%;
 
-  font-family: 'Roboto';
+  background: $MainGrey;
+
+  font-family: Roboto;
+  font-size: 10px;
 
   font-weight: 500;
-  font-size: 10px;
   line-height: 10px;
-  cursor: pointer;
-  color: $PureWhite;
 
   &:hover {
     background: $StrokeColor;
   }
+
   &:active {
     background: $MainBlack;
   }
 }
+
 .inputTokenTicker {
   text-transform: uppercase;
+
   &::placeholder {
     text-transform: none;
   }
@@ -160,31 +180,37 @@
 }
 
 .support::before {
-  content: attr(data-title);
-  display: none;
   position: absolute;
   z-index: 9998;
-  top: 0px;
+  top: 0;
   left: 0;
-  background: #fff;
-  border-radius: 10px 10px 10px 0px;
-  border: 1px solid #e3e3e3;
-  box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
-  text-align: left;
-  color: #000;
-  font-family: Roboto, sans-serif;
-  font-weight: 500;
-  color: #000;
-  font-size: 10px;
-  line-height: 100%;
-  opacity: 0.9;
-  cursor: default;
-  padding: 5px;
-  margin: -15px 0 0 10px;
+
+  display: none;
+
   width: 150px;
-  min-height: 20px;
   height: auto;
+  min-height: 20px;
+  margin: -15px 0 0 10px;
+  padding: 5px;
+
+  content: attr(data-title);
+  cursor: default;
+  text-align: left;
+
+  opacity: 0.9;
+  color: #000;
+  color: #000;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px 10px 10px 0;
+  background: #fff;
+  box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
+
+  font-family: Roboto, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 100%;
 }
+
 .support:hover::before,
 .support:focus::before {
   display: flex;
@@ -194,70 +220,91 @@
 
 .inputTokenName {
   display: flex;
-  padding: 5px 13px;
+
   width: 100%;
-  background: $AppBG;
+  padding: 5px 13px;
+
+  color: $MainGrey;
   border: 1px solid $StrokeColor;
   border-radius: 5px;
+  background: $AppBG;
 
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 400;
+  font-family: Roboto;
   font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
 }
+
 .inputTokenTickerInvalid {
-  border: 1px solid #ff6442;
   color: #ff6442;
+  border: 1px solid #ff6442;
 }
 
 .linkNavigation {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  height: 60px;
-  margin: 20px 0px 0px 0px;
   position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 60px;
+  margin: 20px 0 0;
+
   &::before {
-    content: '';
     position: absolute;
     top: -10px;
     left: 0;
+
     width: 100%;
     height: 2px;
+
+    content: '';
+
     background: $WebBG;
   }
 }
 
 .back {
-  display: block;
-  background: inherit;
-  font-family: 'Roboto';
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
   position: relative;
+
+  display: block;
+
+  margin: 0 0 0 14.5px;
+
   color: $MainGrey;
-  margin: 0px 0px 0px 14.5px;
+  background: inherit;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+
   &::before {
-    content: '';
     position: absolute;
     top: 0;
     left: -14.5px;
+
     width: 11px;
     height: 14px;
+
+    content: '';
+
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%23919191'/%3E%3C/svg%3E");
   }
+
   &:hover {
     color: $ContentBlack;
+
     &::before {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill=' %23747376'/%3E%3C/svg%3E");
     }
   }
+
   &:active {
     color: $MainBlack;
+
     &::before {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%232A2A2A'/%3E%3C/svg%3E");
     }
@@ -267,65 +314,71 @@
 // ===
 
 .finalWarning {
-  font-family: 'Roboto';
+  color: $MainGrey;
+
+  font-family: Roboto;
+  font-size: 14px;
 
   font-weight: 500;
-  font-size: 14px;
   line-height: 16px;
-
-  color: $MainGrey;
 }
 
 .footerContentModal {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  flex-direction: column;
 }
 
 .footerContentModalButton {
   display: flex;
+  align-items: center;
 
   justify-content: center;
-  align-items: center;
-  padding: 0px 10px;
 
   width: 140px;
   height: 32px;
+  margin: 0 0 9px;
+  padding: 0 10px;
+
+  color: $PureWhite;
+  border-radius: 4px;
 
   background: $Primary;
-  border-radius: 4px;
+
+  font-family: Roboto;
+  font-size: 14px;
+
+  font-weight: 400;
+  line-height: 100%;
+
   &:hover {
     background: $PrimaryHover;
   }
+
   &:active {
     background: $PrimaryPressed;
   }
-
-  font-family: 'Roboto';
-
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
-
-  color: $PureWhite;
-  margin: 0px 0px 9px 0px;
 }
 
 .footerContentModalLink {
-  font-family: 'Roboto';
+  color: $Primary;
+
+  font-family: Roboto;
+  font-size: 14px;
 
   font-weight: 400;
-  font-size: 14px;
   line-height: 100%;
 
-  color: $Primary;
   // background: $WebBG;
   &:hover {
     color: $PrimaryHover;
+
     // background: $WebBG;
   }
+
   &:active {
     color: $PrimaryPressed;
+
     // background: $WebBG;
   }
 }

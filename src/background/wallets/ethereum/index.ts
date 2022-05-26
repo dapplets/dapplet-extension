@@ -1,10 +1,10 @@
-import metamask from './metamask';
-import walletconnect from './walletconnect';
-import dapplets from './dapplets';
-import { WalletTypes } from '../../../common/types';
+import { WalletTypes } from '../../../common/types'
+import dapplets from './dapplets'
+import metamask from './metamask'
+import walletconnect from './walletconnect'
 
 export default {
-    [WalletTypes.METAMASK]: metamask,
-    [WalletTypes.WALLETCONNECT]: walletconnect,
-    [WalletTypes.DAPPLETS]: dapplets
+  [WalletTypes.METAMASK]: metamask,
+  [WalletTypes.WALLETCONNECT]: walletconnect,
+  [WalletTypes.DAPPLETS]: dapplets,
 }

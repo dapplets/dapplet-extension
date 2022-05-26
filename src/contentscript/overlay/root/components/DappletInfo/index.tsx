@@ -1,5 +1,5 @@
-import React, { FC } from 'react'
 import cn from 'classnames'
+import React, { FC } from 'react'
 import styles from './DappletInfo.module.scss'
 
 export interface DappletInfoProps {
@@ -25,10 +25,7 @@ export const DappletInfo: FC<DappletInfoProps> = ({
     if (appearance === 'text' || appearance === 'link') return value
 
     const firstFourCharacters = value.substring(0, 4)
-    const lastFourCharacters = value.substring(
-      value.length - 1,
-      value.length - 5
-    )
+    const lastFourCharacters = value.substring(value.length - 1, value.length - 5)
 
     return `${firstFourCharacters}...${lastFourCharacters}`
   }
@@ -39,12 +36,7 @@ export const DappletInfo: FC<DappletInfoProps> = ({
     <div className={cn(styles.wrapper, className)}>
       <h6 className={styles.title}>{title}:</h6>
       {isLink ? (
-        <a
-          href={value}
-          className={styles.value}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <a href={value} className={styles.value} target="_blank" rel="noreferrer">
           {visible({ appearance, value })}
         </a>
       ) : (

@@ -1,0 +1,25 @@
+{
+    "extends": [
+        "stylelint-config-standard",
+        "stylelint-config-standard-scss",
+        "stylelint-order-config-standard",
+        "stylelint-config-prettier"
+    ],
+    "plugins": [
+        "stylelint-order"
+    ],
+    "rules": {
+        "selector-class-pattern": null
+    },
+    "overrides": [
+        {
+            "files": [
+                "src/**/*.scss"
+            ],
+            "customSyntax": "postcss-scss"
+        }
+    ],
+    "ignoreFiles": [
+        "src/common/semantic-ui-css/semantic.min.css"
+    ]
+} 

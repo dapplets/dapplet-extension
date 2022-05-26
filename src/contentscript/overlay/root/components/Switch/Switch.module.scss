@@ -1,57 +1,57 @@
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/null.scss";
+@import '../../assets/styles/color.variables.scss';
+@import '../../assets/styles/null.scss';
 
 .wrapper {
-	position: relative;
+  position: relative;
 }
 
 .input {
-	position: absolute;
-	top: 0;
-	left: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 
-	width: 100%;
-	height: 100%;
+  width: 100%;
+  height: 100%;
 
-	opacity: 0;
+  opacity: 0;
 }
 
 .inputCheckbox {
-	position: relative;
+  position: relative;
 
-	display: block;
+  display: block;
 
-	width: 32px;
-	height: 20px;
+  width: 32px;
+  height: 20px;
 
-	cursor: pointer;
-	transition: all 0.3s ease 0s;
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
 
-	border-radius: 20px;
-	background: $MainGrey;
+  border-radius: 20px;
+  background: $MainGrey;
 
-	&::before {
-		position: absolute;
-		top: 50%;
-		left: 2px;
+  &::before {
+    position: absolute;
+    top: 50%;
+    left: 2px;
 
-		width: 16px;
-		height: 16px;
+    width: 16px;
+    height: 16px;
 
-		content: "";
+    content: '';
 
-		transition: all 0.3s ease 0s;
-		transform: translateY(-50%);
+    transition: all 0.3s ease 0s;
+    transform: translateY(-50%);
 
-		border-radius: 50%;
-		background: $PureWhite;
-	}
+    border-radius: 50%;
+    background: $PureWhite;
+  }
 
-	&.active {
-		background: $Primary;
+  &.active {
+    background: $Primary;
 
-		&::before {
-			transform: translateY(-50%) translateX(calc(100% - 4px));
-		}
-	}
+    &::before {
+      transform: translateY(-50%) translateX(calc(100% - 4px));
+    }
+  }
 }

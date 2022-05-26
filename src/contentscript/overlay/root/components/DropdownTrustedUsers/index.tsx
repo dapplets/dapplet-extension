@@ -1,23 +1,11 @@
-import React, {
-  FC,
-  FunctionComponent,
-  ReactNode,
-  HTMLAttributes,
-  DetailedHTMLProps,
-  useState,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react'
-import cn from 'classnames'
-import styles from './DropdownTrustedUsers.module.scss'
-import { IDropdown } from '../../models/dropdown.model'
-import { useToggle } from '../../hooks/useToggle'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import cn from 'classnames'
+import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-
-import { isValidUrl } from '../../../../../popup/helpers'
 import { typeOfUri, UriTypes } from '../../../../../common/helpers'
+import { isValidUrl } from '../../../../../popup/helpers'
+import { IDropdown } from '../../models/dropdown.model'
+import styles from './DropdownTrustedUsers.module.scss'
 
 export interface DropdownTrustedProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -25,9 +13,7 @@ export interface DropdownTrustedProps
   value?: IDropdown | null
 }
 let _isMounted = false
-export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
-  props: DropdownTrustedProps
-) => {
+export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTrustedProps) => {
   const {
     list,
     className,
@@ -41,15 +27,9 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
   const [trustedUsers, setTrustedUsers] = useState([])
   const [registries, setRegistries] = useState([])
 
-  const regExpIndexNearTestnet = new RegExp(
-    /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/
-  )
-  const regExpIndexNear = new RegExp(
-    /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/
-  )
-  const regExpIndexENS = new RegExp(
-    /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/
-  )
+  const regExpIndexNearTestnet = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/)
+  const regExpIndexNear = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/)
+  const regExpIndexENS = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/)
   const regExpIndexEthereum = new RegExp(/^0x[a-fA-F0-9]{40}$/)
   const regExpIndexNEARImplicit = new RegExp(/^[0-9a-z]{64}$/)
   const regExpIndexNEARDev = new RegExp(/^dev-\d*-\d*$/)
@@ -77,17 +57,11 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
   const addTrustedUser = async (account: string, x: () => void) => {
     const { addTrustedUser } = await initBGFunctions(browser)
     const valueParse = getNumIndex(trustedUserInput, regExpIndexEthereum)
-    const valueParseNEARImplicit = getNumIndex(
-      trustedUserInput,
-      regExpIndexNEARImplicit
-    )
+    const valueParseNEARImplicit = getNumIndex(trustedUserInput, regExpIndexNEARImplicit)
     const valueParseNEARDev = getNumIndex(trustedUserInput, regExpIndexNEARDev)
     const valueParseENS = getNumIndex(trustedUserInput, regExpIndexENS)
     const valueParseNear = getNumIndex(trustedUserInput, regExpIndexNear)
-    const valueParseNearTestnet = getNumIndex(
-      trustedUserInput,
-      regExpIndexNearTestnet
-    )
+    const valueParseNearTestnet = getNumIndex(trustedUserInput, regExpIndexNearTestnet)
     if (
       valueParse !== null ||
       valueParseNEARImplicit !== null ||
@@ -128,10 +102,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
     } else if (typeOfUri(address) === UriTypes.Ethereum) {
       window.open(`https://goerli.etherscan.io/address/${address}`, '_blank')
     } else if (typeOfUri(address) === UriTypes.Near) {
-      window.open(
-        `https://explorer.testnet.near.org/accounts/${address}`,
-        '_blank'
-      )
+      window.open(`https://explorer.testnet.near.org/accounts/${address}`, '_blank')
     }
   }
   const loadRegistries = async () => {
@@ -143,10 +114,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
   const visible = (hash: string): string => {
     if (hash.length > 38) {
       const firstFourCharacters = hash.substring(0, 20)
-      const lastFourCharacters = hash.substring(
-        hash.length - 0,
-        hash.length - 18
-      )
+      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 18)
 
       return `${firstFourCharacters}...${lastFourCharacters}`
     } else {
@@ -210,10 +178,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (
             </div>
             {trustedUsers.map((user, i) => (
               <div key={i} className={styles.itemUser}>
-                <a
-                  className={styles.userlink}
-                  onClick={() => _openEtherscan(user.account)}
-                >
+                <a className={styles.userlink} onClick={() => _openEtherscan(user.account)}>
                   {visible(user.account)}
                 </a>
                 <span

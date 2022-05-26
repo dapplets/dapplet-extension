@@ -1,12 +1,4 @@
-import React, {
-  ReactElement,
-  useState,
-  useEffect,
-  useMemo,
-  FC,
-  useRef,
-} from 'react'
-import cn from 'classnames'
+import React, { ReactElement, useEffect } from 'react'
 import styles from './ModalReward.module.scss'
 
 interface ModalRewardProps {

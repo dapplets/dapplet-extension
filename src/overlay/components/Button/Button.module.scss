@@ -1,43 +1,43 @@
 .button {
-	padding: 5px 10px;
+  padding: 5px 10px;
 
-	cursor: pointer;
+  cursor: pointer;
 
-	color: #FFF;
-	border: none;
-	border-radius: 5px;
-	background-color: #D9304F;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  background-color: #d9304f;
 
-	font-size: 14px;
+  font-size: 14px;
 }
 
 .button:hover {
-	background-color: #E52347;
+  background-color: #e52347;
 }
 
 .button:active {
-	background-color: #95132B;
+  background-color: #95132b;
 }
 
 .basic {
-	padding: 5px 10px;
+  padding: 5px 10px;
 
-	cursor: pointer;
+  cursor: pointer;
 
-	color: #D9304F;
-	border: none;
-	border-radius: 5px;
-	background-color: #0000;
+  color: #d9304f;
+  border: none;
+  border-radius: 5px;
+  background-color: #0000;
 
-	font-size: 14px;
+  font-size: 14px;
 
-	font-weight: 500;
+  font-weight: 500;
 }
 
 .basic:hover {
-	color: #E52347;
+  color: #e52347;
 }
 
 .basic:active {
-	color: #95132B;
+  color: #95132b;
 }

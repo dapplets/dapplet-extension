@@ -1,6 +1,6 @@
+import cn from 'classnames'
 import React, { CSSProperties, ReactElement } from 'react'
 import styles from './SettingTitle.module.scss'
-import cn from 'classnames'
 
 export interface SettingTitleProps {
   title: string
@@ -12,22 +12,12 @@ export interface SettingTitleProps {
 }
 
 export const SettingTitle = (props: SettingTitleProps): ReactElement => {
-  const {
-    title,
-    isActive = false,
-    found = null,
-    style,
-    className,
-    onClick,
-  } = props
+  const { title, isActive = false, found = null, style, className, onClick } = props
   const isVisibleFound = found && found > 0
 
   return (
     <div className={cn(styles.wrapper, className)} onClick={onClick}>
-      <h4
-        className={cn(styles.title, { [styles.isActive]: isActive })}
-        style={style}
-      >
+      <h4 className={cn(styles.title, { [styles.isActive]: isActive })} style={style}>
         {title}
         {isVisibleFound ? <span className={styles.found}>{found}</span> : null}
       </h4>

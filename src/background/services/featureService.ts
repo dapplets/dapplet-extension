@@ -1,31 +1,20 @@
-import ManifestDTO from '../dto/manifestDTO'
-import ModuleManager from '../utils/moduleManager'
-import { browser } from 'webextension-polyfill-ts'
-import { StorageAggregator } from '../moduleStorages/moduleStorage'
-import GlobalConfigService from './globalConfigService'
-import {
-  CONTEXT_ID_WILDCARD,
-  DEFAULT_BRANCH_NAME,
-  ModuleTypes,
-  StorageTypes,
-} from '../../common/constants'
+import JSZip from 'jszip'
 import { rcompare } from 'semver'
+import { browser } from 'webextension-polyfill-ts'
+import { base64ArrayBuffer } from '../../common/base64ArrayBuffer'
+import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants'
+import * as EventBus from '../../common/global-event-bus'
+import { areModulesEqual, getCurrentTab, mergeDedupe, parseModuleName } from '../../common/helpers'
+import ManifestDTO from '../dto/manifestDTO'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
-import JSZip from 'jszip'
-
-import {
-  areModulesEqual,
-  getCurrentTab,
-  mergeDedupe,
-  parseModuleName,
-} from '../../common/helpers'
-import { WalletService } from './walletService'
+import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
 import { StorageRef } from '../registries/registry'
-import { base64ArrayBuffer } from '../../common/base64ArrayBuffer'
+import ModuleManager from '../utils/moduleManager'
+import GlobalConfigService from './globalConfigService'
 import { OverlayService } from './overlayService'
-import * as EventBus from '../../common/global-event-bus'
+import { WalletService } from './walletService'
 
 export default class FeatureService {
   private _moduleManager: ModuleManager
@@ -60,39 +49,29 @@ export default class FeatureService {
     const dtos: ManifestDTO[] = []
 
     const configRegistries = await this._globalConfigService.getRegistries()
-    const everywhereConfig = await this._globalConfigService.getSiteConfigById(
-      CONTEXT_ID_WILDCARD
-    )
+    const everywhereConfig = await this._globalConfigService.getSiteConfigById(CONTEXT_ID_WILDCARD)
 
     let i = 0
 
     // ToDo: how to merge modules from different registries???
-    for (const [registryUrl, moduleInfosByContextId] of Object.entries(
-      contextIdsByRegsitries
-    )) {
-      for (const [contextId, moduleInfos] of Object.entries(
-        moduleInfosByContextId
-      )) {
+    for (const [registryUrl, moduleInfosByContextId] of Object.entries(contextIdsByRegsitries)) {
+      for (const [contextId, moduleInfos] of Object.entries(moduleInfosByContextId)) {
         for (const moduleInfo of moduleInfos) {
           const dto = dtos.find((d) => d.name === moduleInfo.name)
           if (!dto) {
             const dto: ManifestDTO = moduleInfo as any
-            const config = await this._globalConfigService.getSiteConfigById(
-              contextId
-            ) // ToDo: which contextId should we compare?
+            const config = await this._globalConfigService.getSiteConfigById(contextId) // ToDo: which contextId should we compare?
             dto.isActive =
               config.activeFeatures[dto.name]?.isActive ||
               everywhereConfig.activeFeatures[dto.name]?.isActive ||
               false
             dto.isActionHandler =
               config.activeFeatures[dto.name]?.runtime?.isActionHandler ||
-              everywhereConfig.activeFeatures[dto.name]?.runtime
-                ?.isActionHandler ||
+              everywhereConfig.activeFeatures[dto.name]?.runtime?.isActionHandler ||
               false
             dto.isHomeHandler =
               config.activeFeatures[dto.name]?.runtime?.isHomeHandler ||
-              everywhereConfig.activeFeatures[dto.name]?.runtime
-                ?.isHomeHandler ||
+              everywhereConfig.activeFeatures[dto.name]?.runtime?.isHomeHandler ||
               false
             dto.activeVersion = dto.isActive
               ? config.activeFeatures[dto.name]?.version ||
@@ -100,9 +79,7 @@ export default class FeatureService {
                 null
               : null
             dto.lastVersion = dto.isActive
-              ? await this.getVersions(registryUrl, dto.name).then(
-                  (x) => x.sort(rcompare)[0]
-                )
+              ? await this.getVersions(registryUrl, dto.name).then((x) => x.sort(rcompare)[0])
               : null // ToDo: how does this affect performance?
             dto.order = i++
             dto.sourceRegistry = {
@@ -127,29 +104,20 @@ export default class FeatureService {
 
     // Adding of unavailable dapplets
     for (const contextId of contextIds) {
-      const config = await this._globalConfigService.getSiteConfigById(
-        contextId
-      )
+      const config = await this._globalConfigService.getSiteConfigById(contextId)
       for (const moduleName in config.activeFeatures) {
         const registryUrl = config.activeFeatures[moduleName].registryUrl
         if (!activeRegistries.find((r) => r.url === registryUrl)) continue
         if (dtos.find((x) => x.name === moduleName)) continue
 
-        const moduleInfo = await this.getModuleInfoByName(
-          registryUrl,
-          moduleName
-        )
+        const moduleInfo = await this.getModuleInfoByName(registryUrl, moduleName)
         if (!moduleInfo) continue
 
         const dto: ManifestDTO = moduleInfo as any
         dto.isActive = config.activeFeatures[dto.name]?.isActive || false
-        dto.isActionHandler =
-          config.activeFeatures[dto.name]?.runtime?.isActionHandler || false
-        dto.isHomeHandler =
-          config.activeFeatures[dto.name]?.runtime?.isHomeHandler || false
-        dto.activeVersion = dto.isActive
-          ? config.activeFeatures[dto.name]?.version || null
-          : null
+        dto.isActionHandler = config.activeFeatures[dto.name]?.runtime?.isActionHandler || false
+        dto.isHomeHandler = config.activeFeatures[dto.name]?.runtime?.isHomeHandler || false
+        dto.activeVersion = dto.isActive ? config.activeFeatures[dto.name]?.version || null : null
         dto.lastVersion = dto.isActive
           ? await this.getVersions(registryUrl, dto.name)
               .then((x) => x.sort(rcompare)[0])
@@ -190,36 +158,22 @@ export default class FeatureService {
     ).then((x) => x.filter((y) => !!y))
 
     if (myDappletsToAdd.length > 0) {
-      const registryUrls = Array.from(
-        new Set(myDappletsToAdd.map((x) => x.registryUrl))
-      )
+      const registryUrls = Array.from(new Set(myDappletsToAdd.map((x) => x.registryUrl)))
       for (const registryUrl of registryUrls) {
         const owners = Array.from(
           new Set([
             ...users.map((x) => x.account),
-            ...myDappletsToAdd
-              .filter((x) => x.registryUrl === registryUrl)
-              .map((x) => x.author),
+            ...myDappletsToAdd.filter((x) => x.registryUrl === registryUrl).map((x) => x.author),
           ])
         )
-        const registry =
-          await this._moduleManager.registryAggregator.getRegistryByUri(
-            registryUrl
-          )
-        const moduleInfosByContextId = await registry.getModuleInfo(
-          contextIds,
-          owners
-        )
+        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl)
+        const moduleInfosByContextId = await registry.getModuleInfo(contextIds, owners)
 
-        for (const [contextId, moduleInfos] of Object.entries(
-          moduleInfosByContextId
-        )) {
+        for (const [contextId, moduleInfos] of Object.entries(moduleInfosByContextId)) {
           for (const moduleInfo of moduleInfos) {
             if (
               !myDappletsToAdd.find(
-                (x) =>
-                  x.registryUrl === moduleInfo.registryUrl &&
-                  x.name === moduleInfo.name
+                (x) => x.registryUrl === moduleInfo.registryUrl && x.name === moduleInfo.name
               )
             )
               continue
@@ -227,22 +181,18 @@ export default class FeatureService {
             const dto = dtos.find((d) => d.name === moduleInfo.name)
             if (!dto) {
               const dto: ManifestDTO = moduleInfo as any
-              const config = await this._globalConfigService.getSiteConfigById(
-                contextId
-              ) // ToDo: which contextId should we compare?
+              const config = await this._globalConfigService.getSiteConfigById(contextId) // ToDo: which contextId should we compare?
               dto.isActive =
                 config.activeFeatures[dto.name]?.isActive ||
                 everywhereConfig.activeFeatures[dto.name]?.isActive ||
                 false
               dto.isActionHandler =
                 config.activeFeatures[dto.name]?.runtime?.isActionHandler ||
-                everywhereConfig.activeFeatures[dto.name]?.runtime
-                  ?.isActionHandler ||
+                everywhereConfig.activeFeatures[dto.name]?.runtime?.isActionHandler ||
                 false
               dto.isHomeHandler =
                 config.activeFeatures[dto.name]?.runtime?.isHomeHandler ||
-                everywhereConfig.activeFeatures[dto.name]?.runtime
-                  ?.isHomeHandler ||
+                everywhereConfig.activeFeatures[dto.name]?.runtime?.isHomeHandler ||
                 false
               dto.activeVersion = dto.isActive
                 ? config.activeFeatures[dto.name]?.version ||
@@ -250,15 +200,12 @@ export default class FeatureService {
                   null
                 : null
               dto.lastVersion = dto.isActive
-                ? await this.getVersions(registryUrl, dto.name).then(
-                    (x) => x.sort(rcompare)[0]
-                  )
+                ? await this.getVersions(registryUrl, dto.name).then((x) => x.sort(rcompare)[0])
                 : null // ToDo: how does this affect performance?
               dto.order = i++
               dto.sourceRegistry = {
                 url: registryUrl,
-                isDev: configRegistries.find((r) => r.url === registryUrl)
-                  .isDev,
+                isDev: configRegistries.find((r) => r.url === registryUrl).isDev,
               }
               if (!dto.hostnames) dto.hostnames = []
               dto.hostnames = mergeDedupe([dto.hostnames, [contextId]])
@@ -276,9 +223,7 @@ export default class FeatureService {
     }
 
     const endTime = Date.now()
-    console.log(
-      `getFeaturesByHostnames  #${requestId} end: ${endTime - startTime} ms`
-    )
+    console.log(`getFeaturesByHostnames  #${requestId} end: ${endTime - startTime} ms`)
 
     return dtos
   }
@@ -397,18 +342,14 @@ export default class FeatureService {
 
       // ToDo: merge with config updating upper
       for (const hostname of hostnames) {
-        const config = await this._globalConfigService.getSiteConfigById(
-          hostname
-        )
+        const config = await this._globalConfigService.getSiteConfigById(hostname)
         config.activeFeatures[name].runtime = runtime
         await this._globalConfigService.updateSiteConfig(config)
       }
     } catch (err) {
       // revert config if error
       for (const hostname of hostnames) {
-        const config = await this._globalConfigService.getSiteConfigById(
-          hostname
-        )
+        const config = await this._globalConfigService.getSiteConfigById(hostname)
         config.activeFeatures[name] = {
           version,
           isActive: !isActive,
@@ -432,14 +373,7 @@ export default class FeatureService {
     order: number,
     registryUrl: string
   ): Promise<void> {
-    await this._setFeatureActive(
-      name,
-      version,
-      hostnames,
-      true,
-      order,
-      registryUrl
-    )
+    await this._setFeatureActive(name, version, hostnames, true, order, registryUrl)
   }
 
   async deactivateFeature(
@@ -449,14 +383,7 @@ export default class FeatureService {
     order: number,
     registryUrl: string
   ): Promise<void> {
-    await this._setFeatureActive(
-      name,
-      version,
-      hostnames,
-      false,
-      order,
-      registryUrl
-    )
+    await this._setFeatureActive(name, version, hostnames, false, order, registryUrl)
   }
 
   async reloadFeature(
@@ -468,22 +395,8 @@ export default class FeatureService {
   ): Promise<void> {
     const modules = await this.getActiveModulesByHostnames(hostnames)
     if (!modules.find((m) => m.name === name)) return
-    await this._setFeatureActive(
-      name,
-      version,
-      hostnames,
-      false,
-      order,
-      registryUrl
-    )
-    await this._setFeatureActive(
-      name,
-      version,
-      hostnames,
-      true,
-      order,
-      registryUrl
-    )
+    await this._setFeatureActive(name, version, hostnames, false, order, registryUrl)
+    await this._setFeatureActive(name, version, hostnames, true, order, registryUrl)
   }
 
   public async getActiveModulesByHostnames(contextIds: string[]) {
@@ -531,9 +444,7 @@ export default class FeatureService {
     // ToDo: it reduces performance because of additional request to a registry
     //       it's need to be fixed after registry improvements (should return all contextIds by module)
     const availableModules = await this.getFeaturesByHostnames(contextIds)
-    const config = await this._globalConfigService.getSiteConfigById(
-      CONTEXT_ID_WILDCARD
-    )
+    const config = await this._globalConfigService.getSiteConfigById(CONTEXT_ID_WILDCARD)
     for (const dto of availableModules) {
       if (config.activeFeatures[dto.name]?.isActive === true) {
         const moduleId = {
@@ -558,9 +469,7 @@ export default class FeatureService {
     }
 
     // Activate dynamic adapter for dynamic contexts searching
-    const hostnames = contextIds.filter((x) =>
-      /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/gm.test(x)
-    )
+    const hostnames = contextIds.filter((x) => /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/gm.test(x))
     if (hostnames.length > 0) {
       const dynamicAdapter = await this._globalConfigService.getDynamicAdapter()
       if (dynamicAdapter) {
@@ -589,9 +498,7 @@ export default class FeatureService {
     }[]
   ) {
     if (modules.length === 0) return []
-    const modulesWithDeps = await this._moduleManager.resolveDependencies(
-      modules
-    )
+    const modulesWithDeps = await this._moduleManager.resolveDependencies(modules)
     // ToDo: catch errors
     // ToDo: run parallel
     const dists = await Promise.all(
@@ -613,19 +520,12 @@ export default class FeatureService {
     contextIds: string[]
   ) {
     // ToDo: fix this hack
-    return this._moduleManager.optimizeDependency(
-      name,
-      version,
-      branch,
-      contextIds
-    )
+    return this._moduleManager.optimizeDependency(name, version, branch, contextIds)
   }
 
   public async getAllDevModules() {
     const descriptors = await this._walletService.getWalletDescriptors()
-    const users = descriptors
-      .filter((x) => x.available && x.connected)
-      .map((x) => x.account)
+    const users = descriptors.filter((x) => x.available && x.connected).map((x) => x.account)
     return this._moduleManager.registryAggregator.getAllDevModules({ users })
   }
 
@@ -636,12 +536,8 @@ export default class FeatureService {
     targetStorages: StorageTypes[],
     targetRegistry: string
   ): Promise<{ scriptUrl: string }> {
-    const registry =
-      await this._moduleManager.registryAggregator.getRegistryByUri(
-        targetRegistry
-      )
-    if (!registry)
-      throw new Error('No registry with this url exists in config.')
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry)
+    if (!registry) throw new Error('No registry with this url exists in config.')
 
     try {
       const scriptUrl = await this.uploadModule(mi, vi, targetStorages)
@@ -667,10 +563,7 @@ export default class FeatureService {
       if (
         mi.icon &&
         mi.icon.uris.length > 0 &&
-        !(
-          mi.icon.uris[0].endsWith('.png') ||
-          mi.icon.uris[0].startsWith('data:image/png;base64')
-        )
+        !(mi.icon.uris[0].endsWith('.png') || mi.icon.uris[0].startsWith('data:image/png;base64'))
       )
         throw new Error('Type of module icon must be PNG.')
 
@@ -702,9 +595,7 @@ export default class FeatureService {
           const arr = await this._storageAggregator
             .getResource({ uris: [assetManifestUrl], hash: null })
             .catch(() => {
-              throw new Error(
-                'Cannot find an assets manifest by the URL: ' + assetManifestUrl
-              )
+              throw new Error('Cannot find an assets manifest by the URL: ' + assetManifestUrl)
             })
           const json = String.fromCharCode.apply(null, new Uint8Array(arr))
 
@@ -713,8 +604,7 @@ export default class FeatureService {
             assetManifest = JSON.parse(json)
           } catch (_) {
             throw new Error(
-              'The assets manifest has invalid JSON.\nRequested URL: ' +
-                assetManifestUrl
+              'The assets manifest has invalid JSON.\nRequested URL: ' + assetManifestUrl
             )
           }
 
@@ -751,10 +641,7 @@ export default class FeatureService {
             )
           )
 
-          const hashUris = await this._storageAggregator.saveDir(
-            files,
-            targetStorages
-          )
+          const hashUris = await this._storageAggregator.saveDir(files, targetStorages)
           vi.overlays[overlayName] = hashUris
         }
 
@@ -773,10 +660,7 @@ export default class FeatureService {
           compressionOptions: { level: 9 },
         })
         const blob = new Blob([buf], { type: 'application/zip' })
-        const hashUris = await this._storageAggregator.save(
-          blob,
-          targetStorages
-        )
+        const hashUris = await this._storageAggregator.save(blob, targetStorages)
 
         // Manifest editing
         vi.dist = hashUris
@@ -788,10 +672,7 @@ export default class FeatureService {
           // Icon file publishing (from base64)
           const res = await fetch(mi.icon.uris[0])
           const blob = await res.blob()
-          const hashUris = await this._storageAggregator.save(
-            blob,
-            targetStorages
-          )
+          const hashUris = await this._storageAggregator.save(blob, targetStorages)
 
           // Manifest editing
           mi.icon = hashUris
@@ -799,10 +680,7 @@ export default class FeatureService {
           // Icon file publishing
           const buf = await this._storageAggregator.getResource(mi.icon)
           const blob = new Blob([buf], { type: 'image/png' })
-          const hashUris = await this._storageAggregator.save(
-            blob,
-            targetStorages
-          )
+          const hashUris = await this._storageAggregator.save(blob, targetStorages)
 
           // Manifest editing
           mi.icon = hashUris
@@ -853,9 +731,7 @@ export default class FeatureService {
   async getRegistries() {
     const configRegistries = await this._globalConfigService.getRegistries()
     const result = configRegistries.map(async (c) => {
-      const reg = await this._moduleManager.registryAggregator.getRegistryByUri(
-        c.url
-      )
+      const reg = await this._moduleManager.registryAggregator.getRegistryByUri(c.url)
       return {
         isAvailable: reg?.isAvailable || false,
         error: reg?.error,
@@ -867,8 +743,7 @@ export default class FeatureService {
   }
 
   public async getOwnership(registryUri: string, moduleName: string) {
-    const registry =
-      await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     const owner = await registry.getOwnership(moduleName)
     return owner
   }
@@ -879,8 +754,7 @@ export default class FeatureService {
     branch: string,
     version: string
   ) {
-    const registry =
-      await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     if (!registry) return null
     return registry.getVersionInfo(moduleName, branch, version)
   }
@@ -892,10 +766,7 @@ export default class FeatureService {
     const isDev = config.isDev
 
     if (isDev) {
-      const registry =
-        await this._moduleManager.registryAggregator.getRegistryByUri(
-          registryUrl
-        )
+      const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl)
       if (!registry) return null
       const moduleInfo = await registry.getModuleInfoByName(moduleName)
       return moduleInfo
@@ -905,10 +776,7 @@ export default class FeatureService {
       // if (moduleInfo) {
       //     return moduleInfo;
       // } else {
-      const registry =
-        await this._moduleManager.registryAggregator.getRegistryByUri(
-          registryUrl
-        )
+      const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl)
       if (!registry) return null
       const moduleInfo = await registry.getModuleInfoByName(moduleName)
       // if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
@@ -923,45 +791,27 @@ export default class FeatureService {
     oldAccount: string,
     newAccount: string
   ) {
-    const registry =
-      await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     await registry.transferOwnership(moduleName, oldAccount, newAccount)
   }
 
-  public async addContextId(
-    registryUri: string,
-    moduleName: string,
-    contextId: string
-  ) {
-    const registry =
-      await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+  public async addContextId(registryUri: string, moduleName: string, contextId: string) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     await registry.addContextId(moduleName, contextId)
   }
 
-  public async removeContextId(
-    registryUri: string,
-    moduleName: string,
-    contextId: string
-  ) {
-    const registry =
-      await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+  public async removeContextId(registryUri: string, moduleName: string, contextId: string) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     await registry.removeContextId(moduleName, contextId)
   }
 
-  public async editModuleInfo(
-    registryUri: string,
-    targetStorages: StorageTypes[],
-    mi: ModuleInfo
-  ) {
+  public async editModuleInfo(registryUri: string, targetStorages: StorageTypes[], mi: ModuleInfo) {
     if (mi.icon && mi.icon.uris.length > 0) {
       if (mi.icon.uris[0].startsWith('data:image/png;base64')) {
         // Icon file publishing (from base64)
         const res = await fetch(mi.icon.uris[0])
         const blob = await res.blob()
-        const hashUris = await this._storageAggregator.save(
-          blob,
-          targetStorages
-        )
+        const hashUris = await this._storageAggregator.save(blob, targetStorages)
 
         // Manifest editing
         mi.icon = hashUris
@@ -969,29 +819,20 @@ export default class FeatureService {
         // Icon file publishing
         const buf = await this._storageAggregator.getResource(mi.icon)
         const blob = new Blob([buf], { type: 'image/png' })
-        const hashUris = await this._storageAggregator.save(
-          blob,
-          targetStorages
-        )
+        const hashUris = await this._storageAggregator.save(blob, targetStorages)
 
         // Manifest editing
         mi.icon = hashUris
       }
     }
-    const registry =
-      await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     await registry.editModuleInfo(mi)
   }
 
   public async getVersions(registryUri: string, moduleName: string) {
-    const registry =
-      await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
-    if (!registry)
-      throw new Error('No registry with this url exists in config.')
-    const versions = await registry.getVersionNumbers(
-      moduleName,
-      DEFAULT_BRANCH_NAME
-    )
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    if (!registry) throw new Error('No registry with this url exists in config.')
+    const versions = await registry.getVersionNumbers(moduleName, DEFAULT_BRANCH_NAME)
     if (versions.length === 0) throw new Error('This module has no versions.')
     return versions
   }
@@ -1014,8 +855,8 @@ export default class FeatureService {
   }
 
   public async getUserSettingsForOverlay(registryUrl: string, moduleName: string) {
-    const mi = await this.getModuleInfoByName(registryUrl, moduleName);
-    const versions = await this.getVersions(registryUrl, moduleName);
+    const mi = await this.getModuleInfoByName(registryUrl, moduleName)
+    const versions = await this.getVersions(registryUrl, moduleName)
     const version = versions.sort(rcompare)[0] // Last version by SemVer
     const vi = await this._moduleManager.registryAggregator.getVersionInfo(
       mi.name,
@@ -1024,18 +865,18 @@ export default class FeatureService {
     )
     const dist = await this._moduleManager.loadModule(vi)
     const configRegistries = await this._globalConfigService.getRegistries()
-    
+
     return {
-      mi: { 
-        ...mi, 
+      mi: {
+        ...mi,
         sourceRegistry: {
           url: registryUrl,
           isDev: configRegistries.find((r) => r.url === registryUrl).isDev,
-        }
+        },
       },
       vi,
       schemaConfig: dist.schemaConfig,
-      defaultConfig: dist.defaultConfig
+      defaultConfig: dist.defaultConfig,
     }
   }
 
@@ -1053,10 +894,8 @@ export default class FeatureService {
   ) {
     if (!branch) branch = DEFAULT_BRANCH_NAME
 
-    const registry =
-      await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
-    if (!registry)
-      throw new Error('No registry with this url exists in config.')
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    if (!registry) throw new Error('No registry with this url exists in config.')
 
     if (!version) {
       const versions = await registry.getVersionNumbers(name, branch)
@@ -1067,9 +906,7 @@ export default class FeatureService {
 
     const mi = await this.getModuleInfoByName(registryUri, name)
     const vi =
-      version !== null
-        ? await this.getVersionInfo(registryUri, name, branch, version)
-        : null
+      version !== null ? await this.getVersionInfo(registryUri, name, branch, version) : null
 
     await this._overlayService.openDeployOverlay(mi, vi)
   }

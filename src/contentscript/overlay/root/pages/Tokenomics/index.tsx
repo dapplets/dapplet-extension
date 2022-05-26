@@ -1,11 +1,10 @@
-import React, { useState, useEffect, FC } from 'react'
 import cn from 'classnames'
-import styles from './Tokenomics.module.scss'
-import { SettingWrapper } from '../../components/SettingWrapper'
-import { SettingItem } from '../../components/SettingItem'
-
+import React, { FC, useEffect, useState } from 'react'
 import { Message } from '../../components/Message'
 import { Modal } from '../../components/Modal'
+import { SettingItem } from '../../components/SettingItem'
+import { SettingWrapper } from '../../components/SettingWrapper'
+import styles from './Tokenomics.module.scss'
 
 export interface TokenomicsProps {
   setUnderConstructionDetails: (x) => void
@@ -44,10 +43,7 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
             link="F.A.Q"
             linkText="F.A.Q"
             children={
-              <button
-                onClick={() => SetCreate(true)}
-                className={styles.createTokenomics}
-              >
+              <button onClick={() => SetCreate(true)} className={styles.createTokenomics}>
                 CREATE
               </button>
             }
@@ -110,23 +106,15 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
                   children={
                     <input
                       placeholder="Enter token name"
-                      className={cn(
-                        styles.inputTokenName,
-                        styles.inputTokenTicker,
-                        {
-                          [styles.inputTokenTickerInvalid]:
-                            isInvalidTokenTicker,
-                        }
-                      )}
+                      className={cn(styles.inputTokenName, styles.inputTokenTicker, {
+                        [styles.inputTokenTickerInvalid]: isInvalidTokenTicker,
+                      })}
                       value={tokenListing}
                       onFocus={() => setInvalidTokenTicker(false)}
                       onChange={(e) => {
                         setTokenListing(e.target.value)
 
-                        if (
-                          e.target.value.length <= 2 ||
-                          e.target.value.length >= 5
-                        ) {
+                        if (e.target.value.length <= 2 || e.target.value.length >= 5) {
                           setInvalidTokenTicker(true)
                         } else {
                           setInvalidTokenTicker(false)
@@ -190,10 +178,7 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
       )}
 
       <div className={styles.linkNavigation}>
-        <button
-          onClick={() => setUnderConstructionDetails(false)}
-          className={styles.back}
-        >
+        <button onClick={() => setUnderConstructionDetails(false)} className={styles.back}>
           Back
         </button>
       </div>

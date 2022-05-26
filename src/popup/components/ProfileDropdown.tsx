@@ -1,26 +1,25 @@
-import React from "react";
-import { Button, Dropdown, Icon, Input } from "semantic-ui-react";
-import { Label, Menu, Modal } from "semantic-ui-react";
-import { browser } from "webextension-polyfill-ts";
-import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { typeOfUri, UriTypes } from "../../common/helpers";
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import React from 'react'
+import { Button, Dropdown, Icon, Input, Label, Menu, Modal } from 'semantic-ui-react'
+import { browser } from 'webextension-polyfill-ts'
+import { typeOfUri, UriTypes } from '../../common/helpers'
 
 interface Props {
-  profiles: { id: string; text: string }[];
-  currentProfileId: string;
-  onRefresh: Function;
+  profiles: { id: string; text: string }[]
+  currentProfileId: string
+  onRefresh: Function
 }
 
 interface State {
-  currentMode: CurrentMode;
-  isImportLoading: boolean;
-  importError: string;
-  isExportUploading: boolean;
-  isExportCopied: boolean;
-  exportError: string;
-  deletingProfileId: string;
-  renamingValue: string;
-  importInputValue: string;
+  currentMode: CurrentMode
+  isImportLoading: boolean
+  importError: string
+  isExportUploading: boolean
+  isExportCopied: boolean
+  exportError: string
+  deletingProfileId: string
+  renamingValue: string
+  importInputValue: string
 }
 
 enum CurrentMode {
@@ -32,7 +31,7 @@ enum CurrentMode {
 
 export class ProfileDropdown extends React.Component<Props, State> {
   constructor(p: Props) {
-    super(p);
+    super(p)
     this.state = {
       currentMode: CurrentMode.DEFAULT,
       isImportLoading: false,
@@ -41,41 +40,41 @@ export class ProfileDropdown extends React.Component<Props, State> {
       isExportCopied: false,
       exportError: null,
       deletingProfileId: null,
-      renamingValue: "",
-      importInputValue: "",
-    };
+      renamingValue: '',
+      importInputValue: '',
+    }
   }
 
   getCurrentProfile() {
-    const p = this.props;
-    return p.profiles.find((x) => x.id === p.currentProfileId);
+    const p = this.props
+    return p.profiles.find((x) => x.id === p.currentProfileId)
   }
 
   cloneHandler = async () => {
-    const { copyProfile } = await initBGFunctions(browser);
-    const sourceProfileName = this.props.currentProfileId;
-    await copyProfile(sourceProfileName, true);
-    this.props.onRefresh();
-  };
+    const { copyProfile } = await initBGFunctions(browser)
+    const sourceProfileName = this.props.currentProfileId
+    await copyProfile(sourceProfileName, true)
+    this.props.onRefresh()
+  }
 
   renameModeHandler = () => {
-    const p = this.props;
+    const p = this.props
     this.setState({
       currentMode:
         this.state.currentMode !== CurrentMode.RENAMING
           ? CurrentMode.RENAMING
           : CurrentMode.DEFAULT,
-      renamingValue: this.getCurrentProfile()?.text ?? "",
-    });
-  };
+      renamingValue: this.getCurrentProfile()?.text ?? '',
+    })
+  }
 
   renameChangeHandler = (e) => {
-    this.setState({ renamingValue: e.target.value });
-  };
+    this.setState({ renamingValue: e.target.value })
+  }
 
   deleteHandler = (e, { id }) => {
-    e.stopPropagation();
-    e.preventDefault();
+    e.stopPropagation()
+    e.preventDefault()
 
     this.setState({
       currentMode:
@@ -83,8 +82,8 @@ export class ProfileDropdown extends React.Component<Props, State> {
           ? CurrentMode.DELETING
           : CurrentMode.DEFAULT,
       deletingProfileId: id,
-    });
-  };
+    })
+  }
 
   importModeHandler = () => {
     this.setState({
@@ -92,116 +91,115 @@ export class ProfileDropdown extends React.Component<Props, State> {
         this.state.currentMode !== CurrentMode.IMPORTING
           ? CurrentMode.IMPORTING
           : CurrentMode.DEFAULT,
-    });
-  };
+    })
+  }
 
   exportHandler = async (e) => {
-    this.setState({ isExportUploading: true });
+    this.setState({ isExportUploading: true })
 
     try {
-      const { exportProfile } = await initBGFunctions(browser);
-      const url = await exportProfile(this.props.currentProfileId);
-      await navigator.clipboard.writeText(url);
-      this.setState({ isExportUploading: false, isExportCopied: true });
-      await new Promise((r) => setTimeout(r, 3000));
-      this.setState({ isExportCopied: false });
+      const { exportProfile } = await initBGFunctions(browser)
+      const url = await exportProfile(this.props.currentProfileId)
+      await navigator.clipboard.writeText(url)
+      this.setState({ isExportUploading: false, isExportCopied: true })
+      await new Promise((r) => setTimeout(r, 3000))
+      this.setState({ isExportCopied: false })
     } catch (err) {
       this.setState({
         isExportUploading: false,
         exportError: err instanceof Error ? err.message : err,
-      });
-      await new Promise((r) => setTimeout(r, 3000));
-      this.setState({ exportError: null });
+      })
+      await new Promise((r) => setTimeout(r, 3000))
+      this.setState({ exportError: null })
     }
-  };
+  }
 
   resetExportHandler = async () => {
     this.setState({
       exportError: null,
       isExportCopied: false,
       isExportUploading: false,
-    });
-  };
+    })
+  }
 
   saveRenameHandler = async () => {
-    const newName = this.state.renamingValue;
-    const { renameProfile } = await initBGFunctions(browser);
-    await renameProfile(this.props.currentProfileId, newName);
-    this.setState({ currentMode: CurrentMode.DEFAULT });
-    this.props.onRefresh();
-  };
+    const newName = this.state.renamingValue
+    const { renameProfile } = await initBGFunctions(browser)
+    await renameProfile(this.props.currentProfileId, newName)
+    this.setState({ currentMode: CurrentMode.DEFAULT })
+    this.props.onRefresh()
+  }
 
   cancelRenameHandler = () => {
-    this.setState({ currentMode: CurrentMode.DEFAULT, renamingValue: "" });
-  };
+    this.setState({ currentMode: CurrentMode.DEFAULT, renamingValue: '' })
+  }
 
   confirmDeletionHandler = async () => {
-    const { deleteProfile } = await initBGFunctions(browser);
-    await deleteProfile(this.state.deletingProfileId);
+    const { deleteProfile } = await initBGFunctions(browser)
+    await deleteProfile(this.state.deletingProfileId)
     this.setState({
       currentMode: CurrentMode.DEFAULT,
       deletingProfileId: null,
-    });
-    this.props.onRefresh();
-  };
+    })
+    this.props.onRefresh()
+  }
 
   cancelDeletionHandler = () => {
     this.setState({
       currentMode: CurrentMode.DEFAULT,
       deletingProfileId: null,
-    });
-  };
+    })
+  }
 
   importChangeHandler = (e) => {
-    this.setState({ importError: null, importInputValue: e.target.value });
-  };
+    this.setState({ importError: null, importInputValue: e.target.value })
+  }
 
   loadImportHandler = async () => {
-    this.setState({ isImportLoading: true });
+    this.setState({ isImportLoading: true })
 
     try {
-      const { importProfile } = await initBGFunctions(browser);
-      await importProfile(this.state.importInputValue, true);
+      const { importProfile } = await initBGFunctions(browser)
+      await importProfile(this.state.importInputValue, true)
       this.setState({
         currentMode: CurrentMode.DEFAULT,
         isImportLoading: false,
-        importInputValue: "",
-      });
-      this.props.onRefresh();
+        importInputValue: '',
+      })
+      this.props.onRefresh()
     } catch (err) {
       this.setState({
         isImportLoading: false,
         importError: err instanceof Error ? err.message : err,
-        importInputValue: "",
-      });
+        importInputValue: '',
+      })
     }
-  };
+  }
 
   cancelImportHandler = () => {
-    this.setState({ currentMode: CurrentMode.DEFAULT, importInputValue: "" });
-  };
+    this.setState({ currentMode: CurrentMode.DEFAULT, importInputValue: '' })
+  }
 
   dropdownCloseHandler = () => {
-    this.setState({ exportError: null });
-  };
+    this.setState({ exportError: null })
+  }
 
   selectProfileHandler = async (_, { id }) => {
-    const { setActiveProfile } = await initBGFunctions(browser);
-    await setActiveProfile(id);
-    this.props.onRefresh();
-  };
+    const { setActiveProfile } = await initBGFunctions(browser)
+    await setActiveProfile(id)
+    this.props.onRefresh()
+  }
 
   render() {
-    const p = this.props;
-    const s = this.state;
+    const p = this.props
+    const s = this.state
 
     const modal =
       s.currentMode === CurrentMode.DELETING ? (
         <Modal open={true} size="mini" dimmer="inverted">
           <Modal.Header>Delete Profile?</Modal.Header>
           <Modal.Content>
-            Deleting the <b>{s.deletingProfileId}</b> profile permanently remove
-            it from extension.
+            Deleting the <b>{s.deletingProfileId}</b> profile permanently remove it from extension.
           </Modal.Content>
           <Modal.Actions>
             <Button basic onClick={this.cancelDeletionHandler}>
@@ -212,7 +210,7 @@ export class ProfileDropdown extends React.Component<Props, State> {
             </Button>
           </Modal.Actions>
         </Modal>
-      ) : null;
+      ) : null
 
     const panel = (
       <div>
@@ -273,12 +271,12 @@ export class ProfileDropdown extends React.Component<Props, State> {
           />
         )}
       </div>
-    );
+    )
 
     if (s.currentMode === CurrentMode.IMPORTING) {
       return (
         <>
-          <div style={{ margin: "1rem 0" }}>
+          <div style={{ margin: '1rem 0' }}>
             <Input
               type="text"
               placeholder="Swarm address..."
@@ -291,7 +289,7 @@ export class ProfileDropdown extends React.Component<Props, State> {
             >
               <input
                 onKeyPress={(e) =>
-                  e.key === "Enter" &&
+                  e.key === 'Enter' &&
                   typeOfUri(s.importInputValue) === UriTypes.Swarm &&
                   this.loadImportHandler()
                 }
@@ -301,18 +299,11 @@ export class ProfileDropdown extends React.Component<Props, State> {
                 size="mini"
                 onClick={this.loadImportHandler}
                 loading={s.isImportLoading}
-                disabled={
-                  s.isImportLoading ||
-                  typeOfUri(s.importInputValue) !== UriTypes.Swarm
-                }
+                disabled={s.isImportLoading || typeOfUri(s.importInputValue) !== UriTypes.Swarm}
               >
                 Load
               </Button>
-              <Button
-                size="mini"
-                onClick={this.cancelImportHandler}
-                disabled={s.isImportLoading}
-              >
+              <Button size="mini" onClick={this.cancelImportHandler} disabled={s.isImportLoading}>
                 Cancel
               </Button>
             </Input>
@@ -324,7 +315,7 @@ export class ProfileDropdown extends React.Component<Props, State> {
           </div>
           {panel}
         </>
-      );
+      )
     }
 
     if (s.currentMode === CurrentMode.RENAMING) {
@@ -336,13 +327,13 @@ export class ProfileDropdown extends React.Component<Props, State> {
             action
             size="mini"
             fluid
-            style={{ margin: "1rem 0" }}
+            style={{ margin: '1rem 0' }}
           >
             <input
               value={s.renamingValue}
               onChange={this.renameChangeHandler}
               onKeyPress={(e) =>
-                e.key === "Enter" &&
+                e.key === 'Enter' &&
                 s.renamingValue !== this.getCurrentProfile()?.text &&
                 this.saveRenameHandler()
               }
@@ -361,12 +352,12 @@ export class ProfileDropdown extends React.Component<Props, State> {
           </Input>
           {panel}
         </>
-      );
+      )
     }
 
     return (
       <>
-        <Menu size="mini" style={{ boxShadow: "none", border: "none" }}>
+        <Menu size="mini" style={{ boxShadow: 'none', border: 'none' }}>
           <Dropdown
             fluid
             basic
@@ -376,16 +367,16 @@ export class ProfileDropdown extends React.Component<Props, State> {
             onClose={this.dropdownCloseHandler}
             text={this.getCurrentProfile()?.text}
           >
-            <Dropdown.Menu style={{ maxHeight: "17rem", overflowY: "auto" }}>
-              <Dropdown.Divider style={{ margin: "unset" }} />
+            <Dropdown.Menu style={{ maxHeight: '17rem', overflowY: 'auto' }}>
+              <Dropdown.Divider style={{ margin: 'unset' }} />
               {p.profiles.map((x) => (
                 <Dropdown.Item
                   selected={x.id === p.currentProfileId}
                   key={x.id}
                   id={x.id}
                   content={
-                    <div style={{ display: "flex" }}>
-                      <div style={{ flex: "auto" }}>{x.text}</div>
+                    <div style={{ display: 'flex' }}>
+                      <div style={{ flex: 'auto' }}>{x.text}</div>
                       <div>
                         {x.id !== p.currentProfileId ? (
                           <Icon
@@ -409,6 +400,6 @@ export class ProfileDropdown extends React.Component<Props, State> {
         {panel}
         {modal}
       </>
-    );
+    )
   }
 }

@@ -3,15 +3,15 @@
  * https://github.com/rjsf-team/react-jsonschema-form/blob/d48eeaae8969a64c72429dcfd0df151b3e8bc730/packages/semantic-ui/src/util.js
  */
 
-import React from "react";
-import { utils } from '@rjsf/core';
-import _ from "lodash";
-import { Form } from "semantic-ui-react";
-import { getSemanticProps } from "./utils";
+import { utils } from '@rjsf/core'
+import _ from 'lodash'
+import React from 'react'
+import { Form } from 'semantic-ui-react'
+import { getSemanticProps } from './utils'
 
-const { asNumber, guessType } = utils;
+const { asNumber, guessType } = utils
 
-const nums = new Set(["number", "integer"]);
+const nums = new Set(['number', 'integer'])
 
 /**
  * * Returns and creates an array format required for semantic drop down
@@ -20,16 +20,16 @@ const nums = new Set(["number", "integer"]);
  * @returns {*}
  */
 function createDefaultValueOptionsForDropDown(enumOptions, enumDisabled) {
-  const disabledOptions = enumDisabled || [];
-  let options = [];
+  const disabledOptions = enumDisabled || []
+  let options = []
   // eslint-disable-next-line no-shadow
   options = _.map(enumOptions, ({ label, value }) => ({
     disabled: disabledOptions.indexOf(value) !== -1,
     key: label,
     text: label,
     value,
-  }));
-  return options;
+  }))
+  return options
 }
 
 /**
@@ -38,29 +38,29 @@ function createDefaultValueOptionsForDropDown(enumOptions, enumDisabled) {
  */
 const processValue = (schema, value) => {
   // "enum" is a reserved word, so only "type" and "items" can be destructured
-  const { type, items } = schema;
-  if (value === "") {
-    return undefined;
-  } else if (type === "array" && items && nums.has(items.type)) {
-    return value.map(asNumber);
-  } else if (type === "boolean") {
-    return value === "true" || value === true;
-  } else if (type === "number") {
-    return asNumber(value);
+  const { type, items } = schema
+  if (value === '') {
+    return undefined
+  } else if (type === 'array' && items && nums.has(items.type)) {
+    return value.map(asNumber)
+  } else if (type === 'boolean') {
+    return value === 'true' || value === true
+  } else if (type === 'number') {
+    return asNumber(value)
   }
 
   // If type is undefined, but an enum is present, try and infer the type from
   // the enum values
   if (schema.enum) {
-    if (schema.enum.every(x => guessType(x) === "number")) {
-      return asNumber(value);
-    } else if (schema.enum.every(x => guessType(x) === "boolean")) {
-      return value === "true";
+    if (schema.enum.every((x) => guessType(x) === 'number')) {
+      return asNumber(value)
+    } else if (schema.enum.every((x) => guessType(x) === 'boolean')) {
+      return value === 'true'
     }
   }
 
-  return value;
-};
+  return value
+}
 
 function SelectWidget(props) {
   const {
@@ -81,46 +81,42 @@ function SelectWidget(props) {
     onChange,
     onBlur,
     onFocus,
-  } = props;
+  } = props
   const semanticProps = getSemanticProps({
     schema,
     uiSchema,
     formContext,
     options,
     defaultSchemaProps: {
-      inverted: "false",
+      inverted: 'false',
       selection: true,
       fluid: true,
       scrolling: true,
       upward: false,
-    }
- });
-  const { enumDisabled, enumOptions } = options;
-  const emptyValue = multiple ? [] : "";
-  const dropdownOptions = createDefaultValueOptionsForDropDown(
-    enumOptions,
-    enumDisabled
-  );
+    },
+  })
+  const { enumDisabled, enumOptions } = options
+  const emptyValue = multiple ? [] : ''
+  const dropdownOptions = createDefaultValueOptionsForDropDown(enumOptions, enumDisabled)
   const _onChange = (
     event,
     // eslint-disable-next-line no-shadow
     { value }
-  ) => onChange && onChange(processValue(schema, value));
+  ) => onChange && onChange(processValue(schema, value))
   // eslint-disable-next-line no-shadow
-  const _onBlur = ({ target: { value } }) =>
-    onBlur && onBlur(id, processValue(schema, value));
+  const _onBlur = ({ target: { value } }) => onBlur && onBlur(id, processValue(schema, value))
   const _onFocus = ({
     // eslint-disable-next-line no-shadow
     target: { value },
-  }) => onFocus && onFocus(id, processValue(schema, value));
+  }) => onFocus && onFocus(id, processValue(schema, value))
 
   return (
     <Form.Dropdown
       key={id}
       name={name}
       label={label || schema.title}
-      multiple={typeof multiple === "undefined" ? false : multiple}
-      value={typeof value === "undefined" ? emptyValue : value}
+      multiple={typeof multiple === 'undefined' ? false : multiple}
+      value={typeof value === 'undefined' ? emptyValue : value}
       disabled={disabled}
       placeholder={placeholder}
       {...semanticProps}
@@ -132,6 +128,6 @@ function SelectWidget(props) {
       onBlur={_onBlur}
       onFocus={_onFocus}
     />
-  );
+  )
 }
-export default SelectWidget;
+export default SelectWidget

@@ -45,6 +45,7 @@
   border-radius: 0 10px 10px 0;
 
   background: #fff;
+
   // box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
 
   font-size: 14px;
@@ -55,12 +56,16 @@
 
 .close {
   position: absolute;
-  top: 90%;
-  right: 14px;
-  height: 100%;
-  cursor: pointer;
-  transform: translateY(-50%);
+
   // background: #000;
   z-index: 50;
+  top: 90%;
+  right: 14px;
+
+  height: 100%;
+
+  cursor: pointer;
+  transform: translateY(-50%);
+
   // width: 50px;
 }

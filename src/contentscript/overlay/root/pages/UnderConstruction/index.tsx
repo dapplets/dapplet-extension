@@ -1,26 +1,16 @@
-import React, { useState, useEffect, FC } from 'react'
-import cn from 'classnames'
-import styles from './UnderConstruction.module.scss'
-import { SettingItem } from '../../components/SettingItem'
-import { SettingWrapper } from '../../components/SettingWrapper'
-
-import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-
-import { Bus } from '../../../../../common/bus'
+import cn from 'classnames'
+import React, { FC, useEffect, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
-
+import { ModuleTypes, StorageTypes } from '../../../../../common/constants'
+import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { typeOfUri, chainByUri, joinUrls } from '../../../../../common/helpers'
-
-import {
-  DEFAULT_BRANCH_NAME,
-  ModuleTypes,
-  StorageTypes,
-} from '../../../../../common/constants'
-
 import { Modal } from '../../components/Modal'
+import { SettingItem } from '../../components/SettingItem'
+import { SettingWrapper } from '../../components/SettingWrapper'
+import styles from './UnderConstruction.module.scss'
 
 enum DeploymentStatus {
   Unknown,
@@ -59,23 +49,15 @@ export interface UnderConstruction {
   setModuleVersion: (x) => void
 }
 let _isMounted = false
-export const UnderConstruction: FC<UnderConstruction> = (
-  props: UnderConstruction
-) => {
-  const {
-    setUnderConstruction,
-    setUnderConstructionDetails,
-    setModuleInfo,
-    setModuleVersion,
-  } = props
+export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstruction) => {
+  const { setUnderConstruction, setUnderConstructionDetails, setModuleInfo, setModuleVersion } =
+    props
 
   const [originalMi, setOriginalMi] = useState<ModuleInfo>(new ModuleInfo())
 
   const [mi, setMi] = useState<ModuleInfo>(new ModuleInfo())
   const [vi, setVi] = useState<VersionInfo>()
-  const [dependenciesChecking, setDpendenciesChecking] = useState<
-    DependencyChecking[]
-  >([])
+  const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>([])
   const [loading, setLoading] = useState(false)
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
@@ -86,9 +68,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
 
   const [currentAccount, setCurrentAccount] = useState(null)
 
-  const [deploymentStatus, setDeploymentStatus] = useState(
-    DeploymentStatus.Unknown
-  )
+  const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
   const [trustedUsers, setTrustedUsers] = useState([])
 
   const [mode, setMode] = useState(FormMode.Creating)
@@ -102,8 +82,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
   const [inputNameError, setInputNameError] = useState(null)
   const [inputTitleError, setInputTitleError] = useState(null)
   const [inputDescriptionError, setInputDescriptionError] = useState(null)
-  const [inputFullDescriptionError, setFullInputDescriptionError] =
-    useState(null)
+  const [inputFullDescriptionError, setFullInputDescriptionError] = useState(null)
   const onClose = () => setModal(false)
 
   const [isModalCreation, setModalCreation] = useState(false)
@@ -147,10 +126,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
 
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
-    const currentAccount = await getAddress(
-      DefaultSigners.EXTENSION,
-      targetChain
-    )
+    const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
     setCurrentAccount(currentAccount)
     setLoading(false)
   }
@@ -165,20 +141,16 @@ export const UnderConstruction: FC<UnderConstruction> = (
     try {
       setModalTransaction(true)
       const isNotNullCurrentAccount = !(
-        !currentAccount ||
-        currentAccount === '0x0000000000000000000000000000000000000000'
+        !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
       )
       const isNotTrustedUser =
         isNotNullCurrentAccount &&
-        !trustedUsers.find(
-          (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
-        )
+        !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
       if (isNotTrustedUser) {
         await addTrustedUser(currentAccount.toLowerCase())
       }
       const result =
-        mode === FormMode.Creating &&
-        (await deployModule(mi, null, targetStorages, targetRegistry))
+        mode === FormMode.Creating && (await deployModule(mi, null, targetStorages, targetRegistry))
       setMessage({
         type: 'positive',
         header: 'Module was deployed',
@@ -200,22 +172,16 @@ export const UnderConstruction: FC<UnderConstruction> = (
 
   const isNoStorage = targetStorages.length === 0
   const isNotNullCurrentAccount = !(
-    !currentAccount ||
-    currentAccount === '0x0000000000000000000000000000000000000000'
+    !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
   )
   const isNotWalletPaired = !isNotNullCurrentAccount && !!owner
   const isNotAnOwner =
-    !!owner &&
-    isNotNullCurrentAccount &&
-    owner.toLowerCase() !== currentAccount.toLowerCase()
-  const isAlreadyDeployed =
-    !message && deploymentStatus === DeploymentStatus.Deployed
+    !!owner && isNotNullCurrentAccount && owner.toLowerCase() !== currentAccount.toLowerCase()
+  const isAlreadyDeployed = !message && deploymentStatus === DeploymentStatus.Deployed
   const isNewModule = deploymentStatus === DeploymentStatus.NewModule
   const isNotTrustedUser =
     isNotNullCurrentAccount &&
-    !trustedUsers.find(
-      (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
-    )
+    !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
   const isDependenciesExist =
     dependenciesChecking && dependenciesChecking.length > 0
       ? dependenciesChecking.every((x) => x.isExists === true)
@@ -234,8 +200,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
     isDependenciesLoading ||
     !isDependenciesExist ||
     !isManifestValid
-  const isReuploadButtonDisabled =
-    !isAlreadyDeployed || mode === FormMode.Creating
+  const isReuploadButtonDisabled = !isAlreadyDeployed || mode === FormMode.Creating
 
   return (
     <div className={styles.wrapper}>
@@ -279,8 +244,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
             title={'Wallet is not connected'}
             content={
               <div className={styles.modalDefaultContent}>
-                You can not deploy a module without a wallet. Connect a new
-                wallet
+                You can not deploy a module without a wallet. Connect a new wallet
               </div>
             }
             footer={''}
@@ -379,8 +343,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
                       }
                     }}
                     className={cn(styles.inputTitle, {
-                      [styles.inputNameDisabled]:
-                        inputDescriptionError !== null,
+                      [styles.inputNameDisabled]: inputDescriptionError !== null,
                     })}
                   />
                 }
@@ -400,8 +363,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
                       }
                     }}
                     className={cn(styles.fullDescription, {
-                      [styles.inputNameDisabled]:
-                        inputFullDescriptionError !== null,
+                      [styles.inputNameDisabled]: inputFullDescriptionError !== null,
                     })}
                   />
                 }
@@ -411,10 +373,7 @@ export const UnderConstruction: FC<UnderConstruction> = (
         />
       </div>
       <div className={styles.linkNavigation}>
-        <button
-          onClick={() => setUnderConstruction(false)}
-          className={styles.back}
-        >
+        <button onClick={() => setUnderConstruction(false)} className={styles.back}>
           Back
         </button>
         <button
@@ -447,9 +406,8 @@ export const UnderConstruction: FC<UnderConstruction> = (
         title={'Initial Stake'}
         content={
           <div className={styles.modalCreationContent}>
-            To create a Dapplet Under Construction you need to Stake 100 AUGe.
-            You will get this stake back if you deploy this module within 2
-            months. Otherwise you will lose it
+            To create a Dapplet Under Construction you need to Stake 100 AUGe. You will get this
+            stake back if you deploy this module within 2 months. Otherwise you will lose it
           </div>
         }
         footer={
@@ -478,9 +436,8 @@ export const UnderConstruction: FC<UnderConstruction> = (
         title={`Congratulations, your "${mi.name}" has been created`}
         content={
           <div className={styles.modalEndCreationContent}>
-            You have 2 months to deploy this dapplet. Otherwise, you will lose
-            your Initial Steak.Also now you can add additional details,
-            Tokenomics and Rewards to your dapplet
+            You have 2 months to deploy this dapplet. Otherwise, you will lose your Initial
+            Steak.Also now you can add additional details, Tokenomics and Rewards to your dapplet
           </div>
         }
         footer={

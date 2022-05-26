@@ -3,15 +3,16 @@ $background-color: #bada55;
 
 // Chrome applies an 8px margin by default (gross).
 body {
-    margin: 0px;
+  margin: 0;
 }
 
 .container {
-    padding: 10px;
+  padding: 10px;
 }
 
 .emoji {
-    height: 1em !important;
-    margin-left: 0.2em;
-    display: inline !important;
+  display: inline !important;
+
+  height: 1em !important;
+  margin-left: 0.2em;
 }

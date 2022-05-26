@@ -1,17 +1,20 @@
 @import '../../assets/styles/null.scss';
 @import '../../assets/styles/fonts.scss';
 @import '../../assets/styles/color.variables.scss';
+
 .wrapper {
   display: flex;
-  flex-direction: column;
   overflow: hidden;
-  width: 100%;
 
   flex: 1 1 auto;
+  flex-direction: column;
+
+  width: 100%;
 
   height: calc(100vh - 125px);
   margin-top: -7.5px;
 }
+
 .wrapper::-webkit-scrollbar {
   width: 0;
 }
@@ -26,13 +29,14 @@
 
 .blockRewards {
   display: flex;
-  flex-direction: column;
   overflow: hidden;
 
   align-items: center;
+  flex: 1 1 auto;
+  flex-direction: column;
+
   width: 100%;
   height: 100%;
-  flex: 1 1 auto;
 }
 
 // .blockRewards > * {
@@ -41,91 +45,110 @@
 
 .customPoolBlock {
   display: flex;
+
   width: 100%;
 }
 
 .customPool {
   display: flex;
-  min-width: 105px;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+
+  min-width: 105px;
 }
+
 .customPoolLabel {
-  font-family: 'Roboto';
+  color: #979696;
+
+  font-family: Roboto;
+  font-size: 14px;
 
   font-weight: 500;
-  font-size: 14px;
   line-height: 16px;
-
-  color: #979696;
 }
+
 .customPoolButton {
   display: block;
+
   width: 20px;
   height: 20px;
+
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%235EC280'/%3E%3C/svg%3E");
+
   &:hover {
     background-color: inherit;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%2372D694'/%3E%3C/svg%3E");
   }
+
   &:active {
     background-color: inherit;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%2326A651'/%3E%3C/svg%3E");
   }
 }
+
 .customPoolDistributed {
   display: flex;
-  min-width: 100px;
-  justify-content: space-between;
   align-items: center;
-  margin: 0px 0px 0px 16px;
-}
-.customLabelDistributed {
-  font-family: 'Roboto';
+  justify-content: space-between;
 
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 149%;
+  min-width: 100px;
+  margin: 0 0 0 16px;
+}
+
+.customLabelDistributed {
+  display: inline-block;
+
+  margin-bottom: 1px;
+  margin-left: 5px;
 
   color: $Primary;
 
-  display: inline-block;
-  margin-bottom: 1px;
-  margin-left: 5px;
+  font-family: Roboto;
+  font-size: 16px;
+
+  font-weight: 500;
+  line-height: 149%;
 }
 
 .newMessage {
   h6 {
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 500;
+    font-family: Roboto;
     font-size: 24px;
+    font-weight: 500;
+    font-style: normal;
     line-height: 28px;
   }
+
   p {
-    font-family: 'Roboto';
-    font-style: normal;
-    font-weight: 500;
+    font-family: Roboto;
     font-size: 16px;
+    font-weight: 500;
+    font-style: normal;
     line-height: 19px;
   }
 }
 
 .createRewards {
   display: block;
+
+  margin: 3.5px 0 0;
+
+  cursor: pointer;
+
+  color: $Primary;
   background: inherit;
-  font-family: 'Roboto';
+
+  font-family: Roboto;
+  font-size: 16px;
 
   font-weight: 500;
-  font-size: 16px;
   line-height: 19px;
-  cursor: pointer;
-  color: $Primary;
-  margin: 3.5px 0px 0px 0px;
+
   &:hover {
     color: $PrimaryHover;
   }
+
   &:active {
     color: $PrimaryPressed;
   }
@@ -133,52 +156,62 @@
 
 .blockNewCustomPool {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
 
   width: 110px;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0px 5px 0px 5px;
+  margin: 0 5px;
 }
 
 .inputNewCustomPool {
-  height: 31px;
   display: block;
-  width: 100%;
-  padding: 5px 13px;
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
-  border-radius: 5px;
 
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 149%;
+  width: 100%;
+  height: 31px;
+  padding: 5px 13px;
 
   color: $MainGrey;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
+  background: $AppBG;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
 }
 
 .inputNewCustomPoolLabel {
   display: block;
+
+  padding: 0 10px;
+
+  color: $MainGrey;
   background: inherit;
-  font-family: 'Roboto';
+
+  font-family: Roboto;
+  font-size: 16px;
 
   font-weight: 500;
-  font-size: 16px;
   line-height: 19px;
-  color: $MainGrey;
-  padding: 0 10px;
 }
+
 .buttonDeleteNewCustomPool {
   display: block;
+
   width: 18px;
   height: 20px;
-  border-color: inherit;
+
   cursor: pointer;
+
+  border-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='21' viewBox='0 0 18 21' fill='none'%3E%3Cpath d='M14 20.5H4C2.89543 20.5 2 19.6046 2 18.5V5.5H0V3.5H4V2.5C4 1.39543 4.89543 0.5 6 0.5H12C13.1046 0.5 14 1.39543 14 2.5V3.5H18V5.5H16V18.5C16 19.6046 15.1046 20.5 14 20.5ZM4 5.5V18.5H14V5.5H4ZM6 2.5V3.5H12V2.5H6ZM12 16.5H10V7.5H12V16.5ZM8 16.5H6V7.5H8V16.5Z' fill='%23D9304F'/%3E%3C/svg%3E");
+
   &:hover {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='21' viewBox='0 0 18 21' fill='none'%3E%3Cpath d='M14 20.5H4C2.89543 20.5 2 19.6046 2 18.5V5.5H0V3.5H4V2.5C4 1.39543 4.89543 0.5 6 0.5H12C13.1046 0.5 14 1.39543 14 2.5V3.5H18V5.5H16V18.5C16 19.6046 15.1046 20.5 14 20.5ZM4 5.5V18.5H14V5.5H4ZM6 2.5V3.5H12V2.5H6ZM12 16.5H10V7.5H12V16.5ZM8 16.5H6V7.5H8V16.5Z' fill='%23EB9DAB'/%3E%3C/svg%3E");
   }
+
   &:active {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='21' viewBox='0 0 18 21' fill='none'%3E%3Cpath d='M14 20.5H4C2.89543 20.5 2 19.6046 2 18.5V5.5H0V3.5H4V2.5C4 1.39543 4.89543 0.5 6 0.5H12C13.1046 0.5 14 1.39543 14 2.5V3.5H18V5.5H16V18.5C16 19.6046 15.1046 20.5 14 20.5ZM4 5.5V18.5H14V5.5H4ZM6 2.5V3.5H12V2.5H6ZM12 16.5H10V7.5H12V16.5ZM8 16.5H6V7.5H8V16.5Z' fill='%23A6253C'/%3E%3C/svg%3E");
   }
@@ -186,47 +219,54 @@
 
 .pushChanges {
   display: flex;
+  align-items: center;
 
   justify-content: center;
-  align-items: center;
 
   width: 108px;
   height: 32px;
-  padding: 9px 0px;
-
-  background: $Primary;
-  border-radius: 4px;
-  font-family: 'Roboto';
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
-  margin: -8px 0px 0px 0px;
+  margin: -8px 0 0;
+  padding: 9px 0;
 
   color: $PureWhite;
+  border-radius: 4px;
+
+  background: $Primary;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+
   &:hover {
     background: $PrimaryHover;
   }
+
   &:active {
     background: $PrimaryPressed;
   }
 }
+
 .newReward {
-  margin: 0px 0px 0px 0px;
+  width: auto;
+  margin: 0;
   margin-left: auto;
   padding: 9px 10px;
-  width: auto;
 }
 
 .newRewardDisabled {
-  cursor: default;
   display: flex;
 
+  cursor: default;
+
   color: $StrokeColor;
-  background: $AppBG;
   border: 1px solid $StrokeColor;
+  background: $AppBG;
+
   &:hover {
     background: $AppBG;
   }
+
   &:active {
     background: $AppBG;
   }
@@ -234,95 +274,104 @@
 
 .customPooNewDistributed {
   display: flex;
-  min-width: 80px;
-  justify-content: space-between;
   align-items: center;
-  margin: 0px 0px 0px 10px;
+  justify-content: space-between;
+
+  min-width: 80px;
+  margin: 0 0 0 10px;
 }
 
 .creationFirstBlock {
   display: flex;
   align-items: center;
-  width: 100%;
   justify-content: space-between;
+
+  width: 100%;
 }
 
 .rewardNameBlock {
   display: flex;
+  align-items: center;
+
+  width: 65%;
+  margin: 0 2px 0 0;
 
   padding: 10px;
 
-  background: $WebBG;
   border-radius: 10px;
-  align-items: center;
-  margin: 0px 2px 0px 0px;
-  width: 65%;
-}
-.nameLabel {
-  font-family: 'Roboto';
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 16px;
 
+  background: $WebBG;
+}
+
+.nameLabel {
   color: $PureBlack;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 16px;
 }
 
 .nameInput {
   display: inline-block;
-  padding: 5px 13px;
 
   width: 68%;
   height: 31px;
+  margin: 0 0 0 4px;
+  padding: 5px 13px;
 
-  background: $PureWhite;
+  color: $MainGrey;
 
   border: 1px solid $StrokeColor;
 
   border-radius: 5px;
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 149%;
 
-  color: $MainGrey;
-  margin: 0px 0px 0px 4px;
+  background: $PureWhite;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
 }
 
 .rewardPoolBlock {
   display: flex;
+  align-items: center;
 
   padding: 10px;
 
-  background: $WebBG;
   border-radius: 10px;
-  align-items: center;
+
+  background: $WebBG;
 }
 
 .poolInput {
   // display: inline-block;
   display: flex;
-  justify-content: center;
   align-items: center;
-  padding: 5px 5px;
+  justify-content: center;
 
   width: 46px;
   height: 31px;
+  margin: 0 0 0 4px;
+  padding: 5px;
 
-  background: $PureWhite;
+  color: $MainGrey;
 
   border: 1px solid $StrokeColor;
 
   border-radius: 5px;
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 149%;
 
-  color: $MainGrey;
-  margin: 0px 0px 0px 4px;
+  background: $PureWhite;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
 }
+
 .poolInputInvalid {
   color: #ff6442;
   border: 1px solid #ff6442;
@@ -330,16 +379,19 @@
 
 .poolInputInvalidText {
   width: 100%;
-  text-align: right;
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 149%;
 
-  color: #ff6442;
   // margin: 0px 0px 0px 4px;
   margin-top: 5px;
+
+  text-align: right;
+
+  color: #ff6442;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
 }
 
 .rewardRecepientBlock {
@@ -347,14 +399,16 @@
   flex-direction: column;
   justify-content: center;
 
+  width: 100%;
+  margin: 8px 0 0;
+
   padding: 10px;
 
-  width: 100%;
+  border-radius: 10px;
 
   background: $WebBG;
-  border-radius: 10px;
-  margin: 8px 0px 0px 0px;
 }
+
 .newRewardRecepientBlock {
   display: flex;
   flex-direction: column;
@@ -362,50 +416,56 @@
 
   width: 100%;
 
-  background: $WebBG;
   border-radius: 10px;
+
+  background: $WebBG;
 }
+
 .recepientBlock {
   display: flex;
   align-items: center;
-  width: 100%;
   justify-content: space-between;
+
+  width: 100%;
 }
 
 .recepientInputBlock {
   display: flex;
-  width: 100%;
   align-items: center;
   justify-content: space-between;
-  margin: 12px 0px 0px 0px;
+
+  width: 100%;
+  margin: 12px 0 0;
 }
+
 .recepientInput {
   display: inline-block;
 
-  padding: 5px 13px;
-
   width: 100%;
 
-  background: $PureWhite;
+  padding: 5px 13px;
+
+  color: $MainGrey;
 
   border: 1px solid $StrokeColor;
 
   border-radius: 5px;
 
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 149%;
+  background: $PureWhite;
 
-  color: $MainGrey;
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
 }
 
 .recepientInputButton {
   width: 21px;
   height: 21px;
+  margin: 0 0 0 2px;
+
   border-radius: 50%;
-  margin: 0px 0px 0px 2px;
 
   background-color: #f26780;
 
@@ -416,6 +476,7 @@
   &:hover {
     background-color: $PrimaryHover;
   }
+
   &:active {
     background-color: $Primary;
   }
@@ -423,40 +484,51 @@
 
 .recepientConditionalBlock {
   display: flex;
-  width: 100%;
   flex-direction: column;
+
+  width: 100%;
 }
+
 .conditionalLabel {
   display: flex;
   justify-content: center;
-  padding: 2px 0px 2px 0px;
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-size: 10px;
-  line-height: 100%;
+
+  padding: 2px 0;
+
   text-align: center;
 
   color: $MainGrey;
+
+  font-family: Roboto;
+  font-size: 10px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 100%;
 }
 
 .recepientChangeBlock {
   display: flex;
-  width: 100%;
   align-items: center;
   justify-content: flex-start;
-  margin: 5.5px 0px 0px 0px;
+
+  width: 100%;
+  margin: 5.5px 0 0;
 }
+
 .recepientConditionalButton {
   display: block;
+
   width: 12.5px;
   height: 12.5px;
+
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12.5' height='12.5' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%235EC280'/%3E%3C/svg%3E");
+
   &:hover {
     background-color: inherit;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12.5' height='12.5' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%2372D694'/%3E%3C/svg%3E");
   }
+
   &:active {
     background-color: inherit;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12.5' height='12.5' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%2326A651'/%3E%3C/svg%3E");
@@ -465,15 +537,18 @@
 
 .recepientConditionalLabel {
   display: inline-block;
-  margin: 0px 0px 0px 3.25px;
-  font-family: 'Roboto';
 
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
+  margin: 0 0 0 3.25px;
 
   color: #5ec280;
+
+  font-family: Roboto;
+  font-size: 14px;
+
+  font-weight: 400;
+  line-height: 100%;
 }
+
 .conditionalWrapper {
   display: flex;
   flex-direction: column;
@@ -485,36 +560,41 @@
 
 .conditionalInputBlock {
   display: flex;
-  width: 100%;
   align-items: center;
   justify-content: flex-end;
+
+  width: 100%;
 }
+
 .inputConditional {
   display: inline-block;
-
-  padding: 5px 13px;
 
   width: 83%;
   height: 31px;
 
-  background: $PureWhite;
+  padding: 5px 13px;
+
+  color: $MainGrey;
 
   border: 1px solid $StrokeColor;
 
   border-radius: 5px;
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 149%;
 
-  color: $MainGrey;
+  background: $PureWhite;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
 }
+
 .inputConditionalDelete {
   width: 21px;
   height: 21px;
+  margin: 0 0 0 2px;
+
   border-radius: 50%;
-  margin: 0px 0px 0px 2px;
 
   background-color: #f26780;
 
@@ -525,136 +605,160 @@
   &:hover {
     background-color: $PrimaryHover;
   }
+
   &:active {
     background-color: $Primary;
   }
 }
 
 .applyButtonDisabled {
-  cursor: default;
   display: flex;
+  align-items: center;
 
   justify-content: center;
-  align-items: center;
 
   width: 62px;
   height: 32px;
 
-  border-radius: 4px;
-
-  font-family: 'Roboto';
-
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
+  cursor: default;
 
   color: $StrokeColor;
-  background: $AppBG;
   border: 1px solid $StrokeColor;
+
+  border-radius: 4px;
+  background: $AppBG;
+
+  font-family: Roboto;
+  font-size: 14px;
+
+  font-weight: 400;
+  line-height: 100%;
+
   &:hover {
     background: $AppBG;
   }
+
   &:active {
     background: $AppBG;
   }
 }
+
 .applyButton {
   display: flex;
+  align-items: center;
 
   justify-content: center;
-  align-items: center;
 
   width: 62px;
   height: 32px;
-
-  background: $Primary;
-  border-radius: 4px;
-
-  font-family: 'Roboto';
-
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
+  margin-top: 10px;
 
   color: $PureWhite;
-  margin-top: 10px;
+  border-radius: 4px;
+
+  background: $Primary;
+
+  font-family: Roboto;
+  font-size: 14px;
+
+  font-weight: 400;
+  line-height: 100%;
+
   &:hover {
     background: $PrimaryHover;
   }
+
   &:active {
     background: $PrimaryPressed;
   }
 }
 
 .createdRewardsWrapper {
-  display: flex;
-  margin-top: 15px;
-  width: 97%;
   position: relative;
+
+  display: flex;
+
+  width: 97%;
+  margin-top: 15px;
   margin-bottom: 21px;
 }
 
 .settingWrapperCreatedRewards {
   h5 {
-    display: inline-block;
-    height: 20px;
-    text-align: center;
-    font-style: italic;
-    font-size: 14px;
     left: 14px;
-    color: $MainGrey;
-    padding: 0px 10px;
-    max-width: 50%;
-    white-space: nowrap;
+
+    display: inline-block;
     overflow: hidden;
+
+    max-width: 50%;
+    height: 20px;
+    padding: 0 10px;
+
+    text-align: center;
+    white-space: nowrap;
     text-overflow: ellipsis;
+
+    color: $MainGrey;
+
+    font-size: 14px;
+    font-style: italic;
   }
 }
+
 .percentReward {
   position: absolute;
+  z-index: 3;
   top: -11px;
   right: 15px;
+
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+
   height: 20px;
-  padding: 0px 10px;
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 149%;
-  background: $AppBG;
+  padding: 0 10px;
+  padding-top: 1.5px;
+
   color: $MainGrey;
-  z-index: 3;
   border: 1px solid $MainGrey;
   border-radius: 4px;
-  padding-top: 1.5px;
+  background: $AppBG;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
 }
+
 .changeReward {
   position: absolute;
+  z-index: 3;
   bottom: 7px;
   left: 14px;
+
   display: flex;
-  height: 20px;
-  width: 86px;
-  background: inherit;
   align-items: center;
   justify-content: center;
 
-  font-family: 'Roboto';
-  background: $AppBG;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
+  width: 86px;
+  height: 20px;
 
   color: $Primary;
-  z-index: 3;
   border: 1px solid $MainGrey;
   border-radius: 4px;
+  background: inherit;
+  background: $AppBG;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+
   &:hover {
     color: $PrimaryHover;
   }
+
   &:active {
     color: $PrimaryPressed;
   }
@@ -662,28 +766,32 @@
 
 .deleteReward {
   position: absolute;
+  z-index: 3;
   bottom: 7px;
   left: 104px;
+
   display: flex;
-  height: 20px;
-  width: 76px;
-  background: inherit;
   align-items: center;
   justify-content: center;
 
-  font-family: 'Roboto';
-  background: $AppBG;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
+  width: 76px;
+  height: 20px;
 
   color: $Primary;
-  z-index: 3;
   border: 1px solid $MainGrey;
   border-radius: 4px;
+  background: inherit;
+  background: $AppBG;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+
   &:hover {
     color: $PrimaryHover;
   }
+
   &:active {
     color: $PrimaryPressed;
   }
@@ -692,166 +800,201 @@
 .createdRewardsBlock {
   display: flex;
   flex-direction: column;
-  padding: 10px;
 
   width: 100%;
+  margin: 0 0 10px;
+  padding: 10px;
+
+  border-radius: 10px;
 
   background: $PureWhite;
-  border-radius: 10px;
-  margin: 0px 0px 10px 0px;
+
   &:last-child {
-    margin: 0px 0px 0px 0px;
+    margin: 0;
   }
 }
 
 .createdRewardsBlockUser {
   display: flex;
-  width: 100%;
-  justify-content: flex-start;
   align-items: center;
+  justify-content: flex-start;
+
+  width: 100%;
 }
+
 .createdRewardsBlockLabel {
   display: inline-block;
-  margin: 0px 4px 0px 0px;
-  font-family: 'Roboto';
 
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 16px;
+  margin: 0 4px 0 0;
 
   color: $ContentBlack;
+
+  font-family: Roboto;
+  font-size: 14px;
+
+  font-weight: 500;
+  line-height: 16px;
 }
 
 .createdRewardsBlockLabelUser {
-  font-family: 'Roboto';
+  color: $ContentBlack;
+
+  font-family: Roboto;
+  font-size: 14px;
 
   font-weight: 500;
-  font-size: 14px;
   line-height: 16px;
-
-  color: $ContentBlack;
 }
 
 .createdRewardsBlockConditions {
   display: flex;
-  width: 100%;
-  justify-content: flex-start;
   align-items: center;
+  justify-content: flex-start;
+
+  width: 100%;
 }
 
 .createdRewardsBlockLabelAdapter {
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 149%;
-
   color: #5ab5e8;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
 }
 
 .linkNavigation {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  height: 60px;
-  margin: 20px 0px 0px 0px;
   position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 60px;
+  margin: 20px 0 0;
+
   &::before {
-    content: '';
     position: absolute;
     top: -10px;
     left: 0;
+
     width: 100%;
     height: 2px;
+
+    content: '';
+
     background: $WebBG;
   }
 }
 
 .wrapperChanges {
   display: flex;
-  width: 100%;
-  flex-direction: column;
-  align-items: center;
-  margin: 20px 0px 0px 0px;
 
   overflow-y: scroll;
+  align-items: center;
+  flex-direction: column;
+
+  width: 100%;
+  margin: 20px 0 0;
   direction: rtl;
+
   &::-webkit-scrollbar {
     width: 4px;
+
     cursor: pointer;
   }
+
   &::-webkit-scrollbar-track {
-    background: rgb(244, 244, 244);
-    background: rgb(244, 244, 244);
+    background: rgb(244 244 244);
+    background: rgb(244 244 244);
     background: linear-gradient(
       90deg,
-      rgba(244, 244, 244, 0) 10%,
-      rgba(227, 227, 227, 1) 50%,
-      rgba(244, 244, 244, 0) 90%
+      rgb(244 244 244 / 0%) 10%,
+      rgb(227 227 227 / 100%) 50%,
+      rgb(244 244 244 / 0%) 90%
     );
   }
+
   &::-webkit-scrollbar-thumb {
     width: 4px;
     height: 2px;
-    background: $Primary;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.09),
-      0px 2px 2px rgba(38, 117, 209, 0.04);
+
     border-radius: 2px;
+    background: $Primary;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
   }
 }
+
 .wrapperChanges > * {
   direction: ltr;
 }
 
 .back {
-  display: block;
-  background: inherit;
-  font-family: 'Roboto';
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
   position: relative;
+
+  display: block;
+
+  margin: 0 0 0 14.5px;
+
   color: $MainGrey;
-  margin: 0px 0px 0px 14.5px;
+  background: inherit;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+
   &::before {
-    content: '';
     position: absolute;
     top: 0;
     left: -14.5px;
+
     width: 11px;
     height: 14px;
+
+    content: '';
+
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%23919191'/%3E%3C/svg%3E");
   }
+
   &:hover {
     color: $ContentBlack;
+
     &::before {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill=' %23747376'/%3E%3C/svg%3E");
     }
   }
+
   &:active {
     color: $MainBlack;
+
     &::before {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%232A2A2A'/%3E%3C/svg%3E");
     }
   }
 }
+
 .isActive {
   color: red;
 }
 
 .createTokenomics {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 19px;
+  cursor: pointer;
 
   color: #f26780;
-  cursor: pointer;
+
+  font-family: Roboto;
+  font-size: 16px;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 19px;
+
   &:hover {
     color: $PrimaryHover;
   }
+
   &:active {
     color: $Primary;
   }
@@ -859,6 +1002,7 @@
 
 .newPoolInput::-webkit-outer-spin-button,
 ::-webkit-inner-spin-button {
-  -webkit-appearance: none;
+  appearance: none;
+
   margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
 }

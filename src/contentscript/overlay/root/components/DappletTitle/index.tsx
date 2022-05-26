@@ -1,15 +1,12 @@
-import React, { FC } from 'react'
 import cn from 'classnames'
+import React, { FC } from 'react'
 import styles from './DappletTitle.module.scss'
-import { ReactComponent as Up } from '../../assets/icons/up-mini.svg'
 
 export interface DappletTitleProps {
   title: string
   isShowDescription: boolean
 }
-export const DappletTitle: FC<DappletTitleProps> = (
-  props: DappletTitleProps
-) => {
+export const DappletTitle: FC<DappletTitleProps> = (props: DappletTitleProps) => {
   const { title, isShowDescription = false } = props
 
   return (

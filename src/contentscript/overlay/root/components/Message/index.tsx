@@ -1,6 +1,6 @@
+import cn from 'classnames'
 import React, { ReactElement, ReactNode } from 'react'
 import styles from './Message.module.scss'
-import cn from 'classnames'
 
 export interface MessageProps {
   title: string

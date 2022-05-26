@@ -1,22 +1,9 @@
-import React, { ReactElement, useState, useEffect, useMemo } from 'react'
-import cn from 'classnames'
-import styles from './Main.module.scss'
-import {
-  isValidHttp,
-  isValidUrl,
-  isValidPostageStampId,
-} from '../../../../../popup/helpers'
-import { browser } from 'webextension-polyfill-ts'
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { useToggle } from '../../hooks/useToggle'
-
-import { SettingTitle } from '../../components/SettingTitle'
-import { SettingItem } from '../../components/SettingItem'
-import { Switch } from '../../components/Switch'
-import { Dropdown } from '../../components/Dropdown'
-import { SettingWrapper } from '../../components/SettingWrapper'
+import React, { useState } from 'react'
 import { Checkbox } from '../../components/Checkbox'
-import { InputPanel } from '../../components/InputPanel'
+import { SettingItem } from '../../components/SettingItem'
+import { SettingWrapper } from '../../components/SettingWrapper'
+import { Switch } from '../../components/Switch'
+import { useToggle } from '../../hooks/useToggle'
 
 export const DROPDOWN_LIST = [{ _id: '0', label: 'Custom' }]
 export const CHECKBOX_LIST = [
@@ -73,18 +60,10 @@ export const MainList = () => {
         title="Extension settings"
         children={
           <>
-            <SettingItem
-              title="Autoupdate"
-              component={<Switch checked={isUpdateAvailable} />}
-            />
+            <SettingItem title="Autoupdate" component={<Switch checked={isUpdateAvailable} />} />
             <SettingItem
               title="Notifications"
-              component={
-                <Switch
-                  checked={isNotificationActive}
-                  onClick={onNotificationActive}
-                />
-              }
+              component={<Switch checked={isNotificationActive} onClick={onNotificationActive} />}
               children={
                 isNotificationActive && (
                   <>
@@ -109,14 +88,8 @@ export const MainList = () => {
         title="Dapplets settings"
         children={
           <>
-            <SettingItem
-              title="Autoactivate dapplets"
-              component={<Switch checked={false} />}
-            />
-            <SettingItem
-              title="Autoupdate dapplets"
-              component={<Switch checked={false} />}
-            />
+            <SettingItem title="Autoactivate dapplets" component={<Switch checked={false} />} />
+            <SettingItem title="Autoupdate dapplets" component={<Switch checked={false} />} />
           </>
         }
       />

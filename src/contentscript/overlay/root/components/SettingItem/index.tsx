@@ -1,10 +1,5 @@
-import React, {
-  FC,
-  DetailedHTMLProps,
-  HTMLAttributes,
-  ReactElement,
-} from 'react'
 import cn from 'classnames'
+import React, { DetailedHTMLProps, FC, HTMLAttributes, ReactElement } from 'react'
 import styles from './SettingItem.module.scss'
 
 export interface SettingItemProps

@@ -1,119 +1,134 @@
-import React, { Key } from "react";
-import { Button, Message } from "semantic-ui-react";
-import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { browser } from "webextension-polyfill-ts";
-import { SecureLink } from "react-secure-link";
-import Linkify from "react-linkify";
-import ReactTimeAgo from 'react-time-ago';
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import React, { Key } from 'react'
+import Linkify from 'react-linkify'
+import { SecureLink } from 'react-secure-link'
+import ReactTimeAgo from 'react-time-ago'
+import { Button, Message } from 'semantic-ui-react'
+import { browser } from 'webextension-polyfill-ts'
 
 interface Props {
-  isOverlay: boolean;
-  style?: any;
+  isOverlay: boolean
+  style?: any
 }
 
 interface State {
-  devMessage: string;
-  newExtensionVersion: string;
+  devMessage: string
+  newExtensionVersion: string
   discordMessages: {
-    authorUsername: string,
-    content: string,
-    timestamp: string,
-    link: string,
-  }[];
+    authorUsername: string
+    content: string
+    timestamp: string
+    link: string
+  }[]
 }
 
 export class DevMessage extends React.Component<Props, State> {
   constructor(props: Props) {
-    super(props);
+    super(props)
     this.state = {
       devMessage: null,
       newExtensionVersion: null,
       discordMessages: [],
-    };
+    }
   }
 
   async componentDidMount() {
-    const { getDevMessage, getNewExtensionVersion, getIgnoredUpdate, getDiscordMessages } = await initBGFunctions(browser);
-    const devMessage = await getDevMessage();
-    const ignoredUpdate = await getIgnoredUpdate();
-    const newExtensionVersion = await getNewExtensionVersion();
-    const discordMessages = await getDiscordMessages();
+    const { getDevMessage, getNewExtensionVersion, getIgnoredUpdate, getDiscordMessages } =
+      await initBGFunctions(browser)
+    const devMessage = await getDevMessage()
+    const ignoredUpdate = await getIgnoredUpdate()
+    const newExtensionVersion = await getNewExtensionVersion()
+    const discordMessages = await getDiscordMessages()
 
-    this.setState({ 
-      devMessage, 
-      newExtensionVersion: (ignoredUpdate === newExtensionVersion) ? null : newExtensionVersion,
+    this.setState({
+      devMessage,
+      newExtensionVersion: ignoredUpdate === newExtensionVersion ? null : newExtensionVersion,
       discordMessages,
-    });
+    })
   }
 
   async _hideDevMessage() {
-    const { hideDevMessage } = await initBGFunctions(browser);
-    await hideDevMessage(this.state.devMessage);
-    this.setState({ devMessage: null });
+    const { hideDevMessage } = await initBGFunctions(browser)
+    await hideDevMessage(this.state.devMessage)
+    this.setState({ devMessage: null })
   }
 
   async _hideDiscordMessages() {
-    const { hideDiscordMessages } = await initBGFunctions(browser);
-    await hideDiscordMessages(this.state.discordMessages[0].timestamp);
-    this.setState({ discordMessages: [] });
+    const { hideDiscordMessages } = await initBGFunctions(browser)
+    await hideDiscordMessages(this.state.discordMessages[0].timestamp)
+    this.setState({ discordMessages: [] })
   }
 
   async _ignoreUpdate() {
-    const { setIgnoredUpdate } = await initBGFunctions(browser);
-    setIgnoredUpdate(this.state.newExtensionVersion);
-    this.setState({ newExtensionVersion: null });
+    const { setIgnoredUpdate } = await initBGFunctions(browser)
+    setIgnoredUpdate(this.state.newExtensionVersion)
+    this.setState({ newExtensionVersion: null })
   }
 
   async _showUpgradeGuide() {
-    const { openGuideOverlay } = await initBGFunctions(browser);
+    const { openGuideOverlay } = await initBGFunctions(browser)
     if (this.props.isOverlay) {
-      await openGuideOverlay();
-      await this.componentDidMount();
+      await openGuideOverlay()
+      await this.componentDidMount()
     } else {
-      openGuideOverlay();
-      window.close();
+      openGuideOverlay()
+      window.close()
     }
   }
 
   render() {
-    const s = this.state;
+    const s = this.state
 
     if (s.newExtensionVersion) {
       return (
         <div style={this.props.style}>
           <Message info size="small">
             <div style={{ display: 'flex' }}>
-            <Message.Content style={{ flex: 'auto'}}>
-              <Message.Header>Upgrade extension</Message.Header>
-              <p>Newer version is available: <a href="https://github.com/dapplets/dapplet-extension/releases/latest" target="_blank"><b>{s.newExtensionVersion}</b></a></p>
-            </Message.Content>
-              <Button.Group size="mini" style={{ display: 'unset', margin: 'auto 0'} }>
-                <Button primary onClick={this._showUpgradeGuide.bind(this)}>Upgrade</Button>
+              <Message.Content style={{ flex: 'auto' }}>
+                <Message.Header>Upgrade extension</Message.Header>
+                <p>
+                  Newer version is available:{' '}
+                  <a
+                    href="https://github.com/dapplets/dapplet-extension/releases/latest"
+                    target="_blank"
+                  >
+                    <b>{s.newExtensionVersion}</b>
+                  </a>
+                </p>
+              </Message.Content>
+              <Button.Group size="mini" style={{ display: 'unset', margin: 'auto 0' }}>
+                <Button primary onClick={this._showUpgradeGuide.bind(this)}>
+                  Upgrade
+                </Button>
                 <Button onClick={this._ignoreUpdate.bind(this)}>Ignore</Button>
               </Button.Group>
             </div>
           </Message>
         </div>
-      );
+      )
     }
 
     if (s.discordMessages.length) {
-      const { authorUsername, content, timestamp, link } = s.discordMessages[0];
+      const { authorUsername, content, timestamp, link } = s.discordMessages[0]
 
-      const otherUnreadMsgsNumber = s.discordMessages.length - 1;
-      let linkMessage: string;
+      const otherUnreadMsgsNumber = s.discordMessages.length - 1
+      let linkMessage: string
       if (otherUnreadMsgsNumber === 0) {
-        linkMessage = 'no more unread messages';
+        linkMessage = 'no more unread messages'
       } else if (otherUnreadMsgsNumber === 1) {
-        linkMessage = '1 more unread message';
+        linkMessage = '1 more unread message'
       } else if (otherUnreadMsgsNumber >= 2 && otherUnreadMsgsNumber <= 10) {
-        linkMessage = `${otherUnreadMsgsNumber} more unread messages`;
+        linkMessage = `${otherUnreadMsgsNumber} more unread messages`
       } else {
-        linkMessage = 'more than 10 unread messages';
+        linkMessage = 'more than 10 unread messages'
       }
       return (
         <div style={this.props.style}>
-          <Message info onDismiss={() => this._hideDiscordMessages()} style={{ paddingBottom: '5px' }}>
+          <Message
+            info
+            onDismiss={() => this._hideDiscordMessages()}
+            style={{ paddingBottom: '5px' }}
+          >
             <Message.Header>
               <a href={link} target="_blank" style={{ color: '#276f86' }}>
                 Dapplets announcements
@@ -122,14 +137,25 @@ export class DevMessage extends React.Component<Props, State> {
             <Message.Content style={{ marginTop: '10px' }}>
               <p style={{ marginBottom: '0', fontSize: '13px' }}>
                 <b>{authorUsername}</b>
-                <span style={{ fontSize: '12px', opacity: '.7', letterSpacing: '0.3px', paddingLeft: '5px' }}>
+                <span
+                  style={{
+                    fontSize: '12px',
+                    opacity: '.7',
+                    letterSpacing: '0.3px',
+                    paddingLeft: '5px',
+                  }}
+                >
                   <ReactTimeAgo date={new Date(timestamp)} locale="en-US" />
                 </span>
               </p>
               <p style={{ margin: '0 auto' }}>
-                <Linkify componentDecorator={( decoratedHref: string, decoratedText: string, key: Key) => (
-                  <SecureLink href={decoratedHref} key={key}>{decoratedText}</SecureLink>
-                )}>
+                <Linkify
+                  componentDecorator={(decoratedHref: string, decoratedText: string, key: Key) => (
+                    <SecureLink href={decoratedHref} key={key}>
+                      {decoratedText}
+                    </SecureLink>
+                  )}
+                >
                   {content}
                 </Linkify>
               </p>
@@ -141,11 +167,11 @@ export class DevMessage extends React.Component<Props, State> {
             </Message.Content>
           </Message>
         </div>
-      );
+      )
     }
 
     if (s.devMessage) {
-      const [title, ...messages] = s.devMessage.split('\n');
+      const [title, ...messages] = s.devMessage.split('\n')
 
       return (
         <div style={this.props.style}>
@@ -153,18 +179,25 @@ export class DevMessage extends React.Component<Props, State> {
             <Message.Header>{title}</Message.Header>
             <p>
               <Linkify
-                componentDecorator={( decoratedHref: string, decoratedText: string, key: Key) => (
-                  <SecureLink href={decoratedHref} key={key}>{decoratedText}</SecureLink>
+                componentDecorator={(decoratedHref: string, decoratedText: string, key: Key) => (
+                  <SecureLink href={decoratedHref} key={key}>
+                    {decoratedText}
+                  </SecureLink>
                 )}
               >
-                {messages.map((x, i) => (<>{x}<br key={i} /></>))}
+                {messages.map((x, i) => (
+                  <>
+                    {x}
+                    <br key={i} />
+                  </>
+                ))}
               </Linkify>
             </p>
           </Message>
         </div>
-      );
+      )
     }
 
-    return null;
+    return null
   }
 }

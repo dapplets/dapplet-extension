@@ -1,24 +1,16 @@
-import React, { useState, useEffect, useMemo, FC } from 'react'
-import cn from 'classnames'
-import styles from './Developer.module.scss'
-import {
-  isValidHttp,
-  isValidUrl,
-  isValidPostageStampId,
-} from '../../../../../popup/helpers'
-import { checkUrlAvailability, groupBy } from '../../../../../common/helpers'
-
-import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-
+import cn from 'classnames'
+import React, { FC, useEffect, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
-import { Localhost } from '../../components/Localhost'
-import { UnderConstruction } from '../../components/UnderConstruction'
+import { groupBy } from '../../../../../common/helpers'
+import { isValidUrl } from '../../../../../popup/helpers'
 import { DevModule } from '../../components/DevModulesList'
+import { Localhost } from '../../components/Localhost'
 import { Registry } from '../../components/Registery'
-import TopologicalSort from 'topological-sort'
-import { DevModulesList } from '../../../../../popup/components/DevModulesList'
+import styles from './Developer.module.scss'
+
 let _isMounted = true
 export interface DeveloperProps {
   isDappletsDetails: any
@@ -220,8 +212,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
               }}
               placeholder="Manifest URL"
               disabled={
-                !isValidUrl(registryInput) &&
-                !!registries.find((r) => r.url === registryInput)
+                !isValidUrl(registryInput) && !!registries.find((r) => r.url === registryInput)
               }
             />
             {isLoadAdd ? (
@@ -268,30 +259,24 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                   children={
                     <div className={styles.modules}>
                       {modules.length > 0 &&
-                        Object.entries(groupedModules).map(
-                          ([registryUrl, modules]) => (
-                            <div key={registryUrl + i}>
-                              {modules.length > 0 && registryUrl === r.url && (
-                                <DevModule
-                                  setUpdate={setUpdate}
-                                  isLocalhost={isLocalhost}
-                                  isDappletsDetails={isDappletsDetails}
-                                  setDappletsDetail={setDappletsDetail}
-                                  modules={modules}
-                                  onDetailsClick={deployModule.bind(this)}
-                                  setModuleInfo={setModuleInfo}
-                                  setModuleVersion={setModuleVersion}
-                                  isUnderConstructionDetails={
-                                    isUnderConstructionDetails
-                                  }
-                                  setUnderConstructionDetails={
-                                    setUnderConstructionDetails
-                                  }
-                                />
-                              )}
-                            </div>
-                          )
-                        )}
+                        Object.entries(groupedModules).map(([registryUrl, modules]) => (
+                          <div key={registryUrl + i}>
+                            {modules.length > 0 && registryUrl === r.url && (
+                              <DevModule
+                                setUpdate={setUpdate}
+                                isLocalhost={isLocalhost}
+                                isDappletsDetails={isDappletsDetails}
+                                setDappletsDetail={setDappletsDetail}
+                                modules={modules}
+                                onDetailsClick={deployModule.bind(this)}
+                                setModuleInfo={setModuleInfo}
+                                setModuleVersion={setModuleVersion}
+                                isUnderConstructionDetails={isUnderConstructionDetails}
+                                setUnderConstructionDetails={setUnderConstructionDetails}
+                              />
+                            )}
+                          </div>
+                        ))}
                     </div>
                   }
                 />
@@ -319,9 +304,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                             setModuleInfo={setModuleInfo}
                             setModuleVersion={setModuleVersion}
                             isUnderConstructionDetails={isShowChildrenRegistery}
-                            setUnderConstructionDetails={
-                              setUnderConstructionDetails
-                            }
+                            setUnderConstructionDetails={setUnderConstructionDetails}
                           />
                         </div>
                       }

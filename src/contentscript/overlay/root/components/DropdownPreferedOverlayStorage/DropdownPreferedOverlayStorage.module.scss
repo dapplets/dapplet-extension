@@ -3,77 +3,98 @@
 @import '../../assets/styles/color.variables.scss';
 
 .wrapper {
-  display: flex;
-  width: 100%;
   position: relative;
+
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  background: $AppBG;
+
+  width: 100%;
 
   padding: 5px 13px;
+
+  color: $MainGrey;
   border: 1px solid $StrokeColor;
 
   border-radius: 5px;
+  background: $AppBG;
 
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 400;
+  font-family: Roboto;
   font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
   line-height: 149%;
-
-  color: $MainGrey;
 }
+
 .dropdownLabel {
   cursor: pointer;
 }
 
 .openDropdown {
   display: inline-block;
+
   width: 8px;
   height: 6px;
+
   cursor: pointer;
+
   background: url("data:image/svg+xml,%3Csvg width='8' height='6' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%232A2A2A' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
+
 .openOverlay {
   position: absolute;
+  z-index: 3;
   top: 0;
   left: 0;
-  z-index: 3;
+
+  display: flex;
+  flex-direction: column;
+
   width: 100%;
   height: auto;
-  background: $AppBG;
 
   padding: 5px 13px;
+
   border: 1px solid $StrokeColor;
 
   border-radius: 5px;
-  display: flex;
-  flex-direction: column;
+  background: $AppBG;
 }
+
 .blockIcon {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
+  justify-content: flex-end;
+
   height: 15px;
 }
+
 .closeDropdown {
   display: inline-block;
+
   width: 8px;
   height: 6px;
-  background: url("data:image/svg+xml,%3Csvg width='8' height='6' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%232A2A2A' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  transform: rotate(180deg);
+
   cursor: pointer;
+  transform: rotate(180deg);
+
+  background: url("data:image/svg+xml,%3Csvg width='8' height='6' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%232A2A2A' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
+
 .item {
   cursor: pointer;
+
   &:hover {
     color: $PrimaryHover;
   }
+
   // &:active {
   //   color: $MainBlack;
   // }
 }
+
 .activeItem {
-  font-weight: 700;
   color: $MainBlack;
+
+  font-weight: 700;
 }

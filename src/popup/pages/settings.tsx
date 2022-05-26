@@ -1,24 +1,21 @@
-import * as React from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import * as React from 'react'
 import {
+  Checkbox,
+  Dropdown,
+  Header,
+  Icon,
+  Input,
+  Label,
+  List,
+  Menu,
   Popup,
   Segment,
-  List,
-  Label,
-  Input,
-  Checkbox,
-  Icon,
-  Header,
-  Button,
-  Dropdown,
-  Form,
-  Divider,
-  Menu,
 } from 'semantic-ui-react'
-import { isValidHttp, isValidUrl, isValidPostageStampId } from '../helpers'
+import { browser } from 'webextension-polyfill-ts'
 import { parseModuleName, typeOfUri, UriTypes } from '../../common/helpers'
 import { ProfileDropdown } from '../components/ProfileDropdown'
+import { isValidHttp, isValidPostageStampId, isValidUrl } from '../helpers'
 
 interface ISettingsProps {
   devMode: boolean
@@ -473,10 +470,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
     } else if (typeOfUri(address) === UriTypes.Ethereum) {
       window.open(`https://goerli.etherscan.io/address/${address}`, '_blank')
     } else if (typeOfUri(address) === UriTypes.Near) {
-      window.open(
-        `https://explorer.testnet.near.org/accounts/${address}`,
-        '_blank'
-      )
+      window.open(`https://explorer.testnet.near.org/accounts/${address}`, '_blank')
     }
   }
 
@@ -539,10 +533,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
               <a
                 style={{ cursor: 'pointer' }}
                 onClick={() =>
-                  window.open(
-                    `https://github.com/dapplets/dapplet-extension/releases`,
-                    '_blank'
-                  )
+                  window.open(`https://github.com/dapplets/dapplet-extension/releases`, '_blank')
                 }
               >
                 v{EXTENSION_VERSION}
@@ -567,8 +558,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                 size: 'mini',
                 onClick: () => this.addRegistry(registryInput),
                 disabled: !(
-                  isValidUrl(registryInput) &&
-                  !registries.find((r) => r.url === registryInput)
+                  isValidUrl(registryInput) && !registries.find((r) => r.url === registryInput)
                 ),
                 color: 'blue',
               }}
@@ -705,10 +695,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
               size="mini"
               fluid
               placeholder="Provider URL"
-              error={
-                !!this.state.providerInputError ||
-                !isValidHttp(this.state.providerInput)
-              }
+              error={!!this.state.providerInputError || !isValidHttp(this.state.providerInput)}
               iconPosition="left"
               loading={this.state.providerLoading}
               // style={{ marginBottom: '15px' }}
@@ -745,8 +732,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
               fluid
               placeholder="Gateway URL"
               error={
-                !!this.state.swarmGatewayInputError ||
-                !isValidHttp(this.state.swarmGatewayInput)
+                !!this.state.swarmGatewayInputError || !isValidHttp(this.state.swarmGatewayInput)
               }
               iconPosition="left"
               loading={this.state.swarmGatewayLoading}
@@ -799,10 +785,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                     this.state.swarmPostageStampIdLoading ||
                     !this.state.swarmPostageStampIdEdited ||
                     !isValidPostageStampId(this.state.swarmPostageStampIdInput)
-                  ) &&
-                  this.setSwarmPostageStampId(
-                    this.state.swarmPostageStampIdInput
-                  )
+                  ) && this.setSwarmPostageStampId(this.state.swarmPostageStampIdInput)
                 }
                 onChange={(e) =>
                   this.setState({
@@ -826,8 +809,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
               fluid
               placeholder="Gateway URL"
               error={
-                !!this.state.ipfsGatewayInputError ||
-                !isValidHttp(this.state.ipfsGatewayInput)
+                !!this.state.ipfsGatewayInputError || !isValidHttp(this.state.ipfsGatewayInput)
               }
               iconPosition="left"
               loading={this.state.ipfsGatewayLoading}
@@ -864,10 +846,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
               size="mini"
               fluid
               placeholder="Gateway URL"
-              error={
-                !!this.state.siaPortalInputError ||
-                !isValidHttp(this.state.siaPortalInput)
-              }
+              error={!!this.state.siaPortalInputError || !isValidHttp(this.state.siaPortalInput)}
               iconPosition="left"
               loading={this.state.siaPortalLoading}
               // style={{ marginBottom: '15px' }}
@@ -959,10 +938,8 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
               <input
                 value={this.state.userAgentNameInput}
                 onBlur={() =>
-                  !(
-                    this.state.userAgentNameLoading ||
-                    !this.state.userAgentNameEdited
-                  ) && this.setUserAgentName(this.state.userAgentNameInput)
+                  !(this.state.userAgentNameLoading || !this.state.userAgentNameEdited) &&
+                  this.setUserAgentName(this.state.userAgentNameInput)
                 }
                 onChange={(e) =>
                   this.setState({
@@ -1014,9 +991,7 @@ class Settings extends React.Component<ISettingsProps, ISettingsState> {
                 floating
                 text={s.preferedOverlayStorage}
               >
-                <Dropdown.Menu
-                  style={{ maxHeight: '17rem', overflowY: 'auto' }}
-                >
+                <Dropdown.Menu style={{ maxHeight: '17rem', overflowY: 'auto' }}>
                   <Dropdown.Divider style={{ margin: 'unset' }} />
                   {[
                     { id: 'centralized', text: 'Centralized' },

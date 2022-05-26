@@ -1,21 +1,12 @@
-import React, {
-  FC,
-  DetailedHTMLProps,
-  HTMLAttributes,
-  ReactElement,
-  useState,
-  useRef,
-  useEffect,
-} from 'react'
-
 import cn from 'classnames'
-import styles from './Notification.module.scss'
-import { useToggle } from '../../hooks/useToggle'
-import ReactTimeAgo from 'react-time-ago'
-import { CloseIcon } from '../CloseIcon'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
-import { on } from 'process'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import ReactTimeAgo from 'react-time-ago'
+import { useToggle } from '../../hooks/useToggle'
+import { CloseIcon } from '../CloseIcon'
+import styles from './Notification.module.scss'
+
 TimeAgo.addLocale(en)
 
 export interface NotificationProps {
@@ -31,8 +22,7 @@ export interface NotificationProps {
 }
 
 export const Notification = (props: NotificationProps): ReactElement => {
-  const { label, title, date, onClear, _id, description, href, onChange } =
-    props
+  const { label, title, date, onClear, _id, description, href, onChange } = props
   const refComponent = useRef<HTMLInputElement>()
   const [isOpen, onOpen] = useState(false)
   const [isDelete, onDelete] = useState(false)

@@ -1,4 +1,3 @@
-export default abstract class Base 
-{
-    abstract getId : () => string;
+export default abstract class Base {
+  abstract getId: () => string
 }

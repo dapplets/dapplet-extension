@@ -1,13 +1,9 @@
-import React, { ChangeEvent, FC, useState } from 'react'
-import { InputHTMLAttributes, DetailedHTMLProps } from 'react'
 import cn from 'classnames'
+import React, { ChangeEvent, FC } from 'react'
 import styles from './InputPanel.module.scss'
 
 export interface InputPanelProps
-  extends React.DetailedHTMLProps<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
-  > {
+  extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   onSubmit?: () => void
   value?: string
   placeholder?: string
@@ -35,10 +31,7 @@ export const InputPanel: FC<InputPanelProps> = (props) => {
   }
 
   return (
-    <form
-      className={cn(styles.inputPanel, { [styles.error]: error })}
-      onSubmit={handlerSubmit}
-    >
+    <form className={cn(styles.inputPanel, { [styles.error]: error })} onSubmit={handlerSubmit}>
       <input
         className={cn(styles.inputInfo, {
           [styles.inputDefault]: buttonDefault,

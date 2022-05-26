@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { Button, List, Label } from 'semantic-ui-react'
+import { Button, Label, List } from 'semantic-ui-react'
+import TopologicalSort from 'topological-sort'
 import ModuleInfo from '../../background/models/moduleInfo'
 import VersionInfo from '../../background/models/versionInfo'
-import { StorageRefImage } from './StorageRefImage'
-import TopologicalSort from 'topological-sort'
 import { DEFAULT_BRANCH_NAME } from '../../common/constants'
+import { StorageRefImage } from './StorageRefImage'
 
 interface Props {
   modules: {
@@ -24,12 +24,7 @@ export class DevModulesList extends React.Component<Props, State> {
     // Topological sorting by dependencies
     const nodes = new Map<string, any>()
     modules.forEach((x) =>
-      nodes.set(
-        x.versions[0]
-          ? x.module.name + '#' + x.versions[0]?.branch
-          : x.module.name,
-        x
-      )
+      nodes.set(x.versions[0] ? x.module.name + '#' + x.versions[0]?.branch : x.module.name, x)
     )
     const sorting = new TopologicalSort(nodes)
     modules.forEach((x) => {
@@ -71,9 +66,7 @@ export class DevModulesList extends React.Component<Props, State> {
                 size="mini"
                 compact
                 color="blue"
-                onClick={() =>
-                  this.props.onDetailsClick(m.module, m.versions[0])
-                }
+                onClick={() => this.props.onDetailsClick(m.module, m.versions[0])}
               >
                 Details
               </Button>

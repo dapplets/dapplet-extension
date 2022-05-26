@@ -7,19 +7,19 @@
  * @link https://gist.github.com/jonleighton/958841
  */
 export function base64ArrayBuffer(arrayBuffer: ArrayBuffer) {
-  var base64 = ''
-  var encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+  let base64 = ''
+  const encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 
-  var bytes = new Uint8Array(arrayBuffer)
-  var byteLength = bytes.byteLength
-  var byteRemainder = byteLength % 3
-  var mainLength = byteLength - byteRemainder
+  const bytes = new Uint8Array(arrayBuffer)
+  const byteLength = bytes.byteLength
+  const byteRemainder = byteLength % 3
+  const mainLength = byteLength - byteRemainder
 
-  var a, b, c, d
-  var chunk
+  let a, b, c, d
+  let chunk
 
   // Main loop deals with bytes in chunks of 3
-  for (var i = 0; i < mainLength; i = i + 3) {
+  for (let i = 0; i < mainLength; i = i + 3) {
     // Combine the three bytes into a single integer
     chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2]
 
@@ -27,7 +27,7 @@ export function base64ArrayBuffer(arrayBuffer: ArrayBuffer) {
     a = (chunk & 16515072) >> 18 // 16515072 = (2^6 - 1) << 18
     b = (chunk & 258048) >> 12 // 258048   = (2^6 - 1) << 12
     c = (chunk & 4032) >> 6 // 4032     = (2^6 - 1) << 6
-    d = chunk & 63               // 63       = 2^6 - 1
+    d = chunk & 63 // 63       = 2^6 - 1
 
     // Convert the raw binary segments to the appropriate ASCII encoding
     base64 += encodings[a] + encodings[b] + encodings[c] + encodings[d]

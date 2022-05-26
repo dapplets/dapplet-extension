@@ -1,42 +1,47 @@
 $primary-color: darkblue;
-$background-color: #BADA55;
+$background-color: #bada55;
 
 // Chrome applies an 8px margin by default (gross).
 body {
-    margin: 0px;
-    // max-height: 600px;
-    // min-width: 428px; // 428px is width of the overlay
-    //width: 500px;
+  margin: 0;
+
+  // max-height: 600px;
+  // min-width: 428px; // 428px is width of the overlay
+  //width: 500px;
 }
 
 .popupContainer {
-    padding: 10px;
+  padding: 10px;
 }
 
 .internalTab {
-    min-height: 80px;
-    max-height: 520px;
-    overflow: auto;
+  overflow: auto;
+
+  min-height: 80px;
+  max-height: 520px;
 }
 
 .internalTabSettings {
-    min-height: 250px;
-    max-height: 520px;
-    overflow: auto;
+  overflow: auto;
+
+  min-height: 250px;
+  max-height: 520px;
 }
 
 .internalTabDapplets {
-    min-height: 80px;
-    max-height: 470px;
-    overflow: auto;
+  overflow: auto;
+
+  min-height: 80px;
+  max-height: 470px;
 }
 
 .popupContainer.popup {
-    width: 493px;
+  width: 493px;
 }
 
 .internalTabColumn {
-    height: 520px;
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+
+  height: 520px;
 }

@@ -1,53 +1,52 @@
-import * as React from "react";
-import { Icon, Popup } from "semantic-ui-react";
-import { SemanticICONS } from "semantic-ui-react/dist/commonjs/generic";
+import * as React from 'react'
+import { Icon, Popup } from 'semantic-ui-react'
+import { SemanticICONS } from 'semantic-ui-react/dist/commonjs/generic'
 
 interface Props {
-    name: SemanticICONS;
-    text: string;
-    onClick: (...args: any[]) => void;
-    style?: any;
+  name: SemanticICONS
+  text: string
+  onClick: (...args: any[]) => void
+  style?: any
 }
 
 interface State {
-    clicked: boolean;
+  clicked: boolean
 }
 
 export class CheckIcon extends React.Component<Props, State> {
-    constructor(props) {
-        super(props);
+  constructor(props) {
+    super(props)
 
-        this.state = {
-            clicked: false
-        };
+    this.state = {
+      clicked: false,
     }
+  }
 
-    clickHandler = (...args: any[]) => {
-        this.setState({ clicked: true });
-        setTimeout(() => this.setState({ clicked: false }), 2000);
-        this.props.onClick(...args);
-    }
+  clickHandler = (...args: any[]) => {
+    this.setState({ clicked: true })
+    setTimeout(() => this.setState({ clicked: false }), 2000)
+    this.props.onClick(...args)
+  }
 
-    render() {
-        if (this.state.clicked) {
-            return <Popup
-                content={this.props.text}
-                open
-                size='mini'
-                trigger={<Icon
-                    style={this.props.style}
-                    link
-                    name='check'
-                    onClick={this.clickHandler}
-                />}
-            />
-        } else {
-            return <Icon
-                style={this.props.style}
-                link
-                name={(this.state.clicked) ? 'check' : this.props.name}
-                onClick={this.clickHandler}
-            />;
-        }
+  render() {
+    if (this.state.clicked) {
+      return (
+        <Popup
+          content={this.props.text}
+          open
+          size="mini"
+          trigger={<Icon style={this.props.style} link name="check" onClick={this.clickHandler} />}
+        />
+      )
+    } else {
+      return (
+        <Icon
+          style={this.props.style}
+          link
+          name={this.state.clicked ? 'check' : this.props.name}
+          onClick={this.clickHandler}
+        />
+      )
     }
+  }
 }

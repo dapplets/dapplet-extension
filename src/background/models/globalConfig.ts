@@ -1,16 +1,16 @@
-import Base from '../../common/models/base'
 import { StorageTypes, WalletInfo } from '../../common/constants'
-import SiteConfig from './siteConfig'
+import Base from '../../common/models/base'
 import { EthereumNetwrokConfig, NearNetworkConfig } from '../../common/types'
+import SiteConfig from './siteConfig'
 
 export class GlobalConfig extends Base {
   getId = () => this.id
 
-  id: string = 'default'
+  id = 'default'
 
-  isActive: boolean = false
+  isActive = false
 
-  suspended: boolean = false
+  suspended = false
 
   walletInfo: WalletInfo = null
 
@@ -20,7 +20,7 @@ export class GlobalConfig extends Base {
     popupDeveloperWelcome: true,
   }
 
-  devMode: boolean = false
+  devMode = false
 
   trustedUsers: { account: string }[] = []
 
@@ -29,13 +29,13 @@ export class GlobalConfig extends Base {
   } = {}
   targetStorages: StorageTypes[] = []
 
-  errorReporting: boolean = true // indirectly affects on '/src/common/logger.ts'
+  errorReporting = true // indirectly affects on '/src/common/logger.ts'
 
   userAgentId: string = null
 
   userAgentName: string = null
 
-  autoBackup: boolean = true
+  autoBackup = true
 
   providerUrl: string = null
 
@@ -45,7 +45,7 @@ export class GlobalConfig extends Base {
 
   identityContract: string = null
 
-  popupInOverlay: boolean = false
+  popupInOverlay = false
 
   hostnames: {
     [hostname: string]: SiteConfig

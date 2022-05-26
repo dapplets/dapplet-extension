@@ -1,21 +1,17 @@
-import React, { FC, useEffect, useState } from 'react'
-import cn from 'classnames'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { ReactComponent as Star } from '../../assets/images/icon/stars.svg'
-import NO_LOGO from '../../../../../common/resources/no-logo.png'
-
-import styles from './DappletImage.module.scss'
-import { StorageRef } from '../../../../../background/registries/registry'
+import cn from 'classnames'
+import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import { StorageRef } from '../../../../../background/registries/registry'
+import NO_LOGO from '../../../../../common/resources/no-logo.png'
+import styles from './DappletImage.module.scss'
 
 export interface DappletImageProps {
   storageRef: StorageRef
   isFavourites: boolean
 }
 
-export const DappletImage: FC<DappletImageProps> = (
-  props: DappletImageProps
-) => {
+export const DappletImage: FC<DappletImageProps> = (props: DappletImageProps) => {
   const { storageRef, isFavourites } = props
   const { img } = useStorageRef(storageRef)
 

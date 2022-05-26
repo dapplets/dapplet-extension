@@ -1,43 +1,42 @@
-import React from 'react'
-import styles from './components/Overlay/Overlay.module.scss'
-import { browser } from 'webextension-polyfill-ts'
+import '@fontsource/montserrat'
+import '@fontsource/roboto'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { ContentItem } from './components/ContentItem'
-import { DAPPLETS_STORE_URL } from '../../../common/constants'
-import { OverlayManager } from './overlayManager'
-import { OverlayToolbar } from './components/OverlayToolbar'
 import cn from 'classnames'
-import { Profile } from './components/Profile'
-import { SquaredButton } from './components/SquaredButton'
-import { ReactComponent as StoreIcon } from './assets/svg/store.svg'
-import { ReactComponent as SearchIcon } from './assets/svg/magnifying-glass.svg'
-import { ReactComponent as Home } from './assets/svg/home-toolbar.svg'
-import { ReactComponent as Settings } from './assets/svg/setting-toolbar.svg'
-import { ReactComponent as Notification } from './assets/svg/notification.svg'
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+import React from 'react'
+import {
+  MemoryRouter,
+  Navigate,
+  NavigateFunction,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
+import { browser } from 'webextension-polyfill-ts'
+import ManifestDTO from '../../../background/dto/manifestDTO'
+import { DAPPLETS_STORE_URL } from '../../../common/constants'
+import { groupBy } from '../../../common/helpers'
+import Wallets from '../../../popup/pages/wallets'
 import { ReactComponent as Card } from './assets/svg/card.svg'
 import { ReactComponent as DappletsLogo } from './assets/svg/dapplets-logo.svg'
-
-import '@fontsource/roboto'
-import '@fontsource/montserrat'
+import { ReactComponent as Home } from './assets/svg/home-toolbar.svg'
+import { ReactComponent as SearchIcon } from './assets/svg/magnifying-glass.svg'
+import { ReactComponent as Notification } from './assets/svg/notification.svg'
+import { ReactComponent as Settings } from './assets/svg/setting-toolbar.svg'
+import { ReactComponent as StoreIcon } from './assets/svg/store.svg'
+import { ContentItem } from './components/ContentItem'
+import styles from './components/Overlay/Overlay.module.scss'
+import { OverlayToolbar } from './components/OverlayToolbar'
+import { Profile } from './components/Profile'
+import { Search } from './components/Search'
+import { SquaredButton } from './components/SquaredButton'
+import { Overlay } from './overlay'
+import { OverlayManager } from './overlayManager'
 import { Dapplets } from './pages/Dapplets'
 import { Notifications } from './pages/Notifications'
 import { SettingsOverlay } from './pages/Settings'
-import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en'
-import { Search } from './components/Search'
-import Wallets from '../../../popup/pages/wallets'
-import {
-  MemoryRouter,
-  useNavigate,
-  NavigateFunction,
-  useLocation,
-  Navigate,
-} from 'react-router-dom'
-import { ToolbarTab, ToolbarTabMenu } from './types'
-import { groupBy } from '../../../common/helpers'
-import { Overlay } from './overlay'
 import { UserSettings } from './pages/UserSettings'
-import ManifestDTO from '../../../background/dto/manifestDTO'
+import { ToolbarTab, ToolbarTabMenu } from './types'
 
 export const withRouter = (Component) => {
   const Wrapper = (props) => {
@@ -86,6 +85,7 @@ const SYSTEM_TAB: ToolbarTab = {
 }
 
 interface P {
+  hidden: boolean
   onToggle: () => void
   overlayManager: OverlayManager
   navigate?: NavigateFunction
@@ -110,7 +110,7 @@ class _App extends React.Component<P, S> {
   async componentDidMount() {
     this.props.overlayManager.onActiveOverlayChanged = (overlay: Overlay) => {
       const route = overlay
-        ? `/${overlay.source}/${overlay.id}`
+        ? `/${overlay.source ? overlay.source : overlay.id}/${overlay.id}`
         : '/system/dapplets'
       this.props.navigate!(route)
     }
@@ -133,32 +133,54 @@ class _App extends React.Component<P, S> {
 
     for (const source in overlayGroups) {
       const group = overlayGroups[source]
-      const tab: ToolbarTab = {
-        id: source,
-        icon: {
-          moduleName: group[0]?.module?.name,
-          registryUrl: group[0]?.module?.registryUrl,
-        },
-        pinned: false,
-        title: '',
-        menus: [
-          ...group.map((x) => ({
-            id: x.id,
-            title: x.title,
-            icon: Home,
-          })),
-          {
-            id: 'settings',
-            icon: Settings,
-            title: 'User Settings',
-            props: {
-              moduleName: group[0]?.module?.name,
-              registryUrl: group[0]?.module?.registryUrl,
-            },
+
+      // system legacy tab
+      if (source === 'null') {
+        for (const overlay of group) {
+          const tab: ToolbarTab = {
+            id: overlay.id,
+            icon: null,
+            pinned: false,
+            title: overlay.title,
+            menus: [
+              {
+                id: overlay.id,
+                icon: null,
+                title: overlay.title,
+                hidden: true,
+              },
+            ],
+          }
+          tabs.push(tab)
+        }
+      } else {
+        const tab: ToolbarTab = {
+          id: source,
+          icon: {
+            moduleName: group[0]?.module?.name,
+            registryUrl: group[0]?.module?.registryUrl,
           },
-        ],
+          pinned: false,
+          title: '',
+          menus: [
+            ...group.map((x) => ({
+              id: x.id,
+              title: x.title,
+              icon: Home,
+            })),
+            {
+              id: 'settings',
+              icon: Settings,
+              title: 'User Settings',
+              props: {
+                moduleName: group[0]?.module?.name,
+                registryUrl: group[0]?.module?.registryUrl,
+              },
+            },
+          ],
+        }
+        tabs.push(tab)
       }
-      tabs.push(tab)
     }
 
     tabs.push(...this.state.internalTabs)
@@ -178,9 +200,7 @@ class _App extends React.Component<P, S> {
     // remove internal tabs
     if (this.state.internalTabs.length > 0) {
       const beforeCount = this.state.internalTabs.length
-      const internalTabs = this.state.internalTabs.filter(
-        (x) => x.id !== tab.id
-      )
+      const internalTabs = this.state.internalTabs.filter((x) => x.id !== tab.id)
       const afterCount = internalTabs.length
       this.setState({ internalTabs })
 
@@ -254,6 +274,9 @@ class _App extends React.Component<P, S> {
   render() {
     const p = this.props
     const s = this.state
+
+    if (p.hidden) return null
+
     const overlays = this.getOverlays()
     // TODO: naming wallets is the notification
     const { pathname } = this.props.location!
@@ -316,16 +339,10 @@ class _App extends React.Component<P, S> {
 
             <div
               onClick={() => this.handleCloseSearch()}
-              className={cn(
-                styles.children,
-                'dapplets-overlay-nav-content-list'
-              )}
+              className={cn(styles.children, 'dapplets-overlay-nav-content-list')}
             >
               {pathname === '/system/dapplets' && (
-                <Dapplets
-                  search={s.search}
-                  onUserSettingsClick={this.handleUserSettingsClick}
-                />
+                <Dapplets search={s.search} onUserSettingsClick={this.handleUserSettingsClick} />
               )}
 
               {pathname === '/system/notifications' && <Notifications />}
@@ -337,20 +354,15 @@ class _App extends React.Component<P, S> {
               {overlays.map((x) => (
                 <ContentItem
                   overlay={x}
-                  isActive={pathname === `/${x.source}/${x.id}`}
+                  isActive={pathname === `/${x.source ? x.source : x.id}/${x.id}`}
                   overlayManager={p.overlayManager}
                   key={x.id}
                 />
               ))}
 
-              {activeTabId !== 'system' &&
-                activeTabMenuId === 'settings' &&
-                menu && (
-                  <UserSettings
-                    dappletName={activeTabId}
-                    registryUrl={menu.props!.registryUrl}
-                  />
-                )}
+              {activeTabId !== 'system' && activeTabMenuId === 'settings' && menu && (
+                <UserSettings dappletName={activeTabId} registryUrl={menu.props!.registryUrl} />
+              )}
             </div>
           </div>
         </div>

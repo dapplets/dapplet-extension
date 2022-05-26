@@ -1,18 +1,18 @@
-import React, { FC, useEffect, useMemo, useState } from 'react'
-import { Dropdown } from '../../components/Dropdown'
-import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import styles from './Dapplets.module.scss'
-import { Dapplet } from '../../components/Dapplet'
-import ManifestDTO from '../../../../../background/dto/manifestDTO'
-import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
-import { browser } from 'webextension-polyfill-ts'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import { rcompare } from 'semver'
+import { browser } from 'webextension-polyfill-ts'
+import ManifestDTO from '../../../../../background/dto/manifestDTO'
 import {
   CONTEXT_ID_WILDCARD,
-  ModuleTypes,
   DAPPLETS_STORE_URL,
+  ModuleTypes,
 } from '../../../../../common/constants'
+import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
+import { Dapplet } from '../../components/Dapplet'
+import { Dropdown } from '../../components/Dropdown'
+import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
+import styles from './Dapplets.module.scss'
 
 export type Module = ManifestDTO & {
   isLoading: boolean
@@ -21,7 +21,7 @@ export type Module = ManifestDTO & {
 }
 export interface DappletsProps {
   search: string
-  onUserSettingsClick: (mi: ManifestDTO) => void;
+  onUserSettingsClick: (mi: ManifestDTO) => void
 }
 
 let _isMounted = false
@@ -44,19 +44,17 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   useEffect(() => {
     _isMounted = true
     const init = async () => {
-      const { getFeaturesByHostnames, getCurrentContextIds, getThisTab } =
-        await initBGFunctions(browser)
+      const { getFeaturesByHostnames, getCurrentContextIds, getThisTab } = await initBGFunctions(
+        browser
+      )
 
       const currentTab = await getThisTab()
 
       const ids = await getCurrentContextIds(currentTab)
 
-      const d = await getFeaturesByHostnames(ids)
-
       setContextIds(ids)
       await _refreshDataByContext(ids)
 
-      setDapplets(d)
       setLoadingListDapplets(false)
 
       await loadTrustedUsers()
@@ -73,10 +71,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     return () => {
       _isMounted = false
     }
-  }, [
-    // search
-    dropdownListValue,
-  ])
+  }, [])
   // console.log(dropdownListValue)
 
   const _refreshDataByContext = async (contextIds: Promise<string[]>) => {
@@ -91,18 +86,14 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       return
     }
 
-    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(
-      browser
-    )
+    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(browser)
 
     const features: ManifestDTO[] = contextIdsValues
       ? await getFeaturesByHostnames(contextIdsValues)
       : []
 
     const registries = await getRegistries()
-    const regsWithErrors = registries.filter(
-      (r) => !r.isDev && !!r.isEnabled && !!r.error
-    )
+    const regsWithErrors = registries.filter((r) => !r.isDev && !!r.isEnabled && !!r.error)
     if (regsWithErrors.length > 0) {
       const isProviderProblems =
         regsWithErrors.filter(
@@ -153,25 +144,21 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   }
 
   const refreshContextPage = async () => {
-    const { getCurrentTab, getCurrentContextIds, reloadCurrentPage } =
-      await initBGFunctions(browser)
+    const { getCurrentTab, getCurrentContextIds, reloadCurrentPage } = await initBGFunctions(
+      browser
+    )
     const tab = await getCurrentTab()
     if (!tab) return
     await reloadCurrentPage()
     setNoContentScript(false)
 
-    setTimeout(
-      () => _refreshDataByContext(getCurrentContextIds(dapplets)),
-      4000
-    ) // ToDo: get rid of timeout
+    setTimeout(() => _refreshDataByContext(getCurrentContextIds(dapplets)), 4000) // ToDo: get rid of timeout
   }
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
     try {
       _updateFeatureState(f.name, { isActionLoading: true })
-      const { openDappletAction, getCurrentTab } = await initBGFunctions(
-        browser
-      )
+      const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
       const tab = await getCurrentTab()
       if (!tab) return
       await openDappletAction(f.name, tab.id)
@@ -186,8 +173,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const _getFilteredDapplets = (dapplets) => {
     if (!search || search.length === 0) return dapplets
 
-    const find = (a: string) =>
-      (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1
+    const find = (a: string) => (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1
 
     return dapplets.filter(
       (x: ManifestAndDetails) =>
@@ -195,22 +181,14 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     )
   }
 
-  const onSwitchChange = async (
-    module: Module,
-    isActive?,
-    order?,
-    selectVersions?: boolean
-  ) => {
+  const onSwitchChange = async (module: Module, isActive?, order?, selectVersions?: boolean) => {
     const { name } = module
     // TODO : try catch
     setLoadShowButton(true)
     if (selectVersions && isActive) {
       _updateFeatureState(name, { isLoading: true })
       const { getVersions } = await initBGFunctions(browser)
-      const allVersions = await getVersions(
-        module.sourceRegistry.url,
-        module.name
-      )
+      const allVersions = await getVersions(module.sourceRegistry.url, module.name)
       _updateFeatureState(name, { versions: allVersions, isLoading: false })
     } else {
       await toggleFeature(module, null, isActive, order, null)
@@ -226,13 +204,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     allVersions: string[] | null
   ) => {
     const { name, hostnames, sourceRegistry } = module
-    const {
-      getCurrentContextIds,
-      getVersions,
-      activateFeature,
-      deactivateFeature,
-      getThisTab,
-    } = await initBGFunctions(browser)
+    const { getCurrentContextIds, getVersions, activateFeature, deactivateFeature, getThisTab } =
+      await initBGFunctions(browser)
 
     _updateFeatureState(name, { isActive, isLoading: true })
 
@@ -255,21 +228,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     try {
       if (isActive) {
-        await activateFeature(
-          name,
-          version,
-          targetContextIds,
-          order,
-          sourceRegistry.url
-        )
+        await activateFeature(name, version, targetContextIds, order, sourceRegistry.url)
       } else {
-        await deactivateFeature(
-          name,
-          version,
-          targetContextIds,
-          order,
-          sourceRegistry.url
-        )
+        await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url)
       }
 
       const currentTab = await getThisTab()
@@ -324,22 +285,19 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     if (dropdownListValue === 'All') return dapplets
 
     if (dropdownListValue === 'Extension') {
-      const find = (a: string) =>
-        (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
+      const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.isMyDapplet === true) return find(x.author)
       })
     }
     if (dropdownListValue === 'Trusted Users') {
-      const find = (a: string) =>
-        (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
+      const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.author !== null) return find(x.author)
       })
     }
     if (dropdownListValue === 'Public') {
-      const find = (a: string) =>
-        (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
+      const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.isUnderConstruction !== true) return find(x.author)
       })
@@ -348,9 +306,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
   // const filteredDapplets = _getSortedDapplets(_getFilteredDapplets(dapplets))
   const filteredDapplets = useMemo(() => {
-    console.log('fd')
     return _getSortedDapplets(_getFilteredDapplets(dapplets))
-  }, [search, dapplets])
+  }, [search, dapplets, dropdownListValue])
 
   return (
     <>
@@ -391,9 +348,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                       onSwitchChange={onSwitchChange}
                       onSettingsModule={onUserSettingsClick}
                       onOpenDappletAction={onOpenDappletAction}
-                      onRemoveMyDapplet={
-                        dapplet.isMyDapplet ? onRemoveMyDapplet : undefined
-                      }
+                      onRemoveMyDapplet={dapplet.isMyDapplet ? onRemoveMyDapplet : undefined}
                       onDeployDapplet={onDeployDapplet}
                       onOpenStore={onOpenStore}
                       onOpenStoreAuthor={onOpenStoreAuthor}

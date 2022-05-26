@@ -1,18 +1,18 @@
-import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserStorage'
-import { GlobalConfig } from '../models/globalConfig'
+import { browser } from 'webextension-polyfill-ts'
+import { StorageTypes } from '../../common/constants'
+import * as EventBus from '../../common/global-event-bus'
 import {
+  generateGuid,
   incrementFilename,
   joinUrls,
   pick,
   typeOfUri,
   UriTypes,
 } from '../../common/helpers'
-import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage'
-import { browser } from 'webextension-polyfill-ts'
-import { generateGuid } from '../../common/helpers'
+import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserStorage'
+import { GlobalConfig } from '../models/globalConfig'
 import SiteConfig from '../models/siteConfig'
-import * as EventBus from '../../common/global-event-bus'
-import { StorageTypes } from '../../common/constants'
+import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage'
 
 const EXPORTABLE_PROPERTIES = [
   'id',
@@ -45,34 +45,26 @@ const EXPORTABLE_PROPERTIES = [
 
 export default class GlobalConfigService {
   private _globalConfigRepository = new GlobalConfigBrowserStorage()
-  private _defaultConfigId: string = 'default'
+  private _defaultConfigId = 'default'
 
   async get(): Promise<GlobalConfig> {
     const configs = await this._globalConfigRepository.getAll()
     const config =
-      configs.find((x) => x.isActive) ??
-      configs.find((x) => x.id === this._defaultConfigId)
+      configs.find((x) => x.isActive) ?? configs.find((x) => x.id === this._defaultConfigId)
 
     if (config) {
-      if (!config.swarmGatewayUrl)
-        config.swarmGatewayUrl = this.getInitialConfig().swarmGatewayUrl
+      if (!config.swarmGatewayUrl) config.swarmGatewayUrl = this.getInitialConfig().swarmGatewayUrl
       if (!config.swarmPostageStampId)
         config.swarmPostageStampId = this.getInitialConfig().swarmPostageStampId
       if (!config.preferedOverlayStorage)
-        config.preferedOverlayStorage =
-          this.getInitialConfig().preferedOverlayStorage
-      if (!config.ipfsGatewayUrl)
-        config.ipfsGatewayUrl = this.getInitialConfig().ipfsGatewayUrl
-      if (!config.siaPortalUrl)
-        config.siaPortalUrl = this.getInitialConfig().siaPortalUrl
-      if (!config.nearNetworks)
-        config.nearNetworks = this.getInitialConfig().nearNetworks
+        config.preferedOverlayStorage = this.getInitialConfig().preferedOverlayStorage
+      if (!config.ipfsGatewayUrl) config.ipfsGatewayUrl = this.getInitialConfig().ipfsGatewayUrl
+      if (!config.siaPortalUrl) config.siaPortalUrl = this.getInitialConfig().siaPortalUrl
+      if (!config.nearNetworks) config.nearNetworks = this.getInitialConfig().nearNetworks
       if (!config.ethereumNetworks)
         config.ethereumNetworks = this.getInitialConfig().ethereumNetworks
-      if (!config.myDapplets)
-        config.myDapplets = this.getInitialConfig().myDapplets
-      if (!config.targetStorages)
-        config.targetStorages = this.getInitialConfig().targetStorages
+      if (!config.myDapplets) config.myDapplets = this.getInitialConfig().myDapplets
+      if (!config.targetStorages) config.targetStorages = this.getInitialConfig().targetStorages
     }
 
     return config ?? this.getInitialConfig()
@@ -110,8 +102,7 @@ export default class GlobalConfigService {
 
   async renameProfile(profileId: string, newProfileId: string) {
     let oldConfig = await this._globalConfigRepository.getById(profileId)
-    if (!oldConfig && profileId === this._defaultConfigId)
-      oldConfig = this.getInitialConfig()
+    if (!oldConfig && profileId === this._defaultConfigId) oldConfig = this.getInitialConfig()
     if (!oldConfig) throw new Error(`The "${profileId}" profile doesn't exist.`)
 
     oldConfig.id = newProfileId
@@ -121,8 +112,7 @@ export default class GlobalConfigService {
 
   async copyProfile(sourceProfileId: string, makeActive = false) {
     let config = await this._globalConfigRepository.getById(sourceProfileId)
-    if (!config && sourceProfileId === this._defaultConfigId)
-      config = this.getInitialConfig()
+    if (!config && sourceProfileId === this._defaultConfigId) config = this.getInitialConfig()
     if (!config) throw new Error(`Profile "${sourceProfileId}" doesn't exist.`)
 
     // Add increment for uniqueness of profile id
@@ -142,7 +132,7 @@ export default class GlobalConfigService {
   }
 
   async deleteProfile(id: string) {
-    let config = await this._globalConfigRepository.getById(id)
+    const config = await this._globalConfigRepository.getById(id)
     if (!config) return
     if (config.isActive) throw new Error(`Cannot delete active profile.`)
 
@@ -160,10 +150,7 @@ export default class GlobalConfigService {
     const json = new TextDecoder('utf-8').decode(new Uint8Array(arr))
     const config = JSON.parse(json)
     const importingConfig = pick(config, ...EXPORTABLE_PROPERTIES)
-    const mergedConfigs = Object.assign(
-      this.getInitialConfig(),
-      importingConfig
-    )
+    const mergedConfigs = Object.assign(this.getInitialConfig(), importingConfig)
 
     // Add increment for uniqueness of profile id
     while (await this._globalConfigRepository.getById(mergedConfigs.id)) {
@@ -185,8 +172,7 @@ export default class GlobalConfigService {
   async exportProfile(profileId: string): Promise<string> {
     let config = await this._globalConfigRepository.getById(profileId)
 
-    if (!config && profileId === this._defaultConfigId)
-      config = this.getInitialConfig()
+    if (!config && profileId === this._defaultConfigId) config = this.getInitialConfig()
     if (!config) throw new Error(`Profile "${profileId}" doesn't exist.`)
 
     const exportedConfig = pick(config, ...EXPORTABLE_PROPERTIES)
@@ -205,10 +191,7 @@ export default class GlobalConfigService {
   async createShareLink(profileId: string): Promise<string> {
     const bzzLink = await this.exportProfile(profileId)
     const swarmGatewayUrl = await this.getSwarmGateway()
-    const absoluteLink = joinUrls(
-      swarmGatewayUrl,
-      'bzz/' + bzzLink.replace('bzz://', '')
-    )
+    const absoluteLink = joinUrls(swarmGatewayUrl, 'bzz/' + bzzLink.replace('bzz://', ''))
     const shareLink = `https://github.com/dapplets/dapplet-extension/releases/latest/download/dapplet-extension.zip?config=${absoluteLink}`
     return shareLink
   }
@@ -255,11 +238,7 @@ export default class GlobalConfigService {
       { account: '0xf64849376812667bda7d902666229f8b8dd90687' },
       { account: 'team.dapplet-base.eth' },
     ]
-    config.targetStorages = [
-      StorageTypes.Ipfs,
-      StorageTypes.Sia,
-      StorageTypes.Swarm,
-    ]
+    config.targetStorages = [StorageTypes.Ipfs, StorageTypes.Sia, StorageTypes.Swarm]
     config.userSettings = {}
     config.providerUrl = 'https://goerli.mooo.com/'
     config.swarmGatewayUrl = 'https://swarmgateway.mooo.com/'
@@ -273,16 +252,14 @@ export default class GlobalConfigService {
     config.hostnames = {}
     config.dynamicAdapter = 'dynamic-adapter.dapplet-base.eth#default@latest'
     config.preferedOverlayStorage = 'centralized'
-    config.swarmPostageStampId =
-      '59b7a1ef40a1b3143e9e80e7eb90175b83996fcf86f13480dbe0e21a732572e9'
+    config.swarmPostageStampId = '59b7a1ef40a1b3143e9e80e7eb90175b83996fcf86f13480dbe0e21a732572e9'
     config.ipfsGatewayUrl = 'https://ipfs.kaleido.art'
     config.siaPortalUrl = 'https://siasky.net'
     config.ethereumNetworks = [
       {
         networkId: 'rinkeby',
         chainId: 4,
-        nodeUrl:
-          'https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992',
+        nodeUrl: 'https://rinkeby.infura.io/v3/eda881d858ae4a25b2dfbbd0b4629992',
         explorerUrl: 'https://rinkeby.etherscan.io',
       },
       {
@@ -345,13 +322,9 @@ export default class GlobalConfigService {
     if (!isEthAddress && !isEnsAddress && !isHttpAddress && !isNearAddress)
       throw new Error('Unsupported URL type')
     if (isDev && !isHttpAddress)
-      throw new Error(
-        'Only HTTP(S) links are supported for development servers'
-      )
+      throw new Error('Only HTTP(S) links are supported for development servers')
     if (!isDev && !isEthAddress && !isEnsAddress && !isNearAddress)
-      throw new Error(
-        'A public registry must have a valid Ethereum, ENS or NEAR Protocol address'
-      )
+      throw new Error('A public registry must have a valid Ethereum, ENS or NEAR Protocol address')
 
     const config = await this.get()
     if (config.registries.find((r) => r.url === url)) return
@@ -382,8 +355,7 @@ export default class GlobalConfigService {
           const resp = await fetch(url)
           if (!resp.ok) return false
           const obj = await resp.json()
-          if (!(Array.isArray(obj) || (obj.name && obj.version && obj.type)))
-            return false
+          if (!(Array.isArray(obj) || (obj.name && obj.version && obj.type))) return false
           if (config.registries.find((r) => r.url === url)) return true
           config.registries.push({ url, isDev, isEnabled: isEnabled })
           await this.set(config)
@@ -404,9 +376,7 @@ export default class GlobalConfigService {
   }
 
   async removeRegistry(url: string) {
-    return this.updateConfig(
-      (c) => (c.registries = c.registries.filter((r) => r.url !== url))
-    )
+    return this.updateConfig((c) => (c.registries = c.registries.filter((r) => r.url !== url)))
   }
 
   async enableRegistry(url: string) {
@@ -425,9 +395,7 @@ export default class GlobalConfigService {
   }
 
   async disableRegistry(url: string) {
-    return this.updateConfig(
-      (c) => (c.registries.find((x) => x.url === url).isEnabled = false)
-    )
+    return this.updateConfig((c) => (c.registries.find((x) => x.url === url).isEnabled = false))
   }
 
   async getIntro() {
@@ -482,9 +450,7 @@ export default class GlobalConfigService {
     const isNearAddress = typeOfUri(account) === UriTypes.Near
 
     if (!isEthAddress && !isEnsAddress && !isNearAddress)
-      throw Error(
-        'User account must be valid Ethereum or NEAR Protocol address'
-      )
+      throw Error('User account must be valid Ethereum or NEAR Protocol address')
 
     // ToDo: fix it
     // if (isEnsAddress) {
@@ -502,8 +468,7 @@ export default class GlobalConfigService {
 
   async removeTrustedUser(account: string) {
     await this.updateConfig(
-      (c) =>
-        (c.trustedUsers = c.trustedUsers.filter((r) => r.account !== account))
+      (c) => (c.trustedUsers = c.trustedUsers.filter((r) => r.account !== account))
     )
     EventBus.emit('trustedusers_changed')
   }
@@ -577,8 +542,7 @@ export default class GlobalConfigService {
   }
 
   async setEthereumProvider(url: string) {
-    if (typeOfUri(url) !== UriTypes.Http)
-      throw new Error('URL must be a valid HTTP(S) address.')
+    if (typeOfUri(url) !== UriTypes.Http) throw new Error('URL must be a valid HTTP(S) address.')
 
     try {
       const body = JSON.stringify({
@@ -605,8 +569,7 @@ export default class GlobalConfigService {
   }
 
   async setSwarmGateway(url: string) {
-    if (typeOfUri(url) !== UriTypes.Http)
-      throw new Error('URL must be a valid HTTP(S) address.')
+    if (typeOfUri(url) !== UriTypes.Http) throw new Error('URL must be a valid HTTP(S) address.')
 
     try {
       const response = await fetch(url)
@@ -630,9 +593,7 @@ export default class GlobalConfigService {
     return config.walletsUsage ?? {}
   }
 
-  async setWalletsUsage(walletsUsage: {
-    [moduleName: string]: { [chain: string]: string }
-  }) {
+  async setWalletsUsage(walletsUsage: { [moduleName: string]: { [chain: string]: string } }) {
     return this.updateConfig((c) => (c.walletsUsage = walletsUsage))
   }
 
@@ -672,8 +633,7 @@ export default class GlobalConfigService {
 
   async updateSiteConfig(config: SiteConfig) {
     const globalConfig = await this.get()
-    if (!config.hostname)
-      throw new Error('"hostname" is required in SiteConfig.')
+    if (!config.hostname) throw new Error('"hostname" is required in SiteConfig.')
     if (!globalConfig.hostnames) globalConfig.hostnames = {}
     globalConfig.hostnames[config.hostname] = config
     await this.set(globalConfig)
@@ -700,9 +660,7 @@ export default class GlobalConfigService {
   }
 
   async setLastMessageSeenTimestamp(lastMessageSeenTimestamp: string) {
-    return this.updateConfig(
-      (c) => (c.lastMessageSeenTimestamp = lastMessageSeenTimestamp)
-    )
+    return this.updateConfig((c) => (c.lastMessageSeenTimestamp = lastMessageSeenTimestamp))
   }
 
   async getDynamicAdapter() {
@@ -734,8 +692,7 @@ export default class GlobalConfigService {
   }
 
   async setIpfsGateway(url: string) {
-    if (typeOfUri(url) !== UriTypes.Http)
-      throw new Error('URL must be a valid HTTP(S) address.')
+    if (typeOfUri(url) !== UriTypes.Http) throw new Error('URL must be a valid HTTP(S) address.')
     await this.updateConfig((c) => (c.ipfsGatewayUrl = url))
   }
 
@@ -744,8 +701,7 @@ export default class GlobalConfigService {
   }
 
   async setSiaPortal(url: string) {
-    if (typeOfUri(url) !== UriTypes.Http)
-      throw new Error('URL must be a valid HTTP(S) address.')
+    if (typeOfUri(url) !== UriTypes.Http) throw new Error('URL must be a valid HTTP(S) address.')
     await this.updateConfig((c) => (c.siaPortalUrl = url))
   }
 
@@ -766,12 +722,7 @@ export default class GlobalConfigService {
 
   async addMyDapplet(registryUrl: string, name: string) {
     const config = await this.get()
-    if (
-      config.myDapplets.find(
-        (x) => x.registryUrl === registryUrl && x.name === name
-      )
-    )
-      return
+    if (config.myDapplets.find((x) => x.registryUrl === registryUrl && x.name === name)) return
     config.myDapplets.push({ registryUrl, name })
     await this.set(config)
     EventBus.emit('mydapplets_changed')
