@@ -126,9 +126,7 @@ export default class ModuleManager {
     return object
   }
 
-  private async _loadDist(
-    url: StorageRef
-  ): Promise<{
+  private async _loadDist(url: StorageRef): Promise<{
     script: string
     defaultConfig: DefaultConfig
     schemaConfig: SchemaConfig
@@ -152,9 +150,7 @@ export default class ModuleManager {
     }
   }
 
-  public async loadModule(
-    m: VersionInfo
-  ): Promise<{
+  public async loadModule(m: VersionInfo): Promise<{
     script: string
     defaultConfig: DefaultConfig
     schemaConfig: SchemaConfig
