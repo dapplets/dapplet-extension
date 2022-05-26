@@ -12,8 +12,9 @@
     "start": "cross-env NODE_OPTIONS=--max-old-space-size=6144 webpack -w --config webpack.dev.js",
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
     "clean": "rm -rf ./build && rm -rf ./lib",
+    "lint": "npm run prettify && npm run eslint && npm run stylelint",
     "prettify": "prettier --write src",
-    "lint": "eslint ./src --ext .ts --fix",
+    "eslint": "eslint ./src --ext .ts --fix",
     "stylelint": "stylelint ./src/**/*.{css,scss} --fix"
   },
   "devDependencies": {
