@@ -5,7 +5,7 @@ export class WsJsonRpc implements IPubSub {
   private _queue: any[] = []
   private _ws: WebSocketProxyClient
 
-  private _msgCount: number = 0
+  private _msgCount = 0
 
   constructor(public readonly url: string) {
     this._connect()

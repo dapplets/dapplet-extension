@@ -291,7 +291,7 @@ browser.notifications.onClicked.addListener(function (notificationId) {
     notificationId[1] == 'x'
   ) {
     // ToDo: it's incorrect to be linked with Ethereum and Goerli only.
-    var url = 'https://goerli.etherscan.io/tx/' + notificationId
+    const url = 'https://goerli.etherscan.io/tx/' + notificationId
     browser.tabs.create({ url: url })
   }
 })

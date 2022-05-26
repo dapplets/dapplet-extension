@@ -3,7 +3,7 @@ import { MESSAGE_BUS_NAME } from './constants'
 
 export default class WebSocketProxyClient {
   private _port
-  private _isMsgBusConnected: boolean = false
+  private _isMsgBusConnected = false
   private _eventTarget = new EventTarget()
   public readyState: number = WebSocket.CONNECTING
 

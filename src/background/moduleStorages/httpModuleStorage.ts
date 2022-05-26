@@ -24,7 +24,7 @@ export class HttpModuleStorage implements ModuleStorage {
   }
 
   public async save(blob: Blob, registryUrl: string) {
-    var form = new FormData()
+    const form = new FormData()
     form.append('file', blob)
 
     const response = await fetch(`${registryUrl}/storage`, {

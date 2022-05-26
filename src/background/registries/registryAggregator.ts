@@ -22,7 +22,7 @@ import { Registry } from './registry'
 if (!Promise.allSettled) Promise.allSettled = allSettled
 
 export class RegistryAggregator {
-  public isAvailable: boolean = true
+  public isAvailable = true
   public registries: Registry[] = []
 
   private _versionInfoStorage = new VersionInfoBrowserStorage()

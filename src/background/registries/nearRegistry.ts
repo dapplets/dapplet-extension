@@ -47,7 +47,7 @@ const moduleTypesMap: { [key: number]: ModuleTypes } = {
 
 // ToDo: errors from here don't reach contentscript!
 export class NearRegistry implements Registry {
-  public isAvailable: boolean = true
+  public isAvailable = true
   public error: string = null
 
   private _contract: any

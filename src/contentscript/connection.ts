@@ -60,7 +60,7 @@ export class Connection<T> implements IConnection {
   }
 
   sendAndListen(topic: string, message: any, h: MsgHandler | EventHandler): this {
-    let listener = this.listener('', h as any)
+    const listener = this.listener('', h as any)
     listener.f = this.send(topic, message)
     return this
   }
@@ -163,7 +163,7 @@ export class Connection<T> implements IConnection {
       this.send('subscribe', { id }).then((id) => (listener.f = id))
     }
 
-    let ap = {
+    const ap = {
       name: key,
       value: undefined,
       set: (v: any) => {
@@ -262,7 +262,7 @@ export class Connection<T> implements IConnection {
           }
 
           //push values to autoProperties
-          for (let ap of listener.p || []) {
+          for (const ap of listener.p || []) {
             ap && msg[ap.name] !== undefined && ap.set(msg[ap.name])
           }
         }

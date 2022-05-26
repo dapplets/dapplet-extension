@@ -40,8 +40,8 @@ declare module '*.module.scss' {
   export default value
 }
 
-declare var EXTENSION_VERSION: string
-declare var EXTENSION_ENV: 'development' | 'production'
+declare let EXTENSION_VERSION: string
+declare let EXTENSION_ENV: 'development' | 'production'
 
 interface ObjectConstructor {
   /**

@@ -288,7 +288,7 @@ export class WalletService {
   private async _getInternalSignerFor(
     appOrSessionId: string | DefaultSigners,
     chain: ChainTypes,
-    isConnected: boolean = true
+    isConnected = true
   ): Promise<GenericWallet> {
     const map = await this._getWalletsMap()
 

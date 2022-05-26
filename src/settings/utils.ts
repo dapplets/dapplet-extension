@@ -6,8 +6,8 @@ export function getSemanticProps({
   defaultContextProps = {},
 }: any) {
   const formContextProps = formContext.semantic
-  let schemaProps = uiSchema['ui:options'] && uiSchema['ui:options'].semantic
-  let optionProps = options.semantic
+  const schemaProps = uiSchema['ui:options'] && uiSchema['ui:options'].semantic
+  const optionProps = options.semantic
   // formContext props should overide other props
   return Object.assign(
     {},

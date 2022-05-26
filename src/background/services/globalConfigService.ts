@@ -45,7 +45,7 @@ const EXPORTABLE_PROPERTIES = [
 
 export default class GlobalConfigService {
   private _globalConfigRepository = new GlobalConfigBrowserStorage()
-  private _defaultConfigId: string = 'default'
+  private _defaultConfigId = 'default'
 
   async get(): Promise<GlobalConfig> {
     const configs = await this._globalConfigRepository.getAll()
@@ -132,7 +132,7 @@ export default class GlobalConfigService {
   }
 
   async deleteProfile(id: string) {
-    let config = await this._globalConfigRepository.getById(id)
+    const config = await this._globalConfigRepository.getById(id)
     if (!config) return
     if (config.isActive) throw new Error(`Cannot delete active profile.`)
 

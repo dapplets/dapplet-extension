@@ -21,7 +21,7 @@ export class Bus {
 
       if (!data || !data.topic) return
 
-      let callbacks = this._callbacks[data.topic] || []
+      const callbacks = this._callbacks[data.topic] || []
 
       if (callbacks.length === 0) {
         if (this._queue[data.topic]) {

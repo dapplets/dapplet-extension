@@ -6,5 +6,5 @@ export class Event extends Base {
   title: string = null
   description: string = null
   created: Date = null
-  isRead: boolean = false
+  isRead = false
 }

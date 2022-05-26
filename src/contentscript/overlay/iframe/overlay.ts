@@ -6,11 +6,11 @@ export class OverlayIframe implements IOverlay {
   public url: string
   public title: string
   public source: string = null
-  public hidden: boolean = false
+  public hidden = false
   public parent: IOverlay
 
   frame: HTMLIFrameElement
-  registered: boolean = false
+  registered = false
   onmessage: (topic: string, message: any) => void
   onclose: Function
   loader: HTMLDivElement

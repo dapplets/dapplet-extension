@@ -1,7 +1,7 @@
 import { Bus } from './bus'
 
 class StarterBus extends Bus {
-  _subId: number = 0
+  _subId = 0
 
   onCtx(callback: (ctx: any, buttons: any[]) => void) {
     this.subscribe('ctx', (ctx: any, buttons: any[]) => {

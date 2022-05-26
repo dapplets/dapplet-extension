@@ -44,7 +44,7 @@ type DevManifestRaw = DevManifest & {
 
 export class DevRegistry implements Registry {
   private _rootUrl: string
-  public isAvailable: boolean = true
+  public isAvailable = true
   public error: string = null
 
   private _cachePromise: Promise<void> = null

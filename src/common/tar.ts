@@ -28,7 +28,7 @@ export class Tar {
   _createBuffer() {
     let tarDataSize = 0
     for (let i = 0; i < this.fileData.length; i++) {
-      let size = this.fileData[i].size
+      const size = this.fileData[i].size
       tarDataSize += 512 + 512 * Math.trunc(size / 512)
       if (size % 512) {
         tarDataSize += 512
@@ -46,16 +46,16 @@ export class Tar {
       this._createBuffer()
       let offset = 0
       let filesAdded = 0
-      let onFileDataAdded = () => {
+      const onFileDataAdded = () => {
         filesAdded++
         if (filesAdded === this.fileData.length) {
-          let arr = new Uint8Array(this.buffer)
-          let blob = new Blob([arr], { type: 'application/x-tar' })
+          const arr = new Uint8Array(this.buffer)
+          const blob = new Blob([arr], { type: 'application/x-tar' })
           resolve(blob)
         }
       }
       for (let fileIdx = 0; fileIdx < this.fileData.length; fileIdx++) {
-        let fdata = this.fileData[fileIdx]
+        const fdata = this.fileData[fileIdx]
         // write header
         this._writeFileName(fdata.name, offset)
         this._writeFileType(fdata.type, offset)
@@ -64,20 +64,20 @@ export class Tar {
         this._writeChecksum(offset)
 
         // write file data
-        let destArray = new Uint8Array(this.buffer, offset + 512, fdata.size)
+        const destArray = new Uint8Array(this.buffer, offset + 512, fdata.size)
         if (fdata.dataType === 'array') {
           for (let byteIdx = 0; byteIdx < fdata.size; byteIdx++) {
             destArray[byteIdx] = fdata.array[byteIdx]
           }
           onFileDataAdded()
         } else if (fdata.dataType === 'file') {
-          let reader = new FileReader()
+          const reader = new FileReader()
 
           reader.onload = (function (outArray) {
-            let dArray = outArray
+            const dArray = outArray
             return function (event) {
-              let sbuf = event.target.result
-              let sarr = new Uint8Array(sbuf as any)
+              const sbuf = event.target.result
+              const sarr = new Uint8Array(sbuf as any)
               for (let bIdx = 0; bIdx < sarr.length; bIdx++) {
                 dArray[bIdx] = sarr[bIdx]
               }
@@ -98,7 +98,7 @@ export class Tar {
   }
 
   _writeString(str, offset, size) {
-    let strView = new Uint8Array(this.buffer, offset, size)
+    const strView = new Uint8Array(this.buffer, offset, size)
     for (let i = 0; i < size; i++) {
       if (i < str.length) {
         strView[i] = str.charCodeAt(i)
@@ -121,7 +121,7 @@ export class Tar {
     } else if (typeStr === 'directory') {
       typeChar = '5'
     }
-    let typeView = new Uint8Array(this.buffer, header_offset + 156, 1)
+    const typeView = new Uint8Array(this.buffer, header_offset + 156, 1)
     typeView[0] = typeChar.charCodeAt(0)
   }
 
@@ -175,7 +175,7 @@ export class Tar {
     this._writeString('        ', header_offset + 148, 8) // first fill with spaces
 
     // add up header bytes
-    let header = new Uint8Array(this.buffer, header_offset, 512)
+    const header = new Uint8Array(this.buffer, header_offset, 512)
     let chksum = 0
     for (let i = 0; i < 512; i++) {
       chksum += header[i]
@@ -193,12 +193,12 @@ export class Tar {
   }
 
   _fillHeader(header_offset, opts, fileType) {
-    let uid = this._getOpt(opts, 'uid', 1000)
-    let gid = this._getOpt(opts, 'gid', 1000)
-    let mode = this._getOpt(opts, 'mode', fileType === 'file' ? '664' : '775')
-    let mtime = this._getOpt(opts, 'mtime', Date.now())
-    let user = this._getOpt(opts, 'user', 'tarballjs')
-    let group = this._getOpt(opts, 'group', 'tarballjs')
+    const uid = this._getOpt(opts, 'uid', 1000)
+    const gid = this._getOpt(opts, 'gid', 1000)
+    const mode = this._getOpt(opts, 'mode', fileType === 'file' ? '664' : '775')
+    const mtime = this._getOpt(opts, 'mtime', Date.now())
+    const user = this._getOpt(opts, 'user', 'tarballjs')
+    const group = this._getOpt(opts, 'group', 'tarballjs')
 
     this._writeFileMode(mode, header_offset)
     this._writeFileUid(uid.toString(8), header_offset)

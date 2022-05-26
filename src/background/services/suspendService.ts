@@ -122,7 +122,7 @@ export class SuspendService {
    * @returns {Promise<boolean>}
    */
   getSuspendityByHostname = async (hostname) => {
-    var config = await this._globalConfigService.getSiteConfigById(hostname)
+    const config = await this._globalConfigService.getSiteConfigById(hostname)
     return !config ? false : config.paused
   }
 

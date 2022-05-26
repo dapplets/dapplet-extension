@@ -103,7 +103,7 @@ export function assertRejected<T>(item: PromiseSettledResult<T>): item is Promis
 
 export function allSettled($) {
   'use strict'
-  var self = this
+  const self = this
   return self.all(
     $.map(
       function (value) {
@@ -211,7 +211,7 @@ export async function fetchWithTimeout(resource, options) {
 
 export function generateGuid() {
   return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0,
+    const r = (Math.random() * 16) | 0,
       v = c == 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
   })

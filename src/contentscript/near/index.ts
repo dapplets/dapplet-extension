@@ -19,7 +19,7 @@ export async function createWalletConnection(app: string, cfg: { network: string
 
   const { localStorage_getItem } = await initBGFunctions(browser)
   const authDataKey = cfg.network + '_wallet_auth_key'
-  let authData = JSON.parse(await localStorage_getItem(authDataKey))
+  const authData = JSON.parse(await localStorage_getItem(authDataKey))
   if (!authData) return null
 
   const near = new BackgroundNear(app, currentNetworkConfig)

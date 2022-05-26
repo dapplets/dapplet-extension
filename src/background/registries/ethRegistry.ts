@@ -54,7 +54,7 @@ const ZERO_BYTES32 = '0x00000000000000000000000000000000000000000000000000000000
 
 // ToDo: errors from here don't reach contentscript!
 export class EthRegistry implements Registry {
-  public isAvailable: boolean = true
+  public isAvailable = true
   public error: string = null
 
   private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>()

@@ -1,7 +1,7 @@
 import GlobalConfigService from './globalConfigService'
 
 export default class ProxyService {
-  private _nextId: number = 0
+  private _nextId = 0
 
   constructor(private _globalConfigService: GlobalConfigService) {}
 

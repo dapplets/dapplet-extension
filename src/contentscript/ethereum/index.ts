@@ -70,7 +70,7 @@ export async function createWalletConnection<T>(
   }
   const waitTransaction = async (
     txHash: string,
-    confirmations: number = 1
+    confirmations = 1
   ): Promise<ITransactionReceipt> => {
     while (true) {
       await new Promise((res) => setTimeout(res, 1000))

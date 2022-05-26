@@ -9,21 +9,21 @@ export class Overlay implements IOverlay {
   public url: string
   public title: string
   public source: string = null
-  public hidden: boolean = false
+  public hidden = false
   public parent: IOverlay = null
   public module: OverlaySourceModule = null
 
   public _queue: any[] = []
-  public _isFrameLoaded: boolean = false
-  private _msgCount: number = 0
+  public _isFrameLoaded = false
+  private _msgCount = 0
 
   public readonly id = generateGuid()
   public frame: HTMLIFrameElement = null
-  public registered: boolean = false
+  public registered = false
   public onmessage: (topic: string, message: any) => void = null
   public onclose: Function = null
   public onregisteredchange: (value: boolean) => void = null
-  public isError: boolean = false
+  public isError = false
 
   constructor(private _manager: OverlayManager, config: OverlayConfig) {
     this.url = config.url
