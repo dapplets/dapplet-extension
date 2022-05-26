@@ -13,7 +13,7 @@ export interface ProfileProps {
   avatar?: string
   hash?: string
 }
-const TEST_WALLET = [
+export const TEST_WALLET = [
   { id: '1', title: 'ENS' },
   { id: '1', title: 'NOT_ENS' },
 ]
@@ -33,7 +33,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
   const onCloseModalWalletConnect = () => setModalWalletConnect(false)
   useEffect(() => {
     console.log(isNotLogIn)
-  }, [isNotLogIn])
+  }, [isNotLogIn, isModalWalletConnect])
 
   const visible = (hash: string): string => {
     const firstFourCharacters = hash.substring(0, 6)
@@ -60,7 +60,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
           avatar={avatar}
           isEns={isEns}
           setEns={setEns}
-          // isNotLogin={isNotLogIn}
+          setModalWalletConnect={setModalWalletConnect}
         />
       )}
       <Modal

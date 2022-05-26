@@ -17,6 +17,7 @@ export interface HeaderLogInProps {
   // isNotLogin: boolean
   isEns: boolean
   setEns: (x) => void
+  setModalWalletConnect: (x: any) => void
 }
 
 export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
@@ -31,7 +32,9 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     // isNotLogin,
     isEns,
     setEns,
+    setModalWalletConnect,
   } = props
+
   useEffect(() => {}, [
     isOpen,
     isMini,
@@ -44,14 +47,6 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 5)
 
     return `${firstFourCharacters}...${lastFourCharacters}`
-  }
-  const onKeydown = ({ key }: KeyboardEvent) => {
-    switch (key) {
-      case 'Escape':
-        setMini()
-        setOpen()
-        break
-    }
   }
 
   return (
@@ -105,16 +100,32 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
             <div className={styles.profileBlock}>
               <div className={styles.profileBlockImg}>
                 <img className={styles.profileImg} src={avatar}></img>
-                <button className={styles.profileImgButton} />
+                <button
+                  onClick={() => {
+                    setOpen()
+                    setMini()
+                  }}
+                  className={styles.profileImgButton}
+                />
               </div>
-              <span className={styles.ensLabel}>ens</span>
-              <p className={styles.ensName}>UserENSName</p>
-              <p className={styles.ensHash}>{visible(hash)}</p>
+              {isEns ? (
+                <>
+                  <span className={styles.ensLabel}>ens</span>
+                  <p className={styles.ensName}>UserENSName</p>
+                  <p className={styles.ensHash}>{visible(hash)}</p>
+                </>
+              ) : (
+                <p className={styles.notEnsHash}>{visible(hash)}</p>
+              )}
+
               <a className={styles.profileLink}>Profile</a>
             </div>
             <div className={styles.walletBlock}>
               <div className={styles.addWallet}>
-                <button className={styles.AddUser}></button>
+                <button
+                  onClick={() => setModalWalletConnect(true)}
+                  className={styles.AddUser}
+                ></button>
                 <span className={styles.AddUserLabel}>Add Wallet</span>
               </div>
             </div>

@@ -267,6 +267,7 @@
   width: 100%;
   height: 120px;
   justify-content: space-around;
+  padding-bottom: 5px;
 }
 .profileBlockImg {
   display: flex;
@@ -295,10 +296,10 @@
   background-position: center;
   background-repeat: no-repeat;
   &:hover {
-    background-color: $MainGrey;
+    background-color: $AppBG;
   }
   &:active {
-    background-color: $ContentBlack;
+    background-color: $StrokeColor;
   }
 }
 
@@ -312,10 +313,25 @@
   text-transform: capitalize;
 
   color: $Primary;
+  cursor: pointer;
   &:hover {
     color: $PrimaryHover;
   }
   &:active {
     color: $PrimaryPressed;
   }
+}
+
+.notEnsHash {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 100%;
+
+  text-transform: capitalize;
+
+  color: $MainBlack;
+  display: inline-block;
+  margin-bottom: -10px;
 }
