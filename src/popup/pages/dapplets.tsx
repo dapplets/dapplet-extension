@@ -1,19 +1,14 @@
-import * as React from 'react'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
-
-import { Button, List, Segment, Icon, Input, Message } from 'semantic-ui-react'
-import ManifestDTO from '../../background/dto/manifestDTO'
-import {
-  CONTEXT_ID_WILDCARD,
-  DEFAULT_BRANCH_NAME,
-  ModuleTypes,
-} from '../../common/constants'
+import * as React from 'react'
+import { Button, Icon, Input, List, Message, Segment } from 'semantic-ui-react'
 import { rcompare } from 'semver'
-import { Dapplet, ManifestAndDetails } from '../components/dapplet'
+import { browser } from 'webextension-polyfill-ts'
+import ManifestDTO from '../../background/dto/manifestDTO'
 import Manifest from '../../background/models/manifest'
-import { DevMessage } from '../components/DevMessage'
+import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
 import * as EventBus from '../../common/global-event-bus'
+import { Dapplet, ManifestAndDetails } from '../components/dapplet'
+import { DevMessage } from '../components/DevMessage'
 
 interface IDappletsProps {
   isOverlay: boolean
@@ -73,18 +68,14 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   }
 
   async _refreshDataByContext(contextIdsValues: string[]) {
-    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(
-      browser
-    )
+    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(browser)
 
     const features: ManifestDTO[] = contextIdsValues
       ? await getFeaturesByHostnames(contextIdsValues)
       : []
 
     const registries = await getRegistries()
-    const regsWithErrors = registries.filter(
-      (r) => !r.isDev && !!r.isEnabled && !!r.error
-    )
+    const regsWithErrors = registries.filter((r) => !r.isDev && !!r.isEnabled && !!r.error)
     if (regsWithErrors.length > 0) {
       const isProviderProblems =
         regsWithErrors.filter(
@@ -138,10 +129,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     if (selectVersions && isActive) {
       this._updateFeatureState(name, { isLoading: true })
       const { getVersions } = await initBGFunctions(browser)
-      const allVersions = await getVersions(
-        module.sourceRegistry.url,
-        module.name
-      )
+      const allVersions = await getVersions(module.sourceRegistry.url, module.name)
       this._updateFeatureState(name, {
         versions: allVersions,
         isLoading: false,
@@ -173,9 +161,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
       version = allVersions.sort(rcompare)[0]
     }
 
-    const { activateFeature, deactivateFeature } = await initBGFunctions(
-      browser
-    )
+    const { activateFeature, deactivateFeature } = await initBGFunctions(browser)
 
     this._updateFeatureState(name, {
       isActive,
@@ -191,21 +177,9 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
 
     try {
       if (isActive) {
-        await activateFeature(
-          name,
-          version,
-          targetContextIds,
-          order,
-          sourceRegistry.url
-        )
+        await activateFeature(name, version, targetContextIds, order, sourceRegistry.url)
       } else {
-        await deactivateFeature(
-          name,
-          version,
-          targetContextIds,
-          order,
-          sourceRegistry.url
-        )
+        await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url)
       }
 
       await this._refreshDataByContext(this.state.contextIds)
@@ -233,17 +207,14 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   }
 
   async refreshContextPage() {
-    const { getCurrentTab, getCurrentContextIds, reloadCurrentPage } =
-      await initBGFunctions(browser)
+    const { getCurrentTab, getCurrentContextIds, reloadCurrentPage } = await initBGFunctions(
+      browser
+    )
     const tab = await getCurrentTab()
     if (!tab) return
     await reloadCurrentPage()
     this.setState({ isNoContentScript: false, isLoading: true })
-    setTimeout(
-      () =>
-        this._refreshDataByContext(getCurrentContextIds(this.props.currentTab)),
-      4000
-    ) // ToDo: get rid of timeout
+    setTimeout(() => this._refreshDataByContext(getCurrentContextIds(this.props.currentTab)), 4000) // ToDo: get rid of timeout
   }
 
   async settingsModule(mi: ManifestDTO) {
@@ -255,9 +226,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   openDappletAction = async (f: ManifestAndDetails) => {
     try {
       this._updateFeatureState(f.name, { isActionLoading: true })
-      const { openDappletAction, getCurrentTab } = await initBGFunctions(
-        browser
-      )
+      const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
       const tab = await getCurrentTab()
       if (!tab) return
       await openDappletAction(f.name, tab.id)
@@ -301,8 +270,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     const { features, search } = this.state
     if (!search || search.length === 0) return features
 
-    const find = (a: string) =>
-      (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1
+    const find = (a: string) => (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1
     return features.filter(
       (x: ManifestAndDetails) =>
         find(x.name) || find(x.title) || find(x.description) || find(x.author)
@@ -310,15 +278,11 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   }
 
   async deployModule(f: ManifestAndDetails, v: string) {
-    const { openDeployOverlay, getModuleInfoByName, getVersionInfo } =
-      await initBGFunctions(browser)
-    const mi = await getModuleInfoByName(f.sourceRegistry.url, f.name)
-    const vi = await getVersionInfo(
-      f.sourceRegistry.url,
-      f.name,
-      DEFAULT_BRANCH_NAME,
-      v
+    const { openDeployOverlay, getModuleInfoByName, getVersionInfo } = await initBGFunctions(
+      browser
     )
+    const mi = await getModuleInfoByName(f.sourceRegistry.url, f.name)
+    const vi = await getVersionInfo(f.sourceRegistry.url, f.name, DEFAULT_BRANCH_NAME, v)
     await openDeployOverlay(mi, vi)
     window.close()
   }
@@ -330,10 +294,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     return (
       <React.Fragment>
         <div className={this.props.isOverlay ? undefined : 'internalTabColumn'}>
-          <DevMessage
-            style={{ marginBottom: '10px' }}
-            isOverlay={this.props.isOverlay}
-          />
+          <DevMessage style={{ marginBottom: '10px' }} isOverlay={this.props.isOverlay} />
 
           {error ? (
             <Message

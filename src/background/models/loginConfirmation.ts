@@ -1,35 +1,39 @@
-import Base from '../../common/models/base';
+import Base from '../../common/models/base'
 
 export default class LoginConfirmation extends Base {
-    getId = () => this.loginConfirmationId;
+  getId = () => this.loginConfirmationId
 
-    loginConfirmationId: string = null;
-    
-    authMethod: string = null;
-    wallet: string = null;
-    address: string = null;
-    timeout: string = null;
-    from: string = null;
-    role: string = null;
-    help: string = null;
-    
-    signature: string = null;    
-    
-    expiresAt: string = null;
-    createdAt: string = null;
+  loginConfirmationId: string = null
 
-    isExpired() {
-        const expiresAt = new Date(this.expiresAt).getTime();
-        const now = Date.now();
-        return expiresAt < now;
-    }
+  authMethod: string = null
+  wallet: string = null
+  address: string = null
+  timeout: string = null
+  from: string = null
+  role: string = null
+  help: string = null
 
-    loginMessage() {
-        return JSON.stringify({
-            timeout: this.expiresAt,
-            from: this.from,
-            role: this.role,
-            help: this.help
-        }, null, 2);
-    }
+  signature: string = null
+
+  expiresAt: string = null
+  createdAt: string = null
+
+  isExpired() {
+    const expiresAt = new Date(this.expiresAt).getTime()
+    const now = Date.now()
+    return expiresAt < now
+  }
+
+  loginMessage() {
+    return JSON.stringify(
+      {
+        timeout: this.expiresAt,
+        from: this.from,
+        role: this.role,
+        help: this.help,
+      },
+      null,
+      2
+    )
+  }
 }

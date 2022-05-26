@@ -16,11 +16,11 @@
 }
 
 .close:hover {
-  filter: brightness(0) saturate(100%) invert(18%) sepia(99%) saturate(3198%)
-    hue-rotate(338deg) brightness(95%) contrast(89%);
+  filter: brightness(0) saturate(100%) invert(18%) sepia(99%) saturate(3198%) hue-rotate(338deg)
+    brightness(95%) contrast(89%);
 }
 
 .close:active {
-  filter: brightness(0) saturate(100%) invert(14%) sepia(97%) saturate(2247%)
-    hue-rotate(332deg) brightness(92%) contrast(103%);
+  filter: brightness(0) saturate(100%) invert(14%) sepia(97%) saturate(2247%) hue-rotate(332deg)
+    brightness(92%) contrast(103%);
 }

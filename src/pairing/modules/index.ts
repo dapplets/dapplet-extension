@@ -1,11 +1,6 @@
-import metamask from './metamask';
-import walletconnect from './walletconnect';
-import near from './near';
-import dapplets from './dapplets';
+import dapplets from './dapplets'
+import metamask from './metamask'
+import near from './near'
+import walletconnect from './walletconnect'
 
-export {
-    metamask,
-    walletconnect,
-    near,
-    dapplets
-}
+export { metamask, walletconnect, near, dapplets }

@@ -1,9 +1,7 @@
-import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
-import { HTMLAttributes, DetailedHTMLProps } from 'react'
 import cn from 'classnames'
-import styles from './Localhost.module.scss'
-
+import React, { FC, useEffect, useRef } from 'react'
 import { useToggle } from '../../hooks/useToggle'
+import styles from './Localhost.module.scss'
 
 export interface LocalhostProps {
   isEnabled: false

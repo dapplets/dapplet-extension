@@ -1,6 +1,5 @@
-import React, { ChangeEvent, FC } from 'react'
-import { HTMLAttributes, DetailedHTMLProps } from 'react'
 import cn from 'classnames'
+import React, { FC } from 'react'
 import styles from './Registery.module.scss'
 
 export interface RegisteryProps {
@@ -9,8 +8,7 @@ export interface RegisteryProps {
   setShowChildrenRegistery: (x) => void
 }
 export const Registry: FC<RegisteryProps> = (props) => {
-  const { isShowChildrenRegistery, setShowChildrenRegistery, label, children } =
-    props
+  const { isShowChildrenRegistery, setShowChildrenRegistery, label, children } = props
 
   return (
     <div className={styles.localhost}>

@@ -1,6 +1,6 @@
+import cn from 'classnames'
 import React, { DetailedHTMLProps, HTMLAttributes, ReactElement } from 'react'
 import styles from './SettingWrapper.module.scss'
-import cn from 'classnames'
 
 export interface SettingWrapperProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {

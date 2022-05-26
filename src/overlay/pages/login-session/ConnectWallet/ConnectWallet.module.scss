@@ -1,44 +1,44 @@
 .wrapper {
-	// margin-top: 124px;
+  // margin-top: 124px;
 }
 
 .list {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-	margin-bottom: 0;
-	padding-left: 0;
+  margin-bottom: 0;
+  padding-left: 0;
 
-	list-style: none;
+  list-style: none;
 }
 
 .otherServices {
-	margin-top: 20px;
+  margin-top: 20px;
 }
 
 .item {
-	width: 77px;
-	height: 77px;
+  width: 77px;
+  height: 77px;
 
-	cursor: pointer;
+  cursor: pointer;
 
-	border-radius: 5px;
+  border-radius: 5px;
 
-	&:not(:last-child) {
-		margin-right: 5px;
-	}
+  &:not(:last-child) {
+    margin-right: 5px;
+  }
 
-	display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .item:hover {
-	filter: brightness(0.9);
-    background: #00000010;
+  filter: brightness(0.9);
+  background: #00000010;
 }
 
 .FAQ {
-	margin-top: 80px;
+  margin-top: 80px;
 }

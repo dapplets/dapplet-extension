@@ -1,31 +1,16 @@
-import React, {
-  FC,
-  DetailedHTMLProps,
-  HTMLAttributes,
-  useEffect,
-  useMemo,
-} from 'react'
 import cn from 'classnames'
+import React, { DetailedHTMLProps, FC, HTMLAttributes } from 'react'
 import styles from './Checkbox.module.scss'
 
 export interface CheckboxProps
-  extends DetailedHTMLProps<
-    HTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
-  > {
+  extends DetailedHTMLProps<HTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   title: string
   isCheckbox?: boolean
   isSupport?: boolean
   onChange?: (x) => void
 }
 export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
-  const {
-    title,
-    isSupport = false,
-    isCheckbox,
-    onChange,
-    ...anotherProps
-  } = props
+  const { title, isSupport = false, isCheckbox, onChange, ...anotherProps } = props
 
   return (
     <div className={styles.supportBlock}>

@@ -1,3 +1,3 @@
-import { IOverlay } from "../../interfaces";
+import { IOverlay } from '../../interfaces'
 
-export type ITab = IOverlay;
+export type ITab = IOverlay

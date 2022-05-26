@@ -1,38 +1,19 @@
-import React, {
-  ReactElement,
-  useState,
-  useEffect,
-  useMemo,
-  FC,
-  useRef,
-} from 'react'
-import cn from 'classnames'
-import styles from './DappletsInfo.module.scss'
-import { SettingWrapper } from '../../components/SettingWrapper'
-import { SettingItem } from '../../components/SettingItem'
-import {
-  isValidHttp,
-  isValidUrl,
-  isValidPostageStampId,
-} from '../../../../../popup/helpers'
-import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { useToggle } from '../../hooks/useToggle'
-import { Bus } from '../../../../../common/bus'
+import cn from 'classnames'
+import React, { FC, useEffect, useRef, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
+import { Bus } from '../../../../../common/bus'
+import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
+import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import * as tracing from '../../../../../common/tracing'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { typeOfUri, chainByUri, joinUrls } from '../../../../../common/helpers'
 import { StorageRefImage } from '../../components/DevModulesList'
-import {
-  DEFAULT_BRANCH_NAME,
-  ModuleTypes,
-  StorageTypes,
-} from '../../../../../common/constants'
-
 import { Modal } from '../../components/Modal'
-import ReactDOM from 'react-dom'
+import { SettingItem } from '../../components/SettingItem'
+import { SettingWrapper } from '../../components/SettingWrapper'
+import styles from './DappletsInfo.module.scss'
 
 tracing.startTracing()
 
@@ -84,8 +65,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [originalMi, setOriginalMi] = useState(null)
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
   const [vi, setVi] = useState<VersionInfo>(ModuleVersion)
-  const [dependenciesChecking, setDpendenciesChecking] =
-    useState<DependencyChecking[]>()
+  const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>()
   const [loading, setLoading] = useState(false)
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
@@ -99,9 +79,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [editContextId, setEditContextId] = useState('')
   const [editContextIdLoading, setEditContextIdLoading] = useState(false)
   const [editContextIdDone, setEditContextIdDone] = useState(false)
-  const [deploymentStatus, setDeploymentStatus] = useState(
-    DeploymentStatus.Unknown
-  )
+  const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
   const [trustedUsers, setTrustedUsers] = useState([])
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [mode, setMode] = useState(null)
@@ -212,12 +190,9 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
     await Promise.all(
       dependenciesChecking.map((x) =>
-        getVersionInfo(
-          targetRegistry,
-          x.name,
-          DEFAULT_BRANCH_NAME,
-          x.version
-        ).then((y) => (x.isExists = !!y))
+        getVersionInfo(targetRegistry, x.name, DEFAULT_BRANCH_NAME, x.version).then(
+          (y) => (x.isExists = !!y)
+        )
       )
     )
   }
@@ -244,10 +219,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
 
-    const currentAccount = await getAddress(
-      DefaultSigners.EXTENSION,
-      targetChain
-    )
+    const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
 
     setCurrentAccount(currentAccount)
   }
@@ -260,9 +232,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const _updateDeploymentStatus = async () => {
     setDeploymentStatus(DeploymentStatus.Unknown)
 
-    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(
-      browser
-    )
+    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
     const miF = await getModuleInfoByName(targetRegistry, mi.name)
     const deployed = vi
       ? await getVersionInfo(targetRegistry, miF.name, vi.branch, vi.version)
@@ -308,14 +278,11 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
     try {
       const isNotNullCurrentAccount = !(
-        !currentAccount ||
-        currentAccount === '0x0000000000000000000000000000000000000000'
+        !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
       )
       const isNotTrustedUser =
         isNotNullCurrentAccount &&
-        !trustedUsers.find(
-          (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
-        )
+        !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
       if (isNotTrustedUser) {
         await addTrustedUser(currentAccount.toLowerCase())
       }
@@ -371,9 +338,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     await _updateData()
   }
 
-  const iconInputChangeHandler = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const iconInputChangeHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
     // const s = this.state
     const files = event.target.files
     if (files.length > 0) {
@@ -416,22 +381,16 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
   const isNoStorage = targetStorages.length === 0
   const isNotNullCurrentAccount = !(
-    !currentAccount ||
-    currentAccount === '0x0000000000000000000000000000000000000000'
+    !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
   )
   const isNotWalletPaired = !isNotNullCurrentAccount && !!owner
   const isNotAnOwner =
-    !!owner &&
-    isNotNullCurrentAccount &&
-    owner.toLowerCase() !== currentAccount.toLowerCase()
-  const isAlreadyDeployed =
-    !message && deploymentStatus === DeploymentStatus.Deployed
+    !!owner && isNotNullCurrentAccount && owner.toLowerCase() !== currentAccount.toLowerCase()
+  const isAlreadyDeployed = !message && deploymentStatus === DeploymentStatus.Deployed
   const isNewModule = deploymentStatus === DeploymentStatus.NewModule
   const isNotTrustedUser =
     isNotNullCurrentAccount &&
-    !trustedUsers.find(
-      (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
-    )
+    !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
   const isDependenciesExist =
     dependenciesChecking && dependenciesChecking.length > 0
       ? dependenciesChecking.every((x) => x.isExists === true)
@@ -450,8 +409,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     isDependenciesLoading ||
     !isDependenciesExist ||
     !isManifestValid
-  const isReuploadButtonDisabled =
-    !isAlreadyDeployed || mode === FormMode.Creating || !vi
+  const isReuploadButtonDisabled = !isAlreadyDeployed || mode === FormMode.Creating || !vi
 
   const onChange = (e) => {
     const files = e.target.files
@@ -536,10 +494,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     : m}
                 </p>
               ))}
-              <button
-                onClick={() => onClose()}
-                className={styles.modalDefaultContentButton}
-              >
+              <button onClick={() => onClose()} className={styles.modalDefaultContentButton}>
                 OK
               </button>
             </div>
@@ -568,9 +523,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
           <Modal
             visible={isNotAccountModal}
             title={'Wallet is not connected'}
-            content={
-              'You can not deploy a module without a wallet. Connect a new wallet'
-            }
+            content={'You can not deploy a module without a wallet. Connect a new wallet'}
             footer={''}
             onClose={() => setNotAccountModal(false)}
           />
@@ -625,10 +578,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
               <div className={styles.iconBlock}>
                 <div className={styles.imgBlock}>
-                  <StorageRefImage
-                    className={styles.img}
-                    storageRef={mi.icon}
-                  />
+                  <StorageRefImage className={styles.img} storageRef={mi.icon} />
 
                   {st.map((x, i) => (
                     <span className={styles.imgTitle} key={i}>
@@ -696,9 +646,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     <Modal
                       visible={newOwnerLoading}
                       title={'Loading new Owner'}
-                      content={
-                        'This modal window will close automatically after successful change'
-                      }
+                      content={'This modal window will close automatically after successful change'}
                       footer={''}
                       onClose={() => setNewOwnerLoading(false)}
                     />
@@ -721,11 +669,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                   />
                 </div>
                 {author.authorForm.map((x, i) => (
-                  <div
-                    ref={messagesContainer}
-                    key={i}
-                    className={styles.blockAuthors}
-                  >
+                  <div ref={messagesContainer} key={i} className={styles.blockAuthors}>
                     <input
                       className={styles.authorTitle}
                       placeholder={x.author}
@@ -736,10 +680,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                         }
                       }}
                     />
-                    <button
-                      onClick={() => onDeleteChild(i)}
-                      className={styles.authorDelete}
-                    />
+                    <button onClick={() => onDeleteChild(i)} className={styles.authorDelete} />
                   </div>
                 ))}
               </div>
@@ -758,8 +699,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     disabled={mi.contextIds.length >= 1}
                     onClick={addButtonClickHandlerContext}
                     className={cn(styles.contextIDButton, {
-                      [styles.contextIDButtonDisabled]:
-                        mi.contextIds.length >= 1,
+                      [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
                     })}
                   />
                 </div>
@@ -792,9 +732,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                       />
                     </div>
                     <button
-                      disabled={
-                        nodeInput.current?.value.length < 2 || addDisabled
-                      }
+                      disabled={nodeInput.current?.value.length < 2 || addDisabled}
                       onClick={() => {
                         node.current?.classList.add('valid')
                         _addContextId(editContextId)

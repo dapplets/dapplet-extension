@@ -1,15 +1,8 @@
-import React, {
-  FC,
-  FunctionComponent,
-  ReactNode,
-  HTMLAttributes,
-  DetailedHTMLProps,
-  useEffect,
-} from 'react'
 import cn from 'classnames'
-import styles from './Dropdown.module.scss'
-import { IDropdown } from '../../models/dropdown.model'
+import React, { DetailedHTMLProps, FC, HTMLAttributes } from 'react'
 import { useToggle } from '../../hooks/useToggle'
+import { IDropdown } from '../../models/dropdown.model'
+import styles from './Dropdown.module.scss'
 
 export interface DropdownProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -35,15 +28,10 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
   } = props
   // useEffect(() => {}, [])
 
-  const onChange = (value: IDropdown) => (): void =>
-    handlerChangeValue && handlerChangeValue(value)
+  const onChange = (value: IDropdown) => (): void => handlerChangeValue && handlerChangeValue(value)
 
   return (
-    <div
-      className={cn({ [styles.isTitle]: title })}
-      {...anotherProps}
-      onClick={setOpen}
-    >
+    <div className={cn({ [styles.isTitle]: title })} {...anotherProps} onClick={setOpen}>
       {title && <p className={styles.title}>{title}</p>}
 
       <div className={cn(styles.dropdownBlock, { [styles.isOpen]: isOpen })}>

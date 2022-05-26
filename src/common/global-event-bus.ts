@@ -67,19 +67,13 @@ function register(portOrWindow: Runtime.Port | Window) {
 
     message.from = currentContext // ToDo: change sender in relayed messages
     // console.log(message)
-    connections
-      .filter((x) => x !== _conn)
-      .forEach((p) => p.postMessage(message)) // Notify all conections except itself
+    connections.filter((x) => x !== _conn).forEach((p) => p.postMessage(message)) // Notify all conections except itself
     callbacks.get(message.event)?.forEach((cb) => cb(message.data))
   }
 
   if (portOrWindow instanceof Window) {
     const listener = (e) => {
-      if (
-        typeof e.data === 'object' &&
-        e.data.bus === BUS_ID &&
-        e.data.from !== currentContext
-      ) {
+      if (typeof e.data === 'object' && e.data.bus === BUS_ID && e.data.from !== currentContext) {
         callback(e.data)
       }
     }
@@ -115,10 +109,7 @@ if (environment === EnvType.BACKGROUND) {
       register(port)
     }
   })
-} else if (
-  environment === EnvType.CONTENT_SCRIPT ||
-  environment === EnvType.CONTENT_FRAME
-) {
+} else if (environment === EnvType.CONTENT_SCRIPT || environment === EnvType.CONTENT_FRAME) {
   // Connect to the background
   const port = browser.runtime.connect({ name: BUS_ID } as any)
   register(port)

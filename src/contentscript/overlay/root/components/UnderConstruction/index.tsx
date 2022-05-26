@@ -1,6 +1,5 @@
-import React, { ChangeEvent, FC, useState } from 'react'
-import { HTMLAttributes, DetailedHTMLProps } from 'react'
 import cn from 'classnames'
+import React, { FC } from 'react'
 import styles from './UnderConstruction.module.scss'
 
 export interface UnderConstructionProps {
@@ -9,8 +8,7 @@ export interface UnderConstructionProps {
   setShowChildrenUnderConstraction: (x) => void
 }
 export const UnderConstruction: FC<UnderConstructionProps> = (props) => {
-  const { setShowChildrenUnderConstraction, isShowChildren, label, children } =
-    props
+  const { setShowChildrenUnderConstraction, isShowChildren, label, children } = props
 
   return (
     <div className={styles.localhost}>

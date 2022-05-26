@@ -1,11 +1,9 @@
-import React, { useState, useEffect, FC, useRef } from 'react'
 import cn from 'classnames'
-import styles from './Rewards.module.scss'
-import { SettingWrapper } from '../../components/SettingWrapper'
-
+import React, { FC, useEffect, useRef, useState } from 'react'
 import { Message } from '../../components/Message'
-
 import { ModalReward } from '../../components/ModalReward'
+import { SettingWrapper } from '../../components/SettingWrapper'
+import styles from './Rewards.module.scss'
 import './rewards.scss'
 
 export interface RewardsProps {
@@ -22,11 +20,7 @@ enum UnderConstructionDetails {
 }
 
 export const Rewards: FC<RewardsProps> = (props) => {
-  const {
-    setUnderConstructionDetails,
-    isTokenomics,
-    setActiveTabUnderConstructionDetails,
-  } = props
+  const { setUnderConstructionDetails, isTokenomics, setActiveTabUnderConstructionDetails } = props
   let sumQuantity = 0
   const [distributed, onDistributed] = useState(`${sumQuantity}%`)
 
@@ -111,10 +105,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
       console.log(+pool.pool + Number(sumQuantity))
     }
 
-    if (
-      +poolNewInput.current?.value > 100 ||
-      +poolNewInput.current?.value <= 0
-    ) {
+    if (+poolNewInput.current?.value > 100 || +poolNewInput.current?.value <= 0) {
       setPoolInputInvalid(true)
     } else {
       setPoolInputInvalid(false)
@@ -275,9 +266,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
             </div>
             <div className={styles.customPooNewDistributed}>
               <div className={styles.customPoolLabel}>{`Distributed `}</div>
-              <span className={styles.customLabelDistributed}>
-                {distributed}
-              </span>
+              <span className={styles.customLabelDistributed}>{distributed}</span>
             </div>
             {items && items.items && items.items.length !== 0 && (
               <button
@@ -311,47 +300,23 @@ export const Rewards: FC<RewardsProps> = (props) => {
                           item.recepientForm.map((x, i) => (
                             <>
                               {/* {x !== null ? ( */}
-                              <div
-                                key={i}
-                                className={styles.createdRewardsBlock}
-                              >
+                              <div key={i} className={styles.createdRewardsBlock}>
                                 <div className={styles.createdRewardsBlockUser}>
-                                  <span
-                                    className={styles.createdRewardsBlockLabel}
-                                  >
-                                    User:
-                                  </span>
-                                  <span
-                                    className={
-                                      styles.createdRewardsBlockLabelUser
-                                    }
-                                  >
+                                  <span className={styles.createdRewardsBlockLabel}>User:</span>
+                                  <span className={styles.createdRewardsBlockLabelUser}>
                                     {x.userID}
                                   </span>
                                 </div>
-                                {x.condition &&
-                                  typeof x.condition === 'string' && (
-                                    <div
-                                      className={
-                                        styles.createdRewardsBlockConditions
-                                      }
-                                    >
-                                      <span
-                                        className={
-                                          styles.createdRewardsBlockLabel
-                                        }
-                                      >
-                                        Conditions :
-                                      </span>
-                                      <span
-                                        className={
-                                          styles.createdRewardsBlockLabelAdapter
-                                        }
-                                      >
-                                        {x.condition}
-                                      </span>
-                                    </div>
-                                  )}
+                                {x.condition && typeof x.condition === 'string' && (
+                                  <div className={styles.createdRewardsBlockConditions}>
+                                    <span className={styles.createdRewardsBlockLabel}>
+                                      Conditions :
+                                    </span>
+                                    <span className={styles.createdRewardsBlockLabelAdapter}>
+                                      {x.condition}
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                               {/* ) : null} */}
                             </>
@@ -359,9 +324,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                       </>
                     }
                   />
-                  <span
-                    className={styles.percentReward}
-                  >{`Reward ${item.pool}%`}</span>
+                  <span className={styles.percentReward}>{`Reward ${item.pool}%`}</span>
                   <button
                     onClick={() => {
                       setItemInex(index)
@@ -384,12 +347,9 @@ export const Rewards: FC<RewardsProps> = (props) => {
                   </button>
                 </div>
               ))}
-            {items &&
-              items.items &&
-              items.items.length !== 0 &&
-              sumQuantity <= 100 && (
-                <button className={styles.pushChanges}>Push changes</button>
-              )}
+            {items && items.items && items.items.length !== 0 && sumQuantity <= 100 && (
+              <button className={styles.pushChanges}>Push changes</button>
+            )}
           </div>
 
           {items && items.items && items.items.length === 0 && (
@@ -492,8 +452,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                             <input
                               onBlur={() => {
                                 if (
-                                  itemsRecepientForm.recepientForm[i].userID
-                                    .length === 0 ||
+                                  itemsRecepientForm.recepientForm[i].userID.length === 0 ||
                                   // e.target.value.length === 0 ||
                                   !revardUserIdInput.current?.value
                                 ) {
@@ -507,15 +466,13 @@ export const Rewards: FC<RewardsProps> = (props) => {
                               className={styles.recepientInput}
                               onChange={(e) => {
                                 handleChangeRecepient(e)
-                                itemsRecepientForm.recepientForm[i].userID =
-                                  e.target.value
+                                itemsRecepientForm.recepientForm[i].userID = e.target.value
                                 // console.log(
                                 //   itemsRecepientForm.recepientForm[i].userID
                                 //     .length
                                 // )
                                 if (
-                                  itemsRecepientForm.recepientForm[i].userID
-                                    .length === 0 ||
+                                  itemsRecepientForm.recepientForm[i].userID.length === 0 ||
                                   e.target.value.length === 0 ||
                                   !revardUserIdInput.current?.value
                                 ) {
@@ -545,9 +502,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                   }}
                                   className={styles.recepientConditionalButton}
                                 />
-                                <span
-                                  className={styles.recepientConditionalLabel}
-                                >
+                                <span className={styles.recepientConditionalLabel}>
                                   conditional
                                 </span>
                               </div>
@@ -569,19 +524,14 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                     name="condition"
                                     className={styles.inputConditional}
                                     onChange={(e) => {
-                                      itemsRecepientForm.recepientForm[
-                                        i
-                                      ].condition = e.target.value
+                                      itemsRecepientForm.recepientForm[i].condition = e.target.value
                                     }}
                                   />
-                                  {itemsRecepientForm.recepientForm.length <=
-                                    1 && (
+                                  {itemsRecepientForm.recepientForm.length <= 1 && (
                                     <button
                                       type="button"
                                       onClick={(e) => {
-                                        itemsRecepientForm.recepientForm[
-                                          i
-                                        ].condition = null
+                                        itemsRecepientForm.recepientForm[i].condition = null
                                         // onDeleteChildConditional(i)
                                         setCondition(false)
                                       }}
@@ -656,9 +606,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
           children={
             <a
               onClick={() => {
-                setActiveTabUnderConstructionDetails(
-                  UnderConstructionDetails.TOKENOMICS
-                )
+                setActiveTabUnderConstructionDetails(UnderConstructionDetails.TOKENOMICS)
               }}
               className={styles.createTokenomics}
             >
@@ -669,10 +617,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
       )}
 
       <div className={styles.linkNavigation}>
-        <button
-          onClick={() => setUnderConstructionDetails(false)}
-          className={styles.back}
-        >
+        <button onClick={() => setUnderConstructionDetails(false)} className={styles.back}>
           Back
         </button>
       </div>
@@ -727,12 +672,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         // value={poolNewInput.current?.value}
                         ref={poolNewInput}
                         onBlur={() => {
-                          if (
-                            +newItem.newItem[i].pool <= 0 ||
-                            +newItem.newItem[i].pool > 100
-                          ) {
-                            newItem.newItem[i].pool =
-                              items.items[itemIndex].pool
+                          if (+newItem.newItem[i].pool <= 0 || +newItem.newItem[i].pool > 100) {
+                            newItem.newItem[i].pool = items.items[itemIndex].pool
                           } else {
                             newItem.newItem[i].pool = newItem.newItem[i].pool
                           }
@@ -795,21 +736,16 @@ export const Rewards: FC<RewardsProps> = (props) => {
                               ref={newRewardUserIdInput}
                               name="userId"
                               className={styles.recepientInput}
-                              defaultValue={
-                                newItem.newItem[i].recepientForm[item].userID
-                              }
+                              defaultValue={newItem.newItem[i].recepientForm[item].userID}
                               onChange={(e) => {
                                 handleChangeRecepient(e)
-                                newItem.newItem[i].recepientForm[item].userID =
-                                  e.target.value
+                                newItem.newItem[i].recepientForm[item].userID = e.target.value
                               }}
                             />
                             {/* {newItem.newItem[i].recepientForm.lendth <= 1 ? ( */}
                             <button
                               type="button"
-                              onClick={() =>
-                                onDeleteChildRecepientEdit(i, item)
-                              }
+                              onClick={() => onDeleteChildRecepientEdit(i, item)}
                               className={styles.recepientInputButton}
                             />
                             {/* ) : null} */}
@@ -826,9 +762,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                   }}
                                   className={styles.recepientConditionalButton}
                                 />
-                                <span
-                                  className={styles.recepientConditionalLabel}
-                                >
+                                <span className={styles.recepientConditionalLabel}>
                                   conditional
                                 </span>
                               </div>
@@ -845,25 +779,18 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                 <div className={styles.conditionalInputBlock}>
                                   <input
                                     name="condition"
-                                    defaultValue={
-                                      newItem.newItem[i].recepientForm[item]
-                                        .condition
-                                    }
+                                    defaultValue={newItem.newItem[i].recepientForm[item].condition}
                                     className={styles.inputConditional}
                                     onChange={(e) => {
-                                      newItem.newItem[i].recepientForm[
-                                        item
-                                      ].condition = e.target.value
+                                      newItem.newItem[i].recepientForm[item].condition =
+                                        e.target.value
                                     }}
                                   />
-                                  {newItem.newItem[i].recepientForm.lendth <=
-                                    1 && (
+                                  {newItem.newItem[i].recepientForm.lendth <= 1 && (
                                     <button
                                       type="button"
                                       onClick={(e) => {
-                                        newItem.newItem[i].recepientForm[
-                                          item
-                                        ].condition = null
+                                        newItem.newItem[i].recepientForm[item].condition = null
                                         // onDeleteChildConditionalEdit(i, item)
                                         setCondition(false)
                                       }}

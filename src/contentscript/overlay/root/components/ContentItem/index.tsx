@@ -1,6 +1,6 @@
+import cn from 'classnames'
 import * as React from 'react'
 import { Overlay } from '../../overlay'
-import cn from 'classnames'
 import { OverlayManager } from '../../overlayManager'
 import { PopupItem } from '../../PopupItem'
 import styles from './ContentItem.module.scss'
@@ -69,10 +69,7 @@ export class ContentItem extends React.Component<P, S> {
       overlay.frame.remove()
 
       const { protocol, hostname } = new URL(overlay.url)
-      if (
-        protocol === 'https:' &&
-        (hostname === 'localhost' || hostname === '127.0.0.1')
-      ) {
+      if (protocol === 'https:' && (hostname === 'localhost' || hostname === '127.0.0.1')) {
         this.setState({ loadingMode: LoadingMode.SslError })
       } else {
         this.setState({ loadingMode: LoadingMode.NetworkError })
@@ -101,19 +98,14 @@ export class ContentItem extends React.Component<P, S> {
     const p = this.props
     const x = this.props.overlay
 
-    const childrenOverlays = p.overlayManager
-      .getOverlays()
-      .filter((x) => x.parent === p.overlay)
+    const childrenOverlays = p.overlayManager.getOverlays().filter((x) => x.parent === p.overlay)
 
     return (
       <div
         // style={{ display: 'none' }}
-        className={cn(
-          styles.contentItem, 
-          {
-            [styles.contentItemActive]: p.isActive,
-          }
-        )}
+        className={cn(styles.contentItem, {
+          [styles.contentItemActive]: p.isActive,
+        })}
       >
         {s.loadingMode === LoadingMode.Loading && (
           <div className="loader-container">
@@ -122,8 +114,7 @@ export class ContentItem extends React.Component<P, S> {
             </div>
             <div className="load-text">Loading Overlay...</div>
             <div className="load-text">
-              Downloading from decentralized sources like Swarm or IPFS can take
-              some time
+              Downloading from decentralized sources like Swarm or IPFS can take some time
             </div>
           </div>
         )}
@@ -134,12 +125,10 @@ export class ContentItem extends React.Component<P, S> {
               <div className="loader"></div>
             </div>
             <div className="load-text">Loading Overlay...</div>
-            <div className="load-text">
-              The overlay it is taking a while to load.
-            </div>
+            <div className="load-text">The overlay it is taking a while to load.</div>
             <div className="load-text-desc">
-              If the overlay does not load, try changing your preferred overlay
-              storage in the extension settings.
+              If the overlay does not load, try changing your preferred overlay storage in the
+              extension settings.
             </div>
           </div>
         )}
@@ -147,9 +136,7 @@ export class ContentItem extends React.Component<P, S> {
         {s.loadingMode === LoadingMode.NetworkError && (
           <div className="loader-container" style={{ zIndex: 1 }}>
             <div className="load-text">No Internet Connection</div>
-            <div className="load-text">
-              Please check your internet connection and try again
-            </div>
+            <div className="load-text">Please check your internet connection and try again</div>
             <div className="load-text">
               <button onClick={this.loadFrame.bind(this)}>Try again</button>
             </div>
@@ -160,8 +147,8 @@ export class ContentItem extends React.Component<P, S> {
           <div className="loader-container" style={{ zIndex: 1 }}>
             <div className="load-text">Internal Server Error</div>
             <div className="load-text">
-              Sorry, there were some technical issues while processing your
-              request. You can change preferred overlay storage and try again.
+              Sorry, there were some technical issues while processing your request. You can change
+              preferred overlay storage and try again.
             </div>
             <div className="load-text">
               <button onClick={this.loadFrame.bind(this)}>Try again</button>
@@ -174,21 +161,18 @@ export class ContentItem extends React.Component<P, S> {
             <div className="load-text">Unverified SSL Certificate</div>
             <div className="load-text">
               <p>
-                If you are a dapplet developer and you are running the overlay
-                over HTTPS, you may encounter an untrusted SSL certificate
-                error. Open the overlay in a new browser tab and accept the
-                self-signed certificate.
+                If you are a dapplet developer and you are running the overlay over HTTPS, you may
+                encounter an untrusted SSL certificate error. Open the overlay in a new browser tab
+                and accept the self-signed certificate.
               </p>
             </div>
             <div className="load-text">
-              <button onClick={this.openOverlayInTab.bind(this)}>
-                Accept SSL
-              </button>
+              <button onClick={this.openOverlayInTab.bind(this)}>Accept SSL</button>
             </div>
             <div className="load-text">
               <p>
-                If you are not developing dapplets, then you should beware, your
-                Internet connection may be broken.
+                If you are not developing dapplets, then you should beware, your Internet connection
+                may be broken.
               </p>
             </div>
             <div className="load-text">

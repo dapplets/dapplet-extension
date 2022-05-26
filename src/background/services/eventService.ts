@@ -1,7 +1,7 @@
-import { Event } from '../../common/models/event'
-import { generateGuid } from '../../common/helpers'
-import EventBrowserStorage from '../browserStorages/eventBrowserStorage'
 import { browser } from 'webextension-polyfill-ts'
+import { generateGuid } from '../../common/helpers'
+import { Event } from '../../common/models/event'
+import EventBrowserStorage from '../browserStorages/eventBrowserStorage'
 
 // добавить функцию удаления
 // EventBrowserStorage - реализует паттерн реппозиторий - чтение / удаление/ добавление
@@ -11,15 +11,10 @@ export async function getEvents(): Promise<Event[]> {
   const eventBrowserStorage = new EventBrowserStorage()
   const events: Event[] = await eventBrowserStorage.getAll()
   // DESC by Created Date
-  return events.sort(
-    (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
-  )
+  return events.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
 }
 
-export async function addEvent(
-  title: string,
-  description: string
-): Promise<void> {
+export async function addEvent(title: string, description: string): Promise<void> {
   const eventBrowserStorage = new EventBrowserStorage()
 
   const event = new Event()

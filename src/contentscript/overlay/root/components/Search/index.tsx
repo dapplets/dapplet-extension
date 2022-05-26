@@ -1,31 +1,17 @@
-import React, {
-  DetailedHTMLProps,
-  InputHTMLAttributes,
-  ReactElement,
-} from 'react'
-import styles from './Search.module.scss'
 import cn from 'classnames'
+import React, { DetailedHTMLProps, InputHTMLAttributes, ReactElement } from 'react'
 import { ReactComponent as MiniIcon } from '../../assets/icons/mini-close.svg'
 import { ReactComponent as SearchIcon } from '../../assets/svg/magnifying-glass.svg'
+import styles from './Search.module.scss'
 
 export interface SearchProps
-  extends DetailedHTMLProps<
-    InputHTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
-  > {
+  extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   onClearValue?: () => void
   onCloseSearch?: () => void
 }
 
 export const Search = (props: SearchProps): ReactElement => {
-  const {
-    value,
-    onChange,
-    className,
-    onClearValue,
-    onCloseSearch,
-    ...otherProps
-  } = props
+  const { value, onChange, className, onClearValue, onCloseSearch, ...otherProps } = props
 
   return (
     <div

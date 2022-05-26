@@ -1,14 +1,10 @@
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
-
+import INNER_STYLE from '!raw-loader!./overlayManager.css'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { capitalizeFirstLetter } from '../../../common/helpers'
-import { Overlay } from './overlay'
-import { IOverlayManager, OverlayConfig } from '../interfaces'
 import { JsonRpc } from '../../../common/jsonrpc'
+import { IOverlayManager, OverlayConfig } from '../interfaces'
 import { App } from './App'
-import INNER_STYLE from '!raw-loader!./overlayManager.css'
+import { Overlay } from './overlay'
 
 const CollapsedOverlayClass = 'dapplets-overlay-collapsed'
 const HiddenOverlayClass = 'dapplets-overlay-hidden'
@@ -18,8 +14,7 @@ const OverlayFrameClass = 'dapplets-overlay-frame'
 export class OverlayManager implements IOverlayManager {
   private _panel: HTMLElement = null
   public activeOverlay: Overlay = null
-  public onActiveOverlayChanged: (overlay: Overlay | null) => void | null =
-    null
+  public onActiveOverlayChanged: (overlay: Overlay | null) => void | null = null
 
   private _root = null
 
@@ -37,11 +32,7 @@ export class OverlayManager implements IOverlayManager {
     if (!extensionHost) {
       const panel = document.createElement(DappletsOverlayManagerClass)
       panel.id = 'dapplets-overlay-manager'
-      panel.classList.add(
-        OverlayFrameClass,
-        CollapsedOverlayClass,
-        HiddenOverlayClass
-      )
+      panel.classList.add(OverlayFrameClass, CollapsedOverlayClass, HiddenOverlayClass)
       this._panel = panel
 
       const shadowRoot = panel.attachShadow({ mode: 'open' })
@@ -133,8 +124,7 @@ export class OverlayManager implements IOverlayManager {
     overlay.registered = true
     overlay.onregisteredchange?.(true)
 
-    if (this._tabsRegistry.filter((t) => t.overlay === overlay).length > 0)
-      return
+    if (this._tabsRegistry.filter((t) => t.overlay === overlay).length > 0) return
 
     this._tabsRegistry.push({ overlay })
     this.show()
@@ -148,9 +138,7 @@ export class OverlayManager implements IOverlayManager {
     const tab = this._tabsRegistry.filter((t) => t.overlay === overlay)[0]
     if (!tab) return
 
-    const childs = this._tabsRegistry.filter(
-      (x) => x.overlay.parent === overlay
-    )
+    const childs = this._tabsRegistry.filter((x) => x.overlay.parent === overlay)
     childs.forEach((x) => this.unregister(x.overlay))
 
     const tabIndex = this._tabsRegistry.indexOf(tab)

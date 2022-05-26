@@ -1,38 +1,18 @@
-import React, {
-  ReactElement,
-  useState,
-  useEffect,
-  useMemo,
-  FC,
-  useRef,
-} from 'react'
-import cn from 'classnames'
-import styles from './Settings.module.scss'
-import {
-  isValidHttp,
-  isValidUrl,
-  isValidPostageStampId,
-} from '../../../../../popup/helpers'
-import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { useToggle } from '../../hooks/useToggle'
-
-import { SettingTitle } from '../../components/SettingTitle'
-import { SettingItem } from '../../components/SettingItem'
-import { Switch } from '../../components/Switch'
-import { Dropdown } from '../../components/Dropdown'
-import { SettingWrapper } from '../../components/SettingWrapper'
+import cn from 'classnames'
+import React, { FC, useEffect, useRef, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
+import { StorageTypes } from '../../../../../common/constants'
+import { parseModuleName } from '../../../../../common/helpers'
+import { isValidHttp, isValidPostageStampId } from '../../../../../popup/helpers'
 import { Checkbox } from '../../components/Checkbox'
-import { InputPanel } from '../../components/InputPanel'
+import { DropdownPreferedOverlayStorage } from '../../components/DropdownPreferedOverlayStorage'
 import { DropdownRegistery } from '../../components/DropdownRegistery'
 import { DropdownTrustedUsers } from '../../components/DropdownTrustedUsers'
-import { DropdownPreferedOverlayStorage } from '../../components/DropdownPreferedOverlayStorage'
-import {
-  DEFAULT_BRANCH_NAME,
-  ModuleTypes,
-  StorageTypes,
-} from '../../../../../common/constants'
-import { parseModuleName } from '../../../../../common/helpers'
+import { SettingItem } from '../../components/SettingItem'
+import { SettingWrapper } from '../../components/SettingWrapper'
+import { Switch } from '../../components/Switch'
+import styles from './Settings.module.scss'
 
 export const DROPDOWN_LIST = [{ _id: '0', label: 'Custom' }]
 let _isMounted = false
@@ -66,17 +46,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [swarmGatewayLoading, setSwarmGatewayLoading] = useState(false)
 
   const [swarmPostageStampIdInput, setSwarmPostageStampIdInput] = useState('')
-  const [swarmPostageStampIdInputError, setSwarmPostageStampIdInputError] =
-    useState(null)
-  const [swarmPostageStampIdInputEdited, setSwarmPostageStampIdInputEdited] =
-    useState(false)
-  const [swarmPostageStampIdLoading, setSwarmPostageStampIdLoading] =
-    useState(false)
+  const [swarmPostageStampIdInputError, setSwarmPostageStampIdInputError] = useState(null)
+  const [swarmPostageStampIdInputEdited, setSwarmPostageStampIdInputEdited] = useState(false)
+  const [swarmPostageStampIdLoading, setSwarmPostageStampIdLoading] = useState(false)
 
   const [dynamicAdapterInput, setDynamicAdapterInput] = useState('')
   const [dynamicAdapterInputError, setDynamicAdapterInputError] = useState(null)
-  const [dynamicAdapterInputEdited, setDynamicAdapterInputEdited] =
-    useState(false)
+  const [dynamicAdapterInputEdited, setDynamicAdapterInputEdited] = useState(false)
   const [dynamicAdapterLoading, setDynamicAdapterLoading] = useState(false)
 
   const [registryInput, setRegistryInput] = useState('')
@@ -285,10 +261,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const setUserAgentName = async (userAgentName: string) => {
     setUserAgentNameLoading(true)
-    const valueParse = getValidUserAgentName(
-      userAgentNameInput,
-      regExpUserAgentName
-    )
+    const valueParse = getValidUserAgentName(userAgentNameInput, regExpUserAgentName)
     if (valueParse !== null) {
       const { setUserAgentName } = await initBGFunctions(browser)
       await setUserAgentName(userAgentName)
@@ -352,10 +325,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       }, 3000)
     }
   }
-  const changeTargetStorage = async (
-    storage: StorageTypes,
-    checked: boolean
-  ) => {
+  const changeTargetStorage = async (storage: StorageTypes, checked: boolean) => {
     const { updateTargetStorages } = await initBGFunctions(browser)
 
     const newTarget = targetStorages.filter((x) => x !== storage)
@@ -448,9 +418,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 title="Version"
                 component={
                   <div className={styles.version}>
-                    <span className={styles.versionTitle}>
-                      {EXTENSION_VERSION}
-                    </span>
+                    <span className={styles.versionTitle}>{EXTENSION_VERSION}</span>
                     {isUpdateAvailable ? (
                       <button
                         className={styles.versionButton}
@@ -480,10 +448,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     {isSvgLoaderDevMode ? (
                       <span className={styles.loader}></span>
                     ) : (
-                      <Switch
-                        checked={devModeProps}
-                        onChange={() => setDevMode(!devModeProps)}
-                      />
+                      <Switch checked={devModeProps} onChange={() => setDevMode(!devModeProps)} />
                     )}
                   </>
                 }
@@ -506,10 +471,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
               <SettingItem
                 title="Open popup"
                 component={
-                  <Switch
-                    onChange={() => setPopupInOverlay(!isPopup)}
-                    checked={isPopup}
-                  />
+                  <Switch onChange={() => setPopupInOverlay(!isPopup)} checked={isPopup} />
                 }
               />
               <SettingItem
@@ -548,9 +510,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       />
                     </form>
                     {userAgentNameInputError ? (
-                      <div className={styles.errorMessage}>
-                        {userAgentNameInputError}
-                      </div>
+                      <div className={styles.errorMessage}>{userAgentNameInputError}</div>
                     ) : null}
                   </>
                 }
@@ -564,11 +524,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
           title="Parameters"
           children={
             <>
-              <SettingItem
-                title="Registries"
-                component={<></>}
-                children={<DropdownRegistery />}
-              />
+              <SettingItem title="Registries" component={<></>} children={<DropdownRegistery />} />
               <SettingItem
                 title="Dynamic Adapter"
                 component={<></>}
@@ -587,12 +543,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           setDynamicAdapterInputError(null)
                           // getDefaultValueDynamicAdapter(dynamicAdapterInput)
                           if (
-                            parseModuleName(dynamicAdapterInput).branch ===
-                              null ||
-                            parseModuleName(dynamicAdapterInput).name ===
-                              null ||
-                            parseModuleName(dynamicAdapterInput).version ===
-                              null
+                            parseModuleName(dynamicAdapterInput).branch === null ||
+                            parseModuleName(dynamicAdapterInput).name === null ||
+                            parseModuleName(dynamicAdapterInput).version === null
                           ) {
                             getDefaultValueDynamicAdapter(dynamicAdapterInput)
                             // setTimeout(() => {
@@ -611,19 +564,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           if (
                             // parseModuleName(dynamicAdapterInput).branch !==
                             //   null &&
-                            parseModuleName(dynamicAdapterInput).name !==
-                              null &&
-                            parseModuleName(dynamicAdapterInput).version !==
-                              null
+                            parseModuleName(dynamicAdapterInput).name !== null &&
+                            parseModuleName(dynamicAdapterInput).version !== null
                           ) {
                             setDynamicAdapter(dynamicAdapterInput)
                           } else if (
-                            parseModuleName(dynamicAdapterInput).branch ===
-                              null ||
-                            parseModuleName(dynamicAdapterInput).name ===
-                              null ||
-                            parseModuleName(dynamicAdapterInput).version ===
-                              null
+                            parseModuleName(dynamicAdapterInput).branch === null ||
+                            parseModuleName(dynamicAdapterInput).name === null ||
+                            parseModuleName(dynamicAdapterInput).version === null
                           ) {
                             setDynamicAdapterInputError('Enter a valid value')
                             getDefaultValueDynamicAdapter(dynamicAdapterInput)
@@ -656,16 +604,11 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
                           getDefaultValueDynamicAdapter(dynamicAdapterInput)
                         }}
-                        className={cn(
-                          styles.buttonInputDefault,
-                          styles.btnAbsolute
-                        )}
+                        className={cn(styles.buttonInputDefault, styles.btnAbsolute)}
                       />
                     </div>
                     {dynamicAdapterInputError ? (
-                      <div className={styles.errorMessage}>
-                        {dynamicAdapterInputError}
-                      </div>
+                      <div className={styles.errorMessage}>{dynamicAdapterInputError}</div>
                     ) : null}
                   </>
                 }
@@ -701,10 +644,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       title="Swarm"
                       isCheckbox={targetStorages?.includes(StorageTypes.Swarm)}
                       onChange={(e) => {
-                        changeTargetStorage(
-                          StorageTypes.Swarm,
-                          e.target.checked
-                        )
+                        changeTargetStorage(StorageTypes.Swarm, e.target.checked)
                       }}
                     />
                   </div>
@@ -725,8 +665,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          (!!providerInputError &&
-                            !isValidHttp(providerInput)) ||
+                          (!!providerInputError && !isValidHttp(providerInput)) ||
                           providerInputError,
                       })}
                     >
@@ -769,16 +708,11 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
                           getDefaultValueProvider(providerInput)
                         }}
-                        className={cn(
-                          styles.buttonInputDefault,
-                          styles.btnAbsolute
-                        )}
+                        className={cn(styles.buttonInputDefault, styles.btnAbsolute)}
                       />
                     </div>
                     {providerInputError ? (
-                      <div className={styles.errorMessage}>
-                        {providerInputError}
-                      </div>
+                      <div className={styles.errorMessage}>{providerInputError}</div>
                     ) : null}
                   </>
                 }
@@ -791,8 +725,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          (!!swarmGatewayInputError &&
-                            !isValidHttp(swarmGatewayInput)) ||
+                          (!!swarmGatewayInputError && !isValidHttp(swarmGatewayInput)) ||
                           swarmGatewayInputError,
                       })}
                     >
@@ -834,16 +767,11 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           e.preventDefault()
                           getDefaultValueSwarmGateway(swarmGatewayInput)
                         }}
-                        className={cn(
-                          styles.buttonInputDefault,
-                          styles.btnAbsolute
-                        )}
+                        className={cn(styles.buttonInputDefault, styles.btnAbsolute)}
                       />
                     </div>
                     {swarmGatewayInputError ? (
-                      <div className={styles.errorMessage}>
-                        {swarmGatewayInputError}
-                      </div>
+                      <div className={styles.errorMessage}>{swarmGatewayInputError}</div>
                     ) : null}
                   </>
                 }
@@ -867,19 +795,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         style={{ width: '100%' }}
                         onBlur={() => {
                           // setSwarmPostageStampIdInputError(null)
-                          if (
-                            !isValidPostageStampId(swarmPostageStampIdInput)
-                          ) {
-                            getDefaultValueSwarmPostageStampId(
-                              swarmPostageStampIdInput
-                            )
+                          if (!isValidPostageStampId(swarmPostageStampIdInput)) {
+                            getDefaultValueSwarmPostageStampId(swarmPostageStampIdInput)
                             setSwarmPostageStampIdInputError(null)
                           }
                           if (swarmPostageStampIdInput.length === 0) {
                             setSwarmPostageStampIdInputError(null)
-                            getDefaultValueSwarmPostageStampId(
-                              swarmPostageStampIdInput
-                            )
+                            getDefaultValueSwarmPostageStampId(swarmPostageStampIdInput)
                           }
                         }}
                         onFocus={() => {
@@ -890,15 +812,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           e.preventDefault()
                           if (isValidPostageStampId(swarmPostageStampIdInput)) {
                             setSwarmPostageStampId(swarmPostageStampIdInput)
-                          } else if (
-                            !isValidPostageStampId(swarmPostageStampIdInput)
-                          ) {
-                            setSwarmPostageStampIdInputError(
-                              'Enter valid Swarm Postage Stamp ID'
-                            )
-                            getDefaultValueSwarmPostageStampId(
-                              swarmPostageStampIdInput
-                            )
+                          } else if (!isValidPostageStampId(swarmPostageStampIdInput)) {
+                            setSwarmPostageStampIdInputError('Enter valid Swarm Postage Stamp ID')
+                            getDefaultValueSwarmPostageStampId(swarmPostageStampIdInput)
                             setTimeout(() => {
                               setSwarmPostageStampIdInputError(null)
                             }, 3000)
@@ -920,20 +836,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       <button
                         onClick={(e) => {
                           e.preventDefault()
-                          getDefaultValueSwarmPostageStampId(
-                            swarmPostageStampIdInput
-                          )
+                          getDefaultValueSwarmPostageStampId(swarmPostageStampIdInput)
                         }}
-                        className={cn(
-                          styles.buttonInputDefault,
-                          styles.btnAbsolute
-                        )}
+                        className={cn(styles.buttonInputDefault, styles.btnAbsolute)}
                       />
                     </div>
                     {swarmPostageStampIdInputError ? (
-                      <div className={styles.errorMessage}>
-                        {swarmPostageStampIdInputError}
-                      </div>
+                      <div className={styles.errorMessage}>{swarmPostageStampIdInputError}</div>
                     ) : null}
                   </>
                 }
@@ -946,8 +855,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          (!!ipfsGatewayInputError &&
-                            !isValidHttp(ipfsGatewayInput)) ||
+                          (!!ipfsGatewayInputError && !isValidHttp(ipfsGatewayInput)) ||
                           ipfsGatewayInputError,
                       })}
                     >
@@ -989,16 +897,11 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
                           getDefaultValueIpfsGateway(ipfsGatewayInput)
                         }}
-                        className={cn(
-                          styles.buttonInputDefault,
-                          styles.btnAbsolute
-                        )}
+                        className={cn(styles.buttonInputDefault, styles.btnAbsolute)}
                       />
                     </div>
                     {ipfsGatewayInputError ? (
-                      <div className={styles.errorMessage}>
-                        {ipfsGatewayInputError}
-                      </div>
+                      <div className={styles.errorMessage}>{ipfsGatewayInputError}</div>
                     ) : null}
                   </>
                 }
@@ -1011,8 +914,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]:
-                          (!!siaPortalInputError &&
-                            !isValidHttp(siaPortalInput)) ||
+                          (!!siaPortalInputError && !isValidHttp(siaPortalInput)) ||
                           siaPortalInputError,
                       })}
                     >
@@ -1056,16 +958,11 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
                           getDefaultValueSiaPortal(siaPortalInput)
                         }}
-                        className={cn(
-                          styles.buttonInputDefault,
-                          styles.btnAbsolute
-                        )}
+                        className={cn(styles.buttonInputDefault, styles.btnAbsolute)}
                       />
                     </div>
                     {siaPortalInputError ? (
-                      <div className={styles.errorMessage}>
-                        {siaPortalInputError}
-                      </div>
+                      <div className={styles.errorMessage}>{siaPortalInputError}</div>
                     ) : null}
                   </>
                 }

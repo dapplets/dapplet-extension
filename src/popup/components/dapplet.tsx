@@ -1,7 +1,6 @@
 import * as React from 'react'
-import * as semver from 'semver'
-
 import { Checkbox, Icon, Label, List, Popup } from 'semantic-ui-react'
+import * as semver from 'semver'
 import ManifestDTO from '../../background/dto/manifestDTO'
 import { StorageRefImage } from './StorageRefImage'
 
@@ -38,11 +37,7 @@ export class Dapplet extends React.Component<Props, State> {
     return (
       <List.Item style={{ overflow: 'hidden' }}>
         <List.Content style={{ width: 45, float: 'left' }}>
-          <Popup
-            trigger={
-              <StorageRefImage alt={f.description} storageRef={f.icon} />
-            }
-          >
+          <Popup trigger={<StorageRefImage alt={f.description} storageRef={f.icon} />}>
             <h4>Related Context IDs</h4>
             <List>
               {f.hostnames?.map((h, j) => (
@@ -60,9 +55,7 @@ export class Dapplet extends React.Component<Props, State> {
               disabled={f.isLoading ?? false}
               toggle
               style={{ marginTop: 5 }}
-              onChange={(e) =>
-                this.props.onSwitchChange(f, !f.isActive, i, e['shiftKey'])
-              }
+              onChange={(e) => this.props.onSwitchChange(f, !f.isActive, i, e['shiftKey'])}
               checked={f.isActive}
             />
           </List.Content>
@@ -103,22 +96,12 @@ export class Dapplet extends React.Component<Props, State> {
               </Label>
             ) : null}
             {f.isMyDapplet ? (
-              <Label
-                style={{ marginLeft: '8px' }}
-                horizontal
-                size="mini"
-                color="black"
-              >
+              <Label style={{ marginLeft: '8px' }} horizontal size="mini" color="black">
                 MY
               </Label>
             ) : null}
             {f.isUnderConstruction ? (
-              <Label
-                style={{ marginLeft: '8px' }}
-                horizontal
-                size="mini"
-                color="teal"
-              >
+              <Label style={{ marginLeft: '8px' }} horizontal size="mini" color="teal">
                 UNDER CONSTRUCTION
               </Label>
             ) : null}
@@ -158,12 +141,7 @@ export class Dapplet extends React.Component<Props, State> {
                 </Label>
               )
             ) : f.isActive && f.activeVersion ? (
-              <Label
-                style={{ cursor: 'default' }}
-                horizontal
-                size="mini"
-                color="grey"
-              >
+              <Label style={{ cursor: 'default' }} horizontal size="mini" color="grey">
                 {f.activeVersion}
               </Label>
             ) : null}

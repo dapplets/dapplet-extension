@@ -1,102 +1,101 @@
-import * as React from "react";
-import { initBGFunctions } from "chrome-extension-message-wrapper";
-import { browser } from "webextension-polyfill-ts";
-
-import { Button, Divider } from "semantic-ui-react";
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import * as React from 'react'
+import { Button, Divider } from 'semantic-ui-react'
+import { browser } from 'webextension-polyfill-ts'
 
 interface IHeaderProps {
-  contextIds: Promise<string[]>;
+  contextIds: Promise<string[]>
 }
 
 interface IHeaderState {
-  isHostnameSuspended: boolean;
-  isEverywhereSuspended: boolean;
-  hostname?: string;
+  isHostnameSuspended: boolean
+  isEverywhereSuspended: boolean
+  hostname?: string
 }
 
 class Header extends React.Component<IHeaderProps, IHeaderState> {
-  private _mounted = false;
+  private _mounted = false
 
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
       isHostnameSuspended: false,
       isEverywhereSuspended: false,
-      hostname: null
-    };
+      hostname: null,
+    }
   }
 
   async componentDidMount() {
-    this._mounted = true;
-    
+    this._mounted = true
+
     try {
-      const contextId = await this.props.contextIds;
-      const { getSuspendityByHostname, getSuspendityEverywhere } = await initBGFunctions(browser);
-      const isHostnameSuspended = await getSuspendityByHostname(contextId);
-      const isEverywhereSuspended = await getSuspendityEverywhere();
+      const contextId = await this.props.contextIds
+      const { getSuspendityByHostname, getSuspendityEverywhere } = await initBGFunctions(browser)
+      const isHostnameSuspended = await getSuspendityByHostname(contextId)
+      const isEverywhereSuspended = await getSuspendityEverywhere()
 
       if (this._mounted) {
         this.setState({
           isHostnameSuspended: isHostnameSuspended,
-          isEverywhereSuspended: isEverywhereSuspended
-        });
+          isEverywhereSuspended: isEverywhereSuspended,
+        })
       }
     } catch (err) {
-      console.error(err);
+      console.error(err)
     }
   }
 
   componentWillUnmount() {
-    this._mounted = false;
+    this._mounted = false
   }
 
   async resumeByHostnameButtonClick() {
-    const backgroundFunctions = await initBGFunctions(browser);
-    const { resumeByHostname } = backgroundFunctions;
-    await resumeByHostname(this.props.contextIds[0]);
+    const backgroundFunctions = await initBGFunctions(browser)
+    const { resumeByHostname } = backgroundFunctions
+    await resumeByHostname(this.props.contextIds[0])
 
     this.setState({
-      isHostnameSuspended: false
-    });
+      isHostnameSuspended: false,
+    })
   }
 
   async resumeEverywhereButtonClick() {
-    const backgroundFunctions = await initBGFunctions(browser);
-    const { resumeEverywhere } = backgroundFunctions;
-    await resumeEverywhere();
+    const backgroundFunctions = await initBGFunctions(browser)
+    const { resumeEverywhere } = backgroundFunctions
+    await resumeEverywhere()
 
     this.setState({
-      isEverywhereSuspended: false
-    });
+      isEverywhereSuspended: false,
+    })
   }
 
   render() {
-    const { isHostnameSuspended, isEverywhereSuspended } = this.state;
+    const { isHostnameSuspended, isEverywhereSuspended } = this.state
 
     return (
       <React.Fragment>
         {isHostnameSuspended && (
-          <div style={{ overflow: "hidden" }}>
+          <div style={{ overflow: 'hidden' }}>
             ⚠️ Injectors are suspended at this site.
             <Button
               size="mini"
               positive
               onClick={() => this.resumeByHostnameButtonClick()}
-              style={{ padding: 5, width: 55, float: "right" }}
+              style={{ padding: 5, width: 55, float: 'right' }}
             >
               Resume
             </Button>
           </div>
         )}
         {isEverywhereSuspended && (
-          <div style={{ overflow: "hidden", marginTop: 4 }}>
+          <div style={{ overflow: 'hidden', marginTop: 4 }}>
             ⚠️ Injectors are suspended everywhere.
             <Button
               size="mini"
               positive
               onClick={() => this.resumeEverywhereButtonClick()}
-              style={{ padding: 5, width: 55, float: "right" }}
+              style={{ padding: 5, width: 55, float: 'right' }}
             >
               Resume
             </Button>
@@ -104,8 +103,8 @@ class Header extends React.Component<IHeaderProps, IHeaderState> {
         )}
         {(isHostnameSuspended || isEverywhereSuspended) && <Divider />}
       </React.Fragment>
-    );
+    )
   }
 }
 
-export default Header;
+export default Header

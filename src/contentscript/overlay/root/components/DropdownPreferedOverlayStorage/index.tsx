@@ -1,20 +1,9 @@
-import React, {
-  FC,
-  FunctionComponent,
-  ReactNode,
-  HTMLAttributes,
-  DetailedHTMLProps,
-  useState,
-  useEffect,
-} from 'react'
-import cn from 'classnames'
-import styles from './DropdownPreferedOverlayStorage.module.scss'
-
-import { IDropdown } from '../../models/dropdown.model'
-import { useToggle } from '../../hooks/useToggle'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import cn from 'classnames'
+import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { isValidUrl } from '../../../../../popup/helpers'
+import { IDropdown } from '../../models/dropdown.model'
+import styles from './DropdownPreferedOverlayStorage.module.scss'
 
 export interface DropdownProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -23,19 +12,10 @@ export interface DropdownProps
   handlerChangeValue?: (value: IDropdown | null) => void
 }
 let _isMounted = false
-export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (
-  props: DropdownProps
-) => {
+export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (props: DropdownProps) => {
   const [isOpen, setOpen] = useState(false)
   const [preferedOverlayStorage, setPreferedOverlayStorage] = useState('')
-  const {
-    list,
-    className,
-    value = null,
-    handlerChangeValue,
-    title,
-    ...anotherProps
-  } = props
+  const { list, className, value = null, handlerChangeValue, title, ...anotherProps } = props
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -53,10 +33,7 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (
     setPreferedOverlayStorage(preferedOverlayStorage)
   }
 
-  const selectPreferedOverlayStorage = async (
-    storage: string,
-    x: (x) => void
-  ) => {
+  const selectPreferedOverlayStorage = async (storage: string, x: (x) => void) => {
     const { setPreferedOverlayStorage } = await initBGFunctions(browser)
     await setPreferedOverlayStorage(storage)
     loadPreferedOverlayStorage()
@@ -74,11 +51,7 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (
       {isOpen && (
         <div className={styles.openOverlay}>
           <div className={styles.blockIcon}>
-            <span
-              className={styles.closeDropdown}
-              onClick={() => setOpen(false)}
-              tabIndex={1}
-            />
+            <span className={styles.closeDropdown} onClick={() => setOpen(false)} tabIndex={1} />
           </div>
           {[
             { id: 'centralized', text: 'centralized' },

@@ -1,32 +1,31 @@
 import { setupMessageListener } from 'chrome-extension-message-wrapper'
-import { WalletService } from './services/walletService'
-import { SuspendService } from './services/suspendService'
-import * as NotificationService from './services/notificationService'
-import FeatureService from './services/featureService'
-import GlobalConfigService from './services/globalConfigService'
-import * as EventService from './services/eventService'
 import { browser, Tabs } from 'webextension-polyfill-ts'
-import EnsService from './services/ensService'
 import { WebSocketProxy } from '../common/chrome-extension-websocket-wrapper'
-import ProxyService from './services/proxyService'
-import * as tracing from '../common/tracing'
+import { CONTEXT_ID_WILDCARD, ModuleTypes } from '../common/constants'
 import {
-  getCurrentTab,
+  checkUrlAvailability,
   getCurrentContextIds,
+  getCurrentTab,
+  getThisTab,
   multipleReplace,
   reloadCurrentPage,
   waitClosingTab,
   waitTab,
-  checkUrlAvailability,
-  getThisTab,
 } from '../common/helpers'
-import GithubService from './services/githubService'
+import * as tracing from '../common/tracing'
 import DiscordService from './services/discordService'
+import EnsService from './services/ensService'
+import * as EventService from './services/eventService'
+import FeatureService from './services/featureService'
+import GithubService from './services/githubService'
+import GlobalConfigService from './services/globalConfigService'
 import { IdentityService } from './services/identityService'
-import { CONTEXT_ID_WILDCARD, ModuleTypes } from '../common/constants'
+import * as NotificationService from './services/notificationService'
 import { OverlayService } from './services/overlayService'
+import ProxyService from './services/proxyService'
 import { SessionService } from './services/sessionService'
-import * as EventBus from '../common/global-event-bus'
+import { SuspendService } from './services/suspendService'
+import { WalletService } from './services/walletService'
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -40,11 +39,7 @@ const githubService = new GithubService(globalConfigService)
 const discordService = new DiscordService(globalConfigService)
 const walletService = new WalletService(globalConfigService, overlayService)
 const sessionService = new SessionService(walletService, overlayService)
-const featureService = new FeatureService(
-  globalConfigService,
-  walletService,
-  overlayService
-)
+const featureService = new FeatureService(globalConfigService, walletService, overlayService)
 const identityService = new IdentityService(globalConfigService, walletService)
 const ensService = new EnsService(walletService)
 
@@ -57,24 +52,19 @@ browser.runtime.onMessage.addListener(
     prepareWalletFor: walletService.prepareWalletFor.bind(walletService),
     connectWallet: walletService.connectWallet.bind(walletService),
     disconnectWallet: walletService.disconnectWallet.bind(walletService),
-    getWalletDescriptors:
-      walletService.getWalletDescriptors.bind(walletService),
+    getWalletDescriptors: walletService.getWalletDescriptors.bind(walletService),
     setWalletFor: walletService.setWalletFor.bind(walletService),
     unsetWalletFor: walletService.unsetWalletFor.bind(walletService),
     getAddress: walletService.getAddress.bind(walletService),
 
-    eth_sendTransactionOutHash:
-      walletService.eth_sendTransactionOutHash.bind(walletService),
-    eth_sendCustomRequest:
-      walletService.eth_sendCustomRequest.bind(walletService),
+    eth_sendTransactionOutHash: walletService.eth_sendTransactionOutHash.bind(walletService),
+    eth_sendCustomRequest: walletService.eth_sendCustomRequest.bind(walletService),
     eth_waitTransaction: walletService.eth_waitTransaction.bind(walletService),
-    near_sendCustomRequest:
-      walletService.near_sendCustomRequest.bind(walletService),
+    near_sendCustomRequest: walletService.near_sendCustomRequest.bind(walletService),
 
     // SessionService
     createSession: sessionService.createSession.bind(sessionService),
-    createLoginConfirmation:
-      sessionService.createLoginConfirmation.bind(sessionService),
+    createLoginConfirmation: sessionService.createLoginConfirmation.bind(sessionService),
     killSession: sessionService.killSession.bind(sessionService),
     getSessions: sessionService.getSessions.bind(sessionService),
     getSuitableLoginConfirmations:
@@ -89,10 +79,8 @@ browser.runtime.onMessage.addListener(
     openGuideOverlay: overlayService.openGuideOverlay.bind(overlayService),
 
     // SuspendService
-    getSuspendityByHostname:
-      suspendService.getSuspendityByHostname.bind(suspendService),
-    getSuspendityEverywhere:
-      suspendService.getSuspendityEverywhere.bind(suspendService),
+    getSuspendityByHostname: suspendService.getSuspendityByHostname.bind(suspendService),
+    getSuspendityEverywhere: suspendService.getSuspendityEverywhere.bind(suspendService),
     suspendByHostname: suspendService.suspendByHostname.bind(suspendService),
     suspendEverywhere: suspendService.suspendEverywhere.bind(suspendService),
     resumeByHostname: suspendService.resumeByHostname.bind(suspendService),
@@ -103,18 +91,11 @@ browser.runtime.onMessage.addListener(
     transactionRejected: NotificationService.transactionRejected,
 
     // FeatureService
-    getFeaturesByHostnames: (hostnames) =>
-      featureService.getFeaturesByHostnames(hostnames),
+    getFeaturesByHostnames: (hostnames) => featureService.getFeaturesByHostnames(hostnames),
     activateFeature: (name, version, hostnames, order, registry) =>
       featureService.activateFeature(name, version, hostnames, order, registry),
     deactivateFeature: (name, version, hostnames, order, registry) =>
-      featureService.deactivateFeature(
-        name,
-        version,
-        hostnames,
-        order,
-        registry
-      ),
+      featureService.deactivateFeature(name, version, hostnames, order, registry),
     reloadFeature: (name, version, hostnames, order, registry) =>
       featureService.reloadFeature(name, version, hostnames, order, registry),
     getActiveModulesByHostnames: (hostnames) =>
@@ -123,51 +104,39 @@ browser.runtime.onMessage.addListener(
     optimizeDependency: (name, branch, version, contextIds) =>
       featureService.optimizeDependency(name, branch, version, contextIds),
     getAllDevModules: () => featureService.getAllDevModules(),
-    uploadModule: (mi, vi, targetStorages) =>
-      featureService.uploadModule(mi, vi, targetStorages),
+    uploadModule: (mi, vi, targetStorages) => featureService.uploadModule(mi, vi, targetStorages),
     deployModule: (mi, vi, targetStorages, targetRegistry) =>
       featureService.deployModule(mi, vi, targetStorages, targetRegistry),
     getRegistries: () => featureService.getRegistries(),
-    getOwnership: (registryUri, moduleName) =>
-      featureService.getOwnership(registryUri, moduleName),
+    getOwnership: (registryUri, moduleName) => featureService.getOwnership(registryUri, moduleName),
     getVersionInfo: (registryUri, moduleName, branch, version) =>
       featureService.getVersionInfo(registryUri, moduleName, branch, version),
     getModuleInfoByName: (registryUri, moduleName) =>
       featureService.getModuleInfoByName(registryUri, moduleName),
     transferOwnership: (registryUri, moduleName, oldAccount, newAccount) =>
-      featureService.transferOwnership(
-        registryUri,
-        moduleName,
-        oldAccount,
-        newAccount
-      ),
+      featureService.transferOwnership(registryUri, moduleName, oldAccount, newAccount),
     addContextId: (registryUri, moduleName, contextId) =>
       featureService.addContextId(registryUri, moduleName, contextId),
     removeContextId: (registryUri, moduleName, contextId) =>
       featureService.removeContextId(registryUri, moduleName, contextId),
     editModuleInfo: (registryUri, targetStorages, module) =>
       featureService.editModuleInfo(registryUri, targetStorages, module),
-    getVersions: (registryUri, moduleName) =>
-      featureService.getVersions(registryUri, moduleName),
+    getVersions: (registryUri, moduleName) => featureService.getVersions(registryUri, moduleName),
     openSettingsOverlay: (mi) => featureService.openSettingsOverlay(mi),
-    removeDapplet: (name, hostnames) =>
-      featureService.removeDapplet(name, hostnames),
+    removeDapplet: (name, hostnames) => featureService.removeDapplet(name, hostnames),
     getResource: (hashUris) => featureService.getResource(hashUris),
-    openDeployOverlayById:
-      featureService.openDeployOverlayById.bind(featureService),
+    openDeployOverlayById: featureService.openDeployOverlayById.bind(featureService),
     getUserSettingsForOverlay: featureService.getUserSettingsForOverlay.bind(featureService),
 
     // GlobalConfigService
     getProfiles: globalConfigService.getProfiles.bind(globalConfigService),
-    setActiveProfile:
-      globalConfigService.setActiveProfile.bind(globalConfigService),
+    setActiveProfile: globalConfigService.setActiveProfile.bind(globalConfigService),
     renameProfile: globalConfigService.renameProfile.bind(globalConfigService),
     copyProfile: globalConfigService.copyProfile.bind(globalConfigService),
     deleteProfile: globalConfigService.deleteProfile.bind(globalConfigService),
     importProfile: globalConfigService.importProfile.bind(globalConfigService),
     exportProfile: globalConfigService.exportProfile.bind(globalConfigService),
-    createShareLink:
-      globalConfigService.createShareLink.bind(globalConfigService),
+    createShareLink: globalConfigService.createShareLink.bind(globalConfigService),
     getGlobalConfig: () => globalConfigService.get(),
     setGlobalConfig: (config) => globalConfigService.set(config),
     getDevMode: () => globalConfigService.getDevMode(),
@@ -188,28 +157,19 @@ browser.runtime.onMessage.addListener(
     setIntro: (intro) => globalConfigService.setIntro(intro),
     getTrustedUsers: () => globalConfigService.getTrustedUsers(),
     addTrustedUser: (account) => globalConfigService.addTrustedUser(account),
-    removeTrustedUser: (account) =>
-      globalConfigService.removeTrustedUser(account),
+    removeTrustedUser: (account) => globalConfigService.removeTrustedUser(account),
     getAutoBackup: () => globalConfigService.getAutoBackup(),
     setAutoBackup: (isActive) => globalConfigService.setAutoBackup(isActive),
     getErrorReporting: () => globalConfigService.getErrorReporting(),
-    setErrorReporting: (isActive) =>
-      globalConfigService.setErrorReporting(isActive),
-    getIdentityContract:
-      globalConfigService.getIdentityContract.bind(globalConfigService),
+    setErrorReporting: (isActive) => globalConfigService.setErrorReporting(isActive),
+    getIdentityContract: globalConfigService.getIdentityContract.bind(globalConfigService),
     getPopupInOverlay: () => globalConfigService.getPopupInOverlay(),
-    setPopupInOverlay: (isActive) =>
-      globalConfigService.setPopupInOverlay(isActive),
-    getUserAgentId:
-      globalConfigService.getUserAgentId.bind(globalConfigService),
-    getUserAgentName:
-      globalConfigService.getUserAgentName.bind(globalConfigService),
-    setUserAgentName:
-      globalConfigService.setUserAgentName.bind(globalConfigService),
-    getIgnoredUpdate:
-      globalConfigService.getIgnoredUpdate.bind(globalConfigService),
-    setIgnoredUpdate:
-      globalConfigService.setIgnoredUpdate.bind(globalConfigService),
+    setPopupInOverlay: (isActive) => globalConfigService.setPopupInOverlay(isActive),
+    getUserAgentId: globalConfigService.getUserAgentId.bind(globalConfigService),
+    getUserAgentName: globalConfigService.getUserAgentName.bind(globalConfigService),
+    setUserAgentName: globalConfigService.setUserAgentName.bind(globalConfigService),
+    getIgnoredUpdate: globalConfigService.getIgnoredUpdate.bind(globalConfigService),
+    setIgnoredUpdate: globalConfigService.setIgnoredUpdate.bind(globalConfigService),
     getLastMessageSeenTimestamp:
       globalConfigService.getLastMessageSeenTimestamp.bind(globalConfigService),
     setLastMessageSeenTimestamp:
@@ -218,52 +178,36 @@ browser.runtime.onMessage.addListener(
       globalConfigService.getPreferedOverlayStorage.bind(globalConfigService),
     setPreferedOverlayStorage:
       globalConfigService.setPreferedOverlayStorage.bind(globalConfigService),
-    getSwarmPostageStampId:
-      globalConfigService.getSwarmPostageStampId.bind(globalConfigService),
-    setSwarmPostageStampId:
-      globalConfigService.setSwarmPostageStampId.bind(globalConfigService),
+    getSwarmPostageStampId: globalConfigService.getSwarmPostageStampId.bind(globalConfigService),
+    setSwarmPostageStampId: globalConfigService.setSwarmPostageStampId.bind(globalConfigService),
     getEthereumProvider: () => globalConfigService.getEthereumProvider(),
     setEthereumProvider: (url) => globalConfigService.setEthereumProvider(url),
-    getSwarmGateway:
-      globalConfigService.getSwarmGateway.bind(globalConfigService),
-    setSwarmGateway:
-      globalConfigService.setSwarmGateway.bind(globalConfigService),
-    getIpfsGateway:
-      globalConfigService.getIpfsGateway.bind(globalConfigService),
-    setIpfsGateway:
-      globalConfigService.setIpfsGateway.bind(globalConfigService),
-    getDynamicAdapter:
-      globalConfigService.getDynamicAdapter.bind(globalConfigService),
-    setDynamicAdapter:
-      globalConfigService.setDynamicAdapter.bind(globalConfigService),
+    getSwarmGateway: globalConfigService.getSwarmGateway.bind(globalConfigService),
+    setSwarmGateway: globalConfigService.setSwarmGateway.bind(globalConfigService),
+    getIpfsGateway: globalConfigService.getIpfsGateway.bind(globalConfigService),
+    setIpfsGateway: globalConfigService.setIpfsGateway.bind(globalConfigService),
+    getDynamicAdapter: globalConfigService.getDynamicAdapter.bind(globalConfigService),
+    setDynamicAdapter: globalConfigService.setDynamicAdapter.bind(globalConfigService),
     getSiaPortal: globalConfigService.getSiaPortal.bind(globalConfigService),
     setSiaPortal: globalConfigService.setSiaPortal.bind(globalConfigService),
-    getNearNetworks:
-      globalConfigService.getNearNetworks.bind(globalConfigService),
-    getEthereumNetworks:
-      globalConfigService.getEthereumNetworks.bind(globalConfigService),
+    getNearNetworks: globalConfigService.getNearNetworks.bind(globalConfigService),
+    getEthereumNetworks: globalConfigService.getEthereumNetworks.bind(globalConfigService),
     getMyDapplets: globalConfigService.getMyDapplets.bind(globalConfigService),
     addMyDapplet: globalConfigService.addMyDapplet.bind(globalConfigService),
-    removeMyDapplet:
-      globalConfigService.removeMyDapplet.bind(globalConfigService),
+    removeMyDapplet: globalConfigService.removeMyDapplet.bind(globalConfigService),
 
-    updateTargetStorages:
-      globalConfigService.updateTargetStorages.bind(globalConfigService),
+    updateTargetStorages: globalConfigService.updateTargetStorages.bind(globalConfigService),
 
-    getTargetStorages:
-      globalConfigService.getTargetStorages.bind(globalConfigService),
+    getTargetStorages: globalConfigService.getTargetStorages.bind(globalConfigService),
 
     // UserSettings (AppStorage)
-    getUserSettings: (moduleName, key) =>
-      globalConfigService.getUserSettings(moduleName, key),
+    getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),
     setUserSettings: (moduleName, key, value) =>
       globalConfigService.setUserSettings(moduleName, key, value),
     removeUserSettings: (moduleName, key) =>
       globalConfigService.removeUserSettings(moduleName, key),
-    clearUserSettings: (moduleName) =>
-      globalConfigService.clearUserSettings(moduleName),
-    getAllUserSettings: (moduleName) =>
-      globalConfigService.getAllUserSettings(moduleName),
+    clearUserSettings: (moduleName) => globalConfigService.clearUserSettings(moduleName),
+    getAllUserSettings: (moduleName) => globalConfigService.getAllUserSettings(moduleName),
     setAllUserSettings: (moduleName, values) =>
       globalConfigService.setAllUserSettings(moduleName, values),
 
@@ -274,26 +218,22 @@ browser.runtime.onMessage.addListener(
     fetchJsonRpc: (method, params) => proxyService.fetchJsonRpc(method, params),
 
     // Github Service
-    getNewExtensionVersion:
-      githubService.getNewExtensionVersion.bind(githubService),
+    getNewExtensionVersion: githubService.getNewExtensionVersion.bind(githubService),
     getDevMessage: githubService.getDevMessage.bind(githubService),
     hideDevMessage: githubService.hideDevMessage.bind(githubService),
 
     // Discord Service
     getDiscordMessages: discordService.getDiscordMessages.bind(discordService),
-    hideDiscordMessages:
-      discordService.hideDiscordMessages.bind(discordService),
+    hideDiscordMessages: discordService.hideDiscordMessages.bind(discordService),
 
     // Identity Service
     getIdentityAccounts: identityService.getAccounts.bind(identityService),
     addIdentityAccount: identityService.addAccount.bind(identityService),
 
     // LocalStorage
-    localStorage_setItem: (key, value) =>
-      Promise.resolve(localStorage.setItem(key, value)),
+    localStorage_setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
     localStorage_getItem: (key) => Promise.resolve(localStorage.getItem(key)),
-    localStorage_removeItem: (key) =>
-      Promise.resolve(localStorage.removeItem(key)),
+    localStorage_removeItem: (key) => Promise.resolve(localStorage.removeItem(key)),
     localStorage_clear: () => Promise.resolve(localStorage.clear()),
     localStorage_key: (index) => Promise.resolve(localStorage.key(index)),
     localStorage_length: () => Promise.resolve(localStorage.length),
@@ -301,14 +241,12 @@ browser.runtime.onMessage.addListener(
     // Extension Basic
     createTab: (url) => browser.tabs.create({ url }),
     removeTab: (tabId) => browser.tabs.remove(tabId),
-    updateTab: (tabId, updateProperties) =>
-      browser.tabs.update(tabId, updateProperties),
+    updateTab: (tabId, updateProperties) => browser.tabs.update(tabId, updateProperties),
     queryTab: (queryInfo) => browser.tabs.query(queryInfo),
 
     // Overlay Service
     openDeployOverlay: overlayService.openDeployOverlay.bind(overlayService),
-    pairWalletViaOverlay:
-      overlayService.pairWalletViaOverlay.bind(overlayService),
+    pairWalletViaOverlay: overlayService.pairWalletViaOverlay.bind(overlayService),
     openDappletHome: overlayService.openDappletHome.bind(overlayService),
     openDappletAction: overlayService.openDappletAction.bind(overlayService),
     openPopupOverlay: overlayService.openPopupOverlay.bind(overlayService),
@@ -361,8 +299,7 @@ browser.notifications.onClicked.addListener(function (notificationId) {
 browser.commands.onCommand.addListener((cmd) => {
   if (cmd === 'toggle-overlay') {
     return getCurrentTab().then(
-      (activeTab) =>
-        activeTab && browser.tabs.sendMessage(activeTab.id, 'TOGGLE_OVERLAY')
+      (activeTab) => activeTab && browser.tabs.sendMessage(activeTab.id, 'TOGGLE_OVERLAY')
     )
   }
 })
@@ -370,44 +307,34 @@ browser.commands.onCommand.addListener((cmd) => {
 browser.runtime.onMessage.addListener((message, sender) => {
   if (!message || !message.type) return
 
-  if (
-    message.type === 'CONTEXT_STARTED' ||
-    message.type === 'CONTEXT_FINISHED'
-  ) {
-    featureService
-      .getActiveModulesByHostnames(message.payload.contextIds)
-      .then((manifests) => {
-        if (manifests.length === 0) return
+  if (message.type === 'CONTEXT_STARTED' || message.type === 'CONTEXT_FINISHED') {
+    featureService.getActiveModulesByHostnames(message.payload.contextIds).then((manifests) => {
+      if (manifests.length === 0) return
 
-        browser.tabs.sendMessage(
-          sender.tab.id,
-          {
-            type:
-              message.type === 'CONTEXT_STARTED'
-                ? 'FEATURE_ACTIVATED'
-                : 'FEATURE_DEACTIVATED',
-            payload: manifests.map((m) => ({
-              name: m.name,
-              version: m.version,
-              branch: m.branch, // ToDo: fix branch
-              order: m.order,
-              contextIds: multipleReplace(
-                m.hostnames,
-                CONTEXT_ID_WILDCARD,
-                message.payload.contextIds
-              ), // ToDo: remove this map after renaming of hostnames to contextIds
-            })),
-          },
-          {
-            frameId: sender.frameId,
-          }
-        )
-      })
+      browser.tabs.sendMessage(
+        sender.tab.id,
+        {
+          type: message.type === 'CONTEXT_STARTED' ? 'FEATURE_ACTIVATED' : 'FEATURE_DEACTIVATED',
+          payload: manifests.map((m) => ({
+            name: m.name,
+            version: m.version,
+            branch: m.branch, // ToDo: fix branch
+            order: m.order,
+            contextIds: multipleReplace(
+              m.hostnames,
+              CONTEXT_ID_WILDCARD,
+              message.payload.contextIds
+            ), // ToDo: remove this map after renaming of hostnames to contextIds
+          })),
+        },
+        {
+          frameId: sender.frameId,
+        }
+      )
+    })
 
     // Load adapters, providing stable context IDs.
-    const idContexts = message.payload.contextIds.filter((x) =>
-      x.endsWith('/id')
-    )
+    const idContexts = message.payload.contextIds.filter((x) => x.endsWith('/id'))
     if (idContexts.length > 0) {
       featureService.getFeaturesByHostnames(idContexts).then((manifests) => {
         const adapters = manifests.filter((x) => x.type === ModuleTypes.Adapter)
@@ -416,10 +343,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
         browser.tabs.sendMessage(
           sender.tab.id,
           {
-            type:
-              message.type === 'CONTEXT_STARTED'
-                ? 'FEATURE_ACTIVATED'
-                : 'FEATURE_DEACTIVATED',
+            type: message.type === 'CONTEXT_STARTED' ? 'FEATURE_ACTIVATED' : 'FEATURE_DEACTIVATED',
             payload: adapters.map((m) => ({
               name: m.name,
               version: 'latest',
@@ -443,9 +367,7 @@ globalConfigService.getPopupInOverlay().then((popupInOverlay) => {
   })
 })
 
-browser.browserAction.onClicked.addListener(() =>
-  overlayService.openPopupOverlay('dapplets')
-)
+browser.browserAction.onClicked.addListener(() => overlayService.openPopupOverlay('dapplets'))
 
 // Set predefined configuration when extension is installed
 browser.runtime.onInstalled.addListener(async (details) => {
@@ -455,9 +377,7 @@ browser.runtime.onInstalled.addListener(async (details) => {
     filenameRegex: 'dapplet-extension',
   })
   if (downloads.length === 0) return
-  const [downloadItem] = downloads.sort(
-    (a, b) => -a.startTime.localeCompare(b.startTime)
-  )
+  const [downloadItem] = downloads.sort((a, b) => -a.startTime.localeCompare(b.startTime))
   if (!downloadItem || !downloadItem.url) return
   const url = new URL(downloadItem.url)
   const config = url.searchParams.get('config')
@@ -496,9 +416,7 @@ browser.runtime.onInstalled.addListener(async (details) => {
       await globalConfigService.set(json)
     }
 
-    console.log(
-      `The predefined configuration was initialized. URL: ${url.href}`
-    )
+    console.log(`The predefined configuration was initialized. URL: ${url.href}`)
   } catch (err) {
     console.error('Cannot set predefined configuration.', err)
   }
@@ -508,15 +426,11 @@ browser.runtime.onInstalled.addListener(async () => {
   // disable all another instances of the current extension
   const exts = await browser.management.getAll()
   const currentExtId = browser.runtime.id
-  const previousExts = exts.filter(
-    (x) => x.name === 'Dapplets' && x.id !== currentExtId
-  )
+  const previousExts = exts.filter((x) => x.name === 'Dapplets' && x.id !== currentExtId)
   if (previousExts.length !== 0) {
     // const welcomeUrl = new URL(browser.runtime.getURL('welcome.html'));
     // await browser.tabs.create({ url: welcomeUrl.href });
-    console.log(
-      `Found ${previousExts.length} another instance(s) of the current extension.`
-    )
+    console.log(`Found ${previousExts.length} another instance(s) of the current extension.`)
     previousExts.forEach((x) => browser.management.setEnabled(x.id, false))
   }
 })
@@ -535,9 +449,7 @@ if (window['DAPPLETS_JSLIB'] !== true) {
             .catch((e) => {
               browser.tabs
                 .executeScript(x.id, { file: 'common.js' })
-                .then(() =>
-                  browser.tabs.executeScript(x.id, { file: 'contentscript.js' })
-                )
+                .then(() => browser.tabs.executeScript(x.id, { file: 'contentscript.js' }))
               return true
             })
         )

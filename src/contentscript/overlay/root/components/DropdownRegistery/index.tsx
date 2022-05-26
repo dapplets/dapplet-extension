@@ -1,41 +1,23 @@
-import React, {
-  FC,
-  FunctionComponent,
-  ReactNode,
-  HTMLAttributes,
-  DetailedHTMLProps,
-  useState,
-  useEffect,
-} from 'react'
-import cn from 'classnames'
-import styles from './DropdownRegistery.module.scss'
-
-import { useToggle } from '../../hooks/useToggle'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import cn from 'classnames'
+import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { isValidUrl } from '../../../../../popup/helpers'
+import styles from './DropdownRegistery.module.scss'
 
 export interface DropdownRegisteryProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {}
 let _isMounted = false
-export const DropdownRegistery: FC<DropdownRegisteryProps> = (
-  props: DropdownRegisteryProps
-) => {
+export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownRegisteryProps) => {
   const { ...anotherProps } = props
   const [isOpen, setOpen] = useState(false)
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
   const [registries, setRegistries] = useState([])
 
-  const regExpIndexNearTestnet = new RegExp(
-    /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/
-  )
-  const regExpIndexNear = new RegExp(
-    /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/
-  )
-  const regExpIndexENS = new RegExp(
-    /^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/
-  )
+  const regExpIndexNearTestnet = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/)
+  const regExpIndexNear = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/)
+  const regExpIndexENS = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/)
   const regExpIndexEthereum = new RegExp(/^0x[a-fA-F0-9]{40}$/)
   const regExpIndexNEARImplicit = new RegExp(/^[0-9a-z]{64}$/)
   const regExpIndexNEARDev = new RegExp(/^dev-\d*-\d*$/)
@@ -67,17 +49,11 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
   const addRegistry = async (url: string, x: () => void) => {
     const { addRegistry } = await initBGFunctions(browser)
     const valueParse = getNumIndex(registryInput, regExpIndexEthereum)
-    const valueParseNEARImplicit = getNumIndex(
-      registryInput,
-      regExpIndexNEARImplicit
-    )
+    const valueParseNEARImplicit = getNumIndex(registryInput, regExpIndexNEARImplicit)
     const valueParseNEARDev = getNumIndex(registryInput, regExpIndexNEARDev)
     const valueParseENS = getNumIndex(registryInput, regExpIndexENS)
     const valueParseNear = getNumIndex(registryInput, regExpIndexNear)
-    const valueParseNearTestnet = getNumIndex(
-      registryInput,
-      regExpIndexNearTestnet
-    )
+    const valueParseNearTestnet = getNumIndex(registryInput, regExpIndexNearTestnet)
     if (
       valueParse !== null ||
       valueParseNEARImplicit !== null ||
@@ -116,10 +92,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
   const visible = (hash: string): string => {
     if (hash.length > 38) {
       const firstFourCharacters = hash.substring(0, 20)
-      const lastFourCharacters = hash.substring(
-        hash.length - 0,
-        hash.length - 18
-      )
+      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 18)
 
       return `${firstFourCharacters}...${lastFourCharacters}`
     } else {
@@ -201,19 +174,14 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (
                   {visible(r.url)}
                 </span>
                 {!r.isEnabled && (
-                  <span
-                    onClick={() => removeRegistry(r.url)}
-                    className={styles.deleteRegistryes}
-                  />
+                  <span onClick={() => removeRegistry(r.url)} className={styles.deleteRegistryes} />
                 )}
               </div>
             ))}
           </div>
         )}
       </div>
-      {registryInputError ? (
-        <div className={styles.errorMessage}>{registryInputError}</div>
-      ) : null}
+      {registryInputError ? <div className={styles.errorMessage}>{registryInputError}</div> : null}
     </>
   )
 }

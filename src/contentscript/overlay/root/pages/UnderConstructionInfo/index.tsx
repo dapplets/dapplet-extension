@@ -1,33 +1,19 @@
-import React, {
-  ReactElement,
-  useState,
-  useEffect,
-  useMemo,
-  FC,
-  useRef,
-} from 'react'
-import cn from 'classnames'
-import styles from './UnderConstructionInfo.module.scss'
-import { SettingWrapper } from '../../components/SettingWrapper'
-import { SettingItem } from '../../components/SettingItem'
-
-import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-
-import { Bus } from '../../../../../common/bus'
+import cn from 'classnames'
+import React, { FC, useEffect, useRef, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
-
+import { Bus } from '../../../../../common/bus'
+import { StorageTypes } from '../../../../../common/constants'
+import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { typeOfUri, chainByUri, joinUrls } from '../../../../../common/helpers'
 import { StorageRefImage } from '../../components/DevModulesList'
-import {
-  DEFAULT_BRANCH_NAME,
-  ModuleTypes,
-  StorageTypes,
-} from '../../../../../common/constants'
-import './valid.scss'
 import { Modal } from '../../components/Modal'
+import { SettingItem } from '../../components/SettingItem'
+import { SettingWrapper } from '../../components/SettingWrapper'
+import styles from './UnderConstructionInfo.module.scss'
+import './valid.scss'
 
 enum DeploymentStatus {
   Unknown,
@@ -62,9 +48,7 @@ export interface UnderConstructionInfoProps {
 
 let _isMounted = false
 
-export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
-  props
-) => {
+export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => {
   const {
     setUnderConstructionDetails,
     ModuleInfo,
@@ -77,8 +61,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   const [originalMi, setOriginalMi] = useState(null)
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
   const [vi, setVi] = useState<VersionInfo>(ModuleVersion)
-  const [dependenciesChecking, setDpendenciesChecking] =
-    useState<DependencyChecking[]>()
+  const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>()
   const [loading, setLoading] = useState(false)
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
@@ -90,9 +73,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
   const [editContextId, setEditContextId] = useState('')
   const [editContextIdLoading, setEditContextIdLoading] = useState(false)
   const [editContextIdDone, setEditContextIdDone] = useState(false)
-  const [deploymentStatus, setDeploymentStatus] = useState(
-    DeploymentStatus.Unknown
-  )
+  const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
   const [trustedUsers, setTrustedUsers] = useState([])
 
   const [mode, setMode] = useState(null)
@@ -174,16 +155,11 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
 
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
-    const currentAccount = await getAddress(
-      DefaultSigners.EXTENSION,
-      targetChain
-    )
+    const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
     setCurrentAccount(currentAccount)
   }
 
-  const iconInputChangeHandler = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const iconInputChangeHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
     // const s = this.state
     const files = event.target.files
     if (files.length > 0) {
@@ -275,22 +251,16 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
 
   const isNoStorage = targetStorages.length === 0
   const isNotNullCurrentAccount = !(
-    !currentAccount ||
-    currentAccount === '0x0000000000000000000000000000000000000000'
+    !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
   )
   const isNotWalletPaired = !isNotNullCurrentAccount && !!owner
   const isNotAnOwner =
-    !!owner &&
-    isNotNullCurrentAccount &&
-    owner.toLowerCase() !== currentAccount.toLowerCase()
-  const isAlreadyDeployed =
-    !message && deploymentStatus === DeploymentStatus.Deployed
+    !!owner && isNotNullCurrentAccount && owner.toLowerCase() !== currentAccount.toLowerCase()
+  const isAlreadyDeployed = !message && deploymentStatus === DeploymentStatus.Deployed
   const isNewModule = deploymentStatus === DeploymentStatus.NewModule
   const isNotTrustedUser =
     isNotNullCurrentAccount &&
-    !trustedUsers.find(
-      (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
-    )
+    !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
   const isDependenciesExist =
     dependenciesChecking && dependenciesChecking.length > 0
       ? dependenciesChecking.every((x) => x.isExists === true)
@@ -309,8 +279,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
     isDependenciesLoading ||
     !isDependenciesExist ||
     !isManifestValid
-  const isReuploadButtonDisabled =
-    !isAlreadyDeployed || mode === FormMode.Creating || !vi
+  const isReuploadButtonDisabled = !isAlreadyDeployed || mode === FormMode.Creating || !vi
 
   const onChange = (e) => {
     const files = e.target.files
@@ -342,10 +311,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                     : m}
                 </p>
               ))}
-              <button
-                onClick={() => onClose()}
-                className={styles.modalDefaultContentButton}
-              >
+              <button onClick={() => onClose()} className={styles.modalDefaultContentButton}>
                 OK
               </button>
             </div>
@@ -378,8 +344,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
             title={'Wallet is not connected'}
             content={
               <div className={styles.modalDefaultContent}>
-                You can not deploy a module without a wallet. Connect a new
-                wallet
+                You can not deploy a module without a wallet. Connect a new wallet
               </div>
             }
             footer={''}
@@ -437,10 +402,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
 
               <div className={styles.iconBlock}>
                 <div className={styles.imgBlock}>
-                  <StorageRefImage
-                    className={styles.img}
-                    storageRef={mi.icon}
-                  />
+                  <StorageRefImage className={styles.img} storageRef={mi.icon} />
 
                   {st.map((x, i) => (
                     <span className={styles.imgTitle} key={i}>
@@ -502,10 +464,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                         setDisabledPush(false)
                       }}
                     />
-                    <button
-                      onClick={onDeleteChild.bind(null, i)}
-                      className={styles.authorDelete}
-                    />
+                    <button onClick={onDeleteChild.bind(null, i)} className={styles.authorDelete} />
                   </div>
                 ))}
               </div>
@@ -523,8 +482,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                     disabled={mi.contextIds.length >= 1}
                     onClick={addButtonClickHandlerContext}
                     className={cn(styles.contextIDButton, {
-                      [styles.contextIDButtonDisabled]:
-                        mi.contextIds.length >= 1,
+                      [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
                     })}
                   />
                 </div>
@@ -554,9 +512,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (
                       />
                     </div>
                     <button
-                      disabled={
-                        nodeInput.current?.value.length < 2 || addDisabled
-                      }
+                      disabled={nodeInput.current?.value.length < 2 || addDisabled}
                       onClick={() => {
                         node.current?.classList.add('valid')
                         _addContextId(editContextId)

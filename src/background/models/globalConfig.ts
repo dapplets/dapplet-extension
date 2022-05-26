@@ -1,7 +1,7 @@
-import Base from '../../common/models/base'
 import { StorageTypes, WalletInfo } from '../../common/constants'
-import SiteConfig from './siteConfig'
+import Base from '../../common/models/base'
 import { EthereumNetwrokConfig, NearNetworkConfig } from '../../common/types'
+import SiteConfig from './siteConfig'
 
 export class GlobalConfig extends Base {
   getId = () => this.id

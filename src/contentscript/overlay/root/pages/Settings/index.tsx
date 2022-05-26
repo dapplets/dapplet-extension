@@ -1,26 +1,15 @@
-import React, { ReactElement, useState, useEffect, useMemo } from 'react'
-import cn from 'classnames'
-import styles from './Settings.module.scss'
-import {
-  isValidHttp,
-  isValidUrl,
-  isValidPostageStampId,
-} from '../../../../../popup/helpers'
-import { browser } from 'webextension-polyfill-ts'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-
+import React, { useEffect, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
-
+import { DappletsMainInfo } from '../DappletsInfo'
+import { Rewards } from '../Rewards'
+import { Tokenimics } from '../Tokenomics'
+import { UnderConstruction } from '../UnderConstruction'
+import { UnderConstructionInfo } from '../UnderConstructionInfo'
 import { Developer } from './Developer'
 import { SettingsList } from './Settings'
-import { MainList } from './Main'
-
-import { UnderConstructionInfo } from '../UnderConstructionInfo'
-import { DappletsMainInfo } from '../DappletsInfo'
-import { UnderConstruction } from '../UnderConstruction'
-import { DappletsInfoSettings } from '../DappletsInfoSettings'
-import { Tokenimics } from '../Tokenomics'
-import { Rewards } from '../Rewards'
+import styles from './Settings.module.scss'
 
 enum SettingsTabs {
   // MAIN = 0,
@@ -46,13 +35,10 @@ export const NAVIGATION_LIST = [
 let _isMounted = false
 export const SettingsOverlay = () => {
   const [activeTab, setActiveTab] = useState(SettingsTabs.SETTINGS)
-  const [activeTaDappletsDetails, setActiveTabDappletsDetails] = useState(
-    DappletsDetails.MAININFO
+  const [activeTaDappletsDetails, setActiveTabDappletsDetails] = useState(DappletsDetails.MAININFO)
+  const [activeTabUnderConstructionDetails, setActiveTabUnderConstructionDetails] = useState(
+    UnderConstructionDetails.INFO
   )
-  const [
-    activeTabUnderConstructionDetails,
-    setActiveTabUnderConstructionDetails,
-  ] = useState(UnderConstructionDetails.INFO)
   const [devMode, setMode] = useState(false)
   const [isSvgLoaderDevMode, setSvgLoaderDevMode] = useState(false)
 
@@ -61,14 +47,12 @@ export const SettingsOverlay = () => {
 
   const [isDappletsDetails, setDappletsDetail] = useState(false)
   const [isUnderConstruction, setUnderConstruction] = useState(false)
-  const [isUnderConstructionDetails, setUnderConstructionDetails] =
-    useState(false)
+  const [isUnderConstructionDetails, setUnderConstructionDetails] = useState(false)
   const [ModuleInfo, setModuleInfo] = useState([])
   const [ModuleVersion, setModuleVersion] = useState([])
 
   const [isTokenomics, setTokenomics] = useState(false)
-  const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] =
-    useState(false)
+  const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] = useState(false)
   const [isShowChildrenRegistery, setShowChildrenRegistery] = useState(false)
   useEffect(() => {
     _isMounted = true
@@ -113,185 +97,145 @@ export const SettingsOverlay = () => {
 
   return (
     <>
-      {!isDappletsDetails &&
-        !isUnderConstruction &&
-        !isUnderConstructionDetails && (
-          <div className={styles.wrapper}>
-            <div className={styles.title}>
-              {/* <SettingTitle
+      {!isDappletsDetails && !isUnderConstruction && !isUnderConstructionDetails && (
+        <div className={styles.wrapper}>
+          <div className={styles.title}>
+            {/* <SettingTitle
           title="Main"
           onClick={() => setActiveTab(SettingsTabs.MAIN)}
           isActive={activeTab === SettingsTabs.MAIN}
         /> */}
+            <SettingTitle
+              title="Settings"
+              onClick={() => setActiveTab(SettingsTabs.SETTINGS)}
+              isActive={activeTab === SettingsTabs.SETTINGS}
+            />
+            {devMode && (
               <SettingTitle
-                title="Settings"
-                onClick={() => setActiveTab(SettingsTabs.SETTINGS)}
-                isActive={activeTab === SettingsTabs.SETTINGS}
+                title="Developer"
+                onClick={() => setActiveTab(SettingsTabs.DEVELOPER)}
+                isActive={activeTab === SettingsTabs.DEVELOPER}
               />
-              {devMode && (
-                <SettingTitle
-                  title="Developer"
-                  onClick={() => setActiveTab(SettingsTabs.DEVELOPER)}
-                  isActive={activeTab === SettingsTabs.DEVELOPER}
-                />
-              )}
-            </div>
+            )}
+          </div>
 
-            <div className={styles.settingMain}>
-              {/* {activeTab === SettingsTabs.MAIN && (
+          <div className={styles.settingMain}>
+            {/* {activeTab === SettingsTabs.MAIN && (
   <MainList/>
         )} */}
-              {activeTab === SettingsTabs.SETTINGS && (
-                <SettingsList
-                  devModeProps={devMode}
-                  setDevMode={setDevmode}
-                  isSvgLoaderDevMode={isSvgLoaderDevMode}
-                  isSvgErrorReporting={isSvgErrorReporting}
-                  errorReporting={errorReporting}
-                  setErrorReporting={setErrorReporting}
-                />
-              )}
-
-              {activeTab === SettingsTabs.DEVELOPER && (
-                <Developer
-                  isShowChildrenUnderConstraction={
-                    isShowChildrenUnderConstraction
-                  }
-                  setShowChildrenUnderConstraction={
-                    setShowChildrenUnderConstraction
-                  }
-                  isShowChildrenRegistery={isShowChildrenRegistery}
-                  setShowChildrenRegistery={setShowChildrenRegistery}
-                  setModuleVersion={setModuleVersion}
-                  setModuleInfo={setModuleInfo}
-                  isDappletsDetails={isDappletsDetails}
-                  setDappletsDetail={setDappletsDetail}
-                  isUnderConstruction={isUnderConstruction}
-                  setUnderConstruction={setUnderConstruction}
-                  isUnderConstructionDetails={isUnderConstructionDetails}
-                  setUnderConstructionDetails={setUnderConstructionDetails}
-                />
-              )}
-            </div>
-          </div>
-        )}
-      {isDappletsDetails &&
-        !isUnderConstructionDetails &&
-        !isUnderConstruction && (
-          <div className={styles.wrapper}>
-            <div className={styles.title}>
-              <SettingTitle
-                title="Main info"
-                onClick={() =>
-                  setActiveTabDappletsDetails(DappletsDetails.MAININFO)
-                }
-                isActive={activeTaDappletsDetails === DappletsDetails.MAININFO}
+            {activeTab === SettingsTabs.SETTINGS && (
+              <SettingsList
+                devModeProps={devMode}
+                setDevMode={setDevmode}
+                isSvgLoaderDevMode={isSvgLoaderDevMode}
+                isSvgErrorReporting={isSvgErrorReporting}
+                errorReporting={errorReporting}
+                setErrorReporting={setErrorReporting}
               />
-            </div>
-            <div className={styles.settingMain}>
-              {activeTaDappletsDetails === DappletsDetails.MAININFO && (
-                <DappletsMainInfo
-                  ModuleInfo={ModuleInfo}
-                  ModuleVersion={ModuleVersion}
-                  isDappletsDetails={isDappletsDetails}
-                  setDappletsDetail={setDappletsDetail}
-                  setShowChildrenRegistery={setShowChildrenRegistery}
-                />
-              )}
-            </div>
-          </div>
-        )}
-      {isUnderConstruction &&
-        !isDappletsDetails &&
-        !isUnderConstructionDetails && (
-          <div className={styles.wrapper}>
-            <div className={styles.settingMain}>
-              <UnderConstruction
+            )}
+
+            {activeTab === SettingsTabs.DEVELOPER && (
+              <Developer
+                isShowChildrenUnderConstraction={isShowChildrenUnderConstraction}
+                setShowChildrenUnderConstraction={setShowChildrenUnderConstraction}
+                isShowChildrenRegistery={isShowChildrenRegistery}
+                setShowChildrenRegistery={setShowChildrenRegistery}
                 setModuleVersion={setModuleVersion}
                 setModuleInfo={setModuleInfo}
-                setUnderConstructionDetails={setUnderConstructionDetails}
+                isDappletsDetails={isDappletsDetails}
+                setDappletsDetail={setDappletsDetail}
+                isUnderConstruction={isUnderConstruction}
                 setUnderConstruction={setUnderConstruction}
+                isUnderConstructionDetails={isUnderConstructionDetails}
+                setUnderConstructionDetails={setUnderConstructionDetails}
               />
-            </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
+      {isDappletsDetails && !isUnderConstructionDetails && !isUnderConstruction && (
+        <div className={styles.wrapper}>
+          <div className={styles.title}>
+            <SettingTitle
+              title="Main info"
+              onClick={() => setActiveTabDappletsDetails(DappletsDetails.MAININFO)}
+              isActive={activeTaDappletsDetails === DappletsDetails.MAININFO}
+            />
+          </div>
+          <div className={styles.settingMain}>
+            {activeTaDappletsDetails === DappletsDetails.MAININFO && (
+              <DappletsMainInfo
+                ModuleInfo={ModuleInfo}
+                ModuleVersion={ModuleVersion}
+                isDappletsDetails={isDappletsDetails}
+                setDappletsDetail={setDappletsDetail}
+                setShowChildrenRegistery={setShowChildrenRegistery}
+              />
+            )}
+          </div>
+        </div>
+      )}
+      {isUnderConstruction && !isDappletsDetails && !isUnderConstructionDetails && (
+        <div className={styles.wrapper}>
+          <div className={styles.settingMain}>
+            <UnderConstruction
+              setModuleVersion={setModuleVersion}
+              setModuleInfo={setModuleInfo}
+              setUnderConstructionDetails={setUnderConstructionDetails}
+              setUnderConstruction={setUnderConstruction}
+            />
+          </div>
+        </div>
+      )}
 
-      {!isUnderConstruction &&
-        !isDappletsDetails &&
-        isUnderConstructionDetails && (
-          <div className={styles.wrapper}>
-            <div className={styles.title}>
-              <SettingTitle
-                title="Info"
-                onClick={() =>
-                  setActiveTabUnderConstructionDetails(
-                    UnderConstructionDetails.INFO
-                  )
-                }
-                isActive={
-                  activeTabUnderConstructionDetails ===
-                  UnderConstructionDetails.INFO
-                }
-              />
-              <SettingTitle
-                title="Tokenomics"
-                onClick={() =>
-                  setActiveTabUnderConstructionDetails(
-                    UnderConstructionDetails.TOKENOMICS
-                  )
-                }
-                isActive={
-                  activeTabUnderConstructionDetails ===
-                  UnderConstructionDetails.TOKENOMICS
-                }
-              />
-              <SettingTitle
-                title="Rewards"
-                onClick={() =>
-                  setActiveTabUnderConstructionDetails(
-                    UnderConstructionDetails.REWARDS
-                  )
-                }
-                isActive={
-                  activeTabUnderConstructionDetails ===
-                  UnderConstructionDetails.REWARDS
-                }
-              />
-            </div>
-            <div className={styles.settingMain}>
-              {activeTabUnderConstructionDetails ===
-                UnderConstructionDetails.INFO && (
-                <div>
-                  <UnderConstructionInfo
-                    ModuleInfo={ModuleInfo}
-                    ModuleVersion={ModuleVersion}
-                    setUnderConstructionDetails={setUnderConstructionDetails}
-                    setShowChildrenUnderConstraction={
-                      setShowChildrenUnderConstraction
-                    }
-                  />
-                </div>
-              )}
-              {activeTabUnderConstructionDetails ===
-                UnderConstructionDetails.TOKENOMICS && (
-                <Tokenimics
-                  setUnderConstructionDetails={setUnderConstructionDetails}
-                  setTokenomics={setTokenomics}
-                />
-              )}
-              {activeTabUnderConstructionDetails ===
-                UnderConstructionDetails.REWARDS && (
-                <Rewards
-                  setUnderConstructionDetails={setUnderConstructionDetails}
-                  isTokenomics={isTokenomics}
-                  setActiveTabUnderConstructionDetails={
-                    setActiveTabUnderConstructionDetails
-                  }
-                />
-              )}
-            </div>
+      {!isUnderConstruction && !isDappletsDetails && isUnderConstructionDetails && (
+        <div className={styles.wrapper}>
+          <div className={styles.title}>
+            <SettingTitle
+              title="Info"
+              onClick={() => setActiveTabUnderConstructionDetails(UnderConstructionDetails.INFO)}
+              isActive={activeTabUnderConstructionDetails === UnderConstructionDetails.INFO}
+            />
+            <SettingTitle
+              title="Tokenomics"
+              onClick={() =>
+                setActiveTabUnderConstructionDetails(UnderConstructionDetails.TOKENOMICS)
+              }
+              isActive={activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS}
+            />
+            <SettingTitle
+              title="Rewards"
+              onClick={() => setActiveTabUnderConstructionDetails(UnderConstructionDetails.REWARDS)}
+              isActive={activeTabUnderConstructionDetails === UnderConstructionDetails.REWARDS}
+            />
           </div>
-        )}
+          <div className={styles.settingMain}>
+            {activeTabUnderConstructionDetails === UnderConstructionDetails.INFO && (
+              <div>
+                <UnderConstructionInfo
+                  ModuleInfo={ModuleInfo}
+                  ModuleVersion={ModuleVersion}
+                  setUnderConstructionDetails={setUnderConstructionDetails}
+                  setShowChildrenUnderConstraction={setShowChildrenUnderConstraction}
+                />
+              </div>
+            )}
+            {activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS && (
+              <Tokenimics
+                setUnderConstructionDetails={setUnderConstructionDetails}
+                setTokenomics={setTokenomics}
+              />
+            )}
+            {activeTabUnderConstructionDetails === UnderConstructionDetails.REWARDS && (
+              <Rewards
+                setUnderConstructionDetails={setUnderConstructionDetails}
+                isTokenomics={isTokenomics}
+                setActiveTabUnderConstructionDetails={setActiveTabUnderConstructionDetails}
+              />
+            )}
+          </div>
+        </div>
+      )}
     </>
   )
 }

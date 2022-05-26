@@ -1,21 +1,17 @@
-import React, { useState, useEffect, FC, useRef, useMemo } from 'react'
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import cn from 'classnames'
+import React, { FC, useEffect, useRef, useState } from 'react'
+import TopologicalSort from 'topological-sort'
+import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
-
 import { StorageRef } from '../../../../../background/registries/registry'
-
-import { DEFAULT_BRANCH_NAME } from '../../../../../common/constants'
-import TopologicalSort from 'topological-sort'
-import styles from './DevModulesList.module.scss'
-import cn from 'classnames'
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
-
-import { browser } from 'webextension-polyfill-ts'
+import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
+import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { ModuleTypes, StorageTypes } from '../../../../../common/constants'
-import { typeOfUri, chainByUri, joinUrls } from '../../../../../common/helpers'
 import { Modal } from '../Modal'
-import { xhrCallback } from '@sentry/tracing/types/browser/request'
+import styles from './DevModulesList.module.scss'
+
 let _isMounted = true
 enum DeploymentStatus {
   Unknown,
@@ -53,8 +49,8 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
     _isMounted = true
 
     const init = async () => {
-      if (!storageRef) return;
-      
+      if (!storageRef) return
+
       if (typeof storageRef === 'string') {
         setDataUri(storageRef)
       } else {
@@ -76,8 +72,8 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
           } else {
             setDataUri(null)
           }
+        }
       }
-    } 
     }
     init()
     return () => {
@@ -134,13 +130,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   ])
   const [registryOptions, setRegistryOptions] = useState([])
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
-  const [deploymentStatus, setDeploymentStatus] = useState(
-    DeploymentStatus.Unknown
-  )
+  const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
   const [owner, setOwner] = useState(null)
-  const [dependenciesChecking, setDpendenciesChecking] = useState<
-    DependencyChecking[]
-  >([])
+  const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>([])
   const nodeButton = useRef<HTMLButtonElement>()
   const [textButtonDeploy, setTextButtonDeploy] = useState('Deploy')
   // const [textButtonReupload, setTextButtonReupload] = useState('Deploy')
@@ -151,12 +143,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const [isNotAccountModal, setNotAccountModal] = useState(false)
 
   modules.forEach((x) => {
-    nodes.set(
-      x.versions[0]
-        ? x.module.name + '#' + x.versions[0]?.branch
-        : x.module.name,
-      x
-    )
+    nodes.set(x.versions[0] ? x.module.name + '#' + x.versions[0]?.branch : x.module.name, x)
   })
   const sorting = new TopologicalSort(nodes)
   modules.forEach((x) => {
@@ -166,10 +153,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     ]
     deps.forEach((d) => {
       if (nodes.has(d + '#' + DEFAULT_BRANCH_NAME)) {
-        sorting.addEdge(
-          d + '#' + DEFAULT_BRANCH_NAME,
-          x.module.name + '#' + x.versions[0]?.branch
-        )
+        sorting.addEdge(d + '#' + DEFAULT_BRANCH_NAME, x.module.name + '#' + x.versions[0]?.branch)
       }
     })
   })
@@ -178,10 +162,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const visible = (hash: string): string => {
     if (hash.length > 28) {
       const firstFourCharacters = hash.substring(0, 14)
-      const lastFourCharacters = hash.substring(
-        hash.length - 0,
-        hash.length - 14
-      )
+      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 14)
 
       return `${firstFourCharacters}...${lastFourCharacters}`
     } else {
@@ -244,9 +225,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const _updateDeploymentStatus = async () => {
     setDeploymentStatus(DeploymentStatus.Unknown)
 
-    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(
-      browser
-    )
+    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
     const miF = await getModuleInfoByName(targetRegistry, mi.name)
     const deployed = vi
       ? await getVersionInfo(targetRegistry, mi.name, vi.branch, vi.version)
@@ -260,10 +239,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   }
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
-    const currentAccount = await getAddress(
-      DefaultSigners.EXTENSION,
-      targetChain
-    )
+    const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
     setCurrentAccount(currentAccount)
   }
   const _checkDependencies = async () => {
@@ -271,12 +247,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
     await Promise.all(
       dependenciesChecking.map((x) =>
-        getVersionInfo(
-          targetRegistry,
-          x.name,
-          DEFAULT_BRANCH_NAME,
-          x.version
-        ).then((y) => (x.isExists = !!y))
+        getVersionInfo(targetRegistry, x.name, DEFAULT_BRANCH_NAME, x.version).then(
+          (y) => (x.isExists = !!y)
+        )
       )
     )
   }
@@ -293,14 +266,11 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setTextButtonDeploy('')
     try {
       const isNotNullCurrentAccount = !(
-        !currentAccount ||
-        currentAccount === '0x0000000000000000000000000000000000000000'
+        !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
       )
       const isNotTrustedUser =
         isNotNullCurrentAccount &&
-        !trustedUsers.find(
-          (x) => x.account.toLowerCase() === currentAccount.toLowerCase()
-        )
+        !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
       if (isNotTrustedUser) {
         await addTrustedUser(currentAccount.toLowerCase())
       }
@@ -331,8 +301,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   }
   // console.log(isLocalhost)
   const isNotNullCurrentAccount = !(
-    !currentAccount ||
-    currentAccount === '0x0000000000000000000000000000000000000000'
+    !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
   )
 
   return (
@@ -351,19 +320,14 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   {m.versions[0].version}
                 </div>
               ) : (
-                <div className={styles.dappletsVersionUC}>
-                  Under Construction
-                </div>
+                <div className={styles.dappletsVersionUC}>Under Construction</div>
               )}
 
               {m.versions &&
                 m.versions[0] &&
                 m.versions[0].branch &&
                 m.versions[0].branch !== 'default' && (
-                  <div
-                    style={{ margin: '0 3px 0 0px' }}
-                    className={styles.dappletsBranch}
-                  >
+                  <div style={{ margin: '0 3px 0 0px' }} className={styles.dappletsBranch}>
                     {m.versions[0].branch}
                   </div>
                 )}
@@ -385,9 +349,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   }}
                   className={styles.dappletsSettingsIsUnderConstructionBlock}
                 >
-                  <button
-                    className={styles.dappletsSettingsIsUnderConstruction}
-                  />
+                  <button className={styles.dappletsSettingsIsUnderConstruction} />
                   <span className={styles.dappletsSettingsIsTocenomics} />
                 </span>
               ) : (
@@ -424,12 +386,10 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   ref={nodeButton}
                   disabled={!isNotNullCurrentAccount || isLoadingDeploy}
                   onClick={(e) => {
-                    m.isDeployed?.[0] === false &&
-                      deployButtonClickHandler(m.versions[0], e)
+                    m.isDeployed?.[0] === false && deployButtonClickHandler(m.versions[0], e)
                   }}
                   className={cn(styles.dappletsReupload, {
-                    [styles.dapDeploy]:
-                      m.isDeployed?.[0] !== false || !isNotNullCurrentAccount,
+                    [styles.dapDeploy]: m.isDeployed?.[0] !== false || !isNotNullCurrentAccount,
                   })}
                 >
                   {/* {m.isDeployed?.[0] === false */}
@@ -443,12 +403,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
               {m.module.name && (
                 <div>
                   <span className={styles.dappletsLabelSpan}>Name:</span>
-                  <label
-                    className={cn(
-                      styles.dappletsLabelSpan,
-                      styles.dappletsLabelSpanInfo
-                    )}
-                  >
+                  <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
                     {m.module.name}
                   </label>
                 </div>
@@ -457,12 +412,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
               {m.module.author && (
                 <div>
                   <span className={styles.dappletsLabelSpan}>Ownership:</span>
-                  <label
-                    className={cn(
-                      styles.dappletsLabelSpan,
-                      styles.dappletsLabelSpanInfo
-                    )}
-                  >
+                  <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
                     {visible(` ${m.module.author}`)}
                   </label>
                 </div>
@@ -497,12 +447,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
               )} */}
               <div>
                 <span className={styles.dappletsLabelSpan}>Type:</span>
-                <label
-                  className={cn(
-                    styles.dappletsLabelSpan,
-                    styles.dappletsLabelSpanInfo
-                  )}
-                >
+                <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
                   {m.module.type}
                 </label>
               </div>
@@ -530,9 +475,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           <Modal
             visible={isNotAccountModal}
             title={'Wallet is not connected'}
-            content={
-              'You can not deploy a module without a wallet. Connect a new wallet'
-            }
+            content={'You can not deploy a module without a wallet. Connect a new wallet'}
             footer={''}
             onClose={() => setNotAccountModal(false)}
           />
@@ -552,10 +495,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     : m}
                 </p>
               ))}
-              <button
-                onClick={() => onCloseError()}
-                className={styles.modalDefaultContentButton}
-              >
+              <button onClick={() => onCloseError()} className={styles.modalDefaultContentButton}>
                 Ok
               </button>
             </div>

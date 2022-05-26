@@ -1,18 +1,13 @@
-import React, { useEffect, useState } from 'react'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-
-import styles from './Notifications.module.scss'
-import { Notification } from '../../components/Notification'
-import { CloseIcon } from '../../components/CloseIcon'
-
-import { addEvent } from '../../../../../background/services/eventService'
-
-import { browser } from 'webextension-polyfill-ts'
-import { rcompare } from 'semver'
-import { List, Segment, Label } from 'semantic-ui-react'
-import { Event } from '../../../../../common/models/event'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
+import React, { useEffect, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
+import { Event } from '../../../../../common/models/event'
+import { CloseIcon } from '../../components/CloseIcon'
+import { Notification } from '../../components/Notification'
+import styles from './Notifications.module.scss'
+
 TimeAgo.addLocale(en)
 
 let _isMounted = false
@@ -77,20 +72,14 @@ export const Notifications = () => {
           </div>
 
           <div className={styles.notificationClose}>
-            <CloseIcon
-              onClick={() => onRemoveEventsAll(event)}
-              appearance="big"
-              color="red"
-            />
+            <CloseIcon onClick={() => onRemoveEventsAll(event)} appearance="big" color="red" />
             <span className={styles.clearAll}>Clear all</span>
           </div>
         </div>
       )) ||
         ''}
 
-      {!event.length && (
-        <div className={styles.noNot}>There is no notifications</div>
-      )}
+      {!event.length && <div className={styles.noNot}>There is no notifications</div>}
     </div>
   )
 }

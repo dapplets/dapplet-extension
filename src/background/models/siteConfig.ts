@@ -1,22 +1,21 @@
-import Base from '../../common/models/base';
-import ModuleInfo from './moduleInfo';
+import Base from '../../common/models/base'
 
 // ToDo: It should be UserConfig
 export default class SiteConfig extends Base {
-    getId = () => this.hostname;
+  getId = () => this.hostname
 
-    hostname: string = null;
+  hostname: string = null
 
-    activeFeatures: {
-        [name: string]: {
-            version: string;
-            isActive: boolean;
-            order: number;
-            runtime: { isActionHandler: boolean } & any;
-            //moduleInfo: ModuleInfo;
-            registryUrl: string;
-        }
-    } = {};
+  activeFeatures: {
+    [name: string]: {
+      version: string
+      isActive: boolean
+      order: number
+      runtime: { isActionHandler: boolean } & any
+      //moduleInfo: ModuleInfo;
+      registryUrl: string
+    }
+  } = {}
 
-    paused: boolean = null;
+  paused: boolean = null
 }

@@ -1,13 +1,9 @@
-import React, { FC, FunctionComponent } from 'react'
-import { ButtonHTMLAttributes, DetailedHTMLProps } from 'react'
 import cn from 'classnames'
+import React, { ButtonHTMLAttributes, DetailedHTMLProps, FC, FunctionComponent } from 'react'
 import styles from './SquaredButton.module.scss'
 
 export interface ButtonProps
-  extends DetailedHTMLProps<
-    ButtonHTMLAttributes<HTMLButtonElement>,
-    HTMLButtonElement
-  > {
+  extends DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
   disabled?: boolean
   appearance: 'smail' | 'big'
   icon: FunctionComponent

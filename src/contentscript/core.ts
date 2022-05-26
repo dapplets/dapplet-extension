@@ -1,24 +1,22 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
-
 import * as ethers from 'ethers'
 import * as NearApi from 'near-api-js'
-
-import { IOverlay, IOverlayManager } from './overlay/interfaces'
-import { Swiper } from './swiper'
-import { EventDef, Connection } from './connection'
-import { WsJsonRpc } from './wsJsonRpc'
-import { AppStorage } from './appStorage'
-import { SystemOverlayTabs, LoginRequest } from '../common/types'
-import { generateGuid, parseShareLink } from '../common/helpers'
-import * as near from './near'
-import * as ethereum from './ethereum'
-import { LoginSession } from './login/login-session'
-import { LoginHooks, LoginRequestSettings } from './login/types'
-import { IEtherneumWallet } from './ethereum/types'
+import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
+import { generateGuid, parseShareLink } from '../common/helpers'
+import { LoginRequest, SystemOverlayTabs } from '../common/types'
+import { AppStorage } from './appStorage'
+import { Connection, EventDef } from './connection'
+import * as ethereum from './ethereum'
+import { IEtherneumWallet } from './ethereum/types'
+import { LoginSession } from './login/login-session'
+import { LoginHooks, LoginRequestSettings } from './login/types'
+import * as near from './near'
+import { IOverlay, IOverlayManager } from './overlay/interfaces'
 import { State } from './state'
+import { Swiper } from './swiper'
+import { WsJsonRpc } from './wsJsonRpc'
 
 type Abi = any
 
@@ -71,10 +69,7 @@ export default class Core {
           if (message.type === 'OPEN_DEPLOY_OVERLAY') {
             return this.waitDeployOverlay(message.payload)
           } else if (message.type === 'APPROVE_SOWA_TRANSACTION') {
-            return this._approveSowaTransaction(
-              message.payload.sowaId,
-              message.payload.metadata
-            )
+            return this._approveSowaTransaction(message.payload.sowaId, message.payload.metadata)
               .then(() => [null, 'approved'])
               .catch(() => ['error'])
           } else if (message.type === 'OPEN_SETTINGS_OVERLAY') {
@@ -82,10 +77,7 @@ export default class Core {
           } else if (message.type === 'OPEN_GUIDE_OVERLAY') {
             return this.waitGuideOverlay(message.payload)
           } else if (message.type === 'OPEN_PAIRING_OVERLAY') {
-            if (
-              message.payload.topic === 'walletconnect' &&
-              message.payload.args[1]
-            ) {
+            if (message.payload.topic === 'walletconnect' && message.payload.args[1]) {
               const [, overlayId] = message.payload.args
               const targetOverlay = this.overlayManager
                 .getOverlays()
@@ -93,24 +85,16 @@ export default class Core {
               targetOverlay?.send(message.payload.topic, message.payload.args)
               return Promise.resolve([null, 'ready'])
             } else {
-              return this.waitPairingOverlay(
-                message.payload.topic,
-                message.payload.args
-              )
+              return this.waitPairingOverlay(message.payload.topic, message.payload.args)
                 .then(() => [null, 'ready'])
                 .catch(() => ['error'])
             }
           } else if (message.type === 'OPEN_LOGIN_OVERLAY') {
-            return this.waitLoginOverlay(
-              message.payload.topic,
-              message.payload.args
-            )
+            return this.waitLoginOverlay(message.payload.topic, message.payload.args)
               .then(() => [null, 'ready'])
               .catch((err) => [err])
           } else if (message.type === 'OPEN_POPUP_OVERLAY') {
-            return Promise.resolve(
-              this.overlayManager.openPopup(message.payload.path)
-            ) // ToDo: make toggle of the overlay
+            return Promise.resolve(this.overlayManager.openPopup(message.payload.path)) // ToDo: make toggle of the overlay
           } else if (message.type === 'OPEN_SYSTEM_OVERLAY') {
             return this.waitSystemOverlay(message.payload)
               .then((x) => [null, x])
@@ -123,9 +107,7 @@ export default class Core {
       window.addEventListener('message', ({ data }) => {
         if (typeof data === 'object' && data.type !== undefined) {
           if (data.type === 'OPEN_POPUP_OVERLAY') {
-            return Promise.resolve(
-              this.overlayManager.openPopup(data.payload.path)
-            )
+            return Promise.resolve(this.overlayManager.openPopup(data.payload.path))
           } else if (data.type === 'CLOSE_OVERLAY') {
             this.closeOverlay()
           }
@@ -142,13 +124,11 @@ export default class Core {
     const me = this
     return new Promise<void>((resolve, reject) => {
       const pairingUrl = browser.runtime.getURL('pairing.html')
-      let overlay = me.overlayManager
-        .getOverlays()
-        .find((x) => x.url === pairingUrl)
+      let overlay = me.overlayManager.getOverlays().find((x) => x.url === pairingUrl)
       if (!overlay)
         overlay = me.overlayManager.createOverlay({
-          url: pairingUrl, 
-          title: 'Wallet'
+          url: pairingUrl,
+          title: 'Wallet',
         })
 
       overlay.open()
@@ -179,8 +159,8 @@ export default class Core {
       const url = browser.runtime.getURL('login.html')
       //let overlay = this.overlayManager.getOverlays().find(x => x.uri === pairingUrl);
       const overlay = me.overlayManager.createOverlay({
-        url, 
-        title: 'Login'
+        url,
+        title: 'Login',
       })
 
       overlay.open()
@@ -211,8 +191,8 @@ export default class Core {
     return new Promise<void>((resolve, reject) => {
       const pairingUrl = browser.runtime.getURL('deploy.html')
       const overlay = me.overlayManager.createOverlay({
-        url: pairingUrl, 
-        title: 'Deploy'
+        url: pairingUrl,
+        title: 'Deploy',
       })
       overlay.open(() => overlay.send('data', [payload]))
 
@@ -238,7 +218,7 @@ export default class Core {
       const pairingUrl = browser.runtime.getURL('settings.html')
       const overlay = me.overlayManager.createOverlay({
         url: pairingUrl,
-        title: 'User Settings'
+        title: 'User Settings',
       })
       overlay.open(() => overlay.send('data', [payload]))
 
@@ -262,7 +242,7 @@ export default class Core {
     const pairingUrl = browser.runtime.getURL('guide.html')
     const overlay = this.overlayManager.createOverlay({
       url: pairingUrl,
-      title: 'Upgrade Guide'
+      title: 'Upgrade Guide',
     })
     overlay.open(() => overlay.send('data', [payload]))
   }
@@ -278,12 +258,9 @@ export default class Core {
       const pairingUrl = browser.runtime.getURL('overlay.html')
 
       const isTargetLoginSession =
-        data.activeTab === SystemOverlayTabs.LOGIN_SESSION &&
-        data.payload?.loginRequest?.target
+        data.activeTab === SystemOverlayTabs.LOGIN_SESSION && data.payload?.loginRequest?.target
       const parentOverlay = isTargetLoginSession
-        ? this.overlayManager
-            .getOverlays()
-            .find((x) => x.id === data.payload.loginRequest.target)
+        ? this.overlayManager.getOverlays().find((x) => x.id === data.payload.loginRequest.target)
         : null
 
       if (parentOverlay) {
@@ -291,9 +268,7 @@ export default class Core {
       }
 
       const popupOverlay = parentOverlay
-        ? this.overlayManager
-            .getOverlays()
-            .find((x) => x.parent?.id === parentOverlay.id)
+        ? this.overlayManager.getOverlays().find((x) => x.parent?.id === parentOverlay.id)
         : null
       const overlay =
         popupOverlay ??
@@ -302,7 +277,7 @@ export default class Core {
           title: 'System',
           source: null,
           hidden: null,
-          parent: parentOverlay
+          parent: parentOverlay,
         })
 
       overlay.open(() => overlay.send('data', [frameRequestId, data]))
@@ -331,7 +306,7 @@ export default class Core {
         url: pairingUrl,
         title: 'Dapplets',
         source: null,
-        hidden: true
+        hidden: true,
       })
       this._popupOverlay.open()
     } else {
@@ -357,8 +332,8 @@ export default class Core {
     return new Promise<void>((resolve, reject) => {
       const pairingUrl = browser.runtime.getURL('sowa.html')
       const overlay = me.overlayManager.createOverlay({
-        url: pairingUrl, 
-        title: 'SOWA'
+        url: pairingUrl,
+        title: 'SOWA',
       })
       // ToDo: implement multiframe
       overlay.open(() => overlay.send('txmeta', [sowaId, metadata]))
@@ -386,9 +361,7 @@ export default class Core {
     return conn
   }
 
-  public async wallet(cfg: {
-    authMethods: ['ethereum/goerli']
-  }): Promise<IEthWallet>
+  public async wallet(cfg: { authMethods: ['ethereum/goerli'] }): Promise<IEthWallet>
   public async wallet(cfg: {
     authMethods: ('near/testnet' | 'near/mainnet')[]
   }): Promise<INearWallet>
@@ -445,9 +418,7 @@ export default class Core {
     app?: string
   ) {
     if (!cfg || !(cfg.authMethods || (cfg.type && cfg.network)))
-      throw new Error(
-        ' "authMethods" or "type" with "network" are required in Core.wallet().'
-      )
+      throw new Error(' "authMethods" or "type" with "network" are required in Core.wallet().')
     if (cfg.authMethods) {
       cfg.authMethods.forEach((x) => {
         if (!['ethereum/goerli', 'near/testnet', 'near/mainnet'].includes(x))
@@ -457,20 +428,11 @@ export default class Core {
       })
     } else {
       if (cfg.type !== 'near' && cfg.type !== 'ethereum')
-        throw new Error(
-          'The "ethereum" and "near" only are supported in Core.wallet().'
-        )
-      if (
-        cfg.type === 'near' &&
-        !(cfg.network == 'testnet' || cfg.network == 'mainnet')
-      )
-        throw new Error(
-          '"testnet" and "mainnet" network only is supported in "near" type wallet.'
-        )
+        throw new Error('The "ethereum" and "near" only are supported in Core.wallet().')
+      if (cfg.type === 'near' && !(cfg.network == 'testnet' || cfg.network == 'mainnet'))
+        throw new Error('"testnet" and "mainnet" network only is supported in "near" type wallet.')
       if (cfg.type === 'ethereum' && cfg.network !== 'goerli')
-        throw new Error(
-          '"goerli" network only is supported in "ethereum" type wallet.'
-        )
+        throw new Error('"goerli" network only is supported in "ethereum" type wallet.')
     }
 
     const _authMethods = cfg.authMethods ?? [cfg.type + '/' + cfg.network]
@@ -551,26 +513,26 @@ export default class Core {
   }
 
   public overlay<T>(
-    cfg: { name: string; url?: string; title: string; source?: string, module?: any },
+    cfg: { name: string; url?: string; title: string; source?: string; module?: any },
     eventDef?: EventDef<any>
   ): OverlayConnection<any>
   public overlay<T>(
-    cfg: { name: string; url?: string; title: string; source?: string, module?: any },
+    cfg: { name: string; url?: string; title: string; source?: string; module?: any },
     eventDef?: EventDef<any>
   ): OverlayConnection<T>
   public overlay<T>(
-    cfg: { name?: string; url: string; title: string; source?: string, module?: any },
+    cfg: { name?: string; url: string; title: string; source?: string; module?: any },
     eventDef?: EventDef<any>
   ): OverlayConnection<T>
   public overlay<T>(
-    cfg: { name: string; url: string; title: string; source?: string, module?: any },
+    cfg: { name: string; url: string; title: string; source?: string; module?: any },
     eventDef?: EventDef<any>
   ): OverlayConnection<T | any> {
     const _overlay = this.overlayManager.createOverlay({
-        url: cfg.url,
-        title: cfg.title,
-        source: cfg.source,
-        module: cfg.module
+      url: cfg.url,
+      title: cfg.title,
+      source: cfg.source,
+      module: cfg.module,
     })
     const conn = new Connection<T>(_overlay, eventDef)
     let overridedConn: OverlayConnection<T>
@@ -610,12 +572,7 @@ export default class Core {
 
   public storage: AppStorage
 
-  public async contract(
-    type: 'ethereum',
-    address: string,
-    options: Abi,
-    app?: string
-  ): Promise<any>
+  public async contract(type: 'ethereum', address: string, options: Abi, app?: string): Promise<any>
   public async contract(
     type: 'near',
     address: string,
@@ -633,12 +590,7 @@ export default class Core {
     app?: string
   ): Promise<any> {
     if (type === 'ethereum') {
-      return ethereum.createContractWrapper(
-        app,
-        { network: 'goerli' },
-        address,
-        options
-      )
+      return ethereum.createContractWrapper(app, { network: 'goerli' }, address, options)
     } else if (type === 'near') {
       const network = options.network ?? 'testnet'
       return near.createContractWrapper(app, { network }, address, options)
@@ -680,13 +632,7 @@ export default class Core {
     const [, targetUrlNoProxy] = groups ?? []
     if (targetUrlNoProxy) targetUrl = targetUrlNoProxy
     const { urlNoPayload } = parseShareLink(targetUrl) // prevent duplicate of base64 payload
-    const payload = [
-      EXTENSION_VERSION,
-      _env.registry,
-      _env.moduleId,
-      ['*'],
-      modulePayload,
-    ]
+    const payload = [EXTENSION_VERSION, _env.registry, _env.moduleId, ['*'], modulePayload]
     const base64Payload = btoa(JSON.stringify(payload))
     const WEB_PROXY_URL = 'https://augm.link/live/'
     return WEB_PROXY_URL + urlNoPayload + '#dapplet/' + base64Payload
@@ -714,9 +660,7 @@ export default class Core {
     moduleName?: string
   ): Promise<LoginSession | LoginSession[]> {
     if (Array.isArray(request)) {
-      return Promise.all(
-        request.map((x) => this.login(x, settings, moduleName))
-      )
+      return Promise.all(request.map((x) => this.login(x, settings, moduleName)))
     }
 
     const _request = { ...request }
@@ -726,9 +670,7 @@ export default class Core {
     }
 
     if (!_request.target) {
-      const overlays = this.overlayManager
-        .getOverlays()
-        .filter((x) => x.source === moduleName)
+      const overlays = this.overlayManager.getOverlays().filter((x) => x.source === moduleName)
       const target = overlays.length > 0 ? overlays[0].id : null
       _request.target = target
     }
