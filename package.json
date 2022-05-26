@@ -13,7 +13,7 @@
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
     "clean": "rm -rf ./build && rm -rf ./lib",
     "prettify": "prettier --write src",
-    "lint": "eslint ./src --ext .ts",
+    "lint": "eslint ./src --ext .ts --fix",
     "stylelint": "stylelint ./src/**/*.{css,scss} --fix"
   },
   "devDependencies": {
