@@ -1,10 +1,7 @@
-import React, { FC, useEffect } from 'react'
-import styles from './HeaderLogIn.module.scss'
 import cn from 'classnames'
+import React, { FC, useEffect } from 'react'
 import { Avatar } from '../../Avatar'
-import { ReactComponent as Down } from '../../../assets/icons/down.svg'
-
-import { useState } from 'react'
+import styles from './HeaderLogIn.module.scss'
 
 export interface HeaderLogInProps {
   avatar?: string
