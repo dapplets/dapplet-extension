@@ -1,64 +1,77 @@
 @import '../../assets/styles/null.scss';
 @import '../../assets/styles/fonts.scss';
 @import '../../assets/styles/color.variables.scss';
+
 .localhost {
   display: flex;
+  align-items: center;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
-  padding: 10px;
 
   width: 100%;
   height: auto;
+  margin: 2.5px 0;
+  padding: 10px;
+
+  border-radius: 10px;
 
   background: $PureWhite;
-  border-radius: 10px;
-  margin: 2.5px 0px 2.5px 0px;
 }
+
 .hostBlock {
-  width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
 }
+
 .buttonLocalhost {
   display: flex;
 
   align-items: center;
   justify-content: center;
-  padding: 5px;
-  background: #f5cf6c;
+
   width: 58px;
   height: 20px;
+  padding: 5px;
+
+  cursor: default;
+
+  color: $PureWhite;
 
   border-radius: 10px;
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
+  background: #f5cf6c;
+
+  font-family: Roboto;
   font-size: 10px;
+  font-weight: 500;
+  font-style: normal;
   line-height: 100%;
-  color: $PureWhite;
-  cursor: default;
 }
 
 .labelLocalhost {
+  display: flex;
+  align-items: center;
   // width: 211px;
   width: 100%;
   height: 21px;
-  font-family: 'Roboto';
+  padding: 0 0 0 20px;
+
+  cursor: pointer;
+
+  color: $ContentBlack;
+
+  font-family: Roboto;
+  font-size: 14px;
 
   font-weight: 500;
-  font-size: 14px;
   line-height: 16px;
-  display: flex;
-  align-items: center;
-  padding: 0px 0px 0px 20px;
-  color: $ContentBlack;
-  cursor: pointer;
 }
 
 .closeLocalhost {
   width: 20px;
   height: 20px;
+
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='21' height='20' viewBox='0 0 21 20' fill='none'%3E%3Cpath d='M9.99999 20.0002C7.3471 20.0026 4.80217 18.9498 2.92629 17.0739C1.0504 15.198 -0.00239798 12.6531 -1.12094e-05 10.0002V9.80019C0.0817768 5.79241 2.54779 2.22035 6.26635 0.723251C9.98491 -0.773844 14.2381 0.0930834 17.074 2.92619C19.9364 5.78627 20.7932 10.0895 19.2443 13.8278C17.6955 17.5661 14.0464 20.0026 9.99999 20.0002ZM9.99999 11.4102L12.59 14.0002L14 12.5902L11.41 10.0002L14 7.41019L12.59 6.00019L9.99999 8.59019L7.40999 6.00019L5.99999 7.41019L8.58999 10.0002L5.99999 12.5902L7.40999 14.0002L9.99999 11.4112V11.4102Z' fill='%23919191'/%3E%3C/svg%3E");
 }

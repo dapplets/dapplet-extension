@@ -6,12 +6,13 @@
   position: relative;
 
   width: 100%;
+  margin: 0 0 15px;
 
-  padding: 25px 17px 15px 17px;
+  padding: 25px 17px 15px;
 
   border: 1px solid $MainGrey;
   border-radius: 5px;
-  margin: 0px 0px 15px 0px;
+
   font-family: Roboto, sans-serif;
 }
 
@@ -23,7 +24,7 @@
 
   display: inline-block;
 
-  padding: 0px 10px;
+  padding: 0 10px;
 
   color: $ContentBlack;
   border: 1px solid $MainGrey;
@@ -36,22 +37,25 @@
     position: absolute;
     z-index: -1;
     top: 0;
-    left: 0px;
+    left: 0;
+
     width: 100%;
     height: 100%;
+
     content: '';
+
     border-radius: 3px;
     background-color: $OverlayBG;
   }
 }
 @media (max-width: 640px) and (min-width: 320px) {
   .wrapper {
-    padding: 25px 10px 15px 10px;
     max-width: 100%;
+    padding: 25px 10px 15px;
   }
-  .title {
-    left: 10px;
 
+  .title {
     top: -12px;
+    left: 10px;
   }
 }

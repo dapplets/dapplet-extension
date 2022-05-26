@@ -59,27 +59,28 @@
 }
 
 .list {
+  overflow-y: auto;
+
+  max-height: 295px;
   margin: 0;
   margin-top: 30px;
   padding-left: 0;
 
   list-style: none;
-  max-height: 295px;
-  overflow-y: auto;
 
   &::-webkit-scrollbar {
     width: 10px;
   }
 
   &::-webkit-scrollbar-track {
+    border-left: 5px solid rgb(0 0 0 / 0%);
     background: #f5f5f5;
-    border-left: 5px solid rgba(0, 0, 0, 0);
     background-clip: padding-box;
   }
 
   &::-webkit-scrollbar-thumb {
+    border-left: 5px solid rgb(0 0 0 / 0%);
     background: #d9304f;
-    border-left: 5px solid rgba(0, 0, 0, 0);
     background-clip: padding-box;
   }
 

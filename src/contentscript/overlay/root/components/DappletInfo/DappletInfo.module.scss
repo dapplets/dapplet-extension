@@ -22,7 +22,10 @@
 .value {
   // position: relative;
   display: inline-block;
+
   padding-left: 5px;
+
+  cursor: pointer;
 
   color: $Secondary;
 
@@ -32,10 +35,11 @@
   font-style: normal;
   line-height: 149%;
   text-decoration-line: underline;
-  cursor: pointer;
+
   &:hover {
     color: $MainGrey;
   }
+
   &:active {
     color: $ContentBlack;
   }
@@ -44,41 +48,50 @@
 a.value::before {
   content: attr(data-title);
 }
+
 // span.support::before,
 a.value::before {
-  content: attr(data-title);
-
-  display: none;
   position: absolute;
+
   /* z-index: 9998; */
   top: -20px;
   right: 0;
-  background: #f4f4f4;
-  border-radius: 3px;
-  border: 1px solid #ccc;
-  box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
-  text-align: right;
-  font-family: Roboto, sans-serif;
-  font-weight: 400;
-  font-style: italic;
-  font-size: 12px;
-  line-height: 16px;
-  opacity: 0.9;
-  cursor: default;
-  padding: 5px 10px;
+
+  display: none;
+
   /* margin: -15px 0 0 10px; */
   width: auto;
+  padding: 5px 10px;
+
+  content: attr(data-title);
+  cursor: default;
+  text-align: right;
+
+  opacity: 0.9;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background: #f4f4f4;
+  box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
+
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 16px;
+
   // min-height: 50px;
 }
 
 a.value:hover::before,
 a.value:focus::before {
   display: inline-block;
+  align-items: center;
   flex: 1 1 auto;
   justify-content: center;
-  align-items: center;
+
   // opacity: 1;
 }
+
 // .supportHover {
 //   display: inline-block;
 //   position: relative;

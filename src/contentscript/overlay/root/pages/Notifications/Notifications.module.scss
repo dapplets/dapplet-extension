@@ -4,20 +4,23 @@
 
 .wrapper {
   display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
 
   // padding: 20px 0px 0px 0px;
   overflow: hidden;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
 }
 
 .wrapper::-webkit-scrollbar {
   width: 0;
 }
+
 .wrapper::-webkit-scrollbar-thumb {
   width: 0;
 }
+
 .wrapper::-webkit-scrollbar-track {
   width: 0;
 }
@@ -32,96 +35,111 @@
 
 .block {
   display: flex;
+
+  overflow: hidden;
   flex-direction: column;
 
   height: calc(100% - 75px);
-
-  overflow: hidden;
-  padding: 20px 0px 0px 1px;
+  padding: 20px 0 0 1px;
 }
 
 .notification {
   display: flex;
-  width: 100%;
+  overflow-y: scroll;
   flex: 1 1 auto;
 
-  height: 50vh;
-
   flex-direction: column;
-  padding: 8px 0px 0px 0px;
-  overflow-y: scroll;
+
+  width: 100%;
+
+  height: 50vh;
+  padding: 8px 0 0;
   direction: rtl;
+
   &::-webkit-scrollbar {
     width: 4px;
+
     cursor: pointer;
   }
+
   &::-webkit-scrollbar-track {
-    background: rgb(244, 244, 244);
-    background: rgb(244, 244, 244);
+    background: rgb(244 244 244);
+    background: rgb(244 244 244);
     background: linear-gradient(
       90deg,
-      rgba(244, 244, 244, 0) 10%,
-      rgba(227, 227, 227, 1) 50%,
-      rgba(244, 244, 244, 0) 90%
+      rgb(244 244 244 / 0%) 10%,
+      rgb(227 227 227 / 100%) 50%,
+      rgb(244 244 244 / 0%) 90%
     );
   }
 
   &::-webkit-scrollbar-thumb {
     width: 4px;
     height: 2px;
-    background: $Primary;
-    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.09), 0px 2px 2px rgba(38, 117, 209, 0.04);
+
     border-radius: 2px;
+    background: $Primary;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
   }
 }
+
 .notification > * {
   direction: ltr;
 }
 
 .notificationClose {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  flex-direction: column;
+
   min-height: 68px;
-  padding: 20px 0px 0px 0px;
+  padding: 20px 0 0;
 }
 
 .clearAll {
-  font-family: 'Roboto';
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 149%;
   color: $Primary;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 149%;
 }
 
 .noNot {
   position: absolute;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  justify-content: center;
 
   width: 100%;
   height: 80%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1 1 auto;
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 700;
-  font-size: 22px;
-  line-height: 26px;
+
   text-align: center;
+
   color: $StrokeColor;
-  z-index: 9999;
+
+  font-family: Roboto;
+  font-size: 22px;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 26px;
 }
 @media (max-width: 640px) and (min-width: 320px) {
   .wrapper {
-    padding: 0px 0px 0px 0px;
+    padding: 0;
   }
+
   .block {
     height: calc(100% - 145px);
   }
+
   .notificationClose {
-    padding: 10px 0px 0px 0px;
+    padding: 10px 0 0;
   }
+
   .notification {
     flex: 1 1 auto;
   }

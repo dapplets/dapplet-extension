@@ -3,7 +3,8 @@ $background-color: #bada55;
 
 // Chrome applies an 8px margin by default (gross).
 body {
-  margin: 0px;
+  margin: 0;
+
   // max-height: 600px;
   // min-width: 428px; // 428px is width of the overlay
   //width: 500px;
@@ -14,21 +15,24 @@ body {
 }
 
 .internalTab {
+  overflow: auto;
+
   min-height: 80px;
   max-height: 520px;
-  overflow: auto;
 }
 
 .internalTabSettings {
+  overflow: auto;
+
   min-height: 250px;
   max-height: 520px;
-  overflow: auto;
 }
 
 .internalTabDapplets {
+  overflow: auto;
+
   min-height: 80px;
   max-height: 470px;
-  overflow: auto;
 }
 
 .popupContainer.popup {
@@ -36,7 +40,8 @@ body {
 }
 
 .internalTabColumn {
-  height: 520px;
   display: flex;
   flex-direction: column;
+
+  height: 520px;
 }

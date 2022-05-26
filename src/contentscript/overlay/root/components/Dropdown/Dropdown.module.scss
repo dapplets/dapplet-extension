@@ -3,8 +3,10 @@
 @import '../../assets/styles/color.variables.scss';
 
 .dropdownBlock {
-  display: inline-block;
   position: relative;
+
+  display: inline-block;
+
   box-sizing: border-box;
   width: 100%;
   min-width: 95px;
@@ -28,14 +30,14 @@
   position: relative;
 
   display: block;
+  overflow: hidden;
 
   width: 100%;
-  padding: 5px 25px 5px 8px;
 
   max-width: 93px;
+  padding: 5px 25px 5px 8px;
 
   white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
 
   &::after {
@@ -54,23 +56,27 @@
 }
 
 .isOpen {
-  border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .list {
-  list-style: none;
-  background-color: $PureWhite;
-  padding-left: 9px;
   position: absolute;
-  border-radius: 0px 0px 10px 10px;
-  width: 102%;
-  left: -1px;
+  z-index: 5;
   bottom: 0;
+  left: -1px;
+
+  width: 102%;
+  padding-left: 9px;
+
+  list-style: none;
+
   transform: translateY(100%);
+
   border: 1px solid #e3e3e3;
   border-top: none;
-  z-index: 5;
+  border-radius: 0 0 10px 10px;
+  background-color: $PureWhite;
 }
 
 .item {

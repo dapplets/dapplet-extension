@@ -18,6 +18,10 @@
 }
 
 .item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   width: 77px;
   height: 77px;
 
@@ -28,14 +32,11 @@
   &:not(:last-child) {
     margin-right: 5px;
   }
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .item:hover {
   filter: brightness(0.9);
+
   background: #00000010;
 }
 

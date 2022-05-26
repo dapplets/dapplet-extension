@@ -3,126 +3,153 @@
 @import '../../assets/styles/color.variables.scss';
 
 .wrapper {
+  position: relative;
+
   display: flex;
   flex-direction: column;
-
-  padding: 5px 13px;
 
   width: 100%;
   height: auto;
 
-  background: $AppBG;
+  padding: 5px 13px;
+
+  color: $MainGrey;
 
   border: 1px solid $StrokeColor;
 
   border-radius: 5px;
 
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 149%;
+  background: $AppBG;
 
-  color: $MainGrey;
-  position: relative;
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
 }
+
 .inputBlock {
   display: flex;
-  width: 100%;
   align-items: center;
+
+  width: 100%;
 }
+
 .inputUsers {
   display: inline-block;
+
   width: 97.5%;
   height: 21px;
-  background: inherit;
-
-  font-family: 'Roboto';
-  font-style: italic;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 149%;
 
   color: $MainGrey;
+  background: inherit;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
 }
+
 .inputTrustedUsers {
   display: flex;
-  width: 100%;
   flex-direction: column;
+
+  width: 100%;
 }
+
 .errorInput {
-  background: #fef2f4;
-
   border: 1px solid $Primary;
+  background: #fef2f4;
 }
-.errorMessage {
-  // padding: 0px 0px 0px 0px;
-  font-family: 'Roboto';
 
-  font-weight: 400;
-  font-size: 10px;
-  line-height: 100%;
+.errorMessage {
+  margin: 0;
 
   // text-transform: uppercase;
 
   color: #d9304f;
-  margin: 0px 0px 0px 0px;
+  // padding: 0px 0px 0px 0px;
+  font-family: Roboto;
+  font-size: 10px;
+
+  font-weight: 400;
+  line-height: 100%;
 }
 
 .openList {
   display: block;
-  cursor: pointer;
+
   width: 8px;
   height: 5px;
+
+  cursor: pointer;
+
   background-image: url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%232A2A2A' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
+
 .isOpen {
   transform: rotate(180deg);
 }
+
 .delimiterSpan {
   display: flex;
   justify-content: flex-start;
+
   width: 97%;
 }
 
 .userList {
-  display: flex;
-  flex-direction: column;
-  padding: 5px 13px;
-  border-radius: 5px;
-  border: 1px solid $StrokeColor;
-  width: 100.5%;
-  z-index: 3;
   position: absolute;
+  z-index: 3;
   top: -0.9%;
   left: -0.3%;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100.5%;
+  padding: 5px 13px;
+
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
   background: $AppBG;
 }
+
 .itemUser {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 6.5px 0px;
+  justify-content: space-between;
+
+  padding: 6.5px 0;
 }
+
 .userlink {
   cursor: pointer;
+
   &:hover {
     color: $ContentBlack;
   }
+
   &:active {
     color: $MainBlack;
   }
 }
 
 .deleteUsers {
-  cursor: pointer;
   display: inline-block;
+
   width: 10px;
   height: 10px;
+
+  cursor: pointer;
+
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10' fill='none'%3E%3Cpath d='M8.59 0L5 3.59L1.41 0L0 1.41L3.59 5L0 8.59L1.41 10L5 6.41L8.59 10L10 8.59L6.41 5L10 1.41L8.59 0Z' fill='%23919191'/%3E%3C/svg%3E");
+
   &:hover {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10' fill='none'%3E%3Cpath d='M8.59 0L5 3.59L1.41 0L0 1.41L3.59 5L0 8.59L1.41 10L5 6.41L8.59 10L10 8.59L6.41 5L10 1.41L8.59 0Z' fill='%23747376'/%3E%3C/svg%3E");
   }
+
   &:active {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10' fill='none'%3E%3Cpath d='M8.59 0L5 3.59L1.41 0L0 1.41L3.59 5L0 8.59L1.41 10L5 6.41L8.59 10L10 8.59L6.41 5L10 1.41L8.59 0Z' fill='%232A2A2A'/%3E%3C/svg%3E");
   }

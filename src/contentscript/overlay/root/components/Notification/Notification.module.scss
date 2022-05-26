@@ -9,7 +9,13 @@
   width: 100%;
 
   max-width: 421px;
+  margin: 0 0 19px;
   padding: 17px 15px 10px;
+
+  transition: all 0.5s cubic-bezier(0.36, -0.64, 0.34, 1.76);
+  transform: none;
+
+  opacity: 1;
 
   border: 1px solid $WebBG;
   border-radius: 10px;
@@ -17,10 +23,6 @@
   background: #fff;
 
   font-family: Roboto, sans-serif;
-  margin: 0px 0px 19px 0px;
-  opacity: 1;
-  transform: none;
-  transition: all 0.5s cubic-bezier(0.36, -0.64, 0.34, 1.76);
 }
 
 .header {
@@ -44,20 +46,26 @@
 .title {
   display: flex;
   align-items: center;
+
   color: $MainBlack;
 
   color: $MainBlack;
+
   font-size: 14px;
-  line-height: 16px;
   font-weight: 700;
+  line-height: 16px;
 }
+
 .toggle {
   display: inline-block;
-  margin: 0px 0px 0px 7px;
+
   width: 10px;
   height: 5px;
+  margin: 0 0 0 7px;
+
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='5' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M5 5.5L10 0.5L0 0.5L5 5.5Z' fill='%23747376'/%3E%3C/svg%3E");
 }
+
 .isOnOpen {
   transform: rotate(180deg);
 }
@@ -77,6 +85,7 @@
 
 .description {
   display: inline-block;
+
   // max-width: 362px;
   margin-top: 8px;
 
@@ -109,41 +118,57 @@
     max-width: 98%;
   }
 }
+
 .delete {
-  opacity: 0;
-  transform: rotateX(-90deg);
   transition: all 0.7s cubic-bezier(0.36, -0.64, 0.34, 1.76);
+  transform: rotateX(-90deg);
+
+  opacity: 0;
 }
+
 .blockInfo {
   display: flex;
   align-items: flex-end;
 }
+
 .moreDescription {
-  color: $Secondary;
+
   // position: absolute;
   // top: 0;
   // right: 0;
   display: block;
-  padding: 0px 0px 4px 0px;
-  font-size: 20px;
+
+  padding: 0 0 4px;
+
   cursor: pointer;
+
+  color: $Secondary;
+
+  font-size: 20px;
+
   &:hover {
     color: $SecondaryHover;
   }
+
   &:active {
     color: $SecondaryPressed;
   }
 }
 
 .descriptionMore {
-  display: inline-block;
-  height: 23px;
-  overflow: hidden;
-  text-overflow: clip;
   position: relative;
+
+  display: inline-block;
+  overflow: hidden;
+
+  height: 23px;
+
+  text-overflow: clip;
 }
+
 .moreInformation {
   height: auto;
+
   cursor: pointer;
 }
 
