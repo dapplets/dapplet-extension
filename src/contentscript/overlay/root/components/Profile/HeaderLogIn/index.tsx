@@ -11,7 +11,7 @@ export interface HeaderLogInProps {
   setMini: () => void
   isOpen: boolean
   setNotLogIn: (x: any) => void
-  // isNotLogin: boolean
+  isNotLogin: boolean
   isEns: boolean
   setEns: (x: boolean) => void
   setModalWalletConnect: (x: boolean) => void
@@ -30,7 +30,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     isOpen,
     setNotLogIn,
 
-    // isNotLogin,
+    isNotLogin,
     isEns,
     setEns,
     setModalWalletConnect,
@@ -45,13 +45,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     // return () => {
     //   window.removeEventListener('click', handleClick)
     // }
-  }, [
-    isOpen,
-    isMini,
-    isEns,
-    newProfile,
-    //  isNotLogin
-  ])
+  }, [isOpen, isMini, isEns, newProfile, isNotLogin])
   // const handleClick = (event) => {
   //   if (event.target !== modalRef.current) {
   //     setOpen()
@@ -157,9 +151,12 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
               <div className={styles.profileBlockImg}>
                 <img className={styles.profileImg} src={avatar}></img>
                 <button
-                  onClick={() => {
-                    setOpen()
-                    setMini()
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    // setOpen()
+                    // setMini()
+                    // setEns(false)
+                    setNotLogIn(true)
                   }}
                   className={styles.profileImgButton}
                 />

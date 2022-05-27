@@ -89,6 +89,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
             setModalWalletConnect={setModalWalletConnectProfile}
             newProfile={newProfile}
             setNewProfile={setNewProfile}
+            isNotLogin={isNotLogIn}
             // onDeleteChildConnectNewProfile={onDeleteChildConnectNewProfile}
           />
         </>
@@ -152,8 +153,8 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
       <Modal
         visible={isModalWantLink}
         classNameWrapper={styles.contentModal}
-        title="Want to link?"
-        content={'You can link your twitter account to your wallet'}
+        title="Want to link your accounts?"
+        content={'You can link your Twitter account with your wallet'}
         footer={
           <div className={cn(styles.wrapperModalWantLink)}>
             {TEST_ACCOUNT.map((x, i) => (
@@ -179,25 +180,23 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
         visible={isModalWaitTransaction}
         classNameWrapper={styles.contentModal}
         title="Metamask message"
-        content={'Confirm the transaction so that we can generate a message'}
+        content={'Please confirm your transaction to generate a message'}
         footer={''}
         onClose={() => onCloseModalWaitTransaction()}
       />
       <Modal
         visible={isModalPost}
         classNameWrapper={styles.contentModal}
-        title="Post a message on twitter"
-        content={'Copy the message and post it on your twitter'}
+        title="Post the message on Twitter"
+        content={'Copy the message and post it on Twitter'}
         footer={
           <div className={styles.wrapperModalWantLink}>
             <div className={styles.postBlock}>
-              <textarea
-                readOnly
-                value={'There will be directly the text that is generated using the metamask'}
-                className={styles.postInput}
-              ></textarea>
+              <div className={styles.postInput}>
+                Тут будет непосредственно текст который генерируется с помощью метамаска
+              </div>
             </div>
-            <a className={styles.postLinkCopy}>Copy</a>
+            <a className={styles.postLinkCopy}>copy text</a>
             <button
               onClick={() => {
                 onCloseModalPost()
@@ -206,7 +205,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
               className={cn(styles.buttonModalModalWantLink)}
               // className={styles.postLinkPublished}
             >
-              Published
+              Posted
             </button>
           </div>
         }
@@ -215,12 +214,12 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
       <Modal
         visible={isModalPostLink}
         classNameWrapper={styles.contentModal}
-        title="Link to post"
-        content={'Insert link to post for verification'}
+        title="Twitter post link"
+        content={'Add a link to the Twitter post to complete the verification'}
         footer={
           <div className={styles.postLinkWrapper}>
             <div className={styles.postBlock}>
-              <input placeholder="Link to post" className={styles.postLinkInput}></input>
+              <input placeholder="post link" className={styles.postLinkInput}></input>
             </div>
 
             <button
@@ -228,9 +227,9 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
                 onCloseModalPostLink()
                 setModalFinalConnect(true)
               }}
-              className={styles.buttonModalModalWantLink}
+              className={cn(styles.buttonModalModalWantLink, styles.newMargin)}
             >
-              Ready
+              Done
             </button>
           </div>
         }
@@ -238,8 +237,8 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
       />
       <Modal
         visible={isModalFinalConnect}
-        title="You bind"
-        content={'This process may take some time'}
+        title="Linking accounts"
+        content={'This can take some time'}
         classNameWrapper={styles.contentModal}
         footer={
           <div className={cn(styles.wrapperModalWantLink)}>

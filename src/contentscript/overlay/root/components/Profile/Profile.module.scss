@@ -89,7 +89,7 @@
   }
 }
 
-.contentModal{
+.contentModal {
   text-align: center;
 
   color: $MainGrey;
@@ -101,7 +101,7 @@
   line-height: 16px;
 }
 
-.wrapperModalWantLink{
+.wrapperModalWantLink {
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -109,7 +109,7 @@
   width: 100%;
 }
 
-.blockModalModalWantLink{
+.blockModalModalWantLink {
   display: flex;
 
   align-items: center;
@@ -129,23 +129,23 @@
 //   margin-bottom: 10px;
 // }
 
-.imgModalModalWantLink{
+.imgModalModalWantLink {
   width: 29px;
   height: 29px;
 
-  border: 1px solid #D9304F;
+  border: 1px solid #d9304f;
   filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
 
   border-radius: 50%;
 }
 
-.nameModalModalWantLink{
+.nameModalModalWantLink {
   display: inline-block;
 
   padding-left: 5px;
 
   text-transform: capitalize;
-  
+
   color: $MainBlack;
 
   font-family: Roboto;
@@ -155,12 +155,12 @@
   line-height: 100%;
 }
 
-.buttonModalModalWantLink{
+.buttonModalModalWantLink {
   display: flex;
   align-items: center;
 
   justify-content: center;
-  
+
   width: min-content;
 
   // width: 46px;
@@ -168,115 +168,106 @@
   margin-top: 14px;
   padding: 0 10px;
 
-
-color: $PureWhite;
+  color: $PureWhite;
   border-radius: 4px;
 
-  
   background: $Primary;
 
   font-family: Roboto;
-font-size: 14px;
+  font-size: 14px;
 
-font-weight: 400;
-line-height: 100%;
+  font-weight: 400;
+  line-height: 100%;
 
-  &:hover{
-    background:$PrimaryHover;
+  &:hover {
+    background: $PrimaryHover;
   }
 
-  &:active{
-    background:$PrimaryPressed;
+  &:active {
+    background: $PrimaryPressed;
   }
 }
 
-.postBlock{
+.postBlock {
   display: flex;
 
   width: 100%;
   margin-bottom: 26px;
-  padding: 10px ;
+  padding: 10px;
 
   border-radius: 10px;
 
-  background: #F5F5F5;
-
+  background: #f5f5f5;
 }
 
-.postInput{
+.postInput {
   display: flex;
-  
+
   width: 306px;
   height: 200px;
 
   padding: 5px 13px;
 
-resize: none;
+  // resize: none;
 
-color: $MainGrey;
- 
-  
+  color: $MainGrey;
+
   border: 1px solid $StrokeColor;
   border-radius: 5px;
-  
+
   background: $PureWhite;
 
-
-font-family: Roboto;
-font-size: 14px;
-font-weight: 400;
-font-style: italic;
-line-height: 149%;
-
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
 }
 
-.postLinkCopy{
-cursor: pointer;
+.postLinkCopy {
+  cursor: pointer;
 
-color: $Primary;
+  color: $Primary;
 
   font-family: Roboto;
-font-size: 14px;
-font-weight: 400;
-font-style: normal;
-line-height: 100%;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 100%;
 
-&:hover{
-color: $PrimaryHover;
+  &:hover {
+    color: $PrimaryHover;
+  }
+
+  &:active {
+    color: $PrimaryPressed;
+  }
 }
 
-&:active{
-  color: $PrimaryPressed;
-}
-}
-
-.postLinkInput{
+.postLinkInput {
   display: flex;
-  
+
   width: 306px;
   height: 32px;
 
   padding: 5px 13px;
 
-// resize: none;
+  color: $MainGrey;
 
-color: $MainGrey;
- 
-  
   border: 1px solid $StrokeColor;
   border-radius: 5px;
-  
+
   background: $PureWhite;
 
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
 
-font-family: Roboto;
-font-size: 14px;
-font-weight: 400;
-font-style: italic;
-line-height: 149%;
+  line-height: 149%;
 }
 
-.postLinkWrapper{
+.postLinkWrapper {
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -284,3 +275,6 @@ line-height: 149%;
   width: 100%;
 }
 
+.newMargin{
+  margin-top: 0;
+}

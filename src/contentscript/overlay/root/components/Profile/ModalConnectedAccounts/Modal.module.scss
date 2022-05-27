@@ -54,6 +54,14 @@
   display: flex;
 }
 
+.modalContent{
+  display: flex;
+  flex:  1 1 auto;
+  justify-content: center;
+
+  max-width: 232px;
+}
+
 .modalClose {
   position: absolute;
   top: 15px;
