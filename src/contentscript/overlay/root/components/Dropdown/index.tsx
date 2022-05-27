@@ -12,7 +12,7 @@ export interface DropdownProps
     label: string
   }
   handlerChangeValue?: (value: IDropdown | null) => void
-  setDropdownListValue: (x: any) => void
+  setDropdownListValue: any
 }
 
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
@@ -35,7 +35,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
       {title && <p className={styles.title}>{title}</p>}
 
       <div className={cn(styles.dropdownBlock, { [styles.isOpen]: isOpen })}>
-        <span className={cn(styles.spanBlock, className)} {...props}>
+        <span className={cn(styles.spanBlock, className)} {...anotherProps}>
           {/* {value.label ? value.label : 'All'} */}
           {value.label}
         </span>

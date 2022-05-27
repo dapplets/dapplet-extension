@@ -1,21 +1,25 @@
-import React, { FC, useEffect } from 'react'
-import styles from './Profile.module.scss'
 import cn from 'classnames'
-import { Avatar } from '../Avatar'
-import { ReactComponent as Down } from '../../assets/icons/down.svg'
+import React, { FC, useEffect, useState } from 'react'
 import { useToggle } from '../../hooks/useToggle'
-import { useState } from 'react'
+import { HeaderLogIn } from './HeaderLogIn'
 import { LogInButton } from './LoginButtons'
 import { Modal } from './ModalConnectedAccounts'
-import { HeaderLogIn } from './HeaderLogIn'
+import styles from './Profile.module.scss'
+import test_acc_one from './profileIcons/Profile/profileOne.svg'
+import test_acc_two from './profileIcons/Profile/profileTwo.svg'
 
 export interface ProfileProps {
   avatar?: string
   hash?: string
 }
+// let uniqId = Math.floor(Math.random() * 1_000_000)
 export const TEST_WALLET = [
-  { id: '1', title: 'ENS' },
-  { id: '1', title: 'NOT_ENS' },
+  { id: 0, title: 'ENS' },
+  { id: 1, title: 'NOT_ENS' },
+]
+export const TEST_ACCOUNT = [
+  { id: 0, title: 'ENS_ACC', img: test_acc_one },
+  { id: 1, title: 'NOT_ENS_ACC', img: test_acc_two },
 ]
 
 export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
@@ -27,41 +31,67 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
   const [isOpen, setOpen] = useToggle(false)
   const [isNotLogIn, setNotLogIn] = useState(true)
   const [isModalWalletConnect, setModalWalletConnect] = useState(false)
+  const [isModalWalletConnectProfile, setModalWalletConnectProfile] = useState(false)
   const [isMini, setMini] = useToggle(false)
   const [isEns, setEns] = useState(false)
 
+  const [isModalWantLink, setModalWantLink] = useState(false)
+  const [isModalWaitTransaction, setModalWaitTransaction] = useState(false)
+  const [isModalPost, setModalPost] = useState(false)
+  const [isModalPostLink, setModalPostLink] = useState(false)
+  const [isModalFinalConnect, setModalFinalConnect] = useState(false)
+
   const onCloseModalWalletConnect = () => setModalWalletConnect(false)
-  useEffect(() => {
-    console.log(isNotLogIn)
-  }, [isNotLogIn, isModalWalletConnect])
+  const onCloseModalWalletConnectProfile = () => setModalWalletConnectProfile(false)
 
-  const visible = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 5)
+  const onCloseModalWantLink = () => setModalWantLink(false)
+  const onCloseModalWaitTransaction = () => setModalWaitTransaction(false)
+  const onCloseModalPost = () => setModalPost(false)
+  const onCloseModalPostLink = () => setModalPostLink(false)
+  const onCloseModalFinalConnect = () => setModalFinalConnect(false)
 
-    return `${firstFourCharacters}...${lastFourCharacters}`
+  const [newProfile, setNewProfile] = useState([])
+  useEffect(() => {}, [isNotLogIn, isModalWalletConnect, newProfile])
+
+  const addConnectNewProfile = (i: number) => {
+    const pushForm = Object.assign({}, TEST_ACCOUNT[i])
+
+    newProfile.push(pushForm)
+    setNewProfile(newProfile)
+    console.log(newProfile, 'add')
+  }
+
+  const temporaryOpenModalTransaction = () => {
+    setModalWantLink(false)
+    setModalWaitTransaction(true)
+    setTimeout(() => {
+      onCloseModalWaitTransaction()
+      setModalPost(true)
+    }, 5000)
   }
 
   return (
     <>
       {isNotLogIn ? (
-        <LogInButton
-          label="Login"
-          onClick={() => setModalWalletConnect(true)}
-        />
+        <LogInButton label="Login" onClick={() => setModalWalletConnect(true)} />
       ) : (
-        <HeaderLogIn
-          isMini={isMini}
-          setOpen={setOpen}
-          setMini={setMini}
-          isOpen={isOpen}
-          setNotLogIn={setNotLogIn}
-          hash={hash}
-          avatar={avatar}
-          isEns={isEns}
-          setEns={setEns}
-          setModalWalletConnect={setModalWalletConnect}
-        />
+        <>
+          <HeaderLogIn
+            isMini={isMini}
+            setOpen={setOpen}
+            setMini={setMini}
+            isOpen={isOpen}
+            setNotLogIn={setNotLogIn}
+            hash={hash}
+            avatar={avatar}
+            isEns={isEns}
+            setEns={setEns}
+            setModalWalletConnect={setModalWalletConnectProfile}
+            newProfile={newProfile}
+            setNewProfile={setNewProfile}
+            // onDeleteChildConnectNewProfile={onDeleteChildConnectNewProfile}
+          />
+        </>
       )}
       <Modal
         visible={isModalWalletConnect}
@@ -71,6 +101,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
           <div className={cn(styles.wrapperModalWallets)}>
             {TEST_WALLET.map((x, i) => (
               <div
+                key={i}
                 className={cn(styles.walletBlock, {
                   [styles.ens]: x.title === 'ENS',
                 })}
@@ -84,6 +115,149 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
           </div>
         }
         onClose={() => onCloseModalWalletConnect()}
+      />
+      <Modal
+        visible={isModalWalletConnectProfile}
+        title="Connect new wallet"
+        content={'select connection type '}
+        footer={
+          <div className={cn(styles.wrapperModalWallets)}>
+            {TEST_WALLET.map((x, i) => (
+              <div
+                key={i}
+                className={cn(styles.walletBlock, {
+                  [styles.ens]: x.title === 'ENS',
+                })}
+                onClick={() => {
+                  // setNotLogIn(false)
+
+                  addConnectNewProfile(i)
+                  setOpen()
+                  setMini()
+                  setTimeout(() => onCloseModalWalletConnectProfile(), 500)
+
+                  // x.title === 'ENS' ? setEns(true) : setEns(false)
+                }}
+              ></div>
+            ))}
+          </div>
+        }
+        onClose={() => onCloseModalWalletConnectProfile()}
+      />
+      <LogInButton
+        onClick={() => setModalWantLink(true)}
+        label="Modal"
+        style={{ marginLeft: '20px' }}
+      />
+      <Modal
+        visible={isModalWantLink}
+        classNameWrapper={styles.contentModal}
+        title="Want to link?"
+        content={'You can link your twitter account to your wallet'}
+        footer={
+          <div className={cn(styles.wrapperModalWantLink)}>
+            {TEST_ACCOUNT.map((x, i) => (
+              <div key={i} className={cn(styles.blockModalModalWantLink)}>
+                <img src={x.img} className={cn(styles.imgModalModalWantLink)} />
+                <p className={cn(styles.nameModalModalWantLink)}>{x.title}</p>
+              </div>
+            ))}
+            <button
+              onClick={() => {
+                onCloseModalWantLink()
+                temporaryOpenModalTransaction()
+              }}
+              className={cn(styles.buttonModalModalWantLink)}
+            >
+              Link
+            </button>
+          </div>
+        }
+        onClose={() => onCloseModalWantLink()}
+      />
+      <Modal
+        visible={isModalWaitTransaction}
+        classNameWrapper={styles.contentModal}
+        title="Metamask message"
+        content={'Confirm the transaction so that we can generate a message'}
+        footer={''}
+        onClose={() => onCloseModalWaitTransaction()}
+      />
+      <Modal
+        visible={isModalPost}
+        classNameWrapper={styles.contentModal}
+        title="Post a message on twitter"
+        content={'Copy the message and post it on your twitter'}
+        footer={
+          <div className={styles.wrapperModalWantLink}>
+            <div className={styles.postBlock}>
+              <textarea
+                readOnly
+                value={'There will be directly the text that is generated using the metamask'}
+                className={styles.postInput}
+              ></textarea>
+            </div>
+            <a className={styles.postLinkCopy}>Copy</a>
+            <button
+              onClick={() => {
+                onCloseModalPost()
+                setModalPostLink(true)
+              }}
+              className={cn(styles.buttonModalModalWantLink)}
+              // className={styles.postLinkPublished}
+            >
+              Published
+            </button>
+          </div>
+        }
+        onClose={() => onCloseModalPost()}
+      />
+      <Modal
+        visible={isModalPostLink}
+        classNameWrapper={styles.contentModal}
+        title="Link to post"
+        content={'Insert link to post for verification'}
+        footer={
+          <div className={styles.postLinkWrapper}>
+            <div className={styles.postBlock}>
+              <input placeholder="Link to post" className={styles.postLinkInput}></input>
+            </div>
+
+            <button
+              onClick={() => {
+                onCloseModalPostLink()
+                setModalFinalConnect(true)
+              }}
+              className={styles.buttonModalModalWantLink}
+            >
+              Ready
+            </button>
+          </div>
+        }
+        onClose={() => onCloseModalPostLink()}
+      />
+      <Modal
+        visible={isModalFinalConnect}
+        title="You bind"
+        content={'This process may take some time'}
+        classNameWrapper={styles.contentModal}
+        footer={
+          <div className={cn(styles.wrapperModalWantLink)}>
+            {TEST_ACCOUNT.map((x, i) => (
+              <div key={i} className={cn(styles.blockModalModalWantLink)}>
+                <img src={x.img} className={cn(styles.imgModalModalWantLink)} />
+                <p className={cn(styles.nameModalModalWantLink)}>{x.title}</p>
+              </div>
+            ))}
+            <button
+              onClick={() => onCloseModalFinalConnect()}
+              className={cn(styles.buttonModalModalWantLink)}
+            >
+              Confirm
+            </button>
+          </div>
+        }
+        onClose={() => onCloseModalFinalConnect()}
       />
     </>
   )

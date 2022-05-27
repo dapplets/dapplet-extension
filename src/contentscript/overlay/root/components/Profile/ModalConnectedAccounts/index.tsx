@@ -1,12 +1,5 @@
-import React, {
-  ReactElement,
-  useState,
-  useEffect,
-  useMemo,
-  FC,
-  useRef,
-} from 'react'
 import cn from 'classnames'
+import React, { ReactElement, useEffect } from 'react'
 import styles from './Modal.module.scss'
 
 interface ModalProps {
@@ -52,9 +45,7 @@ export const Modal = ({
       >
         <div className={styles.modalHeader}>
           <h3 className={cn(styles.modalTitle, className)}>{title}</h3>
-          {onClose ? (
-            <span className={styles.modalClose} onClick={onClose} />
-          ) : null}
+          {onClose ? <span className={styles.modalClose} onClick={onClose} /> : null}
         </div>
         <div className={styles.modalBody}>
           <div className={styles.modalContent}>{content}</div>

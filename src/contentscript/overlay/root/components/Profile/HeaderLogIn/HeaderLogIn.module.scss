@@ -1,11 +1,14 @@
+/* stylelint-disable order/properties-order */
 @import '../../../assets/styles/null.scss';
 @import '../../../assets/styles/fonts.scss';
 @import '../../../assets/styles/color.variables.scss';
+
 .wrapper {
   display: inline-block;
 
   font-family: Roboto, sans-serif;
 }
+
 .avatar {
   width: 29px;
   height: 29px;
@@ -32,6 +35,7 @@
   &.mini {
     padding: 2px;
     display: inline-block;
+
     .avatar {
     }
   }
@@ -52,15 +56,17 @@
   flex-direction: column;
   align-items: flex-start;
 }
+
 .ensNameBlock {
   display: flex;
   align-items: center;
-  padding: 0px 0px 0px 5px;
+  padding: 0 0 0 5px;
+
   // justify-content: space-between;
 }
 
 .ensName {
-  font-family: 'Roboto';
+  font-family: Roboto;
   font-style: normal;
   font-weight: 400;
   font-size: 12px;
@@ -70,12 +76,12 @@
 
   color: $MainBlack;
   display: inline-block;
-  padding: 0px 5px 0px 0px;
+  padding: 0 5px 0 0;
 }
 
 .ensLabel {
   display: inline-block;
-  padding: 0px 10px;
+  padding: 0 10px;
 
   width: 36px;
   height: 11px;
@@ -83,7 +89,7 @@
   background: #5ec280;
   border-radius: 11px;
 
-  font-family: 'Roboto';
+  font-family: Roboto;
   font-style: normal;
   font-weight: 400;
   font-size: 10px;
@@ -98,7 +104,7 @@
 .ensHash {
   display: inline-block;
   padding-left: 5px;
-  font-family: 'Roboto';
+  font-family: Roboto;
   font-style: normal;
   font-weight: 400;
   font-size: 10px;
@@ -112,20 +118,22 @@
 
 .fakeModal {
   position: fixed;
-  top: 0px;
+  top: 0;
   bottom: 0;
   left: 0;
+
   // right: 0;
   width: 100%;
   z-index: 3;
   display: flex;
+
   // align-items: center;
   // justify-content: center;
-  background: rgba(196, 196, 196, 0.1);
+  background: rgb(196 196 196 / 10%);
   backdrop-filter: blur(2px);
   animation-name: appear;
   animation-duration: 300ms;
-  padding: 19px 0px 0px 18px;
+  padding: 19px 0 0 18px;
 }
 
 .headerWrapperIsOpen {
@@ -139,11 +147,12 @@
 
   width: 168px;
   height: min-content;
-  background: #ffffff;
-  border-radius: 0px 0px 10px 10px;
+  background: #fff;
+  border-radius: 0 0 10px 10px;
   padding: 9px 9px 9px 7px;
   font-size: 14px;
   line-height: 16px;
+
   &::after {
     content: '';
     position: absolute;
@@ -158,7 +167,7 @@
 
 .logOut {
   display: block;
-  padding: 0px 10px;
+  padding: 0 10px;
   margin-top: 7px;
   background: inherit;
   width: 64px;
@@ -167,7 +176,7 @@
   border: 1px solid $MainGrey;
   border-radius: 4px;
 
-  font-family: 'Roboto';
+  font-family: Roboto;
   font-style: normal;
   font-weight: 400;
   font-size: 10px;
@@ -179,6 +188,7 @@
 
   &:hover {
     border: 1px solid $OverlayBG;
+
     // color: $OverlayBG;
   }
 
@@ -187,12 +197,14 @@
     color: $ContentBlack;
   }
 }
+
 .walletBlock {
   display: flex;
   flex-direction: column;
   position: relative;
   width: 100%;
-  padding: 11px 0px;
+  padding: 5px 0 11px;
+
   &::after {
     content: '';
     top: 0;
@@ -202,6 +214,7 @@
     height: 1px;
     background: $StrokeColor;
   }
+
   &::before {
     content: '';
     bottom: 0;
@@ -212,6 +225,7 @@
     background: $StrokeColor;
   }
 }
+
 .addWallet {
   display: flex;
   align-items: center;
@@ -227,23 +241,26 @@
   border-radius: 50%;
   background: $PureWhite;
   border: 1px solid $WebBG;
-  filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2 9.5H1C1 7.84315 2.34315 6.5 4 6.5C5.65685 6.5 7 7.84315 7 9.5H6C6 8.39543 5.10457 7.5 4 7.5C2.89543 7.5 2 8.39543 2 9.5ZM9.5 8H8.5V6.5H7V5.5H8.5V4H9.5V5.5H11V6.5H9.5V8ZM4 6C2.89543 6 2 5.10457 2 4C2 2.89543 2.89543 2 4 2C5.10457 2 6 2.89543 6 4C5.99862 5.104 5.104 5.99862 4 6ZM4 3C3.4537 3.00055 3.00894 3.43942 3.00112 3.98567C2.99329 4.53192 3.42528 4.98335 3.97134 4.99956C4.51741 5.01577 4.97542 4.59075 5 4.045V4.245V4C5 3.44772 4.55228 3 4 3Z' fill='%23919191'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
+
   &:hover {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2 9.5H1C1 7.84315 2.34315 6.5 4 6.5C5.65685 6.5 7 7.84315 7 9.5H6C6 8.39543 5.10457 7.5 4 7.5C2.89543 7.5 2 8.39543 2 9.5ZM9.5 8H8.5V6.5H7V5.5H8.5V4H9.5V5.5H11V6.5H9.5V8ZM4 6C2.89543 6 2 5.10457 2 4C2 2.89543 2.89543 2 4 2C5.10457 2 6 2.89543 6 4C5.99862 5.104 5.104 5.99862 4 6ZM4 3C3.4537 3.00055 3.00894 3.43942 3.00112 3.98567C2.99329 4.53192 3.42528 4.98335 3.97134 4.99956C4.51741 5.01577 4.97542 4.59075 5 4.045V4.245V4C5 3.44772 4.55228 3 4 3Z' fill='%23F4F4F4'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
   }
+
   &:active {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2 9.5H1C1 7.84315 2.34315 6.5 4 6.5C5.65685 6.5 7 7.84315 7 9.5H6C6 8.39543 5.10457 7.5 4 7.5C2.89543 7.5 2 8.39543 2 9.5ZM9.5 8H8.5V6.5H7V5.5H8.5V4H9.5V5.5H11V6.5H9.5V8ZM4 6C2.89543 6 2 5.10457 2 4C2 2.89543 2.89543 2 4 2C5.10457 2 6 2.89543 6 4C5.99862 5.104 5.104 5.99862 4 6ZM4 3C3.4537 3.00055 3.00894 3.43942 3.00112 3.98567C2.99329 4.53192 3.42528 4.98335 3.97134 4.99956C4.51741 5.01577 4.97542 4.59075 5 4.045V4.245V4C5 3.44772 4.55228 3 4 3Z' fill='%23747376'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
   }
 }
+
 .AddUserLabel {
-  font-family: 'Roboto';
+  font-family: Roboto;
   font-style: normal;
   font-weight: 400;
   font-size: 10px;
@@ -269,6 +286,7 @@
   justify-content: space-around;
   padding-bottom: 5px;
 }
+
 .profileBlockImg {
   display: flex;
   align-items: flex-start;
@@ -276,35 +294,38 @@
   justify-content: space-between;
   margin-left: auto;
 }
+
 .profileImg {
   border-radius: 50%;
   width: 53px;
   height: 53px;
 
   border: 1px solid $Primary;
-  filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
 }
 
 .profileImgButton {
   display: block;
   width: 14px;
   height: 14px;
-  filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
   background-color: $WebBG;
   border-radius: 50%;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='4' viewBox='0 0 8 4' fill='none'%3E%3Cpath d='M1.3013 2.00065C1.3013 1.43065 1.76464 0.967318 2.33464 0.967318H3.66797V0.333984H2.33464C1.41464 0.333984 0.667969 1.08065 0.667969 2.00065C0.667969 2.92065 1.41464 3.66732 2.33464 3.66732H3.66797V3.03398H2.33464C1.76464 3.03398 1.3013 2.57065 1.3013 2.00065ZM2.66797 2.33398H5.33464V1.66732H2.66797V2.33398ZM5.66797 0.333984H4.33464V0.967318H5.66797C6.23797 0.967318 6.7013 1.43065 6.7013 2.00065C6.7013 2.57065 6.23797 3.03398 5.66797 3.03398H4.33464V3.66732H5.66797C6.58797 3.66732 7.33464 2.92065 7.33464 2.00065C7.33464 1.08065 6.58797 0.333984 5.66797 0.333984Z' fill='%23919191'/%3E%3C/svg%3E");
   background-position: center;
   background-repeat: no-repeat;
+
   &:hover {
     background-color: $AppBG;
   }
+
   &:active {
     background-color: $StrokeColor;
   }
 }
 
 .profileLink {
-  font-family: 'Roboto';
+  font-family: Roboto;
   font-style: normal;
   font-weight: 400;
   font-size: 10px;
@@ -314,16 +335,18 @@
 
   color: $Primary;
   cursor: pointer;
+
   &:hover {
     color: $PrimaryHover;
   }
+
   &:active {
     color: $PrimaryPressed;
   }
 }
 
 .notEnsHash {
-  font-family: 'Roboto';
+  font-family: Roboto;
   font-style: normal;
   font-weight: 400;
   font-size: 12px;
@@ -334,4 +357,47 @@
   color: $MainBlack;
   display: inline-block;
   margin-bottom: -10px;
+}
+
+.newProfileBlock{
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.newProfileBlockInfo{
+  display: flex;
+  align-items: center;
+
+  // justify-content: space-between;
+
+  width: 90px;
+  padding-left: 5px;
+  padding-top: 5px;
+ 
+  &:last-child{
+     padding-top: 5px;
+  }
+}
+
+.newProfileBlockImg{
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-block;
+
+  // padding-left: 5px;
+}
+
+.newProfileBlockName{
+font-family: Roboto;
+font-style: normal;
+font-weight: 400;
+font-size: 10px;
+line-height: 100%;
+text-transform: capitalize;
+color: $MainBlack;
+display: inline-block;
+padding-left: 5px;
 }

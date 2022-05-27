@@ -310,6 +310,7 @@ class _App extends React.Component<P, S> {
                   hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
                 />
               </div>
+
               <div className={styles.right}>
                 <SquaredButton
                   appearance="big"
