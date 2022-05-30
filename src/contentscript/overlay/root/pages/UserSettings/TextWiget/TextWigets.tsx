@@ -1,8 +1,12 @@
 import { utils } from '@rjsf/core'
 import { rangeSpec } from '@rjsf/core/lib/utils'
+// import { Form } from 'semantic-ui-react'
+// import {Form} from './index'
+import cn from 'classnames'
 import React from 'react'
-import { Form } from 'semantic-ui-react'
-import { getSemanticProps } from './utils'
+import { getSemanticProps } from '../utils'
+// import './textWiget.css'
+import styles from './TextWiget.module.scss'
 // const Form = JSONSchemaForm.default;
 
 const { getDisplayLabel } = utils
@@ -25,7 +29,7 @@ function TextWidget(props) {
     uiSchema,
     formContext,
   } = props
-  const semanticProps = getSemanticProps({ formContext, options, uiSchema })
+  const uiThemeProps = getSemanticProps({ formContext, options, uiSchema })
   // eslint-disable-next-line no-shadow
   const _onChange = ({ target: { value } }) => onChange(value === '' ? options.emptyValue : value)
   const _onBlur = () => onBlur && onBlur(id, value)
@@ -38,9 +42,13 @@ function TextWidget(props) {
 
   const step = schema.type === 'number' ? 'any' : undefined // non-integer numbers shouldn't have a default step of 1
   const stepProps = rangeSpec(schema) // sets step, min, and max from the schema
+  console.log('lala')
 
   return (
-    <Form.Input
+    <input
+      className={cn(styles.inputOverlay, {
+        [styles.inputOverlayNumber]: `${schema.type}` === 'number',
+      })}
       key={id}
       id={id}
       placeholder={placeholder}
@@ -50,7 +58,7 @@ function TextWidget(props) {
       autoFocus={autofocus}
       disabled={disabled || readonly}
       name={name}
-      {...semanticProps}
+      {...uiThemeProps}
       value={value || value === 0 ? value : ''}
       onChange={_onChange}
       onBlur={_onBlur}

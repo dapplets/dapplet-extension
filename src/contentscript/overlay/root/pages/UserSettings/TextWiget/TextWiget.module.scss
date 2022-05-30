@@ -1,0 +1,34 @@
+@import '../../../assets/styles/null.scss';
+@import '../../../assets/styles/fonts.scss';
+@import '../../../assets/styles/color.variables.scss';
+
+.inputOverlay{
+  display: flex;
+
+  align-items: flex-start;
+
+  
+  width: 100%;
+  height: 31px;
+  margin-top: 10px;
+  padding: 5px 13px;
+
+  /* identical to box height, or 21px */
+
+  /* MainColors/MainGrey */
+  color: $MainGrey;
+  
+
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
+  
+
+  background: $AppBG;
+
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
+}

@@ -1,8 +1,8 @@
 import { utils } from '@rjsf/core'
 import _ from 'lodash'
 import React from 'react'
-import { Form } from 'semantic-ui-react'
-import { getSemanticProps } from './utils'
+import { getSemanticProps } from '../utils'
+import styles from './SelectWiget.module.scss'
 
 const { asNumber, guessType } = utils
 
@@ -84,10 +84,10 @@ function SelectWidget(props) {
     options,
     defaultSchemaProps: {
       inverted: 'false',
-      selection: true,
-      fluid: true,
-      scrolling: true,
-      upward: false,
+      selection: 'true',
+      fluid: 'true',
+      scrolling: 'true',
+      upward: 'false',
     },
   })
   const { enumDisabled, enumOptions } = options
@@ -106,7 +106,9 @@ function SelectWidget(props) {
   }) => onFocus && onFocus(id, processValue(schema, value))
 
   return (
-    <Form.Dropdown
+    <input
+      // Form.Dropdown
+      className={styles.inputSelect}
       key={id}
       name={name}
       label={label || schema.title}

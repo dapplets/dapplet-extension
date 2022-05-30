@@ -1,21 +1,16 @@
-// import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { withTheme } from '@rjsf/core'
-import { Theme as SemanticUITheme } from '@rjsf/semantic-ui'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { FC, useEffect, useState } from 'react'
-import { Button } from 'semantic-ui-react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
 import { CONTEXT_ID_WILDCARD } from '../../../../../common/constants'
 import { DefaultConfig, SchemaConfig } from '../../../../../common/types'
 import { Message } from '../../components/Message'
-import SelectWidget from './SelectWigets'
-import TextWidget from './TextWigets'
-
-SemanticUITheme.widgets.SelectWidget = SelectWidget
-SemanticUITheme.widgets.TextWidget = TextWidget
-const Form = withTheme(SemanticUITheme)
+import SelectWidget from './SelectWiget/SelectWigets'
+import './settingPage.css'
+import TextWidget from './TextWiget/TextWigets'
+import styles from './UserSettings.module.scss'
 
 export interface SettingsPageProps {
   mi?: ModuleInfo & {
@@ -28,6 +23,10 @@ export interface SettingsPageProps {
   defaultConfig?: DefaultConfig
 }
 let _isMounted = false
+
+const theme = { widgets: { SelectWidget, TextWidget } }
+const Form = withTheme(theme)
+
 export const SettingsPage: FC<SettingsPageProps> = (props) => {
   const { mi, vi, schemaConfig, defaultConfig } = props
 
@@ -123,13 +122,17 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
     setLoading(false)
     setEdited(false)
   }
+  const visible = (hash: string): string => {
+    const firstFourCharacters = hash.substring(0, 6)
+    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 6)
+
+    return `${firstFourCharacters}...${lastFourCharacters}`
+  }
 
   return (
-    <div>
-      <h1>User Settings</h1>
-
+    <div className={styles.wrapper}>
       {mi && vi ? (
-        <div>
+        <div className={styles.block}>
           {/* Warning about Hidden properties */}
           {devMode && hiddenProperties.length > 0 ? (
             <Message
@@ -140,35 +143,33 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
           ) : null}
 
           {/* Module Header Info */}
-          <div>
-            <h3>{mi.title}</h3>
-            <h3>{mi.type}</h3>
-            <div>
-              {mi.description}
-              <br />
-              <strong>
-                {mi.name}#{vi.branch}@{vi.version}
-              </strong>
-              <br />
-              {owner ? (
-                <div>
-                  Owner:
-                  <a
-                    style={{ cursor: 'pointer' }}
-                    onClick={() =>
-                      window.open(`https://goerli.etherscan.io/address/${owner}`, '_blank')
-                    }
-                  >
-                    {owner}
-                  </a>
-                </div>
-              ) : null}
+          <div className={styles.wrapperInfoCard}>
+            <h3 className={styles.cardTitle}>{mi.title}</h3>
+            <h3 className={styles.cardType}>{mi.type}</h3>
+            <div className={styles.cardDescription}>{mi.description}</div>
+            <div className={styles.cardOwner}>
+              version:
+              <span className={styles.cardVersion}>{vi.version}</span>
             </div>
+            {owner ? (
+              <div className={styles.cardOwner}>
+                Owner:
+                <a
+                  className={styles.cardLink}
+                  onClick={() =>
+                    window.open(`https://goerli.etherscan.io/address/${owner}`, '_blank')
+                  }
+                >
+                  {visible(owner)}
+                </a>
+              </div>
+            ) : null}
           </div>
 
           {/* Form */}
           {schemaConfig && schemaConfig.properties ? (
             <Form
+              className={styles.form}
               schema={schemaConfig || {}}
               onSubmit={(e) => _saveData(e.formData)}
               formData={data}
@@ -177,21 +178,29 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
                 setData(e.formData)
               }}
             >
-              <div>
-                <Button type="submit" primary disabled={loading || !isEdited} loading={loading}>
+              <div className={styles.wrapperButton}>
+                <button
+                  className={styles.buttonSubmit}
+                  type="submit"
+                  disabled={loading || !isEdited}
+                >
                   Save and Reload
-                </Button>
-                <Button basic disabled={loading} onClick={() => _resetSettings()}>
+                </button>
+                <button
+                  className={styles.buttonSubmit}
+                  disabled={loading}
+                  onClick={() => _resetSettings()}
+                >
                   Reset
-                </Button>
+                </button>
               </div>
             </Form>
           ) : (
-            <p>No settings available for this dapplet.</p>
+            <p className={styles.textNoSettings}>No settings available for this dapplet.</p>
           )}
         </div>
       ) : (
-        <div>Loading</div>
+        <div className={styles.blockLoading}>Loading</div>
       )}
     </div>
   )

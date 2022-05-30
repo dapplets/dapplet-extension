@@ -89,10 +89,10 @@ function SelectWidget(props) {
     options,
     defaultSchemaProps: {
       inverted: 'false',
-      selection: true,
-      fluid: true,
-      scrolling: true,
-      upward: false,
+      selection: 'true',
+      fluid: 'true',
+      scrolling: 'true',
+      upward: 'false',
     },
   })
   const { enumDisabled, enumOptions } = options
