@@ -133,40 +133,40 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
     <div className={styles.wrapper}>
       {mi && vi ? (
         <div className={styles.block}>
-          {/* Warning about Hidden properties */}
+          <div className={styles.wrapperInfoCard}>
+            <h3 className={styles.cardTitle}>{mi.title}</h3>
+            <h3 className={styles.cardType}>{mi.type}</h3>
+            <div className={styles.cardDescription}>{mi.description}</div>
+            <div className={styles.cardName}>{mi.name}</div>
+            <div className={styles.blockInfo}>
+              <div className={styles.cardOwner}>
+                version:
+                <span className={styles.cardVersion}>{vi.version}</span>
+              </div>
+              {owner ? (
+                <div className={styles.cardOwner}>
+                  Owner:
+                  <a
+                    className={styles.cardLink}
+                    onClick={() =>
+                      window.open(`https://goerli.etherscan.io/address/${owner}`, '_blank')
+                    }
+                  >
+                    {visible(owner)}
+                  </a>
+                </div>
+              ) : null}
+            </div>
+          </div>
           {devMode && hiddenProperties.length > 0 ? (
             <Message
+              className={styles.messageUserSettings}
               title="Hidden settings"
               subtitle="The following options are available only in developer mode:"
               children={<>{hiddenProperties.join(', ')}</>}
             />
           ) : null}
 
-          {/* Module Header Info */}
-          <div className={styles.wrapperInfoCard}>
-            <h3 className={styles.cardTitle}>{mi.title}</h3>
-            <h3 className={styles.cardType}>{mi.type}</h3>
-            <div className={styles.cardDescription}>{mi.description}</div>
-            <div className={styles.cardOwner}>
-              version:
-              <span className={styles.cardVersion}>{vi.version}</span>
-            </div>
-            {owner ? (
-              <div className={styles.cardOwner}>
-                Owner:
-                <a
-                  className={styles.cardLink}
-                  onClick={() =>
-                    window.open(`https://goerli.etherscan.io/address/${owner}`, '_blank')
-                  }
-                >
-                  {visible(owner)}
-                </a>
-              </div>
-            ) : null}
-          </div>
-
-          {/* Form */}
           {schemaConfig && schemaConfig.properties ? (
             <Form
               className={styles.form}
@@ -196,7 +196,10 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
               </div>
             </Form>
           ) : (
-            <p className={styles.textNoSettings}>No settings available for this dapplet.</p>
+            <Message
+              className={styles.messageUserSettings}
+              title="No settings available for this dapplet."
+            />
           )}
         </div>
       ) : (

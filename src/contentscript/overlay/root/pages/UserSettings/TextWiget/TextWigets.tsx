@@ -45,27 +45,35 @@ function TextWidget(props) {
   console.log('lala')
 
   return (
-    <input
-      className={cn(styles.inputOverlay, {
-        [styles.inputOverlayNumber]: `${schema.type}` === 'number',
-      })}
-      key={id}
-      id={id}
-      placeholder={placeholder}
-      type={schema.type === 'string' ? 'text' : `${schema.type}`}
-      label={displayLabel ? label || schema.title : false}
-      required={required}
-      autoFocus={autofocus}
-      disabled={disabled || readonly}
-      name={name}
-      {...uiThemeProps}
-      value={value || value === 0 ? value : ''}
-      onChange={_onChange}
-      onBlur={_onBlur}
-      onFocus={_onFocus}
-      step={step}
-      {...stepProps}
-    />
+    <div className={cn({ [styles.inputBlock]: `${schema.type}` === 'number' })}>
+      {`${schema.type}` === 'number' ? (
+        <button type="button" className={styles.buttonMin}></button>
+      ) : null}
+      <input
+        className={cn(styles.inputOverlay, {
+          [styles.inputOverlayNumber]: `${schema.type}` === 'number',
+        })}
+        key={id}
+        id={id}
+        placeholder={placeholder}
+        type={schema.type === 'string' ? 'text' : `${schema.type}`}
+        label={displayLabel ? label || schema.title : false}
+        required={required}
+        autoFocus={autofocus}
+        disabled={disabled || readonly}
+        name={name}
+        {...uiThemeProps}
+        value={value || value === 0 ? value : ''}
+        onChange={_onChange}
+        onBlur={_onBlur}
+        onFocus={_onFocus}
+        step={step}
+        {...stepProps}
+      />
+      {`${schema.type}` === 'number' ? (
+        <button type="button" className={styles.buttonMax}></button>
+      ) : null}
+    </div>
   )
 }
 export default TextWidget

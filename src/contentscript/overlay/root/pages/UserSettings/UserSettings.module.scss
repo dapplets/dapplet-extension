@@ -8,7 +8,7 @@
 
   width: 100%;
 
-  margin-top: 30px;
+  margin-top: 25px;
 }
 
 .block{
@@ -16,7 +16,7 @@
   flex-direction: column;
 
   width: 100%;
-  padding: 0;
+  padding: 0 12px;
 }
 
 .form{
@@ -27,9 +27,6 @@
     justify-content: center;
 
     width: 100%;
-  
-
-  
 
     div{
       display: flex;
@@ -66,6 +63,8 @@
 }
 
 .cardTitle{
+  margin-bottom: 5px;
+
   color: $MainBlack;
 
   font-family: Roboto, sans-serif;
@@ -76,6 +75,8 @@
 }
 
 .cardType{
+  margin-bottom: 5px;
+
   text-transform: uppercase;
 
   color: $Secondary;
@@ -88,6 +89,8 @@
 }
 
 .cardDescription{
+  margin-bottom: 20px;
+
   text-transform: lowercase;
 
   color: $ContentBlack;
@@ -97,6 +100,27 @@
   font-weight: 400;
   font-style: normal;
   line-height: 120%;
+}
+
+.cardName{
+  padding-bottom: 5px;
+
+  color: $ContentBlack;
+
+  font-family: Roboto;
+  font-size: 12px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 120%;
+}
+
+.blockInfo{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 60%;
+  margin-bottom: 20px;
 }
 
 .cardOwner{
@@ -112,6 +136,10 @@
 }
 
 .cardVersion{
+  display: inline-block;
+
+  margin-left: 5px;
+
   text-transform: lowercase;
 
   color: $Secondary;
@@ -124,6 +152,10 @@
 }
 
 .cardLink{
+  display: inline-block;
+
+  margin-left: 5px;
+
   cursor: pointer;
   text-transform: uppercase;
 
@@ -134,6 +166,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
+
 
   &:hover{
     color: $SecondaryHover;
@@ -187,5 +220,46 @@
     color: $StrokeColor;
     border: 1px solid $StrokeColor;
     background: inherit;
+  }
+}
+
+.messageUserSettings{
+  width: 100%;
+  height: min-content;
+  padding: 14px 0 21px 18px;
+
+
+  color: $PureWhite;
+
+  border-radius: 10px;
+  background: #5AB5E8;
+  box-shadow: 0 0 5px rgb(0 0 0 / 10%);
+
+  font-family: Roboto;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 120%;
+
+  h6{
+    color: $PureWhite;
+
+    font-family: Roboto;
+    font-size: 16px;
+    font-weight: 500;
+    font-style: normal;
+    line-height: 120%
+  }
+
+  p{
+    text-transform: lowercase;
+
+    color: $PureWhite;
+
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 120%;
   }
 }
