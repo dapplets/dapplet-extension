@@ -17,5 +17,6 @@
     "[scss]": {
         "editor.defaultFormatter": "stylelint.vscode-stylelint"
     },
-    "stylelint.customSyntax": "postcss-scss"
+    "stylelint.customSyntax": "postcss-scss",
+    "files.eol": "\n"
 }
