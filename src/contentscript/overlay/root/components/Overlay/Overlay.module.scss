@@ -1,5 +1,5 @@
-@import '../../assets/styles/color.variables.scss';
-@import '../../overlayManager.css';
+@import "../../assets/styles/color.variables.scss";
+@import "../../overlayManager.css";
 
 .overlay {
   z-index: 9999;
@@ -166,6 +166,7 @@
 
   opacity: 1;
 }
+
 @media (min-width: 320px) and (max-width: 640px) {
   .overlay {
     width: 100%;

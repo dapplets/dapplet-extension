@@ -1,5 +1,5 @@
-@import '../../assets/styles/color.variables.scss';
-@import '../../assets/styles/null.scss';
+@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null.scss";
 
 .wrapper {
   display: flex;
@@ -27,12 +27,13 @@
   &::-webkit-scrollbar-track {
     background: rgb(244 244 244);
     background: rgb(244 244 244);
-    background: linear-gradient(
-      90deg,
-      rgb(244 244 244 / 100%) 25%,
-      rgb(227 227 227 / 100%) 50%,
-      rgb(244 244 244 / 100%) 25%
-    );
+    background:
+      linear-gradient(
+        90deg,
+        rgb(244 244 244 / 100%) 25%,
+        rgb(227 227 227 / 100%) 50%,
+        rgb(244 244 244 / 100%) 25%
+      );
   }
 
   &::-webkit-scrollbar-thumb {
@@ -60,6 +61,7 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+
 @media (min-width: 320px) and (max-width: 640px) {
   .wrapper {
     margin-bottom: 22px;

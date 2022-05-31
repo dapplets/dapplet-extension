@@ -1,6 +1,6 @@
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
-@import '../../assets/styles/null.scss';
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null.scss";
 
 .BlockTitleCard {
   display: flex;
@@ -36,9 +36,11 @@
     }
   }
 }
+
 @media (min-width: 320px) and (max-width: 640px) {
   .BlockTitleCard {
     width: 100%;
+
     // max-width: 191px;
     min-width: 105px;
   }

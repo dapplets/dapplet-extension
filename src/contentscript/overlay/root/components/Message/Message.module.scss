@@ -1,6 +1,6 @@
-@import '../../assets/styles/null.scss';
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
+@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
 
 .wrapper {
   display: flex;
@@ -24,6 +24,7 @@
   padding: 0 0 4px;
 
   color: $MainBlack;
+
   // max-width: 220px;
 
   font-family: Roboto;
