@@ -38,7 +38,7 @@
     "ignorePatterns": [
         "webpack.common.js",
         "webpack.dev.js",
-        "webpack.libjs.js",
+        "webpack.jslib.js",
         "webpack.prod.js"
     ]
 }
