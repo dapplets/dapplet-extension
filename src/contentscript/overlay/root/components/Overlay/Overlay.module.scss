@@ -4,24 +4,19 @@
 .overlay {
   z-index: 9999;
 
+  overflow: -moz-scrollbars-none;
+
   min-width: 468px;
   height: 100vh;
 
   // width: 320px;
   transition: transform 0.3s ease;
   filter: drop-shadow(-4px 0 4px rgb(0 0 0 / 25%));
+  -ms-overflow-style: none;
 }
 
 .overlay::-webkit-scrollbar {
   width: 0;
-}
-
-.overlay {
-  -ms-overflow-style: none;
-}
-
-.overlay {
-  overflow: -moz-scrollbars-none;
 }
 
 .overlay::-webkit-scrollbar-thumb {
@@ -42,23 +37,17 @@
 
 .wrapper {
   overflow: auto;
+  overflow: -moz-scrollbars-none;
 
   // height: 100%;
   padding: 17px 15px 5px;
 
   background: $OverlayBG;
+  -ms-overflow-style: none;
 }
 
 .wrapper::-webkit-scrollbar {
   width: 0;
-}
-
-.wrapper {
-  -ms-overflow-style: none;
-}
-
-.wrapper {
-  overflow: -moz-scrollbars-none;
 }
 
 .toolbar {
