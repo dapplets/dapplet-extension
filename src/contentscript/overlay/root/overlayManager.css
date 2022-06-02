@@ -11,8 +11,18 @@
   border: 0;
   background: #fff;
 
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    sans-serif;
   font-size: 14px;
   line-height: 20px;
 
@@ -42,7 +52,7 @@
   }
 }
 
-.dapplets-overlay-frame.dapplets-overlay-collapsed [class*='toggleOverlay'] {
+.dapplets-overlay-frame.dapplets-overlay-collapsed [class*="toggleOverlay"] {
   left: -100px;
 }
 
@@ -64,7 +74,7 @@
     /* width: 640px !important; */
   }
 
-  .dapplets-overlay-frame.dapplets-overlay-collapsed [class*='toggleOverlay'] {
+  .dapplets-overlay-frame.dapplets-overlay-collapsed [class*="toggleOverlay"] {
     left: -100px;
   }
 

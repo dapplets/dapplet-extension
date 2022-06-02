@@ -1,6 +1,6 @@
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
-@import '../../assets/styles/null.scss';
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null.scss";
 
 .wrapper {
   overflow: hidden;
@@ -69,12 +69,13 @@
   &::-webkit-scrollbar-track {
     background: rgb(244 244 244);
     background: rgb(244 244 244);
-    background: linear-gradient(
-      90deg,
-      rgb(244 244 244 / 0%) 10%,
-      rgb(227 227 227 / 100%) 50%,
-      rgb(244 244 244 / 0%) 90%
-    );
+    background:
+      linear-gradient(
+        90deg,
+        rgb(244 244 244 / 0%) 10%,
+        rgb(227 227 227 / 100%) 50%,
+        rgb(244 244 244 / 0%) 90%
+      );
   }
 
   &::-webkit-scrollbar-thumb {

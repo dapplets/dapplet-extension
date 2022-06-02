@@ -1,8 +1,8 @@
-@import '../../assets/styles/null.scss';
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
+@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
 
-.wrapper{
+.wrapper {
   display: flex;
   flex-direction: column;
 
@@ -11,7 +11,7 @@
   margin-top: 25px;
 }
 
-.block{
+.block {
   display: flex;
   flex-direction: column;
 
@@ -19,8 +19,8 @@
   padding: 0 12px;
 }
 
-.form{
-  fieldset{
+.form {
+  fieldset {
     display: flex;
     align-items: flex-start;
     flex-direction: column;
@@ -28,7 +28,7 @@
 
     width: 100%;
 
-    div{
+    div {
       display: flex;
       align-items: flex-start;
       flex-direction: column;
@@ -43,7 +43,7 @@
       background: $PureWhite;
     }
   }
-  
+
   label {
     color: $PureBlack;
 
@@ -55,14 +55,14 @@
   }
 }
 
-.wrapperInfoCard{
+.wrapperInfoCard {
   display: flex;
   flex-direction: column;
 
   width: 100%;
 }
 
-.cardTitle{
+.cardTitle {
   margin-bottom: 5px;
 
   color: $MainBlack;
@@ -74,7 +74,7 @@
   line-height: 26px;
 }
 
-.cardType{
+.cardType {
   margin-bottom: 5px;
 
   text-transform: uppercase;
@@ -85,10 +85,10 @@
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
-  line-height: 120%
+  line-height: 120%;
 }
 
-.cardDescription{
+.cardDescription {
   margin-bottom: 20px;
 
   text-transform: lowercase;
@@ -102,7 +102,7 @@
   line-height: 120%;
 }
 
-.cardName{
+.cardName {
   padding-bottom: 5px;
 
   color: $ContentBlack;
@@ -114,7 +114,7 @@
   line-height: 120%;
 }
 
-.blockInfo{
+.blockInfo {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -123,7 +123,7 @@
   margin-bottom: 20px;
 }
 
-.cardOwner{
+.cardOwner {
   text-transform: lowercase;
 
   color: $ContentBlack;
@@ -135,7 +135,7 @@
   line-height: 120%;
 }
 
-.cardVersion{
+.cardVersion {
   display: inline-block;
 
   margin-left: 5px;
@@ -151,7 +151,7 @@
   line-height: 120%;
 }
 
-.cardLink{
+.cardLink {
   display: inline-block;
 
   margin-left: 5px;
@@ -167,17 +167,16 @@
   font-style: normal;
   line-height: 100%;
 
-
-  &:hover{
+  &:hover {
     color: $SecondaryHover;
   }
 
-  &:active{
+  &:active {
     color: $SecondaryPressed;
   }
 }
 
-.wrapperButton{
+.wrapperButton {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -186,17 +185,16 @@
   margin-top: 5px;
 }
 
-.buttonSubmit{
+.buttonSubmit {
   display: inline-block;
 
   height: 32px;
 
   padding: 7px 10px 9px;
 
-  color: $PureWhite; 
+  color: $PureWhite;
 
   border-radius: 4px;
-
 
   background: $Primary;
 
@@ -206,15 +204,15 @@
   font-style: normal;
   line-height: 100%;
 
-  &:hover{
+  &:hover {
     background: $PrimaryHover;
   }
 
-  &:active{
-    background:   $PrimaryPressed;
+  &:active {
+    background: $PrimaryPressed;
   }
 
-  &:disabled{
+  &:disabled {
     cursor: default;
 
     color: $StrokeColor;
@@ -223,16 +221,15 @@
   }
 }
 
-.messageUserSettings{
+.messageUserSettings {
   width: 100%;
   height: min-content;
   padding: 14px 0 21px 18px;
 
-
   color: $PureWhite;
 
   border-radius: 10px;
-  background: #5AB5E8;
+  background: #5ab5e8;
   box-shadow: 0 0 5px rgb(0 0 0 / 10%);
 
   font-family: Roboto;
@@ -241,17 +238,17 @@
   font-style: normal;
   line-height: 120%;
 
-  h6{
+  h6 {
     color: $PureWhite;
 
     font-family: Roboto;
     font-size: 16px;
     font-weight: 500;
     font-style: normal;
-    line-height: 120%
+    line-height: 120%;
   }
 
-  p{
+  p {
     text-transform: lowercase;
 
     color: $PureWhite;

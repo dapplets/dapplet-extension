@@ -1,5 +1,5 @@
-@import '../../assets/styles/color.variables.scss';
-@import '../../assets/styles/null.scss';
+@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null.scss";
 
 .wrapper {
   position: relative;
@@ -38,7 +38,7 @@
     width: 16px;
     height: 16px;
 
-    content: '';
+    content: "";
 
     transition: all 0.3s ease 0s;
     transform: translateY(-50%);

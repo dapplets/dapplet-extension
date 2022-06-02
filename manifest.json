@@ -32,7 +32,7 @@
       "js": [
         "custom-elements.min.js",
         "common.js",
-      	"contentscript.js"
+        "contentscript.js"
       ],
       "run_at": "document_idle",
       "all_frames": true
@@ -51,13 +51,10 @@
     }
   ],
   "web_accessible_resources": [
-    "pairing.html",
-    "sowa.html",
     "popup.html",
     "deploy.html",
     "starter.html",
     "settings.html",
-    "login.html",
     "callback.html",
     "guide.html",
     "overlay.html",

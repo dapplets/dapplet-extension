@@ -1,6 +1,6 @@
-@import '../../assets/styles/null.scss';
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
+@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
 
 .wrapperCard {
   display: flex;
@@ -113,7 +113,7 @@
     width: 1px;
     height: 16px;
 
-    content: '';
+    content: "";
     transform: translateY(-50%);
 
     background-color: #e3e3e3;
@@ -147,6 +147,7 @@
   max-width: 240px;
   margin-top: 5px;
 }
+
 @media (min-width: 320px) and (max-width: 640px) {
   .wrapperCard {
     width: 100%;
