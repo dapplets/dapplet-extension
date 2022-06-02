@@ -24,47 +24,28 @@
   font-weight: 500;
   font-style: normal;
   line-height: 149%;
-<<<<<<< HEAD
-
-  option{
-    background: red!important;
-  }
 }
 
-select{
+select {
   display: flex;
 
   align-items: flex-start;
- 
-  
+
   width: 100%;
   height: 36px;
 
   margin-top: 10px;
   padding: 5px 13px;
 
-  cursor: pointer;
-  
-  
   color: $MainGrey;
   border: 1px solid $StrokeColor;
   border-radius: 5px;
-  
- 
+
   background: $AppBG;
-  
+
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 149%;
-
-  &:first-child{
-    background: red;
-  }
 }
-
-
-=======
-}
->>>>>>> 64382493050145ca0abf41d33e91193372730451
