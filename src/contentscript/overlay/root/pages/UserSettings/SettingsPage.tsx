@@ -1,4 +1,5 @@
 import { withTheme } from '@rjsf/core'
+import { Theme as SemanticUITheme } from '@rjsf/semantic-ui'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
@@ -23,8 +24,8 @@ export interface SettingsPageProps {
   defaultConfig?: DefaultConfig
 }
 let _isMounted = false
-
-const theme = { widgets: { SelectWidget, TextWidget } }
+SemanticUITheme.widgets.SelectWidget = SelectWidget
+const theme = { widgets: { SemanticUITheme, TextWidget } }
 const Form = withTheme(theme)
 
 export const SettingsPage: FC<SettingsPageProps> = (props) => {
