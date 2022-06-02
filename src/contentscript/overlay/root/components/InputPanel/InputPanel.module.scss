@@ -1,6 +1,6 @@
-@import '../../assets/styles/null.scss';
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
+@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
 
 .inputPanel {
   display: flex;
@@ -87,7 +87,7 @@
   height: 31px;
   margin-left: 5px;
 
-  content: 'add';
+  content: "add";
 
   text-transform: uppercase;
 

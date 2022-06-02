@@ -1,6 +1,6 @@
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
-@import '../../assets/styles/null.scss';
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null.scss";
 
 .wrapper {
   display: inline-block;
@@ -48,7 +48,7 @@
     width: 120%;
     height: 3px;
 
-    content: '';
+    content: "";
     transform: translateX(-50%);
 
     border-radius: 5px;

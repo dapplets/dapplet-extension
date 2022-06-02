@@ -95,6 +95,10 @@
 
   border-style: solid none solid solid;
 
+<<<<<<< HEAD
+=======
+  // box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.5);
+>>>>>>> adaptive-overlay
   border-radius: 0;
 }
 
@@ -124,7 +128,7 @@
   position: relative;
   right: -12px;
 
-  content: '';
+  content: "";
 
   border-right: 1px #aaa solid;
 }
@@ -322,7 +326,7 @@
 
   color: #000;
 
-  font: 14pt 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font: 14pt "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .popup-loader-container {

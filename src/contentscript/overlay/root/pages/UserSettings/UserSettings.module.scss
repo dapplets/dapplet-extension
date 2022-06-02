@@ -1,126 +1,207 @@
-@import '../../assets/styles/null.scss';
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
+@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
 
 .wrapper {
   display: flex;
-  overflow: hidden;
-
-  flex: 1 1 auto;
   flex-direction: column;
 
   width: 100%;
 
-  height: calc(100vh - 140px);
+  margin-top: 25px;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  padding: 0 12px;
+}
+
+.form {
+  fieldset {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+
+    width: 100%;
+
+    div {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      justify-content: center;
+
+      width: 100%;
+      margin: 5px 0;
+      padding: 10px;
+
+      border-radius: 10px;
+
+      background: $PureWhite;
+    }
+  }
+
+  label {
+    color: $PureBlack;
+
+    font-family: Roboto;
+    font-size: 14px;
+    font-weight: 500;
+    font-style: normal;
+    line-height: 16px;
+  }
+}
+
+.wrapperInfoCard {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+}
+
+.cardTitle {
+  margin-bottom: 5px;
+
+  color: $MainBlack;
+
+  font-family: Roboto, sans-serif;
+  font-size: 22px;
+
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.cardType {
+  margin-bottom: 5px;
+
+  text-transform: uppercase;
+
+  color: $Secondary;
+
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 120%;
+}
+
+.cardDescription {
+  margin-bottom: 20px;
+
+  text-transform: lowercase;
+
+  color: $ContentBlack;
+
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 120%;
+}
+
+.cardName {
+  padding-bottom: 5px;
+
+  color: $ContentBlack;
+
+  font-family: Roboto;
+  font-size: 12px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 120%;
 }
 
 .blockInfo {
   display: flex;
-
-  display: flex;
-
-  overflow: hidden;
-  flex: 1 1 auto;
-  flex-direction: column;
-
-  flex-direction: column;
-
-  width: 100%;
-  width: 100%;
-  height: 100%;
-  padding: 15px 0 0 15px;
-}
-
-.wrapperSettings {
-  margin: 0 0 20px !important;
-}
-
-.socialBlock {
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-}
-
-.moduleTitle {
-  display: flex;
   align-items: center;
+  justify-content: space-between;
 
-  width: 100%;
-  height: 44px;
-  margin: 0 0 10px;
-  padding: 10px;
+  width: 60%;
+  margin-bottom: 20px;
+}
 
+.cardOwner {
+  text-transform: lowercase;
+
+  color: $ContentBlack;
+
+  font-family: Roboto;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 120%;
+}
+
+.cardVersion {
+  display: inline-block;
+
+  margin-left: 5px;
+
+  text-transform: lowercase;
+
+  color: $Secondary;
+
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 120%;
+}
+
+.cardLink {
+  display: inline-block;
+
+  margin-left: 5px;
+
+  cursor: pointer;
   text-transform: uppercase;
 
-  color: $PureBlack;
-  border-radius: 10px;
-  background: #fff;
+  color: $Secondary;
 
   font-family: Roboto;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 16px;
-}
-
-.ownershipBlock {
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-}
-
-.item {
-  margin-bottom: 10px !important;
-}
-
-.inputOwnershipBlock {
-  display: flex;
-  align-items: center;
-
-  width: 100%;
-}
-
-.inputOwnership {
-  display: flex;
-
-  width: 90%;
-  padding: 5px 13px;
-
-  color: $MainGrey;
-
-  border: 1px solid $StrokeColor;
-
-  border-radius: 5px;
-
-  background: $AppBG;
-
-  font-family: Roboto;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
-  font-style: italic;
-  line-height: 149%;
+  font-style: normal;
+  line-height: 100%;
+
+  &:hover {
+    color: $SecondaryHover;
+  }
+
+  &:active {
+    color: $SecondaryPressed;
+  }
 }
 
-.ownershipButton {
+.wrapperButton {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 
-  width: 37px;
+  width: 50%;
+  margin-top: 5px;
+}
+
+.buttonSubmit {
+  display: inline-block;
+
   height: 32px;
-  margin: 0 5px;
-  padding: 0 5px;
 
-  text-transform: uppercase;
+  padding: 7px 10px 9px;
 
-  color: #fff;
+  color: $PureWhite;
+
   border-radius: 4px;
-  background: #d9304f;
+
+  background: $Primary;
 
   font-family: Roboto;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 400;
+  font-style: normal;
   line-height: 100%;
 
   &:hover {
@@ -130,24 +211,52 @@
   &:active {
     background: $PrimaryPressed;
   }
+
+  &:disabled {
+    cursor: default;
+
+    color: $StrokeColor;
+    border: 1px solid $StrokeColor;
+    background: inherit;
+  }
 }
 
-.authorDelete {
-  display: block;
+.messageUserSettings {
+  width: 100%;
+  height: min-content;
+  padding: 14px 0 21px 18px;
 
-  width: 11.5px;
-  height: 12.5px;
+  color: $PureWhite;
 
-  cursor: pointer;
+  border-radius: 10px;
+  background: #5ab5e8;
+  box-shadow: 0 0 5px rgb(0 0 0 / 10%);
 
-  background: inherit;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%23747376'/%3E%3C/svg%3E");
+  font-family: Roboto;
+  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 120%;
 
-  &:hover {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%23919191'/%3E%3C/svg%3E");
+  h6 {
+    color: $PureWhite;
+
+    font-family: Roboto;
+    font-size: 16px;
+    font-weight: 500;
+    font-style: normal;
+    line-height: 120%;
   }
 
-  &:active {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%232A2A2A'/%3E%3C/svg%3E");
+  p {
+    text-transform: lowercase;
+
+    color: $PureWhite;
+
+    font-family: Roboto;
+    font-size: 12px;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 120%;
   }
 }

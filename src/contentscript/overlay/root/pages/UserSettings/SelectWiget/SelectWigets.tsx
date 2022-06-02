@@ -1,13 +1,9 @@
-/**
- * https://github.com/rjsf-team/react-jsonschema-form/blob/d48eeaae8969a64c72429dcfd0df151b3e8bc730/packages/semantic-ui/src/SelectWidget/SelectWidget.js
- * https://github.com/rjsf-team/react-jsonschema-form/blob/d48eeaae8969a64c72429dcfd0df151b3e8bc730/packages/semantic-ui/src/util.js
- */
-
 import { utils } from '@rjsf/core'
 import _ from 'lodash'
 import React from 'react'
-import { Form } from 'semantic-ui-react'
-import { getSemanticProps } from './utils'
+import { Dropdown } from 'semantic-ui-react'
+import { getSemanticProps } from '../utils'
+import styles from './SelectWiget.module.scss'
 
 const { asNumber, guessType } = utils
 
@@ -19,14 +15,17 @@ const nums = new Set(['number', 'integer'])
  * @param {array} enumDisabled - array of enum option values to disable
  * @returns {*}
  */
-function createDefaultValueOptionsForDropDown(enumOptions, enumDisabled) {
+
+function createDefaultValueOptionsForDropDown(enumOptions, enumDisabled, className) {
   const disabledOptions = enumDisabled || []
   let options = []
   // eslint-disable-next-line no-shadow
+
   options = _.map(enumOptions, ({ label, value }) => ({
     disabled: disabledOptions.indexOf(value) !== -1,
     key: label,
     text: label,
+    className: className,
     value,
   }))
   return options
@@ -89,15 +88,15 @@ function SelectWidget(props) {
     options,
     defaultSchemaProps: {
       inverted: 'false',
-      selection: 'true',
-      fluid: 'true',
-      scrolling: 'true',
-      upward: 'false',
+      selection: true,
+      fluid: true,
+      scrolling: true,
+      upward: false,
     },
   })
   const { enumDisabled, enumOptions } = options
   const emptyValue = multiple ? [] : ''
-  const dropdownOptions = createDefaultValueOptionsForDropDown(enumOptions, enumDisabled)
+  const dropdownOptions = createDefaultValueOptionsForDropDown(enumOptions, enumDisabled, 'num')
   const _onChange = (
     event,
     // eslint-disable-next-line no-shadow
@@ -109,9 +108,11 @@ function SelectWidget(props) {
     // eslint-disable-next-line no-shadow
     target: { value },
   }) => onFocus && onFocus(id, processValue(schema, value))
+  console.log(options)
 
   return (
-    <Form.Dropdown
+    <Dropdown
+      className={styles.inputSelect}
       key={id}
       name={name}
       label={label || schema.title}

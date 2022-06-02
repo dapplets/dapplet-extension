@@ -4,7 +4,8 @@ import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
 import { DefaultConfig, SchemaConfig } from '../../../../../common/types'
-import { SettingsPage } from '../../../../../settings/SettingsPage'
+import { SettingsPage } from './SettingsPage'
+// import { SettingsPage } from '../../../../../settings/SettingsPage'
 
 type UserSettingsContext = {
   mi: ModuleInfo & {
@@ -45,6 +46,7 @@ export const UserSettings = ({ dappletName, registryUrl }: UserSettingsProps): R
 
   if (!settingsContext) return null
   const { mi, vi, schemaConfig, defaultConfig } = settingsContext
+  // console.log(settingsContext)
 
   return <SettingsPage mi={mi} vi={vi} schemaConfig={schemaConfig} defaultConfig={defaultConfig} />
 }

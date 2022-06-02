@@ -22,8 +22,6 @@ export class OverlayManager implements IOverlayManager {
     overlay: Overlay
   }[] = []
 
-  public ref = React.createRef<any>()
-
   constructor(private _iframeMessenger: JsonRpc) {
     // Side panel
     const extensionHostID = 'dapplets-overlay-manager'
@@ -221,7 +219,6 @@ export class OverlayManager implements IOverlayManager {
         hidden={this._panel.classList.contains(HiddenOverlayClass)}
         overlayManager={this}
         onToggle={this.toggle.bind(this)}
-        ref={this.ref}
       />,
       this._root
     )

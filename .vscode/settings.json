@@ -11,7 +11,12 @@
         "css",
         "scss"
     ],
+    "[css]": {
+        "editor.defaultFormatter": "stylelint.vscode-stylelint"
+    },
     "[scss]": {
         "editor.defaultFormatter": "stylelint.vscode-stylelint"
-    }
+    },
+    "stylelint.customSyntax": "postcss-scss",
+    "files.eol": "\n"
 }
