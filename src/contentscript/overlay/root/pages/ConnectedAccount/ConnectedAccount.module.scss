@@ -1,0 +1,309 @@
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null.scss";
+
+.wrapper{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 59px 0 0;
+}
+
+.title{
+ display: grid;
+ grid-template-columns: 2fr 1fr;
+ grid-template-rows: 1fr;
+ font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 10px;
+line-height: 100%;
+
+text-transform: capitalize;
+
+color: $MainGrey;
+
+position: relative;
+padding-bottom: 7px;
+&::after{
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: $WebBG;
+}
+}
+
+.titleAccount{}
+.titleStatus{}
+
+.accountsWrapper{
+  display: flex;
+flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+.mainBlock{
+  display: grid;
+  width: 100%;
+  grid-template-columns: 3fr 1.15fr 0.35fr;
+  grid-template-rows: 1fr;
+  padding-left: 2px;
+}
+
+.accountBlock{
+display: flex;
+width: 100%;
+align-items: center;
+justify-content: space-between;
+padding: 0px 25px 0px 0px;
+margin-bottom: 17px;
+
+&:first-child{
+  margin-top: 12px;
+}
+
+}
+
+.account{
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 33px;
+  background: $WebBG;
+box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+border-radius: 200px;
+padding: 2px 5px 2px 2px;
+justify-content: space-between;
+position: relative;
+}
+
+.choiseUserActive{
+  position: absolute;
+  top: 45%;
+  right: -67%;
+  z-index: 10;
+  display: flex;
+  width: 107px;
+  height: 37px;
+  justify-content: space-around;
+  background: #eaf0f0;
+  border-radius: 10px;
+  align-items: start;
+  padding: 5px 0px;
+}
+.blockLinkChoise{
+
+  display: flex;
+  justify-content: space-between;
+    height: 100%;
+
+  flex-direction: column;
+  font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 10px;
+line-height: 100%;
+
+
+color: $MainGrey;
+cursor: pointer;
+a{
+  &:hover{
+  color: $PrimaryHover;
+}
+&:active{
+  color: $PrimaryPressed;
+}
+}
+
+}
+
+
+
+.accountFirst{}
+.arrowsAccount{}
+
+
+
+.imgUser{
+  width: 29px;
+  height: 29px;
+  border-radius: 50%;
+  display: inline-block;
+  filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1))
+}
+
+.nameUser{
+  font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 10px;
+line-height: 100%;
+
+text-transform: capitalize;
+color: $MainBlack;
+}
+.nameUserActive{
+  background: $Primary;
+  .nameUser{
+    color: $PureWhite;
+  }
+}
+
+.accountButton{
+  display: inline-block;
+  width: 15px;
+height: 15px;
+border-radius: 50%;
+background-color: $PureWhite;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='3' viewBox='0 0 7 3' fill='none'%3E%3Cpath d='M5.64307 2.21568C5.24858 2.21568 4.92878 1.89588 4.92878 1.5014C4.92878 1.10691 5.24858 0.787109 5.64307 0.787109C6.03756 0.787109 6.35735 1.10691 6.35735 1.5014C6.35735 1.69084 6.2821 1.87252 6.14814 2.00647C6.01419 2.14043 5.83251 2.21568 5.64307 2.21568ZM3.50021 2.21568C3.10572 2.21568 2.78592 1.89588 2.78592 1.5014C2.78592 1.10691 3.10572 0.787109 3.50021 0.787109C3.8947 0.787109 4.2145 1.10691 4.2145 1.5014C4.2145 1.69084 4.13924 1.87252 4.00529 2.00647C3.87133 2.14043 3.68965 2.21568 3.50021 2.21568ZM1.35735 2.21568C0.962863 2.21568 0.643066 1.89588 0.643066 1.5014C0.643066 1.10691 0.962863 0.787109 1.35735 0.787109C1.75184 0.787109 2.07164 1.10691 2.07164 1.5014C2.07164 1.69084 1.99638 1.87252 1.86243 2.00647C1.72847 2.14043 1.54679 2.21568 1.35735 2.21568Z' fill='%23919191'/%3E%3C/svg%3E");
+background-repeat: no-repeat;
+background-position: center;
+&:hover{
+  background-color: $WebBG;
+}
+&:active{
+  background-color: $OverlayBG;
+}
+&:disabled{
+  cursor: default;
+  background-color: $PureWhite;
+}
+}
+
+.accountButtonChoise{
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='3' viewBox='0 0 7 3' fill='none'%3E%3Cpath d='M5.64307 2.21568C5.24858 2.21568 4.92878 1.89588 4.92878 1.5014C4.92878 1.10691 5.24858 0.787109 5.64307 0.787109C6.03756 0.787109 6.35735 1.10691 6.35735 1.5014C6.35735 1.69084 6.2821 1.87252 6.14814 2.00647C6.01419 2.14043 5.83251 2.21568 5.64307 2.21568ZM3.50021 2.21568C3.10572 2.21568 2.78592 1.89588 2.78592 1.5014C2.78592 1.10691 3.10572 0.787109 3.50021 0.787109C3.8947 0.787109 4.2145 1.10691 4.2145 1.5014C4.2145 1.69084 4.13924 1.87252 4.00529 2.00647C3.87133 2.14043 3.68965 2.21568 3.50021 2.21568ZM1.35735 2.21568C0.962863 2.21568 0.643066 1.89588 0.643066 1.5014C0.643066 1.10691 0.962863 0.787109 1.35735 0.787109C1.75184 0.787109 2.07164 1.10691 2.07164 1.5014C2.07164 1.69084 1.99638 1.87252 1.86243 2.00647C1.72847 2.14043 1.54679 2.21568 1.35735 2.21568Z' fill='%23d9304f'/%3E%3C/svg%3E");
+  
+}
+
+.arrowsAccount{
+  display: inline-block;
+  width: 22px;
+  height: 11px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='11' viewBox='0 0 16 11' fill='none'%3E%3Cpath d='M0.221076 1.96378L1.63608 0.550781L6.58508 5.50078L1.63008 10.4448L0.222076 9.03678L3.75808 5.50078L0.221076 1.96478L0.221076 1.96378ZM9.41408 5.50078L14.3691 0.555781L15.7781 1.96478L12.2431 5.50078L15.7781 9.03578L14.3641 10.4508L9.41508 5.50178L9.41408 5.50078Z' fill='%23E3E3E3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  margin: 0px 6px ;
+}
+
+.accountStatus{
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: start;
+  position: relative;
+}
+
+.statusLabel{
+  display: block;
+  width: 23px;
+height: 23px;
+border-radius: 50%;
+box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1);
+cursor: pointer;
+
+}
+
+.accountStatus::before{
+  content: attr(data-title);
+}
+.accountStatus::before{
+  content: attr(data-title);
+  display: none;
+  position: absolute;
+  z-index: 9998;
+  top: 47%;
+  right: 87%;
+  background: $PureWhite;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 10px 0px 10px 10px;
+text-align: center;
+padding: 8px 10px;
+  height: auto;
+width: max-content;
+  font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 10px;
+line-height: 100%;
+
+text-transform: capitalize;
+
+color: $MainGrey;
+}
+.accountStatus:hover::before, .accountStatus:focus::before{
+  display: inline-block;
+
+}
+
+.statusName{
+  display: inline-block;
+  font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 10px;
+line-height: 100%;
+
+text-transform: capitalize;
+
+color: $MainBlack;
+padding-left: 5px;
+}
+
+.statusConnected{
+  background: #5EC280;
+  padding: 4px 5px ;
+}
+
+.statusProcessing{
+  background: #F5CF6C;
+  padding: 6px 5px ;
+}
+
+.statusError{
+  background: $Primary;
+  padding: 4px 2px 7px 2px;
+}
+
+.accountDelete{
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.buttonDelete{
+  display: inline-block;
+  width: 27px;
+height: 27px;
+border-radius: 50%;
+filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
+background-color: $PureWhite;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23919191'/%3E%3C/svg%3E");
+background-repeat: no-repeat;
+background-position: center;
+&:hover{
+  background-color: $WebBG;
+}
+&:active{
+  background-color: $OverlayBG;
+}
+}
+
+.contentModal {
+  text-align: center;
+
+  color: $MainGrey;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 16px;
+}
