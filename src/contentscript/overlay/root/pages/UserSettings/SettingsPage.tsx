@@ -163,8 +163,11 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
             <Message
               className={styles.messageUserSettings}
               title="Hidden settings"
-              subtitle="The following options are available only in developer mode:"
-              children={<>{hiddenProperties.join(', ')}</>}
+              subtitle="The following options are available only in developer mode"
+              children={
+                ''
+                // <div className={styles.hiddenProps}>{hiddenProperties.join(', ')}</div>
+              }
             />
           ) : null}
 
