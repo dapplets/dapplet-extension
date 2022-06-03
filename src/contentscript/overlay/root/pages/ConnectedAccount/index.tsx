@@ -77,7 +77,7 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
     setModalWaitTransaction(true)
     setTimeout(() => {
       onCloseModalWaitTransaction()
-    }, 50000)
+    }, 5000)
   }
 
   const onDeleteChildRecepient = (id: number) => {
@@ -85,7 +85,7 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
     TEST_PROFILE.splice(id, 1)
     setTimeout(() => {
       onCloseModalWaitTransaction()
-    }, 50000)
+    }, 5000)
 
     // setItemsRecepient(newForm)
   }
