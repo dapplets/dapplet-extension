@@ -145,11 +145,11 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
         }
         onClose={() => onCloseModalWalletConnectProfile()}
       />
-      <LogInButton
+      {/* <LogInButton
         onClick={() => setModalWantLink(true)}
         label="Modal"
         style={{ marginLeft: '20px' }}
-      />
+      /> */}
       <Modal
         visible={isModalWantLink}
         classNameWrapper={styles.contentModal}
