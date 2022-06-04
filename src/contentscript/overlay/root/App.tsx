@@ -291,6 +291,9 @@ class _App extends React.Component<P, S> {
   handleWalletLengthConnect = () => {
     this.setState({ isWalletLength: true })
   }
+  handleWalletLengthDisconnect = () => {
+    this.setState({ isWalletLength: false })
+  }
 
   render() {
     const p = this.props
@@ -327,11 +330,13 @@ class _App extends React.Component<P, S> {
               <div className={styles.left}>
                 <Profile
                   // mini
+                  handleWalletLengthDisconnect={this.handleWalletLengthDisconnect}
                   handleWalletLengthConnect={this.handleWalletLengthConnect}
                   isWalletLength={s.isWalletLength}
                   handleWalletConnect={this.handleWalletConnect}
                   avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
                   hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
+                  isOverlay={true}
                 />
               </div>
 
@@ -373,8 +378,13 @@ class _App extends React.Component<P, S> {
               {pathname === '/system/notifications' && <Notifications />}
               {/* {pathname === '/system/connected' && <ConnectedAccount />} */}
               {pathname === '/system/settings' && <SettingsOverlay />}
-
-              {/* {pathname === '/system/wallet' && <Wallets isOverlay={true} />} */}
+              {/* 
+              {pathname === '/system/wallet' && (
+                <Wallet
+                  handleWalletLengthConnect={this.handleWalletLengthConnect}
+                  isOverlay={true}
+                />
+              )} */}
 
               {overlays.map((x) => (
                 <ContentItem
@@ -395,7 +405,11 @@ class _App extends React.Component<P, S> {
           visible={s.isWalletConnect}
           content={''}
           footer={
-            <Wallet isOverlay={true} handleWalletLengthConnect={this.handleWalletLengthConnect} />
+            <Wallet
+              isOverlay={true}
+              handleWalletLengthConnect={this.handleWalletLengthConnect}
+              handleWalletConnect={this.handleWalletConnect}
+            />
           }
           onClose={this.handleWalletConnect}
         />

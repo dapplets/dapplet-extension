@@ -15,16 +15,13 @@ import {
   WalletTypes,
 } from '../../../../../common/types'
 export interface WalletProps {
-  // descriptors?: WalletDescriptor[]
-  //walletInfo: WalletInfo;
-  // loading?: boolean
   isOverlay?: boolean
-  // isWallet?: boolean
+  handleWalletConnect?: () => void
   handleWalletLengthConnect: () => void
 }
 let _isMounted = false
 export const Wallet: FC<WalletProps> = (props: WalletProps) => {
-  const { isOverlay, handleWalletLengthConnect } = props
+  const { isOverlay, handleWalletLengthConnect, handleWalletConnect } = props
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -34,13 +31,11 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
       refresh()
       _isMounted = true
       EventBus.on('wallet_changed', refresh)
-      connectedDescriptors.length > 0 ? handleWalletLengthConnect() : null
     }
 
     init()
 
     return () => {
-      _isMounted = false
       _isMounted = false
       EventBus.off('wallet_changed', refresh)
     }
@@ -64,11 +59,15 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
   const connectWallet = async () => {
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
     if (isOverlay) {
+      handleWalletConnect()
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       // await this.componentDidMount()
+      handleWalletLengthConnect()
     } else {
+      handleWalletConnect()
       pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       window.close()
+      handleWalletLengthConnect()
     }
   }
   const setWalletFor = async (type: string) => {

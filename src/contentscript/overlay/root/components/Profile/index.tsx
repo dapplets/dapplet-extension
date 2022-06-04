@@ -14,8 +14,10 @@ export interface ProfileProps {
   handleWalletConnect: () => void
   isWalletLength: boolean
   handleWalletLengthConnect: () => void
+  isOverlay: boolean
+  handleWalletLengthDisconnect: () => void
 }
-// let uniqId = Math.floor(Math.random() * 1_000_000)
+
 export const TEST_WALLET = [
   { id: 0, title: 'ENS' },
   { id: 1, title: 'NOT_ENS' },
@@ -24,17 +26,18 @@ export const TEST_ACCOUNT = [
   { id: 0, title: 'ENS_ACC', img: test_acc_one },
   { id: 1, title: 'NOT_ENS_ACC', img: test_acc_two },
 ]
-
+let _isMounted = false
 export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
   const {
     avatar,
     hash,
     handleWalletConnect,
     isWalletLength,
-    //  isOpen, onLogout, open, mini = false
+    isOverlay,
+    handleWalletLengthDisconnect,
   } = props
   const [isOpen, setOpen] = useToggle(false)
-  const [isNotLogIn, setNotLogIn] = useState(isWalletLength)
+
   const [isModalWalletConnect, setModalWalletConnect] = useState(false)
   const [isModalWalletConnectProfile, setModalWalletConnectProfile] = useState(false)
   const [isMini, setMini] = useToggle(false)
@@ -56,7 +59,19 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
   const onCloseModalFinalConnect = () => setModalFinalConnect(false)
 
   const [newProfile, setNewProfile] = useState([])
-  useEffect(() => {}, [isNotLogIn, isModalWalletConnect, newProfile])
+  useEffect(() => {
+    const init = async () => {
+      _isMounted = true
+      // isWalletLength && setNotLogIn(false)
+    }
+
+    init()
+
+    return () => {
+      _isMounted = false
+    }
+  }, [isModalWalletConnect, newProfile, isWalletLength])
+  console.log(isWalletLength)
 
   const addConnectNewProfile = (i: number) => {
     const pushForm = Object.assign({}, TEST_ACCOUNT[i])
@@ -77,7 +92,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
 
   return (
     <>
-      {isNotLogIn ? (
+      {isWalletLength ? (
         <LogInButton label="Login" onClick={() => handleWalletConnect()} />
       ) : (
         <>
@@ -86,20 +101,17 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
             setOpen={setOpen}
             setMini={setMini}
             isOpen={isOpen}
-            setNotLogIn={setNotLogIn}
             hash={hash}
             avatar={avatar}
-            isEns={isEns}
-            setEns={setEns}
+            handleWalletLengthDisconnect={handleWalletLengthDisconnect}
             setModalWalletConnect={setModalWalletConnectProfile}
             newProfile={newProfile}
             setNewProfile={setNewProfile}
-            isNotLogin={isNotLogIn}
-            // onDeleteChildConnectNewProfile={onDeleteChildConnectNewProfile}
+            isOverlay={isOverlay}
           />
         </>
       )}
-      <Modal
+      {/* <Modal
         visible={isModalWalletConnect}
         title="Connect new wallet"
         content={'select connection type '}
@@ -121,8 +133,8 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
           </div>
         }
         onClose={() => onCloseModalWalletConnect()}
-      />
-      <Modal
+      /> */}
+      {/* <Modal
         visible={isModalWalletConnectProfile}
         title="Connect new wallet"
         content={'select connection type '}
@@ -149,7 +161,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
           </div>
         }
         onClose={() => onCloseModalWalletConnectProfile()}
-      />
+      /> */}
       {/* <LogInButton
         onClick={() => setModalWantLink(true)}
         label="Modal"
