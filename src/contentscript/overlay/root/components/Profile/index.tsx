@@ -11,6 +11,9 @@ import test_acc_two from './profileIcons/Profile/profileTwo.svg'
 export interface ProfileProps {
   avatar?: string
   hash?: string
+  handleWalletConnect: () => void
+  isWalletLength: boolean
+  handleWalletLengthConnect: () => void
 }
 // let uniqId = Math.floor(Math.random() * 1_000_000)
 export const TEST_WALLET = [
@@ -26,10 +29,12 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
   const {
     avatar,
     hash,
+    handleWalletConnect,
+    isWalletLength,
     //  isOpen, onLogout, open, mini = false
   } = props
   const [isOpen, setOpen] = useToggle(false)
-  const [isNotLogIn, setNotLogIn] = useState(true)
+  const [isNotLogIn, setNotLogIn] = useState(isWalletLength)
   const [isModalWalletConnect, setModalWalletConnect] = useState(false)
   const [isModalWalletConnectProfile, setModalWalletConnectProfile] = useState(false)
   const [isMini, setMini] = useToggle(false)
@@ -73,7 +78,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
   return (
     <>
       {isNotLogIn ? (
-        <LogInButton label="Login" onClick={() => setModalWalletConnect(true)} />
+        <LogInButton label="Login" onClick={() => handleWalletConnect()} />
       ) : (
         <>
           <HeaderLogIn

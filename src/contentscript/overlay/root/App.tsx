@@ -16,7 +16,7 @@ import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../background/dto/manifestDTO'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
-import Wallets from '../../../popup/pages/wallets'
+// import Wallets from '../../../popup/pages/wallets'
 import { ReactComponent as Card } from './assets/svg/card.svg'
 // import { ReactComponent as Account } from './assets/svg/connected-account.svg'
 import { ReactComponent as DappletsLogo } from './assets/svg/dapplets-logo.svg'
@@ -29,6 +29,7 @@ import { ContentItem } from './components/ContentItem'
 import styles from './components/Overlay/Overlay.module.scss'
 import { OverlayToolbar } from './components/OverlayToolbar'
 import { Profile } from './components/Profile'
+import { Modal } from './components/Profile/ModalConnectedAccounts'
 import { Search } from './components/Search'
 import { SquaredButton } from './components/SquaredButton'
 import { Overlay } from './overlay'
@@ -38,6 +39,7 @@ import { Dapplets } from './pages/Dapplets'
 import { Notifications } from './pages/Notifications'
 import { SettingsOverlay } from './pages/Settings'
 import { UserSettings } from './pages/UserSettings'
+import { Wallet } from './pages/Wallet'
 import { ToolbarTab, ToolbarTabMenu } from './types'
 
 export const withRouter = (Component) => {
@@ -104,6 +106,8 @@ interface S {
   isOpenSearch: boolean
   search: string
   internalTabs: ToolbarTab[]
+  isWalletConnect: boolean
+  isWalletLength: boolean
 }
 
 class _App extends React.Component<P, S> {
@@ -112,6 +116,8 @@ class _App extends React.Component<P, S> {
     isOpenSearch: false,
     search: '',
     internalTabs: [],
+    isWalletConnect: false,
+    isWalletLength: false,
   }
 
   async componentDidMount() {
@@ -278,6 +284,14 @@ class _App extends React.Component<P, S> {
     this.props.navigate!(`/${mi.name}/settings`)
   }
 
+  handleWalletConnect = () => {
+    this.setState({ isWalletConnect: !this.state.isWalletConnect })
+  }
+
+  handleWalletLengthConnect = () => {
+    this.setState({ isWalletLength: true })
+  }
+
   render() {
     const p = this.props
     const s = this.state
@@ -313,6 +327,9 @@ class _App extends React.Component<P, S> {
               <div className={styles.left}>
                 <Profile
                   // mini
+                  handleWalletLengthConnect={this.handleWalletLengthConnect}
+                  isWalletLength={s.isWalletLength}
+                  handleWalletConnect={this.handleWalletConnect}
                   avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
                   hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
                 />
@@ -357,7 +374,7 @@ class _App extends React.Component<P, S> {
               {/* {pathname === '/system/connected' && <ConnectedAccount />} */}
               {pathname === '/system/settings' && <SettingsOverlay />}
 
-              {pathname === '/system/wallet' && <Wallets isOverlay={true} />}
+              {/* {pathname === '/system/wallet' && <Wallets isOverlay={true} />} */}
 
               {overlays.map((x) => (
                 <ContentItem
@@ -374,6 +391,14 @@ class _App extends React.Component<P, S> {
             </div>
           </div>
         </div>
+        <Modal
+          visible={s.isWalletConnect}
+          content={''}
+          footer={
+            <Wallet isOverlay={true} handleWalletLengthConnect={this.handleWalletLengthConnect} />
+          }
+          onClose={this.handleWalletConnect}
+        />
       </div>
     )
   }

@@ -1,8 +1,13 @@
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { FC, useEffect, useMemo, useRef } from 'react'
-import { Avatar } from '../../Avatar'
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
+import * as EventBus from '../../../../../../common/global-event-bus'
+import { WalletDescriptor } from '../../../../../../common/types'
+import { ReactComponent as Card } from '../../../assets/svg/card.svg'
 import styles from './HeaderLogIn.module.scss'
-
+// import makeBlockie from 'ethereum-blockies-base64'
+import makeBlockie from 'ethereum-blockies-base64'
+import { browser } from 'webextension-polyfill-ts'
 export interface HeaderLogInProps {
   avatar?: string
   hash?: string
@@ -19,7 +24,7 @@ export interface HeaderLogInProps {
   setNewProfile: (x: any) => void
   // onDeleteChildConnectNewProfile: (x: any) => void
 }
-
+let _isMounted = false
 export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const {
     avatar,
@@ -39,25 +44,37 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     // onDeleteChildConnectNewProfile,
   } = props
   const modalRef = useRef<HTMLInputElement>()
-
+  const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
+  const connectedDescriptors = descriptors.filter((x) => x.connected)
   useEffect(() => {
-    // window.addEventListener('click', handleClick)
-    // return () => {
-    //   window.removeEventListener('click', handleClick)
-    // }
+    const init = async () => {
+      refresh()
+      _isMounted = true
+    }
+
+    init()
+
+    return () => {
+      _isMounted = false
+      _isMounted = false
+      EventBus.off('wallet_changed', refresh)
+    }
   }, [isOpen, isMini, isEns, newProfile, isNotLogin])
-  // const handleClick = (event) => {
-  //   if (event.target !== modalRef.current) {
-  //     setOpen()
-  //     setMini()
-  //     // console.log('lala')
-  //   }
-  // }
+  const refresh = async () => {
+    const { getWalletDescriptors } = await initBGFunctions(browser)
+
+    const descriptors = await getWalletDescriptors()
+
+    if (_isMounted) {
+      setDescriptors(descriptors)
+    }
+  }
+
   const onDeleteChildConnectNewProfile = (id: any) => {
     newProfile.splice(id, 1)
 
     setNewProfile(newProfile.splice(id, 1))
-    // console.log(newProfile, 'del')
+
     return newProfile
   }
   const filteredDapplets = useMemo(() => {
@@ -70,19 +87,14 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
 
     return `${firstFourCharacters}...${lastFourCharacters}`
   }
-  // console.log(filteredDapplets)
 
   const handleBlur = (e) => {
     const currentTarget = e.currentTarget
 
-    // Check the newly focused element in the next tick of the event loop
     setTimeout(() => {
-      // Check if the new activeElement is a child of the original container
       if (!currentTarget.contains(document.activeElement)) {
-        // You can invoke a callback or add custom logic here
         setOpen()
         setMini()
-        // console.log('lala')
       }
     }, 0)
   }
@@ -98,7 +110,18 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
           setMini()
         }}
       >
-        <Avatar avatar={avatar} size="big" className={styles.avatar} />
+        {/* <Avatar avatar={avatar} size="big" className={styles.avatar} /> */}
+        <span
+          // avatar={Card}
+          // size="big"
+          className={styles.avatar}
+          onClick={() => {
+            setOpen()
+            setMini()
+          }}
+        >
+          <Card />
+        </span>
         {!isMini && (
           <div className={cn(styles.wrapperNames)}>
             {isEns ? (
@@ -124,15 +147,17 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
             [styles.fakeModalWrapper]: true,
           })}
         >
-          <Avatar
-            avatar={avatar}
-            size="big"
+          <span
+            // avatar={Card}
+            // size="big"
             className={styles.avatar}
             onClick={() => {
               setOpen()
               setMini()
             }}
-          />
+          >
+            <Card />
+          </span>
           <div
             tabIndex={0}
             // ref={modalRef}
@@ -149,7 +174,18 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
           >
             <div className={styles.profileBlock}>
               <div className={styles.profileBlockImg}>
-                <img className={styles.profileImg} src={avatar}></img>
+                {/* <img className={styles.profileImg} src={avatar}></img> */}
+                <span
+                  // avatar={Card}
+                  // size="big"
+                  className={styles.profileImg}
+                  onClick={() => {
+                    setOpen()
+                    setMini()
+                  }}
+                >
+                  <Card />
+                </span>
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
@@ -165,21 +201,33 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
                 <>
                   <span className={styles.ensLabel}>ens</span>
                   <p className={styles.ensName}>UserENSName</p>
-                  <p className={styles.ensHash}>{visible(hash)}</p>
+                  {/* <p className={styles.ensHash}>{visible(hash)}</p> */}
+                  <p className={styles.ensHash}>wallets</p>
                 </>
               ) : (
-                <p className={styles.notEnsHash}>{visible(hash)}</p>
+                // <p className={styles.notEnsHash}>{visible(hash)}</p>
+                <p className={styles.notEnsHash}>wallets</p>
               )}
 
               <a className={styles.profileLink}>Profile</a>
             </div>
             <div className={styles.walletBlock}>
-              {filteredDapplets &&
-                filteredDapplets.map((x, i) => (
+              {connectedDescriptors &&
+                connectedDescriptors.map((x, i) => (
                   <div key={i} className={styles.newProfileBlock}>
                     <div className={styles.newProfileBlockInfo}>
-                      <img className={styles.newProfileBlockImg} src={x.img} />
-                      <p className={styles.newProfileBlockName}>{x.title}</p>
+                      {x.account ? (
+                        <img src={makeBlockie(x.account)} className={styles.newProfileBlockImg} />
+                      ) : null}
+                      {x.account ? (
+                        <p title={x.account} className={styles.newProfileBlockName}>
+                          {x.account.length === 42
+                            ? x.account.substr(0, 6) + '...' + x.account.substr(38)
+                            : x.account}
+                        </p>
+                      ) : null}
+                      {/* <img className={styles.newProfileBlockImg} src={x.img} /> */}
+                      {/* <p className={styles.newProfileBlockName}>{x.title}</p> */}
                     </div>
                     <button
                       onClick={() => {

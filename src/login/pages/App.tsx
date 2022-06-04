@@ -34,6 +34,7 @@ export class App extends React.Component<Props, State> {
 
   render() {
     const p = this.props
+    console.log('lala')
 
     if (p.account) {
       return <Login bus={p.bus} account={p.account} app={p.app} chain={p.chain} />
