@@ -22,13 +22,12 @@ function createDefaultValueOptionsForDropDown(enumOptions, enumDisabled) {
   let options = []
   // eslint-disable-next-line no-shadow
 
-  options = _.map(enumOptions, ({ label, value, className }) => ({
+  options = _.map(enumOptions, ({ label, value }) => ({
     disabled: disabledOptions.indexOf(value) !== -1,
     key: label,
     text: label,
-    className: className,
+
     value,
-    styles,
   }))
   // <Dropdown.Item style={{ backgroundColor: 'red', color: '#fff' }}>{label}</Dropdown.Item>
   return options
@@ -40,6 +39,7 @@ function createDefaultValueOptionsForDropDown(enumOptions, enumDisabled) {
  */
 const processValue = (schema, value) => {
   // "enum" is a reserved word, so only "type" and "items" can be destructured
+
   const { type, items } = schema
   if (value === '') {
     return undefined
@@ -95,6 +95,7 @@ function SelectWidget(props) {
       fluid: true,
       scrolling: true,
       upward: false,
+      'aria-expanded': false,
     },
   })
   const { enumDisabled, enumOptions } = options
@@ -104,20 +105,23 @@ function SelectWidget(props) {
     event,
     // eslint-disable-next-line no-shadow
     { value }
-  ) => onChange && onChange(processValue(schema, value))
+  ) => {
+    onChange && onChange(processValue(schema, value))
+  }
   // eslint-disable-next-line no-shadow
   const _onBlur = ({ target: { value } }) => onBlur && onBlur(id, processValue(schema, value))
   const _onFocus = ({
     // eslint-disable-next-line no-shadow
     target: { value },
   }) => onFocus && onFocus(id, processValue(schema, value))
+  // console.log(semanticProps, '...semanticProps')
 
   return (
     <Form.Dropdown
       className={styles.inputSelect}
       key={id}
       name={name}
-      label={label || schema.title}
+      // label={label || schema.title}
       multiple={typeof multiple === 'undefined' ? false : multiple}
       value={typeof value === 'undefined' ? emptyValue : value}
       disabled={disabled}

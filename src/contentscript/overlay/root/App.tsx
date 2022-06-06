@@ -17,7 +17,7 @@ import ManifestDTO from '../../../background/dto/manifestDTO'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
 // import Wallets from '../../../popup/pages/wallets'
-import { ReactComponent as Card } from './assets/svg/card.svg'
+// import { ReactComponent as Card } from './assets/svg/card.svg'
 // import { ReactComponent as Account } from './assets/svg/connected-account.svg'
 import { ReactComponent as DappletsLogo } from './assets/svg/dapplets-logo.svg'
 import { ReactComponent as Home } from './assets/svg/home-toolbar.svg'
@@ -85,11 +85,11 @@ const SYSTEM_TAB: ToolbarTab = {
       icon: Settings,
       title: 'Settings',
     },
-    {
-      id: 'wallet',
-      icon: Card,
-      title: 'Wallet',
-    },
+    // {
+    //   id: 'wallet',
+    //   icon: Card,
+    //   title: 'Wallet',
+    // },
   ],
 }
 

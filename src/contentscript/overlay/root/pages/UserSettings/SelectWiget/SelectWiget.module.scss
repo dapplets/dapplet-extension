@@ -2,58 +2,140 @@
 @import "../../../assets/styles/fonts.scss";
 @import "../../../assets/styles/color.variables.scss";
 
-.inputSelect {
-  display: flex;
+// .inputSelect {
+//   display: flex;
 
-  align-items: flex-start;
+//   align-items: flex-start;
 
-  width: 100%;
-  height: 36px;
+//   width: 100%;
+//   height: 36px;
 
-  margin-top: 10px;
-  padding: 5px 13px;
+//   margin-top: 10px;
+//   padding: 5px 13px;
 
-  color: $MainGrey;
-  border: 1px solid $StrokeColor;
-  border-radius: 5px;
+//   color: $MainGrey;
+//   border: 1px solid $StrokeColor;
+//   border-radius: 5px;
 
-  background: $AppBG;
+//   background: $AppBG;
 
-  font-family: Roboto;
-  font-size: 14px;
-  font-weight: 500;
+//   font-family: Roboto;
+//   font-size: 14px;
+//   font-weight: 500;
+//   font-style: normal;
+//   line-height: 149%;
+// }
+
+// .inputSelect{
+//   color: red;
+// }
+
+
+
+[class^='control-label'],
+[class*=' control-label'] {
+  font-family: 'Roboto';
   font-style: normal;
-  line-height: 149%;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  
+  color: #000000;
 }
 
-select {
-  display: flex;
 
+[class^='divider'],
+[class*=' divider'] {
+
+padding: 5px 13px;
+width: 100%;
+min-height: 36px;
+height: auto;
+background: $AppBG;
+border: 1px solid $StrokeColor;
+border-radius: 5px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 149%;
+color: $MainGrey;
+}
+
+[class*='field-string']{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: flex-start;
+  padding: 10px;
 
   width: 100%;
-  height: 36px;
+  height: auto;
+  
+  background: $PureWhite;
+  border-radius: 10px;
+  [class*='field']{
+width: 100%;
+  }
+  [class*='control-label']{
+    width: 100%;
+    margin-bottom: 10px;
+  }
 
-  margin-top: 10px;
+  [class*=' transition']{
+   display: none;
+  }
+
+  [class*='visible']{
+    display: block;
+  position: absolute;
+  top: 0%;
+  left: 0;
   padding: 5px 13px;
+width: 100%;
+height: auto;
+background: $AppBG;
+border: 1px solid $StrokeColor;
+border-radius: 5px;
 
-  color: $MainGrey;
-  border: 1px solid $StrokeColor;
-  border-radius: 5px;
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 149%;
+color: $MainGrey;
+cursor: pointer;
 
-  background: $AppBG;
 
-  font-family: Roboto;
-  font-size: 14px;
-  font-weight: 500;
-  font-style: normal;
-  line-height: 149%;
-
-  cursor: pointer;
-
- option{
-   background: #000;
- }
+   }
+   [class*=' scrolling dropdown']{
+     position: relative;
+   }
+  
+  [class*='dropdown icon']{
+    display: block;
+    position: absolute;
+    top: 13px;
+    right: 15px;
+    width: 12px;
+    height: 8px;
+    background: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M6.99999 7.713L13.01 1.703L11.597 0.288002L6.99999 4.888L2.40399 0.288002L0.98999 1.702L6.99999 7.713Z' fill='%23919191'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+  }
+   
 }
+
+
+
+
+
+
+
 
 

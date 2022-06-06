@@ -9,7 +9,7 @@ import { CONTEXT_ID_WILDCARD } from '../../../../../common/constants'
 import { DefaultConfig, SchemaConfig } from '../../../../../common/types'
 import { Message } from '../../components/Message'
 import SelectWidget from './SelectWiget/SelectWigets'
-import './settingPage.css'
+
 import TextWidget from './TextWiget/TextWigets'
 import styles from './UserSettings.module.scss'
 
@@ -25,7 +25,9 @@ export interface SettingsPageProps {
 }
 let _isMounted = false
 SemanticUITheme.widgets.SelectWidget = SelectWidget
-const theme = { widgets: { SemanticUITheme, TextWidget } }
+const theme = { widgets: { SelectWidget, TextWidget } }
+// console.log(SelectWidget)
+
 const Form = withTheme(theme)
 
 export const SettingsPage: FC<SettingsPageProps> = (props) => {

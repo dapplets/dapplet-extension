@@ -71,7 +71,6 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
       _isMounted = false
     }
   }, [isModalWalletConnect, newProfile, isWalletLength])
-  console.log(isWalletLength)
 
   const addConnectNewProfile = (i: number) => {
     const pushForm = Object.assign({}, TEST_ACCOUNT[i])

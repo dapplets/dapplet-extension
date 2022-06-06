@@ -19,41 +19,41 @@
   padding: 0 12px;
 }
 
-.form {
-  fieldset {
-    display: flex;
-    align-items: flex-start;
-    flex-direction: column;
-    justify-content: center;
+// .form {
+//   fieldset {
+//     display: flex;
+//     align-items: flex-start;
+//     flex-direction: column;
+//     justify-content: center;
 
-    width: 100%;
+//     width: 100%;
 
-    div {
-      display: flex;
-      align-items: flex-start;
-      flex-direction: column;
-      justify-content: center;
+//     div {
+//       display: flex;
+//       align-items: flex-start;
+//       flex-direction: column;
+//       justify-content: center;
 
-      width: 100%;
-      margin: 5px 0;
-      padding: 10px;
+//       width: 100%;
+//       margin: 5px 0;
+//       padding: 10px;
 
-      border-radius: 10px;
+//       border-radius: 10px;
 
-      background: $PureWhite;
-    }
-  }
+//       background: $PureWhite;
+//     }
+//   }
 
-  label {
-    color: $PureBlack;
+//   label {
+//     color: $PureBlack;
 
-    font-family: Roboto;
-    font-size: 14px;
-    font-weight: 500;
-    font-style: normal;
-    line-height: 16px;
-  }
-}
+//     font-family: Roboto;
+//     font-size: 14px;
+//     font-weight: 500;
+//     font-style: normal;
+//     line-height: 16px;
+//   }
+// }
 
 .wrapperInfoCard {
   display: flex;
