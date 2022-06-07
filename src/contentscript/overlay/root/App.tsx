@@ -189,7 +189,8 @@ class _App extends React.Component<P, S> {
   }
 
   getOverlays() {
-    return this.props.overlayManager.getOverlays().filter((x) => !x.parent)
+    return this.props.overlayManager.getOverlays()
+    //.filter((x) => !x.parent)
   }
 
   handleCloseTabClick = async (tab: ToolbarTab) => {

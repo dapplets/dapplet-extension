@@ -19,7 +19,7 @@ export class LoginSession {
   }
 
   private get _chain() {
-    return this.authMethod.split('/')[1] // goerli, testnet, mainnet
+    return this.authMethod.split('/')[1] // goerli, testnet, mainnet, xdai
   }
 
   private get _isExpired() {

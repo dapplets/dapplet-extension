@@ -1,3 +1,4 @@
+import { ChainTypes } from '../../common/types'
 import GlobalConfigService from './globalConfigService'
 
 export default class ProxyService {
@@ -5,8 +6,16 @@ export default class ProxyService {
 
   constructor(private _globalConfigService: GlobalConfigService) {}
 
-  async fetchJsonRpc(method: string, params?: Array<any>): Promise<any> {
-    const endpointUrl = await this._globalConfigService.getEthereumProvider()
+  async fetchJsonRpc(chain: ChainTypes, method: string, params?: Array<any>): Promise<any> {
+    let endpointUrl
+
+    if (chain === ChainTypes.ETHEREUM_GOERLI) {
+      endpointUrl = await this._globalConfigService.getEthereumProvider()
+    } else if (chain === ChainTypes.ETHEREUM_XDAI) {
+      endpointUrl = await this._globalConfigService.getXdaiProvider()
+    } else {
+      throw new Error('Unsupported network.')
+    }
 
     const request = {
       method: method,

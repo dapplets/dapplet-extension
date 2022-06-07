@@ -23,7 +23,12 @@ export class OverlayService {
     tabId: number
   ): Promise<void> {
     const arr = !chains
-      ? [ChainTypes.ETHEREUM_GOERLI, ChainTypes.NEAR_MAINNET, ChainTypes.NEAR_TESTNET]
+      ? [
+          ChainTypes.ETHEREUM_GOERLI,
+          ChainTypes.ETHEREUM_XDAI,
+          ChainTypes.NEAR_MAINNET,
+          ChainTypes.NEAR_TESTNET,
+        ]
       : Array.isArray(chains)
       ? chains
       : [chains]

@@ -48,7 +48,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
 
   const getNumIndex = (value, reg) => {
     try {
-      let numEl = value.match(reg)
+      const numEl = value.match(reg)
 
       return numEl
     } catch {}

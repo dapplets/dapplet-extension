@@ -66,6 +66,7 @@ export default class extends ethers.Signer implements EthereumWallet {
   }
 
   async sendTransactionOutHash(transaction: ethers.providers.TransactionRequest): Promise<string> {
+    await this._checkNetwork()
     transaction.from = await this.getAddress()
     const tx = await ethers.utils.resolveProperties(transaction)
     const txHash = await this._walletconnect.sendTransaction(tx as any)
@@ -137,6 +138,23 @@ export default class extends ethers.Signer implements EthereumWallet {
 
   getLastUsage() {
     return localStorage['walletconnect_lastUsage']
+  }
+
+  private async _checkNetwork(): Promise<void> {
+    const network = await this.provider.getNetwork()
+    const chainId = await this._getWalletChainId()
+
+    if (network.chainId !== chainId) {
+      throw new Error(`Switch network to ${network.name} in the wallet`)
+    }
+  }
+
+  private async _getWalletChainId(): Promise<number> {
+    const chainId = await this._walletconnect.sendCustomRequest({
+      method: 'eth_chainId',
+      params: [],
+    })
+    return Number(chainId)
   }
 
   private async _showQR(uri: string, overlayId?: string) {

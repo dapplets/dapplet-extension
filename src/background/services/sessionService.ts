@@ -92,7 +92,7 @@ export class SessionService {
 
     if (request.secureLogin === 'required') {
       for (const authMethod of request.authMethods) {
-        if (ChainTypes.ETHEREUM_GOERLI !== authMethod) {
+        if (ChainTypes.ETHEREUM_GOERLI !== authMethod && ChainTypes.ETHEREUM_XDAI !== authMethod) {
           throw new Error(`${authMethod} doesn't support secure login.`)
         }
       }

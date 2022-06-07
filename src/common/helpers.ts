@@ -1,7 +1,7 @@
 import * as semver from 'semver'
 import { browser, Tabs } from 'webextension-polyfill-ts'
 import { DEFAULT_BRANCH_NAME } from './constants'
-import { ChainTypes, ModuleId, UrlAvailability } from './types'
+import { ChainTypes, ModuleId, UrlAvailability, WalletDescriptor } from './types'
 
 export function getHostName(url: string): string {
   return new URL(url).hostname
@@ -177,6 +177,7 @@ export function networkName(chainId: number) {
     4: 'rinkeby',
     5: 'goerli',
     42: 'kovan',
+    100: 'xdai',
   }
 
   return map[chainId] ?? 'unknown'
@@ -521,4 +522,24 @@ export function CacheMethod() {
 export async function getThisTab(callInfo: any) {
   const thisTab = callInfo?.sender?.tab
   return thisTab
+}
+
+export function mergeSameWallets(descriptors: WalletDescriptor[]): WalletDescriptor[] {
+  const wallets: WalletDescriptor[] = []
+
+  for (const descriptor of descriptors) {
+    const isEthereum =
+      descriptor.chain === ChainTypes.ETHEREUM_GOERLI ||
+      descriptor.chain === ChainTypes.ETHEREUM_XDAI
+    const isTheSameWallets = wallets.findIndex((x) => x.type === descriptor.type) !== -1
+
+    // skip the same wallets
+    if (isEthereum && isTheSameWallets) {
+      continue
+    }
+
+    wallets.push(descriptor)
+  }
+
+  return wallets
 }

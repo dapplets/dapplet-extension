@@ -29,6 +29,7 @@ const EXPORTABLE_PROPERTIES = [
   'userAgentName',
   // 'autoBackup',
   'providerUrl',
+  'xdaiProviderUrl',
   'swarmGatewayUrl',
   'ipfsGatewayUrl',
   'siaPortalUrl',
@@ -65,6 +66,7 @@ export default class GlobalConfigService {
         config.ethereumNetworks = this.getInitialConfig().ethereumNetworks
       if (!config.myDapplets) config.myDapplets = this.getInitialConfig().myDapplets
       if (!config.targetStorages) config.targetStorages = this.getInitialConfig().targetStorages
+      if (!config.xdaiProviderUrl) config.xdaiProviderUrl = this.getInitialConfig().xdaiProviderUrl
     }
 
     return config ?? this.getInitialConfig()
@@ -241,6 +243,7 @@ export default class GlobalConfigService {
     config.targetStorages = [StorageTypes.Ipfs, StorageTypes.Sia, StorageTypes.Swarm]
     config.userSettings = {}
     config.providerUrl = 'https://goerli.mooo.com/'
+    config.xdaiProviderUrl = 'https://rpc.gnosischain.com/'
     config.swarmGatewayUrl = 'https://swarmgateway.mooo.com/'
     config.walletsUsage = {}
     config.identityContract = '0xf6b3a0B20281796D465bB8613e233BE30be07084'
@@ -543,29 +546,22 @@ export default class GlobalConfigService {
 
   async setEthereumProvider(url: string) {
     if (typeOfUri(url) !== UriTypes.Http) throw new Error('URL must be a valid HTTP(S) address.')
-
-    try {
-      const body = JSON.stringify({
-        jsonrpc: '2.0',
-        method: 'eth_blockNumber',
-        params: [],
-        id: 0,
-      })
-      const headers = { 'Content-Type': 'application/json' }
-      const response = await fetch(url, { method: 'POST', body, headers })
-      const json = await response.json()
-      if (!json.result) throw new Error()
-    } catch (err) {
-      throw new Error(
-        'The server returns invalid response. Make sure the server complies with the Ethereum JSON RPC Specification.'
-      )
-    }
-
+    await this._checkEthereumProvider(url)
     await this.updateConfig((c) => (c.providerUrl = url))
   }
 
   async getEthereumProvider() {
     return this.get().then((x) => x.providerUrl)
+  }
+
+  async setXdaiProvider(url: string) {
+    if (typeOfUri(url) !== UriTypes.Http) throw new Error('URL must be a valid HTTP(S) address.')
+    await this._checkEthereumProvider(url)
+    await this.updateConfig((c) => (c.xdaiProviderUrl = url))
+  }
+
+  async getXdaiProvider() {
+    return this.get().then((x) => x.xdaiProviderUrl)
   }
 
   async setSwarmGateway(url: string) {
@@ -736,5 +732,24 @@ export default class GlobalConfigService {
         ))
     )
     EventBus.emit('mydapplets_changed')
+  }
+
+  private async _checkEthereumProvider(url: string) {
+    try {
+      const body = JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'eth_blockNumber',
+        params: [],
+        id: 0,
+      })
+      const headers = { 'Content-Type': 'application/json' }
+      const response = await fetch(url, { method: 'POST', body, headers })
+      const json = await response.json()
+      if (!json.result) throw new Error()
+    } catch (err) {
+      throw new Error(
+        'The server returns invalid response. Make sure the server complies with the Ethereum JSON RPC Specification.'
+      )
+    }
   }
 }

@@ -13,6 +13,7 @@ interface Props {
     loginRequest: LoginRequest
   }
   bus: Bus
+  chain: ChainTypes
   frameId: string
 }
 
@@ -23,7 +24,7 @@ interface State {
   descriptor: WalletDescriptor | null
 }
 
-export default class extends React.Component<Props, State> {
+export default class Dapplets extends React.Component<Props, State> {
   private _mounted = false
 
   constructor(props) {
@@ -44,7 +45,7 @@ export default class extends React.Component<Props, State> {
         await initBGFunctions(browser)
 
       // connect wallet
-      await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.DAPPLETS, null)
+      await connectWallet(this.props.chain, WalletTypes.DAPPLETS, null)
       const descriptors = await getWalletDescriptors()
       const descriptor = descriptors.find((x) => x.type === 'dapplets')
 
@@ -54,7 +55,7 @@ export default class extends React.Component<Props, State> {
       if (secureLogin === 'required') {
         const app = this.props.data.app
         const loginRequest = this.props.data.loginRequest
-        const chain = ChainTypes.ETHEREUM_GOERLI
+        const chain = this.props.chain
         const wallet = WalletTypes.DAPPLETS
         const confirmation = await createLoginConfirmation(app, loginRequest, chain, wallet)
         confirmationId = confirmation.loginConfirmationId
@@ -66,7 +67,7 @@ export default class extends React.Component<Props, State> {
           this.props.frameId,
           {
             wallet: WalletTypes.DAPPLETS,
-            chain: ChainTypes.ETHEREUM_GOERLI,
+            chain: this.props.chain,
             confirmationId,
           },
         ])
@@ -84,7 +85,7 @@ export default class extends React.Component<Props, State> {
 
   // async disconnect() {
   //     const { disconnectWallet } = await initBGFunctions(browser);
-  //     await disconnectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.DAPPLETS);
+  //     await disconnectWallet(this.props.chain, WalletTypes.DAPPLETS);
   //     this.setState({ toBack: true });
   // }
 
@@ -93,7 +94,7 @@ export default class extends React.Component<Props, State> {
       this.props.frameId,
       {
         wallet: WalletTypes.DAPPLETS,
-        chain: ChainTypes.ETHEREUM_GOERLI,
+        chain: this.props.chain,
       },
     ])
   }

@@ -86,7 +86,7 @@ export class WalletService {
     )
   }
 
-  async eth_getSignerFor(app: string | DefaultSigners): Promise<Signer> {
+  async eth_getSignerFor(app: string | DefaultSigners, chain: ChainTypes): Promise<Signer> {
     if (!this._signersByApp.has(app)) {
       const me = this
       const providerUrl = await this._globalConfigService.getEthereumProvider()
@@ -98,10 +98,7 @@ export class WalletService {
         }
 
         async getAddress(): Promise<string> {
-          const signer = (await me._getInternalSignerFor(
-            app,
-            ChainTypes.ETHEREUM_GOERLI
-          )) as EthereumWallet
+          const signer = (await me._getInternalSignerFor(app, chain)) as EthereumWallet
           if (!signer) return '0x0000000000000000000000000000000000000000'
           const address = await signer.getAddress()
           if (!address) return '0x0000000000000000000000000000000000000000'
@@ -122,8 +119,8 @@ export class WalletService {
           transaction: providers.TransactionRequest
         ): Promise<providers.TransactionResponse> {
           const signer =
-            ((await me._getInternalSignerFor(app, ChainTypes.ETHEREUM_GOERLI)) as EthereumWallet) ??
-            ((await me._pairSignerFor(app, ChainTypes.ETHEREUM_GOERLI)) as EthereumWallet)
+            ((await me._getInternalSignerFor(app, chain)) as EthereumWallet) ??
+            ((await me._pairSignerFor(app, chain)) as EthereumWallet)
           return signer.sendTransaction(transaction)
         }
 
@@ -215,11 +212,12 @@ export class WalletService {
 
   public async eth_sendTransactionOutHash(
     app: string | DefaultSigners,
+    chain: ChainTypes,
     transaction: providers.TransactionRequest
   ): Promise<string> {
     const wallet =
-      ((await this._getInternalSignerFor(app, ChainTypes.ETHEREUM_GOERLI)) as EthereumWallet) ??
-      ((await this._pairSignerFor(app, ChainTypes.ETHEREUM_GOERLI)) as EthereumWallet)
+      ((await this._getInternalSignerFor(app, chain)) as EthereumWallet) ??
+      ((await this._pairSignerFor(app, chain)) as EthereumWallet)
     if (!(await wallet.isAvailable())) throw new Error('The wallet is not available')
     if (!(await wallet.isConnected())) await wallet.connectWallet({})
     return wallet.sendTransactionOutHash(transaction)
@@ -227,12 +225,13 @@ export class WalletService {
 
   public async eth_sendCustomRequest(
     app: string | DefaultSigners,
+    chain: ChainTypes,
     method: string,
     params: any[]
   ): Promise<any> {
     const wallet =
-      ((await this._getInternalSignerFor(app, ChainTypes.ETHEREUM_GOERLI)) as EthereumWallet) ??
-      ((await this._pairSignerFor(app, ChainTypes.ETHEREUM_GOERLI)) as EthereumWallet)
+      ((await this._getInternalSignerFor(app, chain)) as EthereumWallet) ??
+      ((await this._pairSignerFor(app, chain)) as EthereumWallet)
     if (!(await wallet.isAvailable())) throw new Error('The wallet is not available')
     if (!(await wallet.isConnected())) await wallet.connectWallet({})
     return wallet.sendCustomRequest(method, params)
@@ -240,12 +239,13 @@ export class WalletService {
 
   public async eth_waitTransaction(
     app: string | DefaultSigners,
+    chain: ChainTypes,
     txHash: string,
     confirmations?: number
   ) {
     const wallet =
-      ((await this._getInternalSignerFor(app, ChainTypes.ETHEREUM_GOERLI)) as EthereumWallet) ??
-      ((await this._pairSignerFor(app, ChainTypes.ETHEREUM_GOERLI)) as EthereumWallet)
+      ((await this._getInternalSignerFor(app, chain)) as EthereumWallet) ??
+      ((await this._pairSignerFor(app, chain)) as EthereumWallet)
     // the wait of a transaction from another provider can be long
     while (true) {
       await new Promise((res) => setTimeout(res, 1000))
@@ -368,19 +368,30 @@ export class WalletService {
 
   private async _getWalletsMap() {
     if (!this._map) {
-      this._map = this._globalConfigService.getEthereumProvider().then((providerUrl) => {
+      const promises = Promise.all([
+        this._globalConfigService.getEthereumProvider(),
+        this._globalConfigService.getXdaiProvider(),
+      ])
+
+      this._map = promises.then(([ethereumProviderUrl, xdaiProviderUrl]) => {
         const map = {}
-        const config = {
-          providerUrl,
-          sendDataToPairingOverlay: this._overlayService.sendDataToPairingOverlay.bind(
-            this._overlayService
-          ),
-        }
 
         for (const chain in wallets) {
           map[chain] = {}
           for (const wallet in wallets[chain]) {
-            map[chain][wallet] = new wallets[chain][wallet](config)
+            const providerUrl =
+              chain === ChainTypes.ETHEREUM_GOERLI
+                ? ethereumProviderUrl
+                : chain === ChainTypes.ETHEREUM_XDAI
+                ? xdaiProviderUrl
+                : null
+
+            map[chain][wallet] = new wallets[chain][wallet]({
+              providerUrl,
+              sendDataToPairingOverlay: this._overlayService.sendDataToPairingOverlay.bind(
+                this._overlayService
+              ),
+            })
           }
         }
 
