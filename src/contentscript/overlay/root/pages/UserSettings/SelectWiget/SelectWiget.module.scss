@@ -26,116 +26,122 @@
   line-height: 149%;
 }
 
-.inputSelect{
+.inputSelect {
   color: red;
 }
 
-
-
-[class^='control-label'],
-[class*=' control-label'] {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 16px;
+[class^="control-label"],
+[class*=" control-label"] {
   display: flex;
   align-items: center;
-  
-  color: #000000;
+
+  color: #000;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 16px;
 }
 
+[class^="divider"],
+[class*=" divider"] {
+  width: 100%;
+  height: auto;
+  min-height: 36px;
 
-[class^='divider'],
-[class*=' divider'] {
+  padding: 5px 13px;
 
-padding: 5px 13px;
-width: 100%;
-min-height: 36px;
-height: auto;
-background: $AppBG;
-border: 1px solid $StrokeColor;
-border-radius: 5px;
+  color: $MainGrey;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
+  background: $AppBG;
 
-font-family: 'Roboto';
-font-style: normal;
-font-weight: 500;
-font-size: 14px;
-line-height: 149%;
-color: $MainGrey;
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 149%;
 }
 
-[class*='field-string']{
+[class*="field-string"] {
   display: flex;
+  align-items: flex-start;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
-  padding: 10px;
 
   width: 100%;
   height: auto;
-  
-  background: $PureWhite;
-  border-radius: 10px;
   margin-top: 10px;
-  [class*='field']{
-width: 100%;
+  padding: 10px;
+
+  border-radius: 10px;
+
+  background: $PureWhite;
+
+  [class*="field"] {
+    width: 100%;
   }
-  [class*='control-label']{
+
+  [class*="control-label"] {
     width: 100%;
     margin-bottom: 10px;
   }
 
-  [class*=' transition']{
-   display: none;
+  [class*=" transition"] {
+    display: none;
   }
 
-  [class*='visible']{
-    display: block;
+  [class*="visible"] {
     position: absolute;
     top: 0%;
     left: 0;
+
+    display: block;
+
+    width: 100%;
+    height: auto;
     padding: 5px 13px;
-  width: 100%;
-  height: auto;
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
-  border-radius: 5px;
-  
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 149%;
-  color: $MainGrey;
-  cursor: pointer;
+
+    cursor: pointer;
+
+    color: $MainGrey;
+    border: 1px solid $StrokeColor;
+    border-radius: 5px;
+    background: $AppBG;
+
+    font-family: Roboto;
+    font-size: 14px;
+    font-weight: 500;
+    font-style: normal;
+    line-height: 149%;
   }
 
   // [class*='visible']{
   //   display: none;
 
-
   //  }
-   [class*=' scrolling dropdown']{
-     position: relative;
-   }
-  
-  [class*='dropdown icon']{
-    display: block;
+  [class*=" scrolling dropdown"] {
+    position: relative;
+  }
+
+  [class*="dropdown icon"] {
     position: absolute;
     top: 13px;
     right: 15px;
+
+    display: block;
+
     width: 12px;
     height: 8px;
+
     background: inherit;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M6.99999 7.713L13.01 1.703L11.597 0.288002L6.99999 4.888L2.40399 0.288002L0.98999 1.702L6.99999 7.713Z' fill='%23919191'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-size: contain;
     background-position: center;
+    background-size: contain;
   }
-   
 }
-
 
 select {
   display: flex;
@@ -147,6 +153,8 @@ select {
 
   margin-top: 10px;
   padding: 5px 13px;
+
+  cursor: pointer;
 
   color: $MainGrey;
   border: 1px solid $StrokeColor;
@@ -160,16 +168,7 @@ select {
   font-style: normal;
   line-height: 149%;
 
-  cursor: pointer;
-
- option{
-   background: #000;
- }
+  option {
+    background: #000;
+  }
 }
-
-
-
-
-
-
-

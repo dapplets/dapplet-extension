@@ -190,7 +190,7 @@
 
   height: 32px;
 
-  padding: 9px 10px 9px;
+  padding: 9px 10px;
 
   color: $PureWhite;
 
@@ -239,6 +239,8 @@
   line-height: 120%;
 
   h6 {
+    margin-left: 0;
+
     color: $PureWhite;
 
     font-family: Roboto;
@@ -246,10 +248,11 @@
     font-weight: 500;
     font-style: normal;
     line-height: 120%;
-    margin-left: 0;
   }
 
   p {
+    margin-left: 0;
+
     text-transform: lowercase;
 
     color: $PureWhite;
@@ -259,9 +262,9 @@
     font-weight: 400;
     font-style: normal;
     line-height: 120%;
-    margin-left: 0;
   }
-  div{
-  width: 100%;
+
+  div {
+    width: 100%;
   }
 }

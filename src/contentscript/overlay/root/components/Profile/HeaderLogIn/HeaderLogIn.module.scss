@@ -1,7 +1,7 @@
 /* stylelint-disable order/properties-order */
-@import '../../../assets/styles/null.scss';
-@import '../../../assets/styles/fonts.scss';
-@import '../../../assets/styles/color.variables.scss';
+@import "../../../assets/styles/null.scss";
+@import "../../../assets/styles/fonts.scss";
+@import "../../../assets/styles/color.variables.scss";
 
 .wrapper {
   display: inline-block;
@@ -158,7 +158,7 @@
   line-height: 16px;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: -5px;
     left: 5px;
@@ -210,7 +210,7 @@
   padding: 5px 0 11px;
 
   &::after {
-    content: '';
+    content: "";
     top: 0;
     left: 0;
     position: absolute;
@@ -220,7 +220,7 @@
   }
 
   &::before {
-    content: '';
+    content: "";
     bottom: 0;
     left: 0;
     position: absolute;
@@ -367,19 +367,19 @@
   margin-bottom: -10px;
 }
 
-.newProfileBlock{
+.newProfileBlock {
   display: flex;
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  margin: 3px 0px;
-  
+  margin: 3px 0;
 }
+
 // .newProfileBlock:last-child{
 //   margin-bottom: 5px;
 // }
 
-.newProfileBlockInfo{
+.newProfileBlockInfo {
   display: flex;
   align-items: center;
 
@@ -387,14 +387,15 @@
 
   width: 90px;
   padding-left: 5px;
+
   // padding-top: 5px;
- 
+
   // &:last-child{
   //    padding-top: 5px;
   // }
 }
 
-.newProfileBlockImg{
+.newProfileBlockImg {
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -403,14 +404,14 @@
   // padding-left: 5px;
 }
 
-.newProfileBlockName{
-font-family: Roboto;
-font-style: normal;
-font-weight: 400;
-font-size: 10px;
-line-height: 100%;
-text-transform: capitalize;
-color: $MainBlack;
-display: inline-block;
-padding-left: 5px;
+.newProfileBlockName {
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 100%;
+  text-transform: capitalize;
+  color: $MainBlack;
+  display: inline-block;
+  padding-left: 5px;
 }

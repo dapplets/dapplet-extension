@@ -9,7 +9,8 @@
 
   width: 100%;
 }
-.inputBlockNumber{
+
+.inputBlockNumber {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -31,7 +32,9 @@
   color: $MainGrey;
 
   border: 1px solid $StrokeColor;
- 
+
+  
+
   border-radius: 5px;
 
   background: $AppBG;
@@ -45,9 +48,9 @@
 
 .inputOverlayNumber {
   width: 110px;
+  margin-top: 0;
 
   text-align: center;
-  margin-top: 0;
 }
 
 .buttonMin {
@@ -65,19 +68,20 @@
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M0 14L11 7L0 0V14Z' fill='%23747376'/%3E%3C/svg%3E");
 }
-[class^='field-number'],
-[class*=' field-number'] {
+
+[class^="field-number"],
+[class*=" field-number"] {
   display: flex;
+  align-items: flex-start;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
-  padding: 10px;
 
   width: 100%;
   height: auto;
-  
-  background: $PureWhite;
-  border-radius: 10px;
   margin-top: 10px;
-}
+  padding: 10px;
 
+  border-radius: 10px;
+
+  background: $PureWhite;
+}

@@ -1,6 +1,6 @@
-@import '../../../assets/styles/null.scss';
-@import '../../../assets/styles/fonts.scss';
-@import '../../../assets/styles/color.variables.scss';
+@import "../../../assets/styles/null.scss";
+@import "../../../assets/styles/fonts.scss";
+@import "../../../assets/styles/color.variables.scss";
 
 // ===
 .modal {
@@ -54,9 +54,9 @@
   display: flex;
 }
 
-.modalContent{
+.modalContent {
   display: flex;
-  flex:  1 1 auto;
+  flex: 1 1 auto;
   justify-content: center;
 
   max-width: 232px;
@@ -118,6 +118,7 @@
     opacity: 1;
   }
 }
+
 @keyframes slide-in {
   from {
     transform: translateY(-150px);

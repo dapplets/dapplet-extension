@@ -1,16 +1,15 @@
-import React, { FC } from 'react';
-import styles from './LoginButtons.module.scss';
-import cn from 'classnames';
-import { ButtonHTMLAttributes, DetailedHTMLProps } from 'react';
+import cn from 'classnames'
+import React, { ButtonHTMLAttributes, DetailedHTMLProps, FC } from 'react'
+import styles from './LoginButtons.module.scss'
 
 export interface LogInButtonProps
   extends DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
-  label: string;
-  onLogin?: () => void;
-  disabled?: boolean;
+  label: string
+  onLogin?: () => void
+  disabled?: boolean
 }
 export const LogInButton: FC<LogInButtonProps> = (props: LogInButtonProps) => {
-  const { label, onLogin, disabled, ...otherProps } = props;
+  const { label, onLogin, disabled, ...otherProps } = props
   return (
     <button
       className={cn(styles.buttonLogin)}
@@ -20,5 +19,5 @@ export const LogInButton: FC<LogInButtonProps> = (props: LogInButtonProps) => {
     >
       {label}
     </button>
-  );
-};
+  )
+}
