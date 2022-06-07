@@ -1,9 +1,9 @@
 import { utils } from '@rjsf/core'
 import _ from 'lodash'
 import React from 'react'
-import { Form } from 'semantic-ui-react'
+import Select from 'react-select'
 import { getSemanticProps } from '../utils'
-import './select.css'
+// import './select.css'
 import styles from './SelectWiget.module.scss'
 
 const { asNumber, guessType } = utils
@@ -27,7 +27,7 @@ function createDefaultValueOptionsForDropDown(enumOptions, enumDisabled) {
     key: label,
     text: label,
     className: className,
-    value,
+    value: value,
     styles,
   }))
   // <Dropdown.Item style={{ backgroundColor: 'red', color: '#fff' }}>{label}</Dropdown.Item>
@@ -95,6 +95,7 @@ function SelectWidget(props) {
       fluid: true,
       scrolling: true,
       upward: false,
+      'aria-live': false,
     },
   })
   const { enumDisabled, enumOptions } = options
@@ -111,26 +112,44 @@ function SelectWidget(props) {
     // eslint-disable-next-line no-shadow
     target: { value },
   }) => onFocus && onFocus(id, processValue(schema, value))
+  console.log(value)
 
   return (
-    <Form.Dropdown
+    <Select
+      // placeholder={use}
+      // name={name}
+      // key={id}
       className={styles.inputSelect}
-      key={id}
-      name={name}
-      label={label || schema.title}
-      multiple={typeof multiple === 'undefined' ? false : multiple}
-      value={typeof value === 'undefined' ? emptyValue : value}
-      disabled={disabled}
-      placeholder={placeholder}
-      {...semanticProps}
-      required={required}
-      autoFocus={autofocus}
-      readOnly={readonly}
-      options={dropdownOptions}
-      onChange={_onChange}
+      // value={value}
+      options={enumOptions}
+      // inputValue={value}
+      // autoFocus={autofocus}
+      isMulti={false}
+      // {...semanticProps}
+      // required={required}
+      // onChange={onChange(processValue(schema, value))}
       onBlur={_onBlur}
       onFocus={_onFocus}
+      delimiter={value}
     />
   )
 }
 export default SelectWidget
+
+// className={styles.inputSelect}
+// key={id}
+// name={name}
+// label={label || schema.title}
+// // multiple={typeof multiple === 'undefined' ? false : multiple}
+// isMulti
+// value={dropdownOptions}
+// disabled={disabled}
+// placeholder={placeholder}
+// {...semanticProps}
+// required={required}
+// autoFocus={autofocus}
+// readOnly={readonly}
+// options={enumOptions}
+// onChange={_onChange}
+// onBlur={_onBlur}
+// onFocus={_onFocus}
