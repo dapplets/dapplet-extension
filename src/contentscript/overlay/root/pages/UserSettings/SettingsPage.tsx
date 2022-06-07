@@ -25,7 +25,7 @@ export interface SettingsPageProps {
 }
 let _isMounted = false
 SemanticUITheme.widgets.SelectWidget = SelectWidget
-const theme = { widgets: { SelectWidget, TextWidget } }
+const theme = { widgets: { SemanticUITheme, TextWidget } }
 // console.log(SelectWidget)
 
 const Form = withTheme(theme)

@@ -2,33 +2,33 @@
 @import "../../../assets/styles/fonts.scss";
 @import "../../../assets/styles/color.variables.scss";
 
-// .inputSelect {
-//   display: flex;
+.inputSelect {
+  display: flex;
 
-//   align-items: flex-start;
+  align-items: flex-start;
 
-//   width: 100%;
-//   height: 36px;
+  width: 100%;
+  height: 36px;
 
-//   margin-top: 10px;
-//   padding: 5px 13px;
+  margin-top: 10px;
+  padding: 5px 13px;
 
-//   color: $MainGrey;
-//   border: 1px solid $StrokeColor;
-//   border-radius: 5px;
+  color: $MainGrey;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
 
-//   background: $AppBG;
+  background: $AppBG;
 
-//   font-family: Roboto;
-//   font-size: 14px;
-//   font-weight: 500;
-//   font-style: normal;
-//   line-height: 149%;
-// }
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 149%;
+}
 
-// .inputSelect{
-//   color: red;
-// }
+.inputSelect{
+  color: red;
+}
 
 
 
@@ -137,6 +137,35 @@ width: 100%;
 }
 
 
+select {
+  display: flex;
+
+  align-items: flex-start;
+
+  width: 100%;
+  height: 36px;
+
+  margin-top: 10px;
+  padding: 5px 13px;
+
+  color: $MainGrey;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
+
+  background: $AppBG;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 149%;
+
+  cursor: pointer;
+
+ option{
+   background: #000;
+ }
+}
 
 
 
