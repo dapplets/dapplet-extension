@@ -16,19 +16,26 @@ const MyCustomWidget = (props, step) => {
     <div className={styles.inputBlockNumber}>
       <button
         className={styles.buttonMin}
-        value={props.value}
+        value={String(Number(props.value).toFixed(2))}
+        disabled={props.value <= step.min}
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
-          props.onChange(String(+e.currentTarget.value + step))
+          props.onChange(String(+e.currentTarget.value - step.step))
         }}
       />
 
       <input
         type="number"
         className={cn(styles.inputOverlay, styles.inputOverlayNumber)}
-        value={props.value}
+        value={
+          String(Number(props.value).toFixed(2)) || props.value === 0
+            ? String(Number(props.value).toFixed(2))
+            : ''
+        }
         required={props.required}
+        min={step.min}
+        max={step.max}
         onChange={(event) => {
           event.preventDefault()
           event.stopPropagation()
@@ -38,10 +45,11 @@ const MyCustomWidget = (props, step) => {
       <button
         className={styles.buttonMax}
         value={props.value}
+        disabled={props.value >= step.max}
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
-          props.onChange(String(+e.currentTarget.value - step))
+          props.onChange(String(+e.currentTarget.value + step.step))
         }}
       />
     </div>
@@ -102,11 +110,13 @@ function TextWidget(props) {
       _isMounted = false
     }
   }, [])
+  // console.log(stepProps)
+  console.log(value)
 
   return (
     <>
       {schema.type === 'number' ? (
-        MyCustomWidget(props, stepProps.step)
+        MyCustomWidget(props, stepProps)
       ) : (
         <input
           className={cn(styles.inputOverlay, {})}
