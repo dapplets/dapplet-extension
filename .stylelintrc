@@ -1,39 +1,8 @@
 {
-<<<<<<< HEAD
-  "extends": [
-    "stylelint-config-standard",
-    "stylelint-config-standard-scss",
-    "stylelint-order-config-standard",
-    "stylelint-config-prettier"
-  ],
-  "plugins": ["stylelint-order"],
+  "extends": ["stylelint-config-standard-scss", "stylelint-order-config-standard"],
+  "plugins": ["stylelint-scss", "stylelint-order"],
   "rules": {
-    "selector-class-pattern": null,
-    "scss/dollar-variable-pattern": null
+    "selector-class-pattern": null
   },
-  "overrides": [
-    {
-      "files": ["src/**/*.scss"],
-      "customSyntax": "postcss-scss"
-    }
-  ],
   "ignoreFiles": ["src/common/semantic-ui-css/semantic.min.css"]
 }
-=======
-    "extends": [
-        "stylelint-config-standard-scss",
-        "stylelint-order-config-standard"
-    ],
-    "plugins": [
-        "stylelint-scss",
-        "stylelint-order"
-    ],
-    "rules": {
-        "selector-class-pattern": null,
-        "scss/at-import-partial-extension": null
-    },
-    "ignoreFiles": [
-        "src/common/semantic-ui-css/semantic.min.css"
-    ]
-}
->>>>>>> adaptive-overlay

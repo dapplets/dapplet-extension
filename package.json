@@ -12,10 +12,10 @@
     "start": "cross-env NODE_OPTIONS=--max-old-space-size=6144 webpack -w --config webpack.dev.js",
     "test": "mocha -r ts-node/register tests/**/*.spec.ts",
     "clean": "rm -rf ./build && rm -rf ./lib",
-    "lint": "npm run prettify && npm run eslint && npm run stylelint",
+    "lint": "npm run prettify && npm run stylelint && npm run eslint",
     "prettify": "prettier --write src",
     "eslint": "eslint ./src --ext .ts --fix",
-    "stylelint": "stylelint ./src/**/*.{css,scss} --fix"
+    "stylelint": "stylelint ./src/**/*.{css,scss,module.scss} --fix"
   },
   "devDependencies": {
     "@fontsource/montserrat": "^4.5.5",
