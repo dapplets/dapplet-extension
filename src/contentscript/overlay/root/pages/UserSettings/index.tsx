@@ -46,7 +46,7 @@ export const UserSettings = ({ dappletName, registryUrl }: UserSettingsProps): R
 
   if (!settingsContext) return null
   const { mi, vi, schemaConfig, defaultConfig } = settingsContext
-  console.log(settingsContext)
+  // console.log(settingsContext)
 
   return <SettingsPage mi={mi} vi={vi} schemaConfig={schemaConfig} defaultConfig={defaultConfig} />
 }

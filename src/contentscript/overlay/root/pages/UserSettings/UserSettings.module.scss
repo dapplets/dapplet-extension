@@ -19,41 +19,41 @@
   padding: 0 12px;
 }
 
-.form {
-  fieldset {
-    display: flex;
-    align-items: flex-start;
-    flex-direction: column;
-    justify-content: center;
+// .form {
+//   fieldset {
+//     display: flex;
+//     align-items: flex-start;
+//     flex-direction: column;
+//     justify-content: center;
 
-    width: 100%;
+//     width: 100%;
 
-    div {
-      display: flex;
-      align-items: flex-start;
-      flex-direction: column;
-      justify-content: center;
+//     div {
+//       display: flex;
+//       align-items: flex-start;
+//       flex-direction: column;
+//       justify-content: center;
 
-      width: 100%;
-      margin: 5px 0;
-      padding: 10px;
+//       width: 100%;
+//       margin: 5px 0;
+//       padding: 10px;
 
-      border-radius: 10px;
+//       border-radius: 10px;
 
-      background: $PureWhite;
-    }
-  }
+//       background: $PureWhite;
+//     }
+//   }
 
-  label {
-    color: $PureBlack;
+//   label {
+//     color: $PureBlack;
 
-    font-family: Roboto;
-    font-size: 14px;
-    font-weight: 500;
-    font-style: normal;
-    line-height: 16px;
-  }
-}
+//     font-family: Roboto;
+//     font-size: 14px;
+//     font-weight: 500;
+//     font-style: normal;
+//     line-height: 16px;
+//   }
+// }
 
 .wrapperInfoCard {
   display: flex;
@@ -190,7 +190,7 @@
 
   height: 32px;
 
-  padding: 7px 10px 9px;
+  padding: 9px 10px;
 
   color: $PureWhite;
 
@@ -224,7 +224,7 @@
 .messageUserSettings {
   width: 100%;
   height: min-content;
-  padding: 14px 0 21px 18px;
+  padding: 14px 0 14px 18px;
 
   color: $PureWhite;
 
@@ -239,6 +239,8 @@
   line-height: 120%;
 
   h6 {
+    margin-left: 0;
+
     color: $PureWhite;
 
     font-family: Roboto;
@@ -249,6 +251,8 @@
   }
 
   p {
+    margin-left: 0;
+
     text-transform: lowercase;
 
     color: $PureWhite;
@@ -258,5 +262,9 @@
     font-weight: 400;
     font-style: normal;
     line-height: 120%;
+  }
+
+  div {
+    width: 100%;
   }
 }

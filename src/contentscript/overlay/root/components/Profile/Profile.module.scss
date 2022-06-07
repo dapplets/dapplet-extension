@@ -11,28 +11,22 @@
 .header {
   position: relative;
   z-index: 2;
-
-  display: flex;
-  align-items: center;
-
-  padding: 2px;
-  padding-right: 14px;
-
-  cursor: pointer;
-
-  border-radius: 100px;
-  background: $PureWhite;
-
-  &.mini {
-    padding: 2px;
-  }
 }
 
-.avatar {
-  width: 29px;
-  height: 29px;
+.wrapperModalWallets {
+  display: flex;
+  justify-content: space-between;
 
-  border: 1px solid $StrokeColor;
+  width: 100%;
+  min-width: 160px;
+}
+
+.walletBlock {
+  width: 77px;
+  height: 77px;
+
+  border-radius: 5px;
+  background: #c4c4c4;
 }
 
 .hash {
@@ -70,9 +64,217 @@
 
   cursor: pointer;
 
-  color: $Primary;
+  &:hover {
+    background: $MainGrey;
+    box-shadow: 0 3px 4px rgb(0 0 0 / 9%), 0 10px 8px rgb(38 117 209 / 4%);
+  }
+
+  &:active {
+    background: $ContentBlack;
+    box-shadow: 0 3px 4px rgb(0 0 0 / 9%), 0 10px 8px rgb(38 117 209 / 4%);
+  }
 }
 
-.isOpen {
-  border-radius: 7px 7px 10px 10px;
+.ens {
+  background: #5ec280;
+
+  &:hover {
+    background: #72d694;
+    box-shadow: 0 3px 4px rgb(0 0 0 / 9%), 0 10px 8px rgb(38 117 209 / 4%);
+  }
+
+  &:active {
+    background: #26a651;
+    box-shadow: 0 3px 4px rgb(0 0 0 / 9%), 0 10px 8px rgb(38 117 209 / 4%);
+  }
+}
+
+.contentModal {
+  text-align: center;
+
+  color: $MainGrey;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 16px;
+}
+
+.wrapperModalWantLink {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  width: 100%;
+}
+
+.blockModalModalWantLink {
+  display: flex;
+
+  align-items: center;
+
+  width: 120px;
+  height: 33px;
+  margin-bottom: 10px;
+  padding: 2px 20px 2px 2px;
+
+  border-radius: 200px;
+
+  background: $WebBG;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+}
+
+// .blockModalModalWantLink:first-child{
+//   margin-bottom: 10px;
+// }
+
+.imgModalModalWantLink {
+  width: 29px;
+  height: 29px;
+
+  border: 1px solid #d9304f;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
+
+  border-radius: 50%;
+}
+
+.nameModalModalWantLink {
+  display: inline-block;
+
+  padding-left: 5px;
+
+  text-transform: capitalize;
+
+  color: $MainBlack;
+
+  font-family: Roboto;
+  font-size: 10px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 100%;
+}
+
+.buttonModalModalWantLink {
+  display: flex;
+  align-items: center;
+
+  justify-content: center;
+
+  width: min-content;
+
+  // width: 46px;
+  height: 32px;
+  margin-top: 14px;
+  padding: 0 10px;
+
+  color: $PureWhite;
+  border-radius: 4px;
+
+  background: $Primary;
+
+  font-family: Roboto;
+  font-size: 14px;
+
+  font-weight: 400;
+  line-height: 100%;
+
+  &:hover {
+    background: $PrimaryHover;
+  }
+
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+
+.postBlock {
+  display: flex;
+
+  width: 100%;
+  margin-bottom: 26px;
+  padding: 10px;
+
+  border-radius: 10px;
+
+  background: #f5f5f5;
+}
+
+.postInput {
+  display: flex;
+
+  width: 306px;
+  height: 200px;
+
+  padding: 5px 13px;
+
+  // resize: none;
+
+  color: $MainGrey;
+
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
+
+  background: $PureWhite;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
+}
+
+.postLinkCopy {
+  cursor: pointer;
+
+  color: $Primary;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 100%;
+
+  &:hover {
+    color: $PrimaryHover;
+  }
+
+  &:active {
+    color: $PrimaryPressed;
+  }
+}
+
+.postLinkInput {
+  display: flex;
+
+  width: 306px;
+  height: 32px;
+
+  padding: 5px 13px;
+
+  color: $MainGrey;
+
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
+
+  background: $PureWhite;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+
+  line-height: 149%;
+}
+
+.postLinkWrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  width: 100%;
+}
+
+.newMargin {
+  margin-top: 0;
 }

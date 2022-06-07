@@ -6,12 +6,14 @@ export interface AvatarProps {
   avatar: string
   size: 'small' | 'big'
   className?: string
+  onClick?: () => void
 }
 
 export const Avatar: FC<AvatarProps> = (props: AvatarProps) => {
-  const { avatar, size, className = '' } = props
+  const { avatar, size, className = '', onClick } = props
   return (
     <div
+      onClick={onClick}
       className={cn(
         styles.usersAvatars,
         {

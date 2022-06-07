@@ -1,4 +1,5 @@
 import { withTheme } from '@rjsf/core'
+import { Theme as SemanticUITheme } from '@rjsf/semantic-ui'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
@@ -8,7 +9,7 @@ import { CONTEXT_ID_WILDCARD } from '../../../../../common/constants'
 import { DefaultConfig, SchemaConfig } from '../../../../../common/types'
 import { Message } from '../../components/Message'
 import SelectWidget from './SelectWiget/SelectWigets'
-import './settingPage.css'
+
 import TextWidget from './TextWiget/TextWigets'
 import styles from './UserSettings.module.scss'
 
@@ -23,8 +24,10 @@ export interface SettingsPageProps {
   defaultConfig?: DefaultConfig
 }
 let _isMounted = false
+SemanticUITheme.widgets.SelectWidget = SelectWidget
+const theme = { widgets: { SemanticUITheme, TextWidget } }
+// console.log(SelectWidget)
 
-const theme = { widgets: { SelectWidget, TextWidget } }
 const Form = withTheme(theme)
 
 export const SettingsPage: FC<SettingsPageProps> = (props) => {
@@ -162,8 +165,11 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
             <Message
               className={styles.messageUserSettings}
               title="Hidden settings"
-              subtitle="The following options are available only in developer mode:"
-              children={<>{hiddenProperties.join(', ')}</>}
+              subtitle="The following options are available only in developer mode"
+              children={
+                ''
+                // <div className={styles.hiddenProps}>{hiddenProperties.join(', ')}</div>
+              }
             />
           ) : null}
 

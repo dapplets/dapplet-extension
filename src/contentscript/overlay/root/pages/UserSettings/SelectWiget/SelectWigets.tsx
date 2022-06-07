@@ -1,7 +1,9 @@
 import { utils } from '@rjsf/core'
 import _ from 'lodash'
 import React from 'react'
+import { Form } from 'semantic-ui-react'
 import { getSemanticProps } from '../utils'
+import './select.css'
 import styles from './SelectWiget.module.scss'
 
 const { asNumber, guessType } = utils
@@ -10,20 +12,25 @@ const nums = new Set(['number', 'integer'])
 
 /**
  * * Returns and creates an array format required for semantic drop down
- * @param {array} enumOptions- array of items for the dropdown
+ * @param {array} enumOptions - array of items for the dropdown
  * @param {array} enumDisabled - array of enum option values to disable
  * @returns {*}
  */
+
 function createDefaultValueOptionsForDropDown(enumOptions, enumDisabled) {
   const disabledOptions = enumDisabled || []
   let options = []
   // eslint-disable-next-line no-shadow
-  options = _.map(enumOptions, ({ label, value }) => ({
+
+  options = _.map(enumOptions, ({ label, value, className }) => ({
     disabled: disabledOptions.indexOf(value) !== -1,
     key: label,
     text: label,
+    className: className,
     value,
+    styles,
   }))
+  // <Dropdown.Item style={{ backgroundColor: 'red', color: '#fff' }}>{label}</Dropdown.Item>
   return options
 }
 
@@ -84,10 +91,10 @@ function SelectWidget(props) {
     options,
     defaultSchemaProps: {
       inverted: 'false',
-      selection: 'true',
-      fluid: 'true',
-      scrolling: 'true',
-      upward: 'false',
+      selection: true,
+      fluid: true,
+      scrolling: true,
+      upward: false,
     },
   })
   const { enumDisabled, enumOptions } = options
@@ -106,8 +113,7 @@ function SelectWidget(props) {
   }) => onFocus && onFocus(id, processValue(schema, value))
 
   return (
-    <input
-      // Form.Dropdown
+    <Form.Dropdown
       className={styles.inputSelect}
       key={id}
       name={name}

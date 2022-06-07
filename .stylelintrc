@@ -1,17 +1,8 @@
 {
-    "extends": [
-        "stylelint-config-standard-scss",
-        "stylelint-order-config-standard"
-    ],
-    "plugins": [
-        "stylelint-scss",
-        "stylelint-order"
-    ],
-    "rules": {
-        "selector-class-pattern": null,
-        "scss/at-import-partial-extension": null
-    },
-    "ignoreFiles": [
-        "src/common/semantic-ui-css/semantic.min.css"
-    ]
+  "extends": ["stylelint-config-standard-scss", "stylelint-order-config-standard"],
+  "plugins": ["stylelint-scss", "stylelint-order"],
+  "rules": {
+    "selector-class-pattern": null
+  },
+  "ignoreFiles": ["src/common/semantic-ui-css/semantic.min.css"]
 }

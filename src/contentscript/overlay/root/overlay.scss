@@ -95,7 +95,10 @@
 
   border-style: solid none solid solid;
 
+<<<<<<< HEAD
+=======
   // box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.5);
+>>>>>>> adaptive-overlay
   border-radius: 0;
 }
 
@@ -245,6 +248,7 @@
   background-color: rgb(0 0 0 / 5%);
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
 .dapplets-action-dropdown:hover > div {
   right: 0;
 
