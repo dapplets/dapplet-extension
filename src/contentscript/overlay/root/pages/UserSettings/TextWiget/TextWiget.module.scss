@@ -9,6 +9,14 @@
 
   width: 100%;
 }
+.inputBlockNumber{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 40%;
+  margin-top: 10px;
+}
 
 .inputOverlay {
   display: flex;
@@ -39,6 +47,7 @@
   width: 110px;
 
   text-align: center;
+  margin-top: 0;
 }
 
 .buttonMin {

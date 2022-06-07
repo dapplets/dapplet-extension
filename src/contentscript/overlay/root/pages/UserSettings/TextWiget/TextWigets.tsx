@@ -1,16 +1,60 @@
 import { utils } from '@rjsf/core'
 import { rangeSpec } from '@rjsf/core/lib/utils'
-// import { Form } from 'semantic-ui-react'
-// import {Form} from './index'
+
 import cn from 'classnames'
-import React from 'react'
+import React, { useEffect } from 'react'
+
 import { getSemanticProps } from '../utils'
-// import './textWiget.css'
+
 import styles from './TextWiget.module.scss'
-// const Form = JSONSchemaForm.default;
 
 const { getDisplayLabel } = utils
 let _isMounted = false
+
+const MyCustomWidget = (props, step) => {
+  return (
+    <div className={styles.inputBlockNumber}>
+      <button
+        className={styles.buttonMin}
+        value={props.value}
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          props.onChange(String(+e.currentTarget.value + step))
+        }}
+      />
+
+      <input
+        type="number"
+        className={cn(styles.inputOverlay, styles.inputOverlayNumber)}
+        value={props.value}
+        required={props.required}
+        onChange={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          props.onChange(event.target.value)
+        }}
+      />
+      <button
+        className={styles.buttonMax}
+        value={props.value}
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          props.onChange(String(+e.currentTarget.value - step))
+        }}
+      />
+    </div>
+  )
+}
+
+const widgets = {
+  myCustomWidget: MyCustomWidget,
+}
+
+const NewuiSchema = {
+  'ui:widget': 'myCustomWidget',
+}
 
 function TextWidget(props) {
   const {
@@ -31,25 +75,15 @@ function TextWidget(props) {
     schema,
     uiSchema,
     formContext,
+    formData,
   } = props
+
   const uiThemeProps = getSemanticProps({ formContext, options, uiSchema })
 
-  // eslint-disable-next-line no-shadow
-
-  const step = schema.type === 'number' ? 'any' : undefined // non-integer numbers shouldn't have a default step of 1
-  const stepProps = rangeSpec(schema) // sets step, min, and max from the schema
+  const step = schema.type === 'number' ? 'any' : undefined
+  const stepProps = rangeSpec(schema)
 
   const _onChange = ({ target: { value } }) => onChange(value === '' ? options.emptyValue : value)
-
-  const _onChangeNum = ({ currentTarget: { value } }) => {
-    let num = 0.5
-    value = `${num}`
-    onChange(value === '' ? options.emptyValue : value)
-    console.log(value, '_onChangeNum')
-  }
-
-  const _onChangeDec = ({ currentTarget: { value } }) =>
-    onChange(value === '' ? options.emptyValue : value)
 
   const _onBlur = () => onBlur && onBlur(id, value)
   const _onFocus = () => onFocus && onFocus(id, value)
@@ -59,38 +93,41 @@ function TextWidget(props) {
     /* TODO: , rootSchema */
   )
 
-  console.log(value)
+  useEffect(() => {
+    _isMounted = true
+    const init = async () => {}
+    init()
+
+    return () => {
+      _isMounted = false
+    }
+  }, [])
 
   return (
     <>
-      {/* <button value={value || value === 0 ? value : ''} onClick={_onChangeNum}>
-        +
-      </button> */}
-      <input
-        className={cn(styles.inputOverlay, {
-          [styles.inputOverlayNumber]: `${schema.type}` === 'number',
-        })}
-        key={id}
-        id={id}
-        placeholder={value}
-        type={schema.type === 'string' ? 'text' : `${schema.type}`}
-        label={displayLabel ? label || schema.title : false}
-        required={required}
-        autoFocus={autofocus}
-        disabled={disabled || readonly}
-        name={name}
-        {...uiThemeProps}
-        value={value || value === 0 ? value : ''}
-        onChange={_onChange}
-        onBlur={_onBlur}
-        onFocus={_onFocus}
-        step={step}
-        // _onChangeNum={_onChangeNum}
-        {...stepProps}
-      />
-      {/* <button value={stepProps.step} onChange={_onChangeDec}>
-        -
-      </button> */}
+      {schema.type === 'number' ? (
+        MyCustomWidget(props, stepProps.step)
+      ) : (
+        <input
+          className={cn(styles.inputOverlay, {})}
+          key={id}
+          id={id}
+          placeholder={value}
+          type={'text'}
+          label={displayLabel ? label || schema.title : false}
+          required={required}
+          autoFocus={autofocus}
+          disabled={disabled || readonly}
+          name={name}
+          {...uiThemeProps}
+          value={value || value === 0 ? value : ''}
+          onChange={_onChange}
+          onBlur={_onBlur}
+          onFocus={_onFocus}
+          step={step}
+          {...stepProps}
+        />
+      )}
     </>
   )
 }

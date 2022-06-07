@@ -10,6 +10,19 @@ const { asNumber, guessType } = utils
 
 const nums = new Set(['number', 'integer'])
 
+const MyCustomWidget = (props, _onChange, _onBlur, value) => {
+  // const{defaultSchemaProps}=props
+
+  return (
+    <div>
+      <span>{value}</span>
+      {props.map((item, index) => (
+        <input onClick={_onChange} value={item.value} className="custom" key={index} />
+      ))}
+    </div>
+  )
+}
+
 /**
  * * Returns and creates an array format required for semantic drop down
  * @param {array} enumOptions - array of items for the dropdown
@@ -100,13 +113,14 @@ function SelectWidget(props) {
   })
   const { enumDisabled, enumOptions } = options
   const emptyValue = multiple ? [] : ''
-  const dropdownOptions = createDefaultValueOptionsForDropDown(enumOptions, enumDisabled)
+
   const _onChange = (
     event,
     // eslint-disable-next-line no-shadow
     { value }
   ) => {
     onChange && onChange(processValue(schema, value))
+    _onBlur
   }
   // eslint-disable-next-line no-shadow
   const _onBlur = ({ target: { value } }) => onBlur && onBlur(id, processValue(schema, value))
@@ -116,6 +130,9 @@ function SelectWidget(props) {
   }) => onFocus && onFocus(id, processValue(schema, value))
   // console.log(semanticProps, '...semanticProps')
 
+  const dropdownOptions = createDefaultValueOptionsForDropDown(enumOptions, enumDisabled)
+
+  console.log(dropdownOptions)
   return (
     <Form.Dropdown
       className={styles.inputSelect}
@@ -134,7 +151,13 @@ function SelectWidget(props) {
       onChange={_onChange}
       onBlur={_onBlur}
       onFocus={_onFocus}
+      onClick={(e) => {
+        e.currentTarget.classList.toggle('new_icon')
+        e.currentTarget.parentElement.classList.add('khgfjh')
+      }}
     />
+
+    // MyCustomWidget(dropdownOptions, _onChange, _onBlur, value)
   )
 }
 export default SelectWidget
