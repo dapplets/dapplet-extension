@@ -17,27 +17,21 @@ const MyCustomWidget = (props, step) => {
     <div className={styles.inputBlockNumber}>
       <button
         className={styles.buttonMin}
-        value={String(Number(props.value).toFixed(2))}
+        value={props.value}
         disabled={props.value <= step.min}
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
-          props.onChange(String(+e.currentTarget.value - step.step))
-          console.log(props.onChange)
+          const newValue = Number(+e.currentTarget.value - Number(step.step)).toFixed(2)
+          props.onChange(String(newValue))
         }}
       />
 
       <input
         type="number"
         className={cn(styles.inputOverlay, styles.inputOverlayNumber)}
-        value={
-          String(Number(props.value).toFixed(2)) || props.value === 0
-            ? String(Number(props.value).toFixed(2))
-            : ''
-        }
+        value={props.value}
         required={props.required}
-        min={step.min}
-        max={step.max}
         onChange={(event) => {
           event.preventDefault()
           event.stopPropagation()
@@ -51,7 +45,10 @@ const MyCustomWidget = (props, step) => {
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
-          props.onChange(String(+e.currentTarget.value + step.step))
+          const newValue = Number(+e.currentTarget.value + Number(step.step)).toFixed(2)
+          console.log(newValue)
+
+          props.onChange(String(newValue))
         }}
       />
     </div>
