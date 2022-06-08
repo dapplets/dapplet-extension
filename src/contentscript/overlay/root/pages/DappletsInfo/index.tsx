@@ -645,8 +645,10 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     </button>
                     <Modal
                       visible={newOwnerLoading}
-                      title={'Loading new Owner'}
-                      content={'This modal window will close automatically after successful change'}
+                      title={'Changing the Owner'}
+                      content={
+                        'This modal window will close automatically after your changes are saved'
+                      }
                       footer={''}
                       onClose={() => setNewOwnerLoading(false)}
                     />
@@ -813,7 +815,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       />
       <Modal
         visible={isModalTransaction}
-        title="Transaction confirmation"
+        title="Confirming Transaction"
         content={<div className={styles.modalDefaultContent}></div>}
         footer={''}
         onClose={() => {

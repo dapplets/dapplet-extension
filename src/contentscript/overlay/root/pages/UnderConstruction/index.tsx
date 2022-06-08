@@ -425,7 +425,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
       />
       <Modal
         visible={isModalTransaction}
-        title={'Transaction confirmation'}
+        title={'Confirming Transaction'}
         content={''}
         footer={''}
         onClose={() => !isModalTransaction}

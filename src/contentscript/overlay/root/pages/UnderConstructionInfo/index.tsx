@@ -597,7 +597,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       <Modal
         classNameWrapper={styles.newModalTransaction}
         visible={isModalTransaction}
-        title="Transaction confirmation"
+        title="Confirming Transaction"
         content={<div className={styles.modalDefaultContent}></div>}
         footer={''}
         onClose={() => {

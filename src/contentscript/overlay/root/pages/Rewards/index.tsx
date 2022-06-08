@@ -355,7 +355,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
           {items && items.items && items.items.length === 0 && (
             <Message
               title="No rewards yet"
-              subtitle="Click below to create first reward"
+              subtitle="Click below to create the first reward"
               className={styles.newMessage}
               children={
                 <button
@@ -426,9 +426,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     </div>
                   </div>
                   {poolInputInvalid || +pool.pool > 100 || +pool.pool <= 0 ? (
-                    <div className={styles.poolInputInvalidText}>
-                      Distributed must not exceed 100%
-                    </div>
+                    <div className={styles.poolInputInvalidText}>Distributed amount 100%</div>
                   ) : null}
                   <div className={styles.rewardRecepientBlock}>
                     <div className={styles.recepientBlock}>
@@ -517,7 +515,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                 className={cn(styles.conditionalWrapper, {})}
                               >
                                 <span className={styles.conditionalLabel}>
-                                  condition: if this dapplet has dependency to
+                                  condition: this dapplet is dependent on
                                 </span>
                                 <div className={styles.conditionalInputBlock}>
                                   <input
@@ -707,7 +705,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                   +poolNewInput.current?.value > 100 ||
                   +poolNewInput.current?.value <= 0 ? (
                     <div className={styles.poolInputInvalidText}>
-                      Distributed must not exceed 100% or be negative
+                      Distributed amount 100% or be negative
                     </div>
                   ) : null}
                   <div className={styles.rewardRecepientBlock}>
@@ -774,7 +772,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                 className={cn(styles.conditionalWrapper, {})}
                               >
                                 <span className={styles.conditionalLabel}>
-                                  condition: if this dapplet has dependency to
+                                  condition: this dapplet is dependent on
                                 </span>
                                 <div className={styles.conditionalInputBlock}>
                                   <input

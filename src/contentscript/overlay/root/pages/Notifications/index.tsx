@@ -79,7 +79,7 @@ export const Notifications = () => {
       )) ||
         ''}
 
-      {!event.length && <div className={styles.noNot}>There is no notifications</div>}
+      {!event.length && <div className={styles.noNot}>There are no notifications</div>}
     </div>
   )
 }

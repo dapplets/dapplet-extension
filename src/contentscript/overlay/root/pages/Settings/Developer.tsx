@@ -324,7 +324,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
             setUnderConstructionDetails(false)
           }}
         >
-          Create under construction dapplet
+          Create «under construction» dapplet
         </button>
       </div>
     </div>

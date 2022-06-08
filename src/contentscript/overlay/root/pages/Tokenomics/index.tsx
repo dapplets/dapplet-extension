@@ -38,7 +38,7 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
       {!isCreate && (
         <div className={styles.blockMessage}>
           <Message
-            title="Do you want to connect tokenomics?"
+            title="Do you want to add tokenomics?"
             subtitle="Be careful - this can only be done once"
             link="F.A.Q"
             linkText="F.A.Q"
@@ -153,9 +153,7 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
             visible={isModal}
             title="Create Tokenomy"
             content={
-              <div className={styles.finalWarning}>
-                China's final warning - you can't change it anymore
-              </div>
+              <div className={styles.finalWarning}>Final warning - you can't change it anymore</div>
             }
             footer={
               <div className={styles.footerContentModal}>
@@ -167,7 +165,7 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
                     setVisibleConfirm(false)
                   }}
                 >
-                  Yes, i'm over sure
+                  Yes, I`m sure
                 </button>
                 <a className={styles.footerContentModalLink}>F.A.Q.</a>
               </div>
