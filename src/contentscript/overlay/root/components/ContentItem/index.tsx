@@ -1,9 +1,9 @@
 import cn from 'classnames'
 import * as React from 'react'
+import { PopupItem } from '../../components/PopupItem'
 import { TabLoader } from '../../components/TabLoader'
 import { Overlay } from '../../overlay'
 import { OverlayManager } from '../../overlayManager'
-import { PopupItem } from '../../PopupItem'
 import styles from './ContentItem.module.scss'
 
 const OVERLAY_LOADING_TIMEOUT = 5000

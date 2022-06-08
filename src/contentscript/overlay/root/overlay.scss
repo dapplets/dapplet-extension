@@ -260,26 +260,6 @@
   background: rgb(0 0 0 / 10%);
 }
 
-.dapplets-popup-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  background: rgb(0 0 0 / 10%);
-  backdrop-filter: blur(4px);
-}
-
-.dapplets-popup-container > * {
-  position: absolute;
-  top: calc(50% - 271px);
-  left: calc(50% - 187.5px);
-
-  width: 375px;
-  height: 542px;
-
-  border: none;
-}
-
 .loader-container {
   position: absolute;
   z-index: -1;

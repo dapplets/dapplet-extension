@@ -1,6 +1,7 @@
 import * as React from 'react'
-import PopupLoader from '../../../overlay/assests/loader.svg'
-import { Overlay } from './overlay'
+import PopupLoader from '../../../../../overlay/assests/loader.svg'
+import { Overlay } from '../../overlay'
+import styles from './PopupItem.module.scss'
 
 interface P {
   overlay: Overlay
@@ -32,9 +33,9 @@ export class PopupItem extends React.Component<P, S> {
     const s = this.state
 
     return (
-      <div ref={this.ref} className="dapplets-popup-container">
+      <div ref={this.ref} className={styles['dapplets-popup-container']}>
         {s.isLoading && (
-          <div className="popup-loader-container">
+          <div className={styles['popup-loader-container']}>
             <div>
               <img src={PopupLoader} alt="Loading" />
             </div>
