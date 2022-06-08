@@ -260,26 +260,6 @@
   background: rgb(0 0 0 / 10%);
 }
 
-.dapplets-popup-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  background: rgb(0 0 0 / 10%);
-  backdrop-filter: blur(4px);
-}
-
-.dapplets-popup-container > * {
-  position: absolute;
-  top: calc(50% - 271px);
-  left: calc(50% - 187.5px);
-
-  width: 375px;
-  height: 542px;
-
-  border: none;
-}
-
 .loader-container {
   position: absolute;
   z-index: -1;
@@ -327,22 +307,4 @@
   color: #000;
 
   font: 14pt "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-.popup-loader-container {
-  box-sizing: border-box;
-  padding: 18px;
-
-  border-radius: 10px;
-  background: #fff;
-}
-
-.popup-loader-container img {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-
-  width: 143px;
-  height: 143px;
-  margin: -71.5px 0 0 -71.5px;
 }

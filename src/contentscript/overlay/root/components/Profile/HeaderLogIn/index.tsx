@@ -13,6 +13,7 @@ import styles from './HeaderLogIn.module.scss'
 // import makeBlockie from 'ethereum-blockies-base64'
 import makeBlockie from 'ethereum-blockies-base64'
 import { browser } from 'webextension-polyfill-ts'
+import { mergeSameWallets } from '../../../../../../common/helpers'
 
 export interface HeaderLogInProps {
   avatar?: string
@@ -43,7 +44,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   } = props
 
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
-  const connectedDescriptors = descriptors.filter((x) => x.connected)
+  const connectedDescriptors = mergeSameWallets(descriptors.filter((x) => x.connected))
   useEffect(() => {
     const init = async () => {
       _isMounted = true
