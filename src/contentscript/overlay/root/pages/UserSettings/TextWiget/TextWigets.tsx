@@ -7,6 +7,7 @@ import React, { useEffect } from 'react'
 import { getSemanticProps } from '../utils'
 
 import styles from './TextWiget.module.scss'
+// import Select from 'react-select';
 
 const { getDisplayLabel } = utils
 let _isMounted = false
@@ -111,7 +112,7 @@ function TextWidget(props) {
     }
   }, [])
   // console.log(stepProps)
-  console.log(value)
+  // console.log(value)
 
   return (
     <>

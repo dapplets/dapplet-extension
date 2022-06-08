@@ -98,7 +98,8 @@
   "dependencies": {
     "@types/react-jsonschema-form": "^1.7.8",
     "ethers": "^5.5.4",
-    "near-api-js": "^0.39.0"
+    "near-api-js": "^0.39.0",
+    "react-select": "^5.3.2"
   },
   "directories": {
     "doc": "docs"
