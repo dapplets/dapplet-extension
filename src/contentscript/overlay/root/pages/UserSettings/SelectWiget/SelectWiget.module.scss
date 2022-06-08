@@ -51,10 +51,18 @@
 
   width: 14px;
   height: 8px;
+
+  cursor: pointer;
 }
 
-[class*=" css-4ljt47-MenuList"] {
+[class*=" css-tlfecz-indicatorContainer"]:checked {
+  background: #000;
+}
+
+[class*=" css-4ljt47-MenuList"] > div:hover {
   cursor: pointer;
+
+  color: $Primary;
 }
 
 [class^="control-label"],

@@ -1,6 +1,6 @@
 import { utils } from '@rjsf/core'
 import _ from 'lodash'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Select from 'react-select'
 import { getSemanticProps } from '../utils'
 // import './select.css'
@@ -30,7 +30,7 @@ function createDefaultValueOptionsForDropDown(enumOptions, enumDisabled) {
     value: value,
     styles,
   }))
-  // <Dropdown.Item style={{ backgroundColor: 'red', color: '#fff' }}>{label}</Dropdown.Item>
+
   return options
 }
 
@@ -40,6 +40,7 @@ function createDefaultValueOptionsForDropDown(enumOptions, enumDisabled) {
  */
 const processValue = (schema, value) => {
   // "enum" is a reserved word, so only "type" and "items" can be destructured
+
   const { type, items } = schema
   if (value === '') {
     return undefined
@@ -48,6 +49,8 @@ const processValue = (schema, value) => {
   } else if (type === 'boolean') {
     return value === 'true' || value === true
   } else if (type === 'number') {
+    return asNumber(value)
+  } else if (type === 'string') {
     return asNumber(value)
   }
 
@@ -62,6 +65,24 @@ const processValue = (schema, value) => {
   }
 
   return value
+}
+
+const MyCustomWidget = (props, setNewValue) => {
+  const ttOpt = props.options.enumOptions
+
+  const options = [...ttOpt]
+  return (
+    <Select
+      className={styles.inputSelect}
+      options={options}
+      // closeMenuOnSelect={false}
+      placeholder={props.value}
+      onChange={(e) => {
+        setNewValue(e.value)
+      }}
+      name={props.name}
+    />
+  )
 }
 
 function SelectWidget(props) {
@@ -83,6 +104,7 @@ function SelectWidget(props) {
     onChange,
     onBlur,
     onFocus,
+    formData,
   } = props
   const semanticProps = getSemanticProps({
     schema,
@@ -103,53 +125,25 @@ function SelectWidget(props) {
   const dropdownOptions = createDefaultValueOptionsForDropDown(enumOptions, enumDisabled)
   const _onChange = (
     event,
-    // eslint-disable-next-line no-shadow
+
     { value }
-  ) => onChange && onChange(processValue(schema, value))
+  ) => {
+    onChange && onChange(processValue(schema, value))
+  }
   // eslint-disable-next-line no-shadow
   const _onBlur = ({ target: { value } }) => onBlur && onBlur(id, processValue(schema, value))
   const _onFocus = ({
     // eslint-disable-next-line no-shadow
     target: { value },
   }) => onFocus && onFocus(id, processValue(schema, value))
-  console.log(value)
 
-  return (
-    <Select
-      // placeholder={use}
-      // name={name}
-      // key={id}
-      className={styles.inputSelect}
-      // value={value}
-      options={enumOptions}
-      // inputValue={value}
-      // autoFocus={autofocus}
-      isMulti={false}
-      // {...semanticProps}
-      // required={required}
-      // onChange={onChange(processValue(schema, value))}
-      onBlur={_onBlur}
-      onFocus={_onFocus}
-      delimiter={value}
-    />
-  )
+  const [newWalue, setNewValue] = useState(null)
+  useEffect(() => {
+    if (newWalue) {
+      onChange(newWalue)
+    }
+  }, [newWalue])
+
+  return MyCustomWidget(props, setNewValue)
 }
 export default SelectWidget
-
-// className={styles.inputSelect}
-// key={id}
-// name={name}
-// label={label || schema.title}
-// // multiple={typeof multiple === 'undefined' ? false : multiple}
-// isMulti
-// value={dropdownOptions}
-// disabled={disabled}
-// placeholder={placeholder}
-// {...semanticProps}
-// required={required}
-// autoFocus={autofocus}
-// readOnly={readonly}
-// options={enumOptions}
-// onChange={_onChange}
-// onBlur={_onBlur}
-// onFocus={_onFocus}

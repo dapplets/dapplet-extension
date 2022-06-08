@@ -23,6 +23,7 @@ const MyCustomWidget = (props, step) => {
           e.preventDefault()
           e.stopPropagation()
           props.onChange(String(+e.currentTarget.value - step.step))
+          console.log(props.onChange)
         }}
       />
 
