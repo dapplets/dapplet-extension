@@ -12,6 +12,7 @@ import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
 import { Dapplet } from '../../components/Dapplet'
 import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
+import { TabLoader } from '../../components/TabLoader'
 import styles from './Dapplets.module.scss'
 
 export type Module = ManifestDTO & {
@@ -326,7 +327,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         />
       </div>
       {isLoadingListDapplets ? (
-        <div className={styles.loadingListDapplets}></div>
+        <TabLoader />
       ) : (
         <div className={styles.dappletsBlock}>
           {!isNoContentScript ? (

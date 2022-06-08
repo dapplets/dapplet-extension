@@ -1,5 +1,6 @@
 import cn from 'classnames'
 import * as React from 'react'
+import { TabLoader } from '../../components/TabLoader'
 import { Overlay } from '../../overlay'
 import { OverlayManager } from '../../overlayManager'
 import { PopupItem } from '../../PopupItem'
@@ -102,35 +103,36 @@ export class ContentItem extends React.Component<P, S> {
 
     return (
       <div
-        // style={{ display: 'none' }}
         className={cn(styles.contentItem, {
           [styles.contentItemActive]: p.isActive,
         })}
       >
         {s.loadingMode === LoadingMode.Loading && (
-          <div className="loader-container">
-            <div className="flex">
-              <div className="loader"></div>
-            </div>
-            <div className="load-text">Loading Overlay...</div>
-            <div className="load-text">
-              Downloading from decentralized sources like Swarm or IPFS can take some time
-            </div>
-          </div>
+          // <div className="loader-container">
+          //   <div className="flex">
+          //     <div className="loader"></div>
+          //   </div>
+          //   <div className="load-text">Loading Overlay...</div>
+          //   <div className="load-text">
+          //     Downloading from decentralized sources like Swarm or IPFS can take some time
+          //   </div>
+          // </div>
+          <TabLoader />
         )}
 
         {s.loadingMode === LoadingMode.SlowLoading && (
-          <div className="loader-container">
-            <div className="flex">
-              <div className="loader"></div>
-            </div>
-            <div className="load-text">Loading Overlay...</div>
-            <div className="load-text">The overlay it is taking a while to load.</div>
-            <div className="load-text-desc">
-              If the overlay does not load, try changing your preferred overlay storage in the
-              extension settings.
-            </div>
-          </div>
+          // <div className="loader-container">
+          //   <div className="flex">
+          //     <div className="loader"></div>
+          //   </div>
+          //   <div className="load-text">Loading Overlay...</div>
+          //   <div className="load-text">The overlay it is taking a while to load.</div>
+          //   <div className="load-text-desc">
+          //     If the overlay does not load, try changing your preferred overlay storage in the
+          //     extension settings.
+          //   </div>
+          // </div>
+          <TabLoader />
         )}
 
         {s.loadingMode === LoadingMode.NetworkError && (
@@ -181,7 +183,11 @@ export class ContentItem extends React.Component<P, S> {
           </div>
         )}
 
-        <div className={styles.frameContainer} ref={this.ref}></div>
+        <div
+          style={{ display: s.loadingMode === LoadingMode.NotLoading ? undefined : 'none' }}
+          className={styles.frameContainer}
+          ref={this.ref}
+        ></div>
 
         {childrenOverlays.map((x) => (
           <PopupItem key={x.id} overlay={x} />
