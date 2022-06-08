@@ -56,6 +56,7 @@ export default class extends ethers.Signer implements EthereumWallet {
   }
 
   async sendTransactionOutHash(transaction: TransactionRequest): Promise<string> {
+    await this._prepareNetwork()
     const metamask = await this._getMetamaskProvider()
     localStorage['metamask_lastUsage'] = new Date().toISOString()
     transaction.from = await this.getAddress()
@@ -127,6 +128,51 @@ export default class extends ethers.Signer implements EthereumWallet {
 
   getLastUsage() {
     return localStorage['metamask_lastUsage']
+  }
+
+  private async _prepareNetwork(): Promise<void> {
+    const network = await this.provider.getNetwork()
+    const chainId = await this._getWalletChainId()
+
+    if (network.chainId === chainId) return
+
+    const metamask = await this._getMetamaskProvider()
+    const chainIdHex = '0x' + network.chainId.toString(16)
+
+    try {
+      await metamask.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: chainIdHex }],
+      })
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      if (switchError.code === 4902) {
+        try {
+          await metamask.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: chainIdHex,
+                chainName: network.name,
+                rpcUrls: [this.provider.connection.url],
+              },
+            ],
+          })
+        } catch (addError) {
+          throw new Error('Network adding rejected')
+        }
+      }
+      throw new Error('Network switching rejected')
+    }
+  }
+
+  private async _getWalletChainId(): Promise<number> {
+    const metamask = await this._getMetamaskProvider()
+    const chainId = await metamask.request({
+      method: 'eth_chainId',
+      params: [],
+    })
+    return Number(chainId)
   }
 
   private async _getMetamaskProvider(): Promise<MetaMaskInpageProvider> {

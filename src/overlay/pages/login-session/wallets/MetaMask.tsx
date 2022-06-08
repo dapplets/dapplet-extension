@@ -13,6 +13,7 @@ interface Props {
     loginRequest: LoginRequest
   }
   bus: Bus
+  chain: ChainTypes
   frameId: string
 }
 
@@ -24,7 +25,7 @@ interface State {
   descriptor: WalletDescriptor | null
 }
 
-export default class extends React.Component<Props, State> {
+export default class MetaMask extends React.Component<Props, State> {
   private _mounted = false
 
   constructor(props) {
@@ -44,7 +45,7 @@ export default class extends React.Component<Props, State> {
     try {
       const { connectWallet, getWalletDescriptors, createLoginConfirmation } =
         await initBGFunctions(browser)
-      await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.METAMASK, null)
+      await connectWallet(this.props.chain, WalletTypes.METAMASK, null)
       const descriptors = await getWalletDescriptors()
       const descriptor = descriptors.find((x) => x.type === WalletTypes.METAMASK)
 
@@ -57,7 +58,7 @@ export default class extends React.Component<Props, State> {
         this.setState({ signing: true })
         const app = this.props.data.app
         const loginRequest = this.props.data.loginRequest
-        const chain = ChainTypes.ETHEREUM_GOERLI
+        const chain = this.props.chain
         const wallet = WalletTypes.METAMASK
         const confirmation = await createLoginConfirmation(app, loginRequest, chain, wallet)
         confirmationId = confirmation.loginConfirmationId
@@ -69,7 +70,7 @@ export default class extends React.Component<Props, State> {
           this.props.frameId,
           {
             wallet: WalletTypes.METAMASK,
-            chain: ChainTypes.ETHEREUM_GOERLI,
+            chain: this.props.chain,
             confirmationId,
           },
         ])
@@ -87,7 +88,7 @@ export default class extends React.Component<Props, State> {
 
   // async disconnect() {
   //     const { disconnectWallet } = await initBGFunctions(browser);
-  //     await disconnectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.METAMASK);
+  //     await disconnectWallet(this.props.chain, WalletTypes.METAMASK);
   //     this.setState({ toBack: true });
   // }
 
@@ -96,7 +97,7 @@ export default class extends React.Component<Props, State> {
       this.props.frameId,
       {
         wallet: WalletTypes.METAMASK,
-        chain: ChainTypes.ETHEREUM_GOERLI,
+        chain: this.props.chain,
       },
     ])
   }

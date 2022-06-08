@@ -96,12 +96,70 @@ export class LoginSession extends React.Component<Props, State> {
             element={<WalletPairing bus={p.bus} chains={chains as ChainTypes[]} data={p.request} />}
           />
           <Route
-            path="/pairing/metamask"
-            element={<MetaMask bus={p.bus} frameId={p.request.frameId} data={p.request} />}
+            path="/pairing/metamask_goerli"
+            element={
+              <MetaMask
+                bus={p.bus}
+                frameId={p.request.frameId}
+                chain={ChainTypes.ETHEREUM_GOERLI}
+                data={p.request}
+              />
+            }
           />
           <Route
-            path="/pairing/walletconnect"
-            element={<WalletConnect bus={p.bus} frameId={p.request.frameId} data={p.request} />}
+            path="/pairing/walletconnect_goerli"
+            element={
+              <WalletConnect
+                bus={p.bus}
+                frameId={p.request.frameId}
+                chain={ChainTypes.ETHEREUM_GOERLI}
+                data={p.request}
+              />
+            }
+          />
+          <Route
+            path="/pairing/dapplets_goerli"
+            element={
+              <Dapplets
+                bus={p.bus}
+                frameId={p.request.frameId}
+                chain={ChainTypes.ETHEREUM_GOERLI}
+                data={p.request}
+              />
+            }
+          />
+          <Route
+            path="/pairing/metamask_xdai"
+            element={
+              <MetaMask
+                bus={p.bus}
+                frameId={p.request.frameId}
+                chain={ChainTypes.ETHEREUM_XDAI}
+                data={p.request}
+              />
+            }
+          />
+          <Route
+            path="/pairing/walletconnect_xdai"
+            element={
+              <WalletConnect
+                bus={p.bus}
+                frameId={p.request.frameId}
+                chain={ChainTypes.ETHEREUM_XDAI}
+                data={p.request}
+              />
+            }
+          />
+          <Route
+            path="/pairing/dapplets_xdai"
+            element={
+              <Dapplets
+                bus={p.bus}
+                frameId={p.request.frameId}
+                chain={ChainTypes.ETHEREUM_XDAI}
+                data={p.request}
+              />
+            }
           />
           <Route
             path="/pairing/near_testnet"
@@ -124,10 +182,6 @@ export class LoginSession extends React.Component<Props, State> {
                 data={p.request}
               />
             }
-          />
-          <Route
-            path="/pairing/dapplets"
-            element={<Dapplets bus={p.bus} frameId={p.request.frameId} data={p.request} />}
           />
 
           <Route path="*" element={s?.redirect ? <Navigate to={s.redirect} /> : null} />

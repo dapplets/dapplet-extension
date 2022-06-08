@@ -4,7 +4,7 @@
 
 .list {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   justify-content: center;
 
   margin-bottom: 0;
@@ -24,14 +24,16 @@
 
   width: 77px;
   height: 77px;
+  margin-right: 5px;
+  margin-bottom: 5px;
 
   cursor: pointer;
 
   border-radius: 5px;
 
-  &:not(:last-child) {
-    margin-right: 5px;
-  }
+  // &:not(:last-child) {
+  //   margin-right: 5px;
+  // }
 }
 
 .item:hover {

@@ -182,6 +182,8 @@ browser.runtime.onMessage.addListener(
     setSwarmPostageStampId: globalConfigService.setSwarmPostageStampId.bind(globalConfigService),
     getEthereumProvider: () => globalConfigService.getEthereumProvider(),
     setEthereumProvider: (url) => globalConfigService.setEthereumProvider(url),
+    getXdaiProvider: () => globalConfigService.getXdaiProvider(),
+    setXdaiProvider: (url) => globalConfigService.setXdaiProvider(url),
     getSwarmGateway: globalConfigService.getSwarmGateway.bind(globalConfigService),
     setSwarmGateway: globalConfigService.setSwarmGateway.bind(globalConfigService),
     getIpfsGateway: globalConfigService.getIpfsGateway.bind(globalConfigService),
@@ -215,7 +217,7 @@ browser.runtime.onMessage.addListener(
     resolveName: (name) => ensService.resolveName(name),
 
     // Contract Service
-    fetchJsonRpc: (method, params) => proxyService.fetchJsonRpc(method, params),
+    fetchJsonRpc: proxyService.fetchJsonRpc.bind(proxyService),
 
     // Github Service
     getNewExtensionVersion: githubService.getNewExtensionVersion.bind(githubService),

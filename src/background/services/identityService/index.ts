@@ -1,5 +1,5 @@
 import * as ethers from 'ethers'
-import { DefaultSigners } from '../../../common/types'
+import { ChainTypes, DefaultSigners } from '../../../common/types'
 import GlobalConfigService from '../globalConfigService'
 import { WalletService } from '../walletService'
 import abi from './abi'
@@ -57,7 +57,10 @@ export class IdentityService {
 
   private async _init() {
     if (this._contract) return
-    const signer = await this._walletService.eth_getSignerFor(DefaultSigners.EXTENSION)
+    const signer = await this._walletService.eth_getSignerFor(
+      DefaultSigners.EXTENSION,
+      ChainTypes.ETHEREUM_GOERLI
+    )
     const address = await this._globalConfigService.getIdentityContract()
     this._contract = new ethers.Contract(address, abi, signer)
   }

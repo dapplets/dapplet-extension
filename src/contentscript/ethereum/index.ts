@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { ethers } from 'ethers'
 import { browser } from 'webextension-polyfill-ts'
+import { ChainTypes } from '../../common/types'
 import { Connection, EventDef } from '../connection'
 import { ProxySigner } from '../proxySigner'
 import { IEtherneumWallet, ITransactionReceipt } from './types'
@@ -8,6 +9,7 @@ import { IEtherneumWallet, ITransactionReceipt } from './types'
 // ToDo: use sendSowaTransaction method from background
 async function _sendWalletConnectTx(
   app: string,
+  chain: ChainTypes,
   sowaIdOrRpcMethod,
   sowaMetadataOrRpcParams,
   callback: (e: { type: string; data?: any }) => void
@@ -17,11 +19,16 @@ async function _sendWalletConnectTx(
   callback({ type: 'pending' })
 
   try {
-    const txHash = await eth_sendCustomRequest(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams)
+    const txHash = await eth_sendCustomRequest(
+      app,
+      chain,
+      sowaIdOrRpcMethod,
+      sowaMetadataOrRpcParams
+    )
     if (typeof txHash === 'string' && txHash.startsWith('0x') && txHash.length === 66) {
       callback({ type: 'result', data: txHash })
       callback({ type: 'created', data: txHash })
-      const tx = await eth_waitTransaction(app, txHash)
+      const tx = await eth_waitTransaction(app, chain, txHash)
       callback({ type: 'mined', data: tx })
     } else {
       callback({ type: 'result', data: txHash })
@@ -37,12 +44,24 @@ export async function createWalletConnection<T>(
   cfg: { network: string },
   eventDef?: EventDef<any>
 ): Promise<IEtherneumWallet> {
+  const { network } = cfg
+  const chain =
+    network === 'goerli'
+      ? ChainTypes.ETHEREUM_GOERLI
+      : network === 'xdai'
+      ? ChainTypes.ETHEREUM_XDAI
+      : null
+
+  if (chain === null) {
+    throw new Error('Only "goerli" and "xdai" netowrks are supported.')
+  }
+
   const transport = {
     _txCount: 0,
     _handler: null,
     exec: (sowaIdOrRpcMethod: string, sowaMetadataOrRpcParams: any) => {
       const id = (++transport._txCount).toString()
-      _sendWalletConnectTx(app, sowaIdOrRpcMethod, sowaMetadataOrRpcParams, (e) =>
+      _sendWalletConnectTx(app, chain, sowaIdOrRpcMethod, sowaMetadataOrRpcParams, (e) =>
         transport._handler(id, e)
       )
       return Promise.resolve(id)
@@ -104,6 +123,18 @@ export async function createContractWrapper(
   address: string,
   options: any
 ) {
-  const signer = new ProxySigner(app)
+  const { network } = cfg
+  const chain =
+    network === 'goerli'
+      ? ChainTypes.ETHEREUM_GOERLI
+      : network === 'xdai'
+      ? ChainTypes.ETHEREUM_XDAI
+      : null
+
+  if (chain === null) {
+    throw new Error('Only "goerli" and "xdai" netowrks are supported.')
+  }
+
+  const signer = new ProxySigner(app, chain)
   return new ethers.Contract(address, options, signer)
 }

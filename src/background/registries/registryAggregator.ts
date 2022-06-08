@@ -8,7 +8,7 @@ import {
   typeOfUri,
   UriTypes,
 } from '../../common/helpers'
-import { DefaultSigners, Environments } from '../../common/types'
+import { ChainTypes, DefaultSigners, Environments } from '../../common/types'
 import VersionInfoBrowserStorage from '../browserStorages/versionInfoStorage'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
@@ -301,7 +301,10 @@ export class RegistryAggregator {
     if (uriType === UriTypes.Http && registryConfig.isDev) {
       return new DevRegistry(registryConfig.url)
     } else if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) {
-      const eth_signer = await this._walletService.eth_getSignerFor(DefaultSigners.EXTENSION)
+      const eth_signer = await this._walletService.eth_getSignerFor(
+        DefaultSigners.EXTENSION,
+        ChainTypes.ETHEREUM_GOERLI
+      )
       return new EthRegistry(registryConfig.url, eth_signer)
     } else if (uriType === UriTypes.Near) {
       const near_account = await this._walletService.near_getAccount(DefaultSigners.EXTENSION)

@@ -14,6 +14,7 @@ interface Props {
     loginRequest: LoginRequest
   }
   bus: Bus
+  chain: ChainTypes
   frameId: string
 }
 
@@ -26,7 +27,7 @@ interface State {
   descriptor: WalletDescriptor | null
 }
 
-export default class extends React.Component<Props, State> {
+export default class WalletConnect extends React.Component<Props, State> {
   private _mounted = false
 
   constructor(props) {
@@ -55,7 +56,7 @@ export default class extends React.Component<Props, State> {
       })
 
       const overlayId = window.name.replace('dapplet-overlay/', '')
-      await connectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.WALLETCONNECT, { overlayId })
+      await connectWallet(this.props.chain, WalletTypes.WALLETCONNECT, { overlayId })
       const descriptors = await getWalletDescriptors()
       const descriptor = descriptors.find((x) => x.type === WalletTypes.WALLETCONNECT)
 
@@ -66,7 +67,7 @@ export default class extends React.Component<Props, State> {
         this.setState({ signing: true })
         const app = this.props.data.app
         const loginRequest = this.props.data.loginRequest
-        const chain = ChainTypes.ETHEREUM_GOERLI
+        const chain = this.props.chain
         const wallet = WalletTypes.WALLETCONNECT
         const confirmation = await createLoginConfirmation(app, loginRequest, chain, wallet)
         confirmationId = confirmation.loginConfirmationId
@@ -78,7 +79,7 @@ export default class extends React.Component<Props, State> {
           this.props.frameId,
           {
             wallet: WalletTypes.WALLETCONNECT,
-            chain: ChainTypes.ETHEREUM_GOERLI,
+            chain: this.props.chain,
             confirmationId,
           },
         ])
@@ -97,7 +98,7 @@ export default class extends React.Component<Props, State> {
 
   // async disconnect() {
   //     const { disconnectWallet } = await initBGFunctions(browser);
-  //     await disconnectWallet(ChainTypes.ETHEREUM_GOERLI, WalletTypes.WALLETCONNECT);
+  //     await disconnectWallet(this.props.chain, WalletTypes.WALLETCONNECT);
   //     this.setState({ toBack: true });
   // }
 

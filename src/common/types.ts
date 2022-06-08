@@ -24,6 +24,7 @@ export enum DefaultSigners {
 
 export enum ChainTypes {
   ETHEREUM_GOERLI = 'ethereum/goerli',
+  ETHEREUM_XDAI = 'ethereum/xdai',
   NEAR_TESTNET = 'near/testnet',
   NEAR_MAINNET = 'near/mainnet',
 }

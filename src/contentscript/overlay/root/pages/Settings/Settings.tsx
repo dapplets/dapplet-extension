@@ -127,7 +127,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const getValidUserAgentName = (value, reg) => {
     try {
-      let numEl = value.match(reg)
+      const numEl = value.match(reg)
 
       return numEl
     } catch {}

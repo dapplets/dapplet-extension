@@ -24,7 +24,7 @@ interface State {
   descriptor: WalletDescriptor | null
 }
 
-export default class extends React.Component<Props, State> {
+export default class Near extends React.Component<Props, State> {
   private _mounted = false
 
   constructor(props) {
