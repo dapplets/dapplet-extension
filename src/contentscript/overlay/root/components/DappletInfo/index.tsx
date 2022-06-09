@@ -24,8 +24,8 @@ export const DappletInfo: FC<DappletInfoProps> = ({
     if (!value) return ''
     if (appearance === 'text' || appearance === 'link') return value
 
-    const firstFourCharacters = value.substring(0, 4)
-    const lastFourCharacters = value.substring(value.length - 1, value.length - 5)
+    const firstFourCharacters = value.substring(0, 10)
+    const lastFourCharacters = value.substring(value.length - 1, value.length - 9)
 
     return `${firstFourCharacters}...${lastFourCharacters}`
   }

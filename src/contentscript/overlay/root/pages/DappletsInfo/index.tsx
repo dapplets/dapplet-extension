@@ -611,6 +611,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
         />
         <SettingWrapper
           title="Ownership"
+          className={styles.wrapperSettings}
           children={
             <div className={styles.ownershipBlock}>
               <SettingItem
@@ -692,6 +693,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
         <SettingWrapper
           title="Parameters"
+          className={styles.wrapperSettings}
           children={
             <div className={styles.parametersBlock}>
               <div className={styles.wrapperContextID}>

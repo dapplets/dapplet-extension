@@ -39,6 +39,8 @@
 
   background-color: #fff;
 
+  font-family: Roboto, sans-serif;
+
   font-size: 10px;
   line-height: 100%;
 }
@@ -49,9 +51,8 @@
 
   color: $MainBlack;
 
-  color: $MainBlack;
-
-  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
   font-weight: 700;
   line-height: 16px;
 }
@@ -74,10 +75,11 @@
   display: block;
 
   margin-top: 5px;
+  margin-bottom: 5px;
 
   text-transform: uppercase;
 
-  color: $MainBlack;
+  color: #2a2a2a;
 
   font-size: 10px;
   line-height: 100%;

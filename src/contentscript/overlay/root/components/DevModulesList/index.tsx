@@ -163,8 +163,8 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
   const visible = (hash: string): string => {
     if (hash.length > 28) {
-      const firstFourCharacters = hash.substring(0, 14)
-      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 14)
+      const firstFourCharacters = hash.substring(0, 7)
+      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
 
       return `${firstFourCharacters}...${lastFourCharacters}`
     } else {
@@ -413,7 +413,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
               {m.module.author && (
                 <div>
-                  <span className={styles.dappletsLabelSpan}>Ownership:</span>
+                  <span className={styles.dappletsLabelSpan}>Owner:</span>
                   <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
                     {visible(` ${m.module.author}`)}
                   </label>

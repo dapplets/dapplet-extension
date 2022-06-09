@@ -309,7 +309,7 @@
 }
 
 .nameLabel {
-  color: $PureBlack;
+  color: #2a2a2a;
 
   font-family: Roboto;
   font-size: 14px;
@@ -472,7 +472,7 @@
 
   border-radius: 50%;
 
-  background-color: #f26780;
+  background-color: $Primary;
 
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11.25' height='12.5' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='white'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -601,7 +601,7 @@
 
   border-radius: 50%;
 
-  background-color: #f26780;
+  background-color: $Primary;
 
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11.25' height='12.5' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='white'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -989,7 +989,7 @@
 .createTokenomics {
   cursor: pointer;
 
-  color: #f26780;
+  color: $Primary;
 
   font-family: Roboto;
   font-size: 16px;

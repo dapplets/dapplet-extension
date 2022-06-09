@@ -106,14 +106,14 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
               appearance="smail"
               icon={SearchIcon}
               className={styles.squareButton}
-              title="Search"
+              title="Dapplet in the Store"
               onClick={() => {
                 onOpenStore(dapplet)
               }}
             />
 
             <DappletInfo
-              title="Author"
+              title="Owner"
               value={author}
               className={styles.cardInfo}
               onClick={() => onOpenStoreAuthor(dapplet)}

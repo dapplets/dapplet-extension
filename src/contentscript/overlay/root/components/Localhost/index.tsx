@@ -82,6 +82,7 @@ export const Localhost: FC<LocalhostProps> = (props) => {
           className={styles.labelLocalhost}
         >
           {label}
+          {isEnabled && !error && <span className={styles.spanLabel}></span>}
         </label>
         <button className={styles.closeLocalhost} onClick={closeHost} />
       </div>

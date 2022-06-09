@@ -342,11 +342,6 @@ class _App extends React.Component<P, S> {
               </div>
 
               <div className={styles.right}>
-                <SquaredButton
-                  appearance="big"
-                  icon={StoreIcon}
-                  onClick={this.handleStoreButtonClick}
-                />
                 {!s.isOpenSearch && pathname === '/system/dapplets' && (
                   <SquaredButton
                     onClick={this.handleOpenSearchClick}
@@ -354,7 +349,6 @@ class _App extends React.Component<P, S> {
                     icon={SearchIcon}
                   />
                 )}
-
                 {s.isOpenSearch && pathname === '/system/dapplets' && (
                   <div className={styles.searchBlock} tabIndex={1}>
                     <Search
@@ -365,6 +359,11 @@ class _App extends React.Component<P, S> {
                     />
                   </div>
                 )}
+                <SquaredButton
+                  appearance="big"
+                  icon={StoreIcon}
+                  onClick={this.handleStoreButtonClick}
+                />
               </div>
             </header>
 

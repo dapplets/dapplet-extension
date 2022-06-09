@@ -434,6 +434,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
         />
         <SettingWrapper
           title="Team"
+          className={styles.wrapperSettings}
           children={
             <div className={styles.ownershipBlock}>
               <div className={styles.wrapperAdmins}>
@@ -473,6 +474,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
         />
         <SettingWrapper
           title="Parameters"
+          className={styles.wrapperSettings}
           children={
             <div className={styles.parametersBlock}>
               <div className={styles.wrapperContextID}>

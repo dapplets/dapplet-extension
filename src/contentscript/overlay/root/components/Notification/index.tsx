@@ -61,10 +61,11 @@ export const Notification = (props: NotificationProps): ReactElement => {
       onChange={onChange}
     >
       <header className={styles.header}>{label}</header>
-      <h4 className={styles.title}>{title}</h4>
       <span className={styles.date}>
         <ReactTimeAgo date={newDateNum} locale="en-US" />
       </span>
+      <h4 className={styles.title}>{title}</h4>
+
       <div className={styles.blockInfo}>
         <p ref={refComponent} className={cn(styles.description, {})}>
           {newDescription}
