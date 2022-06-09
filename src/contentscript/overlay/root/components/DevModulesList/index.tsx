@@ -146,17 +146,19 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     nodes.set(x.versions[0] ? x.module.name + '#' + x.versions[0]?.branch : x.module.name, x)
   })
   const sorting = new TopologicalSort(nodes)
-  modules.forEach((x) => {
-    const deps = [
-      ...Object.keys(x.versions[0]?.dependencies || {}),
-      ...Object.keys(x.versions[0]?.interfaces || {}),
-    ]
-    deps.forEach((d) => {
-      if (nodes.has(d + '#' + DEFAULT_BRANCH_NAME)) {
-        sorting.addEdge(d + '#' + DEFAULT_BRANCH_NAME, x.module.name + '#' + x.versions[0]?.branch)
-      }
-    })
-  })
+  // modules.forEach((x) => {
+  //   const deps = [
+  //     ...Object.keys(x.versions[0]?.dependencies || {}),
+  //     ...Object.keys(x.versions[0]?.interfaces || {}),
+  //   ]
+  //   deps.forEach((d) => {
+  //     if (nodes.has(d + '#' + DEFAULT_BRANCH_NAME)) {
+  //       sorting.addEdge(d + '#' + DEFAULT_BRANCH_NAME, x.module.name + '#' + x.versions[0]?.branch)
+  //     }
+  //   })
+  // })
+  // console.log(sorting)
+
   const sorted = [...sorting.sort().values()].map((x) => x.node)
 
   const visible = (hash: string): string => {
