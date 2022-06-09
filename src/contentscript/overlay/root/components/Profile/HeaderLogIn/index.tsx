@@ -203,10 +203,10 @@ export const Modal = ({
           <div className={styles.profileBlockImg}>
             <span
               className={styles.profileImg}
-              onClick={() => {
-                setOpen()
-                // setMini()
-              }}
+              // onClick={() => {
+              //   setOpen()
+              //   setMini()
+              // }}
             >
               <Card />
             </span>

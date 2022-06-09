@@ -33,8 +33,6 @@
 
   border: 1px solid $StrokeColor;
 
-
-
   border-radius: 5px;
 
   background: $AppBG;
@@ -59,6 +57,10 @@
 
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 -9.53674e-07L-6.11959e-07 7L11 14L11 -9.53674e-07Z' fill='%23747376'/%3E%3C/svg%3E");
+
+  &:disabled {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 -9.53674e-07L-6.11959e-07 7L11 14L11 -9.53674e-07Z' fill='%23e3e3e3'/%3E%3C/svg%3E");
+  }
 }
 
 .buttonMax {
@@ -67,6 +69,10 @@
 
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M0 14L11 7L0 0V14Z' fill='%23747376'/%3E%3C/svg%3E");
+
+  &:disabled {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M0 14L11 7L0 0V14Z' fill='%23e3e3e3'/%3E%3C/svg%3E");
+  }
 }
 
 [class^="field-number"],
