@@ -108,6 +108,7 @@ interface S {
   internalTabs: ToolbarTab[]
   isWalletConnect: boolean
   isWalletLength: boolean
+  // isOpenWallet:
 }
 
 class _App extends React.Component<P, S> {
@@ -329,7 +330,7 @@ class _App extends React.Component<P, S> {
             <header className={styles.header}>
               <div className={styles.left}>
                 <Profile
-                  // mini
+                  isMini
                   handleWalletLengthDisconnect={this.handleWalletLengthDisconnect}
                   handleWalletLengthConnect={this.handleWalletLengthConnect}
                   isWalletLength={s.isWalletLength}

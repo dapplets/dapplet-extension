@@ -20,7 +20,7 @@ export interface HeaderLogInProps {
   hash?: string
   isMini: boolean
   setOpen: () => void
-  setMini: () => void
+  // setMini: () => void
   isOpen: boolean
   handleWalletLengthDisconnect: () => void
 
@@ -34,7 +34,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const {
     isMini,
     setOpen,
-    setMini,
+    // setMini,
     isOpen,
     handleWalletLengthDisconnect,
 
@@ -45,6 +45,8 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
 
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
   const connectedDescriptors = mergeSameWallets(descriptors.filter((x) => x.connected))
+  const [isModal, setModal] = useState(false)
+  const onCloseModalWantLink = () => setModal(false)
   useEffect(() => {
     const init = async () => {
       _isMounted = true
@@ -57,7 +59,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       _isMounted = false
       EventBus.off('wallet_changed', refresh)
     }
-  }, [isOpen, isMini, newProfile])
+  }, [isOpen, isMini, newProfile, isModal])
 
   const refresh = async () => {
     const { getWalletDescriptors } = await initBGFunctions(browser)
@@ -87,16 +89,6 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     return `${firstFourCharacters}...${lastFourCharacters}`
   }
 
-  const handleBlur = (e) => {
-    const currentTarget = e.currentTarget
-
-    setTimeout(() => {
-      if (!currentTarget.contains(document.activeElement)) {
-        setOpen()
-        setMini()
-      }
-    }, 0)
-  }
   const disconnectButtonClick = async (chain: ChainTypes, wallet: WalletTypes) => {
     const { disconnectWallet } = await initBGFunctions(browser)
     await disconnectWallet(chain, wallet)
@@ -120,14 +112,14 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         })}
         onClick={() => {
           setOpen()
-          setMini()
+          // setMini()
         }}
       >
         <span
           className={styles.avatar}
           onClick={() => {
             setOpen()
-            setMini()
+            // setMini()
           }}
         >
           <Card />
@@ -142,6 +134,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         // !mini &&
 
         <div
+          // onClick={() => setOpen()}
           className={cn(styles.fakeModal, {
             [styles.fakeModalWrapper]: true,
           })}
@@ -150,14 +143,16 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
             className={styles.avatar}
             onClick={() => {
               setOpen()
-              setMini()
+              // setMini()
             }}
           >
             <Card />
           </span>
           <div
-            tabIndex={0}
-            onBlur={handleBlur}
+            // tabIndex={0}
+            // onBlur={() => {
+            //   setOpen()
+            // }}
             className={cn(styles.headerWrapperIsOpen, {
               [styles.isOpen]: isOpen,
             })}
@@ -168,7 +163,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
                   className={styles.profileImg}
                   onClick={() => {
                     setOpen()
-                    setMini()
+                    // setMini()
                   }}
                 >
                   <Card />
@@ -211,16 +206,16 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
                 <span className={styles.AddUserLabel}>Add Wallet</span>
               </div>
             </div>
-            <button
+            {/* <button
               onClick={() => {
-                setMini()
+         
                 setOpen()
               }}
               className={styles.logOut}
             >
-              {/* Log out */}
+             
               Out
-            </button>
+            </button> */}
           </div>
         </div>
       )}

@@ -10,6 +10,7 @@ interface ModalProps {
   onClose?: () => void
   className?: string
   classNameWrapper?: string
+  classNameModal?: string
   id?: any
 }
 
@@ -21,6 +22,7 @@ export const Modal = ({
   onClose,
   className,
   classNameWrapper,
+  classNameModal,
 }: ModalProps) => {
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -38,7 +40,7 @@ export const Modal = ({
   if (!visible) return null
 
   return (
-    <div className={styles.modal} onClick={onClose}>
+    <div className={cn(styles.modal, classNameModal)} onClick={onClose}>
       <div
         className={cn(styles.modalDialog, classNameWrapper)}
         onClick={(e) => e.stopPropagation()}

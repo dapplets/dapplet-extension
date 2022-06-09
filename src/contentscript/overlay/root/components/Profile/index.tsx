@@ -16,6 +16,7 @@ export interface ProfileProps {
   handleWalletLengthConnect: () => void
   isOverlay: boolean
   handleWalletLengthDisconnect: () => void
+  isMini: boolean
 }
 
 export const TEST_WALLET = [
@@ -35,12 +36,13 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
     isWalletLength,
     isOverlay,
     handleWalletLengthDisconnect,
+    isMini,
   } = props
   const [isOpen, setOpen] = useToggle(false)
 
   const [isModalWalletConnect, setModalWalletConnect] = useState(false)
   const [isModalWalletConnectProfile, setModalWalletConnectProfile] = useState(false)
-  const [isMini, setMini] = useToggle(false)
+  // const [isMini, setMini] = useToggle(false)
   const [isEns, setEns] = useState(false)
 
   const [isModalWantLink, setModalWantLink] = useState(false)
@@ -98,7 +100,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
           <HeaderLogIn
             isMini={isMini}
             setOpen={setOpen}
-            setMini={setMini}
+            // setMini={setMini}
             isOpen={isOpen}
             hash={hash}
             avatar={avatar}
