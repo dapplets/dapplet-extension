@@ -237,15 +237,17 @@ export const Modal = ({
                 />
               </div>
             ))}
-          <div className={styles.addWallet}>
-            <button
-              onClick={() => {
-                setOpen()
-                connectWallet()
-              }}
-              className={styles.AddUser}
-            ></button>
-            <span className={styles.AddUserLabel}>Add Wallet</span>
+          <div
+            className={styles.addWallet}
+            onClick={() => {
+              setOpen()
+              connectWallet()
+            }}
+          >
+            <button className={styles.AddUser}></button>
+            <span style={{ cursor: 'pointer' }} className={styles.AddUserLabel}>
+              Add Wallet
+            </span>
           </div>
         </div>
       </div>

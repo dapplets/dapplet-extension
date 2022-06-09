@@ -88,21 +88,21 @@ export const Rewards: FC<RewardsProps> = (props) => {
       setUserIdDisabled(false)
     }
 
-    if (
-      newRewardUserIdBlock &&
-      newRewardUserIdBlock.current !== null &&
-      !newRewardUserIdInput.current?.value
-    ) {
-      setNewUserIdDisabled(true)
-    } else {
-      setNewUserIdDisabled(false)
-    }
+    // if (
+    //   newRewardUserIdBlock &&
+    //   newRewardUserIdBlock.current !== null &&
+    //   !newRewardUserIdInput.current?.value
+    // ) {
+    //   setNewUserIdDisabled(true)
+    // } else {
+    //   setNewUserIdDisabled(false)
+    // }
     if (+pool.pool + Number(sumQuantity) > 100) {
       setPoolInputInvalid(true)
-      console.log(+pool.pool + Number(sumQuantity))
+      // console.log(+pool.pool + Number(sumQuantity))
     } else if (+pool.pool + Number(sumQuantity) <= 100) {
       setPoolInputInvalid(false)
-      console.log(+pool.pool + Number(sumQuantity))
+      // console.log(+pool.pool + Number(sumQuantity))
     }
 
     if (+poolNewInput.current?.value > 100 || +poolNewInput.current?.value <= 0) {
@@ -115,7 +115,26 @@ export const Rewards: FC<RewardsProps> = (props) => {
 
     // console.log(items, 'items')
     // console.log(newItem, 'newItem')
-    // console.log(itemIndex, 'itemIndex')
+    // console.log(revardUserIdInput.current?.value, 'revardUserIdInput')
+    if (revardUserIdInput.current?.value === undefined) {
+      setUserIdDisabled(false)
+    } else if (revardUserIdInput.current?.value === '') {
+      setUserIdDisabled(true)
+    } else {
+      setUserIdDisabled(false)
+    }
+
+    if (newRewardUserIdInput.current?.value === undefined) {
+      setNewUserIdDisabled(false)
+    } else if (
+      newRewardUserIdBlock &&
+      newRewardUserIdBlock.current !== null &&
+      newRewardUserIdInput.current?.value === ''
+    ) {
+      setNewUserIdDisabled(true)
+    } else {
+      setNewUserIdDisabled(false)
+    }
   }, [
     sumQuantity,
     items,
@@ -133,6 +152,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
     recepient,
     revardUserIdInput,
     newRewardUserIdInput,
+    newUserIdDisabled,
     newRewardUserIdBlock,
   ])
 
@@ -196,6 +216,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
     const newForm = Object.assign({}, itemsRecepientForm)
     newForm.recepientForm.splice(id, 1)
     setItemsRecepient(newForm)
+    // setItemsRecepient(itemsRecepientForm)
   }
   const onDeleteChildRecepientEdit = (i: number, id: number) => {
     const newForm = newItem.newItem[i].recepientForm.splice(id, 1)
@@ -244,6 +265,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
 
     setItems(newCustomPoolForm)
   }
+  // console.log(items)
 
   return (
     <div className={styles.wrapper}>
@@ -435,6 +457,10 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         type="button"
                         disabled={userIdDisabled}
                         onClick={() => {
+                          // console.log(
+                          //   itemsRecepientForm,
+                          //   ' itemsRecepientForm before onDeleteChildRecepient'
+                          // )
                           addButtonClickRecepient()
                           // console.log(revardUserIdInput.current?.value, 'rui')
                         }}
@@ -448,54 +474,29 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         <div key={i} className={styles.newRewardRecepientBlock}>
                           <div className={styles.recepientInputBlock}>
                             <input
-                              onBlur={() => {
-                                if (
-                                  itemsRecepientForm.recepientForm[i].userID.length === 0 ||
-                                  // e.target.value.length === 0 ||
-                                  !revardUserIdInput.current?.value
-                                ) {
-                                  setUserIdDisabled(true)
-                                } else {
-                                  setUserIdDisabled(false)
-                                }
-                              }}
                               ref={revardUserIdInput}
                               name="userId"
                               className={styles.recepientInput}
                               onChange={(e) => {
                                 handleChangeRecepient(e)
                                 itemsRecepientForm.recepientForm[i].userID = e.target.value
-                                // console.log(
-                                //   itemsRecepientForm.recepientForm[i].userID
-                                //     .length
-                                // )
-                                if (
-                                  itemsRecepientForm.recepientForm[i].userID.length === 0 ||
-                                  e.target.value.length === 0 ||
-                                  !revardUserIdInput.current?.value
-                                ) {
-                                  setUserIdDisabled(true)
-                                } else {
-                                  setUserIdDisabled(false)
-                                }
-                                // console.log(e.target.value.length)
                               }}
                             />
                             <button
                               type="button"
-                              onClick={() => onDeleteChildRecepient(i)}
+                              onClick={() => {
+                                onDeleteChildRecepient(i)
+                              }}
                               className={styles.recepientInputButton}
                             />
                           </div>
 
                           <div className={styles.recepientConditionalBlock}>
-                            {/* {!itemsRecepientForm.recepientForm[i].isActive && ( */}
                             {!isCondition && (
                               <div className={styles.recepientChangeBlock}>
                                 <button
                                   type="button"
                                   onClick={(e) => {
-                                    // addButtonClickConditional(i)
                                     setCondition(true)
                                   }}
                                   className={styles.recepientConditionalButton}
@@ -506,14 +507,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
                               </div>
                             )}
 
-                            {/* )} */}
-
-                            {/* {itemsRecepientForm.recepientForm[i].isActive && ( */}
                             {isCondition && (
-                              <div
-                                // key={i}
-                                className={cn(styles.conditionalWrapper, {})}
-                              >
+                              <div className={cn(styles.conditionalWrapper, {})}>
                                 <span className={styles.conditionalLabel}>
                                   condition: this dapplet is dependent on
                                 </span>
@@ -530,7 +525,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                       type="button"
                                       onClick={(e) => {
                                         itemsRecepientForm.recepientForm[i].condition = null
-                                        // onDeleteChildConditional(i)
+
                                         setCondition(false)
                                       }}
                                       className={styles.inputConditionalDelete}
@@ -539,15 +534,12 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                 </div>
                               </div>
                             )}
-
-                            {/* )} */}
                           </div>
                         </div>
                       ))}
                   </div>
                 </form>
               </>
-              //
             }
             footer={
               <button
@@ -558,8 +550,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     pool.pool &&
                     pool.pool.length >= 1 &&
                     Number(pool.pool) <= 100 &&
-                    recepient.userID &&
-                    recepient.userID.length >= 1 &&
+                    !userIdDisabled &&
                     !poolInputInvalid
                   )
                 }
@@ -575,8 +566,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                     pool.pool &&
                     pool.pool.length >= 1 &&
                     Number(pool.pool) <= 100 &&
-                    recepient.userID &&
-                    recepient.userID.length >= 1 &&
+                    !userIdDisabled &&
                     !poolInputInvalid,
                 })}
               >
@@ -819,7 +809,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         //     items.items[itemIndex].pool
                         // ) <= 100 &&
                         !poolInputInvalid &&
-                        newItem.newItem[i].recepientForm
+                        newItem.newItem[i].recepientForm &&
+                        !newUserIdDisabled
                       )
                       // newItem.newItem[i].recepientForm.lendth >= 1
                     )
@@ -841,7 +832,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
                       //     sumQuantity -
                       //     items.items[itemIndex].pool
                       // ) <= 100 &&
-                      newItem.newItem[i].recepientForm,
+                      newItem.newItem[i].recepientForm &&
+                      !newUserIdDisabled,
                     // newItem.newItem[i].recepientForm.lendth >= 1,
                   })}
                 >
