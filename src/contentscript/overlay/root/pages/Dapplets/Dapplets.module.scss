@@ -18,6 +18,8 @@
   height: calc(100vh - 110px);
   direction: rtl;
 
+  padding: 0 0 0 1px;
+
   &::-webkit-scrollbar {
     width: 4px;
 
@@ -30,9 +32,9 @@
     background:
       linear-gradient(
         90deg,
-        rgb(244 244 244 / 100%) 25%,
+        rgb(244 244 244 / 0%) 10%,
         rgb(227 227 227 / 100%) 50%,
-        rgb(244 244 244 / 100%) 25%
+        rgb(244 244 244 / 0%) 90%
       );
   }
 

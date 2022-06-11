@@ -16,7 +16,14 @@
     height: 100%;
 
     border-radius: 5px;
+    background-image: inherit;
+    background-size: cover;
   }
+}
+
+.errorImg {
+  background-image: inherit;
+  background-size: cover;
 }
 
 .label {

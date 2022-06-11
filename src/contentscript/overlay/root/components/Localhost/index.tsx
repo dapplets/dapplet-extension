@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import React, { FC, useEffect, useRef } from 'react'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import { useToggle } from '../../hooks/useToggle'
 import styles from './Localhost.module.scss'
 
@@ -25,8 +25,16 @@ export const Localhost: FC<LocalhostProps> = (props) => {
     setLoadButtonLocalhost,
   } = props
   const [isShowDescription, onShowDescription] = useToggle(false)
+  const [isHeightLabel, onHeightLabel] = useState(false)
   const nodeBtn = useRef<HTMLButtonElement>()
-  useEffect(() => {}, [isLoadButtonLocalhost, nodeBtn])
+  const nodeLabelBlock = useRef<HTMLDivElement>()
+
+  useEffect(() => {
+    const height = nodeLabelBlock.current.getBoundingClientRect().height
+    if (height > 22) {
+      onHeightLabel(true)
+    }
+  }, [isLoadButtonLocalhost, nodeBtn, nodeLabelBlock])
 
   return (
     <div className={styles.localhost}>
@@ -74,16 +82,22 @@ export const Localhost: FC<LocalhostProps> = (props) => {
             (isEnabled && !error && 'Enabled')}
         </button>
         {/* )} */}
-
-        <label
+        <div
+          ref={nodeLabelBlock}
+          className={styles.labelLocalhost}
           onClick={() => {
             onShowDescription()
           }}
-          className={styles.labelLocalhost}
         >
-          {label}
-          {isEnabled && !error && <span className={styles.spanLabel}></span>}
-        </label>
+          <label
+            className={cn(styles.label, {
+              [styles.bigLabel]: isHeightLabel,
+            })}
+          >
+            {label}
+          </label>
+          {isEnabled && !error && <span className={cn(styles.spanLabel, {})}></span>}
+        </div>
         <button className={styles.closeLocalhost} onClick={closeHost} />
       </div>
       {isShowDescription && isEnabled && !error && children}

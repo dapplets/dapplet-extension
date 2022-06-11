@@ -11,6 +11,7 @@ interface ModalProps {
   className?: string
   classNameWrapper?: string
   id?: any
+  classNameContent?: string
 }
 
 export const Modal = ({
@@ -21,6 +22,7 @@ export const Modal = ({
   onClose,
   className,
   classNameWrapper,
+  classNameContent,
 }: ModalProps) => {
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -47,7 +49,7 @@ export const Modal = ({
           <h3 className={cn(styles.modalTitle, className)}>{title}</h3>
           {onClose ? <span className={styles.modalClose} onClick={onClose} /> : null}
         </div>
-        <div className={styles.modalBody}>
+        <div className={cn(styles.modalBod, classNameContent)}>
           <div className={styles.modalContent}>{content}</div>
         </div>
         {footer && <div className={styles.modalFooter}>{footer}</div>}

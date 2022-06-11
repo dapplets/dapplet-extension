@@ -34,7 +34,13 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     <div className={cn({ [styles.isTitle]: title })} {...anotherProps} onClick={setOpen}>
       {title && <p className={styles.title}>{title}</p>}
 
-      <div className={cn(styles.dropdownBlock, { [styles.isOpen]: isOpen })}>
+      <div
+        tabIndex={0}
+        onBlur={() => {
+          setOpen()
+        }}
+        className={cn(styles.dropdownBlock, { [styles.isOpen]: isOpen })}
+      >
         <span className={cn(styles.spanBlock, className)} {...anotherProps}>
           {/* {value.label ? value.label : 'All'} */}
           {value.label}

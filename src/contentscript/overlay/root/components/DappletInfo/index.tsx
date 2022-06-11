@@ -1,5 +1,6 @@
 import cn from 'classnames'
 import React, { FC } from 'react'
+import useCopied from '../../hooks/useCopyed'
 import styles from './DappletInfo.module.scss'
 
 export interface DappletInfoProps {
@@ -7,7 +8,7 @@ export interface DappletInfoProps {
   value: string
   appearance?: 'text' | 'hash' | 'link'
   className?: string
-  onClick?: (x) => void
+  onClick?: any
 }
 
 export const DappletInfo: FC<DappletInfoProps> = ({
@@ -32,15 +33,26 @@ export const DappletInfo: FC<DappletInfoProps> = ({
 
   const isLink = appearance === 'link'
 
+  const [copied, copy, setCopied] = useCopied(`${value}`)
+  const copyText = () => {
+    copy()
+
+    setTimeout(() => {
+      setCopied(false)
+    }, 2000)
+  }
+
   return (
     <div className={cn(styles.wrapper, className)}>
-      <h6 className={styles.title}>{title}:</h6>
+      <h6 data-title={`${value}`} onClick={copyText} className={styles.title}>
+        {title}:<span className={styles.copied}>{value}</span>
+      </h6>
       {isLink ? (
         <a href={value} className={styles.value} target="_blank" rel="noreferrer">
           {visible({ appearance, value })}
         </a>
       ) : (
-        <a onClick={onClick} data-title={value} className={styles.value}>
+        <a onClick={onClick} className={styles.value}>
           {visible({ appearance, value })}
         </a>
       )}

@@ -522,6 +522,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
         ) : (
           <Modal
             visible={isNotAccountModal}
+            classNameContent={styles.modalContentOwnership}
             title={'Wallet is not connected'}
             content={'You can not deploy a module without a wallet. Connect a new wallet'}
             footer={''}
@@ -646,6 +647,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     </button>
                     <Modal
                       visible={newOwnerLoading}
+                      classNameContent={styles.modalContentOwnership}
                       title={'Changing the Owner'}
                       content={
                         'This modal window will close automatically after your changes are saved'

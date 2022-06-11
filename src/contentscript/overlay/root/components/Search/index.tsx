@@ -32,6 +32,7 @@ export const Search = (props: SearchProps): ReactElement => {
       >
         <input
           // style={{ background: 'green' }}
+          spellCheck={false}
           autoFocus
           type="text"
           className={styles.input}

@@ -11,6 +11,8 @@
   display: flex;
   align-items: center;
 
+  margin-bottom: 2px;
+
   color: $MainGrey;
 
   font-family: Montserrat, sans-serif;
@@ -45,12 +47,12 @@
   }
 }
 
-a.value::before {
-  content: attr(data-title);
+h6.title .copied {
+  // content: attr(data-title);
 }
 
 // span.support::before,
-a.value::before {
+h6.title .copied {
   position: absolute;
 
   /* z-index: 9998; */
@@ -61,7 +63,7 @@ a.value::before {
 
   /* margin: -15px 0 0 10px; */
   width: auto;
-  padding: 5px 10px;
+  padding: 5px 20px 5px 10px;
 
   content: attr(data-title);
   cursor: default;
@@ -71,6 +73,9 @@ a.value::before {
   border: 1px solid #ccc;
   border-radius: 3px;
   background: #f4f4f4;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10' fill='none'%3E%3Cpath d='M6.0001 10.0001H1.0001C0.732133 10.0094 0.472333 9.90705 0.28274 9.71745C0.0931476 9.52786 -0.00921597 9.26806 9.5836e-05 9.0001V4.0001C-0.00921597 3.73213 0.0931476 3.47233 0.28274 3.28274C0.472333 3.09315 0.732133 2.99078 1.0001 3.0001H3.0001V1.0001C2.99078 0.732133 3.09315 0.472333 3.28274 0.28274C3.47233 0.0931476 3.73213 -0.00921597 4.0001 9.5836e-05H9.0001C9.26806 -0.00921597 9.52786 0.0931476 9.71745 0.28274C9.90705 0.472333 10.0094 0.732133 10.0001 1.0001V6.0001C10.0093 6.26802 9.90685 6.52773 9.71729 6.71729C9.52773 6.90685 9.26802 7.00926 9.0001 7.0001H7.0001V9.0001C7.00926 9.26802 6.90685 9.52773 6.71729 9.71729C6.52773 9.90685 6.26802 10.0093 6.0001 10.0001ZM1.0001 4.0001V9.0001H6.0001V7.0001H4.0001C3.73218 7.00926 3.47246 6.90685 3.28291 6.71729C3.09335 6.52773 2.99093 6.26802 3.0001 6.0001V4.0001H1.0001ZM4.0001 1.0001V6.0001H9.0001V1.0001H4.0001Z' fill='%23747376'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 98% 50%;
   box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
 
   font-family: Roboto, sans-serif;
@@ -82,23 +87,20 @@ a.value::before {
   // min-height: 50px;
 }
 
-a.value:hover::before,
-a.value:focus::before {
+h6.title:hover .copied,
+h6.title:focus .copied {
+  display: inline-block;
+  align-items: center;
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+h6.title:active .copied,
+h6.title:checked .copied {
   display: inline-block;
   align-items: center;
   flex: 1 1 auto;
   justify-content: center;
 
-  // opacity: 1;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='12.5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%23747376' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
-
-// .supportHover {
-//   display: inline-block;
-//   position: relative;
-//   display: inline-block;
-//   border-radius: 50%;
-//   width: 14.17px;
-//   height: 14.17px;
-//   background: url('../../../icons/Input/question.svg');
-//   cursor: pointer;
-// }

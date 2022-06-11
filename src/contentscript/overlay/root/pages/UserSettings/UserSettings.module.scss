@@ -91,7 +91,7 @@
 .cardDescription {
   margin-bottom: 20px;
 
-  text-transform: lowercase;
+  // text-transform: lowercase;
 
   color: $ContentBlack;
 
@@ -181,8 +181,8 @@
   align-items: center;
   justify-content: space-between;
 
-  width: 50%;
-  margin-top: 5px;
+  width: 45%;
+  margin-top: 15px;
 }
 
 .buttonSubmit {

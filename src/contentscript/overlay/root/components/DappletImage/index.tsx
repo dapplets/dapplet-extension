@@ -18,7 +18,14 @@ export const DappletImage: FC<DappletImageProps> = (props: DappletImageProps) =>
   return (
     <div className={cn(styles.icon)}>
       <div className={cn(styles.img)}>
-        <img src={img} alt="" />
+        <img
+          src={img}
+          alt=" "
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null // prevents looping
+            currentTarget.src = NO_LOGO
+          }}
+        />
         {/* <span
 					className={cn(styles.label, {
 						[styles.true]: isFavourites,

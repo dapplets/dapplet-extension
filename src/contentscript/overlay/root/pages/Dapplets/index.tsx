@@ -177,8 +177,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const find = (a: string) => (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1
 
     return dapplets.filter(
-      (x: ManifestAndDetails) =>
-        find(x.name) || find(x.title) || find(x.description) || find(x.author)
+      (x: ManifestAndDetails) => find(x.title) || find(x.description) || find(x.author)
     )
   }
 
@@ -331,7 +330,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       ) : (
         <div className={styles.dappletsBlock}>
           {!isNoContentScript ? (
-            filteredDapplets.length > 0 ? (
+            filteredDapplets && filteredDapplets.length && filteredDapplets.length > 0 ? (
               filteredDapplets.map((dapplet) => {
                 if (dapplet.type !== 'FEATURE') {
                   return
