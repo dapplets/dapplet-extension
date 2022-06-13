@@ -193,3 +193,21 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+
+.isDev {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 25px;
+  height: 20px;
+
+  color: $PureWhite;
+  border-radius: 4px;
+  background: $Secondary;
+
+  font-family: Roboto;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 100%;
+}

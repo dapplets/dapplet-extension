@@ -58,7 +58,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
         <div className={styles.header}>
           <div className={cn(styles.blockTop)}>
             <DappletTitle isShowDescription={false} title={title} />
-
+            {dapplet.sourceRegistry.isDev && <span className={styles.isDev}>dev</span>}
             <div className={cn(styles.blockIcons)}>
               {/* <Icon size="small" icon={Installed} />
                           <Icon size="small" icon={Update} />  */}

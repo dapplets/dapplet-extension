@@ -54,6 +54,8 @@
 }
 
 .isOpen {
+  margin-left: 3px;
+
   transform: rotate(180deg);
 }
 
@@ -67,8 +69,8 @@
 .registriesList {
   position: absolute;
   z-index: 3;
-  top: -0.9%;
-  left: -0.3%;
+  top: -1px;
+  left: -1px;
 
   display: flex;
   flex-direction: column;

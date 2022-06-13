@@ -133,11 +133,12 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     try {
       await addRegistry(url, true)
       setRegistryInput('')
+      loadRegistries()
     } catch (msg) {
       setRegistryInputError(msg.toString())
+      setTimeout(() => setRegistryInputError(''), 2000)
     }
 
-    loadRegistries()
     x()
     setLoadButton(false)
     setTimeout(() => setLoadAdd(false), 1500)
