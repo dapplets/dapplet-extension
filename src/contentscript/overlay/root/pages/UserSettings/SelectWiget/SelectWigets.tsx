@@ -77,15 +77,14 @@ const MyCustomWidget = (props, setNewValue, _onBlur, _onFocus) => {
   const [focusValue, setFocusValue] = useState()
   const handleFocus = (event) => {
     const focusValue = event.target.value
-    console.log('Should be focus value', focusValue)
+
     setFocusValue(focusValue)
   }
 
   const handleBlur = (event) => {
     const blurValue = event.target.value
-    console.log('Should be blur value', blurValue)
+
     if (focusValue !== blurValue) {
-      console.log('Do something')
     }
   }
 
@@ -107,7 +106,6 @@ const MyCustomWidget = (props, setNewValue, _onBlur, _onFocus) => {
       }}
       placeholder={props.value}
       onChange={(e) => {
-        console.log(selectRef)
         setNewValue(e.value)
       }}
       name={props.name}
