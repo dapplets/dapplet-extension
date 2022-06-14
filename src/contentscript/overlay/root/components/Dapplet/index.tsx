@@ -49,8 +49,8 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
   const { title, description, author, icon, isActive, isActionHandler, isUnderConstruction } =
     dapplet
-  console.log(isActive, 'isActive')
-  console.log(isActionHandler, 'isActionHandler')
+
+  console.log(loadShowButton, 'loadShowButton')
 
   return (
     <div className={cn(styles.wrapperCard, className)} {...anotherProps}>
@@ -72,7 +72,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
               <Switch
                 checked={isActive}
                 onChange={() => {
-                  onSwitchChange(dapplet, !isActive)
+                  setTimeout(() => onSwitchChange(dapplet, !isActive), 500)
                 }}
               />
             )}
@@ -83,7 +83,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
         <div className={cn(styles.blockBottom)}>
           <div className={cn(styles.firstButtons)}>
-            {isActive && isActionHandler ? (
+            {isActive ? (
               <SquaredButton
                 appearance="smail"
                 icon={HomeIcon}
