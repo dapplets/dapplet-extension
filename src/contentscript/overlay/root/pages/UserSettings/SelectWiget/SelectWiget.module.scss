@@ -118,3 +118,9 @@
     width: 100%;
   }
 }
+
+.isOpen {
+  [class*=" css-tlfecz-indicatorContainer"] {
+    transform: rotate(180deg);
+  }
+}

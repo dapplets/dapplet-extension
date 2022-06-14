@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react'
 import Select from 'react-select'
 import { getSemanticProps } from '../utils'
 // import './select.css'
+import cn from 'classnames'
+import { useToggle } from '../../../hooks/useToggle'
 import styles from './SelectWiget.module.scss'
 
 const { asNumber, guessType } = utils
@@ -69,13 +71,18 @@ const processValue = (schema, value) => {
 
 const MyCustomWidget = (props, setNewValue) => {
   const ttOpt = props.options.enumOptions
-
+  const [isOpen, setOpen] = useToggle(false)
   const options = [...ttOpt]
+  useEffect(() => {}, [isOpen])
   return (
     <Select
-      className={styles.inputSelect}
+      className={cn(styles.inputSelect, {
+        [styles.isOpen]: isOpen,
+      })}
       options={options}
       // closeMenuOnSelect={false}
+      onMenuClose={setOpen}
+      onMenuOpen={setOpen}
       placeholder={props.value}
       onChange={(e) => {
         setNewValue(e.value)
