@@ -69,7 +69,7 @@ const processValue = (schema, value) => {
   return value
 }
 
-const MyCustomWidget = (props, setNewValue, _onBlur, _onFocus) => {
+const MyCustomWidget = (props, setNewValue) => {
   const ttOpt = props.options.enumOptions
   const [isOpen, setOpen] = useToggle(false)
   const selectRef = useRef<any>()
@@ -175,6 +175,6 @@ function SelectWidget(props) {
     }
   }, [newWalue])
 
-  return MyCustomWidget(props, setNewValue, _onBlur, _onFocus)
+  return MyCustomWidget(props, setNewValue)
 }
 export default SelectWidget
