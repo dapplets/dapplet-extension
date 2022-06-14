@@ -195,10 +195,12 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
                   Save and Reload
                 </button>
                 <button
-                  className={styles.buttonReset}
+                  className={styles.buttonSubmit}
                   disabled={loading}
                   onClick={() => _resetSettings()}
-                />
+                >
+                  Reset
+                </button>
               </div>
             </Form>
           ) : (

@@ -86,7 +86,7 @@
 
 .labelLocalhost {
   display: flex;
-  display: flex;
+
   align-items: flex-start;
   justify-content: flex-start;
 
@@ -203,7 +203,8 @@
 .label {
   display: inline-block;
 
-  width: 85%;
+  width: auto;
+  max-width: 80%;
 }
 
 .isShowDescriptionLabel {

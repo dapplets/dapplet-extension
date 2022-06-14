@@ -50,8 +50,6 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const { title, description, author, icon, isActive, isActionHandler, isUnderConstruction } =
     dapplet
 
-  console.log(loadShowButton, 'loadShowButton')
-
   return (
     <div className={cn(styles.wrapperCard, className)} {...anotherProps}>
       <DappletImage isFavourites={false} storageRef={icon} />

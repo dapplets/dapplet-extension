@@ -69,7 +69,7 @@ const processValue = (schema, value) => {
   return value
 }
 
-const MyCustomWidget = (props, setNewValue) => {
+const MyCustomWidget = (props, setNewValue, _onBlur, _onFocus) => {
   const ttOpt = props.options.enumOptions
   const [isOpen, setOpen] = useToggle(false)
   const options = [...ttOpt]
@@ -80,7 +80,8 @@ const MyCustomWidget = (props, setNewValue) => {
         [styles.isOpen]: isOpen,
       })}
       options={options}
-      // closeMenuOnSelect={false}
+      closeMenuOnSelect
+      onFocus={props.onFocus}
       isDisabled={props.isDisabled}
       onMenuClose={setOpen}
       onMenuOpen={setOpen}
@@ -152,6 +153,6 @@ function SelectWidget(props) {
     }
   }, [newWalue])
 
-  return MyCustomWidget(props, setNewValue)
+  return MyCustomWidget(props, setNewValue, _onBlur, _onFocus)
 }
 export default SelectWidget

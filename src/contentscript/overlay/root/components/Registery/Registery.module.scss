@@ -82,7 +82,7 @@
   width: 10px;
   height: 6px;
 
-  margin-bottom: 2px;
+  margin-top: 5px;
   margin-left: 7px;
 
   cursor: pointer;
@@ -100,4 +100,34 @@
 
 .isShowDescriptionLabel {
   transform: rotate(180deg);
+}
+
+.labelLocalhost {
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  width: 75%;
+  height: auto;
+  min-height: 21px;
+
+  padding-top: 2px;
+
+  cursor: pointer;
+
+  color: $ContentBlack;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 16px;
+}
+
+.label {
+  display: inline-block;
+
+  width: auto;
+  max-width: 80%;
 }
