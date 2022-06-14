@@ -49,6 +49,8 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
   const { title, description, author, icon, isActive, isActionHandler, isUnderConstruction } =
     dapplet
+  console.log(isActive, 'isActive')
+  console.log(isActionHandler, 'isActionHandler')
 
   return (
     <div className={cn(styles.wrapperCard, className)} {...anotherProps}>
@@ -57,8 +59,10 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
       <div className={cn(styles.wrapperBlock)}>
         <div className={styles.header}>
           <div className={cn(styles.blockTop)}>
-            <DappletTitle isShowDescription={false} title={title} />
-            {dapplet.sourceRegistry.isDev && <span className={styles.isDev}>dev</span>}
+            <DappletTitle isShowDescription={false} title={title}>
+              {dapplet.sourceRegistry.isDev && <span className={styles.isDev}>dev</span>}
+            </DappletTitle>
+
             <div className={cn(styles.blockIcons)}>
               {/* <Icon size="small" icon={Installed} />
                           <Icon size="small" icon={Update} />  */}

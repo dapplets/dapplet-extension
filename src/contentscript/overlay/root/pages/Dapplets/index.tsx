@@ -138,6 +138,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       if (feature.name == name) {
         Object.entries(f).forEach(([k, v]) => (feature[k] = v))
       }
+
       return feature
     })
 
@@ -186,11 +187,16 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     // TODO : try catch
     setLoadShowButton(true)
     if (selectVersions && isActive) {
+      console.log('lala')
+
       _updateFeatureState(name, { isLoading: true })
       const { getVersions } = await initBGFunctions(browser)
       const allVersions = await getVersions(module.sourceRegistry.url, module.name)
       _updateFeatureState(name, { versions: allVersions, isLoading: false })
+      return
     } else {
+      console.log('lolo')
+
       await toggleFeature(module, null, isActive, order, null)
     }
     setLoadShowButton(false)
