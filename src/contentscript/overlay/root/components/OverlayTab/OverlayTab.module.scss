@@ -26,6 +26,12 @@
   }
 }
 
+.tabNotActive {
+  svg {
+    filter: grayscale(100%);
+  }
+}
+
 .cursor {
   cursor: pointer;
 }

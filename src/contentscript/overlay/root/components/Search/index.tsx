@@ -44,7 +44,6 @@ export const Search = (props: SearchProps): ReactElement => {
           className={styles.close}
           onClick={() => {
             onClearValue()
-            console.log('lolo')
           }}
           // style={{ background: 'black' }}
         />
