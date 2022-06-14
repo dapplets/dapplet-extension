@@ -1,6 +1,6 @@
 import { utils } from '@rjsf/core'
 import _ from 'lodash'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Select from 'react-select'
 import { getSemanticProps } from '../utils'
 // import './select.css'
@@ -72,24 +72,47 @@ const processValue = (schema, value) => {
 const MyCustomWidget = (props, setNewValue, _onBlur, _onFocus) => {
   const ttOpt = props.options.enumOptions
   const [isOpen, setOpen] = useToggle(false)
+  const selectRef = useRef<any>()
   const options = [...ttOpt]
+  const [focusValue, setFocusValue] = useState()
+  const handleFocus = (event) => {
+    const focusValue = event.target.value
+    console.log('Should be focus value', focusValue)
+    setFocusValue(focusValue)
+  }
+
+  const handleBlur = (event) => {
+    const blurValue = event.target.value
+    console.log('Should be blur value', blurValue)
+    if (focusValue !== blurValue) {
+      console.log('Do something')
+    }
+  }
+
   useEffect(() => {}, [isOpen])
   return (
     <Select
+      ref={selectRef}
       className={cn(styles.inputSelect, {
         [styles.isOpen]: isOpen,
       })}
+      isMulti={typeof props.multiple === 'undefined' ? false : props.multiple}
       options={options}
-      closeMenuOnSelect
-      onFocus={props.onFocus}
       isDisabled={props.isDisabled}
-      onMenuClose={setOpen}
-      onMenuOpen={setOpen}
+      onMenuClose={() => {
+        setOpen()
+      }}
+      onMenuOpen={() => {
+        setOpen()
+      }}
       placeholder={props.value}
       onChange={(e) => {
+        console.log(selectRef)
         setNewValue(e.value)
       }}
       name={props.name}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
     />
   )
 }

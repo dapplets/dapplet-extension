@@ -29,12 +29,9 @@
   line-height: 149%;
 
   input {
-    display: none;
+    // display: none;
+    height: 0;
   }
-}
-
-[class*="css-1f43avz-a11yText-A11yText"] {
-  display: none;
 }
 
 [class*="css-1s2u09g-control"] {
@@ -126,19 +123,74 @@
     transform: rotate(180deg);
   }
 
-  [class*=" css-26l3qy-menu"] {
+  [class*=" css-1hb7zxy-IndicatorsContainer"] {
     position: absolute;
-    z-index: 10;
-    top: 80%;
-    left: -1px;
+    top: 13px;
+    right: 16px;
 
-    width: 100.5%;
-    padding: 5px 13px;
+    display: flex;
 
-    border-right: 1px solid #e3e3e3;
-    border-bottom: 1px solid #e3e3e3;
-    border-left: 1px solid #e3e3e3;
-    border-radius: 5px;
-    background: inherit;
+    align-items: center;
+
+    width: 14px;
+    height: 8px;
+
+    cursor: pointer;
+    transform: rotate(180deg);
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M6.99999 7.713L13.01 1.703L11.597 0.288002L6.99999 4.888L2.40399 0.288002L0.98999 1.702L6.99999 7.713Z' fill='%23919191'/%3E%3C/svg%3E");
+
+    svg {
+      display: none;
+    }
   }
+}
+
+[class*="css-1f43avz-a11yText-A11yText"] {
+  display: none;
+}
+
+[class*=" css-6j8wv5-Input"] {
+  height: 0;
+}
+
+[class*=" css-b62m3t-container"] {
+  position: relative;
+}
+
+[class*=" css-1hb7zxy-IndicatorsContainer"] {
+  position: absolute;
+  top: 13px;
+  right: 16px;
+
+  display: flex;
+
+  align-items: center;
+
+  width: 14px;
+  height: 8px;
+
+  cursor: pointer;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M6.99999 7.713L13.01 1.703L11.597 0.288002L6.99999 4.888L2.40399 0.288002L0.98999 1.702L6.99999 7.713Z' fill='%23919191'/%3E%3C/svg%3E");
+
+  svg {
+    display: none;
+  }
+}
+
+[class*=" css-26l3qy-menu"] {
+  position: absolute;
+  z-index: 10;
+  top: 80%;
+  left: -1px;
+
+  width: 100.5%;
+  padding: 5px 13px;
+
+  border-right: 1px solid #e3e3e3;
+  border-bottom: 1px solid #e3e3e3;
+  border-left: 1px solid #e3e3e3;
+  border-radius: 5px;
+  background: inherit;
 }

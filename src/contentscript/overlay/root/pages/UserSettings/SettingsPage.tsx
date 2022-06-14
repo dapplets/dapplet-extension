@@ -133,7 +133,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} onBlur={() => console.log('lo')}>
       {mi && vi ? (
         <div className={styles.block}>
           <div className={styles.wrapperInfoCard}>
