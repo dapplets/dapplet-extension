@@ -16,22 +16,6 @@
   }
 }
 
-.tabNotActive {
-  background: #eaf0f0;
-
-  box-shadow: inset -2px 0 4px rgb(0 0 0 / 25%);
-
-  img {
-    filter: grayscale(100%);
-  }
-}
-
-.tabNotActive {
-  svg {
-    filter: grayscale(100%);
-  }
-}
-
 .cursor {
   cursor: pointer;
 }
@@ -76,6 +60,29 @@
     width: 30px !important;
     height: 30px !important;
   }
+}
+
+.tabNotActive {
+  background: #eaf0f0;
+  background-image: none !important;
+
+  box-shadow: inset -2px 0 4px rgb(0 0 0 / 25%);
+
+  img {
+    filter: grayscale(100%);
+  }
+}
+
+.tabNotActive {
+  background-image: none !important;
+
+  svg {
+    filter: grayscale(100%);
+  }
+}
+
+.tabNotActive.image {
+  background-image: none !important;
 }
 
 .item {

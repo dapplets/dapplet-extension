@@ -28,6 +28,7 @@ export const Localhost: FC<LocalhostProps> = (props) => {
   const [isHeightLabel, onHeightLabel] = useState(false)
   const nodeBtn = useRef<HTMLButtonElement>()
   const nodeLabelBlock = useRef<HTMLDivElement>()
+  // const [isSpanLabel, setSpanLabel] = useToggle(false)
 
   useEffect(() => {
     const height = nodeLabelBlock.current.getBoundingClientRect().height
@@ -96,7 +97,13 @@ export const Localhost: FC<LocalhostProps> = (props) => {
           >
             {label}
           </label>
-          {isEnabled && !error && <span className={cn(styles.spanLabel, {})}></span>}
+          {isEnabled && !error && (
+            <span
+              className={cn(styles.spanLabel, {
+                [styles.isShowDescriptionLabel]: isShowDescription,
+              })}
+            ></span>
+          )}
         </div>
         <button className={styles.closeLocalhost} onClick={closeHost} />
       </div>
