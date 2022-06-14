@@ -19,7 +19,7 @@ export const DappletImage: FC<DappletImageProps> = (props: DappletImageProps) =>
     <div className={cn(styles.icon)}>
       <div className={cn(styles.img)}>
         <img
-          src={img}
+          src={img ? img : NO_LOGO}
           alt=" "
           onError={({ currentTarget }) => {
             currentTarget.onerror = null // prevents looping
