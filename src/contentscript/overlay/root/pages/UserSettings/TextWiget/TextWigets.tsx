@@ -18,7 +18,7 @@ const MyCustomWidget = (props, step) => {
       <button
         className={styles.buttonMin}
         value={props.value}
-        disabled={props.value <= step.min}
+        disabled={props.value <= step.min || props.disabled}
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
@@ -32,6 +32,7 @@ const MyCustomWidget = (props, step) => {
         className={cn(styles.inputOverlay, styles.inputOverlayNumber)}
         value={props.value}
         required={props.required}
+        readOnly={props.readonly}
         onChange={(event) => {
           event.preventDefault()
           event.stopPropagation()
@@ -41,7 +42,7 @@ const MyCustomWidget = (props, step) => {
       <button
         className={styles.buttonMax}
         value={props.value}
-        disabled={props.value >= step.max}
+        disabled={props.value >= step.max || props.disabled}
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
@@ -109,8 +110,6 @@ function TextWidget(props) {
       _isMounted = false
     }
   }, [])
-  // console.log(stepProps)
-  // console.log(value)
 
   return (
     <>

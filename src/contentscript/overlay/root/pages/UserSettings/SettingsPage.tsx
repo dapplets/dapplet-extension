@@ -179,6 +179,8 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
               schema={schemaConfig || {}}
               onSubmit={(e) => _saveData(e.formData)}
               formData={data}
+              disabled={loading}
+              readonly={loading}
               onChange={(e) => {
                 setEdited(true)
                 setData(e.formData)
@@ -193,12 +195,10 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
                   Save and Reload
                 </button>
                 <button
-                  className={styles.buttonSubmit}
+                  className={styles.buttonReset}
                   disabled={loading}
                   onClick={() => _resetSettings()}
-                >
-                  Reset
-                </button>
+                />
               </div>
             </Form>
           ) : (

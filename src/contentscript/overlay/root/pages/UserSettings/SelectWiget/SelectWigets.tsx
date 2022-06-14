@@ -81,6 +81,7 @@ const MyCustomWidget = (props, setNewValue) => {
       })}
       options={options}
       // closeMenuOnSelect={false}
+      isDisabled={props.isDisabled}
       onMenuClose={setOpen}
       onMenuOpen={setOpen}
       placeholder={props.value}
