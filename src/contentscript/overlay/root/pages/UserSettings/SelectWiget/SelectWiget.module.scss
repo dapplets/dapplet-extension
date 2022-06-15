@@ -43,17 +43,24 @@
 }
 
 [class*=" css-tlfecz-indicatorContainer"] {
+  position: absolute;
+  top: 13px;
+  right: 16px;
+
   display: flex;
+
   align-items: center;
 
   width: 14px;
   height: 8px;
 
   cursor: pointer;
-}
 
-[class*=" css-tlfecz-indicatorContainer"]:checked {
-  background: #000;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M6.99999 7.713L13.01 1.703L11.597 0.288002L6.99999 4.888L2.40399 0.288002L0.98999 1.702L6.99999 7.713Z' fill='%23919191'/%3E%3C/svg%3E");
+
+  svg {
+    display: none;
+  }
 }
 
 [class*=" css-4ljt47-MenuList"] > div:hover {
@@ -120,7 +127,7 @@
   position: relative;
 
   [class*=" css-tlfecz-indicatorContainer"] {
-    transform: rotate(180deg);
+    // transform: rotate(180deg);
   }
 
   [class*=" css-1hb7zxy-IndicatorsContainer"] {
@@ -136,7 +143,8 @@
     height: 8px;
 
     cursor: pointer;
-    transform: rotate(180deg);
+
+    // transform: rotate(180deg);
 
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M6.99999 7.713L13.01 1.703L11.597 0.288002L6.99999 4.888L2.40399 0.288002L0.98999 1.702L6.99999 7.713Z' fill='%23919191'/%3E%3C/svg%3E");
 
@@ -177,6 +185,10 @@
   svg {
     display: none;
   }
+
+  [class*=" css-tlfecz-indicatorContainer"] {
+    display: none;
+  }
 }
 
 [class*=" css-26l3qy-menu"] {
@@ -196,3 +208,46 @@
 }
 
 // 
+[class="css-7pg0cj-a11yText"],
+[class*="css-7pg0cj-a11yText"],
+[class*=" css-7pg0cj-a11yText"] {
+  display: none;
+}
+
+[class*=" css-ackcql"] {
+  height: 0;
+}
+
+//' css-1s2u09g-control'
+//' css-pahdxh-control'
+
+[class=" css-1wy0on6"] {
+  [class*=" css-1gtu0rj-indicatorContainer"] {
+    position: absolute;
+    top: 13px;
+    right: 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    width: 14px;
+    height: 8px;
+
+    cursor: pointer;
+
+    // transform: rotate(180deg);
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='8' viewBox='0 0 14 8' fill='none'%3E%3Cpath d='M6.99999 7.713L13.01 1.703L11.597 0.288002L6.99999 4.888L2.40399 0.288002L0.98999 1.702L6.99999 7.713Z' fill='%23919191'/%3E%3C/svg%3E");
+
+    svg {
+      display: none;
+    }
+  }
+}
+
+.isOpen {
+  [class*=" css-1hb7zxy-IndicatorsContainer"] {
+    transform: rotate(180deg);
+  }
+}

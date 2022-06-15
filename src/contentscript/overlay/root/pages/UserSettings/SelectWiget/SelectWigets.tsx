@@ -84,6 +84,7 @@ const MyCustomWidget = (props, setNewValue) => {
   const handleBlur = (event) => {
     const blurValue = event.target.value
 
+    setOpen()
     if (focusValue !== blurValue) {
     }
   }
