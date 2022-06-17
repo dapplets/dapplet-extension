@@ -46,6 +46,7 @@ export class DevRegistry implements Registry {
   private _rootUrl: string
   public isAvailable = true
   public error: string = null
+  public blockchain: string = 'develop'
 
   private _cachePromise: Promise<void> = null
   private _devConfig: DevManifestRaw | string[] = null

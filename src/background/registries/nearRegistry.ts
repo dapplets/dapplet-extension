@@ -49,6 +49,7 @@ const moduleTypesMap: { [key: number]: ModuleTypes } = {
 export class NearRegistry implements Registry {
   public isAvailable = true
   public error: string = null
+  public blockchain: string = 'near'
 
   private _contract: any
   private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>()
