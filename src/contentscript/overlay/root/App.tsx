@@ -197,7 +197,18 @@ class _App extends React.Component<P, S> {
       }
     }
 
-    tabs.push(...this.state.internalTabs)
+    for (const internalTab of this.state.internalTabs) {
+      const existingTab = tabs.find((x) => x.id === internalTab.id)
+      if (existingTab) {
+        for (const menu of internalTab.menus) {
+          if (!existingTab.menus.find((x) => x.id === menu.id)) {
+            existingTab.menus.push(menu)
+          }
+        }
+      } else {
+        tabs.push(internalTab)
+      }
+    }
 
     return tabs
   }
