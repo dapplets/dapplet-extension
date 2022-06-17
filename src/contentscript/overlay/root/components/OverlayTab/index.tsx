@@ -55,7 +55,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             storageRef={p.icon as any}
           />
         )}
-        {!p.pinned && <Close className={styles.close} onClick={p.onCloseClick} />}
+        {!p.pinned && (
+          <span className={styles.close} onClick={p.onCloseClick}>
+            <Close />
+          </span>
+        )}
       </div>
 
       {p.isActive && visibleMenus.length > 0 && (

@@ -20,20 +20,21 @@
   border-radius: 5px;
   background: $WebBG;
 
-  // &:hover {
-  // svg {
-  //   rect {
-  //     background: $Primary;
-  //   }
-  // }
-  // }
-  // &:active {
-  //   svg {
-  //     rect {
-  //       background: $ContentBlack;
-  //     }
-  //   }
-  // }
+  &:hover {
+    svg {
+      path {
+        fill: #f53a5c;
+      }
+    }
+  }
+
+  &:active {
+    svg {
+      path {
+        fill: #a6253c;
+      }
+    }
+  }
 }
 
 .big {
@@ -49,5 +50,11 @@
 
   &:active {
     background: $AppBG;
+  }
+
+  svg {
+    g {
+      clip-path: #000;
+    }
   }
 }

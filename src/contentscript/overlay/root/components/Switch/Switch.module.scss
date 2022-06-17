@@ -30,6 +30,12 @@
   border-radius: 20px;
   background: $MainGrey;
 
+  &:hover {
+    &::before {
+      background: $StrokeColor;
+    }
+  }
+
   &::before {
     position: absolute;
     top: 50%;
@@ -49,6 +55,10 @@
 
   &.active {
     background: $Primary;
+
+    &:hover {
+      background: #f26680;
+    }
 
     &::before {
       transform: translateY(-50%) translateX(calc(100% - 4px));
