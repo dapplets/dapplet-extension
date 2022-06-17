@@ -390,7 +390,12 @@ export default class FeatureService {
 
     public async getAllDevModules() {
         const descriptors = await this._walletService.getWalletDescriptors();
-        const users = descriptors.filter(x => x.available && x.connected).map(x => x.account);
+        const users = descriptors
+            .filter(x => x.available && x.connected)
+            .map(x => ({
+                name: x.account,
+                blockchain: x.chain.split('/')[0]
+            }));
         return this._moduleManager.registryAggregator.getAllDevModules({ users });
     }
 

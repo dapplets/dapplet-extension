@@ -10,6 +10,7 @@ export interface Registry {
     isAvailable: boolean;
     error: string;
     url: string;
+    blockchain: string;
 
     getModuleInfo(contextIds: string[], users: string[]): Promise<{ [contextId: string]: ModuleInfo[] }>;
     getModuleInfoByName(name: string): Promise<ModuleInfo>;

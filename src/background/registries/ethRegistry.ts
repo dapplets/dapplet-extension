@@ -56,6 +56,7 @@ const ZERO_BYTES32 = "0x00000000000000000000000000000000000000000000000000000000
 export class EthRegistry implements Registry {
     public isAvailable: boolean = true;
     public error: string = null;
+    public blockchain: string = 'ethereum';
 
     private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>();
     private _contract: ethers.ethers.Contract = null;

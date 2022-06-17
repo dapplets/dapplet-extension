@@ -121,12 +121,23 @@ export class RegistryAggregator {
         return merged;
     }
 
-    public async getAllDevModules({ users }: { users: string[] }): Promise<{ module: ModuleInfo, versions: VersionInfo[], isDeployed?: boolean[] }[]> {
+    public async getAllDevModules(
+        { users }: { users: { name: string, blockchain: string }[] }
+    ): Promise<{
+        module: ModuleInfo,
+        versions: VersionInfo[],
+        isDeployed?: boolean[]
+    }[]> {
         await this._initRegistries();
         const registries = this._getNonSkippedRegistries();
 
         // fetch all dev modules
-        const modules = await Promise.allSettled(registries.map(r => r.getAllDevModules({ users })));
+        const modules = await Promise.allSettled(registries.map(r => {
+            const addresses = users
+                .filter(user => user.blockchain === r.blockchain) // ToDo: We need to know the chain of the registry. Is there another way to get it?
+                .map(user => user.name);
+            return r.getAllDevModules({ users: addresses });
+        }));
         modules.filter(assertRejected).forEach(p => console.error(p.reason));
         const validModules = modules.filter(assertFullfilled).map(p => p.value);
         const reduced = validModules.length > 0 ? validModules.reduce((a, b) => a.concat(b)) : [];
