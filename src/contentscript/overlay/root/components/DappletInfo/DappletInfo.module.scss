@@ -13,6 +13,8 @@
 
   margin-bottom: 1px;
 
+  cursor: default;
+
   color: $MainGrey;
 
   font-family: Montserrat, sans-serif;
@@ -66,7 +68,7 @@ h6.title .copied {
   padding: 5px 20px 5px 10px;
 
   content: attr(data-title);
-  cursor: default;
+  cursor: pointer;
   text-align: right;
 
   opacity: 0.9;

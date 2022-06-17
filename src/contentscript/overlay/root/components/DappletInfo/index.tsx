@@ -44,9 +44,12 @@ export const DappletInfo: FC<DappletInfoProps> = ({
 
   return (
     <div className={cn(styles.wrapper, className)}>
-      <h6 data-title={`${value}`} onClick={copyText} className={styles.title}>
-        {title}:<span className={styles.copied}>{value}</span>
-      </h6>
+      {value ? (
+        <h6 data-title={`${value}`} onClick={copyText} className={styles.title}>
+          {title}:<span className={styles.copied}>{value}</span>
+        </h6>
+      ) : null}
+
       {isLink ? (
         <a href={value} className={styles.value} target="_blank" rel="noreferrer">
           {visible({ appearance, value })}
