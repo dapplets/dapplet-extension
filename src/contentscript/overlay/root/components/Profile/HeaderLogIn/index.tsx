@@ -14,7 +14,8 @@ import styles from './HeaderLogIn.module.scss'
 import makeBlockie from 'ethereum-blockies-base64'
 import { browser } from 'webextension-polyfill-ts'
 import { mergeSameWallets } from '../../../../../../common/helpers'
-
+import { Wallet } from '../../../pages/Wallet'
+import { Modal as ModalWallet } from '../../Modal'
 export interface HeaderLogInProps {
   avatar?: string
   hash?: string
@@ -46,7 +47,9 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
   const connectedDescriptors = mergeSameWallets(descriptors.filter((x) => x.connected))
   const [isModal, setModal] = useState(false)
+  const [isModalWallet, setModalWallet] = useState(false)
   const onCloseModalWantLink = () => setModal(false)
+  const onCloseModalWallet = () => setModalWallet(false)
   useEffect(() => {
     const init = async () => {
       _isMounted = true
@@ -132,6 +135,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       </header>
 
       <Modal
+        setModalWallet={setModalWallet}
         visible={isOpen}
         refresh={refresh}
         disconnectButtonClick={disconnectButtonClick}
@@ -139,6 +143,18 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         setOpen={setOpen}
         onClose={() => setOpen()}
         connectWallet={connectWallet}
+      />
+      <ModalWallet
+        visible={isModalWallet}
+        content={''}
+        footer={
+          <Wallet
+            isOverlay={true}
+            // handleWalletLengthConnect={this.handleWalletLengthConnect}
+            // handleWalletConnect={this.handleWalletConnect}
+          />
+        }
+        onClose={() => onCloseModalWallet()}
       />
     </div>
   )
@@ -152,6 +168,7 @@ interface ModalProps {
   disconnectButtonClick: (x: any, y: any) => void
   refresh: () => void
   connectWallet: () => void
+  setModalWallet?: (x: boolean) => void
 }
 
 export const Modal = ({
@@ -163,6 +180,7 @@ export const Modal = ({
   disconnectButtonClick,
   refresh,
   connectWallet,
+  setModalWallet,
 }: ModalProps) => {
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -241,7 +259,8 @@ export const Modal = ({
             className={styles.addWallet}
             onClick={() => {
               setOpen()
-              connectWallet()
+              // connectWallet()
+              setModalWallet(true)
             }}
           >
             <button className={styles.AddUser}></button>

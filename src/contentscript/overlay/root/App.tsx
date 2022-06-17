@@ -29,7 +29,6 @@ import { ContentItem } from './components/ContentItem'
 import styles from './components/Overlay/Overlay.module.scss'
 import { OverlayToolbar } from './components/OverlayToolbar'
 import { Profile } from './components/Profile'
-import { Modal } from './components/Profile/ModalConnectedAccounts'
 import { Search } from './components/Search'
 import { SquaredButton } from './components/SquaredButton'
 import { Overlay } from './overlay'
@@ -39,7 +38,6 @@ import { Dapplets } from './pages/Dapplets'
 import { Notifications } from './pages/Notifications'
 import { SettingsOverlay } from './pages/Settings'
 import { UserSettings } from './pages/UserSettings'
-import { Wallet } from './pages/Wallet'
 import { ToolbarTab, ToolbarTabMenu } from './types'
 
 export const withRouter = (Component) => {
@@ -412,7 +410,7 @@ class _App extends React.Component<P, S> {
             </div>
           </div>
         </div>
-        <Modal
+        {/* <Modal
           visible={s.isWalletConnect}
           content={''}
           footer={
@@ -423,7 +421,7 @@ class _App extends React.Component<P, S> {
             />
           }
           onClose={this.handleWalletConnect}
-        />
+        /> */}
       </div>
     )
   }

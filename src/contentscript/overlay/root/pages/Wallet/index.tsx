@@ -17,7 +17,7 @@ import {
 export interface WalletProps {
   isOverlay?: boolean
   handleWalletConnect?: () => void
-  handleWalletLengthConnect: () => void
+  handleWalletLengthConnect?: () => void
 }
 let _isMounted = false
 export const Wallet: FC<WalletProps> = (props: WalletProps) => {
@@ -59,12 +59,12 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
   const connectWallet = async () => {
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
     if (isOverlay) {
-      handleWalletConnect()
+      // handleWalletConnect()
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       // await this.componentDidMount()
       handleWalletLengthConnect()
     } else {
-      handleWalletConnect()
+      // handleWalletConnect()
       pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       window.close()
       handleWalletLengthConnect()
