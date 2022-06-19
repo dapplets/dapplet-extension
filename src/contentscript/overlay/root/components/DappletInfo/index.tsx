@@ -46,7 +46,11 @@ export const DappletInfo: FC<DappletInfoProps> = ({
     <div className={cn(styles.wrapper, className)}>
       {value ? (
         <h6 data-title={`${value}`} onClick={copyText} className={styles.title}>
-          {title}:<span className={styles.copied}>{value}</span>
+          {title}:
+          <span className={styles.copied}>
+            {value}
+            <span className={styles.copiedIcon}></span>
+          </span>
         </h6>
       ) : null}
 

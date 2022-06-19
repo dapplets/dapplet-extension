@@ -7,6 +7,7 @@ import VersionInfo from '../../../../../background/models/versionInfo'
 import { CONTEXT_ID_WILDCARD } from '../../../../../common/constants'
 import { DefaultConfig, SchemaConfig } from '../../../../../common/types'
 import { Message } from '../../components/Message'
+import { TabLoader } from '../../components/TabLoader'
 import SelectWidget from './SelectWiget/SelectWigets'
 // import SelectWidget from '../../../../../settings/SelectWidget'
 import TextWidget from './TextWiget/TextWigets'
@@ -40,6 +41,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   const [hiddenProperties, setHiddenProperties] = useState([])
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [isEdited, setEdited] = useState(false)
+  const [isLoad, setLoad] = useState(false)
 
   useEffect(() => {
     _isMounted = true
@@ -48,7 +50,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
         const { getDevMode, getSwarmGateway } = await initBGFunctions(browser)
         const devMode = await getDevMode()
         const swarmGatewayUrl = await getSwarmGateway()
-
+        setLoad(true)
         const hiddenProperties =
           schemaConfig && schemaConfig.properties
             ? Object.entries(schemaConfig.properties)
@@ -72,6 +74,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
 
         await _refreshData()
         await _updateOwnership()
+        setLoad(false)
       }
     }
     init()
@@ -86,6 +89,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
     const customData = await getAllUserSettings(mi.name)
     const defaultData = (defaultConfig && defaultConfig[vi.environment]) || {}
     const data = { ...defaultData, ...customData }
+
     setData(data)
   }
 
@@ -133,86 +137,92 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   }
 
   return (
-    <div className={styles.wrapper}>
-      {mi && vi ? (
-        <div className={styles.block}>
-          <div className={styles.wrapperInfoCard}>
-            <h3 className={styles.cardTitle}>{mi.title}</h3>
-            <h3 className={styles.cardType}>{mi.type}</h3>
-            <div className={styles.cardDescription}>{mi.description}</div>
-            <div className={styles.cardName}>{mi.name}</div>
-            <div className={styles.blockInfo}>
-              <div className={styles.cardOwner}>
-                version:
-                <span className={styles.cardVersion}>{vi.version}</span>
-              </div>
-              {owner ? (
-                <div className={styles.cardOwner}>
-                  Owner:
-                  <a
-                    className={styles.cardLink}
-                    onClick={() =>
-                      window.open(`https://goerli.etherscan.io/address/${owner}`, '_blank')
-                    }
-                  >
-                    {visible(owner)}
-                  </a>
+    <>
+      {isLoad ? (
+        <TabLoader />
+      ) : (
+        <div className={styles.wrapper}>
+          {mi && vi ? (
+            <div className={styles.block}>
+              <div className={styles.wrapperInfoCard}>
+                <h3 className={styles.cardTitle}>{mi.title}</h3>
+                <h3 className={styles.cardType}>{mi.type}</h3>
+                <div className={styles.cardDescription}>{mi.description}</div>
+                <div className={styles.cardName}>{mi.name}</div>
+                <div className={styles.blockInfo}>
+                  <div className={styles.cardOwner}>
+                    version:
+                    <span className={styles.cardVersion}>{vi.version}</span>
+                  </div>
+                  {owner ? (
+                    <div className={styles.cardOwner}>
+                      Owner:
+                      <a
+                        className={styles.cardLink}
+                        onClick={() =>
+                          window.open(`https://goerli.etherscan.io/address/${owner}`, '_blank')
+                        }
+                      >
+                        {visible(owner)}
+                      </a>
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-            </div>
-          </div>
-          {devMode && hiddenProperties.length > 0 ? (
-            <Message
-              className={styles.messageUserSettings}
-              title="Hidden settings"
-              subtitle="The following options are available only in developer mode"
-              children={
-                ''
-                // <div className={styles.hiddenProps}>{hiddenProperties.join(', ')}</div>
-              }
-            />
-          ) : null}
-
-          {schemaConfig && schemaConfig.properties ? (
-            <Form
-              className={styles.form}
-              schema={schemaConfig || {}}
-              onSubmit={(e) => _saveData(e.formData)}
-              formData={data}
-              disabled={loading}
-              readonly={loading}
-              onChange={(e) => {
-                setEdited(true)
-                setData(e.formData)
-              }}
-            >
-              <div className={styles.wrapperButton}>
-                <button
-                  className={styles.buttonSubmit}
-                  type="submit"
-                  disabled={loading || !isEdited}
-                >
-                  Save and Reload
-                </button>
-                <button
-                  className={styles.buttonSubmit}
-                  disabled={loading}
-                  onClick={() => _resetSettings()}
-                >
-                  Reset
-                </button>
               </div>
-            </Form>
+              {devMode && hiddenProperties.length > 0 ? (
+                <Message
+                  className={styles.messageUserSettings}
+                  title="Hidden settings"
+                  subtitle="The following options are available only in developer mode"
+                  children={
+                    ''
+                    // <div className={styles.hiddenProps}>{hiddenProperties.join(', ')}</div>
+                  }
+                />
+              ) : null}
+
+              {schemaConfig && schemaConfig.properties ? (
+                <Form
+                  className={styles.form}
+                  schema={schemaConfig || {}}
+                  onSubmit={(e) => _saveData(e.formData)}
+                  formData={data}
+                  disabled={loading}
+                  readonly={loading}
+                  onChange={(e) => {
+                    setEdited(true)
+                    setData(e.formData)
+                  }}
+                >
+                  <div className={styles.wrapperButton}>
+                    <button
+                      className={styles.buttonSubmit}
+                      type="submit"
+                      disabled={loading || !isEdited}
+                    >
+                      Save and Reload
+                    </button>
+                    <button
+                      className={styles.buttonSubmit}
+                      disabled={loading}
+                      onClick={() => _resetSettings()}
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </Form>
+              ) : (
+                <Message
+                  className={styles.messageUserSettings}
+                  title="No settings available for this dapplet."
+                />
+              )}
+            </div>
           ) : (
-            <Message
-              className={styles.messageUserSettings}
-              title="No settings available for this dapplet."
-            />
+            <div className={styles.blockLoading}>Loading</div>
           )}
         </div>
-      ) : (
-        <div className={styles.blockLoading}>Loading</div>
       )}
-    </div>
+    </>
   )
 }

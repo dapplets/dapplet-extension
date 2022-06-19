@@ -75,19 +75,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [siaPortalLoading, setSiaPortalLoading] = useState(false)
   const [siaPortalEdited, setSiaPortalEdited] = useState(false)
 
-  const [targetStorages, setTargetStorages] = useState([
-    // StorageTypes.Swarm,
-    // StorageTypes.Sia,
-    // StorageTypes.Ipfs,
-  ])
-  //   [
-  //   StorageTypes.Swarm,
-  //   StorageTypes.Sia,
-  //   StorageTypes.Ipfs,
-  // ]
-  const [checkedSia, setCheckedSia] = useState(true)
-  const [checkedIPFS, setCheckedIPFS] = useState(true)
-  const [checkedSwarm, setCheckedSwarm] = useState(true)
+  const [targetStorages, setTargetStorages] = useState([])
 
   const [isPopup, setPopup] = useState(false)
 
@@ -623,7 +611,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 component={<></>}
                 children={
                   <div className={styles.checkboxBlock}>
-                    <Checkbox isSupport isCheckbox title="Centralized" />
+                    <Checkbox isSupport isReadonly isCheckbox title="Centralized" />
 
                     <Checkbox
                       isCheckbox={targetStorages?.includes(StorageTypes.Sia)}

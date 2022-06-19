@@ -8,9 +8,10 @@ export interface CheckboxProps
   isCheckbox?: boolean
   isSupport?: boolean
   onChange?: (x) => void
+  isReadonly?: boolean
 }
 export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
-  const { title, isSupport = false, isCheckbox, onChange, ...anotherProps } = props
+  const { title, isSupport = false, isCheckbox, onChange, isReadonly, ...anotherProps } = props
 
   return (
     <div className={styles.supportBlock}>
@@ -24,6 +25,7 @@ export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
             type="checkbox"
             onChange={onChange}
             checked={isCheckbox}
+            readOnly={isReadonly}
             {...anotherProps}
           />
           <span

@@ -149,11 +149,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
     const init = async () => {
       await _updateData()
-      if (!isNotNullCurrentAccount) {
-        setNotAccountModal(true)
-      } else {
-        setNotAccountModal(false)
-      }
     }
     init()
     return () => {
@@ -249,22 +244,24 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
     } else {
-      return Promise.all([
-        _updateOwnership(),
-        _updateCurrentAccount(),
-        _updateDeploymentStatus(),
-        _checkDependencies(),
-      ])
+      // return Promise.all([
+      await _updateOwnership(),
+        await _updateCurrentAccount(),
+        await _updateDeploymentStatus(),
+        await _checkDependencies()
+      // ])
     }
   }
   const _updateOwnership = async () => {
-    // console.log(targetRegistry)
-    // console.log(mi.name)
+    if (targetRegistry && mi.name) {
+      const { getOwnership } = await initBGFunctions(browser)
 
-    const { getOwnership } = await initBGFunctions(browser)
-    const owner = await getOwnership(targetRegistry, mi.name)
+      const owner = await getOwnership(targetRegistry, mi.name)
 
-    setOwner(owner)
+      setOwner(owner)
+    } else {
+      return
+    }
   }
   const _updateDeploymentStatus = async () => {
     setDeploymentStatus(DeploymentStatus.Unknown)
@@ -325,6 +322,11 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
       if (isNotTrustedUser) {
         await addTrustedUser(currentAccount.toLowerCase())
+      }
+      if (!isNotNullCurrentAccount) {
+        setNotAccountModal(true)
+      } else {
+        setNotAccountModal(false)
       }
 
       mode === FormMode.Creating
@@ -514,7 +516,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           </div>
         </div>
       ))}
-      {!isNotNullCurrentAccount ? (
+      {isNotAccountModal ? (
         owner ? (
           <Modal
             visible={isNotAccountModal}
