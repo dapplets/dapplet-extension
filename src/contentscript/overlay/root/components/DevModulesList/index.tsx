@@ -117,17 +117,19 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   } = props
 
   const nodes = new Map<string, any>()
+  const [originalMi, setOriginalMi] = useState<ModuleInfo>(null)
   const [mi, setMi] = useState<ModuleInfo>(modules[0].module)
   const [vi, setVi] = useState<VersionInfo>(modules[0].versions[0])
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [currentAccount, setCurrentAccount] = useState(null)
   const [trustedUsers, setTrustedUsers] = useState([])
-  const [mode, setMode] = useState(FormMode.Deploying)
+  const [mode, setMode] = useState<FormMode>(null)
   const [targetStorages, setTargetStorages] = useState([
     StorageTypes.Swarm,
     StorageTypes.Sia,
     StorageTypes.Ipfs,
   ])
+  const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [registryOptions, setRegistryOptions] = useState([])
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
   const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
@@ -141,37 +143,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const [isModalError, setModalError] = useState(false)
   const onCloseError = () => setModalError(false)
   const [isNotAccountModal, setNotAccountModal] = useState(false)
-
-  modules.forEach((x) => {
-    nodes.set(x.versions[0] ? x.module.name + '#' + x.versions[0]?.branch : x.module.name, x)
-  })
-  const sorting = new TopologicalSort(nodes)
-  // modules.forEach((x) => {
-  //   const deps = [
-  //     ...Object.keys(x.versions[0]?.dependencies || {}),
-  //     ...Object.keys(x.versions[0]?.interfaces || {}),
-  //   ]
-  //   deps.forEach((d) => {
-  //     if (nodes.has(d + '#' + DEFAULT_BRANCH_NAME)) {
-  //       sorting.addEdge(d + '#' + DEFAULT_BRANCH_NAME, x.module.name + '#' + x.versions[0]?.branch)
-  //     }
-  //   })
-  // })
-  // console.log(sorting)
-
-  const sorted = [...sorting.sort().values()].map((x) => x.node)
-
-  const visible = (hash: string): string => {
-    if (hash.length > 28) {
-      const firstFourCharacters = hash.substring(0, 7)
-      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
-
-      return `${firstFourCharacters}...${lastFourCharacters}`
-    } else {
-      return hash
-    }
-  }
-
   useEffect(() => {
     _isMounted = true
     // loadSwarmGateway()
@@ -190,12 +161,80 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     }
   }, [targetChain, currentAccount, isLoadingDeploy, modules[0]])
 
+  modules.forEach((x) => {
+    nodes.set(x.versions[0] ? x.module.name + '#' + x.versions[0]?.branch : x.module.name, x)
+  })
+  const sorting = new TopologicalSort(nodes)
+  // modules.forEach((x) => {
+  //   const deps = [
+  //     ...Object.keys(x.versions[0]?.dependencies || {}),
+  //     ...Object.keys(x.versions[0]?.interfaces || {}),
+  //   ]
+  //   deps.forEach((d) => {
+  //     if (nodes.has(d + '#' + DEFAULT_BRANCH_NAME)) {
+  //       sorting.addEdge(d + '#' + DEFAULT_BRANCH_NAME, x.module.name + '#' + x.versions[0]?.branch)
+  //     }
+  //   })
+  // })
+
+  const sorted = [...sorting.sort().values()].map((x) => x.node)
+
+  const visible = (hash: string): string => {
+    if (hash.length > 28) {
+      const firstFourCharacters = hash.substring(0, 7)
+      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
+
+      return `${firstFourCharacters}...${lastFourCharacters}`
+    } else {
+      return hash
+    }
+  }
+
   const _updateData = async () => {
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
+    const { getSwarmGateway } = await initBGFunctions(browser)
+    const swarmGatewayUrl = await getSwarmGateway()
+
+    if (mi === null && vi === null) {
+      // New module
+      const mi = new ModuleInfo()
+      setOriginalMi(JSON.parse(JSON.stringify(mi)))
+      setMi(mi)
+      setSwarmGatewayUrl(swarmGatewayUrl)
+      setMode(FormMode.Creating)
+    } else {
+      // Deploy module
+      const dependencies = vi?.dependencies
+        ? Object.entries(vi.dependencies).map(([name, version]) => ({
+            name: name,
+            version: version,
+            type: DependencyType.Dependency,
+          }))
+        : []
+      const interfaces = vi?.interfaces
+        ? Object.entries(vi.interfaces).map(([name, version]) => ({
+            name: name,
+            version: version,
+            type: DependencyType.Interface,
+          }))
+        : []
+      const dependenciesChecking = [...dependencies, ...interfaces]
+      setOriginalMi(JSON.parse(JSON.stringify(mi)))
+      setMi(mi)
+      setVi(vi)
+      setSwarmGatewayUrl(swarmGatewayUrl)
+      setDpendenciesChecking(dependenciesChecking)
+      setTargetStorages(
+        Object.keys(vi?.overlays ?? {}).length > 0
+          ? [StorageTypes.Swarm, StorageTypes.Sia]
+          : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs]
+      )
+      setMode(FormMode.Deploying)
+    }
     setRegistryOptions(
       prodRegistries.map((r) => ({
         key: r.url,
@@ -219,14 +258,16 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     }
   }
   const _updateOwnership = async () => {
+    // console.log(targetRegistry)
+    // console.log(mi.name)
+
     const { getOwnership } = await initBGFunctions(browser)
-    const owner = await getOwnership(targetRegistry)
+    const owner = await getOwnership(targetRegistry, mi.name)
 
     setOwner(owner)
   }
   const _updateDeploymentStatus = async () => {
     setDeploymentStatus(DeploymentStatus.Unknown)
-
     const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
     const miF = await getModuleInfoByName(targetRegistry, mi.name)
     const deployed = vi
@@ -238,6 +279,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       ? DeploymentStatus.Deployed
       : DeploymentStatus.NotDeployed
     setDeploymentStatus(deploymentStatus)
+    // console.log(deploymentStatus)
   }
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
@@ -256,16 +298,24 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     )
   }
 
-  const deployButtonClickHandler = async (vi, e) => {
+  const deployButtonClickHandler = async (e) => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
 
-    mi.registryUrl = targetRegistry
-    mi.author = currentAccount
+    // mi.registryUrl = targetRegistry
+    // mi.author = currentAccount
 
     setLoadingDeploy(true)
 
     e.target.classList.add(styles.dappletsIsLoadingDeploy)
     setTextButtonDeploy('')
+    console.log(mode, 'mode')
+
+    console.log(mi, 'mi ')
+    console.log(vi, 'vi ')
+    console.log(targetStorages, 'targetStorages')
+    console.log(targetRegistry, 'targetRegistry ')
+
+    console.log(currentAccount, 'currentAccount')
     try {
       const isNotNullCurrentAccount = !(
         !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
@@ -277,10 +327,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         await addTrustedUser(currentAccount.toLowerCase())
       }
 
-      const result =
-        mode === FormMode.Creating
-          ? await deployModule(mi, null, targetStorages, targetRegistry)
-          : await deployModule(mi, vi, targetStorages, targetRegistry)
+      mode === FormMode.Creating
+        ? await deployModule(mi, null, targetStorages, targetRegistry)
+        : await deployModule(mi, vi, targetStorages, targetRegistry)
 
       setDeploymentStatus(DeploymentStatus.Deployed)
 
@@ -288,6 +337,14 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       setTextButtonDeploy('Deploy')
       setUpdate(true)
     } catch (err) {
+      console.log(err, 'err')
+      console.log(mi, 'mi err')
+      console.log(vi, 'vi err')
+      console.log(mode, 'modeerr')
+
+      console.log(targetStorages, 'targetStorages err')
+      console.log(targetRegistry, 'targetRegistry err')
+      console.log(currentAccount, 'currentAccount err')
       setMessageError({
         type: 'negative',
         header: 'Publication error',
@@ -388,7 +445,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   ref={nodeButton}
                   disabled={!isNotNullCurrentAccount || isLoadingDeploy}
                   onClick={(e) => {
-                    m.isDeployed?.[0] === false && deployButtonClickHandler(m.versions[0], e)
+                    m.isDeployed?.[0] === false && deployButtonClickHandler(e)
                   }}
                   className={cn(styles.dappletsReupload, {
                     [styles.dapDeploy]: m.isDeployed?.[0] !== false || !isNotNullCurrentAccount,
