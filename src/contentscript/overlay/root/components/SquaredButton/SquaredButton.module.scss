@@ -49,16 +49,18 @@
   background: $PureWhite;
 
   &:hover {
-    background: #979696;
+    svg {
+      path {
+        fill: $PrimaryHover;
+      }
+    }
   }
 
   &:active {
-    background: $AppBG;
-  }
-
-  svg {
-    g {
-      clip-path: #000;
+    svg {
+      path {
+        fill: $PrimaryPressed;
+      }
     }
   }
 }
