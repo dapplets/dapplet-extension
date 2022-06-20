@@ -97,7 +97,6 @@ export class ContentItem extends React.Component<P, S> {
   render() {
     const s = this.state
     const p = this.props
-    const x = this.props.overlay
 
     const childrenOverlays = p.overlayManager.getOverlays().filter((x) => x.parent === p.overlay)
 

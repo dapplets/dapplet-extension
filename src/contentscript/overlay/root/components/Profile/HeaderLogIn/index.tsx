@@ -259,8 +259,8 @@ export const Modal = ({
             className={styles.addWallet}
             onClick={() => {
               setOpen()
-              // connectWallet()
-              setModalWallet(true)
+              connectWallet()
+              // setModalWallet(true)
             }}
           >
             <button className={styles.AddUser}></button>

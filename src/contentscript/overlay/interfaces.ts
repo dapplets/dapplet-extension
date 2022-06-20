@@ -12,6 +12,7 @@ export type OverlayConfig = {
   hidden?: boolean
   parent?: IOverlay
   module?: OverlaySourceModule
+  isSystemPopup?: boolean
 }
 
 export interface IOverlay extends IPubSub {

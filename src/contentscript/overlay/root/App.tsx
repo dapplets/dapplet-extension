@@ -28,6 +28,7 @@ import { ReactComponent as StoreIcon } from './assets/svg/store.svg'
 import { ContentItem } from './components/ContentItem'
 import styles from './components/Overlay/Overlay.module.scss'
 import { OverlayToolbar } from './components/OverlayToolbar'
+import { PopupItem } from './components/PopupItem'
 import { Profile } from './components/Profile'
 import { Search } from './components/Search'
 import { SquaredButton } from './components/SquaredButton'
@@ -144,7 +145,7 @@ class _App extends React.Component<P, S> {
     const tabs: ToolbarTab[] = [SYSTEM_TAB]
 
     for (const source in overlayGroups) {
-      const group = overlayGroups[source]
+      const group = overlayGroups[source].filter((x) => !x.isSystemPopup)
 
       // system legacy tab
       if (source === 'null') {
@@ -321,6 +322,8 @@ class _App extends React.Component<P, S> {
     const tab = this.getTabs().find((x) => x.id === activeTabId)
     const menu = tab?.menus.find((x) => x.id === activeTabMenuId)
 
+    const systemPopups = overlays.filter((x) => x.isSystemPopup)
+
     return (
       <div className={cn(styles.overlay)}>
         <div className={styles.wrapper}>
@@ -395,18 +398,24 @@ class _App extends React.Component<P, S> {
                 />
               )} */}
 
-              {overlays.map((x) => (
-                <ContentItem
-                  overlay={x}
-                  isActive={pathname === `/${x.source ? x.source : x.id}/${x.id}`}
-                  overlayManager={p.overlayManager}
-                  key={x.id}
-                />
-              ))}
+              {overlays
+                .filter((x) => !x.isSystemPopup)
+                .map((x) => (
+                  <ContentItem
+                    overlay={x}
+                    isActive={pathname === `/${x.source ? x.source : x.id}/${x.id}`}
+                    overlayManager={p.overlayManager}
+                    key={x.id}
+                  />
+                ))}
 
               {activeTabId !== 'system' && activeTabMenuId === 'settings' && menu && (
                 <UserSettings dappletName={activeTabId} registryUrl={menu.props!.registryUrl} />
               )}
+
+              {systemPopups.map((x) => (
+                <PopupItem key={x.id} overlay={x} />
+              ))}
             </div>
           </div>
         </div>

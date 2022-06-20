@@ -12,6 +12,7 @@ export class Overlay implements IOverlay {
   public hidden = false
   public parent: IOverlay = null
   public module: OverlaySourceModule = null
+  public isSystemPopup: boolean
 
   public _queue: any[] = []
   public _isFrameLoaded = false
@@ -32,6 +33,7 @@ export class Overlay implements IOverlay {
     this.hidden = config.hidden ?? false
     this.parent = config.parent ?? null
     this.module = config.module ?? null
+    this.isSystemPopup = config.isSystemPopup ?? false
 
     // // disable cache
     // const url = new URL(uri);
@@ -62,7 +64,11 @@ export class Overlay implements IOverlay {
    */
   public open(callback?: Function) {
     this._manager.register(this)
-    this._manager.activate(this)
+
+    if (!this.isSystemPopup) {
+      this._manager.activate(this)
+    }
+
     this._manager.open()
 
     if (this._isFrameLoaded) {
