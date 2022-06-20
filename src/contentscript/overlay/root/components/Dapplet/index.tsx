@@ -81,7 +81,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
         <div className={cn(styles.blockBottom)}>
           <div className={cn(styles.firstButtons)}>
-            {isActive ? (
+            {isActive && isActionHandler ? (
               <SquaredButton
                 appearance="smail"
                 icon={HomeIcon}
