@@ -82,37 +82,44 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
         <div className={cn(styles.blockBottom)}>
           <div className={cn(styles.firstButtons)}>
             {isActive && isActionHandler ? (
-              <SquaredButton
-                appearance="smail"
-                icon={HomeIcon}
-                className={styles.squareButton}
-                title="Home"
-                onClick={() => {
-                  onOpenDappletAction(dapplet)
-                }}
-              />
+              <div className={styles.blockButtons}>
+                <SquaredButton
+                  appearance="smail"
+                  icon={HomeIcon}
+                  className={styles.squareButton}
+                  title="Home"
+                  onClick={() => {
+                    onOpenDappletAction(dapplet)
+                  }}
+                />
+              </div>
             ) : null}
+
             {!isUnderConstruction && (
-              <SquaredButton
-                appearance="smail"
-                icon={SettingsIcon}
-                className={styles.squareButton}
-                title="Settings"
-                onClick={() => {
-                  onSettingsModule(dapplet)
-                }}
-              />
+              <div className={styles.blockButtons}>
+                <SquaredButton
+                  appearance="smail"
+                  icon={SettingsIcon}
+                  className={styles.squareButton}
+                  title="Settings"
+                  onClick={() => {
+                    onSettingsModule(dapplet)
+                  }}
+                />{' '}
+              </div>
             )}
 
-            <SquaredButton
-              appearance="smail"
-              icon={SearchIcon}
-              className={styles.squareButton}
-              title="Dapplet in the Store"
-              onClick={() => {
-                onOpenStore(dapplet)
-              }}
-            />
+            <div className={styles.blockButtons}>
+              <SquaredButton
+                appearance="smail"
+                icon={SearchIcon}
+                className={styles.squareButton}
+                title="Dapplet in the Store"
+                onClick={() => {
+                  onOpenStore(dapplet)
+                }}
+              />
+            </div>
 
             <DappletInfo
               title="Owner"
