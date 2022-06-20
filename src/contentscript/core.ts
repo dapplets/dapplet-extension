@@ -263,9 +263,7 @@ export default class Core {
         ? this.overlayManager.getOverlays().find((x) => x.id === data.payload.loginRequest.target)
         : null
 
-      if (parentOverlay) {
-        data.popup = true
-      }
+      data.popup = true
 
       const popupOverlay = parentOverlay
         ? this.overlayManager.getOverlays().find((x) => x.parent?.id === parentOverlay.id)
@@ -278,6 +276,7 @@ export default class Core {
           source: null,
           hidden: null,
           parent: parentOverlay,
+          isSystemPopup: true,
         })
 
       overlay.open(() => overlay.send('data', [frameRequestId, data]))
