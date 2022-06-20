@@ -153,9 +153,9 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   }
 
   const deployModule = async (mi: ModuleInfo, vi: VersionInfo) => {
-    const { openDeployOverlay } = await initBGFunctions(browser)
-    await openDeployOverlay(mi, vi)
-    window.close()
+    // const { openDeployOverlay } = await initBGFunctions(browser)
+    // await openDeployOverlay(mi, vi)
+    // window.close()
   }
   const enableRegistry = async (url: string) => {
     // onLoading(true)
@@ -179,11 +179,11 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     setTimeout(() => setLoadButtonLocalhost(false), 1500)
   }
 
-  const onCreateModuleHandler = async () => {
-    const { openDeployOverlay } = await initBGFunctions(browser)
-    await openDeployOverlay(null, null)
-    // window.close()
-  }
+  // const onCreateModuleHandler = async () => {
+  //   const { openDeployOverlay } = await initBGFunctions(browser)
+  //   await openDeployOverlay(null, null)
+  //   // window.close()
+  // }
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
   // const groupedModules2 = groupBy(modules, (x) => x.module.isUnderConstruction)
 
