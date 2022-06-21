@@ -50,6 +50,8 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const [isModalWallet, setModalWallet] = useState(false)
   const onCloseModalWantLink = () => setModal(false)
   const onCloseModalWallet = () => setModalWallet(false)
+  const isEveryWalletConnected = descriptors.filter((x) => !x.connected).length === 0
+
   useEffect(() => {
     const init = async () => {
       _isMounted = true
@@ -68,6 +70,8 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     const { getWalletDescriptors } = await initBGFunctions(browser)
 
     const descriptors = await getWalletDescriptors()
+
+    console.log('descriptors', descriptors)
 
     if (_isMounted) {
       setDescriptors(descriptors)
@@ -142,7 +146,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         wallets={connectedDescriptors}
         setOpen={setOpen}
         onClose={() => setOpen()}
-        connectWallet={connectWallet}
+        connectWallet={isEveryWalletConnected ? null : connectWallet}
       />
       <ModalWallet
         visible={isModalWallet}
@@ -167,7 +171,7 @@ interface ModalProps {
   wallets: any
   disconnectButtonClick: (x: any, y: any) => void
   refresh: () => void
-  connectWallet: () => void
+  connectWallet?: () => void
   setModalWallet?: (x: boolean) => void
 }
 
@@ -255,19 +259,21 @@ export const Modal = ({
                 />
               </div>
             ))}
-          <div
-            className={styles.addWallet}
-            onClick={() => {
-              setOpen()
-              connectWallet()
-              // setModalWallet(true)
-            }}
-          >
-            <button className={styles.AddUser}></button>
-            <span style={{ cursor: 'pointer' }} className={styles.AddUserLabel}>
-              Add Wallet
-            </span>
-          </div>
+          {connectWallet && (
+            <div
+              className={styles.addWallet}
+              onClick={() => {
+                setOpen()
+                connectWallet()
+                // setModalWallet(true)
+              }}
+            >
+              <button className={styles.AddUser}></button>
+              <span style={{ cursor: 'pointer' }} className={styles.AddUserLabel}>
+                Add Wallet
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>
