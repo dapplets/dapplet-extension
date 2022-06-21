@@ -57,18 +57,6 @@
 .label {
   width: 100%;
   height: 100%;
-
-  &:hover {
-    svg path {
-      fill: $PrimaryHover;
-    }
-  }
-
-  &:active {
-    svg path {
-      fill: $PrimaryPressed;
-    }
-  }
 }
 
 .input {
@@ -81,7 +69,8 @@
   border-radius: 0 10px 10px 0;
 
   background: $WebBG;
-  box-shadow: 6px 0 8px -6px rgb(0 0 0 / 25%) inset;
+
+  // box-shadow: 6px 0 8px -6px rgb(0 0 0 / 25%) inset;
 
   // box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
 
@@ -105,4 +94,18 @@
   transform: translateY(-50%);
 
   // width: 50px;
+}
+
+span {
+  &:hover {
+    svg path {
+      fill: $PrimaryHover;
+    }
+  }
+
+  &:active {
+    svg path {
+      fill: $PrimaryPressed;
+    }
+  }
 }
