@@ -40,13 +40,15 @@ export const Search = (props: SearchProps): ReactElement => {
           onChange={onChange}
           {...otherProps}
         />
-        <MiniIcon
-          className={styles.close}
-          onClick={() => {
-            onClearValue()
-          }}
-          // style={{ background: 'black' }}
-        />
+        <span>
+          <MiniIcon
+            className={styles.close}
+            onClick={() => {
+              onClearValue()
+            }}
+            // style={{ background: 'black' }}
+          />
+        </span>
       </label>
     </div>
   )

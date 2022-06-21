@@ -68,8 +68,6 @@
   margin-right: auto;
   margin-left: auto;
 
-
-
   span {
     width: 30px !important;
     height: 30px !important;
@@ -170,6 +168,14 @@
       }
     }
   }
+
+  // &:active{
+  //   svg {
+  //     path {
+  //       fill: #747376;
+  //     }
+  //   }
+  // }
 }
 
 .selected path {

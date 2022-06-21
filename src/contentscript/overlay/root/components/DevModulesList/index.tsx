@@ -445,12 +445,12 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 <button
                   id={String(i)}
                   ref={nodeButton}
-                  disabled={!isNotNullCurrentAccount || isLoadingDeploy}
+                  disabled={isLoadingDeploy}
                   onClick={(e) => {
                     m.isDeployed?.[0] === false && deployButtonClickHandler(e)
                   }}
                   className={cn(styles.dappletsReupload, {
-                    [styles.dapDeploy]: m.isDeployed?.[0] !== false || !isNotNullCurrentAccount,
+                    [styles.dapDeploy]: m.isDeployed?.[0] !== false,
                   })}
                 >
                   {/* {m.isDeployed?.[0] === false */}
@@ -521,6 +521,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           <Modal
             visible={isNotAccountModal}
             title={'The wrong wallet'}
+            classNameContent={styles.isNotAccountModalOwner}
             content={
               <>
                 <p>Change account to {owner}</p>
@@ -532,15 +533,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
             footer={''}
             onClose={() => setNotAccountModal(false)}
           />
-        ) : (
-          <Modal
-            visible={isNotAccountModal}
-            title={'Wallet is not connected'}
-            content={'You can not deploy a module without a wallet. Connect a new wallet'}
-            footer={''}
-            onClose={() => setNotAccountModal(false)}
-          />
-        )
+        ) : null
       ) : null}
 
       {messageError ? (
