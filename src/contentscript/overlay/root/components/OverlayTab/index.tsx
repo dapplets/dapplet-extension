@@ -25,6 +25,9 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
 
   return (
     <div
+      onClick={() => {
+        !p.isActive && p.onTabClick()
+      }}
       className={cn(styles.tab, {
         [styles.tabNotActive]: !p.isActive,
       })}

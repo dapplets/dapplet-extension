@@ -187,6 +187,13 @@
   &:active {
     background: $PrimaryPressed;
   }
+
+  &:disabled {
+    color: $StrokeColor;
+
+    border: 1px solid $StrokeColor;
+    background: $AppBG;
+  }
 }
 
 .buttonInputDisabled {

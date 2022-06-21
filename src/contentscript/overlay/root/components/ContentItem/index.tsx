@@ -97,7 +97,7 @@ export class ContentItem extends React.Component<P, S> {
   render() {
     const s = this.state
     const p = this.props
-
+    const y = true
     const childrenOverlays = p.overlayManager.getOverlays().filter((x) => x.parent === p.overlay)
 
     return (
@@ -135,49 +135,59 @@ export class ContentItem extends React.Component<P, S> {
         )}
 
         {s.loadingMode === LoadingMode.NetworkError && (
-          <div className="loader-container" style={{ zIndex: 1 }}>
-            <div className="load-text">No Internet Connection</div>
-            <div className="load-text">Please check your internet connection and try again</div>
-            <div className="load-text">
-              <button onClick={this.loadFrame.bind(this)}>Try again</button>
+          <div className={styles.loaderContainer}>
+            <div className={styles.loadTitle}>No Internet Connection</div>
+            <div className={styles.loadText}>
+              Please check your internet connection and try again
+            </div>
+            <div className={styles.loadButtonBlock}>
+              <button className={styles.loadButton} onClick={this.loadFrame.bind(this)}>
+                Try again
+              </button>
             </div>
           </div>
         )}
 
         {s.loadingMode === LoadingMode.ServerError && (
-          <div className="loader-container" style={{ zIndex: 1 }}>
-            <div className="load-text">Internal Server Error</div>
-            <div className="load-text">
+          <div className={styles.loaderContainer}>
+            <div className={styles.loadTitle}>Internal Server Error</div>
+            <div className={styles.loadText}>
               Sorry, there were some technical issues while processing your request. You can change
               preferred overlay storage and try again.
             </div>
-            <div className="load-text">
-              <button onClick={this.loadFrame.bind(this)}>Try again</button>
+            <div className={styles.loadButtonBlock}>
+              <button className={styles.loadButton} onClick={this.loadFrame.bind(this)}>
+                Try again
+              </button>
             </div>
           </div>
         )}
 
         {s.loadingMode === LoadingMode.SslError && (
-          <div className="loader-container" style={{ zIndex: 1 }}>
-            <div className="load-text">Unverified SSL Certificate</div>
-            <div className="load-text">
+          <div className={styles.loaderContainer}>
+            <div className={styles.loadTitle}>Unverified SSL Certificate</div>
+            <div className={styles.loadText}>
               <p>
                 If you are a dapplet developer and you are running the overlay over HTTPS, you may
                 encounter an untrusted SSL certificate error. Open the overlay in a new browser tab
                 and accept the self-signed certificate.
               </p>
             </div>
-            <div className="load-text">
-              <button onClick={this.openOverlayInTab.bind(this)}>Accept SSL</button>
+            <div className={styles.loadButtonBlock}>
+              <button className={styles.loadButton} onClick={this.openOverlayInTab.bind(this)}>
+                Accept SSL
+              </button>
             </div>
-            <div className="load-text">
+            <div className={styles.loadText}>
               <p>
                 If you are not developing dapplets, then you should beware, your Internet connection
                 may be broken.
               </p>
             </div>
-            <div className="load-text">
-              <button onClick={this.loadFrame.bind(this)}>Try again</button>
+            <div className={styles.loadButtonBlock}>
+              <button className={styles.loadButton} onClick={this.loadFrame.bind(this)}>
+                Try again
+              </button>
             </div>
           </div>
         )}

@@ -22,6 +22,8 @@ export interface SettingsPageProps {
   vi?: VersionInfo
   schemaConfig?: SchemaConfig
   defaultConfig?: DefaultConfig
+  isLoad: boolean
+  setLoad: any
 }
 let _isMounted = false
 // SemanticUITheme.widgets.SelectWidget = SelectWidget
@@ -32,7 +34,7 @@ const theme = { widgets: { SelectWidget, TextWidget } }
 const Form = withTheme(theme)
 
 export const SettingsPage: FC<SettingsPageProps> = (props) => {
-  const { mi, vi, schemaConfig, defaultConfig } = props
+  const { mi, vi, schemaConfig, defaultConfig, isLoad, setLoad } = props
 
   const [owner, setOwner] = useState(null)
   const [data, setData] = useState({})
@@ -41,7 +43,6 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   const [hiddenProperties, setHiddenProperties] = useState([])
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [isEdited, setEdited] = useState(false)
-  const [isLoad, setLoad] = useState(false)
 
   useEffect(() => {
     _isMounted = true
@@ -50,7 +51,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
         const { getDevMode, getSwarmGateway } = await initBGFunctions(browser)
         const devMode = await getDevMode()
         const swarmGatewayUrl = await getSwarmGateway()
-        setLoad(true)
+
         const hiddenProperties =
           schemaConfig && schemaConfig.properties
             ? Object.entries(schemaConfig.properties)

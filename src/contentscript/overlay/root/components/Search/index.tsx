@@ -24,7 +24,7 @@ export const Search = (props: SearchProps): ReactElement => {
         <SearchIcon onClick={() => onCloseSearch()} />
       </div>
       <label
-        className={styles.label}
+        className={styles.labelSearchModule}
         //  style={{ background: 'red' }}
         // onBlur={() => {
         //   onCloseSearch()

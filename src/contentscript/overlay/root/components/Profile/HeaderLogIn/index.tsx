@@ -197,12 +197,12 @@ export const Modal = ({
 
   if (!visible) return null
 
-  const newVisible = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 7)
+  // const newVisible = (hash: string): string => {
+  //   const firstFourCharacters = hash.substring(0, 6)
+  //   const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 7)
 
-    return `${firstFourCharacters}...${lastFourCharacters}`
-  }
+  //   return `${firstFourCharacters}...${lastFourCharacters}`
+  // }
 
   return (
     <div
@@ -242,7 +242,7 @@ export const Modal = ({
                   ) : null}
                   {x.account ? (
                     <p title={x.account} className={styles.newProfileBlockName}>
-                      {newVisible(x.account)}
+                      {x.account}
                     </p>
                   ) : null}
                 </div>

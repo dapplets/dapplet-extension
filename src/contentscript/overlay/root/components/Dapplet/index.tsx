@@ -105,7 +105,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                   onClick={() => {
                     onSettingsModule(dapplet)
                   }}
-                />{' '}
+                />
               </div>
             )}
 

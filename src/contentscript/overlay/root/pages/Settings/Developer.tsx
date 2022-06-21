@@ -220,7 +220,10 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
               <div className={styles.loadAdd}></div>
             ) : (
               <button
-                disabled={isLoadButton}
+                disabled={
+                  isLoadButton ||
+                  !(isValidUrl(registryInput) && !registries.find((r) => r.url === registryInput))
+                }
                 className={cn(styles.buttonInput, {
                   [styles.buttonInputDisabled]: isLoadButton,
                 })}
