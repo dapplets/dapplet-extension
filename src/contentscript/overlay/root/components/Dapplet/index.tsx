@@ -70,7 +70,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
               <Switch
                 checked={isActive}
                 onChange={() => {
-                  setTimeout(() => onSwitchChange(dapplet, !isActive), 500)
+                  onSwitchChange(dapplet, !isActive)
                 }}
               />
             )}
