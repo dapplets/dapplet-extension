@@ -16,7 +16,7 @@ import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../background/dto/manifestDTO'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
-// import Wallets from '../../../popup/pages/wallets'
+
 // import { ReactComponent as Card } from './assets/svg/card.svg'
 // import { ReactComponent as Account } from './assets/svg/connected-account.svg'
 import { ReactComponent as DappletsLogo } from './assets/svg/dapplets-logo.svg'
@@ -419,18 +419,6 @@ class _App extends React.Component<P, S> {
             </div>
           </div>
         </div>
-        {/* <Modal
-          visible={s.isWalletConnect}
-          content={''}
-          footer={
-            <Wallet
-              isOverlay={true}
-              handleWalletLengthConnect={this.handleWalletLengthConnect}
-              handleWalletConnect={this.handleWalletConnect}
-            />
-          }
-          onClose={this.handleWalletConnect}
-        /> */}
       </div>
     )
   }
