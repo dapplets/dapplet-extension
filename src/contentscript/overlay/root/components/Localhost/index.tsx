@@ -24,7 +24,7 @@ export const Localhost: FC<LocalhostProps> = (props) => {
     isLoadButtonLocalhost,
     setLoadButtonLocalhost,
   } = props
-  const [isShowDescription, onShowDescription] = useToggle(false)
+  const [isShowDescription, onShowDescription] = useToggle(true)
   const [isHeightLabel, onHeightLabel] = useState(false)
   const nodeBtn = useRef<HTMLButtonElement>()
   const nodeLabelBlock = useRef<HTMLDivElement>()
