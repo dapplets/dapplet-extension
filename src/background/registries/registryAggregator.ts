@@ -192,9 +192,10 @@ export class RegistryAggregator {
     const modules = await Promise.allSettled(
       registries.map((r) => {
         const addresses = users
-          .filter((user) => user.blockchain === r.blockchain) // ToDo: We need to know the chain of the registry. Is there another way to get it?
+          .filter((user) => user.blockchain === r.blockchain && !!user.name) // ToDo: We need to know the chain of the registry. Is there another way to get it?
           .map((user) => user.name)
-        return r.getAllDevModules({ users: addresses })
+        const uniqAdresses = [...new Set(addresses)]
+        return r.getAllDevModules({ users: uniqAdresses })
       })
     )
     modules.filter(assertRejected).forEach((p) => console.error(p.reason))
