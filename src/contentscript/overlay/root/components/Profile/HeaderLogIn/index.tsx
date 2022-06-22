@@ -8,12 +8,13 @@ import {
   WalletDescriptor,
   WalletTypes,
 } from '../../../../../../common/types'
-import { ReactComponent as Card } from '../../../assets/svg/card.svg'
+import { ReactComponent as WalletImg } from '../../../assets/svg/wallet.svg'
 import styles from './HeaderLogIn.module.scss'
 // import makeBlockie from 'ethereum-blockies-base64'
 import makeBlockie from 'ethereum-blockies-base64'
 import { browser } from 'webextension-polyfill-ts'
 import { mergeSameWallets } from '../../../../../../common/helpers'
+import { ReactComponent as Card } from '../../../assets/svg/card.svg'
 import { Wallet } from '../../../pages/Wallet'
 import { Modal as ModalWallet } from '../../Modal'
 export interface HeaderLogInProps {
@@ -53,8 +54,8 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const isEveryWalletConnected = descriptors.filter((x) => !x.connected).length === 0
 
   useEffect(() => {
+    _isMounted = true
     const init = async () => {
-      _isMounted = true
       refresh()
     }
 
@@ -70,12 +71,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     const { getWalletDescriptors } = await initBGFunctions(browser)
 
     const descriptors = await getWalletDescriptors()
-
-    console.log('descriptors', descriptors)
-
-    if (_isMounted) {
-      setDescriptors(descriptors)
-    }
+    setDescriptors(descriptors)
   }
 
   const onDeleteChildConnectNewProfile = (id: any) => {
@@ -99,15 +95,18 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const disconnectButtonClick = async (chain: ChainTypes, wallet: WalletTypes) => {
     const { disconnectWallet } = await initBGFunctions(browser)
     await disconnectWallet(chain, wallet)
+    await refresh()
   }
   const connectWallet = async () => {
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
     if (isOverlay) {
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       // await this.componentDidMount()
+      await refresh()
     } else {
       pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       window.close()
+      await refresh()
     }
   }
 
@@ -122,7 +121,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
           // setMini()
         }}
       >
-        <span
+        <div
           className={styles.avatar}
           onClick={() => {
             setOpen()
@@ -130,7 +129,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
           }}
         >
           <Card />
-        </span>
+        </div>
         {!isMini && (
           <div className={cn(styles.wrapperNames)}>
             <p className={styles.hash}>wallets</p>
@@ -141,7 +140,6 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       <Modal
         setModalWallet={setModalWallet}
         visible={isOpen}
-        refresh={refresh}
         disconnectButtonClick={disconnectButtonClick}
         wallets={connectedDescriptors}
         setOpen={setOpen}
@@ -170,7 +168,7 @@ interface ModalProps {
   setOpen: any
   wallets: any
   disconnectButtonClick: (x: any, y: any) => void
-  refresh: () => void
+
   connectWallet?: () => void
   setModalWallet?: (x: boolean) => void
 }
@@ -182,14 +180,19 @@ export const Modal = ({
   setOpen,
   wallets,
   disconnectButtonClick,
-  refresh,
+
   connectWallet,
   setModalWallet,
 }: ModalProps) => {
+  const [isNotVisible, setNotVisible] = useState(false)
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
       case 'Escape':
-        onClose()
+        setNotVisible(true)
+        setTimeout(() => {
+          setNotVisible(false)
+          onClose()
+        }, 500)
         break
     }
   }
@@ -201,16 +204,22 @@ export const Modal = ({
 
   if (!visible) return null
 
-  // const newVisible = (hash: string): string => {
-  //   const firstFourCharacters = hash.substring(0, 6)
-  //   const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 7)
+  const newVisible = (hash: string): string => {
+    const firstFourCharacters = hash.substring(0, 6)
+    const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
 
-  //   return `${firstFourCharacters}...${lastFourCharacters}`
-  // }
+    return `${firstFourCharacters}...${lastFourCharacters}`
+  }
 
   return (
     <div
-      onClick={onClose}
+      onClick={() => {
+        setNotVisible(true)
+        setTimeout(() => {
+          setNotVisible(false)
+          onClose()
+        }, 500)
+      }}
       className={cn(styles.fakeModal, {
         [styles.fakeModalWrapper]: true,
       })}
@@ -219,6 +228,7 @@ export const Modal = ({
         onClick={(e) => e.stopPropagation()}
         className={cn(styles.headerWrapperIsOpen, {
           [styles.isOpen]: true,
+          [styles.isNotVisible]: isNotVisible,
         })}
       >
         <div className={styles.profileBlock}>
@@ -230,7 +240,7 @@ export const Modal = ({
               //   setMini()
               // }}
             >
-              <Card />
+              <WalletImg />
             </span>
           </div>
 
@@ -240,35 +250,52 @@ export const Modal = ({
           {wallets &&
             wallets.map((x, i) => (
               <div key={i} className={styles.newProfileBlock}>
-                <div className={styles.newProfileBlockInfo}>
+                <div
+                  onClick={() => {
+                    console.log(wallets)
+                  }}
+                  className={styles.newProfileBlockInfo}
+                >
                   {x.account ? (
                     <img src={makeBlockie(x.account)} className={styles.newProfileBlockImg} />
                   ) : null}
                   {x.account ? (
-                    <p title={x.account} className={styles.newProfileBlockName}>
-                      {x.account}
-                    </p>
+                    <div className={styles.meta}>
+                      {x.type !== 'near' ? (
+                        <p title={x.account} className={styles.newProfileBlockName}>
+                          {newVisible(x.account)}
+                        </p>
+                      ) : (
+                        <p title={x.account} className={styles.newProfileBlockNameNear}>
+                          {x.account}
+                        </p>
+                      )}
+
+                      {x.meta.icon ? (
+                        <img className={styles.walletsIcon} src={x.meta.icon} alt="" />
+                      ) : null}
+                    </div>
                   ) : null}
                 </div>
-                <button
-                  onClick={() => {
-                    disconnectButtonClick(x.chain, x.type)
-                    refresh()
-                  }}
-                  className={styles.profileImgButton}
-                />
+                <div className={styles.profileImgButtonBlock}>
+                  <button
+                    onClick={() => {
+                      disconnectButtonClick(x.chain, x.type)
+                    }}
+                    className={styles.profileImgButton}
+                  />
+                </div>
               </div>
             ))}
           {connectWallet && (
             <div
               className={styles.addWallet}
               onClick={() => {
-                setOpen()
+                // setOpen()
                 connectWallet()
-                // setModalWallet(true)
               }}
             >
-              <button className={styles.AddUser}></button>
+              {/* <button className={styles.AddUser}></button> */}
               <span style={{ cursor: 'pointer' }} className={styles.AddUserLabel}>
                 Add Wallet
               </span>
