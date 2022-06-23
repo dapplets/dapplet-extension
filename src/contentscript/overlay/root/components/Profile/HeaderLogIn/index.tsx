@@ -16,6 +16,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { mergeSameWallets } from '../../../../../../common/helpers'
 import * as walletIcons from '../../../../../../common/resources/wallets'
 import { ReactComponent as Card } from '../../../assets/svg/card.svg'
+import useCopied from '../../../hooks/useCopyed'
 import { Wallet } from '../../../pages/Wallet'
 import { Modal as ModalWallet } from '../../Modal'
 export interface HeaderLogInProps {
@@ -186,6 +187,8 @@ export const Modal = ({
   setModalWallet,
 }: ModalProps) => {
   const [isNotVisible, setNotVisible] = useState(false)
+  const [value, setValue] = useState('')
+  const [copied, copy, setCopied] = useCopied(`${value}`)
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
       case 'Escape':
@@ -213,6 +216,14 @@ export const Modal = ({
     const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
 
     return `${firstFourCharacters}...${lastFourCharacters}`
+  }
+
+  const copyText = () => {
+    copy()
+
+    setTimeout(() => {
+      setCopied(false)
+    }, 2000)
   }
 
   return (
@@ -288,6 +299,13 @@ export const Modal = ({
                     </div>
                   ) : null}
                 </div>
+                <div
+                  onClick={() => {
+                    setValue(x.account)
+                    copyText()
+                  }}
+                  className={styles.copy}
+                ></div>
                 <div className={styles.profileImgButtonBlock}>
                   <button
                     onClick={() => {
@@ -303,12 +321,27 @@ export const Modal = ({
               className={styles.addWallet}
               onClick={() => {
                 // setOpen()
-                connectWallet()
+                wallets.length >= 4 ? null : connectWallet()
               }}
             >
               {/* <button className={styles.AddUser}></button> */}
-              <span style={{ cursor: 'pointer' }} className={styles.AddUserLabel}>
+              <span
+                data-title={
+                  wallets.length >= 4
+                    ? 'You have already connected all wallets disconnect one of the connected ones to connect a new one'
+                    : null
+                }
+                className={cn(styles.AddUserLabel, {
+                  [styles.addWalletsDisabled]: wallets.length >= 4,
+                })}
+              >
                 Add Wallet
+                {wallets.length >= 4 ? (
+                  <span className={styles.copied}>
+                    You have already connected all wallets disconnect one of the connected ones to
+                    connect a new one
+                  </span>
+                ) : null}
               </span>
             </div>
           )}
