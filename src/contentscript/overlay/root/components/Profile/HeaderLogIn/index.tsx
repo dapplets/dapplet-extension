@@ -255,7 +255,7 @@ export const Modal = ({
               <div key={i} className={styles.newProfileBlock}>
                 <div
                   onClick={() => {
-                    console.log(wallets)
+                    // console.log(wallets)
                   }}
                   className={styles.newProfileBlockInfo}
                 >
