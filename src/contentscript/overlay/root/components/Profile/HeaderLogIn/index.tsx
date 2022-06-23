@@ -299,7 +299,9 @@ export const Modal = ({
                     }, 500)
                   }}
                   className={styles.copy}
-                ></div>
+                >
+                  <span></span>
+                </div>
                 <div className={styles.profileImgButtonBlock}>
                   <button
                     onClick={() => {
