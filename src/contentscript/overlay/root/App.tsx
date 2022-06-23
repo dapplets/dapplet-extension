@@ -108,6 +108,7 @@ interface S {
   isWalletConnect: boolean
   isWalletLength: boolean
   isOpenWallet: boolean
+  classNameSearch: string
 }
 
 class _App extends React.Component<P, S> {
@@ -119,6 +120,7 @@ class _App extends React.Component<P, S> {
     isWalletConnect: false,
     isWalletLength: false,
     isOpenWallet: false,
+    classNameSearch: '',
   }
 
   async componentDidMount() {
@@ -247,6 +249,7 @@ class _App extends React.Component<P, S> {
   handleOpenSearchClick = () => {
     this.setState({
       isOpenSearch: true,
+      classNameSearch: 'open',
     })
   }
 
@@ -307,7 +310,10 @@ class _App extends React.Component<P, S> {
     this.setState({ isWalletLength: false })
   }
   setOpenWallet = () => {
-    this.setState({ isOpenWallet: !this.state.isOpenWallet })
+    this.setState({
+      isOpenWallet: !this.state.isOpenWallet,
+      isOpenSearch: !this.state.isOpenWallet === true ? false : this.state.isOpenSearch,
+    })
   }
   closeOpenWallet = () => {
     this.setState({ isOpenWallet: false })
@@ -374,7 +380,9 @@ class _App extends React.Component<P, S> {
                 {s.isOpenSearch && pathname === '/system/dapplets' && (
                   <div className={styles.searchBlock} tabIndex={1}>
                     <Search
+                      className={s.classNameSearch}
                       value={s.search}
+                      isOpenSearch={s.isOpenSearch}
                       onChange={this.handleSearchChange}
                       onClearValue={this.handleSearchClear}
                       onCloseSearch={this.handleCloseSearch}

@@ -192,7 +192,7 @@ export const Modal = ({
         setTimeout(() => {
           setNotVisible(false)
           onClose()
-        }, 500)
+        }, 300)
         break
     }
   }
@@ -221,7 +221,7 @@ export const Modal = ({
         setTimeout(() => {
           setNotVisible(false)
           onClose()
-        }, 500)
+        }, 300)
       }}
       className={cn(styles.fakeModal, {
         [styles.fakeModalWrapper]: true,
@@ -231,7 +231,7 @@ export const Modal = ({
         onClick={(e) => e.stopPropagation()}
         className={cn(styles.headerWrapperIsOpen, {
           [styles.isOpen]: true,
-          [styles.isNotVisible]: isNotVisible,
+          [styles.isNotVisible]: isNotVisible || !visible,
         })}
       >
         <div className={styles.profileBlock}>
@@ -255,7 +255,7 @@ export const Modal = ({
               <div key={i} className={styles.newProfileBlock}>
                 <div
                   onClick={() => {
-                    // console.log(wallets)
+                    console.log(wallets)
                   }}
                   className={styles.newProfileBlockInfo}
                 >

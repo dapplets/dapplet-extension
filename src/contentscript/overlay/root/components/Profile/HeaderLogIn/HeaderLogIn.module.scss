@@ -151,7 +151,7 @@
 
   animation-name: appear;
   animation-duration: 300ms;
-  padding: 19px 0 0 18px;
+  padding: 19px 0 0 16px;
 }
 
 .headerWrapperIsOpen {
@@ -175,7 +175,7 @@
 
   animation-duration: 0.5s;
 
-  animation-timing-function: ease-in-out;
+  animation-timing-function: ease;
 
   // box-shadow: 1px 15px 20px 15px rgb(0 0 0 / 45%);
 }
@@ -184,14 +184,18 @@
 
   animation-name: slideLeft;
 
-  animation-duration: 0.5s;
+  animation-duration: 0.3s;
 
-  animation-timing-function: ease-in-out;
+  animation-timing-function: ease;
 }
 
 @keyframes slideRight {
   0% {
     transform: translateX(150%);
+  }
+
+  65% {
+    transform: translateX(-8%);
   }
 
   100% {

@@ -8,30 +8,20 @@ export interface SearchProps
   extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   onClearValue?: () => void
   onCloseSearch?: () => void
+  isOpenSearch: boolean
 }
 
 export const Search = (props: SearchProps): ReactElement => {
-  const { value, onChange, className, onClearValue, onCloseSearch, ...otherProps } = props
+  const { value, onChange, className, onClearValue, onCloseSearch, isOpenSearch, ...otherProps } =
+    props
 
   return (
-    <div
-      className={cn(styles.wrapper, className)}
-      // onBlur={() => {
-      //   onCloseSearch()
-      // }}
-    >
+    <div className={cn(styles.wrapper, className)}>
       <div className={styles.searchIcon}>
         <SearchIcon onClick={() => onCloseSearch()} />
       </div>
-      <label
-        className={styles.labelSearchModule}
-        //  style={{ background: 'red' }}
-        // onBlur={() => {
-        //   onCloseSearch()
-        // }}
-      >
+      <label className={styles.labelSearchModule}>
         <input
-          // style={{ background: 'green' }}
           spellCheck={false}
           autoFocus
           type="text"
@@ -46,7 +36,6 @@ export const Search = (props: SearchProps): ReactElement => {
             onClick={() => {
               onClearValue()
             }}
-            // style={{ background: 'black' }}
           />
         </span>
       </label>

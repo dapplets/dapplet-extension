@@ -12,14 +12,27 @@
 
   height: 35px;
 
-  // transition-delay: 10s, 10s;
+  animation-name: slideLeft;
 
-  // transition-timing-function: ease, ease-out;
+  animation-duration: 0.3s;
 
-  // transition-duration: 10s, 5s;
-  // transition-property: width;
+  animation-timing-function: ease;
 
   font-family: Roboto, sans-serif;
+}
+
+@keyframes slideRight {
+  0% {
+    transform: translateX(150%);
+  }
+
+  65% {
+    transform: translateX(-8%);
+  }
+
+  100% {
+    transform: translateX(0%);
+  }
 }
 
 .labelSearchModule {
@@ -75,10 +88,6 @@
 
   background: $WebBG;
 
-  // box-shadow: 6px 0 8px -6px rgb(0 0 0 / 25%) inset;
-
-  // box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
-
   font-size: 14px;
 
   font-weight: 500;
@@ -88,7 +97,6 @@
 .close {
   position: absolute;
 
-  // background: #000;
   z-index: 50;
   top: 85%;
   right: 12%;
@@ -97,8 +105,6 @@
 
   cursor: pointer;
   transform: translateY(-50%);
-
-  // width: 50px;
 }
 
 span {

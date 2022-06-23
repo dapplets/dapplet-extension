@@ -74,7 +74,7 @@
   align-items: center;
 
   & > *:first-child {
-    margin-right: 5px;
+    margin-right: 3px;
   }
 }
 
@@ -195,8 +195,8 @@
 
 .searchBlock {
   position: absolute;
-  z-index: 3;
-  top: 13px;
+  z-index: 1;
+  top: 12px;
   right: 15px;
 
   width: 84%;
