@@ -107,7 +107,7 @@ interface S {
   internalTabs: ToolbarTab[]
   isWalletConnect: boolean
   isWalletLength: boolean
-  // isOpenWallet:
+  isOpenWallet: boolean
 }
 
 class _App extends React.Component<P, S> {
@@ -118,6 +118,7 @@ class _App extends React.Component<P, S> {
     internalTabs: [],
     isWalletConnect: false,
     isWalletLength: false,
+    isOpenWallet: false,
   }
 
   async componentDidMount() {
@@ -305,7 +306,12 @@ class _App extends React.Component<P, S> {
   handleWalletLengthDisconnect = () => {
     this.setState({ isWalletLength: false })
   }
-
+  setOpenWallet = () => {
+    this.setState({ isOpenWallet: !this.state.isOpenWallet })
+  }
+  closeOpenWallet = () => {
+    this.setState({ isOpenWallet: false })
+  }
   render() {
     const p = this.props
     const s = this.state
@@ -336,6 +342,8 @@ class _App extends React.Component<P, S> {
             onToggleClick={this.props.onToggle}
             activeTabId={activeTabId}
             activeTabMenuId={activeTabMenuId}
+            setOpenWallet={this.closeOpenWallet}
+            isOpenWallet={s.isOpenWallet}
           />
 
           <div className={styles.inner}>
@@ -350,6 +358,8 @@ class _App extends React.Component<P, S> {
                   avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
                   hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
                   isOverlay={true}
+                  setOpenWallet={this.setOpenWallet}
+                  isOpenWallet={s.isOpenWallet}
                 />
               </div>
 

@@ -142,8 +142,8 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         visible={isOpen}
         disconnectButtonClick={disconnectButtonClick}
         wallets={connectedDescriptors}
-        setOpen={setOpen}
-        onClose={() => setOpen()}
+        // setOpen={setOpen}
+        onClose={setOpen}
         connectWallet={isEveryWalletConnected ? null : connectWallet}
       />
       <ModalWallet
@@ -165,7 +165,7 @@ interface ModalProps {
   visible: boolean
 
   onClose?: () => void
-  setOpen: any
+  // setOpen: any
   wallets: any
   disconnectButtonClick: (x: any, y: any) => void
 
@@ -177,7 +177,7 @@ export const Modal = ({
   visible = false,
 
   onClose,
-  setOpen,
+  // setOpen,
   wallets,
   disconnectButtonClick,
 
@@ -199,7 +199,10 @@ export const Modal = ({
 
   useEffect(() => {
     document.addEventListener('keydown', onKeydown)
-    return () => document.removeEventListener('keydown', onKeydown)
+
+    return () => {
+      document.removeEventListener('keydown', onKeydown)
+    }
   })
 
   if (!visible) return null

@@ -18,6 +18,8 @@ export interface OverlayTabProps {
   onTabClick: () => void
   onCloseClick: () => void
   onMenuClick: (menu: ToolbarTabMenu) => void
+  setOpenWallet: any
+  isOpenWallet: boolean
 }
 
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
@@ -27,9 +29,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     <div
       onClick={() => {
         !p.isActive && p.onTabClick()
+        p.setOpenWallet()
       }}
       className={cn(styles.tab, {
         [styles.tabNotActive]: !p.isActive,
+        [styles.isOpenWallet]: p.isOpenWallet,
       })}
     >
       <div className={styles.top}>

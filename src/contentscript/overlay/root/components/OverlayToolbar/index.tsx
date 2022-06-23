@@ -16,21 +16,8 @@ export interface OverlayToolbarProps {
   onCloseClick: (tab: ToolbarTab) => void
   onMenuClick: (tab: ToolbarTab, menu: ToolbarTabMenu) => void
   onToggleClick: () => void
-
-  // tabs: ITab[];
-  // menu: IMenu[];
-  // nameSelectedMenu?: string;
-  // activeOverlay: Overlay;
-  // idActiveTab: string;
-  // isDevMode: boolean;
-  // isSystemDapplets: boolean;
-  // onOverlayTab: () => void;
-  // onSelectedMenu: (selected: string) => void;
-  // onRemoveTab: (id: string) => void;
-  // onSelectedTab: (id: string) => void;
-  // menuActiveTabs?: IMenu[];
-  // nameActiveTab?: string;
-  // onSelectedActiveMenu?: (selected: string) => void;
+  setOpenWallet: any
+  isOpenWallet: boolean
 }
 
 type TToggleOverlay = {
@@ -85,17 +72,26 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       )}
     >
       <div className={styles.inner}>
-        <ToggleOverlay
-          getNode={handleClickGetNodeOverlayToolbar}
-          onClick={p.onToggleClick}
-          className="toggleOverlay"
-        />
+        <div style={{ background: '#f5f5f5', borderRadius: '10px 0 0 10px' }}>
+          <ToggleOverlay
+            getNode={handleClickGetNodeOverlayToolbar}
+            onClick={() => {
+              p.setOpenWallet()
+              p.onToggleClick()
+            }}
+            className={cn(styles.toggleOverlay, {
+              [styles.isOpenWallet]: p.isOpenWallet,
+            })}
+          />
+        </div>
 
         <div className={cn(styles.tabs, {})}>
           <div className={styles.TabList}>
             {p.tabs.length > 0 &&
               p.tabs.map((tab) => (
                 <OverlayTab
+                  setOpenWallet={p.setOpenWallet}
+                  isOpenWallet={p.isOpenWallet}
                   key={tab.id}
                   {...tab}
                   isActive={p.activeTabId === tab.id}

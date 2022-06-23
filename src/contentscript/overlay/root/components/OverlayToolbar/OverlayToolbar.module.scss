@@ -50,6 +50,10 @@
   }
 }
 
+.isOpenWallet {
+  background-color: rgb(0 0 0 / 30%);
+}
+
 @media (min-width: 320px) and (max-width: 640px) {
   .overlayToolbar {
     flex-direction: row;

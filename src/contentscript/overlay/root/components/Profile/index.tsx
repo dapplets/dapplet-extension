@@ -1,6 +1,5 @@
 import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
-import { useToggle } from '../../hooks/useToggle'
 import { HeaderLogIn } from './HeaderLogIn'
 import { LogInButton } from './LoginButtons'
 import { Modal } from './ModalConnectedAccounts'
@@ -17,6 +16,8 @@ export interface ProfileProps {
   isOverlay: boolean
   handleWalletLengthDisconnect: () => void
   isMini: boolean
+  setOpenWallet: () => void
+  isOpenWallet: boolean
 }
 
 export const TEST_WALLET = [
@@ -37,8 +38,10 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
     isOverlay,
     handleWalletLengthDisconnect,
     isMini,
+    setOpenWallet,
+    isOpenWallet,
   } = props
-  const [isOpen, setOpen] = useToggle(false)
+  // const [isOpen, setOpen] = useToggle(false)
 
   const [isModalWalletConnect, setModalWalletConnect] = useState(false)
   const [isModalWalletConnectProfile, setModalWalletConnectProfile] = useState(false)
@@ -99,9 +102,9 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
         <>
           <HeaderLogIn
             isMini={isMini}
-            setOpen={setOpen}
+            setOpen={setOpenWallet}
             // setMini={setMini}
-            isOpen={isOpen}
+            isOpen={isOpenWallet}
             hash={hash}
             avatar={avatar}
             handleWalletLengthDisconnect={handleWalletLengthDisconnect}
