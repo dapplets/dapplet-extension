@@ -312,6 +312,7 @@ class _App extends React.Component<P, S> {
     this.setState({
       isOpenWallet: !this.state.isOpenWallet,
       isOpenSearch: !this.state.isOpenWallet === true ? false : this.state.isOpenSearch,
+      search: '',
     })
   }
   closeOpenWallet = () => {

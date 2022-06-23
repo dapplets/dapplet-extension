@@ -188,7 +188,7 @@ export const Modal = ({
 }: ModalProps) => {
   const [isNotVisible, setNotVisible] = useState(false)
   const [value, setValue] = useState('')
-  const [copied, copy, setCopied] = useCopied(`${value}`)
+  const [copied, copy, setCopied] = useCopied(value)
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
       case 'Escape':
@@ -208,7 +208,7 @@ export const Modal = ({
       document.removeEventListener('keydown', onKeydown)
     }
   })
-
+  useEffect(() => {}, [value])
   if (!visible) return null
 
   const newVisible = (hash: string): string => {
@@ -216,14 +216,6 @@ export const Modal = ({
     const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
 
     return `${firstFourCharacters}...${lastFourCharacters}`
-  }
-
-  const copyText = () => {
-    copy()
-
-    setTimeout(() => {
-      setCopied(false)
-    }, 2000)
   }
 
   return (
@@ -302,7 +294,9 @@ export const Modal = ({
                 <div
                   onClick={() => {
                     setValue(x.account)
-                    copyText()
+                    setTimeout(() => {
+                      copy()
+                    }, 500)
                   }}
                   className={styles.copy}
                 ></div>
