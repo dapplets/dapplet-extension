@@ -14,6 +14,7 @@ import styles from './HeaderLogIn.module.scss'
 import makeBlockie from 'ethereum-blockies-base64'
 import { browser } from 'webextension-polyfill-ts'
 import { mergeSameWallets } from '../../../../../../common/helpers'
+import * as walletIcons from '../../../../../../common/resources/wallets'
 import { ReactComponent as Card } from '../../../assets/svg/card.svg'
 import { Wallet } from '../../../pages/Wallet'
 import { Modal as ModalWallet } from '../../Modal'
@@ -275,7 +276,14 @@ export const Modal = ({
                       )}
 
                       {x.meta.icon ? (
-                        <img className={styles.walletsIcon} src={x.meta.icon} alt="" />
+                        <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+                          <img className={styles.walletsIcon} src={walletIcons[x.type]} alt="" />
+                          {x.type === 'dapplets' ? (
+                            <img className={styles.walletsIcon} src={walletIcons[x.type]} alt="" />
+                          ) : (
+                            <img className={styles.walletsIcon} src={x.meta.icon} alt="" />
+                          )}
+                        </div>
                       ) : null}
                     </div>
                   ) : null}

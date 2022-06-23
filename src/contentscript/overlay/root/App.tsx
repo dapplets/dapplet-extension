@@ -249,7 +249,6 @@ class _App extends React.Component<P, S> {
   handleOpenSearchClick = () => {
     this.setState({
       isOpenSearch: true,
-      classNameSearch: 'open',
     })
   }
 
@@ -380,7 +379,6 @@ class _App extends React.Component<P, S> {
                 {s.isOpenSearch && pathname === '/system/dapplets' && (
                   <div className={styles.searchBlock} tabIndex={1}>
                     <Search
-                      className={s.classNameSearch}
                       value={s.search}
                       isOpenSearch={s.isOpenSearch}
                       onChange={this.handleSearchChange}

@@ -14,7 +14,7 @@
 
   animation-name: slideLeft;
 
-  animation-duration: 0.3s;
+  animation-duration: 5s;
 
   animation-timing-function: ease;
 
@@ -23,15 +23,15 @@
 
 @keyframes slideRight {
   0% {
-    transform: translateX(150%);
+    transform: scale(0);
   }
 
   65% {
-    transform: translateX(-8%);
+    transform: scale(1.1, 1);
   }
 
   100% {
-    transform: translateX(0%);
+    transform: scale(1, 1);
   }
 }
 
