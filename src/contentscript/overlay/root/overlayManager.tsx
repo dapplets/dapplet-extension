@@ -14,7 +14,7 @@ const OverlayFrameClass = 'dapplets-overlay-frame'
 export class OverlayManager implements IOverlayManager {
   private _panel: HTMLElement = null
   public activeOverlay: Overlay = null
-  public onActiveOverlayChanged: (overlay: Overlay | null) => void | null = null
+  public onActiveOverlayChanged: (newOverlay: Overlay | null) => void | null = null
 
   private _root = null
 
@@ -130,6 +130,8 @@ export class OverlayManager implements IOverlayManager {
   }
 
   public unregister(overlay: Overlay) {
+    const oldOverlay = this.activeOverlay
+
     overlay.registered = false
     overlay.onregisteredchange?.(false)
     overlay.onclose?.()
@@ -159,7 +161,9 @@ export class OverlayManager implements IOverlayManager {
     //   this.hide()
     // }
 
-    this.onActiveOverlayChanged?.(this.activeOverlay)
+    if (this.activeOverlay !== oldOverlay) {
+      this.onActiveOverlayChanged?.(this.activeOverlay)
+    }
 
     this._render()
   }
@@ -172,6 +176,8 @@ export class OverlayManager implements IOverlayManager {
   }
 
   public activate(overlay: Overlay) {
+    const oldOverlay = this.activeOverlay
+
     if (overlay.parent) return this.activate(overlay.parent as Overlay)
     if (this.activeOverlay == overlay) return
 
@@ -181,16 +187,22 @@ export class OverlayManager implements IOverlayManager {
 
     this.activeOverlay = overlay
 
-    this.onActiveOverlayChanged?.(this.activeOverlay)
+    if (this.activeOverlay !== oldOverlay) {
+      this.onActiveOverlayChanged?.(this.activeOverlay)
+    }
 
     this._render()
   }
 
   public deactivate(overlay: Overlay) {
+    const oldOverlay = this.activeOverlay
     const tab = this._tabsRegistry.filter((t) => t.overlay === overlay)[0]
     if (this.activeOverlay === tab.overlay) {
       this.activeOverlay = null
-      this.onActiveOverlayChanged?.(null)
+
+      if (null !== oldOverlay) {
+        this.onActiveOverlayChanged?.(null)
+      }
     }
     this._render()
   }
