@@ -461,7 +461,7 @@ export default class Core {
       // ToDo: remove it when subscription on disconnect event will be implemented
       //       (see: /background/services/walletService.ts/disconnect())
       const descriptors = await getWalletDescriptors()
-      const descriptor = descriptors.find((x) => x.type == session.walletType)
+      const descriptor = descriptors.find((x) => x.chain == session.authMethod)
       return descriptor ? descriptor.connected : false
     }
 
