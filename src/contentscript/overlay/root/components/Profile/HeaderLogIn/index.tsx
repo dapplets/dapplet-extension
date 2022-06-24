@@ -317,25 +317,25 @@ export const Modal = ({
               className={styles.addWallet}
               onClick={() => {
                 // setOpen()
-                wallets.length >= 4 ? null : connectWallet()
+                wallets.length > 5 ? null : connectWallet()
               }}
             >
               {/* <button className={styles.AddUser}></button> */}
               <span
                 data-title={
-                  wallets.length >= 4
-                    ? 'You have already connected all wallets disconnect one of the connected ones to connect a new one'
+                  wallets.length > 5
+                    ? 'All of your wallets are already connected Disconnect one of them to add a new one'
                     : null
                 }
                 className={cn(styles.AddUserLabel, {
-                  [styles.addWalletsDisabled]: wallets.length >= 4,
+                  [styles.addWalletsDisabled]: wallets.length > 5,
                 })}
               >
                 Add Wallet
-                {wallets.length >= 4 ? (
+                {wallets.length > 5 ? (
                   <span className={styles.copied}>
-                    You have already connected all wallets disconnect one of the connected ones to
-                    connect a new one
+                    All of your wallets are already connected Disconnect one of them to add a new
+                    one
                   </span>
                 ) : null}
               </span>
