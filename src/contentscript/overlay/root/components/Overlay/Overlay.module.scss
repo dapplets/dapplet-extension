@@ -9,7 +9,6 @@
   min-width: 468px;
   height: 100vh;
 
-  // width: 320px;
   transition: transform 0.3s ease;
   filter: drop-shadow(-4px 0 4px rgb(0 0 0 / 25%));
   -ms-overflow-style: none;
@@ -39,7 +38,6 @@
   overflow: auto;
   overflow: -moz-scrollbars-none;
 
-  // height: 100%;
   padding: 10px 15px 5px;
 
   background: $OverlayBG;
@@ -60,8 +58,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  // margin-bottom: 20px;
 }
 
 .left {
@@ -134,7 +130,6 @@
 
   height: calc(100vh - 75px);
 
-  // opacity: 0;
   pointer-events: none;
 }
 
@@ -147,7 +142,6 @@
 }
 
 .overlayActive {
-  // display: none;
   position: relative;
 
   margin-top: 0 !important;
@@ -175,8 +169,6 @@
 
     max-width: 100%;
     padding: 42px 0 0;
-
-    // padding: 17px 20px;
   }
 
   .header {

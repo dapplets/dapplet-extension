@@ -10,7 +10,7 @@ import {
 } from '../../../../../../common/types'
 import { ReactComponent as WalletImg } from '../../../assets/svg/wallet.svg'
 import styles from './HeaderLogIn.module.scss'
-// import makeBlockie from 'ethereum-blockies-base64'
+
 import makeBlockie from 'ethereum-blockies-base64'
 import { browser } from 'webextension-polyfill-ts'
 import { mergeSameWallets } from '../../../../../../common/helpers'
@@ -24,34 +24,19 @@ export interface HeaderLogInProps {
   hash?: string
   isMini: boolean
   setOpen: () => void
-  // setMini: () => void
   isOpen: boolean
-  handleWalletLengthDisconnect: () => void
-
   setModalWalletConnect: (x: boolean) => void
   newProfile: any
-  setNewProfile: (x: any) => void
   isOverlay: boolean
 }
 let _isMounted = false
 export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
-  const {
-    isMini,
-    setOpen,
-    // setMini,
-    isOpen,
-    handleWalletLengthDisconnect,
-
-    newProfile,
-    setNewProfile,
-    isOverlay,
-  } = props
+  const { isMini, setOpen, isOpen, newProfile, isOverlay } = props
 
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
   const connectedDescriptors = mergeSameWallets(descriptors.filter((x) => x.connected))
   const [isModal, setModal] = useState(false)
   const [isModalWallet, setModalWallet] = useState(false)
-  const onCloseModalWantLink = () => setModal(false)
   const onCloseModalWallet = () => setModalWallet(false)
   const isEveryWalletConnected = descriptors.filter((x) => !x.connected).length === 0
 
@@ -71,28 +56,13 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
 
   const refresh = async () => {
     const { getWalletDescriptors } = await initBGFunctions(browser)
-
     const descriptors = await getWalletDescriptors()
     setDescriptors(descriptors)
   }
 
-  const onDeleteChildConnectNewProfile = (id: any) => {
-    newProfile.splice(id, 1)
-
-    setNewProfile(newProfile.splice(id, 1))
-
-    return newProfile
-  }
-  const filteredDapplets = useMemo(() => {
+  const filteredProfile = useMemo(() => {
     return newProfile
   }, [newProfile])
-
-  const visible = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 7)
-
-    return `${firstFourCharacters}...${lastFourCharacters}`
-  }
 
   const disconnectButtonClick = async (chain: ChainTypes, wallet: WalletTypes) => {
     const { disconnectWallet } = await initBGFunctions(browser)
@@ -103,7 +73,6 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
     if (isOverlay) {
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
-      // await this.componentDidMount()
       await refresh()
     } else {
       pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
@@ -120,14 +89,12 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         })}
         onClick={() => {
           setOpen()
-          // setMini()
         }}
       >
         <div
           className={styles.avatar}
           onClick={() => {
             setOpen()
-            // setMini()
           }}
         >
           <Card />
@@ -140,24 +107,16 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       </header>
 
       <Modal
-        setModalWallet={setModalWallet}
         visible={isOpen}
         disconnectButtonClick={disconnectButtonClick}
         wallets={connectedDescriptors}
-        // setOpen={setOpen}
         onClose={setOpen}
         connectWallet={isEveryWalletConnected ? null : connectWallet}
       />
       <ModalWallet
         visible={isModalWallet}
         content={''}
-        footer={
-          <Wallet
-            isOverlay={true}
-            // handleWalletLengthConnect={this.handleWalletLengthConnect}
-            // handleWalletConnect={this.handleWalletConnect}
-          />
-        }
+        footer={<Wallet isOverlay={true} />}
         onClose={() => onCloseModalWallet()}
       />
     </div>
@@ -165,26 +124,18 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
 }
 interface ModalProps {
   visible: boolean
-
   onClose?: () => void
-  // setOpen: any
   wallets: any
   disconnectButtonClick: (x: any, y: any) => void
-
   connectWallet?: () => void
-  setModalWallet?: (x: boolean) => void
 }
 
 export const Modal = ({
   visible = false,
-
   onClose,
-  // setOpen,
   wallets,
   disconnectButtonClick,
-
   connectWallet,
-  setModalWallet,
 }: ModalProps) => {
   const [isNotVisible, setNotVisible] = useState(false)
   const [value, setValue] = useState('')
@@ -203,7 +154,6 @@ export const Modal = ({
 
   useEffect(() => {
     document.addEventListener('keydown', onKeydown)
-
     return () => {
       document.removeEventListener('keydown', onKeydown)
     }
@@ -214,7 +164,6 @@ export const Modal = ({
   const newVisible = (hash: string): string => {
     const firstFourCharacters = hash.substring(0, 6)
     const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
-
     return `${firstFourCharacters}...${lastFourCharacters}`
   }
 
@@ -240,13 +189,7 @@ export const Modal = ({
       >
         <div className={styles.profileBlock}>
           <div className={styles.profileBlockImg}>
-            <span
-              className={styles.profileImg}
-              // onClick={() => {
-              //   setOpen()
-              //   setMini()
-              // }}
-            >
+            <span className={styles.profileImg}>
               <WalletImg />
             </span>
           </div>
@@ -257,12 +200,7 @@ export const Modal = ({
           {wallets &&
             wallets.map((x, i) => (
               <div key={i} className={styles.newProfileBlock}>
-                <div
-                  onClick={() => {
-                    console.log(wallets)
-                  }}
-                  className={styles.newProfileBlockInfo}
-                >
+                <div className={styles.newProfileBlockInfo}>
                   {x.account ? (
                     <img src={makeBlockie(x.account)} className={styles.newProfileBlockImg} />
                   ) : null}
@@ -316,11 +254,9 @@ export const Modal = ({
             <div
               className={styles.addWallet}
               onClick={() => {
-                // setOpen()
                 wallets.length > 5 ? null : connectWallet()
               }}
             >
-              {/* <button className={styles.AddUser}></button> */}
               <span
                 data-title={
                   wallets.length > 5

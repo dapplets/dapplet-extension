@@ -7,7 +7,7 @@ import styles from './Dropdown.module.scss'
 export interface DropdownProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   list: IDropdown[]
-  // value?: IDropdown | null
+
   value: {
     label: string
   }
@@ -26,7 +26,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
     setDropdownListValue,
     ...anotherProps
   } = props
-  // useEffect(() => {}, [])
 
   const onChange = (value: IDropdown) => (): void => handlerChangeValue && handlerChangeValue(value)
 
@@ -42,7 +41,6 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
         className={cn(styles.dropdownBlock, { [styles.isOpen]: isOpen })}
       >
         <span className={cn(styles.spanBlock, className)} {...anotherProps}>
-          {/* {value.label ? value.label : 'All'} */}
           {value.label}
         </span>
 

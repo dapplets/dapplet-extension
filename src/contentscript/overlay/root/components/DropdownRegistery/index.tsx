@@ -34,9 +34,9 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
   }, [])
   const getNumIndex = (value, reg) => {
     try {
-      let numEl = value.match(reg)
+      let valueReg = value.match(reg)
 
-      return numEl
+      return valueReg
     } catch {}
   }
 
@@ -185,6 +185,3 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
     </>
   )
 }
-
-// registry.dapplet-base.eth
-// dev-1627024020035-70641704943070

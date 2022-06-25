@@ -9,7 +9,7 @@ import { DefaultConfig, SchemaConfig } from '../../../../../common/types'
 import { Message } from '../../components/Message'
 import { TabLoader } from '../../components/TabLoader'
 import SelectWidget from './SelectWiget/SelectWigets'
-// import SelectWidget from '../../../../../settings/SelectWidget'
+
 import TextWidget from './TextWiget/TextWigets'
 import styles from './UserSettings.module.scss'
 
@@ -26,10 +26,8 @@ export interface SettingsPageProps {
   setLoad: any
 }
 let _isMounted = false
-// SemanticUITheme.widgets.SelectWidget = SelectWidget
+
 const theme = { widgets: { SelectWidget, TextWidget } }
-// SemanticUITheme.widgets.SelectWidget = SelectWidget
-// const theme = { widgets: { SemanticUITheme, TextWidget } }
 
 const Form = withTheme(theme)
 
@@ -59,7 +57,6 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
                 .map(([k, v]: any) => v.title ?? k)
             : []
 
-        // Do not show hidden settings when developer mode is disabled
         if (!devMode) {
           if (schemaConfig && schemaConfig.properties) {
             for (const key in schemaConfig.properties) {
@@ -175,10 +172,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
                   className={styles.messageUserSettings}
                   title="Hidden settings"
                   subtitle="The following options are available only in developer mode"
-                  children={
-                    ''
-                    // <div className={styles.hiddenProps}>{hiddenProperties.join(', ')}</div>
-                  }
+                  children={''}
                 />
               ) : null}
 

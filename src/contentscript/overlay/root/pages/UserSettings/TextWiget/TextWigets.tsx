@@ -7,7 +7,6 @@ import React, { useEffect } from 'react'
 import { getSemanticProps } from '../utils'
 
 import styles from './TextWiget.module.scss'
-// import Select from 'react-select';
 
 const { getDisplayLabel } = utils
 let _isMounted = false
@@ -47,21 +46,11 @@ const MyCustomWidget = (props, step) => {
           e.preventDefault()
           e.stopPropagation()
           const newValue = Number(+e.currentTarget.value + Number(step.step)).toFixed(2)
-          console.log(newValue)
-
           props.onChange(String(newValue))
         }}
       />
     </div>
   )
-}
-
-const widgets = {
-  myCustomWidget: MyCustomWidget,
-}
-
-const NewuiSchema = {
-  'ui:widget': 'myCustomWidget',
 }
 
 function TextWidget(props) {

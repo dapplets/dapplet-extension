@@ -543,7 +543,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           if (dynamicAdapterInput.length === 0) {
                             getDefaultValueDynamicAdapter(dynamicAdapterInput)
                           }
-                          // console.log(parseModuleName(dynamicAdapterInput))
                         }}
                         onSubmit={(e) => {
                           e.preventDefault()

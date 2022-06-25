@@ -167,7 +167,6 @@ export const SettingsOverlay = () => {
               <DappletsMainInfo
                 ModuleInfo={ModuleInfo}
                 ModuleVersion={ModuleVersion}
-                isDappletsDetails={isDappletsDetails}
                 setDappletsDetail={setDappletsDetail}
                 setShowChildrenRegistery={setShowChildrenRegistery}
               />

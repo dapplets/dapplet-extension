@@ -5,7 +5,6 @@ import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
 import { DefaultConfig, SchemaConfig } from '../../../../../common/types'
 import { SettingsPage } from './SettingsPage'
-// import { SettingsPage } from '../../../../../settings/SettingsPage'
 
 type UserSettingsContext = {
   mi: ModuleInfo & {

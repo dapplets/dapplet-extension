@@ -16,12 +16,11 @@ import {
 } from '../../../../../common/types'
 export interface WalletProps {
   isOverlay?: boolean
-  handleWalletConnect?: () => void
   handleWalletLengthConnect?: () => void
 }
 let _isMounted = false
 export const Wallet: FC<WalletProps> = (props: WalletProps) => {
-  const { isOverlay, handleWalletLengthConnect, handleWalletConnect } = props
+  const { isOverlay, handleWalletLengthConnect } = props
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -59,21 +58,16 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
   const connectWallet = async () => {
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
     if (isOverlay) {
-      // handleWalletConnect()
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
-      // await this.componentDidMount()
+
       handleWalletLengthConnect()
     } else {
-      // handleWalletConnect()
       pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       window.close()
       handleWalletLengthConnect()
     }
   }
-  const setWalletFor = async (type: string) => {
-    const { setWalletFor } = await initBGFunctions(browser)
-    await setWalletFor(type, DefaultSigners.EXTENSION, ChainTypes.ETHEREUM_GOERLI)
-  }
+
   if (loading) return null
 
   return (
@@ -108,7 +102,6 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
                 ) : null}
                 <div style={{ flex: 'auto', marginLeft: '10px' }}>
                   <div style={{ display: 'inline', color: 'rgba(0,0,0,.4)' }}>
-                    {/* {(x.default) ? <Icon name='star' /> : <Icon link name='star outline' onClick={() => this.setWalletFor(x.type)} />} */}
                     {x.account ? (
                       <span title={x.account} style={{ color: '#000', fontWeight: 'bold' }}>
                         {x.account.length === 42
@@ -123,8 +116,6 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
                       onClick={() => navigator.clipboard.writeText(x.account)}
                     />
                   </div>
-                  {/* <Comment.Author style={{ display: 'inline' }}>{x.account}</Comment.Author> */}
-                  {/* <Icon link name='external' onClick={() => window.open(`https://${(x.chainId === 1) ? '' : networkName(x.chainId) + '.'}etherscan.io/address/${x.account}`, '_blank')} /> */}
                   <div>
                     {walletIcons[x.type] ? (
                       <img
@@ -148,7 +139,6 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
                         <ReactTimeAgo date={new Date(x.lastUsage)} locale="en-US" />
                       </span>
                     ) : null}
-                    {/* <span style={{ marginLeft: '0.5em' }}>{networkName(x.chainId)}</span> */}
                   </div>
                 </div>
                 <div>

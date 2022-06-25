@@ -9,7 +9,6 @@ export interface IconsTitleProps {
 export const Icon: FC<IconsTitleProps> = (props: IconsTitleProps) => {
   const { icon: Icon, size, ...anotherProps } = props
   return (
-    // <Img {...anotherProps} />
     <div
       className={cn(styles.iconsTitle, {
         [styles.smail]: size === 'small',

@@ -3,7 +3,6 @@ import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import ReactTimeAgo from 'react-time-ago'
-import { useToggle } from '../../hooks/useToggle'
 import { CloseIcon } from '../CloseIcon'
 import styles from './Notification.module.scss'
 
@@ -24,9 +23,9 @@ export interface NotificationProps {
 export const Notification = (props: NotificationProps): ReactElement => {
   const { label, title, date, onClear, _id, description, href, onChange } = props
   const refComponent = useRef<HTMLInputElement>()
-  const [isOpen, onOpen] = useState(false)
+
   const [isDelete, onDelete] = useState(false)
-  const [isMoreInformation, onMoreInformation] = useToggle(false)
+
   const [newDescription, setDescription] = useState(description)
 
   const booleanNode = refComponent.current?.classList.contains('more')

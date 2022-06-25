@@ -26,7 +26,6 @@
 
   background: inherit;
 
-  // margin: 0px 0px 0px 10px;
   img {
     width: 100%;
     height: 100%;
@@ -47,15 +46,9 @@
   display: flex;
 
   width: 65%;
-
-  // justify-content: space-between;
 }
 
 .dappletsVersion {
-  // display: flex;
-
-  // justify-content: center;
-  // align-items: center;
   display: inline-block;
 
   margin: 0 3px 0 0;
@@ -63,9 +56,6 @@
 
   color: $WebBG;
   border-radius: 4px;
-
-  // width: 39px;
-  // height: 14px;
 
   background: #41bf55;
 
@@ -84,9 +74,6 @@
 
   color: $WebBG;
   border-radius: 4px;
-
-  // width: 39px;
-  // height: 14px;
 
   background: #f5cf6c;
 
@@ -136,8 +123,6 @@
   justify-content: space-between;
 
   width: 100%;
-
-  // flex-direction: column;
 }
 
 .dappletsTitle {
@@ -148,8 +133,6 @@
 
   color: $MainBlack;
 
-  // height: 17px;
-  // text-align: center;
   font-family: Roboto;
   font-size: 14px;
 
@@ -164,7 +147,6 @@
 
   display: block;
 
-  // margin: 12px 0px 0px 0px;
   width: 14px;
   height: 14px;
   padding: 0 5px 0 0;
@@ -236,22 +218,6 @@
   }
 }
 
-// .dappletsLabelSpan {
-//   display: block;
-
-//   width: 40%;
-//   padding: 0 0 5px;
-
-//   color: $MainGrey;
-
-//   font-family: Roboto;
-//   font-size: 10px;
-
-//   font-weight: 500;
-//   line-height: 100%;
-// }
-
-/* stylelint-disable-next-line no-duplicate-selectors */
 .dappletsLabelSpan {
   display: block;
 
@@ -281,7 +247,6 @@
   width: 42px;
   height: 42px;
 
-  /* MainColors/WebBG */
   border: 1px solid $WebBG;
   border-radius: 20px;
 
@@ -297,7 +262,6 @@
 .dappletsSettingsIsUnderConstruction {
   display: block;
 
-  // margin: 12px 0px 0px 0px;
   width: 14px;
   height: 14px;
   padding: 0 5px 0 0;
@@ -320,70 +284,6 @@
   border-radius: 50%;
 
   background: $Primary;
-}
-
-.dappletsReuploadisUnderConstructionPublish {
-  // position: absolute;
-  // top: 12px;
-  // right: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 90px;
-  height: 20px;
-  margin: 0 0 0 5px;
-  padding: 4px 10px;
-
-  cursor: auto;
-
-  color: $ContentBlack;
-  border-radius: 10px;
-
-  background: $StrokeColor;
-
-  font-family: Roboto;
-  font-size: 10px;
-
-  font-weight: 500;
-  line-height: 100%;
-}
-
-.dappletsReuploadisUnderConstructionDeploy {
-  // position: absolute;
-  // top: 12px;
-  // right: 0;
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  // margin: 0px 16px 0px 0px;
-  width: 90px;
-  height: 20px;
-  margin: 0 0 0 5px;
-  padding: 4px 10px;
-
-  cursor: pointer;
-
-  color: $PureWhite;
-  border-radius: 10px;
-
-  background: $Primary;
-
-  font-family: Roboto;
-  font-size: 10px;
-
-  font-weight: 500;
-  line-height: 100%;
-
-  &:hover {
-    background: $PrimaryHover;
-  }
-
-  &:active {
-    background: $PrimaryPressed;
-  }
 }
 
 .dappletsIsLoadingDeploy {

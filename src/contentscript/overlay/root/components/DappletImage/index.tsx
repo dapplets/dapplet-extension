@@ -22,7 +22,7 @@ export const DappletImage: FC<DappletImageProps> = (props: DappletImageProps) =>
           src={img ? img : NO_LOGO}
           alt=" "
           onError={({ currentTarget }) => {
-            currentTarget.onerror = null // prevents looping
+            currentTarget.onerror = null
             currentTarget.src = NO_LOGO
           }}
         />

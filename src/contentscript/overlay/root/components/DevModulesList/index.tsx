@@ -87,7 +87,6 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
   )
 }
 interface PropsDeveloper {
-  isDappletsDetails: boolean
   setDappletsDetail: (x) => void
   modules: {
     module: ModuleInfo
@@ -97,7 +96,7 @@ interface PropsDeveloper {
   onDetailsClick: (x: any, y: any) => void
   setModuleInfo: (x) => void
   setModuleVersion: (x) => void
-  isUnderConstructionDetails: boolean
+
   setUnderConstructionDetails: (x) => void
   isLocalhost?: boolean
   setUpdate?: (x) => void
@@ -106,11 +105,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const {
     modules,
     onDetailsClick,
-    isDappletsDetails,
     setDappletsDetail,
     setModuleInfo,
     setModuleVersion,
-    isUnderConstructionDetails,
     setUnderConstructionDetails,
     isLocalhost = false,
     setUpdate,
@@ -137,7 +134,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>([])
   const nodeButton = useRef<HTMLButtonElement>()
   const [textButtonDeploy, setTextButtonDeploy] = useState('Deploy')
-  // const [textButtonReupload, setTextButtonReupload] = useState('Deploy')
+
   const [isLoadingDeploy, setLoadingDeploy] = useState(false)
   const [messageError, setMessageError] = useState(null)
   const [isModalError, setModalError] = useState(false)
@@ -145,7 +142,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const [isNotAccountModal, setNotAccountModal] = useState(false)
   useEffect(() => {
     _isMounted = true
-    // loadSwarmGateway()
 
     const init = async () => {
       await _updateData()
@@ -195,14 +191,12 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     const swarmGatewayUrl = await getSwarmGateway()
 
     if (mi === null && vi === null) {
-      // New module
       const mi = new ModuleInfo()
       setOriginalMi(JSON.parse(JSON.stringify(mi)))
       setMi(mi)
       setSwarmGatewayUrl(swarmGatewayUrl)
       setMode(FormMode.Creating)
     } else {
-      // Deploy module
       const dependencies = vi?.dependencies
         ? Object.entries(vi.dependencies).map(([name, version]) => ({
             name: name,
@@ -244,12 +238,10 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
     } else {
-      // return Promise.all([
       await _updateOwnership(),
         await _updateCurrentAccount(),
         await _updateDeploymentStatus(),
         await _checkDependencies()
-      // ])
     }
   }
   const _updateOwnership = async () => {
@@ -276,7 +268,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       ? DeploymentStatus.Deployed
       : DeploymentStatus.NotDeployed
     setDeploymentStatus(deploymentStatus)
-    // console.log(deploymentStatus)
   }
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
@@ -298,21 +289,11 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const deployButtonClickHandler = async (e) => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
 
-    // mi.registryUrl = targetRegistry
-    // mi.author = currentAccount
-
     setLoadingDeploy(true)
 
     e.target.classList.add(styles.dappletsIsLoadingDeploy)
     setTextButtonDeploy('')
-    console.log(mode, 'mode')
 
-    console.log(mi, 'mi ')
-    console.log(vi, 'vi ')
-    console.log(targetStorages, 'targetStorages')
-    console.log(targetRegistry, 'targetRegistry ')
-
-    console.log(currentAccount, 'currentAccount')
     try {
       const isNotNullCurrentAccount = !(
         !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
@@ -339,14 +320,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       setTextButtonDeploy('Deploy')
       setUpdate(true)
     } catch (err) {
-      console.log(err, 'err')
-      console.log(mi, 'mi err')
-      console.log(vi, 'vi err')
-      console.log(mode, 'modeerr')
-
-      console.log(targetStorages, 'targetStorages err')
-      console.log(targetRegistry, 'targetRegistry err')
-      console.log(currentAccount, 'currentAccount err')
       setMessageError({
         type: 'negative',
         header: 'Publication error',
@@ -360,10 +333,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       await _updateData()
     }
   }
-  // console.log(isLocalhost)
-  const isNotNullCurrentAccount = !(
-    !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
-  )
 
   return (
     <>
@@ -374,12 +343,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           <div className={styles.dappletsInfo}>
             <div className={styles.dappletsTegs}>
               {m.versions && m.versions[0] && m.versions[0].version ? (
-                <div
-                  className={styles.dappletsVersion}
-                  // onClick={() => console.log(m)}
-                >
-                  {m.versions[0].version}
-                </div>
+                <div className={styles.dappletsVersion}>{m.versions[0].version}</div>
               ) : (
                 <div className={styles.dappletsVersionUC}>Under Construction</div>
               )}
@@ -403,7 +367,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                 <span
                   onClick={() => {
                     onDetailsClick(m.module, m.versions[0])
-                    // setDappletsDetail(false)
+
                     setUnderConstructionDetails(true)
                     setModuleInfo(m.module)
                     setModuleVersion(m.versions[0])
@@ -424,24 +388,13 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     m.module.contextIds = []
                     onDetailsClick(m.module, m.versions[0])
                     setDappletsDetail(true)
-                    // setUnderConstructionDetails(false)
+
                     setModuleInfo(m.module)
                     setModuleVersion(m.versions[0])
                   }}
                 />
               )}
               {m.module.isUnderConstruction || !isLocalhost ? null : (
-                // <button
-                //   className={cn(
-                //     styles.dappletsReuploadisUnderConstructionPublish,
-                //     {
-                //       [styles.dappletsReuploadisUnderConstructionDeploy]:
-                //         m.isDeployed?.[0] === false,
-                //     }
-                //   )}
-                // >
-                //   {m.isDeployed?.[0] === false ? 'Deploy' : 'Publish'}
-                // </button>
                 <button
                   id={String(i)}
                   ref={nodeButton}
@@ -453,10 +406,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     [styles.dapDeploy]: m.isDeployed?.[0] !== false,
                   })}
                 >
-                  {/* {m.isDeployed?.[0] === false */}
-                  {/* ?  */}
                   {textButtonDeploy}
-                  {/* textButtonReupload */}
                 </button>
               )}
             </div>
@@ -478,34 +428,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   </label>
                 </div>
               )}
-              {/* {m.module.registryUrl && (
-                <div>
-                  <span className={styles.dappletsLabelSpan}>Registry:</span>
-                  <label
-                    className={cn(
-                      styles.dappletsLabelSpan,
-                      styles.dappletsLabelSpanInfo
-                    )}
-                  >
-                    {visible(`${m.module.registryUrl}`)}
-                  </label>
-                </div>
-              )} */}
-              {/* {m.versions && m.versions[0] && m.versions[0].version && (
-                <div>
-                  <span className={styles.dappletsLabelSpan}>
-                    Version in registry:
-                  </span>
-                  <label
-                    className={cn(
-                      styles.dappletsLabelSpan,
-                      styles.dappletsLabelSpanInfo
-                    )}
-                  >
-                    {m.versions[0].version}
-                  </label>
-                </div>
-              )} */}
+
               <div>
                 <span className={styles.dappletsLabelSpan}>Type:</span>
                 <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>

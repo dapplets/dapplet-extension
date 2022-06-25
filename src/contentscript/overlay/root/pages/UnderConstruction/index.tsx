@@ -3,7 +3,6 @@ import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
-import VersionInfo from '../../../../../background/models/versionInfo'
 import { ModuleTypes, StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
@@ -53,10 +52,8 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
   const { setUnderConstruction, setUnderConstructionDetails, setModuleInfo, setModuleVersion } =
     props
 
-  const [originalMi, setOriginalMi] = useState<ModuleInfo>(new ModuleInfo())
-
   const [mi, setMi] = useState<ModuleInfo>(new ModuleInfo())
-  const [vi, setVi] = useState<VersionInfo>()
+
   const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>([])
   const [loading, setLoading] = useState(false)
   const [targetRegistry, setTargetRegistry] = useState(null)
@@ -88,7 +85,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
   const [isModalCreation, setModalCreation] = useState(false)
   const onCloseModalCreation = () => setModalCreation(false)
   const [isModalEndCreation, setModalEndCreation] = useState(false)
-  const onCloseEndModalCreation = () => setModalCreation(false)
+
   const [isModalTransaction, setModalTransaction] = useState(false)
 
   useEffect(() => {
@@ -170,37 +167,14 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
     }
   }
 
-  const isNoStorage = targetStorages.length === 0
   const isNotNullCurrentAccount = !(
     !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
   )
-  const isNotWalletPaired = !isNotNullCurrentAccount && !!owner
+
   const isNotAnOwner =
     !!owner && isNotNullCurrentAccount && owner.toLowerCase() !== currentAccount.toLowerCase()
-  const isAlreadyDeployed = !message && deploymentStatus === DeploymentStatus.Deployed
+
   const isNewModule = deploymentStatus === DeploymentStatus.NewModule
-  const isNotTrustedUser =
-    isNotNullCurrentAccount &&
-    !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
-  const isDependenciesExist =
-    dependenciesChecking && dependenciesChecking.length > 0
-      ? dependenciesChecking.every((x) => x.isExists === true)
-      : true
-  const isDependenciesLoading =
-    dependenciesChecking && dependenciesChecking.length > 0
-      ? dependenciesChecking.every((x) => x.isExists === undefined)
-      : false
-  const isManifestValid = mi?.name && mi?.title && mi?.type
-  const isDeployButtonDisabled =
-    loading ||
-    deploymentStatus === DeploymentStatus.Deployed ||
-    !isNotNullCurrentAccount ||
-    isNotAnOwner ||
-    isNoStorage ||
-    isDependenciesLoading ||
-    !isDependenciesExist ||
-    !isManifestValid
-  const isReuploadButtonDisabled = !isAlreadyDeployed || mode === FormMode.Creating
 
   return (
     <div className={styles.wrapper}>

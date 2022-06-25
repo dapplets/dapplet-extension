@@ -34,12 +34,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
   const [error, setError] = useState<string>(null)
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
-  // const [devMessage, setDevMessage] = useState<string>(null)npm
   const [loadShowButton, setLoadShowButton] = useState(false)
   const [contextId, setContextIds] = useState<string[]>([])
-
   const [trustedUsers, setTrustedUsers] = useState([])
-
   const [dropdownListValue, setDropdownListValue] = useState('All')
 
   useEffect(() => {
@@ -73,7 +70,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       _isMounted = false
     }
   }, [])
-  // console.log(dropdownListValue)
 
   const _refreshDataByContext = async (contextIds: Promise<string[]>) => {
     let contextIdsValues = undefined
@@ -250,12 +246,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const d = dapplets.filter((x) => x.name !== f.name)
 
     setDapplets(d)
-    // const { removeDapplet } = await initBGFunctions(browser)
-    // const contextIds = await contextIds
-    // await removeDapplet(f.name, contextIds)
-    // this.setState({
-    //   features: this.state.features.filter((x) => x.name !== f.name),
-    // })
   }
 
   const onDeployDapplet = async (f: ManifestAndDetails) => {
@@ -272,7 +262,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   }
   const onOpenStoreAuthor = async (f: ManifestAndDetails) => {
     const url = `${DAPPLETS_STORE_URL}/#sortType=Sort%20A-Z&addressFilter=${f.author}`
-    // https://stoic-bartik-42e9f3.netlify.app/#sortType=Sort%20A-Z&addressFilter=0xF64849376812667BDa7D902666229f8b8dd90687&searchQuery=&isTrustedSort=false&selectedList=undefined
     window.open(url, '_blank')
   }
 
@@ -281,7 +270,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const trustedUsers = await getTrustedUsers()
     setTrustedUsers(trustedUsers)
   }
-  // setDapplets(features)
 
   const _getSortedDapplets = (dapplets) => {
     if (dropdownListValue === 'All') return dapplets
@@ -306,7 +294,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
   }
 
-  // const filteredDapplets = _getSortedDapplets(_getFilteredDapplets(dapplets))
   const filteredDapplets = useMemo(() => {
     return _getSortedDapplets(_getFilteredDapplets(dapplets))
   }, [search, dapplets, dropdownListValue])
@@ -314,12 +301,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   return (
     <>
       <div className={styles.wrapper}>
-        {/* <Dropdown
-          list={DROPDOWN_LIST}
-          title="Sort by:"
-          style={{ marginRight: 10 }}
-          value={{ label: 'All' }}
-        /> */}
         <Dropdown
           list={DROPDOWN_LIST}
           title="List:"

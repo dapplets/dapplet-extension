@@ -14,14 +14,14 @@ export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
   const { title, isSupport = false, isCheckbox, onChange, isReadonly, ...anotherProps } = props
 
   return (
-    <div className={styles.supportBlock}>
+    <div className={styles.supportBlockCheckbox}>
       <div
         data-title="The centralized storage maintained by Dapplets Project. It backs up your modules in case decentralized storages become unavailable."
-        className={cn(styles.checkboxBlock, { [styles.support]: isSupport })}
+        className={cn(styles.checkboxBlock, { [styles.supportLabel]: isSupport })}
       >
         <label className={cn(styles.wrapper)}>
           <input
-            className={cn(styles.input)}
+            className={cn(styles.inputCheckbox)}
             type="checkbox"
             onChange={onChange}
             checked={isCheckbox}
@@ -29,7 +29,7 @@ export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
             {...anotherProps}
           />
           <span
-            className={cn(styles.inputCheckbox, {
+            className={cn(styles.fakeInputCheckbox, {
               [styles.active]: isCheckbox,
             })}
           />

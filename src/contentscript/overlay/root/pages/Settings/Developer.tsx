@@ -87,7 +87,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       _isMounted = false
     }
   }, [isUpdate])
-  // console.log(isUpdate)
 
   const loadSwarmGateway = async () => {
     const { getSwarmGateway } = await initBGFunctions(browser)
@@ -252,7 +251,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                   key={i}
                   closeHost={() => removeRegistry(r.url)}
                   isLoadButtonLocalhost={isLoadButtonLocalhost}
-                  setLoadButtonLocalhost={setLoadButtonLocalhost}
                   onClickButtonLocalhost={() => {
                     // setLoadButtonLocalhost(true)
                     ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
@@ -269,13 +267,11 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                               <DevModule
                                 setUpdate={setUpdate}
                                 isLocalhost={isLocalhost}
-                                isDappletsDetails={isDappletsDetails}
                                 setDappletsDetail={setDappletsDetail}
                                 modules={modules}
                                 onDetailsClick={deployModule.bind(this)}
                                 setModuleInfo={setModuleInfo}
                                 setModuleVersion={setModuleVersion}
-                                isUnderConstructionDetails={isUnderConstructionDetails}
                                 setUnderConstructionDetails={setUnderConstructionDetails}
                               />
                             )}
@@ -302,12 +298,10 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                         <div className={styles.modules}>
                           <DevModule
                             setDappletsDetail={setDappletsDetail}
-                            isDappletsDetails={isDappletsDetails}
                             modules={modules}
                             onDetailsClick={deployModule.bind(this)}
                             setModuleInfo={setModuleInfo}
                             setModuleVersion={setModuleVersion}
-                            isUnderConstructionDetails={isShowChildrenRegistery}
                             setUnderConstructionDetails={setUnderConstructionDetails}
                           />
                         </div>

@@ -115,7 +115,6 @@
     position: absolute;
     z-index: 10;
 
-    /* margin-top: 6px; */
     top: 0;
     left: 0;
 
@@ -126,9 +125,6 @@
 
     content: "";
 
-    /* padding: 10px; */
-
-    /* padding-bottom: 15px; */
     border-radius: 10px 0 0 10px;
     background-color: rgb(0 0 0 / 30%);
   }
@@ -147,14 +143,6 @@
 
   svg {
     width: 100%;
-  }
-
-  &:not(:last-child) {
-    // margin-bottom: 8px;
-  }
-
-  &:nth-child(2) {
-    // margin-top: 12px;
   }
 
   &:nth-child(2),
@@ -196,14 +184,6 @@
       }
     }
   }
-
-  // &:active{
-  //   svg {
-  //     path {
-  //       fill: #747376;
-  //     }
-  //   }
-  // }
 }
 
 .selected path {

@@ -3,7 +3,7 @@ import _ from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
 import Select from 'react-select'
 import { getSemanticProps } from '../utils'
-// import './select.css'
+
 import cn from 'classnames'
 import { useToggle } from '../../../hooks/useToggle'
 import styles from './SelectWiget.module.scss'

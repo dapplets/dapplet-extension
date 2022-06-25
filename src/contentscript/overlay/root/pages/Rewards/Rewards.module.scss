@@ -39,10 +39,6 @@
   height: 100%;
 }
 
-// .blockRewards > * {
-//   direction: ltr;
-// }
-
 .customPoolBlock {
   display: flex;
 
@@ -352,7 +348,6 @@
 }
 
 .poolInput {
-  // display: inline-block;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -385,7 +380,6 @@
 .poolInputInvalidText {
   width: 100%;
 
-  // margin: 0px 0px 0px 4px;
   margin-top: 5px;
 
   text-align: right;
@@ -1010,5 +1004,5 @@
 ::-webkit-inner-spin-button {
   appearance: none;
 
-  margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+  margin: 0;
 }

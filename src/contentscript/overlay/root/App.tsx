@@ -74,21 +74,12 @@ const SYSTEM_TAB: ToolbarTab = {
       icon: Notification,
       title: 'Notifications',
     },
-    // {
-    //   id: 'connected',
-    //   icon: Account,
-    //   title: 'Connected',
-    // },
+
     {
       id: 'settings',
       icon: Settings,
       title: 'Settings',
     },
-    // {
-    //   id: 'wallet',
-    //   icon: Card,
-    //   title: 'Wallet',
-    // },
   ],
 }
 
@@ -357,7 +348,6 @@ class _App extends React.Component<P, S> {
               <div className={styles.left}>
                 <Profile
                   isMini
-                  handleWalletLengthDisconnect={this.handleWalletLengthDisconnect}
                   handleWalletLengthConnect={this.handleWalletLengthConnect}
                   isWalletLength={s.isWalletLength}
                   handleWalletConnect={this.handleWalletConnect}
@@ -405,15 +395,8 @@ class _App extends React.Component<P, S> {
               )}
 
               {pathname === '/system/notifications' && <Notifications />}
-              {/* {pathname === '/system/connected' && <ConnectedAccount />} */}
+
               {pathname === '/system/settings' && <SettingsOverlay />}
-              {/* 
-              {pathname === '/system/wallet' && (
-                <Wallet
-                  handleWalletLengthConnect={this.handleWalletLengthConnect}
-                  isOverlay={true}
-                />
-              )} */}
 
               {overlays
                 .filter((x) => !x.isSystemPopup)

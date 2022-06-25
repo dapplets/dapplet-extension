@@ -4,7 +4,6 @@ import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
-import { Bus } from '../../../../../common/bus'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
@@ -56,8 +55,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     setShowChildrenUnderConstraction,
   } = props
 
-  const bus = new Bus()
-
   const [originalMi, setOriginalMi] = useState(null)
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
   const [vi, setVi] = useState<VersionInfo>(ModuleVersion)
@@ -77,7 +74,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [trustedUsers, setTrustedUsers] = useState([])
 
   const [mode, setMode] = useState(null)
-  const [sawing, isSawing] = useState(false)
+
   const [targetStorages, setTargetStorages] = useState([
     StorageTypes.Swarm,
     StorageTypes.Sia,
@@ -97,9 +94,8 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const onClose = () => setModal(false)
   const [autorDisabled, setAuthorDisabled] = useState(false)
   const [isModalPush, setModalPush] = useState(false)
-  const onClosePush = () => setModalPush(false)
+
   const [isModalTransaction, setModalTransaction] = useState(false)
-  const onCloseTransaction = () => setModalTransaction(false)
 
   const [isNotAccountModal, setNotAccountModal] = useState(false)
 
@@ -160,7 +156,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   }
 
   const iconInputChangeHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    // const s = this.state
     const files = event.target.files
     if (files.length > 0) {
       const file = files[0]
@@ -249,37 +244,9 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     }
   }
 
-  const isNoStorage = targetStorages.length === 0
   const isNotNullCurrentAccount = !(
     !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
   )
-  const isNotWalletPaired = !isNotNullCurrentAccount && !!owner
-  const isNotAnOwner =
-    !!owner && isNotNullCurrentAccount && owner.toLowerCase() !== currentAccount.toLowerCase()
-  const isAlreadyDeployed = !message && deploymentStatus === DeploymentStatus.Deployed
-  const isNewModule = deploymentStatus === DeploymentStatus.NewModule
-  const isNotTrustedUser =
-    isNotNullCurrentAccount &&
-    !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
-  const isDependenciesExist =
-    dependenciesChecking && dependenciesChecking.length > 0
-      ? dependenciesChecking.every((x) => x.isExists === true)
-      : true
-  const isDependenciesLoading =
-    dependenciesChecking && dependenciesChecking.length > 0
-      ? dependenciesChecking.every((x) => x.isExists === undefined)
-      : false
-  const isManifestValid = mi?.name && mi?.title && mi?.type
-  const isDeployButtonDisabled =
-    loading ||
-    deploymentStatus === DeploymentStatus.Deployed ||
-    !isNotNullCurrentAccount ||
-    isNotAnOwner ||
-    isNoStorage ||
-    isDependenciesLoading ||
-    !isDependenciesExist ||
-    !isManifestValid
-  const isReuploadButtonDisabled = !isAlreadyDeployed || mode === FormMode.Creating || !vi
 
   const onChange = (e) => {
     const files = e.target.files

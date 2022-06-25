@@ -23,36 +23,26 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const { setUnderConstructionDetails, isTokenomics, setActiveTabUnderConstructionDetails } = props
   let sumQuantity = 0
   const [distributed, onDistributed] = useState(`${sumQuantity}%`)
-
   const [items, setItems] = useState({
     items: [],
   })
   const [name, setName] = useState({ name: '' })
   const [pool, setPool] = useState({ pool: '20' })
-
   const [itemsRecepientForm, setItemsRecepient] = useState({
     recepientForm: [],
   })
-
   const [recepient, setRecepient] = useState({
     userID: null,
     condition: null,
     isActive: false,
   })
-
   const [poolInputInvalid, setPoolInputInvalid] = useState(false)
   const [addRecepientDisabled, setAddRecepientDisabled] = useState(false)
-
   const [isModal, setModal] = useState(false)
-
   const [isModalChange, setModalChange] = useState(false)
-
   const [itemIndex, setItemInex] = useState(0)
-
   const [newItem, setNewItem] = useState({ newItem: [] })
-
   const [inputValueCustomPool, setDefaultValueCustomPool] = useState('')
-
   const [isCondition, setCondition] = useState(false)
   const poolNewInput = useRef<HTMLInputElement>()
   const revardUserIdInput = useRef<HTMLInputElement>()
@@ -88,21 +78,10 @@ export const Rewards: FC<RewardsProps> = (props) => {
       setUserIdDisabled(false)
     }
 
-    // if (
-    //   newRewardUserIdBlock &&
-    //   newRewardUserIdBlock.current !== null &&
-    //   !newRewardUserIdInput.current?.value
-    // ) {
-    //   setNewUserIdDisabled(true)
-    // } else {
-    //   setNewUserIdDisabled(false)
-    // }
     if (+pool.pool + Number(sumQuantity) > 100) {
       setPoolInputInvalid(true)
-      // console.log(+pool.pool + Number(sumQuantity))
     } else if (+pool.pool + Number(sumQuantity) <= 100) {
       setPoolInputInvalid(false)
-      // console.log(+pool.pool + Number(sumQuantity))
     }
 
     if (+poolNewInput.current?.value > 100 || +poolNewInput.current?.value <= 0) {
@@ -113,9 +92,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
 
     onDistributed(`${sumQuantity}%`)
 
-    // console.log(items, 'items')
-    // console.log(newItem, 'newItem')
-    // console.log(revardUserIdInput.current?.value, 'revardUserIdInput')
     if (revardUserIdInput.current?.value === undefined) {
       setUserIdDisabled(false)
     } else if (revardUserIdInput.current?.value === '') {
@@ -155,30 +131,21 @@ export const Rewards: FC<RewardsProps> = (props) => {
     newUserIdDisabled,
     newRewardUserIdBlock,
   ])
-
   const onClose = () => setModal(false)
   const onCloseChange = () => setModalChange(false)
 
   const addItem = (event) => {
     event.preventDefault()
-
     const newForm = Object.assign({}, items)
-
     const pushForm = Object.assign({}, name, pool, itemsRecepientForm)
-
     if (itemsRecepientForm.recepientForm) newForm.items.push(pushForm)
-
     setItems(newForm)
-
     itemsRecepientForm.recepientForm = []
   }
 
   const addItemEdit = (event, i) => {
     event.preventDefault()
-
     const newForm = Object.assign({}, items)
-
-    const pushForm = Object.assign({}, newItem.newItem)
     newForm.items
   }
 
@@ -186,29 +153,22 @@ export const Rewards: FC<RewardsProps> = (props) => {
     setName({ name: event.target.value })
   }
 
-  // ====
-
   const addButtonClickRecepient = () => {
     setItemsRecepient({
       recepientForm: [],
     })
     const newForm = Object.assign({}, itemsRecepientForm)
-
     const pushForm = Object.assign({}, recepient)
-
     newForm.recepientForm.push(pushForm)
     setItemsRecepient(newForm)
   }
 
   const addButtonClickRecepientEdit = (i) => {
     const pushForm = Object.assign({}, recepient)
-    console.log(pushForm)
     pushForm.condition = null
     pushForm.isActive = false
     pushForm.userID = null
-
     const newForm = newItem.newItem[i].recepientForm.push(pushForm)
-
     setItemsRecepient(newForm)
   }
 
@@ -216,69 +176,35 @@ export const Rewards: FC<RewardsProps> = (props) => {
     const newForm = Object.assign({}, itemsRecepientForm)
     newForm.recepientForm.splice(id, 1)
     setItemsRecepient(newForm)
-    // setItemsRecepient(itemsRecepientForm)
   }
   const onDeleteChildRecepientEdit = (i: number, id: number) => {
     const newForm = newItem.newItem[i].recepientForm.splice(id, 1)
     setItemsRecepient(newForm)
   }
 
-  // const addButtonClickConditional = (id: number) => {
-  //   const newForm = Object.assign({}, itemsRecepientForm)
-  //   newForm.recepientForm[id].isActive = true
-  //   setItemsRecepient(newForm)
-  // }
-
-  // const addButtonClickConditionalEdit = (id: number, i?: number) => {
-  //   const newForm = newItem.newItem[id].recepientForm
-  //   newForm[i].isActive = true
-  //   console.log(newForm, 'tr')
-
-  //   setItemsRecepient(newForm)
-  // }
-
-  // const onDeleteChildConditional = (id: number) => {
-  //   const newForm = Object.assign({}, itemsRecepientForm)
-  //   newForm.recepientForm[id].isActive = false
-  //   setItemsRecepient(newForm)
-  // }
-
-  // const onDeleteChildConditionalEdit = (id: number, i?: number) => {
-  //   const newForm = newItem.newItem[id].recepientForm
-  //   newForm[i].isActive = false
-  //   console.log(newForm, 'fl')
-  //   setItemsRecepient(newForm)
-  // }
-
   const handleChangeRecepient = (event) => {
     setRecepient({ ...recepient, userID: event.target.value })
   }
 
-  // ===
   const onDeleteChildItems = (id: number) => {
     const newCustomPoolForm = Object.assign({}, items)
     newCustomPoolForm.items.splice(id, 1)
     setName({ name: '' })
     setPool({ pool: '20' })
-
     setRecepient({ userID: null, condition: null, isActive: false })
-
     setItems(newCustomPoolForm)
   }
-  // console.log(items)
 
   return (
     <div className={styles.wrapper}>
       {isTokenomics ? (
         <div className={styles.blockRewards}>
-          {/* {newCustomPool.customPoolForm.map((x, i) => ( */}
           <div className={styles.customPoolBlock}>
             <div className={styles.customPool}>
               <div className={styles.customPoolLabel}>Pool</div>
               <div className={styles.blockNewCustomPool}>
                 <input
                   className={styles.inputNewCustomPool}
-                  // value={}
                   onChange={(e) => {
                     setDefaultValueCustomPool(e.target.value)
                   }}
@@ -307,8 +233,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
               </button>
             )}
           </div>
-          {/* ))} */}
-
           <div className={styles.wrapperChanges}>
             {items.items &&
               items.items.map((item, index) => (
@@ -321,7 +245,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         {item.recepientForm &&
                           item.recepientForm.map((x, i) => (
                             <>
-                              {/* {x !== null ? ( */}
                               <div key={i} className={styles.createdRewardsBlock}>
                                 <div className={styles.createdRewardsBlockUser}>
                                   <span className={styles.createdRewardsBlockLabel}>User:</span>
@@ -340,7 +263,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                   </div>
                                 )}
                               </div>
-                              {/* ) : null} */}
                             </>
                           ))}
                       </>
@@ -353,7 +275,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                       const newItemForm = Object.assign({}, item)
                       setNewItem({ newItem: [newItemForm] })
                       setModalChange(true)
-                      // setOldItem({ oldItem: [item] })
                     }}
                     className={styles.changeReward}
                   >
@@ -373,7 +294,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
               <button className={styles.pushChanges}>Push changes</button>
             )}
           </div>
-
           {items && items.items && items.items.length === 0 && (
             <Message
               title="No rewards yet"
@@ -391,7 +311,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
               }
             />
           )}
-
           <ModalReward
             visible={isModal}
             title={'Reward creation'}
@@ -423,7 +342,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                             setPoolInputInvalid(true)
                           } else {
                             setPoolInputInvalid(false)
-
                             setPool({ pool: e.target.value })
                           }
                         }}
@@ -433,13 +351,8 @@ export const Rewards: FC<RewardsProps> = (props) => {
                             setPoolInputInvalid(false)
                           }
                           if (+e.target.value <= 0 || +e.target.value > 100) {
-                            // setPool({ pool: '20' })
                             setPoolInputInvalid(true)
-                            console.log(poolInputInvalid)
                           }
-
-                          // }
-                          console.log(poolInputInvalid)
                         }}
                         className={cn(styles.poolInput, {
                           [styles.poolInputInvalid]: poolInputInvalid,
@@ -457,12 +370,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         type="button"
                         disabled={userIdDisabled}
                         onClick={() => {
-                          // console.log(
-                          //   itemsRecepientForm,
-                          //   ' itemsRecepientForm before onDeleteChildRecepient'
-                          // )
                           addButtonClickRecepient()
-                          // console.log(revardUserIdInput.current?.value, 'rui')
                         }}
                         className={styles.customPoolButton}
                       />
@@ -490,7 +398,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                               className={styles.recepientInputButton}
                             />
                           </div>
-
                           <div className={styles.recepientConditionalBlock}>
                             {!isCondition && (
                               <div className={styles.recepientChangeBlock}>
@@ -506,7 +413,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                 </span>
                               </div>
                             )}
-
                             {isCondition && (
                               <div className={cn(styles.conditionalWrapper, {})}>
                                 <span className={styles.conditionalLabel}>
@@ -525,7 +431,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                       type="button"
                                       onClick={(e) => {
                                         itemsRecepientForm.recepientForm[i].condition = null
-
                                         setCondition(false)
                                       }}
                                       className={styles.inputConditionalDelete}
@@ -603,13 +508,11 @@ export const Rewards: FC<RewardsProps> = (props) => {
           }
         />
       )}
-
       <div className={styles.linkNavigation}>
         <button onClick={() => setUnderConstructionDetails(false)} className={styles.back}>
           Back
         </button>
       </div>
-
       <>
         {newItem &&
           newItem.newItem &&
@@ -643,13 +546,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         className={styles.nameInput}
                       />
                     </div>
-                    <div
-                      className={styles.rewardPoolBlock}
-                      onClick={() => {
-                        console.log(i)
-                        console.log(itemIndex)
-                      }}
-                    >
+                    <div className={styles.rewardPoolBlock}>
                       <span className={styles.nameLabel}>% of Pool</span>
                       <input
                         name="pool"
@@ -657,7 +554,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                         min="1"
                         max="100"
                         defaultValue={newItem.newItem[i].pool}
-                        // value={poolNewInput.current?.value}
                         ref={poolNewInput}
                         onBlur={() => {
                           if (+newItem.newItem[i].pool <= 0 || +newItem.newItem[i].pool > 100) {
@@ -666,7 +562,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                             newItem.newItem[i].pool = newItem.newItem[i].pool
                           }
                         }}
-                        // tabIndex={0}
                         onFocus={(e) => {
                           if (+e.target.value <= 0 || +e.target.value > 100) {
                             setPoolInputInvalid(true)
@@ -681,7 +576,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                             setPoolInputInvalid(true)
                           } else {
                             setPoolInputInvalid(false)
-
                             newItem.newItem[i].pool = e.target.value
                           }
                         }}
@@ -730,13 +624,12 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                 newItem.newItem[i].recepientForm[item].userID = e.target.value
                               }}
                             />
-                            {/* {newItem.newItem[i].recepientForm.lendth <= 1 ? ( */}
+
                             <button
                               type="button"
                               onClick={() => onDeleteChildRecepientEdit(i, item)}
                               className={styles.recepientInputButton}
                             />
-                            {/* ) : null} */}
                           </div>
 
                           <div className={styles.recepientConditionalBlock}>
@@ -745,7 +638,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                 <button
                                   type="button"
                                   onClick={(e) => {
-                                    // addButtonClickConditionalEdit(i, item)
                                     setCondition(true)
                                   }}
                                   className={styles.recepientConditionalButton}
@@ -757,10 +649,7 @@ export const Rewards: FC<RewardsProps> = (props) => {
                             )}
 
                             {isCondition && (
-                              <div
-                                // key={item}
-                                className={cn(styles.conditionalWrapper, {})}
-                              >
+                              <div className={cn(styles.conditionalWrapper, {})}>
                                 <span className={styles.conditionalLabel}>
                                   condition: this dapplet is dependent on
                                 </span>
@@ -779,7 +668,6 @@ export const Rewards: FC<RewardsProps> = (props) => {
                                       type="button"
                                       onClick={(e) => {
                                         newItem.newItem[i].recepientForm[item].condition = null
-                                        // onDeleteChildConditionalEdit(i, item)
                                         setCondition(false)
                                       }}
                                       className={styles.inputConditionalDelete}
@@ -798,43 +686,23 @@ export const Rewards: FC<RewardsProps> = (props) => {
                 <button
                   disabled={
                     !(
-                      (
-                        newItem.newItem[i].name &&
-                        newItem.newItem[i].name.length >= 1 &&
-                        // newItem.newItem[i].pool &&
-                        // +newItem.newItem[i].pool.length >= 1 &&
-                        // Number(
-                        //   newItem.newItem[i].pool +
-                        //     sumQuantity -
-                        //     items.items[itemIndex].pool
-                        // ) <= 100 &&
-                        !poolInputInvalid &&
-                        newItem.newItem[i].recepientForm &&
-                        !newUserIdDisabled
-                      )
-                      // newItem.newItem[i].recepientForm.lendth >= 1
+                      newItem.newItem[i].name &&
+                      newItem.newItem[i].name.length >= 1 &&
+                      !poolInputInvalid &&
+                      newItem.newItem[i].recepientForm &&
+                      !newUserIdDisabled
                     )
                   }
                   onClick={(e) => {
-                    // items.items[i] = newItem.newItem[i]
                     addItemEdit(e, i)
-
                     onCloseChange()
                   }}
                   className={cn(styles.applyButtonDisabled, {
                     [styles.applyButton]:
                       newItem.newItem[i].name &&
                       newItem.newItem[i].name.length >= 1 &&
-                      // newItem.newItem[i].pool &&
-                      // +newItem.newItem[i].pool.length >= 1 &&
-                      // Number(
-                      //   newItem.newItem[i].pool +
-                      //     sumQuantity -
-                      //     items.items[itemIndex].pool
-                      // ) <= 100 &&
                       newItem.newItem[i].recepientForm &&
                       !newUserIdDisabled,
-                    // newItem.newItem[i].recepientForm.lendth >= 1,
                   })}
                 >
                   Edit

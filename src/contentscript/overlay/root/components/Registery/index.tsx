@@ -46,22 +46,6 @@ export const Registry: FC<RegisteryProps> = (props) => {
             })}
           ></span>
         </div>
-        {/* <label
-          onClick={() => {
-            setShowChildrenRegistery(!isShowChildrenRegistery)
-          }}
-          className={styles.labelLocalhost}
-        >
-          {label}
-        </label>
-        <span
-          onClick={() => {
-            setShowChildrenRegistery(!isShowChildrenRegistery)
-          }}
-          className={cn(styles.spanLabel, {
-            [styles.isShowDescriptionLabel]: isShowChildrenRegistery,
-          })}
-        ></span> */}
       </div>
       {isShowChildrenRegistery && children}
     </div>

@@ -66,9 +66,7 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (props: Dropdow
                 key={id}
                 onClick={() => {
                   selectPreferedOverlayStorage(id, setOpen)
-                  // setOpen(false)
                 }}
-                // tabIndex={2}
               >
                 {text}
               </div>
