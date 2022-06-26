@@ -55,10 +55,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [dynamicAdapterInputEdited, setDynamicAdapterInputEdited] = useState(false)
   const [dynamicAdapterLoading, setDynamicAdapterLoading] = useState(false)
 
-  const [registryInput, setRegistryInput] = useState('')
-  const [registryInputError, setRegistryInputError] = useState(null)
-  const [registries, setRegistries] = useState([])
-
   const [userAgentNameInput, setUserAgentNameInput] = useState('')
   const [userAgentId, setUserAgentID] = useState('')
   const [userAgentNameInputError, setUserAgentNameInputError] = useState(null)
@@ -115,17 +111,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const getValidUserAgentName = (value, reg) => {
     try {
-      const numEl = value.match(reg)
+      const valueReg = value.match(reg)
 
-      return numEl
+      return valueReg
     } catch {}
   }
 
-  const loadDevMode = async () => {
-    const { getDevMode } = await initBGFunctions(browser)
-    const devMode = await getDevMode()
-    setDevMode(devMode)
-  }
   const loadErrorReporting = async () => {
     const { getErrorReporting } = await initBGFunctions(browser)
     const errorReporting = await getErrorReporting()
@@ -474,7 +465,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                       onSubmit={(e) => {
                         e.preventDefault()
 
-                        // !(userAgentNameLoading || !userAgentNameEdited) &&
                         setUserAgentName(userAgentNameInput)
                         onPress(e, inputOfFocusAgentName)
                       }}
@@ -521,24 +511,19 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
                         [styles.errorInputDefault]: dynamicAdapterInputError,
-                        //  ||
-                        // !parseModuleName(dynamicAdapterInput),
                       })}
                     >
                       <form
                         style={{ width: '100%' }}
                         onBlur={() => {
                           setDynamicAdapterInputError(null)
-                          // getDefaultValueDynamicAdapter(dynamicAdapterInput)
+
                           if (
                             parseModuleName(dynamicAdapterInput).branch === null ||
                             parseModuleName(dynamicAdapterInput).name === null ||
                             parseModuleName(dynamicAdapterInput).version === null
                           ) {
                             getDefaultValueDynamicAdapter(dynamicAdapterInput)
-                            // setTimeout(() => {
-                            //   setDynamicAdapterInputError(null)
-                            // }, 3000)
                           }
                           if (dynamicAdapterInput.length === 0) {
                             getDefaultValueDynamicAdapter(dynamicAdapterInput)
@@ -549,8 +534,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
                           setDynamicAdapter(dynamicAdapterInput)
                           if (
-                            // parseModuleName(dynamicAdapterInput).branch !==
-                            //   null &&
                             parseModuleName(dynamicAdapterInput).name !== null &&
                             parseModuleName(dynamicAdapterInput).version !== null
                           ) {
@@ -578,7 +561,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                           }}
                           ref={inputOfFocusAdapter}
                           onChange={(e) => {
-                            // e.preventDefault()
                             setDynamicAdapterInput(e.target.value)
                             setDynamicAdapterInputError(null)
                             setDynamicAdapterInputEdited(true)
@@ -770,18 +752,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   <>
                     <div
                       className={cn(styles.formDefault, styles.formAbsolute, {
-                        [styles.errorInputDefault]:
-                          // (
-                          swarmPostageStampIdInputError,
-                        //  &&
-                        // !isValidPostageStampId(swarmPostageStampIdInput)) ||
-                        // swarmPostageStampIdInputError,
+                        [styles.errorInputDefault]: swarmPostageStampIdInputError,
                       })}
                     >
                       <form
                         style={{ width: '100%' }}
                         onBlur={() => {
-                          // setSwarmPostageStampIdInputError(null)
                           if (!isValidPostageStampId(swarmPostageStampIdInput)) {
                             getDefaultValueSwarmPostageStampId(swarmPostageStampIdInput)
                             setSwarmPostageStampIdInputError(null)
@@ -806,7 +782,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                               setSwarmPostageStampIdInputError(null)
                             }, 3000)
                           }
-                          // onPress(e, inputOfFocusSwarmId)
                         }}
                       >
                         <input

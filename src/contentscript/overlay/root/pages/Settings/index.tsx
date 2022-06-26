@@ -77,9 +77,6 @@ export const SettingsOverlay = () => {
     const { setDevMode } = await initBGFunctions(browser)
     await setDevMode(isActive)
     loadDevMode()
-
-    // TODO: ???
-    // await this.props.updateTabs()
   }
   const loadErrorReporting = async () => {
     setSvgErrorReporting(true)
@@ -136,17 +133,12 @@ export const SettingsOverlay = () => {
 
             {activeTab === SettingsTabs.DEVELOPER && (
               <Developer
-                isShowChildrenUnderConstraction={isShowChildrenUnderConstraction}
-                setShowChildrenUnderConstraction={setShowChildrenUnderConstraction}
                 isShowChildrenRegistery={isShowChildrenRegistery}
                 setShowChildrenRegistery={setShowChildrenRegistery}
                 setModuleVersion={setModuleVersion}
                 setModuleInfo={setModuleInfo}
-                isDappletsDetails={isDappletsDetails}
                 setDappletsDetail={setDappletsDetail}
-                isUnderConstruction={isUnderConstruction}
                 setUnderConstruction={setUnderConstruction}
-                isUnderConstructionDetails={isUnderConstructionDetails}
                 setUnderConstructionDetails={setUnderConstructionDetails}
               />
             )}

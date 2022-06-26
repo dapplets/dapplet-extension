@@ -13,28 +13,22 @@ import styles from './Developer.module.scss'
 
 let _isMounted = true
 export interface DeveloperProps {
-  isDappletsDetails: any
   setDappletsDetail: (x) => void
   setModuleInfo: any
   setModuleVersion: any
-  isUnderConstruction: boolean
   setUnderConstruction: (x) => void
-  isUnderConstructionDetails: boolean
   setUnderConstructionDetails: (x) => void
-  isShowChildrenUnderConstraction: boolean
-  setShowChildrenUnderConstraction: (x) => void
   isShowChildrenRegistery: boolean
   setShowChildrenRegistery: (x) => void
 }
 export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
-  const [isLoading, onLoading] = useState(true)
   const [registries, setRegistries] = useState([])
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
   const [intro, setIntro] = useState({ popupDeveloperWelcome: false })
   const [modules, setModules] = useState([])
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
-  const [dataUri, setDataUri] = useState(null)
+
   const [isLoadButton, setLoadButton] = useState(false)
   const [isLocalhost, setLocalhost] = useState(true)
   const [isLoadButtonLocalhost, setLoadButtonLocalhost] = useState(false)
@@ -42,16 +36,11 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [isUpdate, setUpdate] = useState(false)
 
   const {
-    isDappletsDetails,
     setDappletsDetail,
     setModuleInfo,
     setModuleVersion,
-    isUnderConstruction,
     setUnderConstruction,
-    isUnderConstructionDetails,
     setUnderConstructionDetails,
-    isShowChildrenUnderConstraction,
-    setShowChildrenUnderConstraction,
     isShowChildrenRegistery,
     setShowChildrenRegistery,
   } = props
@@ -94,37 +83,24 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     setSwarmGatewayUrl(swarmGatewayUrl)
   }
   const loadRegistries = async () => {
-    // setLoadButton(true)
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
-
     const modules: {
       module: ModuleInfo
       versions: VersionInfo[]
       isDeployed: boolean[]
     }[] = await getAllDevModules()
     setModules(modules)
-
     const registries = await getRegistries()
-    // onLoading(false)
     setRegistries(registries.filter((r) => r.isDev === true))
-    // setLoadButton(false)
   }
 
   const loadIntro = async () => {
-    // setLoadButton(true)
     const { getIntro } = await initBGFunctions(browser)
     const intro = await getIntro()
     setIntro(intro)
-    // setLoadButton(false)
   }
 
-  const closeWelcomeIntro = async () => {
-    const { setIntro } = await initBGFunctions(browser)
-    setIntro({ popupDeveloperWelcome: false })
-    await setIntro({ popupDeveloperWelcome: false })
-  }
-
-  const addRegistry = async (url: string, x: () => void) => {
+  const addRegistry = async (url: string, newFunction: () => void) => {
     setLoadAdd(true)
     setLoadButton(true)
     const { addRegistry } = await initBGFunctions(browser)
@@ -138,7 +114,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       setTimeout(() => setRegistryInputError(''), 2000)
     }
 
-    x()
+    newFunction()
     setLoadButton(false)
     setTimeout(() => setLoadAdd(false), 1500)
   }
@@ -157,34 +133,22 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     // window.close()
   }
   const enableRegistry = async (url: string) => {
-    // onLoading(true)
-
     setLoadButtonLocalhost(true)
     const { enableRegistry } = await initBGFunctions(browser)
     await enableRegistry(url)
-
     loadRegistries()
     setTimeout(() => setLoadButtonLocalhost(false), 1500)
   }
 
   const disableRegistry = async (url: string) => {
-    // onLoading(true)
-
     setLoadButtonLocalhost(true)
     const { disableRegistry } = await initBGFunctions(browser)
     await disableRegistry(url)
-
     loadRegistries()
     setTimeout(() => setLoadButtonLocalhost(false), 1500)
   }
 
-  // const onCreateModuleHandler = async () => {
-  //   const { openDeployOverlay } = await initBGFunctions(browser)
-  //   await openDeployOverlay(null, null)
-  //   // window.close()
-  // }
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
-  // const groupedModules2 = groupBy(modules, (x) => x.module.isUnderConstruction)
 
   const handleClear = () => {
     setRegistryInput('')
@@ -238,8 +202,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
         </div>
         <div className={styles.host}>
           {isLoadButton ? (
-            // &&
-            // !isLoadButtonLocalhost
             <div className={styles.miniLoader}></div>
           ) : (
             registries.map((r, i) => (
@@ -252,11 +214,9 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                   closeHost={() => removeRegistry(r.url)}
                   isLoadButtonLocalhost={isLoadButtonLocalhost}
                   onClickButtonLocalhost={() => {
-                    // setLoadButtonLocalhost(true)
                     ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
                       (r.isEnabled && r.error && disableRegistry(r.url)) ||
                       (r.isEnabled && !r.error && disableRegistry(r.url))
-                    // setLoadButtonLocalhost(false)
                   }}
                   children={
                     <div className={styles.modules}>
@@ -283,7 +243,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
               </div>
             ))
           )}
-
           <div className={styles.host}>
             {modules.length > 0 &&
               Object.entries(groupedModules).map(([registryUrl, modules]) => (
