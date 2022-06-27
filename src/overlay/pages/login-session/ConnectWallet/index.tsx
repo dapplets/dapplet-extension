@@ -16,6 +16,11 @@ export const ConnectWallet: FC<Props> = (p: Props) => {
         <h3 className={base.subtitle}>select connection type</h3>
         <ul className={styles.list}>
           {p.wallets.map(({ id, label, icon }) => {
+            // console.log(id)
+            // console.log(label)
+            if (label === 'WalletConnect') {
+              return
+            }
             return (
               <li
                 key={id}

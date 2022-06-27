@@ -3,9 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
 import { DappletsMainInfo } from '../DappletsInfo'
-import { Rewards } from '../Rewards'
-import { Tokenimics } from '../Tokenomics'
-import { UnderConstruction } from '../UnderConstruction'
 import { UnderConstructionInfo } from '../UnderConstructionInfo'
 import { Developer } from './Developer'
 import { SettingsList } from './Settings'
@@ -22,8 +19,8 @@ enum DappletsDetails {
 
 enum UnderConstructionDetails {
   INFO = 0,
-  TOKENOMICS = 1,
-  REWARDS = 2,
+  // TOKENOMICS = 1,
+  // REWARDS = 2,
 }
 
 export const NAVIGATION_LIST = [
@@ -166,7 +163,7 @@ export const SettingsOverlay = () => {
           </div>
         </div>
       )}
-      {isUnderConstruction && !isDappletsDetails && !isUnderConstructionDetails && (
+      {/* {isUnderConstruction && !isDappletsDetails && !isUnderConstructionDetails && (
         <div className={styles.wrapper}>
           <div className={styles.settingMain}>
             <UnderConstruction
@@ -177,7 +174,7 @@ export const SettingsOverlay = () => {
             />
           </div>
         </div>
-      )}
+      )} */}
 
       {!isUnderConstruction && !isDappletsDetails && isUnderConstructionDetails && (
         <div className={styles.wrapper}>
@@ -187,7 +184,7 @@ export const SettingsOverlay = () => {
               onClick={() => setActiveTabUnderConstructionDetails(UnderConstructionDetails.INFO)}
               isActive={activeTabUnderConstructionDetails === UnderConstructionDetails.INFO}
             />
-            <SettingTitle
+            {/* <SettingTitle
               title="Tokenomics"
               onClick={() =>
                 setActiveTabUnderConstructionDetails(UnderConstructionDetails.TOKENOMICS)
@@ -198,7 +195,7 @@ export const SettingsOverlay = () => {
               title="Rewards"
               onClick={() => setActiveTabUnderConstructionDetails(UnderConstructionDetails.REWARDS)}
               isActive={activeTabUnderConstructionDetails === UnderConstructionDetails.REWARDS}
-            />
+            /> */}
           </div>
           <div className={styles.settingMain}>
             {activeTabUnderConstructionDetails === UnderConstructionDetails.INFO && (
@@ -211,7 +208,7 @@ export const SettingsOverlay = () => {
                 />
               </div>
             )}
-            {activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS && (
+            {/* {activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS && (
               <Tokenimics
                 setUnderConstructionDetails={setUnderConstructionDetails}
                 setTokenomics={setTokenomics}
@@ -223,7 +220,7 @@ export const SettingsOverlay = () => {
                 isTokenomics={isTokenomics}
                 setActiveTabUnderConstructionDetails={setActiveTabUnderConstructionDetails}
               />
-            )}
+            )} */}
           </div>
         </div>
       )}

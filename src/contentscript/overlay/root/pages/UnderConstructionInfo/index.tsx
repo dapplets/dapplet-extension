@@ -360,12 +360,12 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
                   />
                 }
               />
-              <SettingItem
+              {/* <SettingItem
                 title="Full description"
                 component={<></>}
                 className={styles.item}
                 children={<textarea className={styles.fullDescription} />}
-              />
+              /> */}
 
               <div className={styles.iconBlock}>
                 <div className={styles.imgBlock}>
@@ -399,7 +399,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
             </div>
           }
         />
-        <SettingWrapper
+        {/* <SettingWrapper
           title="Team"
           className={styles.wrapperSettings}
           children={
@@ -438,7 +438,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
               </div>
             </div>
           }
-        />
+        /> */}
         <SettingWrapper
           title="Parameters"
           className={styles.wrapperSettings}

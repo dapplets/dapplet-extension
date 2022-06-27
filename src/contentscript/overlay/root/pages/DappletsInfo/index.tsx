@@ -338,12 +338,12 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                   />
                 }
               />
-              <SettingItem
+              {/* <SettingItem
                 title="Full description"
                 component={<></>}
                 className={styles.item}
                 children={<textarea className={styles.fullDescription} />}
-              />
+              /> */}
 
               <div className={styles.iconBlock}>
                 <div className={styles.imgBlock}>
@@ -425,7 +425,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                   </div>
                 }
               />
-              <div className={styles.wrapperAdmins}>
+              {/* <div className={styles.wrapperAdmins}>
                 <div className={styles.blockAdmins}>
                   <h3 className={styles.adminsTitle}>Admins</h3>
                   <button
@@ -454,7 +454,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                     <button onClick={() => onDeleteChild(i)} className={styles.authorDelete} />
                   </div>
                 ))}
-              </div>
+              </div> */}
             </div>
           }
         />

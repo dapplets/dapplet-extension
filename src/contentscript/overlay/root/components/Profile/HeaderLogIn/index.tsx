@@ -200,7 +200,12 @@ export const Modal = ({
           {wallets &&
             wallets.map((x, i) => (
               <div key={i} className={styles.newProfileBlock}>
-                <div className={styles.newProfileBlockInfo}>
+                <div
+                  onClick={() => {
+                    console.log(wallets)
+                  }}
+                  className={styles.newProfileBlockInfo}
+                >
                   {x.account ? (
                     <img src={makeBlockie(x.account)} className={styles.newProfileBlockImg} />
                   ) : null}
@@ -254,21 +259,21 @@ export const Modal = ({
             <div
               className={styles.addWallet}
               onClick={() => {
-                wallets.length > 5 ? null : connectWallet()
+                wallets.length >= 4 ? null : connectWallet()
               }}
             >
               <span
                 data-title={
-                  wallets.length > 5
+                  wallets.length >= 4
                     ? 'All of your wallets are already connected Disconnect one of them to add a new one'
                     : null
                 }
                 className={cn(styles.AddUserLabel, {
-                  [styles.addWalletsDisabled]: wallets.length > 5,
+                  [styles.addWalletsDisabled]: wallets.length >= 4,
                 })}
               >
                 Add Wallet
-                {wallets.length > 5 ? (
+                {wallets.length >= 4 ? (
                   <span className={styles.copied}>
                     All of your wallets are already connected Disconnect one of them to add a new
                     one
