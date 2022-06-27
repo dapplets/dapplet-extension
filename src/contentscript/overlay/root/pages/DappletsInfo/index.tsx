@@ -174,10 +174,10 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     } finally {
     }
   }
-
-  const isNotNullCurrentAccount = !(
-    !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
-  )
+  // const isNotNullCurrentAccount = !(
+  //   !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
+  // )
+  let isNotNullCurrentAccount = true
 
   const onChange = (e) => {
     const files = e.target.files
@@ -251,6 +251,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     <div className={styles.wrapper}>
       {message ? (
         <Modal
+          classNameWrapper={styles.messageModalDefault}
           visible={isModal}
           title={message.header}
           content={
@@ -274,6 +275,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       {!isNotNullCurrentAccount ? (
         owner ? (
           <Modal
+            classNameWrapper={styles.messageModalDefault}
             visible={isNotAccountModal}
             title={'The wrong wallet'}
             content={
@@ -289,6 +291,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
           />
         ) : (
           <Modal
+            classNameWrapper={styles.messageModalDefault}
             visible={isNotAccountModal}
             classNameContent={styles.modalContentOwnership}
             title={'Wallet is not connected'}

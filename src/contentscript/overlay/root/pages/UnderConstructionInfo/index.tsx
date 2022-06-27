@@ -244,9 +244,10 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     }
   }
 
-  const isNotNullCurrentAccount = !(
-    !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
-  )
+  // const isNotNullCurrentAccount = !(
+  //   !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
+  // )
+  let isNotNullCurrentAccount = true
 
   const onChange = (e) => {
     const files = e.target.files
@@ -266,7 +267,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     <div className={styles.wrapper}>
       {message ? (
         <Modal
-          classNameWrapper=""
+          classNameWrapper={styles.messageModalDefault}
           visible={isModal}
           title={message.header}
           content={
@@ -290,7 +291,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       {!isNotNullCurrentAccount && !loading ? (
         owner ? (
           <Modal
-            classNameWrapper=""
+            classNameWrapper={styles.messageModalDefault}
             visible={isNotAccountModal}
             title={'The wrong wallet'}
             content={
@@ -306,7 +307,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
           />
         ) : (
           <Modal
-            classNameWrapper=""
+            classNameWrapper={styles.messageModalDefault}
             visible={isNotAccountModal}
             title={'Wallet is not connected'}
             content={
