@@ -274,7 +274,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const _getSortedDapplets = (dapplets) => {
     if (dropdownListValue === 'All') return dapplets
 
-    if (dropdownListValue === 'Extension') {
+    if (dropdownListValue === 'Local') {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.isMyDapplet === true) return find(x.author)
@@ -297,6 +297,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const filteredDapplets = useMemo(() => {
     return _getSortedDapplets(_getFilteredDapplets(dapplets))
   }, [search, dapplets, dropdownListValue])
+  console.log(filteredDapplets)
 
   return (
     <>
