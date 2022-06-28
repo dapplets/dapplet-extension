@@ -1,6 +1,5 @@
 import cn from 'classnames'
-import React, { DetailedHTMLProps, FC, HTMLAttributes } from 'react'
-import { useToggle } from '../../hooks/useToggle'
+import React, { DetailedHTMLProps, FC, HTMLAttributes, useState } from 'react'
 import { IDropdown } from '../../models/dropdown.model'
 import styles from './Dropdown.module.scss'
 
@@ -16,7 +15,7 @@ export interface DropdownProps
 }
 
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
-  const [isOpen, setOpen] = useToggle(false)
+  const [isOpen, setOpen] = useState(false)
   const {
     list,
     className,
@@ -30,13 +29,17 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
   const onChange = (value: IDropdown) => (): void => handlerChangeValue && handlerChangeValue(value)
 
   return (
-    <div className={cn({ [styles.isTitle]: title })} {...anotherProps} onClick={setOpen}>
+    <div
+      className={cn({ [styles.isTitle]: title })}
+      {...anotherProps}
+      onClick={() => setOpen(!isOpen)}
+    >
       {title && <p className={styles.title}>{title}</p>}
 
       <div
         tabIndex={0}
         onBlur={() => {
-          setOpen()
+          setOpen(false)
         }}
         className={cn(styles.dropdownBlock, { [styles.isOpen]: isOpen })}
       >
