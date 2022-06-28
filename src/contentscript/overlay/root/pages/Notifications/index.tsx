@@ -1,7 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { Event } from '../../../../../common/models/event'
 import { CloseIcon } from '../../components/CloseIcon'
@@ -11,22 +11,22 @@ import styles from './Notifications.module.scss'
 
 TimeAgo.addLocale(en)
 
-let _isMounted = false
-
 export const Notifications = () => {
   const [event, setEvent] = useState([])
   const [load, setLoad] = useState(true)
+  const _isMounted = useRef(true)
 
   useEffect(() => {
-    _isMounted = true
-
     const init = async () => {
-      await getNotifications()
+      const notifications = await getNotifications()
+      if (_isMounted.current) {
+        setEvent(notifications)
+        setLoad(false)
+      }
     }
     init()
-
     return () => {
-      _isMounted = false
+      _isMounted.current = false
     }
   }, [event, load])
 
@@ -34,10 +34,8 @@ export const Notifications = () => {
     const backgroundFunctions = await initBGFunctions(browser)
     const { getEvents, setRead } = backgroundFunctions
 
-    const events: Event[] = await getEvents()
-
-    setEvent(events)
-    setLoad(false)
+    const notifications: Event[] = await getEvents()
+    return notifications
   }
 
   const onRemoveEvent = async (f) => {
