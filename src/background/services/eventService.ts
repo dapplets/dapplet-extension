@@ -9,7 +9,8 @@ _updateBadge()
 
 export async function getEvents(): Promise<Event[]> {
   const eventBrowserStorage = new EventBrowserStorage()
-  const events: Event[] = await eventBrowserStorage.getAll()
+  // const events: Event[] = await eventBrowserStorage.getAll()
+  const events: Event[] = [] // !!! ToDo: change it !!!
   // DESC by Created Date
   return events.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
 }
@@ -61,9 +62,9 @@ export async function getNewEventsCount(): Promise<number> {
 }
 
 async function _updateBadge() {
-  const count = await getNewEventsCount()
+  const count = 0 // await getNewEventsCount()  !!!! ToDo ACHTUNG !!!!
   browser.browserAction.setBadgeText({
-    text: count === 0 ? '' : count.toString(),
+    text: '', // count === 0 ? '' : count.toString(),  !!!! ToDo ACHTUNG !!!!
   })
   browser.browserAction.setBadgeBackgroundColor({ color: '#2185d0' })
 }

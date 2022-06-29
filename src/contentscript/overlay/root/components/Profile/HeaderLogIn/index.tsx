@@ -13,7 +13,6 @@ import styles from './HeaderLogIn.module.scss'
 
 import makeBlockie from 'ethereum-blockies-base64'
 import { browser } from 'webextension-polyfill-ts'
-import { mergeSameWallets } from '../../../../../../common/helpers'
 import * as walletIcons from '../../../../../../common/resources/wallets'
 import { ReactComponent as Card } from '../../../assets/svg/card.svg'
 import useCopied from '../../../hooks/useCopyed'
@@ -34,11 +33,11 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const { isMini, setOpen, isOpen, newProfile, isOverlay } = props
 
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
-  const connectedDescriptors = mergeSameWallets(descriptors.filter((x) => x.connected))
+  const connectedDescriptors = descriptors.filter((x) => x.connected)
   const [isModal, setModal] = useState(false)
   const [isModalWallet, setModalWallet] = useState(false)
   const onCloseModalWallet = () => setModalWallet(false)
-  const isEveryWalletConnected = descriptors.filter((x) => !x.connected).length === 0
+  // const isEveryWalletConnected = descriptors.filter((x) => !x.connected).length === 0
 
   useEffect(() => {
     _isMounted = true
@@ -111,7 +110,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         disconnectButtonClick={disconnectButtonClick}
         wallets={connectedDescriptors}
         onClose={setOpen}
-        connectWallet={isEveryWalletConnected ? null : connectWallet}
+        connectWallet={connectWallet} // isEveryWalletConnected ? null : connectWallet
       />
       <ModalWallet
         visible={isModalWallet}
@@ -259,21 +258,21 @@ export const Modal = ({
             <div
               className={styles.addWallet}
               onClick={() => {
-                wallets.length >= 4 ? null : connectWallet()
+                wallets.length >= 5 ? null : connectWallet()
               }}
             >
               <span
                 data-title={
-                  wallets.length >= 4
+                  wallets.length >= 5
                     ? 'All of your wallets are already connected Disconnect one of them to add a new one'
                     : null
                 }
                 className={cn(styles.AddUserLabel, {
-                  [styles.addWalletsDisabled]: wallets.length >= 4,
+                  [styles.addWalletsDisabled]: wallets.length >= 5,
                 })}
               >
                 Add Wallet
-                {wallets.length >= 4 ? (
+                {wallets.length >= 5 ? (
                   <span className={styles.copied}>
                     All of your wallets are already connected Disconnect one of them to add a new
                     one

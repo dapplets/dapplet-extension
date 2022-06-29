@@ -4,7 +4,6 @@ import { Navigate } from 'react-router-dom'
 import { browser } from 'webextension-polyfill-ts'
 // import * as logos from '../../../common/resources/wallets';
 import { Bus } from '../../../common/bus'
-import { mergeSameWallets } from '../../../common/helpers'
 import { ChainTypes, LoginRequest, WalletDescriptor, WalletTypes } from '../../../common/types'
 import DappletsLogo from '../../assests/dapplets.svg'
 import MetaMaskLogo from '../../assests/metamask.svg'
@@ -57,16 +56,14 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
     //     .filter(x => x.connected)
     //     .filter(x => p.chains.length > 0 ? p.chains.includes(x.chain) : true);
 
-    const disconnectedWallets = mergeSameWallets(
-      descriptors
-        .filter((x) => !x.connected)
-        .filter((x) => (p.chains.length > 0 ? p.chains.includes(x.chain) : true))
-        .filter((x) =>
-          secureLogin === 'required'
-            ? x.chain === ChainTypes.ETHEREUM_GOERLI || x.chain === ChainTypes.ETHEREUM_XDAI
-            : true
-        )
-    )
+    const disconnectedWallets = descriptors
+      .filter((x) => !x.connected)
+      .filter((x) => (p.chains.length > 0 ? p.chains.includes(x.chain) : true))
+      .filter((x) =>
+        secureLogin === 'required'
+          ? x.chain === ChainTypes.ETHEREUM_GOERLI || x.chain === ChainTypes.ETHEREUM_XDAI
+          : true
+      )
 
     const wallets = disconnectedWallets.map((x) => this.getMeta(x.type, x.chain))
 

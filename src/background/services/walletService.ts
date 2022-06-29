@@ -1,5 +1,6 @@
 import { providers, Signer, utils } from 'ethers'
 import * as EventBus from '../../common/global-event-bus'
+import { mergeSameWallets } from '../../common/helpers'
 import {
   ChainTypes,
   DefaultSigners,
@@ -70,7 +71,7 @@ export class WalletService {
       return arr
     }
 
-    return Promise.all(
+    const descriptors = await Promise.all(
       arr.map(async (w) => ({
         chain: w.chain,
         type: w.wallet,
@@ -84,6 +85,11 @@ export class WalletService {
         lastUsage: w.instance.getLastUsage(),
       }))
     )
+
+    // ToDo: remove `mergeSameWallets` after multiple networks support
+    const merged = mergeSameWallets(descriptors)
+
+    return merged
   }
 
   async eth_getSignerFor(app: string | DefaultSigners, chain: ChainTypes): Promise<Signer> {
