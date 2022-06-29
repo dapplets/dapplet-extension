@@ -5,7 +5,6 @@ import ReactTimeAgo from 'react-time-ago'
 import { Button, Comment, Segment } from 'semantic-ui-react'
 import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../common/global-event-bus'
-import { mergeSameWallets } from '../../common/helpers'
 import { CheckIcon } from '../../common/react-components/CheckIcon'
 import * as walletIcons from '../../common/resources/wallets'
 import { ChainTypes, DefaultSigners, WalletDescriptor, WalletTypes } from '../../common/types'
@@ -50,7 +49,7 @@ class Wallets extends React.Component<IWalletsProps, IWalletsState> {
 
     if (this._isMounted) {
       this.setState({
-        descriptors: mergeSameWallets(descriptors),
+        descriptors: descriptors,
         loading: false,
       })
     }
