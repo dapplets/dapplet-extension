@@ -11,13 +11,13 @@
 
   width: 100%;
 
-  padding: 5px 13px;
+  padding: 6.5px 13px;
 
   color: $MainGrey;
-  border: 1px solid $StrokeColor;
 
-  border-radius: 5px;
-  background: $AppBG;
+  border-radius: 10px;
+
+  background: #ebebeb;
 
   font-family: Roboto;
   font-size: 14px;
@@ -30,15 +30,11 @@
   cursor: pointer;
 }
 
-.openDropdown {
-  display: inline-block;
+.delimiterSpan {
+  display: flex;
+  justify-content: flex-start;
 
-  width: 8px;
-  height: 6px;
-
-  cursor: pointer;
-
-  background: url("data:image/svg+xml,%3Csvg width='8' height='6' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%232A2A2A' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  width: 97%;
 }
 
 .openOverlay {
@@ -53,12 +49,34 @@
   width: 101%;
   height: auto;
 
-  padding: 5px 13px;
+  animation-name: listVisible;
 
-  border: 1px solid $StrokeColor;
+  animation-duration: 0.2s;
 
-  border-radius: 5px;
-  background: $AppBG;
+  animation-timing-function: ease;
+
+  border-radius: 10px;
+
+  background: #ebebeb;
+  animation-fill-mode: forwards;
+
+  :last-child {
+    border-radius: 0 0 10px 10px;
+  }
+}
+
+@keyframes listVisible {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 .blockIcon {
@@ -66,32 +84,81 @@
   align-items: center;
   justify-content: flex-end;
 
-  height: 15px;
+  // height: 15px;
+  padding: 6.5px 13px;
 }
 
-.closeDropdown {
-  display: inline-block;
+.openList {
+  display: block;
 
-  width: 8px;
-  height: 6px;
-  margin-left: 3px;
+  width: 24px;
+  height: 24px;
 
   cursor: pointer;
-  transform: rotate(180deg);
+  animation-name: rotateIsClose;
 
-  background: url("data:image/svg+xml,%3Csvg width='8' height='6' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%232A2A2A' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  animation-duration: 0.2s;
+
+  animation-timing-function: ease;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='10' viewBox='0 0 18 10' fill='none'%3E%3Cpath d='M0.515015 1.46495L9.00001 9.94995L17.485 1.46495L16.071 0.0499516L9.00001 7.12195L1.92901 0.0499516L0.515015 1.46495Z' fill='%23919191'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat;
+  background-position: center;
+  animation-fill-mode: forwards;
+}
+
+.isOpen {
+  animation-name: rotateIsOpen;
+
+  animation-duration: 0.2s;
+
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes rotateIsOpen {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(90deg);
+  }
+
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
+@keyframes rotateIsClose {
+  0% {
+    transform: rotate(180deg);
+  }
+
+  50% {
+    transform: rotate(90deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 .item {
+  padding: 6.5px 13px;
+
   cursor: pointer;
 
   &:hover {
-    color: $PrimaryHover;
+    background: $StrokeColor;
+  }
+
+  &:active {
+    background: #dad9d9;
   }
 }
 
 .activeItem {
-  color: $MainBlack;
-
-  font-weight: 700;
+  background: #dad9d9;
 }

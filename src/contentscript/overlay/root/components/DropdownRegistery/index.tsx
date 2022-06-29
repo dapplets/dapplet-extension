@@ -162,10 +162,15 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
             </div>
 
             {registries.map((r, i) => (
-              <div key={i} className={styles.itemRegistries}>
+              <div
+                key={i}
+                className={cn(styles.itemRegistries, {
+                  [styles.activeLink]: r.isEnabled,
+                })}
+              >
                 <span
                   className={cn(styles.registrieslink, {
-                    [styles.activeLink]: r.isEnabled,
+                    // [styles.activeLink]: r.isEnabled,
                   })}
                   onClick={() => {
                     enableRegistry(r.url, setOpen)
@@ -174,7 +179,12 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
                   {visible(r.url)}
                 </span>
                 {!r.isEnabled && (
-                  <span onClick={() => removeRegistry(r.url)} className={styles.deleteRegistryes} />
+                  <span className={styles.deleteUsersContainer}>
+                    <span
+                      onClick={() => removeRegistry(r.url)}
+                      className={styles.deleteRegistryes}
+                    />
+                  </span>
                 )}
               </div>
             ))}

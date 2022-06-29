@@ -303,7 +303,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       <div className={styles.wrapper}>
         <Dropdown
           list={DROPDOWN_LIST}
-          title="List:"
+          title="filter:"
           value={{ label: dropdownListValue }}
           setDropdownListValue={setDropdownListValue}
         />

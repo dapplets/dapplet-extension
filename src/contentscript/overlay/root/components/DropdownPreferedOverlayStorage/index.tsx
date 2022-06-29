@@ -47,11 +47,16 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (props: Dropdow
       tabIndex={0}
     >
       <div className={styles.dropdownLabel}>{preferedOverlayStorage}</div>
-      <span className={styles.openDropdown} />
+      <span className={cn(styles.openList, { [styles.isOpen]: isOpen })} />
       {isOpen && (
         <div className={styles.openOverlay}>
           <div className={styles.blockIcon}>
-            <span className={styles.closeDropdown} onClick={() => setOpen(false)} tabIndex={1} />
+            <div className={styles.delimiterSpan}>-</div>
+            <span
+              className={cn(styles.openList, { [styles.isOpen]: isOpen })}
+              onClick={() => setOpen(false)}
+              tabIndex={1}
+            />
           </div>
           {[
             { id: 'centralized', text: 'centralized' },

@@ -44,6 +44,14 @@
   line-height: 149%;
 }
 
+.inputOverlay::-webkit-outer-spin-button,
+.inputOverlay::-webkit-inner-spin-button {
+
+  appearance: none;
+
+  margin: 0;
+}
+
 .inputOverlayNumber {
   width: 110px;
   margin-top: 0;
