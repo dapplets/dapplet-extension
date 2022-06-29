@@ -4,9 +4,17 @@ import { ethers } from 'ethers'
 import { Deferrable } from 'ethers/lib/utils'
 import { EthereumWallet } from './interface'
 
-let walletconnect = new WalletConnect({
-  bridge: 'https://bridge.walletconnect.org',
-})
+let _walletconnect
+
+function getWalletConnect() {
+  if (!_walletconnect) {
+    _walletconnect = new WalletConnect({
+      bridge: 'https://bridge.walletconnect.org',
+    })
+  }
+
+  return _walletconnect
+}
 
 export default class extends ethers.Signer implements EthereumWallet {
   public provider: ethers.providers.JsonRpcProvider
@@ -22,12 +30,14 @@ export default class extends ethers.Signer implements EthereumWallet {
   }
 
   async getAddress(): Promise<string> {
+    const walletconnect = getWalletConnect()
     return Promise.resolve(
       walletconnect.accounts[0] || '0x0000000000000000000000000000000000000000'
     )
   }
 
   async signMessage(message: string | ethers.Bytes): Promise<string> {
+    const walletconnect = getWalletConnect()
     const address = await this.getAddress()
     return walletconnect.sendCustomRequest({
       method: 'personal_sign',
@@ -55,6 +65,7 @@ export default class extends ethers.Signer implements EthereumWallet {
   }
 
   async sendTransactionOutHash(transaction: ethers.providers.TransactionRequest): Promise<string> {
+    const walletconnect = getWalletConnect()
     await this._checkNetwork()
     transaction.from = await this.getAddress()
     const tx = await ethers.utils.resolveProperties(transaction)
@@ -64,6 +75,7 @@ export default class extends ethers.Signer implements EthereumWallet {
   }
 
   async sendCustomRequest(method: string, params: any[]): Promise<any> {
+    const walletconnect = getWalletConnect()
     return walletconnect.sendCustomRequest({ method, params })
   }
 
@@ -76,10 +88,13 @@ export default class extends ethers.Signer implements EthereumWallet {
   }
 
   async isConnected() {
+    const walletconnect = getWalletConnect()
     return walletconnect.connected ?? false
   }
 
   async connectWallet({ overlayId }: { overlayId: string }): Promise<void> {
+    const walletconnect = getWalletConnect()
+
     if (walletconnect.connected) return
     walletconnect['_handshakeTopic'] = '' // ToDo: remove after update of WalletConnect to >1.3.1
 
@@ -106,15 +121,17 @@ export default class extends ethers.Signer implements EthereumWallet {
   }
 
   async disconnectWallet() {
+    const walletconnect = getWalletConnect()
     if (walletconnect.connected) {
       await walletconnect.killSession()
       delete localStorage['walletconnect']
       delete localStorage['walletconnect_lastUsage']
-      walletconnect = null
+      _walletconnect = null
     }
   }
 
   async getMeta() {
+    const walletconnect = getWalletConnect()
     const m = walletconnect.peerMeta
     return m
       ? {
@@ -139,6 +156,7 @@ export default class extends ethers.Signer implements EthereumWallet {
   }
 
   private async _getWalletChainId(): Promise<number> {
+    const walletconnect = getWalletConnect()
     const chainId = await walletconnect.sendCustomRequest({
       method: 'eth_chainId',
       params: [],
