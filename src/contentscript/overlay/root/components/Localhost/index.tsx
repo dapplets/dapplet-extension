@@ -67,13 +67,14 @@ export const Localhost: FC<LocalhostProps> = (props) => {
             onShowDescription()
           }}
         >
-          <label
+          <a
+            onClick={() => window.open(label, '_blank')}
             className={cn(styles.label, {
               [styles.bigLabel]: isHeightLabel,
             })}
           >
             {label}
-          </label>
+          </a>
           {isEnabled && !error && (
             <span
               className={cn(styles.spanLabel, {
