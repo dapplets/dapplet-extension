@@ -154,7 +154,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
         {isOpen && (
           <div className={styles.registriesList}>
             <div className={styles.inputBlock}>
-              <div className={styles.delimiterSpan}>-</div>
+              <div className={styles.delimiterSpan}>{'\u2013'}</div>
               <span
                 className={cn(styles.openList, { [styles.isOpen]: isOpen })}
                 onClick={() => setOpen(false)}

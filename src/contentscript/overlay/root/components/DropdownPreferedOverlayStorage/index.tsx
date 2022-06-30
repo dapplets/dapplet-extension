@@ -51,7 +51,7 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (props: Dropdow
       {isOpen && (
         <div className={styles.openOverlay}>
           <div className={styles.blockIcon}>
-            <div className={styles.delimiterSpan}>-</div>
+            <div className={styles.delimiterSpan}>{'\u2013'}</div>
             <span
               className={cn(styles.openList, { [styles.isOpen]: isOpen })}
               onClick={() => setOpen(false)}

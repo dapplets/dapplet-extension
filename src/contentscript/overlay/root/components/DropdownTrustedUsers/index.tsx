@@ -170,7 +170,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
         {isOpen && (
           <div className={styles.userList}>
             <div className={styles.inputBlock}>
-              <div className={styles.delimiterSpan}>-</div>
+              <div className={styles.delimiterSpan}>{'\u2013'}</div>
               <span
                 className={cn(styles.openList, { [styles.isOpen]: isOpen })}
                 onClick={() => setOpen(false)}
