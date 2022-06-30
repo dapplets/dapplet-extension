@@ -1,8 +1,8 @@
 import cn from 'classnames'
-import React, { ChangeEvent, FC } from 'react'
+import React, { FC, useEffect } from 'react'
+import { parseModuleName } from '../../../../../common/helpers'
 import { isValidHttp } from '../../../../../popup/helpers'
 import styles from './InputPanelSettings.module.scss'
-
 export interface InputPanelSettingsProps
   extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   onSubmit?: () => void
@@ -18,6 +18,8 @@ export interface InputPanelSettingsProps
   isValidHttpFunction: boolean
   isPostStampId: boolean
   isValidPostageStampId?: any
+  isDefaultValueInput: any
+  isDynamycAdapter: boolean
 }
 
 export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
@@ -34,14 +36,11 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
     isValidHttpFunction,
     isPostStampId,
     isValidPostageStampId,
+    isDefaultValueInput,
+    isDynamycAdapter,
     ...anotherProps
   } = props
-
-  const handlerSubmit = (event: ChangeEvent<HTMLFormElement>): void => {
-    event.preventDefault()
-    onSubmit && onSubmit()
-  }
-
+  useEffect(() => {}, [isDefaultValueInput])
   return (
     <>
       <div
@@ -55,11 +54,24 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
           style={{ width: '100%' }}
           onBlur={() => {
             setProviderInputError(null)
-            if (!isValidHttp(providerInput)) {
-              getDefaultValueProvider(providerInput)
-            }
-            if (providerInput.length === 0) {
-              getDefaultValueProvider(providerInput)
+            if (isDynamycAdapter) {
+              if (
+                parseModuleName(providerInput).branch === null ||
+                parseModuleName(providerInput).name === null ||
+                parseModuleName(providerInput).version === null
+              ) {
+                getDefaultValueProvider(providerInput)
+              }
+              if (providerInput.length === 0) {
+                getDefaultValueProvider(providerInput)
+              }
+            } else {
+              if (!isValidHttp(providerInput)) {
+                getDefaultValueProvider(providerInput)
+              }
+              if (providerInput.length === 0) {
+                getDefaultValueProvider(providerInput)
+              }
             }
           }}
           onFocus={() => {
@@ -78,6 +90,24 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
                   setProviderInputError(null)
                 }, 3000)
               }
+            } else if (isDynamycAdapter) {
+              setProvider(providerInput)
+              if (
+                parseModuleName(providerInput).name !== null &&
+                parseModuleName(providerInput).version !== null
+              ) {
+                setProvider(providerInput)
+              } else if (
+                parseModuleName(providerInput).branch === null ||
+                parseModuleName(providerInput).name === null ||
+                parseModuleName(providerInput).version === null
+              ) {
+                setProviderInputError('Enter a valid value')
+                getDefaultValueProvider(providerInput)
+                setTimeout(() => {
+                  setProviderInputError(null)
+                }, 3000)
+              }
             } else {
               setProvider(providerInput)
               onPress(e, inputOfFocusEtn)
@@ -89,20 +119,31 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
             className={cn(styles.inputDefault, {})}
             value={providerInput || ''}
             ref={inputOfFocusEtn}
+            onFocus={() => {
+              if (isDynamycAdapter) {
+                setProviderInput('')
+                setProviderInputError(null)
+              } else {
+                return null
+              }
+            }}
+            placeholder={isDynamycAdapter ? providerInput : null}
             onChange={(e) => {
               setProviderInput(e.target.value)
               setProviderInputError(null)
             }}
           />
         </form>
-        <button
-          onClick={(e) => {
-            e.preventDefault()
+        {isDefaultValueInput !== providerInput && (
+          <button
+            onClick={(e) => {
+              e.preventDefault()
 
-            getDefaultValueProvider(providerInput)
-          }}
-          className={cn(styles.buttonInputDefault, styles.btnAbsolute)}
-        />
+              getDefaultValueProvider(providerInput)
+            }}
+            className={cn(styles.buttonInputDefault, styles.btnAbsolute)}
+          />
+        )}
       </div>
       {providerInputError ? <div className={styles.errorMessage}>{providerInputError}</div> : null}
     </>

@@ -3,7 +3,6 @@ import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { StorageTypes } from '../../../../../common/constants'
-import { parseModuleName } from '../../../../../common/helpers'
 import { isValidPostageStampId } from '../../../../../popup/helpers'
 import { Checkbox } from '../../components/Checkbox'
 import { DropdownPreferedOverlayStorage } from '../../components/DropdownPreferedOverlayStorage'
@@ -37,27 +36,32 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [isUpdateAvailable, onUpdateAvailable] = useState(false)
 
   const [providerInput, setProviderInput] = useState('')
-
   const [providerInputError, setProviderInputError] = useState(null)
+  const [providerInputDefault, setProviderInputDefault] = useState('')
 
   const [swarmGatewayInput, setSwarmGatewayInput] = useState('')
   const [swarmGatewayInputError, setSwarmGatewayInputError] = useState(null)
+  const [swarmGatewayInputDefault, setSwarmGatewayInputDefault] = useState('')
 
   const [swarmPostageStampIdInput, setSwarmPostageStampIdInput] = useState('')
   const [swarmPostageStampIdInputError, setSwarmPostageStampIdInputError] = useState(null)
+  const [swarmPostageStampIdInputDefault, setSwarmPostageStampIdInputDefault] = useState('')
 
   const [dynamicAdapterInput, setDynamicAdapterInput] = useState('')
   const [dynamicAdapterInputError, setDynamicAdapterInputError] = useState(null)
+  const [dynamicAdapterInputDefault, setDynamicAdapterInputDefault] = useState('')
 
   const [userAgentNameInput, setUserAgentNameInput] = useState('')
-  // const [userAgentId, setUserAgentID] = useState('')
   const [userAgentNameInputError, setUserAgentNameInputError] = useState(null)
 
   const [ipfsGatewayInput, setIpfsGatewayInput] = useState('')
   const [ipfsGatewayInputError, setIpfsGatewayInputError] = useState(null)
+  const [ipfsGatewayInputDefault, setIpfsGatewayInputDefault] = useState('')
 
   const [siaPortalInput, setSiaPortalInput] = useState('')
   const [siaPortalInputError, setSiaPortalInputError] = useState(null)
+  const [siaPortalInputDefault, setSiaPortalInputDefault] = useState('')
+
   const [targetStorages, setTargetStorages] = useState([])
 
   const [isPopup, setPopup] = useState(false)
@@ -71,7 +75,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const inputOfFocusAdapter = useRef<HTMLInputElement>()
   const inputOfFocusAgentName = useRef<HTMLInputElement>()
 
-  const [isDefaultValueInput, setDefaultValueInput] = useState(false)
+  const [isDefaultValueInput, setDefaultValueInput] = useState(null)
 
   useEffect(() => {
     _isMounted = true
@@ -117,6 +121,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     onUpdateAvailable(isUpdateAvailable)
   }
   const loadProvider = async () => {
+    const { getInitialConfig } = await initBGFunctions(browser)
+    const config = await getInitialConfig()
+
+    if (config.providerUrl) {
+      setProviderInputDefault(config.providerUrl)
+    }
     const { getEthereumProvider } = await initBGFunctions(browser)
     const provider = await getEthereumProvider()
     setProviderInput(provider)
@@ -135,6 +145,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const loadSwarmGateway = async () => {
+    const { getInitialConfig } = await initBGFunctions(browser)
+    const config = await getInitialConfig()
+
+    if (config.swarmGatewayUrl) {
+      setSwarmGatewayInputDefault(config.swarmGatewayUrl)
+    }
     const { getSwarmGateway } = await initBGFunctions(browser)
     const gateway = await getSwarmGateway()
     setSwarmGatewayInput(gateway)
@@ -154,6 +170,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const loadSwarmPostageStampId = async () => {
+    const { getInitialConfig } = await initBGFunctions(browser)
+    const config = await getInitialConfig()
+
+    if (config.swarmPostageStampId) {
+      setSwarmPostageStampIdInputDefault(config.swarmPostageStampId)
+    }
     const { getSwarmPostageStampId } = await initBGFunctions(browser)
     const id = await getSwarmPostageStampId()
     setSwarmPostageStampIdInput(id)
@@ -174,6 +196,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const loadDynamicAdapter = async () => {
+    const { getInitialConfig } = await initBGFunctions(browser)
+    const config = await getInitialConfig()
+
+    if (config.dynamicAdapter) {
+      setDynamicAdapterInputDefault(config.dynamicAdapter)
+    }
     const { getDynamicAdapter } = await initBGFunctions(browser)
     const dynamicAdapterInput = await getDynamicAdapter()
 
@@ -218,6 +246,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const loadIpfsGateway = async () => {
+    const { getInitialConfig } = await initBGFunctions(browser)
+    const config = await getInitialConfig()
+
+    if (config.ipfsGatewayUrl) {
+      setIpfsGatewayInputDefault(config.ipfsGatewayUrl)
+    }
     const { getIpfsGateway } = await initBGFunctions(browser)
     const gateway = await getIpfsGateway()
     setIpfsGatewayInput(gateway)
@@ -237,6 +271,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const loadSiaPortal = async () => {
+    const { getInitialConfig } = await initBGFunctions(browser)
+    const config = await getInitialConfig()
+
+    if (config.siaPortalUrl) {
+      setSiaPortalInputDefault(config.siaPortalUrl)
+    }
     const { getSiaPortal } = await initBGFunctions(browser)
     const gateway = await getSiaPortal()
     setSiaPortalInput(gateway)
@@ -427,6 +467,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                         className={cn(styles.inputDefault, {})}
                         placeholder={userAgentNameInput}
                         ref={inputOfFocusAgentName}
+                        value={userAgentNameInput}
                         onFocus={() => {
                           setUserAgentNameInput('')
                           setUserAgentNameInputError(null)
@@ -457,79 +498,20 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 title="Dynamic Adapter"
                 component={<></>}
                 children={
-                  <>
-                    <div
-                      className={cn(styles.formDefault, styles.formAbsolute, {
-                        [styles.errorInputDefault]: dynamicAdapterInputError,
-                      })}
-                    >
-                      <form
-                        style={{ width: '100%' }}
-                        onBlur={() => {
-                          setDynamicAdapterInputError(null)
-
-                          if (
-                            parseModuleName(dynamicAdapterInput).branch === null ||
-                            parseModuleName(dynamicAdapterInput).name === null ||
-                            parseModuleName(dynamicAdapterInput).version === null
-                          ) {
-                            getDefaultValueDynamicAdapter(dynamicAdapterInput)
-                          }
-                          if (dynamicAdapterInput.length === 0) {
-                            getDefaultValueDynamicAdapter(dynamicAdapterInput)
-                          }
-                        }}
-                        onSubmit={(e) => {
-                          e.preventDefault()
-
-                          setDynamicAdapter(dynamicAdapterInput)
-                          if (
-                            parseModuleName(dynamicAdapterInput).name !== null &&
-                            parseModuleName(dynamicAdapterInput).version !== null
-                          ) {
-                            setDynamicAdapter(dynamicAdapterInput)
-                          } else if (
-                            parseModuleName(dynamicAdapterInput).branch === null ||
-                            parseModuleName(dynamicAdapterInput).name === null ||
-                            parseModuleName(dynamicAdapterInput).version === null
-                          ) {
-                            setDynamicAdapterInputError('Enter a valid value')
-                            getDefaultValueDynamicAdapter(dynamicAdapterInput)
-                            setTimeout(() => {
-                              setDynamicAdapterInputError(null)
-                            }, 3000)
-                          }
-                        }}
-                      >
-                        <input
-                          spellCheck={false}
-                          className={cn(styles.inputDefault, {})}
-                          value={dynamicAdapterInput}
-                          placeholder={dynamicAdapterInput}
-                          onFocus={() => {
-                            setDynamicAdapterInput('')
-                            setDynamicAdapterInputError(null)
-                          }}
-                          ref={inputOfFocusAdapter}
-                          onChange={(e) => {
-                            setDynamicAdapterInput(e.target.value)
-                            setDynamicAdapterInputError(null)
-                          }}
-                        />
-                      </form>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault()
-
-                          getDefaultValueDynamicAdapter(dynamicAdapterInput)
-                        }}
-                        className={cn(styles.buttonInputDefault, styles.btnAbsolute)}
-                      />
-                    </div>
-                    {dynamicAdapterInputError ? (
-                      <div className={styles.errorMessage}>{dynamicAdapterInputError}</div>
-                    ) : null}
-                  </>
+                  <InputPanelSettings
+                    isDynamycAdapter={true}
+                    isDefaultValueInput={dynamicAdapterInputDefault}
+                    isPostStampId={false}
+                    isValidHttpFunction={false}
+                    providerInputError={dynamicAdapterInputError}
+                    providerInput={dynamicAdapterInput}
+                    getDefaultValueProvider={getDefaultValueDynamicAdapter}
+                    setProviderInputError={setDynamicAdapterInputError}
+                    setProviderInput={setDynamicAdapterInput}
+                    setProvider={setDynamicAdapter}
+                    onPress={onPress}
+                    inputOfFocusEtn={inputOfFocusAdapter}
+                  />
                 }
               />
               <SettingItem
@@ -581,6 +563,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 component={<></>}
                 children={
                   <InputPanelSettings
+                    isDynamycAdapter={false}
+                    isDefaultValueInput={providerInputDefault}
                     isPostStampId={false}
                     isValidHttpFunction={true}
                     providerInputError={providerInputError}
@@ -599,6 +583,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 component={<></>}
                 children={
                   <InputPanelSettings
+                    isDynamycAdapter={false}
+                    isDefaultValueInput={swarmGatewayInputDefault}
                     isPostStampId={false}
                     isValidHttpFunction={true}
                     providerInputError={swarmGatewayInputError}
@@ -617,6 +603,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 component={<></>}
                 children={
                   <InputPanelSettings
+                    isDynamycAdapter={false}
+                    isDefaultValueInput={swarmPostageStampIdInputDefault}
                     isPostStampId={true}
                     isValidHttpFunction={false}
                     isValidPostageStampId={isValidPostageStampId}
@@ -635,6 +623,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 component={<></>}
                 children={
                   <InputPanelSettings
+                    isDynamycAdapter={false}
+                    isDefaultValueInput={ipfsGatewayInputDefault}
                     isPostStampId={false}
                     isValidHttpFunction={true}
                     providerInputError={ipfsGatewayInputError}
@@ -653,6 +643,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 component={<></>}
                 children={
                   <InputPanelSettings
+                    isDynamycAdapter={false}
+                    isDefaultValueInput={siaPortalInputDefault}
                     isPostStampId={false}
                     isValidHttpFunction={true}
                     providerInputError={siaPortalInputError}
