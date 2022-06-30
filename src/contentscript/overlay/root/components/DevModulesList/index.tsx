@@ -12,7 +12,6 @@ import { ChainTypes, DefaultSigners } from '../../../../../common/types'
 import { Modal } from '../Modal'
 import styles from './DevModulesList.module.scss'
 
-let _isMounted = true
 enum DeploymentStatus {
   Unknown,
   Deployed,
@@ -45,9 +44,8 @@ type DependencyChecking = {
 export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
   const { storageRef, className, title, onClick } = props
   const [dataUri, setDataUri] = useState(null)
-  useEffect(() => {
-    _isMounted = true
 
+  useEffect(() => {
     const init = async () => {
       if (!storageRef) return
 
@@ -76,9 +74,7 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
       }
     }
     init()
-    return () => {
-      _isMounted = false
-    }
+    return () => {}
   }, [storageRef])
   return (
     <div className={cn(styles.dappletsImg, className)} onClick={onClick}>
@@ -140,15 +136,16 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const [isModalError, setModalError] = useState(false)
   const onCloseError = () => setModalError(false)
   const [isNotAccountModal, setNotAccountModal] = useState(false)
+  const _isMounted = useRef(true)
   useEffect(() => {
-    _isMounted = true
-
     const init = async () => {
-      await _updateData()
+      if (_isMounted.current) {
+        await _updateData()
+      }
     }
     init()
     return () => {
-      _isMounted = false
+      _isMounted.current = false
     }
   }, [targetChain, currentAccount, isLoadingDeploy, modules[0]])
 

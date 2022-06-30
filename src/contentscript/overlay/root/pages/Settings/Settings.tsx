@@ -15,7 +15,7 @@ import { Switch } from '../../components/Switch'
 import styles from './Settings.module.scss'
 
 export const DROPDOWN_LIST = [{ _id: '0', label: 'Custom' }]
-let _isMounted = false
+
 export interface SettingsListProps {
   devModeProps: boolean
   setDevMode: (x) => void
@@ -75,30 +75,31 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const inputOfFocusAdapter = useRef<HTMLInputElement>()
   const inputOfFocusAgentName = useRef<HTMLInputElement>()
 
-  const [isDefaultValueInput, setDefaultValueInput] = useState(null)
+  const _isMounted = useRef(true)
 
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
-      await checkUpdates()
+      if (_isMounted.current) {
+        await checkUpdates()
 
-      await loadProvider()
-      await loadSwarmGateway()
-      await loadErrorReporting()
-      await loadSwarmPostageStampId()
-      await loadDynamicAdapter()
+        await loadProvider()
+        await loadSwarmGateway()
+        await loadErrorReporting()
+        await loadSwarmPostageStampId()
+        await loadDynamicAdapter()
 
-      await loadUserAgentId()
-      await loadUserAgentName()
-      await loadIpfsGateway()
-      await loadSiaPortal()
-      await loadPopupInOverlay()
-      await loadTargetStorages()
+        await loadUserAgentId()
+        await loadUserAgentName()
+        await loadIpfsGateway()
+        await loadSiaPortal()
+        await loadPopupInOverlay()
+        await loadTargetStorages()
+      }
     }
     init()
 
     return () => {
-      _isMounted = false
+      _isMounted.current = false
     }
   }, [])
 

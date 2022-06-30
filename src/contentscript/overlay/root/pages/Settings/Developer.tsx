@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
@@ -11,7 +11,6 @@ import { Localhost } from '../../components/Localhost'
 import { Registry } from '../../components/Registery'
 import styles from './Developer.module.scss'
 
-let _isMounted = true
 export interface DeveloperProps {
   setDappletsDetail: (x) => void
   setModuleInfo: any
@@ -34,6 +33,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [isLoadButtonLocalhost, setLoadButtonLocalhost] = useState(false)
   const [isLoadAdd, setLoadAdd] = useState(false)
   const [isUpdate, setUpdate] = useState(false)
+  const _isMounted = useRef(true)
 
   const {
     setDappletsDetail,
@@ -46,34 +46,33 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   } = props
 
   useEffect(() => {
-    _isMounted = true
-
     const init = async () => {
       setLoadButton(true)
       await loadSwarmGateway()
       await loadRegistries()
       await loadIntro()
-
-      const { getCurrentTab } = await initBGFunctions(browser)
-      const currentTab = await getCurrentTab()
-      if (!currentTab) return
-      const currentUrl = currentTab.url
-      const urlEnding = currentUrl.split('/').reverse()[0]
-      if (['index.json', 'dapplet.json'].includes(urlEnding)) {
-        setRegistryInput(currentUrl)
-      }
-      setLoadButton(false)
-      if (isUpdate) {
-        await loadSwarmGateway()
-        await loadRegistries()
-        await loadIntro()
-        setUpdate(false)
+      if (_isMounted.current) {
+        const { getCurrentTab } = await initBGFunctions(browser)
+        const currentTab = await getCurrentTab()
+        if (!currentTab) return
+        const currentUrl = currentTab.url
+        const urlEnding = currentUrl.split('/').reverse()[0]
+        if (['index.json', 'dapplet.json'].includes(urlEnding)) {
+          setRegistryInput(currentUrl)
+        }
+        setLoadButton(false)
+        if (isUpdate) {
+          await loadSwarmGateway()
+          await loadRegistries()
+          await loadIntro()
+          setUpdate(false)
+        }
       }
     }
     init()
 
     return () => {
-      _isMounted = false
+      _isMounted.current = false
     }
   }, [isUpdate])
 

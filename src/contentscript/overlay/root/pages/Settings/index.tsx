@@ -1,5 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
 import { DappletsMainInfo } from '../DappletsInfo'
@@ -29,7 +29,6 @@ export const NAVIGATION_LIST = [
   { _id: '1', title: 'Developer' },
 ]
 
-let _isMounted = false
 export const SettingsOverlay = () => {
   const [activeTab, setActiveTab] = useState(SettingsTabs.SETTINGS)
   const [activeTaDappletsDetails, setActiveTabDappletsDetails] = useState(DappletsDetails.MAININFO)
@@ -51,15 +50,17 @@ export const SettingsOverlay = () => {
   const [isTokenomics, setTokenomics] = useState(false)
   const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] = useState(false)
   const [isShowChildrenRegistery, setShowChildrenRegistery] = useState(false)
+  const _isMounted = useRef(true)
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
-      await loadDevMode()
-      await loadErrorReporting()
+      if (_isMounted.current) {
+        await loadDevMode()
+        await loadErrorReporting()
+      }
     }
     init()
     return () => {
-      _isMounted = false
+      _isMounted.current = false
     }
   }, [])
   const loadDevMode = async () => {
