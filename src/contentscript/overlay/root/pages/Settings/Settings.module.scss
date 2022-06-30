@@ -167,13 +167,11 @@
   align-items: center;
 
   width: 100%;
-  height: 31px;
-  padding: 5px 7px 5px 13px;
+  height: 36px;
+  padding: 5px 13px;
 
-  border: 1px solid $StrokeColor;
-  border-radius: 5px;
-
-  background: $AppBG;
+  border-radius: 10px;
+  background: #ebebeb;
 }
 
 .inputDefault {
@@ -190,8 +188,8 @@
 }
 
 .errorInputDefault {
-  border: 1px solid #d9304f;
-  background: #fef2f4;
+  color: $Primary;
+  border: 1px solid $Primary;
 }
 
 .buttonInputDefault {
