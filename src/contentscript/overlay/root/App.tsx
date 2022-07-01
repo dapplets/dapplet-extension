@@ -100,6 +100,7 @@ interface S {
   isWalletLength: boolean
   isOpenWallet: boolean
   classNameSearch: string
+  classNameSearchButton: string
 }
 
 class _App extends React.Component<P, S> {
@@ -112,6 +113,7 @@ class _App extends React.Component<P, S> {
     isWalletLength: false,
     isOpenWallet: false,
     classNameSearch: '',
+    classNameSearchButton: '',
   }
 
   async componentDidMount() {
@@ -245,9 +247,25 @@ class _App extends React.Component<P, S> {
 
   handleCloseSearch = () => {
     this.setState({
-      isOpenSearch: false,
-      search: '',
+      classNameSearch: 'close',
     })
+    setTimeout(() => {
+      this.setState({
+        isOpenSearch: false,
+        search: '',
+        classNameSearch: '',
+      })
+    }, 200)
+    setTimeout(() => {
+      this.setState({
+        classNameSearchButton: 'closeSearch',
+      })
+    }, 500)
+    setTimeout(() => {
+      this.setState({
+        classNameSearchButton: '',
+      })
+    }, 500)
   }
 
   handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -362,6 +380,7 @@ class _App extends React.Component<P, S> {
               <div className={styles.right}>
                 {!s.isOpenSearch && pathname === '/system/dapplets' && (
                   <SquaredButton
+                    className={s.classNameSearchButton}
                     onClick={this.handleOpenSearchClick}
                     appearance="big"
                     icon={SearchIcon}
@@ -370,6 +389,7 @@ class _App extends React.Component<P, S> {
                 {s.isOpenSearch && pathname === '/system/dapplets' && (
                   <div className={styles.searchBlock} tabIndex={1}>
                     <Search
+                      className={s.classNameSearch}
                       value={s.search}
                       isOpenSearch={s.isOpenSearch}
                       onChange={this.handleSearchChange}

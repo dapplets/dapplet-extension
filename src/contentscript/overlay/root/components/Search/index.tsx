@@ -9,6 +9,7 @@ export interface SearchProps
   onClearValue?: () => void
   onCloseSearch?: () => void
   isOpenSearch: boolean
+  className?: string
 }
 
 export const Search = (props: SearchProps): ReactElement => {
