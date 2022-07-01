@@ -101,21 +101,27 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
 
   const addRegistry = async (url: string, newFunction: () => void) => {
     setLoadAdd(true)
-    setLoadButton(true)
+
+    // setLoadButton(true)
     const { addRegistry } = await initBGFunctions(browser)
 
     try {
       await addRegistry(url, true)
+      setLoadButton(true)
       setRegistryInput('')
+
       loadRegistries()
     } catch (msg) {
       setRegistryInputError(msg.toString())
-      setTimeout(() => setRegistryInputError(''), 2000)
+
+      setTimeout(() => setRegistryInputError(''), 3000)
     }
 
     newFunction()
+
     setLoadButton(false)
-    setTimeout(() => setLoadAdd(false), 1500)
+
+    setTimeout(() => setLoadAdd(false), 3000)
   }
 
   const removeRegistry = async (url: string) => {
@@ -123,7 +129,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     const { removeRegistry } = await initBGFunctions(browser)
     await removeRegistry(url)
     loadRegistries()
-    setTimeout(() => setLoadAdd(false), 1500)
+    setTimeout(() => setLoadAdd(false), 3000)
   }
 
   const deployModule = async (mi: ModuleInfo, vi: VersionInfo) => {
