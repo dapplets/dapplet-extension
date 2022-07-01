@@ -5,8 +5,15 @@
 .MainSettingsAuto {
   padding: 10px;
 
+  animation-name: openError;
+
+  animation-duration: 0.3s;
+
+  animation-timing-function: ease;
+
   border-radius: 10px;
   background-color: $PureWhite;
+  animation-fill-mode: forwards;
 
   &:not(:last-child) {
     margin-bottom: 5px;

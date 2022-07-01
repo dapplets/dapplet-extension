@@ -15,7 +15,7 @@
 }
 
 .inputDefault {
-  width: 100%;
+  width: 99%;
 
   color: #919191;
   background: inherit;
@@ -54,17 +54,111 @@
   display: flex;
 
   width: 100%;
-  margin: 0 0 -10px;
-  padding: 5px 0 0;
+
+  // margin: 0 0 -10px;
+  // padding: 5px 0 0;
+
+  animation-name: openError;
+
+  animation-duration: 3s;
+
+  animation-timing-function: linear;
 
   color: #d9304f;
 
   font-family: Roboto;
+
   font-size: 10px;
 
   font-weight: 400;
   line-height: 100%;
+  animation-fill-mode: forwards;
 }
 
 .formAbsolute {
+}
+
+@keyframes openError {
+  0% {
+    margin: 0;
+    padding: 0;
+
+    opacity: 0;
+
+    font-size: 0;
+  }
+
+  5% {
+    margin: 0 0 -5px;
+    padding: 2.5px 7.5px;
+
+    opacity: 0;
+  }
+
+  10% {
+    margin: 0 0 -10px;
+    padding: 5px 13px;
+
+    opacity: 0;
+  }
+
+  12% {
+    margin: 0 0 -10px;
+    padding: 5px 13px;
+
+    opacity: 1;
+
+    font-size: 14px;
+    line-height: 100%;
+  }
+
+  85% {
+    margin: 0 0 -10px;
+    padding: 5px 13px;
+
+    opacity: 1;
+
+    font-size: 14px;
+    line-height: 100%;
+  }
+
+  87% {
+    margin: 0 0 -7.5px;
+    padding: 4px 7.5px;
+
+    opacity: 0;
+
+    font-size: 12px;
+    line-height: 50%;
+  }
+
+  90% {
+    margin: 0 0 -5px;
+    padding: 2.5px 7.5px;
+
+    opacity: 0;
+
+    font-size: 7px;
+    line-height: 20%;
+  }
+
+  95% {
+    margin: 0 0 -2.5px;
+    padding: 1.5px 5px;
+
+    opacity: 0;
+
+    font-size: 2px;
+    line-height: 0%;
+  }
+
+  100% {
+    margin: 0;
+    padding: 0;
+
+    opacity: 0;
+
+    font-size: 0;
+    line-height: 0%;
+  }
 }
