@@ -12,6 +12,8 @@ import { InputPanelSettings } from '../../components/InputPanelSettings'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { Switch } from '../../components/Switch'
+import { getDefaultValueProvider } from '../../utils/getDefaultValue'
+
 import styles from './Settings.module.scss'
 
 export const DROPDOWN_LIST = [{ _id: '0', label: 'Custom' }]
@@ -311,55 +313,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     setTargetStorages(loadTarget)
   }
 
-  const getDefaultValueDynamicAdapter = async (inputValue: string) => {
-    const { getInitialConfig } = await initBGFunctions(browser)
-    const config = await getInitialConfig()
-
-    if (config.dynamicAdapter !== inputValue) {
-      await setDynamicAdapter(config.dynamicAdapter)
-    }
-  }
-  const getDefaultValueProvider = async (inputValue: string) => {
-    const { getInitialConfig } = await initBGFunctions(browser)
-    const config = await getInitialConfig()
-
-    if (config.providerUrl !== inputValue) {
-      await setProvider(config.providerUrl)
-    }
-  }
-  const getDefaultValueSwarmGateway = async (inputValue: string) => {
-    const { getInitialConfig } = await initBGFunctions(browser)
-    const config = await getInitialConfig()
-
-    if (config.swarmGatewayUrl !== inputValue) {
-      setSwarmGateway(config.swarmGatewayUrl)
-    }
-  }
-  const getDefaultValueSwarmPostageStampId = async (inputValue: string) => {
-    const { getInitialConfig } = await initBGFunctions(browser)
-    const config = await getInitialConfig()
-
-    if (config.swarmPostageStampId !== inputValue) {
-      setSwarmPostageStampId(config.swarmPostageStampId)
-    }
-  }
-  const getDefaultValueIpfsGateway = async (inputValue: string) => {
-    const { getInitialConfig } = await initBGFunctions(browser)
-    const config = await getInitialConfig()
-
-    if (config.ipfsGatewayUrl !== inputValue) {
-      setIpfsGateway(config.ipfsGatewayUrl)
-    }
-  }
-  const getDefaultValueSiaPortal = async (inputValue: string) => {
-    const { getInitialConfig } = await initBGFunctions(browser)
-    const config = await getInitialConfig()
-
-    if (config.siaPortalUrl !== inputValue) {
-      setSiaPortal(config.siaPortalUrl)
-    }
-  }
-
   const loadPopupInOverlay = async () => {
     const { getPopupInOverlay } = await initBGFunctions(browser)
     const popupInOverlay = await getPopupInOverlay()
@@ -506,7 +459,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     isValidHttpFunction={false}
                     providerInputError={dynamicAdapterInputError}
                     providerInput={dynamicAdapterInput}
-                    getDefaultValueProvider={getDefaultValueDynamicAdapter}
+                    getDefaultValueProvider={() =>
+                      getDefaultValueProvider(
+                        dynamicAdapterInput,
+                        'dynamicAdapter',
+                        setDynamicAdapter
+                      )
+                    }
                     setProviderInputError={setDynamicAdapterInputError}
                     setProviderInput={setDynamicAdapterInput}
                     setProvider={setDynamicAdapter}
@@ -570,10 +529,16 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     isValidHttpFunction={true}
                     providerInputError={providerInputError}
                     providerInput={providerInput}
-                    getDefaultValueProvider={getDefaultValueProvider}
+                    getDefaultValueProvider={() =>
+                      getDefaultValueProvider(
+                        providerInput,
+                        'providerUrl',
+                        setProvider(providerInput)
+                      )
+                    }
                     setProviderInputError={setProviderInputError}
                     setProviderInput={setProviderInput}
-                    setProvider={setProvider}
+                    setProvider={() => setProvider(providerInput)}
                     onPress={onPress}
                     inputOfFocusEtn={inputOfFocusEtn}
                   />
@@ -590,7 +555,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     isValidHttpFunction={true}
                     providerInputError={swarmGatewayInputError}
                     providerInput={swarmGatewayInput}
-                    getDefaultValueProvider={getDefaultValueSwarmGateway}
+                    getDefaultValueProvider={() =>
+                      getDefaultValueProvider(swarmGatewayInput, 'swarmGatewayUrl', setSwarmGateway)
+                    }
                     setProviderInputError={setSwarmGatewayInputError}
                     setProviderInput={setSwarmGatewayInput}
                     setProvider={setSwarmGateway}
@@ -611,7 +578,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     isValidPostageStampId={isValidPostageStampId}
                     providerInputError={swarmPostageStampIdInputError}
                     providerInput={swarmPostageStampIdInput}
-                    getDefaultValueProvider={getDefaultValueSwarmPostageStampId}
+                    getDefaultValueProvider={() =>
+                      getDefaultValueProvider(
+                        swarmPostageStampIdInput,
+                        'swarmPostageStampId',
+                        setSwarmPostageStampId
+                      )
+                    }
                     setProviderInputError={setSwarmPostageStampIdInputError}
                     setProviderInput={setSwarmPostageStampIdInput}
                     setProvider={setSwarmPostageStampId}
@@ -630,7 +603,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     isValidHttpFunction={true}
                     providerInputError={ipfsGatewayInputError}
                     providerInput={ipfsGatewayInput}
-                    getDefaultValueProvider={getDefaultValueIpfsGateway}
+                    getDefaultValueProvider={() =>
+                      getDefaultValueProvider(ipfsGatewayInput, 'ipfsGatewayUrl', setIpfsGateway)
+                    }
                     setProviderInputError={setIpfsGatewayInputError}
                     setProviderInput={setIpfsGatewayInput}
                     setProvider={setIpfsGateway}
@@ -650,7 +625,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     isValidHttpFunction={true}
                     providerInputError={siaPortalInputError}
                     providerInput={siaPortalInput}
-                    getDefaultValueProvider={getDefaultValueSiaPortal}
+                    getDefaultValueProvider={() =>
+                      getDefaultValueProvider(siaPortalInput, 'siaPortalUrl', setSiaPortal)
+                    }
                     setProviderInputError={setSiaPortalInputError}
                     setProviderInput={setSiaPortalInput}
                     setProvider={setSiaPortal}

@@ -60,17 +60,17 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
                 parseModuleName(providerInput).name === null ||
                 parseModuleName(providerInput).version === null
               ) {
-                getDefaultValueProvider(providerInput)
+                getDefaultValueProvider()
               }
               if (providerInput.length === 0) {
-                getDefaultValueProvider(providerInput)
+                getDefaultValueProvider()
               }
             } else {
               if (!isValidHttp(providerInput)) {
-                getDefaultValueProvider(providerInput)
+                getDefaultValueProvider()
               }
               if (providerInput.length === 0) {
-                getDefaultValueProvider(providerInput)
+                getDefaultValueProvider()
               }
             }
           }}
@@ -85,7 +85,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
                 setProvider(providerInput)
               } else if (!isValidPostageStampId(providerInput)) {
                 setProviderInputError('Enter valid Swarm Postage Stamp ID')
-                getDefaultValueProvider(providerInput)
+                getDefaultValueProvider()
                 setTimeout(() => {
                   setProviderInputError(null)
                 }, 3000)
@@ -103,13 +103,13 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
                 parseModuleName(providerInput).version === null
               ) {
                 setProviderInputError('Enter a valid value')
-                getDefaultValueProvider(providerInput)
+                getDefaultValueProvider()
                 setTimeout(() => {
                   setProviderInputError(null)
                 }, 3000)
               }
             } else {
-              setProvider(providerInput)
+              setProvider()
               onPress(e, inputOfFocusEtn)
             }
           }}
@@ -139,7 +139,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
             onClick={(e) => {
               e.preventDefault()
 
-              getDefaultValueProvider(providerInput)
+              getDefaultValueProvider()
             }}
             className={cn(styles.buttonInputDefault, styles.btnAbsolute)}
           />

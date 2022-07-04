@@ -24,10 +24,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [registries, setRegistries] = useState([])
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
-  const [intro, setIntro] = useState({ popupDeveloperWelcome: false })
   const [modules, setModules] = useState([])
-  const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
-
   const [isLoadButton, setLoadButton] = useState(false)
   const [isLocalhost, setLocalhost] = useState(true)
   const [isLoadButtonLocalhost, setLoadButtonLocalhost] = useState(false)
@@ -48,9 +45,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   useEffect(() => {
     const init = async () => {
       setLoadButton(true)
-      await loadSwarmGateway()
       await loadRegistries()
-      await loadIntro()
       if (_isMounted.current) {
         const { getCurrentTab } = await initBGFunctions(browser)
         const currentTab = await getCurrentTab()
@@ -62,9 +57,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
         }
         setLoadButton(false)
         if (isUpdate) {
-          await loadSwarmGateway()
           await loadRegistries()
-          await loadIntro()
           setUpdate(false)
         }
       }
@@ -76,11 +69,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     }
   }, [isUpdate])
 
-  const loadSwarmGateway = async () => {
-    const { getSwarmGateway } = await initBGFunctions(browser)
-    const swarmGatewayUrl = await getSwarmGateway()
-    setSwarmGatewayUrl(swarmGatewayUrl)
-  }
   const loadRegistries = async () => {
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
     const modules: {
@@ -93,16 +81,8 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     setRegistries(registries.filter((r) => r.isDev === true))
   }
 
-  const loadIntro = async () => {
-    const { getIntro } = await initBGFunctions(browser)
-    const intro = await getIntro()
-    setIntro(intro)
-  }
-
   const addRegistry = async (url: string, newFunction: () => void) => {
     setLoadAdd(true)
-
-    // setLoadButton(true)
     const { addRegistry } = await initBGFunctions(browser)
 
     try {
