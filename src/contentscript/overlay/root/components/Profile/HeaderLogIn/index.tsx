@@ -222,7 +222,10 @@ export const Modal = ({
 
                       {x.meta.icon ? (
                         <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-                          <img className={styles.walletsIcon} src={walletIcons[x.type]} alt="" />
+                          {x.type === 'walletconnect' ? (
+                            <img className={styles.walletsIcon} src={walletIcons[x.type]} alt="" />
+                          ) : null}
+
                           {x.type === 'dapplets' ? (
                             <img className={styles.walletsIcon} src={walletIcons[x.type]} alt="" />
                           ) : (

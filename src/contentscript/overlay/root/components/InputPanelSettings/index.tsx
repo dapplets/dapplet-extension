@@ -109,7 +109,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
                 }, 3000)
               }
             } else {
-              setProvider()
+              setProvider(providerInput)
               onPress(e, inputOfFocusEtn)
             }
           }}

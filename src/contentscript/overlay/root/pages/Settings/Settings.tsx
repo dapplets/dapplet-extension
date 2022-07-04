@@ -530,15 +530,11 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     providerInputError={providerInputError}
                     providerInput={providerInput}
                     getDefaultValueProvider={() =>
-                      getDefaultValueProvider(
-                        providerInput,
-                        'providerUrl',
-                        setProvider(providerInput)
-                      )
+                      getDefaultValueProvider(providerInput, 'providerUrl', setProvider)
                     }
                     setProviderInputError={setProviderInputError}
                     setProviderInput={setProviderInput}
-                    setProvider={() => setProvider(providerInput)}
+                    setProvider={setProvider}
                     onPress={onPress}
                     inputOfFocusEtn={inputOfFocusEtn}
                   />
