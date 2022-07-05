@@ -96,6 +96,10 @@ interface PropsDeveloper {
   setUnderConstructionDetails: (x) => void
   isLocalhost?: boolean
   setUpdate?: (x) => void
+
+  isLoadingDeploy?: boolean
+  setLoadingDeploy?: () => void
+  setLoadingDeployFinally?: () => void
 }
 export const DevModule: FC<PropsDeveloper> = (props) => {
   const {
@@ -107,6 +111,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setUnderConstructionDetails,
     isLocalhost = false,
     setUpdate,
+    isLoadingDeploy,
+    setLoadingDeploy,
+    setLoadingDeployFinally,
   } = props
 
   const nodes = new Map<string, any>()
@@ -131,7 +138,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const nodeButton = useRef<HTMLButtonElement>()
   const [textButtonDeploy, setTextButtonDeploy] = useState('Deploy')
 
-  const [isLoadingDeploy, setLoadingDeploy] = useState(false)
   const [messageError, setMessageError] = useState(null)
   const [isModalError, setModalError] = useState(false)
   const onCloseError = () => setModalError(false)
@@ -141,13 +147,14 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     const init = async () => {
       if (_isMounted.current) {
         await _updateData()
+        isLoadingDeploy ? setTextButtonDeploy('') : setTextButtonDeploy('Deploy')
       }
     }
     init()
     return () => {
       _isMounted.current = false
     }
-  }, [targetChain, currentAccount, isLoadingDeploy, modules[0]])
+  }, [targetChain, currentAccount, modules[0], isLoadingDeploy])
 
   modules.forEach((x) => {
     nodes.set(x.versions[0] ? x.module.name + '#' + x.versions[0]?.branch : x.module.name, x)
@@ -286,34 +293,32 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const deployButtonClickHandler = async (e) => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
 
-    setLoadingDeploy(true)
+    setLoadingDeploy()
 
-    e.target.classList.add(styles.dappletsIsLoadingDeploy)
+    // e.target.classList.add(styles.dappletsIsLoadingDeploy)
     setTextButtonDeploy('')
-
+    const isNotNullCurrentAccount = !(
+      !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
+    )
+    const isNotTrustedUser =
+      isNotNullCurrentAccount &&
+      !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
+    if (isNotTrustedUser) {
+      await addTrustedUser(currentAccount.toLowerCase())
+    }
+    if (!isNotNullCurrentAccount) {
+      setNotAccountModal(true)
+    } else {
+      setNotAccountModal(false)
+    }
     try {
-      const isNotNullCurrentAccount = !(
-        !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
-      )
-      const isNotTrustedUser =
-        isNotNullCurrentAccount &&
-        !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
-      if (isNotTrustedUser) {
-        await addTrustedUser(currentAccount.toLowerCase())
-      }
-      if (!isNotNullCurrentAccount) {
-        setNotAccountModal(true)
-      } else {
-        setNotAccountModal(false)
-      }
-
       mode === FormMode.Creating
         ? await deployModule(mi, null, targetStorages, targetRegistry)
         : await deployModule(mi, vi, targetStorages, targetRegistry)
 
       setDeploymentStatus(DeploymentStatus.Deployed)
 
-      e.target.classList.remove(styles.dappletsIsLoadingDeploy)
+      // e.target.classList.remove(styles.dappletsIsLoadingDeploy)
       setTextButtonDeploy('Deploy')
       setUpdate(true)
     } catch (err) {
@@ -323,10 +328,10 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         message: [err.message],
       })
       setModalError(true)
-      e.target.classList.remove(styles.dappletsIsLoadingDeploy)
+      // e.target.classList.remove(styles.dappletsIsLoadingDeploy)
       setTextButtonDeploy('Deploy')
     } finally {
-      setLoadingDeploy(false)
+      setLoadingDeployFinally()
       await _updateData()
     }
   }
@@ -401,6 +406,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   }}
                   className={cn(styles.dappletsReupload, {
                     [styles.dapDeploy]: m.isDeployed?.[0] !== false,
+                    [styles.dappletsIsLoadingDeploy]: isLoadingDeploy,
                   })}
                 >
                   {textButtonDeploy}

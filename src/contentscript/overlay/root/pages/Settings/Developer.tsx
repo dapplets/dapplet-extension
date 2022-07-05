@@ -19,6 +19,10 @@ export interface DeveloperProps {
   setUnderConstructionDetails: (x) => void
   isShowChildrenRegistery: boolean
   setShowChildrenRegistery: (x) => void
+
+  isLoadingDeploy: boolean
+  setLoadingDeploy: () => void
+  setLoadingDeployFinally: () => void
 }
 export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [registries, setRegistries] = useState([])
@@ -40,6 +44,9 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     setUnderConstructionDetails,
     isShowChildrenRegistery,
     setShowChildrenRegistery,
+    isLoadingDeploy,
+    setLoadingDeploy,
+    setLoadingDeployFinally,
   } = props
 
   useEffect(() => {
@@ -55,12 +62,14 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
         if (['index.json', 'dapplet.json'].includes(urlEnding)) {
           setRegistryInput(currentUrl)
         }
-        setLoadButton(false)
+
         if (isUpdate) {
           await loadRegistries()
           setUpdate(false)
+          setLoadButton(false)
         }
       }
+      setLoadButton(false)
     }
     init()
 
@@ -68,6 +77,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       _isMounted.current = false
     }
   }, [isUpdate])
+  console.log(isLoadButton, 'isLoadButton')
 
   const loadRegistries = async () => {
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
@@ -210,6 +220,9 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                           <div key={registryUrl + i}>
                             {modules.length > 0 && registryUrl === r.url && (
                               <DevModule
+                                isLoadingDeploy={isLoadingDeploy}
+                                setLoadingDeploy={setLoadingDeploy}
+                                setLoadingDeployFinally={setLoadingDeployFinally}
                                 setUpdate={setUpdate}
                                 isLocalhost={isLocalhost}
                                 setDappletsDetail={setDappletsDetail}

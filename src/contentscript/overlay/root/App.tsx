@@ -17,7 +17,6 @@ import ManifestDTO from '../../../background/dto/manifestDTO'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
 
-// import { ReactComponent as Card } from './assets/svg/card.svg'
 // import { ReactComponent as Account } from './assets/svg/connected-account.svg'
 import { ReactComponent as DappletsLogo } from './assets/svg/dapplets-logo.svg'
 import { ReactComponent as Home } from './assets/svg/home-toolbar.svg'
@@ -101,6 +100,7 @@ interface S {
   isOpenWallet: boolean
   classNameSearch: string
   classNameSearchButton: string
+  isLoadingDeploy: boolean
 }
 
 class _App extends React.Component<P, S> {
@@ -114,6 +114,7 @@ class _App extends React.Component<P, S> {
     isOpenWallet: false,
     classNameSearch: '',
     classNameSearchButton: '',
+    isLoadingDeploy: false,
   }
 
   async componentDidMount() {
@@ -327,6 +328,14 @@ class _App extends React.Component<P, S> {
   closeOpenWallet = () => {
     this.setState({ isOpenWallet: false })
   }
+
+  setLoadingDeploy = () => {
+    this.setState({ isLoadingDeploy: true })
+  }
+  setLoadingDeployFinally = () => {
+    this.setState({ isLoadingDeploy: false })
+  }
+
   render() {
     const p = this.props
     const s = this.state
@@ -416,7 +425,13 @@ class _App extends React.Component<P, S> {
 
               {pathname === '/system/notifications' && <Notifications />}
 
-              {pathname === '/system/settings' && <SettingsOverlay />}
+              {pathname === '/system/settings' && (
+                <SettingsOverlay
+                  isLoadingDeploy={s.isLoadingDeploy}
+                  setLoadingDeploy={this.setLoadingDeploy}
+                  setLoadingDeployFinally={this.setLoadingDeployFinally}
+                />
+              )}
 
               {overlays
                 .filter((x) => !x.isSystemPopup)

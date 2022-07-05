@@ -1,5 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
 import { DappletsMainInfo } from '../DappletsInfo'
@@ -28,8 +28,14 @@ export const NAVIGATION_LIST = [
   { _id: '0', title: 'Settings' },
   { _id: '1', title: 'Developer' },
 ]
+export interface SettingsOverlayProps {
+  isLoadingDeploy: boolean
+  setLoadingDeploy: () => void
+  setLoadingDeployFinally: () => void
+}
 
-export const SettingsOverlay = () => {
+export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
+  const { isLoadingDeploy, setLoadingDeploy, setLoadingDeployFinally } = props
   const [activeTab, setActiveTab] = useState(SettingsTabs.SETTINGS)
   const [activeTaDappletsDetails, setActiveTabDappletsDetails] = useState(DappletsDetails.MAININFO)
   const [activeTabUnderConstructionDetails, setActiveTabUnderConstructionDetails] = useState(
@@ -131,6 +137,9 @@ export const SettingsOverlay = () => {
 
             {activeTab === SettingsTabs.DEVELOPER && (
               <Developer
+                isLoadingDeploy={isLoadingDeploy}
+                setLoadingDeploy={setLoadingDeploy}
+                setLoadingDeployFinally={setLoadingDeployFinally}
                 isShowChildrenRegistery={isShowChildrenRegistery}
                 setShowChildrenRegistery={setShowChildrenRegistery}
                 setModuleVersion={setModuleVersion}
