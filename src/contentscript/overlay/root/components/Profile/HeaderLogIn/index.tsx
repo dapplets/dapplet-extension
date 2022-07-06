@@ -71,12 +71,16 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const connectWallet = async () => {
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
     if (isOverlay) {
+      setOpen()
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       await refresh()
+      setOpen()
     } else {
+      setOpen()
       pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       window.close()
       await refresh()
+      setOpen()
     }
   }
 
