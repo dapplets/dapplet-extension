@@ -77,7 +77,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       _isMounted.current = false
     }
   }, [isUpdate])
-  console.log(isLoadButton, 'isLoadButton')
 
   const loadRegistries = async () => {
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
