@@ -29,6 +29,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     <div
       onClick={() => {
         !p.isActive && p.onTabClick()
+
         p.setOpenWallet()
       }}
       className={cn(styles.tab, {
@@ -39,14 +40,18 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       <div className={styles.top}>
         {p.icon && typeof p.icon === 'function' ? (
           <p.icon
-            onClick={p.onTabClick}
+            onClick={() => {
+              // !p.isActive && p.onTabClick()
+            }}
             className={cn(styles.image, {
               [styles.cursor]: !p.isActive,
             })}
           />
         ) : p.icon && typeof p.icon === 'object' && 'moduleName' in p.icon ? (
           <ModuleIcon
-            onClick={p.onTabClick}
+            onClick={() => {
+              // !p.isActive && p.onTabClick()
+            }}
             className={cn(styles.image, {
               [styles.cursor]: !p.isActive,
             })}
@@ -55,7 +60,9 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           />
         ) : (
           <StorageRefImage
-            onClick={p.onTabClick}
+            onClick={() => {
+              // !p.isActive && p.onTabClick()
+            }}
             className={cn(styles.image, {
               [styles.cursor]: !p.isActive,
             })}
