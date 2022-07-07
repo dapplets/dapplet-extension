@@ -23,10 +23,12 @@ export type Module = ManifestDTO & {
 export interface DappletsProps {
   search: string
   onUserSettingsClick: (mi: ManifestDTO) => void
+  dropdownListValue: string
+  setDropdownListValue: (x) => void
 }
 
 export const Dapplets: FC<DappletsProps> = (props) => {
-  const { search, onUserSettingsClick } = props
+  const { search, onUserSettingsClick, dropdownListValue, setDropdownListValue } = props
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
   const [isLoading, setLoading] = useState<boolean>(null)
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
@@ -35,7 +37,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [loadShowButton, setLoadShowButton] = useState(false)
   const [contextId, setContextIds] = useState<string[]>([])
   const [trustedUsers, setTrustedUsers] = useState([])
-  const [dropdownListValue, setDropdownListValue] = useState('All')
+  // const [dropdownListValue, setDropdownListValue] = useState('All')
   const _isMounted = useRef(true)
 
   useEffect(() => {
@@ -278,18 +280,21 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.isMyDapplet === true) return find(x.author)
+        // setDropdownListValue('Local')
       })
     }
     if (dropdownListValue === 'Trusted Users') {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.author !== null) return find(x.author)
+        // setDropdownListValue('Trusted Users')
       })
     }
     if (dropdownListValue === 'Public') {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.isUnderConstruction !== true) return find(x.author)
+        // setDropdownListValue('Public')
       })
     }
   }

@@ -101,6 +101,7 @@ interface S {
   classNameSearch: string
   classNameSearchButton: string
   isLoadingDeploy: boolean
+  dropdownListValue: string
 }
 
 class _App extends React.Component<P, S> {
@@ -115,6 +116,7 @@ class _App extends React.Component<P, S> {
     classNameSearch: '',
     classNameSearchButton: '',
     isLoadingDeploy: false,
+    dropdownListValue: 'All',
   }
 
   async componentDidMount() {
@@ -335,6 +337,9 @@ class _App extends React.Component<P, S> {
   setLoadingDeployFinally = () => {
     this.setState({ isLoadingDeploy: false })
   }
+  setDropdownListValue = (value: string) => {
+    this.setState({ dropdownListValue: value })
+  }
 
   render() {
     const p = this.props
@@ -420,7 +425,12 @@ class _App extends React.Component<P, S> {
               className={cn(styles.children, 'dapplets-overlay-nav-content-list')}
             >
               {pathname === '/system/dapplets' && (
-                <Dapplets search={s.search} onUserSettingsClick={this.handleUserSettingsClick} />
+                <Dapplets
+                  search={s.search}
+                  onUserSettingsClick={this.handleUserSettingsClick}
+                  setDropdownListValue={this.setDropdownListValue}
+                  dropdownListValue={s.dropdownListValue}
+                />
               )}
 
               {pathname === '/system/notifications' && <Notifications />}
