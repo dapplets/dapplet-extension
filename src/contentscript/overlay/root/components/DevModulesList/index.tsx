@@ -154,7 +154,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     return () => {
       isMounted = false
     }
-  }, [targetChain, currentAccount, modules[0], isLoadingDeploy])
+  }, [targetChain, currentAccount, modules[0], isLoadingDeploy, isModalError])
 
   modules.forEach((x) => {
     nodes.set(x.versions[0] ? x.module.name + '#' + x.versions[0]?.branch : x.module.name, x)
@@ -329,6 +329,8 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         setTextButtonDeploy('Deploy')
         setUpdate(true)
       } catch (err) {
+        console.log(err)
+
         setMessageError({
           type: 'negative',
           header: 'Publication error',
@@ -349,10 +351,10 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
     try {
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
+      await _updateData()
     } catch (e) {
       console.log(e)
     } finally {
-      await _updateData()
       window.close()
     }
   }

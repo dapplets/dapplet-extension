@@ -39,16 +39,6 @@
 .top {
   position: relative;
   top: 2px;
-
-  // cursor: pointer;
-
-  // &:hover {
-  //   svg {
-  //     path {
-  //       fill: $PrimaryHover;
-  //     }
-  //   }
-  // }
 }
 
 .close {
@@ -86,6 +76,10 @@
 
   img {
     filter: grayscale(100%);
+
+    &:hover {
+      filter: none;
+    }
   }
 
   .top {
@@ -97,6 +91,14 @@
     svg {
       path {
         fill: $MainGrey;
+      }
+    }
+
+    &:hover {
+      svg {
+        path {
+          fill: $PrimaryHover;
+        }
       }
     }
   }
