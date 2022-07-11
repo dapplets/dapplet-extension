@@ -33,6 +33,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const { isMini, setOpen, isOpen, newProfile, isOverlay } = props
 
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
+  const [selectedWallet, setSelectedWallet] = useState<string | null>(null)
   const connectedDescriptors = descriptors.filter((x) => x.connected)
   const [isModal, setModal] = useState(false)
   const [isModalWallet, setModalWallet] = useState(false)
@@ -54,8 +55,13 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   }, [isOpen, isMini, newProfile, isModal])
 
   const refresh = async () => {
-    const { getWalletDescriptors } = await initBGFunctions(browser)
+    const { getWalletDescriptors, getDefaultWalletFor } = await initBGFunctions(browser)
     const descriptors = await getWalletDescriptors()
+    const selectedWallet = await getDefaultWalletFor(
+      DefaultSigners.EXTENSION,
+      ChainTypes.ETHEREUM_GOERLI
+    )
+    setSelectedWallet(selectedWallet)
     setDescriptors(descriptors)
   }
 
@@ -113,8 +119,10 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         visible={isOpen}
         disconnectButtonClick={disconnectButtonClick}
         wallets={connectedDescriptors}
+        selectedWallet={selectedWallet}
         onClose={setOpen}
         connectWallet={connectWallet} // isEveryWalletConnected ? null : connectWallet
+        refresh={refresh}
       />
       <ModalWallet
         visible={isModalWallet}
@@ -128,21 +136,26 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
 interface ModalProps {
   visible: boolean
   onClose?: () => void
-  wallets: any
+  wallets: WalletDescriptor[]
+  selectedWallet: string
   disconnectButtonClick: (x: any, y: any) => void
   connectWallet?: () => void
+  refresh?: () => void
 }
 
 export const Modal = ({
   visible = false,
   onClose,
   wallets,
+  selectedWallet,
   disconnectButtonClick,
   connectWallet,
+  refresh,
 }: ModalProps) => {
   const [isNotVisible, setNotVisible] = useState(false)
   const [value, setValue] = useState('')
   const [copied, copy, setCopied] = useCopied(value)
+
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
       case 'Escape':
@@ -161,7 +174,7 @@ export const Modal = ({
       document.removeEventListener('keydown', onKeydown)
     }
   })
-  useEffect(() => {}, [value])
+
   if (!visible) return null
 
   const newVisible = (hash: string): string => {
@@ -169,6 +182,16 @@ export const Modal = ({
     const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
     return `${firstFourCharacters}...${lastFourCharacters}`
   }
+
+  const handleWalletClick = async (wallet: WalletDescriptor) => {
+    const { setWalletFor } = await initBGFunctions(browser)
+    await setWalletFor(wallet.type, DefaultSigners.EXTENSION, wallet.chain)
+    refresh()
+  }
+
+  const selectedWalletDescriptor = selectedWallet
+    ? wallets.find((x) => x.type === selectedWallet)
+    : null
 
   return (
     <div
@@ -193,11 +216,22 @@ export const Modal = ({
         <div className={styles.profileBlock}>
           <div className={styles.profileBlockImg}>
             <span className={styles.profileImg}>
-              <WalletImg />
+              {selectedWalletDescriptor && selectedWalletDescriptor.account ? (
+                <img
+                  src={makeBlockie(selectedWalletDescriptor.account)}
+                  className={styles.profileImg}
+                />
+              ) : (
+                <WalletImg />
+              )}
             </span>
           </div>
 
-          <p className={styles.notEnsHash}>wallets</p>
+          <p className={styles.notEnsHash}>
+            {selectedWalletDescriptor?.account
+              ? newVisible(selectedWalletDescriptor?.account)
+              : 'Wallets'}
+          </p>
         </div>
         <div className={styles.walletBlock}>
           {wallets &&
@@ -205,7 +239,7 @@ export const Modal = ({
               <div key={i} className={styles.newProfileBlock}>
                 <div
                   onClick={() => {
-                    console.log(wallets)
+                    handleWalletClick(x)
                   }}
                   className={styles.newProfileBlockInfo}
                 >

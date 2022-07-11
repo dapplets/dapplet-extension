@@ -53,6 +53,8 @@ browser.runtime.onMessage.addListener(
     connectWallet: walletService.connectWallet.bind(walletService),
     disconnectWallet: walletService.disconnectWallet.bind(walletService),
     getWalletDescriptors: walletService.getWalletDescriptors.bind(walletService),
+    getWalletFor: walletService.getWalletFor.bind(walletService),
+    getDefaultWalletFor: walletService.getDefaultWalletFor.bind(walletService),
     setWalletFor: walletService.setWalletFor.bind(walletService),
     unsetWalletFor: walletService.unsetWalletFor.bind(walletService),
     getAddress: walletService.getAddress.bind(walletService),
