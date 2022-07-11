@@ -25,6 +25,12 @@ export interface OverlayTabProps {
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const visibleMenus = p.menus.filter((x) => x.hidden !== true)
 
+  const _handleCloseClick: React.MouseEventHandler<HTMLSpanElement> = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    p.onCloseClick()
+  }
+
   return (
     <div
       onClick={() => {
@@ -70,7 +76,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           />
         )}
         {!p.pinned && (
-          <span className={styles.close} onClick={p.onCloseClick}>
+          <span className={styles.close} onClick={_handleCloseClick}>
             <Close />
           </span>
         )}
