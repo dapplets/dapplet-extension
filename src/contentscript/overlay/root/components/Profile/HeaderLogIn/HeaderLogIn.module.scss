@@ -85,7 +85,6 @@
   line-height: 100%;
 
   align-items: center;
-  text-transform: capitalize;
 
   color: $MainGrey;
 }
@@ -326,8 +325,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
+  cursor: pointer;
 
   &:hover {
+    background: #eaf0f0;
+  }
+
+  &:active {
     background: $StrokeColor;
   }
 }
