@@ -46,7 +46,27 @@
   top: -7px;
   right: -7px;
 
+  display: block;
+
+  width: 18px;
+  height: 18px;
+
   cursor: pointer;
+
+  border-radius: 50%;
+
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 17 17' fill='none'%3E%3Crect x='0.5' y='0.5' width='16' height='16' rx='8' fill='%23D9304F'/%3E%3Cpath d='M10.7438 5.375L8.5 7.61875L6.25625 5.375L5.375 6.25625L7.61875 8.5L5.375 10.7438L6.25625 11.625L8.5 9.38125L10.7438 11.625L11.625 10.7438L9.38125 8.5L11.625 6.25625L10.7438 5.375Z' fill='white'/%3E%3Crect x='0.5' y='0.5' width='16' height='16' rx='8' stroke='%23F5F5F5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+
+  &:hover {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 17 17' fill='none'%3E%3Crect x='0.5' y='0.5' width='16' height='16' rx='8' fill='%23eb9dab'/%3E%3Cpath d='M10.7438 5.375L8.5 7.61875L6.25625 5.375L5.375 6.25625L7.61875 8.5L5.375 10.7438L6.25625 11.625L8.5 9.38125L10.7438 11.625L11.625 10.7438L9.38125 8.5L11.625 6.25625L10.7438 5.375Z' fill='white'/%3E%3Crect x='0.5' y='0.5' width='16' height='16' rx='8' stroke='%23F5F5F5'/%3E%3C/svg%3E");
+  }
+
+  &:active {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 17 17' fill='none'%3E%3Crect x='0.5' y='0.5' width='16' height='16' rx='8' fill='%23a6253c'/%3E%3Cpath d='M10.7438 5.375L8.5 7.61875L6.25625 5.375L5.375 6.25625L7.61875 8.5L5.375 10.7438L6.25625 11.625L8.5 9.38125L10.7438 11.625L11.625 10.7438L9.38125 8.5L11.625 6.25625L10.7438 5.375Z' fill='white'/%3E%3Crect x='0.5' y='0.5' width='16' height='16' rx='8' stroke='%23F5F5F5'/%3E%3C/svg%3E");
+  }
 }
 
 .image {
@@ -203,46 +223,6 @@
 
   svg {
     width: 100%;
-  }
-}
-
-.close {
-  svg {
-    path {
-      fill: #fff !important;
-    }
-  }
-
-  &:hover {
-    svg {
-      rect {
-        fill: $PrimaryHover;
-
-        path {
-          fill: #fff !important;
-        }
-      }
-    }
-
-    path {
-      fill: #fff !important;
-    }
-  }
-
-  &:active {
-    svg {
-      path {
-        fill: #fff !important;
-      }
-
-      rect {
-        fill: $PrimaryPressed;
-
-        path {
-          fill: #fff !important;
-        }
-      }
-    }
   }
 }
 

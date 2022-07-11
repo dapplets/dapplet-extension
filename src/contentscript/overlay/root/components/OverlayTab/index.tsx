@@ -1,7 +1,6 @@
 import cn from 'classnames'
 import React, { ReactElement } from 'react'
 import { StorageRef } from '../../../../../background/registries/registry'
-import { ReactComponent as Close } from '../../assets/svg/close.svg'
 import { ToolbarTabMenu } from '../../types'
 import { StorageRefImage } from '../DevModulesList'
 import { ModuleIcon, ModuleIconProps } from '../ModuleIcon'
@@ -71,7 +70,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
         )}
         {!p.pinned && (
           <span className={styles.close} onClick={p.onCloseClick}>
-            <Close />
+            {/* <Close /> */}
           </span>
         )}
       </div>
