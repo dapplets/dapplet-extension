@@ -75,7 +75,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           />
         )}
         {!p.pinned && (
-          <span className={styles.close} onClick={p.onCloseClick}>
+          <span className={styles.close} onClick={_handleCloseClick}>
             {/* <Close /> */}
           </span>
         )}
