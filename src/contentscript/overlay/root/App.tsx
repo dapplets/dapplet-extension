@@ -121,10 +121,28 @@ class _App extends React.Component<P, S> {
 
   async componentDidMount() {
     this.props.overlayManager.onActiveOverlayChanged = (overlay: Overlay) => {
-      const route = overlay
-        ? `/${overlay.source ? overlay.source : overlay.id}/${overlay.id}`
-        : '/system/dapplets'
-      this.props.navigate!(route)
+      if (overlay && overlay.registered) {
+        const route = `/${overlay.source ? overlay.source : overlay.id}/${overlay.id}`
+        this.props.navigate!(route)
+      } else {
+        // no iframe tabs
+        const { pathname } = this.props.location!
+        const activeTabId = pathname.split('/')[1]
+        const activeTabMenuId = pathname.split('/')[2]
+
+        // do not redirect if dapplet' settings is opened
+        if (activeTabId !== 'system' && activeTabMenuId === 'settings') {
+          return
+        }
+
+        // do not redirect if system tab is opened
+        if (activeTabId === 'system') {
+          return
+        }
+
+        // redirect to default page
+        this.props.navigate!(`/system/dapplets`)
+      }
     }
 
     const { getDevMode } = await initBGFunctions(browser)
@@ -222,12 +240,14 @@ class _App extends React.Component<P, S> {
 
     // remove internal tabs
     if (this.state.internalTabs.length > 0) {
-      const beforeCount = this.state.internalTabs.length
       const internalTabs = this.state.internalTabs.filter((x) => x.id !== tab.id)
-      const afterCount = internalTabs.length
       this.setState({ internalTabs })
 
-      if (beforeCount !== afterCount) {
+      const { pathname } = this.props.location!
+      const activeTabId = pathname.split('/')[1]
+
+      // redirect to default page if an active tab was closed
+      if (activeTabId === tab.id) {
         this.props.navigate!(`/system/dapplets`)
       }
     }
