@@ -336,7 +336,14 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           header: 'Publication error',
           message: [err.message],
         })
-        setModalError(true)
+        if (messageError) {
+          messageError.message.map((m) => {
+            const messageErr = m.toLowerCase()
+            messageErr.includes('You are not the owner of this module') ? null : setModalError(true)
+          })
+        }
+
+        // setModalError(true)
         setNotAccountModal(false)
 
         setTextButtonDeploy('Deploy')
@@ -511,10 +518,11 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         <Modal
           visible={isModalError}
           title={messageError.header}
+          classNameWrapper={styles.modalDefaultWrapper}
           content={
             <div className={styles.modalDefaultContent}>
               {messageError.message.map((m, i) => (
-                <p key={i} style={{ overflowWrap: 'break-word' }}>
+                <p key={i} className={styles.modalDefaultContentText}>
                   {m === `Cannot read properties of null (reading 'length')`
                     ? 'Please fill in the empty fields'
                     : m}

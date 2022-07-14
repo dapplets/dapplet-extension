@@ -374,3 +374,20 @@
     text-align: center;
   }
 }
+
+.modalDefaultContentText {
+  display: inline-block;
+  overflow-y: scroll;
+
+  max-width: 100%;
+  max-height: 30vh;
+
+  text-overflow: ellipsis;
+  overflow-wrap: break-word;
+}
+
+.modalDefaultWrapper {
+  justify-content: center;
+
+  height: 80vh;
+}

@@ -13,6 +13,8 @@ export interface ProfileProps {
   isMini: boolean
   setOpenWallet: () => void
   isOpenWallet: boolean
+  setOpenWalletMini: () => void
+  isOpenSearch: boolean
 }
 
 let _isMounted = false
@@ -26,6 +28,8 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
     isMini,
     setOpenWallet,
     isOpenWallet,
+    setOpenWalletMini,
+    isOpenSearch,
   } = props
 
   const [isModalWalletConnectProfile, setModalWalletConnectProfile] = useState(false)
@@ -41,7 +45,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
     return () => {
       _isMounted = false
     }
-  }, [newProfile])
+  }, [newProfile, isMini])
 
   return (
     <>
@@ -58,6 +62,8 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
             setModalWalletConnect={setModalWalletConnectProfile}
             newProfile={newProfile}
             isOverlay={isOverlay}
+            setOpenWalletMini={setOpenWalletMini}
+            isOpenSearch={isOpenSearch}
           />
         </>
       )}

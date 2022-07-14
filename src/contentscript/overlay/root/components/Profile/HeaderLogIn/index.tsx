@@ -27,10 +27,12 @@ export interface HeaderLogInProps {
   setModalWalletConnect: (x: boolean) => void
   newProfile: any
   isOverlay: boolean
+  setOpenWalletMini: () => void
+  isOpenSearch: boolean
 }
 let _isMounted = false
 export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
-  const { isMini, setOpen, isOpen, newProfile, isOverlay } = props
+  const { isMini, setOpen, isOpen, newProfile, isOverlay, setOpenWalletMini, isOpenSearch } = props
 
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
   const [selectedWallet, setSelectedWallet] = useState<string | null>(null)
@@ -38,21 +40,41 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const [isModal, setModal] = useState(false)
   const [isModalWallet, setModalWallet] = useState(false)
   const onCloseModalWallet = () => setModalWallet(false)
+  const [walletImage, setWalletImage] = useState(null)
+  const [walletAccount, setWalletAccount] = useState(null)
+  const [walletIcon, setWalletIcon] = useState(null)
+  const [walletTypeWalletConnect, setWalletTypeWalletConnect] = useState(null)
+  const newVisible = (hash: string): string => {
+    const firstFourCharacters = hash.substring(0, 6)
+    const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
+    return `${firstFourCharacters}...${lastFourCharacters}`
+  }
   // const isEveryWalletConnected = descriptors.filter((x) => !x.connected).length === 0
 
   useEffect(() => {
     _isMounted = true
     const init = async () => {
-      refresh()
+      await refresh()
     }
 
     init()
 
     return () => {
       _isMounted = false
+
       EventBus.off('wallet_changed', refresh)
     }
-  }, [isOpen, isMini, newProfile, isModal])
+  }, [
+    isOpen,
+    isMini,
+    newProfile,
+    isModal,
+    walletImage,
+    walletAccount,
+    walletIcon,
+    walletTypeWalletConnect,
+    isMini,
+  ])
 
   const refresh = async () => {
     const { getWalletDescriptors, getDefaultWalletFor } = await initBGFunctions(browser)
@@ -61,8 +83,32 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       DefaultSigners.EXTENSION,
       ChainTypes.ETHEREUM_GOERLI
     )
+
     setSelectedWallet(selectedWallet)
+
     setDescriptors(descriptors)
+    !isOpen && !isOpenSearch && setOpenWalletMini()
+    if (descriptors.length > 0) {
+      const connectedDescriptors = descriptors.filter((x) => x.connected)
+      const newDescriptors = connectedDescriptors?.find((x) => x.type === selectedWallet)
+      const newWalletImage = makeBlockie(newDescriptors.account)
+      setWalletImage(newWalletImage)
+      if (newDescriptors.type === 'near') {
+        setWalletAccount(newDescriptors.account)
+      } else {
+        setWalletAccount(newVisible(newDescriptors.account))
+      }
+      if (newDescriptors.type !== 'dapplets') {
+        setWalletIcon(newDescriptors.meta.icon)
+      } else {
+        setWalletIcon(walletIcons[newDescriptors.type])
+      }
+      if (selectedWallet === 'walletconnect') {
+        setWalletTypeWalletConnect(walletIcons[newDescriptors.type])
+      } else {
+        setWalletTypeWalletConnect(null)
+      }
+    }
   }
 
   const filteredProfile = useMemo(() => {
@@ -76,6 +122,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   }
   const connectWallet = async () => {
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
+
     if (isOverlay) {
       setOpen()
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
@@ -100,17 +147,46 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
           setOpen()
         }}
       >
-        <div
-          className={styles.avatar}
-          onClick={() => {
-            setOpen()
-          }}
-        >
-          <Card />
-        </div>
+        {walletImage ? (
+          <img
+            src={walletImage}
+            className={styles.avatar}
+            onClick={() => {
+              setOpen()
+            }}
+          />
+        ) : (
+          <div
+            className={styles.avatar}
+            onClick={() => {
+              setOpen()
+            }}
+          >
+            <Card />
+          </div>
+        )}
+
         {!isMini && (
           <div className={cn(styles.wrapperNames)}>
-            <p className={styles.hash}>wallets</p>
+            {walletAccount ? (
+              <p style={{ fontSize: '12px' }} className={styles.hash}>
+                {walletAccount}
+              </p>
+            ) : (
+              <p style={{ fontSize: '12px', textTransform: 'uppercase' }} className={styles.hash}>
+                wallets
+              </p>
+            )}
+            {walletAccount && (
+              <div
+                style={{ width: '100%', display: 'flex', alignItems: 'center', marginLeft: '5px' }}
+              >
+                {walletTypeWalletConnect ? (
+                  <img className={styles.walletsIcon} src={walletTypeWalletConnect} alt="" />
+                ) : null}
+                {walletIcon ? <img className={styles.walletsIcon} src={walletIcon} alt="" /> : null}
+              </div>
+            )}
           </div>
         )}
       </header>
@@ -123,6 +199,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         onClose={setOpen}
         connectWallet={connectWallet} // isEveryWalletConnected ? null : connectWallet
         refresh={refresh}
+        setOpenWalletMini={setOpenWalletMini}
       />
       <ModalWallet
         visible={isModalWallet}
@@ -141,6 +218,7 @@ interface ModalProps {
   disconnectButtonClick: (x: any, y: any) => void
   connectWallet?: () => void
   refresh?: () => void
+  setOpenWalletMini: () => void
 }
 
 export const Modal = ({
@@ -151,6 +229,7 @@ export const Modal = ({
   disconnectButtonClick,
   connectWallet,
   refresh,
+  setOpenWalletMini,
 }: ModalProps) => {
   const [isNotVisible, setNotVisible] = useState(false)
   const [value, setValue] = useState('')
@@ -163,6 +242,8 @@ export const Modal = ({
         setTimeout(() => {
           setNotVisible(false)
           onClose()
+          refresh()
+          // setOpenWalletMini()
         }, 300)
         break
     }
@@ -192,6 +273,8 @@ export const Modal = ({
   const selectedWalletDescriptor = selectedWallet
     ? wallets.find((x) => x.type === selectedWallet)
     : null
+  // console.log(wallets)
+  // console.log(selectedWallet)
 
   return (
     <div
@@ -200,6 +283,8 @@ export const Modal = ({
         setTimeout(() => {
           setNotVisible(false)
           onClose()
+          refresh()
+          // setOpenWalletMini()
         }, 300)
       }}
       className={cn(styles.fakeModal, {

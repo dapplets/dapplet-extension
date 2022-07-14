@@ -102,6 +102,7 @@ interface S {
   classNameSearchButton: string
   isLoadingDeploy: boolean
   dropdownListValue: string
+  isMiniWallets: boolean
 }
 
 class _App extends React.Component<P, S> {
@@ -117,6 +118,7 @@ class _App extends React.Component<P, S> {
     classNameSearchButton: '',
     isLoadingDeploy: false,
     dropdownListValue: 'All',
+    isMiniWallets: false,
   }
 
   async componentDidMount() {
@@ -264,12 +266,14 @@ class _App extends React.Component<P, S> {
 
   handleOpenSearchClick = () => {
     this.setState({
+      isMiniWallets: true,
       isOpenSearch: true,
     })
   }
 
   handleCloseSearch = () => {
     this.setState({
+      isMiniWallets: false,
       classNameSearch: 'close',
     })
     setTimeout(() => {
@@ -345,10 +349,14 @@ class _App extends React.Component<P, S> {
       isOpenWallet: !this.state.isOpenWallet,
       isOpenSearch: !this.state.isOpenWallet === true ? false : this.state.isOpenSearch,
       search: '',
+      isMiniWallets: !this.state.isMiniWallets,
     })
   }
   closeOpenWallet = () => {
-    this.setState({ isOpenWallet: false })
+    this.setState({
+      isOpenWallet: false,
+      isMiniWallets: false,
+    })
   }
 
   setLoadingDeploy = () => {
@@ -359,6 +367,11 @@ class _App extends React.Component<P, S> {
   }
   setDropdownListValue = (value: string) => {
     this.setState({ dropdownListValue: value })
+  }
+  setOpenWalletMini = () => {
+    this.setState({
+      isMiniWallets: false,
+    })
   }
 
   render() {
@@ -399,7 +412,7 @@ class _App extends React.Component<P, S> {
             <header className={styles.header}>
               <div className={styles.left}>
                 <Profile
-                  isMini
+                  isMini={s.isMiniWallets}
                   handleWalletLengthConnect={this.handleWalletLengthConnect}
                   isWalletLength={s.isWalletLength}
                   handleWalletConnect={this.handleWalletConnect}
@@ -408,6 +421,8 @@ class _App extends React.Component<P, S> {
                   isOverlay={true}
                   setOpenWallet={this.setOpenWallet}
                   isOpenWallet={s.isOpenWallet}
+                  setOpenWalletMini={this.setOpenWalletMini}
+                  isOpenSearch={s.isOpenSearch}
                 />
               </div>
 
