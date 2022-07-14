@@ -7,6 +7,12 @@
   display: inline-block;
 
   font-family: Roboto, sans-serif;
+
+  &.mini {
+
+    width: 39px;
+    height: 39px;
+  }
 }
 
 .avatar {
@@ -56,6 +62,8 @@
   &.mini {
     padding: 2px;
     display: inline-block;
+    width: 39px;
+    height: 39px;
   }
 }
 

@@ -1,7 +1,11 @@
+import anime from 'animejs'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { FC, useEffect, useMemo, useState } from 'react'
+import makeBlockie from 'ethereum-blockies-base64'
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../../common/global-event-bus'
+import * as walletIcons from '../../../../../../common/resources/wallets'
 import {
   ChainTypes,
   DefaultSigners,
@@ -9,15 +13,13 @@ import {
   WalletTypes,
 } from '../../../../../../common/types'
 import { ReactComponent as WalletImg } from '../../../assets/svg/wallet.svg'
-import styles from './HeaderLogIn.module.scss'
-
-import makeBlockie from 'ethereum-blockies-base64'
-import { browser } from 'webextension-polyfill-ts'
-import * as walletIcons from '../../../../../../common/resources/wallets'
-import { ReactComponent as Card } from '../../../assets/svg/card.svg'
 import useCopied from '../../../hooks/useCopyed'
 import { Wallet } from '../../../pages/Wallet'
 import { Modal as ModalWallet } from '../../Modal'
+import styles from './HeaderLogIn.module.scss'
+
+import { ReactComponent as Card } from '../../../assets/svg/card.svg'
+
 export interface HeaderLogInProps {
   avatar?: string
   hash?: string
@@ -44,6 +46,8 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const [walletAccount, setWalletAccount] = useState(null)
   const [walletIcon, setWalletIcon] = useState(null)
   const [walletTypeWalletConnect, setWalletTypeWalletConnect] = useState(null)
+  const liRef = useRef<HTMLDivElement>()
+
   const newVisible = (hash: string): string => {
     const firstFourCharacters = hash.substring(0, 6)
     const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
@@ -74,6 +78,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     walletIcon,
     walletTypeWalletConnect,
     isMini,
+    liRef,
   ])
 
   const refresh = async () => {
@@ -136,9 +141,37 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       setOpen()
     }
   }
+  const x = useMemo(() => {
+    // const animeRef =
+    anime({
+      targets: liRef.current,
+      scale: () => {
+        if (isMini === true) {
+          return ['1', '0']
+        } else if (isMini === false) {
+          return ['0', '1']
+        }
+      },
+      // scaleY: () => {
+      //   if (isMini === true) {
+      //     return ['1', '0']
+      //   } else if (isMini === false) {
+      //     return ['0', '1']
+      //   }
+      // },
+      elasticity: () => {
+        if (isMini === true) {
+          return 0
+        } else if (isMini === false) {
+          return 300
+        }
+      },
+      duration: 500,
+    })
+  }, [liRef, isMini])
 
   return (
-    <div className={styles.wrapper}>
+    <div className={cn(styles.wrapper, { [styles.mini]: isMini })}>
       <header
         className={cn(styles.header, {
           [styles.mini]: isMini,
@@ -166,29 +199,34 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
           </div>
         )}
 
-        {!isMini && (
-          <div className={cn(styles.wrapperNames)}>
-            {walletAccount ? (
-              <p style={{ fontSize: '12px' }} className={styles.hash}>
-                {walletAccount}
-              </p>
-            ) : (
-              <p style={{ fontSize: '12px', textTransform: 'uppercase' }} className={styles.hash}>
-                wallets
-              </p>
-            )}
-            {walletAccount && (
-              <div
-                style={{ width: '100%', display: 'flex', alignItems: 'center', marginLeft: '5px' }}
-              >
-                {walletTypeWalletConnect ? (
-                  <img className={styles.walletsIcon} src={walletTypeWalletConnect} alt="" />
-                ) : null}
-                {walletIcon ? <img className={styles.walletsIcon} src={walletIcon} alt="" /> : null}
-              </div>
-            )}
-          </div>
-        )}
+        {/* {!isMini && ( */}
+        <div className={cn(styles.wrapperNames)} ref={liRef}>
+          {walletAccount ? (
+            <p style={{ fontSize: '12px' }} className={styles.hash}>
+              {walletAccount}
+            </p>
+          ) : (
+            <p style={{ fontSize: '12px', textTransform: 'uppercase' }} className={styles.hash}>
+              wallets
+            </p>
+          )}
+          {walletAccount && (
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                marginLeft: '5px',
+              }}
+            >
+              {walletTypeWalletConnect ? (
+                <img className={styles.walletsIcon} src={walletTypeWalletConnect} alt="" />
+              ) : null}
+              {walletIcon ? <img className={styles.walletsIcon} src={walletIcon} alt="" /> : null}
+            </div>
+          )}
+        </div>
+        {/* )} */}
       </header>
 
       <Modal
