@@ -266,8 +266,8 @@ class _App extends React.Component<P, S> {
 
   handleOpenSearchClick = () => {
     this.setState({
-      isMiniWallets: true,
       isOpenSearch: true,
+      isMiniWallets: true,
     })
   }
 
@@ -356,6 +356,7 @@ class _App extends React.Component<P, S> {
     this.setState({
       isOpenWallet: false,
       isMiniWallets: false,
+      isOpenSearch: false,
     })
   }
 

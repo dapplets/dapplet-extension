@@ -79,6 +79,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     walletTypeWalletConnect,
     isMini,
     liRef,
+    isOpenSearch,
   ])
 
   const refresh = async () => {
@@ -93,6 +94,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
 
     setDescriptors(descriptors)
     !isOpen && !isOpenSearch && setOpenWalletMini()
+
     if (descriptors.length > 0) {
       const connectedDescriptors = descriptors.filter((x) => x.connected)
       const newDescriptors = connectedDescriptors?.find((x) => x.type === selectedWallet)
@@ -146,35 +148,35 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     anime({
       targets: liRef.current,
       scale: () => {
-        if (isMini === true) {
-          return ['1', '0']
+        if (isMini === true || isOpenSearch) {
+          return ['0', '0']
         } else if (isMini === false) {
           return ['0', '1']
         }
       },
-      // scaleY: () => {
-      //   if (isMini === true) {
-      //     return ['1', '0']
+      // width:()=>{
+      //   if (isMini === true || isOpenSearch) {
+      //     return ['0px', '0px']
       //   } else if (isMini === false) {
       //     return ['0', '1']
       //   }
       // },
       elasticity: () => {
-        if (isMini === true) {
+        if (isMini === true || isOpenSearch) {
           return 0
         } else if (isMini === false) {
           return 300
         }
       },
-      duration: 500,
+      duration: 300,
     })
-  }, [liRef, isMini])
+  }, [liRef, isMini, isOpenSearch])
 
   return (
     <div className={cn(styles.wrapper, { [styles.mini]: isMini })}>
       <header
         className={cn(styles.header, {
-          [styles.mini]: isMini,
+          [styles.mini]: isMini || isOpenSearch,
         })}
         onClick={() => {
           setOpen()
@@ -323,7 +325,7 @@ export const Modal = ({
           onClose()
           refresh()
           // setOpenWalletMini()
-        }, 300)
+        }, 200)
       }}
       className={cn(styles.fakeModal, {
         [styles.fakeModalWrapper]: true,
