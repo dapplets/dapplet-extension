@@ -13,6 +13,7 @@ import {
   waitTab,
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
+import ConnectedAccountService from './services/connectedAccountService'
 import DiscordService from './services/discordService'
 import EnsService from './services/ensService'
 import * as EventService from './services/eventService'
@@ -42,6 +43,7 @@ const sessionService = new SessionService(walletService, overlayService)
 const featureService = new FeatureService(globalConfigService, walletService, overlayService)
 const identityService = new IdentityService(globalConfigService, walletService)
 const ensService = new EnsService(walletService)
+const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
 
 // ToDo: fix this circular dependency
 walletService.sessionService = sessionService
@@ -254,6 +256,10 @@ browser.runtime.onMessage.addListener(
     openDappletHome: overlayService.openDappletHome.bind(overlayService),
     openDappletAction: overlayService.openDappletAction.bind(overlayService),
     openPopupOverlay: overlayService.openPopupOverlay.bind(overlayService),
+
+    // Connected Account Service
+    getConnectedAccounts:
+      connectedAccountService.getConnectedAccounts.bind(connectedAccountService),
 
     // Helpers
     waitTab: (url) => waitTab(url),
