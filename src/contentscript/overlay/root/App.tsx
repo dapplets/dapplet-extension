@@ -157,6 +157,8 @@ class _App extends React.Component<P, S> {
     this.props.overlayManager.onActiveOverlayChanged = null
   }
 
+  // The function is too large
+  // Divide into several smaller ones
   getTabs = (): ToolbarTab[] => {
     const overlays = this.getOverlays()
     const overlayGroups = groupBy(overlays, (x) => x.source)
@@ -235,6 +237,8 @@ class _App extends React.Component<P, S> {
     return this.props.overlayManager.getOverlays().filter((x) => !x.parent)
   }
 
+  // As for me, the function performs too many actions.
+  // Can be divided into several functions
   handleCloseTabClick = async (tab: ToolbarTab) => {
     // remove external tabs
     const overlays = this.getOverlays()
@@ -393,6 +397,8 @@ class _App extends React.Component<P, S> {
 
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
 
+    // There are many components that accept propses and pass along the chain.
+    // Can be put into context
     return (
       <div className={cn(styles.overlay)}>
         <div className={styles.wrapper}>

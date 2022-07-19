@@ -29,6 +29,9 @@ export const Notification = (props: NotificationProps): ReactElement => {
   const [newDescription, setDescription] = useState(description)
 
   const booleanNode = refComponent.current?.classList.contains('more')
+
+  // refComponent.current?.classList
+  // Repeats. Take out as a single function
   useEffect(() => {
     if (description.length > 235) {
       if (refComponent && refComponent.current) {

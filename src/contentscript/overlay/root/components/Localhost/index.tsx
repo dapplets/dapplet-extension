@@ -37,6 +37,7 @@ export const Localhost: FC<LocalhostProps> = (props) => {
   return (
     <div className={styles.localhost}>
       <div className={styles.hostBlock}>
+        {/* Take out functions and pass as a link */}
         <button
           ref={nodeBtn}
           onClick={(e) => {
@@ -85,6 +86,7 @@ export const Localhost: FC<LocalhostProps> = (props) => {
         </div>
         <button className={styles.closeLocalhost} onClick={closeHost} />
       </div>
+      {/* What ??????? */}
       {isShowDescription && isEnabled && !error && children}
     </div>
   )

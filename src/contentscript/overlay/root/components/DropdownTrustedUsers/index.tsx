@@ -27,6 +27,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
   const [trustedUsers, setTrustedUsers] = useState([])
   const [registries, setRegistries] = useState([])
 
+  // Does it make sense to put it in a separate file?
   const regExpIndexNearTestnet = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/)
   const regExpIndexNear = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/)
   const regExpIndexENS = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/)
@@ -46,6 +47,8 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
     }
   }, [trustedUserInput])
 
+  // The same function is used in DropdownRegistery. In order not to repeat, you can make a hook
+  // What does catch do?
   const getNumIndex = (value, reg) => {
     try {
       const valueReg = value.match(reg)

@@ -50,6 +50,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
             providerInputError,
         })}
       >
+        {/* Take out functions and pass as a link */}
         <form
           style={{ width: '100%' }}
           onBlur={() => {

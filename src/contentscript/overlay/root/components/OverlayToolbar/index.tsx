@@ -60,6 +60,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     }
   }
 
+  // Move the function from onClick to a separate one and pass it as a link
   return (
     <div
       ref={nodeOverlayToolbar}
@@ -87,6 +88,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
         <div className={cn(styles.tabs, {})}>
           <div className={styles.TabList}>
+            {/* The check can be placed in a separate variable */}
             {p.tabs.length > 0 &&
               p.tabs.map((tab) => (
                 <OverlayTab

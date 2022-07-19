@@ -5,8 +5,10 @@ import { browser } from 'webextension-polyfill-ts'
 import { isValidUrl } from '../../../../../popup/helpers'
 import styles from './DropdownRegistery.module.scss'
 
-export interface DropdownRegisteryProps
-  extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {}
+export type DropdownRegisteryProps = DetailedHTMLProps<
+  HTMLAttributes<HTMLDivElement>,
+  HTMLDivElement
+>
 let _isMounted = false
 export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownRegisteryProps) => {
   const { ...anotherProps } = props
@@ -32,11 +34,13 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
       _isMounted = false
     }
   }, [])
+  // What does catch do?
   const getNumIndex = (value, reg) => {
     try {
       let valueReg = value.match(reg)
 
       return valueReg
+      // eslint-disable-next-line no-empty
     } catch {}
   }
 

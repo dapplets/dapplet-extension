@@ -17,6 +17,7 @@ export const ModuleIcon: React.FC<ModuleIconProps> = (props) => {
   const [storageRef, setStorageRef] = useState<StorageRef>(null)
 
   useEffect(() => {
+    // The exclamation mark is more common and easier to understand than the semicolon
     ;(async () => {
       const { getModuleInfoByName } = await initBGFunctions(browser)
       const mi = await getModuleInfoByName(registryUrl, moduleName)

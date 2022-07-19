@@ -8,6 +8,7 @@ export interface DappletTitleProps {
   children?: ReactChild | ReactNode
 }
 export const DappletTitle: FC<DappletTitleProps> = (props: DappletTitleProps) => {
+  // If not used, delete
   const { title, isShowDescription = false, children } = props
 
   return (

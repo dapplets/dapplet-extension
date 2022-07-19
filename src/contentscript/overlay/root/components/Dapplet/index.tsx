@@ -85,6 +85,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                   icon={HomeIcon}
                   className={styles.squareButton}
                   title="Home"
+                  // Take out as a function and pass the link
                   onClick={() => {
                     onOpenDappletAction(dapplet)
                   }}
@@ -99,6 +100,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                   icon={SettingsIcon}
                   className={styles.squareButton}
                   title="Settings"
+                  // Take out as a function and pass the link
                   onClick={() => {
                     onSettingsModule(dapplet)
                   }}
@@ -112,6 +114,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 icon={SearchIcon}
                 className={styles.squareButton}
                 title="Dapplet in the Store"
+                // Take out as a function and pass the link
                 onClick={() => {
                   onOpenStore(dapplet)
                 }}
@@ -122,6 +125,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
               title="Owner"
               value={author}
               className={styles.cardInfo}
+              // Take out as a function and pass the link
               onClick={() => onOpenStoreAuthor(dapplet)}
             />
           </div>
@@ -132,6 +136,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 appearance="smail"
                 icon={DeleteIcon}
                 title="Delete"
+                // Take out as a function and pass the link
                 onClick={() => onRemoveMyDapplet(dapplet)}
               />
             )}

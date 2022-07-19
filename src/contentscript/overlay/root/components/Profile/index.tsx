@@ -32,6 +32,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
     isOpenSearch,
   } = props
 
+  // If it is not used anywhere, delete it
   const [isModalWalletConnectProfile, setModalWalletConnectProfile] = useState(false)
 
   const [newProfile, setNewProfile] = useState([])
@@ -47,6 +48,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
     }
   }, [newProfile, isMini])
 
+  // Move the function from onClick to a separate one and pass it as a link
   return (
     <>
       {isWalletLength ? (

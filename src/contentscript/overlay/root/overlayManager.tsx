@@ -52,6 +52,7 @@ export class OverlayManager implements IOverlayManager {
 
     this._render()
 
+    // If not necessary, delete
     // // const avatarAction = document.createElement("div");
     // // avatarAction.innerHTML = `
     // //     <button>

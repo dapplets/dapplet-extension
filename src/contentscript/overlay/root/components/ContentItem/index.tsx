@@ -43,6 +43,7 @@ export class ContentItem extends React.Component<P, S> {
     this.loadFrame()
   }
 
+  // The function does too much
   loadFrame() {
     const timeoutId = setTimeout(
       () => this.setState({ loadingMode: LoadingMode.SlowLoading }),

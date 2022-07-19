@@ -118,6 +118,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     }
   }
 
+  // If it is not used anywhere, delete it
   const filteredProfile = useMemo(() => {
     return newProfile
   }, [newProfile])
@@ -143,6 +144,8 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       setOpen()
     }
   }
+
+  // If it is not used anywhere, delete it
   const x = useMemo(() => {
     // const animeRef =
     anime({

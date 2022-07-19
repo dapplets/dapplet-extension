@@ -45,6 +45,7 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
   const { storageRef, className, title, onClick } = props
   const [dataUri, setDataUri] = useState(null)
 
+  // Performs too many duties.
   useEffect(() => {
     const init = async () => {
       if (!storageRef) return
