@@ -42,6 +42,7 @@ const EXPORTABLE_PROPERTIES = [
   'dynamicAdapter',
   'preferedOverlayStorage',
   'myDapplets',
+  'connectedAccountContractAddress',
 ]
 
 export default class GlobalConfigService {
@@ -67,6 +68,9 @@ export default class GlobalConfigService {
       if (!config.myDapplets) config.myDapplets = this.getInitialConfig().myDapplets
       if (!config.targetStorages) config.targetStorages = this.getInitialConfig().targetStorages
       if (!config.xdaiProviderUrl) config.xdaiProviderUrl = this.getInitialConfig().xdaiProviderUrl
+      if (!config.connectedAccountsContractAddress)
+        config.connectedAccountsContractAddress =
+          this.getInitialConfig().connectedAccountsContractAddress
     }
 
     return config ?? this.getInitialConfig()
@@ -301,6 +305,7 @@ export default class GlobalConfigService {
       },
     ]
     config.myDapplets = []
+    config.connectedAccountsContractAddress = 'dev-1657809840477-71552146558217'
 
     return config
   }
@@ -751,5 +756,10 @@ export default class GlobalConfigService {
         'The server returns invalid response. Make sure the server complies with the Ethereum JSON RPC Specification.'
       )
     }
+  }
+
+  async getConnectedAccountsContractAddress() {
+    const config = await this.get()
+    return config.connectedAccountsContractAddress
   }
 }

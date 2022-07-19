@@ -260,6 +260,15 @@ browser.runtime.onMessage.addListener(
     // Connected Account Service
     getConnectedAccounts:
       connectedAccountService.getConnectedAccounts.bind(connectedAccountService),
+    getMinStakeAmount: connectedAccountService.getMinStakeAmount.bind(connectedAccountService),
+    getPendingRequests: connectedAccountService.getPendingRequests.bind(connectedAccountService),
+    getVerificationRequest:
+      connectedAccountService.getVerificationRequest.bind(connectedAccountService),
+    getStatus: connectedAccountService.getStatus.bind(connectedAccountService),
+    getMainAccount: connectedAccountService.getMainAccount.bind(connectedAccountService),
+    getRequestStatus: connectedAccountService.getRequestStatus.bind(connectedAccountService),
+    requestVerification: connectedAccountService.requestVerification.bind(connectedAccountService),
+    changeStatus: connectedAccountService.changeStatus.bind(connectedAccountService),
 
     // Helpers
     waitTab: (url) => waitTab(url),
