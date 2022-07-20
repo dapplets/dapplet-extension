@@ -97,15 +97,19 @@ export default class ConnectedAccountService {
 
   // ***** CALL *****
 
-  public async requestVerification(props: {
-    firstAccountId: string
-    firstOriginId: string
-    secondAccountId: string
-    secondOriginId: string
-    isUnlink: boolean
-    firstProofUrl?: string
-    secondProofUrl?: string
-  }): Promise<number> {
+  public async requestVerification(
+    props: {
+      firstAccountId: string
+      firstOriginId: string
+      secondAccountId: string
+      secondOriginId: string
+      isUnlink: boolean
+      firstProofUrl?: string
+      secondProofUrl?: string
+    },
+    stake: number
+  ): Promise<number> {
+    console.log('%%% stake', stake)
     const {
       firstAccountId,
       firstOriginId,
@@ -116,15 +120,19 @@ export default class ConnectedAccountService {
       secondProofUrl,
     } = props
     const contract = await this._getContract()
-    return contract.requestVerification({
-      firstAccountId,
-      firstOriginId,
-      secondAccountId,
-      secondOriginId,
-      isUnlink,
-      firstProofUrl: firstProofUrl === null ? undefined : firstProofUrl,
-      secondProofUrl: secondProofUrl === null ? undefined : secondProofUrl,
-    })
+    return contract.requestVerification(
+      {
+        firstAccountId,
+        firstOriginId,
+        secondAccountId,
+        secondOriginId,
+        isUnlink,
+        firstProofUrl: firstProofUrl === null ? undefined : firstProofUrl,
+        secondProofUrl: secondProofUrl === null ? undefined : secondProofUrl,
+      },
+      undefined,
+      stake
+    )
   }
 
   public async changeStatus(accountId: string, originId: string, isMain: boolean): Promise<void> {

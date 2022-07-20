@@ -46,17 +46,21 @@ class ConnectedAccounts {
 
   // ***** CALL *****
 
-  public async requestVerification(props: {
-    firstAccountId: string
-    firstOriginId: string
-    secondAccountId: string
-    secondOriginId: string
-    isUnlink: boolean
-    firstProofUrl?: string
-    secondProofUrl?: string
-  }): Promise<number> {
+  public async requestVerification(
+    props: {
+      firstAccountId: string
+      firstOriginId: string
+      secondAccountId: string
+      secondOriginId: string
+      isUnlink: boolean
+      firstProofUrl?: string
+      secondProofUrl?: string
+    },
+    stake: number
+  ): Promise<number> {
+    console.log('$$$ stake', stake)
     const { requestVerification } = await initBGFunctions(browser)
-    return requestVerification(props)
+    return requestVerification(props, stake)
   }
 
   public async changeStatus(accountId: string, originId: string, isMain: boolean): Promise<void> {
