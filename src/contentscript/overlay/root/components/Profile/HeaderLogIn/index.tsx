@@ -115,6 +115,11 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       } else {
         setWalletTypeWalletConnect(null)
       }
+    } else if (descriptors.length === 0) {
+      setWalletTypeWalletConnect(null)
+      setWalletIcon(null)
+      setWalletImage(null)
+      setWalletAccount(null)
     }
   }
 
@@ -148,7 +153,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     anime({
       targets: liRef.current,
       scale: () => {
-        if (isMini === true || isOpenSearch) {
+        if (isMini === true || isOpenSearch || isOpen) {
           return ['0', '0']
         } else if (isMini === false) {
           return ['0', '1']
@@ -176,7 +181,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     <div className={cn(styles.wrapper, { [styles.mini]: isMini })}>
       <header
         className={cn(styles.header, {
-          [styles.mini]: isMini || isOpenSearch,
+          [styles.mini]: isMini || isOpenSearch || isOpen,
         })}
         onClick={() => {
           setOpen()
