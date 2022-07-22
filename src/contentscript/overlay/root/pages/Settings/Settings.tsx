@@ -12,6 +12,7 @@ import { InputPanelSettings } from '../../components/InputPanelSettings'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { Switch } from '../../components/Switch'
+import { getDefaultValueProvider } from '../../utils/getDefaultValue'
 
 import styles from './Settings.module.scss'
 
@@ -65,7 +66,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const [targetStorages, setTargetStorages] = useState([])
 
-  // const [isPopup, setPopup] = useState(false)
+  const [isPopup, setPopup] = useState(false)
 
   const regExpUserAgentName = new RegExp(/^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/)
   const inputOfFocusIPFS = useRef<HTMLInputElement>()
@@ -93,6 +94,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
         await loadUserAgentName()
         await loadIpfsGateway()
         await loadSiaPortal()
+        await loadPopupInOverlay()
         await loadTargetStorages()
       }
     }
@@ -311,13 +313,16 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     setTargetStorages(loadTarget)
   }
 
-  const getDefaultValueProvider = async (inputValue: string) => {
-    const { getInitialConfig } = await initBGFunctions(browser)
-    const config = await getInitialConfig()
+  const loadPopupInOverlay = async () => {
+    const { getPopupInOverlay } = await initBGFunctions(browser)
+    const popupInOverlay = await getPopupInOverlay()
+    setPopup(popupInOverlay)
+  }
 
-    if (config.providerUrl !== inputValue) {
-      await setProvider(config.providerUrl)
-    }
+  const setPopupInOverlay = async (isActive: boolean) => {
+    const { setPopupInOverlay } = await initBGFunctions(browser)
+    await setPopupInOverlay(isActive)
+    loadPopupInOverlay()
   }
 
   const onPress = (e, ref) => {
@@ -386,12 +391,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   </>
                 }
               />
-              {/* <SettingItem
+              <SettingItem
                 title="Open popup"
                 component={
                   <Switch onChange={() => setPopupInOverlay(!isPopup)} checked={isPopup} />
                 }
-              /> */}
+              />
               <SettingItem
                 title="User Agent Name"
                 component={<></>}
