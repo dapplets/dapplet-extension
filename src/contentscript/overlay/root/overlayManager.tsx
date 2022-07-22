@@ -211,7 +211,7 @@ export class OverlayManager implements IOverlayManager {
     return this._tabsRegistry.map((x) => x.overlay)
   }
 
-  public openPopup(path: string) {
+  public openPopup() {
     this.togglePanel()
   }
 

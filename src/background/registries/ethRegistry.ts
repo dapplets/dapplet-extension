@@ -17,6 +17,7 @@ type EthModuleInfo = {
   name: string // string
   title: string // string
   description: string // string
+  fullDescription: EthStorageRef
   icon: EthStorageRef
   owner: string // bytes32
   interfaces: string[] // string[]
@@ -40,6 +41,7 @@ type EthVersionInfoDto = {
   dependencies: EthDependencyDto[]
   interfaces: EthDependencyDto[] // bytes32[]
   flags: number // uint8
+  extensionVersion: string
 }
 
 const moduleTypesMap: { [key: number]: ModuleTypes } = {
@@ -56,7 +58,7 @@ const ZERO_BYTES32 = '0x00000000000000000000000000000000000000000000000000000000
 export class EthRegistry implements Registry {
   public isAvailable = true
   public error: string = null
-  public blockchain: string = 'ethereum'
+  public blockchain = 'ethereum'
 
   private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>()
   private _contract: ethers.ethers.Contract = null
@@ -109,7 +111,7 @@ export class EthRegistry implements Registry {
       }
 
       const contract = await this._contractPromise
-      const moduleInfosByCtx: EthModuleInfo[][] = await contract.getModuleInfoBatch(
+      const moduleInfosByCtx: EthModuleInfo[][] = await contract.getModulesInfoByListersBatch(
         contextIds,
         users,
         0
@@ -236,20 +238,38 @@ export class EthRegistry implements Registry {
     return modulesWithLastVersions
   }
 
+  // TODO: the function crashes with an error during the transaction
   public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
+    console.log('0', { module, version })
+
     const contract = await this._contractPromise
+
+    console.log('1 contract', contract)
+
     const isModuleExist = await contract
       .getModuleInfoByName(module.name)
       .then((x) => !!x)
       .catch(() => false)
 
+    console.log('2 isModuleExist', isModuleExist)
+
     if (isModuleExist && !version) throw new Error('A module with such name already exists.')
 
     if (!isModuleExist) {
       const mi = this._convertToEthMi(module)
+
+      console.log('3 mi', mi)
+
       const vis = version ? [this._convertToEthVi(version)] : []
+
+      console.log('4 vis', vis)
+
       const tx = await contract.addModuleInfo(module.contextIds, mi, vis)
-      await tx.wait()
+
+      console.log('5 tx', tx)
+
+      const wt = await tx.wait()
+      console.log('6 wt', wt)
     } else {
       const vi = this._convertToEthVi(version)
       const tx = await contract.addModuleVersion(module.name, vi)
@@ -268,6 +288,7 @@ export class EthRegistry implements Registry {
     }
   }
 
+  // TODO: make it later
   public async transferOwnership(moduleName: string, newAccount: string, oldAccount: string) {
     const contract = await this._contractPromise
     const devModules: EthModuleInfo[] = await contract.getModuleInfoByOwner(oldAccount)
@@ -340,10 +361,14 @@ export class EthRegistry implements Registry {
   private _convertToEthMi(module: ModuleInfo): EthModuleInfo {
     return {
       name: module.name,
-      moduleType: parseInt(Object.entries(moduleTypesMap).find(([k, v]) => v === module.type)[0]),
+      moduleType: parseInt(Object.entries(moduleTypesMap).find(([, v]) => v === module.type)[0]),
       flags: ethers.BigNumber.from('0x00'),
       title: module.title,
       description: module.description,
+      fullDescription: {
+        hash: ZERO_BYTES32,
+        uris: [],
+      },
       icon: module.icon
         ? {
             hash: module.icon.hash,
@@ -394,6 +419,7 @@ export class EthRegistry implements Registry {
           }))) ||
         [],
       flags: 0,
+      extensionVersion: '0x00ff08',
     }
   }
 }
