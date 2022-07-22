@@ -109,7 +109,6 @@ export default class ConnectedAccountService {
     },
     stake: number
   ): Promise<number> {
-    console.log('%%% stake', stake)
     const {
       firstAccountId,
       firstOriginId,
