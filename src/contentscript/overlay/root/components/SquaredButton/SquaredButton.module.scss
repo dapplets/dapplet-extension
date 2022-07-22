@@ -21,7 +21,7 @@
   transition: all 1s;
 
   border-radius: 5px;
-  background: #16151a;
+  background: $WebBG;
 
   &:hover {
     width: 22px;
@@ -51,7 +51,7 @@
   min-height: 35px;
 
   border-radius: 10px;
-  background: #25262a;
+  background: $PureWhite;
 
   &:hover {
     svg {

@@ -10,7 +10,7 @@
   height: 100vh;
 
   transition: transform 0.3s ease;
-  filter: drop-shadow(-4px 0 4px rgb(255 255 255 / 30%));
+  filter: drop-shadow(-4px 0 4px rgb(0 0 0 / 25%));
   -ms-overflow-style: none;
 }
 
@@ -40,9 +40,7 @@
 
   padding: 10px 15px 5px;
 
-  color: #fff;
-
-  background: #16151a;
+  background: $OverlayBG;
   -ms-overflow-style: none;
 }
 

@@ -9,7 +9,7 @@
   // min-height: calc(100vh - 32px);
   min-height: 30vh;
 
-  background: #16151a;
+  background: $AppBG;
 }
 
 .active {
@@ -38,7 +38,7 @@
   border-radius: 10px 0 0 10px;
   background: transparent;
 
-  background: #16151a;
+  background: $AppBG;
 
   svg path {
     fill: $Secondary;

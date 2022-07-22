@@ -10,7 +10,7 @@
   padding-bottom: 15px;
 
   border-radius: 10px 0 0 10px;
-  background: #16151a;
+  background: #f5f5f5;
 
   img {
     width: 30px !important;
@@ -89,7 +89,7 @@
 .tabNotActive {
   cursor: pointer;
 
-  background: #16151a;
+  background: #eaf0f0;
   background-image: none !important;
 
   box-shadow: inset -2px 0 4px rgb(0 0 0 / 25%);
@@ -165,10 +165,6 @@
 
   svg {
     width: 100%;
-
-    path {
-      fill: #fff;
-    }
   }
 
   &:nth-child(2),
