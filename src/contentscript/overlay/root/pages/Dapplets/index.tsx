@@ -1,5 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import React, { FC, useEffect, useMemo, useState } from 'react'
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { rcompare } from 'semver'
 import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
@@ -23,12 +23,12 @@ export type Module = ManifestDTO & {
 export interface DappletsProps {
   search: string
   onUserSettingsClick: (mi: ManifestDTO) => void
+  dropdownListValue: string
+  setDropdownListValue: (x) => void
 }
 
-let _isMounted = false
-
 export const Dapplets: FC<DappletsProps> = (props) => {
-  const { search, onUserSettingsClick } = props
+  const { search, onUserSettingsClick, dropdownListValue, setDropdownListValue } = props
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
   const [isLoading, setLoading] = useState<boolean>(null)
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
@@ -37,25 +37,27 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [loadShowButton, setLoadShowButton] = useState(false)
   const [contextId, setContextIds] = useState<string[]>([])
   const [trustedUsers, setTrustedUsers] = useState([])
-  const [dropdownListValue, setDropdownListValue] = useState('All')
+  // const [dropdownListValue, setDropdownListValue] = useState('All')
+  const _isMounted = useRef(true)
 
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
-      const { getFeaturesByHostnames, getCurrentContextIds, getThisTab } = await initBGFunctions(
-        browser
-      )
+      if (_isMounted.current) {
+        const { getFeaturesByHostnames, getCurrentContextIds, getThisTab } = await initBGFunctions(
+          browser
+        )
 
-      const currentTab = await getThisTab()
+        const currentTab = await getThisTab()
 
-      const ids = await getCurrentContextIds(currentTab)
+        const ids = await getCurrentContextIds(currentTab)
 
-      setContextIds(ids)
-      await _refreshDataByContext(ids)
+        setContextIds(ids)
+        await _refreshDataByContext(ids)
 
-      setLoadingListDapplets(false)
+        setLoadingListDapplets(false)
 
-      await loadTrustedUsers()
+        await loadTrustedUsers()
+      }
     }
 
     init()
@@ -67,7 +69,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
 
     return () => {
-      _isMounted = false
+      _isMounted.current = false
     }
   }, [])
 
@@ -112,21 +114,21 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       )
     }
 
-    if (_isMounted) {
-      const d = features
-        .filter((f) => f.type === ModuleTypes.Feature)
-        .map((f) => ({
-          ...f,
-          isLoading: false,
-          isActionLoading: false,
-          isHomeLoading: false,
-          error: null,
-          versions: [],
-        }))
+    // if (_isMounted) {
+    const d = features
+      .filter((f) => f.type === ModuleTypes.Feature)
+      .map((f) => ({
+        ...f,
+        isLoading: false,
+        isActionLoading: false,
+        isHomeLoading: false,
+        error: null,
+        versions: [],
+      }))
 
-      setDapplets(d)
-      setLoading(false)
-    }
+    setDapplets(d)
+    setLoading(false)
+    // }
   }
 
   const _updateFeatureState = (name: string, f: any) => {
@@ -278,18 +280,21 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.isMyDapplet === true) return find(x.author)
+        // setDropdownListValue('Local')
       })
     }
     if (dropdownListValue === 'Trusted Users') {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.author !== null) return find(x.author)
+        // setDropdownListValue('Trusted Users')
       })
     }
     if (dropdownListValue === 'Public') {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.isUnderConstruction !== true) return find(x.author)
+        // setDropdownListValue('Public')
       })
     }
   }
@@ -303,7 +308,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       <div className={styles.wrapper}>
         <Dropdown
           list={DROPDOWN_LIST}
-          title="List:"
+          title="filter:"
           value={{ label: dropdownListValue }}
           setDropdownListValue={setDropdownListValue}
         />

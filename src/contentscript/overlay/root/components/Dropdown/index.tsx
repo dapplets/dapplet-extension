@@ -44,7 +44,12 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
         className={cn(styles.dropdownBlock, { [styles.isOpen]: isOpen })}
       >
         <span className={cn(styles.spanBlock, className)} {...anotherProps}>
-          {value.label}
+          {isOpen ? '\u2013' : value.label}
+          <span
+            className={cn(styles.isOpenIcon, {
+              [styles.isOpenAnimationIcon]: isOpen,
+            })}
+          ></span>
         </span>
 
         {isOpen && (

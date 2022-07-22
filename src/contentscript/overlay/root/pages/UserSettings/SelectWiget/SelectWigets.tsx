@@ -1,11 +1,9 @@
 import { utils } from '@rjsf/core'
 import _ from 'lodash'
-import React, { useEffect, useRef, useState } from 'react'
-import Select from 'react-select'
+import React, { useEffect, useState } from 'react'
 import { getSemanticProps } from '../utils'
 
 import cn from 'classnames'
-import { useToggle } from '../../../hooks/useToggle'
 import styles from './SelectWiget.module.scss'
 
 const { asNumber, guessType } = utils
@@ -71,48 +69,48 @@ const processValue = (schema, value) => {
 
 const MyCustomWidget = (props, setNewValue) => {
   const ttOpt = props.options.enumOptions
-  const [isOpen, setOpen] = useToggle(false)
-  const selectRef = useRef<any>()
-  const options = [...ttOpt]
-  const [focusValue, setFocusValue] = useState()
-  const handleFocus = (event) => {
-    const focusValue = event.target.value
-
-    setFocusValue(focusValue)
-  }
-
-  const handleBlur = (event) => {
-    const blurValue = event.target.value
-
-    setOpen()
-    if (focusValue !== blurValue) {
-    }
-  }
+  const [isOpen, setOpen] = useState(false)
 
   useEffect(() => {}, [isOpen])
+  const enableOptions = (value: any, x?: (x) => void) => {
+    setNewValue(value)
+    x(false)
+  }
+
   return (
-    <Select
-      ref={selectRef}
-      className={cn(styles.inputSelect, {
-        [styles.isOpen]: isOpen,
-      })}
-      isMulti={typeof props.multiple === 'undefined' ? false : props.multiple}
-      options={options}
-      isDisabled={props.isDisabled}
-      onMenuClose={() => {
-        setOpen()
-      }}
-      onMenuOpen={() => {
-        setOpen()
-      }}
-      placeholder={props.value}
-      onChange={(e) => {
-        setNewValue(e.value)
-      }}
-      name={props.name}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-    />
+    <div className={styles.wrapperSelectWiget} onBlur={() => setOpen(false)} tabIndex={0}>
+      <div className={styles.dropdownLabel}>{props.value}</div>
+      <span
+        onClick={() => setOpen(true)}
+        className={cn(styles.openList, { [styles.isOpen]: isOpen })}
+      />
+      {isOpen && (
+        <div className={styles.openOverlay}>
+          <div className={styles.blockIcon}>
+            <div className={styles.delimiterSpan}>-</div>
+            <span
+              className={cn(styles.openList, { [styles.isOpen]: isOpen })}
+              onClick={() => setOpen(false)}
+              tabIndex={1}
+            />
+          </div>
+          {ttOpt.map((item) => {
+            const { label, value } = item
+            return (
+              <div
+                className={cn(styles.item, {
+                  [styles.activeItem]: label === props.value,
+                })}
+                key={label}
+                onClick={() => enableOptions(value, setOpen)}
+              >
+                {value}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
   )
 }
 

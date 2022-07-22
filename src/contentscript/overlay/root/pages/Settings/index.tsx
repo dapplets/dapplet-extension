@@ -1,5 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import React, { useEffect, useState } from 'react'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
 import { DappletsMainInfo } from '../DappletsInfo'
@@ -28,9 +28,14 @@ export const NAVIGATION_LIST = [
   { _id: '0', title: 'Settings' },
   { _id: '1', title: 'Developer' },
 ]
+export interface SettingsOverlayProps {
+  isLoadingDeploy: boolean
+  setLoadingDeploy: () => void
+  setLoadingDeployFinally: () => void
+}
 
-let _isMounted = false
-export const SettingsOverlay = () => {
+export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
+  const { isLoadingDeploy, setLoadingDeploy, setLoadingDeployFinally } = props
   const [activeTab, setActiveTab] = useState(SettingsTabs.SETTINGS)
   const [activeTaDappletsDetails, setActiveTabDappletsDetails] = useState(DappletsDetails.MAININFO)
   const [activeTabUnderConstructionDetails, setActiveTabUnderConstructionDetails] = useState(
@@ -51,15 +56,17 @@ export const SettingsOverlay = () => {
   const [isTokenomics, setTokenomics] = useState(false)
   const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] = useState(false)
   const [isShowChildrenRegistery, setShowChildrenRegistery] = useState(false)
+  const _isMounted = useRef(true)
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
-      await loadDevMode()
-      await loadErrorReporting()
+      if (_isMounted.current) {
+        await loadDevMode()
+        await loadErrorReporting()
+      }
     }
     init()
     return () => {
-      _isMounted = false
+      _isMounted.current = false
     }
   }, [])
   const loadDevMode = async () => {
@@ -130,6 +137,9 @@ export const SettingsOverlay = () => {
 
             {activeTab === SettingsTabs.DEVELOPER && (
               <Developer
+                isLoadingDeploy={isLoadingDeploy}
+                setLoadingDeploy={setLoadingDeploy}
+                setLoadingDeployFinally={setLoadingDeployFinally}
                 isShowChildrenRegistery={isShowChildrenRegistery}
                 setShowChildrenRegistery={setShowChildrenRegistery}
                 setModuleVersion={setModuleVersion}

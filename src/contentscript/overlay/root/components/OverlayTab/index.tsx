@@ -1,7 +1,6 @@
 import cn from 'classnames'
 import React, { ReactElement } from 'react'
 import { StorageRef } from '../../../../../background/registries/registry'
-import { ReactComponent as Close } from '../../assets/svg/close.svg'
 import { ToolbarTabMenu } from '../../types'
 import { StorageRefImage } from '../DevModulesList'
 import { ModuleIcon, ModuleIconProps } from '../ModuleIcon'
@@ -25,10 +24,17 @@ export interface OverlayTabProps {
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const visibleMenus = p.menus.filter((x) => x.hidden !== true)
 
+  const _handleCloseClick: React.MouseEventHandler<HTMLSpanElement> = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    p.onCloseClick()
+  }
+
   return (
     <div
       onClick={() => {
         !p.isActive && p.onTabClick()
+
         p.setOpenWallet()
       }}
       className={cn(styles.tab, {
@@ -39,14 +45,18 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       <div className={styles.top}>
         {p.icon && typeof p.icon === 'function' ? (
           <p.icon
-            onClick={p.onTabClick}
+            onClick={() => {
+              // !p.isActive && p.onTabClick()
+            }}
             className={cn(styles.image, {
               [styles.cursor]: !p.isActive,
             })}
           />
         ) : p.icon && typeof p.icon === 'object' && 'moduleName' in p.icon ? (
           <ModuleIcon
-            onClick={p.onTabClick}
+            onClick={() => {
+              // !p.isActive && p.onTabClick()
+            }}
             className={cn(styles.image, {
               [styles.cursor]: !p.isActive,
             })}
@@ -55,7 +65,9 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           />
         ) : (
           <StorageRefImage
-            onClick={p.onTabClick}
+            onClick={() => {
+              // !p.isActive && p.onTabClick()
+            }}
             className={cn(styles.image, {
               [styles.cursor]: !p.isActive,
             })}
@@ -63,8 +75,8 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           />
         )}
         {!p.pinned && (
-          <span className={styles.close} onClick={p.onCloseClick}>
-            <Close />
+          <span className={styles.close} onClick={_handleCloseClick}>
+            {/* <Close /> */}
           </span>
         )}
       </div>

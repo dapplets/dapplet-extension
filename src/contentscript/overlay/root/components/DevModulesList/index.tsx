@@ -12,7 +12,6 @@ import { ChainTypes, DefaultSigners } from '../../../../../common/types'
 import { Modal } from '../Modal'
 import styles from './DevModulesList.module.scss'
 
-let _isMounted = true
 enum DeploymentStatus {
   Unknown,
   Deployed,
@@ -45,9 +44,8 @@ type DependencyChecking = {
 export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
   const { storageRef, className, title, onClick } = props
   const [dataUri, setDataUri] = useState(null)
-  useEffect(() => {
-    _isMounted = true
 
+  useEffect(() => {
     const init = async () => {
       if (!storageRef) return
 
@@ -76,9 +74,7 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
       }
     }
     init()
-    return () => {
-      _isMounted = false
-    }
+    return () => {}
   }, [storageRef])
   return (
     <div className={cn(styles.dappletsImg, className)} onClick={onClick}>
@@ -100,7 +96,12 @@ interface PropsDeveloper {
   setUnderConstructionDetails: (x) => void
   isLocalhost?: boolean
   setUpdate?: (x) => void
+
+  isLoadingDeploy?: boolean
+  setLoadingDeploy?: () => void
+  setLoadingDeployFinally?: () => void
 }
+let isMounted = false
 export const DevModule: FC<PropsDeveloper> = (props) => {
   const {
     modules,
@@ -111,6 +112,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setUnderConstructionDetails,
     isLocalhost = false,
     setUpdate,
+    isLoadingDeploy,
+    setLoadingDeploy,
+    setLoadingDeployFinally,
   } = props
 
   const nodes = new Map<string, any>()
@@ -135,22 +139,22 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const nodeButton = useRef<HTMLButtonElement>()
   const [textButtonDeploy, setTextButtonDeploy] = useState('Deploy')
 
-  const [isLoadingDeploy, setLoadingDeploy] = useState(false)
   const [messageError, setMessageError] = useState(null)
   const [isModalError, setModalError] = useState(false)
   const onCloseError = () => setModalError(false)
   const [isNotAccountModal, setNotAccountModal] = useState(false)
+  // const _isMounted = useRef(true)
   useEffect(() => {
-    _isMounted = true
-
+    isMounted = true
     const init = async () => {
       await _updateData()
+      isLoadingDeploy ? setTextButtonDeploy('') : setTextButtonDeploy('Deploy')
     }
     init()
     return () => {
-      _isMounted = false
+      isMounted = false
     }
-  }, [targetChain, currentAccount, isLoadingDeploy, modules[0]])
+  }, [targetChain, currentAccount, modules[0], isLoadingDeploy, isModalError])
 
   modules.forEach((x) => {
     nodes.set(x.versions[0] ? x.module.name + '#' + x.versions[0]?.branch : x.module.name, x)
@@ -238,10 +242,16 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
     } else {
-      await _updateOwnership(),
-        await _updateCurrentAccount(),
-        await _updateDeploymentStatus(),
-        await _checkDependencies()
+      return Promise.all([
+        _updateOwnership(),
+        _updateCurrentAccount(),
+        _updateDeploymentStatus(),
+        _checkDependencies(),
+      ])
+      // await _updateOwnership(),
+      //   await _updateCurrentAccount(),
+      //   await _updateDeploymentStatus(),
+      //   await _checkDependencies()
     }
   }
   const _updateOwnership = async () => {
@@ -270,9 +280,13 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setDeploymentStatus(deploymentStatus)
   }
   const _updateCurrentAccount = async () => {
-    const { getOwnership, getAddress } = await initBGFunctions(browser)
-    const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-    setCurrentAccount(currentAccount)
+    if (targetChain) {
+      const { getOwnership, getAddress } = await initBGFunctions(browser)
+      const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
+      setCurrentAccount(currentAccount)
+    } else {
+      return
+    }
   }
   const _checkDependencies = async () => {
     const { getVersionInfo } = await initBGFunctions(browser)
@@ -289,48 +303,66 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const deployButtonClickHandler = async (e) => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
 
-    setLoadingDeploy(true)
+    // e.target.classList.add(styles.dappletsIsLoadingDeploy)
+    const isNotNullCurrentAccount = !(
+      !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
+    )
+    const isNotTrustedUser =
+      isNotNullCurrentAccount &&
+      !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
+    if (isNotTrustedUser) {
+      await addTrustedUser(currentAccount.toLowerCase())
+    }
+    if (!isNotNullCurrentAccount) {
+      setNotAccountModal(true)
+    } else {
+      try {
+        setLoadingDeploy()
+        setTextButtonDeploy('')
 
-    e.target.classList.add(styles.dappletsIsLoadingDeploy)
-    setTextButtonDeploy('')
+        mode === FormMode.Creating
+          ? await deployModule(mi, null, targetStorages, targetRegistry)
+          : await deployModule(mi, vi, targetStorages, targetRegistry)
 
-    try {
-      const isNotNullCurrentAccount = !(
-        !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
-      )
-      const isNotTrustedUser =
-        isNotNullCurrentAccount &&
-        !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
-      if (isNotTrustedUser) {
-        await addTrustedUser(currentAccount.toLowerCase())
-      }
-      if (!isNotNullCurrentAccount) {
-        setNotAccountModal(true)
-      } else {
+        setDeploymentStatus(DeploymentStatus.Deployed)
+
+        setTextButtonDeploy('Deploy')
+        setUpdate(true)
+      } catch (err) {
+        console.log(err)
+
+        setMessageError({
+          type: 'negative',
+          header: 'Publication error',
+          message: [err.message],
+        })
+        if (messageError) {
+          messageError.message.map((m) => {
+            const messageErr = m.toLowerCase()
+            messageErr.includes('You are not the owner of this module') ? null : setModalError(true)
+          })
+        }
+
+        // setModalError(true)
         setNotAccountModal(false)
+
+        setTextButtonDeploy('Deploy')
+      } finally {
+        setLoadingDeployFinally()
+        await _updateData()
       }
-
-      mode === FormMode.Creating
-        ? await deployModule(mi, null, targetStorages, targetRegistry)
-        : await deployModule(mi, vi, targetStorages, targetRegistry)
-
-      setDeploymentStatus(DeploymentStatus.Deployed)
-
-      e.target.classList.remove(styles.dappletsIsLoadingDeploy)
-      setTextButtonDeploy('Deploy')
-      setUpdate(true)
-    } catch (err) {
-      setMessageError({
-        type: 'negative',
-        header: 'Publication error',
-        message: [err.message],
-      })
-      setModalError(true)
-      e.target.classList.remove(styles.dappletsIsLoadingDeploy)
-      setTextButtonDeploy('Deploy')
-    } finally {
-      setLoadingDeploy(false)
+    }
+  }
+  const connectWallet = async () => {
+    setNotAccountModal(false)
+    const { pairWalletViaOverlay } = await initBGFunctions(browser)
+    try {
+      await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       await _updateData()
+    } catch (e) {
+      console.log(e)
+    } finally {
+      window.close()
     }
   }
 
@@ -404,6 +436,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   }}
                   className={cn(styles.dappletsReupload, {
                     [styles.dapDeploy]: m.isDeployed?.[0] !== false,
+                    [styles.dappletsIsLoadingDeploy]: isLoadingDeploy,
                   })}
                 >
                   {textButtonDeploy}
@@ -446,27 +479,50 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
             title={'The wrong wallet'}
             classNameContent={styles.isNotAccountModalOwner}
             content={
-              <>
-                <p>Change account to {owner}</p>
+              <div className={styles.modalDefaultContent}>
+                <p style={{ overflowWrap: 'break-word' }}>Change account to {owner}</p>
 
                 <br />
-                <p> Connect a new wallet</p>
-              </>
+                <button onClick={connectWallet} className={styles.modalDefaultContentButton}>
+                  Connect a new wallet
+                </button>
+              </div>
             }
             footer={''}
             onClose={() => setNotAccountModal(false)}
           />
-        ) : null
+        ) : (
+          <Modal
+            visible={isNotAccountModal}
+            title={'Wallet is not connected'}
+            classNameContent={styles.isNotAccountModalOwner}
+            content={
+              <div className={styles.modalDefaultContent}>
+                <p style={{ overflowWrap: 'break-word' }}>
+                  You can not deploy a module without a wallet.
+                </p>
+
+                <br />
+                <button onClick={connectWallet} className={styles.modalDefaultContentButton}>
+                  Connect a new wallet
+                </button>
+              </div>
+            }
+            footer={''}
+            onClose={() => setNotAccountModal(false)}
+          />
+        )
       ) : null}
 
       {messageError ? (
         <Modal
           visible={isModalError}
           title={messageError.header}
+          classNameWrapper={styles.modalDefaultWrapper}
           content={
             <div className={styles.modalDefaultContent}>
               {messageError.message.map((m, i) => (
-                <p key={i} style={{ overflowWrap: 'break-word' }}>
+                <p key={i} className={styles.modalDefaultContentText}>
                   {m === `Cannot read properties of null (reading 'length')`
                     ? 'Please fill in the empty fields'
                     : m}

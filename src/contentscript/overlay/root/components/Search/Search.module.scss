@@ -8,30 +8,65 @@
   display: flex;
   align-items: center;
 
-  width: 100%;
+  // width: 100%;
 
   height: 35px;
 
-  animation-name: slideLeft;
+  animation-name: slideRight;
 
-  animation-duration: 5s;
+  animation-duration: 0.3s;
 
   animation-timing-function: ease;
+  animation-fill-mode: forwards;
 
   font-family: Roboto, sans-serif;
 }
 
+[class*=" close"] {
+  animation-name: slideLeft;
+
+  animation-duration: 0.2s;
+
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+}
+
 @keyframes slideRight {
   0% {
-    transform: scale(0);
+    position: relative;
+    right: -70%;
+
+    width: 0%;
   }
 
-  65% {
-    transform: scale(1.1, 1);
+  70% {
+    right: 10%;
+
+    width: 105%;
   }
 
   100% {
-    transform: scale(1, 1);
+    right: 0;
+
+    width: 100%;
+  }
+}
+
+@keyframes slideLeft {
+  0% {
+    right: 0;
+
+    width: 100%;
+  }
+
+  90% {
+    opacity: 0;
+  }
+
+  100% {
+    right: -80%;
+
+    width: 0;
   }
 }
 
@@ -99,12 +134,19 @@
 
   z-index: 50;
   top: 85%;
-  right: 12%;
 
   height: 100%;
 
   cursor: pointer;
   transform: translateY(-50%);
+
+  // right: 12%;
+  animation-name: slideRightClose;
+
+  animation-duration: 0.4s;
+
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
 }
 
 span {
@@ -118,5 +160,19 @@ span {
     svg path {
       fill: $PrimaryPressed;
     }
+  }
+}
+
+@keyframes slideRightClose {
+  0% {
+    right: 12%;
+  }
+
+  70% {
+    right: 17%;
+  }
+
+  100% {
+    right: 12%;
   }
 }

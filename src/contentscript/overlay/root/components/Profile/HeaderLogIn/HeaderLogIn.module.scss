@@ -7,6 +7,12 @@
   display: inline-block;
 
   font-family: Roboto, sans-serif;
+
+  &.mini {
+
+    width: 39px;
+    height: 39px;
+  }
 }
 
 .avatar {
@@ -56,6 +62,8 @@
   &.mini {
     padding: 2px;
     display: inline-block;
+    width: 39px;
+    height: 39px;
   }
 }
 
@@ -63,7 +71,7 @@
   margin-right: 5px;
   margin-left: 6px;
 
-  text-transform: uppercase;
+  // text-transform: uppercase;
 
   font-size: 10px;
   line-height: 100%;
@@ -85,7 +93,6 @@
   line-height: 100%;
 
   align-items: center;
-  text-transform: capitalize;
 
   color: $MainGrey;
 }
@@ -326,8 +333,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
+  cursor: pointer;
 
   &:hover {
+    background: #eaf0f0;
+  }
+
+  &:active {
     background: $StrokeColor;
   }
 }
@@ -378,6 +390,7 @@
   text-transform: capitalize;
   color: $MainBlack;
   display: inline-block;
+  text-transform: lowercase;
 
   width: 100%;
   overflow: hidden;

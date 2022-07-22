@@ -1,5 +1,6 @@
 import { providers, Signer, utils } from 'ethers'
 import * as EventBus from '../../common/global-event-bus'
+import { mergeSameWallets } from '../../common/helpers'
 import {
   ChainTypes,
   DefaultSigners,
@@ -56,7 +57,7 @@ export class WalletService {
   }
 
   async getWalletDescriptors(): Promise<WalletDescriptor[]> {
-    const defaults = await this._getWalletFor(DefaultSigners.EXTENSION)
+    const defaults = await this.getWalletFor(DefaultSigners.EXTENSION)
     const usage = await this._globalConfigService.getWalletsUsage()
     const arr = await this._getWalletsArray()
 
@@ -70,7 +71,7 @@ export class WalletService {
       return arr
     }
 
-    return Promise.all(
+    const descriptors = await Promise.all(
       arr.map(async (w) => ({
         chain: w.chain,
         type: w.wallet,
@@ -84,6 +85,11 @@ export class WalletService {
         lastUsage: w.instance.getLastUsage(),
       }))
     )
+
+    // ToDo: remove `mergeSameWallets` after multiple networks support
+    const merged = mergeSameWallets(descriptors)
+
+    return merged
   }
 
   async eth_getSignerFor(app: string | DefaultSigners, chain: ChainTypes): Promise<Signer> {
@@ -135,6 +141,53 @@ export class WalletService {
     return this._signersByApp.get(app)
   }
 
+  // returns: walletType
+  public async getWalletFor(app: string | DefaultSigners): Promise<{ [chain: string]: string }> {
+    const wallets = await this._globalConfigService.getWalletsUsage()
+    return wallets[app] ?? {}
+  }
+
+  public async getDefaultWalletFor(
+    appOrSessionId: string | DefaultSigners,
+    chain: ChainTypes,
+    isConnected = true
+  ): Promise<string> {
+    const map = await this._getWalletsMap()
+
+    const isLoginSession = /[a-f0-9]{32}/gm.test(appOrSessionId)
+
+    if (!isLoginSession) {
+      const defaults = await this.getWalletFor(appOrSessionId)
+      const defaultWallet = defaults?.[chain]
+
+      if (defaultWallet && (await map[chain][defaultWallet].isConnected())) {
+        return defaultWallet
+      }
+
+      // ToDo: clean walletType?
+
+      // choose first connected wallet
+      for (const wallet in map[chain]) {
+        if (await map[chain][wallet].isConnected()) {
+          return wallet
+        }
+      }
+
+      if (!isConnected) {
+        for (const wallet in map[chain]) {
+          return wallet
+        }
+      }
+    } else {
+      const session = await this.sessionService.getSession(appOrSessionId)
+      if (!session) throw new Error("The session doesn't exist.")
+      if (session.isExpired()) throw new Error('The session is expired.')
+      if (session.authMethod !== chain) throw new Error('The session auth method is invalid.')
+
+      return session.walletType
+    }
+  }
+
   public async setWalletFor(
     walletType: WalletTypes,
     app: string | DefaultSigners,
@@ -175,7 +228,7 @@ export class WalletService {
       return
     }
 
-    const defaults = await this._getWalletFor(app)
+    const defaults = await this.getWalletFor(app)
     const defaultWallet = defaults[chain]
 
     const payload = {
@@ -290,40 +343,9 @@ export class WalletService {
     chain: ChainTypes,
     isConnected = true
   ): Promise<GenericWallet> {
+    const wallet = await this.getDefaultWalletFor(appOrSessionId, chain, isConnected)
     const map = await this._getWalletsMap()
-
-    const isLoginSession = /[a-f0-9]{32}/gm.test(appOrSessionId)
-
-    if (!isLoginSession) {
-      const defaults = await this._getWalletFor(appOrSessionId)
-      const defaultWallet = defaults?.[chain]
-
-      if (defaultWallet && (await map[chain][defaultWallet].isConnected())) {
-        return map[chain][defaultWallet]
-      }
-
-      // ToDo: clean walletType?
-
-      // choose first connected wallet
-      for (const wallet in map[chain]) {
-        if (await map[chain][wallet].isConnected()) {
-          return map[chain][wallet]
-        }
-      }
-
-      if (!isConnected) {
-        for (const wallet in map[chain]) {
-          return map[chain][wallet]
-        }
-      }
-    } else {
-      const session = await this.sessionService.getSession(appOrSessionId)
-      if (!session) throw new Error("The session doesn't exist.")
-      if (session.isExpired()) throw new Error('The session is expired.')
-
-      const wallet = map[session.authMethod][session.walletType]
-      return wallet
-    }
+    return map[chain][wallet]
   }
 
   private async _pairSignerFor(
@@ -358,12 +380,6 @@ export class WalletService {
       }
     }
     return arr
-  }
-
-  // returns: walletType
-  private async _getWalletFor(app: string | DefaultSigners): Promise<{ [chain: string]: string }> {
-    const wallets = await this._globalConfigService.getWalletsUsage()
-    return wallets[app] ?? {}
   }
 
   private async _getWalletsMap() {

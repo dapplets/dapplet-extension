@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
@@ -11,7 +11,6 @@ import { Localhost } from '../../components/Localhost'
 import { Registry } from '../../components/Registery'
 import styles from './Developer.module.scss'
 
-let _isMounted = true
 export interface DeveloperProps {
   setDappletsDetail: (x) => void
   setModuleInfo: any
@@ -20,20 +19,22 @@ export interface DeveloperProps {
   setUnderConstructionDetails: (x) => void
   isShowChildrenRegistery: boolean
   setShowChildrenRegistery: (x) => void
+
+  isLoadingDeploy: boolean
+  setLoadingDeploy: () => void
+  setLoadingDeployFinally: () => void
 }
 export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [registries, setRegistries] = useState([])
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
-  const [intro, setIntro] = useState({ popupDeveloperWelcome: false })
   const [modules, setModules] = useState([])
-  const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
-
   const [isLoadButton, setLoadButton] = useState(false)
   const [isLocalhost, setLocalhost] = useState(true)
   const [isLoadButtonLocalhost, setLoadButtonLocalhost] = useState(false)
   const [isLoadAdd, setLoadAdd] = useState(false)
   const [isUpdate, setUpdate] = useState(false)
+  const _isMounted = useRef(true)
 
   const {
     setDappletsDetail,
@@ -43,45 +44,40 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     setUnderConstructionDetails,
     isShowChildrenRegistery,
     setShowChildrenRegistery,
+    isLoadingDeploy,
+    setLoadingDeploy,
+    setLoadingDeployFinally,
   } = props
 
   useEffect(() => {
-    _isMounted = true
-
     const init = async () => {
       setLoadButton(true)
-      await loadSwarmGateway()
       await loadRegistries()
-      await loadIntro()
+      if (_isMounted.current) {
+        const { getCurrentTab } = await initBGFunctions(browser)
+        const currentTab = await getCurrentTab()
+        if (!currentTab) return
+        const currentUrl = currentTab.url
+        const urlEnding = currentUrl.split('/').reverse()[0]
+        if (['index.json', 'dapplet.json'].includes(urlEnding)) {
+          setRegistryInput(currentUrl)
+        }
 
-      const { getCurrentTab } = await initBGFunctions(browser)
-      const currentTab = await getCurrentTab()
-      if (!currentTab) return
-      const currentUrl = currentTab.url
-      const urlEnding = currentUrl.split('/').reverse()[0]
-      if (['index.json', 'dapplet.json'].includes(urlEnding)) {
-        setRegistryInput(currentUrl)
+        if (isUpdate) {
+          await loadRegistries()
+          setUpdate(false)
+          setLoadButton(false)
+        }
       }
       setLoadButton(false)
-      if (isUpdate) {
-        await loadSwarmGateway()
-        await loadRegistries()
-        await loadIntro()
-        setUpdate(false)
-      }
     }
     init()
 
     return () => {
-      _isMounted = false
+      _isMounted.current = false
     }
   }, [isUpdate])
 
-  const loadSwarmGateway = async () => {
-    const { getSwarmGateway } = await initBGFunctions(browser)
-    const swarmGatewayUrl = await getSwarmGateway()
-    setSwarmGatewayUrl(swarmGatewayUrl)
-  }
   const loadRegistries = async () => {
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
     const modules: {
@@ -94,29 +90,27 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     setRegistries(registries.filter((r) => r.isDev === true))
   }
 
-  const loadIntro = async () => {
-    const { getIntro } = await initBGFunctions(browser)
-    const intro = await getIntro()
-    setIntro(intro)
-  }
-
   const addRegistry = async (url: string, newFunction: () => void) => {
     setLoadAdd(true)
-    setLoadButton(true)
     const { addRegistry } = await initBGFunctions(browser)
 
     try {
       await addRegistry(url, true)
+      setLoadButton(true)
       setRegistryInput('')
+
       loadRegistries()
     } catch (msg) {
       setRegistryInputError(msg.toString())
-      setTimeout(() => setRegistryInputError(''), 2000)
+
+      setTimeout(() => setRegistryInputError(''), 3000)
     }
 
     newFunction()
+
     setLoadButton(false)
-    setTimeout(() => setLoadAdd(false), 1500)
+
+    setTimeout(() => setLoadAdd(false), 3000)
   }
 
   const removeRegistry = async (url: string) => {
@@ -124,7 +118,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     const { removeRegistry } = await initBGFunctions(browser)
     await removeRegistry(url)
     loadRegistries()
-    setTimeout(() => setLoadAdd(false), 1500)
+    setTimeout(() => setLoadAdd(false), 3000)
   }
 
   const deployModule = async (mi: ModuleInfo, vi: VersionInfo) => {
@@ -225,6 +219,9 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                           <div key={registryUrl + i}>
                             {modules.length > 0 && registryUrl === r.url && (
                               <DevModule
+                                isLoadingDeploy={isLoadingDeploy}
+                                setLoadingDeploy={setLoadingDeploy}
+                                setLoadingDeployFinally={setLoadingDeployFinally}
                                 setUpdate={setUpdate}
                                 isLocalhost={isLocalhost}
                                 setDappletsDetail={setDappletsDetail}

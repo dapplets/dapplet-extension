@@ -17,7 +17,6 @@ import ManifestDTO from '../../../background/dto/manifestDTO'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
 
-// import { ReactComponent as Card } from './assets/svg/card.svg'
 // import { ReactComponent as Account } from './assets/svg/connected-account.svg'
 import { ReactComponent as DappletsLogo } from './assets/svg/dapplets-logo.svg'
 import { ReactComponent as Home } from './assets/svg/home-toolbar.svg'
@@ -74,7 +73,11 @@ const SYSTEM_TAB: ToolbarTab = {
       icon: Notification,
       title: 'Notifications',
     },
-
+    // {
+    //   id: 'connected',
+    //   icon: Account,
+    //   title: 'Connected',
+    // },
     {
       id: 'settings',
       icon: Settings,
@@ -100,6 +103,10 @@ interface S {
   isWalletLength: boolean
   isOpenWallet: boolean
   classNameSearch: string
+  classNameSearchButton: string
+  isLoadingDeploy: boolean
+  dropdownListValue: string
+  isMiniWallets: boolean
 }
 
 class _App extends React.Component<P, S> {
@@ -112,14 +119,36 @@ class _App extends React.Component<P, S> {
     isWalletLength: false,
     isOpenWallet: false,
     classNameSearch: '',
+    classNameSearchButton: '',
+    isLoadingDeploy: false,
+    dropdownListValue: 'All',
+    isMiniWallets: false,
   }
 
   async componentDidMount() {
     this.props.overlayManager.onActiveOverlayChanged = (overlay: Overlay) => {
-      const route = overlay
-        ? `/${overlay.source ? overlay.source : overlay.id}/${overlay.id}`
-        : '/system/dapplets'
-      this.props.navigate!(route)
+      if (overlay && overlay.registered) {
+        const route = `/${overlay.source ? overlay.source : overlay.id}/${overlay.id}`
+        this.props.navigate!(route)
+      } else {
+        // no iframe tabs
+        const { pathname } = this.props.location!
+        const activeTabId = pathname.split('/')[1]
+        const activeTabMenuId = pathname.split('/')[2]
+
+        // do not redirect if dapplet' settings is opened
+        if (activeTabId !== 'system' && activeTabMenuId === 'settings') {
+          return
+        }
+
+        // do not redirect if system tab is opened
+        if (activeTabId === 'system') {
+          return
+        }
+
+        // redirect to default page
+        this.props.navigate!(`/system/dapplets`)
+      }
     }
 
     const { getDevMode } = await initBGFunctions(browser)
@@ -217,12 +246,14 @@ class _App extends React.Component<P, S> {
 
     // remove internal tabs
     if (this.state.internalTabs.length > 0) {
-      const beforeCount = this.state.internalTabs.length
       const internalTabs = this.state.internalTabs.filter((x) => x.id !== tab.id)
-      const afterCount = internalTabs.length
       this.setState({ internalTabs })
 
-      if (beforeCount !== afterCount) {
+      const { pathname } = this.props.location!
+      const activeTabId = pathname.split('/')[1]
+
+      // redirect to default page if an active tab was closed
+      if (activeTabId === tab.id) {
         this.props.navigate!(`/system/dapplets`)
       }
     }
@@ -240,14 +271,32 @@ class _App extends React.Component<P, S> {
   handleOpenSearchClick = () => {
     this.setState({
       isOpenSearch: true,
+      isMiniWallets: true,
     })
   }
 
   handleCloseSearch = () => {
     this.setState({
-      isOpenSearch: false,
-      search: '',
+      isMiniWallets: false,
+      classNameSearch: 'close',
     })
+    setTimeout(() => {
+      this.setState({
+        isOpenSearch: false,
+        search: '',
+        classNameSearch: '',
+      })
+    }, 200)
+    setTimeout(() => {
+      this.setState({
+        classNameSearchButton: 'closeSearch',
+      })
+    }, 500)
+    setTimeout(() => {
+      this.setState({
+        classNameSearchButton: '',
+      })
+    }, 500)
   }
 
   handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -304,11 +353,32 @@ class _App extends React.Component<P, S> {
       isOpenWallet: !this.state.isOpenWallet,
       isOpenSearch: !this.state.isOpenWallet === true ? false : this.state.isOpenSearch,
       search: '',
+      isMiniWallets: !this.state.isMiniWallets,
     })
   }
   closeOpenWallet = () => {
-    this.setState({ isOpenWallet: false })
+    this.setState({
+      isOpenWallet: false,
+      isMiniWallets: false,
+      isOpenSearch: false,
+    })
   }
+
+  setLoadingDeploy = () => {
+    this.setState({ isLoadingDeploy: true })
+  }
+  setLoadingDeployFinally = () => {
+    this.setState({ isLoadingDeploy: false })
+  }
+  setDropdownListValue = (value: string) => {
+    this.setState({ dropdownListValue: value })
+  }
+  setOpenWalletMini = () => {
+    this.setState({
+      isMiniWallets: false,
+    })
+  }
+
   render() {
     const p = this.props
     const s = this.state
@@ -347,7 +417,7 @@ class _App extends React.Component<P, S> {
             <header className={styles.header}>
               <div className={styles.left}>
                 <Profile
-                  isMini
+                  isMini={s.isMiniWallets}
                   handleWalletLengthConnect={this.handleWalletLengthConnect}
                   isWalletLength={s.isWalletLength}
                   handleWalletConnect={this.handleWalletConnect}
@@ -356,12 +426,15 @@ class _App extends React.Component<P, S> {
                   isOverlay={true}
                   setOpenWallet={this.setOpenWallet}
                   isOpenWallet={s.isOpenWallet}
+                  setOpenWalletMini={this.setOpenWalletMini}
+                  isOpenSearch={s.isOpenSearch}
                 />
               </div>
 
               <div className={styles.right}>
                 {!s.isOpenSearch && pathname === '/system/dapplets' && (
                   <SquaredButton
+                    className={s.classNameSearchButton}
                     onClick={this.handleOpenSearchClick}
                     appearance="big"
                     icon={SearchIcon}
@@ -370,6 +443,7 @@ class _App extends React.Component<P, S> {
                 {s.isOpenSearch && pathname === '/system/dapplets' && (
                   <div className={styles.searchBlock} tabIndex={1}>
                     <Search
+                      className={s.classNameSearch}
                       value={s.search}
                       isOpenSearch={s.isOpenSearch}
                       onChange={this.handleSearchChange}
@@ -391,12 +465,23 @@ class _App extends React.Component<P, S> {
               className={cn(styles.children, 'dapplets-overlay-nav-content-list')}
             >
               {pathname === '/system/dapplets' && (
-                <Dapplets search={s.search} onUserSettingsClick={this.handleUserSettingsClick} />
+                <Dapplets
+                  search={s.search}
+                  onUserSettingsClick={this.handleUserSettingsClick}
+                  setDropdownListValue={this.setDropdownListValue}
+                  dropdownListValue={s.dropdownListValue}
+                />
               )}
 
               {pathname === '/system/notifications' && <Notifications />}
-
-              {pathname === '/system/settings' && <SettingsOverlay />}
+              {/* {pathname === '/system/connected' && <ConnectedAccount />} */}
+              {pathname === '/system/settings' && (
+                <SettingsOverlay
+                  isLoadingDeploy={s.isLoadingDeploy}
+                  setLoadingDeploy={this.setLoadingDeploy}
+                  setLoadingDeployFinally={this.setLoadingDeployFinally}
+                />
+              )}
 
               {overlays
                 .filter((x) => !x.isSystemPopup)

@@ -170,7 +170,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
         {isOpen && (
           <div className={styles.userList}>
             <div className={styles.inputBlock}>
-              <div className={styles.delimiterSpan}>-</div>
+              <div className={styles.delimiterSpan}>{'\u2013'}</div>
               <span
                 className={cn(styles.openList, { [styles.isOpen]: isOpen })}
                 onClick={() => setOpen(false)}
@@ -181,10 +181,12 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
                 <a className={styles.userlink} onClick={() => _openEtherscan(user.account)}>
                   {visible(user.account)}
                 </a>
-                <span
-                  className={styles.deleteUsers}
-                  onClick={() => removeTrustedUser(user.account)}
-                />
+                <span className={styles.deleteUsersContainer}>
+                  <span
+                    className={styles.deleteUsers}
+                    onClick={() => removeTrustedUser(user.account)}
+                  />
+                </span>
               </div>
             ))}
           </div>

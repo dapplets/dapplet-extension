@@ -9,6 +9,7 @@ export interface SearchProps
   onClearValue?: () => void
   onCloseSearch?: () => void
   isOpenSearch: boolean
+  className?: string
 }
 
 export const Search = (props: SearchProps): ReactElement => {
@@ -17,8 +18,8 @@ export const Search = (props: SearchProps): ReactElement => {
 
   return (
     <div className={cn(styles.wrapper, className)}>
-      <div className={styles.searchIcon}>
-        <SearchIcon onClick={() => onCloseSearch()} />
+      <div className={styles.searchIcon} onClick={() => onCloseSearch()}>
+        <SearchIcon />
       </div>
       <label className={styles.labelSearchModule}>
         <input
