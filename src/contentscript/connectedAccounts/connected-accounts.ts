@@ -25,7 +25,7 @@ class ConnectedAccounts {
     return getPendingRequests()
   }
 
-  public async getVerificationRequest(id: string): Promise<VerificationRequest | null> {
+  public async getVerificationRequest(id: number): Promise<VerificationRequest | null> {
     const { getVerificationRequest } = await initBGFunctions(browser)
     return getVerificationRequest(id)
   }
@@ -40,7 +40,9 @@ class ConnectedAccounts {
     return getMainAccount(accountId, originId)
   }
 
-  public async getRequestStatus(id: string): Promise<number> {
+  public async getRequestStatus(
+    id: number
+  ): Promise<'not found' | 'pending' | 'approved' | 'rejected'> {
     const { getRequestStatus } = await initBGFunctions(browser)
     return getRequestStatus(id)
   }

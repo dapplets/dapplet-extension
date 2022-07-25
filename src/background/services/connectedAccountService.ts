@@ -75,7 +75,7 @@ export default class ConnectedAccountService {
     return contract.getPendingRequests()
   }
 
-  public async getVerificationRequest(id: string): Promise<VerificationRequest | null> {
+  public async getVerificationRequest(id: number): Promise<VerificationRequest | null> {
     const contract = await this._getContract()
     return contract.getVerificationRequest({ id })
   }
@@ -90,9 +90,23 @@ export default class ConnectedAccountService {
     return contract.getMainAccount({ accountId, originId })
   }
 
-  public async getRequestStatus(id: string): Promise<number> {
+  public async getRequestStatus(
+    id: number
+  ): Promise<'not found' | 'pending' | 'approved' | 'rejected'> {
     const contract = await this._getContract()
-    return contract.getRequestStatus({ id })
+    const status = await contract.getRequestStatus({ id })
+    switch (status) {
+      case 0:
+        return 'not found'
+      case 1:
+        return 'pending'
+      case 2:
+        return 'approved'
+      case 3:
+        return 'rejected'
+      default:
+        throw new Error('Error in Connected Accounts getRequestStatus()')
+    }
   }
 
   // ***** CALL *****
