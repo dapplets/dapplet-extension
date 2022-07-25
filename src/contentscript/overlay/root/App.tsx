@@ -73,7 +73,11 @@ const SYSTEM_TAB: ToolbarTab = {
       icon: Notification,
       title: 'Notifications',
     },
-
+    // {
+    //   id: 'connected',
+    //   icon: Account,
+    //   title: 'Connected',
+    // },
     {
       id: 'settings',
       icon: Settings,
@@ -470,7 +474,7 @@ class _App extends React.Component<P, S> {
               )}
 
               {pathname === '/system/notifications' && <Notifications />}
-
+              {/* {pathname === '/system/connected' && <ConnectedAccount />} */}
               {pathname === '/system/settings' && (
                 <SettingsOverlay
                   isLoadingDeploy={s.isLoadingDeploy}
