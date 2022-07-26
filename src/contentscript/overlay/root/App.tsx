@@ -477,6 +477,7 @@ class _App extends React.Component<P, S> {
               {/* {pathname === '/system/connected' && <ConnectedAccount />} */}
               {pathname === '/system/settings' && (
                 <SettingsOverlay
+                  setOpenWallet={this.setOpenWallet}
                   isLoadingDeploy={s.isLoadingDeploy}
                   setLoadingDeploy={this.setLoadingDeploy}
                   setLoadingDeployFinally={this.setLoadingDeployFinally}

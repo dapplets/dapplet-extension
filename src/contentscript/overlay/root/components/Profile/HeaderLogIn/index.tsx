@@ -41,7 +41,10 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const connectedDescriptors = descriptors.filter((x) => x.connected)
   const [isModal, setModal] = useState(false)
   const [isModalWallet, setModalWallet] = useState(false)
-  const onCloseModalWallet = () => setModalWallet(false)
+  const onCloseModalWallet = async () => {
+    setModalWallet(false)
+    await refresh()
+  }
   const [walletImage, setWalletImage] = useState(null)
   const [walletAccount, setWalletAccount] = useState(null)
   const [walletIcon, setWalletIcon] = useState(null)
@@ -94,25 +97,31 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
 
     setDescriptors(descriptors)
     !isOpen && !isOpenSearch && setOpenWalletMini()
-
     if (descriptors.length > 0) {
       const connectedDescriptors = descriptors.filter((x) => x.connected)
-      const newDescriptors = connectedDescriptors?.find((x) => x.type === selectedWallet)
-      const newWalletImage = makeBlockie(newDescriptors.account)
-      setWalletImage(newWalletImage)
-      if (newDescriptors.type === 'near') {
-        setWalletAccount(newDescriptors.account)
+      if (connectedDescriptors.length > 0) {
+        const newDescriptors = connectedDescriptors?.find((x) => x.type === selectedWallet)
+        const newWalletImage = makeBlockie(newDescriptors.account)
+        setWalletImage(newWalletImage)
+        if (newDescriptors.type === 'near') {
+          setWalletAccount(newDescriptors.account)
+        } else {
+          setWalletAccount(newVisible(newDescriptors.account))
+        }
+        if (newDescriptors.type !== 'dapplets') {
+          setWalletIcon(newDescriptors.meta.icon)
+        } else {
+          setWalletIcon(walletIcons[newDescriptors.type])
+        }
+        if (selectedWallet === 'walletconnect') {
+          setWalletTypeWalletConnect(walletIcons[newDescriptors.type])
+        } else {
+          setWalletTypeWalletConnect(null)
+        }
       } else {
-        setWalletAccount(newVisible(newDescriptors.account))
-      }
-      if (newDescriptors.type !== 'dapplets') {
-        setWalletIcon(newDescriptors.meta.icon)
-      } else {
-        setWalletIcon(walletIcons[newDescriptors.type])
-      }
-      if (selectedWallet === 'walletconnect') {
-        setWalletTypeWalletConnect(walletIcons[newDescriptors.type])
-      } else {
+        setWalletImage(null)
+        setWalletAccount(null)
+        setWalletIcon(null)
         setWalletTypeWalletConnect(null)
       }
     }
@@ -144,28 +153,13 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     }
   }
   const x = useMemo(() => {
-    // const animeRef =
-    anime({
+    const animeRef = anime({
       targets: liRef.current,
       scale: () => {
         if (isMini === true || isOpenSearch) {
           return ['0', '0']
         } else if (isMini === false) {
           return ['0', '1']
-        }
-      },
-      // width:()=>{
-      //   if (isMini === true || isOpenSearch) {
-      //     return ['0px', '0px']
-      //   } else if (isMini === false) {
-      //     return ['0', '1']
-      //   }
-      // },
-      elasticity: () => {
-        if (isMini === true || isOpenSearch) {
-          return 0
-        } else if (isMini === false) {
-          return 300
         }
       },
       duration: 300,
@@ -202,7 +196,12 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         )}
 
         {/* {!isMini && ( */}
-        <div className={cn(styles.wrapperNames)} ref={liRef}>
+        <div
+          className={cn(styles.wrapperNames, {
+            [styles.wrapperNamesMini]: isMini || isOpenSearch,
+          })}
+          ref={liRef}
+        >
           {walletAccount ? (
             <p style={{ fontSize: '12px' }} className={styles.hash}>
               {walletAccount}
@@ -364,6 +363,8 @@ export const Modal = ({
               <div key={i} className={styles.newProfileBlock}>
                 <div
                   onClick={() => {
+                    console.log('handleWalletClick')
+
                     handleWalletClick(x)
                   }}
                   className={styles.newProfileBlockInfo}

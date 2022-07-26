@@ -23,6 +23,7 @@ export interface DeveloperProps {
   isLoadingDeploy: boolean
   setLoadingDeploy: () => void
   setLoadingDeployFinally: () => void
+  setOpenWallet: () => void
 }
 export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [registries, setRegistries] = useState([])
@@ -47,6 +48,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     isLoadingDeploy,
     setLoadingDeploy,
     setLoadingDeployFinally,
+    setOpenWallet,
   } = props
 
   useEffect(() => {
@@ -219,6 +221,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                           <div key={registryUrl + i}>
                             {modules.length > 0 && registryUrl === r.url && (
                               <DevModule
+                                setOpenWallet={setOpenWallet}
                                 isLoadingDeploy={isLoadingDeploy}
                                 setLoadingDeploy={setLoadingDeploy}
                                 setLoadingDeployFinally={setLoadingDeployFinally}

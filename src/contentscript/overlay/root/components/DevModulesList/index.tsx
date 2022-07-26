@@ -100,6 +100,7 @@ interface PropsDeveloper {
   isLoadingDeploy?: boolean
   setLoadingDeploy?: () => void
   setLoadingDeployFinally?: () => void
+  setOpenWallet?: () => void
 }
 let isMounted = false
 export const DevModule: FC<PropsDeveloper> = (props) => {
@@ -115,6 +116,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     isLoadingDeploy,
     setLoadingDeploy,
     setLoadingDeployFinally,
+    setOpenWallet,
   } = props
 
   const nodes = new Map<string, any>()
@@ -141,7 +143,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
   const [messageError, setMessageError] = useState(null)
   const [isModalError, setModalError] = useState(false)
+  const [isModalErrorOwner, setModalErrorOwner] = useState(false)
   const onCloseError = () => setModalError(false)
+  const onCloseErrorOwner = () => setModalErrorOwner(false)
   const [isNotAccountModal, setNotAccountModal] = useState(false)
   // const _isMounted = useRef(true)
   useEffect(() => {
@@ -302,6 +306,11 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
   const deployButtonClickHandler = async (e) => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
+    // console.log(mi, 'mi')
+    // console.log(vi, 'vi')
+    // console.log(targetStorages, 'targetStorages')
+    // console.log(targetRegistry, 'targetRegistry')
+    // console.log(currentAccount, 'currentAccount')
 
     // e.target.classList.add(styles.dappletsIsLoadingDeploy)
     const isNotNullCurrentAccount = !(
@@ -336,11 +345,19 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           header: 'Publication error',
           message: [err.message],
         })
-        if (messageError) {
-          messageError.message.map((m) => {
-            const messageErr = m.toLowerCase()
-            messageErr.includes('You are not the owner of this module') ? null : setModalError(true)
-          })
+        // if (err.message) {
+        //   messageError.message.map((m) => {
+        //     const messageErr = m.toLowerCase()
+        //     messageErr.includes('You are not the owner of this module') ? null : setModalError(true)
+        //     console.log('l')
+        //   })
+        // }
+        if (err.message) {
+          // messageError.message.map((m) => {
+          const messageErr = err.message.toLowerCase()
+          messageErr.includes(' are not the owner of this module') ? setModalErrorOwner(true) : null
+
+          // })
         }
 
         // setModalError(true)
@@ -535,6 +552,30 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           }
           footer={''}
           onClose={() => onCloseError()}
+        />
+      ) : null}
+      {messageError ? (
+        <Modal
+          visible={isModalErrorOwner}
+          title={messageError.header}
+          classNameWrapper={styles.modalDefaultWrapper}
+          content={
+            <div className={styles.modalDefaultContent}>
+              <p className={styles.modalDefaultContentText}>THE WRONG WALLET</p>
+
+              <button
+                onClick={() => {
+                  setOpenWallet()
+                  onCloseErrorOwner()
+                }}
+                className={styles.modalDefaultContentButton}
+              >
+                GO TO THE WALLETS
+              </button>
+            </div>
+          }
+          footer={''}
+          onClose={() => onCloseErrorOwner()}
         />
       ) : null}
     </>
