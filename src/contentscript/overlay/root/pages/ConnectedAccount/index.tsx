@@ -1,13 +1,12 @@
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
+import makeBlockie from 'ethereum-blockies-base64'
 import React, { FC, useEffect, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import { Message } from '../../components/Message'
 import styles from './ConnectedAccount.module.scss'
 import { Modal } from './ModalConnectedAccounts'
-import Attention from './testProfile/attention.svg'
 import Ok from './testProfile/ok.svg'
-import UserTest_1 from './testProfile/testUser_1.svg'
-import UserTest_2 from './testProfile/testUser_2.svg'
-import Time from './testProfile/Time.svg'
 
 export interface ConnectedAccountProps {}
 enum Status {
@@ -15,51 +14,28 @@ enum Status {
   Connected = 'Connected',
   Error = 'Error',
 }
-export const TEST_PROFILE = [
-  {
-    id: '0',
-    userTestOne: { img: UserTest_1, name: '@Twitter', userActive: false, accountActive: false },
-    userTestTwo: {
-      img: UserTest_2,
-      name: '0xB6fa...B8ad',
-      userActive: false,
-      accountActive: false,
-    },
-    statusName: Status.Connected,
-    statusLabel: Ok,
-    statusMessage: 'Status connected',
-    userActive: false,
-  },
-  {
-    id: '1',
-    userTestOne: { img: UserTest_1, name: '@Twitter', userActive: false, accountActive: false },
-    userTestTwo: {
-      img: UserTest_2,
-      name: '0xB6fa...B8ad',
-      userActive: false,
-      accountActive: false,
-    },
-    statusName: Status.Processing,
-    statusLabel: Time,
-    statusMessage: 'Status processing',
-    userActive: false,
-  },
-  {
-    id: '2',
-    userTestOne: { img: UserTest_1, name: '@Twitter', userActive: false, accountActive: false },
-    userTestTwo: {
-      img: UserTest_2,
-      name: '0xB6fa...B8ad',
-      userActive: false,
-      accountActive: false,
-    },
-    statusName: Status.Error,
-    statusLabel: Attention,
-    statusMessage: 'Status error',
-    userActive: false,
-  },
-]
+
+interface IUser {
+  img: string
+  name: string
+  origin: string
+  userActive: boolean
+  accountActive: boolean
+}
+
+interface IPair {
+  firstAccount: IUser
+  secondAccount: IUser
+  statusName: Status
+  statusLabel: string // Ok | Time | Attention
+  statusMessage: string
+  userActive: boolean
+  closeness: number
+}
+
 export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAccountProps) => {
+  const [pairs, setPairs] = useState<IPair[]>()
+
   const [activeStatus, setActiveStatus] = useState<Status>(null)
   // const [isActiveChoiseButton, setActiveChoiseButton] = useState(false)
   const [isDisabledButtonChoise, setDisabledButtonChoise] = useState(false)
@@ -71,64 +47,133 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
   const onCloseModalModalDeleteMainAccount = () => setModalDeleteMainAccount(false)
 
   const [activeId, setActiveId] = useState(null)
-  useEffect(() => {}, [TEST_PROFILE])
+
+  useEffect(() => {
+    const fn = async () => {
+      const { getWalletDescriptors, getConnectedAccounts } = await initBGFunctions(browser)
+      const descriptors: {
+        account: string
+        chain: string
+        connected: boolean
+      }[] = await getWalletDescriptors()
+      console.log('descriptors', descriptors)
+      const connectedDescriptors = descriptors.filter((d) => d.connected === true)
+      if (!connectedDescriptors || connectedDescriptors.length === 0) return
+      let newPairs: IPair[] = []
+      for (const d of connectedDescriptors) {
+        const firstAccount: IUser = {
+          name: d.account,
+          origin: d.chain,
+          img: makeBlockie(d.account),
+          userActive: false,
+          accountActive: false,
+        }
+        const connectedAccounts: any[][] = await getConnectedAccounts(d.account, d.chain, null)
+        console.log('connectedAccounts', connectedAccounts)
+        connectedAccounts.forEach((level, i) =>
+          level.forEach((ca) => {
+            const [caName, caOrigin1, caOrigin2] = ca.id.split('/')
+            newPairs.push({
+              firstAccount,
+              secondAccount: {
+                name: caName,
+                origin: caOrigin2 ? caOrigin1 + '/' + caOrigin2 : caOrigin1,
+                img: makeBlockie(caName),
+                userActive: false,
+                accountActive: false,
+              },
+              statusName: Status.Connected,
+              statusLabel: Ok,
+              statusMessage: 'Connected',
+              userActive: false,
+              closeness: i + 1,
+            })
+          })
+        )
+      }
+      setPairs(newPairs)
+    }
+
+    fn()
+  }, [])
 
   const temporaryOpenModalTransaction = () => {
-    setModalWaitTransaction(true)
-    setTimeout(() => {
-      onCloseModalWaitTransaction()
-    }, 5000)
+    // setModalWaitTransaction(true)
+    // setTimeout(() => {
+    //   onCloseModalWaitTransaction()
+    // }, 5000)
   }
 
-  const onDeleteChildRecepient = (id: number) => {
-    setModalWaitTransaction(true)
-    TEST_PROFILE.splice(id, 1)
-    setTimeout(() => {
-      onCloseModalWaitTransaction()
-    }, 5000)
+  const handleDisconnectAccounts = async (firstAccount: IUser, secondAccount: IUser) => {
+    const { getMinStakeAmount, requestVerification } = await initBGFunctions(browser)
+    const minStakeAmount = await getMinStakeAmount()
+    const requestId = await requestVerification(
+      {
+        firstAccountId: firstAccount.name,
+        firstOriginId: firstAccount.origin,
+        secondAccountId: secondAccount.name,
+        secondOriginId: secondAccount.origin,
+        firstProofUrl:
+          firstAccount.origin === 'twitter' // ToDo !!! Only for I stage of CA
+            ? 'https://twitter.com/' + firstAccount.name
+            : null,
+        secondProofUrl:
+          secondAccount.origin === 'twitter' // ToDo !!! Only for I stage of CA
+            ? 'https://twitter.com/' + secondAccount.name
+            : null,
+        isUnlink: true,
+      },
+      minStakeAmount
+    )
+    console.log('requestId', requestId)
 
+    // setModalWaitTransaction(true)
+    // TEST_PROFILE.splice(id, 1)
+    // setTimeout(() => {
+    //   onCloseModalWaitTransaction()
+    // }, 5000)
     // setItemsRecepient(newForm)
   }
 
   return (
     <div className={cn(styles.wrapper)}>
       <div className={styles.title}>
-        <h3 className={styles.titleAccount}>Account</h3>
+        <h3 className={styles.titleAccount}>Accounts</h3>
         <h3 className={styles.titleStatus}>Status</h3>
       </div>
-      {TEST_PROFILE.length === 0 ? (
+      {!pairs || pairs.length === 0 ? (
         <Message
           className={styles.messageDelete}
           title={'There are no connected accounts'}
-          subtitle={'You can connect an account if you go to the appropriate URL'}
+          subtitle={'Use Connecting Accounts dapplet to connect your accounts'}
         />
       ) : (
         <div className={styles.accountsWrapper}>
-          {TEST_PROFILE.map((x, i) => {
+          {pairs.map((x, i) => {
             return (
               <div key={i} className={styles.mainBlock}>
                 <div className={styles.accountBlock}>
                   <div
-                    className={cn(styles.account, styles.accountFirst, {
-                      [styles.nameUserActive]: x.userTestOne.accountActive,
+                    className={cn(styles.account, {
+                      [styles.nameUserActive]: x.firstAccount.accountActive,
                     })}
                   >
-                    <img src={x.userTestOne.img} className={styles.imgUser} />
-                    <h4 className={cn(styles.nameUser)}>{x.userTestOne.name}</h4>
-                    <button
+                    <img src={x.firstAccount.img} className={styles.imgUser} />
+                    <h4 className={styles.nameUser}>{x.firstAccount.name}</h4>
+                    {/* <button
                       disabled={isDisabledButtonChoise}
                       onClick={() => {
-                        x.userTestOne.userActive = true
+                        x.firstAccount.userActive = true
                         setDisabledButtonChoise(true)
                       }}
                       className={styles.accountButton}
                       type="button"
-                    />
-                    {x.userTestOne.userActive && (
+                    /> */}
+                    {/* {x.firstAccount.userActive && (
                       <div className={styles.choiseUserActive}>
                         <button
                           onClick={() => {
-                            x.userTestOne.userActive = false
+                            x.firstAccount.userActive = false
                             setDisabledButtonChoise(false)
                           }}
                           className={cn(styles.accountButton, styles.accountButtonChoise)}
@@ -137,10 +182,10 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
                           <a
                             onClick={() => {
                               temporaryOpenModalTransaction()
-                              x.userTestOne.userActive = false
+                              x.firstAccount.userActive = false
                               setDisabledButtonChoise(false)
                               setTimeout(() => {
-                                x.userTestOne.accountActive = true
+                                x.firstAccount.accountActive = true
                               }, 4000)
                             }}
                             className={styles.linkChoise}
@@ -150,10 +195,10 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
                           <a
                             onClick={() => {
                               temporaryOpenModalTransaction()
-                              x.userTestOne.userActive = false
+                              x.firstAccount.userActive = false
                               setDisabledButtonChoise(false)
                               setTimeout(() => {
-                                x.userTestOne.accountActive = false
+                                x.firstAccount.accountActive = false
                               }, 4000)
                             }}
                             className={styles.linkChoise}
@@ -162,30 +207,26 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
                           </a>
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </div>
                   <span className={styles.arrowsAccount}></span>
-                  <div
-                    className={cn(styles.account, styles.accountSecond, {
-                      // [styles.nameUserActive]: x.id,
-                    })}
-                  >
-                    <img src={x.userTestTwo.img} className={styles.imgUser} />
-                    <h4 className={cn(styles.nameUser)}>{x.userTestTwo.name}</h4>
-                    <button
+                  <div className={styles.account}>
+                    <img src={x.secondAccount.img} className={styles.imgUser} />
+                    <h4 className={styles.nameUser}>{x.secondAccount.name}</h4>
+                    {/* <button
                       disabled={isDisabledButtonChoise}
                       onClick={() => {
-                        x.userTestTwo.userActive = true
+                        x.secondAccount.userActive = true
                         setDisabledButtonChoise(true)
                       }}
                       className={styles.accountButton}
                       type="button"
-                    />
-                    {x.userTestTwo.userActive && (
+                    /> */}
+                    {/* {x.secondAccount.userActive && (
                       <div className={styles.choiseUserActive}>
                         <button
                           onClick={() => {
-                            x.userTestTwo.userActive = false
+                            x.secondAccount.userActive = false
                             setDisabledButtonChoise(false)
                           }}
                           className={cn(styles.accountButton, styles.accountButtonChoise)}
@@ -194,7 +235,7 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
                           <a
                             onClick={() => {
                               temporaryOpenModalTransaction()
-                              x.userTestTwo.userActive = false
+                              x.secondAccount.userActive = false
                               setDisabledButtonChoise(false)
                               // setActiveId(x.id)
                             }}
@@ -205,7 +246,7 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
                           <a className={styles.linkChoise}> Disconnect</a>
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
                 <div data-title={x.statusMessage} className={cn(styles.accountStatus)}>
@@ -218,20 +259,21 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
                     })}
                     alt={x.statusMessage}
                   />
-                  <span className={styles.statusName}>{x.statusName}</span>
+                  {/* <span className={styles.statusName}>{x.statusName}</span> */}
                 </div>
                 <div className={cn(styles.accountDelete)}>
                   <button
                     type="button"
                     onClick={() => {
-                      if (x.userTestOne.accountActive === true) {
+                      if (x.firstAccount.accountActive === true) {
                         setActiveId(i)
                         setModalDeleteMainAccount(true)
                       } else {
-                        onDeleteChildRecepient(i)
+                        handleDisconnectAccounts(x.firstAccount, x.secondAccount)
                       }
                     }}
                     className={styles.buttonDelete}
+                    disabled={x.closeness > 1}
                   />
                 </div>
               </div>
@@ -239,7 +281,7 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
           })}
         </div>
       )}
-      <Modal
+      {/* <Modal
         visible={isModalDeleteMainAccount}
         classNameWrapper={styles.contentModal}
         title="Want to delete your alias?"
@@ -251,7 +293,7 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
             </a>
             <button
               onClick={() => {
-                onDeleteChildRecepient(activeId)
+                handleDisconnectAccounts(activeId)
                 onCloseModalModalDeleteMainAccount()
               }}
               className={cn(styles.buttonModalModalWantLink)}
@@ -262,7 +304,7 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
           </div>
         }
         onClose={() => onCloseModalModalDeleteMainAccount()}
-      />
+      /> */}
       <Modal
         visible={isModalWaitTransaction}
         classNameWrapper={styles.contentModal}
