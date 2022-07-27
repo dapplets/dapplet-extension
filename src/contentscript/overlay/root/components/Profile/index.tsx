@@ -15,6 +15,8 @@ export interface ProfileProps {
   isOpenWallet: boolean
   setOpenWalletMini: () => void
   isOpenSearch: boolean
+  setConnectedDescriptors: (x: []) => void
+  setSelectedWallet: (x: string) => void
 }
 
 let _isMounted = false
@@ -30,6 +32,8 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
     isOpenWallet,
     setOpenWalletMini,
     isOpenSearch,
+    setConnectedDescriptors,
+    setSelectedWallet,
   } = props
 
   const [isModalWalletConnectProfile, setModalWalletConnectProfile] = useState(false)
@@ -54,6 +58,8 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
       ) : (
         <>
           <HeaderLogIn
+            setSelectWallet={setSelectedWallet}
+            setConnectedDescriptors={setConnectedDescriptors}
             isMini={isMini}
             setOpen={setOpenWallet}
             isOpen={isOpenWallet}

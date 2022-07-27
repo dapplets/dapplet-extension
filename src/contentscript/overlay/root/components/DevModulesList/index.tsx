@@ -101,6 +101,8 @@ interface PropsDeveloper {
   setLoadingDeploy?: () => void
   setLoadingDeployFinally?: () => void
   setOpenWallet?: () => void
+  connectedDescriptors?: []
+  selectedWallet?: string
 }
 let isMounted = false
 export const DevModule: FC<PropsDeveloper> = (props) => {
@@ -117,6 +119,8 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setLoadingDeploy,
     setLoadingDeployFinally,
     setOpenWallet,
+    connectedDescriptors,
+    selectedWallet,
   } = props
 
   const nodes = new Map<string, any>()
@@ -158,7 +162,15 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     return () => {
       isMounted = false
     }
-  }, [targetChain, currentAccount, modules[0], isLoadingDeploy, isModalError])
+  }, [
+    targetChain,
+    currentAccount,
+    modules[0],
+    isLoadingDeploy,
+    isModalError,
+    isModalErrorOwner,
+    owner,
+  ])
 
   modules.forEach((x) => {
     nodes.set(x.versions[0] ? x.module.name + '#' + x.versions[0]?.branch : x.module.name, x)
@@ -259,12 +271,18 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     }
   }
   const _updateOwnership = async () => {
+    console.log(targetRegistry)
+    console.log(mi.name)
+    console.log(vi)
+
     if (targetRegistry && mi.name) {
       const { getOwnership } = await initBGFunctions(browser)
+      console.log(mi)
 
       const owner = await getOwnership(targetRegistry, mi.name)
 
       setOwner(owner)
+      console.log(owner)
     } else {
       return
     }
@@ -306,13 +324,23 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
   const deployButtonClickHandler = async (e) => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
-    // console.log(mi, 'mi')
-    // console.log(vi, 'vi')
-    // console.log(targetStorages, 'targetStorages')
-    // console.log(targetRegistry, 'targetRegistry')
-    // console.log(currentAccount, 'currentAccount')
+    let newDescriptors
+    let isOwner
+    console.log(owner)
+    console.log(mode)
+    console.log(vi)
 
-    // e.target.classList.add(styles.dappletsIsLoadingDeploy)
+    if (connectedDescriptors && connectedDescriptors.length > 0) {
+      newDescriptors = connectedDescriptors.find((x: any) => x.type === selectedWallet)
+    }
+    if (connectedDescriptors && connectedDescriptors.length > 0) {
+      isOwner = connectedDescriptors.find((x: any) => {
+        if (owner && x.account === owner.toLowerCase()) {
+          return x.account
+        }
+      })
+    }
+
     const isNotNullCurrentAccount = !(
       !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
     )
@@ -322,8 +350,13 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     if (isNotTrustedUser) {
       await addTrustedUser(currentAccount.toLowerCase())
     }
-    if (!isNotNullCurrentAccount) {
+    if (!isNotNullCurrentAccount || !isOwner) {
       setNotAccountModal(true)
+    } else if (isOwner && isOwner.account !== newDescriptors.account) {
+      console.log(isOwner.account !== newDescriptors.account)
+      console.log(isOwner)
+
+      setModalErrorOwner(true)
     } else {
       try {
         setLoadingDeploy()
@@ -360,7 +393,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           // })
         }
 
-        // setModalError(true)
+        setModalError(true)
         setNotAccountModal(false)
 
         setTextButtonDeploy('Deploy')
@@ -448,8 +481,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                   id={String(i)}
                   ref={nodeButton}
                   disabled={isLoadingDeploy}
-                  onClick={(e) => {
-                    m.isDeployed?.[0] === false && deployButtonClickHandler(e)
+                  onClick={async (e) => {
+                    m.isDeployed?.[0] === false &&
+                      (await _updateCurrentAccount().then(() => deployButtonClickHandler(e)))
                   }}
                   className={cn(styles.dappletsReupload, {
                     [styles.dapDeploy]: m.isDeployed?.[0] !== false,
@@ -497,7 +531,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
             classNameContent={styles.isNotAccountModalOwner}
             content={
               <div className={styles.modalDefaultContent}>
-                <p style={{ overflowWrap: 'break-word' }}>Change account to {owner}</p>
+                <p style={{ overflowWrap: 'break-word' }}>Connect account to {owner}</p>
 
                 <br />
                 <button onClick={connectWallet} className={styles.modalDefaultContentButton}>
@@ -554,30 +588,29 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           onClose={() => onCloseError()}
         />
       ) : null}
-      {messageError ? (
-        <Modal
-          visible={isModalErrorOwner}
-          title={messageError.header}
-          classNameWrapper={styles.modalDefaultWrapper}
-          content={
-            <div className={styles.modalDefaultContent}>
-              <p className={styles.modalDefaultContentText}>THE WRONG WALLET</p>
 
-              <button
-                onClick={() => {
-                  setOpenWallet()
-                  onCloseErrorOwner()
-                }}
-                className={styles.modalDefaultContentButton}
-              >
-                GO TO THE WALLETS
-              </button>
-            </div>
-          }
-          footer={''}
-          onClose={() => onCloseErrorOwner()}
-        />
-      ) : null}
+      <Modal
+        visible={isModalErrorOwner}
+        title={'THE WRONG WALLET'}
+        classNameWrapper={styles.modalDefaultWrapper}
+        content={
+          <div className={styles.modalDefaultContent}>
+            <p className={styles.modalDefaultContentText}></p>
+
+            <button
+              onClick={() => {
+                setOpenWallet()
+                onCloseErrorOwner()
+              }}
+              className={styles.modalDefaultContentButton}
+            >
+              GO TO THE WALLETS
+            </button>
+          </div>
+        }
+        footer={''}
+        onClose={() => onCloseErrorOwner()}
+      />
     </>
   )
 }

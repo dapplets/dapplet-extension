@@ -33,10 +33,19 @@ export interface SettingsOverlayProps {
   setLoadingDeploy: () => void
   setLoadingDeployFinally: () => void
   setOpenWallet: () => void
+  connectedDescriptors: []
+  selectedWallet: string
 }
 
 export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
-  const { isLoadingDeploy, setLoadingDeploy, setLoadingDeployFinally, setOpenWallet } = props
+  const {
+    isLoadingDeploy,
+    setLoadingDeploy,
+    setLoadingDeployFinally,
+    setOpenWallet,
+    connectedDescriptors,
+    selectedWallet,
+  } = props
   const [activeTab, setActiveTab] = useState(SettingsTabs.SETTINGS)
   const [activeTaDappletsDetails, setActiveTabDappletsDetails] = useState(DappletsDetails.MAININFO)
   const [activeTabUnderConstructionDetails, setActiveTabUnderConstructionDetails] = useState(
@@ -138,6 +147,8 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
 
             {activeTab === SettingsTabs.DEVELOPER && (
               <Developer
+                selectedWallet={selectedWallet}
+                connectedDescriptors={connectedDescriptors}
                 setOpenWallet={setOpenWallet}
                 isLoadingDeploy={isLoadingDeploy}
                 setLoadingDeploy={setLoadingDeploy}

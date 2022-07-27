@@ -31,10 +31,22 @@ export interface HeaderLogInProps {
   isOverlay: boolean
   setOpenWalletMini: () => void
   isOpenSearch: boolean
+  setConnectedDescriptors: (x: []) => void
+  setSelectWallet: (x: string) => void
 }
 let _isMounted = false
 export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
-  const { isMini, setOpen, isOpen, newProfile, isOverlay, setOpenWalletMini, isOpenSearch } = props
+  const {
+    isMini,
+    setOpen,
+    isOpen,
+    newProfile,
+    isOverlay,
+    setOpenWalletMini,
+    isOpenSearch,
+    setConnectedDescriptors,
+    setSelectWallet,
+  } = props
 
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
   const [selectedWallet, setSelectedWallet] = useState<string | null>(null)
@@ -94,13 +106,16 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     )
 
     setSelectedWallet(selectedWallet)
+    setSelectWallet(selectedWallet)
 
     setDescriptors(descriptors)
     !isOpen && !isOpenSearch && setOpenWalletMini()
     if (descriptors.length > 0) {
       const connectedDescriptors = descriptors.filter((x) => x.connected)
+
       if (connectedDescriptors.length > 0) {
         const newDescriptors = connectedDescriptors?.find((x) => x.type === selectedWallet)
+        setConnectedDescriptors(connectedDescriptors)
         const newWalletImage = makeBlockie(newDescriptors.account)
         setWalletImage(newWalletImage)
         if (newDescriptors.type === 'near') {
