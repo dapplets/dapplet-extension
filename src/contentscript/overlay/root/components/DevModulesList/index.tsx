@@ -151,7 +151,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const onCloseError = () => setModalError(false)
   const onCloseErrorOwner = () => setModalErrorOwner(false)
   const [isNotAccountModal, setNotAccountModal] = useState(false)
-  // const _isMounted = useRef(true)
+  const [isNewModule, setNewModule] = useState(false)
+  const onCloseNewModule = () => setNewModule(false)
+  const [isDeployNewModule, setDeployNewModule] = useState(false)
   useEffect(() => {
     isMounted = true
     const init = async () => {
@@ -170,6 +172,8 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     isModalError,
     isModalErrorOwner,
     owner,
+    isNewModule,
+    isDeployNewModule,
   ])
 
   modules.forEach((x) => {
@@ -264,25 +268,15 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         _updateDeploymentStatus(),
         _checkDependencies(),
       ])
-      // await _updateOwnership(),
-      //   await _updateCurrentAccount(),
-      //   await _updateDeploymentStatus(),
-      //   await _checkDependencies()
     }
   }
   const _updateOwnership = async () => {
-    console.log(targetRegistry)
-    console.log(mi.name)
-    console.log(vi)
-
     if (targetRegistry && mi.name) {
       const { getOwnership } = await initBGFunctions(browser)
-      console.log(mi)
 
       const owner = await getOwnership(targetRegistry, mi.name)
 
       setOwner(owner)
-      console.log(owner)
     } else {
       return
     }
@@ -326,9 +320,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
     let newDescriptors
     let isOwner
-    console.log(owner)
-    console.log(mode)
-    console.log(vi)
 
     if (connectedDescriptors && connectedDescriptors.length > 0) {
       newDescriptors = connectedDescriptors.find((x: any) => x.type === selectedWallet)
@@ -344,32 +335,46 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     const isNotNullCurrentAccount = !(
       !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
     )
+
     const isNotTrustedUser =
       isNotNullCurrentAccount &&
       !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
     if (isNotTrustedUser) {
       await addTrustedUser(currentAccount.toLowerCase())
     }
-    if (!isNotNullCurrentAccount || !isOwner) {
+    if (!isNotNullCurrentAccount || (!isOwner && deploymentStatus !== 3)) {
       setNotAccountModal(true)
-    } else if (isOwner && isOwner.account !== newDescriptors.account) {
+    } else if (isOwner && isOwner.account !== newDescriptors.account && deploymentStatus !== 3) {
       console.log(isOwner.account !== newDescriptors.account)
-      console.log(isOwner)
-
       setModalErrorOwner(true)
     } else {
       try {
         setLoadingDeploy()
         setTextButtonDeploy('')
+        if (deploymentStatus === 3) {
+          setNewModule(true)
+          if (isDeployNewModule) {
+            console.log(isDeployNewModule)
 
-        mode === FormMode.Creating
-          ? await deployModule(mi, null, targetStorages, targetRegistry)
-          : await deployModule(mi, vi, targetStorages, targetRegistry)
+            mode === FormMode.Creating
+              ? await deployModule(mi, null, targetStorages, targetRegistry)
+              : await deployModule(mi, vi, targetStorages, targetRegistry)
 
-        setDeploymentStatus(DeploymentStatus.Deployed)
+            setDeploymentStatus(DeploymentStatus.Deployed)
 
-        setTextButtonDeploy('Deploy')
-        setUpdate(true)
+            setTextButtonDeploy('Deploy')
+            setUpdate(true)
+          }
+        } else {
+          mode === FormMode.Creating
+            ? await deployModule(mi, null, targetStorages, targetRegistry)
+            : await deployModule(mi, vi, targetStorages, targetRegistry)
+
+          setDeploymentStatus(DeploymentStatus.Deployed)
+
+          setTextButtonDeploy('Deploy')
+          setUpdate(true)
+        }
       } catch (err) {
         console.log(err)
 
@@ -378,19 +383,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           header: 'Publication error',
           message: [err.message],
         })
-        // if (err.message) {
-        //   messageError.message.map((m) => {
-        //     const messageErr = m.toLowerCase()
-        //     messageErr.includes('You are not the owner of this module') ? null : setModalError(true)
-        //     console.log('l')
-        //   })
-        // }
         if (err.message) {
-          // messageError.message.map((m) => {
           const messageErr = err.message.toLowerCase()
           messageErr.includes(' are not the owner of this module') ? setModalErrorOwner(true) : null
-
-          // })
         }
 
         setModalError(true)
@@ -610,6 +605,32 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         }
         footer={''}
         onClose={() => onCloseErrorOwner()}
+      />
+      <Modal
+        visible={isNewModule}
+        title={'Deploy new module'}
+        classNameWrapper={styles.modalDefaultWrapper}
+        content={
+          <div className={styles.modalDefaultContent}>
+            <p className={styles.modalDefaultContentText}>
+              {` You deploy the first version of the ${mi.name} dapplet with the wallet
+              ${currentAccount}. If everything is correct, click OK. Or connect another
+              wallet.`}
+            </p>
+
+            <button
+              onClick={() => {
+                setDeployNewModule(true)
+                onCloseNewModule()
+              }}
+              className={styles.modalDefaultContentButton}
+            >
+              Ok
+            </button>
+          </div>
+        }
+        footer={''}
+        onClose={() => onCloseNewModule()}
       />
     </>
   )
