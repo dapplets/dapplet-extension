@@ -221,28 +221,32 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                   children={
                     <div className={styles.modules}>
                       {modules.length > 0 &&
-                        Object.entries(groupedModules).map(([registryUrl, modules]) => (
-                          <div key={registryUrl + i}>
-                            {modules.length > 0 && registryUrl === r.url && (
-                              <DevModule
-                                selectedWallet={selectedWallet}
-                                connectedDescriptors={connectedDescriptors}
-                                setOpenWallet={setOpenWallet}
-                                isLoadingDeploy={isLoadingDeploy}
-                                setLoadingDeploy={setLoadingDeploy}
-                                setLoadingDeployFinally={setLoadingDeployFinally}
-                                setUpdate={setUpdate}
-                                isLocalhost={isLocalhost}
-                                setDappletsDetail={setDappletsDetail}
-                                modules={modules}
-                                onDetailsClick={deployModule.bind(this)}
-                                setModuleInfo={setModuleInfo}
-                                setModuleVersion={setModuleVersion}
-                                setUnderConstructionDetails={setUnderConstructionDetails}
-                              />
-                            )}
-                          </div>
-                        ))}
+                        Object.entries(groupedModules).map(([registryUrl, modules]) => {
+                          return (
+                            modules.length > 0 &&
+                            registryUrl === r.url &&
+                            modules.map((x, i) => (
+                              <div key={registryUrl + i}>
+                                <DevModule
+                                  selectedWallet={selectedWallet}
+                                  connectedDescriptors={connectedDescriptors}
+                                  setOpenWallet={setOpenWallet}
+                                  isLoadingDeploy={isLoadingDeploy}
+                                  setLoadingDeploy={setLoadingDeploy}
+                                  setLoadingDeployFinally={setLoadingDeployFinally}
+                                  setUpdate={setUpdate}
+                                  isLocalhost={isLocalhost}
+                                  setDappletsDetail={setDappletsDetail}
+                                  modules={x}
+                                  onDetailsClick={deployModule.bind(this)}
+                                  setModuleInfo={setModuleInfo}
+                                  setModuleVersion={setModuleVersion}
+                                  setUnderConstructionDetails={setUnderConstructionDetails}
+                                />
+                              </div>
+                            ))
+                          )
+                        })}
                     </div>
                   }
                 />
@@ -259,18 +263,18 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                       label={registryUrl}
                       isShowChildrenRegistery={isShowChildrenRegistery}
                       setShowChildrenRegistery={setShowChildrenRegistery}
-                      children={
-                        <div className={styles.modules}>
+                      children={modules.map((x, i) => (
+                        <div key={i} className={styles.modules}>
                           <DevModule
                             setDappletsDetail={setDappletsDetail}
-                            modules={modules}
+                            modules={x}
                             onDetailsClick={deployModule.bind(this)}
                             setModuleInfo={setModuleInfo}
                             setModuleVersion={setModuleVersion}
                             setUnderConstructionDetails={setUnderConstructionDetails}
                           />
                         </div>
-                      }
+                      ))}
                     />
                   )}
                 </div>
