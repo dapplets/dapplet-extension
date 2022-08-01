@@ -44,6 +44,8 @@ type EthVersionInfoDto = {
   extensionVersion: string
 }
 
+type LinkString = { prev: string; next: string }
+
 const moduleTypesMap: { [key: number]: ModuleTypes } = {
   1: ModuleTypes.Feature,
   2: ModuleTypes.Adapter,
@@ -79,22 +81,22 @@ export class EthRegistry implements Registry {
 
   public async getModuleInfo(
     contextIds: string[],
-    users: string[]
+    listers: string[]
   ): Promise<{ [contextId: string]: ModuleInfo[] }> {
     if (!contextIds || contextIds.length === 0) return {}
-    if (!users || users.length === 0) return {}
+    if (!listers || listers.length === 0) return {}
 
     try {
-      users = users.filter(
+      listers = listers.filter(
         (x) => typeOfUri(x) === UriTypes.Ens || typeOfUri(x) === UriTypes.Ethereum
       )
-      users = await Promise.all(
-        users.map((u) =>
+      listers = await Promise.all(
+        listers.map((u) =>
           typeOfUri(u) === UriTypes.Ens ? this._signer.resolveName(u) : Promise.resolve(u)
         )
       )
-      users = users.filter((u) => u !== null)
-      const usersCacheKey = users.join(';')
+      listers = listers.filter((u) => u !== null)
+      const usersCacheKey = listers.join(';')
 
       // ToDo: maybe it's overcached
       if (!this._moduleInfoCache.has(usersCacheKey))
@@ -111,18 +113,24 @@ export class EthRegistry implements Registry {
       }
 
       const contract = await this._contractPromise
-      const moduleInfosByCtx: EthModuleInfo[][] = await contract.getModulesInfoByListersBatch(
-        contextIds,
-        users,
-        0
-      )
+      const {
+        modulesInfos,
+        ctxIdsOwners,
+      }: { modulesInfos: EthModuleInfo[][]; ctxIdsOwners: string[][] } =
+        await contract.getModulesInfoByListersBatch(
+          contextIds,
+          listers,
+          0 // ToDo: utilize paging (max buffer length)
+        )
       this.isAvailable = true
       this.error = null
 
       const result = Object.fromEntries(
-        moduleInfosByCtx.map((modules, i) => {
+        modulesInfos.map((modules, i) => {
           const ctx = contextIds[i]
-          const mis = modules.map((m) => this._convertFromEthMi(m))
+          const mis = modules.map((m, j) =>
+            this._convertFromEthMi({ ...m, owner: ctxIdsOwners[i][j] })
+          )
 
           if (!this._moduleInfoCache.get(usersCacheKey).has(ctx)) {
             this._moduleInfoCache.get(usersCacheKey).set(ctx, mis)
@@ -144,8 +152,8 @@ export class EthRegistry implements Registry {
   public async getModuleInfoByName(name: string): Promise<ModuleInfo> {
     try {
       const contract = await this._contractPromise
-      const m = await contract.getModuleInfoByName(name)
-      const mi = this._convertFromEthMi(m)
+      const { modulesInfo, owner } = await contract.getModuleInfoByName(name)
+      const mi = this._convertFromEthMi({ ...modulesInfo, owner })
       return mi
     } catch (err) {
       //console.error(err);
@@ -204,7 +212,12 @@ export class EthRegistry implements Registry {
   }): Promise<{ module: ModuleInfo; versions: VersionInfo[] }[]> {
     const contract = await this._contractPromise
     const devModules: EthModuleInfo[][] = await Promise.all(
-      users.map((x) => contract.getModuleInfoByOwner(x))
+      // ToDo: utilize paging
+      users.map((x) =>
+        contract
+          .getModulesInfoByOwner(x, 0, 0)
+          .then((y) => y.modulesInfo.map((z) => ({ ...z, owner: x })))
+      )
     )
     const modules = mergeDedupe(devModules).map((x) => this._convertFromEthMi(x))
     const modulesWithLastVersions = await Promise.all(
@@ -264,7 +277,10 @@ export class EthRegistry implements Registry {
 
       console.log('4 vis', vis)
 
-      const tx = await contract.addModuleInfo(module.contextIds, mi, vis)
+      // ToDo: linkify
+      const links: LinkString[] = []
+
+      const tx = await contract.addModuleInfo(module.contextIds, links, mi, vis)
 
       console.log('5 tx', tx)
 
@@ -312,9 +328,13 @@ export class EthRegistry implements Registry {
   public async editModuleInfo(module: ModuleInfo): Promise<void> {
     const contract = await this._contractPromise
     const ethMi = this._convertToEthMi(module)
-    const key = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(ethMi.name))
-    const moduleIdx = await contract.moduleIdxs(key)
-    await contract.editModuleInfo(moduleIdx, ethMi.title, ethMi.description, ethMi.icon)
+    await contract.editModuleInfo(
+      ethMi.name,
+      ethMi.title,
+      ethMi.description,
+      ethMi.fullDescription,
+      ethMi.icon
+    )
   }
 
   private _convertFromEthMi(m: EthModuleInfo): ModuleInfo {
@@ -327,6 +347,10 @@ export class EthRegistry implements Registry {
     mi.icon = {
       hash: m.icon.hash,
       uris: m.icon.uris.map((u) => ethers.utils.toUtf8String(u)),
+    }
+    mi.icon = {
+      hash: m.fullDescription.hash,
+      uris: m.fullDescription.uris.map((u) => ethers.utils.toUtf8String(u)),
     }
     mi.interfaces = m.interfaces
     mi.registryUrl = this.url
@@ -365,10 +389,17 @@ export class EthRegistry implements Registry {
       flags: ethers.BigNumber.from('0x00'),
       title: module.title,
       description: module.description,
-      fullDescription: {
-        hash: ZERO_BYTES32,
-        uris: [],
-      },
+      fullDescription: module.fullDescription
+        ? {
+            hash: module.fullDescription.hash,
+            uris: module.fullDescription.uris.map((u) =>
+              ethers.utils.hexlify(ethers.utils.toUtf8Bytes(u))
+            ),
+          }
+        : {
+            hash: ZERO_BYTES32,
+            uris: [],
+          },
       icon: module.icon
         ? {
             hash: module.icon.hash,
@@ -419,7 +450,7 @@ export class EthRegistry implements Registry {
           }))) ||
         [],
       flags: 0,
-      extensionVersion: '0x00ff08',
+      extensionVersion: '0x00ff08', // ToDo: use real extension version
     }
   }
 }
