@@ -25,4 +25,5 @@ export default class VersionInfo extends Base {
   overlays: {
     [name: string]: StorageRef
   } = null
+  extensionVersion?: string = null
 }

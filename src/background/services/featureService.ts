@@ -692,6 +692,21 @@ export default class FeatureService {
         }
       }
 
+      if (mi.fullDescription && mi.fullDescription.uris.length > 0) {
+        // Detailed description publishing
+        const buf = await this._storageAggregator.getResource(mi.fullDescription)
+        const blob = new Blob([buf], { type: 'image/png' })
+        const hashUris = await this._storageAggregator.save(blob, targetStorages)
+
+        // Manifest editing
+        mi.fullDescription = hashUris
+      }
+
+      // Use a current version of the extension as target value
+      if (vi && EXTENSION_VERSION) {
+        vi.extensionVersion = EXTENSION_VERSION
+      }
+
       return scriptUrl
     } catch (err) {
       console.error(err)

@@ -14,6 +14,7 @@ type DevManifest = {
   main?: string
   dist?: string
   icon?: string
+  fullDescription?: string
   contextIds?: string[]
   interfaces?: {
     [name: string]: string
@@ -38,6 +39,7 @@ type DevManifestRaw = DevManifest & {
   name: string | JsonReference
   version: string | JsonReference
   description: string | JsonReference
+  fullDescription: string | JsonReference
   main: string | JsonReference
   dist: string | JsonReference
 }
@@ -46,7 +48,7 @@ export class DevRegistry implements Registry {
   private _rootUrl: string
   public isAvailable = true
   public error: string = null
-  public blockchain: string = 'develop'
+  public blockchain = 'develop'
 
   private _cachePromise: Promise<void> = null
   private _devConfig: DevManifestRaw | string[] = null
@@ -210,6 +212,12 @@ export class DevRegistry implements Registry {
     mi.title = dm.title
     mi.type = dm.type
     mi.description = dm.description
+    mi.fullDescription = dm.fullDescription
+      ? {
+          hash: null,
+          uris: [new URL(dm.fullDescription, new URL(manifestUri, this._rootUrl).href).href],
+        }
+      : null
     mi.icon = dm.icon
       ? {
           hash: null,
@@ -277,7 +285,7 @@ export class DevRegistry implements Registry {
     manifestUri: string
   ): Promise<DevManifest> {
     const cache = new Map<string, any>()
-    for (const key of ['name', 'version', 'description', 'main', 'dist']) {
+    for (const key of ['name', 'version', 'description', 'main', 'dist', 'fullDescription']) {
       if (typeof manifest[key] === 'object' && !!manifest[key]['$ref']) {
         const [jsonUrl, path] = manifest[key]['$ref'].split('#/')
         const jsonRefUri = new URL(jsonUrl, manifestUri).href

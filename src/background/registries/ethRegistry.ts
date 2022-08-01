@@ -5,6 +5,7 @@ import { getBitFromHex, mergeDedupe, typeOfUri, UriTypes } from '../../common/he
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import abi from './ethRegistryAbi'
+import nftAbi from './nftContractAbi'
 import { Registry } from './registry'
 
 type EthStorageRef = {
@@ -215,10 +216,11 @@ export class EthRegistry implements Registry {
       // ToDo: utilize paging
       users.map((x) =>
         contract
-          .getModulesInfoByOwner(x, 0, 0)
+          .getModulesInfoByOwner(x, 0, 1000)
           .then((y) => y.modulesInfo.map((z) => ({ ...z, owner: x })))
       )
     )
+
     const modules = mergeDedupe(devModules).map((x) => this._convertFromEthMi(x))
     const modulesWithLastVersions = await Promise.all(
       modules.map((a) =>
@@ -251,41 +253,51 @@ export class EthRegistry implements Registry {
     return modulesWithLastVersions
   }
 
-  // TODO: the function crashes with an error during the transaction
   public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
-    console.log('0', { module, version })
-
     const contract = await this._contractPromise
-
-    console.log('1 contract', contract)
 
     const isModuleExist = await contract
       .getModuleInfoByName(module.name)
       .then((x) => !!x)
       .catch(() => false)
 
-    console.log('2 isModuleExist', isModuleExist)
-
     if (isModuleExist && !version) throw new Error('A module with such name already exists.')
 
     if (!isModuleExist) {
       const mi = this._convertToEthMi(module)
-
-      console.log('3 mi', mi)
-
       const vis = version ? [this._convertToEthVi(version)] : []
 
-      console.log('4 vis', vis)
-
-      // ToDo: linkify
-      const links: LinkString[] = []
+      // add module in the end of a listing
+      let links: LinkString[] = []
+      const signerAddress = await this._signer.getAddress()
+      const listedModules = await contract.getModulesOfListing(signerAddress)
+      if (listedModules.length === 0) {
+        links = [
+          {
+            prev: 'H',
+            next: module.name,
+          },
+          {
+            prev: module.name,
+            next: 'T',
+          },
+        ]
+      } else {
+        const last = listedModules[listedModules.length - 1]
+        links = [
+          {
+            prev: last,
+            next: module.name,
+          },
+          {
+            prev: module.name,
+            next: 'T',
+          },
+        ]
+      }
 
       const tx = await contract.addModuleInfo(module.contextIds, links, mi, vis)
-
-      console.log('5 tx', tx)
-
-      const wt = await tx.wait()
-      console.log('6 wt', wt)
+      await tx.wait()
     } else {
       const vi = this._convertToEthVi(version)
       const tx = await contract.addModuleVersion(module.name, vi)
@@ -304,12 +316,12 @@ export class EthRegistry implements Registry {
     }
   }
 
-  // TODO: make it later
   public async transferOwnership(moduleName: string, newAccount: string, oldAccount: string) {
     const contract = await this._contractPromise
-    const devModules: EthModuleInfo[] = await contract.getModuleInfoByOwner(oldAccount)
-    const oldOwnerArrIdx = devModules.findIndex((x) => x.name === moduleName)
-    const tx = await contract.transferOwnership(moduleName, newAccount, oldOwnerArrIdx)
+    const moduleIdx = await contract.getModuleIndx(moduleName)
+    const nftAddress = await contract.getNFTContractAddress()
+    const nftContract = new ethers.Contract(nftAddress, nftAbi, this._signer)
+    const tx = await nftContract.transferFrom(oldAccount, newAccount, moduleIdx)
     await tx.wait()
   }
 
@@ -348,7 +360,7 @@ export class EthRegistry implements Registry {
       hash: m.icon.hash,
       uris: m.icon.uris.map((u) => ethers.utils.toUtf8String(u)),
     }
-    mi.icon = {
+    mi.fullDescription = {
       hash: m.fullDescription.hash,
       uris: m.fullDescription.uris.map((u) => ethers.utils.toUtf8String(u)),
     }
@@ -379,6 +391,9 @@ export class EthRegistry implements Registry {
     vi.interfaces = Object.fromEntries(
       dto.interfaces.map((d) => [d.name, d.major + '.' + d.minor + '.' + d.patch])
     )
+    const v = dto.extensionVersion
+    vi.extensionVersion =
+      parseInt(v[2] + v[3], 16) + '.' + parseInt(v[4] + v[5], 16) + '.' + parseInt(v[6] + v[7], 16)
     return vi
   }
 
@@ -450,7 +465,12 @@ export class EthRegistry implements Registry {
           }))) ||
         [],
       flags: 0,
-      extensionVersion: '0x00ff08', // ToDo: use real extension version
+      extensionVersion: !version.extensionVersion
+        ? '0x000000'
+        : '0x' +
+          semver.major(version.extensionVersion).toString(16) +
+          semver.minor(version.extensionVersion).toString(16) +
+          semver.patch(version.extensionVersion).toString(16),
     }
   }
 }
