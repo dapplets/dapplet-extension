@@ -107,6 +107,8 @@ interface S {
   isLoadingDeploy: boolean
   dropdownListValue: string
   isMiniWallets: boolean
+  connectedDescriptors: []
+  selectedWallet: string
 }
 
 class _App extends React.Component<P, S> {
@@ -123,6 +125,8 @@ class _App extends React.Component<P, S> {
     isLoadingDeploy: false,
     dropdownListValue: 'All',
     isMiniWallets: false,
+    connectedDescriptors: null,
+    selectedWallet: null,
   }
 
   async componentDidMount() {
@@ -378,6 +382,16 @@ class _App extends React.Component<P, S> {
       isMiniWallets: false,
     })
   }
+  setConnectedDescriptors = (descriptors: []) => {
+    this.setState({
+      connectedDescriptors: descriptors,
+    })
+  }
+  setSelectedWallet = (selectedWallet: string) => {
+    this.setState({
+      selectedWallet: selectedWallet,
+    })
+  }
 
   render() {
     const p = this.props
@@ -417,6 +431,8 @@ class _App extends React.Component<P, S> {
             <header className={styles.header}>
               <div className={styles.left}>
                 <Profile
+                  setSelectedWallet={this.setSelectedWallet}
+                  setConnectedDescriptors={this.setConnectedDescriptors}
                   isMini={s.isMiniWallets}
                   handleWalletLengthConnect={this.handleWalletLengthConnect}
                   isWalletLength={s.isWalletLength}
@@ -477,6 +493,9 @@ class _App extends React.Component<P, S> {
               {/* {pathname === '/system/connected' && <ConnectedAccount />} */}
               {pathname === '/system/settings' && (
                 <SettingsOverlay
+                  selectedWallet={s.selectedWallet}
+                  connectedDescriptors={s.connectedDescriptors}
+                  setOpenWallet={this.setOpenWallet}
                   isLoadingDeploy={s.isLoadingDeploy}
                   setLoadingDeploy={this.setLoadingDeploy}
                   setLoadingDeployFinally={this.setLoadingDeployFinally}

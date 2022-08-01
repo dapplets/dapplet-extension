@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
-import TopologicalSort from 'topological-sort'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
@@ -88,7 +87,7 @@ interface PropsDeveloper {
     module: ModuleInfo
     versions: VersionInfo[]
     isDeployed: boolean[]
-  }[]
+  }
   onDetailsClick: (x: any, y: any) => void
   setModuleInfo: (x) => void
   setModuleVersion: (x) => void
@@ -100,6 +99,9 @@ interface PropsDeveloper {
   isLoadingDeploy?: boolean
   setLoadingDeploy?: () => void
   setLoadingDeployFinally?: () => void
+  setOpenWallet?: () => void
+  connectedDescriptors?: []
+  selectedWallet?: string
 }
 let isMounted = false
 export const DevModule: FC<PropsDeveloper> = (props) => {
@@ -115,12 +117,14 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     isLoadingDeploy,
     setLoadingDeploy,
     setLoadingDeployFinally,
+    setOpenWallet,
+    connectedDescriptors,
+    selectedWallet,
   } = props
 
-  const nodes = new Map<string, any>()
   const [originalMi, setOriginalMi] = useState<ModuleInfo>(null)
-  const [mi, setMi] = useState<ModuleInfo>(modules[0].module)
-  const [vi, setVi] = useState<VersionInfo>(modules[0].versions[0])
+  const [mi, setMi] = useState(modules.module)
+  const [vi, setVi] = useState(modules.versions[0])
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [currentAccount, setCurrentAccount] = useState(null)
   const [trustedUsers, setTrustedUsers] = useState([])
@@ -141,38 +145,37 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
   const [messageError, setMessageError] = useState(null)
   const [isModalError, setModalError] = useState(false)
+  const [isModalErrorOwner, setModalErrorOwner] = useState(false)
   const onCloseError = () => setModalError(false)
+  const onCloseErrorOwner = () => setModalErrorOwner(false)
   const [isNotAccountModal, setNotAccountModal] = useState(false)
-  // const _isMounted = useRef(true)
+  const [isNewModule, setNewModule] = useState(false)
+  const onCloseNewModule = () => {
+    // nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
+    setNewModule(false)
+  }
+  const [isDeployNewModule, setDeployNewModule] = useState(false)
   useEffect(() => {
     isMounted = true
     const init = async () => {
       await _updateData()
-      isLoadingDeploy ? setTextButtonDeploy('') : setTextButtonDeploy('Deploy')
     }
     init()
     return () => {
       isMounted = false
     }
-  }, [targetChain, currentAccount, modules[0], isLoadingDeploy, isModalError])
-
-  modules.forEach((x) => {
-    nodes.set(x.versions[0] ? x.module.name + '#' + x.versions[0]?.branch : x.module.name, x)
-  })
-  const sorting = new TopologicalSort(nodes)
-  // modules.forEach((x) => {
-  //   const deps = [
-  //     ...Object.keys(x.versions[0]?.dependencies || {}),
-  //     ...Object.keys(x.versions[0]?.interfaces || {}),
-  //   ]
-  //   deps.forEach((d) => {
-  //     if (nodes.has(d + '#' + DEFAULT_BRANCH_NAME)) {
-  //       sorting.addEdge(d + '#' + DEFAULT_BRANCH_NAME, x.module.name + '#' + x.versions[0]?.branch)
-  //     }
-  //   })
-  // })
-
-  const sorted = [...sorting.sort().values()].map((x) => x.node)
+  }, [
+    targetChain,
+    currentAccount,
+    modules,
+    isLoadingDeploy,
+    isModalError,
+    isModalErrorOwner,
+    owner,
+    isNewModule,
+    isDeployNewModule,
+    nodeButton,
+  ])
 
   const visible = (hash: string): string => {
     if (hash.length > 28) {
@@ -248,10 +251,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         _updateDeploymentStatus(),
         _checkDependencies(),
       ])
-      // await _updateOwnership(),
-      //   await _updateCurrentAccount(),
-      //   await _updateDeploymentStatus(),
-      //   await _checkDependencies()
     }
   }
   const _updateOwnership = async () => {
@@ -281,7 +280,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   }
   const _updateCurrentAccount = async () => {
     if (targetChain) {
-      const { getOwnership, getAddress } = await initBGFunctions(browser)
+      const { getAddress } = await initBGFunctions(browser)
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
       setCurrentAccount(currentAccount)
     } else {
@@ -302,32 +301,50 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
   const deployButtonClickHandler = async (e) => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
+    let newDescriptors
+    let isOwner
 
-    // e.target.classList.add(styles.dappletsIsLoadingDeploy)
+    if (connectedDescriptors && connectedDescriptors.length > 0) {
+      newDescriptors = connectedDescriptors.find((x: any) => x.type === selectedWallet)
+    }
+    if (connectedDescriptors && connectedDescriptors.length > 0) {
+      isOwner = connectedDescriptors.find((x: any) => {
+        if (owner && x.account === owner.toLowerCase()) {
+          return x.account
+        }
+      })
+    }
+
     const isNotNullCurrentAccount = !(
       !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
     )
+
     const isNotTrustedUser =
       isNotNullCurrentAccount &&
       !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
     if (isNotTrustedUser) {
       await addTrustedUser(currentAccount.toLowerCase())
     }
-    if (!isNotNullCurrentAccount) {
+    if (!isNotNullCurrentAccount || (!isOwner && deploymentStatus !== 3)) {
       setNotAccountModal(true)
+    } else if (isOwner && isOwner.account !== newDescriptors.account && deploymentStatus !== 3) {
+      setModalErrorOwner(true)
     } else {
       try {
         setLoadingDeploy()
-        setTextButtonDeploy('')
+        nodeButton.current.classList.add('dappletsIsLoadingDeploy')
 
-        mode === FormMode.Creating
-          ? await deployModule(mi, null, targetStorages, targetRegistry)
-          : await deployModule(mi, vi, targetStorages, targetRegistry)
+        if (deploymentStatus === 3) {
+          setNewModule(true)
+        } else {
+          // isLoadingDeploy && nodeButton.current.classList.add('dappletsIsLoadingDeploy')
+          mode === FormMode.Creating
+            ? await deployModule(mi, null, targetStorages, targetRegistry)
+            : await deployModule(mi, vi, targetStorages, targetRegistry)
 
-        setDeploymentStatus(DeploymentStatus.Deployed)
-
-        setTextButtonDeploy('Deploy')
-        setUpdate(true)
+          setDeploymentStatus(DeploymentStatus.Deployed)
+          setUpdate(true)
+        }
       } catch (err) {
         console.log(err)
 
@@ -336,18 +353,17 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           header: 'Publication error',
           message: [err.message],
         })
-        if (messageError) {
-          messageError.message.map((m) => {
-            const messageErr = m.toLowerCase()
-            messageErr.includes('You are not the owner of this module') ? null : setModalError(true)
-          })
+        if (err.message) {
+          nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
+          const messageErr = err.message.toLowerCase()
+          messageErr.includes(' are not the owner of this module') ? setModalErrorOwner(true) : null
         }
 
-        // setModalError(true)
+        setModalError(true)
         setNotAccountModal(false)
-
-        setTextButtonDeploy('Deploy')
+        // nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
       } finally {
+        // nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
         setLoadingDeployFinally()
         await _updateData()
       }
@@ -368,110 +384,108 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
   return (
     <>
-      {sorted.map((m, i) => (
-        <div id={String(i)} className={styles.dappletsBlock} key={i}>
-          <StorageRefImage storageRef={m.module.icon} />
+      <div className={styles.dappletsBlock}>
+        <StorageRefImage storageRef={mi.icon} />
 
-          <div className={styles.dappletsInfo}>
-            <div className={styles.dappletsTegs}>
-              {m.versions && m.versions[0] && m.versions[0].version ? (
-                <div className={styles.dappletsVersion}>{m.versions[0].version}</div>
-              ) : (
-                <div className={styles.dappletsVersionUC}>Under Construction</div>
-              )}
+        <div className={styles.dappletsInfo}>
+          <div className={styles.dappletsTegs}>
+            {vi && vi.version ? (
+              <div className={styles.dappletsVersion}>{vi.version}</div>
+            ) : (
+              <div className={styles.dappletsVersionUC}>Under Construction</div>
+            )}
 
-              {m.versions &&
-                m.versions[0] &&
-                m.versions[0].branch &&
-                m.versions[0].branch !== 'default' && (
-                  <div style={{ margin: '0 3px 0 0px' }} className={styles.dappletsBranch}>
-                    {m.versions[0].branch}
-                  </div>
-                )}
-              {m.isDeployed?.[0] === false && (
-                <div className={styles.dappletsNotDeploy}>not deployed</div>
-              )}
-            </div>
+            {vi && vi.branch && vi.branch !== 'default' && (
+              <div style={{ margin: '0 3px 0 0px' }} className={styles.dappletsBranch}>
+                {vi.branch}
+              </div>
+            )}
+            {modules.isDeployed[0] === false && (
+              <div className={styles.dappletsNotDeploy}>not deployed</div>
+            )}
+          </div>
 
-            <div className={styles.blockInfo}>
-              <h3 className={styles.dappletsTitle}>{m.module.title}</h3>
-              {m.module.isUnderConstruction ? (
-                <span
-                  onClick={() => {
-                    onDetailsClick(m.module, m.versions[0])
+          <div className={styles.blockInfo}>
+            <h3 className={styles.dappletsTitle}>{mi.title}</h3>
+            {mi.isUnderConstruction ? (
+              <span
+                onClick={() => {
+                  onDetailsClick(mi, vi)
 
-                    setUnderConstructionDetails(true)
-                    setModuleInfo(m.module)
-                    setModuleVersion(m.versions[0])
-                  }}
-                  className={styles.dappletsSettingsIsUnderConstructionBlock}
-                >
-                  <button className={styles.dappletsSettingsIsUnderConstruction} />
-                  <span className={styles.dappletsSettingsIsTocenomics} />
-                </span>
-              ) : (
-                <button
-                  className={cn(styles.dappletsSettings, {
-                    [styles.dappletsSettingsRegistry]: m.module.author !== null,
-                    [styles.noneVisible]: isLocalhost,
-                  })}
-                  onClick={() => {
-                    // TODO: DELETE J add contextID
-                    m.module.contextIds = []
-                    onDetailsClick(m.module, m.versions[0])
-                    setDappletsDetail(true)
+                  setUnderConstructionDetails(true)
+                  setModuleInfo(mi)
+                  setModuleVersion(vi)
+                }}
+                className={styles.dappletsSettingsIsUnderConstructionBlock}
+              >
+                <button className={styles.dappletsSettingsIsUnderConstruction} />
+                <span className={styles.dappletsSettingsIsTocenomics} />
+              </span>
+            ) : (
+              <button
+                className={cn(styles.dappletsSettings, {
+                  [styles.dappletsSettingsRegistry]: mi.author !== null,
+                  [styles.noneVisible]: isLocalhost,
+                })}
+                onClick={() => {
+                  // TODO: DELETE J add contextID
+                  mi.contextIds = []
+                  onDetailsClick(mi, vi)
+                  setDappletsDetail(true)
 
-                    setModuleInfo(m.module)
-                    setModuleVersion(m.versions[0])
-                  }}
-                />
-              )}
-              {m.module.isUnderConstruction || !isLocalhost ? null : (
-                <button
-                  id={String(i)}
-                  ref={nodeButton}
-                  disabled={isLoadingDeploy}
-                  onClick={(e) => {
-                    m.isDeployed?.[0] === false && deployButtonClickHandler(e)
-                  }}
-                  className={cn(styles.dappletsReupload, {
-                    [styles.dapDeploy]: m.isDeployed?.[0] !== false,
-                    [styles.dappletsIsLoadingDeploy]: isLoadingDeploy,
-                  })}
-                >
-                  {textButtonDeploy}
-                </button>
-              )}
-            </div>
-            <div className={styles.dappletsLabel}>
-              {m.module.name && (
-                <div>
-                  <span className={styles.dappletsLabelSpan}>Name:</span>
-                  <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
-                    {m.module.name}
-                  </label>
-                </div>
-              )}
-
-              {m.module.author && (
-                <div>
-                  <span className={styles.dappletsLabelSpan}>Owner:</span>
-                  <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
-                    {visible(` ${m.module.author}`)}
-                  </label>
-                </div>
-              )}
-
+                  setModuleInfo(mi)
+                  setModuleVersion(vi)
+                }}
+              />
+            )}
+            {mi.isUnderConstruction || !isLocalhost ? null : (
+              <button
+                ref={nodeButton}
+                disabled={isLoadingDeploy}
+                onClick={async (e) => {
+                  modules.isDeployed?.[0] === false &&
+                    (await _updateCurrentAccount().then(() => deployButtonClickHandler(e)))
+                }}
+                className={cn(styles.dappletsReupload, {
+                  [styles.dapDeploy]: modules.isDeployed?.[0] !== false,
+                })}
+              >
+                {nodeButton.current &&
+                nodeButton.current?.classList.contains('dappletsIsLoadingDeploy')
+                  ? ''
+                  : textButtonDeploy}
+              </button>
+            )}
+          </div>
+          <div className={styles.dappletsLabel}>
+            {mi.name && (
               <div>
-                <span className={styles.dappletsLabelSpan}>Type:</span>
+                <span className={styles.dappletsLabelSpan}>Name:</span>
                 <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
-                  {m.module.type}
+                  {mi.name}
                 </label>
               </div>
+            )}
+
+            {mi.author && (
+              <div>
+                <span className={styles.dappletsLabelSpan}>Owner:</span>
+                <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
+                  {visible(` ${mi.author}`)}
+                </label>
+              </div>
+            )}
+
+            <div>
+              <span className={styles.dappletsLabelSpan}>Type:</span>
+              <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
+                {mi.type}
+              </label>
             </div>
           </div>
         </div>
-      ))}
+      </div>
+
       {isNotAccountModal ? (
         owner ? (
           <Modal
@@ -480,7 +494,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
             classNameContent={styles.isNotAccountModalOwner}
             content={
               <div className={styles.modalDefaultContent}>
-                <p style={{ overflowWrap: 'break-word' }}>Change account to {owner}</p>
+                <p style={{ overflowWrap: 'break-word' }}>Connect account to {owner}</p>
 
                 <br />
                 <button onClick={connectWallet} className={styles.modalDefaultContentButton}>
@@ -537,6 +551,87 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
           onClose={() => onCloseError()}
         />
       ) : null}
+
+      <Modal
+        visible={isModalErrorOwner}
+        title={'THE WRONG WALLET'}
+        classNameWrapper={styles.modalDefaultWrapper}
+        content={
+          <div className={styles.modalDefaultContent}>
+            <p className={styles.modalDefaultContentText}></p>
+
+            <button
+              onClick={() => {
+                setOpenWallet()
+                onCloseErrorOwner()
+              }}
+              className={styles.modalDefaultContentButton}
+            >
+              GO TO THE WALLETS
+            </button>
+          </div>
+        }
+        footer={''}
+        onClose={() => onCloseErrorOwner()}
+      />
+      <Modal
+        visible={isNewModule}
+        title={'Deploy new module'}
+        classNameWrapper={styles.modalDefaultWrapper}
+        content={
+          <div className={styles.modalDefaultContent}>
+            <p className={styles.modalDefaultContentText}>
+              {` You deploy the first version of the ${mi.name} dapplet with the wallet
+              ${currentAccount}. If everything is correct, click OK. Or connect another
+              wallet.`}
+            </p>
+
+            <button
+              onClick={async () => {
+                const { deployModule } = await initBGFunctions(browser)
+                try {
+                  setLoadingDeploy()
+                  nodeButton.current.classList.add('dappletsIsLoadingDeploy')
+
+                  onCloseNewModule()
+                  mode === FormMode.Creating
+                    ? await deployModule(mi, null, targetStorages, targetRegistry)
+                    : await deployModule(mi, vi, targetStorages, targetRegistry)
+
+                  setDeploymentStatus(DeploymentStatus.Deployed)
+                  setUpdate(true)
+                } catch (err) {
+                  console.log(err)
+
+                  setMessageError({
+                    type: 'negative',
+                    header: 'Publication error',
+                    message: [err.message],
+                  })
+                  if (err.message) {
+                    nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
+                    const messageErr = err.message.toLowerCase()
+                    messageErr.includes(' are not the owner of this module')
+                      ? setModalErrorOwner(true)
+                      : null
+                  }
+
+                  setModalError(true)
+                  setNotAccountModal(false)
+                } finally {
+                  setLoadingDeployFinally()
+                  await _updateData()
+                }
+              }}
+              className={styles.modalDefaultContentButton}
+            >
+              Ok
+            </button>
+          </div>
+        }
+        footer={''}
+        onClose={() => onCloseNewModule()}
+      />
     </>
   )
 }

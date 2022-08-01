@@ -19,7 +19,7 @@
 
   width: 35px;
   height: 35px;
-
+  min-width: 35px;
   border: 1px solid $Primary;
   z-index: 4;
   border-radius: 50%;
@@ -61,9 +61,10 @@
 
   &.mini {
     padding: 2px;
-    display: inline-block;
+    display: flex;
     width: 39px;
     height: 39px;
+    flex-wrap: nowrap;
   }
 }
 
@@ -81,6 +82,10 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+.wrapperNamesMini {
+  // display: none;
 }
 
 .ensHash {

@@ -286,7 +286,7 @@
   background: $Primary;
 }
 
-.dappletsIsLoadingDeploy {
+[class*="dappletsIsLoadingDeploy"] {
   position: absolute;
   top: 12px;
   right: 0;
