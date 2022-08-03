@@ -18,6 +18,7 @@ import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
 
 // import { ReactComponent as Account } from './assets/svg/connected-account.svg'
+import { ReactComponent as Share } from './assets/icons/share.svg'
 import { ReactComponent as DappletsLogo } from './assets/svg/dapplets-logo.svg'
 import { ReactComponent as Home } from './assets/svg/home-toolbar.svg'
 import { ReactComponent as SearchIcon } from './assets/svg/magnifying-glass.svg'
@@ -456,6 +457,7 @@ class _App extends React.Component<P, S> {
                     icon={SearchIcon}
                   />
                 )}
+
                 {s.isOpenSearch && pathname === '/system/dapplets' && (
                   <div className={styles.searchBlock} tabIndex={1}>
                     <Search
@@ -472,6 +474,12 @@ class _App extends React.Component<P, S> {
                   appearance="big"
                   icon={StoreIcon}
                   onClick={this.handleStoreButtonClick}
+                />
+                <SquaredButton
+                  // className={s.classNameSearchButton}
+                  // onClick={this.handleOpenSearchClick}
+                  appearance="big"
+                  icon={Share}
                 />
               </div>
             </header>

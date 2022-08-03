@@ -72,6 +72,32 @@
   & > *:first-child {
     margin-right: 3px;
   }
+
+  & > *:nth-child(2) {
+    margin-right: 3px;
+  }
+
+  & > *:last-child {
+    &:hover {
+      svg {
+        path {
+          fill: none;
+
+          stroke: $PrimaryHover;
+        }
+      }
+    }
+
+    &:active {
+      svg {
+        path {
+          fill: none;
+
+          stroke: $PrimaryPressed;
+        }
+      }
+    }
+  }
 }
 
 .balance {

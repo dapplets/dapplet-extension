@@ -152,6 +152,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const [isNewModule, setNewModule] = useState(false)
   const onCloseNewModule = () => {
     // nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
+
     setNewModule(false)
   }
   const [isDeployNewModule, setDeployNewModule] = useState(false)
@@ -576,6 +577,10 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       />
       <Modal
         visible={isNewModule}
+        onFewFunction={() => {
+          nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
+          setLoadingDeployFinally()
+        }}
         title={'Deploy new module'}
         classNameWrapper={styles.modalDefaultWrapper}
         content={
