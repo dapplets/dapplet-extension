@@ -252,7 +252,7 @@ export default class GlobalConfigService {
     config.swarmGatewayUrl = 'https://swarmgateway.mooo.com/'
     config.walletsUsage = {}
     config.identityContract = '0xf6b3a0B20281796D465bB8613e233BE30be07084'
-    config.popupInOverlay = false
+    config.popupInOverlay = true
     config.autoBackup = true
     config.errorReporting = true
     config.userAgentId = generateGuid()
