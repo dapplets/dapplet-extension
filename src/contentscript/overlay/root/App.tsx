@@ -18,7 +18,6 @@ import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
 
 // import { ReactComponent as Account } from './assets/svg/connected-account.svg'
-import { ReactComponent as Share } from './assets/icons/share.svg'
 import { ReactComponent as DappletsLogo } from './assets/svg/dapplets-logo.svg'
 import { ReactComponent as Home } from './assets/svg/home-toolbar.svg'
 import { ReactComponent as SearchIcon } from './assets/svg/magnifying-glass.svg'
@@ -31,6 +30,7 @@ import { OverlayToolbar } from './components/OverlayToolbar'
 import { PopupItem } from './components/PopupItem'
 import { Profile } from './components/Profile'
 import { Search } from './components/Search'
+import { ShareButton } from './components/ShareButton'
 import { SquaredButton } from './components/SquaredButton'
 import { Overlay } from './overlay'
 import { OverlayManager } from './overlayManager'
@@ -475,12 +475,7 @@ class _App extends React.Component<P, S> {
                   icon={StoreIcon}
                   onClick={this.handleStoreButtonClick}
                 />
-                <SquaredButton
-                  // className={s.classNameSearchButton}
-                  // onClick={this.handleOpenSearchClick}
-                  appearance="big"
-                  icon={Share}
-                />
+                <ShareButton />
               </div>
             </header>
 
