@@ -76,6 +76,12 @@ export default class GlobalConfigService {
     await this._globalConfigRepository.update(config)
   }
 
+  async mergeConfig(config: Partial<GlobalConfig>): Promise<void> {
+    const previousConfig = await this.get()
+    const newConfig = { ...previousConfig, ...config }
+    await this.set(newConfig)
+  }
+
   async getProfiles(): Promise<{ id: string; isActive: boolean }[]> {
     const configs = await this._globalConfigRepository.getAll()
     if (configs.length === 0) configs.push(this.getInitialConfig())
