@@ -176,3 +176,17 @@ span {
     right: 12%;
   }
 }
+
+@media (min-width: 320px) and (max-width: 640px) {
+  .wrapper {
+    left: 10%;
+  }
+
+  .labelSearchModule {
+    width: 65%;
+  }
+
+  .close {
+    left: 55%;
+  }
+}

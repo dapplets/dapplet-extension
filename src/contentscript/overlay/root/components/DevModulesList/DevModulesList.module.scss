@@ -391,3 +391,15 @@
 
   height: 80vh;
 }
+
+@media (min-width: 320px) and (max-width: 640px) {
+  .dappletsImg {
+    img {
+      height: auto;
+    }
+  }
+
+  .dappletsLabelSpanInfo {
+    margin: 0;
+  }
+}

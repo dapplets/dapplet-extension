@@ -265,6 +265,11 @@
   }
 
   .isOpenWallet {
-    background-color: rgb(0 0 0 / 0%);
+    &::before {
+      border-radius: 10px;
+      background-color: rgb(255 255 255 / 0%);
+    }
+
+    // background-color: #fff;
   }
 }
