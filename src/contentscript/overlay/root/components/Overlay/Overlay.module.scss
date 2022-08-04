@@ -177,6 +177,15 @@
   opacity: 1;
 }
 
+.searchBlock {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  right: 15px;
+
+  width: 84%;
+}
+
 @media (min-width: 320px) and (max-width: 640px) {
   .overlay {
     width: 100%;
@@ -187,6 +196,7 @@
     overflow: hidden;
 
     width: 100%;
+    height: 100%;
     padding: 17px 15px 7px;
   }
 
@@ -194,7 +204,8 @@
     flex: 1 1 auto;
 
     max-width: 100%;
-    padding: 42px 0 0;
+    height: 100%;
+    padding: 37px 0 0;
   }
 
   .header {
@@ -202,6 +213,7 @@
   }
 
   .children {
+    height: 80%;
   }
 
   .toolbar {
@@ -209,13 +221,8 @@
     top: 0;
     left: 0;
   }
-}
 
-.searchBlock {
-  position: absolute;
-  z-index: 1;
-  top: 12px;
-  right: 15px;
-
-  width: 84%;
+  .searchBlock {
+    top: inherit;
+  }
 }
