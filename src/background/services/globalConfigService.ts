@@ -13,6 +13,7 @@ import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserSt
 import { GlobalConfig } from '../models/globalConfig'
 import SiteConfig from '../models/siteConfig'
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage'
+import EnsService from './ensService'
 
 const EXPORTABLE_PROPERTIES = [
   'id',
@@ -47,6 +48,8 @@ const EXPORTABLE_PROPERTIES = [
 export default class GlobalConfigService {
   private _globalConfigRepository = new GlobalConfigBrowserStorage()
   private _defaultConfigId = 'default'
+
+  public ensService: EnsService
 
   async get(): Promise<GlobalConfig> {
     const configs = await this._globalConfigRepository.getAll()
@@ -243,13 +246,10 @@ export default class GlobalConfigService {
     ]
     config.devMode = true
     config.trustedUsers = [
+      { account: 'team.dapplet-base.eth' },
       { account: 'buidl.testnet' },
       { account: 'nik3ter.testnet' },
       { account: 'dapplets.testnet' },
-      { account: '0x692a4d7B7BE2dc1623155E90B197a82D114a74f3' },
-      { account: '0x9126d36880905fcb9e5f2a7f7c4f19703d52bc62' },
-      { account: '0xf64849376812667bda7d902666229f8b8dd90687' },
-      { account: 'team.dapplet-base.eth' },
     ]
     config.targetStorages = [StorageTypes.Ipfs, StorageTypes.Sia, StorageTypes.Swarm]
     config.userSettings = {}
@@ -478,6 +478,28 @@ export default class GlobalConfigService {
     await this.set(config)
 
     EventBus.emit('trustedusers_changed')
+  }
+
+  async containsTrustedUser(account: string): Promise<boolean> {
+    const trustedUsers = await this.getTrustedUsers()
+
+    // compare addresses as strings
+    if (trustedUsers.find((x) => x.account.toLowerCase() === account.toLowerCase())) {
+      return true
+    }
+
+    // check ENS names
+    for (const trustedUser of trustedUsers) {
+      if (typeOfUri(trustedUser.account) === UriTypes.Ens) {
+        const trustedUserAddress = await this.ensService.resolveName(trustedUser.account)
+        if (!trustedUserAddress) continue
+        if (trustedUserAddress.toLowerCase() === account.toLowerCase()) {
+          return true
+        }
+      }
+    }
+
+    return false
   }
 
   async removeTrustedUser(account: string) {

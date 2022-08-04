@@ -38,8 +38,9 @@ export class ShareButton extends React.Component<Props, State> {
       loop: 2,
       duration: 800,
     })
-    let timeline1 = anime.timeline()
-    timeline1.add({
+
+    const timeline = anime.timeline()
+    timeline.add({
       targets: this.myRef.current,
       opacity: [1, 0],
       easing: 'linear',
@@ -58,7 +59,6 @@ export class ShareButton extends React.Component<Props, State> {
       this.setState({ isShareUploading: false, isShareCopied: true })
       await new Promise((r) => setTimeout(r, 3000))
       this.setState({ isShareCopied: false })
-      console.log(url)
     } catch (err) {
       this.setState({
         isShareUploading: false,
@@ -80,19 +80,14 @@ export class ShareButton extends React.Component<Props, State> {
   render() {
     const s = this.state
     const p = this.props
-    // console.log(s.isShareCopied, 's.isShareCopied ')
-    // console.log(s.shareError, 's.shareError')
-    // console.log(s.isShareUploading, 's.isShareUploading')
 
-    // newAnime()
     return (
       <div style={p.style}>
-        {/* ToDo: Uncomment it when loading and error icons will be ready */}
         {s.isShareCopied ? (
           <div ref={this.myRef}>
             <SquaredButton
               appearance="big"
-              title="copy"
+              title="Link copied to clipboard"
               icon={CopyShare}
               onClick={this.resetShareHandler}
             />
@@ -110,16 +105,9 @@ export class ShareButton extends React.Component<Props, State> {
             icon={Share}
             disabled={s.isShareUploading}
             onClick={this.shareHandler}
-            title="Share the extension link with your configuration"
+            title="Share your configuration"
           />
         )}
-        {/* <SquaredButton
-          appearance="big"
-          icon={Share}
-          disabled={s.isShareUploading}
-          onClick={this.shareHandler}
-          title="Share the extension link with your configuration"
-        /> */}
       </div>
     )
   }

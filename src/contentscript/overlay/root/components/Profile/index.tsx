@@ -63,8 +63,6 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
             isMini={isMini}
             setOpen={setOpenWallet}
             isOpen={isOpenWallet}
-            hash={hash}
-            avatar={avatar}
             setModalWalletConnect={setModalWalletConnectProfile}
             newProfile={newProfile}
             isOverlay={isOverlay}

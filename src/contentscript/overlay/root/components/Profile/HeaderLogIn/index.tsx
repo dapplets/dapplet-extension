@@ -21,8 +21,6 @@ import styles from './HeaderLogIn.module.scss'
 import { ReactComponent as Card } from '../../../assets/svg/card.svg'
 
 export interface HeaderLogInProps {
-  avatar?: string
-  hash?: string
   isMini: boolean
   setOpen: () => void
   isOpen: boolean

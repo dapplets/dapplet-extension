@@ -438,8 +438,6 @@ class _App extends React.Component<P, S> {
                   handleWalletLengthConnect={this.handleWalletLengthConnect}
                   isWalletLength={s.isWalletLength}
                   handleWalletConnect={this.handleWalletConnect}
-                  avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
-                  hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
                   isOverlay={true}
                   setOpenWallet={this.setOpenWallet}
                   isOpenWallet={s.isOpenWallet}
@@ -451,6 +449,7 @@ class _App extends React.Component<P, S> {
               <div className={styles.right}>
                 {!s.isOpenSearch && pathname === '/system/dapplets' && (
                   <SquaredButton
+                    title="Search dapplets"
                     className={s.classNameSearchButton}
                     onClick={this.handleOpenSearchClick}
                     appearance="big"
@@ -472,6 +471,7 @@ class _App extends React.Component<P, S> {
                 )}
                 <SquaredButton
                   appearance="big"
+                  title="Dapplets Store"
                   icon={StoreIcon}
                   onClick={this.handleStoreButtonClick}
                 />
