@@ -13,6 +13,7 @@ import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserSt
 import { GlobalConfig } from '../models/globalConfig'
 import SiteConfig from '../models/siteConfig'
 import { SwarmModuleStorage } from '../moduleStorages/swarmModuleStorage'
+import EnsService from './ensService'
 
 const EXPORTABLE_PROPERTIES = [
   'id',
@@ -47,6 +48,8 @@ const EXPORTABLE_PROPERTIES = [
 export default class GlobalConfigService {
   private _globalConfigRepository = new GlobalConfigBrowserStorage()
   private _defaultConfigId = 'default'
+
+  public ensService: EnsService
 
   async get(): Promise<GlobalConfig> {
     const configs = await this._globalConfigRepository.getAll()
@@ -475,6 +478,28 @@ export default class GlobalConfigService {
     await this.set(config)
 
     EventBus.emit('trustedusers_changed')
+  }
+
+  async containsTrustedUser(account: string): Promise<boolean> {
+    const trustedUsers = await this.getTrustedUsers()
+
+    // compare addresses as strings
+    if (trustedUsers.find((x) => x.account.toLowerCase() === account.toLowerCase())) {
+      return true
+    }
+
+    // check ENS names
+    for (const trustedUser of trustedUsers) {
+      if (typeOfUri(trustedUser.account) === UriTypes.Ens) {
+        const trustedUserAddress = await this.ensService.resolveName(trustedUser.account)
+        if (!trustedUserAddress) continue
+        if (trustedUserAddress.toLowerCase() === account.toLowerCase()) {
+          return true
+        }
+      }
+    }
+
+    return false
   }
 
   async removeTrustedUser(account: string) {
