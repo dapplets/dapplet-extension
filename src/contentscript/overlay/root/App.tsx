@@ -451,6 +451,7 @@ class _App extends React.Component<P, S> {
               <div className={styles.right}>
                 {!s.isOpenSearch && pathname === '/system/dapplets' && (
                   <SquaredButton
+                    title="Search dapplets"
                     className={s.classNameSearchButton}
                     onClick={this.handleOpenSearchClick}
                     appearance="big"
@@ -472,6 +473,7 @@ class _App extends React.Component<P, S> {
                 )}
                 <SquaredButton
                   appearance="big"
+                  title="Dapplets Store"
                   icon={StoreIcon}
                   onClick={this.handleStoreButtonClick}
                 />
