@@ -5,7 +5,8 @@ import styles from './Modal.module.scss'
 interface ModalProps {
   visible: boolean
   title?: string
-  content: ReactElement | string
+  content?: ReactElement | string
+  accounts?: ReactElement
   footer: ReactElement | string
   onClose?: () => void
   className?: string
@@ -17,6 +18,7 @@ export const Modal = ({
   visible = false,
   title = '',
   content = '',
+  accounts = null,
   footer = '',
   onClose,
   className,
@@ -47,9 +49,12 @@ export const Modal = ({
           <h3 className={cn(styles.modalTitle, className)}>{title}</h3>
           {onClose ? <span className={styles.modalClose} onClick={onClose} /> : null}
         </div>
-        <div className={styles.modalBody}>
-          <div className={styles.modalContent}>{content}</div>
-        </div>
+        {content && (
+          <div className={styles.modalBody}>
+            <div className={styles.modalContent}>{content}</div>
+          </div>
+        )}
+        {accounts && <div className={styles.modalAccounts}>{accounts}</div>}
         {footer && <div className={styles.modalFooter}>{footer}</div>}
       </div>
     </div>

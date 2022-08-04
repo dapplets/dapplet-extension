@@ -5,27 +5,99 @@ import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { Message } from '../../components/Message'
 import styles from './ConnectedAccount.module.scss'
-// import { Modal } from './ModalConnectedAccounts'
+import { Modal } from './ModalConnectedAccounts'
 import Attention from './testProfile/attention.svg'
 import Ok from './testProfile/ok.svg'
 import Time from './testProfile/time.svg'
 import { IPair, IUser, Status, TAccount, TVerificationRequest } from './types'
+
+const UserButton = ({
+  user,
+  handleSetMainAccount,
+}: {
+  user: IUser
+  handleSetMainAccount:
+    | ((name: string, origin: string, accountActive: boolean) => Promise<void>)
+    | null
+}) => {
+  return (
+    <div
+      className={cn(styles.account, {
+        [styles.nameUserActive]: user.accountActive,
+        [styles.hasAction]: !!handleSetMainAccount,
+      })}
+      onClick={() =>
+        handleSetMainAccount && handleSetMainAccount(user.name, user.origin, user.accountActive)
+      }
+    >
+      <img src={user.img} className={styles.imgUser} />
+      <h4 className={styles.nameUser}>{user.name}</h4>
+      {/* <button
+        disabled={isDisabledButtonChoise}
+        onClick={() => {
+          user.userActive = true
+          setDisabledButtonChoise(true)
+        }}
+        className={styles.accountButton}
+        type="button"
+      /> */}
+      {/* {user.userActive && (
+        <div className={styles.choiseUserActive}>
+          <button
+            onClick={() => {
+              user.userActive = false
+              setDisabledButtonChoise(false)
+            }}
+            className={cn(styles.accountButton, styles.accountButtonChoise)}
+          />
+          <div className={styles.blockLinkChoise}>
+            <a
+              onClick={() => {
+                temporaryOpenModalTransaction()
+                user.userActive = false
+                setDisabledButtonChoise(false)
+                setTimeout(() => {
+                  user.accountActive = true
+                }, 4000)
+              }}
+              className={styles.linkChoise}
+            >
+              Use as an alias
+            </a>
+            <a
+              onClick={() => {
+                temporaryOpenModalTransaction()
+                user.userActive = false
+                setDisabledButtonChoise(false)
+                setTimeout(() => {
+                  user.accountActive = false
+                }, 4000)
+              }}
+              className={styles.linkChoise}
+            >
+              Disconnect
+            </a>
+          </div>
+        </div>
+      )} */}
+    </div>
+  )
+}
 
 export interface ConnectedAccountProps {}
 
 export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAccountProps) => {
   const [pairs, setPairs] = useState<IPair[]>([])
   // const [isModalWaitTransaction, setModalWaitTransaction] = useState(false)
-  // const onCloseModalWaitTransaction = () => setModalWaitTransaction(false)
+  const [accountsToDisconnect, setAccountsToDisconnect] = useState<[IUser, IUser]>()
 
   // const [activeStatus, setActiveStatus] = useState<Status>(null)
   // const [isActiveChoiseButton, setActiveChoiseButton] = useState(false)
   // const [isDisabledButtonChoise, setDisabledButtonChoise] = useState(false)
-
-  // const [isModalDeleteMainAccount, setModalDeleteMainAccount] = useState(false)
-  // const onCloseModalModalDeleteMainAccount = () => setModalDeleteMainAccount(false)
-
   // const [activeId, setActiveId] = useState(null)
+
+  const onCloseModalModalDeleteMainAccount = () => setAccountsToDisconnect(null)
+  // const onCloseModalWaitTransaction = () => setModalWaitTransaction(false)
 
   const setAllPairs = async (pendingIds: number[] = []) => {
     const {
@@ -280,120 +352,17 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
           {pairs.map((x, i) => {
             return (
               <div key={i} className={styles.mainBlock}>
-                <div className={styles.accountBlock}>
-                  <div
-                    className={cn(styles.account, {
-                      [styles.nameUserActive]: x.firstAccount.accountActive,
-                    })}
-                    onClick={() =>
-                      handleSetMainAccount(
-                        x.firstAccount.name,
-                        x.firstAccount.origin,
-                        x.firstAccount.accountActive
-                      )
-                    }
-                  >
-                    <img src={x.firstAccount.img} className={styles.imgUser} />
-                    <h4 className={styles.nameUser}>{x.firstAccount.name}</h4>
-                    {/* <button
-                      disabled={isDisabledButtonChoise}
-                      onClick={() => {
-                        x.firstAccount.userActive = true
-                        setDisabledButtonChoise(true)
-                      }}
-                      className={styles.accountButton}
-                      type="button"
-                    /> */}
-                    {/* {x.firstAccount.userActive && (
-                      <div className={styles.choiseUserActive}>
-                        <button
-                          onClick={() => {
-                            x.firstAccount.userActive = false
-                            setDisabledButtonChoise(false)
-                          }}
-                          className={cn(styles.accountButton, styles.accountButtonChoise)}
-                        />
-                        <div className={styles.blockLinkChoise}>
-                          <a
-                            onClick={() => {
-                              temporaryOpenModalTransaction()
-                              x.firstAccount.userActive = false
-                              setDisabledButtonChoise(false)
-                              setTimeout(() => {
-                                x.firstAccount.accountActive = true
-                              }, 4000)
-                            }}
-                            className={styles.linkChoise}
-                          >
-                            Use as an alias
-                          </a>
-                          <a
-                            onClick={() => {
-                              temporaryOpenModalTransaction()
-                              x.firstAccount.userActive = false
-                              setDisabledButtonChoise(false)
-                              setTimeout(() => {
-                                x.firstAccount.accountActive = false
-                              }, 4000)
-                            }}
-                            className={styles.linkChoise}
-                          >
-                            Disconnect
-                          </a>
-                        </div>
-                      </div>
-                    )} */}
-                  </div>
-                  <span className={styles.arrowsAccount}></span>
-                  <div
-                    className={cn(styles.account, {
-                      [styles.nameUserActive]: x.secondAccount.accountActive,
-                    })}
-                    onClick={() =>
-                      handleSetMainAccount(
-                        x.secondAccount.name,
-                        x.secondAccount.origin,
-                        x.secondAccount.accountActive
-                      )
-                    }
-                  >
-                    <img src={x.secondAccount.img} className={styles.imgUser} />
-                    <h4 className={styles.nameUser}>{x.secondAccount.name}</h4>
-                    {/* <button
-                      disabled={isDisabledButtonChoise}
-                      onClick={() => {
-                        x.secondAccount.userActive = true
-                        setDisabledButtonChoise(true)
-                      }}
-                      className={styles.accountButton}
-                      type="button"
-                    /> */}
-                    {/* {x.secondAccount.userActive && (
-                      <div className={styles.choiseUserActive}>
-                        <button
-                          onClick={() => {
-                            x.secondAccount.userActive = false
-                            setDisabledButtonChoise(false)
-                          }}
-                          className={cn(styles.accountButton, styles.accountButtonChoise)}
-                        />
-                        <div className={styles.blockLinkChoise}>
-                          <a
-                            onClick={() => {
-                              temporaryOpenModalTransaction()
-                              x.secondAccount.userActive = false
-                              setDisabledButtonChoise(false)
-                              // setActiveId(x.id)
-                            }}
-                            className={styles.linkChoise}
-                          >
-                            Use as an alias
-                          </a>
-                          <a className={styles.linkChoise}> Disconnect</a>
-                        </div>
-                      </div>
-                    )} */}
-                  </div>
+                <div
+                  className={cn(
+                    styles.accountBlock,
+                    (x.firstAccount.name + x.secondAccount.name).length > 30
+                      ? styles.accountBlockVertical
+                      : styles.accountBlockHorizontal
+                  )}
+                >
+                  <UserButton user={x.firstAccount} handleSetMainAccount={handleSetMainAccount} />
+                  <span className={styles.arrowsAccount} />
+                  <UserButton user={x.secondAccount} handleSetMainAccount={handleSetMainAccount} />
                 </div>
                 <div data-title={x.statusMessage} className={cn(styles.accountStatus)}>
                   <img
@@ -410,13 +379,14 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
                 <div className={cn(styles.accountDelete)}>
                   <button
                     type="button"
-                    onClick={(e: any) => {
+                    onClick={() => {
                       // if (x.firstAccount.accountActive === true) {
                       // setActiveId(i)
                       // setModalDeleteMainAccount(true)
                       // } else {
-                      e.target.disabled = true
-                      handleDisconnectAccounts(x.firstAccount, x.secondAccount)
+                      // e.target.disabled = true
+                      setAccountsToDisconnect([x.firstAccount, x.secondAccount])
+                      // handleDisconnectAccounts(x.firstAccount, x.secondAccount)
                       // }
                     }}
                     className={styles.buttonDelete}
@@ -428,32 +398,43 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
           })}
         </div>
       )}
+      {!!accountsToDisconnect && (
+        <Modal
+          visible={true}
+          classNameWrapper={styles.contentModal}
+          title="Do you want to disconnect these accounts?"
+          accounts={
+            <>
+              <UserButton user={accountsToDisconnect[0]} handleSetMainAccount={null} />
+              <UserButton user={accountsToDisconnect[1]} handleSetMainAccount={null} />
+            </>
+          }
+          footer={
+            <div className={styles.wrapperModalWantLink}>
+              <button
+                onClick={async () => {
+                  // handleDisconnectAccounts(activeId)
+                  await handleDisconnectAccounts(accountsToDisconnect[0], accountsToDisconnect[1])
+                  onCloseModalModalDeleteMainAccount()
+                }}
+                className={cn(styles.button, styles.primary)}
+                // className={styles.postLinkPublished}
+              >
+                Disconnect
+              </button>
+              <button
+                onClick={() => onCloseModalModalDeleteMainAccount()}
+                className={cn(styles.button, styles.secondary)}
+              >
+                Cancel
+              </button>
+            </div>
+          }
+          onClose={() => onCloseModalModalDeleteMainAccount()}
+        />
+      )}
       {/* <Modal
-        visible={isModalDeleteMainAccount}
-        classNameWrapper={styles.contentModal}
-        title="Want to delete your alias?"
-        content={'By removing this account you will also delete your alias'}
-        footer={
-          <div className={styles.wrapperModalWantLink}>
-            <a onClick={() => onCloseModalModalDeleteMainAccount()} className={styles.postLinkCopy}>
-              Cancel
-            </a>
-            <button
-              onClick={() => {
-                handleDisconnectAccounts(activeId)
-                onCloseModalModalDeleteMainAccount()
-              }}
-              className={cn(styles.buttonModalModalWantLink)}
-              // className={styles.postLinkPublished}
-            >
-              Delete anyway
-            </button>
-          </div>
-        }
-        onClose={() => onCloseModalModalDeleteMainAccount()}
-      /> */}
-      {/* <Modal
-        visible={isModalWaitTransaction}
+        visible={true}
         classNameWrapper={styles.contentModal}
         title="Metamask message"
         content={'confirm the transaction to set your alias'}

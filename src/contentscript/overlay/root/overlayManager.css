@@ -45,7 +45,7 @@
 
 @media screen and (min-width: 0) {
   .dapplets-overlay-frame {
-    width: auto !important;
+    width: 470px !important;
 
     transition: transform 0.15s cubic-bezier(0.55, 0, 0.2, 0.8);
     transform: translateX(-100%);
