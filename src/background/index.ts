@@ -411,13 +411,14 @@ browser.runtime.onInstalled.addListener(async (details) => {
     }
 
     if (Array.isArray(json)) {
+      // ToDo: A potential bug is here. Configs override each other.
       for (const j of json) {
         addCustomParams(j)
-        await globalConfigService.set(j)
+        await globalConfigService.mergeConfig(j)
       }
     } else {
       addCustomParams(json)
-      await globalConfigService.set(json)
+      await globalConfigService.mergeConfig(json)
     }
 
     console.log(`The predefined configuration was initialized. URL: ${url.href}`)

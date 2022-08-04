@@ -6,7 +6,6 @@ import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
-import * as tracing from '../../../../../common/tracing'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
 import { StorageRefImage } from '../../components/DevModulesList'
 import { Modal } from '../../components/Modal'
@@ -14,15 +13,15 @@ import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import styles from './DappletsInfo.module.scss'
 
-tracing.startTracing()
-
 export interface DappletsMainInfoProps {
   setDappletsDetail: (x) => void
   ModuleInfo: any
   ModuleVersion: any
   setShowChildrenRegistery: (x) => void
 }
+
 let _isMounted = false
+
 export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const { setDappletsDetail, ModuleInfo, ModuleVersion, setShowChildrenRegistery } = props
   const [originalMi, setOriginalMi] = useState(null)
@@ -177,7 +176,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   // const isNotNullCurrentAccount = !(
   //   !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
   // )
-  let isNotNullCurrentAccount = true
+  const isNotNullCurrentAccount = true
 
   const onChange = (e) => {
     const files = e.target.files
@@ -192,7 +191,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     newAuthor.authorForm.push(newAuthorObject)
     setAuthor(newAuthor)
   }
-  let messagesContainer = useRef<HTMLDivElement>()
+  const messagesContainer = useRef<HTMLDivElement>()
 
   const onDeleteChild = (id: number) => {
     const newAuthor = Object.assign({}, author)

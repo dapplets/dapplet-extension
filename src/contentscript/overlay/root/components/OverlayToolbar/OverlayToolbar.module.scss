@@ -61,12 +61,14 @@
   .overlayToolbar {
     flex-direction: row;
 
-    width: 100%;
+    width: 110px;
     min-height: 52px;
   }
 
   .inner {
     display: flex;
+
+    margin-top: 0;
   }
 
   .toggleOverlay {
@@ -86,7 +88,7 @@
 
     width: 16px;
 
-    min-height: calc(100vh - 32px);
+    // min-height: calc(100vh - 32px);
 
     background: $AppBG;
 
@@ -149,58 +151,58 @@
       center no-repeat;
 
     > :first-child {
-      margin: 59px 0 0;
+      // margin: 59px 0 0;
 
-      &::after {
-        position: absolute;
-        top: 46px;
-        right: 0;
+      // &::after {
+      //   position: absolute;
+      //   top: 46px;
+      //   right: 0;
 
-        width: 52px;
-        height: 17px;
+      //   width: 52px;
+      //   height: 17px;
 
-        content: "";
+      //   content: "";
 
-        background: $PureWhite;
-      }
+      //   background: $PureWhite;
+      // }
     }
 
     div {
-      display: inline-block;
+      // display: inline-block;
 
-      width: auto;
+      // width: auto;
 
-      opacity: 0;
+      // opacity: 0;
     }
   }
 
-  .TabList:active {
-    div {
-      display: inline-block;
+  // .TabList:active {
+  //   div {
+  //     display: inline-block;
 
-      width: auto;
+  //     width: auto;
 
-      opacity: 1;
-    }
+  //     opacity: 1;
+  //   }
 
-    div:hover {
-      display: inline-block;
+  //   div:hover {
+  //     display: inline-block;
 
-      width: auto;
+  //     width: auto;
 
-      opacity: 1;
-    }
-  }
+  //     opacity: 1;
+  //   }
+  // }
 
-  .TabList:hover {
-    div {
-      display: inline-block;
+  // .TabList:hover {
+  //   div {
+  //     display: inline-block;
 
-      width: auto;
+  //     width: auto;
 
-      opacity: 1;
-    }
-  }
+  //     opacity: 1;
+  //   }
+  // }
 }
 
 .noActive {
