@@ -3,6 +3,7 @@ import React, { ReactElement, useRef, useState } from 'react'
 import { ReactComponent as Coolicon } from '../../assets/svg/coolicon.svg'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { OverlayTab } from '../OverlayTab'
+import { ModalTabs } from './ModalTabs'
 import styles from './OverlayToolbar.module.scss'
 
 // TODO: change element hiding from Margin to transform
@@ -43,7 +44,8 @@ const ToggleOverlay = ({ onClick, className, getNode }: TToggleOverlay): ReactEl
 export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
-
+  const [isVisibleMobileTabs, setVisibleMobileTabs] = useState(false)
+  const closeMobileModal = () => setVisibleMobileTabs(false)
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
       nodeOverlayToolbar.current.value = ''
@@ -102,6 +104,35 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 />
               ))}
           </div>
+        </div>
+        <div className={cn(styles.tabsMobile, {})}>
+          <span className={styles.noSystemTabLabel} onClick={() => setVisibleMobileTabs(true)} />
+          <ModalTabs
+            visible={isVisibleMobileTabs}
+            content={
+              <div className={styles.TabListMobile}>
+                {p.tabs.length > 0 &&
+                  p.tabs.map((tab) => {
+                    // if (tab.id === 'system') return
+                    return (
+                      <OverlayTab
+                        setOpenWallet={p.setOpenWallet}
+                        isOpenWallet={p.isOpenWallet}
+                        key={tab.id}
+                        {...tab}
+                        isActive={p.activeTabId === tab.id}
+                        activeTabMenuId={p.activeTabMenuId}
+                        onCloseClick={() => p.onCloseClick(tab)}
+                        onMenuClick={(menu) => p.onMenuClick(tab, menu)}
+                        onTabClick={() => p.onTabClick(tab)}
+                      />
+                    )
+                  })}
+              </div>
+            }
+            onClose={() => closeMobileModal()}
+            classNameCLose={styles.noSystemTabLabel}
+          />
         </div>
       </div>
     </div>

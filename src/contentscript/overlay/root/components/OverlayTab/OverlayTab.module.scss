@@ -232,7 +232,7 @@
     display: flex;
     justify-content: space-between;
 
-    width: 180px;
+    width: max-content;
     max-width: none;
     height: 52px;
     margin: 0;
@@ -249,6 +249,8 @@
     display: flex;
     align-items: center;
     flex-direction: row;
+
+    padding-left: 10px;
   }
 
   .item {
@@ -271,5 +273,10 @@
     }
 
     // background-color: #fff;
+  }
+
+  .tabNotActive {
+    width: auto;
+    max-width: min-content;
   }
 }
