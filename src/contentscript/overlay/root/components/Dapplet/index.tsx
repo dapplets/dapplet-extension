@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import React, { DetailedHTMLProps, FC, HTMLAttributes } from 'react'
+import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
 import { ReactComponent as DeleteIcon } from '../../assets/svg/newDelete.svg'
 import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
@@ -21,7 +21,7 @@ export interface DappletProps
     website: string
     isFavourites: boolean
   }
-
+  index?: any
   onSwitchChange: Function
   onSettingsModule: Function
   onOpenDappletAction: Function
@@ -44,12 +44,18 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     onOpenStore,
     loadShowButton,
     onOpenStoreAuthor,
+    index,
     ...anotherProps
   } = props
 
   const { title, description, author, icon, isActive, isActionHandler, isUnderConstruction } =
     dapplet
-
+  // console.log(loadShowButton)
+  const [loadHome, setLoadHome] = useState(false)
+  useEffect(() => {}, [loadHome])
+  const loadingHome = () => {
+    setLoadHome(false)
+  }
   return (
     <div className={cn(styles.wrapperCard, className)} {...anotherProps}>
       <DappletImage isFavourites={false} storageRef={icon} />
@@ -64,12 +70,20 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
             <div className={cn(styles.blockIcons)}></div>
 
             {!isUnderConstruction && (
-              <Switch
-                checked={isActive}
-                onChange={() => {
-                  onSwitchChange(dapplet, !isActive)
-                }}
-              />
+              <>
+                {loadHome ? (
+                  <span className={styles.loader}></span>
+                ) : (
+                  <Switch
+                    // className={loadShowButton ? styles.loadShowButton : ''}
+                    checked={isActive}
+                    onChange={(e) => {
+                      onSwitchChange(dapplet, !isActive, index, e['shiftKey'], loadingHome)
+                      setLoadHome(true)
+                    }}
+                  />
+                )}
+              </>
             )}
           </div>
 

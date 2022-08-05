@@ -8,7 +8,13 @@ export interface SwitchProps
   isLoad?: boolean
 }
 
-export const Switch: FC<SwitchProps> = ({ checked = false, onChange, isLoad, ...props }) => {
+export const Switch: FC<SwitchProps> = ({
+  checked = false,
+  onChange,
+  isLoad,
+
+  ...props
+}) => {
   return (
     <label className={cn(styles.wrapper)}>
       <input className={cn(styles.input)} type="checkbox" onChange={onChange} {...props} />
