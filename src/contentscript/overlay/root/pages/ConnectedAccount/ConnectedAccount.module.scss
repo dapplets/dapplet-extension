@@ -468,11 +468,17 @@
   background: $Primary;
 
   &:hover {
-    background: $PrimaryHover;
+    background: hsl(349, 66%, 44%);
   }
 
   &:active {
     background: $PrimaryPressed;
+  }
+
+  &:disabled {
+    cursor: default;
+
+    background-color: $PrimaryHover;
   }
 }
 
@@ -481,10 +487,16 @@
   background: $Secondary;
 
   &:hover {
-    background: $SecondaryHover;
+    background: hsl(200, 63%, 49%);
   }
 
   &:active {
-    background: $SecondaryPressed;
+    background: hsl(200, 66%, 44%);
+  }
+
+  &:disabled {
+    cursor: default;
+
+    background-color: $SecondaryHover;
   }
 }

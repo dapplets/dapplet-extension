@@ -150,7 +150,7 @@ export default class ConnectedAccountService {
 
   public async changeStatus(accountId: string, originId: string, isMain: boolean): Promise<void> {
     const contract = await this._getContract()
-    contract.changeStatus({
+    return contract.changeStatus({
       accountId,
       originId,
       isMain,

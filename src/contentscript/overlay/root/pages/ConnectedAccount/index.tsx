@@ -4,31 +4,27 @@ import makeBlockie from 'ethereum-blockies-base64'
 import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { Message } from '../../components/Message'
+import Attention from './assets/attention.svg'
+import Ok from './assets/ok.svg'
+import Time from './assets/time.svg'
 import styles from './ConnectedAccount.module.scss'
 import { Modal } from './ModalConnectedAccounts'
-import Attention from './testProfile/attention.svg'
-import Ok from './testProfile/ok.svg'
-import Time from './testProfile/time.svg'
 import { IPair, IUser, Status, TAccount, TVerificationRequest } from './types'
 
 const UserButton = ({
   user,
-  handleSetMainAccount,
+  handleOpenPopup,
 }: {
   user: IUser
-  handleSetMainAccount:
-    | ((name: string, origin: string, accountActive: boolean) => Promise<void>)
-    | null
+  handleOpenPopup: ((account: IUser) => Promise<void>) | null
 }) => {
   return (
     <div
       className={cn(styles.account, {
         [styles.nameUserActive]: user.accountActive,
-        [styles.hasAction]: !!handleSetMainAccount,
+        [styles.hasAction]: !!handleOpenPopup,
       })}
-      onClick={() =>
-        handleSetMainAccount && handleSetMainAccount(user.name, user.origin, user.accountActive)
-      }
+      onClick={() => handleOpenPopup && handleOpenPopup(user)}
     >
       <img src={user.img} className={styles.imgUser} />
       <h4 className={styles.nameUser}>{user.name}</h4>
@@ -90,13 +86,15 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
   const [pairs, setPairs] = useState<IPair[]>([])
   // const [isModalWaitTransaction, setModalWaitTransaction] = useState(false)
   const [accountsToDisconnect, setAccountsToDisconnect] = useState<[IUser, IUser]>()
+  const [accountToChangeStatus, setAccountToChangeStatus] = useState<IUser>()
+  const [isWaiting, setIsWaiting] = useState(false)
 
   // const [activeStatus, setActiveStatus] = useState<Status>(null)
   // const [isActiveChoiseButton, setActiveChoiseButton] = useState(false)
   // const [isDisabledButtonChoise, setDisabledButtonChoise] = useState(false)
   // const [activeId, setActiveId] = useState(null)
 
-  const onCloseModalModalDeleteMainAccount = () => setAccountsToDisconnect(null)
+  // const onCloseModalModalDeleteMainAccount = () => setAccountsToDisconnect(null)
   // const onCloseModalWaitTransaction = () => setModalWaitTransaction(false)
 
   const setAllPairs = async (pendingIds: number[] = []) => {
@@ -321,18 +319,36 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
           : null,
       isUnlink: true,
     }
-    await requestVerification(requestBody, minStakeAmount)
-    setAllPairs()
+
+    try {
+      setIsWaiting(true)
+      const res = await requestVerification(requestBody, minStakeAmount)
+      console.log('Function resolved!!! Res:', res)
+    } catch (err) {
+      console.log('Error in requestVerification().', err)
+    }
+
+    await setAllPairs()
+    setIsWaiting(false)
   }
 
-  const handleSetMainAccount = async (
-    accountId: string,
-    originId: string,
-    isAlreadyMain: boolean
-  ) => {
+  const handleOpenPopup = async (account: IUser) => {
+    setAccountToChangeStatus(account)
+  }
+
+  const handleSetMainAccount = async (account: IUser) => {
     const { changeStatus } = await initBGFunctions(browser)
-    await changeStatus(accountId, originId, !isAlreadyMain)
-    setAllPairs()
+
+    try {
+      setIsWaiting(true)
+      const res = await changeStatus(account.name, account.origin, !account.accountActive)
+      console.log('Function resolved!!! Res:', res)
+    } catch (err) {
+      console.log('Error in changeStatus().', err)
+    }
+
+    await setAllPairs()
+    setIsWaiting(false)
   }
 
   return (
@@ -360,9 +376,9 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
                       : styles.accountBlockHorizontal
                   )}
                 >
-                  <UserButton user={x.firstAccount} handleSetMainAccount={handleSetMainAccount} />
+                  <UserButton user={x.firstAccount} handleOpenPopup={handleOpenPopup} />
                   <span className={styles.arrowsAccount} />
-                  <UserButton user={x.secondAccount} handleSetMainAccount={handleSetMainAccount} />
+                  <UserButton user={x.secondAccount} handleOpenPopup={handleOpenPopup} />
                 </div>
                 <div data-title={x.statusMessage} className={cn(styles.accountStatus)}>
                   <img
@@ -401,12 +417,13 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
       {!!accountsToDisconnect && (
         <Modal
           visible={true}
+          isWaiting={isWaiting}
           classNameWrapper={styles.contentModal}
           title="Do you want to disconnect these accounts?"
           accounts={
             <>
-              <UserButton user={accountsToDisconnect[0]} handleSetMainAccount={null} />
-              <UserButton user={accountsToDisconnect[1]} handleSetMainAccount={null} />
+              <UserButton user={accountsToDisconnect[0]} handleOpenPopup={null} />
+              <UserButton user={accountsToDisconnect[1]} handleOpenPopup={null} />
             </>
           }
           footer={
@@ -415,22 +432,66 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
                 onClick={async () => {
                   // handleDisconnectAccounts(activeId)
                   await handleDisconnectAccounts(accountsToDisconnect[0], accountsToDisconnect[1])
-                  onCloseModalModalDeleteMainAccount()
+                  setAccountsToDisconnect(null)
                 }}
                 className={cn(styles.button, styles.primary)}
                 // className={styles.postLinkPublished}
+                disabled={isWaiting}
               >
                 Disconnect
               </button>
               <button
-                onClick={() => onCloseModalModalDeleteMainAccount()}
+                onClick={() => setAccountsToDisconnect(null)}
                 className={cn(styles.button, styles.secondary)}
+                disabled={isWaiting}
               >
                 Cancel
               </button>
             </div>
           }
-          onClose={() => onCloseModalModalDeleteMainAccount()}
+          onClose={() => setAccountsToDisconnect(null)}
+        />
+      )}
+      {!!accountToChangeStatus && (
+        <Modal
+          visible={true}
+          isWaiting={isWaiting}
+          classNameWrapper={styles.contentModal}
+          title={
+            accountToChangeStatus.accountActive
+              ? 'Set this account to non-main?"'
+              : 'Select this account as main?'
+          }
+          accounts={<UserButton user={accountToChangeStatus} handleOpenPopup={null} />}
+          content={
+            accountToChangeStatus.accountActive
+              ? ''
+              : 'This will allow you to display your username instead of a standard ID in our ecosystem.'
+          }
+          footer={
+            <div className={styles.wrapperModalWantLink}>
+              <button
+                onClick={async () => {
+                  // handleDisconnectAccounts(activeId)
+                  await handleSetMainAccount(accountToChangeStatus)
+                  setAccountToChangeStatus(null)
+                }}
+                className={cn(styles.button, styles.primary)}
+                // className={styles.postLinkPublished}
+                disabled={isWaiting}
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setAccountToChangeStatus(null)}
+                className={cn(styles.button, styles.secondary)}
+                disabled={isWaiting}
+              >
+                Cancel
+              </button>
+            </div>
+          }
+          onClose={() => setAccountToChangeStatus(null)}
         />
       )}
       {/* <Modal

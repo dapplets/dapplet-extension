@@ -92,7 +92,7 @@
 .modalBody {
   overflow: auto;
 
-  padding: 0 0 20px;
+  padding: 10px;
 }
 
 .modalTitle {
@@ -123,6 +123,22 @@
   min-height: 167px;
   justify-content: center;
   box-shadow: 2px 6px 8px rgb(0 0 0 / 8%);
+}
+
+.loader {
+  position: relative;
+
+  overflow: hidden;
+
+  width: 143px;
+  height: 143px;
+  margin: 20px auto;
+
+  border-radius: 50%;
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 @keyframes appear {

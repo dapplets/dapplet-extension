@@ -1,5 +1,6 @@
 import cn from 'classnames'
 import React, { ReactElement, useEffect } from 'react'
+import Loader from '../assets/loader.svg'
 import styles from './Modal.module.scss'
 
 interface ModalProps {
@@ -12,6 +13,7 @@ interface ModalProps {
   className?: string
   classNameWrapper?: string
   id?: any
+  isWaiting?: boolean
 }
 
 export const Modal = ({
@@ -23,6 +25,7 @@ export const Modal = ({
   onClose,
   className,
   classNameWrapper,
+  isWaiting = false,
 }: ModalProps) => {
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -54,7 +57,13 @@ export const Modal = ({
             <div className={styles.modalContent}>{content}</div>
           </div>
         )}
-        {accounts && <div className={styles.modalAccounts}>{accounts}</div>}
+        {accounts && (
+          <div className={styles.modalAccounts}>
+            {accounts}
+            {isWaiting && <img src={Loader} className={styles.loader} />}
+          </div>
+        )}
+        {!accounts && isWaiting && <img src={Loader} className={styles.loader} />}
         {footer && <div className={styles.modalFooter}>{footer}</div>}
       </div>
     </div>
