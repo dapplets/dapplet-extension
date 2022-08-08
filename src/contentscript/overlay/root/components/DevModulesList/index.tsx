@@ -543,6 +543,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     : m}
                 </p>
               ))}
+
               <button onClick={() => onCloseError()} className={styles.modalDefaultContentButton}>
                 Ok
               </button>

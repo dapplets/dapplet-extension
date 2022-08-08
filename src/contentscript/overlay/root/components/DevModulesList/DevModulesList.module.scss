@@ -377,10 +377,12 @@
 
 .modalDefaultContentText {
   display: inline-block;
-  overflow-y: scroll;
+
+  // overflow-y: scroll;
+  overflow: hidden;
 
   max-width: 100%;
-  max-height: 30vh;
+  max-height: 60vh;
 
   text-overflow: ellipsis;
   overflow-wrap: break-word;
