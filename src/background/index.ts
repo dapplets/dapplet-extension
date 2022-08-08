@@ -256,6 +256,7 @@ browser.runtime.onMessage.addListener(
     openDappletHome: overlayService.openDappletHome.bind(overlayService),
     openDappletAction: overlayService.openDappletAction.bind(overlayService),
     openPopupOverlay: overlayService.openPopupOverlay.bind(overlayService),
+    openConnectedAccountsPopup: overlayService.openConnectedAccountsPopup.bind(overlayService),
 
     // Connected Account Service
     getConnectedAccounts:

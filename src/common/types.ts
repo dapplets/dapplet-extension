@@ -62,6 +62,7 @@ export type ModuleId = {
 export enum SystemOverlayTabs {
   DAPPLET_CONFIRMATION = 'DAPPLET_CONFIRMATION',
   LOGIN_SESSION = 'LOGIN_SESSION',
+  CONNECTED_ACCOUNTS = 'CONNECTED_ACCOUNTS',
 }
 
 export type NearNetworkConfig = {

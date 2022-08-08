@@ -8,7 +8,6 @@ import Attention from './assets/attention.svg'
 import Ok from './assets/ok.svg'
 import Time from './assets/time.svg'
 import styles from './ConnectedAccount.module.scss'
-import { Modal } from './ModalConnectedAccounts'
 import { IPair, IUser, Status, TAccount, TVerificationRequest } from './types'
 
 const UserButton = ({
@@ -28,54 +27,6 @@ const UserButton = ({
     >
       <img src={user.img} className={styles.imgUser} />
       <h4 className={styles.nameUser}>{user.name}</h4>
-      {/* <button
-        disabled={isDisabledButtonChoise}
-        onClick={() => {
-          user.userActive = true
-          setDisabledButtonChoise(true)
-        }}
-        className={styles.accountButton}
-        type="button"
-      /> */}
-      {/* {user.userActive && (
-        <div className={styles.choiseUserActive}>
-          <button
-            onClick={() => {
-              user.userActive = false
-              setDisabledButtonChoise(false)
-            }}
-            className={cn(styles.accountButton, styles.accountButtonChoise)}
-          />
-          <div className={styles.blockLinkChoise}>
-            <a
-              onClick={() => {
-                temporaryOpenModalTransaction()
-                user.userActive = false
-                setDisabledButtonChoise(false)
-                setTimeout(() => {
-                  user.accountActive = true
-                }, 4000)
-              }}
-              className={styles.linkChoise}
-            >
-              Use as an alias
-            </a>
-            <a
-              onClick={() => {
-                temporaryOpenModalTransaction()
-                user.userActive = false
-                setDisabledButtonChoise(false)
-                setTimeout(() => {
-                  user.accountActive = false
-                }, 4000)
-              }}
-              className={styles.linkChoise}
-            >
-              Disconnect
-            </a>
-          </div>
-        </div>
-      )} */}
     </div>
   )
 }
@@ -84,18 +35,6 @@ export interface ConnectedAccountProps {}
 
 export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAccountProps) => {
   const [pairs, setPairs] = useState<IPair[]>([])
-  // const [isModalWaitTransaction, setModalWaitTransaction] = useState(false)
-  const [accountsToDisconnect, setAccountsToDisconnect] = useState<[IUser, IUser]>()
-  const [accountToChangeStatus, setAccountToChangeStatus] = useState<IUser>()
-  const [isWaiting, setIsWaiting] = useState(false)
-
-  // const [activeStatus, setActiveStatus] = useState<Status>(null)
-  // const [isActiveChoiseButton, setActiveChoiseButton] = useState(false)
-  // const [isDisabledButtonChoise, setDisabledButtonChoise] = useState(false)
-  // const [activeId, setActiveId] = useState(null)
-
-  // const onCloseModalModalDeleteMainAccount = () => setAccountsToDisconnect(null)
-  // const onCloseModalWaitTransaction = () => setModalWaitTransaction(false)
 
   const setAllPairs = async (pendingIds: number[] = []) => {
     const {
@@ -113,7 +52,6 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
       connected: boolean
     }[] = await getWalletDescriptors()
 
-    // console.log('descriptors', descriptors)
     const connectedDescriptors = descriptors.filter((d) => d.connected === true)
     if (!connectedDescriptors || connectedDescriptors.length === 0) return
 
@@ -139,7 +77,6 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
           const verificationRequest: TVerificationRequest = await getVerificationRequest(
             pendingRequestId
           )
-          // console.log('verificationRequest', verificationRequest)
           if (verificationRequest.firstAccount === globalId) {
             const [sName, sOrigin1, sOrigin2] = verificationRequest.secondAccount.split('/')
             const sOrigin = sOrigin2 ? sOrigin1 + '/' + sOrigin2 : sOrigin1
@@ -188,7 +125,6 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
 
       // *** CONNECTED ***
       const connectedAccounts: TAccount[][] = await getConnectedAccounts(d.account, d.chain, null)
-      // console.log('connectedAccounts', connectedAccounts)
       connectedAccounts.forEach((level, i) =>
         level.forEach((ca) => {
           if (hasEqualPair([globalId, ca.id], processingAccountIdsPairs)) return
@@ -213,19 +149,14 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
     }
 
     // *** REJECTED ***
-
-    // console.log('pendingIds', pendingIds)
-    // console.log('newPendingIds', newPendingIds)
     const resolvedIds = pendingIds.filter((pendingId) => !newPendingIds.includes(pendingId))
     if (resolvedIds.length !== 0) {
       for (const resolvedId of resolvedIds) {
         const requestStatus: 'not found' | 'pending' | 'approved' | 'rejected' =
           await getRequestStatus(resolvedId)
-        // console.log('requestStatus', requestStatus)
         if (requestStatus !== 'rejected') continue
 
         const verificationRequest: TVerificationRequest = await getVerificationRequest(resolvedId)
-        // console.log('verificationRequest', verificationRequest)
         const [fName, fOrigin1, fOrigin2] = verificationRequest.firstAccount.split('/')
         const [sName, sOrigin1, sOrigin2] = verificationRequest.secondAccount.split('/')
 
@@ -276,11 +207,9 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
           userActive: false,
           closeness: 1,
         })
-        // console.log('newPairs', newPairs)
       }
     }
 
-    // console.log("let's set!")
     setPairs(newPairs)
 
     // *** UPDATE ***
@@ -294,61 +223,23 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
     setAllPairs()
   }, [])
 
-  // const temporaryOpenModalTransaction = () => {
-  // setModalWaitTransaction(true)
-  // setTimeout(() => {
-  //   onCloseModalWaitTransaction()
-  // }, 5000)
-  // }
-
-  const handleDisconnectAccounts = async (firstAccount: IUser, secondAccount: IUser) => {
-    const { getMinStakeAmount, requestVerification } = await initBGFunctions(browser)
-    const minStakeAmount: number = await getMinStakeAmount()
-    const requestBody = {
-      firstAccountId: firstAccount.name,
-      firstOriginId: firstAccount.origin,
-      secondAccountId: secondAccount.name,
-      secondOriginId: secondAccount.origin,
-      firstProofUrl:
-        firstAccount.origin === 'twitter' // ToDo !!! Only for I stage of CA
-          ? 'https://twitter.com/' + firstAccount.name
-          : null,
-      secondProofUrl:
-        secondAccount.origin === 'twitter' // ToDo !!! Only for I stage of CA
-          ? 'https://twitter.com/' + secondAccount.name
-          : null,
-      isUnlink: true,
-    }
-
-    try {
-      setIsWaiting(true)
-      const res = await requestVerification(requestBody, minStakeAmount)
-      console.log('Function resolved!!! Res:', res)
-    } catch (err) {
-      console.log('Error in requestVerification().', err)
-    }
-
-    await setAllPairs()
-    setIsWaiting(false)
-  }
-
   const handleOpenPopup = async (account: IUser) => {
-    setAccountToChangeStatus(account)
+    const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
+    const thisTab = await getThisTab()
+    const result = await openConnectedAccountsPopup({ accountToChangeStatus: account }, thisTab.id)
+    setAllPairs()
   }
 
-  const handleSetMainAccount = async (account: IUser) => {
-    const { changeStatus } = await initBGFunctions(browser)
-
-    try {
-      setIsWaiting(true)
-      const res = await changeStatus(account.name, account.origin, !account.accountActive)
-      console.log('Function resolved!!! Res:', res)
-    } catch (err) {
-      console.log('Error in changeStatus().', err)
-    }
-
-    await setAllPairs()
-    setIsWaiting(false)
+  const handleDisconnectAccounts = async (pair: IPair) => {
+    const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
+    const thisTab = await getThisTab()
+    const result = await openConnectedAccountsPopup(
+      {
+        accountsToDisconnect: [pair.firstAccount, pair.secondAccount],
+      },
+      thisTab.id
+    )
+    setAllPairs()
   }
 
   return (
@@ -390,21 +281,11 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
                     })}
                     alt={x.statusMessage}
                   />
-                  {/* <span className={styles.statusName}>{x.statusName}</span> */}
                 </div>
                 <div className={cn(styles.accountDelete)}>
                   <button
                     type="button"
-                    onClick={() => {
-                      // if (x.firstAccount.accountActive === true) {
-                      // setActiveId(i)
-                      // setModalDeleteMainAccount(true)
-                      // } else {
-                      // e.target.disabled = true
-                      setAccountsToDisconnect([x.firstAccount, x.secondAccount])
-                      // handleDisconnectAccounts(x.firstAccount, x.secondAccount)
-                      // }
-                    }}
+                    onClick={() => handleDisconnectAccounts(x)}
                     className={styles.buttonDelete}
                     disabled={x.closeness > 1 || x.statusName !== Status.Connected}
                   />
@@ -414,94 +295,6 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
           })}
         </div>
       )}
-      {!!accountsToDisconnect && (
-        <Modal
-          visible={true}
-          isWaiting={isWaiting}
-          classNameWrapper={styles.contentModal}
-          title="Do you want to disconnect these accounts?"
-          accounts={
-            <>
-              <UserButton user={accountsToDisconnect[0]} handleOpenPopup={null} />
-              <UserButton user={accountsToDisconnect[1]} handleOpenPopup={null} />
-            </>
-          }
-          footer={
-            <div className={styles.wrapperModalWantLink}>
-              <button
-                onClick={async () => {
-                  // handleDisconnectAccounts(activeId)
-                  await handleDisconnectAccounts(accountsToDisconnect[0], accountsToDisconnect[1])
-                  setAccountsToDisconnect(null)
-                }}
-                className={cn(styles.button, styles.primary)}
-                // className={styles.postLinkPublished}
-                disabled={isWaiting}
-              >
-                Disconnect
-              </button>
-              <button
-                onClick={() => setAccountsToDisconnect(null)}
-                className={cn(styles.button, styles.secondary)}
-                disabled={isWaiting}
-              >
-                Cancel
-              </button>
-            </div>
-          }
-          onClose={() => setAccountsToDisconnect(null)}
-        />
-      )}
-      {!!accountToChangeStatus && (
-        <Modal
-          visible={true}
-          isWaiting={isWaiting}
-          classNameWrapper={styles.contentModal}
-          title={
-            accountToChangeStatus.accountActive
-              ? 'Set this account to non-main?"'
-              : 'Select this account as main?'
-          }
-          accounts={<UserButton user={accountToChangeStatus} handleOpenPopup={null} />}
-          content={
-            accountToChangeStatus.accountActive
-              ? ''
-              : 'This will allow you to display your username instead of a standard ID in our ecosystem.'
-          }
-          footer={
-            <div className={styles.wrapperModalWantLink}>
-              <button
-                onClick={async () => {
-                  // handleDisconnectAccounts(activeId)
-                  await handleSetMainAccount(accountToChangeStatus)
-                  setAccountToChangeStatus(null)
-                }}
-                className={cn(styles.button, styles.primary)}
-                // className={styles.postLinkPublished}
-                disabled={isWaiting}
-              >
-                Confirm
-              </button>
-              <button
-                onClick={() => setAccountToChangeStatus(null)}
-                className={cn(styles.button, styles.secondary)}
-                disabled={isWaiting}
-              >
-                Cancel
-              </button>
-            </div>
-          }
-          onClose={() => setAccountToChangeStatus(null)}
-        />
-      )}
-      {/* <Modal
-        visible={true}
-        classNameWrapper={styles.contentModal}
-        title="Metamask message"
-        content={'confirm the transaction to set your alias'}
-        footer={''}
-        onClose={() => onCloseModalWaitTransaction()}
-      /> */}
     </div>
   )
 }

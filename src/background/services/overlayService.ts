@@ -91,6 +91,18 @@ export class OverlayService {
     return this._openOverlay('OPEN_PAIRING_OVERLAY', { topic, args })
   }
 
+  public openConnectedAccountsPopup(
+    { accountsToDisconnect, accountToChangeStatus },
+    tabId: number
+  ) {
+    return this._openOverlay(
+      'OPEN_SYSTEM_OVERLAY',
+      { accountsToDisconnect, accountToChangeStatus, loginRequest: 'yes' },
+      tabId,
+      SystemOverlayTabs.CONNECTED_ACCOUNTS
+    )
+  }
+
   private async _openOverlay(
     type: string,
     payload: any,

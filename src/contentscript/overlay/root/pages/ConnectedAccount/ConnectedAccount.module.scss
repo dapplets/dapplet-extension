@@ -24,13 +24,11 @@
   color: $MainGrey;
 
   font-family: Roboto;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  // grid-template-columns: 4fr 1fr;
-  // grid-template-rows: 1fr;
-  grid-template-columns: 359px 80px;
+  grid-template-columns: 362px 76px;
 
   &::after {
     position: absolute;
@@ -69,8 +67,6 @@
   width: 100%;
   margin: 6px 0;
   padding-left: 2px;
-  // grid-template-columns: 3fr 1.15fr 0.35fr;
-  // grid-template-rows: 1fr;
   grid-template-columns: 372px 35px 30px;
 }
 
@@ -80,12 +76,6 @@
 
   width: 100%;
   padding: 0 10px 0 0;
-
-  // margin-bottom: 17px;
-
-  // &:first-child{
-  //   margin-top: 12px;
-  // }
 }
 
 .accountBlockHorizontal {
@@ -179,8 +169,6 @@
 }
 
 .nameUser {
-  // text-transform: capitalize;
-
   color: $MainBlack;
 
   font-family: Roboto;
@@ -198,37 +186,6 @@
     color: $PureWhite;
   }
 }
-
-// .accountButton {
-//   display: inline-block;
-
-//   width: 15px;
-//   height: 15px;
-
-//   border-radius: 50%;
-//   background-color: $PureWhite;
-//   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='3' viewBox='0 0 7 3' fill='none'%3E%3Cpath d='M5.64307 2.21568C5.24858 2.21568 4.92878 1.89588 4.92878 1.5014C4.92878 1.10691 5.24858 0.787109 5.64307 0.787109C6.03756 0.787109 6.35735 1.10691 6.35735 1.5014C6.35735 1.69084 6.2821 1.87252 6.14814 2.00647C6.01419 2.14043 5.83251 2.21568 5.64307 2.21568ZM3.50021 2.21568C3.10572 2.21568 2.78592 1.89588 2.78592 1.5014C2.78592 1.10691 3.10572 0.787109 3.50021 0.787109C3.8947 0.787109 4.2145 1.10691 4.2145 1.5014C4.2145 1.69084 4.13924 1.87252 4.00529 2.00647C3.87133 2.14043 3.68965 2.21568 3.50021 2.21568ZM1.35735 2.21568C0.962863 2.21568 0.643066 1.89588 0.643066 1.5014C0.643066 1.10691 0.962863 0.787109 1.35735 0.787109C1.75184 0.787109 2.07164 1.10691 2.07164 1.5014C2.07164 1.69084 1.99638 1.87252 1.86243 2.00647C1.72847 2.14043 1.54679 2.21568 1.35735 2.21568Z' fill='%23919191'/%3E%3C/svg%3E");
-//   background-repeat: no-repeat;
-//   background-position: center;
-
-//   &:hover {
-//     background-color: $WebBG;
-//   }
-
-//   &:active {
-//     background-color: $OverlayBG;
-//   }
-
-//   &:disabled {
-//     cursor: default;
-
-//     background-color: $PureWhite;
-//   }
-// }
-
-// .accountButtonChoise {
-//   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='3' viewBox='0 0 7 3' fill='none'%3E%3Cpath d='M5.64307 2.21568C5.24858 2.21568 4.92878 1.89588 4.92878 1.5014C4.92878 1.10691 5.24858 0.787109 5.64307 0.787109C6.03756 0.787109 6.35735 1.10691 6.35735 1.5014C6.35735 1.69084 6.2821 1.87252 6.14814 2.00647C6.01419 2.14043 5.83251 2.21568 5.64307 2.21568ZM3.50021 2.21568C3.10572 2.21568 2.78592 1.89588 2.78592 1.5014C2.78592 1.10691 3.10572 0.787109 3.50021 0.787109C3.8947 0.787109 4.2145 1.10691 4.2145 1.5014C4.2145 1.69084 4.13924 1.87252 4.00529 2.00647C3.87133 2.14043 3.68965 2.21568 3.50021 2.21568ZM1.35735 2.21568C0.962863 2.21568 0.643066 1.89588 0.643066 1.5014C0.643066 1.10691 0.962863 0.787109 1.35735 0.787109C1.75184 0.787109 2.07164 1.10691 2.07164 1.5014C2.07164 1.69084 1.99638 1.87252 1.86243 2.00647C1.72847 2.14043 1.54679 2.21568 1.35735 2.21568Z' fill='%23d9304f'/%3E%3C/svg%3E");
-// }
 
 .arrowsAccount {
   display: block;
@@ -373,18 +330,6 @@
   }
 }
 
-.contentModal {
-  text-align: center;
-
-  color: $MainGrey;
-
-  font-family: Roboto, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  font-style: normal;
-  line-height: 16px;
-}
-
 .messageDelete {
   height: calc(100% - 120px);
   padding: 0 110px;
@@ -411,92 +356,5 @@
     font-weight: 500;
     font-style: normal;
     line-height: 16px;
-  }
-}
-
-.wrapperModalWantLink {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-
-  width: 100%;
-}
-
-.postLinkCopy {
-  cursor: pointer;
-
-  color: $Primary;
-
-  font-family: Roboto;
-  font-size: 14px;
-  font-weight: 400;
-  font-style: normal;
-  line-height: 100%;
-
-  &:hover {
-    color: $PrimaryHover;
-  }
-
-  &:active {
-    color: $PrimaryPressed;
-  }
-}
-
-.button {
-  display: flex;
-  align-items: center;
-
-  justify-content: center;
-
-  width: max-content;
-
-  // width: 46px;
-  height: 32px;
-  margin: 5px;
-  padding: 0 10px;
-  border-radius: 4px;
-
-  font-family: Roboto;
-  font-size: 14px;
-
-  font-weight: 400;
-  line-height: 100%;
-}
-
-.primary {
-  color: $PureWhite;
-  background: $Primary;
-
-  &:hover {
-    background: hsl(349, 66%, 44%);
-  }
-
-  &:active {
-    background: $PrimaryPressed;
-  }
-
-  &:disabled {
-    cursor: default;
-
-    background-color: $PrimaryHover;
-  }
-}
-
-.secondary {
-  color: $PureWhite;
-  background: $Secondary;
-
-  &:hover {
-    background: hsl(200, 63%, 49%);
-  }
-
-  &:active {
-    background: hsl(200, 66%, 44%);
-  }
-
-  &:disabled {
-    cursor: default;
-
-    background-color: $SecondaryHover;
   }
 }
