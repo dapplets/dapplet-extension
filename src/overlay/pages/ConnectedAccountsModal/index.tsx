@@ -82,9 +82,7 @@ const ConnectedAccountsModal = (props: any) => {
     <>
       {!!accountsToConnect && (
         <Modal
-          visible={true}
           isWaiting={isWaiting}
-          classNameWrapper={styles.contentModal}
           title="Do you want to connect these accounts?"
           accounts={
             <>
@@ -92,34 +90,16 @@ const ConnectedAccountsModal = (props: any) => {
               <UserButton user={accountsToConnect[1]} />
             </>
           }
-          footer={
-            <div className={styles.wrapperModalWantLink}>
-              <button
-                onClick={async () => {
-                  await handleConnectOrDisconnect(accountsToConnect[0], accountsToConnect[1], false)
-                }}
-                className={cn(styles.button, styles.primary)}
-                disabled={isWaiting}
-              >
-                Connect
-              </button>
-              <button
-                onClick={onCloseClick}
-                className={cn(styles.button, styles.secondary)}
-                disabled={isWaiting}
-              >
-                Cancel
-              </button>
-            </div>
-          }
           onClose={onCloseClick}
+          onConfirm={async () => {
+            await handleConnectOrDisconnect(accountsToConnect[0], accountsToConnect[1], false)
+          }}
+          onConfirmLabel="Connect"
         />
       )}
       {!!accountsToDisconnect && (
         <Modal
-          visible={true}
           isWaiting={isWaiting}
-          classNameWrapper={styles.contentModal}
           title="Do you want to disconnect these accounts?"
           accounts={
             <>
@@ -127,38 +107,16 @@ const ConnectedAccountsModal = (props: any) => {
               <UserButton user={accountsToDisconnect[1]} />
             </>
           }
-          footer={
-            <div className={styles.wrapperModalWantLink}>
-              <button
-                onClick={async () => {
-                  await handleConnectOrDisconnect(
-                    accountsToDisconnect[0],
-                    accountsToDisconnect[1],
-                    true
-                  )
-                }}
-                className={cn(styles.button, styles.primary)}
-                disabled={isWaiting}
-              >
-                Disconnect
-              </button>
-              <button
-                onClick={onCloseClick}
-                className={cn(styles.button, styles.secondary)}
-                disabled={isWaiting}
-              >
-                Cancel
-              </button>
-            </div>
-          }
           onClose={onCloseClick}
+          onConfirm={async () => {
+            await handleConnectOrDisconnect(accountsToDisconnect[0], accountsToDisconnect[1], true)
+          }}
+          onConfirmLabel="Disconnect"
         />
       )}
       {!!accountToChangeStatus && (
         <Modal
-          visible={true}
           isWaiting={isWaiting}
-          classNameWrapper={styles.contentModal}
           title={
             accountToChangeStatus.accountActive
               ? 'Set this account to non-main?"'
@@ -170,27 +128,11 @@ const ConnectedAccountsModal = (props: any) => {
               ? ''
               : 'This will allow you to display your username instead of a standard ID in our ecosystem.'
           }
-          footer={
-            <div className={styles.wrapperModalWantLink}>
-              <button
-                onClick={async () => {
-                  await handleSetMainAccount(accountToChangeStatus)
-                }}
-                className={cn(styles.button, styles.primary)}
-                disabled={isWaiting}
-              >
-                Confirm
-              </button>
-              <button
-                onClick={onCloseClick}
-                className={cn(styles.button, styles.secondary)}
-                disabled={isWaiting}
-              >
-                Cancel
-              </button>
-            </div>
-          }
           onClose={onCloseClick}
+          onConfirm={async () => {
+            await handleSetMainAccount(accountToChangeStatus)
+          }}
+          onConfirmLabel="Confirm"
         />
       )}
     </>

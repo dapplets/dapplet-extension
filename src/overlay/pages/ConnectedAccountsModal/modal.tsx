@@ -4,27 +4,22 @@ import Loader from '../../assests/loader.svg'
 import styles from './Modal.module.scss'
 
 interface IModalProps {
-  visible: boolean
   title?: string
   content?: ReactElement | string
   accounts?: ReactElement
-  footer: ReactElement | string
-  onClose?: () => void
-  className?: string
-  classNameWrapper?: string
-  id?: any
+  onClose: () => void
+  onConfirm: () => Promise<void>
+  onConfirmLabel: string
   isWaiting?: boolean
 }
 
 export const Modal = ({
-  visible = false,
   title = '',
   content = '',
   accounts = null,
-  footer = '',
   onClose,
-  className,
-  classNameWrapper,
+  onConfirm,
+  onConfirmLabel,
   isWaiting = false,
 }: IModalProps) => {
   const onKeydown = ({ key }: KeyboardEvent) => {
@@ -40,16 +35,14 @@ export const Modal = ({
     return () => document.removeEventListener('keydown', onKeydown)
   })
 
-  if (!visible) return null
-
   return (
     <div className={styles.modal} onClick={onClose}>
       <div
-        className={cn(styles.modalDialog, classNameWrapper)}
+        className={cn(styles.modalDialog, styles.contentModal)}
         onClick={(e) => e.stopPropagation()}
       >
         <div className={styles.modalHeader}>
-          <h3 className={cn(styles.modalTitle, className)}>{title}</h3>
+          <h3 className={styles.modalTitle}>{title}</h3>
           {onClose ? <span className={styles.modalClose} onClick={onClose} /> : null}
         </div>
         {content && (
@@ -64,7 +57,24 @@ export const Modal = ({
           </div>
         )}
         {!accounts && isWaiting && <img src={Loader} className={styles.loader} />}
-        {footer && <div className={styles.modalFooter}>{footer}</div>}
+        <div className={styles.modalFooter}>
+          <div className={styles.wrapperModalWantLink}>
+            <button
+              onClick={onConfirm}
+              className={cn(styles.button, styles.primary)}
+              disabled={isWaiting}
+            >
+              {onConfirmLabel}
+            </button>
+            <button
+              onClick={onClose}
+              className={cn(styles.button, styles.secondary)}
+              disabled={isWaiting}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )

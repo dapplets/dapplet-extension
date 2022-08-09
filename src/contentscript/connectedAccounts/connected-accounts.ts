@@ -4,6 +4,18 @@ import { browser } from 'webextension-polyfill-ts'
 import { connectionCondition } from './connected-accounts-assembly'
 import { Account, VerificationRequest } from './types'
 
+interface IRequestVerificationProps {
+  firstAccountId: string
+  firstOriginId: string
+  firstAccountImage: string
+  secondAccountId: string
+  secondOriginId: string
+  secondAccountImage: string
+  isUnlink: boolean
+  firstProofUrl?: string
+  secondProofUrl?: string
+}
+
 class ConnectedAccounts {
   // ***** VIEW *****
 
@@ -51,23 +63,7 @@ class ConnectedAccounts {
   // ***** CALL *****
 
   public async requestVerification(
-    props: {
-      firstAccountId: string
-      firstOriginId: string
-      firstAccountImage: string
-      secondAccountId: string
-      secondOriginId: string
-      secondAccountImage: string
-      isUnlink: boolean
-      firstProofUrl?: string
-      secondProofUrl?: string
-    },
-    condition: {
-      type: string
-      [name: string]: string
-    }
-  ): Promise<number> {
-    const {
+    {
       firstAccountId,
       firstOriginId,
       firstAccountImage,
@@ -77,7 +73,12 @@ class ConnectedAccounts {
       firstProofUrl,
       secondProofUrl,
       isUnlink,
-    } = props
+    }: IRequestVerificationProps,
+    condition: {
+      type: string
+      [name: string]: string
+    }
+  ): Promise<number> {
     let canConnect: boolean
     switch (condition.type) {
       case 'twitter/near-testnet':
@@ -96,59 +97,36 @@ class ConnectedAccounts {
             user: condition['user'],
           })
         } else {
-          throw new Error('Сonnection conditions not met')
+          throw new Error('Connection conditions not met')
         }
         break
       default:
-        throw new Error('Сonnection conditions not met')
+        throw new Error('Connection conditions not met')
     }
 
     if (canConnect) {
-      if (!isUnlink) {
-        const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
-        const thisTab = await getThisTab()
-        const { requestId } = await openConnectedAccountsPopup(
-          {
-            accountsToConnect: [
-              {
-                name: firstAccountId,
-                origin: firstOriginId,
-                img: firstAccountImage ? firstAccountImage : makeBlockie(firstAccountId),
-              },
-              {
-                name: secondAccountId,
-                origin: secondOriginId,
-                img: secondAccountImage ? secondAccountImage : makeBlockie(secondAccountId),
-              },
-            ],
-          },
-          thisTab.id
-        )
-        return requestId
-      } else {
-        const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
-        const thisTab = await getThisTab()
-        const { requestId } = await openConnectedAccountsPopup(
-          {
-            accountsToDisconnect: [
-              {
-                name: firstAccountId,
-                origin: firstOriginId,
-                img: firstAccountImage ? firstAccountImage : makeBlockie(firstAccountId),
-              },
-              {
-                name: secondAccountId,
-                origin: secondOriginId,
-                img: secondAccountImage ? secondAccountImage : makeBlockie(secondAccountId),
-              },
-            ],
-          },
-          thisTab.id
-        )
-        return requestId
-      }
+      const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
+      const thisTab = await getThisTab()
+      const { requestId } = await openConnectedAccountsPopup(
+        {
+          [isUnlink ? 'accountsToDisconnect' : 'accountsToConnect']: [
+            {
+              name: firstAccountId,
+              origin: firstOriginId,
+              img: firstAccountImage ? firstAccountImage : makeBlockie(firstAccountId),
+            },
+            {
+              name: secondAccountId,
+              origin: secondOriginId,
+              img: secondAccountImage ? secondAccountImage : makeBlockie(secondAccountId),
+            },
+          ],
+        },
+        thisTab.id
+      )
+      return requestId
     } else {
-      throw new Error('Сonnection conditions not met')
+      throw new Error('Connection conditions not met')
     }
   }
 
