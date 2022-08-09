@@ -20,10 +20,8 @@ const UserButton = ({ user }: { user: IUser }) => {
 }
 
 const ConnectedAccountsModal = (props: any) => {
-  console.log('props', props)
   const { data, onCloseClick, bus } = props
   const { accountsToConnect, accountsToDisconnect, accountToChangeStatus } = data
-  console.log('accountsToConnect', accountsToConnect)
 
   const [isWaiting, setIsWaiting] = useState(false)
 

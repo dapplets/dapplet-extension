@@ -226,20 +226,28 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
   const handleOpenPopup = async (account: IUser) => {
     const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
-    await openConnectedAccountsPopup({ accountToChangeStatus: account }, thisTab.id)
-    setAllPairs()
+    try {
+      await openConnectedAccountsPopup({ accountToChangeStatus: account }, thisTab.id)
+      setAllPairs()
+    } catch (err) {
+      console.log('ERROR in openConnectedAccountsPopup():', err)
+    }
   }
 
   const handleDisconnectAccounts = async (pair: IPair) => {
     const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
-    await openConnectedAccountsPopup(
-      {
-        accountsToDisconnect: [pair.firstAccount, pair.secondAccount],
-      },
-      thisTab.id
-    )
-    setAllPairs()
+    try {
+      await openConnectedAccountsPopup(
+        {
+          accountsToDisconnect: [pair.firstAccount, pair.secondAccount],
+        },
+        thisTab.id
+      )
+      setAllPairs()
+    } catch (err) {
+      console.log('ERROR in openConnectedAccountsPopup():', err)
+    }
   }
 
   return (

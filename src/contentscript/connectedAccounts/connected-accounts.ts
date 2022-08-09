@@ -67,8 +67,6 @@ class ConnectedAccounts {
       [name: string]: string
     }
   ): Promise<number> {
-    console.log('props', props)
-    console.log('condition', condition)
     const {
       firstAccountId,
       firstOriginId,
