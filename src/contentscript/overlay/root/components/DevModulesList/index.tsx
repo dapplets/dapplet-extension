@@ -102,6 +102,8 @@ interface PropsDeveloper {
   setOpenWallet?: () => void
   connectedDescriptors?: []
   selectedWallet?: string
+  setCurrentAccount?: (x: any) => void
+  currentAccount?: any
 }
 let isMounted = false
 export const DevModule: FC<PropsDeveloper> = (props) => {
@@ -120,13 +122,15 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     setOpenWallet,
     connectedDescriptors,
     selectedWallet,
+    currentAccount,
+    setCurrentAccount,
   } = props
 
   const [originalMi, setOriginalMi] = useState<ModuleInfo>(null)
   const [mi, setMi] = useState(modules.module)
   const [vi, setVi] = useState(modules.versions[0])
   const [targetRegistry, setTargetRegistry] = useState(null)
-  const [currentAccount, setCurrentAccount] = useState(null)
+  // const [currentAccount, setCurrentAccount] = useState(null)
   const [trustedUsers, setTrustedUsers] = useState([])
   const [mode, setMode] = useState<FormMode>(null)
   const [targetStorages, setTargetStorages] = useState([
@@ -543,6 +547,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     : m}
                 </p>
               ))}
+
               <button onClick={() => onCloseError()} className={styles.modalDefaultContentButton}>
                 Ok
               </button>

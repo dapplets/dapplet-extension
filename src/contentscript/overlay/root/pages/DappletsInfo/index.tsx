@@ -108,11 +108,13 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     await _updateCurrentAccount()
   }
   const _updateCurrentAccount = async () => {
-    const { getOwnership, getAddress } = await initBGFunctions(browser)
-
-    const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-
-    setCurrentAccount(currentAccount)
+    if (targetChain) {
+      const { getAddress } = await initBGFunctions(browser)
+      const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
+      setCurrentAccount(currentAccount)
+    } else {
+      return
+    }
   }
 
   const _transferOwnership = async (newAccount: string) => {

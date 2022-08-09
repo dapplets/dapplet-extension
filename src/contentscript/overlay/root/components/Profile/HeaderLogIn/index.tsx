@@ -93,6 +93,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     isMini,
     liRef,
     isOpenSearch,
+    selectedWallet,
   ])
 
   const refresh = async () => {
@@ -151,18 +152,22 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   }
   const connectWallet = async () => {
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
+    try {
+      if (isOverlay) {
+        setOpen()
+        await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
 
-    if (isOverlay) {
-      setOpen()
-      await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
+        setOpen()
+      } else {
+        setOpen()
+        pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
+        window.close()
+
+        setOpen()
+      }
+    } catch (error) {
+    } finally {
       await refresh()
-      setOpen()
-    } else {
-      setOpen()
-      pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
-      window.close()
-      await refresh()
-      setOpen()
     }
   }
   const x = useMemo(() => {
@@ -325,8 +330,6 @@ export const Modal = ({
   const selectedWalletDescriptor = selectedWallet
     ? wallets.find((x) => x.type === selectedWallet)
     : null
-  // console.log(wallets)
-  // console.log(selectedWallet)
 
   return (
     <div
@@ -376,8 +379,6 @@ export const Modal = ({
               <div key={i} className={styles.newProfileBlock}>
                 <div
                   onClick={() => {
-                    console.log('handleWalletClick')
-
                     handleWalletClick(x)
                   }}
                   className={styles.newProfileBlockInfo}

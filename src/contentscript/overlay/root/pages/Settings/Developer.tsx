@@ -37,6 +37,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [isLoadButtonLocalhost, setLoadButtonLocalhost] = useState(false)
   const [isLoadAdd, setLoadAdd] = useState(false)
   const [isUpdate, setUpdate] = useState(false)
+  const [currentAccount, setCurrentAccount] = useState(null)
   const _isMounted = useRef(true)
 
   const {
@@ -82,7 +83,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     return () => {
       _isMounted.current = false
     }
-  }, [isUpdate])
+  }, [isUpdate, selectedWallet, currentAccount])
 
   const loadRegistries = async () => {
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
@@ -153,6 +154,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const handleClear = () => {
     setRegistryInput('')
   }
+  // const x = useMemo(() => {}, [connectedDescriptors, selectedWallet])
 
   return (
     <div className={styles.wrapper}>
@@ -228,6 +230,8 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                             modules.map((x, i) => (
                               <div key={registryUrl + i}>
                                 <DevModule
+                                  currentAccount={currentAccount}
+                                  setCurrentAccount={setCurrentAccount}
                                   selectedWallet={selectedWallet}
                                   connectedDescriptors={connectedDescriptors}
                                   setOpenWallet={setOpenWallet}
@@ -266,6 +270,8 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                       children={modules.map((x, i) => (
                         <div key={i} className={styles.modules}>
                           <DevModule
+                            currentAccount={currentAccount}
+                            setCurrentAccount={setCurrentAccount}
                             setDappletsDetail={setDappletsDetail}
                             modules={x}
                             onDetailsClick={deployModule.bind(this)}
