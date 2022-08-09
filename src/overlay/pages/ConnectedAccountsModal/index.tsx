@@ -6,20 +6,12 @@ import { IUser } from '../../../contentscript/overlay/root/pages/ConnectedAccoun
 import styles from './ConnectedAccountsModal.module.scss'
 import { Modal } from './modal'
 
-const UserButton = ({
-  user,
-  handleOpenPopup,
-}: {
-  user: IUser
-  handleOpenPopup: ((account: IUser) => Promise<void>) | null
-}) => {
+const UserButton = ({ user }: { user: IUser }) => {
   return (
     <div
       className={cn(styles.account, {
         [styles.nameUserActive]: user.accountActive,
-        [styles.hasAction]: !!handleOpenPopup,
       })}
-      onClick={() => handleOpenPopup && handleOpenPopup(user)}
     >
       <img src={user.img} className={styles.imgUser} />
       <h4 className={styles.nameUser}>{user.name}</h4>
@@ -28,12 +20,18 @@ const UserButton = ({
 }
 
 const ConnectedAccountsModal = (props: any) => {
+  console.log('props', props)
   const { data, onCloseClick, bus } = props
-  const { accountsToDisconnect, accountToChangeStatus } = data
+  const { accountsToConnect, accountsToDisconnect, accountToChangeStatus } = data
+  console.log('accountsToConnect', accountsToConnect)
 
   const [isWaiting, setIsWaiting] = useState(false)
 
-  const handleDisconnectAccounts = async (firstAccount: IUser, secondAccount: IUser) => {
+  const handleConnectOrDisconnect = async (
+    firstAccount: IUser,
+    secondAccount: IUser,
+    isUnlink: boolean
+  ) => {
     const { getMinStakeAmount, requestVerification } = await initBGFunctions(browser)
     const minStakeAmount: number = await getMinStakeAmount()
     const requestBody = {
@@ -49,19 +47,20 @@ const ConnectedAccountsModal = (props: any) => {
         secondAccount.origin === 'twitter' // ToDo !!! Only for I stage of CA
           ? 'https://twitter.com/' + secondAccount.name
           : null,
-      isUnlink: true,
+      isUnlink,
     }
 
+    let requestId: number
     try {
       setIsWaiting(true)
-      const res = await requestVerification(requestBody, minStakeAmount)
+      requestId = await requestVerification(requestBody, minStakeAmount)
     } catch (err) {
       console.log('Error in requestVerification().', err)
     }
 
     setIsWaiting(false)
     const frameId = data.frameId
-    bus.publish('ready', [frameId, 'ok'])
+    bus.publish('ready', [frameId, { requestId }])
     onCloseClick()
   }
 
@@ -83,6 +82,41 @@ const ConnectedAccountsModal = (props: any) => {
 
   return (
     <>
+      {!!accountsToConnect && (
+        <Modal
+          visible={true}
+          isWaiting={isWaiting}
+          classNameWrapper={styles.contentModal}
+          title="Do you want to connect these accounts?"
+          accounts={
+            <>
+              <UserButton user={accountsToConnect[0]} />
+              <UserButton user={accountsToConnect[1]} />
+            </>
+          }
+          footer={
+            <div className={styles.wrapperModalWantLink}>
+              <button
+                onClick={async () => {
+                  await handleConnectOrDisconnect(accountsToConnect[0], accountsToConnect[1], false)
+                }}
+                className={cn(styles.button, styles.primary)}
+                disabled={isWaiting}
+              >
+                Connect
+              </button>
+              <button
+                onClick={onCloseClick}
+                className={cn(styles.button, styles.secondary)}
+                disabled={isWaiting}
+              >
+                Cancel
+              </button>
+            </div>
+          }
+          onClose={onCloseClick}
+        />
+      )}
       {!!accountsToDisconnect && (
         <Modal
           visible={true}
@@ -91,15 +125,19 @@ const ConnectedAccountsModal = (props: any) => {
           title="Do you want to disconnect these accounts?"
           accounts={
             <>
-              <UserButton user={accountsToDisconnect[0]} handleOpenPopup={null} />
-              <UserButton user={accountsToDisconnect[1]} handleOpenPopup={null} />
+              <UserButton user={accountsToDisconnect[0]} />
+              <UserButton user={accountsToDisconnect[1]} />
             </>
           }
           footer={
             <div className={styles.wrapperModalWantLink}>
               <button
                 onClick={async () => {
-                  await handleDisconnectAccounts(accountsToDisconnect[0], accountsToDisconnect[1])
+                  await handleConnectOrDisconnect(
+                    accountsToDisconnect[0],
+                    accountsToDisconnect[1],
+                    true
+                  )
                 }}
                 className={cn(styles.button, styles.primary)}
                 disabled={isWaiting}
@@ -128,7 +166,7 @@ const ConnectedAccountsModal = (props: any) => {
               ? 'Set this account to non-main?"'
               : 'Select this account as main?'
           }
-          accounts={<UserButton user={accountToChangeStatus} handleOpenPopup={null} />}
+          accounts={<UserButton user={accountToChangeStatus} />}
           content={
             accountToChangeStatus.accountActive
               ? ''

@@ -1,4 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import makeBlockie from 'ethereum-blockies-base64'
 import { browser } from 'webextension-polyfill-ts'
 import { connectionCondition } from './connected-accounts-assembly'
 import { Account, VerificationRequest } from './types'
@@ -53,25 +54,31 @@ class ConnectedAccounts {
     props: {
       firstAccountId: string
       firstOriginId: string
+      firstAccountImage: string
       secondAccountId: string
       secondOriginId: string
+      secondAccountImage: string
       isUnlink: boolean
       firstProofUrl?: string
       secondProofUrl?: string
     },
-    stake: number,
     condition: {
       type: string
       [name: string]: string
     }
   ): Promise<number> {
+    console.log('props', props)
+    console.log('condition', condition)
     const {
       firstAccountId,
       firstOriginId,
+      firstAccountImage,
       secondAccountId,
       secondOriginId,
+      secondAccountImage,
       firstProofUrl,
       secondProofUrl,
+      isUnlink,
     } = props
     let canConnect: boolean
     switch (condition.type) {
@@ -99,16 +106,79 @@ class ConnectedAccounts {
     }
 
     if (canConnect) {
-      const { requestVerification } = await initBGFunctions(browser)
-      return requestVerification(props, stake)
+      if (!isUnlink) {
+        const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
+        const thisTab = await getThisTab()
+        const { requestId } = await openConnectedAccountsPopup(
+          {
+            accountsToConnect: [
+              {
+                name: firstAccountId,
+                origin: firstOriginId,
+                img: firstAccountImage ? firstAccountImage : makeBlockie(firstAccountId),
+              },
+              {
+                name: secondAccountId,
+                origin: secondOriginId,
+                img: secondAccountImage ? secondAccountImage : makeBlockie(secondAccountId),
+              },
+            ],
+          },
+          thisTab.id
+        )
+        return requestId
+      } else {
+        const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
+        const thisTab = await getThisTab()
+        const { requestId } = await openConnectedAccountsPopup(
+          {
+            accountsToDisconnect: [
+              {
+                name: firstAccountId,
+                origin: firstOriginId,
+                img: firstAccountImage ? firstAccountImage : makeBlockie(firstAccountId),
+              },
+              {
+                name: secondAccountId,
+                origin: secondOriginId,
+                img: secondAccountImage ? secondAccountImage : makeBlockie(secondAccountId),
+              },
+            ],
+          },
+          thisTab.id
+        )
+        return requestId
+      }
     } else {
       throw new Error('Сonnection conditions not met')
     }
   }
 
-  public async changeStatus(accountId: string, originId: string, isMain: boolean): Promise<void> {
-    const { changeStatus } = await initBGFunctions(browser)
-    changeStatus(accountId, originId, isMain)
+  public async changeStatus({
+    accountId,
+    originId,
+    accountImage,
+    isMain,
+  }: {
+    accountId: string
+    originId: string
+    accountImage: string
+    isMain: boolean
+  }): Promise<void> {
+    const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
+    const thisTab = await getThisTab()
+    const { requestId } = await openConnectedAccountsPopup(
+      {
+        accountToChangeStatus: {
+          name: accountId,
+          origin: originId,
+          img: accountImage ? accountImage : makeBlockie(accountId),
+          accountActive: isMain,
+        },
+      },
+      thisTab.id
+    )
+    return requestId
   }
 }
 

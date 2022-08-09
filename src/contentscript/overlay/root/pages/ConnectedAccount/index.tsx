@@ -226,14 +226,14 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
   const handleOpenPopup = async (account: IUser) => {
     const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
-    const result = await openConnectedAccountsPopup({ accountToChangeStatus: account }, thisTab.id)
+    await openConnectedAccountsPopup({ accountToChangeStatus: account }, thisTab.id)
     setAllPairs()
   }
 
   const handleDisconnectAccounts = async (pair: IPair) => {
     const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
-    const result = await openConnectedAccountsPopup(
+    await openConnectedAccountsPopup(
       {
         accountsToDisconnect: [pair.firstAccount, pair.secondAccount],
       },
