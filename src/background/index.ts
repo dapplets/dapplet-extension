@@ -118,6 +118,7 @@ browser.runtime.onMessage.addListener(
       featureService.getModuleInfoByName(registryUri, moduleName),
     transferOwnership: (registryUri, moduleName, oldAccount, newAccount) =>
       featureService.transferOwnership(registryUri, moduleName, oldAccount, newAccount),
+    getContextIds: featureService.getContextIds.bind(featureService),
     addContextId: (registryUri, moduleName, contextId) =>
       featureService.addContextId(registryUri, moduleName, contextId),
     removeContextId: (registryUri, moduleName, contextId) =>

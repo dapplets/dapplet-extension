@@ -815,6 +815,11 @@ export default class FeatureService {
     await registry.transferOwnership(moduleName, oldAccount, newAccount)
   }
 
+  public async getContextIds(registryUri: string, moduleName: string) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    return registry.getContextIds(moduleName)
+  }
+
   public async addContextId(registryUri: string, moduleName: string, contextId: string) {
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     await registry.addContextId(moduleName, contextId)

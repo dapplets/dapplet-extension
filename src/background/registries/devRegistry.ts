@@ -191,6 +191,10 @@ export class DevRegistry implements Registry {
     return
   }
 
+  public async getContextIds(moduleName: string): Promise<string[]> {
+    throw new Error('Method not implemented.')
+  }
+
   public async addContextId(moduleName: string, contextId: string) {
     return
   }

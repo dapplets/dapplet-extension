@@ -325,6 +325,11 @@ export class EthRegistry implements Registry {
     await tx.wait()
   }
 
+  public async getContextIds(moduleName: string): Promise<string[]> {
+    const contract = await this._contractPromise
+    return contract.getContextIdsByModule(moduleName)
+  }
+
   public async addContextId(moduleName: string, contextId: string) {
     const contract = await this._contractPromise
     const tx = await contract.addContextId(moduleName, contextId)
