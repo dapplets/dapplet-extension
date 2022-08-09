@@ -897,6 +897,21 @@
   background-position-x: center;
 }
 
+.blockContextValue {
+  margin: 0;
+  padding: 0;
+
+  color: $MainGrey;
+
+  border: 0;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
+}
+
 .modalContentOwnership {
   display: flex;
 
