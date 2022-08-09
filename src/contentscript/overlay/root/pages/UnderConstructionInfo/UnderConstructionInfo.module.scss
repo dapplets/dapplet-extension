@@ -1087,3 +1087,13 @@
     text-overflow: ellipsis;
   }
 }
+
+@media (min-width: 320px) and (max-width: 640px) {
+  .wrapper {
+    height: 85%;
+  }
+
+  .linkNavigation {
+    height: 40px;
+  }
+}

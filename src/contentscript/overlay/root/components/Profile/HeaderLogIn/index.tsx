@@ -21,8 +21,6 @@ import styles from './HeaderLogIn.module.scss'
 import { ReactComponent as Card } from '../../../assets/svg/card.svg'
 
 export interface HeaderLogInProps {
-  avatar?: string
-  hash?: string
   isMini: boolean
   setOpen: () => void
   isOpen: boolean
@@ -31,17 +29,32 @@ export interface HeaderLogInProps {
   isOverlay: boolean
   setOpenWalletMini: () => void
   isOpenSearch: boolean
+  setConnectedDescriptors: (x: []) => void
+  setSelectWallet: (x: string) => void
 }
 let _isMounted = false
 export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
-  const { isMini, setOpen, isOpen, newProfile, isOverlay, setOpenWalletMini, isOpenSearch } = props
+  const {
+    isMini,
+    setOpen,
+    isOpen,
+    newProfile,
+    isOverlay,
+    setOpenWalletMini,
+    isOpenSearch,
+    setConnectedDescriptors,
+    setSelectWallet,
+  } = props
 
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
   const [selectedWallet, setSelectedWallet] = useState<string | null>(null)
   const connectedDescriptors = descriptors.filter((x) => x.connected)
   const [isModal, setModal] = useState(false)
   const [isModalWallet, setModalWallet] = useState(false)
-  const onCloseModalWallet = () => setModalWallet(false)
+  const onCloseModalWallet = async () => {
+    setModalWallet(false)
+    await refresh()
+  }
   const [walletImage, setWalletImage] = useState(null)
   const [walletAccount, setWalletAccount] = useState(null)
   const [walletIcon, setWalletIcon] = useState(null)
@@ -80,6 +93,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     isMini,
     liRef,
     isOpenSearch,
+    selectedWallet,
   ])
 
   const refresh = async () => {
@@ -91,28 +105,37 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     )
 
     setSelectedWallet(selectedWallet)
+    setSelectWallet(selectedWallet)
 
     setDescriptors(descriptors)
     !isOpen && !isOpenSearch && setOpenWalletMini()
-
     if (descriptors.length > 0) {
       const connectedDescriptors = descriptors.filter((x) => x.connected)
-      const newDescriptors = connectedDescriptors?.find((x) => x.type === selectedWallet)
-      const newWalletImage = makeBlockie(newDescriptors.account)
-      setWalletImage(newWalletImage)
-      if (newDescriptors.type === 'near') {
-        setWalletAccount(newDescriptors.account)
+
+      if (connectedDescriptors.length > 0) {
+        const newDescriptors = connectedDescriptors?.find((x) => x.type === selectedWallet)
+        setConnectedDescriptors(connectedDescriptors)
+        const newWalletImage = makeBlockie(newDescriptors.account)
+        setWalletImage(newWalletImage)
+        if (newDescriptors.type === 'near') {
+          setWalletAccount(newDescriptors.account)
+        } else {
+          setWalletAccount(newVisible(newDescriptors.account))
+        }
+        if (newDescriptors.type !== 'dapplets') {
+          setWalletIcon(newDescriptors.meta.icon)
+        } else {
+          setWalletIcon(walletIcons[newDescriptors.type])
+        }
+        if (selectedWallet === 'walletconnect') {
+          setWalletTypeWalletConnect(walletIcons[newDescriptors.type])
+        } else {
+          setWalletTypeWalletConnect(null)
+        }
       } else {
-        setWalletAccount(newVisible(newDescriptors.account))
-      }
-      if (newDescriptors.type !== 'dapplets') {
-        setWalletIcon(newDescriptors.meta.icon)
-      } else {
-        setWalletIcon(walletIcons[newDescriptors.type])
-      }
-      if (selectedWallet === 'walletconnect') {
-        setWalletTypeWalletConnect(walletIcons[newDescriptors.type])
-      } else {
+        setWalletImage(null)
+        setWalletAccount(null)
+        setWalletIcon(null)
         setWalletTypeWalletConnect(null)
       }
     }
@@ -129,43 +152,32 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   }
   const connectWallet = async () => {
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
+    try {
+      if (isOverlay) {
+        setOpen()
+        await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
 
-    if (isOverlay) {
-      setOpen()
-      await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
+        setOpen()
+      } else {
+        setOpen()
+        pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
+        window.close()
+
+        setOpen()
+      }
+    } catch (error) {
+    } finally {
       await refresh()
-      setOpen()
-    } else {
-      setOpen()
-      pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
-      window.close()
-      await refresh()
-      setOpen()
     }
   }
   const x = useMemo(() => {
-    // const animeRef =
-    anime({
+    const animeRef = anime({
       targets: liRef.current,
       scale: () => {
         if (isMini === true || isOpenSearch) {
           return ['0', '0']
         } else if (isMini === false) {
           return ['0', '1']
-        }
-      },
-      // width:()=>{
-      //   if (isMini === true || isOpenSearch) {
-      //     return ['0px', '0px']
-      //   } else if (isMini === false) {
-      //     return ['0', '1']
-      //   }
-      // },
-      elasticity: () => {
-        if (isMini === true || isOpenSearch) {
-          return 0
-        } else if (isMini === false) {
-          return 300
         }
       },
       duration: 300,
@@ -202,7 +214,12 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         )}
 
         {/* {!isMini && ( */}
-        <div className={cn(styles.wrapperNames)} ref={liRef}>
+        <div
+          className={cn(styles.wrapperNames, {
+            [styles.wrapperNamesMini]: isMini || isOpenSearch,
+          })}
+          ref={liRef}
+        >
           {walletAccount ? (
             <p style={{ fontSize: '12px' }} className={styles.hash}>
               {walletAccount}
@@ -313,8 +330,6 @@ export const Modal = ({
   const selectedWalletDescriptor = selectedWallet
     ? wallets.find((x) => x.type === selectedWallet)
     : null
-  // console.log(wallets)
-  // console.log(selectedWallet)
 
   return (
     <div

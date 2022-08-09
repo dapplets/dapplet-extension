@@ -214,3 +214,24 @@
 .isShowDescriptionLabel {
   transform: rotate(180deg);
 }
+
+@media (min-width: 320px) and (max-width: 640px) {
+  .label {
+    display: inline-block;
+    overflow: hidden;
+
+    width: 100%;
+    max-width: 100%;
+  }
+
+
+  .buttonLocalhost {
+    margin-right: 0;
+  }
+
+  .labelLocalhost {
+    flex: 1 1 auto;
+
+    max-width: 65%;
+  }
+}

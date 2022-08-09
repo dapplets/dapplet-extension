@@ -139,8 +139,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
       return feature
     })
-
-    setDapplets(newDapplets)
+    return newDapplets
   }
 
   const refreshContextPage = async () => {
@@ -180,7 +179,13 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     )
   }
 
-  const onSwitchChange = async (module: Module, isActive?, order?, selectVersions?: boolean) => {
+  const onSwitchChange = async (
+    module: Module,
+    isActive,
+    order,
+    selectVersions: boolean,
+    isLoad
+  ) => {
     const { name } = module
     // TODO : try catch
     setLoadShowButton(true)
@@ -194,6 +199,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       await toggleFeature(module, null, isActive, order, null)
     }
     setLoadShowButton(false)
+    isLoad()
   }
 
   const toggleFeature = async (
@@ -218,7 +224,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       isActive,
       isLoading: true,
       error: null,
-      ersions: [],
+      versions: [],
       activeVersion: isActive ? version : null,
       lastVersion: allVersions.sort(rcompare)[0],
     })
@@ -319,7 +325,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         <div className={styles.dappletsBlock}>
           {!isNoContentScript ? (
             filteredDapplets && filteredDapplets.length && filteredDapplets.length > 0 ? (
-              filteredDapplets.map((dapplet) => {
+              filteredDapplets.map((dapplet, i) => {
                 if (dapplet.type !== 'FEATURE') {
                   return
                 } else
@@ -332,6 +338,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                         website: 'dapplets.com',
                         users: [],
                       }}
+                      index={i}
                       loadShowButton={loadShowButton}
                       onSwitchChange={onSwitchChange}
                       onSettingsModule={onUserSettingsClick}

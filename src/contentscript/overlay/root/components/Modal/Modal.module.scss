@@ -29,11 +29,15 @@
   display: flex;
   overflow: hidden;
 
+  // padding: 170px 0 202px;
+  overflow: hidden;
+
   align-items: center;
   flex-direction: column;
+  justify-content: center;
 
-  width: 94%;
-  padding: 170px 0 202px;
+  width: 90%;
+  height: 80vh;
 
   animation-name: animatetop;
   animation-name: slide-in;

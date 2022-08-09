@@ -23,6 +23,9 @@ export interface DeveloperProps {
   isLoadingDeploy: boolean
   setLoadingDeploy: () => void
   setLoadingDeployFinally: () => void
+  setOpenWallet: () => void
+  connectedDescriptors: []
+  selectedWallet: string
 }
 export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [registries, setRegistries] = useState([])
@@ -34,6 +37,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [isLoadButtonLocalhost, setLoadButtonLocalhost] = useState(false)
   const [isLoadAdd, setLoadAdd] = useState(false)
   const [isUpdate, setUpdate] = useState(false)
+  const [currentAccount, setCurrentAccount] = useState(null)
   const _isMounted = useRef(true)
 
   const {
@@ -47,6 +51,9 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     isLoadingDeploy,
     setLoadingDeploy,
     setLoadingDeployFinally,
+    setOpenWallet,
+    connectedDescriptors,
+    selectedWallet,
   } = props
 
   useEffect(() => {
@@ -76,7 +83,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     return () => {
       _isMounted.current = false
     }
-  }, [isUpdate])
+  }, [isUpdate, selectedWallet, currentAccount])
 
   const loadRegistries = async () => {
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
@@ -147,6 +154,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const handleClear = () => {
     setRegistryInput('')
   }
+  // const x = useMemo(() => {}, [connectedDescriptors, selectedWallet])
 
   return (
     <div className={styles.wrapper}>
@@ -215,25 +223,34 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                   children={
                     <div className={styles.modules}>
                       {modules.length > 0 &&
-                        Object.entries(groupedModules).map(([registryUrl, modules]) => (
-                          <div key={registryUrl + i}>
-                            {modules.length > 0 && registryUrl === r.url && (
-                              <DevModule
-                                isLoadingDeploy={isLoadingDeploy}
-                                setLoadingDeploy={setLoadingDeploy}
-                                setLoadingDeployFinally={setLoadingDeployFinally}
-                                setUpdate={setUpdate}
-                                isLocalhost={isLocalhost}
-                                setDappletsDetail={setDappletsDetail}
-                                modules={modules}
-                                onDetailsClick={deployModule.bind(this)}
-                                setModuleInfo={setModuleInfo}
-                                setModuleVersion={setModuleVersion}
-                                setUnderConstructionDetails={setUnderConstructionDetails}
-                              />
-                            )}
-                          </div>
-                        ))}
+                        Object.entries(groupedModules).map(([registryUrl, modules]) => {
+                          return (
+                            modules.length > 0 &&
+                            registryUrl === r.url &&
+                            modules.map((x, i) => (
+                              <div key={registryUrl + i}>
+                                <DevModule
+                                  currentAccount={currentAccount}
+                                  setCurrentAccount={setCurrentAccount}
+                                  selectedWallet={selectedWallet}
+                                  connectedDescriptors={connectedDescriptors}
+                                  setOpenWallet={setOpenWallet}
+                                  isLoadingDeploy={isLoadingDeploy}
+                                  setLoadingDeploy={setLoadingDeploy}
+                                  setLoadingDeployFinally={setLoadingDeployFinally}
+                                  setUpdate={setUpdate}
+                                  isLocalhost={isLocalhost}
+                                  setDappletsDetail={setDappletsDetail}
+                                  modules={x}
+                                  onDetailsClick={deployModule.bind(this)}
+                                  setModuleInfo={setModuleInfo}
+                                  setModuleVersion={setModuleVersion}
+                                  setUnderConstructionDetails={setUnderConstructionDetails}
+                                />
+                              </div>
+                            ))
+                          )
+                        })}
                     </div>
                   }
                 />
@@ -250,18 +267,20 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                       label={registryUrl}
                       isShowChildrenRegistery={isShowChildrenRegistery}
                       setShowChildrenRegistery={setShowChildrenRegistery}
-                      children={
-                        <div className={styles.modules}>
+                      children={modules.map((x, i) => (
+                        <div key={i} className={styles.modules}>
                           <DevModule
+                            currentAccount={currentAccount}
+                            setCurrentAccount={setCurrentAccount}
                             setDappletsDetail={setDappletsDetail}
-                            modules={modules}
+                            modules={x}
                             onDetailsClick={deployModule.bind(this)}
                             setModuleInfo={setModuleInfo}
                             setModuleVersion={setModuleVersion}
                             setUnderConstructionDetails={setUnderConstructionDetails}
                           />
                         </div>
-                      }
+                      ))}
                     />
                   )}
                 </div>

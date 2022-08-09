@@ -30,6 +30,7 @@ import { OverlayToolbar } from './components/OverlayToolbar'
 import { PopupItem } from './components/PopupItem'
 import { Profile } from './components/Profile'
 import { Search } from './components/Search'
+import { ShareButton } from './components/ShareButton'
 import { SquaredButton } from './components/SquaredButton'
 import { Overlay } from './overlay'
 import { OverlayManager } from './overlayManager'
@@ -107,6 +108,8 @@ interface S {
   isLoadingDeploy: boolean
   dropdownListValue: string
   isMiniWallets: boolean
+  connectedDescriptors: []
+  selectedWallet: string
 }
 
 class _App extends React.Component<P, S> {
@@ -123,6 +126,8 @@ class _App extends React.Component<P, S> {
     isLoadingDeploy: false,
     dropdownListValue: 'All',
     isMiniWallets: false,
+    connectedDescriptors: null,
+    selectedWallet: null,
   }
 
   async componentDidMount() {
@@ -378,6 +383,16 @@ class _App extends React.Component<P, S> {
       isMiniWallets: false,
     })
   }
+  setConnectedDescriptors = (descriptors: []) => {
+    this.setState({
+      connectedDescriptors: descriptors,
+    })
+  }
+  setSelectedWallet = (selectedWallet: string) => {
+    this.setState({
+      selectedWallet: selectedWallet,
+    })
+  }
 
   render() {
     const p = this.props
@@ -417,12 +432,12 @@ class _App extends React.Component<P, S> {
             <header className={styles.header}>
               <div className={styles.left}>
                 <Profile
+                  setSelectedWallet={this.setSelectedWallet}
+                  setConnectedDescriptors={this.setConnectedDescriptors}
                   isMini={s.isMiniWallets}
                   handleWalletLengthConnect={this.handleWalletLengthConnect}
                   isWalletLength={s.isWalletLength}
                   handleWalletConnect={this.handleWalletConnect}
-                  avatar="https://gafki.ru/wp-content/uploads/2019/11/kartinka-1.-aljaskinskij-malamut.jpg"
-                  hash="0xC5Ee70E47Ef9f3bCDd6Be40160ad916DCef360Aa"
                   isOverlay={true}
                   setOpenWallet={this.setOpenWallet}
                   isOpenWallet={s.isOpenWallet}
@@ -434,12 +449,14 @@ class _App extends React.Component<P, S> {
               <div className={styles.right}>
                 {!s.isOpenSearch && pathname === '/system/dapplets' && (
                   <SquaredButton
+                    title="Search dapplets"
                     className={s.classNameSearchButton}
                     onClick={this.handleOpenSearchClick}
                     appearance="big"
                     icon={SearchIcon}
                   />
                 )}
+
                 {s.isOpenSearch && pathname === '/system/dapplets' && (
                   <div className={styles.searchBlock} tabIndex={1}>
                     <Search
@@ -454,9 +471,11 @@ class _App extends React.Component<P, S> {
                 )}
                 <SquaredButton
                   appearance="big"
+                  title="Dapplets Store"
                   icon={StoreIcon}
                   onClick={this.handleStoreButtonClick}
                 />
+                <ShareButton />
               </div>
             </header>
 
@@ -477,6 +496,9 @@ class _App extends React.Component<P, S> {
               {pathname === '/system/connected' && <ConnectedAccount />}
               {pathname === '/system/settings' && (
                 <SettingsOverlay
+                  selectedWallet={s.selectedWallet}
+                  connectedDescriptors={s.connectedDescriptors}
+                  setOpenWallet={this.setOpenWallet}
                   isLoadingDeploy={s.isLoadingDeploy}
                   setLoadingDeploy={this.setLoadingDeploy}
                   setLoadingDeployFinally={this.setLoadingDeployFinally}

@@ -286,7 +286,7 @@
   background: $Primary;
 }
 
-.dappletsIsLoadingDeploy {
+[class*="dappletsIsLoadingDeploy"] {
   position: absolute;
   top: 12px;
   right: 0;
@@ -377,10 +377,12 @@
 
 .modalDefaultContentText {
   display: inline-block;
-  overflow-y: scroll;
+
+  // overflow-y: scroll;
+  overflow: hidden;
 
   max-width: 100%;
-  max-height: 30vh;
+  max-height: 60vh;
 
   text-overflow: ellipsis;
   overflow-wrap: break-word;
@@ -390,4 +392,16 @@
   justify-content: center;
 
   height: 80vh;
+}
+
+@media (min-width: 320px) and (max-width: 640px) {
+  .dappletsImg {
+    img {
+      height: auto;
+    }
+  }
+
+  .dappletsLabelSpanInfo {
+    margin: 0;
+  }
 }

@@ -228,11 +228,11 @@
 
 @media (min-width: 320px) and (max-width: 640px) {
   .tab {
-    display: none;
+    // display: none;
     display: flex;
     justify-content: space-between;
 
-    width: 215px;
+    width: max-content;
     max-width: none;
     height: 52px;
     margin: 0;
@@ -242,13 +242,19 @@
   }
 
   .list {
+    // display: flex;
+    // align-items: center;
+
+    // margin: 0;
     display: flex;
     align-items: center;
+    flex-direction: row;
 
-    margin: 0;
+    padding-left: 10px;
   }
 
   .item {
+    margin-top: 0;
     padding: 0 10px;
 
     &:not(:last-child) {
@@ -258,5 +264,19 @@
     &:nth-child(2) {
       margin: 0;
     }
+  }
+
+  .isOpenWallet {
+    &::before {
+      border-radius: 10px;
+      background-color: rgb(255 255 255 / 0%);
+    }
+
+    // background-color: #fff;
+  }
+
+  .tabNotActive {
+    width: auto;
+    max-width: min-content;
   }
 }

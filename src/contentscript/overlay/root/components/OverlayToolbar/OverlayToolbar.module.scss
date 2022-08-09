@@ -57,8 +57,44 @@
   background-color: rgb(0 0 0 / 30%);
 }
 
+.tabsMobile {
+  display: none;
+}
+
+.noActive {
+  background: #eaf0f0 !important;
+  box-shadow: inset -2px 0 4px rgb(0 0 0 / 25%);
+}
+
+.TabListMobile {
+  margin-top: 80px;
+  margin-right: 14px;
+  padding: 10px 0 10px 10px;
+
+  border-radius: 10px;
+  background: #fff;
+
+  &::before {
+    position: absolute;
+    top: 60px;
+    right: 14px;
+
+    display: block;
+
+    width: 52px;
+    height: 30px;
+
+    content: "";
+
+    background: #fff;
+  }
+}
+
 @media (min-width: 320px) and (max-width: 640px) {
   .overlayToolbar {
+    position: relative;
+    z-index: 1;
+
     flex-direction: row;
 
     width: 100%;
@@ -67,6 +103,9 @@
 
   .inner {
     display: flex;
+
+    width: 100%;
+    margin-top: 0;
   }
 
   .toggleOverlay {
@@ -78,17 +117,15 @@
 
   .mobileToolbar {
     position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
+    top: 15px !important;
+    left: -40px !important;
 
     display: flex;
     flex-direction: row-reverse;
 
-    width: 16px;
+    width: 52px;
 
-    min-height: calc(100vh - 32px);
-
-    background: $AppBG;
+    background: #f5f5f5;
 
     .inner {
       margin-right: 16px;
@@ -133,10 +170,10 @@
   .TabList {
     position: absolute;
     top: 0;
-    right: 0;
+    left: 60px;
 
     display: flex;
-    display: flex;
+
     flex-direction: column;
 
     width: 52px;
@@ -148,62 +185,45 @@
       url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='16' fill='%23E3E3E3'/%3E%3Cpath d='M21.5001 17.8333C20.4876 17.8333 19.6667 17.0125 19.6667 16C19.6667 14.9874 20.4876 14.1666 21.5001 14.1666C22.5126 14.1666 23.3334 14.9874 23.3334 16C23.3334 16.4862 23.1403 16.9525 22.7964 17.2963C22.4526 17.6401 21.9863 17.8333 21.5001 17.8333ZM16.0001 17.8333C14.9876 17.8333 14.1667 17.0125 14.1667 16C14.1667 14.9874 14.9876 14.1666 16.0001 14.1666C17.0126 14.1666 17.8334 14.9874 17.8334 16C17.8334 16.4862 17.6403 16.9525 17.2964 17.2963C16.9526 17.6401 16.4863 17.8333 16.0001 17.8333ZM10.5001 17.8333C9.48756 17.8333 8.66675 17.0125 8.66675 16C8.66675 14.9874 9.48756 14.1666 10.5001 14.1666C11.5126 14.1666 12.3334 14.9874 12.3334 16C12.3334 16.4862 12.1403 16.9525 11.7964 17.2963C11.4526 17.6401 10.9863 17.8333 10.5001 17.8333Z' fill='white'/%3E%3C/svg%3E")
       center no-repeat;
 
-    > :first-child {
-      margin: 59px 0 0;
-
-      &::after {
-        position: absolute;
-        top: 46px;
-        right: 0;
-
-        width: 52px;
-        height: 17px;
-
-        content: "";
-
-        background: $PureWhite;
-      }
-    }
-
-    div {
-      display: inline-block;
-
-      width: auto;
-
-      opacity: 0;
+    > :nth-child(n+2) {
+      display: none;
     }
   }
 
-  .TabList:active {
-    div {
-      display: inline-block;
+  .tabsMobile {
+    position: fixed;
+    top: inherit;
+    right: 14px;
 
-      width: auto;
-
-      opacity: 1;
-    }
-
-    div:hover {
-      display: inline-block;
-
-      width: auto;
-
-      opacity: 1;
-    }
-  }
-
-  .TabList:hover {
-    div {
-      display: inline-block;
-
-      width: auto;
-
-      opacity: 1;
-    }
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
   }
 }
 
-.noActive {
-  background: #eaf0f0 !important;
-  box-shadow: inset -2px 0 4px rgb(0 0 0 / 25%);
+.noSystemTabLabel {
+  display: block;
+
+  width: 52px;
+  height: 52px;
+
+  border-radius: 10px;
+  background:
+    $PureWhite
+    url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='16' fill='%23E3E3E3'/%3E%3Cpath d='M21.5001 17.8333C20.4876 17.8333 19.6667 17.0125 19.6667 16C19.6667 14.9874 20.4876 14.1666 21.5001 14.1666C22.5126 14.1666 23.3334 14.9874 23.3334 16C23.3334 16.4862 23.1403 16.9525 22.7964 17.2963C22.4526 17.6401 21.9863 17.8333 21.5001 17.8333ZM16.0001 17.8333C14.9876 17.8333 14.1667 17.0125 14.1667 16C14.1667 14.9874 14.9876 14.1666 16.0001 14.1666C17.0126 14.1666 17.8334 14.9874 17.8334 16C17.8334 16.4862 17.6403 16.9525 17.2964 17.2963C16.9526 17.6401 16.4863 17.8333 16.0001 17.8333ZM10.5001 17.8333C9.48756 17.8333 8.66675 17.0125 8.66675 16C8.66675 14.9874 9.48756 14.1666 10.5001 14.1666C11.5126 14.1666 12.3334 14.9874 12.3334 16C12.3334 16.4862 12.1403 16.9525 11.7964 17.2963C11.4526 17.6401 10.9863 17.8333 10.5001 17.8333Z' fill='white'/%3E%3C/svg%3E")
+    center no-repeat;
+
+  &:hover {
+    background:
+      $PureWhite
+      url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='16' fill='%23eb9dab'/%3E%3Cpath d='M21.5001 17.8333C20.4876 17.8333 19.6667 17.0125 19.6667 16C19.6667 14.9874 20.4876 14.1666 21.5001 14.1666C22.5126 14.1666 23.3334 14.9874 23.3334 16C23.3334 16.4862 23.1403 16.9525 22.7964 17.2963C22.4526 17.6401 21.9863 17.8333 21.5001 17.8333ZM16.0001 17.8333C14.9876 17.8333 14.1667 17.0125 14.1667 16C14.1667 14.9874 14.9876 14.1666 16.0001 14.1666C17.0126 14.1666 17.8334 14.9874 17.8334 16C17.8334 16.4862 17.6403 16.9525 17.2964 17.2963C16.9526 17.6401 16.4863 17.8333 16.0001 17.8333ZM10.5001 17.8333C9.48756 17.8333 8.66675 17.0125 8.66675 16C8.66675 14.9874 9.48756 14.1666 10.5001 14.1666C11.5126 14.1666 12.3334 14.9874 12.3334 16C12.3334 16.4862 12.1403 16.9525 11.7964 17.2963C11.4526 17.6401 10.9863 17.8333 10.5001 17.8333Z' fill='white'/%3E%3C/svg%3E")
+      center no-repeat;
+  }
+
+  &:active {
+    background:
+      $PureWhite
+      url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='16' fill='%23a6253c'/%3E%3Cpath d='M21.5001 17.8333C20.4876 17.8333 19.6667 17.0125 19.6667 16C19.6667 14.9874 20.4876 14.1666 21.5001 14.1666C22.5126 14.1666 23.3334 14.9874 23.3334 16C23.3334 16.4862 23.1403 16.9525 22.7964 17.2963C22.4526 17.6401 21.9863 17.8333 21.5001 17.8333ZM16.0001 17.8333C14.9876 17.8333 14.1667 17.0125 14.1667 16C14.1667 14.9874 14.9876 14.1666 16.0001 14.1666C17.0126 14.1666 17.8334 14.9874 17.8334 16C17.8334 16.4862 17.6403 16.9525 17.2964 17.2963C16.9526 17.6401 16.4863 17.8333 16.0001 17.8333ZM10.5001 17.8333C9.48756 17.8333 8.66675 17.0125 8.66675 16C8.66675 14.9874 9.48756 14.1666 10.5001 14.1666C11.5126 14.1666 12.3334 14.9874 12.3334 16C12.3334 16.4862 12.1403 16.9525 11.7964 17.2963C11.4526 17.6401 10.9863 17.8333 10.5001 17.8333Z' fill='white'/%3E%3C/svg%3E")
+      center no-repeat;
+  }
 }

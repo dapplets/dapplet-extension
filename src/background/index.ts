@@ -45,8 +45,9 @@ const identityService = new IdentityService(globalConfigService, walletService)
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
 
-// ToDo: fix this circular dependency
+// ToDo: fix circular dependencies
 walletService.sessionService = sessionService
+globalConfigService.ensService = ensService
 
 browser.runtime.onMessage.addListener(
   setupMessageListener({
@@ -152,7 +153,6 @@ browser.runtime.onMessage.addListener(
     deleteAllEvents: EventService.deleteEventsAll,
     getNewEventsCount: EventService.getNewEventsCount,
     getInitialConfig: () => globalConfigService.getInitialConfig(),
-    // delete event
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),
     enableRegistry: (url) => globalConfigService.enableRegistry(url),
@@ -161,6 +161,7 @@ browser.runtime.onMessage.addListener(
     setIntro: (intro) => globalConfigService.setIntro(intro),
     getTrustedUsers: () => globalConfigService.getTrustedUsers(),
     addTrustedUser: (account) => globalConfigService.addTrustedUser(account),
+    containsTrustedUser: (account) => globalConfigService.containsTrustedUser(account),
     removeTrustedUser: (account) => globalConfigService.removeTrustedUser(account),
     getAutoBackup: () => globalConfigService.getAutoBackup(),
     setAutoBackup: (isActive) => globalConfigService.setAutoBackup(isActive),
@@ -201,9 +202,7 @@ browser.runtime.onMessage.addListener(
     getMyDapplets: globalConfigService.getMyDapplets.bind(globalConfigService),
     addMyDapplet: globalConfigService.addMyDapplet.bind(globalConfigService),
     removeMyDapplet: globalConfigService.removeMyDapplet.bind(globalConfigService),
-
     updateTargetStorages: globalConfigService.updateTargetStorages.bind(globalConfigService),
-
     getTargetStorages: globalConfigService.getTargetStorages.bind(globalConfigService),
 
     // UserSettings (AppStorage)
@@ -427,13 +426,14 @@ browser.runtime.onInstalled.addListener(async (details) => {
     }
 
     if (Array.isArray(json)) {
+      // ToDo: A potential bug is here. Configs override each other.
       for (const j of json) {
         addCustomParams(j)
-        await globalConfigService.set(j)
+        await globalConfigService.mergeConfig(j)
       }
     } else {
       addCustomParams(json)
-      await globalConfigService.set(json)
+      await globalConfigService.mergeConfig(json)
     }
 
     console.log(`The predefined configuration was initialized. URL: ${url.href}`)
