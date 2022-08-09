@@ -430,6 +430,9 @@ export class EthRegistry implements Registry {
   }
 
   private _convertToEthVi(version: VersionInfo): EthVersionInfoDto {
+    const toTwoDigits = (n: string) => {
+      return n.length < 2 ? '0' + n : n.length > 2 ? 'ff' : n
+    }
     return {
       branch: version.branch,
       major: semver.major(version.version),
@@ -468,9 +471,9 @@ export class EthRegistry implements Registry {
       extensionVersion: !version.extensionVersion
         ? '0x000000'
         : '0x' +
-          semver.major(version.extensionVersion).toString(16) +
-          semver.minor(version.extensionVersion).toString(16) +
-          semver.patch(version.extensionVersion).toString(16),
+          toTwoDigits(semver.major(version.extensionVersion).toString(16)) +
+          toTwoDigits(semver.minor(version.extensionVersion).toString(16)) +
+          toTwoDigits(semver.patch(version.extensionVersion).toString(16)),
     }
   }
 }
