@@ -270,6 +270,8 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                       children={modules.map((x, i) => (
                         <div key={i} className={styles.modules}>
                           <DevModule
+                            currentAccount={currentAccount}
+                            setCurrentAccount={setCurrentAccount}
                             setDappletsDetail={setDappletsDetail}
                             modules={x}
                             onDetailsClick={deployModule.bind(this)}

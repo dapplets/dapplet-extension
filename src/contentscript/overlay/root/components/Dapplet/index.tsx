@@ -50,7 +50,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
   const { title, description, author, icon, isActive, isActionHandler, isUnderConstruction } =
     dapplet
-  // console.log(loadShowButton)
+
   const [loadHome, setLoadHome] = useState(false)
   useEffect(() => {}, [loadHome])
   const loadingHome = () => {

@@ -102,7 +102,7 @@ interface PropsDeveloper {
   setOpenWallet?: () => void
   connectedDescriptors?: []
   selectedWallet?: string
-  setCurrentAccount?: any
+  setCurrentAccount?: (x: any) => void
   currentAccount?: any
 }
 let isMounted = false
