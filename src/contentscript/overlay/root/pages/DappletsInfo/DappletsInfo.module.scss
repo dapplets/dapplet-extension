@@ -912,6 +912,16 @@
   line-height: 149%;
 }
 
+.inputContextInvalid {
+  color: #ff6442 !important;
+  border: 1px solid #ff6442;
+}
+
+.inputAdminInvalid {
+  color: #ff6442 !important;
+  border: 1px solid #ff6442;
+}
+
 .modalContentOwnership {
   display: flex;
 
