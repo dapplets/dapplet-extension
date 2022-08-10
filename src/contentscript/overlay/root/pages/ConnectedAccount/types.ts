@@ -8,7 +8,6 @@ export interface IUser {
   img: string
   name: string
   origin: string
-  userActive: boolean
   accountActive: boolean
 }
 
@@ -18,8 +17,8 @@ export interface IPair {
   statusName: Status
   statusLabel: string // Ok | Time | Attention
   statusMessage: string
-  userActive: boolean
   closeness: number
+  pendingRequestId?: number
 }
 
 export type TVerificationRequest = {
@@ -31,7 +30,7 @@ export type TVerificationRequest = {
   transactionSender: string
 }
 
-export type TAccountStatus = {
+type TAccountStatus = {
   isMain: boolean
 }
 

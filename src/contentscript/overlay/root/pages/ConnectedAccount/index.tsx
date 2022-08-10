@@ -1,7 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
-import React, { FC, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { Message } from '../../components/Message'
 import Attention from './assets/attention.svg'
@@ -15,15 +15,14 @@ const UserButton = ({
   handleOpenPopup,
 }: {
   user: IUser
-  handleOpenPopup: ((account: IUser) => Promise<void>) | null
+  handleOpenPopup: (account: IUser) => Promise<void>
 }) => {
   return (
     <div
       className={cn(styles.account, {
         [styles.nameUserActive]: user.accountActive,
-        [styles.hasAction]: !!handleOpenPopup,
       })}
-      onClick={() => handleOpenPopup && handleOpenPopup(user)}
+      onClick={() => handleOpenPopup(user)}
     >
       <img src={user.img} className={styles.imgUser} />
       <h4 className={styles.nameUser}>{user.name}</h4>
@@ -31,12 +30,10 @@ const UserButton = ({
   )
 }
 
-export interface ConnectedAccountProps {}
-
-export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAccountProps) => {
+export const ConnectedAccount = () => {
   const [pairs, setPairs] = useState<IPair[]>([])
 
-  const setAllPairs = async (pendingIds: number[] = []) => {
+  const updatePairs = async (prevPairs?: IPair[]) => {
     const {
       getWalletDescriptors,
       getConnectedAccounts,
@@ -60,65 +57,49 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
     let newPendingIds: number[] = []
 
     for (const d of connectedDescriptors) {
-      const firstAccStatus: boolean = await getStatus(d.account, d.chain)
-      const firstAccount: IUser = {
+      const connectedAccStatus: boolean = await getStatus(d.account, d.chain)
+      const connectedAccount: IUser = {
         name: d.account,
         origin: d.chain,
         img: makeBlockie(d.account),
-        userActive: false,
-        accountActive: firstAccStatus,
+        accountActive: connectedAccStatus,
       }
       const globalId = d.account + '/' + d.chain
 
       // *** PENDING ***
+      const addPendingPair = async (accountGlobalId: string, pendingRequestId: number) => {
+        const [name, origin1, origin2] = accountGlobalId.split('/')
+        const origin = origin2 ? origin1 + '/' + origin2 : origin1
+        const accStatus: boolean = await getStatus(name, origin)
+        newPairs.push({
+          firstAccount: connectedAccount,
+          secondAccount: {
+            name,
+            origin,
+            img: makeBlockie(name),
+            accountActive: accStatus,
+          },
+          statusName: Status.Processing,
+          statusLabel: Time,
+          statusMessage: 'Processing',
+          closeness: 1,
+          pendingRequestId,
+        })
+        processingAccountIdsPairs.push([globalId, accountGlobalId])
+        newPendingIds.push(pendingRequestId)
+      }
+
       const pendingRequestsIds: number[] = await getPendingRequests()
       if (pendingRequestsIds && pendingRequestsIds.length > 0) {
         for (const pendingRequestId of pendingRequestsIds) {
           const verificationRequest: TVerificationRequest = await getVerificationRequest(
             pendingRequestId
           )
-          if (verificationRequest.firstAccount === globalId) {
-            const [sName, sOrigin1, sOrigin2] = verificationRequest.secondAccount.split('/')
-            const sOrigin = sOrigin2 ? sOrigin1 + '/' + sOrigin2 : sOrigin1
-            const sAccStatus: boolean = await getStatus(sName, sOrigin)
-            newPairs.push({
-              firstAccount,
-              secondAccount: {
-                name: sName,
-                origin: sOrigin,
-                img: makeBlockie(sName),
-                userActive: false,
-                accountActive: sAccStatus,
-              },
-              statusName: Status.Processing,
-              statusLabel: Time,
-              statusMessage: 'Processing',
-              userActive: false,
-              closeness: 1,
-            })
-            processingAccountIdsPairs.push([globalId, verificationRequest.secondAccount])
-            newPendingIds.push(pendingRequestId)
-          } else if (verificationRequest.secondAccount === globalId) {
-            const [fName, fOrigin1, fOrigin2] = verificationRequest.firstAccount.split('/')
-            const fOrigin = fOrigin2 ? fOrigin1 + '/' + fOrigin2 : fOrigin1
-            const fAccStatus: boolean = await getStatus(fName, fOrigin)
-            newPairs.push({
-              firstAccount,
-              secondAccount: {
-                name: fName,
-                origin: fOrigin,
-                img: makeBlockie(fName),
-                userActive: false,
-                accountActive: fAccStatus,
-              },
-              statusName: Status.Processing,
-              statusLabel: Time,
-              statusMessage: 'Processing',
-              userActive: false,
-              closeness: 1,
-            })
-            processingAccountIdsPairs.push([globalId, verificationRequest.firstAccount])
-            newPendingIds.push(pendingRequestId)
+          const { firstAccount, secondAccount } = verificationRequest
+          if (firstAccount === globalId) {
+            await addPendingPair(secondAccount, pendingRequestId)
+          } else if (secondAccount === globalId) {
+            await addPendingPair(firstAccount, pendingRequestId)
           }
         }
       }
@@ -127,21 +108,19 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
       const connectedAccounts: TAccount[][] = await getConnectedAccounts(d.account, d.chain, null)
       connectedAccounts.forEach((level, i) =>
         level.forEach((ca) => {
-          if (hasEqualPair([globalId, ca.id], processingAccountIdsPairs)) return
+          if (hasEqualIdsPair([globalId, ca.id], processingAccountIdsPairs)) return
           const [caName, caOrigin1, caOrigin2] = ca.id.split('/')
           newPairs.push({
-            firstAccount,
+            firstAccount: connectedAccount,
             secondAccount: {
               name: caName,
               origin: caOrigin2 ? caOrigin1 + '/' + caOrigin2 : caOrigin1,
               img: makeBlockie(caName),
-              userActive: false,
               accountActive: ca.status.isMain,
             },
             statusName: Status.Connected,
             statusLabel: Ok,
             statusMessage: 'Connected',
-            userActive: false,
             closeness: i + 1,
           })
         })
@@ -149,64 +128,47 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
     }
 
     // *** REJECTED ***
-    const resolvedIds = pendingIds.filter((pendingId) => !newPendingIds.includes(pendingId))
-    if (resolvedIds.length !== 0) {
-      for (const resolvedId of resolvedIds) {
-        const requestStatus: 'not found' | 'pending' | 'approved' | 'rejected' =
-          await getRequestStatus(resolvedId)
-        if (requestStatus !== 'rejected') continue
+    if (prevPairs) {
+      const prevPendingPairs = prevPairs.filter(
+        (pair) => pair.statusName && pair.statusName === Status.Processing
+      )
+      const resolvedPairs = prevPendingPairs.filter(
+        (prevPair) => !newPendingIds.includes(prevPair.pendingRequestId!)
+      )
+      if (resolvedPairs.length !== 0) {
+        for (const resolvedPair of resolvedPairs) {
+          const requestStatus: 'not found' | 'pending' | 'approved' | 'rejected' =
+            await getRequestStatus(resolvedPair.pendingRequestId!)
+          if (requestStatus !== 'rejected') continue
 
-        const verificationRequest: TVerificationRequest = await getVerificationRequest(resolvedId)
-        const [fName, fOrigin1, fOrigin2] = verificationRequest.firstAccount.split('/')
-        const [sName, sOrigin1, sOrigin2] = verificationRequest.secondAccount.split('/')
-
-        const fOrigin = fOrigin2 ? fOrigin1 + '/' + fOrigin2 : fOrigin1
-        const fAccStatus: boolean = await getStatus(fName, fOrigin)
-        const firstAccount: IUser = {
-          name: fName,
-          origin: fOrigin,
-          img: makeBlockie(fName),
-          userActive: false,
-          accountActive: fAccStatus,
+          const newPairsLengthBeforeFilter = newPairs.length
+          newPairs = newPairs.filter(
+            (p) =>
+              !(
+                p.firstAccount.name === resolvedPair.firstAccount.name &&
+                p.firstAccount.origin === resolvedPair.firstAccount.origin &&
+                p.secondAccount.name === resolvedPair.secondAccount.name &&
+                p.secondAccount.origin === resolvedPair.secondAccount.origin
+              ) &&
+              !(
+                p.secondAccount.name === resolvedPair.firstAccount.name &&
+                p.secondAccount.origin === resolvedPair.firstAccount.origin &&
+                p.firstAccount.name === resolvedPair.secondAccount.name &&
+                p.firstAccount.origin === resolvedPair.secondAccount.origin
+              )
+          )
+          newPairs.unshift({
+            firstAccount: resolvedPair.firstAccount,
+            secondAccount: resolvedPair.secondAccount,
+            statusName: Status.Error,
+            statusLabel: Attention,
+            statusMessage:
+              newPairsLengthBeforeFilter === newPairs.length
+                ? 'Connection rejected'
+                : 'Disconnection rejected',
+            closeness: 1,
+          })
         }
-
-        const sOrigin = sOrigin2 ? sOrigin1 + '/' + sOrigin2 : sOrigin1
-        const sAccStatus: boolean = await getStatus(sName, sOrigin)
-        const secondAccount: IUser = {
-          name: sName,
-          origin: sOrigin,
-          img: makeBlockie(sName),
-          userActive: false,
-          accountActive: sAccStatus,
-        }
-
-        newPairs = newPairs.filter(
-          (p) =>
-            !(
-              p.firstAccount.name === firstAccount.name &&
-              p.firstAccount.origin === firstAccount.origin &&
-              p.secondAccount.name === secondAccount.name &&
-              p.secondAccount.origin === secondAccount.origin
-            ) &&
-            !(
-              p.secondAccount.name === firstAccount.name &&
-              p.secondAccount.origin === firstAccount.origin &&
-              p.firstAccount.name === secondAccount.name &&
-              p.firstAccount.origin === secondAccount.origin
-            )
-        )
-
-        newPairs.unshift({
-          firstAccount,
-          secondAccount,
-          statusName: Status.Error,
-          statusLabel: Attention,
-          statusMessage: verificationRequest.isUnlink
-            ? 'Disconnection rejected'
-            : 'Connection rejected',
-          userActive: false,
-          closeness: 1,
-        })
       }
     }
 
@@ -215,12 +177,12 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
     // *** UPDATE ***
     if (processingAccountIdsPairs.length > 0) {
       await new Promise((res) => setTimeout(res, 5000))
-      setAllPairs(newPendingIds)
+      updatePairs(newPairs)
     }
   }
 
   useEffect(() => {
-    setAllPairs()
+    updatePairs()
   }, [])
 
   const handleOpenPopup = async (account: IUser) => {
@@ -228,7 +190,7 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
     const thisTab = await getThisTab()
     try {
       await openConnectedAccountsPopup({ accountToChangeStatus: account }, thisTab.id)
-      setAllPairs()
+      updatePairs()
     } catch (err) {
       console.log('ERROR in openConnectedAccountsPopup():', err)
     }
@@ -244,7 +206,7 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
         },
         thisTab.id
       )
-      setAllPairs()
+      updatePairs()
     } catch (err) {
       console.log('ERROR in openConnectedAccountsPopup():', err)
     }
@@ -307,7 +269,7 @@ export const ConnectedAccount: FC<ConnectedAccountProps> = (props: ConnectedAcco
   )
 }
 
-const hasEqualPair = (pair: [string, string], list: [string, string][]): boolean => {
+const hasEqualIdsPair = (pair: [string, string], list: [string, string][]): boolean => {
   for (const one of list) {
     if ((one[0] === pair[0] && one[1] === pair[1]) || (one[0] === pair[1] && one[1] === pair[0])) {
       return true
