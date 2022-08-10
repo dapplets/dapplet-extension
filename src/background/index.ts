@@ -269,6 +269,7 @@ browser.runtime.onMessage.addListener(
     getRequestStatus: connectedAccountService.getRequestStatus.bind(connectedAccountService),
     requestVerification: connectedAccountService.requestVerification.bind(connectedAccountService),
     changeStatus: connectedAccountService.changeStatus.bind(connectedAccountService),
+    getPairs: connectedAccountService.getPairs.bind(connectedAccountService),
 
     // Helpers
     waitTab: (url) => waitTab(url),
