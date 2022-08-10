@@ -527,15 +527,10 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 <div className={cn(styles.blockAdmins)}>
                   <h3 className={styles.adminsTitle}>Admins</h3>
                   <button
-                    // disabled={autorDisabled}
                     onClick={(e) => {
                       setVisibleAdmins(!visibleAdmins)
-                      // addButtonClickHandler(e)
-                      // setAuthorDisabled(true)
                     }}
-                    className={cn(styles.adminsButton, {
-                      // [styles.adminsButtonDisabled]: autorDisabled,
-                    })}
+                    className={cn(styles.adminsButton, {})}
                   />
                 </div>
                 {visibleAdmins && (
@@ -549,7 +544,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                         ref={nodeInputAdmin}
                         className={cn(styles.blockContextTitle, {})}
                         value={editAdmin}
-                        // placeholder={'Context ID (ex: example.com)'}
                         onChange={(e) => {
                           setEditAdmin(e.target.value)
                         }}
@@ -566,7 +560,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                       />
                     </div>
                     <button
-                      disabled={nodeInputAdmin.current?.value.length < 2 || addAdminDisabled}
+                      disabled={editAdmin.length < 2 || addAdminDisabled}
                       onClick={() => {
                         nodeBtnAdmin.current?.classList.add('valid')
                         _addAdmin(editAdmin)
