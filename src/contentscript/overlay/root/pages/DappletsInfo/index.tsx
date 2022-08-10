@@ -91,7 +91,14 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     return () => {
       _isMounted = false
     }
-  }, [mi, newState, targetChain, editContextId, contextId, admins])
+  }, [
+    mi,
+    newState,
+    targetChain,
+    editContextId,
+    editAdmin,
+    // contextId, admins
+  ])
 
   const _updateData = async () => {
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
@@ -294,7 +301,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
   const getContextId = async () => {
     const { getContextIds } = await initBGFunctions(browser)
-
     const newContextID = await getContextIds(targetRegistry, mi.name)
     setContextId(newContextID)
   }
