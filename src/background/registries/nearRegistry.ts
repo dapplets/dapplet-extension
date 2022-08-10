@@ -80,8 +80,10 @@ export class NearRegistry implements Registry {
         'transferOwnership',
         'createModule',
         'addContextId',
+        'addAdmin',
         'addModuleWithContexts',
         'removeContextId',
+        'removeAdmin',
       ],
     })
   }
@@ -304,6 +306,17 @@ export class NearRegistry implements Registry {
 
   public async removeContextId(moduleName: string, contextId: string) {
     await this._contract.removeContextId({ contextId, moduleName })
+  }
+  public async getAdmins(moduleName: string): Promise<string[]> {
+    throw new Error('Method not implemented.')
+  }
+
+  public async addAdmin(moduleName: string, adressAdmin: string) {
+    await this._contract.addAdmin({ adressAdmin, moduleName })
+  }
+
+  public async removeAdmin(moduleName: string, adressAdmin: string) {
+    await this._contract.removeAdmin({ adressAdmin, moduleName })
   }
 
   public async editModuleInfo(module: ModuleInfo): Promise<void> {

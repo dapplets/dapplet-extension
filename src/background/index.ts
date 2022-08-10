@@ -123,6 +123,11 @@ browser.runtime.onMessage.addListener(
       featureService.addContextId(registryUri, moduleName, contextId),
     removeContextId: (registryUri, moduleName, contextId) =>
       featureService.removeContextId(registryUri, moduleName, contextId),
+    getAdmins: featureService.getAdmins.bind(featureService),
+    addAdmin: (registryUri, moduleName, adressAdmin) =>
+      featureService.addAdmin(registryUri, moduleName, adressAdmin),
+    removeAdmin: (registryUri, moduleName, adressAdmin) =>
+      featureService.removeAdmin(registryUri, moduleName, adressAdmin),
     editModuleInfo: (registryUri, targetStorages, module) =>
       featureService.editModuleInfo(registryUri, targetStorages, module),
     getVersions: (registryUri, moduleName) => featureService.getVersions(registryUri, moduleName),

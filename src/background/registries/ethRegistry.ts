@@ -342,6 +342,22 @@ export class EthRegistry implements Registry {
     await tx.wait()
   }
 
+  public async getAdmins(moduleName: string): Promise<string[]> {
+    const contract = await this._contractPromise
+    return contract.getAdminsByModule(moduleName)
+  }
+
+  public async addAdmin(moduleName: string, adressAdmin: string) {
+    const contract = await this._contractPromise
+    const tx = await contract.addAdmin(moduleName, adressAdmin)
+    await tx.wait()
+  }
+  public async removeAdmin(moduleName: string, adressAdmin: string) {
+    const contract = await this._contractPromise
+    const tx = await contract.removeAdmin(moduleName, adressAdmin)
+    await tx.wait()
+  }
+
   public async editModuleInfo(module: ModuleInfo): Promise<void> {
     const contract = await this._contractPromise
     const ethMi = this._convertToEthMi(module)

@@ -829,6 +829,20 @@ export default class FeatureService {
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     await registry.removeContextId(moduleName, contextId)
   }
+  public async getAdmins(registryUri: string, moduleName: string) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    return registry.getAdmins(moduleName)
+  }
+
+  public async addAdmin(registryUri: string, moduleName: string, adressAdmin: string) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    await registry.addAdmin(moduleName, adressAdmin)
+  }
+
+  public async removeAdmin(registryUri: string, moduleName: string, adressAdmin: string) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    await registry.removeAdmin(moduleName, adressAdmin)
+  }
 
   public async editModuleInfo(registryUri: string, targetStorages: StorageTypes[], mi: ModuleInfo) {
     if (mi.icon && mi.icon.uris.length > 0) {

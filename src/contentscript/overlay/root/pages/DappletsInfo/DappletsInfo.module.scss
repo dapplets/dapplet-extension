@@ -938,6 +938,15 @@
   }
 }
 
+.adminsInput {
+  display: inline-block;
+  overflow: hidden;
+
+  width: 90%;
+
+  text-overflow: ellipsis;
+}
+
 @media (min-width: 320px) and (max-width: 640px) {
   .wrapper {
     height: 85%;
