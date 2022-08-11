@@ -30,8 +30,9 @@ const ConnectedAccountsModal = (props: any) => {
     secondAccount: IUser,
     isUnlink: boolean
   ) => {
-    const { getMinStakeAmount, requestVerification } = await initBGFunctions(browser)
-    const minStakeAmount: number = await getMinStakeAmount()
+    const { getConnectedAccountsMinStakeAmount, requestConnectingAccountsVerification } =
+      await initBGFunctions(browser)
+    const minStakeAmount: number = await getConnectedAccountsMinStakeAmount()
     const requestBody = {
       firstAccountId: firstAccount.name,
       firstOriginId: firstAccount.origin,
@@ -51,9 +52,9 @@ const ConnectedAccountsModal = (props: any) => {
     let requestId: number
     try {
       setIsWaiting(true)
-      requestId = await requestVerification(requestBody, minStakeAmount)
+      requestId = await requestConnectingAccountsVerification(requestBody, minStakeAmount)
     } catch (err) {
-      console.log('Error in requestVerification().', err)
+      console.log('Error in requestConnectingAccountsVerification().', err)
     }
 
     setIsWaiting(false)
@@ -63,13 +64,17 @@ const ConnectedAccountsModal = (props: any) => {
   }
 
   const handleSetMainAccount = async (account: IUser) => {
-    const { changeStatus } = await initBGFunctions(browser)
+    const { changeConnectedAccountStatus } = await initBGFunctions(browser)
 
     try {
       setIsWaiting(true)
-      const res = await changeStatus(account.name, account.origin, !account.accountActive)
+      const res = await changeConnectedAccountStatus(
+        account.name,
+        account.origin,
+        !account.accountActive
+      )
     } catch (err) {
-      console.log('Error in changeStatus().', err)
+      console.log('Error in changeConnectedAccountStatus().', err)
     }
 
     setIsWaiting(false)

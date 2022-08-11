@@ -33,8 +33,8 @@ export const ConnectedAccount = () => {
   const [pairs, setPairs] = useState<IPair[]>([])
 
   const updatePairs = async (prevPairs?: IPair[]) => {
-    const { getPairs } = await initBGFunctions(browser)
-    const newPairs: IPair[] = await getPairs({ prevPairs })
+    const { getConnectedAccountsPairs } = await initBGFunctions(browser)
+    const newPairs: IPair[] = await getConnectedAccountsPairs({ prevPairs })
     setPairs(newPairs)
 
     // *** UPDATE ***
@@ -80,8 +80,8 @@ export const ConnectedAccount = () => {
   return (
     <div className={cn(styles.wrapper)}>
       <div className={styles.title}>
-        <h3 className={styles.titleAccount}>Accounts</h3>
-        <h3 className={styles.titleStatus}>Status</h3>
+        <h3>Accounts</h3>
+        <h3>Status</h3>
       </div>
       {!pairs || pairs.length === 0 ? (
         <Message

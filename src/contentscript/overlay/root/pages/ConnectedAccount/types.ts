@@ -15,7 +15,6 @@ export interface IPair {
   firstAccount: IUser
   secondAccount: IUser
   statusName: Status
-  statusLabel: string // Ok | Time | Attention
   statusMessage: string
   closeness: number
   pendingRequestId?: number

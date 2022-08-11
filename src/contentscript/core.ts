@@ -720,8 +720,5 @@ export default class Core {
     return new State<T>(defaultState, type)
   }
 
-  public connectedAccounts() {
-    const connectedAccounts = new ConnectedAccounts()
-    return connectedAccounts
-  }
+  public connectedAccounts = new ConnectedAccounts()
 }

@@ -29,35 +29,35 @@ class ConnectedAccounts {
   }
 
   public async getMinStakeAmount(): Promise<number> {
-    const { getMinStakeAmount } = await initBGFunctions(browser)
-    return getMinStakeAmount()
+    const { getConnectedAccountsMinStakeAmount } = await initBGFunctions(browser)
+    return getConnectedAccountsMinStakeAmount()
   }
 
   public async getPendingRequests(): Promise<number[]> {
-    const { getPendingRequests } = await initBGFunctions(browser)
-    return getPendingRequests()
+    const { getConnectedAccountsPendingRequests } = await initBGFunctions(browser)
+    return getConnectedAccountsPendingRequests()
   }
 
   public async getVerificationRequest(id: number): Promise<VerificationRequest | null> {
-    const { getVerificationRequest } = await initBGFunctions(browser)
-    return getVerificationRequest(id)
+    const { getConnectedAccountsVerificationRequest } = await initBGFunctions(browser)
+    return getConnectedAccountsVerificationRequest(id)
   }
 
   public async getStatus(accountId: string, originId: string): Promise<boolean> {
-    const { getStatus } = await initBGFunctions(browser)
-    return getStatus(accountId, originId)
+    const { getConnectedAccountStatus } = await initBGFunctions(browser)
+    return getConnectedAccountStatus(accountId, originId)
   }
 
   public async getMainAccount(accountId: string, originId: string): Promise<string | null> {
-    const { getMainAccount } = await initBGFunctions(browser)
-    return getMainAccount(accountId, originId)
+    const { getConnectedAccountsMainAccount } = await initBGFunctions(browser)
+    return getConnectedAccountsMainAccount(accountId, originId)
   }
 
   public async getRequestStatus(
     id: number
   ): Promise<'not found' | 'pending' | 'approved' | 'rejected'> {
-    const { getRequestStatus } = await initBGFunctions(browser)
-    return getRequestStatus(id)
+    const { getConnectedAccountsRequestStatus } = await initBGFunctions(browser)
+    return getConnectedAccountsRequestStatus(id)
   }
 
   // ***** CALL *****

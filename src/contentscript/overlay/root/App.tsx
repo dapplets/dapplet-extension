@@ -75,9 +75,9 @@ const SYSTEM_TAB: ToolbarTab = {
       title: 'Notifications',
     },
     {
-      id: 'connected',
+      id: 'connectedAccounts',
       icon: Account,
-      title: 'Connected',
+      title: 'Connected Accounts',
     },
     {
       id: 'settings',
@@ -493,7 +493,7 @@ class _App extends React.Component<P, S> {
               )}
 
               {pathname === '/system/notifications' && <Notifications />}
-              {pathname === '/system/connected' && <ConnectedAccount />}
+              {pathname === '/system/connectedAccounts' && <ConnectedAccount />}
               {pathname === '/system/settings' && (
                 <SettingsOverlay
                   selectedWallet={s.selectedWallet}

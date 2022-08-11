@@ -22,7 +22,14 @@ type TAccount = {
   status: TAccountStatus
 }
 
-enum Status {
+enum RequestStatus {
+  NotFound = 'not found',
+  Pending = 'pending',
+  Approved = 'approved',
+  Rejected = 'rejected',
+}
+
+enum PairStatus {
   Processing = 'Processing',
   Connected = 'Connected',
   Error = 'Error',
@@ -38,7 +45,7 @@ interface IUser {
 interface IPair {
   firstAccount: IUser
   secondAccount: IUser
-  statusName: Status
+  statusName: PairStatus
   statusMessage: string
   closeness: number
   pendingRequestId?: number
@@ -113,20 +120,18 @@ export default class ConnectedAccountService {
     return contract.getMainAccount({ accountId, originId })
   }
 
-  public async getRequestStatus(
-    id: number
-  ): Promise<'not found' | 'pending' | 'approved' | 'rejected'> {
+  public async getRequestStatus(id: number): Promise<RequestStatus> {
     const contract = await this._getContract()
     const status = await contract.getRequestStatus({ id })
     switch (status) {
       case 0:
-        return 'not found'
+        return RequestStatus.NotFound
       case 1:
-        return 'pending'
+        return RequestStatus.Pending
       case 2:
-        return 'approved'
+        return RequestStatus.Approved
       case 3:
-        return 'rejected'
+        return RequestStatus.Rejected
       default:
         throw new Error('Error in Connected Accounts getRequestStatus()')
     }
@@ -168,7 +173,7 @@ export default class ConnectedAccountService {
             img: makeBlockie(name),
             accountActive: accStatus,
           },
-          statusName: Status.Processing,
+          statusName: PairStatus.Processing,
           statusMessage: 'Processing',
           closeness: 1,
           pendingRequestId,
@@ -210,7 +215,7 @@ export default class ConnectedAccountService {
               img: makeBlockie(caName),
               accountActive: ca.status.isMain,
             },
-            statusName: Status.Connected,
+            statusName: PairStatus.Connected,
             statusMessage: 'Connected',
             closeness: i + 1,
           })
@@ -221,16 +226,17 @@ export default class ConnectedAccountService {
     // *** REJECTED ***
     if (prevPairs) {
       const prevPendingPairs = prevPairs.filter(
-        (pair) => pair.statusName && pair.statusName === Status.Processing
+        (pair) => pair.statusName && pair.statusName === PairStatus.Processing
       )
       const resolvedPairs = prevPendingPairs.filter(
         (prevPair) => !newPendingIds.includes(prevPair.pendingRequestId!)
       )
       if (resolvedPairs.length !== 0) {
         for (const resolvedPair of resolvedPairs) {
-          const requestStatus: 'not found' | 'pending' | 'approved' | 'rejected' =
-            await this.getRequestStatus(resolvedPair.pendingRequestId!)
-          if (requestStatus !== 'rejected') continue
+          const requestStatus: RequestStatus = await this.getRequestStatus(
+            resolvedPair.pendingRequestId!
+          )
+          if (requestStatus !== RequestStatus.Rejected) continue
 
           const newPairsLengthBeforeFilter = newPairs.length
           newPairs = newPairs.filter(
@@ -251,7 +257,7 @@ export default class ConnectedAccountService {
           newPairs.unshift({
             firstAccount: resolvedPair.firstAccount,
             secondAccount: resolvedPair.secondAccount,
-            statusName: Status.Error,
+            statusName: PairStatus.Error,
             statusMessage:
               newPairsLengthBeforeFilter === newPairs.length
                 ? 'Connection rejected'

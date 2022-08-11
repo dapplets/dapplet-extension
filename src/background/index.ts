@@ -260,16 +260,22 @@ browser.runtime.onMessage.addListener(
     // Connected Account Service
     getConnectedAccounts:
       connectedAccountService.getConnectedAccounts.bind(connectedAccountService),
-    getMinStakeAmount: connectedAccountService.getMinStakeAmount.bind(connectedAccountService),
-    getPendingRequests: connectedAccountService.getPendingRequests.bind(connectedAccountService),
-    getVerificationRequest:
+    getConnectedAccountsMinStakeAmount:
+      connectedAccountService.getMinStakeAmount.bind(connectedAccountService),
+    getConnectedAccountsPendingRequests:
+      connectedAccountService.getPendingRequests.bind(connectedAccountService),
+    getConnectedAccountsVerificationRequest:
       connectedAccountService.getVerificationRequest.bind(connectedAccountService),
-    getStatus: connectedAccountService.getStatus.bind(connectedAccountService),
-    getMainAccount: connectedAccountService.getMainAccount.bind(connectedAccountService),
-    getRequestStatus: connectedAccountService.getRequestStatus.bind(connectedAccountService),
-    requestVerification: connectedAccountService.requestVerification.bind(connectedAccountService),
-    changeStatus: connectedAccountService.changeStatus.bind(connectedAccountService),
-    getPairs: connectedAccountService.getPairs.bind(connectedAccountService),
+    getConnectedAccountStatus: connectedAccountService.getStatus.bind(connectedAccountService),
+    getConnectedAccountsMainAccount:
+      connectedAccountService.getMainAccount.bind(connectedAccountService),
+    getConnectedAccountsRequestStatus:
+      connectedAccountService.getRequestStatus.bind(connectedAccountService),
+    requestConnectingAccountsVerification:
+      connectedAccountService.requestVerification.bind(connectedAccountService),
+    changeConnectedAccountStatus:
+      connectedAccountService.changeStatus.bind(connectedAccountService),
+    getConnectedAccountsPairs: connectedAccountService.getPairs.bind(connectedAccountService),
 
     // Helpers
     waitTab: (url) => waitTab(url),

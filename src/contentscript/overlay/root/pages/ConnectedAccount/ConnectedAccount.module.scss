@@ -48,9 +48,6 @@
   padding: 3px;
 }
 
-.titleAccount{}
-.titleStatus{}
-
 .accountsWrapper {
   display: flex;
   flex-direction: column;
@@ -102,53 +99,6 @@
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 
   cursor: pointer;
-}
-
-.choiseUserActive {
-  position: absolute;
-  z-index: 10;
-  top: 45%;
-  right: -67%;
-
-  display: flex;
-  align-items: start;
-  justify-content: space-around;
-
-  width: 107px;
-  height: 37px;
-  padding: 5px 0;
-
-  border-radius: 10px;
-  background: #eaf0f0;
-}
-
-.blockLinkChoise {
-  display: flex;
-
-  flex-direction: column;
-  justify-content: space-between;
-
-  height: 100%;
-
-  cursor: pointer;
-
-  color: $MainGrey;
-
-  font-family: Roboto;
-  font-size: 10px;
-  font-weight: 400;
-  font-style: normal;
-  line-height: 100%;
-
-  a {
-    &:hover {
-      color: $PrimaryHover;
-    }
-
-    &:active {
-      color: $PrimaryPressed;
-    }
-  }
 }
 
 .imgUser {
