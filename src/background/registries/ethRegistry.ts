@@ -325,6 +325,11 @@ export class EthRegistry implements Registry {
     await tx.wait()
   }
 
+  public async getContextIds(moduleName: string): Promise<string[]> {
+    const contract = await this._contractPromise
+    return contract.getContextIdsByModule(moduleName)
+  }
+
   public async addContextId(moduleName: string, contextId: string) {
     const contract = await this._contractPromise
     const tx = await contract.addContextId(moduleName, contextId)
@@ -334,6 +339,22 @@ export class EthRegistry implements Registry {
   public async removeContextId(moduleName: string, contextId: string) {
     const contract = await this._contractPromise
     const tx = await contract.removeContextId(moduleName, contextId)
+    await tx.wait()
+  }
+
+  public async getAdmins(moduleName: string): Promise<string[]> {
+    const contract = await this._contractPromise
+    return contract.getAdminsByModule(moduleName)
+  }
+
+  public async addAdmin(moduleName: string, adressAdmin: string) {
+    const contract = await this._contractPromise
+    const tx = await contract.addAdmin(moduleName, adressAdmin)
+    await tx.wait()
+  }
+  public async removeAdmin(moduleName: string, adressAdmin: string) {
+    const contract = await this._contractPromise
+    const tx = await contract.removeAdmin(moduleName, adressAdmin)
     await tx.wait()
   }
 

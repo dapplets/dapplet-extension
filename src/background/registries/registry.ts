@@ -27,7 +27,11 @@ export interface Registry {
   addModule(module: ModuleInfo, version: VersionInfo): Promise<void>
   getOwnership(moduleName: string): Promise<string>
   transferOwnership(moduleName: string, newAccount: string, oldAccount: string): Promise<void>
+  getContextIds(moduleName: string): Promise<string[]>
   addContextId(moduleName: string, contextId: string): Promise<void>
   removeContextId(moduleName: string, contextId: string): Promise<void>
+  getAdmins(moduleName: string): Promise<string[]>
+  addAdmin(moduleName: string, adressAdmin: string): Promise<void>
+  removeAdmin(moduleName: string, adressAdmin: string): Promise<void>
   editModuleInfo(module: ModuleInfo): Promise<void>
 }

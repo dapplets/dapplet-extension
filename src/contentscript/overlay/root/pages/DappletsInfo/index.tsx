@@ -3,7 +3,6 @@ import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
-import VersionInfo from '../../../../../background/models/versionInfo'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
@@ -26,7 +25,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const { setDappletsDetail, ModuleInfo, ModuleVersion, setShowChildrenRegistery } = props
   const [originalMi, setOriginalMi] = useState(null)
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
-  const [vi, setVi] = useState<VersionInfo>(ModuleVersion)
+  // const [vi, setVi] = useState<VersionInfo>(ModuleVersion)
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
   const [message, setMessage] = useState(null)
@@ -49,24 +48,33 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [newState, setNewState] = useState([])
   const [isDisabledPush, setDisabledPush] = useState(true)
   const [isDisabledAddOwner, setDisabledAddOwner] = useState(false)
+  const [isDisabledAddAdmin, setDisabledAddAdmin] = useState(false)
+  const [isDisabledAddContext, setDisabledAddContext] = useState(false)
   const [isModal, setModal] = useState(false)
   const onClose = () => setModal(false)
   const [isModalPush, setModalPush] = useState(false)
   const [isModalTransaction, setModalTransaction] = useState(false)
   const [autorDisabled, setAuthorDisabled] = useState(false)
-  const [author, setAuthor] = useState({ authorForm: [] })
-  const newAuthorObject = {
-    author: '',
-  }
+  const [editAdmin, setEditAdmin] = useState('')
+  const [admins, setAdmins] = useState(null)
+
   const [isNotAccountModal, setNotAccountModal] = useState(false)
   const [visible, setVisible] = useState(false)
+  const [visibleAdmins, setVisibleAdmins] = useState(false)
   const nodeBtn = useRef<HTMLButtonElement>()
   const nodeInput = useRef<HTMLInputElement>()
-  const [visibleContextId, setVisibleContextId] = useState({
-    visibleContext: [],
-  })
+  const nodeInputAdmin = useRef<HTMLInputElement>()
+  const nodeBtnAdmin = useRef<HTMLButtonElement>()
+
   const [contextDeleteNone, setContextDeleteNone] = useState(false)
   const [addDisabled, setAddDisabled] = useState(false)
+  const [contextId, setContextId] = useState(null)
+  const [addAdminDisabled, setAddAdminDisabled] = useState(false)
+  const [adminDeleteNone, setAdminDeleteNone] = useState(false)
+  const [editAdminsLoading, setEditAdminsLoading] = useState(false)
+  const [editAdminDone, setEditAdminDone] = useState(false)
+
+  const regExpIndexEthereum = new RegExp(/^0x[a-fA-F0-9]{40}$/)
 
   useEffect(() => {
     _isMounted = true
@@ -79,15 +87,25 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       }
     }
     init()
-    if (author.authorForm.length === 0) {
-      setAuthorDisabled(false)
-    }
 
     return () => {
       _isMounted = false
     }
-  }, [mi, newState, targetChain, autorDisabled, author, editContextId])
+  }, [
+    mi,
+    newState,
+    targetChain,
+    editContextId,
+    editAdmin,
+    // contextId, admins
+  ])
+  const getNumIndex = (value, reg) => {
+    try {
+      const valueReg = value.match(reg)
 
+      return valueReg
+    } catch {}
+  }
   const _updateData = async () => {
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
 
@@ -106,6 +124,9 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
     await _updateCurrentAccount()
+    if (!targetRegistry) return
+    await getContextId()
+    await getAdmins()
   }
   const _updateCurrentAccount = async () => {
     if (targetChain) {
@@ -130,6 +151,9 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     } catch (error) {
       setDisabledAddOwner(true)
       setNewOwnerLoading(false)
+      setTimeout(() => {
+        setDisabledAddOwner(false)
+      }, 1000)
     }
   }
 
@@ -188,64 +212,134 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setNewState([...filesArr])
   }
 
-  const addButtonClickHandler = (e) => {
-    const newAuthor = Object.assign({}, author)
-    newAuthor.authorForm.push(newAuthorObject)
-    setAuthor(newAuthor)
-  }
-  const messagesContainer = useRef<HTMLDivElement>()
-
-  const onDeleteChild = (id: number) => {
-    const newAuthor = Object.assign({}, author)
-    newAuthor.authorForm.splice(id, 1)
-    setAuthor(newAuthor)
-  }
-
-  const newContextObject = ''
-  const addButtonClickHandlerContext = () => {
-    const newContext = Object.assign({}, mi)
-    newContext.contextIds.push(newContextObject)
-    setMi(newContext)
-  }
-
-  const onDeleteChildContext = (id: number) => {
-    const newContext = Object.assign({}, mi)
-    newContext.contextIds.splice(id, 1)
-    setMi(newContext)
-  }
-
-  const _addContextId = async (contextId: string) => {
+  const onDeleteContextId = async (context) => {
     setEditContextIdLoading(true)
     setAddDisabled(true)
-
     try {
-      const { addContextId } = await initBGFunctions(browser)
-      await addContextId(targetRegistry, mi.name, contextId)
-      const newForm = Object.assign({}, visibleContextId)
+      const { removeContextId } = await initBGFunctions(browser)
+      await removeContextId(targetRegistry, mi.name, context)
 
-      newForm.visibleContext.push(editContextId)
-      setVisibleContextId(newForm)
-
-      setEditContextIdDone(true)
-      setVisible(true)
       setEditContextId('')
-      setEditContextIdLoading(false)
-      setAddDisabled(false)
-      nodeBtn.current?.classList.remove('valid')
-      setEditContextId('')
+      await getContextId()
     } catch (error) {
-      setEditContextIdDone(true)
-      setVisible(false)
-      setEditContextIdLoading(false)
+    } finally {
       setAddDisabled(false)
       nodeBtn.current?.classList.remove('valid')
+      setEditContextIdLoading(false)
+      setVisible(true)
+      setEditContextIdDone(true)
     }
   }
+
+  const _addContextId = async (newContextId: string) => {
+    setEditContextIdLoading(true)
+    setAddDisabled(true)
+    const validValue = containsValue(contextId, newContextId)
+    if (validValue) {
+      setDisabledAddContext(true)
+      setEditContextIdLoading(false)
+      setAddDisabled(false)
+      setTimeout(() => {
+        setDisabledAddContext(false)
+      }, 1000)
+    } else {
+      try {
+        const { addContextId } = await initBGFunctions(browser)
+        await addContextId(targetRegistry, mi.name, newContextId)
+
+        setEditContextIdDone(true)
+        setVisible(true)
+        setEditContextIdLoading(false)
+        setAddDisabled(false)
+        nodeBtn.current?.classList.remove('valid')
+        setEditContextId('')
+      } catch (error) {
+        setEditContextIdDone(true)
+        setVisible(false)
+        setEditContextIdLoading(false)
+        setAddDisabled(false)
+        nodeBtn.current?.classList.remove('valid')
+      }
+    }
+  }
+
+  const _addAdmin = async (address: string) => {
+    setEditAdminsLoading(true)
+    setAddAdminDisabled(true)
+    const validValue = containsValue(admins, address)
+    const valueParse = getNumIndex(address, regExpIndexEthereum)
+    if (validValue || valueParse === null) {
+      setDisabledAddAdmin(true)
+      setEditAdminsLoading(false)
+      setAddAdminDisabled(false)
+      setTimeout(() => {
+        setDisabledAddAdmin(false)
+      }, 1000)
+    } else {
+      try {
+        const { addAdmin } = await initBGFunctions(browser)
+        await addAdmin(targetRegistry, mi.name, address)
+
+        setEditAdminDone(true)
+        setVisibleAdmins(true)
+        setEditAdminsLoading(false)
+        setAddAdminDisabled(false)
+        nodeBtnAdmin.current?.classList.remove('valid')
+        setEditAdmin('')
+      } catch (error) {
+        setEditAdminDone(true)
+        setVisibleAdmins(false)
+        setEditAdminsLoading(false)
+        setAddAdminDisabled(false)
+        nodeBtnAdmin.current?.classList.remove('valid')
+      }
+    }
+  }
+  const _deleteAdmin = async (address: string) => {
+    setEditAdminsLoading(true)
+    setAddAdminDisabled(true)
+
+    try {
+      const { removeAdmin } = await initBGFunctions(browser)
+      await removeAdmin(targetRegistry, mi.name, address)
+
+      setEditAdmin('')
+      await getAdmins()
+    } catch (error) {
+    } finally {
+      setEditAdminDone(true)
+      setVisibleAdmins(false)
+      setEditAdminsLoading(false)
+      setAddAdminDisabled(false)
+      nodeBtnAdmin.current?.classList.remove('valid')
+    }
+  }
+
   const visibleNameFile = (hash: string): string => {
     const firstFourCharacters = hash.substring(0, 6)
     const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 5)
 
     return `${firstFourCharacters}...${lastFourCharacters}`
+  }
+  const getContextId = async () => {
+    const { getContextIds } = await initBGFunctions(browser)
+    const newContextID = await getContextIds(targetRegistry, mi.name)
+    setContextId(newContextID)
+  }
+  const getAdmins = async () => {
+    const { getAdmins } = await initBGFunctions(browser)
+
+    const authors = await getAdmins(targetRegistry, mi.name)
+    setAdmins(authors)
+  }
+
+  function containsValue(arr, elem: string) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i].toLowerCase() === elem.toLowerCase()) {
+        return true
+      }
+    }
+    return false
   }
 
   return (
@@ -429,36 +523,80 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                   </div>
                 }
               />
-              {/* <div className={styles.wrapperAdmins}>
-                <div className={styles.blockAdmins}>
+              <div className={styles.wrapperAdmins}>
+                <div className={cn(styles.blockAdmins)}>
                   <h3 className={styles.adminsTitle}>Admins</h3>
                   <button
-                    disabled={autorDisabled}
                     onClick={(e) => {
-                      addButtonClickHandler(e)
-                      setAuthorDisabled(true)
+                      setVisibleAdmins(!visibleAdmins)
                     }}
-                    className={cn(styles.adminsButton, {
-                      [styles.adminsButtonDisabled]: autorDisabled,
-                    })}
+                    className={cn(styles.adminsButton, {})}
                   />
                 </div>
-                {author.authorForm.map((x, i) => (
-                  <div ref={messagesContainer} key={i} className={styles.blockAuthors}>
-                    <input
-                      className={styles.authorTitle}
-                      placeholder={x.author}
-                      onChange={(e) => {
-                        author.authorForm[i].author = e.target.value
-                        if (e.target.value.length !== 0) {
-                          setAuthorDisabled(false)
-                        }
+                {visibleAdmins && (
+                  <div className={styles.wrapperContext}>
+                    <div
+                      className={cn(styles.blockContext, {
+                        [styles.inputAdminInvalid]: isDisabledAddAdmin,
+                      })}
+                    >
+                      <input
+                        ref={nodeInputAdmin}
+                        className={cn(styles.blockContextTitle, {})}
+                        value={editAdmin}
+                        onChange={(e) => {
+                          setEditAdmin(e.target.value)
+                        }}
+                      />
+
+                      <button
+                        ref={nodeBtnAdmin}
+                        onClick={() => {
+                          setEditAdmin('')
+                        }}
+                        className={cn(styles.contextDelete, {
+                          [styles.contextDeleteNone]: adminDeleteNone,
+                        })}
+                      />
+                    </div>
+                    <button
+                      disabled={editAdmin.length < 2 || addAdminDisabled}
+                      onClick={() => {
+                        nodeBtnAdmin.current?.classList.add('valid')
+                        _addAdmin(editAdmin)
                       }}
-                    />
-                    <button onClick={() => onDeleteChild(i)} className={styles.authorDelete} />
+                      className={cn(styles.addContext, {
+                        [styles.addContextDisabled]:
+                          nodeInputAdmin.current?.value.length < 2 || addAdminDisabled,
+                      })}
+                    >
+                      ADD
+                    </button>
                   </div>
-                ))}
-              </div> */}
+                )}
+                {editAdminsLoading ? (
+                  <div className={styles.editContextIdLoading}></div>
+                ) : (
+                  <>
+                    {admins &&
+                      admins.map((x, i) => (
+                        <div key={i} className={styles.blockAuthors}>
+                          <input
+                            className={cn(
+                              styles.blockContext,
+                              styles.blockContextValue,
+                              styles.adminsInput
+                            )}
+                            placeholder={x}
+                            value={x}
+                            readOnly
+                          />
+                          <button onClick={() => _deleteAdmin(x)} className={styles.authorDelete} />
+                        </div>
+                      ))}
+                  </>
+                )}
+              </div>
             </div>
           }
         />
@@ -472,18 +610,18 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 <div className={styles.blockContextID}>
                   <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
                   <button
-                    disabled={mi.contextIds.length >= 1}
-                    onClick={addButtonClickHandlerContext}
-                    className={cn(styles.contextIDButton, {
-                      [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
-                    })}
+                    onClick={() => setVisible(!visible)}
+                    className={cn(styles.contextIDButton, {})}
                   />
                 </div>
-                {mi.contextIds.map((x, i) => (
-                  <div key={i} className={styles.wrapperContext}>
-                    <div className={styles.blockContext}>
+                {visible && (
+                  <div className={styles.wrapperContext}>
+                    <div
+                      className={cn(styles.blockContext, {
+                        [styles.inputContextInvalid]: isDisabledAddContext,
+                      })}
+                    >
                       <input
-                        key={i}
                         ref={nodeInput}
                         className={styles.blockContextTitle}
                         value={editContextId}
@@ -496,7 +634,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                       <button
                         ref={nodeBtn}
                         onClick={() => {
-                          onDeleteChildContext(i)
                           setEditContextId('')
                         }}
                         className={cn(styles.contextDelete, {
@@ -518,21 +655,25 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                       ADD
                     </button>
                   </div>
-                ))}
+                )}
                 {editContextIdLoading ? (
                   <div className={styles.editContextIdLoading}></div>
                 ) : (
                   <>
-                    {visible &&
-                      visibleContextId &&
-                      visibleContextId.visibleContext.map((x, i) => (
-                        <input
-                          key={i}
-                          className={styles.blockContext}
-                          placeholder={x}
-                          value={x}
-                          readOnly
-                        />
+                    {contextId &&
+                      contextId.map((x, i) => (
+                        <div key={i} className={styles.blockAuthors}>
+                          <input
+                            className={cn(styles.blockContext, styles.blockContextValue)}
+                            placeholder={x}
+                            value={x}
+                            readOnly
+                          />
+                          <button
+                            onClick={() => onDeleteContextId(x)}
+                            className={styles.authorDelete}
+                          />
+                        </div>
                       ))}
                   </>
                 )}

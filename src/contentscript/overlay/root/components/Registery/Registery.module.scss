@@ -100,8 +100,11 @@
 }
 
 .label {
-  display: inline-block;
+  display: block;
+  overflow: hidden;
 
   width: auto;
   max-width: 80%;
+
+  text-overflow: ellipsis;
 }

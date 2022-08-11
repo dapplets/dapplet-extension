@@ -191,11 +191,26 @@ export class DevRegistry implements Registry {
     return
   }
 
+  public async getContextIds(moduleName: string): Promise<string[]> {
+    throw new Error('Method not implemented.')
+  }
+
   public async addContextId(moduleName: string, contextId: string) {
     return
   }
 
   public async removeContextId(moduleName: string, contextId: string) {
+    return
+  }
+  public async getAdmins(moduleName: string): Promise<string[]> {
+    throw new Error('Method not implemented.')
+  }
+
+  public async addAdmin(moduleName: string, adressAdmin: string) {
+    return
+  }
+
+  public async removeAdmin(moduleName: string, adressAdmin: string) {
     return
   }
 
