@@ -2,19 +2,23 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import {
+  ConnectedAccountsPairStatus,
+  IConnectedAccountsPair,
+  IConnectedAccountUser,
+} from '../../../../../common/types'
 import { Message } from '../../components/Message'
 import Attention from './assets/attention.svg'
 import Ok from './assets/ok.svg'
 import Time from './assets/time.svg'
 import styles from './ConnectedAccount.module.scss'
-import { IPair, IUser, Status } from './types'
 
 const UserButton = ({
   user,
   handleOpenPopup,
 }: {
-  user: IUser
-  handleOpenPopup: (account: IUser) => Promise<void>
+  user: IConnectedAccountUser
+  handleOpenPopup: (account: IConnectedAccountUser) => Promise<void>
 }) => {
   return (
     <div
@@ -30,16 +34,18 @@ const UserButton = ({
 }
 
 export const ConnectedAccount = () => {
-  const [pairs, setPairs] = useState<IPair[]>([])
+  const [pairs, setPairs] = useState<IConnectedAccountsPair[]>([])
 
-  const updatePairs = async (prevPairs?: IPair[]) => {
+  const updatePairs = async (prevPairs?: IConnectedAccountsPair[]) => {
     const { getConnectedAccountsPairs } = await initBGFunctions(browser)
-    const newPairs: IPair[] = await getConnectedAccountsPairs({ prevPairs })
+    const newPairs: IConnectedAccountsPair[] = await getConnectedAccountsPairs({ prevPairs })
     setPairs(newPairs)
 
     // *** UPDATE ***
     if (!newPairs || newPairs.length === 0) return
-    const processingAccountIdsPairs = newPairs.filter((p) => p.statusName === Status.Processing)
+    const processingAccountIdsPairs = newPairs.filter(
+      (p) => p.statusName === ConnectedAccountsPairStatus.Processing
+    )
     if (processingAccountIdsPairs.length > 0) {
       await new Promise((res) => setTimeout(res, 5000))
       updatePairs(newPairs)
@@ -50,7 +56,7 @@ export const ConnectedAccount = () => {
     updatePairs()
   }, [])
 
-  const handleOpenPopup = async (account: IUser) => {
+  const handleOpenPopup = async (account: IConnectedAccountUser) => {
     const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     try {
@@ -61,7 +67,7 @@ export const ConnectedAccount = () => {
     }
   }
 
-  const handleDisconnectAccounts = async (pair: IPair) => {
+  const handleDisconnectAccounts = async (pair: IConnectedAccountsPair) => {
     const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     try {
@@ -93,9 +99,9 @@ export const ConnectedAccount = () => {
         <div className={styles.accountsWrapper}>
           {pairs.map((x, i) => {
             const statusLabel =
-              x.statusName === Status.Connected
+              x.statusName === ConnectedAccountsPairStatus.Connected
                 ? Ok
-                : x.statusName === Status.Processing
+                : x.statusName === ConnectedAccountsPairStatus.Processing
                 ? Time
                 : Attention
             return (
@@ -116,9 +122,11 @@ export const ConnectedAccount = () => {
                   <img
                     src={statusLabel}
                     className={cn(styles.statusLabel, {
-                      [styles.statusConnected]: x.statusName === Status.Connected,
-                      [styles.statusProcessing]: x.statusName === Status.Processing,
-                      [styles.statusError]: x.statusName === Status.Error,
+                      [styles.statusConnected]:
+                        x.statusName === ConnectedAccountsPairStatus.Connected,
+                      [styles.statusProcessing]:
+                        x.statusName === ConnectedAccountsPairStatus.Processing,
+                      [styles.statusError]: x.statusName === ConnectedAccountsPairStatus.Error,
                     })}
                     alt={x.statusMessage}
                   />
@@ -128,7 +136,9 @@ export const ConnectedAccount = () => {
                     type="button"
                     onClick={() => handleDisconnectAccounts(x)}
                     className={styles.buttonDelete}
-                    disabled={x.closeness > 1 || x.statusName !== Status.Connected}
+                    disabled={
+                      x.closeness > 1 || x.statusName !== ConnectedAccountsPairStatus.Connected
+                    }
                   />
                 </div>
               </div>

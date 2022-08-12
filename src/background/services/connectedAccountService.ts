@@ -1,55 +1,16 @@
 import makeBlockie from 'ethereum-blockies-base64'
 import * as nearAPI from 'near-api-js'
-import { DefaultSigners } from '../../common/types'
+import {
+  ConnectedAccountsPairStatus,
+  ConnectedAccountsRequestStatus,
+  DefaultSigners,
+  IConnectedAccountsPair,
+  IConnectedAccountUser,
+  TConnectedAccount,
+  TConnectedAccountsVerificationRequest,
+} from '../../common/types'
 import GlobalConfigService from './globalConfigService'
 import { WalletService } from './walletService'
-
-type TVerificationRequest = {
-  firstAccount: string
-  secondAccount: string
-  isUnlink: boolean
-  firstProofUrl: string
-  secondProofUrl: string
-  transactionSender: string
-}
-
-type TAccountStatus = {
-  isMain: boolean
-}
-
-type TAccount = {
-  id: string
-  status: TAccountStatus
-}
-
-enum RequestStatus {
-  NotFound = 'not found',
-  Pending = 'pending',
-  Approved = 'approved',
-  Rejected = 'rejected',
-}
-
-enum PairStatus {
-  Processing = 'Processing',
-  Connected = 'Connected',
-  Error = 'Error',
-}
-
-interface IUser {
-  img: string
-  name: string
-  origin: string
-  accountActive: boolean
-}
-
-interface IPair {
-  firstAccount: IUser
-  secondAccount: IUser
-  statusName: PairStatus
-  statusMessage: string
-  closeness: number
-  pendingRequestId?: number
-}
 
 export default class ConnectedAccountService {
   _contract: any
@@ -86,7 +47,7 @@ export default class ConnectedAccountService {
     accountId: string,
     originId: string,
     closeness?: number
-  ): Promise<TAccount[][] | null> {
+  ): Promise<TConnectedAccount[][] | null> {
     const contract = await this._getContract()
     return contract.getConnectedAccounts({
       accountId,
@@ -105,7 +66,9 @@ export default class ConnectedAccountService {
     return contract.getPendingRequests()
   }
 
-  public async getVerificationRequest(id: number): Promise<TVerificationRequest | null> {
+  public async getVerificationRequest(
+    id: number
+  ): Promise<TConnectedAccountsVerificationRequest | null> {
     const contract = await this._getContract()
     return contract.getVerificationRequest({ id })
   }
@@ -120,24 +83,28 @@ export default class ConnectedAccountService {
     return contract.getMainAccount({ accountId, originId })
   }
 
-  public async getRequestStatus(id: number): Promise<RequestStatus> {
+  public async getRequestStatus(id: number): Promise<ConnectedAccountsRequestStatus> {
     const contract = await this._getContract()
     const status = await contract.getRequestStatus({ id })
     switch (status) {
       case 0:
-        return RequestStatus.NotFound
+        return ConnectedAccountsRequestStatus.NotFound
       case 1:
-        return RequestStatus.Pending
+        return ConnectedAccountsRequestStatus.Pending
       case 2:
-        return RequestStatus.Approved
+        return ConnectedAccountsRequestStatus.Approved
       case 3:
-        return RequestStatus.Rejected
+        return ConnectedAccountsRequestStatus.Rejected
       default:
         throw new Error('Error in Connected Accounts getRequestStatus()')
     }
   }
 
-  public async getPairs({ prevPairs }: { prevPairs: IPair[] | null }): Promise<IPair[]> {
+  public async getPairs({
+    prevPairs,
+  }: {
+    prevPairs: IConnectedAccountsPair[] | null
+  }): Promise<IConnectedAccountsPair[]> {
     const descriptors: {
       account: string
       chain: string
@@ -146,13 +113,13 @@ export default class ConnectedAccountService {
     const connectedDescriptors = descriptors.filter((d) => d.connected === true)
     if (!connectedDescriptors || connectedDescriptors.length === 0) return
 
-    let newPairs: IPair[] = []
+    let newPairs: IConnectedAccountsPair[] = []
     let processingAccountIdsPairs: [string, string][] = []
     let newPendingIds: number[] = []
 
     for (const d of connectedDescriptors) {
       const connectedAccStatus: boolean = await this.getStatus(d.account, d.chain)
-      const connectedAccount: IUser = {
+      const connectedAccount: IConnectedAccountUser = {
         name: d.account,
         origin: d.chain,
         img: makeBlockie(d.account),
@@ -173,7 +140,7 @@ export default class ConnectedAccountService {
             img: makeBlockie(name),
             accountActive: accStatus,
           },
-          statusName: PairStatus.Processing,
+          statusName: ConnectedAccountsPairStatus.Processing,
           statusMessage: 'Processing',
           closeness: 1,
           pendingRequestId,
@@ -185,9 +152,8 @@ export default class ConnectedAccountService {
       const pendingRequestsIds: number[] = await this.getPendingRequests()
       if (pendingRequestsIds && pendingRequestsIds.length > 0) {
         for (const pendingRequestId of pendingRequestsIds) {
-          const verificationRequest: TVerificationRequest = await this.getVerificationRequest(
-            pendingRequestId
-          )
+          const verificationRequest: TConnectedAccountsVerificationRequest =
+            await this.getVerificationRequest(pendingRequestId)
           const { firstAccount, secondAccount } = verificationRequest
           if (firstAccount === globalId) {
             await addPendingPair(secondAccount, pendingRequestId)
@@ -198,7 +164,7 @@ export default class ConnectedAccountService {
       }
 
       // *** CONNECTED ***
-      const connectedAccounts: TAccount[][] = await this.getConnectedAccounts(
+      const connectedAccounts: TConnectedAccount[][] = await this.getConnectedAccounts(
         d.account,
         d.chain,
         null
@@ -215,7 +181,7 @@ export default class ConnectedAccountService {
               img: makeBlockie(caName),
               accountActive: ca.status.isMain,
             },
-            statusName: PairStatus.Connected,
+            statusName: ConnectedAccountsPairStatus.Connected,
             statusMessage: 'Connected',
             closeness: i + 1,
           })
@@ -226,17 +192,17 @@ export default class ConnectedAccountService {
     // *** REJECTED ***
     if (prevPairs) {
       const prevPendingPairs = prevPairs.filter(
-        (pair) => pair.statusName && pair.statusName === PairStatus.Processing
+        (pair) => pair.statusName && pair.statusName === ConnectedAccountsPairStatus.Processing
       )
       const resolvedPairs = prevPendingPairs.filter(
         (prevPair) => !newPendingIds.includes(prevPair.pendingRequestId!)
       )
       if (resolvedPairs.length !== 0) {
         for (const resolvedPair of resolvedPairs) {
-          const requestStatus: RequestStatus = await this.getRequestStatus(
+          const requestStatus: ConnectedAccountsRequestStatus = await this.getRequestStatus(
             resolvedPair.pendingRequestId!
           )
-          if (requestStatus !== RequestStatus.Rejected) continue
+          if (requestStatus !== ConnectedAccountsRequestStatus.Rejected) continue
 
           const newPairsLengthBeforeFilter = newPairs.length
           newPairs = newPairs.filter(
@@ -257,7 +223,7 @@ export default class ConnectedAccountService {
           newPairs.unshift({
             firstAccount: resolvedPair.firstAccount,
             secondAccount: resolvedPair.secondAccount,
-            statusName: PairStatus.Error,
+            statusName: ConnectedAccountsPairStatus.Error,
             statusMessage:
               newPairsLengthBeforeFilter === newPairs.length
                 ? 'Connection rejected'

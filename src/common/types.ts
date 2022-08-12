@@ -102,3 +102,50 @@ export enum UrlAvailability {
   NETWORK_ERROR = 'NETWORK_ERROR',
   SERVER_ERROR = 'SERVER_ERROR',
 }
+
+export type TConnectedAccountsVerificationRequest = {
+  firstAccount: string
+  secondAccount: string
+  isUnlink: boolean
+  firstProofUrl: string
+  secondProofUrl: string
+  transactionSender: string
+}
+
+export type TConnectedAccountStatus = {
+  isMain: boolean
+}
+
+export type TConnectedAccount = {
+  id: string
+  status: TConnectedAccountStatus
+}
+
+export enum ConnectedAccountsRequestStatus {
+  NotFound = 'not found',
+  Pending = 'pending',
+  Approved = 'approved',
+  Rejected = 'rejected',
+}
+
+export enum ConnectedAccountsPairStatus {
+  Processing = 'Processing',
+  Connected = 'Connected',
+  Error = 'Error',
+}
+
+export interface IConnectedAccountUser {
+  img: string
+  name: string
+  origin: string
+  accountActive: boolean
+}
+
+export interface IConnectedAccountsPair {
+  firstAccount: IConnectedAccountUser
+  secondAccount: IConnectedAccountUser
+  statusName: ConnectedAccountsPairStatus
+  statusMessage: string
+  closeness: number
+  pendingRequestId?: number
+}

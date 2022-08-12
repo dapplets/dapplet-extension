@@ -2,11 +2,11 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { IUser } from '../../../contentscript/overlay/root/pages/ConnectedAccount/types'
+import { IConnectedAccountUser } from '../../../common/types'
 import styles from './ConnectedAccountsModal.module.scss'
 import { Modal } from './modal'
 
-const UserButton = ({ user }: { user: IUser }) => {
+const UserButton = ({ user }: { user: IConnectedAccountUser }) => {
   return (
     <div
       className={cn(styles.account, {
@@ -26,8 +26,8 @@ const ConnectedAccountsModal = (props: any) => {
   const [isWaiting, setIsWaiting] = useState(false)
 
   const handleConnectOrDisconnect = async (
-    firstAccount: IUser,
-    secondAccount: IUser,
+    firstAccount: IConnectedAccountUser,
+    secondAccount: IConnectedAccountUser,
     isUnlink: boolean
   ) => {
     const { getConnectedAccountsMinStakeAmount, requestConnectingAccountsVerification } =
@@ -63,7 +63,7 @@ const ConnectedAccountsModal = (props: any) => {
     onCloseClick()
   }
 
-  const handleSetMainAccount = async (account: IUser) => {
+  const handleSetMainAccount = async (account: IConnectedAccountUser) => {
     const { changeConnectedAccountStatus } = await initBGFunctions(browser)
 
     try {
