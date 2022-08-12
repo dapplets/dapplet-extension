@@ -1,4 +1,3 @@
-import { ConnectedWalletAccount } from 'near-api-js'
 import { IConnection, Listener } from './contentscript/connection'
 import Core, { IEthWallet, INearWallet } from './contentscript/core'
 import { IEtherneumWallet } from './contentscript/ethereum/types'
@@ -20,5 +19,4 @@ export {
   IEthWallet,
   INearWallet,
   IEtherneumWallet,
-  ConnectedWalletAccount,
 }

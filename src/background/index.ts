@@ -13,6 +13,7 @@ import {
   waitTab,
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
+import ConnectedAccountService from './services/connectedAccountService'
 import DiscordService from './services/discordService'
 import EnsService from './services/ensService'
 import * as EventService from './services/eventService'
@@ -42,6 +43,7 @@ const sessionService = new SessionService(walletService, overlayService)
 const featureService = new FeatureService(globalConfigService, walletService, overlayService)
 const identityService = new IdentityService(globalConfigService, walletService)
 const ensService = new EnsService(walletService)
+const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
 
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
@@ -259,6 +261,27 @@ browser.runtime.onMessage.addListener(
     openDappletHome: overlayService.openDappletHome.bind(overlayService),
     openDappletAction: overlayService.openDappletAction.bind(overlayService),
     openPopupOverlay: overlayService.openPopupOverlay.bind(overlayService),
+    openConnectedAccountsPopup: overlayService.openConnectedAccountsPopup.bind(overlayService),
+
+    // Connected Account Service
+    getConnectedAccounts:
+      connectedAccountService.getConnectedAccounts.bind(connectedAccountService),
+    getConnectedAccountsMinStakeAmount:
+      connectedAccountService.getMinStakeAmount.bind(connectedAccountService),
+    getConnectedAccountsPendingRequests:
+      connectedAccountService.getPendingRequests.bind(connectedAccountService),
+    getConnectedAccountsVerificationRequest:
+      connectedAccountService.getVerificationRequest.bind(connectedAccountService),
+    getConnectedAccountStatus: connectedAccountService.getStatus.bind(connectedAccountService),
+    getConnectedAccountsMainAccount:
+      connectedAccountService.getMainAccount.bind(connectedAccountService),
+    getConnectedAccountsRequestStatus:
+      connectedAccountService.getRequestStatus.bind(connectedAccountService),
+    requestConnectingAccountsVerification:
+      connectedAccountService.requestVerification.bind(connectedAccountService),
+    changeConnectedAccountStatus:
+      connectedAccountService.changeStatus.bind(connectedAccountService),
+    getConnectedAccountsPairs: connectedAccountService.getPairs.bind(connectedAccountService),
 
     // Helpers
     waitTab: (url) => waitTab(url),

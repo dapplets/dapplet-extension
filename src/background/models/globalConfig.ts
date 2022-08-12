@@ -74,4 +74,6 @@ export class GlobalConfig extends Base {
   nearNetworks: NearNetworkConfig[] = []
 
   myDapplets: { registryUrl: string; name: string }[] = []
+
+  connectedAccountsContractAddress: string = null
 }
