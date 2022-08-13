@@ -3,6 +3,15 @@ import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { isValidUrl } from '../../../../../popup/helpers'
+import {
+  regExpIndexENS,
+  regExpIndexEthereum,
+  regExpIndexNear,
+  regExpIndexNEARDev,
+  regExpIndexNEARImplicit,
+  regExpIndexNearTestnet,
+} from '../../common/constans'
+import { getValidationAddress } from '../../common/helpers'
 import styles from './DropdownRegistery.module.scss'
 
 export interface DropdownRegisteryProps
@@ -15,13 +24,6 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
   const [registryInputError, setRegistryInputError] = useState(null)
   const [registries, setRegistries] = useState([])
 
-  const regExpIndexNearTestnet = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/)
-  const regExpIndexNear = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/)
-  const regExpIndexENS = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/)
-  const regExpIndexEthereum = new RegExp(/^0x[a-fA-F0-9]{40}$/)
-  const regExpIndexNEARImplicit = new RegExp(/^[0-9a-z]{64}$/)
-  const regExpIndexNEARDev = new RegExp(/^dev-\d*-\d*$/)
-
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -32,13 +34,6 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
       _isMounted = false
     }
   }, [])
-  const getNumIndex = (value, reg) => {
-    try {
-      let valueReg = value.match(reg)
-
-      return valueReg
-    } catch {}
-  }
 
   const loadRegistries = async () => {
     const { getRegistries } = await initBGFunctions(browser)
@@ -46,14 +41,14 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
 
     setRegistries(registries.filter((r) => r.isDev === false))
   }
-  const addRegistry = async (url: string, x: () => void) => {
+  const addRegistry = async (url: string, addedFunction: () => void) => {
     const { addRegistry } = await initBGFunctions(browser)
-    const valueParse = getNumIndex(registryInput, regExpIndexEthereum)
-    const valueParseNEARImplicit = getNumIndex(registryInput, regExpIndexNEARImplicit)
-    const valueParseNEARDev = getNumIndex(registryInput, regExpIndexNEARDev)
-    const valueParseENS = getNumIndex(registryInput, regExpIndexENS)
-    const valueParseNear = getNumIndex(registryInput, regExpIndexNear)
-    const valueParseNearTestnet = getNumIndex(registryInput, regExpIndexNearTestnet)
+    const valueParse = getValidationAddress(registryInput, regExpIndexEthereum)
+    const valueParseNEARImplicit = getValidationAddress(registryInput, regExpIndexNEARImplicit)
+    const valueParseNEARDev = getValidationAddress(registryInput, regExpIndexNEARDev)
+    const valueParseENS = getValidationAddress(registryInput, regExpIndexENS)
+    const valueParseNear = getValidationAddress(registryInput, regExpIndexNear)
+    const valueParseNearTestnet = getValidationAddress(registryInput, regExpIndexNearTestnet)
     if (
       valueParse !== null ||
       valueParseNEARImplicit !== null ||
@@ -71,7 +66,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
       }
 
       loadRegistries()
-      x()
+      addedFunction()
     } else {
       setRegistryInputError('Enter valid Registry')
     }

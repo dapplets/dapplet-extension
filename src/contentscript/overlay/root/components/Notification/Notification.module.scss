@@ -87,8 +87,14 @@
 
 .description {
   display: inline-block;
+  overflow: hidden;
+
+  width: 90%;
 
   margin-top: 8px;
+
+  // 
+  text-overflow: ellipsis;
 
   color: $MainBlack;
 

@@ -17,7 +17,7 @@ export const ModuleIcon: React.FC<ModuleIconProps> = (props) => {
   const [storageRef, setStorageRef] = useState<StorageRef>(null)
 
   useEffect(() => {
-    ;(async () => {
+    !(async () => {
       const { getModuleInfoByName } = await initBGFunctions(browser)
       const mi = await getModuleInfoByName(registryUrl, moduleName)
       setStorageRef(mi?.icon)

@@ -36,8 +36,6 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
     setSelectedWallet,
   } = props
 
-  const [isModalWalletConnectProfile, setModalWalletConnectProfile] = useState(false)
-
   const [newProfile, setNewProfile] = useState([])
   useEffect(() => {
     const init = async () => {
@@ -63,7 +61,6 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
             isMini={isMini}
             setOpen={setOpenWallet}
             isOpen={isOpenWallet}
-            setModalWalletConnect={setModalWalletConnectProfile}
             newProfile={newProfile}
             isOverlay={isOverlay}
             setOpenWalletMini={setOpenWalletMini}

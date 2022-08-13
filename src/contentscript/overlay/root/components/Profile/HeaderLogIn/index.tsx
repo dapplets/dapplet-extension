@@ -24,7 +24,6 @@ export interface HeaderLogInProps {
   isMini: boolean
   setOpen: () => void
   isOpen: boolean
-  setModalWalletConnect: (x: boolean) => void
   newProfile: any
   isOverlay: boolean
   setOpenWalletMini: () => void
@@ -141,10 +140,6 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     }
   }
 
-  const filteredProfile = useMemo(() => {
-    return newProfile
-  }, [newProfile])
-
   const disconnectButtonClick = async (chain: ChainTypes, wallet: WalletTypes) => {
     const { disconnectWallet } = await initBGFunctions(browser)
     await disconnectWallet(chain, wallet)
@@ -170,7 +165,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       await refresh()
     }
   }
-  const x = useMemo(() => {
+  const animation = useMemo(() => {
     const animeRef = anime({
       targets: liRef.current,
       scale: () => {

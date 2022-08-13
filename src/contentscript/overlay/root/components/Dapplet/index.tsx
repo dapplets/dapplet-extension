@@ -24,7 +24,7 @@ export interface DappletProps
   index?: any
   onSwitchChange: Function
   onSettingsModule: Function
-  onOpenDappletAction: Function
+  onOpenDappletAction: any
   onRemoveMyDapplet?: Function
   onDeployDapplet: Function
   onOpenStore: Function
@@ -99,9 +99,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                   icon={HomeIcon}
                   className={styles.squareButton}
                   title="Home"
-                  onClick={() => {
-                    onOpenDappletAction(dapplet)
-                  }}
+                  onClick={() => onOpenDappletAction(dapplet)}
                 />
               </div>
             ) : null}
@@ -113,9 +111,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                   icon={SettingsIcon}
                   className={styles.squareButton}
                   title="Settings"
-                  onClick={() => {
-                    onSettingsModule(dapplet)
-                  }}
+                  onClick={() => onSettingsModule(dapplet)}
                 />
               </div>
             )}
@@ -126,9 +122,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 icon={SearchIcon}
                 className={styles.squareButton}
                 title="Dapplet in the Store"
-                onClick={() => {
-                  onOpenStore(dapplet)
-                }}
+                onClick={() => onOpenStore(dapplet)}
               />
             </div>
 

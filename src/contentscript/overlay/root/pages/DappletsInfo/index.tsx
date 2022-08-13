@@ -99,7 +99,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     editAdmin,
     // contextId, admins
   ])
-  const getNumIndex = (value, reg) => {
+  const getValidationAddress = (value, reg) => {
     try {
       const valueReg = value.match(reg)
 
@@ -267,7 +267,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setEditAdminsLoading(true)
     setAddAdminDisabled(true)
     const validValue = containsValue(admins, address)
-    const valueParse = getNumIndex(address, regExpIndexEthereum)
+    const valueParse = getValidationAddress(address, regExpIndexEthereum)
     if (validValue || valueParse === null) {
       setDisabledAddAdmin(true)
       setEditAdminsLoading(false)
