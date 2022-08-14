@@ -2,13 +2,13 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import ModuleInfo from '../../../../../background/models/moduleInfo'
-import VersionInfo from '../../../../../background/models/versionInfo'
-import { groupBy } from '../../../../../common/helpers'
-import { isValidUrl } from '../../../../../popup/helpers'
-import { DevModule } from '../../components/DevModulesList'
-import { Localhost } from '../../components/Localhost'
-import { Registry } from '../../components/Registry'
+import ModuleInfo from '../../../../../../background/models/moduleInfo'
+import VersionInfo from '../../../../../../background/models/versionInfo'
+import { groupBy } from '../../../../../../common/helpers'
+import { isValidUrl } from '../../../../../../popup/helpers'
+import { DevModule } from '../../../components/DevModulesList'
+import { Localhost } from '../../../components/Localhost'
+import { Registry } from '../../../components/Registry'
 import styles from './Developer.module.scss'
 
 export interface DeveloperProps {
@@ -154,7 +154,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const handleClear = () => {
     setRegistryInput('')
   }
-  // const x = useMemo(() => {}, [connectedDescriptors, selectedWallet])
 
   return (
     <div className={styles.wrapper}>

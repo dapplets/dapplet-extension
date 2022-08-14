@@ -2,22 +2,20 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { StorageTypes } from '../../../../../common/constants'
-import { isValidPostageStampId } from '../../../../../popup/helpers'
-import { Checkbox } from '../../components/Checkbox'
-import { DropdownPreferedOverlayStorage } from '../../components/DropdownPreferedOverlayStorage'
+import { StorageTypes } from '../../../../../../common/constants'
+import { isValidPostageStampId } from '../../../../../../popup/helpers'
+import { Checkbox } from '../../../components/Checkbox'
+import { DropdownPreferedOverlayStorage } from '../../../components/DropdownPreferedOverlayStorage'
 
-import { DropdownRegistry } from '../../components/DropdownRegistry'
-import { DropdownTrustedUsers } from '../../components/DropdownTrustedUsers'
-import { InputPanelSettings } from '../../components/InputPanelSettings'
-import { SettingItem } from '../../components/SettingItem'
-import { SettingWrapper } from '../../components/SettingWrapper'
-import { Switch } from '../../components/Switch'
-import { getDefaultValueProvider } from '../../utils/getDefaultValue'
+import { DropdownRegistry } from '../../../components/DropdownRegistry'
+import { DropdownTrustedUsers } from '../../../components/DropdownTrustedUsers'
+import { InputPanelSettings } from '../../../components/InputPanelSettings'
+import { SettingItem } from '../../../components/SettingItem'
+import { SettingWrapper } from '../../../components/SettingWrapper'
+import { Switch } from '../../../components/Switch'
+import { getDefaultValueProvider } from '../../../utils/getDefaultValue'
 
 import styles from './Settings.module.scss'
-
-export const DROPDOWN_LIST = [{ _id: '0', label: 'Custom' }]
 
 export interface SettingsListProps {
   devModeProps: boolean

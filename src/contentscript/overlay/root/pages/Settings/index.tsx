@@ -4,9 +4,9 @@ import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
 import { DappletsMainInfo } from '../DappletsInfo'
 import { UnderConstructionInfo } from '../UnderConstructionInfo'
-import { Developer } from './Developer'
-import { SettingsList } from './Settings'
-import styles from './Settings.module.scss'
+import { Developer } from './Developer/Developer'
+import { SettingsList } from './Settings/Settings'
+import styles from './Settings/Settings.module.scss'
 
 enum SettingsTabs {
   // MAIN = 0,
