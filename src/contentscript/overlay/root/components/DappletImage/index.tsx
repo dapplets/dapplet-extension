@@ -1,9 +1,8 @@
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { FC, useEffect, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import React, { FC } from 'react'
 import { StorageRef } from '../../../../../background/registries/registry'
 import NO_LOGO from '../../../../../common/resources/no-logo.png'
+import { useStorageRef } from '../../utils/useStorageRef'
 import styles from './DappletImage.module.scss'
 
 export interface DappletImageProps {
@@ -37,29 +36,4 @@ export const DappletImage: FC<DappletImageProps> = (props: DappletImageProps) =>
       </div>
     </div>
   )
-}
-
-const useStorageRef = (storageRef: StorageRef) => {
-  const [img, setImg] = useState<string>('')
-  const _isMounted = useRef(true)
-  useEffect(() => {
-    const init = async () => {
-      if (_isMounted.current) {
-        try {
-          const { getResource } = await initBGFunctions(browser)
-          const base64 = await getResource(storageRef)
-          const dataUri = 'data:text/plain;base64,' + base64
-          setImg(dataUri)
-        } catch (error) {
-          setImg(NO_LOGO)
-        }
-      }
-    }
-    init()
-    return () => {
-      _isMounted.current = false
-    }
-  }, [])
-
-  return { img }
 }

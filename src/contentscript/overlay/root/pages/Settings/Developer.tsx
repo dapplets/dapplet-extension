@@ -8,7 +8,7 @@ import { groupBy } from '../../../../../common/helpers'
 import { isValidUrl } from '../../../../../popup/helpers'
 import { DevModule } from '../../components/DevModulesList'
 import { Localhost } from '../../components/Localhost'
-import { Registry } from '../../components/Registery'
+import { Registry } from '../../components/Registry'
 import styles from './Developer.module.scss'
 
 export interface DeveloperProps {
@@ -17,8 +17,8 @@ export interface DeveloperProps {
   setModuleVersion: any
   setUnderConstruction: (x) => void
   setUnderConstructionDetails: (x) => void
-  isShowChildrenRegistery: boolean
-  setShowChildrenRegistery: (x) => void
+  isShowChildrenRegistry: boolean
+  setShowChildrenRegistry: (x) => void
 
   isLoadingDeploy: boolean
   setLoadingDeploy: () => void
@@ -46,8 +46,8 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     setModuleVersion,
     setUnderConstruction,
     setUnderConstructionDetails,
-    isShowChildrenRegistery,
-    setShowChildrenRegistery,
+    isShowChildrenRegistry,
+    setShowChildrenRegistry,
     isLoadingDeploy,
     setLoadingDeploy,
     setLoadingDeployFinally,
@@ -265,8 +265,8 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                     <Registry
                       key={registryUrl}
                       label={registryUrl}
-                      isShowChildrenRegistery={isShowChildrenRegistery}
-                      setShowChildrenRegistery={setShowChildrenRegistery}
+                      isShowChildrenRegistry={isShowChildrenRegistry}
+                      setShowChildrenRegistry={setShowChildrenRegistry}
                       children={modules.map((x, i) => (
                         <div key={i} className={styles.modules}>
                           <DevModule

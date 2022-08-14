@@ -1,8 +1,8 @@
 import cn from 'classnames'
 import React, { ReactElement } from 'react'
 import { StorageRef } from '../../../../../background/registries/registry'
+import { StorageRefImage } from '../../components/StorageRefImage'
 import { ToolbarTabMenu } from '../../types'
-import { StorageRefImage } from '../DevModulesList'
 import { ModuleIcon, ModuleIconProps } from '../ModuleIcon'
 import styles from './OverlayTab.module.scss'
 

@@ -65,7 +65,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
 
   const [isTokenomics, setTokenomics] = useState(false)
   const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] = useState(false)
-  const [isShowChildrenRegistery, setShowChildrenRegistery] = useState(false)
+  const [isShowChildrenRegistry, setShowChildrenRegistry] = useState(false)
   const _isMounted = useRef(true)
   useEffect(() => {
     const init = async () => {
@@ -153,8 +153,8 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                 isLoadingDeploy={isLoadingDeploy}
                 setLoadingDeploy={setLoadingDeploy}
                 setLoadingDeployFinally={setLoadingDeployFinally}
-                isShowChildrenRegistery={isShowChildrenRegistery}
-                setShowChildrenRegistery={setShowChildrenRegistery}
+                isShowChildrenRegistry={isShowChildrenRegistry}
+                setShowChildrenRegistry={setShowChildrenRegistry}
                 setModuleVersion={setModuleVersion}
                 setModuleInfo={setModuleInfo}
                 setDappletsDetail={setDappletsDetail}
@@ -180,7 +180,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                 ModuleInfo={ModuleInfo}
                 ModuleVersion={ModuleVersion}
                 setDappletsDetail={setDappletsDetail}
-                setShowChildrenRegistery={setShowChildrenRegistery}
+                setShowChildrenRegistry={setShowChildrenRegistry}
               />
             )}
           </div>

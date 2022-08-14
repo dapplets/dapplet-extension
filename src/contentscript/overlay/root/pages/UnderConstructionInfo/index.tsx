@@ -7,10 +7,11 @@ import VersionInfo from '../../../../../background/models/versionInfo'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { StorageRefImage } from '../../components/DevModulesList'
+
 import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
+import { StorageRefImage } from '../../components/StorageRefImage'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
 

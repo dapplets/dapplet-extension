@@ -4,16 +4,9 @@ import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } fro
 import { browser } from 'webextension-polyfill-ts'
 import { typeOfUri, UriTypes } from '../../../../../common/helpers'
 import { isValidUrl } from '../../../../../popup/helpers'
-import {
-  regExpIndexENS,
-  regExpIndexEthereum,
-  regExpIndexNear,
-  regExpIndexNEARDev,
-  regExpIndexNEARImplicit,
-  regExpIndexNearTestnet,
-} from '../../common/constans'
-import { getValidationAddress } from '../../common/helpers'
+
 import { IDropdown } from '../../models/dropdown.model'
+import { addSettingsValueDropdown } from '../../utils/addSettingsValueDropdown'
 import styles from './DropdownTrustedUsers.module.scss'
 
 export interface DropdownTrustedProps
@@ -47,36 +40,6 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
       _isMounted = false
     }
   }, [trustedUserInput])
-
-  const addTrustedUser = async (account: string, addedFunction: () => void) => {
-    const { addTrustedUser } = await initBGFunctions(browser)
-    const valueParse = getValidationAddress(trustedUserInput, regExpIndexEthereum)
-    const valueParseNEARImplicit = getValidationAddress(trustedUserInput, regExpIndexNEARImplicit)
-    const valueParseNEARDev = getValidationAddress(trustedUserInput, regExpIndexNEARDev)
-    const valueParseENS = getValidationAddress(trustedUserInput, regExpIndexENS)
-    const valueParseNear = getValidationAddress(trustedUserInput, regExpIndexNear)
-    const valueParseNearTestnet = getValidationAddress(trustedUserInput, regExpIndexNearTestnet)
-    if (
-      valueParse !== null ||
-      valueParseNEARImplicit !== null ||
-      valueParseNEARDev !== null ||
-      valueParseENS !== null ||
-      valueParseNear !== null ||
-      valueParseNearTestnet !== null
-    ) {
-      try {
-        await addTrustedUser(account)
-        setTrustedUserInput(trustedUserInput)
-      } catch (err) {
-        setTrustedUserInputError(err.message)
-      }
-
-      loadTrustedUsers()
-      addedFunction()
-    } else {
-      setTrustedUserInputError('Enter valid Trusted User')
-    }
-  }
 
   const removeTrustedUser = async (account: string) => {
     const { removeTrustedUser } = await initBGFunctions(browser)
@@ -137,7 +100,15 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
             onSubmit={(e) => {
               e.preventDefault()
 
-              addTrustedUser(trustedUserInput, handleClear)
+              addSettingsValueDropdown(
+                trustedUserInput,
+                'trustedUser',
+                trustedUserInput,
+                setTrustedUserInputError,
+                setTrustedUserInput,
+                loadTrustedUsers,
+                handleClear
+              )
             }}
           >
             <input

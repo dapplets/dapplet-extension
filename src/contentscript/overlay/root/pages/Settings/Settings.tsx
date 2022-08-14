@@ -6,7 +6,8 @@ import { StorageTypes } from '../../../../../common/constants'
 import { isValidPostageStampId } from '../../../../../popup/helpers'
 import { Checkbox } from '../../components/Checkbox'
 import { DropdownPreferedOverlayStorage } from '../../components/DropdownPreferedOverlayStorage'
-import { DropdownRegistery } from '../../components/DropdownRegistery'
+
+import { DropdownRegistry } from '../../components/DropdownRegistry'
 import { DropdownTrustedUsers } from '../../components/DropdownTrustedUsers'
 import { InputPanelSettings } from '../../components/InputPanelSettings'
 import { SettingItem } from '../../components/SettingItem'
@@ -447,7 +448,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
           title="Parameters"
           children={
             <>
-              <SettingItem title="Registries" component={<></>} children={<DropdownRegistery />} />
+              <SettingItem title="Registries" component={<></>} children={<DropdownRegistry />} />
               <SettingItem
                 title="Dynamic Adapter"
                 component={<></>}

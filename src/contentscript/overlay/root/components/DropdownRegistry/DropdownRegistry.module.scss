@@ -1,6 +1,7 @@
 @import "../../assets/styles/null.scss";
 @import "../../assets/styles/fonts.scss";
 @import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/animate.scss";
 
 .wrapper {
   position: relative;
@@ -76,34 +77,6 @@
   background-position: center;
 }
 
-@keyframes rotateIsOpen {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  50% {
-    transform: rotate(90deg);
-  }
-
-  100% {
-    transform: rotate(180deg);
-  }
-}
-
-@keyframes rotateIsClose {
-  0% {
-    transform: rotate(180deg);
-  }
-
-  50% {
-    transform: rotate(90deg);
-  }
-
-  100% {
-    transform: rotate(0deg);
-  }
-}
-
 .delimiterSpan {
   display: flex;
   justify-content: flex-start;
@@ -136,20 +109,6 @@
 
   div:last-child {
     border-radius: 0 0 10px 10px;
-  }
-}
-
-@keyframes listVisible {
-  0% {
-    opacity: 0;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
-
-  100% {
-    opacity: 1;
   }
 }
 
@@ -203,96 +162,6 @@
   font-weight: 400;
 
   animation-fill-mode: forwards;
-}
-
-@keyframes openError {
-  0% {
-    margin: 0;
-    padding: 0;
-
-    opacity: 0;
-
-    font-size: 2px;
-
-    line-height: 0%;
-  }
-
-  3% {
-    margin: 0 0 -5px;
-    padding: 2.5px 7.5px;
-
-    opacity: 0;
-
-    font-size: 7px;
-    line-height: 20%;
-  }
-
-  7% {
-    margin: 0 0 -10px;
-    padding: 5px 13px;
-
-    opacity: 0;
-  }
-
-  10% {
-    margin: 0 0 -10px;
-    padding: 5px 13px;
-
-    opacity: 1;
-
-    font-size: 14px;
-    line-height: 100%;
-  }
-
-  85% {
-    margin: 0 0 -10px;
-    padding: 5px 13px;
-
-    opacity: 1;
-
-    font-size: 14px;
-    line-height: 100%;
-  }
-
-  87% {
-    margin: 0 0 -7.5px;
-    padding: 4px 7.5px;
-
-    opacity: 0;
-
-    font-size: 12px;
-    line-height: 50%;
-  }
-
-  90% {
-    margin: 0 0 -5px;
-    padding: 2.5px 7.5px;
-
-    opacity: 0;
-
-    font-size: 7px;
-    line-height: 20%;
-  }
-
-  95% {
-    margin: 0 0 -2.5px;
-    padding: 1.5px 5px;
-
-    opacity: 0;
-
-    font-size: 2px;
-    line-height: 0%;
-  }
-
-  100% {
-    margin: 0;
-    padding: 0;
-
-    opacity: 0;
-
-    font-size: 0;
-    line-height: 0%;
-  }
 }
 
 .inputBlockandError {

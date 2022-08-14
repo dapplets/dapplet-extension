@@ -6,23 +6,23 @@ import ModuleInfo from '../../../../../background/models/moduleInfo'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { StorageRefImage } from '../../components/DevModulesList'
 import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
+import { StorageRefImage } from '../../components/StorageRefImage'
 import styles from './DappletsInfo.module.scss'
 
 export interface DappletsMainInfoProps {
   setDappletsDetail: (x) => void
   ModuleInfo: any
   ModuleVersion: any
-  setShowChildrenRegistery: (x) => void
+  setShowChildrenRegistry: (x) => void
 }
 
 let _isMounted = false
 
 export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
-  const { setDappletsDetail, ModuleInfo, ModuleVersion, setShowChildrenRegistery } = props
+  const { setDappletsDetail, ModuleInfo, ModuleVersion, setShowChildrenRegistry } = props
   const [originalMi, setOriginalMi] = useState(null)
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
   // const [vi, setVi] = useState<VersionInfo>(ModuleVersion)
@@ -686,7 +686,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
         <button
           onClick={() => {
             setDappletsDetail(false)
-            setShowChildrenRegistery(true)
+            setShowChildrenRegistry(true)
           }}
           className={styles.back}
         >
@@ -711,7 +711,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
             <button
               onClick={() => {
                 setDappletsDetail(false)
-                setShowChildrenRegistery(true)
+                setShowChildrenRegistry(true)
               }}
               className={styles.modalDefaultContentButton}
             >
@@ -722,7 +722,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
         footer={''}
         onClose={() => {
           setDappletsDetail(false)
-          setShowChildrenRegistery(true)
+          setShowChildrenRegistry(true)
         }}
       />
       <Modal
