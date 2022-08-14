@@ -3,8 +3,6 @@ import { HeaderLogIn } from './HeaderLogIn'
 import { LogInButton } from './LoginButtons'
 
 export interface ProfileProps {
-  avatar?: string
-  hash?: string
   handleWalletConnect: () => void
   isWalletLength: boolean
   handleWalletLengthConnect: () => void
@@ -22,8 +20,6 @@ export interface ProfileProps {
 let _isMounted = false
 export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
   const {
-    avatar,
-    hash,
     handleWalletConnect,
     isWalletLength,
     isOverlay,
