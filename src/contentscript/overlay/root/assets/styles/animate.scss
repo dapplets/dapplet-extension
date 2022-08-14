@@ -173,3 +173,56 @@
     transform: translateX(150%);
   }
 }
+
+@keyframes slideRightSearch {
+  0% {
+    position: relative;
+    right: -70%;
+
+    width: 0%;
+  }
+
+  70% {
+    right: 10%;
+
+    width: 105%;
+  }
+
+  100% {
+    right: 0;
+
+    width: 100%;
+  }
+}
+
+@keyframes slideLeftSearch {
+  0% {
+    right: 0;
+
+    width: 100%;
+  }
+
+  90% {
+    opacity: 0;
+  }
+
+  100% {
+    right: -80%;
+
+    width: 0;
+  }
+}
+
+@keyframes slideRightClose {
+  0% {
+    right: 12%;
+  }
+
+  70% {
+    right: 17%;
+  }
+
+  100% {
+    right: 12%;
+  }
+}
