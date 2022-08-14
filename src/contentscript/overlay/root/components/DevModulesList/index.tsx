@@ -531,6 +531,18 @@ export const DevModule: FC<PropsDevModule> = (props) => {
               ${currentAccount}. If everything is correct, click OK. Or connect another
               wallet.`}
             </p>
+            <p className={styles.modalDefaultTitleAttension}>Attention!</p>
+            <p className={styles.modalDefaultContentText}>
+              A dapplet’s ownership is represented through an NFT.
+            </p>
+            <p className={styles.modalDefaultContentText}>
+              When the dapplet is made this NFT will automatically be created and sent to your
+              ETH-account.
+            </p>
+            <p className={styles.modalDefaultContentText}>
+              You will be able to change the dapplet owner by transferring this NFT or by selling it
+              at a marketplace.
+            </p>
 
             <button
               onClick={async () => {

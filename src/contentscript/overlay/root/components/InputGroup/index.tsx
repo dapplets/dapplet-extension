@@ -15,6 +15,14 @@ export interface InputGroupProps {
   visibleArray: any
   setVisibleArray: any
   title: any
+  setEditLoading: any
+  parameters: any
+  setAddDisabled: any
+  containsValue: any
+  setDisabledAdd: any
+  targetRegistry: any
+  mi: any
+  getParameters
 }
 export const InputGroup: FC<InputGroupProps> = (props: InputGroupProps) => {
   const {
@@ -31,6 +39,14 @@ export const InputGroup: FC<InputGroupProps> = (props: InputGroupProps) => {
     editInput,
     setEditInput,
     title,
+    setEditLoading,
+    parameters,
+    setAddDisabled,
+    containsValue,
+    setDisabledAdd,
+    targetRegistry,
+    mi,
+    getParameters,
   } = props
 
   return (
@@ -72,7 +88,20 @@ export const InputGroup: FC<InputGroupProps> = (props: InputGroupProps) => {
             disabled={editInput.length < 2 || addDisabled}
             onClick={() => {
               nodeBtn.current?.classList.add('valid')
-              _addItem(editInput)
+              _addItem(
+                editInput,
+                setEditLoading,
+                setAddDisabled,
+                containsValue,
+                newArray,
+                setDisabledAdd,
+                targetRegistry,
+                mi,
+                setVisibleArray,
+                nodeBtn,
+                setEditInput,
+                parameters
+              )
             }}
             className={cn(styles.addContext, {
               [styles.addContextDisabled]: nodeInput.current?.value.length < 2 || addDisabled,
@@ -95,7 +124,23 @@ export const InputGroup: FC<InputGroupProps> = (props: InputGroupProps) => {
                   value={x}
                   readOnly
                 />
-                <button onClick={() => _deleteItem(x)} className={styles.authorDelete} />
+                <button
+                  onClick={() =>
+                    _deleteItem(
+                      x,
+                      setEditLoading,
+                      setAddDisabled,
+                      targetRegistry,
+                      mi,
+                      setVisibleArray,
+                      nodeBtn,
+                      setEditInput,
+                      parameters,
+                      getParameters
+                    )
+                  }
+                  className={styles.authorDelete}
+                />
               </div>
             ))}
         </>

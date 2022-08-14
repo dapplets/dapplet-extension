@@ -6,13 +6,13 @@ import ModuleInfo from '../../../../../background/models/moduleInfo'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { regExpIndexEthereum } from '../../common/constans'
-import { getValidationAddress } from '../../common/helpers'
 import { InputGroup } from '../../components/InputGroup'
 import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
+import { _addInfoItemInputGroup } from '../../utils/addInfoInputGroup'
+import { _removeInfoItemInputGroup } from '../../utils/removeInfoInputGroup'
 import styles from './DappletsInfo.module.scss'
 
 export interface DappletsMainInfoProps {
@@ -80,20 +80,11 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     return () => {
       _isMounted = false
     }
-  }, [
-    mi,
-    newState,
-    targetChain,
-    editContextId,
-    editAdmin,
-    // admins
-  ])
+  }, [mi, newState, targetChain, editContextId, editAdmin])
 
   const _updateData = async () => {
     const { getRegistries } = await initBGFunctions(browser)
-
     const registries = await getRegistries()
-
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
@@ -124,7 +115,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       const { transferOwnership } = await initBGFunctions(browser)
       setNewOwnerLoading(true)
       await transferOwnership(targetRegistry, mi.name, newAccount, oldAccount)
-
       setNewOwnerLoading(false)
       setDappletsDetail(false)
     } catch (error) {
@@ -160,9 +150,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     try {
       const { editModuleInfo } = await initBGFunctions(browser)
       await editModuleInfo(targetRegistry, targetStorages, mi)
-
       setOriginalMi(JSON.parse(JSON.stringify(mi)))
-
       setModalTransaction(false)
       setModalPush(true)
     } catch (err) {
@@ -181,115 +169,16 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
   const onChange = (e) => {
     const files = e.target.files
-
     const filesArr = Array.prototype.slice.call(files)
-
     setNewState([...filesArr])
-  }
-
-  const onDeleteContextId = async (context) => {
-    setEditContextIdLoading(true)
-    setAddDisabled(true)
-    try {
-      const { removeContextId } = await initBGFunctions(browser)
-      await removeContextId(targetRegistry, mi.name, context)
-
-      setEditContextId('')
-      await getContextId()
-    } catch (error) {
-    } finally {
-      setAddDisabled(false)
-      nodeBtn.current?.classList.remove('valid')
-      setEditContextIdLoading(false)
-      setVisible(true)
-    }
-  }
-
-  const _addContextId = async (newContextId: string) => {
-    setEditContextIdLoading(true)
-    setAddDisabled(true)
-    const validValue = containsValue(contextId, newContextId)
-    if (validValue) {
-      setDisabledAddContext(true)
-      setEditContextIdLoading(false)
-      setAddDisabled(false)
-      setTimeout(() => {
-        setDisabledAddContext(false)
-      }, 1000)
-    } else {
-      try {
-        const { addContextId } = await initBGFunctions(browser)
-        await addContextId(targetRegistry, mi.name, newContextId)
-
-        setVisible(true)
-        setEditContextIdLoading(false)
-        setAddDisabled(false)
-        nodeBtn.current?.classList.remove('valid')
-        setEditContextId('')
-      } catch (error) {
-        setVisible(false)
-        setEditContextIdLoading(false)
-        setAddDisabled(false)
-        nodeBtn.current?.classList.remove('valid')
-      }
-    }
-  }
-
-  const _addAdmin = async (address: string) => {
-    setEditAdminsLoading(true)
-    setAddAdminDisabled(true)
-    const validValue = containsValue(admins, address)
-    const valueParse = getValidationAddress(address, regExpIndexEthereum)
-    if (validValue || valueParse === null) {
-      setDisabledAddAdmin(true)
-      setEditAdminsLoading(false)
-      setAddAdminDisabled(false)
-      setTimeout(() => {
-        setDisabledAddAdmin(false)
-      }, 1000)
-    } else {
-      try {
-        const { addAdmin } = await initBGFunctions(browser)
-        await addAdmin(targetRegistry, mi.name, address)
-
-        setVisibleAdmins(true)
-        setEditAdminsLoading(false)
-        setAddAdminDisabled(false)
-        nodeBtnAdmin.current?.classList.remove('valid')
-        setEditAdmin('')
-      } catch (error) {
-        setVisibleAdmins(false)
-        setEditAdminsLoading(false)
-        setAddAdminDisabled(false)
-        nodeBtnAdmin.current?.classList.remove('valid')
-      }
-    }
-  }
-  const _deleteAdmin = async (address: string) => {
-    setEditAdminsLoading(true)
-    setAddAdminDisabled(true)
-
-    try {
-      const { removeAdmin } = await initBGFunctions(browser)
-      await removeAdmin(targetRegistry, mi.name, address)
-
-      setEditAdmin('')
-      await getAdmins()
-    } catch (error) {
-    } finally {
-      setVisibleAdmins(false)
-      setEditAdminsLoading(false)
-      setAddAdminDisabled(false)
-      nodeBtnAdmin.current?.classList.remove('valid')
-    }
   }
 
   const visibleNameFile = (hash: string): string => {
     const firstFourCharacters = hash.substring(0, 6)
     const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 5)
-
     return `${firstFourCharacters}...${lastFourCharacters}`
   }
+
   const getContextId = async () => {
     const { getContextIds } = await initBGFunctions(browser)
     const newContextID = await getContextIds(targetRegistry, mi.name)
@@ -297,7 +186,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
   const getAdmins = async () => {
     const { getAdmins } = await initBGFunctions(browser)
-
     const authors = await getAdmins(targetRegistry, mi.name)
     setAdmins(authors)
   }
@@ -495,17 +383,25 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
               <InputGroup
                 title={'Admins'}
                 newArray={admins}
-                _deleteItem={_deleteAdmin}
-                _addItem={_addAdmin}
+                _deleteItem={_removeInfoItemInputGroup}
+                _addItem={_addInfoItemInputGroup}
                 nodeInput={nodeInputAdmin}
                 nodeBtn={nodeBtnAdmin}
                 isDisabledAdd={isDisabledAddAdmin}
                 addDisabled={addAdminDisabled}
+                setAddDisabled={setAddAdminDisabled}
                 editLoading={editAdminsLoading}
                 editInput={editAdmin}
                 setEditInput={setEditAdmin}
                 visibleArray={visibleAdmins}
                 setVisibleArray={setVisibleAdmins}
+                parameters={'admins'}
+                setEditLoading={setEditAdminsLoading}
+                containsValue={containsValue}
+                setDisabledAdd={setDisabledAddAdmin}
+                targetRegistry={targetRegistry}
+                mi={mi}
+                getParameters={getAdmins}
               />
             </div>
           }
@@ -519,8 +415,8 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
               <InputGroup
                 title={'Context IDs'}
                 newArray={contextId}
-                _deleteItem={onDeleteContextId}
-                _addItem={_addContextId}
+                _deleteItem={_removeInfoItemInputGroup}
+                _addItem={_addInfoItemInputGroup}
                 nodeInput={nodeInput}
                 nodeBtn={nodeBtn}
                 isDisabledAdd={isDisabledAddContext}
@@ -530,6 +426,14 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                 setEditInput={setEditContextId}
                 visibleArray={visible}
                 setVisibleArray={setVisible}
+                parameters={'contextId'}
+                setEditLoading={setEditContextIdLoading}
+                setAddDisabled={setAddDisabled}
+                containsValue={containsValue}
+                setDisabledAdd={setDisabledAddContext}
+                targetRegistry={targetRegistry}
+                mi={mi}
+                getParameters={getContextId}
               />
             </div>
           }
