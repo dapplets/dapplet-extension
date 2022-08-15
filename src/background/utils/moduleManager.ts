@@ -6,11 +6,11 @@ import { areModulesEqual } from '../../common/helpers'
 import { DefaultConfig, SchemaConfig } from '../../common/types'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
-import { StorageRef } from '../registries/registry'
 import { RegistryAggregator } from '../registries/registryAggregator'
 import { addEvent } from '../services/eventService'
 import GlobalConfigService from '../services/globalConfigService'
 import { WalletService } from '../services/walletService'
+import { StorageRef } from '../types/sowaTemplate'
 
 export default class ModuleManager {
   public registryAggregator: RegistryAggregator

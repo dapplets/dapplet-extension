@@ -23,11 +23,11 @@ export interface DappletProps
   }
   index?: any
   onSwitchChange: Function
-  onSettingsModule: Function
-  onOpenDappletAction: any
-  onRemoveMyDapplet?: Function
+  onSettingsModule: (x: any) => void
+  onOpenDappletAction: (dapplet: any) => void
+  onRemoveMyDapplet?: (x: any) => void
   onDeployDapplet: Function
-  onOpenStore: Function
+  onOpenStore: (x: any) => void
   loadShowButton: boolean
   onOpenStoreAuthor: Function
 }

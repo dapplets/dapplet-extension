@@ -7,7 +7,7 @@ import {
   regExpIndexNEARDev,
   regExpIndexNEARImplicit,
   regExpIndexNearTestnet,
-} from '../common/constans'
+} from '../common/constants'
 import { getValidationAddress } from '../common/helpers'
 export const addSettingsValueDropdown = async (
   value: string,

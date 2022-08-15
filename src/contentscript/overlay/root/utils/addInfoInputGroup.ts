@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { browser } from 'webextension-polyfill-ts'
-import { regExpIndexEthereum } from '../common/constans'
+import { regExpIndexEthereum } from '../common/constants'
 import { getValidationAddress } from '../common/helpers'
 
 export const _addInfoItemInputGroup = async (

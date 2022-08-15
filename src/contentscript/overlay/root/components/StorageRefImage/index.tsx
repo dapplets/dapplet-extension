@@ -2,7 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { StorageRef } from '../../../../../background/registries/registry'
+import { StorageRef } from '../../../../../background/types/sowaTemplate'
 import styles from './StorageRefImage.module.scss'
 
 interface PropsStorageRefImage {

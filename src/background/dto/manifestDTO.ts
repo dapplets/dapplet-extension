@@ -1,5 +1,5 @@
 import { ModuleTypes } from '../../common/constants'
-import { StorageRef } from '../registries/registry'
+import { StorageRef } from '../types/sowaTemplate'
 
 export default class ManifestDTO {
   name: string = null

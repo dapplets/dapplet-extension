@@ -322,6 +322,40 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       window.close()
     }
   }
+  const deployNewModule = async () => {
+    const { deployModule } = await initBGFunctions(browser)
+    try {
+      setLoadingDeploy()
+      nodeButton.current.classList.add('dappletsIsLoadingDeploy')
+
+      onCloseNewModule()
+      mode === FormMode.Creating
+        ? await deployModule(mi, null, targetStorages, targetRegistry)
+        : await deployModule(mi, vi, targetStorages, targetRegistry)
+
+      setDeploymentStatus(DeploymentStatus.Deployed)
+      setUpdate(true)
+    } catch (err) {
+      console.log(err)
+
+      setMessageError({
+        type: 'negative',
+        header: 'Publication error',
+        message: [err.message],
+      })
+      if (err.message) {
+        nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
+        const messageErr = err.message.toLowerCase()
+        messageErr.includes(' are not the owner of this module') ? setModalErrorOwner(true) : null
+      }
+
+      setModalError(true)
+      setNotAccountModal(false)
+    } finally {
+      setLoadingDeployFinally()
+      await _updateData()
+    }
+  }
 
   return (
     <>
@@ -544,45 +578,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
               at a marketplace.
             </p>
 
-            <button
-              onClick={async () => {
-                const { deployModule } = await initBGFunctions(browser)
-                try {
-                  setLoadingDeploy()
-                  nodeButton.current.classList.add('dappletsIsLoadingDeploy')
-
-                  onCloseNewModule()
-                  mode === FormMode.Creating
-                    ? await deployModule(mi, null, targetStorages, targetRegistry)
-                    : await deployModule(mi, vi, targetStorages, targetRegistry)
-
-                  setDeploymentStatus(DeploymentStatus.Deployed)
-                  setUpdate(true)
-                } catch (err) {
-                  console.log(err)
-
-                  setMessageError({
-                    type: 'negative',
-                    header: 'Publication error',
-                    message: [err.message],
-                  })
-                  if (err.message) {
-                    nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
-                    const messageErr = err.message.toLowerCase()
-                    messageErr.includes(' are not the owner of this module')
-                      ? setModalErrorOwner(true)
-                      : null
-                  }
-
-                  setModalError(true)
-                  setNotAccountModal(false)
-                } finally {
-                  setLoadingDeployFinally()
-                  await _updateData()
-                }
-              }}
-              className={styles.modalDefaultContentButton}
-            >
+            <button onClick={deployNewModule} className={styles.modalDefaultContentButton}>
               Ok
             </button>
           </div>

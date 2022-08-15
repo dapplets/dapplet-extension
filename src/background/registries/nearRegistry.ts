@@ -4,7 +4,8 @@ import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
 import { typeOfUri, UriTypes } from '../../common/helpers'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
-import { Registry, StorageRef } from './registry'
+import { StorageRef } from '../types/sowaTemplate'
+import { Registry } from './registry'
 
 type NearStorageRef = {
   hash: string // bytes32

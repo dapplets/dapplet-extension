@@ -12,3 +12,8 @@ export type SowaTemplate = {
     [name: string]: any
   }
 }
+
+export type StorageRef = {
+  hash: string
+  uris: string[]
+}

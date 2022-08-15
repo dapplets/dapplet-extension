@@ -1,11 +1,6 @@
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 
-export type StorageRef = {
-  hash: string
-  uris: string[]
-}
-
 export interface Registry {
   isAvailable: boolean
   error: string

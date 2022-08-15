@@ -1,7 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { StorageRef } from '../../../../../background/registries/registry'
+import { StorageRef } from '../../../../../background/types/sowaTemplate'
 import { StorageRefImage } from '../../components/StorageRefImage'
 
 export interface ModuleIconProps {
