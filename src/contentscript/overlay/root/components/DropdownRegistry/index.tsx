@@ -3,24 +3,21 @@ import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { isValidUrl } from '../../../../../popup/helpers'
-import styles from './DropdownRegistery.module.scss'
 
-export interface DropdownRegisteryProps
+import { addSettingsValueDropdown } from '../../utils/addSettingsValueDropdown'
+
+import styles from './DropdownRegistry.module.scss'
+
+export interface DropdownRegistryProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {}
 let _isMounted = false
-export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownRegisteryProps) => {
+
+export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegistryProps) => {
   const { ...anotherProps } = props
   const [isOpen, setOpen] = useState(false)
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
   const [registries, setRegistries] = useState([])
-
-  const regExpIndexNearTestnet = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/)
-  const regExpIndexNear = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/)
-  const regExpIndexENS = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/)
-  const regExpIndexEthereum = new RegExp(/^0x[a-fA-F0-9]{40}$/)
-  const regExpIndexNEARImplicit = new RegExp(/^[0-9a-z]{64}$/)
-  const regExpIndexNEARDev = new RegExp(/^dev-\d*-\d*$/)
 
   useEffect(() => {
     _isMounted = true
@@ -32,13 +29,6 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
       _isMounted = false
     }
   }, [])
-  const getNumIndex = (value, reg) => {
-    try {
-      let valueReg = value.match(reg)
-
-      return valueReg
-    } catch {}
-  }
 
   const loadRegistries = async () => {
     const { getRegistries } = await initBGFunctions(browser)
@@ -46,36 +36,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
 
     setRegistries(registries.filter((r) => r.isDev === false))
   }
-  const addRegistry = async (url: string, x: () => void) => {
-    const { addRegistry } = await initBGFunctions(browser)
-    const valueParse = getNumIndex(registryInput, regExpIndexEthereum)
-    const valueParseNEARImplicit = getNumIndex(registryInput, regExpIndexNEARImplicit)
-    const valueParseNEARDev = getNumIndex(registryInput, regExpIndexNEARDev)
-    const valueParseENS = getNumIndex(registryInput, regExpIndexENS)
-    const valueParseNear = getNumIndex(registryInput, regExpIndexNear)
-    const valueParseNearTestnet = getNumIndex(registryInput, regExpIndexNearTestnet)
-    if (
-      valueParse !== null ||
-      valueParseNEARImplicit !== null ||
-      valueParseNEARDev !== null ||
-      valueParseENS !== null ||
-      valueParseNear !== null ||
-      valueParseNearTestnet !== null
-    ) {
-      try {
-        await addRegistry(url, false)
-        setRegistryInput(registryInput)
-        setRegistryInputError(null)
-      } catch (err) {
-        setRegistryInputError(err.message)
-      }
 
-      loadRegistries()
-      x()
-    } else {
-      setRegistryInputError('Enter valid Registry')
-    }
-  }
   const removeRegistry = async (url: string) => {
     const { removeRegistry } = await initBGFunctions(browser)
     await removeRegistry(url)
@@ -124,7 +85,15 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
                   onSubmit={(e) => {
                     e.preventDefault()
 
-                    addRegistry(registryInput, handleClear)
+                    addSettingsValueDropdown(
+                      registryInput,
+                      'registry',
+                      registryInput,
+                      setRegistryInputError,
+                      setRegistryInput,
+                      loadRegistries,
+                      handleClear
+                    )
                   }}
                   onBlur={() => setRegistryInputError(null)}
                 >
@@ -169,9 +138,7 @@ export const DropdownRegistery: FC<DropdownRegisteryProps> = (props: DropdownReg
                 })}
               >
                 <span
-                  className={cn(styles.registrieslink, {
-                    // [styles.activeLink]: r.isEnabled,
-                  })}
+                  className={cn(styles.registrieslink, {})}
                   onClick={() => {
                     enableRegistry(r.url, setOpen)
                   }}

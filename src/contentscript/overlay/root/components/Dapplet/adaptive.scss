@@ -1,0 +1,33 @@
+@media (min-width: 320px) and (max-width: 640px) {
+  .wrapperCard {
+    width: 100%;
+    min-width: 100%;
+    max-width: none;
+
+    background: $PureWhite;
+  }
+
+  .wrapperBlock {
+    width: calc(100% - 50px);
+  }
+
+  .blockTop {
+    display: flex;
+
+    .blockIcons {
+      display: flex;
+      justify-content: space-between;
+
+      width: 34px;
+      margin: 0 8.5% 0 4.5%;
+    }
+  }
+
+  .blockIcons {
+    margin: 0;
+  }
+
+  .blockText {
+    width: 100%;
+  }
+}

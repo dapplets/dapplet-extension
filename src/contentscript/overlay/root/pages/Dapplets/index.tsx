@@ -30,28 +30,23 @@ export interface DappletsProps {
 export const Dapplets: FC<DappletsProps> = (props) => {
   const { search, onUserSettingsClick, dropdownListValue, setDropdownListValue } = props
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
-  const [isLoading, setLoading] = useState<boolean>(null)
+
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
-  const [error, setError] = useState<string>(null)
+
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
   const [loadShowButton, setLoadShowButton] = useState(false)
-  const [contextId, setContextIds] = useState<string[]>([])
-  const [trustedUsers, setTrustedUsers] = useState([])
-  // const [dropdownListValue, setDropdownListValue] = useState('All')
+
   const _isMounted = useRef(true)
 
   useEffect(() => {
     const init = async () => {
       if (_isMounted.current) {
-        const { getFeaturesByHostnames, getCurrentContextIds, getThisTab } = await initBGFunctions(
-          browser
-        )
+        const { getCurrentContextIds, getThisTab } = await initBGFunctions(browser)
 
         const currentTab = await getThisTab()
 
         const ids = await getCurrentContextIds(currentTab)
 
-        setContextIds(ids)
         await _refreshDataByContext(ids)
 
         setLoadingListDapplets(false)
@@ -81,41 +76,17 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     } catch (err) {
       console.error(err)
       setNoContentScript(true)
-      setLoading(false)
+
       return
     }
 
-    const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(browser)
+    const { getFeaturesByHostnames } = await initBGFunctions(browser)
 
     const features: ManifestDTO[] = contextIdsValues
       ? await getFeaturesByHostnames(contextIdsValues)
       : []
 
-    const registries = await getRegistries()
-    const regsWithErrors = registries.filter((r) => !r.isDev && !!r.isEnabled && !!r.error)
-    if (regsWithErrors.length > 0) {
-      const isProviderProblems =
-        regsWithErrors.filter(
-          ({ error }) =>
-            error.includes('missing response') ||
-            error.includes('could not detect network') ||
-            error.includes('resolver or addr is not configured for ENS name') ||
-            error.includes('invalid contract address or ENS name')
-        ).length > 0
-
-      const description = isProviderProblems
-        ? 'It looks like the blockchain provider is not available. Check provider addresses in the settings, or try again later.'
-        : 'Please check the settings.'
-
-      setError(
-        `Cannot connect to the Dapplet Registry (${regsWithErrors
-          .map((x) => x.url)
-          .join(', ')}).\n${description}`
-      )
-    }
-
-    // if (_isMounted) {
-    const d = features
+    const newDappletsList = features
       .filter((f) => f.type === ModuleTypes.Feature)
       .map((f) => ({
         ...f,
@@ -126,9 +97,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         versions: [],
       }))
 
-    setDapplets(d)
-    setLoading(false)
-    // }
+    setDapplets(newDappletsList)
   }
 
   const _updateFeatureState = (name: string, f: any) => {
@@ -140,18 +109,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       return feature
     })
     return newDapplets
-  }
-
-  const refreshContextPage = async () => {
-    const { getCurrentTab, getCurrentContextIds, reloadCurrentPage } = await initBGFunctions(
-      browser
-    )
-    const tab = await getCurrentTab()
-    if (!tab) return
-    await reloadCurrentPage()
-    setNoContentScript(false)
-
-    setTimeout(() => _refreshDataByContext(getCurrentContextIds(dapplets)), 4000) // ToDo: get rid of timeout
   }
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
@@ -251,9 +208,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const onRemoveMyDapplet = async (f: ManifestAndDetails) => {
     const { removeMyDapplet } = await initBGFunctions(browser)
     await removeMyDapplet(f.sourceRegistry.url, f.name)
-    const d = dapplets.filter((x) => x.name !== f.name)
+    const newDappletsList = dapplets.filter((x) => x.name !== f.name)
 
-    setDapplets(d)
+    setDapplets(newDappletsList)
   }
 
   const onDeployDapplet = async (f: ManifestAndDetails) => {
@@ -276,7 +233,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const loadTrustedUsers = async () => {
     const { getTrustedUsers } = await initBGFunctions(browser)
     const trustedUsers = await getTrustedUsers()
-    setTrustedUsers(trustedUsers)
   }
 
   const _getSortedDapplets = (dapplets) => {
@@ -286,21 +242,18 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.isMyDapplet === true) return find(x.author)
-        // setDropdownListValue('Local')
       })
     }
     if (dropdownListValue === 'Trusted Users') {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.author !== null) return find(x.author)
-        // setDropdownListValue('Trusted Users')
       })
     }
     if (dropdownListValue === 'Public') {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.isUnderConstruction !== true) return find(x.author)
-        // setDropdownListValue('Public')
       })
     }
   }

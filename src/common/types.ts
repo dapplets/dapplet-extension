@@ -103,6 +103,11 @@ export enum UrlAvailability {
   SERVER_ERROR = 'SERVER_ERROR',
 }
 
+export type StorageRef = {
+  hash: string
+  uris: string[]
+}
+
 export type TConnectedAccountsVerificationRequest = {
   firstAccount: string
   secondAccount: string

@@ -1,7 +1,6 @@
 import { ModuleTypes } from '../../common/constants'
 import Base from '../../common/models/base'
-import { Environments } from '../../common/types'
-import { StorageRef } from '../registries/registry'
+import { Environments, StorageRef } from '../../common/types'
 
 export default class VersionInfo extends Base {
   getId = () => this.registryUrl + ':' + this.name + '#' + this.branch + '@' + this.version

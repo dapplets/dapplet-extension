@@ -4,11 +4,11 @@ import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
-import { StorageRef } from '../../../../../background/registries/registry'
 import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
 import { Modal } from '../Modal'
+import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
 
 enum DeploymentStatus {
@@ -16,12 +16,6 @@ enum DeploymentStatus {
   Deployed,
   NotDeployed,
   NewModule,
-}
-interface PropsStorageRefImage {
-  storageRef: StorageRef | string
-  className?: string
-  onClick?: (x) => void
-  title?: string
 }
 
 enum FormMode {
@@ -40,48 +34,7 @@ type DependencyChecking = {
   isExists?: boolean
 }
 
-export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
-  const { storageRef, className, title, onClick } = props
-  const [dataUri, setDataUri] = useState(null)
-
-  useEffect(() => {
-    const init = async () => {
-      if (!storageRef) return
-
-      if (typeof storageRef === 'string') {
-        setDataUri(storageRef)
-      } else {
-        const { hash, uris } = storageRef
-
-        if (!hash && uris.length > 0 && uris[0].indexOf('data:') === 0) {
-          setDataUri(uris[0])
-        } else {
-          const { getResource } = await initBGFunctions(browser)
-
-          if (
-            storageRef.hash !==
-              '0x0000000000000000000000000000000000000000000000000000000000000000' ||
-            storageRef.uris.length !== 0
-          ) {
-            const base64 = await getResource(storageRef)
-            const dataUri = 'data:text/plain;base64,' + base64
-            setDataUri(dataUri)
-          } else {
-            setDataUri(null)
-          }
-        }
-      }
-    }
-    init()
-    return () => {}
-  }, [storageRef])
-  return (
-    <div className={cn(styles.dappletsImg, className)} onClick={onClick}>
-      {dataUri ? <img src={dataUri} /> : <span className={styles.noLogo} />}
-    </div>
-  )
-}
-interface PropsDeveloper {
+interface PropsDevModule {
   setDappletsDetail: (x) => void
   modules: {
     module: ModuleInfo
@@ -106,7 +59,7 @@ interface PropsDeveloper {
   currentAccount?: any
 }
 let isMounted = false
-export const DevModule: FC<PropsDeveloper> = (props) => {
+export const DevModule: FC<PropsDevModule> = (props) => {
   const {
     modules,
     onDetailsClick,
@@ -130,7 +83,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const [mi, setMi] = useState(modules.module)
   const [vi, setVi] = useState(modules.versions[0])
   const [targetRegistry, setTargetRegistry] = useState(null)
-  // const [currentAccount, setCurrentAccount] = useState(null)
+
   const [trustedUsers, setTrustedUsers] = useState([])
   const [mode, setMode] = useState<FormMode>(null)
   const [targetStorages, setTargetStorages] = useState([
@@ -138,8 +91,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     StorageTypes.Sia,
     StorageTypes.Ipfs,
   ])
-  const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
-  const [registryOptions, setRegistryOptions] = useState([])
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
   const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
   const [owner, setOwner] = useState(null)
@@ -155,8 +106,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
   const [isNotAccountModal, setNotAccountModal] = useState(false)
   const [isNewModule, setNewModule] = useState(false)
   const onCloseNewModule = () => {
-    // nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
-
     setNewModule(false)
   }
   const [isDeployNewModule, setDeployNewModule] = useState(false)
@@ -199,14 +148,12 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-    const { getSwarmGateway } = await initBGFunctions(browser)
-    const swarmGatewayUrl = await getSwarmGateway()
 
     if (mi === null && vi === null) {
       const mi = new ModuleInfo()
       setOriginalMi(JSON.parse(JSON.stringify(mi)))
       setMi(mi)
-      setSwarmGatewayUrl(swarmGatewayUrl)
+
       setMode(FormMode.Creating)
     } else {
       const dependencies = vi?.dependencies
@@ -227,7 +174,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       setOriginalMi(JSON.parse(JSON.stringify(mi)))
       setMi(mi)
       setVi(vi)
-      setSwarmGatewayUrl(swarmGatewayUrl)
+
       setDpendenciesChecking(dependenciesChecking)
       setTargetStorages(
         Object.keys(vi?.overlays ?? {}).length > 0
@@ -236,13 +183,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       )
       setMode(FormMode.Deploying)
     }
-    setRegistryOptions(
-      prodRegistries.map((r) => ({
-        key: r.url,
-        text: r.url,
-        value: r.url,
-      }))
-    )
+
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
@@ -319,11 +260,9 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         }
       })
     }
-
     const isNotNullCurrentAccount = !(
       !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
     )
-
     const isNotTrustedUser =
       isNotNullCurrentAccount &&
       !trustedUsers.find((x) => x.account.toLowerCase() === currentAccount.toLowerCase())
@@ -342,7 +281,6 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         if (deploymentStatus === 3) {
           setNewModule(true)
         } else {
-          // isLoadingDeploy && nodeButton.current.classList.add('dappletsIsLoadingDeploy')
           mode === FormMode.Creating
             ? await deployModule(mi, null, targetStorages, targetRegistry)
             : await deployModule(mi, vi, targetStorages, targetRegistry)
@@ -366,9 +304,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
 
         setModalError(true)
         setNotAccountModal(false)
-        // nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
       } finally {
-        // nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
         setLoadingDeployFinally()
         await _updateData()
       }
@@ -386,6 +322,40 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
       window.close()
     }
   }
+  const deployNewModule = async () => {
+    const { deployModule } = await initBGFunctions(browser)
+    try {
+      setLoadingDeploy()
+      nodeButton.current.classList.add('dappletsIsLoadingDeploy')
+
+      onCloseNewModule()
+      mode === FormMode.Creating
+        ? await deployModule(mi, null, targetStorages, targetRegistry)
+        : await deployModule(mi, vi, targetStorages, targetRegistry)
+
+      setDeploymentStatus(DeploymentStatus.Deployed)
+      setUpdate(true)
+    } catch (err) {
+      console.log(err)
+
+      setMessageError({
+        type: 'negative',
+        header: 'Publication error',
+        message: [err.message],
+      })
+      if (err.message) {
+        nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
+        const messageErr = err.message.toLowerCase()
+        messageErr.includes(' are not the owner of this module') ? setModalErrorOwner(true) : null
+      }
+
+      setModalError(true)
+      setNotAccountModal(false)
+    } finally {
+      setLoadingDeployFinally()
+      await _updateData()
+    }
+  }
 
   return (
     <>
@@ -393,7 +363,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
         <StorageRefImage storageRef={mi.icon} />
 
         <div className={styles.dappletsInfo}>
-          <div className={styles.dappletsTegs}>
+          <div className={styles.dappletsTags}>
             {vi && vi.version ? (
               <div className={styles.dappletsVersion}>{vi.version}</div>
             ) : (
@@ -452,7 +422,7 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
                     (await _updateCurrentAccount().then(() => deployButtonClickHandler(e)))
                 }}
                 className={cn(styles.dappletsReupload, {
-                  [styles.dapDeploy]: modules.isDeployed?.[0] !== false,
+                  [styles.dappletDeploy]: modules.isDeployed?.[0] !== false,
                 })}
               >
                 {nodeButton.current &&
@@ -595,46 +565,20 @@ export const DevModule: FC<PropsDeveloper> = (props) => {
               ${currentAccount}. If everything is correct, click OK. Or connect another
               wallet.`}
             </p>
+            <p className={styles.modalDefaultTitleAttension}>Attention!</p>
+            <p className={styles.modalDefaultContentText}>
+              A dapplet’s ownership is represented through an NFT.
+            </p>
+            <p className={styles.modalDefaultContentText}>
+              When the dapplet is made this NFT will automatically be created and sent to your
+              ETH-account.
+            </p>
+            <p className={styles.modalDefaultContentText}>
+              You will be able to change the dapplet owner by transferring this NFT or by selling it
+              at a marketplace.
+            </p>
 
-            <button
-              onClick={async () => {
-                const { deployModule } = await initBGFunctions(browser)
-                try {
-                  setLoadingDeploy()
-                  nodeButton.current.classList.add('dappletsIsLoadingDeploy')
-
-                  onCloseNewModule()
-                  mode === FormMode.Creating
-                    ? await deployModule(mi, null, targetStorages, targetRegistry)
-                    : await deployModule(mi, vi, targetStorages, targetRegistry)
-
-                  setDeploymentStatus(DeploymentStatus.Deployed)
-                  setUpdate(true)
-                } catch (err) {
-                  console.log(err)
-
-                  setMessageError({
-                    type: 'negative',
-                    header: 'Publication error',
-                    message: [err.message],
-                  })
-                  if (err.message) {
-                    nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
-                    const messageErr = err.message.toLowerCase()
-                    messageErr.includes(' are not the owner of this module')
-                      ? setModalErrorOwner(true)
-                      : null
-                  }
-
-                  setModalError(true)
-                  setNotAccountModal(false)
-                } finally {
-                  setLoadingDeployFinally()
-                  await _updateData()
-                }
-              }}
-              className={styles.modalDefaultContentButton}
-            >
+            <button onClick={deployNewModule} className={styles.modalDefaultContentButton}>
               Ok
             </button>
           </div>

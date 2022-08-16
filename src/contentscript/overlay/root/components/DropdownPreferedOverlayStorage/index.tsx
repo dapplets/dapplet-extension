@@ -33,11 +33,11 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (props: Dropdow
     setPreferedOverlayStorage(preferedOverlayStorage)
   }
 
-  const selectPreferedOverlayStorage = async (storage: string, x: (x) => void) => {
+  const selectPreferedOverlayStorage = async (storage: string, func: (x) => void) => {
     const { setPreferedOverlayStorage } = await initBGFunctions(browser)
     await setPreferedOverlayStorage(storage)
     loadPreferedOverlayStorage()
-    x(false)
+    func(false)
   }
   return (
     <div

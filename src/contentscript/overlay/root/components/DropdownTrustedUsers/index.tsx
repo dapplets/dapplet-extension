@@ -4,7 +4,9 @@ import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } fro
 import { browser } from 'webextension-polyfill-ts'
 import { typeOfUri, UriTypes } from '../../../../../common/helpers'
 import { isValidUrl } from '../../../../../popup/helpers'
+
 import { IDropdown } from '../../models/dropdown.model'
+import { addSettingsValueDropdown } from '../../utils/addSettingsValueDropdown'
 import styles from './DropdownTrustedUsers.module.scss'
 
 export interface DropdownTrustedProps
@@ -27,13 +29,6 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
   const [trustedUsers, setTrustedUsers] = useState([])
   const [registries, setRegistries] = useState([])
 
-  const regExpIndexNearTestnet = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/)
-  const regExpIndexNear = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/)
-  const regExpIndexENS = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/)
-  const regExpIndexEthereum = new RegExp(/^0x[a-fA-F0-9]{40}$/)
-  const regExpIndexNEARImplicit = new RegExp(/^[0-9a-z]{64}$/)
-  const regExpIndexNEARDev = new RegExp(/^dev-\d*-\d*$/)
-
   useEffect(() => {
     _isMounted = true
     const init = async () => {
@@ -45,44 +40,6 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
       _isMounted = false
     }
   }, [trustedUserInput])
-
-  const getNumIndex = (value, reg) => {
-    try {
-      const valueReg = value.match(reg)
-
-      return valueReg
-    } catch {}
-  }
-
-  const addTrustedUser = async (account: string, x: () => void) => {
-    const { addTrustedUser } = await initBGFunctions(browser)
-    const valueParse = getNumIndex(trustedUserInput, regExpIndexEthereum)
-    const valueParseNEARImplicit = getNumIndex(trustedUserInput, regExpIndexNEARImplicit)
-    const valueParseNEARDev = getNumIndex(trustedUserInput, regExpIndexNEARDev)
-    const valueParseENS = getNumIndex(trustedUserInput, regExpIndexENS)
-    const valueParseNear = getNumIndex(trustedUserInput, regExpIndexNear)
-    const valueParseNearTestnet = getNumIndex(trustedUserInput, regExpIndexNearTestnet)
-    if (
-      valueParse !== null ||
-      valueParseNEARImplicit !== null ||
-      valueParseNEARDev !== null ||
-      valueParseENS !== null ||
-      valueParseNear !== null ||
-      valueParseNearTestnet !== null
-    ) {
-      try {
-        await addTrustedUser(account)
-        setTrustedUserInput(trustedUserInput)
-      } catch (err) {
-        setTrustedUserInputError(err.message)
-      }
-
-      loadTrustedUsers()
-      x()
-    } else {
-      setTrustedUserInputError('Enter valid Trusted User')
-    }
-  }
 
   const removeTrustedUser = async (account: string) => {
     const { removeTrustedUser } = await initBGFunctions(browser)
@@ -143,7 +100,15 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
             onSubmit={(e) => {
               e.preventDefault()
 
-              addTrustedUser(trustedUserInput, handleClear)
+              addSettingsValueDropdown(
+                trustedUserInput,
+                'trustedUser',
+                trustedUserInput,
+                setTrustedUserInputError,
+                setTrustedUserInput,
+                loadTrustedUsers,
+                handleClear
+              )
             }}
           >
             <input

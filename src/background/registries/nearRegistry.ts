@@ -2,9 +2,10 @@ import { ethers } from 'ethers'
 import * as nearAPI from 'near-api-js'
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
 import { typeOfUri, UriTypes } from '../../common/helpers'
+import { StorageRef } from '../../common/types'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
-import { Registry, StorageRef } from './registry'
+import { Registry } from './registry'
 
 type NearStorageRef = {
   hash: string // bytes32

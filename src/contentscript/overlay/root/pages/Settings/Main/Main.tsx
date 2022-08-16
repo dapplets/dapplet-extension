@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Checkbox } from '../../components/Checkbox'
-import { SettingItem } from '../../components/SettingItem'
-import { SettingWrapper } from '../../components/SettingWrapper'
-import { Switch } from '../../components/Switch'
-import { useToggle } from '../../hooks/useToggle'
+import { Checkbox } from '../../../components/Checkbox'
+import { SettingItem } from '../../../components/SettingItem'
+import { SettingWrapper } from '../../../components/SettingWrapper'
+import { Switch } from '../../../components/Switch'
+import { useToggle } from '../../../hooks/useToggle'
 
 export const DROPDOWN_LIST = [{ _id: '0', label: 'Custom' }]
 export const CHECKBOX_LIST = [

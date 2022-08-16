@@ -1,14 +1,14 @@
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
-import styles from './Registery.module.scss'
+import styles from './Registry.module.scss'
 
-export interface RegisteryProps {
-  isShowChildrenRegistery?: boolean
+export interface RegistryProps {
+  isShowChildrenRegistry?: boolean
   label: string
-  setShowChildrenRegistery: (x) => void
+  setShowChildrenRegistry: (x) => void
 }
-export const Registry: FC<RegisteryProps> = (props) => {
-  const { isShowChildrenRegistery, setShowChildrenRegistery, label, children } = props
+export const Registry: FC<RegistryProps> = (props) => {
+  const { isShowChildrenRegistry, setShowChildrenRegistry, label, children } = props
   const [isHeightLabel, onHeightLabel] = useState(false)
 
   const nodeLabelBlock = useRef<HTMLDivElement>()
@@ -29,7 +29,7 @@ export const Registry: FC<RegisteryProps> = (props) => {
           ref={nodeLabelBlock}
           className={styles.labelLocalhost}
           onClick={() => {
-            setShowChildrenRegistery(!isShowChildrenRegistery)
+            setShowChildrenRegistry(!isShowChildrenRegistry)
           }}
         >
           <label
@@ -42,12 +42,12 @@ export const Registry: FC<RegisteryProps> = (props) => {
 
           <span
             className={cn(styles.spanLabel, {
-              [styles.isShowDescriptionLabel]: isShowChildrenRegistery,
+              [styles.isShowDescriptionLabel]: isShowChildrenRegistry,
             })}
           ></span>
         </div>
       </div>
-      {isShowChildrenRegistery && children}
+      {isShowChildrenRegistry && children}
     </div>
   )
 }
