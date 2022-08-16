@@ -10,7 +10,7 @@ import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
-import { StorageRef } from '../types/sowaTemplate'
+import { StorageRef } from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
 import GlobalConfigService from './globalConfigService'
 import { OverlayService } from './overlayService'

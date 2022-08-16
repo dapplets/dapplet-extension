@@ -1,6 +1,6 @@
 import { ModuleTypes } from '../../common/constants'
 import Base from '../../common/models/base'
-import { StorageRef } from '../types/sowaTemplate'
+import { StorageRef } from '../../common/types'
 
 export default class ModuleInfo extends Base {
   getId = () => this.registryUrl + ':' + this.name

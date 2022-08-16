@@ -1,4 +1,4 @@
-import { StorageRef } from '../../../../background/types/sowaTemplate'
+import { StorageRef } from '../../../../common/types'
 import { ModuleIconProps } from '../components/ModuleIcon'
 
 export type ToolbarTabMenu = {

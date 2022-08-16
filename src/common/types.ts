@@ -101,3 +101,8 @@ export enum UrlAvailability {
   NETWORK_ERROR = 'NETWORK_ERROR',
   SERVER_ERROR = 'SERVER_ERROR',
 }
+
+export type StorageRef = {
+  hash: string
+  uris: string[]
+}

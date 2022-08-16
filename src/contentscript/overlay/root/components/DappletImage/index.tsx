@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import React, { FC } from 'react'
-import { StorageRef } from '../../../../../background/types/sowaTemplate'
 import NO_LOGO from '../../../../../common/resources/no-logo.png'
+import { StorageRef } from '../../../../../common/types'
 import { useStorageRef } from '../../utils/useStorageRef'
 import styles from './DappletImage.module.scss'
 

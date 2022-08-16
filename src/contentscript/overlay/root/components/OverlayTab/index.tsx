@@ -1,6 +1,6 @@
 import cn from 'classnames'
 import React, { ReactElement } from 'react'
-import { StorageRef } from '../../../../../background/types/sowaTemplate'
+import { StorageRef } from '../../../../../common/types'
 import { StorageRefImage } from '../../components/StorageRefImage'
 import { ToolbarTabMenu } from '../../types'
 import { ModuleIcon, ModuleIconProps } from '../ModuleIcon'

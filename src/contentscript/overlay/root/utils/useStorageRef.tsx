@@ -1,8 +1,8 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { StorageRef } from '../../../../background/types/sowaTemplate'
 import NO_LOGO from '../../../../common/resources/no-logo.png'
+import { StorageRef } from '../../../../common/types'
 
 export const useStorageRef = (storageRef: StorageRef) => {
   const [img, setImg] = useState<string>('')
