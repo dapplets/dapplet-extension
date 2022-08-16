@@ -36,9 +36,9 @@ export default class FeatureService {
   }
 
   async getFeaturesByHostnames(contextIds: string[]): Promise<ManifestDTO[]> {
-    const requestId = this._requestId++
-    const startTime = Date.now()
-    console.log(`getFeaturesByHostnames called #${requestId}`)
+    // const requestId = this._requestId++
+    // const startTime = Date.now()
+    // console.log(`getFeaturesByHostnames called #${requestId}`)
 
     const users = await this._globalConfigService.getTrustedUsers()
     const contextIdsByRegsitries =
@@ -222,8 +222,8 @@ export default class FeatureService {
       }
     }
 
-    const endTime = Date.now()
-    console.log(`getFeaturesByHostnames  #${requestId} end: ${endTime - startTime} ms`)
+    // const endTime = Date.now()
+    // console.log(`getFeaturesByHostnames  #${requestId} end: ${endTime - startTime} ms`)
 
     return dtos
   }

@@ -62,6 +62,7 @@ export type ModuleId = {
 export enum SystemOverlayTabs {
   DAPPLET_CONFIRMATION = 'DAPPLET_CONFIRMATION',
   LOGIN_SESSION = 'LOGIN_SESSION',
+  CONNECTED_ACCOUNTS = 'CONNECTED_ACCOUNTS',
 }
 
 export type NearNetworkConfig = {
@@ -105,4 +106,51 @@ export enum UrlAvailability {
 export type StorageRef = {
   hash: string
   uris: string[]
+}
+
+export type TConnectedAccountsVerificationRequest = {
+  firstAccount: string
+  secondAccount: string
+  isUnlink: boolean
+  firstProofUrl: string
+  secondProofUrl: string
+  transactionSender: string
+}
+
+export type TConnectedAccountStatus = {
+  isMain: boolean
+}
+
+export type TConnectedAccount = {
+  id: string
+  status: TConnectedAccountStatus
+}
+
+export enum ConnectedAccountsRequestStatus {
+  NotFound = 'not found',
+  Pending = 'pending',
+  Approved = 'approved',
+  Rejected = 'rejected',
+}
+
+export enum ConnectedAccountsPairStatus {
+  Processing = 'Processing',
+  Connected = 'Connected',
+  Error = 'Error',
+}
+
+export interface IConnectedAccountUser {
+  img: string
+  name: string
+  origin: string
+  accountActive: boolean
+}
+
+export interface IConnectedAccountsPair {
+  firstAccount: IConnectedAccountUser
+  secondAccount: IConnectedAccountUser
+  statusName: ConnectedAccountsPairStatus
+  statusMessage: string
+  closeness: number
+  pendingRequestId?: number
 }
