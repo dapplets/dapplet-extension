@@ -113,6 +113,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       if (connectedDescriptors.length > 0) {
         const newDescriptors = connectedDescriptors?.find((x) => x.type === selectedWallet)
         setConnectedDescriptors(connectedDescriptors)
+        if (!newDescriptors) return
         const newWalletImage = makeBlockie(newDescriptors.account)
         setWalletImage(newWalletImage)
         if (newDescriptors.type === 'near') {
