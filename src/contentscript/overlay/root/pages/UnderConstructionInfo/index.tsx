@@ -3,40 +3,23 @@ import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
-import VersionInfo from '../../../../../background/models/versionInfo'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
+import { InputGroup } from '../../components/InputGroup'
 
 import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
+import { _addInfoItemInputGroup } from '../../utils/addInfoInputGroup'
+import { _removeInfoItemInputGroup } from '../../utils/removeInfoInputGroup'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
-
-enum DeploymentStatus {
-  Unknown,
-  Deployed,
-  NotDeployed,
-  NewModule,
-}
 
 enum DependencyType {
   Dependency,
   Interface,
-}
-
-enum FormMode {
-  Deploying,
-  Creating,
-  Editing,
-}
-type DependencyChecking = {
-  name: string
-  version: string
-  type: DependencyType
-  isExists?: boolean
 }
 
 export interface UnderConstructionInfoProps {
@@ -58,8 +41,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
 
   const [originalMi, setOriginalMi] = useState(null)
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
-  const [vi, setVi] = useState<VersionInfo>(ModuleVersion)
-  const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>()
+
   const [loading, setLoading] = useState(false)
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
@@ -68,13 +50,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [owner, setOwner] = useState(null)
   const [currentAccount, setCurrentAccount] = useState(null)
 
-  const [editContextId, setEditContextId] = useState('')
-  const [editContextIdLoading, setEditContextIdLoading] = useState(false)
-  const [editContextIdDone, setEditContextIdDone] = useState(false)
-  const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
   const [trustedUsers, setTrustedUsers] = useState([])
-
-  const [mode, setMode] = useState(null)
 
   const [targetStorages, setTargetStorages] = useState([
     StorageTypes.Swarm,
@@ -82,11 +58,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     StorageTypes.Ipfs,
   ])
 
-  const [author, setAuthor] = useState({ authorForm: [] })
-
-  const newAuthorObject = {
-    author: 'New admins',
-  }
   const fileInput = useRef<HTMLInputElement>()
   const [st, setSt] = useState([])
 
@@ -97,63 +68,66 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [isModalPush, setModalPush] = useState(false)
 
   const [isModalTransaction, setModalTransaction] = useState(false)
-
   const [isNotAccountModal, setNotAccountModal] = useState(false)
 
+  const [visible, setVisible] = useState(false)
+  const [visibleAdmins, setVisibleAdmins] = useState(false)
+
+  const nodeBtn = useRef<HTMLButtonElement>()
+  const nodeInput = useRef<HTMLInputElement>()
+  const nodeInputAdmin = useRef<HTMLInputElement>()
+  const nodeBtnAdmin = useRef<HTMLButtonElement>()
+
+  const [addDisabled, setAddDisabled] = useState(false)
+  const [contextId, setContextId] = useState(null)
+  const [editContextId, setEditContextId] = useState('')
+  const [editContextIdLoading, setEditContextIdLoading] = useState(false)
+
+  const [addAdminDisabled, setAddAdminDisabled] = useState(false)
+  const [editAdminsLoading, setEditAdminsLoading] = useState(false)
+  const [editAdmin, setEditAdmin] = useState('')
+  const [admins, setAdmins] = useState(null)
+  const [isDisabledAddContext, setDisabledAddContext] = useState(false)
+  const [isDisabledAddAdmin, setDisabledAddAdmin] = useState(false)
+  let isNotNullCurrentAccount
   useEffect(() => {
     _isMounted = true
     const init = async () => {
       await _updateData()
-      if (!isNotNullCurrentAccount) {
-        setNotAccountModal(true)
-      } else {
-        setNotAccountModal(false)
-      }
     }
     init()
-    if (author.authorForm.length === 0) {
-      setAuthorDisabled(false)
-    }
+
     return () => {
       _isMounted = false
     }
-  }, [mi, st, targetChain, autorDisabled, author, editContextId])
-  const addButtonClickHandler = () => {
-    const newAuthor = Object.assign({}, author)
-    newAuthor.authorForm.push(newAuthorObject)
-    setAuthor(newAuthor)
-  }
-
-  const onDeleteChild = (id: number) => {
-    const newAuthor = Object.assign({}, author)
-    newAuthor.authorForm.splice(id, 1)
-    setAuthor(newAuthor)
-  }
+  }, [mi, targetChain, editContextId, editAdmin])
 
   const _updateData = async () => {
-    const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
-
+    const { getRegistries } = await initBGFunctions(browser)
     const registries = await getRegistries()
-    const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-    setRegistryOptions(
-      prodRegistries.map((r) => ({
-        key: r.url,
-        text: r.url,
-        value: r.url,
-      }))
-    )
     setTargetRegistry(prodRegistries[0]?.url || null)
-    setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
     await _updateCurrentAccount()
+    if (!targetRegistry) return
+    await getContextId()
+    await getAdmins()
   }
 
   const _updateCurrentAccount = async () => {
-    const { getOwnership, getAddress } = await initBGFunctions(browser)
-    const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-    setCurrentAccount(currentAccount)
+    if (targetChain) {
+      const { getAddress } = await initBGFunctions(browser)
+      const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
+      setCurrentAccount(currentAccount)
+    } else {
+      return
+    }
+    setTimeout(() => {
+      isNotNullCurrentAccount = !(
+        !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
+      )
+    }, 1500)
   }
 
   const iconInputChangeHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,59 +171,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     }
   }
 
-  const newContextObject = ''
-  const addButtonClickHandlerContext = () => {
-    const newContext = Object.assign({}, mi)
-    newContext.contextIds.push(newContextObject)
-    setMi(newContext)
-  }
-
-  const onDeleteChildContext = (id: number) => {
-    const newContext = Object.assign({}, mi)
-    newContext.contextIds.splice(id, 1)
-    setMi(newContext)
-  }
-  const [visible, setVisible] = useState(false)
-  const node = useRef<HTMLButtonElement>()
-  const nodeInput = useRef<HTMLInputElement>()
-  const [visibleContextId, setVisibleContextId] = useState({
-    visibleContext: [],
-  })
-  const [contextDeleteNone, setContextDeleteNone] = useState(false)
-  const [addDisabled, setAddDisabled] = useState(false)
-  const _addContextId = async (contextId: string) => {
-    setEditContextIdLoading(true)
-    setAddDisabled(true)
-
-    try {
-      const { addContextId } = await initBGFunctions(browser)
-      await addContextId(targetRegistry, mi.name, contextId)
-      const newForm = Object.assign({}, visibleContextId)
-
-      newForm.visibleContext.push(editContextId)
-      setVisibleContextId(newForm)
-
-      setEditContextIdDone(true)
-      setVisible(true)
-      setEditContextId('')
-      setEditContextIdLoading(false)
-      setAddDisabled(false)
-      node.current?.classList.remove('valid')
-      setEditContextId('')
-    } catch (error) {
-      setEditContextIdDone(true)
-      setVisible(false)
-      setEditContextIdLoading(false)
-      setAddDisabled(false)
-      node.current?.classList.remove('valid')
-    }
-  }
-
-  // const isNotNullCurrentAccount = !(
-  //   !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
-  // )
-  let isNotNullCurrentAccount = true
-
   const onChange = (e) => {
     const files = e.target.files
 
@@ -257,11 +178,32 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
 
     setSt([...filesArr])
   }
+
+  const getContextId = async () => {
+    const { getContextIds } = await initBGFunctions(browser)
+    const newContextID = await getContextIds(targetRegistry, mi.name)
+    setContextId(newContextID)
+  }
+  const getAdmins = async () => {
+    const { getAdmins } = await initBGFunctions(browser)
+    const authors = await getAdmins(targetRegistry, mi.name)
+    setAdmins(authors)
+  }
+
   const visibleNameFile = (hash: string): string => {
     const firstFourCharacters = hash.substring(0, 6)
     const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 6)
 
     return `${firstFourCharacters}...${lastFourCharacters}`
+  }
+
+  function containsValue(arr, elem: string) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i].toLowerCase() === elem.toLowerCase()) {
+        return true
+      }
+    }
+    return false
   }
 
   return (
@@ -401,120 +343,65 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
             </div>
           }
         />
-        {/* <SettingWrapper
+        <SettingWrapper
           title="Team"
           className={styles.wrapperSettings}
           children={
             <div className={styles.ownershipBlock}>
-              <div className={styles.wrapperAdmins}>
-                <div className={styles.blockAdmins}>
-                  <h3 className={styles.adminsTitle}>Admins</h3>
-                  <button
-                    disabled={autorDisabled}
-                    onClick={() => {
-                      addButtonClickHandler()
-                      setAuthorDisabled(true)
-                    }}
-                    className={cn(styles.adminsButton, {
-                      [styles.adminsButtonDisabled]: autorDisabled,
-                    })}
-                  />
-                </div>
-                {author.authorForm.map((x, i) => (
-                  <div key={i} className={styles.blockAuthors}>
-                    <input
-                      key={i}
-                      className={styles.authorTitle}
-                      placeholder={x.author}
-                      onChange={(e) => {
-                        author.authorForm[i].author = e.target.value
-                        if (e.target.value.length !== 0) {
-                          setAuthorDisabled(false)
-                        }
-                        setDisabledPush(false)
-                      }}
-                    />
-                    <button onClick={onDeleteChild.bind(null, i)} className={styles.authorDelete} />
-                  </div>
-                ))}
-              </div>
+              <InputGroup
+                title={'Admins'}
+                newArray={admins}
+                _deleteItem={_removeInfoItemInputGroup}
+                _addItem={_addInfoItemInputGroup}
+                nodeInput={nodeInputAdmin}
+                nodeBtn={nodeBtnAdmin}
+                isDisabledAdd={isDisabledAddAdmin}
+                addDisabled={addAdminDisabled}
+                setAddDisabled={setAddAdminDisabled}
+                editLoading={editAdminsLoading}
+                editInput={editAdmin}
+                setEditInput={setEditAdmin}
+                visibleArray={visibleAdmins}
+                setVisibleArray={setVisibleAdmins}
+                parameters={'admins'}
+                setEditLoading={setEditAdminsLoading}
+                containsValue={containsValue}
+                setDisabledAdd={setDisabledAddAdmin}
+                targetRegistry={targetRegistry}
+                mi={mi}
+                getParameters={getAdmins}
+              />
             </div>
           }
-        /> */}
+        />
         <SettingWrapper
           title="Parameters"
           className={styles.wrapperSettings}
           children={
             <div className={styles.parametersBlock}>
-              <div className={styles.wrapperContextID}>
-                <div className={styles.blockContextID}>
-                  <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
-                  <button
-                    disabled={mi.contextIds.length >= 1}
-                    onClick={addButtonClickHandlerContext}
-                    className={cn(styles.contextIDButton, {
-                      [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
-                    })}
-                  />
-                </div>
-                {mi.contextIds.map((x, i) => (
-                  <div key={i} className={styles.wrapperContext}>
-                    <div className={styles.blockContext}>
-                      <input
-                        key={i}
-                        ref={nodeInput}
-                        className={styles.blockContextTitle}
-                        value={editContextId}
-                        placeholder={'Context ID (ex: example.com)'}
-                        onChange={(e) => {
-                          setEditContextId(e.target.value)
-                        }}
-                      />
-
-                      <button
-                        ref={node}
-                        onClick={() => {
-                          onDeleteChildContext(i)
-                          setEditContextId('')
-                        }}
-                        className={cn(styles.contextDelete, {
-                          [styles.contextDeleteNone]: contextDeleteNone,
-                        })}
-                      />
-                    </div>
-                    <button
-                      disabled={nodeInput.current?.value.length < 2 || addDisabled}
-                      onClick={() => {
-                        node.current?.classList.add('valid')
-                        _addContextId(editContextId)
-                      }}
-                      className={cn(styles.addContext, {
-                        [styles.addContextDisabled]:
-                          nodeInput.current?.value.length < 2 || addDisabled,
-                      })}
-                    >
-                      ADD
-                    </button>
-                  </div>
-                ))}
-                {editContextIdLoading ? (
-                  <div className={styles.editContextIdLoading}></div>
-                ) : (
-                  <>
-                    {visible &&
-                      visibleContextId &&
-                      visibleContextId.visibleContext.map((x, i) => (
-                        <input
-                          key={i}
-                          className={styles.blockContext}
-                          placeholder={x}
-                          value={x}
-                          readOnly
-                        />
-                      ))}
-                  </>
-                )}
-              </div>
+              <InputGroup
+                title={'Context IDs'}
+                newArray={contextId}
+                _deleteItem={_removeInfoItemInputGroup}
+                _addItem={_addInfoItemInputGroup}
+                nodeInput={nodeInput}
+                nodeBtn={nodeBtn}
+                isDisabledAdd={isDisabledAddContext}
+                addDisabled={addDisabled}
+                editLoading={editContextIdLoading}
+                editInput={editContextId}
+                setEditInput={setEditContextId}
+                visibleArray={visible}
+                setVisibleArray={setVisible}
+                parameters={'contextId'}
+                setEditLoading={setEditContextIdLoading}
+                setAddDisabled={setAddDisabled}
+                containsValue={containsValue}
+                setDisabledAdd={setDisabledAddContext}
+                targetRegistry={targetRegistry}
+                mi={mi}
+                getParameters={getContextId}
+              />
             </div>
           }
         />

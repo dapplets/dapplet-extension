@@ -1,0 +1,142 @@
+@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
+
+.modalDefaultContent {
+  width: 263px;
+
+  text-align: center;
+
+  color: $MainGrey;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 16px;
+}
+
+.modalCreationContent {
+  width: 214px;
+  margin-bottom: 15px;
+
+  text-align: center;
+
+  color: $MainGrey;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 16px;
+}
+
+.modalCreationContentButton {
+  display: flex;
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 157px;
+  height: 32px;
+  padding: 0 10px;
+
+  color: $PureWhite;
+  border-radius: 4px;
+
+  background: $Primary;
+
+  font-family: Roboto;
+  font-size: 14px;
+
+  font-weight: 400;
+  line-height: 100%;
+
+  &:hover {
+    background: $PrimaryHover;
+  }
+
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+
+.titleModalEndCreation {
+  width: 307px;
+
+  text-align: center;
+}
+
+.modalEndCreationContent {
+  width: 263px;
+  margin-bottom: 15px;
+
+  text-align: center;
+
+  color: $MainGrey;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 16px;
+}
+
+.modalEndCreationFooterBlock {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  width: 100%;
+}
+
+.modalEndCreationFooterButton {
+  display: flex;
+  align-items: center;
+
+  justify-content: center;
+
+  min-width: 157px;
+  height: 32px;
+  margin-bottom: 10px;
+  padding: 0 10px;
+
+  color: $PureWhite;
+  border-radius: 4px;
+
+  background: $Primary;
+
+  font-family: Roboto;
+  font-size: 14px;
+
+  font-weight: 400;
+  line-height: 100%;
+
+  &:hover {
+    background: $PrimaryHover;
+  }
+
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+
+.modalEndCreationFooterLink {
+  cursor: pointer;
+
+  color: $Primary;
+
+  font-family: Roboto;
+  font-size: 14px;
+
+  font-weight: 400;
+  line-height: 100%;
+
+  &:hover {
+    color: $PrimaryHover;
+  }
+
+  &:active {
+    color: $PrimaryPressed;
+  }
+}

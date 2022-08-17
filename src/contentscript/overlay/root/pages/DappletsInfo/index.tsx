@@ -35,8 +35,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [currentAccount, setCurrentAccount] = useState(null)
   const [newOwner, setNewOwner] = useState('')
   const [newOwnerLoading, setNewOwnerLoading] = useState(false)
-  const [editContextId, setEditContextId] = useState('')
-  const [editContextIdLoading, setEditContextIdLoading] = useState(false)
   const [targetStorages, setTargetStorages] = useState([
     StorageTypes.Swarm,
     StorageTypes.Sia,
@@ -46,18 +44,15 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [newState, setNewState] = useState([])
   const [isDisabledPush, setDisabledPush] = useState(true)
   const [isDisabledAddOwner, setDisabledAddOwner] = useState(false)
-  const [isDisabledAddAdmin, setDisabledAddAdmin] = useState(false)
-  const [isDisabledAddContext, setDisabledAddContext] = useState(false)
   const [isModal, setModal] = useState(false)
-  const onClose = () => setModal(false)
   const [isModalPush, setModalPush] = useState(false)
   const [isModalTransaction, setModalTransaction] = useState(false)
-  const [editAdmin, setEditAdmin] = useState('')
-  const [admins, setAdmins] = useState(null)
 
   const [isNotAccountModal, setNotAccountModal] = useState(false)
+
   const [visible, setVisible] = useState(false)
   const [visibleAdmins, setVisibleAdmins] = useState(false)
+
   const nodeBtn = useRef<HTMLButtonElement>()
   const nodeInput = useRef<HTMLInputElement>()
   const nodeInputAdmin = useRef<HTMLInputElement>()
@@ -65,10 +60,17 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
   const [addDisabled, setAddDisabled] = useState(false)
   const [contextId, setContextId] = useState(null)
+  const [editContextId, setEditContextId] = useState('')
+  const [editContextIdLoading, setEditContextIdLoading] = useState(false)
+
   const [addAdminDisabled, setAddAdminDisabled] = useState(false)
-
   const [editAdminsLoading, setEditAdminsLoading] = useState(false)
+  const [editAdmin, setEditAdmin] = useState('')
+  const [admins, setAdmins] = useState(null)
+  const [isDisabledAddContext, setDisabledAddContext] = useState(false)
+  const [isDisabledAddAdmin, setDisabledAddAdmin] = useState(false)
 
+  const onClose = () => setModal(false)
   let isNotNullCurrentAccount
   useEffect(() => {
     _isMounted = true
@@ -88,12 +90,12 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-
     await _updateCurrentAccount()
     if (!targetRegistry) return
     await getContextId()
     await getAdmins()
   }
+
   const _updateCurrentAccount = async () => {
     if (targetChain) {
       const { getAddress } = await initBGFunctions(browser)

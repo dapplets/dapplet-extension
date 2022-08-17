@@ -53,8 +53,6 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
     props
 
   const [mi, setMi] = useState<ModuleInfo>(new ModuleInfo())
-
-  const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>([])
   const [loading, setLoading] = useState(false)
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
