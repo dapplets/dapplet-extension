@@ -5,7 +5,6 @@ import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import styles from './Tokenomics.module.scss'
-
 export interface TokenomicsProps {
   setUnderConstructionDetails: (x) => void
   setTokenomics: (x) => void
@@ -33,6 +32,7 @@ export const Tokenimics: FC<TokenomicsProps> = (props) => {
     isInvalidTokenName,
     visibleConfirm,
   ])
+
   return (
     <div className={styles.wrapper}>
       {!isCreate && (
