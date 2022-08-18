@@ -156,7 +156,6 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       } else {
         setOpen()
         pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
-        window.close()
 
         setOpen()
       }

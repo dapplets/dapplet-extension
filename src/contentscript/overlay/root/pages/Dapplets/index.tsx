@@ -118,7 +118,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       const tab = await getCurrentTab()
       if (!tab) return
       await openDappletAction(f.name, tab.id)
-      window.close()
     } catch (err) {
       console.error(err)
     } finally {
@@ -218,7 +217,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     // TODO: activeVersion or lastVersion
     await openDeployOverlay(f, f.activeVersion)
-    window.close()
   }
 
   const onOpenStore = async (f: ManifestAndDetails) => {

@@ -318,8 +318,6 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       await _updateData()
     } catch (e) {
       console.log(e)
-    } finally {
-      window.close()
     }
   }
   const deployNewModule = async () => {

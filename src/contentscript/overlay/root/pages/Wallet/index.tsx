@@ -63,7 +63,6 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
       handleWalletLengthConnect()
     } else {
       pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
-      window.close()
       handleWalletLengthConnect()
     }
   }
