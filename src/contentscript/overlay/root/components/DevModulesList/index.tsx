@@ -564,21 +564,19 @@ export const DevModule: FC<PropsDevModule> = (props) => {
               You deploy the first version of the "{mi.name}".
             </p>
             <p className={styles.modalDefaultContentText}>
-              After deploying the account
-              <span className={styles.modalLabelAccount}> {currentAccount}</span> will be the owner
-              of this dapplet.
+            After deployment the dapplet will be owned by this account - 
+              <span className={styles.modalLabelAccount}> {currentAccount}</span>
             </p>
             <br />
             <p className={styles.modalDefaultContentText}>
-              A dapplet’s ownership is represented through an NFT.
+            A dapplet’s ownership is represented through an NFT.
             </p>
             <p className={styles.modalDefaultContentText}>
-              When the dapplet is made this NFT will automatically be created and sent to account{' '}
-              <span className={styles.modalLabelAccount}>{currentAccount}</span>.
+              When the dapplet is made this NFT will automatically be created and sent to this account 
+              <span className={styles.modalLabelAccount}> {''}{currentAccount}</span>.
             </p>
             <p className={styles.modalDefaultContentText}>
-              You will be able to change the dapplet owner by transferring this NFT or by selling it
-              at a marketplace.
+            You can change the dapplet owner by transferring this NFT or by selling it at a marketplace.
             </p>
             <br />
             <button onClick={deployNewModule} className={styles.modalDefaultContentButton}>
