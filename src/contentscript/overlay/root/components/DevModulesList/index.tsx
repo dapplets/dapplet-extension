@@ -559,23 +559,24 @@ export const DevModule: FC<PropsDevModule> = (props) => {
         content={
           <div className={styles.modalDefaultContent}>
             <p className={styles.modalDefaultContentText}>
-              {` You deploy the first version of the ${mi.name} dapplet with the wallet
-              ${currentAccount}. If everything is correct, click OK. Or connect another
-              wallet.`}
-            </p>
-            <p className={styles.modalDefaultTitleAttension}>Attention!</p>
-            <p className={styles.modalDefaultContentText}>
-              A dapplet’s ownership is represented through an NFT.
+              You deploy the first version of the "{mi.name}".
             </p>
             <p className={styles.modalDefaultContentText}>
-              When the dapplet is made this NFT will automatically be created and sent to your
-              ETH-account.
+            After deployment the dapplet will be owned by this account - 
+              <span className={styles.modalLabelAccount}> {currentAccount}</span>
+            </p>
+            <br />
+            <p className={styles.modalDefaultContentText}>
+            A dapplet’s ownership is represented through an NFT.
             </p>
             <p className={styles.modalDefaultContentText}>
-              You will be able to change the dapplet owner by transferring this NFT or by selling it
-              at a marketplace.
+              When the dapplet is made this NFT will automatically be created and sent to this account 
+              <span className={styles.modalLabelAccount}> {''}{currentAccount}</span>.
             </p>
-
+            <p className={styles.modalDefaultContentText}>
+            You can change the dapplet owner by transferring this NFT or by selling it at a marketplace.
+            </p>
+            <br />
             <button onClick={deployNewModule} className={styles.modalDefaultContentButton}>
               Ok
             </button>

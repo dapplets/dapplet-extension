@@ -21,7 +21,7 @@ const UserButton = ({ user }: { user: IConnectedAccountUser }) => {
 
 const ConnectedAccountsModal = (props: any) => {
   const { data, onCloseClick, bus } = props
-  const { accountsToConnect, accountsToDisconnect, accountToChangeStatus } = data
+  const { accountsToConnect, accountsToDisconnect, accountToChangeStatus, condition } = data
 
   const [isWaiting, setIsWaiting] = useState(false)
 
@@ -54,7 +54,8 @@ const ConnectedAccountsModal = (props: any) => {
       setIsWaiting(true)
       requestId = await requestConnectingAccountsVerification(requestBody, minStakeAmount)
     } catch (err) {
-      console.log('Error in requestConnectingAccountsVerification().', err)
+      if (err.message !== 'User rejected the transaction.')
+        console.log('Error in requestConnectingAccountsVerification().', err)
     }
 
     setIsWaiting(false)
@@ -74,7 +75,8 @@ const ConnectedAccountsModal = (props: any) => {
         !account.accountActive
       )
     } catch (err) {
-      console.log('Error in changeConnectedAccountStatus().', err)
+      if (err.message !== 'User rejected the transaction.')
+        console.log('Error in changeConnectedAccountStatus().', err)
     }
 
     setIsWaiting(false)
@@ -138,6 +140,22 @@ const ConnectedAccountsModal = (props: any) => {
             await handleSetMainAccount(accountToChangeStatus)
           }}
           onConfirmLabel="Confirm"
+        />
+      )}
+      {!!condition && (
+        <Modal
+          isWaiting={isWaiting}
+          title={'Add your NEAR account ID'}
+          content={
+            'Add your NEAR account ID to your Twitter username. This is done so the Orace can confirm your ownership of the Twitter account'
+          }
+          onClose={onCloseClick}
+          onConfirm={async () => {
+            const frameId = data.frameId
+            bus.publish('ready', [frameId, 'ok'])
+            onCloseClick()
+          }}
+          onConfirmLabel="Already done"
         />
       )}
     </>

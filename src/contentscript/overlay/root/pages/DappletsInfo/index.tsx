@@ -450,10 +450,10 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
           Back
         </button>
         <button
-          disabled={isDisabledPush || !isNotNullCurrentAccount}
+          disabled={isDisabledPush }
           onClick={() => saveChanges()}
           className={cn(styles.push, {
-            [styles.pushDisabled]: isDisabledPush || !isNotNullCurrentAccount,
+            [styles.pushDisabled]: isDisabledPush,
           })}
         >
           Push changes

@@ -8,7 +8,8 @@
   flex-direction: column;
   justify-content: center;
 
-  width: 263px;
+  width: 80%;
+  margin: 0 auto;
 
   text-align: center;
 
@@ -84,4 +85,8 @@
 
   font-size: 24px;
   font-weight: 700;
+}
+
+.modalLabelAccount {
+  color: #eb5757;
 }

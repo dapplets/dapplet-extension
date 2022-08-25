@@ -216,7 +216,7 @@ export class EthRegistry implements Registry {
       // ToDo: utilize paging
       users.map((x) =>
         contract
-          .getModulesInfoByOwner(x, 0, 1000)
+          .getModulesInfoByOwner(x, 0, 100)
           .then((y) => y.modulesInfo.map((z) => ({ ...z, owner: x })))
       )
     )
