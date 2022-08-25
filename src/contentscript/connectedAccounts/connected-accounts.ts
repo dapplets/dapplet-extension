@@ -97,14 +97,26 @@ class ConnectedAccounts {
             user: condition['user'],
           })
         } else {
-          throw new Error('Connection conditions not met')
+          throw new Error(
+            `Incorrect origins for twitter/near-testnet type connection condition: ${firstOriginId} or ${secondOriginId}.`
+          )
         }
         break
       default:
-        throw new Error('Connection conditions not met')
+        throw new Error(`No such a condition type: ${condition.type}`)
     }
 
-    if (canConnect) {
+    if (!canConnect) {
+      const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
+      const thisTab = await getThisTab()
+      await openConnectedAccountsPopup(
+        {
+          condition: true,
+        },
+        thisTab.id
+      )
+      return -1
+    } else {
       const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
       const thisTab = await getThisTab()
       const { requestId } = await openConnectedAccountsPopup(
@@ -125,8 +137,6 @@ class ConnectedAccounts {
         thisTab.id
       )
       return requestId
-    } else {
-      throw new Error('Connection conditions not met')
     }
   }
 
