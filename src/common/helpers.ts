@@ -543,3 +543,11 @@ export function mergeSameWallets(descriptors: WalletDescriptor[]): WalletDescrip
 
   return wallets
 }
+
+export function convertTimestampToISODate(timestamp: number): string {
+  return new Date(timestamp).toISOString()
+}
+
+export function convertISODateToTimestamp(isoDate: string): number {
+  return new Date(isoDate).getTime() / 1000
+}

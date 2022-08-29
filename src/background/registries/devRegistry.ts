@@ -227,7 +227,7 @@ export class DevRegistry implements Registry {
     mi.title = dm.title
     mi.type = dm.type
     mi.description = dm.description
-    mi.fullDescription = dm.fullDescription
+    mi.metadata = dm.fullDescription
       ? {
           hash: null,
           uris: [new URL(dm.fullDescription, new URL(manifestUri, this._rootUrl).href).href],

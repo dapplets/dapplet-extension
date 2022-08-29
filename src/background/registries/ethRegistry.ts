@@ -1,7 +1,15 @@
 import * as ethers from 'ethers'
 import * as semver from 'semver'
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
-import { getBitFromHex, mergeDedupe, typeOfUri, UriTypes } from '../../common/helpers'
+import {
+  convertISODateToTimestamp,
+  convertTimestampToISODate,
+  getBitFromHex,
+  mergeDedupe,
+  typeOfUri,
+  UriTypes,
+} from '../../common/helpers'
+import { StorageRef } from '../../common/types'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import abi from './ethRegistryAbi'
@@ -18,7 +26,8 @@ type EthModuleInfo = {
   name: string // string
   title: string // string
   description: string // string
-  fullDescription: EthStorageRef
+  image: EthStorageRef
+  manifest: EthStorageRef
   icon: EthStorageRef
   owner: string // bytes32
   interfaces: string[] // string[]
@@ -28,21 +37,18 @@ type EthModuleInfo = {
 type EthDependencyDto = {
   name: string
   branch: string
-  major: number
-  minor: number
-  patch: number
+  version: string // bytes4
 }
 
 type EthVersionInfoDto = {
   branch: string // string
-  major: number // uint8
-  minor: number // uint8
-  patch: number // uint8
+  version: string // bytes4
   binary: EthStorageRef
   dependencies: EthDependencyDto[]
   interfaces: EthDependencyDto[] // bytes32[]
   flags: number // uint8
   extensionVersion: string
+  createdAt: ethers.BigNumber // uint256
 }
 
 type LinkString = { prev: string; next: string }
@@ -56,6 +62,22 @@ const moduleTypesMap: { [key: number]: ModuleTypes } = {
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 const ZERO_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
+
+const EMPTY_STORAGE_REF = {
+  hash: ZERO_BYTES32,
+  uris: [],
+}
+
+const EMPTY_VERSION: EthVersionInfoDto = {
+  branch: '',
+  version: '0x00000000',
+  binary: EMPTY_STORAGE_REF,
+  dependencies: [],
+  interfaces: [],
+  flags: 0,
+  extensionVersion: '0x00000000',
+  createdAt: ethers.BigNumber.from(0),
+}
 
 // ToDo: errors from here don't reach contentscript!
 export class EthRegistry implements Registry {
@@ -114,10 +136,7 @@ export class EthRegistry implements Registry {
       }
 
       const contract = await this._contractPromise
-      const {
-        modulesInfos,
-        ctxIdsOwners,
-      }: { modulesInfos: EthModuleInfo[][]; ctxIdsOwners: string[][] } =
+      const { modules, owners }: { modules: EthModuleInfo[][]; owners: string[][] } =
         await contract.getModulesInfoByListersBatch(
           contextIds,
           listers,
@@ -127,11 +146,9 @@ export class EthRegistry implements Registry {
       this.error = null
 
       const result = Object.fromEntries(
-        modulesInfos.map((modules, i) => {
+        modules.map((modules, i) => {
           const ctx = contextIds[i]
-          const mis = modules.map((m, j) =>
-            this._convertFromEthMi({ ...m, owner: ctxIdsOwners[i][j] })
-          )
+          const mis = modules.map((m, j) => this._convertFromEthMi({ ...m, owner: owners[i][j] }))
 
           if (!this._moduleInfoCache.get(usersCacheKey).has(ctx)) {
             this._moduleInfoCache.get(usersCacheKey).set(ctx, mis)
@@ -153,8 +170,8 @@ export class EthRegistry implements Registry {
   public async getModuleInfoByName(name: string): Promise<ModuleInfo> {
     try {
       const contract = await this._contractPromise
-      const { modulesInfo, owner } = await contract.getModuleInfoByName(name)
-      const mi = this._convertFromEthMi({ ...modulesInfo, owner })
+      const { modules: module, owner } = await contract.getModuleInfoByName(name)
+      const mi = this._convertFromEthMi({ ...module, owner })
       return mi
     } catch (err) {
       //console.error(err);
@@ -165,15 +182,18 @@ export class EthRegistry implements Registry {
   public async getVersionNumbers(name: string, branch: string): Promise<string[]> {
     try {
       const contract = await this._contractPromise
-      const hex: string = await contract.getVersionNumbers(name, branch)
+      const versions = await this._paginateAll<EthVersionInfoDto>(
+        (offset, limit) =>
+          contract
+            .getVersionsByModule(name, branch, offset, limit, true) // ordered by version desc
+            .then(({ versions, total }) => ({ items: versions, total: total.toNumber() })),
+        100
+      )
+
       this.isAvailable = true
       this.error = null
-      const result = (hex.replace('0x', '').match(/.{1,8}/g) ?? []).map((x) => {
-        const major = parseInt('0x' + x[0] + x[1])
-        const minor = parseInt('0x' + x[2] + x[3])
-        const patch = parseInt('0x' + x[4] + x[5])
-        return `${major}.${minor}.${patch}`
-      })
+
+      const result = versions.map((x) => this._convertFromEthVersion(x.version))
       return result
     } catch (err) {
       this.isAvailable = false
@@ -188,9 +208,7 @@ export class EthRegistry implements Registry {
       const response = await contract.getVersionInfo(
         name,
         branch,
-        semver.major(version),
-        semver.minor(version),
-        semver.patch(version)
+        this._convertToEthVersion(version)
       )
       const vi = this._convertFromEthVi(response.dto, response.moduleType, { name, branch })
       this.isAvailable = true
@@ -212,45 +230,30 @@ export class EthRegistry implements Registry {
     users: string[]
   }): Promise<{ module: ModuleInfo; versions: VersionInfo[] }[]> {
     const contract = await this._contractPromise
-    const devModules: EthModuleInfo[][] = await Promise.all(
-      // ToDo: utilize paging
-      users.map((x) =>
-        contract
-          .getModulesInfoByOwner(x, 0, 100)
-          .then((y) => y.modulesInfo.map((z) => ({ ...z, owner: x })))
+    const result: { module: ModuleInfo; versions: VersionInfo[] }[][] = await Promise.all(
+      users.map((account) =>
+        this._paginateAll<{ module: ModuleInfo; versions: VersionInfo[] }>(
+          (offset, limit) =>
+            contract
+              .getModulesByOwner(account, DEFAULT_BRANCH_NAME, offset, limit, true)
+              .then((resp) => ({
+                items: resp.modules.map((module, i) => ({
+                  module: this._convertFromEthMi({ ...module, owner: account }),
+                  versions: [
+                    this._convertFromEthVi(resp.lastVersions[i], resp.modules[i].moduleType, {
+                      name: resp.modules[i].name,
+                      branch: resp.lastVersions[i].branch,
+                    }),
+                  ],
+                })),
+                total: resp.total.toNumber(),
+              })),
+          100
+        )
       )
     )
 
-    const modules = mergeDedupe(devModules).map((x) => this._convertFromEthMi(x))
-    const modulesWithLastVersions = await Promise.all(
-      modules.map((a) =>
-        this.getVersionNumbers(a.name, DEFAULT_BRANCH_NAME) // ToDo: fetch another branches
-          .then((b) => (b.length > 0 ? b[b.length - 1] : null))
-          .then((c) =>
-            c !== null
-              ? contract
-                  .getVersionInfo(
-                    a.name,
-                    DEFAULT_BRANCH_NAME,
-                    semver.major(c),
-                    semver.minor(c),
-                    semver.patch(c)
-                  )
-                  .catch(() => null)
-              : null
-          )
-          .then((d) =>
-            d
-              ? this._convertFromEthVi(d.dto, d.moduleType, {
-                  name: a.name,
-                  branch: DEFAULT_BRANCH_NAME,
-                })
-              : null
-          )
-          .then((e) => ({ module: a, versions: e ? [e] : [] }))
-      )
-    )
-    return modulesWithLastVersions
+    return mergeDedupe(result)
   }
 
   public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
@@ -258,19 +261,26 @@ export class EthRegistry implements Registry {
 
     const isModuleExist = await contract
       .getModuleInfoByName(module.name)
-      .then((x) => !!x)
+      .then(() => true)
       .catch(() => false)
 
     if (isModuleExist && !version) throw new Error('A module with such name already exists.')
 
     if (!isModuleExist) {
       const mi = this._convertToEthMi(module)
-      const vis = version ? [this._convertToEthVi(version)] : []
+      const vi = version ? this._convertToEthVi(version) : EMPTY_VERSION
 
       // add module in the end of a listing
       let links: LinkString[] = []
       const signerAddress = await this._signer.getAddress()
-      const listedModules = await contract.getModulesOfListing(signerAddress)
+      const listedModules = await contract.getModulesOfListing(
+        signerAddress,
+        DEFAULT_BRANCH_NAME,
+        0,
+        1,
+        true
+      ) // ordered by version desc
+
       if (listedModules.length === 0) {
         links = [
           {
@@ -283,7 +293,7 @@ export class EthRegistry implements Registry {
           },
         ]
       } else {
-        const last = listedModules[listedModules.length - 1]
+        const last = listedModules[0]
         links = [
           {
             prev: last,
@@ -296,7 +306,7 @@ export class EthRegistry implements Registry {
         ]
       }
 
-      const tx = await contract.addModuleInfo(module.contextIds, links, mi, vis)
+      const tx = await contract.addModuleInfo(module.contextIds, links, mi, vi)
       await tx.wait()
     } else {
       const vi = this._convertToEthVi(version)
@@ -318,8 +328,8 @@ export class EthRegistry implements Registry {
 
   public async transferOwnership(moduleName: string, newAccount: string, oldAccount: string) {
     const contract = await this._contractPromise
-    const moduleIdx = await contract.getModuleIndx(moduleName)
-    const nftAddress = await contract.getNFTContractAddress()
+    const moduleIdx = await contract.getModuleIndex(moduleName)
+    const nftAddress = await contract.getNftContractAddress()
     const nftContract = new ethers.Contract(nftAddress, nftAbi, this._signer)
     const tx = await nftContract.transferFrom(oldAccount, newAccount, moduleIdx)
     await tx.wait()
@@ -365,7 +375,8 @@ export class EthRegistry implements Registry {
       ethMi.name,
       ethMi.title,
       ethMi.description,
-      ethMi.fullDescription,
+      ethMi.image,
+      ethMi.manifest,
       ethMi.icon
     )
   }
@@ -377,14 +388,9 @@ export class EthRegistry implements Registry {
     mi.title = m.title
     mi.description = m.description
     mi.author = m.owner
-    mi.icon = {
-      hash: m.icon.hash,
-      uris: m.icon.uris.map((u) => ethers.utils.toUtf8String(u)),
-    }
-    mi.fullDescription = {
-      hash: m.fullDescription.hash,
-      uris: m.fullDescription.uris.map((u) => ethers.utils.toUtf8String(u)),
-    }
+    mi.image = this._convertFromEthStorageRef(m.image)
+    mi.metadata = this._convertFromEthStorageRef(m.manifest)
+    mi.icon = this._convertFromEthStorageRef(m.icon)
     mi.interfaces = m.interfaces
     mi.registryUrl = this.url
     mi.isUnderConstruction = getBitFromHex(m.flags.toHexString(), 0)
@@ -400,21 +406,17 @@ export class EthRegistry implements Registry {
     vi.registryUrl = this.url
     vi.name = name
     vi.branch = branch
-    vi.version = `${dto.major}.${dto.minor}.${dto.patch}`
+    vi.version = this._convertFromEthVersion(dto.version)
     vi.type = moduleTypesMap[moduleType]
-    vi.dist = {
-      hash: dto.binary.hash,
-      uris: dto.binary.uris.map((u) => ethers.utils.toUtf8String(u)),
-    }
+    vi.dist = this._convertFromEthStorageRef(dto.binary)
     vi.dependencies = Object.fromEntries(
-      dto.dependencies.map((d) => [d.name, d.major + '.' + d.minor + '.' + d.patch])
+      dto.dependencies.map((d) => [d.name, this._convertFromEthVersion(d.version)])
     )
     vi.interfaces = Object.fromEntries(
-      dto.interfaces.map((d) => [d.name, d.major + '.' + d.minor + '.' + d.patch])
+      dto.interfaces.map((d) => [d.name, this._convertFromEthVersion(d.version)])
     )
-    const v = dto.extensionVersion
-    vi.extensionVersion =
-      parseInt(v[2] + v[3], 16) + '.' + parseInt(v[4] + v[5], 16) + '.' + parseInt(v[6] + v[7], 16)
+    vi.extensionVersion = this._convertFromEthVersion(dto.extensionVersion)
+    vi.createdAt = convertTimestampToISODate(dto.createdAt.toNumber())
     return vi
   }
 
@@ -424,77 +426,85 @@ export class EthRegistry implements Registry {
       moduleType: parseInt(Object.entries(moduleTypesMap).find(([, v]) => v === module.type)[0]),
       flags: ethers.BigNumber.from('0x00'),
       title: module.title,
+      image: module.image,
       description: module.description,
-      fullDescription: module.fullDescription
-        ? {
-            hash: module.fullDescription.hash,
-            uris: module.fullDescription.uris.map((u) =>
-              ethers.utils.hexlify(ethers.utils.toUtf8Bytes(u))
-            ),
-          }
-        : {
-            hash: ZERO_BYTES32,
-            uris: [],
-          },
-      icon: module.icon
-        ? {
-            hash: module.icon.hash,
-            uris: module.icon.uris.map((u) => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(u))),
-          }
-        : {
-            hash: ZERO_BYTES32,
-            uris: [],
-          },
+      manifest: module.metadata,
+      icon: module.icon,
       owner: ZERO_ADDRESS,
       interfaces: module.interfaces || [],
     }
   }
 
   private _convertToEthVi(version: VersionInfo): EthVersionInfoDto {
+    const convertDependencies = (dependencies: { [name: string]: string }): EthDependencyDto[] => {
+      return (
+        (dependencies &&
+          Object.entries(dependencies).map(([k, v]) => ({
+            name: k,
+            branch: 'default',
+            version: this._convertToEthVersion(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
+          }))) ||
+        []
+      )
+    }
+
+    return {
+      branch: version.branch,
+      version: this._convertToEthVersion(version.version),
+      binary: version.dist,
+      dependencies: convertDependencies(version.dependencies),
+      interfaces: convertDependencies(version.interfaces),
+      flags: 0,
+      extensionVersion: this._convertToEthVersion(version.extensionVersion),
+      createdAt: ethers.BigNumber.from(convertISODateToTimestamp(version.createdAt)),
+    }
+  }
+
+  private _convertFromEthVersion(hex: string): string {
+    if (hex.length != 10) throw new Error('Invalid hex of version')
+    const major = parseInt(hex.substr(2, 2), 16)
+    const minor = parseInt(hex.substr(4, 2), 16)
+    const patch = parseInt(hex.substr(6, 2), 16)
+    const pre = parseInt(hex.substr(8, 2), 16)
+    return `${major}.${minor}.${patch}` + (pre !== 255 ? `-pre.${pre}` : '')
+  }
+
+  private _convertToEthVersion(version: string): string {
+    if (!version) return '0x000000ff'
+
     const toTwoDigits = (n: string) => {
       return n.length < 2 ? '0' + n : n.length > 2 ? 'ff' : n
     }
+
+    return (
+      '0x' +
+      toTwoDigits(semver.major(version).toString(16)) +
+      toTwoDigits(semver.minor(version).toString(16)) +
+      toTwoDigits(semver.patch(version).toString(16)) +
+      toTwoDigits(semver.prerelease(version)?.[1].toString(16) ?? 'ff')
+    )
+  }
+
+  private _convertFromEthStorageRef(storageRef: EthStorageRef): StorageRef {
     return {
-      branch: version.branch,
-      major: semver.major(version.version),
-      minor: semver.minor(version.version),
-      patch: semver.patch(version.version),
-      binary: version.dist
-        ? {
-            hash: version.dist.hash,
-            uris: version.dist.uris.map((u) => ethers.utils.hexlify(ethers.utils.toUtf8Bytes(u))),
-          }
-        : {
-            hash: ZERO_BYTES32,
-            uris: [],
-          },
-      dependencies:
-        (version.dependencies &&
-          Object.entries(version.dependencies).map(([k, v]) => ({
-            name: k,
-            branch: 'default',
-            major: semver.major(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
-            minor: semver.minor(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
-            patch: semver.patch(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
-          }))) ||
-        [],
-      interfaces:
-        (version.interfaces &&
-          Object.entries(version.interfaces).map(([k, v]) => ({
-            name: k,
-            branch: 'default',
-            major: semver.major(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
-            minor: semver.minor(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
-            patch: semver.patch(typeof v === 'string' ? v : v[DEFAULT_BRANCH_NAME]),
-          }))) ||
-        [],
-      flags: 0,
-      extensionVersion: !version.extensionVersion
-        ? '0x000000'
-        : '0x' +
-          toTwoDigits(semver.major(version.extensionVersion).toString(16)) +
-          toTwoDigits(semver.minor(version.extensionVersion).toString(16)) +
-          toTwoDigits(semver.patch(version.extensionVersion).toString(16)),
+      hash: storageRef.hash,
+      uris: storageRef.uris,
     }
+  }
+
+  private async _paginateAll<T>(
+    callback: (offset: number, limit: number) => Promise<{ items: T[]; total: number }>,
+    pageSize
+  ) {
+    const out: T[] = []
+    let total = null
+
+    for (let i = 0; total === null || i < total; i = i + pageSize) {
+      const { items, total: _total } = await callback(i, pageSize)
+      out.push(...items)
+      total = _total
+    }
+
+    return out
   }
 }

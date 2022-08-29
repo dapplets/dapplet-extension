@@ -11,7 +11,8 @@ export default class ModuleInfo extends Base {
   title: string = null
   description: string = null
   author: string = null
-  fullDescription?: StorageRef = null
+  image?: StorageRef = null
+  metadata?: StorageRef = null
   icon?: StorageRef = null
   interfaces: string[] = []
   contextIds: string[] = []

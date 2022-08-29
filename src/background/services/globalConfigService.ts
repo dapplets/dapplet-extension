@@ -221,7 +221,7 @@ export default class GlobalConfigService {
     config.id = this._defaultConfigId
     config.isActive = true
     config.registries = [
-      { url: '0x61B5cAe60fD15D30b953cE03d9D3AF58d5087B2d', isDev: false, isEnabled: true },
+      { url: 'v2.registry.dapplet-base.eth', isDev: false, isEnabled: true },
       {
         url: 'dev-1627024020035-70641704943070',
         isDev: false,
@@ -250,7 +250,7 @@ export default class GlobalConfigService {
     ]
     config.devMode = true
     config.trustedUsers = [
-      { account: 'team.dapplet-base.eth' },
+      { account: 'listing.dapplet-base.eth' },
       { account: 'buidl.testnet' },
       { account: 'nik3ter.testnet' },
       { account: 'dapplets.testnet' },

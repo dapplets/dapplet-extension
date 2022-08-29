@@ -1,33 +1,51 @@
 export default [
   {
-    inputs: [{ internalType: 'address', name: '_dappletNFTContractAddress', type: 'address' }],
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_dappletNFTContractAddress',
+        type: 'address',
+      },
+    ],
     stateMutability: 'nonpayable',
     type: 'constructor',
   },
   {
-    anonymous: false,
     inputs: [
-      { indexed: false, internalType: 'string[]', name: 'contextIds', type: 'string[]' },
-      { indexed: false, internalType: 'address', name: 'owner', type: 'address' },
-      { indexed: false, internalType: 'uint32', name: 'moduleIndex', type: 'uint32' },
-    ],
-    name: 'ModuleInfoAdded',
-    type: 'event',
-  },
-  {
-    inputs: [
-      { internalType: 'string', name: 'mod_name', type: 'string' },
-      { internalType: 'address', name: 'admin', type: 'address' },
+      {
+        internalType: 'string',
+        name: 'moduleName',
+        type: 'string',
+      },
+      {
+        internalType: 'address',
+        name: 'admin',
+        type: 'address',
+      },
     ],
     name: 'addAdmin',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
     inputs: [
-      { internalType: 'string', name: 'mod_name', type: 'string' },
-      { internalType: 'string', name: 'contextId', type: 'string' },
+      {
+        internalType: 'string',
+        name: 'moduleName',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'contextId',
+        type: 'string',
+      },
     ],
     name: 'addContextId',
     outputs: [],
@@ -36,11 +54,23 @@ export default [
   },
   {
     inputs: [
-      { internalType: 'string[]', name: 'contextIds', type: 'string[]' },
+      {
+        internalType: 'string[]',
+        name: 'contextIds',
+        type: 'string[]',
+      },
       {
         components: [
-          { internalType: 'string', name: 'prev', type: 'string' },
-          { internalType: 'string', name: 'next', type: 'string' },
+          {
+            internalType: 'string',
+            name: 'prev',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'next',
+            type: 'string',
+          },
         ],
         internalType: 'struct LinkString[]',
         name: 'links',
@@ -48,30 +78,87 @@ export default [
       },
       {
         components: [
-          { internalType: 'uint8', name: 'moduleType', type: 'uint8' },
-          { internalType: 'string', name: 'name', type: 'string' },
-          { internalType: 'string', name: 'title', type: 'string' },
-          { internalType: 'string', name: 'description', type: 'string' },
+          {
+            internalType: 'uint8',
+            name: 'moduleType',
+            type: 'uint8',
+          },
+          {
+            internalType: 'string',
+            name: 'name',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'title',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'description',
+            type: 'string',
+          },
           {
             components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
             ],
             internalType: 'struct StorageRef',
-            name: 'fullDescription',
+            name: 'image',
             type: 'tuple',
           },
           {
             components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'manifest',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
             ],
             internalType: 'struct StorageRef',
             name: 'icon',
             type: 'tuple',
           },
-          { internalType: 'string[]', name: 'interfaces', type: 'string[]' },
-          { internalType: 'uint256', name: 'flags', type: 'uint256' },
+          {
+            internalType: 'string[]',
+            name: 'interfaces',
+            type: 'string[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
         ],
         internalType: 'struct ModuleInfo',
         name: 'mInfo',
@@ -79,14 +166,28 @@ export default [
       },
       {
         components: [
-          { internalType: 'string', name: 'branch', type: 'string' },
-          { internalType: 'uint8', name: 'major', type: 'uint8' },
-          { internalType: 'uint8', name: 'minor', type: 'uint8' },
-          { internalType: 'uint8', name: 'patch', type: 'uint8' },
+          {
+            internalType: 'string',
+            name: 'branch',
+            type: 'string',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'version',
+            type: 'bytes4',
+          },
           {
             components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
             ],
             internalType: 'struct StorageRef',
             name: 'binary',
@@ -94,11 +195,21 @@ export default [
           },
           {
             components: [
-              { internalType: 'string', name: 'name', type: 'string' },
-              { internalType: 'string', name: 'branch', type: 'string' },
-              { internalType: 'uint8', name: 'major', type: 'uint8' },
-              { internalType: 'uint8', name: 'minor', type: 'uint8' },
-              { internalType: 'uint8', name: 'patch', type: 'uint8' },
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
             ],
             internalType: 'struct DependencyDto[]',
             name: 'dependencies',
@@ -106,22 +217,45 @@ export default [
           },
           {
             components: [
-              { internalType: 'string', name: 'name', type: 'string' },
-              { internalType: 'string', name: 'branch', type: 'string' },
-              { internalType: 'uint8', name: 'major', type: 'uint8' },
-              { internalType: 'uint8', name: 'minor', type: 'uint8' },
-              { internalType: 'uint8', name: 'patch', type: 'uint8' },
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
             ],
             internalType: 'struct DependencyDto[]',
             name: 'interfaces',
             type: 'tuple[]',
           },
-          { internalType: 'uint8', name: 'flags', type: 'uint8' },
-          { internalType: 'bytes3', name: 'extensionVersion', type: 'bytes3' },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'extensionVersion',
+            type: 'bytes4',
+          },
+          {
+            internalType: 'uint256',
+            name: 'createdAt',
+            type: 'uint256',
+          },
         ],
-        internalType: 'struct VersionInfoDto[]',
-        name: 'vInfos',
-        type: 'tuple[]',
+        internalType: 'struct VersionInfoDto',
+        name: 'vInfo',
+        type: 'tuple',
       },
     ],
     name: 'addModuleInfo',
@@ -131,17 +265,35 @@ export default [
   },
   {
     inputs: [
-      { internalType: 'string', name: 'mod_name', type: 'string' },
+      {
+        internalType: 'string',
+        name: 'moduleName',
+        type: 'string',
+      },
       {
         components: [
-          { internalType: 'string', name: 'branch', type: 'string' },
-          { internalType: 'uint8', name: 'major', type: 'uint8' },
-          { internalType: 'uint8', name: 'minor', type: 'uint8' },
-          { internalType: 'uint8', name: 'patch', type: 'uint8' },
+          {
+            internalType: 'string',
+            name: 'branch',
+            type: 'string',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'version',
+            type: 'bytes4',
+          },
           {
             components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
             ],
             internalType: 'struct StorageRef',
             name: 'binary',
@@ -149,11 +301,21 @@ export default [
           },
           {
             components: [
-              { internalType: 'string', name: 'name', type: 'string' },
-              { internalType: 'string', name: 'branch', type: 'string' },
-              { internalType: 'uint8', name: 'major', type: 'uint8' },
-              { internalType: 'uint8', name: 'minor', type: 'uint8' },
-              { internalType: 'uint8', name: 'patch', type: 'uint8' },
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
             ],
             internalType: 'struct DependencyDto[]',
             name: 'dependencies',
@@ -161,18 +323,41 @@ export default [
           },
           {
             components: [
-              { internalType: 'string', name: 'name', type: 'string' },
-              { internalType: 'string', name: 'branch', type: 'string' },
-              { internalType: 'uint8', name: 'major', type: 'uint8' },
-              { internalType: 'uint8', name: 'minor', type: 'uint8' },
-              { internalType: 'uint8', name: 'patch', type: 'uint8' },
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
             ],
             internalType: 'struct DependencyDto[]',
             name: 'interfaces',
             type: 'tuple[]',
           },
-          { internalType: 'uint8', name: 'flags', type: 'uint8' },
-          { internalType: 'bytes3', name: 'extensionVersion', type: 'bytes3' },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'extensionVersion',
+            type: 'bytes4',
+          },
+          {
+            internalType: 'uint256',
+            name: 'createdAt',
+            type: 'uint256',
+          },
         ],
         internalType: 'struct VersionInfoDto',
         name: 'vInfo',
@@ -186,65 +371,18 @@ export default [
   },
   {
     inputs: [
-      { internalType: 'string[]', name: 'mod_name', type: 'string[]' },
       {
         components: [
-          { internalType: 'string', name: 'branch', type: 'string' },
-          { internalType: 'uint8', name: 'major', type: 'uint8' },
-          { internalType: 'uint8', name: 'minor', type: 'uint8' },
-          { internalType: 'uint8', name: 'patch', type: 'uint8' },
           {
-            components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
-            ],
-            internalType: 'struct StorageRef',
-            name: 'binary',
-            type: 'tuple',
+            internalType: 'string',
+            name: 'prev',
+            type: 'string',
           },
           {
-            components: [
-              { internalType: 'string', name: 'name', type: 'string' },
-              { internalType: 'string', name: 'branch', type: 'string' },
-              { internalType: 'uint8', name: 'major', type: 'uint8' },
-              { internalType: 'uint8', name: 'minor', type: 'uint8' },
-              { internalType: 'uint8', name: 'patch', type: 'uint8' },
-            ],
-            internalType: 'struct DependencyDto[]',
-            name: 'dependencies',
-            type: 'tuple[]',
+            internalType: 'string',
+            name: 'next',
+            type: 'string',
           },
-          {
-            components: [
-              { internalType: 'string', name: 'name', type: 'string' },
-              { internalType: 'string', name: 'branch', type: 'string' },
-              { internalType: 'uint8', name: 'major', type: 'uint8' },
-              { internalType: 'uint8', name: 'minor', type: 'uint8' },
-              { internalType: 'uint8', name: 'patch', type: 'uint8' },
-            ],
-            internalType: 'struct DependencyDto[]',
-            name: 'interfaces',
-            type: 'tuple[]',
-          },
-          { internalType: 'uint8', name: 'flags', type: 'uint8' },
-          { internalType: 'bytes3', name: 'extensionVersion', type: 'bytes3' },
-        ],
-        internalType: 'struct VersionInfoDto[]',
-        name: 'vInfo',
-        type: 'tuple[]',
-      },
-    ],
-    name: 'addModuleVersionBatch',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        components: [
-          { internalType: 'string', name: 'prev', type: 'string' },
-          { internalType: 'string', name: 'next', type: 'string' },
         ],
         internalType: 'struct LinkString[]',
         name: 'links',
@@ -258,32 +396,91 @@ export default [
   },
   {
     inputs: [
-      { internalType: 'address', name: 'lister', type: 'address' },
-      { internalType: 'string', name: 'moduleName', type: 'string' },
+      {
+        internalType: 'address',
+        name: 'lister',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'moduleName',
+        type: 'string',
+      },
     ],
     name: 'containsModuleInListing',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [
-      { internalType: 'string', name: 'name', type: 'string' },
-      { internalType: 'string', name: 'title', type: 'string' },
-      { internalType: 'string', name: 'description', type: 'string' },
+      {
+        internalType: 'string',
+        name: 'name',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'title',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'description',
+        type: 'string',
+      },
       {
         components: [
-          { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-          { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
+          {
+            internalType: 'bytes32',
+            name: 'hash',
+            type: 'bytes32',
+          },
+          {
+            internalType: 'string[]',
+            name: 'uris',
+            type: 'string[]',
+          },
         ],
         internalType: 'struct StorageRef',
-        name: 'fullDescription',
+        name: 'image',
         type: 'tuple',
       },
       {
         components: [
-          { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-          { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
+          {
+            internalType: 'bytes32',
+            name: 'hash',
+            type: 'bytes32',
+          },
+          {
+            internalType: 'string[]',
+            name: 'uris',
+            type: 'string[]',
+          },
+        ],
+        internalType: 'struct StorageRef',
+        name: 'manifest',
+        type: 'tuple',
+      },
+      {
+        components: [
+          {
+            internalType: 'bytes32',
+            name: 'hash',
+            type: 'bytes32',
+          },
+          {
+            internalType: 'string[]',
+            name: 'uris',
+            type: 'string[]',
+          },
         ],
         internalType: 'struct StorageRef',
         name: 'icon',
@@ -296,292 +493,485 @@ export default [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'string', name: 'mod_name', type: 'string' }],
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'moduleName',
+        type: 'string',
+      },
+    ],
     name: 'getAdminsByModule',
-    outputs: [{ internalType: 'address[]', name: '', type: 'address[]' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'string', name: 'mod_name', type: 'string' }],
-    name: 'getContextIdsByModule',
-    outputs: [{ internalType: 'string[]', name: '', type: 'string[]' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getListers',
-    outputs: [{ internalType: 'address[]', name: '', type: 'address[]' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: 'lister', type: 'address' }],
-    name: 'getListingSize',
-    outputs: [{ internalType: 'uint32', name: '', type: 'uint32' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'string', name: 'mod_name', type: 'string' }],
-    name: 'getModuleIndx',
-    outputs: [{ internalType: 'uint32', name: 'moduleIdx', type: 'uint32' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'string', name: 'mod_name', type: 'string' }],
-    name: 'getModuleInfoByName',
     outputs: [
       {
-        components: [
-          { internalType: 'uint8', name: 'moduleType', type: 'uint8' },
-          { internalType: 'string', name: 'name', type: 'string' },
-          { internalType: 'string', name: 'title', type: 'string' },
-          { internalType: 'string', name: 'description', type: 'string' },
-          {
-            components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
-            ],
-            internalType: 'struct StorageRef',
-            name: 'fullDescription',
-            type: 'tuple',
-          },
-          {
-            components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
-            ],
-            internalType: 'struct StorageRef',
-            name: 'icon',
-            type: 'tuple',
-          },
-          { internalType: 'string[]', name: 'interfaces', type: 'string[]' },
-          { internalType: 'uint256', name: 'flags', type: 'uint256' },
-        ],
-        internalType: 'struct ModuleInfo',
-        name: 'modulesInfo',
-        type: 'tuple',
+        internalType: 'address[]',
+        name: '',
+        type: 'address[]',
       },
-      { internalType: 'address', name: 'owner', type: 'address' },
     ],
     stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [
-      { internalType: 'uint256', name: 'offset', type: 'uint256' },
-      { internalType: 'uint256', name: 'limit', type: 'uint256' },
+      {
+        internalType: 'string',
+        name: 'name',
+        type: 'string',
+      },
+    ],
+    name: 'getBranchesByModule',
+    outputs: [
+      {
+        internalType: 'string[]',
+        name: '',
+        type: 'string[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'moduleName',
+        type: 'string',
+      },
+    ],
+    name: 'getContextIdsByModule',
+    outputs: [
+      {
+        internalType: 'string[]',
+        name: '',
+        type: 'string[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'offset',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'limit',
+        type: 'uint256',
+      },
+    ],
+    name: 'getListers',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: 'listers',
+        type: 'address[]',
+      },
+      {
+        internalType: 'uint256',
+        name: 'total',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'moduleName',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'offset',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'limit',
+        type: 'uint256',
+      },
+    ],
+    name: 'getListersByModule',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: 'out',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'index',
+        type: 'uint256',
+      },
+    ],
+    name: 'getModuleByIndex',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'uint8',
+            name: 'moduleType',
+            type: 'uint8',
+          },
+          {
+            internalType: 'string',
+            name: 'name',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'title',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'description',
+            type: 'string',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'image',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'manifest',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'icon',
+            type: 'tuple',
+          },
+          {
+            internalType: 'string[]',
+            name: 'interfaces',
+            type: 'string[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct ModuleInfo',
+        name: '',
+        type: 'tuple',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'moduleName',
+        type: 'string',
+      },
+    ],
+    name: 'getModuleIndex',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'moduleIdx',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'moduleName',
+        type: 'string',
+      },
+    ],
+    name: 'getModuleInfoByName',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'uint8',
+            name: 'moduleType',
+            type: 'uint8',
+          },
+          {
+            internalType: 'string',
+            name: 'name',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'title',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'description',
+            type: 'string',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'image',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'manifest',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'icon',
+            type: 'tuple',
+          },
+          {
+            internalType: 'string[]',
+            name: 'interfaces',
+            type: 'string[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct ModuleInfo',
+        name: 'modules',
+        type: 'tuple',
+      },
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'branch',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'offset',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'limit',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bool',
+        name: 'reverse',
+        type: 'bool',
+      },
     ],
     name: 'getModules',
     outputs: [
       {
         components: [
-          { internalType: 'uint8', name: 'moduleType', type: 'uint8' },
-          { internalType: 'string', name: 'name', type: 'string' },
-          { internalType: 'string', name: 'title', type: 'string' },
-          { internalType: 'string', name: 'description', type: 'string' },
+          {
+            internalType: 'uint8',
+            name: 'moduleType',
+            type: 'uint8',
+          },
+          {
+            internalType: 'string',
+            name: 'name',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'title',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'description',
+            type: 'string',
+          },
           {
             components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
             ],
             internalType: 'struct StorageRef',
-            name: 'fullDescription',
+            name: 'image',
             type: 'tuple',
           },
           {
             components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'manifest',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
             ],
             internalType: 'struct StorageRef',
             name: 'icon',
             type: 'tuple',
           },
-          { internalType: 'string[]', name: 'interfaces', type: 'string[]' },
-          { internalType: 'uint256', name: 'flags', type: 'uint256' },
+          {
+            internalType: 'string[]',
+            name: 'interfaces',
+            type: 'string[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
         ],
         internalType: 'struct ModuleInfo[]',
         name: 'modules',
         type: 'tuple[]',
       },
-      { internalType: 'address[]', name: 'owners', type: 'address[]' },
-      { internalType: 'uint256', name: 'nextOffset', type: 'uint256' },
-      { internalType: 'uint256', name: 'totalModules', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'string', name: 'ctxId', type: 'string' },
-      { internalType: 'address[]', name: 'listers', type: 'address[]' },
-      { internalType: 'uint32', name: 'maxBufLen', type: 'uint32' },
-    ],
-    name: 'getModulesInfoByListers',
-    outputs: [
       {
         components: [
-          { internalType: 'uint8', name: 'moduleType', type: 'uint8' },
-          { internalType: 'string', name: 'name', type: 'string' },
-          { internalType: 'string', name: 'title', type: 'string' },
-          { internalType: 'string', name: 'description', type: 'string' },
           {
-            components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
-            ],
-            internalType: 'struct StorageRef',
-            name: 'fullDescription',
-            type: 'tuple',
+            internalType: 'string',
+            name: 'branch',
+            type: 'string',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'version',
+            type: 'bytes4',
           },
           {
             components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
-            ],
-            internalType: 'struct StorageRef',
-            name: 'icon',
-            type: 'tuple',
-          },
-          { internalType: 'string[]', name: 'interfaces', type: 'string[]' },
-          { internalType: 'uint256', name: 'flags', type: 'uint256' },
-        ],
-        internalType: 'struct ModuleInfo[]',
-        name: 'modulesInfo',
-        type: 'tuple[]',
-      },
-      { internalType: 'address[]', name: 'owners', type: 'address[]' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'string[]', name: 'ctxIds', type: 'string[]' },
-      { internalType: 'address[]', name: 'listers', type: 'address[]' },
-      { internalType: 'uint32', name: 'maxBufLen', type: 'uint32' },
-    ],
-    name: 'getModulesInfoByListersBatch',
-    outputs: [
-      {
-        components: [
-          { internalType: 'uint8', name: 'moduleType', type: 'uint8' },
-          { internalType: 'string', name: 'name', type: 'string' },
-          { internalType: 'string', name: 'title', type: 'string' },
-          { internalType: 'string', name: 'description', type: 'string' },
-          {
-            components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
-            ],
-            internalType: 'struct StorageRef',
-            name: 'fullDescription',
-            type: 'tuple',
-          },
-          {
-            components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
-            ],
-            internalType: 'struct StorageRef',
-            name: 'icon',
-            type: 'tuple',
-          },
-          { internalType: 'string[]', name: 'interfaces', type: 'string[]' },
-          { internalType: 'uint256', name: 'flags', type: 'uint256' },
-        ],
-        internalType: 'struct ModuleInfo[][]',
-        name: 'modulesInfos',
-        type: 'tuple[][]',
-      },
-      { internalType: 'address[][]', name: 'ctxIdsOwners', type: 'address[][]' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'address', name: 'userId', type: 'address' },
-      { internalType: 'uint256', name: 'offset', type: 'uint256' },
-      { internalType: 'uint256', name: 'limit', type: 'uint256' },
-    ],
-    name: 'getModulesInfoByOwner',
-    outputs: [
-      {
-        components: [
-          { internalType: 'uint8', name: 'moduleType', type: 'uint8' },
-          { internalType: 'string', name: 'name', type: 'string' },
-          { internalType: 'string', name: 'title', type: 'string' },
-          { internalType: 'string', name: 'description', type: 'string' },
-          {
-            components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
-            ],
-            internalType: 'struct StorageRef',
-            name: 'fullDescription',
-            type: 'tuple',
-          },
-          {
-            components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
-            ],
-            internalType: 'struct StorageRef',
-            name: 'icon',
-            type: 'tuple',
-          },
-          { internalType: 'string[]', name: 'interfaces', type: 'string[]' },
-          { internalType: 'uint256', name: 'flags', type: 'uint256' },
-        ],
-        internalType: 'struct ModuleInfo[]',
-        name: 'modulesInfo',
-        type: 'tuple[]',
-      },
-      { internalType: 'uint256', name: 'nextOffset', type: 'uint256' },
-      { internalType: 'uint256', name: 'totalModules', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'address', name: 'lister', type: 'address' }],
-    name: 'getModulesOfListing',
-    outputs: [{ internalType: 'string[]', name: 'out', type: 'string[]' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getNFTContractAddress',
-    outputs: [{ internalType: 'address', name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'string', name: 'name', type: 'string' },
-      { internalType: 'string', name: 'branch', type: 'string' },
-      { internalType: 'uint8', name: 'major', type: 'uint8' },
-      { internalType: 'uint8', name: 'minor', type: 'uint8' },
-      { internalType: 'uint8', name: 'patch', type: 'uint8' },
-    ],
-    name: 'getVersionInfo',
-    outputs: [
-      {
-        components: [
-          { internalType: 'string', name: 'branch', type: 'string' },
-          { internalType: 'uint8', name: 'major', type: 'uint8' },
-          { internalType: 'uint8', name: 'minor', type: 'uint8' },
-          { internalType: 'uint8', name: 'patch', type: 'uint8' },
-          {
-            components: [
-              { internalType: 'bytes32', name: 'hash', type: 'bytes32' },
-              { internalType: 'bytes[]', name: 'uris', type: 'bytes[]' },
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
             ],
             internalType: 'struct StorageRef',
             name: 'binary',
@@ -589,11 +979,21 @@ export default [
           },
           {
             components: [
-              { internalType: 'string', name: 'name', type: 'string' },
-              { internalType: 'string', name: 'branch', type: 'string' },
-              { internalType: 'uint8', name: 'major', type: 'uint8' },
-              { internalType: 'uint8', name: 'minor', type: 'uint8' },
-              { internalType: 'uint8', name: 'patch', type: 'uint8' },
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
             ],
             internalType: 'struct DependencyDto[]',
             name: 'dependencies',
@@ -601,52 +1001,925 @@ export default [
           },
           {
             components: [
-              { internalType: 'string', name: 'name', type: 'string' },
-              { internalType: 'string', name: 'branch', type: 'string' },
-              { internalType: 'uint8', name: 'major', type: 'uint8' },
-              { internalType: 'uint8', name: 'minor', type: 'uint8' },
-              { internalType: 'uint8', name: 'patch', type: 'uint8' },
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
             ],
             internalType: 'struct DependencyDto[]',
             name: 'interfaces',
             type: 'tuple[]',
           },
-          { internalType: 'uint8', name: 'flags', type: 'uint8' },
-          { internalType: 'bytes3', name: 'extensionVersion', type: 'bytes3' },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'extensionVersion',
+            type: 'bytes4',
+          },
+          {
+            internalType: 'uint256',
+            name: 'createdAt',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct VersionInfoDto[]',
+        name: 'lastVersions',
+        type: 'tuple[]',
+      },
+      {
+        internalType: 'address[]',
+        name: 'owners',
+        type: 'address[]',
+      },
+      {
+        internalType: 'uint256',
+        name: 'total',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'branch',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'offset',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'limit',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bool',
+        name: 'reverse',
+        type: 'bool',
+      },
+    ],
+    name: 'getModulesByOwner',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'uint8',
+            name: 'moduleType',
+            type: 'uint8',
+          },
+          {
+            internalType: 'string',
+            name: 'name',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'title',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'description',
+            type: 'string',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'image',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'manifest',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'icon',
+            type: 'tuple',
+          },
+          {
+            internalType: 'string[]',
+            name: 'interfaces',
+            type: 'string[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct ModuleInfo[]',
+        name: 'modules',
+        type: 'tuple[]',
+      },
+      {
+        components: [
+          {
+            internalType: 'string',
+            name: 'branch',
+            type: 'string',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'version',
+            type: 'bytes4',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'binary',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
+            ],
+            internalType: 'struct DependencyDto[]',
+            name: 'dependencies',
+            type: 'tuple[]',
+          },
+          {
+            components: [
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
+            ],
+            internalType: 'struct DependencyDto[]',
+            name: 'interfaces',
+            type: 'tuple[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'extensionVersion',
+            type: 'bytes4',
+          },
+          {
+            internalType: 'uint256',
+            name: 'createdAt',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct VersionInfoDto[]',
+        name: 'lastVersions',
+        type: 'tuple[]',
+      },
+      {
+        internalType: 'uint256',
+        name: 'total',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string[]',
+        name: 'ctxIds',
+        type: 'string[]',
+      },
+      {
+        internalType: 'address[]',
+        name: 'listers',
+        type: 'address[]',
+      },
+      {
+        internalType: 'uint256',
+        name: 'maxBufLen',
+        type: 'uint256',
+      },
+    ],
+    name: 'getModulesInfoByListersBatch',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'uint8',
+            name: 'moduleType',
+            type: 'uint8',
+          },
+          {
+            internalType: 'string',
+            name: 'name',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'title',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'description',
+            type: 'string',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'image',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'manifest',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'icon',
+            type: 'tuple',
+          },
+          {
+            internalType: 'string[]',
+            name: 'interfaces',
+            type: 'string[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct ModuleInfo[][]',
+        name: 'modules',
+        type: 'tuple[][]',
+      },
+      {
+        internalType: 'address[][]',
+        name: 'owners',
+        type: 'address[][]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'lister',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'branch',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'offset',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'limit',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bool',
+        name: 'reverse',
+        type: 'bool',
+      },
+    ],
+    name: 'getModulesOfListing',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'uint8',
+            name: 'moduleType',
+            type: 'uint8',
+          },
+          {
+            internalType: 'string',
+            name: 'name',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'title',
+            type: 'string',
+          },
+          {
+            internalType: 'string',
+            name: 'description',
+            type: 'string',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'image',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'manifest',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'icon',
+            type: 'tuple',
+          },
+          {
+            internalType: 'string[]',
+            name: 'interfaces',
+            type: 'string[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct ModuleInfo[]',
+        name: 'modules',
+        type: 'tuple[]',
+      },
+      {
+        components: [
+          {
+            internalType: 'string',
+            name: 'branch',
+            type: 'string',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'version',
+            type: 'bytes4',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'binary',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
+            ],
+            internalType: 'struct DependencyDto[]',
+            name: 'dependencies',
+            type: 'tuple[]',
+          },
+          {
+            components: [
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
+            ],
+            internalType: 'struct DependencyDto[]',
+            name: 'interfaces',
+            type: 'tuple[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'extensionVersion',
+            type: 'bytes4',
+          },
+          {
+            internalType: 'uint256',
+            name: 'createdAt',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct VersionInfoDto[]',
+        name: 'lastVersions',
+        type: 'tuple[]',
+      },
+      {
+        internalType: 'address[]',
+        name: 'owners',
+        type: 'address[]',
+      },
+      {
+        internalType: 'uint256',
+        name: 'total',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getNftContractAddress',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'name',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'branch',
+        type: 'string',
+      },
+      {
+        internalType: 'bytes4',
+        name: 'version',
+        type: 'bytes4',
+      },
+    ],
+    name: 'getVersionInfo',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'string',
+            name: 'branch',
+            type: 'string',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'version',
+            type: 'bytes4',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'binary',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
+            ],
+            internalType: 'struct DependencyDto[]',
+            name: 'dependencies',
+            type: 'tuple[]',
+          },
+          {
+            components: [
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
+            ],
+            internalType: 'struct DependencyDto[]',
+            name: 'interfaces',
+            type: 'tuple[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'extensionVersion',
+            type: 'bytes4',
+          },
+          {
+            internalType: 'uint256',
+            name: 'createdAt',
+            type: 'uint256',
+          },
         ],
         internalType: 'struct VersionInfoDto',
         name: 'dto',
         type: 'tuple',
       },
-      { internalType: 'uint8', name: 'moduleType', type: 'uint8' },
+      {
+        internalType: 'uint8',
+        name: 'moduleType',
+        type: 'uint8',
+      },
     ],
     stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [
-      { internalType: 'string', name: 'name', type: 'string' },
-      { internalType: 'string', name: 'branch', type: 'string' },
+      {
+        internalType: 'string',
+        name: 'name',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'branch',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'offset',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'limit',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bool',
+        name: 'reverse',
+        type: 'bool',
+      },
     ],
-    name: 'getVersionNumbers',
-    outputs: [{ internalType: 'bytes', name: '', type: 'bytes' }],
+    name: 'getVersionsByModule',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'string',
+            name: 'branch',
+            type: 'string',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'version',
+            type: 'bytes4',
+          },
+          {
+            components: [
+              {
+                internalType: 'bytes32',
+                name: 'hash',
+                type: 'bytes32',
+              },
+              {
+                internalType: 'string[]',
+                name: 'uris',
+                type: 'string[]',
+              },
+            ],
+            internalType: 'struct StorageRef',
+            name: 'binary',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
+            ],
+            internalType: 'struct DependencyDto[]',
+            name: 'dependencies',
+            type: 'tuple[]',
+          },
+          {
+            components: [
+              {
+                internalType: 'string',
+                name: 'name',
+                type: 'string',
+              },
+              {
+                internalType: 'string',
+                name: 'branch',
+                type: 'string',
+              },
+              {
+                internalType: 'bytes4',
+                name: 'version',
+                type: 'bytes4',
+              },
+            ],
+            internalType: 'struct DependencyDto[]',
+            name: 'interfaces',
+            type: 'tuple[]',
+          },
+          {
+            internalType: 'uint256',
+            name: 'flags',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bytes4',
+            name: 'extensionVersion',
+            type: 'bytes4',
+          },
+          {
+            internalType: 'uint256',
+            name: 'createdAt',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct VersionInfoDto[]',
+        name: 'versions',
+        type: 'tuple[]',
+      },
+      {
+        internalType: 'uint256',
+        name: 'total',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [
-      { internalType: 'string', name: 'mod_name', type: 'string' },
-      { internalType: 'address', name: 'admin', type: 'address' },
+      {
+        internalType: 'string',
+        name: 'moduleName',
+        type: 'string',
+      },
+      {
+        internalType: 'address',
+        name: 'admin',
+        type: 'address',
+      },
     ],
     name: 'removeAdmin',
-    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
     inputs: [
-      { internalType: 'string', name: 'mod_name', type: 'string' },
-      { internalType: 'string', name: 'contextId', type: 'string' },
+      {
+        internalType: 'string',
+        name: 'moduleName',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'contextId',
+        type: 'string',
+      },
     ],
     name: 'removeContextId',
     outputs: [],

@@ -25,4 +25,5 @@ export default class VersionInfo extends Base {
     [name: string]: StorageRef
   } = null
   extensionVersion?: string = null
+  createdAt?: string = null
 }

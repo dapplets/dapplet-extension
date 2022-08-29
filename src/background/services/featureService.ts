@@ -692,14 +692,14 @@ export default class FeatureService {
         }
       }
 
-      if (mi.fullDescription && mi.fullDescription.uris.length > 0) {
+      if (mi.metadata && mi.metadata.uris.length > 0) {
         // Detailed description publishing
-        const buf = await this._storageAggregator.getResource(mi.fullDescription)
+        const buf = await this._storageAggregator.getResource(mi.metadata)
         const blob = new Blob([buf], { type: 'image/png' })
         const hashUris = await this._storageAggregator.save(blob, targetStorages)
 
         // Manifest editing
-        mi.fullDescription = hashUris
+        mi.metadata = hashUris
       }
 
       // Use a current version of the extension as target value
