@@ -551,3 +551,11 @@ export function convertTimestampToISODate(timestamp: number): string {
 export function convertISODateToTimestamp(isoDate: string): number {
   return new Date(isoDate).getTime() / 1000
 }
+export function blobToDataURL(blob: Blob): Promise<string> {
+  return new Promise((res, rej) => {
+    const reader = new FileReader()
+    reader.onload = () => res(reader.result as string)
+    reader.onerror = rej
+    reader.readAsDataURL(blob)
+  })
+}
