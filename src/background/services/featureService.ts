@@ -16,6 +16,7 @@ import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
+import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
 import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
 import { StorageRef } from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
@@ -40,6 +41,8 @@ export default class FeatureService {
       this._walletService,
       this._storageAggregator
     )
+
+    console.log(this)
   }
 
   async getFeaturesByHostnames(contextIds: string[]): Promise<ManifestDTO[]> {
@@ -957,21 +960,19 @@ export default class FeatureService {
     titleEl.innerHTML = title
     nameEl.innerHTML = name
 
-    if (icon) {
-      // recognize mime type
-      const dataUrlUnknownMime = await blobToDataURL(new Blob([icon]))
-      const canvas = await base64ImageToCanvas(dataUrlUnknownMime)
-      const dataUrl = await canvas.toDataURL()
+    // recognize mime type
+    const dataUrlUnknownMime = icon ? await blobToDataURL(new Blob([icon])) : NFT_NO_ICON
+    const iconCanvas = await base64ImageToCanvas(dataUrlUnknownMime)
+    const dataUrl = await iconCanvas.toDataURL()
 
-      const iconEl = svg.getElementById('module-icon')
-      iconEl.setAttribute('xlink:href', dataUrl)
-    }
+    const iconEl = svg.getElementById('module-icon')
+    iconEl.setAttribute('xlink:href', dataUrl)
 
     const svgData = new XMLSerializer().serializeToString(svg)
     const svgAsBase64 = 'data:image/svg+xml;base64,' + btoa(svgData)
 
-    const canvas = await base64ImageToCanvas(svgAsBase64)
-    const blob = await new Promise<Blob>((r) => canvas.toBlob(r))
+    const imageCanvas = await base64ImageToCanvas(svgAsBase64)
+    const blob = await new Promise<Blob>((r) => imageCanvas.toBlob(r))
     return blob
   }
 
