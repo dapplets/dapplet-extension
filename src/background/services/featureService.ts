@@ -4,12 +4,20 @@ import { browser } from 'webextension-polyfill-ts'
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer'
 import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants'
 import * as EventBus from '../../common/global-event-bus'
-import { areModulesEqual, getCurrentTab, mergeDedupe, parseModuleName } from '../../common/helpers'
+import {
+  areModulesEqual,
+  blobToDataURL,
+  getCurrentTab,
+  mergeDedupe,
+  parseModuleName,
+} from '../../common/helpers'
 import ManifestDTO from '../dto/manifestDTO'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
+import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
+import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
 import { StorageRef } from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
 import GlobalConfigService from './globalConfigService'
@@ -33,6 +41,8 @@ export default class FeatureService {
       this._walletService,
       this._storageAggregator
     )
+
+    console.log(this)
   }
 
   async getFeaturesByHostnames(contextIds: string[]): Promise<ManifestDTO[]> {
@@ -672,25 +682,8 @@ export default class FeatureService {
         scriptUrl = hashUris.uris[0] // ToDo: remove it?
       }
 
-      if (mi.icon && mi.icon.uris.length > 0) {
-        if (mi.icon.uris[0].startsWith('data:image/png;base64')) {
-          // Icon file publishing (from base64)
-          const res = await fetch(mi.icon.uris[0])
-          const blob = await res.blob()
-          const hashUris = await this._storageAggregator.save(blob, targetStorages)
-
-          // Manifest editing
-          mi.icon = hashUris
-        } else {
-          // Icon file publishing
-          const buf = await this._storageAggregator.getResource(mi.icon)
-          const blob = new Blob([buf], { type: 'image/png' })
-          const hashUris = await this._storageAggregator.save(blob, targetStorages)
-
-          // Manifest editing
-          mi.icon = hashUris
-        }
-      }
+      // Upload icon and NFT image
+      await this._uploadModuleInfoIcons(mi, targetStorages)
 
       if (mi.metadata && mi.metadata.uris.length > 0) {
         // Detailed description publishing
@@ -845,25 +838,9 @@ export default class FeatureService {
   }
 
   public async editModuleInfo(registryUri: string, targetStorages: StorageTypes[], mi: ModuleInfo) {
-    if (mi.icon && mi.icon.uris.length > 0) {
-      if (mi.icon.uris[0].startsWith('data:image/png;base64')) {
-        // Icon file publishing (from base64)
-        const res = await fetch(mi.icon.uris[0])
-        const blob = await res.blob()
-        const hashUris = await this._storageAggregator.save(blob, targetStorages)
+    // Upload icon and NFT image
+    await this._uploadModuleInfoIcons(mi, targetStorages)
 
-        // Manifest editing
-        mi.icon = hashUris
-      } else {
-        // Icon file publishing
-        const buf = await this._storageAggregator.getResource(mi.icon)
-        const blob = new Blob([buf], { type: 'image/png' })
-        const hashUris = await this._storageAggregator.save(blob, targetStorages)
-
-        // Manifest editing
-        mi.icon = hashUris
-      }
-    }
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     await registry.editModuleInfo(mi)
   }
@@ -948,5 +925,98 @@ export default class FeatureService {
       version !== null ? await this.getVersionInfo(registryUri, name, branch, version) : null
 
     await this._overlayService.openDeployOverlay(mi, vi)
+  }
+
+  private async _generateNftImage({
+    name,
+    title,
+    icon,
+  }: {
+    name: string
+    title: string
+    icon?: Blob
+  }): Promise<Blob> {
+    const base64ImageToCanvas = (base64: string) =>
+      new Promise<HTMLCanvasElement>((res, rej) => {
+        const image = new Image()
+        image.src = base64
+        image.onerror = rej
+        image.onload = function () {
+          const canvas = document.createElement('canvas')
+          canvas.width = image.width
+          canvas.height = image.height
+          const ctx = canvas.getContext('2d')
+          ctx.drawImage(image, 0, 0)
+          res(canvas)
+        }
+      })
+
+    const wrapper = document.createElement('svg')
+    wrapper.innerHTML = atob(NFT_TEMPLATE.split(',')[1])
+    const svg = wrapper.firstChild as any
+    const titleEl = svg.getElementById('module-title')
+    const nameEl = svg.getElementById('module-name')
+
+    titleEl.innerHTML = title
+    nameEl.innerHTML = name
+
+    // recognize mime type
+    const dataUrlUnknownMime = icon ? await blobToDataURL(new Blob([icon])) : NFT_NO_ICON
+    const iconCanvas = await base64ImageToCanvas(dataUrlUnknownMime)
+    const dataUrl = await iconCanvas.toDataURL()
+
+    const iconEl = svg.getElementById('module-icon')
+    iconEl.setAttribute('xlink:href', dataUrl)
+
+    const svgData = new XMLSerializer().serializeToString(svg)
+    const svgAsBase64 = 'data:image/svg+xml;base64,' + btoa(svgData)
+
+    const imageCanvas = await base64ImageToCanvas(svgAsBase64)
+    const blob = await new Promise<Blob>((r) => imageCanvas.toBlob(r))
+    return blob
+  }
+
+  private async _uploadModuleInfoIcons(
+    mi: ModuleInfo,
+    targetStorages: StorageTypes[]
+  ): Promise<void> {
+    const { name, title } = mi
+
+    if (mi.icon && mi.icon.uris.length > 0) {
+      if (mi.icon.uris[0].startsWith('data:image/png;base64')) {
+        // Icon file publishing (from base64)
+        const res = await fetch(mi.icon.uris[0])
+        const iconBlob = await res.blob()
+        const iconHashUris = await this._storageAggregator.save(iconBlob, targetStorages)
+
+        // Generate NFT Image
+        const imageBlob = await this._generateNftImage({ name, title, icon: iconBlob })
+        const imageHashUris = await this._storageAggregator.save(imageBlob, targetStorages)
+
+        // Manifest editing
+        mi.icon = iconHashUris
+        mi.image = imageHashUris
+      } else {
+        // Icon file publishing
+        const buf = await this._storageAggregator.getResource(mi.icon)
+        const iconBlob = new Blob([buf], { type: 'image/png' })
+        const iconHashUris = await this._storageAggregator.save(iconBlob, targetStorages)
+
+        // Generate NFT Image
+        const imageBlob = await this._generateNftImage({ name, title, icon: iconBlob })
+        const imageHashUris = await this._storageAggregator.save(imageBlob, targetStorages)
+
+        // Manifest editing
+        mi.icon = iconHashUris
+        mi.image = imageHashUris
+      }
+    } else {
+      // Generate NFT Image
+      const imageBlob = await this._generateNftImage({ name: mi.name, title: mi.title }) // no module icon
+      const imageHashUris = await this._storageAggregator.save(imageBlob, targetStorages)
+
+      // Manifest editing
+      mi.image = imageHashUris
+    }
   }
 }
