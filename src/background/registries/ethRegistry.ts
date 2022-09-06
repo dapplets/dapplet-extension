@@ -257,7 +257,6 @@ export class EthRegistry implements Registry {
   }
 
   public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
-    console.log({ module, version })
     const contract = await this._contractPromise
 
     const isModuleExist = await contract
@@ -270,8 +269,6 @@ export class EthRegistry implements Registry {
     if (!isModuleExist) {
       const mi = this._convertToEthMi(module)
       const vi = version ? this._convertToEthVi(version) : EMPTY_VERSION
-
-      console.log({ mi, vi })
 
       // add module in the end of a listing
       let links: LinkString[] = []
@@ -308,8 +305,6 @@ export class EthRegistry implements Registry {
           },
         ]
       }
-
-      console.log({ links })
 
       const tx = await contract.addModuleInfo(module.contextIds, links, mi, vi)
       await tx.wait()
