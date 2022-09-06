@@ -257,6 +257,7 @@ export class EthRegistry implements Registry {
   }
 
   public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
+    console.log({ module, version })
     const contract = await this._contractPromise
 
     const isModuleExist = await contract
@@ -270,10 +271,12 @@ export class EthRegistry implements Registry {
       const mi = this._convertToEthMi(module)
       const vi = version ? this._convertToEthVi(version) : EMPTY_VERSION
 
+      console.log({ mi, vi })
+
       // add module in the end of a listing
       let links: LinkString[] = []
       const signerAddress = await this._signer.getAddress()
-      const listedModules = await contract.getModulesOfListing(
+      const { modules: listedModules } = await contract.getModulesOfListing(
         signerAddress,
         DEFAULT_BRANCH_NAME,
         0,
@@ -305,6 +308,8 @@ export class EthRegistry implements Registry {
           },
         ]
       }
+
+      console.log({ links })
 
       const tx = await contract.addModuleInfo(module.contextIds, links, mi, vi)
       await tx.wait()
@@ -426,10 +431,10 @@ export class EthRegistry implements Registry {
       moduleType: parseInt(Object.entries(moduleTypesMap).find(([, v]) => v === module.type)[0]),
       flags: ethers.BigNumber.from('0x00'),
       title: module.title,
-      image: module.image,
+      image: module.image ?? EMPTY_STORAGE_REF,
       description: module.description,
-      manifest: module.metadata,
-      icon: module.icon,
+      manifest: module.metadata ?? EMPTY_STORAGE_REF,
+      icon: module.icon ?? EMPTY_STORAGE_REF,
       owner: ZERO_ADDRESS,
       interfaces: module.interfaces || [],
     }
@@ -451,7 +456,7 @@ export class EthRegistry implements Registry {
     return {
       branch: version.branch,
       version: this._convertToEthVersion(version.version),
-      binary: version.dist,
+      binary: version.dist ?? EMPTY_STORAGE_REF,
       dependencies: convertDependencies(version.dependencies),
       interfaces: convertDependencies(version.interfaces),
       flags: 0,
@@ -486,10 +491,12 @@ export class EthRegistry implements Registry {
   }
 
   private _convertFromEthStorageRef(storageRef: EthStorageRef): StorageRef {
-    return {
-      hash: storageRef.hash,
-      uris: storageRef.uris,
-    }
+    return storageRef.hash === ZERO_BYTES32
+      ? null
+      : {
+          hash: storageRef.hash,
+          uris: storageRef.uris,
+        }
   }
 
   private async _paginateAll<T>(
