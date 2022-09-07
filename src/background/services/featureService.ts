@@ -41,8 +41,6 @@ export default class FeatureService {
       this._walletService,
       this._storageAggregator
     )
-
-    console.log(this)
   }
 
   async getFeaturesByHostnames(contextIds: string[]): Promise<ManifestDTO[]> {
