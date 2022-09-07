@@ -3,6 +3,8 @@ import cn from 'classnames'
 import React, { useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { IConnectedAccountUser } from '../../../common/types'
+import NEAR_ICON from '../../assests/near-black.svg'
+import TWITTER_ICON from '../../assests/twitter-icon.svg'
 import styles from './ConnectedAccountsModal.module.scss'
 import { Modal } from './modal'
 
@@ -13,7 +15,7 @@ const UserButton = ({ user }: { user: IConnectedAccountUser }) => {
         [styles.nameUserActive]: user.accountActive,
       })}
     >
-      <img src={user.img} className={styles.imgUser} />
+      <img src={user.origin === 'twitter' ? TWITTER_ICON : NEAR_ICON} className={styles.imgUser} />
       <h4 className={styles.nameUser}>{user.name}</h4>
     </div>
   )
