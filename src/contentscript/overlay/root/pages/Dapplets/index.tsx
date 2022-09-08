@@ -41,16 +41,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   useEffect(() => {
     const init = async () => {
       if (_isMounted.current) {
-        const { getCurrentContextIds, getThisTab } = await initBGFunctions(browser)
-
-        const currentTab = await getThisTab()
-
-        const ids = await getCurrentContextIds(currentTab)
-
-        await _refreshDataByContext(ids)
-
+        await _refreshData()
         setLoadingListDapplets(false)
-
         await loadTrustedUsers()
       }
     }
@@ -68,36 +60,35 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
   }, [])
 
-  const _refreshDataByContext = async (contextIds: Promise<string[]>) => {
-    let contextIdsValues = undefined
-
+  const _refreshData = async () => {
     try {
-      contextIdsValues = await contextIds
+      const { getThisTab, getCurrentContextIds, getFeaturesByHostnames } = await initBGFunctions(
+        browser
+      )
+
+      const currentTab = await getThisTab()
+      const contextIds = await getCurrentContextIds(currentTab)
+
+      const features: ManifestDTO[] = contextIds
+        ? await getFeaturesByHostnames(contextIds, dropdownListValue)
+        : []
+
+      const newDappletsList = features
+        .filter((f) => f.type === ModuleTypes.Feature)
+        .map((f) => ({
+          ...f,
+          isLoading: false,
+          isActionLoading: false,
+          isHomeLoading: false,
+          error: null,
+          versions: [],
+        }))
+
+      setDapplets(newDappletsList)
     } catch (err) {
       console.error(err)
       setNoContentScript(true)
-
-      return
     }
-
-    const { getFeaturesByHostnames } = await initBGFunctions(browser)
-
-    const features: ManifestDTO[] = contextIdsValues
-      ? await getFeaturesByHostnames(contextIdsValues)
-      : []
-
-    const newDappletsList = features
-      .filter((f) => f.type === ModuleTypes.Feature)
-      .map((f) => ({
-        ...f,
-        isLoading: false,
-        isActionLoading: false,
-        isHomeLoading: false,
-        error: null,
-        versions: [],
-      }))
-
-    setDapplets(newDappletsList)
   }
 
   const _updateFeatureState = (name: string, f: any) => {
@@ -195,8 +186,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url)
       }
 
-      const currentTab = await getThisTab()
-      await _refreshDataByContext(await getCurrentContextIds(currentTab))
+      await _refreshData()
     } catch (err) {
       _updateFeatureState(name, { isActive: !isActive, error: err.message })
     }
