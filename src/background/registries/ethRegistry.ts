@@ -293,10 +293,10 @@ export class EthRegistry implements Registry {
           },
         ]
       } else {
-        const last = listedModules[0]
+        const lastModule = listedModules[0]
         links = [
           {
-            prev: last,
+            prev: lastModule.name,
             next: module.name,
           },
           {
