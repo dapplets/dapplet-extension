@@ -109,6 +109,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     setNewModule(false)
   }
   const [isDeployNewModule, setDeployNewModule] = useState(false)
+  const [admins, setAdmins] = useState(null)
   useEffect(() => {
     isMounted = true
     const init = async () => {
@@ -190,14 +191,25 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
+      await getAdmins()
+     
     } else {
       return Promise.all([
         _updateOwnership(),
         _updateCurrentAccount(),
         _updateDeploymentStatus(),
         _checkDependencies(),
+        getAdmins()
       ])
     }
+  }
+
+  const getAdmins = async () => { 
+    const { getAdmins } = await initBGFunctions(browser)
+      const authors = await getAdmins(targetRegistry, mi.name)
+    setAdmins(authors)
+   
+    
   }
   const _updateOwnership = async () => {
     if (targetRegistry && mi.name) {
@@ -249,6 +261,8 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
     let newDescriptors
     let isOwner
+    const unificationAdmins = admins.map(e => e.toLowerCase())
+    const includesAdmins = unificationAdmins.includes(currentAccount)
 
     if (connectedDescriptors && connectedDescriptors.length > 0) {
       newDescriptors = connectedDescriptors.find((x: any) => x.type === selectedWallet)
@@ -269,7 +283,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     if (isNotTrustedUser) {
       await addTrustedUser(currentAccount.toLowerCase())
     }
-    if (!isNotNullCurrentAccount || (!isOwner && deploymentStatus !== 3)) {
+    if (!isNotNullCurrentAccount || (!isOwner && deploymentStatus !== 3 && !includesAdmins)) {
       setNotAccountModal(true)
     } else if (isOwner && isOwner.account !== newDescriptors.account && deploymentStatus !== 3) {
       setModalErrorOwner(true)
