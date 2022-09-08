@@ -24,7 +24,7 @@ export interface DappletsProps {
   search: string
   onUserSettingsClick: (mi: ManifestDTO) => void
   dropdownListValue: string
-  setDropdownListValue: (x) => void
+  setDropdownListValue: (value: string) => void
 }
 
 export const Dapplets: FC<DappletsProps> = (props) => {
@@ -234,21 +234,21 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   }
 
   const _getSortedDapplets = (dapplets) => {
-    if (dropdownListValue === 'All') return dapplets
+    if (dropdownListValue === 'all') return dapplets
 
-    if (dropdownListValue === 'Local') {
+    if (dropdownListValue === 'local') {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.isMyDapplet === true) return find(x.author)
       })
     }
-    if (dropdownListValue === 'Trusted Users') {
+    if (dropdownListValue === 'trusted') {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.author !== null) return find(x.author)
       })
     }
-    if (dropdownListValue === 'Public') {
+    if (dropdownListValue === 'public') {
       const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
       return dapplets.filter((x: ManifestAndDetails) => {
         if (x.isUnderConstruction !== true) return find(x.author)
@@ -266,8 +266,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         <Dropdown
           list={DROPDOWN_LIST}
           title="filter:"
-          value={{ label: dropdownListValue }}
-          setDropdownListValue={setDropdownListValue}
+          value={dropdownListValue}
+          onChange={setDropdownListValue}
         />
       </div>
       {isLoadingListDapplets ? (

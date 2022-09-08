@@ -124,7 +124,7 @@ class _App extends React.Component<P, S> {
     classNameSearch: '',
     classNameSearchButton: '',
     isLoadingDeploy: false,
-    dropdownListValue: 'All',
+    dropdownListValue: 'all',
     isMiniWallets: false,
     connectedDescriptors: null,
     selectedWallet: null,
