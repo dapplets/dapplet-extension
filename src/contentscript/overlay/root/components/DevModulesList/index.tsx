@@ -112,12 +112,16 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const [admins, setAdmins] = useState(null)
   useEffect(() => {
     isMounted = true
+
     const init = async () => {
+ 
       await _updateData()
+ 
     }
     init()
     return () => {
       isMounted = false
+
     }
   }, [
     targetChain,
@@ -173,22 +177,23 @@ export const DevModule: FC<PropsDevModule> = (props) => {
           }))
         : []
       const dependenciesChecking = [...dependencies, ...interfaces]
-      setOriginalMi(JSON.parse(JSON.stringify(mi)))
+      // setOriginalMi(JSON.parse(JSON.stringify(mi)))
       setMi(mi)
       setVi(vi)
-
-      setDpendenciesChecking(dependenciesChecking)
+      
+if(isMounted){
+  setDpendenciesChecking(dependenciesChecking)
       setTargetStorages(
         Object.keys(vi?.overlays ?? {}).length > 0
           ? [StorageTypes.Swarm, StorageTypes.Sia]
           : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs]
       )
       setMode(FormMode.Deploying)
-    }
-
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
+    }} 
+
 
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
@@ -209,7 +214,8 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     if (!targetRegistry || !mi.name) return
     const { getAdmins } = await initBGFunctions(browser)
       const authors = await getAdmins(targetRegistry, mi.name)
-    setAdmins(authors)
+      if(isMounted){  setAdmins(authors)}
+  
    
     
   }
@@ -218,14 +224,15 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       const { getOwnership } = await initBGFunctions(browser)
 
       const owner = await getOwnership(targetRegistry, mi.name)
-
-      setOwner(owner)
+      if(isMounted){setOwner(owner)}
+      
     } else {
       return
     }
   }
   const _updateDeploymentStatus = async () => {
-    setDeploymentStatus(DeploymentStatus.Unknown)
+    if(isMounted){  setDeploymentStatus(DeploymentStatus.Unknown)}
+   
     const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
     const miF = await getModuleInfoByName(targetRegistry, mi.name)
     const deployed = vi
@@ -236,13 +243,15 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       : deployed
       ? DeploymentStatus.Deployed
       : DeploymentStatus.NotDeployed
-    setDeploymentStatus(deploymentStatus)
+      if(isMounted){setDeploymentStatus(deploymentStatus)}
+    
   }
   const _updateCurrentAccount = async () => {
     if (targetChain) {
       const { getAddress } = await initBGFunctions(browser)
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-      setCurrentAccount(currentAccount)
+      if(isMounted){ setCurrentAccount(currentAccount)}
+     
     } else {
       return
     }
