@@ -1,5 +1,7 @@
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
 import { ReactComponent as DeleteIcon } from '../../assets/svg/newDelete.svg'
 import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
@@ -31,7 +33,7 @@ export interface DappletProps
   loadShowButton: boolean
   onOpenStoreAuthor: Function
 }
-
+let _isMounted = false
 export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const {
     dapplet,
@@ -48,14 +50,39 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     ...anotherProps
   } = props
 
-  const { title, description, author, icon, isActive, isActionHandler, isUnderConstruction } =
+  const { name, title, description, author, icon, isActive, isActionHandler, isUnderConstruction } =
     dapplet
 
   const [loadHome, setLoadHome] = useState(false)
+  const [registryActive, setRegistryActive] = useState(null)
+  const [owner, setOwner] = useState(null)
+  useEffect(() => {
+    _isMounted = true
+    const init = async () => {
+      await updateData()
+    }
+    init()
+    return () => {
+      _isMounted = false
+    }
+  }, [])
   useEffect(() => {}, [loadHome])
   const loadingHome = () => {
     setLoadHome(false)
   }
+
+  const updateData = async () => {
+    const { getRegistries, getOwnership } = await initBGFunctions(browser)
+    const registries = await getRegistries()
+
+    const newRegistries = registries
+      .filter((r) => r.isDev === false && r.isEnabled !== false)
+      .map((x, i) => x.url)
+    setRegistryActive(newRegistries[0])
+    const newOwner = await getOwnership(newRegistries[0], name)
+    setOwner(newOwner)
+  }
+
   return (
     <div className={cn(styles.wrapperCard, className)} {...anotherProps}>
       <DappletImage isFavourites={false} storageRef={icon} />
@@ -128,7 +155,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
             <DappletInfo
               title="Owner"
-              value={author}
+              value={dapplet.sourceRegistry.isDev ? owner:author}
               className={styles.cardInfo}
               onClick={() => onOpenStoreAuthor(dapplet)}
             />
