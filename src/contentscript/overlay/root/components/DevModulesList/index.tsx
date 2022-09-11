@@ -144,6 +144,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }
 
   const _updateData = async () => {
+ 
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
@@ -152,7 +153,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
     if (mi === null && vi === null) {
       const mi = new ModuleInfo()
-      setOriginalMi(JSON.parse(JSON.stringify(mi)))
+      // setOriginalMi(JSON.parse(JSON.stringify(mi)))
       setMi(mi)
 
       setMode(FormMode.Creating)
@@ -205,6 +206,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }
 
   const getAdmins = async () => { 
+    if (!targetRegistry || !mi.name) return
     const { getAdmins } = await initBGFunctions(browser)
       const authors = await getAdmins(targetRegistry, mi.name)
     setAdmins(authors)
@@ -429,9 +431,9 @@ export const DevModule: FC<PropsDevModule> = (props) => {
               <button
                 ref={nodeButton}
                 disabled={isLoadingDeploy}
-                onClick={async (e) => {
+                onClick={ (e) => {
                   modules.isDeployed?.[0] === false &&
-                    (await _updateCurrentAccount().then(() => deployButtonClickHandler(e)))
+                    ( _updateCurrentAccount().then(() => deployButtonClickHandler(e)))
                 }}
                 className={cn(styles.dappletsReupload, {
                   [styles.dappletDeploy]: modules.isDeployed?.[0] !== false,
