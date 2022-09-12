@@ -41,6 +41,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   const [hiddenProperties, setHiddenProperties] = useState([])
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [isEdited, setEdited] = useState(false)
+  const [registryActive, setRegistryActive] = useState(null)
 
   useEffect(() => {
     _isMounted = true
@@ -96,8 +97,23 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
       const { getOwnership } = await initBGFunctions(browser)
       const owner = await getOwnership(mi.sourceRegistry.url, mi.name)
       setOwner(owner)
+    }else{
+      await updateData()
     }
   }
+
+  const updateData = async () => {
+    const { getRegistries, getOwnership } = await initBGFunctions(browser)
+    const registries = await getRegistries()
+
+    const newRegistries = registries
+      .filter((r) => r.isDev === false && r.isEnabled !== false)
+      .map((x, i) => x.url)
+    setRegistryActive(newRegistries[0])
+    const newOwner = await getOwnership(newRegistries[0], mi.name)
+    setOwner(newOwner) 
+  }
+
   const _saveData = async (data: any) => {
     setLoading(true)
     setData(data)

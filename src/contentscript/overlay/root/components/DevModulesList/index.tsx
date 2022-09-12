@@ -94,6 +94,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
   const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
   const [owner, setOwner] = useState(null)
+  const [ownerDev, setOwnerDev] = useState(null)
   const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>([])
   const nodeButton = useRef<HTMLButtonElement>()
   const [textButtonDeploy, setTextButtonDeploy] = useState('Deploy')
@@ -108,6 +109,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const onCloseNewModule = () => {
     setNewModule(false)
   }
+  const [registryActive, setRegistryActive] = useState(null)
   const [isDeployNewModule, setDeployNewModule] = useState(false)
   const [admins, setAdmins] = useState(null)
   useEffect(() => {
@@ -380,6 +382,19 @@ if(isMounted){
     }
   }
 
+  const updateDataLocalhost = async () => {
+    const { getRegistries, getOwnership } = await initBGFunctions(browser)
+    const registries = await getRegistries()
+
+    const newRegistries = registries
+      .filter((r) => r.isDev === false && r.isEnabled !== false)
+      .map((x, i) => x.url)
+    setRegistryActive(newRegistries[0])
+    const newOwner = await getOwnership(newRegistries[0], mi.name)
+    setOwnerDev(newOwner)
+  }
+
+
   return (
     <>
       <div className={styles.dappletsBlock}>
@@ -465,11 +480,11 @@ if(isMounted){
               </div>
             )}
 
-            {mi.author && (
+            {(mi.author || ownerDev) && (
               <div>
                 <span className={styles.dappletsLabelSpan}>Owner:</span>
                 <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
-                  {visible(` ${mi.author}`)}
+                  {mi.author? visible(` ${mi.author}`): visible(` ${ownerDev}`)}
                 </label>
               </div>
             )}
