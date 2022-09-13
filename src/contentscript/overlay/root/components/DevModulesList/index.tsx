@@ -116,14 +116,11 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     isMounted = true
 
     const init = async () => {
- 
       await _updateData()
- 
     }
     init()
     return () => {
       isMounted = false
-
     }
   }, [
     targetChain,
@@ -150,7 +147,6 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }
 
   const _updateData = async () => {
- 
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
@@ -182,59 +178,62 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       // setOriginalMi(JSON.parse(JSON.stringify(mi)))
       setMi(mi)
       setVi(vi)
-      
-if(isMounted){
-  setDpendenciesChecking(dependenciesChecking)
-      setTargetStorages(
-        Object.keys(vi?.overlays ?? {}).length > 0
-          ? [StorageTypes.Swarm, StorageTypes.Sia]
-          : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs]
-      )
-      setMode(FormMode.Deploying)
-    setTargetRegistry(prodRegistries[0]?.url || null)
-    setTrustedUsers(trustedUsers)
-    setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-    }} 
 
+      if (isMounted) {
+        setDpendenciesChecking(dependenciesChecking)
+        setTargetStorages(
+          Object.keys(vi?.overlays ?? {}).length > 0
+            ? [StorageTypes.Swarm, StorageTypes.Sia]
+            : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs]
+        )
+        setMode(FormMode.Deploying)
+        setTargetRegistry(prodRegistries[0]?.url || null)
+        setTrustedUsers(trustedUsers)
+        setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
+      }
+    }
 
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
+      await updateDataLocalhost()
       await getAdmins()
-     
     } else {
       return Promise.all([
         _updateOwnership(),
         _updateCurrentAccount(),
         _updateDeploymentStatus(),
         _checkDependencies(),
-        getAdmins()
+        updateDataLocalhost(),
+        getAdmins(),
       ])
     }
   }
 
-  const getAdmins = async () => { 
+  const getAdmins = async () => {
     if (!targetRegistry || !mi.name) return
     const { getAdmins } = await initBGFunctions(browser)
-      const authors = await getAdmins(targetRegistry, mi.name)
-      if(isMounted){  setAdmins(authors)}
-  
-   
-    
+    const authors = await getAdmins(targetRegistry, mi.name)
+    if (isMounted) {
+      setAdmins(authors)
+    }
   }
   const _updateOwnership = async () => {
     if (targetRegistry && mi.name) {
       const { getOwnership } = await initBGFunctions(browser)
 
       const owner = await getOwnership(targetRegistry, mi.name)
-      if(isMounted){setOwner(owner)}
-      
+      if (isMounted) {
+        setOwner(owner)
+      }
     } else {
       return
     }
   }
   const _updateDeploymentStatus = async () => {
-    if(isMounted){  setDeploymentStatus(DeploymentStatus.Unknown)}
-   
+    if (isMounted) {
+      setDeploymentStatus(DeploymentStatus.Unknown)
+    }
+
     const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
     const miF = await getModuleInfoByName(targetRegistry, mi.name)
     const deployed = vi
@@ -245,15 +244,17 @@ if(isMounted){
       : deployed
       ? DeploymentStatus.Deployed
       : DeploymentStatus.NotDeployed
-      if(isMounted){setDeploymentStatus(deploymentStatus)}
-    
+    if (isMounted) {
+      setDeploymentStatus(deploymentStatus)
+    }
   }
   const _updateCurrentAccount = async () => {
     if (targetChain) {
       const { getAddress } = await initBGFunctions(browser)
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-      if(isMounted){ setCurrentAccount(currentAccount)}
-     
+      if (isMounted) {
+        setCurrentAccount(currentAccount)
+      }
     } else {
       return
     }
@@ -274,7 +275,7 @@ if(isMounted){
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
     let newDescriptors
     let isOwner
-    const unificationAdmins = admins.map(e => e.toLowerCase())
+    const unificationAdmins = admins.map((e) => e.toLowerCase())
     const includesAdmins = unificationAdmins.includes(currentAccount)
 
     if (connectedDescriptors && connectedDescriptors.length > 0) {
@@ -389,11 +390,14 @@ if(isMounted){
     const newRegistries = registries
       .filter((r) => r.isDev === false && r.isEnabled !== false)
       .map((x, i) => x.url)
-    setRegistryActive(newRegistries[0])
+    if (isMounted) {
+      setRegistryActive(newRegistries[0])
+    }
     const newOwner = await getOwnership(newRegistries[0], mi.name)
-    setOwnerDev(newOwner)
+    if (isMounted) {
+      setOwnerDev(newOwner)
+    }
   }
-
 
   return (
     <>
@@ -455,9 +459,9 @@ if(isMounted){
               <button
                 ref={nodeButton}
                 disabled={isLoadingDeploy}
-                onClick={ (e) => {
+                onClick={(e) => {
                   modules.isDeployed?.[0] === false &&
-                    ( _updateCurrentAccount().then(() => deployButtonClickHandler(e)))
+                    _updateCurrentAccount().then(() => deployButtonClickHandler(e))
                 }}
                 className={cn(styles.dappletsReupload, {
                   [styles.dappletDeploy]: modules.isDeployed?.[0] !== false,
@@ -484,7 +488,7 @@ if(isMounted){
               <div>
                 <span className={styles.dappletsLabelSpan}>Owner:</span>
                 <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
-                  {mi.author? visible(` ${mi.author}`): visible(` ${ownerDev}`)}
+                  {mi.author ? visible(` ${mi.author}`) : visible(` ${ownerDev}`)}
                 </label>
               </div>
             )}
@@ -602,19 +606,26 @@ if(isMounted){
               You deploy the first version of the "{mi.name}".
             </p>
             <p className={styles.modalDefaultContentText}>
-            After deployment the dapplet will be owned by this account - 
+              After deployment the dapplet will be owned by this account -
               <span className={styles.modalLabelAccount}> {currentAccount}</span>
             </p>
             <br />
             <p className={styles.modalDefaultContentText}>
-            A dapplet’s ownership is represented through an NFT.
+              A dapplet’s ownership is represented through an NFT.
             </p>
             <p className={styles.modalDefaultContentText}>
-              When the dapplet is made this NFT will automatically be created and sent to this account 
-              <span className={styles.modalLabelAccount}> {''}{currentAccount}</span>.
+              When the dapplet is made this NFT will automatically be created and sent to this
+              account
+              <span className={styles.modalLabelAccount}>
+                {' '}
+                {''}
+                {currentAccount}
+              </span>
+              .
             </p>
             <p className={styles.modalDefaultContentText}>
-            You can change the dapplet owner by transferring this NFT or by selling it at a marketplace.
+              You can change the dapplet owner by transferring this NFT or by selling it at a
+              marketplace.
             </p>
             <br />
             <button onClick={deployNewModule} className={styles.modalDefaultContentButton}>
