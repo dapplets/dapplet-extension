@@ -111,8 +111,10 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }
   const [registryActive, setRegistryActive] = useState(null)
   const [isDeployNewModule, setDeployNewModule] = useState(false)
+  const [admins, setAdmins] = useState(null)
   useEffect(() => {
     isMounted = true
+
     const init = async () => {
       await _updateData()
     }
@@ -153,7 +155,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
     if (mi === null && vi === null) {
       const mi = new ModuleInfo()
-      setOriginalMi(JSON.parse(JSON.stringify(mi)))
+      // setOriginalMi(JSON.parse(JSON.stringify(mi)))
       setMi(mi)
 
       setMode(FormMode.Creating)
@@ -173,34 +175,46 @@ export const DevModule: FC<PropsDevModule> = (props) => {
           }))
         : []
       const dependenciesChecking = [...dependencies, ...interfaces]
-      setOriginalMi(JSON.parse(JSON.stringify(mi)))
+      // setOriginalMi(JSON.parse(JSON.stringify(mi)))
       setMi(mi)
       setVi(vi)
 
-      setDpendenciesChecking(dependenciesChecking)
-      setTargetStorages(
-        Object.keys(vi?.overlays ?? {}).length > 0
-          ? [StorageTypes.Swarm, StorageTypes.Sia]
-          : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs]
-      )
-      setMode(FormMode.Deploying)
+      if (isMounted) {
+        setDpendenciesChecking(dependenciesChecking)
+        setTargetStorages(
+          Object.keys(vi?.overlays ?? {}).length > 0
+            ? [StorageTypes.Swarm, StorageTypes.Sia]
+            : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs]
+        )
+        setMode(FormMode.Deploying)
+        setTargetRegistry(prodRegistries[0]?.url || null)
+        setTrustedUsers(trustedUsers)
+        setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
+      }
     }
-
-    setTargetRegistry(prodRegistries[0]?.url || null)
-    setTrustedUsers(trustedUsers)
-    setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
       await updateDataLocalhost()
+      await getAdmins()
     } else {
       return Promise.all([
         _updateOwnership(),
         _updateCurrentAccount(),
         _updateDeploymentStatus(),
         _checkDependencies(),
-         updateDataLocalhost()
+        updateDataLocalhost(),
+        getAdmins(),
       ])
+    }
+  }
+
+  const getAdmins = async () => {
+    if (!targetRegistry || !mi.name) return
+    const { getAdmins } = await initBGFunctions(browser)
+    const authors = await getAdmins(targetRegistry, mi.name)
+    if (isMounted) {
+      setAdmins(authors)
     }
   }
   const _updateOwnership = async () => {
@@ -208,14 +222,18 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       const { getOwnership } = await initBGFunctions(browser)
 
       const owner = await getOwnership(targetRegistry, mi.name)
-
-      setOwner(owner)
+      if (isMounted) {
+        setOwner(owner)
+      }
     } else {
       return
     }
   }
   const _updateDeploymentStatus = async () => {
-    setDeploymentStatus(DeploymentStatus.Unknown)
+    if (isMounted) {
+      setDeploymentStatus(DeploymentStatus.Unknown)
+    }
+
     const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
     const miF = await getModuleInfoByName(targetRegistry, mi.name)
     const deployed = vi
@@ -226,13 +244,17 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       : deployed
       ? DeploymentStatus.Deployed
       : DeploymentStatus.NotDeployed
-    setDeploymentStatus(deploymentStatus)
+    if (isMounted) {
+      setDeploymentStatus(deploymentStatus)
+    }
   }
   const _updateCurrentAccount = async () => {
     if (targetChain) {
       const { getAddress } = await initBGFunctions(browser)
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-      setCurrentAccount(currentAccount)
+      if (isMounted) {
+        setCurrentAccount(currentAccount)
+      }
     } else {
       return
     }
@@ -253,6 +275,8 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
     let newDescriptors
     let isOwner
+    const unificationAdmins = admins.map((e) => e.toLowerCase())
+    const includesAdmins = unificationAdmins.includes(currentAccount)
 
     if (connectedDescriptors && connectedDescriptors.length > 0) {
       newDescriptors = connectedDescriptors.find((x: any) => x.type === selectedWallet)
@@ -273,7 +297,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     if (isNotTrustedUser) {
       await addTrustedUser(currentAccount.toLowerCase())
     }
-    if (!isNotNullCurrentAccount || (!isOwner && deploymentStatus !== 3)) {
+    if (!isNotNullCurrentAccount || (!isOwner && deploymentStatus !== 3 && !includesAdmins)) {
       setNotAccountModal(true)
     } else if (isOwner && isOwner.account !== newDescriptors.account && deploymentStatus !== 3) {
       setModalErrorOwner(true)
@@ -366,11 +390,14 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     const newRegistries = registries
       .filter((r) => r.isDev === false && r.isEnabled !== false)
       .map((x, i) => x.url)
-    setRegistryActive(newRegistries[0])
+    if (isMounted) {
+      setRegistryActive(newRegistries[0])
+    }
     const newOwner = await getOwnership(newRegistries[0], mi.name)
-    setOwnerDev(newOwner)
+    if (isMounted) {
+      setOwnerDev(newOwner)
+    }
   }
-
 
   return (
     <>
@@ -432,9 +459,9 @@ export const DevModule: FC<PropsDevModule> = (props) => {
               <button
                 ref={nodeButton}
                 disabled={isLoadingDeploy}
-                onClick={async (e) => {
+                onClick={(e) => {
                   modules.isDeployed?.[0] === false &&
-                    (await _updateCurrentAccount().then(() => deployButtonClickHandler(e)))
+                    _updateCurrentAccount().then(() => deployButtonClickHandler(e))
                 }}
                 className={cn(styles.dappletsReupload, {
                   [styles.dappletDeploy]: modules.isDeployed?.[0] !== false,
@@ -461,7 +488,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
               <div>
                 <span className={styles.dappletsLabelSpan}>Owner:</span>
                 <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
-                  {mi.author? visible(` ${mi.author}`): visible(` ${ownerDev}`)}
+                  {mi.author ? visible(` ${mi.author}`) : visible(` ${ownerDev}`)}
                 </label>
               </div>
             )}
@@ -579,19 +606,26 @@ export const DevModule: FC<PropsDevModule> = (props) => {
               You deploy the first version of the "{mi.name}".
             </p>
             <p className={styles.modalDefaultContentText}>
-            After deployment the dapplet will be owned by this account - 
+              After deployment the dapplet will be owned by this account -
               <span className={styles.modalLabelAccount}> {currentAccount}</span>
             </p>
             <br />
             <p className={styles.modalDefaultContentText}>
-            A dapplet’s ownership is represented through an NFT.
+              A dapplet’s ownership is represented through an NFT.
             </p>
             <p className={styles.modalDefaultContentText}>
-              When the dapplet is made this NFT will automatically be created and sent to this account 
-              <span className={styles.modalLabelAccount}> {''}{currentAccount}</span>.
+              When the dapplet is made this NFT will automatically be created and sent to this
+              account
+              <span className={styles.modalLabelAccount}>
+                {' '}
+                {''}
+                {currentAccount}
+              </span>
+              .
             </p>
             <p className={styles.modalDefaultContentText}>
-            You can change the dapplet owner by transferring this NFT or by selling it at a marketplace.
+              You can change the dapplet owner by transferring this NFT or by selling it at a
+              marketplace.
             </p>
             <br />
             <button onClick={deployNewModule} className={styles.modalDefaultContentButton}>
