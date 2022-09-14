@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../../background/models/versionInfo'
@@ -10,7 +10,7 @@ import { DevModule } from '../../../components/DevModulesList'
 import { Localhost } from '../../../components/Localhost'
 import { Registry } from '../../../components/Registry'
 import styles from './Developer.module.scss'
-
+let _isMounted = false
 export interface DeveloperProps {
   setDappletsDetail: (x) => void
   setModuleInfo: any
@@ -38,7 +38,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const [isLoadAdd, setLoadAdd] = useState(false)
   const [isUpdate, setUpdate] = useState(false)
   const [currentAccount, setCurrentAccount] = useState(null)
-  const _isMounted = useRef(true)
 
   const {
     setDappletsDetail,
@@ -57,33 +56,29 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   } = props
 
   useEffect(() => {
+    _isMounted = true
     const init = async () => {
       setLoadButton(true)
       await loadRegistries()
-      if (_isMounted.current) {
-        const { getCurrentTab } = await initBGFunctions(browser)
-        const currentTab = await getCurrentTab()
-        if (!currentTab) return
-        const currentUrl = currentTab.url
-        const urlEnding = currentUrl.split('/').reverse()[0]
-        if (['index.json', 'dapplet.json'].includes(urlEnding)) {
-          setRegistryInput(currentUrl)
-        }
-
+      const { getCurrentTab } = await initBGFunctions(browser)
+      const currentTab = await getCurrentTab()
+      if (!currentTab) return
+      const currentUrl = currentTab.url
+      const urlEnding = currentUrl.split('/').reverse()[0]
+      if (['index.json', 'dapplet.json'].includes(urlEnding)) {
+        setRegistryInput(currentUrl)
         if (isUpdate) {
           await loadRegistries()
           setUpdate(false)
-          setLoadButton(false)
         }
       }
       setLoadButton(false)
     }
     init()
-
     return () => {
-      _isMounted.current = false
+      _isMounted = false
     }
-  }, [isUpdate, selectedWallet, currentAccount])
+  }, [isUpdate, selectedWallet ])
 
   const loadRegistries = async () => {
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
@@ -103,7 +98,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
 
     try {
       await addRegistry(url, true)
-      setLoadButton(true)
       setRegistryInput('')
 
       loadRegistries()
@@ -114,9 +108,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     }
 
     newFunction()
-
-    setLoadButton(false)
-
     setTimeout(() => setLoadAdd(false), 3000)
   }
 
@@ -154,6 +145,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const handleClear = () => {
     setRegistryInput('')
   }
+
 
   return (
     <div className={styles.wrapper}>
@@ -205,86 +197,89 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
           {isLoadButton ? (
             <div className={styles.miniLoader}></div>
           ) : (
-            registries.map((r, i) => (
-              <div key={i}>
-                <Localhost
-                  error={r.error}
-                  isEnabled={r.isEnabled}
-                  label={r.url}
-                  key={i}
-                  closeHost={() => removeRegistry(r.url)}
-                  isLoadButtonLocalhost={isLoadButtonLocalhost}
-                  onClickButtonLocalhost={() => {
-                    ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
-                      (r.isEnabled && r.error && disableRegistry(r.url)) ||
-                      (r.isEnabled && !r.error && disableRegistry(r.url))
-                  }}
-                  children={
-                    <div className={styles.modules}>
-                      {modules.length > 0 &&
-                        Object.entries(groupedModules).map(([registryUrl, modules]) => {
-                          return (
-                            modules.length > 0 &&
-                            registryUrl === r.url &&
-                            modules.map((x, i) => (
-                              <div key={registryUrl + i}>
-                                <DevModule
-                                  currentAccount={currentAccount}
-                                  setCurrentAccount={setCurrentAccount}
-                                  selectedWallet={selectedWallet}
-                                  connectedDescriptors={connectedDescriptors}
-                                  setOpenWallet={setOpenWallet}
-                                  isLoadingDeploy={isLoadingDeploy}
-                                  setLoadingDeploy={setLoadingDeploy}
-                                  setLoadingDeployFinally={setLoadingDeployFinally}
-                                  setUpdate={setUpdate}
-                                  isLocalhost={isLocalhost}
-                                  setDappletsDetail={setDappletsDetail}
-                                  modules={x}
-                                  onDetailsClick={deployModule.bind(this)}
-                                  setModuleInfo={setModuleInfo}
-                                  setModuleVersion={setModuleVersion}
-                                  setUnderConstructionDetails={setUnderConstructionDetails}
-                                />
-                              </div>
-                            ))
-                          )
-                        })}
-                    </div>
-                  }
-                />
-              </div>
-            ))
-          )}
-          <div className={styles.host}>
-            {modules.length > 0 &&
-              Object.entries(groupedModules).map(([registryUrl, modules]) => (
-                <div key={registryUrl}>
-                  {modules.length > 0 && modules[0].module.author !== null && (
-                    <Registry
-                      key={registryUrl}
-                      label={registryUrl}
-                      isShowChildrenRegistry={isShowChildrenRegistry}
-                      setShowChildrenRegistry={setShowChildrenRegistry}
-                      children={modules.map((x, i) => (
-                        <div key={i} className={styles.modules}>
-                          <DevModule
-                            currentAccount={currentAccount}
-                            setCurrentAccount={setCurrentAccount}
-                            setDappletsDetail={setDappletsDetail}
-                            modules={x}
-                            onDetailsClick={deployModule.bind(this)}
-                            setModuleInfo={setModuleInfo}
-                            setModuleVersion={setModuleVersion}
-                            setUnderConstructionDetails={setUnderConstructionDetails}
-                          />
-                        </div>
-                      ))}
-                    />
-                  )}
+            <>
+              {registries.map((r, i) => (
+                <div key={i}>
+                  <Localhost
+                    error={r.error}
+                    isEnabled={r.isEnabled}
+                    label={r.url}
+                    key={i}
+                    closeHost={() => removeRegistry(r.url)}
+                    isLoadButtonLocalhost={isLoadButtonLocalhost}
+                    onClickButtonLocalhost={() => {
+                      ; (!r.isEnabled && !r.error && enableRegistry(r.url)) ||
+                        (r.isEnabled && r.error && disableRegistry(r.url)) ||
+                        (r.isEnabled && !r.error && disableRegistry(r.url))
+                    }}
+                    children={
+                      <div className={styles.modules}>
+                        {modules.length > 0 &&
+                          Object.entries(groupedModules).map(([registryUrl, modules]) => {
+                            return (
+                              modules.length > 0 &&
+                              registryUrl === r.url &&
+                              modules.map((x, i) => (
+                                <div key={registryUrl + i}>
+                                  <DevModule
+                                    currentAccount={currentAccount}
+                                    setCurrentAccount={setCurrentAccount}
+                                    selectedWallet={selectedWallet}
+                                    connectedDescriptors={connectedDescriptors}
+                                    setOpenWallet={setOpenWallet}
+                                    isLoadingDeploy={isLoadingDeploy}
+                                    setLoadingDeploy={setLoadingDeploy}
+                                    setLoadingDeployFinally={setLoadingDeployFinally}
+                                    setUpdate={setUpdate}
+                                    isLocalhost={isLocalhost}
+                                    setDappletsDetail={setDappletsDetail}
+                                    modules={x}
+                                    onDetailsClick={deployModule.bind(this)}
+                                    setModuleInfo={setModuleInfo}
+                                    setModuleVersion={setModuleVersion}
+                                    setUnderConstructionDetails={setUnderConstructionDetails}
+                                  />
+                                </div>
+                              ))
+                            )
+                          })}
+                      </div>
+                    }
+                  />
                 </div>
               ))}
-          </div>
+
+              <div className={styles.host}>
+                {modules.length > 0 &&
+                  Object.entries(groupedModules).map(([registryUrl, modules]) => (
+                    <div key={registryUrl}>
+                      {modules.length > 0 && modules[0].module.author !== null && (
+                        <Registry
+                          key={registryUrl}
+                          label={registryUrl}
+                          isShowChildrenRegistry={isShowChildrenRegistry}
+                          setShowChildrenRegistry={setShowChildrenRegistry}
+                          children={modules.map((x, i) => (
+                            <div key={i} className={styles.modules}>
+                              <DevModule
+                                currentAccount={currentAccount}
+                                setCurrentAccount={setCurrentAccount}
+                                setDappletsDetail={setDappletsDetail}
+                                modules={x}
+                                onDetailsClick={deployModule.bind(this)}
+                                setModuleInfo={setModuleInfo}
+                                setModuleVersion={setModuleVersion}
+                                setUnderConstructionDetails={setUnderConstructionDetails}
+                              />
+                            </div>
+                          ))}
+                        />
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
       {/* <div className={styles.createUnderConstraction}>
