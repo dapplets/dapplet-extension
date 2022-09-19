@@ -3,6 +3,7 @@ import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
 import { DappletsMainInfo } from '../DappletsInfo'
+import { UnderConstruction } from '../UnderConstruction'
 import { UnderConstructionInfo } from '../UnderConstructionInfo'
 import { Developer } from './Developer/Developer'
 import { SettingsList } from './Settings/Settings'
@@ -186,7 +187,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
           </div>
         </div>
       )}
-      {/* {isUnderConstruction && !isDappletsDetails && !isUnderConstructionDetails && (
+      {isUnderConstruction && !isDappletsDetails && !isUnderConstructionDetails && (
         <div className={styles.wrapper}>
           <div className={styles.settingMain}>
             <UnderConstruction
@@ -197,7 +198,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
             />
           </div>
         </div>
-      )} */}
+      )}
 
       {!isUnderConstruction && !isDappletsDetails && isUnderConstructionDetails && (
         <div className={styles.wrapper}>
