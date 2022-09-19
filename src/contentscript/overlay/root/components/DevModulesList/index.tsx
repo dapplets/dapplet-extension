@@ -112,6 +112,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const [registryActive, setRegistryActive] = useState(null)
   const [isDeployNewModule, setDeployNewModule] = useState(false)
   const [admins, setAdmins] = useState(null)
+  const [isAdmin, setIsAdmins] = useState(false)
   useEffect(() => {
     isMounted = true
 
@@ -215,6 +216,9 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     const authors = await getAdmins(targetRegistry, mi.name)
     if (isMounted) {
       setAdmins(authors)
+      const unificationAdmins = authors.map((e) => e.toLowerCase())
+      const includesAdmins = unificationAdmins.includes(currentAccount)
+      setIsAdmins(includesAdmins)
     }
   }
   const _updateOwnership = async () => {
@@ -492,6 +496,17 @@ export const DevModule: FC<PropsDevModule> = (props) => {
                 </label>
               </div>
             )}
+            {isLocalhost && currentAccount && isAdmin ? (
+              <div>
+                <span className={styles.dappletsLabelSpan}>Admin:</span>
+                <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
+                 {visible(`${currentAccount}`)}
+                </label>
+              </div>
+            )
+             :null
+
+            }
 
             <div>
               <span className={styles.dappletsLabelSpan}>Type:</span>
@@ -617,8 +632,6 @@ export const DevModule: FC<PropsDevModule> = (props) => {
               When the dapplet is made this NFT will automatically be created and sent to this
               account
               <span className={styles.modalLabelAccount}>
-                {' '}
-                {''}
                 {currentAccount}
               </span>
               .
