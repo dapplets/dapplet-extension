@@ -96,7 +96,8 @@ browser.runtime.onMessage.addListener(
     transactionRejected: NotificationService.transactionRejected,
 
     // FeatureService
-    getFeaturesByHostnames: (hostnames) => featureService.getFeaturesByHostnames(hostnames),
+    getFeaturesByHostnames: (hostnames, filter) =>
+      featureService.getFeaturesByHostnames(hostnames, filter),
     activateFeature: (name, version, hostnames, order, registry) =>
       featureService.activateFeature(name, version, hostnames, order, registry),
     deactivateFeature: (name, version, hostnames, order, registry) =>
@@ -368,7 +369,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
     // Load adapters, providing stable context IDs.
     const idContexts = message.payload.contextIds.filter((x) => x.endsWith('/id'))
     if (idContexts.length > 0) {
-      featureService.getFeaturesByHostnames(idContexts).then((manifests) => {
+      featureService.getFeaturesByHostnames(idContexts, null).then((manifests) => {
         const adapters = manifests.filter((x) => x.type === ModuleTypes.Adapter)
         if (adapters.length === 0) return
 

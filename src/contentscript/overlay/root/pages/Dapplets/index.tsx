@@ -60,6 +60,19 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
   }, [])
 
+  useEffect(() => {
+    const init = async () => {
+      if (_isMounted.current) {
+        setLoadingListDapplets(true)
+        await _refreshData()
+        setLoadingListDapplets(false)
+        await loadTrustedUsers()
+      }
+    }
+
+    init()
+  }, [dropdownListValue])
+
   const _refreshData = async () => {
     try {
       const { getThisTab, getCurrentContextIds, getFeaturesByHostnames } = await initBGFunctions(
@@ -157,8 +170,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     allVersions: string[] | null
   ) => {
     const { name, hostnames, sourceRegistry } = module
-    const { getCurrentContextIds, getVersions, activateFeature, deactivateFeature, getThisTab } =
-      await initBGFunctions(browser)
+    const { getVersions, activateFeature, deactivateFeature } = await initBGFunctions(browser)
 
     _updateFeatureState(name, { isActive, isLoading: true })
 
@@ -223,32 +235,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const trustedUsers = await getTrustedUsers()
   }
 
-  const _getSortedDapplets = (dapplets) => {
-    if (dropdownListValue === 'all') return dapplets
-
-    if (dropdownListValue === 'local') {
-      const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
-      return dapplets.filter((x: ManifestAndDetails) => {
-        if (x.isMyDapplet === true) return find(x.author)
-      })
-    }
-    if (dropdownListValue === 'trusted') {
-      const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
-      return dapplets.filter((x: ManifestAndDetails) => {
-        if (x.author !== null) return find(x.author)
-      })
-    }
-    if (dropdownListValue === 'public') {
-      const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
-      return dapplets.filter((x: ManifestAndDetails) => {
-        if (x.isUnderConstruction !== true) return find(x.author)
-      })
-    }
-  }
-
   const filteredDapplets = useMemo(() => {
-    return _getSortedDapplets(_getFilteredDapplets(dapplets))
-  }, [search, dapplets, dropdownListValue])
+    return _getFilteredDapplets(dapplets)
+  }, [search, dapplets])
 
   return (
     <>

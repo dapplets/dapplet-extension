@@ -272,38 +272,42 @@ export class EthRegistry implements Registry {
 
       // add module in the end of a listing
       let links: LinkString[] = []
-      const signerAddress = await this._signer.getAddress()
-      const { modules: listedModules } = await contract.getModulesOfListing(
-        signerAddress,
-        DEFAULT_BRANCH_NAME,
-        0,
-        1,
-        true
-      ) // ordered by version desc
 
-      if (listedModules.length === 0) {
-        links = [
-          {
-            prev: 'H',
-            next: module.name,
-          },
-          {
-            prev: module.name,
-            next: 'T',
-          },
-        ]
-      } else {
-        const lastModule = listedModules[0]
-        links = [
-          {
-            prev: lastModule.name,
-            next: module.name,
-          },
-          {
-            prev: module.name,
-            next: 'T',
-          },
-        ]
+      // only dapplets will be added to a listing
+      if (module.type === ModuleTypes.Feature) {
+        const signerAddress = await this._signer.getAddress()
+        const { modules: listedModules } = await contract.getModulesOfListing(
+          signerAddress,
+          DEFAULT_BRANCH_NAME,
+          0,
+          1,
+          true
+        ) // ordered by version desc
+
+        if (listedModules.length === 0) {
+          links = [
+            {
+              prev: 'H',
+              next: module.name,
+            },
+            {
+              prev: module.name,
+              next: 'T',
+            },
+          ]
+        } else {
+          const lastModule = listedModules[0]
+          links = [
+            {
+              prev: lastModule.name,
+              next: module.name,
+            },
+            {
+              prev: module.name,
+              next: 'T',
+            },
+          ]
+        }
       }
 
       const tx = await contract.addModuleInfo(module.contextIds, links, mi, vi)
@@ -416,7 +420,7 @@ export class EthRegistry implements Registry {
       dto.interfaces.map((d) => [d.name, this._convertFromEthVersion(d.version)])
     )
     vi.extensionVersion = this._convertFromEthVersion(dto.extensionVersion)
-    vi.createdAt = convertTimestampToISODate(dto.createdAt.toNumber())
+    vi.createdAt = convertTimestampToISODate(dto.createdAt.toNumber() * 1000)
     return vi
   }
 
