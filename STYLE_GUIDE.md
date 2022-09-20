@@ -8,7 +8,7 @@ We use the following tools for code linting and formatting, please follow them.
 
 - [ESLint](https://eslint.org/) rules for linting of TypeScript and TSX code are defined in [the `.eslintrc.json` file](https://github.com/dapplets/dapplet-extension/blob/master/.eslintrc.json)
 - [Stylelint](https://stylelint.io/) rules for linting of SCSS code are defined in [the `.stylelintrc` file](https://github.com/dapplets/dapplet-extension/blob/master/.stylelintrc)
-- [Prettier](https://prettier.io/) rules for linting of SCSS code are defined in [the `.prettierrc.json` file](https://github.com/dapplets/dapplet-extension/blob/master/.prettierrc.json)
+- [Prettier](https://prettier.io/) rules for code formatting are defined in [the `.prettierrc.json` file](https://github.com/dapplets/dapplet-extension/blob/master/.prettierrc.json)
 
 For better coding experience, it is recommended to use IDE extensions.
 
