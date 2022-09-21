@@ -38,8 +38,13 @@ export class Connection<T> implements IConnection {
   }
 
   open(id?: string) {
-    this._bus.exec('getDefaultState', null)
+    if(this.state){
+      this._bus.exec('getDefaultState',  this.state.defaultState )
+      this._bus.exec('changeSharedState', this.state.getAll() )
+    }else{
+   this._bus.exec('getDefaultState',  null)
     this._bus.exec('changeSharedState', null)
+    }
     return this._bus.exec('onOpen', id)
   }
 
