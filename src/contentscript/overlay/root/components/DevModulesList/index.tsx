@@ -7,6 +7,7 @@ import VersionInfo from '../../../../../background/models/versionInfo'
 import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
+import { Localhost } from '../Localhost'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
@@ -417,11 +418,11 @@ export const DevModule: FC<PropsDevModule> = (props) => {
             )}
 
             {vi && vi.branch && vi.branch !== 'default' && (
-              <div style={{ margin: '0 3px 0 0px' }} className={styles.dappletsBranch}>
+              <div  style={{ margin: '0 3px 0 0px' }} className={styles.dappletsBranch}>
                 {vi.branch}
               </div>
             )}
-            {modules.isDeployed[0] === false && (
+            {(modules.isDeployed[0] === false && isLocalhost )&& (
               <div className={styles.dappletsNotDeploy}>not deployed</div>
             )}
           </div>
