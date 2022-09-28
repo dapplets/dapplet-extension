@@ -60,7 +60,7 @@ export default class FeatureService {
     // const startTime = Date.now()
     // console.log(`getFeaturesByHostnames called #${requestId}`)
 
-    const listingAccounts = []
+    const listingAccounts: string[] = []
 
     if (filter === 'all' || filter === 'trusted') {
       const trustedUsers = await this._globalConfigService.getTrustedUsers()
@@ -196,13 +196,14 @@ export default class FeatureService {
         for (const registryUrl of registryUrls) {
           const owners = Array.from(
             new Set([
-              ...listingAccounts.map((x) => x.account),
+              ...listingAccounts,
               ...myDappletsToAdd.filter((x) => x.registryUrl === registryUrl).map((x) => x.author),
             ])
           )
           const registry = await this._moduleManager.registryAggregator.getRegistryByUri(
             registryUrl
           )
+          console.log({ owners, listingAccounts, myDappletsToAdd })
           const moduleInfosByContextId = await registry.getModuleInfo(contextIds, owners)
 
           for (const [contextId, moduleInfos] of Object.entries(moduleInfosByContextId)) {
