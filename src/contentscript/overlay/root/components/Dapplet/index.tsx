@@ -66,7 +66,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
       _isMounted = false
     }
   }, [])
-  useEffect(() => {}, [loadHome])
+  // useEffect(() => {}, [loadHome])
   const loadingHome = () => {
     setLoadHome(false)
   }
