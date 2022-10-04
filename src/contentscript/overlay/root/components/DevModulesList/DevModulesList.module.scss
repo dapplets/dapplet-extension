@@ -287,5 +287,33 @@
   display: none;
 }
 
+.adminsListButton {
+  color: $Secondary;
+  height: fit-content;
+  padding: 2px 5px;
+  margin: -6px 12px 0 0;
+  background: inherit;
+  transition: all .2s ease-in-out;
+}
+
+.moreAdmins {
+  display: flex;
+  margin-bottom: 4px;
+  width: auto;
+  padding: 0 5px;
+  cursor: pointer;
+  transition: all .2s ease-in-out;
+}
+
+.adminsListButton:hover,
+.moreAdmins:hover {
+  color: $SecondaryHover;
+}
+
+.adminsListButton:active,
+.moreAdmins:active {
+  color: $SecondaryPressed;
+}
+
 @import "./modalWindowStyles.scss";
 @import "./adaptive.scss"

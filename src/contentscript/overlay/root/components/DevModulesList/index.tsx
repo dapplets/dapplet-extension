@@ -7,7 +7,6 @@ import VersionInfo from '../../../../../background/models/versionInfo'
 import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { Localhost } from '../Localhost'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
@@ -45,11 +44,9 @@ interface PropsDevModule {
   onDetailsClick: (x: any, y: any) => void
   setModuleInfo: (x) => void
   setModuleVersion: (x) => void
-
   setUnderConstructionDetails: (x) => void
   isLocalhost?: boolean
   setUpdate?: (x) => void
-
   isLoadingDeploy?: boolean
   setLoadingDeploy?: () => void
   setLoadingDeployFinally?: () => void
@@ -59,7 +56,9 @@ interface PropsDevModule {
   setCurrentAccount?: (x: any) => void
   currentAccount?: any
 }
+
 let isMounted = false
+
 export const DevModule: FC<PropsDevModule> = (props) => {
   const {
     modules,
@@ -80,9 +79,8 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     setCurrentAccount,
   } = props
 
-  const [originalMi, setOriginalMi] = useState<ModuleInfo>(null)
   const [mi, setMi] = useState(modules.module)
-  const [vi, setVi] = useState(modules.versions[0])
+  const vi = modules.versions[0]
   const [targetRegistry, setTargetRegistry] = useState(null)
 
   const [trustedUsers, setTrustedUsers] = useState([])
@@ -98,7 +96,6 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const [ownerDev, setOwnerDev] = useState(null)
   const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>([])
   const nodeButton = useRef<HTMLButtonElement>()
-  const [textButtonDeploy, setTextButtonDeploy] = useState('Deploy')
 
   const [messageError, setMessageError] = useState(null)
   const [isModalError, setModalError] = useState(false)
@@ -107,13 +104,10 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const onCloseErrorOwner = () => setModalErrorOwner(false)
   const [isNotAccountModal, setNotAccountModal] = useState(false)
   const [isNewModule, setNewModule] = useState(false)
-  const onCloseNewModule = () => {
-    setNewModule(false)
-  }
-  const [registryActive, setRegistryActive] = useState(null)
-  const [isDeployNewModule, setDeployNewModule] = useState(false)
-  const [admins, setAdmins] = useState(null)
-  const [isAdmin, setIsAdmins] = useState(false)
+  const onCloseNewModule = () => setNewModule(false)
+  const [admins, setAdmins] = useState<string[]>([])
+  const [adminsOpen, setAdminsOpen] = useState(false)
+
   useEffect(() => {
     isMounted = true
 
@@ -126,40 +120,25 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     }
   }, [
     targetChain,
-    currentAccount,
-    modules,
-    isLoadingDeploy,
-    isModalError,
-    isModalErrorOwner,
-    owner,
-    isNewModule,
-    isDeployNewModule,
-    nodeButton,
+    // currentAccount,
+    // modules,
+    // isLoadingDeploy,
+    // isModalError,
+    // isModalErrorOwner,
+    // owner,
+    // isNewModule,
+    // nodeButton,
   ])
-
-  const visible = (hash: string): string => {
-    if (hash.length > 28) {
-      const firstFourCharacters = hash.substring(0, 7)
-      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
-
-      return `${firstFourCharacters}...${lastFourCharacters}`
-    } else {
-      return hash
-    }
-  }
 
   const _updateData = async () => {
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
-
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
 
     if (mi === null && vi === null) {
-      const mi = new ModuleInfo()
-      // setOriginalMi(JSON.parse(JSON.stringify(mi)))
-      setMi(mi)
-
+      const newMi = new ModuleInfo()
+      setMi(newMi)
       setMode(FormMode.Creating)
     } else {
       const dependencies = vi?.dependencies
@@ -177,9 +156,8 @@ export const DevModule: FC<PropsDevModule> = (props) => {
           }))
         : []
       const dependenciesChecking = [...dependencies, ...interfaces]
-      // setOriginalMi(JSON.parse(JSON.stringify(mi)))
-      setMi(mi)
-      setVi(vi)
+      //setMi(mi)
+      //setVi(vi)
 
       if (isMounted) {
         setDpendenciesChecking(dependenciesChecking)
@@ -198,7 +176,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
       await updateDataLocalhost()
-      await getAdmins()
+      await getModulesAdmins()
     } else {
       return Promise.all([
         _updateOwnership(),
@@ -206,26 +184,23 @@ export const DevModule: FC<PropsDevModule> = (props) => {
         _updateDeploymentStatus(),
         _checkDependencies(),
         updateDataLocalhost(),
-        getAdmins(),
+        getModulesAdmins(),
       ])
     }
   }
 
-  const getAdmins = async () => {
+  const getModulesAdmins = async () => {
     if (!targetRegistry || !mi.name) return
     const { getAdmins } = await initBGFunctions(browser)
-    const authors = await getAdmins(targetRegistry, mi.name)
-    if (isMounted) {
+    const authors: string[] = await getAdmins(targetRegistry, mi.name)
+    if (isMounted && authors.length > 0) {
       setAdmins(authors)
-      const unificationAdmins = authors.map((e) => e.toLowerCase())
-      const includesAdmins = unificationAdmins.includes(currentAccount)
-      setIsAdmins(includesAdmins)
     }
   }
+
   const _updateOwnership = async () => {
     if (targetRegistry && mi.name) {
       const { getOwnership } = await initBGFunctions(browser)
-
       const owner = await getOwnership(targetRegistry, mi.name)
       if (isMounted) {
         setOwner(owner)
@@ -234,6 +209,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       return
     }
   }
+
   const _updateDeploymentStatus = async () => {
     if (isMounted) {
       setDeploymentStatus(DeploymentStatus.Unknown)
@@ -253,6 +229,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       setDeploymentStatus(deploymentStatus)
     }
   }
+
   const _updateCurrentAccount = async () => {
     if (targetChain) {
       const { getAddress } = await initBGFunctions(browser)
@@ -264,6 +241,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       return
     }
   }
+
   const _checkDependencies = async () => {
     const { getVersionInfo } = await initBGFunctions(browser)
 
@@ -343,6 +321,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       }
     }
   }
+
   const connectWallet = async () => {
     setNotAccountModal(false)
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
@@ -353,6 +332,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       console.log(e)
     }
   }
+
   const deployNewModule = async () => {
     const { deployModule } = await initBGFunctions(browser)
     try {
@@ -395,9 +375,6 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     const newRegistries = registries
       .filter((r) => r.isDev === false && r.isEnabled !== false)
       .map((x, i) => x.url)
-    if (isMounted) {
-      setRegistryActive(newRegistries[0])
-    }
     const newOwner = await getOwnership(newRegistries[0], mi.name)
     if (isMounted) {
       setOwnerDev(newOwner)
@@ -418,11 +395,11 @@ export const DevModule: FC<PropsDevModule> = (props) => {
             )}
 
             {vi && vi.branch && vi.branch !== 'default' && (
-              <div  style={{ margin: '0 3px 0 0px' }} className={styles.dappletsBranch}>
+              <div style={{ margin: '0 3px 0 0px' }} className={styles.dappletsBranch}>
                 {vi.branch}
               </div>
             )}
-            {(modules.isDeployed[0] === false && isLocalhost )&& (
+            {modules.isDeployed[0] === false && isLocalhost && (
               <div className={styles.dappletsNotDeploy}>not deployed</div>
             )}
           </div>
@@ -475,7 +452,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
                 {nodeButton.current &&
                 nodeButton.current?.classList.contains('dappletsIsLoadingDeploy')
                   ? ''
-                  : textButtonDeploy}
+                  : 'Deploy'}
               </button>
             )}
           </div>
@@ -493,21 +470,46 @@ export const DevModule: FC<PropsDevModule> = (props) => {
               <div>
                 <span className={styles.dappletsLabelSpan}>Owner:</span>
                 <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
-                  {mi.author ? visible(` ${mi.author}`) : visible(` ${ownerDev}`)}
+                  {mi.author ? mi.author : ownerDev}
                 </label>
               </div>
             )}
-            {isLocalhost && currentAccount && isAdmin ? (
+            {isLocalhost && admins && admins.length > 0 ? (
               <div>
-                <span className={styles.dappletsLabelSpan}>Admin:</span>
-                <label className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}>
-                 {visible(`${currentAccount}`)}
-                </label>
+                <div className={styles.dappletsLabelSpan} style={{ width: 'auto' }}>
+                  Admins:
+                </div>
+                <div
+                  className={cn(styles.dappletsLabelSpan, styles.dappletsLabelSpanInfo)}
+                  style={{ flexWrap: 'wrap', marginLeft: '4px' }}
+                >
+                  {admins.map((admin: string, i: number) => (
+                    <div
+                      key={i}
+                      style={{
+                        display: !adminsOpen && i > 1 ? 'none' : 'flex',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      {admin}
+                    </div>
+                  ))}
+                  {admins.length > 2 && !adminsOpen && (
+                    <div className={styles.moreAdmins} onClick={() => setAdminsOpen(!adminsOpen)}>
+                      ...
+                    </div>
+                  )}
+                </div>
+                {admins.length > 2 && (
+                  <button
+                    className={styles.adminsListButton}
+                    onClick={() => setAdminsOpen(!adminsOpen)}
+                  >
+                    {adminsOpen ? '▴' : '▾'}
+                  </button>
+                )}
               </div>
-            )
-             :null
-
-            }
+            ) : null}
 
             <div>
               <span className={styles.dappletsLabelSpan}>Type:</span>
@@ -632,10 +634,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
             <p className={styles.modalDefaultContentText}>
               When the dapplet is made this NFT will automatically be created and sent to this
               account
-              <span className={styles.modalLabelAccount}>
-                {currentAccount}
-              </span>
-              .
+              <span className={styles.modalLabelAccount}>{currentAccount}</span>.
             </p>
             <p className={styles.modalDefaultContentText}>
               You can change the dapplet owner by transferring this NFT or by selling it at a
