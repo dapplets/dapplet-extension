@@ -190,6 +190,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     try {
       if (isActive) {
+   
+        
         await activateFeature(name, version, targetContextIds, order, sourceRegistry.url)
       } else {
         await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url)
@@ -197,6 +199,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
       const currentTab = await getThisTab()
       await _refreshDataByContext(await getCurrentContextIds(currentTab))
+      
     } catch (err) {
       _updateFeatureState(name, { isActive: !isActive, error: err.message })
     }

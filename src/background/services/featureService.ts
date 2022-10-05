@@ -295,15 +295,17 @@ export default class FeatureService {
               resolve(p.runtime)
             }
           } else if (message.type === 'FEATURE_LOADING_ERROR') {
-            if (
-              p.name === name &&
-              p.branch === DEFAULT_BRANCH_NAME &&
-              p.version === version &&
-              isActive === true
-            ) {
+         
+            // if(
+            //   p.name === name &&
+            //   p.branch === DEFAULT_BRANCH_NAME &&
+            //   p.version === version &&
+            //   isActive === true
+            // ){
+            
               browser.runtime.onMessage.removeListener(listener)
               reject(p.error)
-            }
+            // }
           } else if (message.type === 'FEATURE_UNLOADING_ERROR') {
             if (
               p.name === name &&
