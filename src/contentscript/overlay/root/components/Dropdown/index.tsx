@@ -3,30 +3,20 @@ import React, { DetailedHTMLProps, FC, HTMLAttributes, useState } from 'react'
 import { IDropdown } from '../../models/dropdown.model'
 import styles from './Dropdown.module.scss'
 
-export interface DropdownProps
-  extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+export type DropdownProps = Omit<
+  DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>,
+  'onChange'
+> & {
   list: IDropdown[]
-
-  value: {
-    label: string
-  }
-  handlerChangeValue?: (value: IDropdown | null) => void
-  setDropdownListValue: any
+  value: string
+  onChange: (value: string) => void
 }
 
 export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
   const [isOpen, setOpen] = useState(false)
-  const {
-    list,
-    className,
-    value,
-    handlerChangeValue,
-    title,
-    setDropdownListValue,
-    ...anotherProps
-  } = props
+  const { list, className, value, title, onChange, ...anotherProps } = props
 
-  const onChange = (value: IDropdown) => (): void => handlerChangeValue && handlerChangeValue(value)
+  const currentLabel = list.find((x) => x.value === value)?.label ?? value
 
   return (
     <div
@@ -44,7 +34,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
         className={cn(styles.dropdownBlock, { [styles.isOpen]: isOpen })}
       >
         <span className={cn(styles.spanBlock, className)} {...anotherProps}>
-          {isOpen ? '\u2013' : value.label}
+          {isOpen ? '\u2013' : currentLabel}
           <span
             className={cn(styles.isOpenIcon, {
               [styles.isOpenAnimationIcon]: isOpen,
@@ -58,16 +48,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
               list.map((item) => {
                 const { _id, label } = item
                 return (
-                  <li
-                    className={cn(styles.item)}
-                    key={_id}
-                    onClick={() => {
-                      onChange(item)
-
-                      value.label = item.label
-                      setDropdownListValue(item.label)
-                    }}
-                  >
+                  <li className={cn(styles.item)} key={_id} onClick={() => onChange(item.value)}>
                     {label}
                   </li>
                 )

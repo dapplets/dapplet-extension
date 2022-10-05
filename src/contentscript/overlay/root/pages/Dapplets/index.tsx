@@ -24,7 +24,7 @@ export interface DappletsProps {
   search: string
   onUserSettingsClick: (mi: ManifestDTO) => void
   dropdownListValue: string
-  setDropdownListValue: (x) => void
+  setDropdownListValue: (value: string) => void
 }
 
 export const Dapplets: FC<DappletsProps> = (props) => {
@@ -41,16 +41,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   useEffect(() => {
     const init = async () => {
       if (_isMounted.current) {
-        const { getCurrentContextIds, getThisTab } = await initBGFunctions(browser)
-
-        const currentTab = await getThisTab()
-
-        const ids = await getCurrentContextIds(currentTab)
-
-        await _refreshDataByContext(ids)
-
+        await _refreshData()
         setLoadingListDapplets(false)
-
         await loadTrustedUsers()
       }
     }
@@ -68,36 +60,48 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
   }, [])
 
-  const _refreshDataByContext = async (contextIds: Promise<string[]>) => {
-    let contextIdsValues = undefined
+  useEffect(() => {
+    const init = async () => {
+      if (_isMounted.current) {
+        setLoadingListDapplets(true)
+        await _refreshData()
+        setLoadingListDapplets(false)
+        await loadTrustedUsers()
+      }
+    }
 
+    init()
+  }, [dropdownListValue])
+
+  const _refreshData = async () => {
     try {
-      contextIdsValues = await contextIds
+      const { getThisTab, getCurrentContextIds, getFeaturesByHostnames } = await initBGFunctions(
+        browser
+      )
+
+      const currentTab = await getThisTab()
+      const contextIds = await getCurrentContextIds(currentTab)
+
+      const features: ManifestDTO[] = contextIds
+        ? await getFeaturesByHostnames(contextIds, dropdownListValue)
+        : []
+
+      const newDappletsList = features
+        .filter((f) => f.type === ModuleTypes.Feature)
+        .map((f) => ({
+          ...f,
+          isLoading: false,
+          isActionLoading: false,
+          isHomeLoading: false,
+          error: null,
+          versions: [],
+        }))
+
+      setDapplets(newDappletsList)
     } catch (err) {
       console.error(err)
       setNoContentScript(true)
-
-      return
     }
-
-    const { getFeaturesByHostnames } = await initBGFunctions(browser)
-
-    const features: ManifestDTO[] = contextIdsValues
-      ? await getFeaturesByHostnames(contextIdsValues)
-      : []
-
-    const newDappletsList = features
-      .filter((f) => f.type === ModuleTypes.Feature)
-      .map((f) => ({
-        ...f,
-        isLoading: false,
-        isActionLoading: false,
-        isHomeLoading: false,
-        error: null,
-        versions: [],
-      }))
-
-    setDapplets(newDappletsList)
   }
 
   const _updateFeatureState = (name: string, f: any) => {
@@ -166,8 +170,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     allVersions: string[] | null
   ) => {
     const { name, hostnames, sourceRegistry } = module
-    const { getCurrentContextIds, getVersions, activateFeature, deactivateFeature, getThisTab } =
-      await initBGFunctions(browser)
+    const { getVersions, activateFeature, deactivateFeature } = await initBGFunctions(browser)
 
     _updateFeatureState(name, { isActive, isLoading: true })
 
@@ -195,8 +198,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url)
       }
 
-      const currentTab = await getThisTab()
-      await _refreshDataByContext(await getCurrentContextIds(currentTab))
+      await _refreshData()
     } catch (err) {
       _updateFeatureState(name, { isActive: !isActive, error: err.message })
     }
@@ -233,32 +235,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const trustedUsers = await getTrustedUsers()
   }
 
-  const _getSortedDapplets = (dapplets) => {
-    if (dropdownListValue === 'All') return dapplets
-
-    if (dropdownListValue === 'Local') {
-      const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
-      return dapplets.filter((x: ManifestAndDetails) => {
-        if (x.isMyDapplet === true) return find(x.author)
-      })
-    }
-    if (dropdownListValue === 'Trusted Users') {
-      const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
-      return dapplets.filter((x: ManifestAndDetails) => {
-        if (x.author !== null) return find(x.author)
-      })
-    }
-    if (dropdownListValue === 'Public') {
-      const find = (a: string) => (a ?? '').toLowerCase().indexOf(''.toLowerCase()) !== -1
-      return dapplets.filter((x: ManifestAndDetails) => {
-        if (x.isUnderConstruction !== true) return find(x.author)
-      })
-    }
-  }
-
   const filteredDapplets = useMemo(() => {
-    return _getSortedDapplets(_getFilteredDapplets(dapplets))
-  }, [search, dapplets, dropdownListValue])
+    return _getFilteredDapplets(dapplets)
+  }, [search, dapplets])
 
   return (
     <>
@@ -266,8 +245,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         <Dropdown
           list={DROPDOWN_LIST}
           title="filter:"
-          value={{ label: dropdownListValue }}
-          setDropdownListValue={setDropdownListValue}
+          value={dropdownListValue}
+          onChange={setDropdownListValue}
         />
       </div>
       {isLoadingListDapplets ? (
