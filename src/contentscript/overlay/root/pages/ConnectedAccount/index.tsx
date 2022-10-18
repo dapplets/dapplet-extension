@@ -63,7 +63,11 @@ export const ConnectedAccount = () => {
   }
 
   useEffect(() => {
-    updatePairs().then(() => setLoadingListDapplets(false))
+    updatePairs().then(() => {
+      if (!abortController.signal.aborted) {
+        setLoadingListDapplets(false)
+      }
+    })
 
     EventBus.on('wallet_changed', updatePairs)
     return () => {

@@ -13,8 +13,8 @@ import { Dapplet } from '../../components/Dapplet'
 import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { TabLoader } from '../../components/TabLoader'
-import styles from './Dapplets.module.scss'
 import useAbortController from '../../hooks/useAbortController'
+import styles from './Dapplets.module.scss'
 export type Module = ManifestDTO & {
   isLoading: boolean
   error: string
@@ -37,15 +37,14 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [loadShowButton, setLoadShowButton] = useState(false)
 
   const _isMounted = useRef(true)
-  const abortController = useAbortController();
+  const abortController = useAbortController()
   useEffect(() => {
-   
     const init = async () => {
+      await _refreshData()
       if (!abortController.signal.aborted) {
-        await _refreshData()
         setLoadingListDapplets(false)
-        await loadTrustedUsers()
       }
+      await loadTrustedUsers()
     }
 
     init()
@@ -68,10 +67,13 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const init = async () => {
       if (!abortController.signal.aborted) {
         setLoadingListDapplets(true)
-        await _refreshData()
-        setLoadingListDapplets(false)
-        await loadTrustedUsers()
       }
+      await _refreshData()
+      if (!abortController.signal.aborted) {
+        setLoadingListDapplets(false)
+      }
+
+      await loadTrustedUsers()
     }
 
     init()
@@ -80,7 +82,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       // _isMounted.current = false
       abortController.abort()
     }
-  }, [dropdownListValue])
+  }, [dropdownListValue, abortController.signal.aborted])
 
   const _refreshData = async () => {
     try {
@@ -105,8 +107,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           error: null,
           versions: [],
         }))
-
-      setDapplets(newDappletsList)
+      if (!abortController.signal.aborted) {
+        setDapplets(newDappletsList)
+      }
     } catch (err) {
       console.error(err)
       setNoContentScript(true)

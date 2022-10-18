@@ -23,8 +23,10 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
       await _updateStorageRef(storageRef)
     }
     init()
-    return () => {}
-  }, [storageRef])
+    return () => {
+      abortController.abort()
+    }
+  }, [storageRef, abortController.signal.aborted])
   const _updateStorageRef = async (storageRef) => {
     if (!storageRef) return
 
@@ -33,24 +35,21 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
     } else {
       const { hash, uris } = storageRef
 
-      if (
-        !hash &&
-        uris.length > 0 &&
-        uris[0].indexOf('data:') === 0 &&
-        !abortController.signal.aborted
-      ) {
+      if (!hash && uris.length > 0 && uris[0].indexOf('data:') === 0) {
         setDataUri(uris[0])
       } else {
         const { getResource } = await initBGFunctions(browser)
 
         if (
-         ( storageRef.hash !==
+          storageRef.hash !==
             '0x0000000000000000000000000000000000000000000000000000000000000000' ||
-          (storageRef.uris.length !== 0 )&& !abortController.signal.aborted)
+          storageRef.uris.length !== 0
         ) {
           const base64 = await getResource(storageRef)
           const dataUri = 'data:text/plain;base64,' + base64
-          setDataUri(dataUri)
+          if (!abortController.signal.aborted) {
+            setDataUri(dataUri)
+          }
         } else {
           setDataUri(null)
         }

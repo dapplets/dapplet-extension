@@ -5,10 +5,10 @@ import { browser } from 'webextension-polyfill-ts'
 import { typeOfUri, UriTypes } from '../../../../../common/helpers'
 import { isValidUrl } from '../../../../../popup/helpers'
 
+import useAbortController from '../../hooks/useAbortController'
 import { IDropdown } from '../../models/dropdown.model'
 import { addSettingsValueDropdown } from '../../utils/addSettingsValueDropdown'
 import styles from './DropdownTrustedUsers.module.scss'
-import useAbortController from '../../hooks/useAbortController'
 
 export interface DropdownTrustedProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -31,7 +31,6 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
   const [registries, setRegistries] = useState([])
   const abortController = useAbortController()
   useEffect(() => {
- 
     const init = async () => {
       await loadTrustedUsers()
       await loadRegistries()
@@ -40,17 +39,21 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
     return () => {
       abortController.abort()
     }
-  }, [trustedUserInput,abortController.signal.aborted])
+  }, [trustedUserInput, abortController.signal.aborted])
 
   const removeTrustedUser = async (account: string) => {
     const { removeTrustedUser } = await initBGFunctions(browser)
     await removeTrustedUser(account)
-    loadTrustedUsers()
+    if (!abortController.signal.aborted) {
+      loadTrustedUsers()
+    }
   }
   const loadTrustedUsers = async () => {
     const { getTrustedUsers } = await initBGFunctions(browser)
     const trustedUsers = await getTrustedUsers()
-    setTrustedUsers(trustedUsers)
+    if (!abortController.signal.aborted) {
+      setTrustedUsers(trustedUsers)
+    }
   }
   const _openEtherscan = async (address: string) => {
     if (typeOfUri(address) === UriTypes.Ens) {
@@ -69,7 +72,6 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
     if (!abortController.signal.aborted) {
       setRegistries(registries.filter((r) => r.isDev === false))
     }
-   
   }
   const visible = (hash: string): string => {
     if (hash.length > 38) {

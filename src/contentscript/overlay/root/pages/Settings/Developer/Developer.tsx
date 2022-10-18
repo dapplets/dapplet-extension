@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../../background/models/versionInfo'
@@ -9,8 +9,8 @@ import { isValidUrl } from '../../../../../../popup/helpers'
 import { DevModule } from '../../../components/DevModulesList'
 import { Localhost } from '../../../components/Localhost'
 import { Registry } from '../../../components/Registry'
-import styles from './Developer.module.scss'
 import useAbortController from '../../../hooks/useAbortController'
+import styles from './Developer.module.scss'
 
 export interface DeveloperProps {
   setDappletsDetail: (x) => void
@@ -57,7 +57,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   } = props
   const abortController = useAbortController()
   useEffect(() => {
-  
     const init = async () => {
       setLoadButton(true)
       await loadRegistries()
@@ -70,16 +69,20 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
         setRegistryInput(currentUrl)
         if (isUpdate) {
           await loadRegistries()
-          setUpdate(false)
+          if (!abortController.signal.aborted) {
+            setUpdate(false)
+          }
         }
       }
-      setLoadButton(false)
+      if (!abortController.signal.aborted) {
+        setLoadButton(false)
+      }
     }
     init()
     return () => {
       abortController.abort()
     }
-  }, [isUpdate, selectedWallet,abortController.signal.aborted ])
+  }, [isUpdate, selectedWallet, abortController.signal.aborted])
 
   const loadRegistries = async () => {
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
@@ -88,9 +91,14 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       versions: VersionInfo[]
       isDeployed: boolean[]
     }[] = await getAllDevModules()
-    setModules(modules)
+    if (!abortController.signal.aborted) {
+      setModules(modules)
+    }
+
     const registries = await getRegistries()
-    setRegistries(registries.filter((r) => r.isDev === true))
+    if (!abortController.signal.aborted) {
+      setRegistries(registries.filter((r) => r.isDev === true))
+    }
   }
 
   const addRegistry = async (url: string, newFunction: () => void) => {
@@ -130,7 +138,11 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     const { enableRegistry } = await initBGFunctions(browser)
     await enableRegistry(url)
     loadRegistries()
-    setTimeout(() => setLoadButtonLocalhost(false), 1500)
+    setTimeout(() => {
+      if (!abortController.signal.aborted) {
+        setLoadButtonLocalhost(false)
+      }
+    }, 1500)
   }
 
   const disableRegistry = async (url: string) => {
@@ -138,7 +150,11 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     const { disableRegistry } = await initBGFunctions(browser)
     await disableRegistry(url)
     loadRegistries()
-    setTimeout(() => setLoadButtonLocalhost(false), 1500)
+    setTimeout(() => {
+      if (!abortController.signal.aborted) {
+        setLoadButtonLocalhost(false)
+      }
+    }, 1500)
   }
 
   const groupedModules = groupBy(modules, (x) => x.module.registryUrl)
@@ -146,7 +162,6 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const handleClear = () => {
     setRegistryInput('')
   }
-
 
   return (
     <div className={styles.wrapper}>
@@ -209,7 +224,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                     closeHost={() => removeRegistry(r.url)}
                     isLoadButtonLocalhost={isLoadButtonLocalhost}
                     onClickButtonLocalhost={() => {
-                      ; (!r.isEnabled && !r.error && enableRegistry(r.url)) ||
+                      ;(!r.isEnabled && !r.error && enableRegistry(r.url)) ||
                         (r.isEnabled && r.error && disableRegistry(r.url)) ||
                         (r.isEnabled && !r.error && disableRegistry(r.url))
                     }}

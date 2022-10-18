@@ -80,7 +80,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
-      if (!abortController.signal.aborted) {
+     
         await checkUpdates()
 
         await loadProvider()
@@ -95,7 +95,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
         await loadSiaPortal()
         await loadPopupInOverlay()
         await loadTargetStorages()
-      }
+      
     }
     init()
 
@@ -115,7 +115,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const loadErrorReporting = async () => {
     const { getErrorReporting } = await initBGFunctions(browser)
     const errorReporting = await getErrorReporting()
-    setErrorReporting(errorReporting)
+    if (!abortController.signal.aborted) {
+      setErrorReporting(errorReporting)
+    }
   }
   const checkUpdates = async () => {
     const { getNewExtensionVersion } = await initBGFunctions(browser)
@@ -129,7 +131,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     const config = await getInitialConfig()
 
     if (config.providerUrl) {
-      setProviderInputDefault(config.providerUrl)
+      if (!abortController.signal.aborted) {
+        setProviderInputDefault(config.providerUrl)
+      }
     }
     const { getEthereumProvider } = await initBGFunctions(browser)
     const provider = await getEthereumProvider()
@@ -182,7 +186,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     const config = await getInitialConfig()
 
     if (config.swarmPostageStampId) {
-      setSwarmPostageStampIdInputDefault(config.swarmPostageStampId)
+      if (!abortController.signal.aborted) {
+        setSwarmPostageStampIdInputDefault(config.swarmPostageStampId)
+      }
     }
     const { getSwarmPostageStampId } = await initBGFunctions(browser)
     const id = await getSwarmPostageStampId()
@@ -262,7 +268,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     const config = await getInitialConfig()
 
     if (config.ipfsGatewayUrl) {
-      setIpfsGatewayInputDefault(config.ipfsGatewayUrl)
+      if (!abortController.signal.aborted) {
+        setIpfsGatewayInputDefault(config.ipfsGatewayUrl)
+      }
     }
     const { getIpfsGateway } = await initBGFunctions(browser)
     const gateway = await getIpfsGateway()
