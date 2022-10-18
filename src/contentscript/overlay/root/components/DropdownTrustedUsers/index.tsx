@@ -8,13 +8,14 @@ import { isValidUrl } from '../../../../../popup/helpers'
 import { IDropdown } from '../../models/dropdown.model'
 import { addSettingsValueDropdown } from '../../utils/addSettingsValueDropdown'
 import styles from './DropdownTrustedUsers.module.scss'
+import useAbortController from '../../hooks/useAbortController'
 
 export interface DropdownTrustedProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   list?: IDropdown[]
   value?: IDropdown | null
 }
-let _isMounted = false
+
 export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTrustedProps) => {
   const {
     list,
@@ -28,18 +29,18 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
   const [trustedUserInputError, setTrustedUserInputError] = useState(null)
   const [trustedUsers, setTrustedUsers] = useState([])
   const [registries, setRegistries] = useState([])
-
+  const abortController = useAbortController()
   useEffect(() => {
-    _isMounted = true
+ 
     const init = async () => {
       await loadTrustedUsers()
       await loadRegistries()
     }
     init()
     return () => {
-      _isMounted = false
+      abortController.abort()
     }
-  }, [trustedUserInput])
+  }, [trustedUserInput,abortController.signal.aborted])
 
   const removeTrustedUser = async (account: string) => {
     const { removeTrustedUser } = await initBGFunctions(browser)
@@ -65,8 +66,10 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
   const loadRegistries = async () => {
     const { getRegistries } = await initBGFunctions(browser)
     const registries = await getRegistries()
-
-    setRegistries(registries.filter((r) => r.isDev === false))
+    if (!abortController.signal.aborted) {
+      setRegistries(registries.filter((r) => r.isDev === false))
+    }
+   
   }
   const visible = (hash: string): string => {
     if (hash.length > 38) {

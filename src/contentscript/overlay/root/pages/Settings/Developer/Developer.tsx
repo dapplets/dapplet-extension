@@ -10,7 +10,8 @@ import { DevModule } from '../../../components/DevModulesList'
 import { Localhost } from '../../../components/Localhost'
 import { Registry } from '../../../components/Registry'
 import styles from './Developer.module.scss'
-let _isMounted = false
+import useAbortController from '../../../hooks/useAbortController'
+
 export interface DeveloperProps {
   setDappletsDetail: (x) => void
   setModuleInfo: any
@@ -54,9 +55,9 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     connectedDescriptors,
     selectedWallet,
   } = props
-
+  const abortController = useAbortController()
   useEffect(() => {
-    _isMounted = true
+  
     const init = async () => {
       setLoadButton(true)
       await loadRegistries()
@@ -76,9 +77,9 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     }
     init()
     return () => {
-      _isMounted = false
+      abortController.abort()
     }
-  }, [isUpdate, selectedWallet ])
+  }, [isUpdate, selectedWallet,abortController.signal.aborted ])
 
   const loadRegistries = async () => {
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)

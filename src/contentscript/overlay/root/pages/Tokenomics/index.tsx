@@ -12,8 +12,6 @@ export interface TokenomicsProps {
   isSupport?: boolean
 }
 
-let _isMounted = false
-
 export const Tokenimics: FC<TokenomicsProps> = (props) => {
   const { setUnderConstructionDetails, isSupport = true, setTokenomics } = props
   const [isCreate, SetCreate] = useState(false)

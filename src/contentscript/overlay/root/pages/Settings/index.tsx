@@ -1,5 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
 import { DappletsMainInfo } from '../DappletsInfo'
@@ -66,18 +66,14 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   const [isTokenomics, setTokenomics] = useState(false)
   const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] = useState(false)
   const [isShowChildrenRegistry, setShowChildrenRegistry] = useState(false)
-  const _isMounted = useRef(true)
+
   useEffect(() => {
     const init = async () => {
-      if (_isMounted.current) {
-        await loadDevMode()
-        await loadErrorReporting()
-      }
+      await loadDevMode()
+      await loadErrorReporting()
     }
     init()
-    return () => {
-      _isMounted.current = false
-    }
+    return () => {}
   }, [])
   const loadDevMode = async () => {
     setSvgLoaderDevMode(true)

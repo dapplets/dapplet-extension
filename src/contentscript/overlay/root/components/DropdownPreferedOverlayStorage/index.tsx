@@ -11,20 +11,17 @@ export interface DropdownProps
   value?: IDropdown | null
   handlerChangeValue?: (value: IDropdown | null) => void
 }
-let _isMounted = false
+
 export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (props: DropdownProps) => {
   const [isOpen, setOpen] = useState(false)
   const [preferedOverlayStorage, setPreferedOverlayStorage] = useState('')
   const { list, className, value = null, handlerChangeValue, title, ...anotherProps } = props
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
       await loadPreferedOverlayStorage()
     }
     init()
-    return () => {
-      _isMounted = false
-    }
+    return () => {}
   }, [])
 
   const loadPreferedOverlayStorage = async () => {

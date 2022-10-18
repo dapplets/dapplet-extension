@@ -30,7 +30,7 @@ export interface HeaderLogInProps {
   setConnectedDescriptors: (x: []) => void
   setSelectWallet: (x: string) => void
 }
-let _isMounted = false
+
 export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const {
     isMini,
@@ -67,7 +67,6 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   // const isEveryWalletConnected = descriptors.filter((x) => !x.connected).length === 0
 
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
       await refresh()
     }
@@ -75,7 +74,6 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     init()
 
     return () => {
-      _isMounted = false
 
       EventBus.off('wallet_changed', refresh)
     }

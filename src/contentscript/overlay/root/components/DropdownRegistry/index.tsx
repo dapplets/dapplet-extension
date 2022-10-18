@@ -3,14 +3,13 @@ import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { isValidUrl } from '../../../../../popup/helpers'
-
+import useAbortController from '../../hooks/useAbortController'
 import { addSettingsValueDropdown } from '../../utils/addSettingsValueDropdown'
 
 import styles from './DropdownRegistry.module.scss'
 
 export interface DropdownRegistryProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {}
-let _isMounted = false
 
 export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegistryProps) => {
   const { ...anotherProps } = props
@@ -18,23 +17,23 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
   const [registries, setRegistries] = useState([])
-
+  const abortController = useAbortController()
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
       await loadRegistries()
     }
     init()
     return () => {
-      _isMounted = false
+      abortController.abort()
     }
-  }, [])
+  }, [abortController.signal.aborted])
 
   const loadRegistries = async () => {
     const { getRegistries } = await initBGFunctions(browser)
     const registries = await getRegistries()
-
-    setRegistries(registries.filter((r) => r.isDev === false))
+    if (!abortController.signal.aborted) {
+      setRegistries(registries.filter((r) => r.isDev === false))
+    }
   }
 
   const removeRegistry = async (url: string) => {

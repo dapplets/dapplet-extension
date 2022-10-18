@@ -47,7 +47,7 @@ export interface UnderConstruction {
   setModuleInfo: (x) => void
   setModuleVersion: (x) => void
 }
-let _isMounted = false
+
 export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstruction) => {
   const { setUnderConstruction, setUnderConstructionDetails, setModuleInfo, setModuleVersion } =
     props
@@ -89,15 +89,12 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
   const [isModalTransaction, setModalTransaction] = useState(false)
 
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
       await _updateData()
     }
     init()
 
-    return () => {
-      _isMounted = false
-    }
+    return () => {}
   }, [mi, targetChain])
 
   const _updateData = async () => {

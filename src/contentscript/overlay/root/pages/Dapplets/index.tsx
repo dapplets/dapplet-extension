@@ -14,7 +14,7 @@ import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { TabLoader } from '../../components/TabLoader'
 import styles from './Dapplets.module.scss'
-
+import useAbortController from '../../hooks/useAbortController'
 export type Module = ManifestDTO & {
   isLoading: boolean
   error: string
@@ -37,10 +37,11 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [loadShowButton, setLoadShowButton] = useState(false)
 
   const _isMounted = useRef(true)
-
+  const abortController = useAbortController();
   useEffect(() => {
+   
     const init = async () => {
-      if (_isMounted.current) {
+      if (!abortController.signal.aborted) {
         await _refreshData()
         setLoadingListDapplets(false)
         await loadTrustedUsers()
@@ -56,13 +57,16 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
 
     return () => {
-      _isMounted.current = false
+      // _isMounted.current = false
+      abortController.abort()
     }
-  }, [])
+  }, [abortController.signal.aborted])
 
   useEffect(() => {
+    // const controller = new AbortController();
+    // const signal = controller.signal;
     const init = async () => {
-      if (_isMounted.current) {
+      if (!abortController.signal.aborted) {
         setLoadingListDapplets(true)
         await _refreshData()
         setLoadingListDapplets(false)
@@ -71,6 +75,11 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
 
     init()
+
+    return () => {
+      // _isMounted.current = false
+      abortController.abort()
+    }
   }, [dropdownListValue])
 
   const _refreshData = async () => {

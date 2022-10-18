@@ -1,12 +1,13 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { Event } from '../../../../../common/models/event'
 import { CloseIcon } from '../../components/CloseIcon'
 import { Notification } from '../../components/Notification'
 import { TabLoader } from '../../components/TabLoader'
+import useAbortController from '../../hooks/useAbortController'
 import styles from './Notifications.module.scss'
 
 TimeAgo.addLocale(en)
@@ -14,21 +15,20 @@ TimeAgo.addLocale(en)
 export const Notifications = () => {
   const [event, setEvent] = useState([])
   const [load, setLoad] = useState(true)
-  const _isMounted = useRef(true)
-
+  const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
       const notifications = await getNotifications()
-      if (_isMounted.current) {
+      if (!abortController.signal.aborted) {
         setEvent(notifications)
         setLoad(false)
       }
     }
     init()
     return () => {
-      _isMounted.current = false
+      abortController.abort
     }
-  }, [event, load])
+  }, [event, load, abortController.signal.aborted])
 
   const getNotifications = async () => {
     const backgroundFunctions = await initBGFunctions(browser)

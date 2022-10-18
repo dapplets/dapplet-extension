@@ -10,6 +10,7 @@ import { ChainTypes, DefaultSigners } from '../../../../../common/types'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
+import useAbortController from '../../hooks/useAbortController'
 
 enum DeploymentStatus {
   Unknown,
@@ -57,7 +58,7 @@ interface PropsDevModule {
   currentAccount?: any
 }
 
-let isMounted = false
+
 
 export const DevModule: FC<PropsDevModule> = (props) => {
   const {
@@ -107,19 +108,21 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const onCloseNewModule = () => setNewModule(false)
   const [admins, setAdmins] = useState<string[]>([])
   const [adminsOpen, setAdminsOpen] = useState(false)
+  const abortController = useAbortController()
 
   useEffect(() => {
-    isMounted = true
+  
 
     const init = async () => {
       await _updateData()
     }
     init()
     return () => {
-      isMounted = false
+      abortController.abort()
     }
   }, [
     targetChain,
+    abortController.signal.aborted
     // currentAccount,
     // modules,
     // isLoadingDeploy,
@@ -159,7 +162,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       //setMi(mi)
       //setVi(vi)
 
-      if (isMounted) {
+      if (!abortController.signal.aborted) {
         setDpendenciesChecking(dependenciesChecking)
         setTargetStorages(
           Object.keys(vi?.overlays ?? {}).length > 0
@@ -193,7 +196,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     if (!targetRegistry || !mi.name) return
     const { getAdmins } = await initBGFunctions(browser)
     const authors: string[] = await getAdmins(targetRegistry, mi.name)
-    if (isMounted && authors.length > 0) {
+    if (!abortController.signal.aborted && authors.length > 0) {
       setAdmins(authors)
     }
   }
@@ -202,7 +205,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     if (targetRegistry && mi.name) {
       const { getOwnership } = await initBGFunctions(browser)
       const owner = await getOwnership(targetRegistry, mi.name)
-      if (isMounted) {
+      if (!abortController.signal.aborted) {
         setOwner(owner)
       }
     } else {
@@ -211,7 +214,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }
 
   const _updateDeploymentStatus = async () => {
-    if (isMounted) {
+    if (!abortController.signal.aborted) {
       setDeploymentStatus(DeploymentStatus.Unknown)
     }
 
@@ -225,7 +228,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       : deployed
       ? DeploymentStatus.Deployed
       : DeploymentStatus.NotDeployed
-    if (isMounted) {
+    if (!abortController.signal.aborted) {
       setDeploymentStatus(deploymentStatus)
     }
   }
@@ -234,7 +237,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     if (targetChain) {
       const { getAddress } = await initBGFunctions(browser)
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-      if (isMounted) {
+      if (!abortController.signal.aborted) {
         setCurrentAccount(currentAccount)
       }
     } else {
@@ -376,7 +379,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       .filter((r) => r.isDev === false && r.isEnabled !== false)
       .map((x, i) => x.url)
     const newOwner = await getOwnership(newRegistries[0], mi.name)
-    if (isMounted) {
+    if (!abortController.signal.aborted) {
       setOwnerDev(newOwner)
     }
   }

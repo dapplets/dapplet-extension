@@ -4,38 +4,37 @@ import React, { FC, useEffect, useState } from 'react'
 import ReactTimeAgo from 'react-time-ago'
 import { Button, Comment, Segment } from 'semantic-ui-react'
 import { browser } from 'webextension-polyfill-ts'
-import * as walletIcons from '../../../../../common/resources/wallets'
-
 import * as EventBus from '../../../../../common/global-event-bus'
 import { CheckIcon } from '../../../../../common/react-components/CheckIcon'
+import * as walletIcons from '../../../../../common/resources/wallets'
 import {
   ChainTypes,
   DefaultSigners,
   WalletDescriptor,
   WalletTypes,
 } from '../../../../../common/types'
+import useAbortController from '../../hooks/useAbortController'
 export interface WalletProps {
   isOverlay?: boolean
   handleWalletLengthConnect?: () => void
 }
-let _isMounted = false
+
 export const Wallet: FC<WalletProps> = (props: WalletProps) => {
   const { isOverlay, handleWalletLengthConnect } = props
   const [descriptors, setDescriptors] = useState<WalletDescriptor[]>([])
   const [loading, setLoading] = useState(true)
-
+  const abortController = useAbortController()
   const connectedDescriptors = descriptors.filter((x) => x.connected)
   useEffect(() => {
     const init = async () => {
       refresh()
-      _isMounted = true
+
       EventBus.on('wallet_changed', refresh)
     }
 
     init()
 
     return () => {
-      _isMounted = false
       EventBus.off('wallet_changed', refresh)
     }
   }, [])
@@ -43,8 +42,7 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
     const { getWalletDescriptors } = await initBGFunctions(browser)
 
     const descriptors = await getWalletDescriptors()
-
-    if (_isMounted) {
+    if (!abortController.signal.aborted) {
       setDescriptors(descriptors)
       setLoading(false)
     }

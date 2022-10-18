@@ -11,6 +11,7 @@ import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
+import useAbortController from '../../hooks/useAbortController'
 import { _addInfoItemInputGroup } from '../../utils/addInfoInputGroup'
 import { _removeInfoItemInputGroup } from '../../utils/removeInfoInputGroup'
 import styles from './DappletsInfo.module.scss'
@@ -21,8 +22,6 @@ export interface DappletsMainInfoProps {
   ModuleVersion: any
   setShowChildrenRegistry: (x) => void
 }
-
-let _isMounted = false
 
 export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const { setDappletsDetail, ModuleInfo, ModuleVersion, setShowChildrenRegistry } = props
@@ -68,26 +67,27 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [addAdminDisabled, setAddAdminDisabled] = useState(false)
 
   const [editAdminsLoading, setEditAdminsLoading] = useState(false)
-
+  const abortController = useAbortController()
   let isNotNullCurrentAccount
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
       await _updateData()
     }
     init()
 
     return () => {
-      _isMounted = false
+      abortController.abort()
     }
-  }, [mi, newState, targetChain, editContextId, editAdmin])
+  }, [mi, newState, targetChain, editContextId, editAdmin, abortController.signal.aborted])
 
   const _updateData = async () => {
     const { getRegistries } = await initBGFunctions(browser)
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-    setTargetRegistry(prodRegistries[0]?.url || null)
-    setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
+    if (!abortController.signal.aborted) {
+      setTargetRegistry(prodRegistries[0]?.url || null)
+      setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
+    }
 
     await _updateCurrentAccount()
     if (!targetRegistry) return
@@ -98,7 +98,9 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     if (targetChain) {
       const { getAddress } = await initBGFunctions(browser)
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-      setCurrentAccount(currentAccount)
+      if (!abortController.signal.aborted) {
+        setCurrentAccount(currentAccount)
+      }
     } else {
       return
     }
@@ -182,12 +184,16 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const getContextId = async () => {
     const { getContextIds } = await initBGFunctions(browser)
     const newContextID = await getContextIds(targetRegistry, mi.name)
-    setContextId(newContextID)
+    if (!abortController.signal.aborted) {
+      setContextId(newContextID)
+    }
   }
   const getAdmins = async () => {
     const { getAdmins } = await initBGFunctions(browser)
     const authors = await getAdmins(targetRegistry, mi.name)
-    setAdmins(authors)
+    if (!abortController.signal.aborted) {
+      setAdmins(authors)
+    }
   }
 
   function containsValue(arr, elem: string) {
@@ -450,7 +456,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
           Back
         </button>
         <button
-          disabled={isDisabledPush }
+          disabled={isDisabledPush}
           onClick={() => saveChanges()}
           className={cn(styles.push, {
             [styles.pushDisabled]: isDisabledPush,

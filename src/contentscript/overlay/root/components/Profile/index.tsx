@@ -17,7 +17,6 @@ export interface ProfileProps {
   setSelectedWallet: (x: string) => void
 }
 
-let _isMounted = false
 export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
   const {
     handleWalletConnect,
@@ -35,13 +34,11 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
   const [newProfile, setNewProfile] = useState([])
   useEffect(() => {
     const init = async () => {
-      _isMounted = true
     }
 
     init()
 
     return () => {
-      _isMounted = false
     }
   }, [newProfile, isMini])
 

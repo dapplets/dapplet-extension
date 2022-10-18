@@ -13,7 +13,7 @@ import { DappletTitle } from '../DappletTitle'
 import { SquaredButton } from '../SquaredButton'
 import { Switch } from '../Switch'
 import styles from './Dapplet.module.scss'
-
+import useAbortController from '../../hooks/useAbortController'
 // TODO: How will the dapplets be displayed during development?
 
 export interface DappletProps
@@ -33,7 +33,7 @@ export interface DappletProps
   loadShowButton: boolean
   onOpenStoreAuthor: Function
 }
-let _isMounted = false
+
 export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const {
     dapplet,
@@ -56,17 +56,20 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const [loadHome, setLoadHome] = useState(false)
   const [registryActive, setRegistryActive] = useState(null)
   const [owner, setOwner] = useState(null)
+  const abortController = useAbortController();
   useEffect(() => {
-    _isMounted = true
+
     const init = async () => {
-      await updateData()
+      if (!abortController.signal.aborted) {
+       await updateData()
+      }
+     
     }
     init()
     return () => {
-      _isMounted = false
+      abortController.abort()
     }
-  }, [])
-  useEffect(() => {}, [loadHome])
+  }, [loadHome,abortController.signal.aborted])
   const loadingHome = () => {
     setLoadHome(false)
   }
@@ -78,9 +81,15 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     const newRegistries = registries
       .filter((r) => r.isDev === false && r.isEnabled !== false)
       .map((x, i) => x.url)
-    setRegistryActive(newRegistries[0])
+      if (!abortController.signal.aborted) {
+        setRegistryActive(newRegistries[0])
+       }
+   
     const newOwner = await getOwnership(newRegistries[0], name)
-    setOwner(newOwner)
+    if (!abortController.signal.aborted) {
+      setOwner(newOwner)
+     }
+   
   }
 
   return (

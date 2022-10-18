@@ -25,7 +25,6 @@ export interface SettingsPageProps {
   isLoad: boolean
   setLoad: any
 }
-let _isMounted = false
 
 const theme = { widgets: { SelectWidget, TextWidget } }
 
@@ -44,7 +43,6 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   const [registryActive, setRegistryActive] = useState(null)
 
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
       if (mi || vi || schemaConfig || defaultConfig) {
         const { getDevMode, getSwarmGateway } = await initBGFunctions(browser)
@@ -78,9 +76,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
     }
     init()
 
-    return () => {
-      _isMounted = false
-    }
+    return () => {}
   }, [])
 
   const _refreshData = async () => {
@@ -97,7 +93,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
       const { getOwnership } = await initBGFunctions(browser)
       const owner = await getOwnership(mi.sourceRegistry.url, mi.name)
       setOwner(owner)
-    }else{
+    } else {
       await updateData()
     }
   }
@@ -111,7 +107,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
       .map((x, i) => x.url)
     setRegistryActive(newRegistries[0])
     const newOwner = await getOwnership(newRegistries[0], mi.name)
-    setOwner(newOwner) 
+    setOwner(newOwner)
   }
 
   const _saveData = async (data: any) => {

@@ -7,13 +7,11 @@ export interface UserSettingsProps {
   dappletName: string
   registryUrl: string
 }
-let _isMounted = false
+
 export const UserSettings = ({ dappletName, registryUrl }: UserSettingsProps): ReactElement => {
   const [settingsContext, setSettingsContext] = useState(null)
   const [isLoad, setLoad] = useState(false)
   useEffect(() => {
-    _isMounted = true
-
     const init = async () => {
       setLoad(true)
       setSettingsContext(null)
@@ -28,9 +26,7 @@ export const UserSettings = ({ dappletName, registryUrl }: UserSettingsProps): R
     }
     init()
 
-    return () => {
-      _isMounted = false
-    }
+    return () => {}
   }, [dappletName, registryUrl])
 
   if (!settingsContext) return null

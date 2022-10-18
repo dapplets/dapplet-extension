@@ -12,6 +12,7 @@ import NEAR_ICON from '../../../../../overlay/assests/near-black.svg'
 import TWITTER_ICON from '../../../../../overlay/assests/twitter-icon.svg'
 import { Message } from '../../components/Message'
 import { TabLoader } from '../../components/TabLoader'
+import useAbortController from '../../hooks/useAbortController'
 import Attention from './assets/attention.svg'
 import HOME_ICON from './assets/newHome.svg'
 import Ok from './assets/ok.svg'
@@ -42,11 +43,13 @@ export const ConnectedAccount = () => {
   const [pairs, setPairs] = useState<IConnectedAccountsPair[]>([])
 
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(true)
-
+  const abortController = useAbortController()
   const updatePairs = async (prevPairs?: IConnectedAccountsPair[]) => {
     const { getConnectedAccountsPairs } = await initBGFunctions(browser)
     const newPairs: IConnectedAccountsPair[] = await getConnectedAccountsPairs({ prevPairs })
-    setPairs(newPairs)
+    if (!abortController.signal.aborted) {
+      setPairs(newPairs)
+    }
 
     // *** UPDATE ***
     if (!newPairs || newPairs.length === 0) return
@@ -66,7 +69,7 @@ export const ConnectedAccount = () => {
     return () => {
       EventBus.off('wallet_changed', updatePairs)
     }
-  }, [])
+  }, [abortController.signal.aborted])
 
   const handleOpenPopup = async (account: IConnectedAccountUser) => {
     const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)

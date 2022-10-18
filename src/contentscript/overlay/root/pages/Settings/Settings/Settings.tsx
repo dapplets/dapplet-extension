@@ -15,6 +15,7 @@ import { SettingWrapper } from '../../../components/SettingWrapper'
 import { Switch } from '../../../components/Switch'
 import { getDefaultValueProvider } from '../../../utils/getDefaultValue'
 
+import useAbortController from '../../../hooks/useAbortController'
 import styles from './Settings.module.scss'
 
 export interface SettingsListProps {
@@ -76,11 +77,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const inputOfFocusAdapter = useRef<HTMLInputElement>()
   const inputOfFocusAgentName = useRef<HTMLInputElement>()
 
-  const _isMounted = useRef(true)
-
+  const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
-      if (_isMounted.current) {
+      if (!abortController.signal.aborted) {
         await checkUpdates()
 
         await loadProvider()
@@ -100,9 +100,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     init()
 
     return () => {
-      _isMounted.current = false
+      abortController.abort()
     }
-  }, [])
+  }, [abortController.signal.aborted])
 
   const getValidUserAgentName = (value, reg) => {
     try {
@@ -120,7 +120,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const checkUpdates = async () => {
     const { getNewExtensionVersion } = await initBGFunctions(browser)
     const isUpdateAvailable = await getNewExtensionVersion()
-    onUpdateAvailable(isUpdateAvailable)
+    if (!abortController.signal.aborted) {
+      onUpdateAvailable(isUpdateAvailable)
+    }
   }
   const loadProvider = async () => {
     const { getInitialConfig } = await initBGFunctions(browser)
@@ -131,7 +133,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     }
     const { getEthereumProvider } = await initBGFunctions(browser)
     const provider = await getEthereumProvider()
-    setProviderInput(provider)
+    if (!abortController.signal.aborted) {
+      setProviderInput(provider)
+    }
   }
   const setProvider = async (provider: string) => {
     try {
@@ -150,12 +154,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     const { getInitialConfig } = await initBGFunctions(browser)
     const config = await getInitialConfig()
 
-    if (config.swarmGatewayUrl) {
+    if (config.swarmGatewayUrl && !abortController.signal.aborted) {
       setSwarmGatewayInputDefault(config.swarmGatewayUrl)
     }
     const { getSwarmGateway } = await initBGFunctions(browser)
     const gateway = await getSwarmGateway()
-    setSwarmGatewayInput(gateway)
+    if (!abortController.signal.aborted) {
+      setSwarmGatewayInput(gateway)
+    }
   }
 
   const setSwarmGateway = async (gateway: string) => {
@@ -180,7 +186,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     }
     const { getSwarmPostageStampId } = await initBGFunctions(browser)
     const id = await getSwarmPostageStampId()
-    setSwarmPostageStampIdInput(id)
+    if (!abortController.signal.aborted) {
+      setSwarmPostageStampIdInput(id)
+    }
   }
 
   const setSwarmPostageStampId = async (id: string) => {
@@ -201,13 +209,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     const { getInitialConfig } = await initBGFunctions(browser)
     const config = await getInitialConfig()
 
-    if (config.dynamicAdapter) {
+    if (config.dynamicAdapter && !abortController.signal.aborted) {
       setDynamicAdapterInputDefault(config.dynamicAdapter)
     }
     const { getDynamicAdapter } = await initBGFunctions(browser)
     const dynamicAdapterInput = await getDynamicAdapter()
-
-    setDynamicAdapterInput(dynamicAdapterInput)
+    if (!abortController.signal.aborted) {
+      setDynamicAdapterInput(dynamicAdapterInput)
+    }
   }
 
   const setDynamicAdapter = async (dynamicAdapter: string) => {
@@ -228,8 +237,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const loadUserAgentName = async () => {
     const { getUserAgentName } = await initBGFunctions(browser)
     const userAgentNameInput = await getUserAgentName()
-
-    setUserAgentNameInput(userAgentNameInput)
+    if (!abortController.signal.aborted) {
+      setUserAgentNameInput(userAgentNameInput)
+    }
   }
 
   const setUserAgentName = async (userAgentName: string) => {
@@ -256,7 +266,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     }
     const { getIpfsGateway } = await initBGFunctions(browser)
     const gateway = await getIpfsGateway()
-    setIpfsGatewayInput(gateway)
+    if (!abortController.signal.aborted) {
+      setIpfsGatewayInput(gateway)
+    }
   }
 
   const setIpfsGateway = async (gateway: string) => {
@@ -276,12 +288,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     const { getInitialConfig } = await initBGFunctions(browser)
     const config = await getInitialConfig()
 
-    if (config.siaPortalUrl) {
+    if (config.siaPortalUrl && !abortController.signal.aborted) {
       setSiaPortalInputDefault(config.siaPortalUrl)
     }
     const { getSiaPortal } = await initBGFunctions(browser)
     const gateway = await getSiaPortal()
-    setSiaPortalInput(gateway)
+    if (!abortController.signal.aborted) {
+      setSiaPortalInput(gateway)
+    }
   }
 
   const setSiaPortal = async (gateway: string) => {
@@ -308,14 +322,17 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const loadTargetStorages = async () => {
     const { getTargetStorages } = await initBGFunctions(browser)
     const loadTarget = await getTargetStorages()
-
-    setTargetStorages(loadTarget)
+    if (!abortController.signal.aborted) {
+      setTargetStorages(loadTarget)
+    }
   }
 
   const loadPopupInOverlay = async () => {
     const { getPopupInOverlay } = await initBGFunctions(browser)
     const popupInOverlay = await getPopupInOverlay()
-    setPopup(popupInOverlay)
+    if (!abortController.signal.aborted) {
+      setPopup(popupInOverlay)
+    }
   }
 
   const setPopupInOverlay = async (isActive: boolean) => {
