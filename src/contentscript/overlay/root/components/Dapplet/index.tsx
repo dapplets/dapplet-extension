@@ -66,7 +66,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
       _isMounted = false
     }
   }, [])
-  useEffect(() => {}, [loadHome])
+  // useEffect(() => {}, [loadHome])
   const loadingHome = () => {
     setLoadHome(false)
   }
@@ -155,7 +155,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
             <DappletInfo
               title="Owner"
-              value={dapplet.sourceRegistry.isDev ? owner:author}
+              value={dapplet.sourceRegistry.isDev ? owner : author}
               className={styles.cardInfo}
               onClick={() => onOpenStoreAuthor(dapplet)}
             />
