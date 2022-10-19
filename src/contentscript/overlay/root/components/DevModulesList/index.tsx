@@ -201,15 +201,15 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }
 
   const _updateOwnership = async () => {
-    if (targetRegistry && mi.name) {
+    if (!targetRegistry || !mi.name) return
       const { getOwnership } = await initBGFunctions(browser)
       const owner = await getOwnership(targetRegistry, mi.name)
-      if (!abortController.signal.aborted) {
+   
+      if (abortController.signal.aborted) {
         setOwner(owner)
+        setOwnerDev(owner)
       }
-    } else {
-      return
-    }
+    
   }
 
   const _updateDeploymentStatus = async () => {
