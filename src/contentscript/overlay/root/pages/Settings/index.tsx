@@ -7,6 +7,7 @@ import { UnderConstructionInfo } from '../UnderConstructionInfo'
 import { Developer } from './Developer/Developer'
 import { SettingsList } from './Settings/Settings'
 import styles from './Settings/Settings.module.scss'
+import useAbortController from '../../hooks/useAbortController'
 
 enum SettingsTabs {
   // MAIN = 0,
@@ -66,6 +67,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   const [isTokenomics, setTokenomics] = useState(false)
   const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] = useState(false)
   const [isShowChildrenRegistry, setShowChildrenRegistry] = useState(false)
+  const abortController = useAbortController()
 
   useEffect(() => {
     const init = async () => {
@@ -73,14 +75,19 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
       await loadErrorReporting()
     }
     init()
-    return () => {}
-  }, [])
+    return () => {
+      abortController.abort()
+    }
+  }, [abortController.signal.aborted])
   const loadDevMode = async () => {
     setSvgLoaderDevMode(true)
 
     const { getDevMode } = await initBGFunctions(browser)
     const devMode = await getDevMode()
-    setMode(devMode)
+    if(!abortController.signal.aborted){
+     setMode(devMode) 
+    }
+    
     setTimeout(() => setSvgLoaderDevMode(false), 500)
   }
   const setDevmode = async (isActive: boolean) => {
@@ -93,7 +100,10 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
 
     const { getErrorReporting } = await initBGFunctions(browser)
     const errorReporting = await getErrorReporting()
-    onErrorReporting(errorReporting)
+    if(!abortController.signal.aborted){
+      onErrorReporting(errorReporting)
+     }
+  
     setTimeout(() => setSvgErrorReporting(false), 500)
   }
   const setErrorReporting = async (isActive: boolean) => {

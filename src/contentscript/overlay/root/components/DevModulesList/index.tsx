@@ -7,10 +7,10 @@ import VersionInfo from '../../../../../background/models/versionInfo'
 import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
+import useAbortController from '../../hooks/useAbortController'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
-import useAbortController from '../../hooks/useAbortController'
 
 enum DeploymentStatus {
   Unknown,
@@ -57,8 +57,6 @@ interface PropsDevModule {
   setCurrentAccount?: (x: any) => void
   currentAccount?: any
 }
-
-
 
 export const DevModule: FC<PropsDevModule> = (props) => {
   const {
@@ -111,8 +109,6 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const abortController = useAbortController()
 
   useEffect(() => {
-  
-
     const init = async () => {
       await _updateData()
     }
@@ -122,7 +118,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     }
   }, [
     targetChain,
-    abortController.signal.aborted
+    abortController.signal.aborted,
     // currentAccount,
     // modules,
     // isLoadingDeploy,
@@ -196,8 +192,11 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     if (!targetRegistry || !mi.name) return
     const { getAdmins } = await initBGFunctions(browser)
     const authors: string[] = await getAdmins(targetRegistry, mi.name)
-    if (!abortController.signal.aborted && authors.length > 0) {
-      setAdmins(authors)
+
+    if (authors.length > 0) {
+      if (abortController.signal.aborted) {
+        setAdmins(authors)
+      }
     }
   }
 
