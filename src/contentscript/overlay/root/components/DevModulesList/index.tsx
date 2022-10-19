@@ -114,13 +114,14 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     }
     init()
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [
     targetChain,
     abortController.signal.aborted,
     // currentAccount,
     // modules,
+    // admins,
     // isLoadingDeploy,
     // isModalError,
     // isModalErrorOwner,
@@ -171,7 +172,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
         setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
       }
     }
-
+    // if (!abortController.signal.aborted) {
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
       await updateDataLocalhost()
@@ -179,13 +180,15 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     } else {
       return Promise.all([
         _updateOwnership(),
+        getModulesAdmins(),
         _updateCurrentAccount(),
         _updateDeploymentStatus(),
         _checkDependencies(),
         updateDataLocalhost(),
-        getModulesAdmins(),
+        
       ])
     }
+  // }
   }
 
   const getModulesAdmins = async () => {
@@ -194,7 +197,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     const authors: string[] = await getAdmins(targetRegistry, mi.name)
 
     if (authors.length > 0) {
-      if (abortController.signal.aborted) {
+      if (!abortController.signal.aborted) {
         setAdmins(authors)
       }
     }
@@ -205,7 +208,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       const { getOwnership } = await initBGFunctions(browser)
       const owner = await getOwnership(targetRegistry, mi.name)
    
-      if (abortController.signal.aborted) {
+      if (!abortController.signal.aborted) {
         setOwner(owner)
         setOwnerDev(owner)
       }
