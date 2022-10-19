@@ -7,13 +7,13 @@ import { ReactComponent as DeleteIcon } from '../../assets/svg/newDelete.svg'
 import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
 import { ReactComponent as SearchIcon } from '../../assets/svg/newLinks.svg'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
+import useAbortController from '../../hooks/useAbortController'
 import { DappletImage } from '../DappletImage'
 import { DappletInfo } from '../DappletInfo'
 import { DappletTitle } from '../DappletTitle'
 import { SquaredButton } from '../SquaredButton'
 import { Switch } from '../Switch'
 import styles from './Dapplet.module.scss'
-import useAbortController from '../../hooks/useAbortController'
 // TODO: How will the dapplets be displayed during development?
 
 export interface DappletProps
@@ -56,20 +56,18 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const [loadHome, setLoadHome] = useState(false)
   const [registryActive, setRegistryActive] = useState(null)
   const [owner, setOwner] = useState(null)
-  const abortController = useAbortController();
+  const abortController = useAbortController()
   useEffect(() => {
-
     const init = async () => {
       if (!abortController.signal.aborted) {
-       await updateData()
+        await updateData()
       }
-     
     }
     init()
     return () => {
       abortController.abort()
     }
-  }, [loadHome,abortController.signal.aborted])
+  }, [loadHome, abortController.signal.aborted])
   const loadingHome = () => {
     setLoadHome(false)
   }
@@ -81,15 +79,14 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     const newRegistries = registries
       .filter((r) => r.isDev === false && r.isEnabled !== false)
       .map((x, i) => x.url)
-      if (!abortController.signal.aborted) {
-        setRegistryActive(newRegistries[0])
-       }
-   
+    if (!abortController.signal.aborted) {
+      setRegistryActive(newRegistries[0])
+    }
+
     const newOwner = await getOwnership(newRegistries[0], name)
     if (!abortController.signal.aborted) {
       setOwner(newOwner)
-     }
-   
+    }
   }
 
   return (
@@ -164,7 +161,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
             <DappletInfo
               title="Owner"
-              value={dapplet.sourceRegistry.isDev ? owner:author}
+              value={dapplet.sourceRegistry.isDev ? owner : author}
               className={styles.cardInfo}
               onClick={() => onOpenStoreAuthor(dapplet)}
             />

@@ -211,11 +211,12 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       }
 
       await _refreshData()
+      _updateFeatureState(name, { isLoading: false })
     } catch (err) {
       _updateFeatureState(name, { isActive: !isActive, error: err.message })
     }
 
-    _updateFeatureState(name, { isLoading: false })
+    // _updateFeatureState(name, { isLoading: false })
   }
 
   const onRemoveMyDapplet = async (f: ManifestAndDetails) => {
