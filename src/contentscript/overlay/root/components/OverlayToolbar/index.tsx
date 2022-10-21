@@ -5,6 +5,7 @@ import {
   ReactComponent as DappletsLogo,
 } from '../../assets/newIcon/mustache.svg'
 import { ReactComponent as Coolicon } from '../../assets/newIcon/squares.svg'
+import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { OverlayTab } from '../OverlayTab'
 import { ModalTabs } from './ModalTabs'
@@ -65,6 +66,8 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
   const [isVisibleMobileTabs, setVisibleMobileTabs] = useState(false)
+  const [isShowTabs, onShowTabs] = useToggle(true)
+
   const closeMobileModal = () => setVisibleMobileTabs(false)
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
@@ -156,47 +159,61 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
         <div className={cn(styles.tabs, {})}>
           <div className={styles.TabList}>
             {getNewButtonTab('Connected Accounts')}
-            {noSystemTabs.length > 0 &&
-              noSystemTabs.map((tab) => {
-                return (
-                  <OverlayTab
-                    setOpenWallet={p.setOpenWallet}
-                    isOpenWallet={p.isOpenWallet}
-                    key={tab.id}
-                    {...tab}
-                    isActive={p.activeTabId === tab.id}
-                    activeTabMenuId={p.activeTabMenuId}
-                    onCloseClick={() => p.onCloseClick(tab)}
-                    onMenuClick={(menu) => p.onMenuClick(tab, menu)}
-                    onTabClick={() => p.onTabClick(tab)}
-                  />
-                )
+            <div
+              className={cn(styles.toggleTabs, {
+                [styles.hideTabs]: !isShowTabs,
               })}
-            <ToggleOverlay
-              getNode={handleClickGetNodeOverlayToolbar}
-              onClick={() => {
-                if (p.pathname === '/system/dapplets') {
-                  p.setOpenWallet()
-                  p.onToggleClick()
-                } else {
-                  if (
-                    document
-                      .querySelector('#dapplets-overlay-manager')
-                      .classList.contains('CollapsedOverlayClass')
-                  ) {
+            >
+              {noSystemTabs.length > 0 &&
+                noSystemTabs.map((tab) => {
+                  return (
+                    <OverlayTab
+                      setOpenWallet={p.setOpenWallet}
+                      isOpenWallet={p.isOpenWallet}
+                      key={tab.id}
+                      {...tab}
+                      isActive={p.activeTabId === tab.id}
+                      activeTabMenuId={p.activeTabMenuId}
+                      onCloseClick={() => p.onCloseClick(tab)}
+                      onMenuClick={(menu) => p.onMenuClick(tab, menu)}
+                      onTabClick={() => p.onTabClick(tab)}
+                    />
+                  )
+                })}
+              <ToggleOverlay
+                getNode={handleClickGetNodeOverlayToolbar}
+                onClick={() => {
+                  if (p.pathname === '/system/dapplets') {
+                    p.setOpenWallet()
                     p.onToggleClick()
                   } else {
-                    p.navigate('/system/dapplets')
-                    p.onToggleClick()
+                    if (
+                      document
+                        .querySelector('#dapplets-overlay-manager')
+                        .classList.contains('CollapsedOverlayClass')
+                    ) {
+                      p.onToggleClick()
+                    } else {
+                      p.navigate('/system/dapplets')
+                      p.onToggleClick()
+                    }
                   }
-                }
-              }}
-              className={cn(styles.toggleOverlay, {
-                [styles.isOpenWallet]: p.isOpenWallet,
-              })}
-            />
+                }}
+                className={cn(styles.toggleOverlay, {
+                  [styles.isOpenWallet]: p.isOpenWallet,
+                  // [styles.isOpenDappletPage]:  !document
+                  // .querySelector('#dapplets-overlay-manager')
+                  // .classList.contains('CollapsedOverlayClass')
+                })}
+              />
+            </div>
             <div>
-              <button className={cn(styles.miniButton)}></button>
+              <button
+                onClick={() => onShowTabs()}
+                className={cn(styles.miniButton, {
+                  [styles.hideTabsBtn]: !isShowTabs,
+                })}
+              ></button>
             </div>
           </div>
         </div>

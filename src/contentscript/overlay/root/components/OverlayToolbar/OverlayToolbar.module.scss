@@ -58,6 +58,12 @@
   }
 }
 
+.isOpenDappletPage {
+  svg path {
+    fill: $Primary;
+  }
+}
+
 .isOpenWallet {
   background-color: rgb(0 0 0 / 30%);
 }
@@ -137,6 +143,15 @@
   background-position: center;
   border-radius: 4px;
   margin-top: 10px;
+  &:hover {
+    background: #f5f5f5
+      url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0.5 1.25L6 6.75L11.5 1.25' stroke='%23D9304F' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+}
+.hideTabsBtn {
+  transform: rotate(180deg);
 }
 
 .tabConnectedWrapper {
@@ -165,4 +180,16 @@
     width: 30px;
     height: 10px;
   }
+}
+
+.toggleTabs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.5s ease;
+}
+
+.hideTabs {
+  transition: all 0.5s ease;
+  display: none;
 }
