@@ -17,8 +17,13 @@ export interface OverlayTabProps {
   onTabClick: () => void
   onCloseClick: () => void
   onMenuClick: (menu: ToolbarTabMenu) => void
-  setOpenWallet: any
-  isOpenWallet: boolean
+  setOpenWallet?: any
+  isOpenWallet?: boolean
+  classNameTab?: string
+  classNameIcon?: string
+  classNameClose?: string
+  classNameList?: string
+  classNameItem?: string
 }
 
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
@@ -32,82 +37,104 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
 
   return (
     <div
-      onClick={() => {
-        !p.isActive && p.onTabClick()
+      // onClick={() => {
+      //   !p.isActive && p.onTabClick()
 
-        p.setOpenWallet()
-      }}
-      className={cn(styles.tab, {
+      //   // p.setOpenWallet()
+      // }}
+      className={cn(styles.tab, p.classNameTab, {
         [styles.tabNotActive]: !p.isActive,
         [styles.isOpenWallet]: p.isOpenWallet,
       })}
     >
       <div className={styles.top}>
-        {p.icon && typeof p.icon === 'function' ? (
-          <p.icon
-            onClick={() => {
-              // !p.isActive && p.onTabClick()
-            }}
-            className={cn(styles.image, {
-              [styles.cursor]: !p.isActive,
-            })}
-          />
-        ) : p.icon && typeof p.icon === 'object' && 'moduleName' in p.icon ? (
+        {p.icon && typeof p.icon === 'function' ? null : //   onClick={() => { // <p.icon
+        //     !p.isActive && p.onTabClick()
+        //     // console.log('2');
+        //   }}
+        //   className={cn(styles.image, {
+        //     [styles.cursor]: !p.isActive,
+        //   })}
+        // />
+        p.icon && typeof p.icon === 'object' && 'moduleName' in p.icon ? (
           <ModuleIcon
             onClick={() => {
-              // !p.isActive && p.onTabClick()
+              !p.isActive && p.onTabClick()
             }}
-            className={cn(styles.image, {
-              [styles.cursor]: !p.isActive,
-            })}
+            className={cn(
+              styles.image,
+              {
+                [styles.cursor]: !p.isActive,
+              },
+              p.classNameIcon
+            )}
             moduleName={p.icon.moduleName}
             registryUrl={p.icon.registryUrl}
           />
         ) : (
           <StorageRefImage
             onClick={() => {
-              // !p.isActive && p.onTabClick()
+              !p.isActive && p.onTabClick()
             }}
-            className={cn(styles.image, {
-              [styles.cursor]: !p.isActive,
-            })}
+            className={cn(
+              styles.image,
+              {
+                [styles.cursor]: !p.isActive,
+              },
+              p.classNameIcon
+            )}
             storageRef={p.icon as any}
           />
         )}
         {!p.pinned && (
-          <span className={styles.close} onClick={_handleCloseClick}>
+          <span className={cn(styles.close, p.classNameClose)} onClick={_handleCloseClick}>
             {/* <Close /> */}
           </span>
         )}
       </div>
 
-      {p.isActive && visibleMenus.length > 0 && (
-        <ul className={styles.list}>
-          {visibleMenus.map((menu) => {
-            return (
-              <li
-                key={menu.id}
-                title={menu.title}
-                onClick={() => p.onMenuClick(menu)}
-                className={cn(styles.item, {
-                  [styles.selected]: p.activeTabMenuId === menu.id,
-                })}
-              >
-                {menu.icon && typeof menu.icon === 'function' ? (
-                  <menu.icon />
-                ) : menu.icon && typeof menu.icon === 'object' && 'moduleName' in menu.icon ? (
-                  <ModuleIcon
-                    moduleName={menu.icon.moduleName}
-                    registryUrl={menu.icon.registryUrl}
-                  />
-                ) : (
-                  <StorageRefImage storageRef={menu.icon as any} />
-                )}
-              </li>
-            )
-          })}
-        </ul>
-      )}
+      {
+        // p.isActive &&
+        p.pinned && visibleMenus.length > 0 && (
+          <ul
+            className={cn(
+              styles.list,
+              {
+                [styles.listNotPadding]: typeof p.icon === 'function',
+              },
+              p.classNameList
+            )}
+          >
+            {visibleMenus.map((menu) => {
+              return (
+                <li
+                  key={menu.id}
+                  title={menu.title}
+                  onClick={() => p.onMenuClick(menu)}
+                  className={cn(
+                    styles.item,
+                    {
+                      [styles.selected]: p.activeTabMenuId === menu.id,
+                    },
+                    p.classNameItem
+                  )}
+                >
+                  {menu.icon && typeof menu.icon === 'function' ? (
+                    <menu.icon />
+                  ) : menu.icon && typeof menu.icon === 'object' && 'moduleName' in menu.icon ? (
+                    <ModuleIcon
+                      moduleName={menu.icon.moduleName}
+                      registryUrl={menu.icon.registryUrl}
+                    />
+                  ) : (
+                    <StorageRefImage storageRef={menu.icon as any} />
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        )
+      }
     </div>
   )
 }

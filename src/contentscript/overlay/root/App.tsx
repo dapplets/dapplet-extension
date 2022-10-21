@@ -17,15 +17,17 @@ import ManifestDTO from '../../../background/dto/manifestDTO'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
 
-import { ReactComponent as Account } from './assets/svg/connected-account.svg'
-import { ReactComponent as DappletsLogo } from './assets/svg/dapplets-logo.svg'
-import { ReactComponent as Home } from './assets/svg/home-toolbar.svg'
-import { ReactComponent as SearchIcon } from './assets/svg/magnifying-glass.svg'
-import { ReactComponent as Notification } from './assets/svg/notification.svg'
-import { ReactComponent as Settings } from './assets/svg/setting-toolbar.svg'
-import { ReactComponent as StoreIcon } from './assets/svg/store.svg'
+import { ReactComponent as Account } from './assets/newIcon/connected.svg'
+import { ReactComponent as Hide } from './assets/newIcon/hide.svg'
+import { ReactComponent as Settings } from './assets/newIcon/mainset.svg'
+import { ReactComponent as DappletsLogo } from './assets/newIcon/mustache.svg'
+import { ReactComponent as Notification } from './assets/newIcon/notification.svg'
+import { ReactComponent as SearchIcon } from './assets/newIcon/search.svg'
+import { ReactComponent as Home } from './assets/newIcon/squares.svg'
+import { ReactComponent as StoreIcon } from './assets/newIcon/store.svg'
 import { ContentItem } from './components/ContentItem'
 import styles from './components/Overlay/Overlay.module.scss'
+import { OverlayTab } from './components/OverlayTab'
 import { OverlayToolbar } from './components/OverlayToolbar'
 import { PopupItem } from './components/PopupItem'
 import { Profile } from './components/Profile'
@@ -394,6 +396,40 @@ class _App extends React.Component<P, S> {
     })
   }
 
+  getNewButtonTab = (parametersFilter: string) => {
+    let clone = Object.assign({}, SYSTEM_TAB)
+    const newSystemTab = [clone]
+    const newSet = newSystemTab.map((tab) => {
+      const NewTabs = tab
+      const filterNotifications = NewTabs.menus.filter((f) => f.title === parametersFilter)
+      const newTab = NewTabs
+      newTab.menus = filterNotifications
+      const { pathname } = this.props.location!
+      const activeTabId = pathname.split('/')[1]
+      const activeTabMenuId = pathname.split('/')[2]
+      return (
+        <OverlayTab
+          key={NewTabs.id}
+          {...newTab}
+          isActive={activeTabId === NewTabs.id}
+          activeTabMenuId={activeTabMenuId}
+          onCloseClick={() => this.handleCloseTabClick(NewTabs)}
+          onMenuClick={(menu) => this.handleTabMenuClick(NewTabs, menu)}
+          onTabClick={() => this.handleTabMenuClick(NewTabs)}
+          classNameTab={
+            parametersFilter === 'Connected Accounts'
+              ? styles.overlayTabWrapperAccounts
+              : styles.overlayTabWrapper
+          }
+          classNameIcon={styles.overlayTabIcon}
+          classNameList={styles.overlayTabList}
+          classNameItem={styles.overlayTabItem}
+        />
+      )
+    })
+    return newSet
+  }
+
   render() {
     const p = this.props
     const s = this.state
@@ -426,11 +462,20 @@ class _App extends React.Component<P, S> {
             activeTabMenuId={activeTabMenuId}
             setOpenWallet={this.closeOpenWallet}
             isOpenWallet={s.isOpenWallet}
+            navigate={this.props.navigate!}
+            pathname={pathname}
           />
 
           <div className={styles.inner}>
             <header className={styles.header}>
               <div className={styles.left}>
+                <SquaredButton
+                  title="hide"
+                  // className={s.classNameSearchButton}
+                  onClick={this.props.onToggle}
+                  appearance="big"
+                  icon={Hide}
+                />
                 <Profile
                   setSelectedWallet={this.setSelectedWallet}
                   setConnectedDescriptors={this.setConnectedDescriptors}
@@ -444,6 +489,7 @@ class _App extends React.Component<P, S> {
                   setOpenWalletMini={this.setOpenWalletMini}
                   isOpenSearch={s.isOpenSearch}
                 />
+                {this.getNewButtonTab('Connected Accounts')}
               </div>
 
               <div className={styles.right}>
@@ -469,6 +515,9 @@ class _App extends React.Component<P, S> {
                     />
                   </div>
                 )}
+
+                {this.getNewButtonTab('Notifications')}
+
                 <SquaredButton
                   appearance="big"
                   title="Dapplets Store"
@@ -476,6 +525,7 @@ class _App extends React.Component<P, S> {
                   onClick={this.handleStoreButtonClick}
                 />
                 <ShareButton />
+                {this.getNewButtonTab('Settings')}
               </div>
             </header>
 

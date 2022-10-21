@@ -1,13 +1,14 @@
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/null.scss";
+@import '../../assets/styles/color.variables.scss';
+@import '../../assets/styles/null.scss';
 
 .wrapper {
   display: flex;
   align-items: center;
   justify-content: end;
 
-  margin-top: 20px;
+  // margin-top: 20px;
   margin-bottom: 5px;
+  display: none;
 }
 
 .dappletsBlock {
@@ -15,7 +16,7 @@
 
   width: 100%;
 
-  height: calc(100vh - 103px);
+  height: calc(100vh - 58px);
   direction: rtl;
 
   &::-webkit-scrollbar {
@@ -27,13 +28,12 @@
   &::-webkit-scrollbar-track {
     background: rgb(244 244 244);
     background: rgb(244 244 244);
-    background:
-      linear-gradient(
-        90deg,
-        rgb(244 244 244 / 0%) 10%,
-        rgb(227 227 227 / 100%) 50%,
-        rgb(244 244 244 / 0%) 90%
-      );
+    background: linear-gradient(
+      90deg,
+      rgb(244 244 244 / 0%) 10%,
+      rgb(227 227 227 / 100%) 50%,
+      rgb(244 244 244 / 0%) 90%
+    );
   }
 
   &::-webkit-scrollbar-thumb {
@@ -50,4 +50,4 @@
   direction: ltr;
 }
 
-@import "./adaptive.scss"
+@import './adaptive.scss';
