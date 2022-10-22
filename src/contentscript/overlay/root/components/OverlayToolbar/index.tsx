@@ -66,7 +66,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
   const [isVisibleMobileTabs, setVisibleMobileTabs] = useState(false)
-  const [isShowTabs, onShowTabs] = useToggle(true)
+  const [isShowTabs, onShowTabs] = useToggle(false)
 
   const closeMobileModal = () => setVisibleMobileTabs(false)
   const handleClickGetNodeOverlayToolbar = () => {
@@ -211,7 +211,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               <button
                 onClick={() => onShowTabs()}
                 className={cn(styles.miniButton, {
-                  [styles.hideTabsBtn]: !isShowTabs,
+                  [styles.hideTabsBtn]: isShowTabs,
                 })}
               ></button>
             </div>

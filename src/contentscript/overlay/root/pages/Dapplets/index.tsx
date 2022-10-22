@@ -25,10 +25,21 @@ export interface DappletsProps {
   onUserSettingsClick: (mi: ManifestDTO) => void
   dropdownListValue: string
   setDropdownListValue: (value: string) => void
+  getTabsForDapplet?: any
+  handleCloseTabClick?: any
+  tabs?: any
 }
 
 export const Dapplets: FC<DappletsProps> = (props) => {
-  const { search, onUserSettingsClick, dropdownListValue, setDropdownListValue } = props
+  const {
+    search,
+    onUserSettingsClick,
+    dropdownListValue,
+    setDropdownListValue,
+    getTabsForDapplet,
+    handleCloseTabClick,
+    tabs,
+  } = props
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
 
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
@@ -132,6 +143,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       _updateFeatureState(f.name, { isActionLoading: true })
       const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
       const tab = await getCurrentTab()
+
       if (!tab) return
       await openDappletAction(f.name, tab.id)
     } catch (err) {
@@ -206,8 +218,16 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     try {
       if (isActive) {
         await activateFeature(name, version, targetContextIds, order, sourceRegistry.url)
+        getTabsForDapplet(module)
       } else {
         await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url)
+        const noSystemTabs = tabs.filter((f) => f.title !== 'Dapplets')
+        noSystemTabs.length > 0 &&
+          noSystemTabs
+            .filter((f) => f.id === name)
+            .map((tab) => {
+              handleCloseTabClick(tab)
+            })
       }
 
       await _refreshData()
@@ -290,6 +310,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                       onDeployDapplet={onDeployDapplet}
                       onOpenStore={onOpenStore}
                       onOpenStoreAuthor={onOpenStoreAuthor}
+                      getTabsForDapplet={getTabsForDapplet}
                     />
                   )
               })

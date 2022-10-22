@@ -48,9 +48,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       })}
     >
       <div className={styles.top}>
-        {p.icon && typeof p.icon === 'function' ? null : //   onClick={() => { // <p.icon
-        //     !p.isActive && p.onTabClick()
-        //     // console.log('2');
+        {p.icon && typeof p.icon === 'function' ? null : //     !p.isActive && p.onTabClick() //   onClick={() => { // <p.icon
         //   }}
         //   className={cn(styles.image, {
         //     [styles.cursor]: !p.isActive,
@@ -86,11 +84,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             storageRef={p.icon as any}
           />
         )}
-        {!p.pinned && (
+        {/* {!p.pinned && (
           <span className={cn(styles.close, p.classNameClose)} onClick={_handleCloseClick}>
-            {/* <Close /> */}
+            <Close />
           </span>
-        )}
+        )} */}
       </div>
 
       {

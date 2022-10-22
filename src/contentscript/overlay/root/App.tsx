@@ -345,6 +345,35 @@ class _App extends React.Component<P, S> {
     this.props.navigate!(`/${mi.name}/settings`)
   }
 
+  getTabsForDapplet = (mi: ManifestDTO) => {
+    const tab = this.getTabs().find((x) => x.id === mi.name)
+
+    if (!tab) {
+      const internalTabs = [...this.state.internalTabs]
+      internalTabs.push({
+        id: mi.name,
+        pinned: false,
+        title: mi.title,
+        icon: {
+          moduleName: mi.name,
+          registryUrl: mi.sourceRegistry.url,
+        },
+        menus: [
+          {
+            id: 'settings',
+            title: 'User Settings',
+            icon: Settings,
+            props: {
+              moduleName: mi.name,
+              registryUrl: mi.sourceRegistry.url,
+            },
+          },
+        ],
+      })
+      this.setState({ internalTabs })
+    }
+  }
+
   handleWalletConnect = () => {
     this.setState({ isWalletConnect: !this.state.isWalletConnect })
   }
@@ -447,7 +476,6 @@ class _App extends React.Component<P, S> {
     const menu = tab?.menus.find((x) => x.id === activeTabMenuId)
 
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
-
     return (
       <div className={cn(styles.overlay)}>
         <div className={styles.wrapper}>
@@ -539,6 +567,9 @@ class _App extends React.Component<P, S> {
                   onUserSettingsClick={this.handleUserSettingsClick}
                   setDropdownListValue={this.setDropdownListValue}
                   dropdownListValue={s.dropdownListValue}
+                  getTabsForDapplet={this.getTabsForDapplet}
+                  handleCloseTabClick={this.handleCloseTabClick}
+                  tabs={this.getTabs()}
                 />
               )}
 
