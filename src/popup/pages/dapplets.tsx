@@ -290,7 +290,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
   render() {
     const { isLoading, error, isNoContentScript, search } = this.state
     const features = this._getFilteredDapplets()
-    // console.log(features)
+   
     return (
       <React.Fragment>
         <div className={this.props.isOverlay ? undefined : 'internalTabColumn'}>

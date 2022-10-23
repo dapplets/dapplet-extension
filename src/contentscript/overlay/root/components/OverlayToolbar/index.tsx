@@ -40,6 +40,7 @@ export interface OverlayToolbarProps {
   isOpenWallet: boolean
   navigate?: any
   pathname?: string
+  module?: any
 }
 
 type TToggleOverlay = {
@@ -171,12 +172,16 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                       setOpenWallet={p.setOpenWallet}
                       isOpenWallet={p.isOpenWallet}
                       key={tab.id}
+                      tabId={tab.id}
                       {...tab}
                       isActive={p.activeTabId === tab.id}
                       activeTabMenuId={p.activeTabMenuId}
                       onCloseClick={() => p.onCloseClick(tab)}
                       onMenuClick={(menu) => p.onMenuClick(tab, menu)}
                       onTabClick={() => p.onTabClick(tab)}
+                      modules={p.module}
+                      pathname={p.pathname}
+                      navigate={p.navigate}
                     />
                   )
                 })}

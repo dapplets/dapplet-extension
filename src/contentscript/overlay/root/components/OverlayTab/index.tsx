@@ -1,5 +1,7 @@
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import { StorageRef } from '../../../../../common/types'
 import { StorageRefImage } from '../../components/StorageRefImage'
 import { ToolbarTabMenu } from '../../types'
@@ -24,15 +26,45 @@ export interface OverlayTabProps {
   classNameClose?: string
   classNameList?: string
   classNameItem?: string
+  tabId?: string
+  modules?: any
+  navigate?: any
+  pathname?: string
 }
 
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const visibleMenus = p.menus.filter((x) => x.hidden !== true)
+  // const _handleCloseClick: React.MouseEventHandler<HTMLSpanElement> = (e) => {
+  //   e.preventDefault()
+  //   e.stopPropagation()
+  //   p.onCloseClick()
+  // }
 
-  const _handleCloseClick: React.MouseEventHandler<HTMLSpanElement> = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    p.onCloseClick()
+  const onOpenDappletAction = async (f: string) => {
+    if (!p.modules) return
+    let y
+
+    p.modules
+      .filter((x) => x.name === f)
+      .map((x) => {
+        if (x.isActionHandler) return (y = true)
+        else {
+          y = false
+        }
+      })
+
+    if (y) {
+      try {
+        const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
+        const tab = await getCurrentTab()
+        if (!tab) return
+        await openDappletAction(f, tab.id).then(() => p.navigate!(`/${f}/${p.activeTabMenuId}`))
+      } catch (err) {
+        console.error(err)
+      }
+    } else {
+      p.onTabClick()
+    }
   }
 
   return (
@@ -48,16 +80,14 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       })}
     >
       <div className={styles.top}>
-        {p.icon && typeof p.icon === 'function' ? null : //     !p.isActive && p.onTabClick() //   onClick={() => { // <p.icon
-        //   }}
-        //   className={cn(styles.image, {
-        //     [styles.cursor]: !p.isActive,
-        //   })}
-        // />
-        p.icon && typeof p.icon === 'object' && 'moduleName' in p.icon ? (
+        {p.icon && typeof p.icon === 'function' ? null : p.icon && // /> //   })} //     [styles.cursor]: !p.isActive, //   className={cn(styles.image, { //   }} //     !p.isActive && p.onTabClick() //   onClick={() => { // <p.icon
+          typeof p.icon === 'object' &&
+          'moduleName' in p.icon ? (
           <ModuleIcon
             onClick={() => {
+              // onOpenDappletAction(p.tabId)
               !p.isActive && p.onTabClick()
+              // console.log(p.isActive);
             }}
             className={cn(
               styles.image,
@@ -73,6 +103,9 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           <StorageRefImage
             onClick={() => {
               !p.isActive && p.onTabClick()
+              // console.log(p.isActive);
+
+              //  onOpenDappletAction(p.tabId)
             }}
             className={cn(
               styles.image,

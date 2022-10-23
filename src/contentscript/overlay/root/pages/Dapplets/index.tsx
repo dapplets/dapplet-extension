@@ -1,5 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import { rcompare } from 'semver'
 import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
@@ -28,6 +28,7 @@ export interface DappletsProps {
   getTabsForDapplet?: any
   handleCloseTabClick?: any
   tabs?: any
+  setModule:any
 }
 
 export const Dapplets: FC<DappletsProps> = (props) => {
@@ -39,6 +40,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     getTabsForDapplet,
     handleCloseTabClick,
     tabs,
+    setModule
   } = props
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
 
@@ -47,7 +49,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
   const [loadShowButton, setLoadShowButton] = useState(false)
 
-  const _isMounted = useRef(true)
   const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
@@ -67,14 +68,11 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
 
     return () => {
-      // _isMounted.current = false
       abortController.abort()
     }
   }, [abortController.signal.aborted])
 
   useEffect(() => {
-    // const controller = new AbortController();
-    // const signal = controller.signal;
     const init = async () => {
       if (!abortController.signal.aborted) {
         setLoadingListDapplets(true)
@@ -118,7 +116,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           error: null,
           versions: [],
         }))
+       
       if (!abortController.signal.aborted) {
+         setModule(newDappletsList)
         setDapplets(newDappletsList)
       }
     } catch (err) {
@@ -158,9 +158,10 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     const find = (a: string) => (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1
 
-    return dapplets.filter(
+    return( dapplets.filter(
       (x: ManifestAndDetails) => find(x.title) || find(x.description) || find(x.author)
-    )
+    ))
+  
   }
 
   const onSwitchChange = async (
@@ -269,6 +270,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   }
 
   const filteredDapplets = useMemo(() => {
+   
     return _getFilteredDapplets(dapplets)
   }, [search, dapplets])
 

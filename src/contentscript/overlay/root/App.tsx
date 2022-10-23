@@ -112,6 +112,7 @@ interface S {
   isMiniWallets: boolean
   connectedDescriptors: []
   selectedWallet: string
+  module: any
 }
 
 class _App extends React.Component<P, S> {
@@ -130,6 +131,7 @@ class _App extends React.Component<P, S> {
     isMiniWallets: false,
     connectedDescriptors: null,
     selectedWallet: null,
+    module: null,
   }
 
   async componentDidMount() {
@@ -190,10 +192,11 @@ class _App extends React.Component<P, S> {
                 id: overlay.id,
                 icon: null,
                 title: overlay.title,
-                hidden: true,
+                hidden: false,
               },
             ],
           }
+
           tabs.push(tab)
         }
       } else {
@@ -206,11 +209,13 @@ class _App extends React.Component<P, S> {
           pinned: false,
           title: '',
           menus: [
-            ...group.map((x) => ({
-              id: x.id,
-              title: x.title,
-              icon: Home,
-            })),
+            ...group.map((x) => {
+              return {
+                id: x.id,
+                title: x.title,
+                icon: Home,
+              }
+            }),
             {
               id: 'settings',
               icon: Settings,
@@ -218,16 +223,19 @@ class _App extends React.Component<P, S> {
               props: {
                 moduleName: group[0]?.module?.name,
                 registryUrl: group[0]?.module?.registryUrl,
+                id: group[0].id,
               },
             },
           ],
         }
+
         tabs.push(tab)
       }
     }
 
     for (const internalTab of this.state.internalTabs) {
       const existingTab = tabs.find((x) => x.id === internalTab.id)
+
       if (existingTab) {
         for (const menu of internalTab.menus) {
           if (!existingTab.menus.find((x) => x.id === menu.id)) {
@@ -270,9 +278,9 @@ class _App extends React.Component<P, S> {
     window.open(DAPPLETS_STORE_URL, '_blank')
   }
 
-  handleTabMenuClick = (tab: ToolbarTab, menu?: ToolbarTabMenu) => {
-    const menuId = menu?.id ?? tab.menus[0].id
-    this.props.navigate!(`/${tab.id}/${menuId}`)
+  handleTabMenuClick = async (tabs: ToolbarTab, menu?: ToolbarTabMenu) => {
+    const menuId = menu?.id ?? tabs.menus[0].id
+    this.props.navigate!(`/${tabs.id}/${menuId}`)
   }
 
   handleOpenSearchClick = () => {
@@ -424,15 +432,20 @@ class _App extends React.Component<P, S> {
       selectedWallet: selectedWallet,
     })
   }
+  setModule = (module: []) => {
+    this.setState({
+      module: module,
+    })
+  }
 
   getNewButtonTab = (parametersFilter: string) => {
     let clone = Object.assign({}, SYSTEM_TAB)
     const newSystemTab = [clone]
     const newSet = newSystemTab.map((tab) => {
       const NewTabs = tab
-      const filterNotifications = NewTabs.menus.filter((f) => f.title === parametersFilter)
+      const filterTab = NewTabs.menus.filter((f) => f.title === parametersFilter)
       const newTab = NewTabs
-      newTab.menus = filterNotifications
+      newTab.menus = filterTab
       const { pathname } = this.props.location!
       const activeTabId = pathname.split('/')[1]
       const activeTabMenuId = pathname.split('/')[2]
@@ -476,6 +489,7 @@ class _App extends React.Component<P, S> {
     const menu = tab?.menus.find((x) => x.id === activeTabMenuId)
 
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
+
     return (
       <div className={cn(styles.overlay)}>
         <div className={styles.wrapper}>
@@ -492,6 +506,7 @@ class _App extends React.Component<P, S> {
             isOpenWallet={s.isOpenWallet}
             navigate={this.props.navigate!}
             pathname={pathname}
+            module={s.module}
           />
 
           <div className={styles.inner}>
@@ -570,6 +585,7 @@ class _App extends React.Component<P, S> {
                   getTabsForDapplet={this.getTabsForDapplet}
                   handleCloseTabClick={this.handleCloseTabClick}
                   tabs={this.getTabs()}
+                  setModule={this.setModule}
                 />
               )}
 
