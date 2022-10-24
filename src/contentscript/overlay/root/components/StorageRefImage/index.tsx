@@ -24,7 +24,7 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
     }
     init()
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [storageRef, abortController.signal.aborted])
   const _updateStorageRef = async (storageRef) => {
