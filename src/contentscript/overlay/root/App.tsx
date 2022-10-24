@@ -574,7 +574,13 @@ class _App extends React.Component<P, S> {
 
             <div
               onClick={() => this.handleCloseSearch()}
-              className={cn(styles.children, 'dapplets-overlay-nav-content-list')}
+              className={cn(styles.children, 'dapplets-overlay-nav-content-list', {
+                [styles.newChildren]:
+                  pathname !== '/system/dapplets' &&
+                  pathname !== '/system/notifications' &&
+                  pathname !== '/system/connectedAccounts' &&
+                  pathname !== '/system/settings',
+              })}
             >
               {pathname === '/system/dapplets' && (
                 <Dapplets
@@ -604,14 +610,18 @@ class _App extends React.Component<P, S> {
 
               {overlays
                 .filter((x) => !x.isSystemPopup)
-                .map((x) => (
-                  <ContentItem
-                    overlay={x}
-                    isActive={pathname === `/${x.source ? x.source : x.id}/${x.id}`}
-                    overlayManager={p.overlayManager}
-                    key={x.id}
-                  />
-                ))}
+                .map((x) => {
+                  return (
+                    <ContentItem
+                      overlay={x}
+                      isActive={pathname === `/${x.source ? x.source : x.id}/${x.id}`}
+                      overlayManager={p.overlayManager}
+                      key={x.id}
+                      module={s.module}
+                      onSettingsModule={this.handleUserSettingsClick}
+                    />
+                  )
+                })}
 
               {activeTabId !== 'system' && activeTabMenuId === 'settings' && menu && (
                 <UserSettings dappletName={activeTabId} registryUrl={menu.props!.registryUrl} />

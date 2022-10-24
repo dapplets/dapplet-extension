@@ -1,9 +1,13 @@
 import cn from 'classnames'
 import * as React from 'react'
+import { ReactComponent as SettingsIcon } from '../../assets/newIcon/dapset.svg'
 import { PopupItem } from '../../components/PopupItem'
 import { TabLoader } from '../../components/TabLoader'
 import { Overlay } from '../../overlay'
 import { OverlayManager } from '../../overlayManager'
+import { DappletImage } from '../DappletImage'
+import { DappletTitle } from '../DappletTitle'
+import { SquaredButton } from '../SquaredButton'
 import styles from './ContentItem.module.scss'
 
 const OVERLAY_LOADING_TIMEOUT = 5000
@@ -21,6 +25,8 @@ interface P {
   overlay: Overlay
   isActive: boolean
   overlayManager: OverlayManager
+  module?: any
+  onSettingsModule?: any
   // className: string
 }
 
@@ -93,11 +99,39 @@ export class ContentItem extends React.Component<P, S> {
     const overlay = this.props.overlay
     window.open(overlay.url, '_blank')
   }
+  addModuleInfo() {
+    const module = this.props.module
+      .filter((x) => x.name === this.props.overlay.source)
+      .map((x, i) => {
+        return (
+          <div className={cn(styles.wrapperCard)}>
+            <div className={cn(styles.leftBlock)}>
+              <DappletImage isFavourites={false} storageRef={x.icon} className={styles.imgBlock} />
 
+              <DappletTitle
+                className={styles.title}
+                isShowDescription={false}
+                title={x.title}
+              ></DappletTitle>
+            </div>
+
+            <div className={styles.blockButtons}>
+              <SquaredButton
+                appearance="smail"
+                icon={SettingsIcon}
+                className={styles.squareButton}
+                title="Settings"
+                onClick={() => this.props.onSettingsModule(x)}
+              />
+            </div>
+          </div>
+        )
+      })
+    return module
+  }
   render() {
     const s = this.state
     const p = this.props
-    const y = true
     const childrenOverlays = p.overlayManager.getOverlays().filter((x) => x.parent === p.overlay)
 
     return (
@@ -196,7 +230,9 @@ export class ContentItem extends React.Component<P, S> {
           style={{ display: s.loadingMode === LoadingMode.NotLoading ? undefined : 'none' }}
           className={styles.frameContainer}
           ref={this.ref}
-        ></div>
+        >
+          {this.addModuleInfo()}
+        </div>
 
         {childrenOverlays.map((x) => (
           <PopupItem key={x.id} overlay={x} />
