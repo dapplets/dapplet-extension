@@ -1,13 +1,15 @@
 @import '../../assets/styles/fonts.scss';
 @import '../../assets/styles/color.variables.scss';
 @import '../../assets/styles/null.scss';
+/* Segoe UI Regular*/
 @font-face {
-    font-family: 'Segoe UI';
-    font-style: normal;
-    font-weight: 400;
-    src: url('../../assets/fonts/Segoe_UI.ttf');
-  
-  }
+  font-family: "SegoeUIRegular";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/SegoeUI.woff') format('woff');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
 .contentItem {
   display: none;
 }
@@ -27,7 +29,7 @@
     > iframe {
       width: 100%;
       height: 100%;
-      padding: 0 15px 0 15px;
+      // padding: 0 15px 0 15px;
     }
   }
 }
@@ -118,31 +120,30 @@
     position: absolute;
     top: 0;
     left: 15px;
-    width:calc(100% - 30px);
+    width: calc(100% - 30px);
     height: 1px;
     background: #e3e3e3;
     border-radius: 2px;
   }
 }
-.leftBlock{
- display: flex;
+.leftBlock {
+  display: flex;
 }
-.imgBlock{
+.imgBlock {
   width: 34px;
   height: 34px;
 }
-.title{
-
-  font-family: "Segoe UI"!important;
-  font-size: 16px!important;
-  font-weight: 400!important;
-  color: #2a2a2a!important;
+.title {
+  font-family: "SegoeUIRegular";
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  color: #2a2a2a !important;
   margin-left: 5px;
 }
 
-.squareButton{
+.squareButton {
   width: 34px;
   height: 34px;
-  background: #FFFFFF;
-  border-radius: 50px
+  background: #ffffff;
+  border-radius: 50px;
 }

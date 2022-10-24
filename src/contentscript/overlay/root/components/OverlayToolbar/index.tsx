@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import React, { ReactElement, useRef, useState } from 'react'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import {
   ReactComponent as Account,
   ReactComponent as DappletsLogo,
@@ -41,6 +41,7 @@ export interface OverlayToolbarProps {
   navigate?: any
   pathname?: string
   module?: any
+  overlays?: any
 }
 
 type TToggleOverlay = {
@@ -70,6 +71,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [isShowTabs, onShowTabs] = useToggle(false)
 
   const closeMobileModal = () => setVisibleMobileTabs(false)
+  useEffect(() => {}, [document])
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
       nodeOverlayToolbar.current.value = ''
@@ -200,7 +202,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                       p.onToggleClick()
                     } else {
                       p.navigate('/system/dapplets')
-                      p.onToggleClick()
                     }
                   }
                 }}

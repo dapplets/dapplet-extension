@@ -35,7 +35,7 @@ export class ShareButton extends React.Component<Props, State> {
         }
       },
       easing: 'easeInOutSine',
-      loop: 2,
+      loop: 1,
       duration: 800,
     })
 

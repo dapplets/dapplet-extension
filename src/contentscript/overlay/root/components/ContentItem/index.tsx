@@ -104,7 +104,7 @@ export class ContentItem extends React.Component<P, S> {
       .filter((x) => x.name === this.props.overlay.source)
       .map((x, i) => {
         return (
-          <div className={cn(styles.wrapperCard)}>
+          <div key={i} className={cn(styles.wrapperCard)}>
             <div className={cn(styles.leftBlock)}>
               <DappletImage isFavourites={false} storageRef={x.icon} className={styles.imgBlock} />
 

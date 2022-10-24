@@ -58,7 +58,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
         const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
         const tab = await getCurrentTab()
         if (!tab) return
-        await openDappletAction(f, tab.id).then(() => p.navigate!(`/${f}/${p.activeTabMenuId}`))
+        await openDappletAction(f, tab.id)
       } catch (err) {
         console.error(err)
       }
@@ -69,11 +69,12 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
 
   return (
     <div
-      // onClick={() => {
-      //   !p.isActive && p.onTabClick()
-
-      //   // p.setOpenWallet()
-      // }}
+      onClick={() => {
+        // !p.isActive && p.onTabClick()
+        // !p.isActive&&   onOpenDappletAction(p.tabId)
+        p.pinned && visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu))
+        // p.setOpenWallet()
+      }}
       className={cn(styles.tab, p.classNameTab, {
         [styles.tabNotActive]: !p.isActive,
         [styles.isOpenWallet]: p.isOpenWallet,
@@ -85,9 +86,8 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           'moduleName' in p.icon ? (
           <ModuleIcon
             onClick={() => {
-              // onOpenDappletAction(p.tabId)
+              // !p.isActive&&  onOpenDappletAction(p.tabId)
               !p.isActive && p.onTabClick()
-              // console.log(p.isActive);
             }}
             className={cn(
               styles.image,
@@ -103,9 +103,8 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           <StorageRefImage
             onClick={() => {
               !p.isActive && p.onTabClick()
-              // console.log(p.isActive);
 
-              //  onOpenDappletAction(p.tabId)
+              // !p.isActive&&   onOpenDappletAction(p.tabId)
             }}
             className={cn(
               styles.image,
@@ -141,7 +140,10 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                 <li
                   key={menu.id}
                   title={menu.title}
-                  onClick={() => p.onMenuClick(menu)}
+                  // onClick={() => {
+
+                  //   p.onMenuClick(menu)
+                  // }}
                   className={cn(
                     styles.item,
                     {

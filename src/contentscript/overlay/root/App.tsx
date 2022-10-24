@@ -507,6 +507,7 @@ class _App extends React.Component<P, S> {
             navigate={this.props.navigate!}
             pathname={pathname}
             module={s.module}
+            overlays={overlays}
           />
 
           <div className={styles.inner}>
@@ -624,7 +625,10 @@ class _App extends React.Component<P, S> {
                 })}
 
               {activeTabId !== 'system' && activeTabMenuId === 'settings' && menu && (
-                <UserSettings dappletName={activeTabId} registryUrl={menu.props!.registryUrl} />
+               
+                      <UserSettings  module={s.module}  dappletName={activeTabId} registryUrl={menu.props!.registryUrl} />
+
+                  
               )}
 
               {systemPopups.map((x) => (
