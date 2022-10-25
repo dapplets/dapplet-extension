@@ -140,7 +140,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
     try {
-      _updateFeatureState(f.name, { isActionLoading: true })
+      // _updateFeatureState(f.name, { isActionLoading: true })
       const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
       const tab = await getCurrentTab()
 
@@ -149,7 +149,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     } catch (err) {
       console.error(err)
     } finally {
-      _updateFeatureState(f.name, { isActionLoading: false })
+      // _updateFeatureState(f.name, { isActionLoading: false })
     }
   }
 

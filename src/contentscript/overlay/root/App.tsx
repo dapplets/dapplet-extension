@@ -625,10 +625,13 @@ class _App extends React.Component<P, S> {
                 })}
 
               {activeTabId !== 'system' && activeTabMenuId === 'settings' && menu && (
-               
-                      <UserSettings  module={s.module}  dappletName={activeTabId} registryUrl={menu.props!.registryUrl} />
-
-                  
+                <UserSettings
+                  navigation={p.navigate}
+                  overlays={overlays}
+                  module={s.module}
+                  dappletName={activeTabId}
+                  registryUrl={menu.props!.registryUrl}
+                />
               )}
 
               {systemPopups.map((x) => (

@@ -30,6 +30,7 @@ export interface OverlayTabProps {
   modules?: any
   navigate?: any
   pathname?: string
+  overlays?: any
 }
 
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
@@ -42,25 +43,30 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
 
   const onOpenDappletAction = async (f: string) => {
     if (!p.modules) return
-    let y
-
+    let isModuleActive
     p.modules
       .filter((x) => x.name === f)
       .map((x) => {
-        if (x.isActionHandler) return (y = true)
+        if (x.isActionHandler) return (isModuleActive = true)
         else {
-          y = false
+          isModuleActive = false
         }
       })
 
-    if (y) {
-      try {
-        const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
-        const tab = await getCurrentTab()
-        if (!tab) return
-        await openDappletAction(f, tab.id)
-      } catch (err) {
-        console.error(err)
+    const isOverlayActive = p.overlays.find((x) => x.source === f)
+
+    if (isModuleActive) {
+      if ((p.pathname.includes('system') && p.overlays.lenght === 0) || !isOverlayActive) {
+        try {
+          const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
+          const tab = await getCurrentTab()
+          if (!tab) return
+          await openDappletAction(f, tab.id)
+        } catch (err) {
+          console.error(err)
+        }
+      } else {
+        p.overlays.filter((x) => x.source === f).map((x) => p.navigate!(`/${f}/${x.id}`))
       }
     } else {
       p.onTabClick()
@@ -71,7 +77,8 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     <div
       onClick={() => {
         // !p.isActive && p.onTabClick()
-        // !p.isActive&&   onOpenDappletAction(p.tabId)
+
+        // p.pinned ? visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu)) :  !p.isActive&&   onOpenDappletAction(p.tabId)
         p.pinned && visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu))
         // p.setOpenWallet()
       }}
@@ -86,8 +93,9 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           'moduleName' in p.icon ? (
           <ModuleIcon
             onClick={() => {
-              // !p.isActive&&  onOpenDappletAction(p.tabId)
-              !p.isActive && p.onTabClick()
+              // !p.isActive&&
+              onOpenDappletAction(p.tabId)
+              // !p.isActive && p.onTabClick()
             }}
             className={cn(
               styles.image,
@@ -102,9 +110,10 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
         ) : (
           <StorageRefImage
             onClick={() => {
-              !p.isActive && p.onTabClick()
+              // !p.isActive && p.onTabClick()
 
-              // !p.isActive&&   onOpenDappletAction(p.tabId)
+              // !p.isActive&&
+              onOpenDappletAction(p.tabId)
             }}
             className={cn(
               styles.image,

@@ -184,6 +184,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                       modules={p.module}
                       pathname={p.pathname}
                       navigate={p.navigate}
+                      overlays={p.overlays}
                     />
                   )
                 })}
