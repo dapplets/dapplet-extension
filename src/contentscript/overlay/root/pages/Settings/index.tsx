@@ -82,17 +82,15 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
 
   const loadDevMode = async () => {
     if (!abortController.signal.aborted) {
-      setSvgErrorReporting(true)
+      setSvgLoaderDevMode(true)
     }
-   
 
     const { getDevMode } = await initBGFunctions(browser)
     const devMode = await getDevMode()
     if (!abortController.signal.aborted) {
       setMode(devMode)
+      setSvgLoaderDevMode(false)
     }
-
-    setTimeout(() => setSvgLoaderDevMode(false), 500)
   }
 
   const setDevmode = async (isActive: boolean) => {
@@ -105,15 +103,13 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
     if (!abortController.signal.aborted) {
       setSvgErrorReporting(true)
     }
-   
 
     const { getErrorReporting } = await initBGFunctions(browser)
     const errorReporting = await getErrorReporting()
     if (!abortController.signal.aborted) {
       onErrorReporting(errorReporting)
+      setSvgErrorReporting(false)
     }
-
-    setTimeout(() => setSvgErrorReporting(false), 500)
   }
 
   const setErrorReporting = async (isActive: boolean) => {
