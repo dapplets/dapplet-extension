@@ -71,7 +71,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [isShowTabs, onShowTabs] = useToggle(false)
 
   const closeMobileModal = () => setVisibleMobileTabs(false)
-  useEffect(() => {}, [document])
+  useEffect(() => {}, [document, p.pathname])
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
       nodeOverlayToolbar.current.value = ''
@@ -109,20 +109,23 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
           onCloseClick={() => p.onCloseClick(NewTabs)}
           onMenuClick={(menu) => {
             if (
-              p.pathname === '/system/connectedAccounts' &&
-              !document
-                .querySelector('#dapplets-overlay-manager')
-                .classList.contains('CollapsedOverlayClass')
-            ) {
-              p.onToggleClick()
-            } else if (
               document
                 .querySelector('#dapplets-overlay-manager')
-                .classList.contains('CollapsedOverlayClass')
+                .classList.contains('dapplets-overlay-collapsed')
             ) {
-              p.onToggleClick()
-            } else {
               p.onMenuClick(NewTabs, menu)
+
+              p.onToggleClick()
+            } else if (
+              !document
+                .querySelector('#dapplets-overlay-manager')
+                .classList.contains('dapplets-overlay-collapsed')
+            ) {
+              if (p.pathname === '/system/connectedAccounts') {
+                p.onToggleClick()
+              } else {
+                p.onMenuClick(NewTabs, menu)
+              }
             }
           }}
           onTabClick={() => {
@@ -191,15 +194,20 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               <ToggleOverlay
                 getNode={handleClickGetNodeOverlayToolbar}
                 onClick={() => {
-                  if (p.pathname === '/system/dapplets') {
-                    p.setOpenWallet()
+                  if (
+                    document
+                      .querySelector('#dapplets-overlay-manager')
+                      .classList.contains('dapplets-overlay-collapsed')
+                  ) {
+                    p.navigate('/system/dapplets')
+
                     p.onToggleClick()
-                  } else {
-                    if (
-                      document
-                        .querySelector('#dapplets-overlay-manager')
-                        .classList.contains('CollapsedOverlayClass')
-                    ) {
+                  } else if (
+                    !document
+                      .querySelector('#dapplets-overlay-manager')
+                      .classList.contains('dapplets-overlay-collapsed')
+                  ) {
+                    if (p.pathname === '/system/dapplets') {
                       p.onToggleClick()
                     } else {
                       p.navigate('/system/dapplets')
