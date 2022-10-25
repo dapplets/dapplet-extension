@@ -286,7 +286,7 @@ class _App extends React.Component<P, S> {
   handleOpenSearchClick = () => {
     this.setState({
       isOpenSearch: true,
-      isMiniWallets: true,
+      // isMiniWallets: true,
     })
   }
 
@@ -531,34 +531,23 @@ class _App extends React.Component<P, S> {
                   setOpenWallet={this.setOpenWallet}
                   isOpenWallet={s.isOpenWallet}
                   setOpenWalletMini={this.setOpenWalletMini}
-                  isOpenSearch={s.isOpenSearch}
+                  // isOpenSearch={s.isOpenSearch}
                 />
                 {this.getNewButtonTab('Connected Accounts')}
               </div>
 
               <div className={styles.right}>
-                {!s.isOpenSearch && pathname === '/system/dapplets' && (
+                { pathname === '/system/dapplets' && (
                   <SquaredButton
                     title="Search dapplets"
                     className={s.classNameSearchButton}
-                    onClick={this.handleOpenSearchClick}
+                    onClick={()=> s.isOpenSearch? this.handleCloseSearch() :this.handleOpenSearchClick()}
                     appearance="big"
                     icon={SearchIcon}
                   />
                 )}
 
-                {s.isOpenSearch && pathname === '/system/dapplets' && (
-                  <div className={styles.searchBlock} tabIndex={1}>
-                    <Search
-                      className={s.classNameSearch}
-                      value={s.search}
-                      isOpenSearch={s.isOpenSearch}
-                      onChange={this.handleSearchChange}
-                      onClearValue={this.handleSearchClear}
-                      onCloseSearch={this.handleCloseSearch}
-                    />
-                  </div>
-                )}
+               
 
                 {this.getNewButtonTab('Notifications')}
 
@@ -572,7 +561,18 @@ class _App extends React.Component<P, S> {
                 {this.getNewButtonTab('Settings')}
               </div>
             </header>
-
+            {s.isOpenSearch && pathname === '/system/dapplets' && (
+                  <div className={styles.searchBlock} tabIndex={1}>
+                    <Search
+                      className={s.classNameSearch}
+                      value={s.search}
+                      isOpenSearch={s.isOpenSearch}
+                      onChange={this.handleSearchChange}
+                      onClearValue={this.handleSearchClear}
+                      onCloseSearch={this.handleCloseSearch}
+                    />
+                  </div>
+                )}
             <div
               onClick={() => this.handleCloseSearch()}
               className={cn(styles.children, 'dapplets-overlay-nav-content-list', {
@@ -583,6 +583,7 @@ class _App extends React.Component<P, S> {
                   pathname !== '/system/settings',
               })}
             >
+             
               {pathname === '/system/dapplets' && (
                 <Dapplets
                   search={s.search}

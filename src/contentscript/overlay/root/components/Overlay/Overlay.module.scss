@@ -196,12 +196,13 @@
 }
 
 .searchBlock {
-  position: absolute;
+  // position: absolute;
   z-index: 1;
-  top: 12px;
-  right: 15px;
-
-  width: 84%;
+  /* top: 12px; */
+  /* right: 15px; */
+  width: 100%;
+  padding: 0 15px 7px 15px;
+  transition: all 0.5s;
 }
 
 .overlayTabWrapper {
