@@ -80,7 +80,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     return () => {
       // _isMounted.current = false
-      abortController.abort()
+      // abortController.abort()
     }
   }, [dropdownListValue, abortController.signal.aborted])
 

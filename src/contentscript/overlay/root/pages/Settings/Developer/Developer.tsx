@@ -80,7 +80,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     }
     init()
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [isUpdate, selectedWallet, abortController.signal.aborted])
 

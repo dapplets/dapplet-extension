@@ -7,10 +7,10 @@ import VersionInfo from '../../../../../background/models/versionInfo'
 import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
+import useAbortController from '../../hooks/useAbortController'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
-import useAbortController from '../../hooks/useAbortController'
 
 enum DeploymentStatus {
   Unknown,
@@ -57,8 +57,6 @@ interface PropsDevModule {
   setCurrentAccount?: (x: any) => void
   currentAccount?: any
 }
-
-
 
 export const DevModule: FC<PropsDevModule> = (props) => {
   const {
@@ -111,20 +109,19 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const abortController = useAbortController()
 
   useEffect(() => {
-  
-
     const init = async () => {
       await _updateData()
     }
     init()
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [
     targetChain,
-    abortController.signal.aborted
+    abortController.signal.aborted,
     // currentAccount,
     // modules,
+    // admins,
     // isLoadingDeploy,
     // isModalError,
     // isModalErrorOwner,
@@ -175,7 +172,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
         setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
       }
     }
-
+    // if (!abortController.signal.aborted) {
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
       await updateDataLocalhost()
@@ -183,34 +180,39 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     } else {
       return Promise.all([
         _updateOwnership(),
+        getModulesAdmins(),
         _updateCurrentAccount(),
         _updateDeploymentStatus(),
         _checkDependencies(),
         updateDataLocalhost(),
-        getModulesAdmins(),
+        
       ])
     }
+  // }
   }
 
   const getModulesAdmins = async () => {
     if (!targetRegistry || !mi.name) return
     const { getAdmins } = await initBGFunctions(browser)
     const authors: string[] = await getAdmins(targetRegistry, mi.name)
-    if (!abortController.signal.aborted && authors.length > 0) {
-      setAdmins(authors)
+
+    if (authors.length > 0) {
+      if (!abortController.signal.aborted) {
+        setAdmins(authors)
+      }
     }
   }
 
   const _updateOwnership = async () => {
-    if (targetRegistry && mi.name) {
+    if (!targetRegistry || !mi.name) return
       const { getOwnership } = await initBGFunctions(browser)
       const owner = await getOwnership(targetRegistry, mi.name)
+   
       if (!abortController.signal.aborted) {
         setOwner(owner)
+        setOwnerDev(owner)
       }
-    } else {
-      return
-    }
+    
   }
 
   const _updateDeploymentStatus = async () => {

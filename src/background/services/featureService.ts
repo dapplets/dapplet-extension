@@ -154,7 +154,7 @@ export default class FeatureService {
         dto.lastVersion = dto.isActive
           ? await this.getVersions(registryUrl, dto.name)
               .then((x) => x.sort(rcompare)[0])
-              .catch((x) => null)
+              .catch(() => null)
           : null // ToDo: how does this affect performance?
         dto.order = i++
         dto.sourceRegistry = {
@@ -203,7 +203,7 @@ export default class FeatureService {
           const registry = await this._moduleManager.registryAggregator.getRegistryByUri(
             registryUrl
           )
-          console.log({ owners, listingAccounts, myDappletsToAdd })
+          // console.log({ owners, listingAccounts, myDappletsToAdd })
           const moduleInfosByContextId = await registry.getModuleInfo(contextIds, owners)
 
           for (const [contextId, moduleInfos] of Object.entries(moduleInfosByContextId)) {
@@ -301,7 +301,7 @@ export default class FeatureService {
     try {
       const runtime = await new Promise<void>(async (resolve, reject) => {
         // listening of loading/unloading from contentscript
-        const listener = (message, sender) => {
+        const listener = (message) => {
           if (!message || !message.type || !message.payload) return
           const p = message.payload
           if (message.type === 'FEATURE_LOADED') {

@@ -100,7 +100,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     init()
 
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [abortController.signal.aborted])
 
