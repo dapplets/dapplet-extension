@@ -2,6 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { FC, useEffect, useMemo, useState } from 'react'
 import { rcompare } from 'semver'
 import { browser } from 'webextension-polyfill-ts'
+import cn from 'classnames'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
 import {
   CONTEXT_ID_WILDCARD,
@@ -29,6 +30,7 @@ export interface DappletsProps {
   handleCloseTabClick?: any
   tabs?: any
   setModule:any
+  classNameBlock?: string
 }
 
 export const Dapplets: FC<DappletsProps> = (props) => {
@@ -40,7 +42,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     getTabsForDapplet,
     handleCloseTabClick,
     tabs,
-    setModule
+    setModule,
+    classNameBlock
   } = props
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
 
@@ -70,7 +73,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     return () => {
       abortController.abort()
     }
-  }, [abortController.signal.aborted])
+  }, [abortController.signal.aborted,classNameBlock])
 
   useEffect(() => {
     const init = async () => {
@@ -279,7 +282,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       <div className={styles.wrapper}>
         <Dropdown
           list={DROPDOWN_LIST}
-          title="filter:"
+          title="Filter:"
           value={dropdownListValue}
           onChange={setDropdownListValue}
         />
@@ -287,7 +290,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       {isLoadingListDapplets ? (
         <TabLoader />
       ) : (
-        <div className={styles.dappletsBlock}>
+        <div className={cn(styles.dappletsBlock,classNameBlock)}>
           {!isNoContentScript ? (
             filteredDapplets && filteredDapplets.length && filteredDapplets.length > 0 ? (
               filteredDapplets.map((dapplet, i) => {

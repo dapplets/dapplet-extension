@@ -17,11 +17,11 @@ import ManifestDTO from '../../../background/dto/manifestDTO'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
 
+import { ReactComponent as Notification } from './assets/newIcon/bell.svg'
 import { ReactComponent as Account } from './assets/newIcon/connected.svg'
 import { ReactComponent as Hide } from './assets/newIcon/hide.svg'
 import { ReactComponent as Settings } from './assets/newIcon/mainset.svg'
 import { ReactComponent as DappletsLogo } from './assets/newIcon/mustache.svg'
-import { ReactComponent as Notification } from './assets/newIcon/bell.svg'
 import { ReactComponent as SearchIcon } from './assets/newIcon/search.svg'
 import { ReactComponent as Home } from './assets/newIcon/squares.svg'
 import { ReactComponent as StoreIcon } from './assets/newIcon/store.svg'
@@ -537,17 +537,17 @@ class _App extends React.Component<P, S> {
               </div>
 
               <div className={styles.right}>
-                { pathname === '/system/dapplets' && (
+                {pathname === '/system/dapplets' && (
                   <SquaredButton
                     title="Search dapplets"
                     className={s.classNameSearchButton}
-                    onClick={()=> s.isOpenSearch? this.handleCloseSearch() :this.handleOpenSearchClick()}
+                    onClick={() =>
+                      s.isOpenSearch ? this.handleCloseSearch() : this.handleOpenSearchClick()
+                    }
                     appearance="big"
                     icon={SearchIcon}
                   />
                 )}
-
-               
 
                 {this.getNewButtonTab('Notifications')}
 
@@ -562,17 +562,17 @@ class _App extends React.Component<P, S> {
               </div>
             </header>
             {s.isOpenSearch && pathname === '/system/dapplets' && (
-                  <div className={styles.searchBlock} tabIndex={1}>
-                    <Search
-                      className={s.classNameSearch}
-                      value={s.search}
-                      isOpenSearch={s.isOpenSearch}
-                      onChange={this.handleSearchChange}
-                      onClearValue={this.handleSearchClear}
-                      onCloseSearch={this.handleCloseSearch}
-                    />
-                  </div>
-                )}
+              <div className={styles.searchBlock} tabIndex={1}>
+                <Search
+                  className={s.classNameSearch}
+                  value={s.search}
+                  isOpenSearch={s.isOpenSearch}
+                  onChange={this.handleSearchChange}
+                  onClearValue={this.handleSearchClear}
+                  onCloseSearch={this.handleCloseSearch}
+                />
+              </div>
+            )}
             <div
               onClick={() => this.handleCloseSearch()}
               className={cn(styles.children, 'dapplets-overlay-nav-content-list', {
@@ -581,9 +581,9 @@ class _App extends React.Component<P, S> {
                   pathname !== '/system/notifications' &&
                   pathname !== '/system/connectedAccounts' &&
                   pathname !== '/system/settings',
+                // [styles.newHeight]:s.isOpenSearch && pathname === '/system/dapplets'
               })}
             >
-             
               {pathname === '/system/dapplets' && (
                 <Dapplets
                   search={s.search}
@@ -594,6 +594,9 @@ class _App extends React.Component<P, S> {
                   handleCloseTabClick={this.handleCloseTabClick}
                   tabs={this.getTabs()}
                   setModule={this.setModule}
+                  classNameBlock={
+                    s.isOpenSearch && pathname === '/system/dapplets' ? styles.newHeight : null
+                  }
                 />
               )}
 

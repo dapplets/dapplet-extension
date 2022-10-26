@@ -153,6 +153,10 @@
   padding: 0px 0px 0 0px;
 }
 
+.newHeight{
+  height: calc(100vh - 139px)!important;
+}
+
 .noSystemDapplets {
   iframe {
     position: absolute;
