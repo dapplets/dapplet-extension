@@ -1,9 +1,9 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import '../../assets/styles/null.scss';
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
 /* Segoe UI Regular*/
 @font-face {
-  font-family: "SegoeUIRegular";
+  font-family: 'SegoeUIRegular';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -27,8 +27,8 @@
   border-radius: 10px;
   background-color: $PureWhite;
 
-  font-family: "SegoeUIRegular";
-  font-size: 10px;
+  font-family: 'SegoeUIRegular';
+  font-size: 12px;
   font-weight: 400;
   line-height: 100%;
   border: 1px solid #e3e3e3;
@@ -51,8 +51,8 @@
 
   color: #2a2a2a;
 
-  font-family: "SegoeUIRegular";
-  font-size: 14px;
+  // font-family: "SegoeUIRegular";
+  font-size: 12px;
   font-weight: 400;
   // font-style: italic;
   // line-height: 149%;
@@ -64,9 +64,9 @@
   right: 8px;
 
   right: 8px;
-    width: 8px;
-height: 7px;
-  content: "";
+  width: 8px;
+  height: 7px;
+  content: '';
   animation-name: rotateIsClose;
 
   animation-duration: 0.2s;
@@ -187,10 +187,9 @@ height: 7px;
 
   cursor: pointer;
 
-  
   color: #2a2a2a;
-  font-family: "SegoeUIRegular";
-  font-size: 14px;
+  // font-family: "SegoeUIRegular";
+  font-size: 12px;
   font-weight: 400;
   // font-style: italic;
   line-height: 149%;

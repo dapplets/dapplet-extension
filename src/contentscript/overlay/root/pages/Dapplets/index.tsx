@@ -1,8 +1,8 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import cn from 'classnames'
 import React, { FC, useEffect, useMemo, useState } from 'react'
 import { rcompare } from 'semver'
 import { browser } from 'webextension-polyfill-ts'
-import cn from 'classnames'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
 import {
   CONTEXT_ID_WILDCARD,
@@ -29,7 +29,7 @@ export interface DappletsProps {
   getTabsForDapplet?: any
   handleCloseTabClick?: any
   tabs?: any
-  setModule:any
+  setModule: any
   classNameBlock?: string
 }
 
@@ -43,7 +43,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     handleCloseTabClick,
     tabs,
     setModule,
-    classNameBlock
+    classNameBlock,
   } = props
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
 
@@ -73,7 +73,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     return () => {
       abortController.abort()
     }
-  }, [abortController.signal.aborted,classNameBlock])
+  }, [abortController.signal.aborted])
 
   useEffect(() => {
     const init = async () => {
@@ -92,7 +92,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     return () => {
       // _isMounted.current = false
-      abortController.abort()
+      // abortController.abort()
     }
   }, [dropdownListValue, abortController.signal.aborted])
 
@@ -119,9 +119,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           error: null,
           versions: [],
         }))
-       
+
       if (!abortController.signal.aborted) {
-         setModule(newDappletsList)
+        setModule(newDappletsList)
         setDapplets(newDappletsList)
       }
     } catch (err) {
@@ -143,7 +143,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
     try {
-      // _updateFeatureState(f.name, { isActionLoading: true })
+      _updateFeatureState(f.name, { isActionLoading: true })
       const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
       const tab = await getCurrentTab()
 
@@ -152,7 +152,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     } catch (err) {
       console.error(err)
     } finally {
-      // _updateFeatureState(f.name, { isActionLoading: false })
+      _updateFeatureState(f.name, { isActionLoading: false })
     }
   }
 
@@ -161,10 +161,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     const find = (a: string) => (a ?? '').toLowerCase().indexOf(search.toLowerCase()) !== -1
 
-    return( dapplets.filter(
+    return dapplets.filter(
       (x: ManifestAndDetails) => find(x.title) || find(x.description) || find(x.author)
-    ))
-  
+    )
   }
 
   const onSwitchChange = async (
@@ -273,7 +272,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   }
 
   const filteredDapplets = useMemo(() => {
-   
     return _getFilteredDapplets(dapplets)
   }, [search, dapplets])
 
@@ -290,7 +288,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       {isLoadingListDapplets ? (
         <TabLoader />
       ) : (
-        <div className={cn(styles.dappletsBlock,classNameBlock)}>
+        <div className={cn(styles.dappletsBlock, classNameBlock)}>
           {!isNoContentScript ? (
             filteredDapplets && filteredDapplets.length && filteredDapplets.length > 0 ? (
               filteredDapplets.map((dapplet, i) => {
