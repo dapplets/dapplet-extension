@@ -1,8 +1,7 @@
-@import "../../assets/styles/color.variables.scss";
+@import '../../assets/styles/color.variables.scss';
 
 @media (min-width: 320px) and (max-width: 640px) {
   .tab {
- 
     display: flex;
     justify-content: space-between;
 
@@ -20,12 +19,12 @@
     align-items: center;
     flex-direction: row;
 
-    padding-left: 10px;
+    // padding-left: 10px;
   }
 
   .item {
     margin-top: 0;
-    padding: 0 10px;
+    // padding: 0 10px;
 
     &:not(:last-child) {
       margin: 0;
@@ -45,6 +44,6 @@
 
   .tabNotActive {
     width: auto;
-    max-width: min-content;
+    // max-width: min-content;
   }
 }

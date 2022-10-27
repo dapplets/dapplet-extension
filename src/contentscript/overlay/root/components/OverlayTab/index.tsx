@@ -31,6 +31,7 @@ export interface OverlayTabProps {
   navigate?: any
   pathname?: string
   overlays?: any
+  onToggleClick?: any
 }
 
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
@@ -62,14 +63,35 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           const tab = await getCurrentTab()
           if (!tab) return
           await openDappletAction(f, tab.id)
+          if (
+            document
+              .querySelector('#dapplets-overlay-manager')
+              .classList.contains('dapplets-overlay-collapsed')
+          ) {
+            p.onToggleClick()
+          }
         } catch (err) {
           console.error(err)
         }
       } else {
         p.overlays.filter((x) => x.source === f).map((x) => p.navigate!(`/${f}/${x.id}`))
+        if (
+          document
+            .querySelector('#dapplets-overlay-manager')
+            .classList.contains('dapplets-overlay-collapsed')
+        ) {
+          p.onToggleClick()
+        }
       }
     } else {
       p.onTabClick()
+      if (
+        document
+          .querySelector('#dapplets-overlay-manager')
+          .classList.contains('dapplets-overlay-collapsed')
+      ) {
+        p.onToggleClick()
+      }
     }
   }
 

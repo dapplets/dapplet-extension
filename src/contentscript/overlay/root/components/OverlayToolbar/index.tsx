@@ -8,7 +8,6 @@ import { ReactComponent as Coolicon } from '../../assets/newIcon/squares.svg'
 import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { OverlayTab } from '../OverlayTab'
-import { ModalTabs } from './ModalTabs'
 import styles from './OverlayToolbar.module.scss'
 
 const SYSTEM_TAB: ToolbarTab = {
@@ -188,6 +187,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                       pathname={p.pathname}
                       navigate={p.navigate}
                       overlays={p.overlays}
+                      onToggleClick={p.onToggleClick}
                     />
                   )
                 })}
@@ -232,7 +232,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             </div>
           </div>
         </div>
-        <div className={cn(styles.tabsMobile, {})}>
+        {/* <div className={cn(styles.tabsMobile, {})}>
           <span className={styles.noSystemTabLabel} onClick={() => setVisibleMobileTabs(true)} />
           <ModalTabs
             visible={isVisibleMobileTabs}
@@ -261,7 +261,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             onClose={() => closeMobileModal()}
             classNameCLose={styles.noSystemTabLabel}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   )
