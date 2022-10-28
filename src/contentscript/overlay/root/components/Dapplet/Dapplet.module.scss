@@ -142,40 +142,6 @@
   margin-top: 5px;
 }
 
-@media (min-width: 320px) and (max-width: 640px) {
-  .wrapperCard {
-    width: 100%;
-    min-width: 100%;
-    max-width: none;
-
-    background: $PureWhite;
-  }
-
-  .wrapperBlock {
-    width: calc(100% - 50px);
-  }
-
-  .blockTop {
-    display: flex;
-
-    .blockIcons {
-      display: flex;
-      justify-content: space-between;
-
-      width: 34px;
-      margin: 0 8.5% 0 4.5%;
-    }
-  }
-
-  .blockIcons {
-    margin: 0;
-  }
-
-  .blockText {
-    width: 100%;
-  }
-}
-
 .loadingDappletsHome {
   display: inline-block;
 
@@ -224,4 +190,7 @@
   margin-left: 12px;
 
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' id='enmvdj1tPVl1' viewBox='0 0 18 18' shape-rendering='geometricPrecision' text-rendering='geometricPrecision'%3E%3Cstyle%3E%3C!%5BCDATA%5B%23enmvdj1tPVl3_tr %7Banimation: enmvdj1tPVl3_tr__tr 1000ms linear infinite normal forwards%7D@keyframes enmvdj1tPVl3_tr__tr %7B 0%25 %7Btransform: translate(9px,9.080632px) rotate(0deg)%7D 100%25 %7Btransform: translate(9px,9.080632px) rotate(180deg)%7D%7D%5D%5D%3E%3C/style%3E%3Cellipse rx='8.550768' ry='8.550768' transform='matrix(.907954 0 0 0.907954 9 9)' fill='none' stroke='%23919191' stroke-width='2'/%3E%3Cg id='enmvdj1tPVl3_tr' transform='translate(9,9.080632) rotate(0)'%3E%3Crect width='18' height='2.879693' rx='0' ry='0' transform='translate(-9,-1.439846)' fill='%23fff' stroke-width='0'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat;
 }
+
+@import "./adaptive.scss";

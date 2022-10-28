@@ -4,7 +4,10 @@ import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } fro
 import { browser } from 'webextension-polyfill-ts'
 import { typeOfUri, UriTypes } from '../../../../../common/helpers'
 import { isValidUrl } from '../../../../../popup/helpers'
+
+import useAbortController from '../../hooks/useAbortController'
 import { IDropdown } from '../../models/dropdown.model'
+import { addSettingsValueDropdown } from '../../utils/addSettingsValueDropdown'
 import styles from './DropdownTrustedUsers.module.scss'
 
 export interface DropdownTrustedProps
@@ -12,7 +15,7 @@ export interface DropdownTrustedProps
   list?: IDropdown[]
   value?: IDropdown | null
 }
-let _isMounted = false
+
 export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTrustedProps) => {
   const {
     list,
@@ -26,73 +29,31 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
   const [trustedUserInputError, setTrustedUserInputError] = useState(null)
   const [trustedUsers, setTrustedUsers] = useState([])
   const [registries, setRegistries] = useState([])
-
-  const regExpIndexNearTestnet = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+testnet$/)
-  const regExpIndexNear = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+near$/)
-  const regExpIndexENS = new RegExp(/^(?:[a-z0-9](?:[a-z0-9-_]{0,61}[a-z0-9])?\.)+eth$/)
-  const regExpIndexEthereum = new RegExp(/^0x[a-fA-F0-9]{40}$/)
-  const regExpIndexNEARImplicit = new RegExp(/^[0-9a-z]{64}$/)
-  const regExpIndexNEARDev = new RegExp(/^dev-\d*-\d*$/)
-
+  const abortController = useAbortController()
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
       await loadTrustedUsers()
       await loadRegistries()
     }
     init()
     return () => {
-      _isMounted = false
+      abortController.abort()
     }
-  }, [trustedUserInput])
-
-  const getNumIndex = (value, reg) => {
-    try {
-      const valueReg = value.match(reg)
-
-      return valueReg
-    } catch {}
-  }
-
-  const addTrustedUser = async (account: string, x: () => void) => {
-    const { addTrustedUser } = await initBGFunctions(browser)
-    const valueParse = getNumIndex(trustedUserInput, regExpIndexEthereum)
-    const valueParseNEARImplicit = getNumIndex(trustedUserInput, regExpIndexNEARImplicit)
-    const valueParseNEARDev = getNumIndex(trustedUserInput, regExpIndexNEARDev)
-    const valueParseENS = getNumIndex(trustedUserInput, regExpIndexENS)
-    const valueParseNear = getNumIndex(trustedUserInput, regExpIndexNear)
-    const valueParseNearTestnet = getNumIndex(trustedUserInput, regExpIndexNearTestnet)
-    if (
-      valueParse !== null ||
-      valueParseNEARImplicit !== null ||
-      valueParseNEARDev !== null ||
-      valueParseENS !== null ||
-      valueParseNear !== null ||
-      valueParseNearTestnet !== null
-    ) {
-      try {
-        await addTrustedUser(account)
-        setTrustedUserInput(trustedUserInput)
-      } catch (err) {
-        setTrustedUserInputError(err.message)
-      }
-
-      loadTrustedUsers()
-      x()
-    } else {
-      setTrustedUserInputError('Enter valid Trusted User')
-    }
-  }
+  }, [trustedUserInput, abortController.signal.aborted])
 
   const removeTrustedUser = async (account: string) => {
     const { removeTrustedUser } = await initBGFunctions(browser)
     await removeTrustedUser(account)
-    loadTrustedUsers()
+    if (!abortController.signal.aborted) {
+      loadTrustedUsers()
+    }
   }
   const loadTrustedUsers = async () => {
     const { getTrustedUsers } = await initBGFunctions(browser)
     const trustedUsers = await getTrustedUsers()
-    setTrustedUsers(trustedUsers)
+    if (!abortController.signal.aborted) {
+      setTrustedUsers(trustedUsers)
+    }
   }
   const _openEtherscan = async (address: string) => {
     if (typeOfUri(address) === UriTypes.Ens) {
@@ -108,8 +69,9 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
   const loadRegistries = async () => {
     const { getRegistries } = await initBGFunctions(browser)
     const registries = await getRegistries()
-
-    setRegistries(registries.filter((r) => r.isDev === false))
+    if (!abortController.signal.aborted) {
+      setRegistries(registries.filter((r) => r.isDev === false))
+    }
   }
   const visible = (hash: string): string => {
     if (hash.length > 38) {
@@ -143,7 +105,15 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
             onSubmit={(e) => {
               e.preventDefault()
 
-              addTrustedUser(trustedUserInput, handleClear)
+              addSettingsValueDropdown(
+                trustedUserInput,
+                'trustedUser',
+                trustedUserInput,
+                setTrustedUserInputError,
+                setTrustedUserInput,
+                loadTrustedUsers,
+                handleClear
+              )
             }}
           >
             <input

@@ -1,0 +1,234 @@
+@import "../../../assets/styles/fonts.scss";
+@import "../../../assets/styles/color.variables.scss";
+@import "../../../assets/styles/null.scss";
+
+.wrapper {
+  overflow: hidden;
+
+  width: 100%;
+  height: 100%;
+  padding: 27.5px 0 0;
+}
+
+.wrapper::-webkit-scrollbar {
+  width: 0;
+}
+
+.wrapper {
+  -ms-overflow-style: none;
+}
+
+.wrapper {
+  overflow: -moz-scrollbars-none;
+}
+
+.title {
+  display: flex;
+  justify-content: space-around;
+
+  width: 100%;
+  padding: 0 60px 25.5px;
+}
+
+.settingMain {
+  width: 100%;
+  height: 79vh;
+  padding: 0 0 0 1px;
+}
+
+.blockSettings {
+  display: flex;
+  overflow: hidden;
+  flex: 1 1 auto;
+  flex-direction: column;
+
+  width: 100%;
+  max-height: 83vh;
+}
+
+.scrollBlock {
+  display: flex;
+  overflow: hidden;
+
+  overflow-y: scroll;
+  flex: 1 1 auto;
+
+  flex-direction: column;
+
+  width: 100%;
+  height: calc(100% - 120px);
+  padding: 15px 0 0 15px;
+  direction: rtl;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+
+    cursor: pointer;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgb(244 244 244);
+    background: rgb(244 244 244);
+    background:
+      linear-gradient(
+        90deg,
+        rgb(244 244 244 / 0%) 10%,
+        rgb(227 227 227 / 100%) 50%,
+        rgb(244 244 244 / 0%) 90%
+      );
+  }
+
+  &::-webkit-scrollbar-thumb {
+    width: 4px;
+    height: 2px;
+
+    border-radius: 2px;
+    background: $Primary;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
+  }
+}
+
+.scrollBlock > * {
+  direction: ltr;
+}
+
+.version {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+}
+
+.versionTitle {
+  display: inline-block;
+
+  padding: 0 0 0 14px;
+
+  color: $Primary;
+
+  font-family: Roboto;
+  font-size: 14px;
+
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.versionButton {
+  display: flex;
+  align-items: center;
+
+  justify-content: center;
+
+  width: 65px;
+  height: 23px;
+
+  color: $PureWhite;
+  border-radius: 4px;
+
+  background: $Primary;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+
+  &:hover {
+    background: $PrimaryHover;
+  }
+
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+
+.checkboxBlock {
+  display: flex;
+  justify-content: space-between;
+
+  width: 100%;
+  padding: 0 50px 0 0;
+}
+
+.formDefault {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  height: 36px;
+  padding: 5px 13px;
+
+  border-radius: 10px;
+  background: #ebebeb;
+}
+
+.inputDefault {
+  width: 100%;
+  height: 100%;
+
+  color: #919191;
+  background: inherit;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
+}
+
+.errorInputDefault {
+  color: $Primary;
+  border: 1px solid $Primary;
+}
+
+.buttonInputDefault {
+  width: 24px;
+  height: 24px;
+
+  background-color: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='16' viewBox='0 0 15 16' fill='none'%3E%3Cpath d='M0.998869 0H2.99887V2.55709C4.18888 1.622 5.68947 1.0643 7.32031 1.0643C11.1863 1.0643 14.3203 4.19831 14.3203 8.0643C14.3203 11.9303 11.1863 15.0643 7.32031 15.0643C5.16982 15.0643 3.24583 14.0946 1.96176 12.5685L3.58108 11.3837C4.49698 12.4147 5.83279 13.0643 7.32031 13.0643C10.0817 13.0643 12.3203 10.8257 12.3203 8.0643C12.3203 5.30288 10.0817 3.0643 7.32031 3.0643C6.23347 3.0643 5.22762 3.41107 4.40737 4L6.99887 4V6H0.998869V0Z' fill='%23919191'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+
+  &:hover {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='16' viewBox='0 0 15 16' fill='none'%3E%3Cpath d='M0.998869 0H2.99887V2.55709C4.18888 1.622 5.68947 1.0643 7.32031 1.0643C11.1863 1.0643 14.3203 4.19831 14.3203 8.0643C14.3203 11.9303 11.1863 15.0643 7.32031 15.0643C5.16982 15.0643 3.24583 14.0946 1.96176 12.5685L3.58108 11.3837C4.49698 12.4147 5.83279 13.0643 7.32031 13.0643C10.0817 13.0643 12.3203 10.8257 12.3203 8.0643C12.3203 5.30288 10.0817 3.0643 7.32031 3.0643C6.23347 3.0643 5.22762 3.41107 4.40737 4L6.99887 4V6H0.998869V0Z' fill='%23747376'/%3E%3C/svg%3E");
+  }
+
+  &:active {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='16' viewBox='0 0 15 16' fill='none'%3E%3Cpath d='M0.998869 0H2.99887V2.55709C4.18888 1.622 5.68947 1.0643 7.32031 1.0643C11.1863 1.0643 14.3203 4.19831 14.3203 8.0643C14.3203 11.9303 11.1863 15.0643 7.32031 15.0643C5.16982 15.0643 3.24583 14.0946 1.96176 12.5685L3.58108 11.3837C4.49698 12.4147 5.83279 13.0643 7.32031 13.0643C10.0817 13.0643 12.3203 10.8257 12.3203 8.0643C12.3203 5.30288 10.0817 3.0643 7.32031 3.0643C6.23347 3.0643 5.22762 3.41107 4.40737 4L6.99887 4V6H0.998869V0Z' fill='%232A2A2A'/%3E%3C/svg%3E");
+  }
+}
+
+.errorMessage {
+  display: flex;
+
+  width: 100%;
+  margin: 0 0 -10px;
+  padding: 5px 0 0;
+
+  color: #d9304f;
+
+  font-family: Roboto;
+  font-size: 10px;
+
+  font-weight: 400;
+  line-height: 100%;
+}
+
+.formAbsolute {
+}
+
+.wrapperSettings {
+  margin: 0 0 30px !important;
+}
+
+.loader {
+  display: inline-block;
+
+  width: 20px;
+  height: 20px;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' id='enmvdj1tPVl1' viewBox='0 0 18 18' shape-rendering='geometricPrecision' text-rendering='geometricPrecision'%3E%3Cstyle%3E%3C!%5BCDATA%5B%23enmvdj1tPVl3_tr %7Banimation: enmvdj1tPVl3_tr__tr 1000ms linear infinite normal forwards%7D@keyframes enmvdj1tPVl3_tr__tr %7B 0%25 %7Btransform: translate(9px,9.080632px) rotate(0deg)%7D 100%25 %7Btransform: translate(9px,9.080632px) rotate(180deg)%7D%7D%5D%5D%3E%3C/style%3E%3Cellipse rx='8.550768' ry='8.550768' transform='matrix(.907954 0 0 0.907954 9 9)' fill='none' stroke='%23919191' stroke-width='2'/%3E%3Cg id='enmvdj1tPVl3_tr' transform='translate(9,9.080632) rotate(0)'%3E%3Crect width='18' height='2.879693' rx='0' ry='0' transform='translate(-9,-1.439846)' fill='%23fff' stroke-width='0'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+@import "./adaptive.scss"

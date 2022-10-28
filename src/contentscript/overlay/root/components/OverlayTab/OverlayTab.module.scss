@@ -28,7 +28,6 @@
   flex-direction: column;
   justify-content: space-around;
 
-  // height: 100px;
   margin-top: 4px;
   margin-bottom: 0;
   padding-left: 0;
@@ -226,57 +225,4 @@
   }
 }
 
-@media (min-width: 320px) and (max-width: 640px) {
-  .tab {
-    // display: none;
-    display: flex;
-    justify-content: space-between;
-
-    width: max-content;
-    max-width: none;
-    height: 52px;
-    margin: 0;
-
-    border-radius: 10px;
-    background: #fff;
-  }
-
-  .list {
-    // display: flex;
-    // align-items: center;
-
-    // margin: 0;
-    display: flex;
-    align-items: center;
-    flex-direction: row;
-
-    padding-left: 10px;
-  }
-
-  .item {
-    margin-top: 0;
-    padding: 0 10px;
-
-    &:not(:last-child) {
-      margin: 0;
-    }
-
-    &:nth-child(2) {
-      margin: 0;
-    }
-  }
-
-  .isOpenWallet {
-    &::before {
-      border-radius: 10px;
-      background-color: rgb(255 255 255 / 0%);
-    }
-
-    // background-color: #fff;
-  }
-
-  .tabNotActive {
-    width: auto;
-    max-width: min-content;
-  }
-}
+@import "./adaptive.scss"

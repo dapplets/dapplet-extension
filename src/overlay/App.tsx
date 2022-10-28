@@ -2,6 +2,7 @@ import * as React from 'react'
 import { bus } from '.'
 import { SystemOverlayData, SystemOverlayTabs } from '../common/types'
 import { Overlay } from './components/Overlay'
+import ConnectedAccounts from './pages/ConnectedAccountsModal'
 import { DappletConfirmation } from './pages/dapplet-confirmation'
 import { LoginSession } from './pages/login-session'
 
@@ -41,6 +42,14 @@ export class App extends React.Component<Props, State> {
           </Overlay>
         )
 
+      case SystemOverlayTabs.CONNECTED_ACCOUNTS:
+        return (
+          <ConnectedAccounts
+            bus={bus}
+            onCloseClick={popup ? this.closeClickHandler : null}
+            data={payload}
+          />
+        )
       default:
         return null
     }

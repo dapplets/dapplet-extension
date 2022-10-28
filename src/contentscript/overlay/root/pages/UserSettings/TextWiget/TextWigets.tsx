@@ -9,7 +9,6 @@ import { getSemanticProps } from '../utils'
 import styles from './TextWiget.module.scss'
 
 const { getDisplayLabel } = utils
-let _isMounted = false
 
 const MyCustomWidget = (props, step) => {
   return (
@@ -91,13 +90,10 @@ function TextWidget(props) {
   )
 
   useEffect(() => {
-    _isMounted = true
     const init = async () => {}
     init()
 
-    return () => {
-      _isMounted = false
-    }
+    return () => {}
   }, [])
 
   return (

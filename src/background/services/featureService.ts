@@ -4,13 +4,21 @@ import { browser } from 'webextension-polyfill-ts'
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer'
 import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants'
 import * as EventBus from '../../common/global-event-bus'
-import { areModulesEqual, getCurrentTab, mergeDedupe, parseModuleName } from '../../common/helpers'
+import {
+  areModulesEqual,
+  blobToDataURL,
+  getCurrentTab,
+  mergeDedupe,
+  parseModuleName,
+} from '../../common/helpers'
 import ManifestDTO from '../dto/manifestDTO'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
-import { StorageRef } from '../registries/registry'
+import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
+import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
+import { StorageRef } from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
 import GlobalConfigService from './globalConfigService'
 import { OverlayService } from './overlayService'
@@ -35,16 +43,41 @@ export default class FeatureService {
     )
   }
 
-  async getFeaturesByHostnames(contextIds: string[]): Promise<ManifestDTO[]> {
-    const requestId = this._requestId++
-    const startTime = Date.now()
-    console.log(`getFeaturesByHostnames called #${requestId}`)
+  /**
+   * Returns ModuleInfos wrapped to ManifestDTO by given context IDs and filter
+   * @param contextIds array of context IDs
+   * @param filter all - no filters, public - listings of connected wallets,
+   *               trusted - listings of trusted users, local - local listing
+   * @returns Array of ManifestDTOs
+   */
+  async getFeaturesByHostnames(
+    contextIds: string[],
+    filter: 'all' | 'public' | 'trusted' | 'local' | null
+  ): Promise<ManifestDTO[]> {
+    if (!filter) filter = 'all'
 
-    const users = await this._globalConfigService.getTrustedUsers()
+    // const requestId = this._requestId++
+    // const startTime = Date.now()
+    // console.log(`getFeaturesByHostnames called #${requestId}`)
+
+    const listingAccounts: string[] = []
+
+    if (filter === 'all' || filter === 'trusted') {
+      const trustedUsers = await this._globalConfigService.getTrustedUsers()
+      const accounts = trustedUsers.map((u) => u.account)
+      listingAccounts.push(...accounts)
+    }
+
+    if (filter === 'all' || filter === 'public') {
+      const walletDescriptors = await this._walletService.getWalletDescriptors()
+      const accounts = walletDescriptors.filter((x) => x.connected).map((x) => x.account)
+      listingAccounts.push(...accounts)
+    }
+
     const contextIdsByRegsitries =
       await this._moduleManager.registryAggregator.getModuleInfoWithRegistries(
         contextIds,
-        users.map((u) => u.account)
+        listingAccounts
       )
     const dtos: ManifestDTO[] = []
 
@@ -121,7 +154,7 @@ export default class FeatureService {
         dto.lastVersion = dto.isActive
           ? await this.getVersions(registryUrl, dto.name)
               .then((x) => x.sort(rcompare)[0])
-              .catch((x) => null)
+              .catch(() => null)
           : null // ToDo: how does this affect performance?
         dto.order = i++
         dto.sourceRegistry = {
@@ -137,93 +170,98 @@ export default class FeatureService {
     }
 
     // MyDapplets
-    const myDapplets = await this._globalConfigService.getMyDapplets()
-    const myDappletsToAdd = await Promise.all(
-      myDapplets.map(async (x) => {
-        if (!activeRegistries.find((r) => r.url === x.registryUrl)) return
+    if (filter === 'all' || filter === 'local') {
+      const myDapplets = await this._globalConfigService.getMyDapplets()
+      const myDappletsToAdd = await Promise.all(
+        myDapplets.map(async (x) => {
+          if (!activeRegistries.find((r) => r.url === x.registryUrl)) return
 
-        const existingMyDappletDto = dtos.find(
-          (y) => y.sourceRegistry.url === x.registryUrl && y.name === x.name
-        )
-        if (existingMyDappletDto) {
-          existingMyDappletDto.isMyDapplet = true
-          return
-        }
+          const existingMyDappletDto = dtos.find(
+            (y) => y.sourceRegistry.url === x.registryUrl && y.name === x.name
+          )
+          if (existingMyDappletDto) {
+            existingMyDappletDto.isMyDapplet = true
+            return
+          }
 
-        const moduleInfo = await this.getModuleInfoByName(x.registryUrl, x.name)
-        if (!moduleInfo) return
+          const moduleInfo = await this.getModuleInfoByName(x.registryUrl, x.name)
+          if (!moduleInfo) return
 
-        return moduleInfo
-      })
-    ).then((x) => x.filter((y) => !!y))
+          return moduleInfo
+        })
+      ).then((x) => x.filter((y) => !!y))
 
-    if (myDappletsToAdd.length > 0) {
-      const registryUrls = Array.from(new Set(myDappletsToAdd.map((x) => x.registryUrl)))
-      for (const registryUrl of registryUrls) {
-        const owners = Array.from(
-          new Set([
-            ...users.map((x) => x.account),
-            ...myDappletsToAdd.filter((x) => x.registryUrl === registryUrl).map((x) => x.author),
-          ])
-        )
-        const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl)
-        const moduleInfosByContextId = await registry.getModuleInfo(contextIds, owners)
+      if (myDappletsToAdd.length > 0) {
+        const registryUrls = Array.from(new Set(myDappletsToAdd.map((x) => x.registryUrl)))
+        for (const registryUrl of registryUrls) {
+          const owners = Array.from(
+            new Set([
+              ...listingAccounts,
+              ...myDappletsToAdd.filter((x) => x.registryUrl === registryUrl).map((x) => x.author),
+            ])
+          )
+          const registry = await this._moduleManager.registryAggregator.getRegistryByUri(
+            registryUrl
+          )
+          // console.log({ owners, listingAccounts, myDappletsToAdd })
+          const moduleInfosByContextId = await registry.getModuleInfo(contextIds, owners)
 
-        for (const [contextId, moduleInfos] of Object.entries(moduleInfosByContextId)) {
-          for (const moduleInfo of moduleInfos) {
-            if (
-              !myDappletsToAdd.find(
-                (x) => x.registryUrl === moduleInfo.registryUrl && x.name === moduleInfo.name
+          for (const [contextId, moduleInfos] of Object.entries(moduleInfosByContextId)) {
+            for (const moduleInfo of moduleInfos) {
+              if (
+                !myDappletsToAdd.find(
+                  (x) => x.registryUrl === moduleInfo.registryUrl && x.name === moduleInfo.name
+                )
               )
-            )
-              continue
+                continue
 
-            const dto = dtos.find((d) => d.name === moduleInfo.name)
-            if (!dto) {
-              const dto: ManifestDTO = moduleInfo as any
-              const config = await this._globalConfigService.getSiteConfigById(contextId) // ToDo: which contextId should we compare?
-              dto.isActive =
-                config.activeFeatures[dto.name]?.isActive ||
-                everywhereConfig.activeFeatures[dto.name]?.isActive ||
-                false
-              dto.isActionHandler =
-                config.activeFeatures[dto.name]?.runtime?.isActionHandler ||
-                everywhereConfig.activeFeatures[dto.name]?.runtime?.isActionHandler ||
-                false
-              dto.isHomeHandler =
-                config.activeFeatures[dto.name]?.runtime?.isHomeHandler ||
-                everywhereConfig.activeFeatures[dto.name]?.runtime?.isHomeHandler ||
-                false
-              dto.activeVersion = dto.isActive
-                ? config.activeFeatures[dto.name]?.version ||
-                  everywhereConfig.activeFeatures[dto.name]?.version ||
-                  null
-                : null
-              dto.lastVersion = dto.isActive
-                ? await this.getVersions(registryUrl, dto.name).then((x) => x.sort(rcompare)[0])
-                : null // ToDo: how does this affect performance?
-              dto.order = i++
-              dto.sourceRegistry = {
-                url: registryUrl,
-                isDev: configRegistries.find((r) => r.url === registryUrl).isDev,
+              const dto = dtos.find((d) => d.name === moduleInfo.name)
+              if (!dto) {
+                const dto: ManifestDTO = moduleInfo as any
+                const config = await this._globalConfigService.getSiteConfigById(contextId) // ToDo: which contextId should we compare?
+                dto.isActive =
+                  config.activeFeatures[dto.name]?.isActive ||
+                  everywhereConfig.activeFeatures[dto.name]?.isActive ||
+                  false
+                dto.isActionHandler =
+                  config.activeFeatures[dto.name]?.runtime?.isActionHandler ||
+                  everywhereConfig.activeFeatures[dto.name]?.runtime?.isActionHandler ||
+                  false
+                dto.isHomeHandler =
+                  config.activeFeatures[dto.name]?.runtime?.isHomeHandler ||
+                  everywhereConfig.activeFeatures[dto.name]?.runtime?.isHomeHandler ||
+                  false
+                dto.activeVersion = dto.isActive
+                  ? config.activeFeatures[dto.name]?.version ||
+                    everywhereConfig.activeFeatures[dto.name]?.version ||
+                    null
+                  : null
+                dto.lastVersion = dto.isActive
+                  ? await this.getVersions(registryUrl, dto.name).then((x) => x.sort(rcompare)[0])
+                  : null // ToDo: how does this affect performance?
+                dto.order = i++
+                dto.sourceRegistry = {
+                  url: registryUrl,
+                  isDev: configRegistries.find((r) => r.url === registryUrl).isDev,
+                }
+                if (!dto.hostnames) dto.hostnames = []
+                dto.hostnames = mergeDedupe([dto.hostnames, [contextId]])
+                dto.available = true
+                dto.isMyDapplet = true
+                dtos.push(dto)
+              } else {
+                // ToDo: move this merging logic to aggragator
+                if (!dto.hostnames) dto.hostnames = []
+                dto.hostnames = mergeDedupe([dto.hostnames, [contextId]])
               }
-              if (!dto.hostnames) dto.hostnames = []
-              dto.hostnames = mergeDedupe([dto.hostnames, [contextId]])
-              dto.available = true
-              dto.isMyDapplet = true
-              dtos.push(dto)
-            } else {
-              // ToDo: move this merging logic to aggragator
-              if (!dto.hostnames) dto.hostnames = []
-              dto.hostnames = mergeDedupe([dto.hostnames, [contextId]])
             }
           }
         }
       }
     }
 
-    const endTime = Date.now()
-    console.log(`getFeaturesByHostnames  #${requestId} end: ${endTime - startTime} ms`)
+    // const endTime = Date.now()
+    // console.log(`getFeaturesByHostnames  #${requestId} end: ${endTime - startTime} ms`)
 
     return dtos
   }
@@ -263,7 +301,7 @@ export default class FeatureService {
     try {
       const runtime = await new Promise<void>(async (resolve, reject) => {
         // listening of loading/unloading from contentscript
-        const listener = (message, sender) => {
+        const listener = (message) => {
           if (!message || !message.type || !message.payload) return
           const p = message.payload
           if (message.type === 'FEATURE_LOADED') {
@@ -287,15 +325,16 @@ export default class FeatureService {
               resolve(p.runtime)
             }
           } else if (message.type === 'FEATURE_LOADING_ERROR') {
-            if (
-              p.name === name &&
-              p.branch === DEFAULT_BRANCH_NAME &&
-              p.version === version &&
-              isActive === true
-            ) {
-              browser.runtime.onMessage.removeListener(listener)
-              reject(p.error)
-            }
+            // if(
+            //   p.name === name &&
+            //   p.branch === DEFAULT_BRANCH_NAME &&
+            //   p.version === version &&
+            //   isActive === true
+            // ){
+
+            browser.runtime.onMessage.removeListener(listener)
+            reject(p.error)
+            // }
           } else if (message.type === 'FEATURE_UNLOADING_ERROR') {
             if (
               p.name === name &&
@@ -443,7 +482,7 @@ export default class FeatureService {
     // Activate dapplets enabled everywhere
     // ToDo: it reduces performance because of additional request to a registry
     //       it's need to be fixed after registry improvements (should return all contextIds by module)
-    const availableModules = await this.getFeaturesByHostnames(contextIds)
+    const availableModules = await this.getFeaturesByHostnames(contextIds, null)
     const config = await this._globalConfigService.getSiteConfigById(CONTEXT_ID_WILDCARD)
     for (const dto of availableModules) {
       if (config.activeFeatures[dto.name]?.isActive === true) {
@@ -672,24 +711,22 @@ export default class FeatureService {
         scriptUrl = hashUris.uris[0] // ToDo: remove it?
       }
 
-      if (mi.icon && mi.icon.uris.length > 0) {
-        if (mi.icon.uris[0].startsWith('data:image/png;base64')) {
-          // Icon file publishing (from base64)
-          const res = await fetch(mi.icon.uris[0])
-          const blob = await res.blob()
-          const hashUris = await this._storageAggregator.save(blob, targetStorages)
+      // Upload icon and NFT image
+      await this._uploadModuleInfoIcons(mi, targetStorages)
 
-          // Manifest editing
-          mi.icon = hashUris
-        } else {
-          // Icon file publishing
-          const buf = await this._storageAggregator.getResource(mi.icon)
-          const blob = new Blob([buf], { type: 'image/png' })
-          const hashUris = await this._storageAggregator.save(blob, targetStorages)
+      if (mi.metadata && mi.metadata.uris.length > 0) {
+        // Detailed description publishing
+        const buf = await this._storageAggregator.getResource(mi.metadata)
+        const blob = new Blob([buf], { type: 'image/png' })
+        const hashUris = await this._storageAggregator.save(blob, targetStorages)
 
-          // Manifest editing
-          mi.icon = hashUris
-        }
+        // Manifest editing
+        mi.metadata = hashUris
+      }
+
+      // Use a current version of the extension as target value
+      if (vi && EXTENSION_VERSION) {
+        vi.extensionVersion = EXTENSION_VERSION
       }
 
       return scriptUrl
@@ -800,6 +837,11 @@ export default class FeatureService {
     await registry.transferOwnership(moduleName, oldAccount, newAccount)
   }
 
+  public async getContextIds(registryUri: string, moduleName: string) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    return registry.getContextIds(moduleName)
+  }
+
   public async addContextId(registryUri: string, moduleName: string, contextId: string) {
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     await registry.addContextId(moduleName, contextId)
@@ -809,27 +851,25 @@ export default class FeatureService {
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     await registry.removeContextId(moduleName, contextId)
   }
+  public async getAdmins(registryUri: string, moduleName: string) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    return registry.getAdmins(moduleName)
+  }
+
+  public async addAdmin(registryUri: string, moduleName: string, adressAdmin: string) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    await registry.addAdmin(moduleName, adressAdmin)
+  }
+
+  public async removeAdmin(registryUri: string, moduleName: string, adressAdmin: string) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    await registry.removeAdmin(moduleName, adressAdmin)
+  }
 
   public async editModuleInfo(registryUri: string, targetStorages: StorageTypes[], mi: ModuleInfo) {
-    if (mi.icon && mi.icon.uris.length > 0) {
-      if (mi.icon.uris[0].startsWith('data:image/png;base64')) {
-        // Icon file publishing (from base64)
-        const res = await fetch(mi.icon.uris[0])
-        const blob = await res.blob()
-        const hashUris = await this._storageAggregator.save(blob, targetStorages)
+    // Upload icon and NFT image
+    await this._uploadModuleInfoIcons(mi, targetStorages)
 
-        // Manifest editing
-        mi.icon = hashUris
-      } else {
-        // Icon file publishing
-        const buf = await this._storageAggregator.getResource(mi.icon)
-        const blob = new Blob([buf], { type: 'image/png' })
-        const hashUris = await this._storageAggregator.save(blob, targetStorages)
-
-        // Manifest editing
-        mi.icon = hashUris
-      }
-    }
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     await registry.editModuleInfo(mi)
   }
@@ -914,5 +954,98 @@ export default class FeatureService {
       version !== null ? await this.getVersionInfo(registryUri, name, branch, version) : null
 
     await this._overlayService.openDeployOverlay(mi, vi)
+  }
+
+  private async _generateNftImage({
+    name,
+    title,
+    icon,
+  }: {
+    name: string
+    title: string
+    icon?: Blob
+  }): Promise<Blob> {
+    const base64ImageToCanvas = (base64: string) =>
+      new Promise<HTMLCanvasElement>((res, rej) => {
+        const image = new Image()
+        image.src = base64
+        image.onerror = rej
+        image.onload = function () {
+          const canvas = document.createElement('canvas')
+          canvas.width = image.width
+          canvas.height = image.height
+          const ctx = canvas.getContext('2d')
+          ctx.drawImage(image, 0, 0)
+          res(canvas)
+        }
+      })
+
+    const wrapper = document.createElement('svg')
+    wrapper.innerHTML = atob(NFT_TEMPLATE.split(',')[1])
+    const svg = wrapper.firstChild as any
+    const titleEl = svg.getElementById('module-title')
+    const nameEl = svg.getElementById('module-name')
+
+    titleEl.innerHTML = title
+    nameEl.innerHTML = name
+
+    // recognize mime type
+    const dataUrlUnknownMime = icon ? await blobToDataURL(new Blob([icon])) : NFT_NO_ICON
+    const iconCanvas = await base64ImageToCanvas(dataUrlUnknownMime)
+    const dataUrl = await iconCanvas.toDataURL()
+
+    const iconEl = svg.getElementById('module-icon')
+    iconEl.setAttribute('xlink:href', dataUrl)
+
+    const svgData = new XMLSerializer().serializeToString(svg)
+    const svgAsBase64 = 'data:image/svg+xml;base64,' + btoa(svgData)
+
+    const imageCanvas = await base64ImageToCanvas(svgAsBase64)
+    const blob = await new Promise<Blob>((r) => imageCanvas.toBlob(r))
+    return blob
+  }
+
+  private async _uploadModuleInfoIcons(
+    mi: ModuleInfo,
+    targetStorages: StorageTypes[]
+  ): Promise<void> {
+    const { name, title } = mi
+
+    if (mi.icon && mi.icon.uris.length > 0) {
+      if (mi.icon.uris[0].startsWith('data:image/png;base64')) {
+        // Icon file publishing (from base64)
+        const res = await fetch(mi.icon.uris[0])
+        const iconBlob = await res.blob()
+        const iconHashUris = await this._storageAggregator.save(iconBlob, targetStorages)
+
+        // Generate NFT Image
+        const imageBlob = await this._generateNftImage({ name, title, icon: iconBlob })
+        const imageHashUris = await this._storageAggregator.save(imageBlob, targetStorages)
+
+        // Manifest editing
+        mi.icon = iconHashUris
+        mi.image = imageHashUris
+      } else {
+        // Icon file publishing
+        const buf = await this._storageAggregator.getResource(mi.icon)
+        const iconBlob = new Blob([buf], { type: 'image/png' })
+        const iconHashUris = await this._storageAggregator.save(iconBlob, targetStorages)
+
+        // Generate NFT Image
+        const imageBlob = await this._generateNftImage({ name, title, icon: iconBlob })
+        const imageHashUris = await this._storageAggregator.save(imageBlob, targetStorages)
+
+        // Manifest editing
+        mi.icon = iconHashUris
+        mi.image = imageHashUris
+      }
+    } else {
+      // Generate NFT Image
+      const imageBlob = await this._generateNftImage({ name: mi.name, title: mi.title }) // no module icon
+      const imageHashUris = await this._storageAggregator.save(imageBlob, targetStorages)
+
+      // Manifest editing
+      mi.image = imageHashUris
+    }
   }
 }

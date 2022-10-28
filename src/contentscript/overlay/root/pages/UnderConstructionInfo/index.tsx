@@ -7,10 +7,12 @@ import VersionInfo from '../../../../../background/models/versionInfo'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { StorageRefImage } from '../../components/DevModulesList'
+
 import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
+import { StorageRefImage } from '../../components/StorageRefImage'
+import useAbortController from '../../hooks/useAbortController'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
 
@@ -44,8 +46,6 @@ export interface UnderConstructionInfoProps {
   setUnderConstructionDetails: (x) => void
   setShowChildrenUnderConstraction: (x) => void
 }
-
-let _isMounted = false
 
 export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => {
   const {
@@ -98,9 +98,9 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [isModalTransaction, setModalTransaction] = useState(false)
 
   const [isNotAccountModal, setNotAccountModal] = useState(false)
+  const abortController = useAbortController()
 
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
       await _updateData()
       if (!isNotNullCurrentAccount) {
@@ -114,9 +114,9 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       setAuthorDisabled(false)
     }
     return () => {
-      _isMounted = false
+      abortController.abort()
     }
-  }, [mi, st, targetChain, autorDisabled, author, editContextId])
+  }, [mi, st, targetChain, autorDisabled, author, editContextId, abortController.signal.aborted])
   const addButtonClickHandler = () => {
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.push(newAuthorObject)
@@ -135,16 +135,18 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-    setRegistryOptions(
-      prodRegistries.map((r) => ({
-        key: r.url,
-        text: r.url,
-        value: r.url,
-      }))
-    )
-    setTargetRegistry(prodRegistries[0]?.url || null)
-    setTrustedUsers(trustedUsers)
-    setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
+    if (!abortController.signal.aborted) {
+      setRegistryOptions(
+        prodRegistries.map((r) => ({
+          key: r.url,
+          text: r.url,
+          value: r.url,
+        }))
+      )
+      setTargetRegistry(prodRegistries[0]?.url || null)
+      setTrustedUsers(trustedUsers)
+      setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
+    }
 
     await _updateCurrentAccount()
   }
@@ -152,7 +154,9 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
     const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-    setCurrentAccount(currentAccount)
+    if (!abortController.signal.aborted) {
+      setCurrentAccount(currentAccount)
+    }
   }
 
   const iconInputChangeHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {

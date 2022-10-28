@@ -543,3 +543,20 @@ export function mergeSameWallets(descriptors: WalletDescriptor[]): WalletDescrip
 
   return wallets
 }
+
+export function convertTimestampToISODate(timestamp: number): string {
+  return new Date(timestamp).toISOString()
+}
+
+export function convertISODateToTimestamp(isoDate: string): number {
+  return new Date(isoDate).getTime() / 1000
+}
+
+export function blobToDataURL(blob: Blob): Promise<string> {
+  return new Promise((res, rej) => {
+    const reader = new FileReader()
+    reader.onload = () => res(reader.result as string)
+    reader.onerror = rej
+    reader.readAsDataURL(blob)
+  })
+}

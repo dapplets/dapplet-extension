@@ -2,6 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import useAbortController from '../../hooks/useAbortController'
 import { IDropdown } from '../../models/dropdown.model'
 import styles from './DropdownPreferedOverlayStorage.module.scss'
 
@@ -11,33 +12,35 @@ export interface DropdownProps
   value?: IDropdown | null
   handlerChangeValue?: (value: IDropdown | null) => void
 }
-let _isMounted = false
+
 export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (props: DropdownProps) => {
   const [isOpen, setOpen] = useState(false)
   const [preferedOverlayStorage, setPreferedOverlayStorage] = useState('')
   const { list, className, value = null, handlerChangeValue, title, ...anotherProps } = props
+  const abortController = useAbortController()
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
       await loadPreferedOverlayStorage()
     }
     init()
     return () => {
-      _isMounted = false
+      abortController.abort()
     }
-  }, [])
+  }, [abortController.signal.aborted])
 
   const loadPreferedOverlayStorage = async () => {
     const { getPreferedOverlayStorage } = await initBGFunctions(browser)
     const preferedOverlayStorage = await getPreferedOverlayStorage()
-    setPreferedOverlayStorage(preferedOverlayStorage)
+    if (!abortController.signal.aborted) {
+      setPreferedOverlayStorage(preferedOverlayStorage)
+    }
   }
 
-  const selectPreferedOverlayStorage = async (storage: string, x: (x) => void) => {
+  const selectPreferedOverlayStorage = async (storage: string, func: (x) => void) => {
     const { setPreferedOverlayStorage } = await initBGFunctions(browser)
     await setPreferedOverlayStorage(storage)
     loadPreferedOverlayStorage()
-    x(false)
+    func(false)
   }
   return (
     <div

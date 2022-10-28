@@ -7,6 +7,7 @@ import VersionInfo from '../background/models/versionInfo'
 import { generateGuid, parseShareLink } from '../common/helpers'
 import { LoginRequest, SystemOverlayTabs } from '../common/types'
 import { AppStorage } from './appStorage'
+import ConnectedAccounts from './connectedAccounts/connected-accounts'
 import { Connection, EventDef } from './connection'
 import * as ethereum from './ethereum'
 import { IEtherneumWallet } from './ethereum/types'
@@ -718,4 +719,6 @@ export default class Core {
   public state<T>(defaultState: T, type?: string) {
     return new State<T>(defaultState, type)
   }
+
+  public connectedAccounts = new ConnectedAccounts()
 }

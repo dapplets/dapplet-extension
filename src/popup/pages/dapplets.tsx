@@ -26,7 +26,7 @@ interface IDappletsState {
 }
 
 class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
-  private _isMounted: boolean = false
+  private _isMounted = false
 
   state = {
     features: [],
@@ -71,7 +71,7 @@ class Dapplets extends React.Component<IDappletsProps, IDappletsState> {
     const { getFeaturesByHostnames, getRegistries } = await initBGFunctions(browser)
 
     const features: ManifestDTO[] = contextIdsValues
-      ? await getFeaturesByHostnames(contextIdsValues)
+      ? await getFeaturesByHostnames(contextIdsValues, null)
       : []
 
     const registries = await getRegistries()

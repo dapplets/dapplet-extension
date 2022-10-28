@@ -150,21 +150,6 @@ function SelectWidget(props) {
     },
   })
   const { enumDisabled, enumOptions } = options
-  const emptyValue = multiple ? [] : ''
-  const dropdownOptions = createDefaultValueOptionsForDropDown(enumOptions, enumDisabled)
-  const _onChange = (
-    event,
-
-    { value }
-  ) => {
-    onChange && onChange(processValue(schema, value))
-  }
-  // eslint-disable-next-line no-shadow
-  const _onBlur = ({ target: { value } }) => onBlur && onBlur(id, processValue(schema, value))
-  const _onFocus = ({
-    // eslint-disable-next-line no-shadow
-    target: { value },
-  }) => onFocus && onFocus(id, processValue(schema, value))
 
   const [newWalue, setNewValue] = useState(null)
   useEffect(() => {

@@ -17,7 +17,7 @@ import ManifestDTO from '../../../background/dto/manifestDTO'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
 
-// import { ReactComponent as Account } from './assets/svg/connected-account.svg'
+import { ReactComponent as Account } from './assets/svg/connected-account.svg'
 import { ReactComponent as DappletsLogo } from './assets/svg/dapplets-logo.svg'
 import { ReactComponent as Home } from './assets/svg/home-toolbar.svg'
 import { ReactComponent as SearchIcon } from './assets/svg/magnifying-glass.svg'
@@ -34,7 +34,7 @@ import { ShareButton } from './components/ShareButton'
 import { SquaredButton } from './components/SquaredButton'
 import { Overlay } from './overlay'
 import { OverlayManager } from './overlayManager'
-// import { ConnectedAccount } from './pages/ConnectedAccount'
+import { ConnectedAccount } from './pages/ConnectedAccount'
 import { Dapplets } from './pages/Dapplets'
 import { Notifications } from './pages/Notifications'
 import { SettingsOverlay } from './pages/Settings'
@@ -74,11 +74,11 @@ const SYSTEM_TAB: ToolbarTab = {
       icon: Notification,
       title: 'Notifications',
     },
-    // {
-    //   id: 'connected',
-    //   icon: Account,
-    //   title: 'Connected',
-    // },
+    {
+      id: 'connectedAccounts',
+      icon: Account,
+      title: 'Connected Accounts',
+    },
     {
       id: 'settings',
       icon: Settings,
@@ -124,7 +124,7 @@ class _App extends React.Component<P, S> {
     classNameSearch: '',
     classNameSearchButton: '',
     isLoadingDeploy: false,
-    dropdownListValue: 'All',
+    dropdownListValue: 'all',
     isMiniWallets: false,
     connectedDescriptors: null,
     selectedWallet: null,
@@ -493,7 +493,7 @@ class _App extends React.Component<P, S> {
               )}
 
               {pathname === '/system/notifications' && <Notifications />}
-              {/* {pathname === '/system/connected' && <ConnectedAccount />} */}
+              {pathname === '/system/connectedAccounts' && <ConnectedAccount />}
               {pathname === '/system/settings' && (
                 <SettingsOverlay
                   selectedWallet={s.selectedWallet}

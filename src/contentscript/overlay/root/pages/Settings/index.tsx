@@ -1,12 +1,13 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
+import useAbortController from '../../hooks/useAbortController'
 import { DappletsMainInfo } from '../DappletsInfo'
-import { UnderConstructionInfo } from '../UnderConstructionInfo'
-import { Developer } from './Developer'
-import { SettingsList } from './Settings'
-import styles from './Settings.module.scss'
+// import { UnderConstructionInfo } from '../UnderConstructionInfo'
+import { Developer } from './Developer/Developer'
+import { SettingsList } from './Settings/Settings'
+import styles from './Settings/Settings.module.scss'
 
 enum SettingsTabs {
   // MAIN = 0,
@@ -63,43 +64,54 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   const [ModuleInfo, setModuleInfo] = useState([])
   const [ModuleVersion, setModuleVersion] = useState([])
 
-  const [isTokenomics, setTokenomics] = useState(false)
-  const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] = useState(false)
-  const [isShowChildrenRegistery, setShowChildrenRegistery] = useState(false)
-  const _isMounted = useRef(true)
+  // const [isTokenomics, setTokenomics] = useState(false)
+  // const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] = useState(false)
+  const [isShowChildrenRegistry, setShowChildrenRegistry] = useState(false)
+  const abortController = useAbortController()
+
   useEffect(() => {
     const init = async () => {
-      if (_isMounted.current) {
-        await loadDevMode()
-        await loadErrorReporting()
-      }
+      await loadDevMode()
+      await loadErrorReporting()
     }
     init()
     return () => {
-      _isMounted.current = false
+      // abortController.abort()
     }
-  }, [])
+  }, [abortController.signal.aborted])
+
   const loadDevMode = async () => {
-    setSvgLoaderDevMode(true)
+    if (!abortController.signal.aborted) {
+      setSvgLoaderDevMode(true)
+    }
 
     const { getDevMode } = await initBGFunctions(browser)
     const devMode = await getDevMode()
-    setMode(devMode)
-    setTimeout(() => setSvgLoaderDevMode(false), 500)
+    if (!abortController.signal.aborted) {
+      setMode(devMode)
+      setSvgLoaderDevMode(false)
+    }
   }
+
   const setDevmode = async (isActive: boolean) => {
     const { setDevMode } = await initBGFunctions(browser)
     await setDevMode(isActive)
     loadDevMode()
   }
+
   const loadErrorReporting = async () => {
-    setSvgErrorReporting(true)
+    if (!abortController.signal.aborted) {
+      setSvgErrorReporting(true)
+    }
 
     const { getErrorReporting } = await initBGFunctions(browser)
     const errorReporting = await getErrorReporting()
-    onErrorReporting(errorReporting)
-    setTimeout(() => setSvgErrorReporting(false), 500)
+    if (!abortController.signal.aborted) {
+      onErrorReporting(errorReporting)
+      setSvgErrorReporting(false)
+    }
   }
+
   const setErrorReporting = async (isActive: boolean) => {
     const { setErrorReporting } = await initBGFunctions(browser)
     await setErrorReporting(isActive)
@@ -153,8 +165,8 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                 isLoadingDeploy={isLoadingDeploy}
                 setLoadingDeploy={setLoadingDeploy}
                 setLoadingDeployFinally={setLoadingDeployFinally}
-                isShowChildrenRegistery={isShowChildrenRegistery}
-                setShowChildrenRegistery={setShowChildrenRegistery}
+                isShowChildrenRegistry={isShowChildrenRegistry}
+                setShowChildrenRegistry={setShowChildrenRegistry}
                 setModuleVersion={setModuleVersion}
                 setModuleInfo={setModuleInfo}
                 setDappletsDetail={setDappletsDetail}
@@ -180,7 +192,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                 ModuleInfo={ModuleInfo}
                 ModuleVersion={ModuleVersion}
                 setDappletsDetail={setDappletsDetail}
-                setShowChildrenRegistery={setShowChildrenRegistery}
+                setShowChildrenRegistry={setShowChildrenRegistry}
               />
             )}
           </div>
@@ -221,7 +233,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
             /> */}
           </div>
           <div className={styles.settingMain}>
-            {activeTabUnderConstructionDetails === UnderConstructionDetails.INFO && (
+            {/* {activeTabUnderConstructionDetails === UnderConstructionDetails.INFO && (
               <div>
                 <UnderConstructionInfo
                   ModuleInfo={ModuleInfo}
@@ -230,7 +242,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                   setShowChildrenUnderConstraction={setShowChildrenUnderConstraction}
                 />
               </div>
-            )}
+            )} */}
             {/* {activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS && (
               <Tokenimics
                 setUnderConstructionDetails={setUnderConstructionDetails}

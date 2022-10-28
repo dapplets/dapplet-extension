@@ -69,14 +69,6 @@
   justify-content: space-between;
 
   margin-top: 10px;
-
-  // & > * {
-  //   margin-bottom: 10px;
-  // }
 }
 
-@media (max-width: 640px) and (min-width: 320px) {
-  .MainSettingsAuto {
-    max-width: 100%;
-  }
-}
+@import "./adaptive.scss"

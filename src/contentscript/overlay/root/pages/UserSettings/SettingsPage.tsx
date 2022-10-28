@@ -25,7 +25,6 @@ export interface SettingsPageProps {
   isLoad: boolean
   setLoad: any
 }
-let _isMounted = false
 
 const theme = { widgets: { SelectWidget, TextWidget } }
 
@@ -41,9 +40,9 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   const [hiddenProperties, setHiddenProperties] = useState([])
   const [swarmGatewayUrl, setSwarmGatewayUrl] = useState('')
   const [isEdited, setEdited] = useState(false)
+  const [registryActive, setRegistryActive] = useState(null)
 
   useEffect(() => {
-    _isMounted = true
     const init = async () => {
       if (mi || vi || schemaConfig || defaultConfig) {
         const { getDevMode, getSwarmGateway } = await initBGFunctions(browser)
@@ -77,9 +76,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
     }
     init()
 
-    return () => {
-      _isMounted = false
-    }
+    return () => {}
   }, [])
 
   const _refreshData = async () => {
@@ -96,8 +93,23 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
       const { getOwnership } = await initBGFunctions(browser)
       const owner = await getOwnership(mi.sourceRegistry.url, mi.name)
       setOwner(owner)
+    } else {
+      await updateData()
     }
   }
+
+  const updateData = async () => {
+    const { getRegistries, getOwnership } = await initBGFunctions(browser)
+    const registries = await getRegistries()
+
+    const newRegistries = registries
+      .filter((r) => r.isDev === false && r.isEnabled !== false)
+      .map((x, i) => x.url)
+    setRegistryActive(newRegistries[0])
+    const newOwner = await getOwnership(newRegistries[0], mi.name)
+    setOwner(newOwner)
+  }
+
   const _saveData = async (data: any) => {
     setLoading(true)
     setData(data)
