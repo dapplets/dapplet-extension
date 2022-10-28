@@ -132,6 +132,10 @@
     "branches": [
       "master",
       {
+        "name": "testing",
+        "prerelease": "beta"
+      },
+      {
         "name": "develop",
         "prerelease": "alpha"
       }
