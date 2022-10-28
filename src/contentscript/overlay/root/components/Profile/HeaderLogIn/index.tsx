@@ -26,7 +26,7 @@ export interface HeaderLogInProps {
   newProfile: any
   isOverlay: boolean
   setOpenWalletMini: () => void
-  isOpenSearch: boolean
+  // isOpenSearch: boolean
   setConnectedDescriptors: (x: []) => void
   setSelectWallet: (x: string) => void
 }
@@ -39,7 +39,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     newProfile,
     isOverlay,
     setOpenWalletMini,
-    isOpenSearch,
+    // isOpenSearch,
     setConnectedDescriptors,
     setSelectWallet,
   } = props
@@ -88,7 +88,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     walletTypeWalletConnect,
     isMini,
     liRef,
-    isOpenSearch,
+    // isOpenSearch,
     selectedWallet,
   ])
 
@@ -104,7 +104,9 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     setSelectWallet(selectedWallet)
 
     setDescriptors(descriptors)
-    !isOpen && !isOpenSearch && setOpenWalletMini()
+    !isOpen 
+    // && !isOpenSearch
+     && setOpenWalletMini()
     if (descriptors.length > 0) {
       const connectedDescriptors = descriptors.filter((x) => x.connected)
 
@@ -166,7 +168,9 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
     const animeRef = anime({
       targets: liRef.current,
       scale: () => {
-        if (isMini === true || isOpenSearch) {
+        if (isMini === true 
+          // || isOpenSearch
+          ) {
           return ['0', '0']
         } else if (isMini === false) {
           return ['0', '1']
@@ -174,13 +178,16 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       },
       duration: 300,
     })
-  }, [liRef, isMini, isOpenSearch])
+  }, [liRef, isMini,
+    //  isOpenSearch
+    ])
 
   return (
     <div className={cn(styles.wrapper, { [styles.mini]: isMini })}>
       <header
         className={cn(styles.header, {
-          [styles.mini]: isMini || isOpenSearch,
+          [styles.mini]: isMini 
+          // || isOpenSearch,
         })}
         onClick={() => {
           setOpen()
@@ -207,7 +214,8 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
 
         <div
           className={cn(styles.wrapperNames, {
-            [styles.wrapperNamesMini]: isMini || isOpenSearch,
+            [styles.wrapperNamesMini]: isMini 
+            // || isOpenSearch,
           })}
           ref={liRef}
         >

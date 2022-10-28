@@ -1,6 +1,6 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import '../../assets/styles/null.scss';
+@import '../../assets/styles/fonts.scss';
+@import '../../assets/styles/color.variables.scss';
 
 .localhost {
   display: flex;
@@ -16,6 +16,7 @@
   border-radius: 10px;
 
   background: $PureWhite;
+  border: 1px solid #e3e3e3;
 }
 
 .hostBlock {
