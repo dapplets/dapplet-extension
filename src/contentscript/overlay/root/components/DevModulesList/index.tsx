@@ -118,7 +118,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     }
     init()
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [
     targetChain,

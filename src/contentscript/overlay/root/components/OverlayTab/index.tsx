@@ -36,11 +36,6 @@ export interface OverlayTabProps {
 
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const visibleMenus = p.menus.filter((x) => x.hidden !== true)
-  // const _handleCloseClick: React.MouseEventHandler<HTMLSpanElement> = (e) => {
-  //   e.preventDefault()
-  //   e.stopPropagation()
-  //   p.onCloseClick()
-  // }
 
   const onOpenDappletAction = async (f: string) => {
     if (!p.modules) return

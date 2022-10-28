@@ -476,7 +476,7 @@ class _App extends React.Component<P, S> {
     const p = this.props
     const s = this.state
 
-    if (p.hidden) return null
+    // if (p.hidden) return null
 
     const overlays = this.getOverlays()
     // TODO: naming wallets is the notification
@@ -489,6 +489,7 @@ class _App extends React.Component<P, S> {
     const menu = tab?.menus.find((x) => x.id === activeTabMenuId)
 
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
+    this.getTabs()
 
     return (
       <div className={cn(styles.overlay)}>

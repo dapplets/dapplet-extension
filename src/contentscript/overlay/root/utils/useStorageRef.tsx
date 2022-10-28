@@ -18,12 +18,15 @@ export const useStorageRef = (storageRef: StorageRef) => {
           setImg(dataUri)
         }
       } catch (error) {
-        setImg(NO_LOGO)
+        // if (!abortController.signal.aborted) {
+          setImg(NO_LOGO)
+        // }
+       
       }
     }
     init()
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [abortController.signal.aborted])
 
