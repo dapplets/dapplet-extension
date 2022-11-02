@@ -67,7 +67,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     }
     init()
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [loadHome, abortController.signal.aborted])
   const loadingHome = () => {
