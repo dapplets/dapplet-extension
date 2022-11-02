@@ -489,7 +489,6 @@ class _App extends React.Component<P, S> {
     const menu = tab?.menus.find((x) => x.id === activeTabMenuId)
 
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
-    this.getTabs()
 
     return (
       <div className={cn(styles.overlay)}>

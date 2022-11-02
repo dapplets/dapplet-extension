@@ -53,27 +53,27 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [loadShowButton, setLoadShowButton] = useState(false)
 
   const abortController = useAbortController()
-  useEffect(() => {
-    const init = async () => {
-      await _refreshData()
-      if (!abortController.signal.aborted) {
-        setLoadingListDapplets(false)
-      }
-      await loadTrustedUsers()
-    }
+  // useEffect(() => {
+  //   const init = async () => {
+  //     await _refreshData()
+  //     if (!abortController.signal.aborted) {
+  //       setLoadingListDapplets(false)
+  //     }
+  //     await loadTrustedUsers()
+  //   }
 
-    init()
+  //   init()
 
-    if (dapplets.length === 0) {
-      setLoadingListDapplets(true)
-    } else {
-      setLoadingListDapplets(false)
-    }
+  //   // if (dapplets.length === 0) {
+  //   //   setLoadingListDapplets(true)
+  //   // } else {
+  //   //   setLoadingListDapplets(false)
+  //   // }
 
-    return () => {
-      abortController.abort()
-    }
-  }, [abortController.signal.aborted])
+  //   return () => {
+  //     // abortController.abort()
+  //   }
+  // }, [abortController.signal.aborted])
 
   useEffect(() => {
     const init = async () => {
@@ -90,6 +90,11 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     init()
 
+    if (dapplets.length === 0) {
+      setLoadingListDapplets(true)
+    } else {
+      setLoadingListDapplets(false)
+    }
     return () => {
       // _isMounted.current = false
       // abortController.abort()
@@ -119,9 +124,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           error: null,
           versions: [],
         }))
-
+      setModule(newDappletsList)
       if (!abortController.signal.aborted) {
-        setModule(newDappletsList)
         setDapplets(newDappletsList)
       }
     } catch (err) {
