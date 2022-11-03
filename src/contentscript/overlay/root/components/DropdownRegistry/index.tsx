@@ -24,7 +24,7 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
     }
     init()
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [abortController.signal.aborted])
 

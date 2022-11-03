@@ -255,7 +255,7 @@ export default class GlobalConfigService {
       { account: 'nik3ter.testnet' },
       { account: 'dapplets.testnet' },
     ]
-    config.targetStorages = [StorageTypes.Ipfs, StorageTypes.Sia, StorageTypes.Swarm]
+    config.targetStorages = [StorageTypes.Ipfs, StorageTypes.Swarm]
     config.userSettings = {}
     config.providerUrl = 'https://goerli.mooo.com/'
     config.xdaiProviderUrl = 'https://rpc.gnosischain.com/'

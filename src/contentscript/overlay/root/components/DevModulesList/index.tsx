@@ -86,7 +86,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const [mode, setMode] = useState<FormMode>(null)
   const [targetStorages, setTargetStorages] = useState([
     StorageTypes.Swarm,
-    StorageTypes.Sia,
+    
     StorageTypes.Ipfs,
   ])
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
@@ -163,8 +163,8 @@ export const DevModule: FC<PropsDevModule> = (props) => {
         setDpendenciesChecking(dependenciesChecking)
         setTargetStorages(
           Object.keys(vi?.overlays ?? {}).length > 0
-            ? [StorageTypes.Swarm, StorageTypes.Sia]
-            : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs]
+            ? [StorageTypes.Swarm]
+            : [StorageTypes.Swarm, StorageTypes.Ipfs]
         )
         setMode(FormMode.Deploying)
         setTargetRegistry(prodRegistries[0]?.url || null)
@@ -297,6 +297,8 @@ export const DevModule: FC<PropsDevModule> = (props) => {
         if (deploymentStatus === 3) {
           setNewModule(true)
         } else {
+         
+          
           mode === FormMode.Creating
             ? await deployModule(mi, null, targetStorages, targetRegistry)
             : await deployModule(mi, vi, targetStorages, targetRegistry)

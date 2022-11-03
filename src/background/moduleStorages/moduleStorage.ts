@@ -157,9 +157,9 @@ export class StorageAggregator {
         const ipfsGatewayUrl = await this._globalConfigService.getIpfsGateway()
         return new IpfsModuleStorage({ ipfsGatewayUrl })
 
-      case StorageTypes.Sia:
-        const siaPortalUrl = await this._globalConfigService.getSiaPortal()
-        return new SiaModuleStorage({ siaPortalUrl })
+      // case StorageTypes.Sia:
+      //   const siaPortalUrl = await this._globalConfigService.getSiaPortal()
+      //   return new SiaModuleStorage({ siaPortalUrl })
 
       default:
         throw new Error('Unsupported storage type')

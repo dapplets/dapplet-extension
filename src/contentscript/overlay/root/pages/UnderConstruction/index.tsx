@@ -72,7 +72,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
 
   const [targetStorages, setTargetStorages] = useState([
     StorageTypes.Swarm,
-    StorageTypes.Sia,
+    // StorageTypes.Sia,
     StorageTypes.Ipfs,
   ])
   const [isModal, setModal] = useState(false)

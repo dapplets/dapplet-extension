@@ -510,13 +510,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   <div className={styles.checkboxBlock}>
                     <Checkbox isSupport isReadonly isCheckbox title="Centralized" />
 
-                    <Checkbox
+                    {/* <Checkbox
                       isCheckbox={targetStorages?.includes(StorageTypes.Sia)}
                       title="SIA"
                       onChange={(e) => {
                         changeTargetStorage(StorageTypes.Sia, e.target.checked)
                       }}
-                    />
+                    /> */}
                     <Checkbox
                       isCheckbox={targetStorages?.includes(StorageTypes.Ipfs)}
                       title="IPFS"

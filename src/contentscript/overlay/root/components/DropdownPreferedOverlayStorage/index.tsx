@@ -24,7 +24,7 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (props: Dropdow
     }
     init()
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [abortController.signal.aborted])
 
