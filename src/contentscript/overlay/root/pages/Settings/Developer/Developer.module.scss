@@ -11,7 +11,9 @@
 
   width: 100%;
   max-height: calc(100vh - 120px);
+  padding-bottom: 15px;
 }
+
 
 .wrapper::-webkit-scrollbar {
   width: 0;
