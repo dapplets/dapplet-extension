@@ -53,28 +53,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [loadShowButton, setLoadShowButton] = useState(false)
 
   const abortController = useAbortController()
-  // useEffect(() => {
-  //   const init = async () => {
-  //     await _refreshData()
-  //     if (!abortController.signal.aborted) {
-  //       setLoadingListDapplets(false)
-  //     }
-  //     await loadTrustedUsers()
-  //   }
-
-  //   init()
-
-  //   // if (dapplets.length === 0) {
-  //   //   setLoadingListDapplets(true)
-  //   // } else {
-  //   //   setLoadingListDapplets(false)
-  //   // }
-
-  //   return () => {
-  //     // abortController.abort()
-  //   }
-  // }, [abortController.signal.aborted])
-
   useEffect(() => {
     const init = async () => {
       if (!abortController.signal.aborted) {
@@ -95,10 +73,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     } else {
       setLoadingListDapplets(false)
     }
-    return () => {
-      // _isMounted.current = false
-      // abortController.abort()
-    }
+    return () => {}
   }, [dropdownListValue, abortController.signal.aborted])
 
   const _refreshData = async () => {
@@ -128,6 +103,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       if (!abortController.signal.aborted) {
         setDapplets(newDappletsList)
       }
+      newDappletsList.map((x) => {
+        if (x.isActive) getTabsForDapplet(x)
+      })
     } catch (err) {
       console.error(err)
       setNoContentScript(true)
@@ -242,8 +220,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     } catch (err) {
       _updateFeatureState(name, { isActive: !isActive, error: err.message })
     }
-
-    // _updateFeatureState(name, { isLoading: false })
   }
 
   const onRemoveMyDapplet = async (f: ManifestAndDetails) => {

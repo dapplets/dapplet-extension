@@ -61,9 +61,9 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
-      if (!abortController.signal.aborted) {
-        await updateData()
-      }
+      // if (!abortController.signal.aborted) {
+      await updateData()
+      // }
     }
     init()
     return () => {
@@ -89,7 +89,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     if (!abortController.signal.aborted) {
       setOwner(newOwner)
     }
-    if (isActive) getTabsForDapplet(dapplet)
+    // if (isActive) getTabsForDapplet(dapplet)
   }
 
   return (

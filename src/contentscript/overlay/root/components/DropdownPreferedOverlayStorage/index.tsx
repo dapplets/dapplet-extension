@@ -23,9 +23,7 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (props: Dropdow
       await loadPreferedOverlayStorage()
     }
     init()
-    return () => {
-      // abortController.abort()
-    }
+    return () => {}
   }, [abortController.signal.aborted])
 
   const loadPreferedOverlayStorage = async () => {

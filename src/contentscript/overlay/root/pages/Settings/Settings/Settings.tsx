@@ -80,22 +80,20 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
-     
-        await checkUpdates()
+      await checkUpdates()
 
-        await loadProvider()
-        await loadSwarmGateway()
-        await loadErrorReporting()
-        await loadSwarmPostageStampId()
-        await loadDynamicAdapter()
+      await loadProvider()
+      await loadSwarmGateway()
+      await loadErrorReporting()
+      await loadSwarmPostageStampId()
+      await loadDynamicAdapter()
 
-        await loadUserAgentId()
-        await loadUserAgentName()
-        await loadIpfsGateway()
-        await loadSiaPortal()
-        await loadPopupInOverlay()
-        await loadTargetStorages()
-      
+      await loadUserAgentId()
+      await loadUserAgentName()
+      await loadIpfsGateway()
+      await loadSiaPortal()
+      await loadPopupInOverlay()
+      await loadTargetStorages()
     }
     init()
 
@@ -510,13 +508,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   <div className={styles.checkboxBlock}>
                     <Checkbox isSupport isReadonly isCheckbox title="Centralized" />
 
-                    {/* <Checkbox
-                      isCheckbox={targetStorages?.includes(StorageTypes.Sia)}
-                      title="SIA"
-                      onChange={(e) => {
-                        changeTargetStorage(StorageTypes.Sia, e.target.checked)
-                      }}
-                    /> */}
                     <Checkbox
                       isCheckbox={targetStorages?.includes(StorageTypes.Ipfs)}
                       title="IPFS"
