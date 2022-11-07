@@ -37,7 +37,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
     }
     init()
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [trustedUserInput, abortController.signal.aborted])
 

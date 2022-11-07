@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import React, { ReactElement, useRef, useState } from 'react'
 import {
   ReactComponent as Account,
   ReactComponent as DappletsLogo,
@@ -68,24 +68,8 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
   const noSystemTabs = p.tabs.filter((f) => f.title !== 'Dapplets')
   const [isShowTabs, onShowTabs] = useToggle(false)
-  // if(document
-  //   .querySelector('#dapplets-overlay-manager')
-  //   .classList.contains('dapplets-overlay-hidden')){
-  //     p.navigate!('/system/dapplets')
-  //   }
-  useEffect(() => {
-    // if (!p.module) return
-  }, [
-    // // document,
-    // p.pathname,
-    // p.tabs,
-    // noSystemTabs,
-    // isShowTabs,
-    p.module,
-    // p.activeTabMenuId
-    // // nodeOverlayToolbar,
-  ])
-  // useEffect(() => {}, [document, p.pathname])
+ 
+
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
       nodeOverlayToolbar.current.value = ''
@@ -121,9 +105,9 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
       return (
         <div key={NewTabs.id}>
-          {!p.module ? (
+          {/* {!p.module ? (
             <div className={styles.loaderAccount}></div>
-          ) : (
+          ) : ( */}
             <OverlayTab
               {...newTab}
               isActive={activeTabId === NewTabs.id}
@@ -157,7 +141,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 p.onTabClick(NewTabs)
               }}
             />
-          )}
+          {/* )} */}
         </div>
       )
     })
@@ -176,18 +160,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       )}
     >
       <div className={styles.inner}>
-        {/* <div style={{ background: '#f5f5f5', borderRadius: '10px 0 0 10px' }}>
-          <ToggleOverlay
-            getNode={handleClickGetNodeOverlayToolbar}
-            onClick={() => {
-              p.setOpenWallet()
-              p.onToggleClick()
-            }}
-            className={cn(styles.toggleOverlay, {
-              [styles.isOpenWallet]: p.isOpenWallet,
-            })}
-          />
-        </div> */}
+   
 
         <div className={cn(styles.tabs, {})}>
           <div className={styles.TabList}>
@@ -244,9 +217,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 }}
                 className={cn(styles.toggleOverlay, {
                   [styles.isOpenWallet]: p.isOpenWallet,
-                  // [styles.isOpenDappletPage]:  !document
-                  // .querySelector('#dapplets-overlay-manager')
-                  // .classList.contains('CollapsedOverlayClass')
+                 
                 })}
               />
             </div>
@@ -260,36 +231,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             </div>
           </div>
         </div>
-        {/* <div className={cn(styles.tabsMobile, {})}>
-          <span className={styles.noSystemTabLabel} onClick={() => setVisibleMobileTabs(true)} />
-          <ModalTabs
-            visible={isVisibleMobileTabs}
-            content={
-              <div className={styles.TabListMobile}>
-                {p.tabs.length > 0 &&
-                  p.tabs.map((tab) => {
-                    // if (tab.id === 'system') return
-
-                    return (
-                      <OverlayTab
-                        // setOpenWallet={p.setOpenWallet}
-                        // isOpenWallet={p.isOpenWallet}
-                        key={tab.id}
-                        {...tab}
-                        isActive={p.activeTabId === tab.id}
-                        activeTabMenuId={p.activeTabMenuId}
-                        onCloseClick={() => p.onCloseClick(tab)}
-                        onMenuClick={(menu) => p.onMenuClick(tab, menu)}
-                        onTabClick={() => p.onTabClick(tab)}
-                      />
-                    )
-                  })}
-              </div>
-            }
-            onClose={() => closeMobileModal()}
-            classNameCLose={styles.noSystemTabLabel}
-          />
-        </div> */}
+       
       </div>
     </div>
   )
