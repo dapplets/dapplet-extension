@@ -60,9 +60,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [ipfsGatewayInputError, setIpfsGatewayInputError] = useState(null)
   const [ipfsGatewayInputDefault, setIpfsGatewayInputDefault] = useState('')
 
-  const [siaPortalInput, setSiaPortalInput] = useState('')
-  const [siaPortalInputError, setSiaPortalInputError] = useState(null)
-  const [siaPortalInputDefault, setSiaPortalInputDefault] = useState('')
+  // const [siaPortalInput, setSiaPortalInput] = useState('')
+  // const [siaPortalInputError, setSiaPortalInputError] = useState(null)
+  // const [siaPortalInputDefault, setSiaPortalInputDefault] = useState('')
 
   const [targetStorages, setTargetStorages] = useState([])
 
@@ -91,7 +91,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       await loadUserAgentId()
       await loadUserAgentName()
       await loadIpfsGateway()
-      await loadSiaPortal()
+      // await loadSiaPortal()
       await loadPopupInOverlay()
       await loadTargetStorages()
     }
@@ -290,32 +290,32 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     }
   }
 
-  const loadSiaPortal = async () => {
-    const { getInitialConfig } = await initBGFunctions(browser)
-    const config = await getInitialConfig()
+  // const loadSiaPortal = async () => {
+  //   const { getInitialConfig } = await initBGFunctions(browser)
+  //   const config = await getInitialConfig()
 
-    if (config.siaPortalUrl && !abortController.signal.aborted) {
-      setSiaPortalInputDefault(config.siaPortalUrl)
-    }
-    const { getSiaPortal } = await initBGFunctions(browser)
-    const gateway = await getSiaPortal()
-    if (!abortController.signal.aborted) {
-      setSiaPortalInput(gateway)
-    }
-  }
+  //   if (config.siaPortalUrl && !abortController.signal.aborted) {
+  //     setSiaPortalInputDefault(config.siaPortalUrl)
+  //   }
+  //   const { getSiaPortal } = await initBGFunctions(browser)
+  //   const gateway = await getSiaPortal()
+  //   if (!abortController.signal.aborted) {
+  //     setSiaPortalInput(gateway)
+  //   }
+  // }
 
-  const setSiaPortal = async (gateway: string) => {
-    try {
-      const { setSiaPortal } = await initBGFunctions(browser)
-      await setSiaPortal(gateway)
-      loadSiaPortal()
-    } catch (err) {
-      setSiaPortalInputError(err.message)
-      setTimeout(() => {
-        setSiaPortalInputError(null)
-      }, 3000)
-    }
-  }
+  // const setSiaPortal = async (gateway: string) => {
+  //   try {
+  //     const { setSiaPortal } = await initBGFunctions(browser)
+  //     await setSiaPortal(gateway)
+  //     loadSiaPortal()
+  //   } catch (err) {
+  //     setSiaPortalInputError(err.message)
+  //     setTimeout(() => {
+  //       setSiaPortalInputError(null)
+  //     }, 3000)
+  //   }
+  // }
   const changeTargetStorage = async (storage: StorageTypes, checked: boolean) => {
     const { updateTargetStorages } = await initBGFunctions(browser)
 
@@ -625,7 +625,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   />
                 }
               />
-              <SettingItem
+              {/* <SettingItem
                 title="SIA Portal"
                 component={<></>}
                 children={
@@ -646,7 +646,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                     inputOfFocusEtn={inputOfFocusSia}
                   />
                 }
-              />
+              /> */}
             </>
           }
         />
