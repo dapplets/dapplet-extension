@@ -15,6 +15,7 @@ import { LoginSession } from './login/login-session'
 import { LoginHooks, LoginRequestSettings } from './login/types'
 import * as near from './near'
 import { IOverlay, IOverlayManager } from './overlay/interfaces'
+import { proxyFetch } from './proxyFetch'
 import { State } from './state'
 import { Swiper } from './swiper'
 import { WsJsonRpc } from './wsJsonRpc'
@@ -721,4 +722,6 @@ export default class Core {
   }
 
   public connectedAccounts = new ConnectedAccounts()
+
+  public fetch = proxyFetch
 }
