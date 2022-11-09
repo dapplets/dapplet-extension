@@ -1,6 +1,7 @@
 @import "../../assets/styles/null.scss";
 @import "../../assets/styles/fonts.scss";
 @import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/animate.scss";
 
 .wrapper {
   position: relative;
@@ -8,11 +9,9 @@
   display: flex;
   align-items: center;
 
-  // width: 100%;
-
   height: 35px;
 
-  animation-name: slideRight;
+  animation-name: slideRightSearch;
 
   animation-duration: 0.3s;
 
@@ -23,51 +22,12 @@
 }
 
 [class*=" close"] {
-  animation-name: slideLeft;
+  animation-name: slideLeftSearch;
 
   animation-duration: 0.2s;
 
   animation-timing-function: ease;
   animation-fill-mode: forwards;
-}
-
-@keyframes slideRight {
-  0% {
-    position: relative;
-    right: -70%;
-
-    width: 0%;
-  }
-
-  70% {
-    right: 10%;
-
-    width: 105%;
-  }
-
-  100% {
-    right: 0;
-
-    width: 100%;
-  }
-}
-
-@keyframes slideLeft {
-  0% {
-    right: 0;
-
-    width: 100%;
-  }
-
-  90% {
-    opacity: 0;
-  }
-
-  100% {
-    right: -80%;
-
-    width: 0;
-  }
 }
 
 .labelSearchModule {
@@ -163,30 +123,4 @@ span {
   }
 }
 
-@keyframes slideRightClose {
-  0% {
-    right: 12%;
-  }
-
-  70% {
-    right: 17%;
-  }
-
-  100% {
-    right: 12%;
-  }
-}
-
-@media (min-width: 320px) and (max-width: 640px) {
-  .wrapper {
-    left: 10%;
-  }
-
-  .labelSearchModule {
-    width: 65%;
-  }
-
-  .close {
-    left: 55%;
-  }
-}
+@import "./adaptive.scss";

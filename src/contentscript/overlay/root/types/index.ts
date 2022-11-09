@@ -1,4 +1,4 @@
-import { StorageRef } from '../../../../background/registries/registry'
+import { StorageRef } from '../../../../common/types'
 import { ModuleIconProps } from '../components/ModuleIcon'
 
 export type ToolbarTabMenu = {

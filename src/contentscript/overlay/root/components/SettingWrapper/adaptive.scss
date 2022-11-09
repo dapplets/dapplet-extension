@@ -1,0 +1,12 @@
+@media (max-width: 640px) and (min-width: 320px) {
+  .wrapper {
+    max-width: 100%;
+    padding: 25px 10px 15px;
+  }
+
+  .title {
+    z-index: 0;
+    top: -12px;
+    left: 10px;
+  }
+}

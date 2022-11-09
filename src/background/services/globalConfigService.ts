@@ -43,6 +43,7 @@ const EXPORTABLE_PROPERTIES = [
   'dynamicAdapter',
   'preferedOverlayStorage',
   'myDapplets',
+  'connectedAccountContractAddress',
 ]
 
 export default class GlobalConfigService {
@@ -70,6 +71,9 @@ export default class GlobalConfigService {
       if (!config.myDapplets) config.myDapplets = this.getInitialConfig().myDapplets
       if (!config.targetStorages) config.targetStorages = this.getInitialConfig().targetStorages
       if (!config.xdaiProviderUrl) config.xdaiProviderUrl = this.getInitialConfig().xdaiProviderUrl
+      if (!config.connectedAccountsContractAddress)
+        config.connectedAccountsContractAddress =
+          this.getInitialConfig().connectedAccountsContractAddress
     }
 
     return config ?? this.getInitialConfig()
@@ -217,7 +221,7 @@ export default class GlobalConfigService {
     config.id = this._defaultConfigId
     config.isActive = true
     config.registries = [
-      { url: 'registry.dapplet-base.eth', isDev: false, isEnabled: true },
+      { url: 'v2.registry.dapplet-base.eth', isDev: false, isEnabled: true },
       {
         url: 'dev-1627024020035-70641704943070',
         isDev: false,
@@ -246,7 +250,7 @@ export default class GlobalConfigService {
     ]
     config.devMode = true
     config.trustedUsers = [
-      { account: 'team.dapplet-base.eth' },
+      { account: 'listing.dapplet-base.eth' },
       { account: 'buidl.testnet' },
       { account: 'nik3ter.testnet' },
       { account: 'dapplets.testnet' },
@@ -267,7 +271,7 @@ export default class GlobalConfigService {
     config.dynamicAdapter = 'dynamic-adapter.dapplet-base.eth#default@latest'
     config.preferedOverlayStorage = 'centralized'
     config.swarmPostageStampId = '59b7a1ef40a1b3143e9e80e7eb90175b83996fcf86f13480dbe0e21a732572e9'
-    config.ipfsGatewayUrl = 'https://ipfs.kaleido.art'
+    config.ipfsGatewayUrl = 'https://ipfs-gateway.mooo.com'
     config.siaPortalUrl = 'https://siasky.net'
     config.ethereumNetworks = [
       {
@@ -312,6 +316,7 @@ export default class GlobalConfigService {
       },
     ]
     config.myDapplets = []
+    config.connectedAccountsContractAddress = 'dev-1659683929908-36510272337320'
 
     return config
   }
@@ -784,5 +789,10 @@ export default class GlobalConfigService {
         'The server returns invalid response. Make sure the server complies with the Ethereum JSON RPC Specification.'
       )
     }
+  }
+
+  async getConnectedAccountsContractAddress() {
+    const config = await this.get()
+    return config.connectedAccountsContractAddress
   }
 }

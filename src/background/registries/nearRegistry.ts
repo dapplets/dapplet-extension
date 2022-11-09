@@ -2,9 +2,10 @@ import { ethers } from 'ethers'
 import * as nearAPI from 'near-api-js'
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
 import { typeOfUri, UriTypes } from '../../common/helpers'
+import { StorageRef } from '../../common/types'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
-import { Registry, StorageRef } from './registry'
+import { Registry } from './registry'
 
 type NearStorageRef = {
   hash: string // bytes32
@@ -49,7 +50,7 @@ const moduleTypesMap: { [key: number]: ModuleTypes } = {
 export class NearRegistry implements Registry {
   public isAvailable = true
   public error: string = null
-  public blockchain: string = 'near'
+  public blockchain = 'near'
 
   private _contract: any
   private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>()
@@ -294,12 +295,27 @@ export class NearRegistry implements Registry {
     })
   }
 
+  public async getContextIds(moduleName: string): Promise<string[]> {
+    throw new Error('Method not implemented.')
+  }
+
   public async addContextId(moduleName: string, contextId: string) {
     await this._contract.addContextId({ contextId, moduleName })
   }
 
   public async removeContextId(moduleName: string, contextId: string) {
     await this._contract.removeContextId({ contextId, moduleName })
+  }
+  public async getAdmins(moduleName: string): Promise<string[]> {
+    throw new Error('Method not implemented.')
+  }
+
+  public async addAdmin(moduleName: string, adressAdmin: string) {
+    return
+  }
+
+  public async removeAdmin(moduleName: string, adressAdmin: string) {
+    return
   }
 
   public async editModuleInfo(module: ModuleInfo): Promise<void> {

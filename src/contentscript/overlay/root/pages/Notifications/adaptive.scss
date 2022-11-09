@@ -1,0 +1,21 @@
+@media (max-width: 640px) and (min-width: 320px) {
+  .wrapper {
+    padding: 0;
+  }
+
+  .block {
+    height: calc(100% - 145px);
+  }
+
+  .notificationClose {
+    padding: 10px 0 0;
+  }
+
+  .notification {
+    flex: 1 1 auto;
+  }
+
+  .noNot {
+    height: 73vh;
+  }
+}

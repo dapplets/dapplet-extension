@@ -33,7 +33,7 @@ export const DappletInfo: FC<DappletInfoProps> = ({
 
   const isLink = appearance === 'link'
 
-  const [copied, copy, setCopied] = useCopied(`${value}`)
+  const [, copy, setCopied] = useCopied(`${value}`)
   const copyText = () => {
     copy()
 

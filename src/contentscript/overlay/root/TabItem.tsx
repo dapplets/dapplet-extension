@@ -15,7 +15,6 @@ export const TabItem: React.FunctionComponent<P> = (p) => {
     e.stopPropagation()
     p.onTabClick(p.overlay.id)
   }
-  console.log(p)
 
   return (
     <div

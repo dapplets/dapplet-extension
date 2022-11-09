@@ -1,6 +1,7 @@
 @import "../../assets/styles/null.scss";
 @import "../../assets/styles/fonts.scss";
 @import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/animate.scss";
 
 .modal {
   position: fixed;
@@ -29,12 +30,15 @@
   display: flex;
   overflow: hidden;
 
+  // padding: 170px 0 202px;
+  overflow: hidden;
+
   align-items: center;
   flex-direction: column;
+  justify-content: center;
 
-  width: 94%;
+  width: 90%;
   height: 80vh;
-  padding: 170px 0 202px;
 
   animation-name: animatetop;
   animation-name: slide-in;
@@ -96,24 +100,4 @@
 
   font-weight: 700;
   line-height: 26px;
-}
-
-@keyframes appear {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slide-in {
-  from {
-    transform: translateY(-150px);
-  }
-
-  to {
-    transform: translateY(0);
-  }
 }

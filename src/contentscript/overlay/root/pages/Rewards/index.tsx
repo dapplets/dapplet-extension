@@ -11,7 +11,7 @@ export interface RewardsProps {
   isTokenomics: boolean
   setActiveTabUnderConstructionDetails: any
 }
-let _isMounted = false
+
 
 enum UnderConstructionDetails {
   INFO = 0,

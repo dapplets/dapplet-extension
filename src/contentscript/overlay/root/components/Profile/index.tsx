@@ -3,8 +3,6 @@ import { HeaderLogIn } from './HeaderLogIn'
 import { LogInButton } from './LoginButtons'
 
 export interface ProfileProps {
-  avatar?: string
-  hash?: string
   handleWalletConnect: () => void
   isWalletLength: boolean
   handleWalletLengthConnect: () => void
@@ -19,11 +17,8 @@ export interface ProfileProps {
   setSelectedWallet: (x: string) => void
 }
 
-let _isMounted = false
 export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
   const {
-    avatar,
-    hash,
     handleWalletConnect,
     isWalletLength,
     isOverlay,
@@ -36,18 +31,14 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
     setSelectedWallet,
   } = props
 
-  const [isModalWalletConnectProfile, setModalWalletConnectProfile] = useState(false)
-
   const [newProfile, setNewProfile] = useState([])
   useEffect(() => {
     const init = async () => {
-      _isMounted = true
     }
 
     init()
 
     return () => {
-      _isMounted = false
     }
   }, [newProfile, isMini])
 
@@ -63,7 +54,6 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
             isMini={isMini}
             setOpen={setOpenWallet}
             isOpen={isOpenWallet}
-            setModalWalletConnect={setModalWalletConnectProfile}
             newProfile={newProfile}
             isOverlay={isOverlay}
             setOpenWalletMini={setOpenWalletMini}

@@ -22,35 +22,37 @@ export interface NotificationProps {
 
 export const Notification = (props: NotificationProps): ReactElement => {
   const { label, title, date, onClear, _id, description, href, onChange } = props
-  const refComponent = useRef<HTMLInputElement>()
-
   const [isDelete, onDelete] = useState(false)
-
   const [newDescription, setDescription] = useState(description)
-
+  const refComponent = useRef<HTMLInputElement>()
+  const newDateNum = new Date(date)
   const booleanNode = refComponent.current?.classList.contains('more')
+
   useEffect(() => {
     if (description.length > 235) {
-      if (refComponent && refComponent.current) {
-        refComponent.current?.classList.add(styles.more)
-
+      useStyleRef(
+        description,
+        refComponent,
         setDescription(refComponent.current?.innerText.slice(0, 235))
-      }
+      )
     } else {
-      if (refComponent && refComponent.current) {
-        refComponent.current?.classList.remove(styles.more)
-
-        setDescription(description)
-      }
+      useStyleRef(description, refComponent, setDescription(description))
     }
-  }, [refComponent, booleanNode])
+  }, [refComponent, booleanNode, description])
+
+  const useStyleRef = (stroke, ref, func) => {
+    if (ref && ref.current) {
+      stroke.length > 235
+        ? ref.current?.classList.add(styles.more)
+        : ref.current?.classList.remove(styles.more),
+        func
+    }
+  }
 
   const onClick = (id: string) => (): void => {
     onClear && onClear(id)
     onDelete(true)
   }
-
-  const newDateNum = new Date(date)
 
   return (
     <div

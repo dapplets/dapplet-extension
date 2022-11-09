@@ -37,10 +37,4 @@
   }
 }
 
-@media (min-width: 320px) and (max-width: 640px) {
-  .BlockTitleCard {
-    width: 100%;
-
-    min-width: 105px;
-  }
-}
+@import "./adaptive.scss"

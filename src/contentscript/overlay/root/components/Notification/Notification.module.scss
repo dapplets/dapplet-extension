@@ -57,20 +57,6 @@
   line-height: 16px;
 }
 
-.toggle {
-  display: inline-block;
-
-  width: 10px;
-  height: 5px;
-  margin: 0 0 0 7px;
-
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='5' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M5 5.5L10 0.5L0 0.5L5 5.5Z' fill='%23747376'/%3E%3C/svg%3E");
-}
-
-.isOnOpen {
-  transform: rotate(180deg);
-}
-
 .date {
   display: block;
 
@@ -87,8 +73,14 @@
 
 .description {
   display: inline-block;
+  overflow: hidden;
+
+  width: 90%;
 
   margin-top: 8px;
+
+  // 
+  text-overflow: ellipsis;
 
   color: $MainBlack;
 
@@ -115,12 +107,6 @@
   line-height: 100%;
 }
 
-@media (max-width: 640px) and (min-width: 320px) {
-  .wrapper {
-    max-width: 98%;
-  }
-}
-
 .delete {
   transition: all 0.7s cubic-bezier(0.36, -0.64, 0.34, 1.76);
   transform: rotateX(-90deg);
@@ -133,43 +119,4 @@
   align-items: flex-end;
 }
 
-.moreDescription {
-  display: block;
-
-  padding: 0 0 4px;
-
-  cursor: pointer;
-
-  color: $Secondary;
-
-  font-size: 20px;
-
-  &:hover {
-    color: $SecondaryHover;
-  }
-
-  &:active {
-    color: $SecondaryPressed;
-  }
-}
-
-.descriptionMore {
-  position: relative;
-
-  display: inline-block;
-  overflow: hidden;
-
-  height: 23px;
-
-  text-overflow: clip;
-}
-
-.moreInformation {
-  height: auto;
-
-  cursor: pointer;
-}
-
-.deleteEllipsis {
-  display: none;
-}
+@import "./adaptive.scss";

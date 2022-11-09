@@ -1,6 +1,6 @@
 import { ModuleTypes } from '../../common/constants'
 import Base from '../../common/models/base'
-import { StorageRef } from '../registries/registry'
+import { StorageRef } from '../../common/types'
 
 export default class ModuleInfo extends Base {
   getId = () => this.registryUrl + ':' + this.name
@@ -11,6 +11,8 @@ export default class ModuleInfo extends Base {
   title: string = null
   description: string = null
   author: string = null
+  image?: StorageRef = null
+  metadata?: StorageRef = null
   icon?: StorageRef = null
   interfaces: string[] = []
   contextIds: string[] = []

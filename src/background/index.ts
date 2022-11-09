@@ -13,6 +13,7 @@ import {
   waitTab,
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
+import ConnectedAccountService from './services/connectedAccountService'
 import DiscordService from './services/discordService'
 import EnsService from './services/ensService'
 import * as EventService from './services/eventService'
@@ -42,6 +43,7 @@ const sessionService = new SessionService(walletService, overlayService)
 const featureService = new FeatureService(globalConfigService, walletService, overlayService)
 const identityService = new IdentityService(globalConfigService, walletService)
 const ensService = new EnsService(walletService)
+const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
 
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
@@ -94,7 +96,8 @@ browser.runtime.onMessage.addListener(
     transactionRejected: NotificationService.transactionRejected,
 
     // FeatureService
-    getFeaturesByHostnames: (hostnames) => featureService.getFeaturesByHostnames(hostnames),
+    getFeaturesByHostnames: (hostnames, filter) =>
+      featureService.getFeaturesByHostnames(hostnames, filter),
     activateFeature: (name, version, hostnames, order, registry) =>
       featureService.activateFeature(name, version, hostnames, order, registry),
     deactivateFeature: (name, version, hostnames, order, registry) =>
@@ -118,10 +121,16 @@ browser.runtime.onMessage.addListener(
       featureService.getModuleInfoByName(registryUri, moduleName),
     transferOwnership: (registryUri, moduleName, oldAccount, newAccount) =>
       featureService.transferOwnership(registryUri, moduleName, oldAccount, newAccount),
+    getContextIds: featureService.getContextIds.bind(featureService),
     addContextId: (registryUri, moduleName, contextId) =>
       featureService.addContextId(registryUri, moduleName, contextId),
     removeContextId: (registryUri, moduleName, contextId) =>
       featureService.removeContextId(registryUri, moduleName, contextId),
+    getAdmins: featureService.getAdmins.bind(featureService),
+    addAdmin: (registryUri, moduleName, adressAdmin) =>
+      featureService.addAdmin(registryUri, moduleName, adressAdmin),
+    removeAdmin: (registryUri, moduleName, adressAdmin) =>
+      featureService.removeAdmin(registryUri, moduleName, adressAdmin),
     editModuleInfo: (registryUri, targetStorages, module) =>
       featureService.editModuleInfo(registryUri, targetStorages, module),
     getVersions: (registryUri, moduleName) => featureService.getVersions(registryUri, moduleName),
@@ -253,6 +262,27 @@ browser.runtime.onMessage.addListener(
     openDappletHome: overlayService.openDappletHome.bind(overlayService),
     openDappletAction: overlayService.openDappletAction.bind(overlayService),
     openPopupOverlay: overlayService.openPopupOverlay.bind(overlayService),
+    openConnectedAccountsPopup: overlayService.openConnectedAccountsPopup.bind(overlayService),
+
+    // Connected Account Service
+    getConnectedAccounts:
+      connectedAccountService.getConnectedAccounts.bind(connectedAccountService),
+    getConnectedAccountsMinStakeAmount:
+      connectedAccountService.getMinStakeAmount.bind(connectedAccountService),
+    getConnectedAccountsPendingRequests:
+      connectedAccountService.getPendingRequests.bind(connectedAccountService),
+    getConnectedAccountsVerificationRequest:
+      connectedAccountService.getVerificationRequest.bind(connectedAccountService),
+    getConnectedAccountStatus: connectedAccountService.getStatus.bind(connectedAccountService),
+    getConnectedAccountsMainAccount:
+      connectedAccountService.getMainAccount.bind(connectedAccountService),
+    getConnectedAccountsRequestStatus:
+      connectedAccountService.getRequestStatus.bind(connectedAccountService),
+    requestConnectingAccountsVerification:
+      connectedAccountService.requestVerification.bind(connectedAccountService),
+    changeConnectedAccountStatus:
+      connectedAccountService.changeStatus.bind(connectedAccountService),
+    getConnectedAccountsPairs: connectedAccountService.getPairs.bind(connectedAccountService),
 
     // Helpers
     waitTab: (url) => waitTab(url),
@@ -339,7 +369,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
     // Load adapters, providing stable context IDs.
     const idContexts = message.payload.contextIds.filter((x) => x.endsWith('/id'))
     if (idContexts.length > 0) {
-      featureService.getFeaturesByHostnames(idContexts).then((manifests) => {
+      featureService.getFeaturesByHostnames(idContexts, null).then((manifests) => {
         const adapters = manifests.filter((x) => x.type === ModuleTypes.Adapter)
         if (adapters.length === 0) return
 
