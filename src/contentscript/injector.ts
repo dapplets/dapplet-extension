@@ -399,6 +399,7 @@ export class Injector {
         login: (req, settings) => core.login(req, settings, manifest.name),
         state: core.state,
         connectedAccounts: core.connectedAccounts,
+        fetch: core.fetch,
       }
 
       let newBranch: string = null
