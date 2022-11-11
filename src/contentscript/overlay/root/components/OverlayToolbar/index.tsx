@@ -68,7 +68,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
   const noSystemTabs = p.tabs.filter((f) => f.title !== 'Dapplets')
   const [isShowTabs, onShowTabs] = useToggle(false)
- 
 
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
@@ -108,39 +107,39 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
           {/* {!p.module ? (
             <div className={styles.loaderAccount}></div>
           ) : ( */}
-            <OverlayTab
-              {...newTab}
-              isActive={activeTabId === NewTabs.id}
-              activeTabMenuId={activeTabMenuId}
-              classNameTab={styles.tabConnectedWrapper}
-              onCloseClick={() => p.onCloseClick(NewTabs)}
-              overlays={p.overlays}
-              modules={p.module}
-              onMenuClick={(menu) => {
-                if (
-                  document
-                    .querySelector('#dapplets-overlay-manager')
-                    .classList.contains('dapplets-overlay-collapsed')
-                ) {
-                  p.onMenuClick(NewTabs, menu)
+          <OverlayTab
+            {...newTab}
+            isActive={activeTabId === NewTabs.id}
+            activeTabMenuId={activeTabMenuId}
+            classNameTab={styles.tabConnectedWrapper}
+            onCloseClick={() => p.onCloseClick(NewTabs)}
+            overlays={p.overlays}
+            modules={p.module}
+            onMenuClick={(menu) => {
+              if (
+                document
+                  .querySelector('#dapplets-overlay-manager')
+                  .classList.contains('dapplets-overlay-collapsed')
+              ) {
+                p.onMenuClick(NewTabs, menu)
 
+                p.onToggleClick()
+              } else if (
+                !document
+                  .querySelector('#dapplets-overlay-manager')
+                  .classList.contains('dapplets-overlay-collapsed')
+              ) {
+                if (p.pathname === '/system/connectedAccounts') {
                   p.onToggleClick()
-                } else if (
-                  !document
-                    .querySelector('#dapplets-overlay-manager')
-                    .classList.contains('dapplets-overlay-collapsed')
-                ) {
-                  if (p.pathname === '/system/connectedAccounts') {
-                    p.onToggleClick()
-                  } else {
-                    p.onMenuClick(NewTabs, menu)
-                  }
+                } else {
+                  p.onMenuClick(NewTabs, menu)
                 }
-              }}
-              onTabClick={() => {
-                p.onTabClick(NewTabs)
-              }}
-            />
+              }
+            }}
+            onTabClick={() => {
+              p.onTabClick(NewTabs)
+            }}
+          />
           {/* )} */}
         </div>
       )
@@ -160,10 +159,8 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       )}
     >
       <div className={styles.inner}>
-   
-
         <div className={cn(styles.tabs, {})}>
-          <div className={styles.TabList}>
+          <div onClick={()=>p.setOpenWallet()} className={cn(styles.TabList, { [styles.isOpenWallet]: p.isOpenWallet })}>
             {getNewButtonTab('Connected Accounts')}
             <div
               className={cn(styles.toggleTabs, {
@@ -216,8 +213,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                   }
                 }}
                 className={cn(styles.toggleOverlay, {
-                  [styles.isOpenWallet]: p.isOpenWallet,
-                 
+                  // [styles.isOpenWallet]: p.isOpenWallet,
                 })}
               />
             </div>
@@ -231,7 +227,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             </div>
           </div>
         </div>
-       
       </div>
     </div>
   )

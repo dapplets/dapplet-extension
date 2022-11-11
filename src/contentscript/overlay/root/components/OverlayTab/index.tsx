@@ -101,7 +101,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       }}
       className={cn(styles.tab, p.classNameTab, {
         [styles.tabNotActive]: !p.isActive,
-        [styles.isOpenWallet]: p.isOpenWallet,
+        // [styles.isOpenWallet]: p.isOpenWallet,
       })}
     >
       <div className={styles.top}>
