@@ -11,7 +11,9 @@
 
   width: 100%;
   max-height: calc(100vh - 120px);
+  padding-bottom: 15px;
 }
+
 
 .wrapper::-webkit-scrollbar {
   width: 0;
@@ -151,6 +153,7 @@
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
+  border: 1px solid #e5e5e5;
 }
 
 .errorInput {

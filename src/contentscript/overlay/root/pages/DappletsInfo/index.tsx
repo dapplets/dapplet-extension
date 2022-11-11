@@ -38,7 +38,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [editContextIdLoading, setEditContextIdLoading] = useState(false)
   const [targetStorages, setTargetStorages] = useState([
     StorageTypes.Swarm,
-    StorageTypes.Sia,
+ 
     StorageTypes.Ipfs,
   ])
   const fileInput = useRef<HTMLInputElement>()
@@ -76,7 +76,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     init()
 
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [mi, newState, targetChain, editContextId, editAdmin, abortController.signal.aborted])
 

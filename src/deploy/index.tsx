@@ -91,7 +91,7 @@ class Index extends React.Component<IIndexProps, IIndexState> {
       loading: true,
       targetRegistry: null,
       targetChain: null,
-      targetStorages: [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs],
+      targetStorages: [StorageTypes.Swarm, StorageTypes.Ipfs],
       message: null,
       registryOptions: [],
       owner: null,
@@ -151,8 +151,8 @@ class Index extends React.Component<IIndexProps, IIndexState> {
           swarmGatewayUrl,
           targetStorages:
             Object.keys(vi?.overlays ?? {}).length > 0
-              ? [StorageTypes.Swarm, StorageTypes.Sia]
-              : [StorageTypes.Swarm, StorageTypes.Sia, StorageTypes.Ipfs],
+              ? [StorageTypes.Swarm]
+              : [StorageTypes.Swarm, StorageTypes.Ipfs],
           mode: FormMode.Deploying,
         })
         await this._updateData()
@@ -854,11 +854,11 @@ class Index extends React.Component<IIndexProps, IIndexState> {
             onChange={(_, d) => this.changeTargetStorage(StorageTypes.Swarm, d.checked)}
           />
 
-          <Form.Checkbox
+          {/* <Form.Checkbox
             label="SIA"
             checked={targetStorages.includes(StorageTypes.Sia)}
             onChange={(_, d) => this.changeTargetStorage(StorageTypes.Sia, d.checked)}
-          />
+          /> */}
 
           <Form.Checkbox
             label={

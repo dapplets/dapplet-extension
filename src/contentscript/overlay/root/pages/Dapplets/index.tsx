@@ -1,5 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
+import cn from 'classnames'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import { rcompare } from 'semver'
 import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
@@ -25,10 +26,25 @@ export interface DappletsProps {
   onUserSettingsClick: (mi: ManifestDTO) => void
   dropdownListValue: string
   setDropdownListValue: (value: string) => void
+  getTabsForDapplet?: any
+  handleCloseTabClick?: any
+  tabs?: any
+  setModule: any
+  classNameBlock?: string
 }
 
 export const Dapplets: FC<DappletsProps> = (props) => {
-  const { search, onUserSettingsClick, dropdownListValue, setDropdownListValue } = props
+  const {
+    search,
+    onUserSettingsClick,
+    dropdownListValue,
+    setDropdownListValue,
+    getTabsForDapplet,
+    handleCloseTabClick,
+    tabs,
+    setModule,
+    classNameBlock,
+  } = props
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
 
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
@@ -36,34 +52,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
   const [loadShowButton, setLoadShowButton] = useState(false)
 
-  const _isMounted = useRef(true)
   const abortController = useAbortController()
   useEffect(() => {
-    const init = async () => {
-      await _refreshData()
-      if (!abortController.signal.aborted) {
-        setLoadingListDapplets(false)
-      }
-      await loadTrustedUsers()
-    }
-
-    init()
-
-    if (dapplets.length === 0) {
-      setLoadingListDapplets(true)
-    } else {
-      setLoadingListDapplets(false)
-    }
-
-    return () => {
-      // _isMounted.current = false
-      abortController.abort()
-    }
-  }, [abortController.signal.aborted])
-
-  useEffect(() => {
-    // const controller = new AbortController();
-    // const signal = controller.signal;
     const init = async () => {
       if (!abortController.signal.aborted) {
         setLoadingListDapplets(true)
@@ -78,10 +68,12 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     init()
 
-    return () => {
-      // _isMounted.current = false
-      // abortController.abort()
+    if (dapplets.length === 0) {
+      setLoadingListDapplets(true)
+    } else {
+      setLoadingListDapplets(false)
     }
+    return () => {}
   }, [dropdownListValue, abortController.signal.aborted])
 
   const _refreshData = async () => {
@@ -107,9 +99,13 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           error: null,
           versions: [],
         }))
+      setModule(newDappletsList)
       if (!abortController.signal.aborted) {
         setDapplets(newDappletsList)
       }
+      newDappletsList.map((x) => {
+        if (x.isActive) getTabsForDapplet(x)
+      })
     } catch (err) {
       console.error(err)
       setNoContentScript(true)
@@ -132,6 +128,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       _updateFeatureState(f.name, { isActionLoading: true })
       const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
       const tab = await getCurrentTab()
+
       if (!tab) return
       await openDappletAction(f.name, tab.id)
     } catch (err) {
@@ -206,8 +203,16 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     try {
       if (isActive) {
         await activateFeature(name, version, targetContextIds, order, sourceRegistry.url)
+        getTabsForDapplet(module)
       } else {
         await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url)
+        const noSystemTabs = tabs.filter((f) => f.title !== 'Dapplets')
+        noSystemTabs.length > 0 &&
+          noSystemTabs
+            .filter((f) => f.id === name)
+            .map((tab) => {
+              handleCloseTabClick(tab)
+            })
       }
 
       await _refreshData()
@@ -215,8 +220,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     } catch (err) {
       _updateFeatureState(name, { isActive: !isActive, error: err.message })
     }
-
-    // _updateFeatureState(name, { isLoading: false })
   }
 
   const onRemoveMyDapplet = async (f: ManifestAndDetails) => {
@@ -257,7 +260,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       <div className={styles.wrapper}>
         <Dropdown
           list={DROPDOWN_LIST}
-          title="filter:"
+          title="Filter:"
           value={dropdownListValue}
           onChange={setDropdownListValue}
         />
@@ -265,7 +268,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       {isLoadingListDapplets ? (
         <TabLoader />
       ) : (
-        <div className={styles.dappletsBlock}>
+        <div className={cn(styles.dappletsBlock, classNameBlock)}>
           {!isNoContentScript ? (
             filteredDapplets && filteredDapplets.length && filteredDapplets.length > 0 ? (
               filteredDapplets.map((dapplet, i) => {
@@ -290,6 +293,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                       onDeployDapplet={onDeployDapplet}
                       onOpenStore={onOpenStore}
                       onOpenStoreAuthor={onOpenStoreAuthor}
+                      getTabsForDapplet={getTabsForDapplet}
                     />
                   )
               })

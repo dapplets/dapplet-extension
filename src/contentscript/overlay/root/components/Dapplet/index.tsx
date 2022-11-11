@@ -32,6 +32,7 @@ export interface DappletProps
   onOpenStore: (x: any) => void
   loadShowButton: boolean
   onOpenStoreAuthor: Function
+  getTabsForDapplet?: any
 }
 
 export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
@@ -47,6 +48,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     loadShowButton,
     onOpenStoreAuthor,
     index,
+    getTabsForDapplet,
     ...anotherProps
   } = props
 
@@ -59,13 +61,13 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
-      if (!abortController.signal.aborted) {
-        await updateData()
-      }
+      // if (!abortController.signal.aborted) {
+      await updateData()
+      // }
     }
     init()
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [loadHome, abortController.signal.aborted])
   const loadingHome = () => {
@@ -87,6 +89,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     if (!abortController.signal.aborted) {
       setOwner(newOwner)
     }
+    // if (isActive) getTabsForDapplet(dapplet)
   }
 
   return (

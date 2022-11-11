@@ -1,4 +1,4 @@
-@import "../../assets/styles/color.variables.scss";
+@import '../../assets/styles/color.variables.scss';
 
 .button {
   display: flex;
@@ -18,45 +18,22 @@
 .smail {
   padding: 2px;
 
-  transition: all 1s;
+  transition: all 0.5s;
 
   border-radius: 5px;
   background: $WebBG;
 
   &:hover {
-    width: 22px;
+    // width: 22px;
 
-    height: 22px;
+    // height: 22px;
 
-    transition: all 1s;
+    transition: all 0.5s;
 
-    svg {
-      path {
-        fill: #f53a5c;
-      }
-    }
-  }
-
-  &:active {
-    svg {
-      path {
-        fill: #a6253c;
-      }
-    }
-  }
-}
-
-.big {
-  min-width: 35px;
-  min-height: 35px;
-
-  border-radius: 10px;
-  background: $PureWhite;
-
-  &:hover {
     svg {
       path {
         fill: $PrimaryHover;
+        stroke: $PrimaryHover;
       }
     }
   }
@@ -65,6 +42,38 @@
     svg {
       path {
         fill: $PrimaryPressed;
+        stroke: $PrimaryPressed;
+      }
+    }
+  }
+}
+
+.big {
+  // min-width: 35px;
+  // min-height: 35px;
+
+  // border-radius: 10px;
+  background: $PureWhite;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 4px;
+  box-shadow: inset 0px 1px 2px rgb(225 225 225 / 20%), inset 0px -1px 2px rgb(225 225 225 / 20%),
+    inset 0px -1px 2px rgb(255 255 255 / 90%), inset 0px 1px 3px rgb(225 225 225 / 90%);
+
+  &:hover {
+    svg {
+      path {
+        fill: $PrimaryHover;
+        stroke: $PrimaryHover;
+      }
+    }
+  }
+
+  &:active {
+    svg {
+      path {
+        fill: $PrimaryPressed;
+        stroke: $PrimaryPressed;
       }
     }
   }

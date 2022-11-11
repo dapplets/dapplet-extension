@@ -77,7 +77,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
 
   const [targetStorages, setTargetStorages] = useState([
     StorageTypes.Swarm,
-    StorageTypes.Sia,
+    // StorageTypes.Sia,
     StorageTypes.Ipfs,
   ])
 
@@ -114,7 +114,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       setAuthorDisabled(false)
     }
     return () => {
-      abortController.abort()
+      // abortController.abort()
     }
   }, [mi, st, targetChain, autorDisabled, author, editContextId, abortController.signal.aborted])
   const addButtonClickHandler = () => {
