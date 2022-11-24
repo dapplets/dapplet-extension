@@ -298,7 +298,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                   )
               })
             ) : (
-              <div>No available features for current site.</div>
+              <div>No available dapplets for current site.</div>
             )
           ) : (
             <div>No connection with context webpage.</div>
