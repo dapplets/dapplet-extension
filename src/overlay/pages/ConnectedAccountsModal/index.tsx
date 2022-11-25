@@ -3,6 +3,7 @@ import cn from 'classnames'
 import React, { useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { IConnectedAccountUser } from '../../../common/types'
+import GITHUB_ICON from '../../assests/github.svg'
 import NEAR_ICON from '../../assests/near-black.svg'
 import TWITTER_ICON from '../../assests/twitter-icon.svg'
 import styles from './ConnectedAccountsModal.module.scss'
@@ -15,7 +16,16 @@ const UserButton = ({ user }: { user: IConnectedAccountUser }) => {
         [styles.nameUserActive]: user.accountActive,
       })}
     >
-      <img src={user.origin === 'twitter' ? TWITTER_ICON : NEAR_ICON} className={styles.imgUser} />
+      <img
+        src={
+          user.origin === 'twitter'
+            ? TWITTER_ICON
+            : user.origin === 'github'
+            ? GITHUB_ICON
+            : NEAR_ICON
+        }
+        className={styles.imgUser}
+      />
       <h4 className={styles.nameUser}>{user.name}</h4>
     </div>
   )
@@ -43,10 +53,14 @@ const ConnectedAccountsModal = (props: any) => {
       firstProofUrl:
         firstAccount.origin === 'twitter' // ToDo !!! Only for I stage of CA
           ? 'https://twitter.com/' + firstAccount.name
+          : firstAccount.origin === 'github' // ToDo !!! Only for I stage of CA
+          ? 'https://github.com/' + firstAccount.name
           : null,
       secondProofUrl:
         secondAccount.origin === 'twitter' // ToDo !!! Only for I stage of CA
           ? 'https://twitter.com/' + secondAccount.name
+          : secondAccount.origin === 'github' // ToDo !!! Only for I stage of CA
+          ? 'https://github.com/' + secondAccount.name
           : null,
       isUnlink,
     }
@@ -86,6 +100,24 @@ const ConnectedAccountsModal = (props: any) => {
     bus.publish('ready', [frameId, 'ok'])
     onCloseClick()
   }
+
+  const fn = ([firstAccount, secondAccount]: IConnectedAccountUser[]) => {
+    return firstAccount.origin === 'twitter' // ToDo !!! Only for I stage of CA
+      ? 'Twitter'
+      : firstAccount.origin === 'github' // ToDo !!! Only for I stage of CA
+      ? 'GitHub'
+      : secondAccount.origin === 'twitter' // ToDo !!! Only for I stage of CA
+      ? 'Twitter'
+      : secondAccount.origin === 'github' // ToDo !!! Only for I stage of CA
+      ? 'GitHub'
+      : null
+  }
+
+  const socialNetworkToConnect = accountsToConnect
+    ? fn(accountsToConnect)
+    : accountsToDisconnect
+    ? fn(accountsToDisconnect)
+    : null
 
   return (
     <>
@@ -148,9 +180,7 @@ const ConnectedAccountsModal = (props: any) => {
         <Modal
           isWaiting={isWaiting}
           title={'Add your NEAR account ID'}
-          content={
-            'Add your NEAR account ID to your Twitter username. This is done so the Orace can confirm your ownership of the Twitter account'
-          }
+          content={`Add your NEAR account ID to your ${socialNetworkToConnect} username. This is done so the Orace can confirm your ownership of the ${socialNetworkToConnect} account`}
           onClose={onCloseClick}
           onConfirm={async () => {
             const frameId = data.frameId

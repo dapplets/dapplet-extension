@@ -80,30 +80,32 @@ class ConnectedAccounts {
     }
   ): Promise<number> {
     let canConnect: boolean
-    switch (condition.type) {
-      case 'twitter/near-testnet':
-        if (firstOriginId === 'near/testnet' && secondOriginId === 'twitter') {
-          canConnect = connectionCondition({
-            tw_id: secondAccountId,
-            url: secondProofUrl,
-            near_id: firstAccountId,
-            user: condition['user'],
-          })
-        } else if (secondOriginId === 'near/testnet' && firstOriginId === 'twitter') {
-          canConnect = connectionCondition({
-            tw_id: firstAccountId,
-            url: firstProofUrl,
-            near_id: secondAccountId,
-            user: condition['user'],
-          })
-        } else {
-          throw new Error(
-            `Incorrect origins for twitter/near-testnet type connection condition: ${firstOriginId} or ${secondOriginId}.`
-          )
-        }
-        break
-      default:
-        throw new Error(`No such a condition type: ${condition.type}`)
+    if (condition.type === 'twitter/near-testnet' || condition.type === 'github/near-testnet') {
+      if (
+        firstOriginId === 'near/testnet' &&
+        (secondOriginId === 'twitter' || secondOriginId === 'github')
+      ) {
+        canConnect = connectionCondition({
+          socNet_id: secondAccountId,
+          url: secondProofUrl,
+          near_id: firstAccountId,
+          user: condition['user'],
+        })
+      } else if (
+        secondOriginId === 'near/testnet' &&
+        (firstOriginId === 'twitter' || firstOriginId === 'github')
+      ) {
+        canConnect = connectionCondition({
+          socNet_id: firstAccountId,
+          url: firstProofUrl,
+          near_id: secondAccountId,
+          user: condition['user'],
+        })
+      } else {
+        throw new Error(
+          `Incorrect origins for ${condition.type} type connection condition: ${firstOriginId} or ${secondOriginId}.`
+        )
+      }
     }
 
     if (!canConnect) {

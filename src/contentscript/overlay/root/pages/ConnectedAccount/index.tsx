@@ -8,6 +8,7 @@ import {
   IConnectedAccountsPair,
   IConnectedAccountUser,
 } from '../../../../../common/types'
+import GITHUB_ICON from '../../../../../overlay/assests/github.svg'
 import NEAR_ICON from '../../../../../overlay/assests/near-black.svg'
 import TWITTER_ICON from '../../../../../overlay/assests/twitter-icon.svg'
 import { Message } from '../../components/Message'
@@ -33,7 +34,16 @@ const UserButton = ({
       })}
       onClick={() => handleOpenPopup(user)}
     >
-      <img src={user.origin === 'twitter' ? TWITTER_ICON : NEAR_ICON} className={styles.imgUser} />
+      <img
+        src={
+          user.origin === 'twitter'
+            ? TWITTER_ICON
+            : user.origin === 'github'
+            ? GITHUB_ICON
+            : NEAR_ICON
+        }
+        className={styles.imgUser}
+      />
       <h4 className={styles.nameUser}>{user.name}</h4>
     </div>
   )
