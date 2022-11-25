@@ -1,5 +1,5 @@
-@import "../../assets/styles/color.variables.scss";
-@import "../../overlayManager.css";
+@import '../../assets/styles/color.variables.scss';
+@import '../../overlayManager.css';
 
 .overlay {
   z-index: 9999;
@@ -11,8 +11,9 @@
   height: 100vh;
 
   transition: transform 0.3s ease;
-  filter: drop-shadow(-4px 0 4px rgb(0 0 0 / 25%));
-  -ms-overflow-style: none;
+  // filter: drop-shadow(-4px 0 4px rgb(0 0 0 / 25%));
+  // -ms-overflow-style: none;
+  box-shadow: 0px 4px 5px rgb(45 52 60 / 10%), 0px 4px 20px rgb(11 87 111 / 15%);
 }
 
 .overlay::-webkit-scrollbar {
@@ -39,7 +40,8 @@
   overflow: auto;
   overflow: -moz-scrollbars-none;
 
-  padding: 10px 15px 5px;
+  // padding: 10px 15px 5px;
+  padding: 0px 0px 5px;
 
   background: $OverlayBG;
   -ms-overflow-style: none;
@@ -59,6 +61,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 8px 15px;
 }
 
 .left {
@@ -70,15 +73,23 @@
   display: flex;
   align-items: center;
 
+  & > div {
+    margin-right: 4px;
+  }
+  & > button {
+    margin-right: 4px;
+  }
+
   & > *:first-child {
-    margin-right: 3px;
+    // margin-right: 3px;
   }
 
   & > *:nth-child(2) {
-    margin-right: 3px;
+    // margin-right: 3px;
   }
 
   & > *:last-child {
+    margin-right: 0;
     &:hover {
       svg {
         path {
@@ -133,7 +144,17 @@
 
   width: 100%;
   height: 100%;
-  padding: 0 0 0 1px;
+  // padding: 0 0 0 1px;
+  background: #fff;
+  padding: 10px 15px 0 16px;
+}
+
+.newChildren{
+  padding: 0px 0px 0 0px;
+}
+
+.newHeight{
+  height: calc(100vh - 139px)!important;
 }
 
 .noSystemDapplets {
@@ -179,12 +200,38 @@
 }
 
 .searchBlock {
-  position: absolute;
+  // position: absolute;
   z-index: 1;
-  top: 12px;
-  right: 15px;
-
-  width: 84%;
+  /* top: 12px; */
+  /* right: 15px; */
+  width: 100%;
+  padding: 0 15px 7px 15px;
+  transition: all 0.5s;
 }
 
-@import "./adaptive.scss"
+.overlayTabWrapper {
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  border-radius: 4px !important;
+  display: flex;
+  justify-content: center;
+  box-shadow: inset 0px 1px 2px rgb(225 225 225 / 20%), inset 0px -1px 2px rgb(225 225 225 / 20%),
+    inset 0px -1px 2px rgb(255 255 255 / 90%), inset 0px 1px 3px rgb(225 225 225 / 90%);
+}
+
+.overlayTabWrapperAccounts {
+  width: 20px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  border-radius: 4px !important;
+  display: flex;
+  justify-content: center;
+  box-shadow: inset 0px 1px 2px rgb(225 225 225 / 20%), inset 0px -1px 2px rgb(225 225 225 / 20%),
+    inset 0px -1px 2px rgb(255 255 255 / 90%), inset 0px 1px 3px rgb(225 225 225 / 90%);
+}
+.overlayTabList {
+  // background: #000;
+}
+
+@import './adaptive.scss';

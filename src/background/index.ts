@@ -337,6 +337,45 @@ browser.commands.onCommand.addListener((cmd) => {
   }
 })
 
+async function fetchPlain({
+  url,
+  objectUrl,
+  options,
+}: {
+  url: string
+  objectUrl?: string
+  options: RequestInit
+}) {
+  let requestBlob: Blob = undefined
+  if (objectUrl) {
+    requestBlob = await fetch(objectUrl).then((x) => x.blob())
+    URL.revokeObjectURL(objectUrl)
+  }
+
+  const request = new Request(url, { ...options, body: requestBlob })
+
+  const response = await fetch(request)
+  const responseBlob = await response.blob()
+  const responseObjectUrl = URL.createObjectURL(responseBlob)
+
+  return {
+    status: response.status,
+    statusText: response.statusText,
+    headers: Object.fromEntries(response.headers.entries()),
+    objectUrl: responseObjectUrl,
+  }
+}
+
+// Proxify fetch-requests to deal with CORS
+// It's used by Core.fetch()
+browser.runtime.onMessage.addListener((message) => {
+  if (!message || !message.type) return
+
+  if (message.type === 'FETCH_REQUEST') {
+    return fetchPlain(message.payload)
+  }
+})
+
 browser.runtime.onMessage.addListener((message, sender) => {
   if (!message || !message.type) return
 
