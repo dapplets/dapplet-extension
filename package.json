@@ -6,7 +6,7 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "build:extension": "webpack --config webpack.prod.js",
-    "build:jslib": "webpack --config webpack.jslib.js && tsc ./src/index.ts -d --emitDeclarationOnly --outDir ./lib",
+    "build:jslib": "webpack --config webpack.jslib.js && tsc -d --emitDeclarationOnly",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=6144 npm run build:extension && npm run build:jslib",
     "dev": "webpack --config webpack.dev.js",
     "start": "cross-env NODE_OPTIONS=--max-old-space-size=6144 webpack -w --config webpack.dev.js",
