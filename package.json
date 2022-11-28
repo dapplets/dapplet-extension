@@ -6,7 +6,7 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "build:extension": "webpack --config webpack.prod.js",
-    "build:jslib": "webpack --config webpack.jslib.js && tsc -d --emitDeclarationOnly",
+    "build:jslib": "webpack --config webpack.jslib.js && tsc ./src/index.ts -d --emitDeclarationOnly --outDir ./lib",
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=6144 npm run build:extension && npm run build:jslib",
     "dev": "webpack --config webpack.dev.js",
     "start": "cross-env NODE_OPTIONS=--max-old-space-size=6144 webpack -w --config webpack.dev.js",
@@ -15,7 +15,9 @@
     "lint": "npm run prettify && npm run stylelint && npm run eslint",
     "prettify": "prettier --write src",
     "eslint": "eslint ./src --ext .ts --fix",
-    "stylelint": "stylelint ./src/**/*.{css,scss,module.scss} --fix"
+    "stylelint": "stylelint ./src/**/*.{css,scss,module.scss} --fix",
+    "cypress:open": "cypress open",
+    "test:e2e": "cypress run --headed --browser chrome"
   },
   "devDependencies": {
     "@fontsource/montserrat": "^4.5.5",
@@ -43,6 +45,7 @@
     "copy-webpack-plugin": "^10.2.4",
     "cross-env": "^7.0.3",
     "css-loader": "^6.6.0",
+    "cypress": "^11.2.0",
     "detect-browser": "^5.3.0",
     "eslint": "^8.16.0",
     "eslint-config-prettier": "^8.5.0",

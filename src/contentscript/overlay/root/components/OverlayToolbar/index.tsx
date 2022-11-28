@@ -52,6 +52,7 @@ type TToggleOverlay = {
 const ToggleOverlay = ({ onClick, className, getNode }: TToggleOverlay): ReactElement => {
   return (
     <button
+      data-testid="toggle-overlay-button"
       className={cn(styles.toggleOverlay, className)}
       onClick={() => {
         onClick()
@@ -92,7 +93,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     //     p.navigate!('/system/dapplets')
     //   }
     // if (!p.module) return
-    let clone = Object.assign({}, SYSTEM_TAB)
+    const clone = Object.assign({}, SYSTEM_TAB)
     const newSystemTab = [clone]
     const newSet = newSystemTab.map((tab) => {
       const NewTabs = tab
@@ -160,7 +161,10 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     >
       <div className={styles.inner}>
         <div className={cn(styles.tabs, {})}>
-          <div onClick={()=>p.setOpenWallet()} className={cn(styles.TabList, { [styles.isOpenWallet]: p.isOpenWallet })}>
+          <div
+            onClick={() => p.setOpenWallet()}
+            className={cn(styles.TabList, { [styles.isOpenWallet]: p.isOpenWallet })}
+          >
             {getNewButtonTab('Connected Accounts')}
             <div
               className={cn(styles.toggleTabs, {
@@ -220,6 +224,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             <div>
               <button
                 onClick={() => onShowTabs()}
+                data-testid="show-tabs-button"
                 className={cn(styles.miniButton, {
                   [styles.hideTabsBtn]: isShowTabs,
                 })}

@@ -560,3 +560,14 @@ export function blobToDataURL(blob: Blob): Promise<string> {
     reader.readAsDataURL(blob)
   })
 }
+
+export function isE2ETestingEnvironment(win: Window): boolean {
+  // ToDo: find another way to determine Cypress
+  const href = win.location.href
+
+  if (href.indexOf('cypress') !== -1) return true
+  if (href.indexOf('specs') !== -1) return true
+  if (href.indexOf('localhost:55618') !== -1) return true
+
+  return false
+}
