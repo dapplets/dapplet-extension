@@ -270,7 +270,7 @@ export default class GlobalConfigService {
     config.hostnames = {}
     config.dynamicAdapter = 'dynamic-adapter.dapplet-base.eth#default@latest'
     config.preferedOverlayStorage = 'centralized'
-    config.swarmPostageStampId = '59b7a1ef40a1b3143e9e80e7eb90175b83996fcf86f13480dbe0e21a732572e9'
+    config.swarmPostageStampId = '1149efd4cce752c75e815e9b9dbe322afd0c8dce7f86d78e26182b9923403965'
     config.ipfsGatewayUrl = 'https://ipfs-gateway.mooo.com'
     config.siaPortalUrl = 'https://siasky.net'
     config.ethereumNetworks = [
