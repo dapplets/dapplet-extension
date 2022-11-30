@@ -1,11 +1,11 @@
-export interface IConditionProps {
+interface ISocialNetworkConnectionCondition {
   socNet_id: string
   near_id: string
   url: string
-  user: string
+  fullname: string
 }
 
-export const connectionCondition = (props: IConditionProps) => {
-  const { socNet_id, near_id, url, user } = props
-  return url.includes(socNet_id) && user.includes(near_id)
+export const socialNetworkConnectionCondition = (props: ISocialNetworkConnectionCondition) => {
+  const { socNet_id, near_id, url, fullname } = props
+  return url.includes(socNet_id) && fullname.includes(near_id)
 }
