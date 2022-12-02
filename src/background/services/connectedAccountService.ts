@@ -114,8 +114,8 @@ export default class ConnectedAccountService {
     if (!connectedDescriptors || connectedDescriptors.length === 0) return
 
     let newPairs: IConnectedAccountsPair[] = []
-    let processingAccountIdsPairs: [string, string][] = []
-    let newPendingIds: number[] = []
+    const processingAccountIdsPairs: [string, string][] = []
+    const newPendingIds: number[] = []
 
     for (const d of connectedDescriptors) {
       const connectedAccStatus: boolean = await this.getStatus(d.account, d.chain)

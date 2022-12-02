@@ -1,7 +1,8 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import makeBlockie from 'ethereum-blockies-base64'
 import { browser } from 'webextension-polyfill-ts'
-import { connectionCondition } from './connected-accounts-assembly'
+import { resources } from '../../common/resources'
+import { socialNetworkConnectionCondition } from './connected-accounts-assembly'
 import { Account, VerificationRequest } from './types'
 
 interface IRequestVerificationProps {
@@ -79,32 +80,24 @@ class ConnectedAccounts {
       [name: string]: string
     }
   ): Promise<number> {
-    let canConnect: boolean
-    switch (condition.type) {
-      case 'twitter/near-testnet':
-        if (firstOriginId === 'near/testnet' && secondOriginId === 'twitter') {
-          canConnect = connectionCondition({
-            tw_id: secondAccountId,
-            url: secondProofUrl,
-            near_id: firstAccountId,
-            user: condition['user'],
-          })
-        } else if (secondOriginId === 'near/testnet' && firstOriginId === 'twitter') {
-          canConnect = connectionCondition({
-            tw_id: firstAccountId,
+    if (!resources[firstOriginId] || !resources[secondOriginId]) {
+      throw new Error(`Unsupported account type: ${firstOriginId} or ${secondOriginId}`)
+    }
+    const canConnect = socialNetworkConnectionCondition(
+      resources[firstOriginId].type === 'social'
+        ? {
+            socNet_id: firstAccountId,
             url: firstProofUrl,
             near_id: secondAccountId,
-            user: condition['user'],
-          })
-        } else {
-          throw new Error(
-            `Incorrect origins for twitter/near-testnet type connection condition: ${firstOriginId} or ${secondOriginId}.`
-          )
-        }
-        break
-      default:
-        throw new Error(`No such a condition type: ${condition.type}`)
-    }
+            fullname: condition['user'],
+          }
+        : {
+            socNet_id: secondAccountId,
+            url: secondProofUrl,
+            near_id: firstAccountId,
+            fullname: condition['user'],
+          }
+    )
 
     if (!canConnect) {
       const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)

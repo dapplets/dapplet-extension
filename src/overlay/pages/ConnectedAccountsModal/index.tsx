@@ -2,9 +2,8 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import { resources } from '../../../common/resources'
 import { IConnectedAccountUser } from '../../../common/types'
-import NEAR_ICON from '../../assests/near-black.svg'
-import TWITTER_ICON from '../../assests/twitter-icon.svg'
 import styles from './ConnectedAccountsModal.module.scss'
 import { Modal } from './modal'
 
@@ -15,7 +14,7 @@ const UserButton = ({ user }: { user: IConnectedAccountUser }) => {
         [styles.nameUserActive]: user.accountActive,
       })}
     >
-      <img src={user.origin === 'twitter' ? TWITTER_ICON : NEAR_ICON} className={styles.imgUser} />
+      <img src={resources[user.origin].icon} className={styles.imgUser} />
       <h4 className={styles.nameUser}>{user.name}</h4>
     </div>
   )
@@ -35,19 +34,15 @@ const ConnectedAccountsModal = (props: any) => {
     const { getConnectedAccountsMinStakeAmount, requestConnectingAccountsVerification } =
       await initBGFunctions(browser)
     const minStakeAmount: number = await getConnectedAccountsMinStakeAmount()
+    const firstProofUrl = resources[firstAccount.origin].proofUrl(firstAccount.name)
+    const secondProofUrl = resources[secondAccount.origin].proofUrl(secondAccount.name)
     const requestBody = {
       firstAccountId: firstAccount.name,
       firstOriginId: firstAccount.origin,
       secondAccountId: secondAccount.name,
       secondOriginId: secondAccount.origin,
-      firstProofUrl:
-        firstAccount.origin === 'twitter' // ToDo !!! Only for I stage of CA
-          ? 'https://twitter.com/' + firstAccount.name
-          : null,
-      secondProofUrl:
-        secondAccount.origin === 'twitter' // ToDo !!! Only for I stage of CA
-          ? 'https://twitter.com/' + secondAccount.name
-          : null,
+      firstProofUrl,
+      secondProofUrl,
       isUnlink,
     }
 
@@ -86,6 +81,15 @@ const ConnectedAccountsModal = (props: any) => {
     bus.publish('ready', [frameId, 'ok'])
     onCloseClick()
   }
+
+  const getTitle = ([firstAccount, secondAccount]: IConnectedAccountUser[]) =>
+    resources[firstAccount.origin].type === 'social'
+      ? resources[firstAccount.origin].title
+      : resources[secondAccount.origin].title
+
+  const socialNetworkToConnect =
+    (accountsToConnect || accountsToDisconnect) &&
+    getTitle(accountsToConnect || accountsToDisconnect)
 
   return (
     <>
@@ -148,9 +152,7 @@ const ConnectedAccountsModal = (props: any) => {
         <Modal
           isWaiting={isWaiting}
           title={'Add your NEAR account ID'}
-          content={
-            'Add your NEAR account ID to your Twitter username. This is done so the Orace can confirm your ownership of the Twitter account'
-          }
+          content={`Add your NEAR account ID to your ${socialNetworkToConnect} username. This is done so the Orace can confirm your ownership of the ${socialNetworkToConnect} account`}
           onClose={onCloseClick}
           onConfirm={async () => {
             const frameId = data.frameId
