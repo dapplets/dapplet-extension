@@ -16,7 +16,8 @@ import { DefaultConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
 import { __decorate } from './global'
-import { IContentAdapter, IResolver } from './types'
+import OverlayAdapter from './overlay/adapter-overlay/src'
+import { IContentAdapter, IResolver, IOverlayAdapter } from './types'
 
 type RegistriedModule = {
   manifest: VersionInfo
@@ -35,10 +36,10 @@ type RegistriedModule = {
   onHomeHandler?: Function
   onShareLinkHandler?: Function
 }
+export const widgets = []
 
 const DAPPLETS_ORIGINAL_HREF: string = window['DAPPLETS_ORIGINAL_HREF']
 const IS_LIBRARY = window['DAPPLETS_JSLIB'] === true
-
 export class Injector {
   public availableContextIds: string[] = []
   public registry: RegistriedModule[] = []
@@ -109,7 +110,6 @@ export class Injector {
         contextIds: m?.contextIds || [window.location.hostname],
       }
     })
-
     await this._processModules(orderedModules)
 
     // module initialization
@@ -117,17 +117,16 @@ export class Injector {
       const m = this.registry[i]
       if (m.instance) continue
 
-      m.instancedConstructorDeps = m.constructorDependencies.map((d) =>
-        this._proxifyModule(this._getDependency(m.manifest, d), m)
-      )
-      m.instancedActivateMethodsDependencies = m.activateMethodsDependencies.map((d) =>
-        this._proxifyModule(this._getDependency(m.manifest, d), m)
-      )
+      m.instancedConstructorDeps = m.constructorDependencies.map((d) => {
+        return this._proxifyModule(this._getDependency(m.manifest, d, m), m)
+      })
+      m.instancedActivateMethodsDependencies = m.activateMethodsDependencies.map((d) => {
+        return this._proxifyModule(this._getDependency(m.manifest, d, m), m)
+      })
 
       try {
         // ToDo: compare "m.instancedDeps.length" and "m.clazz.constructor.length"
         m.instance = new m.clazz(...m.instancedConstructorDeps)
-
         if (m.instance.activate !== undefined) {
           if (typeof m.instance.activate === 'function') {
             // ToDo: activate modules in parallel
@@ -149,7 +148,6 @@ export class Injector {
             }
           }
         }
-
         console.log(
           `[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`
         )
@@ -405,6 +403,7 @@ export class Injector {
       let newBranch: string = null
 
       // ToDo: describe it
+
       const injectableDecorator = (constructor) => {
         if (constructor.prototype.getBranch) {
           const resolver: IResolver = new constructor()
@@ -428,6 +427,7 @@ export class Injector {
       }
 
       // ToDo: describe it
+      // adapter
       const injectDecorator = (name: string) => {
         if (!name)
           throw new Error(
@@ -441,12 +441,44 @@ export class Injector {
         ) => {
           // ToDo: check module_name with manifest
           // ToDo: add module source to error description
-
           // ContructorDecorator: class, undefined, parameterIndex
           // PropertyDecorator: class(obj), property_name, undefined
           // ParameterDecorator: class(obj), method_name, parameterIndex
-
           // Constructor Parameter Decorator
+          if (name === 'overlay-adapter.dapplet-base.eth') {
+            this.registry.push({
+              manifest: {
+                branch: 'default',
+                createdAt: '1970-01-20T05:35:11.280Z',
+                defaultConfig: null,
+                dependencies: {},
+                dist: { hash: '', uris: [] },
+                environment: null,
+                extensionVersion: '0.0.0-pre.0',
+                interfaces: {},
+                main: null,
+                name: 'overlay-adapter.dapplet-base.eth',
+                overlays: null,
+                registryUrl: 'v2.registry.dapplet-base.eth',
+                schemaConfig: null,
+                type: ModuleTypes.Adapter,
+                version: '0.1.0',
+                getId: null,
+              },
+              instance: OverlayAdapter,
+              clazz: OverlayAdapter,
+
+              order: order,
+              contextIds: contextIds,
+              constructorDependencies: [],
+              instancedPropertyDependencies: {},
+              instancedConstructorDeps: [],
+              activateMethodsDependencies: [],
+              instancedActivateMethodsDependencies: [],
+              defaultConfig: null,
+              // schemaConfig: schemaConfig,
+            })
+          }
           if (propertyOrMethodName === undefined) {
             if (!this.registry.find((m) => areModulesEqual(m.manifest, manifest))) {
               this.registry.push({
@@ -464,28 +496,53 @@ export class Injector {
                 schemaConfig: schemaConfig,
               })
             }
-
             const currentModule = this.registry.find((m) => areModulesEqual(m.manifest, manifest))
             currentModule.constructorDependencies[parameterIndex] = name
           }
           // Class Property Decorator
           else if (parameterIndex === undefined) {
-            if (delete target[propertyOrMethodName]) {
-              Object.defineProperty(target, propertyOrMethodName, {
-                get: () => {
-                  const currentModule = this.registry.find((m) =>
-                    areModulesEqual(m.manifest, manifest)
-                  )
-                  if (!currentModule.instancedPropertyDependencies[name]) {
-                    const depModule = this._getDependency(manifest, name)
-                    const instancedModule = this._proxifyModule(depModule, currentModule)
-                    currentModule.instancedPropertyDependencies[name] = instancedModule
-                  }
-                  return currentModule.instancedPropertyDependencies[name]
-                },
-                enumerable: true,
-                configurable: true,
-              })
+            if (name === 'overlay-adapter.dapplet-base.eth') {
+              if (delete target[propertyOrMethodName]) {
+                Object.defineProperty(target, propertyOrMethodName, {
+                  get: () => {
+                    const currentModule = this.registry.find((m) =>
+                      areModulesEqual(m.manifest, manifest)
+                    )
+                    if (!currentModule.instancedPropertyDependencies[name]) {
+                      const depModule = this._getDependency(manifest, name)
+                      if (name === 'overlay-adapter.dapplet-base.eth') {
+                        const featureModule = modules.find((x) => x.manifest.name === manifest.name)
+                        const instancedModule = this._proxifyModule(depModule, currentModule)
+                        currentModule.instancedPropertyDependencies[name] = instancedModule
+                      } else {
+                        const instancedModule = this._proxifyModule(depModule, currentModule)
+                        currentModule.instancedPropertyDependencies[name] = instancedModule
+                      }
+                    }
+                    return currentModule.instancedPropertyDependencies[name]
+                  },
+                  enumerable: true,
+                  configurable: true,
+                })
+              }
+            } else {
+              if (delete target[propertyOrMethodName]) {
+                Object.defineProperty(target, propertyOrMethodName, {
+                  get: () => {
+                    const currentModule = this.registry.find((m) =>
+                      areModulesEqual(m.manifest, manifest)
+                    )
+                    if (!currentModule.instancedPropertyDependencies[name]) {
+                      const depModule = this._getDependency(manifest, name)
+                      const instancedModule = this._proxifyModule(depModule, currentModule)
+                      currentModule.instancedPropertyDependencies[name] = instancedModule
+                    }
+                    return currentModule.instancedPropertyDependencies[name]
+                  },
+                  enumerable: true,
+                  configurable: true,
+                })
+              }
             }
           }
           // Method Parameter Decorator
@@ -506,7 +563,6 @@ export class Injector {
                 schemaConfig: schemaConfig,
               })
             }
-
             const currentModule = this.registry.find((m) => areModulesEqual(m.manifest, manifest))
             currentModule.activateMethodsDependencies[parameterIndex] = name
           }
@@ -572,7 +628,6 @@ export class Injector {
       })
 
       if (newContextIds.length > 0) {
-        // console.log('[DAPPLETS] Context started:', newContextIds);
         browser.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
         EventBus.emit('context_started', contextIds)
       }
@@ -587,109 +642,230 @@ export class Injector {
       })
 
       if (oldContextIds.length > 0) {
-        // console.log('[DAPPLETS] Context finished:', oldContextIds);
         browser.runtime.sendMessage({ type: 'CONTEXT_FINISHED', payload: { contextIds } })
         EventBus.emit('context_finished', contextIds)
       }
     }
   }
 
-  private _getDependency(manifest: VersionInfo, name: string) {
-    const dependency = manifest.dependencies[name]
-
-    if (dependency === undefined) {
-      console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`)
-      return
-    }
-
-    if (valid(dependency as string) === null) {
-      console.error(
-        `Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`
-      )
-      return
-    }
-
-    // if the module can not be found by the name, then trying to find its implementation by interface name
-    let modules = this.registry.filter((m) => m.manifest.name == name)
-    if (modules.length === 0) {
-      modules = this.registry.filter((m) => m.manifest.interfaces?.[name] !== undefined)
+  private _getDependency(manifest: VersionInfo, name: string, m?: any) {
+    if (name === 'overlay-adapter.dapplet-base.eth') {
+      // if the module can not be found by the name, then trying to find its implementation by interface name
+      let modules = this.registry.filter((m) => m.manifest.name == name)
       if (modules.length === 0) {
-        console.error(
-          `Can not find neither the module, nor an implementation of the interface "${name}".`
-        )
-        return null
+        modules = this.registry.filter((m) => m.manifest.interfaces?.[name] !== undefined)
+        if (modules.length === 0) {
+          console.error(
+            `Can not find neither the module, nor an implementation of the interface "${name}".`
+          )
+          return null
+        }
       }
+      // ToDo: Should be moved to the background?
+      // ToDo: Fetch prefix from global settings.
+      // ToDo: Replace '>=' to '^'
+      const prefix = '>=' // https://devhints.io/semver
+      const range = prefix + 'overlay-adapter.dapplet-base.eth'[DEFAULT_BRANCH_NAME]
+      const maxVer = maxSatisfying(
+        modules.map((m) => m.manifest.version),
+        range
+      )
+      const moduleOverlayAdapter = {
+        manifest: {
+          branch: 'default',
+          createdAt: '1970-01-20T05:35:11.280Z',
+          defaultConfig: null,
+          dependencies: {},
+          dist: { hash: '', uris: [] },
+          environment: null,
+          extensionVersion: '0.0.0-pre.0',
+          interfaces: {},
+          main: null,
+          name: 'overlay-adapter.dapplet-base.eth',
+          overlays: null,
+          registryUrl: 'v2.registry.dapplet-base.eth',
+          schemaConfig: null,
+          type: ModuleTypes.Adapter,
+          version: '0.1.0',
+          getId: null,
+        },
+        instance: {
+          exports: new OverlayAdapter('overlay-adapter.dapplet-base.eth').exports(),
+          config: new OverlayAdapter('overlay-adapter.dapplet-base.eth').config,
+          adapter: new OverlayAdapter('overlay-adapter.dapplet-base.eth')
+         
+        },
+        clazz: OverlayAdapter,
+        order: undefined,
+        contextIds: undefined,
+        constructorDependencies: [],
+        instancedPropertyDependencies: {},
+        instancedConstructorDeps: [],
+        activateMethodsDependencies: [],
+        instancedActivateMethodsDependencies: [],
+        defaultConfig: null,
+      }
+      return moduleOverlayAdapter
+    } else {
+      const dependency = manifest.dependencies[name]
+      if (dependency === undefined) {
+        console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`)
+        return
+      }
+      if (valid(dependency as string) === null) {
+        console.error(
+          `Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`
+        )
+        return
+      }
+
+      // if the module can not be found by the name, then trying to find its implementation by interface name
+      let modules = this.registry.filter((m) => m.manifest.name == name)
+      if (modules.length === 0) {
+        modules = this.registry.filter((m) => m.manifest.interfaces?.[name] !== undefined)
+        if (modules.length === 0) {
+          console.error(
+            `Can not find neither the module, nor an implementation of the interface "${name}".`
+          )
+          return null
+        }
+      }
+
+      // ToDo: Should be moved to the background?
+      // ToDo: Fetch prefix from global settings.
+      // ToDo: Replace '>=' to '^'
+      const prefix = '>=' // https://devhints.io/semver
+      const range =
+        prefix + (typeof dependency === 'string' ? dependency : dependency[DEFAULT_BRANCH_NAME])
+      const maxVer = maxSatisfying(
+        modules.map((m) => m.manifest.version),
+        range
+      )
+
+      const module = modules.find((m) => m.manifest.version == maxVer)
+      return module
     }
-
-    // ToDo: Should be moved to the background?
-    // ToDo: Fetch prefix from global settings.
-    // ToDo: Replace '>=' to '^'
-    const prefix = '>=' // https://devhints.io/semver
-    const range =
-      prefix + (typeof dependency === 'string' ? dependency : dependency[DEFAULT_BRANCH_NAME])
-    const maxVer = maxSatisfying(
-      modules.map((m) => m.manifest.version),
-      range
-    )
-
-    const module = modules.find((m) => m.manifest.version == maxVer)
-    return module
   }
 
   private _proxifyModule(proxiedModule: RegistriedModule, contextModule: RegistriedModule) {
-    if (proxiedModule.manifest.type === ModuleTypes.Adapter) {
-      const cfgsKey = Symbol()
-      const featureId = contextModule.manifest.name
-      return new Proxy(proxiedModule.instance, {
-        get: function (target: IContentAdapter<any>, prop, receiver) {
-          if (prop === 'attachConfig') {
-            return (cfg: any) => {
-              if (contextModule.manifest.type === ModuleTypes.Feature) {
-                cfg.orderIndex = contextModule.order
-                // ToDo: fix context ids adding
-                cfg.contextIds = contextModule.contextIds
-                  .map((id) => {
-                    const [headContextId, ...tailContextId] = id.split('/') // ToDo: check head?
-                    return tailContextId.join('/')
-                  })
-                  .filter((id) => !!id)
-              }
+    if (proxiedModule.manifest.name === 'overlay-adapter.dapplet-base.eth') {
+      if (proxiedModule.manifest.type === ModuleTypes.Adapter) {
+        const cfgsKey = Symbol()
+        const featureId = contextModule.manifest.name
+        return new Proxy(proxiedModule.instance, {
+          get: function (target: IOverlayAdapter<any>, prop, receiver) {
+            if (prop === 'attachConfig') {
+              return (cfg: any) => {
+                if (contextModule.manifest.type === ModuleTypes.Feature) {
+                  cfg.orderIndex = contextModule.order
+                  // ToDo: fix context ids adding
+                  cfg.contextIds = contextModule.contextIds
+                    .map((id) => {
+                      const [headContextId, ...tailContextId] = id.split('/') // ToDo: check head?
+                      return tailContextId.join('/')
+                    })
+                    .filter((id) => !!id)
+                }
 
-              // remember configs to detach it later
-              if (!Reflect.has(target, cfgsKey)) {
-                Reflect.set(target, cfgsKey, [cfg])
+                // remember configs to detach it later
+                if (!Reflect.has(target, cfgsKey)) {
+                  Reflect.set(target, cfgsKey, [cfg])
+                } else {
+                  Reflect.get(target, cfgsKey).push(cfg)
+                }
+                widgets.push(cfg)
+                return cfg
+              }
+            }
+            if (prop === 'detachConfig') {
+              return (cfg) => {
+                const cfgs = cfg ? [cfg] : Reflect.get(target, cfgsKey)
+                cfgs?.forEach((x) => {
+                  widgets.splice(0, widgets.length, ...widgets.filter(n => n.orderIndex !== x.orderIndex))
+                  return target
+                })
+              }
+            }
+            if (prop === 'attachFeature') {
+              console.error('attachFeature() method is deprecated.')
+              return () => null
+            }
+            if (prop === 'detachFeature') {
+              console.error('detachFeature() method is deprecated.')
+              return () => null
+            }
+            if (prop === 'exports') {
+              if (typeof target.exports === 'function') {
+                return target.exports(featureId)
               } else {
-                Reflect.get(target, cfgsKey).push(cfg)
+                return target.exports
               }
-
-              return target.attachConfig(cfg)
-            }
-          }
-          if (prop === 'detachConfig') {
-            return (cfg) => {
-              const cfgs = cfg ? [cfg] : Reflect.get(target, cfgsKey)
-              cfgs?.forEach((x) => target.detachConfig(x, featureId))
-            }
-          }
-          if (prop === 'attachFeature') {
-            console.error('attachFeature() method is deprecated.')
-            return () => null
-          }
-          if (prop === 'detachFeature') {
-            console.error('detachFeature() method is deprecated.')
-            return () => null
-          }
-          if (prop === 'exports') {
-            if (typeof target.exports === 'function') {
-              return target.exports(featureId)
             } else {
-              return target.exports
+              return target[prop]
             }
-          } else return target[prop]
-        },
-      })
+          },
+        })
+      } else {
+        return proxiedModule.instance
+      }
     } else {
-      return proxiedModule.instance
+      if (proxiedModule.manifest.type === ModuleTypes.Adapter) {
+        const cfgsKey = Symbol()
+        const featureId = contextModule.manifest.name
+        return new Proxy(proxiedModule.instance, {
+          get: function (target: IContentAdapter<any>, prop, receiver) {
+            if (prop === 'attachConfig') {
+              return (cfg: any) => {
+                if (contextModule.manifest.type === ModuleTypes.Feature) {
+                  cfg.orderIndex = contextModule.order
+                  // ToDo: fix context ids adding
+                  cfg.contextIds = contextModule.contextIds
+                    .map((id) => {
+                      const [headContextId, ...tailContextId] = id.split('/') // ToDo: check head?
+                      return tailContextId.join('/')
+                    })
+                    .filter((id) => !!id)
+                }
+
+                // remember configs to detach it later
+                if (!Reflect.has(target, cfgsKey)) {
+                  Reflect.set(target, cfgsKey, [cfg])
+                } else {
+                  Reflect.get(target, cfgsKey).push(cfg)
+                }
+                return target.attachConfig(cfg)
+              }
+            }
+            if (prop === 'detachConfig') {
+              return (cfg) => {
+                const cfgs = cfg ? [cfg] : Reflect.get(target, cfgsKey)
+                cfgs?.forEach((x) => {
+                  return target.detachConfig(x, featureId)
+                })
+              }
+            }
+            if (prop === 'attachFeature') {
+              console.error('attachFeature() method is deprecated.')
+              return () => null
+            }
+            if (prop === 'detachFeature') {
+              console.error('detachFeature() method is deprecated.')
+              return () => null
+            }
+            if (prop === 'exports') {
+              if (typeof target.exports === 'function') {
+                return target.exports(featureId)
+              } else {
+                return target.exports
+              }
+            } else {
+              return target[prop]
+            }
+          },
+        })
+      } else {
+        return proxiedModule.instance
+      }
     }
   }
 }

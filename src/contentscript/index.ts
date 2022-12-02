@@ -31,11 +31,12 @@ async function init() {
     console.error('Cannot process the share link', e)
     return null
   })
-
+// const widget = []
   const port = browser.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any)
 
   const jsonrpc = new JsonRpc()
   const overlayManager = IS_IFRAME ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc)
+  
   const core = new Core(IS_IFRAME, overlayManager) // ToDo: is it global for all modules?
   const injector = new Injector(core, { shareLinkPayload })
 
@@ -71,7 +72,11 @@ async function init() {
           } was activated.`
         )
       )
-      return injector.loadModules(modules)
+      // console.log(modules,'modules');
+      return (
+        injector.loadModules(modules)
+
+      )
     } else if (message.type === 'FEATURE_DEACTIVATED') {
       const modules = message.payload
       modules.forEach((f) =>
@@ -95,6 +100,8 @@ async function init() {
 
   // Handle module (de)activations from another tabs
   EventBus.on('dapplet_activated', (m) => injector.loadModules([m]))
+//   widget.push(widgets)
+//  console.log(widget);
   EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]))
 
   // destroy when background is disconnected
