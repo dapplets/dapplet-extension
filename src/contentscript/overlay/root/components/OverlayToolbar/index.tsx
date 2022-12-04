@@ -106,7 +106,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       
             const newWidgetButton = (
               x().state.action?  <WidgetButton
-              
+              data-testid="dapplet-active-button"
                 key={`${newKey}` + i}
                 onClick={(e) => {
                   e.preventDefault()

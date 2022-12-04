@@ -111,7 +111,8 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                   <span className={styles.loader}></span>
                 ) : (
                   <Switch
-                    // className={loadShowButton ? styles.loadShowButton : ''}
+                  
+                    className={isActive?"active-switch":'not-active-switch'}
                     checked={isActive}
                     onChange={(e) => {
                       onSwitchChange(dapplet, !isActive, index, e['shiftKey'], loadingHome)

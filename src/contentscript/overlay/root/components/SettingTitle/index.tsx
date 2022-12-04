@@ -16,8 +16,8 @@ export const SettingTitle = (props: SettingTitleProps): ReactElement => {
   const isVisibleFound = found && found > 0
 
   return (
-    <div className={cn(styles.wrapper, className)} onClick={onClick}>
-      <h4 className={cn(styles.title, { [styles.isActive]: isActive })} style={style}>
+    <div   className={cn(styles.wrapper, className)} onClick={onClick}>
+      <h4 data-testid={`settings-page-${title}`} className={cn(styles.title, { [styles.isActive]: isActive })} style={style}>
         {title}
         {isVisibleFound ? <span className={styles.found}>{found}</span> : null}
       </h4>
