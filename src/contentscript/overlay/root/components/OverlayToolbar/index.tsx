@@ -77,7 +77,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
   const [newWidgets,setNewWidgets]=useState(widgets)
  
- 
   useEffect(() => { 
   },[newWidgets,widgets,nodeOverlayToolbar,isClick])
   const handleClickGetNodeOverlayToolbar = () => {

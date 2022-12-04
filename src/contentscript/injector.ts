@@ -773,7 +773,14 @@ export class Injector {
                 } else {
                   Reflect.get(target, cfgsKey).push(cfg)
                 }
-                widgets.push(cfg)
+                const newWidgets = {
+                  moduleName: contextModule.manifest.name,
+                  MENU_ACTION: cfg.MENU_ACTION,
+                  contextIds:contextModule.contextIds,
+                  orderIndex:cfg.orderIndex
+
+                }
+                widgets.push(newWidgets)
                 return cfg
               }
             }
@@ -781,7 +788,8 @@ export class Injector {
               return (cfg) => {
                 const cfgs = cfg ? [cfg] : Reflect.get(target, cfgsKey)
                 cfgs?.forEach((x) => {
-                  widgets.splice(0, widgets.length, ...widgets.filter(n => n.orderIndex !== x.orderIndex))
+                  widgets.splice(0, widgets.length, ...widgets.filter(n => {
+                   return n.moduleName !== contextModule.manifest.name}))
                   return target
                 })
               }
