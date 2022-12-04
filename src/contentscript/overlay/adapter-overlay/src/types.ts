@@ -12,6 +12,7 @@ export type Exports = {
     hidden?: boolean
     pinned?: string
     action: (ctx: any, me: ButtonProps) => void
+    insPointName?: string
   }
 
   export type WidgetConfig<T> = {

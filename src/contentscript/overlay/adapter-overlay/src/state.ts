@@ -4,8 +4,8 @@ import { ButtonProps,Context,Exports, IButtonWidgetState, ILabelWidgetState, IWi
 import { WidgetBuilder } from './widgetBildet'
 
 export class State<T> {
-    public readonly INITIAL_STATE
-    private _currentStateName = undefined
+    public  INITIAL_STATE
+    public _currentStateName = undefined
     public state: T
     private _cache: any = {}
     public changedHandler: (newValues: Partial<T>) => void
@@ -17,14 +17,12 @@ export class State<T> {
       private getTheme: () => string
     ) {
       const me = this
-     
       this.id = config.id
-      this.INITIAL_STATE = config.initial || 'DEFAULT'
+      this.INITIAL_STATE =  config.initial || me._currentStateName || 'DEFAULT'
       this.state = new Proxy(
         {},
         {
           get(target, property, receiver) {
-           
             if (property === 'state') return me._currentStateName
             if (property === 'ctx') return me.config
             if (property === 'setState') return me.setState.bind(me)
@@ -75,14 +73,13 @@ export class State<T> {
           },
         }
       ) as T
-      if (me.config[me.INITIAL_STATE]){
-         me.setState(me.INITIAL_STATE)
+      if (me.config[me.config.initial]){
+         me.setState(me.config.initial)
         }
     }
   
     public setState(stateName: string, resetState = false): any {
       do {
-        //console.log("Set state from - to: ", this._currentStateName,stateName)
         if (stateName == this._currentStateName) {
           //console.log(`NOP state transition "${stateName}". Skipping...`)
           break
@@ -94,20 +91,19 @@ export class State<T> {
         stateName = this._cache[stateName].NEXT
         
       } while (stateName)
-     
-      this.changedHandler && this.changedHandler(this.getStateValues())
-     
+    this.INITIAL_STATE = this._currentStateName
+    this.config.initial = this._currentStateName
+    
+    this.changedHandler && this.changedHandler(this.getStateValues())
       return this._cache[this._currentStateName]
     }
   
     public getStateValues(): T {
       const cachedState = this._currentStateName ? this._cache[this._currentStateName] : this._cache
-     
       return this._themifyState(cachedState)
     }
   
     private createNewStateFromConfig(stateName) {
-   
       const state = {}
       if (this.config[stateName]) {
         const isObservable = (value: any) => {
@@ -181,6 +177,7 @@ export class State<T> {
         typeof v === 'object' && v?.[theme] ? v[theme] : v,
       ])
       const themedState = Object.fromEntries(themedEntries)
+      console.log({ ...themedState, theme });
       return { ...themedState, theme }
     }
   } // class State

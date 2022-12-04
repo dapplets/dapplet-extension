@@ -112,7 +112,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                   e.preventDefault()
                   e.stopPropagation()
                   x().state.action(x().state.ctx, x().state)
-                  setNewWidgets(widgetsInConstructor)
                  onClick()
                   
                 }}

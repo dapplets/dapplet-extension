@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import React, { ButtonHTMLAttributes, DetailedHTMLProps, FC, FunctionComponent } from 'react'
+import React, { ButtonHTMLAttributes, DetailedHTMLProps, FC, FunctionComponent, useEffect } from 'react'
 import styles from './WidgetButton.module.scss'
 
 export interface WidgetButtonProps

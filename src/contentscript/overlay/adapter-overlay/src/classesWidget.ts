@@ -37,15 +37,16 @@ export class LabelWidget implements IWidget<ILabelWidgetState> {
   export class ButtonWidget implements IWidget<IButtonWidgetState> {
     public el: HTMLElement
     public state: IButtonWidgetState
-    insPointName: string
+  public insPointName: string
   
     public static contextInsPoints = {
-      MENU_ACTION: 'DEFAULT',
+      MENU_ACTION:  'DEFAULT'
     }
+   
   
     public mount() {
-      const { icon, hidden, title,ctx } = this.state
-      this.state
+      this.state = this.state
+      this.insPointName = this.insPointName
     }
   
     public unmount() {
