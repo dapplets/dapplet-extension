@@ -6,6 +6,8 @@ import { IOverlayManager, OverlayConfig } from '../interfaces'
 import { App } from './App'
 import { Overlay } from './overlay'
 
+
+
 const CollapsedOverlayClass = 'dapplets-overlay-collapsed'
 const HiddenOverlayClass = 'dapplets-overlay-hidden'
 const DappletsOverlayManagerClass = 'dapplets-overlay-manager'
@@ -16,11 +18,13 @@ export class OverlayManager implements IOverlayManager {
   public activeOverlay: Overlay = null
   public onActiveOverlayChanged: (newOverlay: Overlay | null) => void | null = null
 
+
   private _root = null
 
   private _tabsRegistry: {
     overlay: Overlay
   }[] = []
+ 
 
   constructor(private _iframeMessenger: JsonRpc) {
     // Side panel
@@ -72,7 +76,7 @@ export class OverlayManager implements IOverlayManager {
     // //     }
     // // });
     // // topActions.appendChild(avatarAction);
-
+ 
     document.body.appendChild(this._panel)
   }
 
@@ -193,6 +197,8 @@ export class OverlayManager implements IOverlayManager {
     }
 
     this._render()
+  
+    
   }
 
   public deactivate(overlay: Overlay) {
@@ -226,12 +232,13 @@ export class OverlayManager implements IOverlayManager {
     return overlay
   }
 
-  private _render() {
+  public _render() {
     ReactDOM.render(
       <App
         hidden={this._panel.classList.contains(HiddenOverlayClass)}
         overlayManager={this}
         onToggle={this.toggle.bind(this)}
+        // overlayAdapter={this._widget}
       />,
       this._root
     )
