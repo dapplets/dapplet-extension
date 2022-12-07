@@ -17,7 +17,8 @@
     "eslint": "eslint ./src --ext .ts --fix",
     "stylelint": "stylelint ./src/**/*.{css,scss,module.scss} --fix",
     "cypress:open": "cypress open",
-    "test:e2e": "cypress run --headed --browser chrome"
+    "test:e2e": "cypress run --headed --browser chrome",
+    "test:ca": "cypress run --spec \"cypress/e2e/connected-accounts\" --headed --browser chrome"
   },
   "devDependencies": {
     "@fontsource/montserrat": "^4.5.5",

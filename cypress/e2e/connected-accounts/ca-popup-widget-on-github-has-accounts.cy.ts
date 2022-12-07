@@ -18,7 +18,7 @@ describe('CA: popup widget on GitHub has accounts', () => {
       .click()
   })
 
-  it('opens empty dapplets list', () => {
+  it('opens dapplets list', () => {
     cy.get('dapplets-overlay-manager')
       .getByTestId('toggle-overlay-button', { includeShadowDom: true })
       .click()
@@ -29,5 +29,21 @@ describe('CA: popup widget on GitHub has accounts', () => {
       timeout: 20000,
       includeShadowDom: true,
     })
+  })
+
+  it('activate test dapplet', () => {
+    cy.get('dapplets-overlay-manager')
+      .wait(5000)
+      .getByTestId('connecting-accounts-dapplet', { includeShadowDom: true })
+      .getByTestId('activation-dapplet', { includeShadowDom: true })
+      .first()
+      .then((button) => {
+        button.hasClass('not-active-switch') &&
+          cy
+            .get('dapplets-overlay-manager')
+            .getByTestId('activation-dapplet', { includeShadowDom: true })
+            .click()
+      })
+      .wait(5000)
   })
 })

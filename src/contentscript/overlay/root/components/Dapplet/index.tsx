@@ -93,7 +93,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   }
 
   return (
-    <div className={cn(styles.wrapperCard, className)} {...anotherProps}>
+    <div className={cn(styles.wrapperCard, className)} data-testid={name} {...anotherProps}>
       <DappletImage isFavourites={false} storageRef={icon} />
 
       <div className={cn(styles.wrapperBlock)}>
@@ -111,8 +111,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                   <span className={styles.loader}></span>
                 ) : (
                   <Switch
-                  
-                    className={isActive?"active-switch":'not-active-switch'}
+                    className={isActive ? 'active-switch' : 'not-active-switch'}
                     checked={isActive}
                     onChange={(e) => {
                       onSwitchChange(dapplet, !isActive, index, e['shiftKey'], loadingHome)
