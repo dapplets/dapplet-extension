@@ -45,16 +45,11 @@ export class IpfsModuleStorage implements ModuleStorage {
     })
 
     if (!response.ok) {
-      const error = await response
-        .json()
-        .then((x) => `${x.code} ${x.message}`)
-        .catch(() => `${response.status} ${response.statusText}`)
-
-      throw new Error(error)
+      throw new Error('Cannot upload file to IPFS')
     }
 
     const cid = response.headers.get('ipfs-hash')
-    if (!cid) throw new Error('Cannot upload file to IPFS.') // ToDo: show message
+    if (!cid) throw new Error('Cannot upload file to IPFS') // ToDo: show message
     const url = 'ipfs://' + cid
     return url
   }
