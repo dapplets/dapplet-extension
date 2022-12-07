@@ -95,6 +95,8 @@
 .modalTitle {
   display: block;
 
+  width: 300px;
+
   padding: 0 0 5px;
 
   color: $MainBlack;
@@ -104,21 +106,22 @@
 
   font-weight: 700;
   line-height: 26px;
-  width: 300px;
 }
 
 .modalAccounts {
   display: flex;
-  background: #f6f8f9;
+  align-items: center;
   flex-direction: column;
-  padding: 20px;
-  border-radius: 3em;
-  margin: 20px;
+  justify-content: center;
+
   min-width: 265px;
   max-width: 100%;
-  align-items: center;
   min-height: 167px;
-  justify-content: center;
+  margin: 20px;
+  padding: 20px;
+
+  border-radius: 3em;
+  background: #f6f8f9;
   box-shadow: 2px 6px 8px rgb(0 0 0 / 8%);
 }
 
@@ -141,9 +144,9 @@
 .wrapperModalWantLink {
   display: flex;
   align-items: center;
-  margin-top: 10px;
 
   width: 100%;
+  margin-top: 10px;
 }
 
 .button {
@@ -157,6 +160,7 @@
   height: 32px;
   margin: 5px;
   padding: 0 10px;
+
   border-radius: 4px;
 
   font-family: Roboto;
@@ -171,7 +175,7 @@
   background: $Primary;
 
   &:hover {
-    background: hsl(349, 66%, 44%);
+    background: hsl(349deg 66% 44%);
   }
 
   &:active {
@@ -190,11 +194,11 @@
   background: $Secondary;
 
   &:hover {
-    background: hsl(200, 63%, 49%);
+    background: hsl(200deg 63% 49%);
   }
 
   &:active {
-    background: hsl(200, 66%, 44%);
+    background: hsl(200deg 66% 44%);
   }
 
   &:disabled {

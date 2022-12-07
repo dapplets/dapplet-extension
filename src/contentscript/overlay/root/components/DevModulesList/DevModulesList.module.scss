@@ -288,21 +288,25 @@
 }
 
 .adminsListButton {
-  color: $Secondary;
   height: fit-content;
-  padding: 2px 5px;
   margin: -6px 12px 0 0;
+  padding: 2px 5px;
+
+  transition: all 0.2s ease-in-out;
+
+  color: $Secondary;
   background: inherit;
-  transition: all .2s ease-in-out;
 }
 
 .moreAdmins {
   display: flex;
-  margin-bottom: 4px;
+
   width: auto;
+  margin-bottom: 4px;
   padding: 0 5px;
+
   cursor: pointer;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .adminsListButton:hover,

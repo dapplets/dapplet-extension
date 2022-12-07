@@ -1,11 +1,18 @@
 import { IFeature } from '../../../types'
 import { ButtonWidget, LabelWidget } from './classesWidget'
 import { State } from './state'
-import { ButtonProps,Context,Exports, IButtonWidgetState, ILabelWidgetState, IWidget, IWidgetBuilderConfig, WidgetConfig } from './types'
+import {
+  ButtonProps,
+  Exports,
+  IButtonWidgetState,
+  ILabelWidgetState,
+  IWidget,
+  WidgetConfig,
+} from './types'
 import { WidgetBuilder } from './widgetBildet'
 
 export default class OverlayAdapter {
-  public state:ButtonProps
+  public state: ButtonProps
   private stateStorage = new Map<string, State<any>>()
   public exports = (): Exports => ({
     button: this.createWidgetFactory<IButtonWidgetState>(ButtonWidget),
@@ -46,12 +53,13 @@ export default class OverlayAdapter {
         order = 0
       }
 
-      const context =builder && builder.contexts?  builder.contexts.get(contextNode):null
+      const context = builder && builder.contexts ? builder.contexts.get(contextNode) : null
       // if (!context) return
 
-      const insPointName = Widget.contextInsPoints[builder&& builder.contextName? builder.contextName: 'DEFAULT']
+      const insPointName =
+        Widget.contextInsPoints[builder && builder.contextName ? builder.contextName : 'DEFAULT']
 
-      const insPoint = builder&& builder.insPoints? builder.insPoints[insPointName]:'DEFAULT'
+      const insPoint = builder && builder.insPoints ? builder.insPoints[insPointName] : 'DEFAULT'
       // if (!insPoint) {
       //   console.error(`Invalid insertion point name: ${insPointName}`)
       //   return
@@ -97,7 +105,7 @@ export default class OverlayAdapter {
 
       // widget state restoring
       const state = (() => {
-        const hasId = context&& context.parsed.id !== undefined
+        const hasId = context && context.parsed.id !== undefined
         if (!hasId) {
           // console.error(
           //   'Warning: Each parsed context in an adapter should have a unique "id" property. Restoring of widget states will be unavailable.'
@@ -140,20 +148,17 @@ export default class OverlayAdapter {
         }
 
         const updateWebComponent = (values: any) => {
- 
           Object.entries(values).forEach(([k, v]) => (widget.el[k] = v))
         }
 
         updateWebComponent(state.getStateValues()) // initialize attributes from state
         state.changedHandler = updateWebComponent // subscribe on state changes
- 
       } else {
         widget = new Widget() as IWidget<T>
         widget.state = state.state
         widget.insPointName = 'DEFAULT'
         state.changedHandler = () => widget.mount() // when data in state was changed, then rerender a widget
         widget.mount() // ToDo: remove it?
-
       }
 
       // widget.el.classList.add('dapplet-widget', clazz)
@@ -191,7 +196,7 @@ export default class OverlayAdapter {
         // searching for an element index before which need to be inserted.
         for (let i = 0; i < insertedElements.length; i++) {
           // const element = insertedElements[i]
-          const elementOrder =null
+          const elementOrder = null
           //  parseInt(element.getAttribute('data-dapplet-order'))
           if (targetElementIndex === null && elementOrder > order) {
             targetElementIndex = i
@@ -214,16 +219,8 @@ export default class OverlayAdapter {
 
     return (config: WidgetConfig<T>) => {
       const uuid = uuidv4()
-      return  (builder: WidgetBuilder, insPointName: string, order: number, contextNode: Element) =>
+      return (builder: WidgetBuilder, insPointName: string, order: number, contextNode: Element) =>
         createWidget(Widget, builder, insPointName, config, order, contextNode, uuid)
     }
   }
 }
-
-
-
-
-
-
-
-

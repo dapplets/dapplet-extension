@@ -1,20 +1,25 @@
-@import '../../assets/styles/color.variables.scss';
+@import "../../assets/styles/color.variables.scss";
 
 .tab {
   position: relative;
 
   box-sizing: border-box;
   width: 52px;
+
   // max-width: 52px;
   // margin-top: 6px;
   padding: 10px;
+
+  cursor: pointer;
+
+  border-radius: 4px 0 0;
+
   // padding-bottom: 15px;
 
   // border-radius: 10px 0 0 10px;
   // background: #f5f5f5;
   background: #fff;
-  border-radius: 4px 0 0 0;
-  cursor: pointer;
+
   img {
     width: 30px !important;
     height: 30px !important;
@@ -31,13 +36,14 @@
   flex-direction: column;
   justify-content: space-around;
 
+  width: 100%;
+  height: 100%;
+
   margin-top: 4px;
   margin-bottom: 0;
   padding-left: 0;
 
   list-style: none;
-  width: 100%;
-    height: 100%;
 }
 
 .top {
@@ -149,7 +155,7 @@
     width: 100%;
     height: 100%;
 
-    content: '';
+    content: "";
 
     border-radius: 10px 0 0 10px;
     background-color: rgb(0 0 0 / 30%);
@@ -163,11 +169,12 @@
   align-items: center;
   justify-content: center;
 
+  width: 100%;
+  height: 100%;
+
   margin-top: 11px;
 
   cursor: pointer;
-  width: 100%;
-  height: 100%;
 
   svg {
     // width: 100%;
@@ -183,7 +190,7 @@
       width: 8px;
       height: 8px;
 
-      content: '';
+      content: "";
 
       opacity: 0;
 
@@ -213,6 +220,7 @@
       }
     }
   }
+
   &:active {
     svg {
       path {
@@ -243,9 +251,10 @@
 
 .listNotPadding {
   margin-top: 0;
+
   .item {
     margin-top: 0;
   }
 }
 
-@import './adaptive.scss';
+@import "./adaptive.scss";

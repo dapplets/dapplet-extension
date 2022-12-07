@@ -17,7 +17,7 @@ import { AppStorage } from './appStorage'
 import Core from './core'
 import { __decorate } from './global'
 import OverlayAdapter from './overlay/adapter-overlay/src'
-import { IContentAdapter, IResolver, IOverlayAdapter } from './types'
+import { IContentAdapter, IOverlayAdapter, IResolver } from './types'
 
 type RegistriedModule = {
   manifest: VersionInfo
@@ -692,8 +692,7 @@ export class Injector {
         instance: {
           exports: new OverlayAdapter('overlay-adapter.dapplet-base.eth').exports(),
           config: new OverlayAdapter('overlay-adapter.dapplet-base.eth').config,
-          adapter: new OverlayAdapter('overlay-adapter.dapplet-base.eth')
-         
+          adapter: new OverlayAdapter('overlay-adapter.dapplet-base.eth'),
         },
         clazz: OverlayAdapter,
         order: undefined,
@@ -781,7 +780,11 @@ export class Injector {
               return (cfg) => {
                 const cfgs = cfg ? [cfg] : Reflect.get(target, cfgsKey)
                 cfgs?.forEach((x) => {
-                  widgets.splice(0, widgets.length, ...widgets.filter(n => n.orderIndex !== x.orderIndex))
+                  widgets.splice(
+                    0,
+                    widgets.length,
+                    ...widgets.filter((n) => n.orderIndex !== x.orderIndex)
+                  )
                   return target
                 })
               }

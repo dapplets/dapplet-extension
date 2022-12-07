@@ -1,19 +1,21 @@
-@import '../../assets/styles/null.scss';
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
+@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts.scss";
+@import "../../assets/styles/color.variables.scss";
 
 .localhost {
   display: flex;
   align-items: center;
   flex-direction: column;
   justify-content: space-between;
+
   width: 100%;
   height: auto;
-  margin: 2.5px 2px 5px 0px;
+  margin: 2.5px 2px 5px 0;
   padding: 10px;
+
+  border: 1px solid #e3e3e3;
   border-radius: 10px;
   background: #fff;
-  border: 1px solid #e3e3e3;
 }
 
 .hostBlock {
@@ -213,4 +215,4 @@
   transform: rotate(180deg);
 }
 
-@import './adaptive.scss';
+@import "./adaptive.scss";

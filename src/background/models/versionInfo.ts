@@ -26,5 +26,5 @@ export default class VersionInfo extends Base {
   } = null
   extensionVersion?: string = null
   createdAt?: string = null
-  actions?:string = null
+  actions?: string = null
 }

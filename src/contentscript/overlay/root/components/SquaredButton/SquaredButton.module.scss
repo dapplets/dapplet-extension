@@ -1,4 +1,4 @@
-@import '../../assets/styles/color.variables.scss';
+@import "../../assets/styles/color.variables.scss";
 
 .button {
   display: flex;
@@ -49,16 +49,20 @@
 }
 
 .big {
+  min-width: 32px;
+  min-height: 32px;
+
+  border-radius: 4px;
   // min-width: 35px;
   // min-height: 35px;
 
   // border-radius: 10px;
   background: $PureWhite;
-  min-width: 32px;
-  min-height: 32px;
-  border-radius: 4px;
-  box-shadow: inset 0px 1px 2px rgb(225 225 225 / 20%), inset 0px -1px 2px rgb(225 225 225 / 20%),
-    inset 0px -1px 2px rgb(255 255 255 / 90%), inset 0px 1px 3px rgb(225 225 225 / 90%);
+  box-shadow:
+    inset 0 1px 2px rgb(225 225 225 / 20%),
+    inset 0 -1px 2px rgb(225 225 225 / 20%),
+    inset 0 -1px 2px rgb(255 255 255 / 90%),
+    inset 0 1px 3px rgb(225 225 225 / 90%);
 
   &:hover {
     svg {

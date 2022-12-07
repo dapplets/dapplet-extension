@@ -14,7 +14,6 @@
   padding-bottom: 15px;
 }
 
-
 .wrapper::-webkit-scrollbar {
   width: 0;
 }
@@ -145,6 +144,7 @@
   padding: 10px;
 
   color: $ContentBlack;
+  border: 1px solid #e5e5e5;
   border-radius: 10px;
 
   background: #fff;
@@ -153,7 +153,6 @@
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
-  border: 1px solid #e5e5e5;
 }
 
 .errorInput {

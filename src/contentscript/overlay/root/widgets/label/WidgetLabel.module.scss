@@ -1,20 +1,25 @@
-@import '../../assets/styles/color.variables.scss';
+@import "../../assets/styles/color.variables.scss";
+
 .widgetLabel {
-    display: flex;
-    width: 30px;
-    height: 30px;
-    background: #f5f5f5;
-    border-radius: 6px;
-    margin: 0 auto;
-    margin: 5px 0;
+  display: flex;
+
+  width: 30px;
+  height: 30px;
+  margin: 0 auto;
+  margin: 5px 0;
+
+  border-radius: 6px;
+  background: #f5f5f5;
 }
 
 .widgetLabelImg {
-    display: block;
-    width: 18px;
-    height: 18px;
-    margin: auto auto;
+  display: block;
+
+  width: 18px;
+  height: 18px;
+  margin: auto;
 }
-.widgetHidden{
-    display: none;
+
+.widgetHidden {
+  display: none;
 }
