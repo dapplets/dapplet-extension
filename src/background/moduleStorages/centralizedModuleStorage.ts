@@ -11,7 +11,7 @@ type PresignResponse = {
 export class CentralizedModuleStorage implements ModuleStorage {
   public timeout = 60000
   private _s3ReadEndpoint = 'https://dapplet-api.s3.nl-ams.scw.cloud/'
-  private _authEndpoint = 'https://dapplet-api.herokuapp.com/s3/presign'
+  private _authEndpoint = 'https://dapplets-api.mooo.com/s3/presign'
 
   public async getResource(
     hash: string,
@@ -71,9 +71,15 @@ export class CentralizedModuleStorage implements ModuleStorage {
       headers: { 'Content-Type': 'application/json' },
     })
 
+    if (!response.ok) {
+      throw new Error('Cannot create presigned post for S3 storage')
+    }
+
     const json = await response.json()
-    if (!json.success)
+    if (!json.success) {
       throw new Error(json.message || 'Cannot create presigned post for S3 storage')
+    }
+
     return json.data
   }
 
@@ -90,6 +96,6 @@ export class CentralizedModuleStorage implements ModuleStorage {
       body: form,
     })
 
-    if (!response.ok) throw new Error('Cannot save object to centralized storage')
+    if (!response.ok) throw new Error('Cannot upload file to the centralized storage')
   }
 }

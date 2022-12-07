@@ -22,10 +22,14 @@ export class SiaModuleStorage implements ModuleStorage {
   }
 
   public async save(blob: Blob) {
-    const file = new File([blob], 'filename')
-    const { skylink } = await this._client.uploadFile(file)
-    const url = 'sia://' + parseSkylink(skylink)
-    return url
+    try {
+      const file = new File([blob], 'filename')
+      const { skylink } = await this._client.uploadFile(file)
+      const url = 'sia://' + parseSkylink(skylink)
+      return url
+    } catch (_) {
+      throw new Error('Cannot upload file to SIA')
+    }
   }
 
   async saveDir(data: DirectoryData): Promise<string> {

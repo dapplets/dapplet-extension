@@ -49,16 +49,11 @@ export class SwarmModuleStorage implements ModuleStorage {
     })
 
     if (!response.ok) {
-      const error = await response
-        .json()
-        .then((x) => `${x.code} ${x.message}`)
-        .catch(() => `${response.status} ${response.statusText}`)
-
-      throw new Error(error)
+      throw new Error('Cannot upload file to Swarm')
     }
 
     const json = await response.json()
-    if (!json.reference) throw new Error('Cannot upload file to Swarm.') // ToDo: show message
+    if (!json.reference) throw new Error('Cannot upload file to Swarm') // ToDo: show message
     const url = 'bzz://' + json.reference
     return url
   }
