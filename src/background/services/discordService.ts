@@ -11,7 +11,7 @@ export default class DiscordService {
   constructor(private _globalConfigService: GlobalConfigService) {}
 
   async getDiscordMessages(): Promise<any> {
-    const url = `https://dapplet-api.herokuapp.com/announcements`
+    const url = `https://dapplets-api.mooo.com/announcements`
     try {
       const resp = await fetch(url)
       const parsedResp = await resp.json()
