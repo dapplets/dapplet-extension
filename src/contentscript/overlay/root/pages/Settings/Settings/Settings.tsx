@@ -190,16 +190,17 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     }
     const { getSwarmPostageStampId } = await initBGFunctions(browser)
     const id = await getSwarmPostageStampId()
-    if (!abortController.signal.aborted) {
+    if (!abortController.signal.aborted) {      
       setSwarmPostageStampIdInput(id)
     }
   }
 
   const setSwarmPostageStampId = async (id: string) => {
     try {
-      const { setSwarmPostageStampId } = await initBGFunctions(browser)
+      const { setSwarmPostageStampId  } = await initBGFunctions(browser)
       await setSwarmPostageStampId(id)
-      loadSwarmPostageStampId()
+
+       loadSwarmPostageStampId()
     } catch (err) {
       setSwarmPostageStampIdInputError(err.message)
 

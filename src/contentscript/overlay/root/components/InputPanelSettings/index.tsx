@@ -66,7 +66,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
                 getDefaultValueProvider()
               }
             } else {
-              if (!isValidHttp(providerInput)) {
+              if (!isValidHttp(providerInput) && !isPostStampId) {
                 getDefaultValueProvider()
               }
               if (providerInput.length === 0) {
@@ -81,7 +81,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
           onSubmit={(e) => {
             e.preventDefault()
             if (isPostStampId) {
-              if (isValidPostageStampId(providerInput)) {
+              if (isValidPostageStampId(providerInput)) {                
                 setProvider(providerInput)
               } else if (!isValidPostageStampId(providerInput)) {
                 setProviderInputError('Enter valid Swarm Postage Stamp ID')
@@ -128,7 +128,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
               }
             }}
             placeholder={isDynamycAdapter ? providerInput : null}
-            onChange={(e) => {
+            onChange={(e) => {           
               setProviderInput(e.target.value)
               setProviderInputError(null)
             }}
