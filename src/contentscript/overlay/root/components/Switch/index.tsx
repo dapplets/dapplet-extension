@@ -6,7 +6,7 @@ export interface SwitchProps
   extends DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   checked?: boolean
   isLoad?: boolean
-  className?:string
+  className?: string
 }
 
 export const Switch: FC<SwitchProps> = ({
@@ -17,10 +17,8 @@ export const Switch: FC<SwitchProps> = ({
   ...props
 }) => {
   return (
-    <label 
-    data-testid="activation-dapplet"
-     className={cn(styles.wrapper,className)}>
-      <input  className={cn(styles.input)} type="checkbox" onChange={onChange} {...props} />
+    <label data-testid="activation-dapplet" className={cn(styles.wrapper, className)}>
+      <input className={cn(styles.input)} type="checkbox" onChange={onChange} {...props} />
       <span
         className={cn(styles.inputCheckbox, {
           [styles.active]: checked,
