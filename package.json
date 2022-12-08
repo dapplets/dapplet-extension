@@ -17,8 +17,8 @@
     "eslint": "eslint ./src --ext .ts --fix",
     "stylelint": "stylelint ./src/**/*.{css,scss,module.scss} --fix",
     "cypress:open": "cypress open",
-    "test:e2e": "cypress run --headed --browser chrome",
-    "test:ca": "cypress run --spec \"cypress/e2e/connected-accounts\" --headed --browser chrome"
+    "test:e2e": "cross-env QASE_REPORT=1 npx cypress run --headed --browser chrome",
+    "test:ca": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/connected-accounts\" --headed --browser chrome"
   },
   "devDependencies": {
     "@fontsource/montserrat": "^4.5.5",
@@ -47,6 +47,9 @@
     "cross-env": "^7.0.3",
     "css-loader": "^6.6.0",
     "cypress": "^11.2.0",
+    "cypress-mochawesome-reporter": "^3.2.3",
+    "cypress-multi-reporters": "^1.6.1",
+    "cypress-qase-reporter": "^1.4.2-alpha.2",
     "detect-browser": "^5.3.0",
     "eslint": "^8.16.0",
     "eslint-config-prettier": "^8.5.0",

@@ -12,4 +12,22 @@ export default defineConfig({
     },
     video: false,
   },
+  reporter: 'cypress-multi-reporters',
+  reporterOptions: {
+    reporterEnabled: 'cypress-mochawesome-reporter, cypress-qase-reporter',
+    cypressMochawesomeReporterReporterOptions: {
+      charts: true,
+    },
+    cypressQaseReporterReporterOptions: {
+      apiToken: '1daa8793fe74e3780aebb625a35d76c84c18cbaf',
+      projectCode: 'DE',
+      logging: true,
+      // basePath: "https://api.qase.io/v1",
+      screenshotFolder: 'screenshots',
+      sendScreenshot: true,
+      runComplete: true,
+      // environmentId: 1,
+      // rootSuiteTitle: "Cypress tests",
+    },
+  },
 })
