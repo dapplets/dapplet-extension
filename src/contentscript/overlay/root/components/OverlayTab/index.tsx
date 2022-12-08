@@ -164,8 +164,6 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             {visibleMenus.map((menu) => {
               return (
                 <li
-                data-testid={`system-tab-${menu.title}`}
-
                   key={menu.id}
                   title={menu.title}
                   // onClick={() => {

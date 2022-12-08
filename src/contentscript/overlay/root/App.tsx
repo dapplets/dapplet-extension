@@ -95,7 +95,6 @@ interface P {
   overlayManager: OverlayManager
   navigate?: NavigateFunction
   location?: Location
-  overlayAdapter?:any
 }
 
 interface S {
@@ -472,7 +471,7 @@ class _App extends React.Component<P, S> {
     })
     return newSet
   }
-  
+
   render() {
     const p = this.props
     const s = this.state
@@ -490,7 +489,6 @@ class _App extends React.Component<P, S> {
     const menu = tab?.menus.find((x) => x.id === activeTabMenuId)
 
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
-
 
     return (
       <div className={cn(styles.overlay)}>
@@ -510,7 +508,6 @@ class _App extends React.Component<P, S> {
             pathname={pathname}
             module={s.module}
             overlays={overlays}
-            // widgets={p.overlayAdapter}
           />
 
           <div className={styles.inner}>

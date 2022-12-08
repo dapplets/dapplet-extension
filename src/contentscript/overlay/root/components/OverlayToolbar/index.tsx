@@ -1,6 +1,5 @@
 import cn from 'classnames'
-import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
-import { widgets } from '../../../../injector'
+import React, { ReactElement, useRef, useState } from 'react'
 import {
   ReactComponent as Account,
   ReactComponent as DappletsLogo,
@@ -8,8 +7,6 @@ import {
 import { ReactComponent as Coolicon } from '../../assets/newIcon/squares.svg'
 import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
-import { WidgetButton } from '../../widgets/button'
-import { LabelButton } from '../../widgets/label'
 import { OverlayTab } from '../OverlayTab'
 import styles from './OverlayToolbar.module.scss'
 
@@ -44,7 +41,6 @@ export interface OverlayToolbarProps {
   pathname?: string
   module?: any
   overlays?: any
-  widgets?: any
 }
 
 type TToggleOverlay = {
@@ -73,12 +69,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
   const noSystemTabs = p.tabs.filter((f) => f.title !== 'Dapplets')
   const [isShowTabs, onShowTabs] = useToggle(false)
-  const [isClick,onClick]=useToggle(false)
 
-  const [newWidgets,setNewWidgets]=useState(widgets)
- 
-  useEffect(() => { 
-  },[newWidgets,widgets,nodeOverlayToolbar,isClick])
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
       nodeOverlayToolbar.current.value = ''
@@ -94,40 +85,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       }
     }
   }
- 
-  const getWigetsConstructor = () => {
-    if (newWidgets && newWidgets.length > 0) {
-      const widgetsInConstructor = newWidgets
-      const widgetsParse = [widgetsInConstructor].map((x, i) => {
-        const widgetsObject = x.map((x, i) => {
-          const newKey = x.orderIndex
-          const widgetsObjectActivate = x.MENU_ACTION().map((x, i) => {
-      
-            const newWidgetButton = (
-              x().state.action?  <WidgetButton
-              data-testid="dapplet-active-button"
-                key={`${newKey}` + i}
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  x().state.action(x().state.ctx, x().state)
-                 onClick()
-                  
-                }}
-                hidden={x().state.hidden?x().state.hidden:false}
-                icon={x().state.icon?x().state.icon:null}
-                title={x().state.title}
-              />:<LabelButton hidden={x().state.hidden?x().state.hidden:false} icon={x().state.icon?x().state.icon:null} key={`${newKey}` + i} title={x().state.title}/>
-            )
-            return newWidgetButton
-          })
-          return widgetsObjectActivate
-        })
-        return widgetsObject
-      })
-      return widgetsParse
-    } else null
-  }
+
   const getNewButtonTab = (parametersFilter: string) => {
     // if(document
     //   .querySelector('#dapplets-overlay-manager')
@@ -189,7 +147,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     })
     return newSet
   }
-  
+
   return (
     <div
       ref={nodeOverlayToolbar}
@@ -235,8 +193,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                     />
                   )
                 })}
-             
-              {newWidgets && newWidgets.length > 0 ? getWigetsConstructor().map((x, y) => x) : null}
               <ToggleOverlay
                 // getNode={handleClickGetNodeOverlayToolbar}
                 onClick={() => {
