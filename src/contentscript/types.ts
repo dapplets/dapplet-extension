@@ -8,6 +8,12 @@ export interface IContentAdapter<IAdapterConfig> extends IModule {
   detachConfig(config: IAdapterConfig, featureId?: string): void
 }
 
+export interface IOverlayAdapter<IOverlayConfig> extends IModule {
+  exports?: any
+  attachConfig(config: IOverlayConfig): { $: (ctx?: any, id?: string) => any }
+  detachConfig(config?: IOverlayConfig, featureId?: string): any
+}
+
 export interface IFeature extends IModule {
   contextIds?: string[]
   orderIndex?: number
