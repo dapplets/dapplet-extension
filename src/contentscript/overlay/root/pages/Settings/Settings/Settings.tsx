@@ -553,6 +553,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
               setProviderInput={setSwarmPostageStampIdInput}
               setProvider={setSwarmPostageStampId}
               inputOfFocusEtn={inputOfFocusSwarmId}
+              loadProvider={loadSwarmPostageStampId}
+              // onPress={onPress}
             />
           </SettingItem>
           <SettingItem title="IPFS Gateway" component={<></>}>
