@@ -4,7 +4,7 @@ let title = 'new title'
 describe('dapplets action test', () => {
   qase(
     2,
-    it('No available dapplets', () => {
+    it('dapplets action test', () => {
       // it('opens context webpage', () => {
       cy.visit('https://example.com')
       // })

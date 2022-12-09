@@ -1,9 +1,9 @@
 import { qase } from 'cypress-qase-reporter/dist/mocha'
 
-describe('CA: popup widget on GitHub has accounts', () => {
+describe('CA: dapplet on GitHub', () => {
   qase(
     3,
-    it('CA: popup widget on GitHub has accounts', () => {
+    it('there is CA dapplet in the dapplets list on GitHub', () => {
       // it('opens Ni-2 profile GitHub page', () => {
       cy.visit('https://github.com/Ni-2')
       // })
@@ -36,7 +36,12 @@ describe('CA: popup widget on GitHub has accounts', () => {
         includeShadowDom: true,
       })
       // })
+    })
+  )
 
+  qase(
+    8,
+    it('they can activate CA dapplet', () => {
       // it('avatar badge is not exist', () => {
       cy.get('.dapplet-widget').should('not.exist')
       // })
@@ -53,18 +58,25 @@ describe('CA: popup widget on GitHub has accounts', () => {
               .find('[data-testid=connecting-accounts-dapplet]', { includeShadowDom: true })
               .find('[data-testid=activation-dapplet]', { includeShadowDom: true })
               .click()
-              .wait(25000)
         })
-      cy.get('dapplets-overlay-manager', { includeShadowDom: true })
-        .find('[data-testid=connecting-accounts-dapplet]', { includeShadowDom: true })
-        .find('[data-testid=activation-dapplet]', { includeShadowDom: true })
-        .should('have.class', 'active-switch')
       // })
 
       // it('find avatar badge', () => {
       cy.get('.dapplet-widget')
       // })
 
+      // it('the dapplets switch in the list is active', () => {
+      // cy.get('dapplets-overlay-manager', { includeShadowDom: true })
+      //   .find('[data-testid=connecting-accounts-dapplet]', { includeShadowDom: true })
+      //   .find('[data-testid=activation-dapplet]', { includeShadowDom: true })
+      //   .should('have.class', 'active-switch')
+      // })
+    })
+  )
+
+  qase(
+    9,
+    it('popup widget has accounts', () => {
       // it('popup is not visible', () => {
       cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
         .find('.accounts', { includeShadowDom: true })
@@ -86,14 +98,66 @@ describe('CA: popup widget on GitHub has accounts', () => {
         { includeShadowDom: true }
       )
       // })
+    })
+  )
 
-      // it('popup closes after click', () => {
+  qase(
+    6,
+    it('copy account name', () => {
+      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
+        .find('.account-container', { includeShadowDom: true })
+        .first()
+        .find('.copy-button')
+        .click()
+
+      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
+        .find('.account-container', { includeShadowDom: true })
+        .first()
+        .invoke('text')
+        .then((accountName) => {
+          const name = accountName.trim()
+          cy.window()
+            // !!! In Chrome we should click Allow to dome question or the test will be failed !!!
+            .its('navigator.clipboard')
+            .invoke('readText')
+            .should((copiedText) => {
+              expect(copiedText).eq(name)
+            })
+        })
+    })
+  )
+
+  qase(
+    7,
+    it('Link to accounts page', () => {
+      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
+        .find('.accounts', { includeShadowDom: true })
+        .should('not.be.visible')
+      cy.get('.dapplet-widget').find('.profile-badge', { includeShadowDom: true }).click()
+      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
+        .find('.accounts', { includeShadowDom: true })
+        .should('be.visible')
+
+      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
+        .find('.account', { includeShadowDom: true })
+        .contains('teremovskii', { includeShadowDom: true })
+        .should('have.attr', 'href', 'https://twitter.com/teremovskii')
+        .should('have.attr', 'target', '_blank')
+    })
+  )
+
+  qase(
+    5,
+    it('popup closes after click', () => {
+      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
+        .find('.accounts', { includeShadowDom: true })
+        .should('be.visible')
+
       cy.get('main').click()
       cy.wait(1000)
       cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
         .find('.accounts', { includeShadowDom: true })
         .should('not.be.visible')
-      // })
     })
   )
 })

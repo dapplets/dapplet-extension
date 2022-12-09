@@ -2,6 +2,7 @@ import { defineConfig } from 'cypress'
 import path from 'path'
 
 export default defineConfig({
+  defaultCommandTimeout: 25000,
   e2e: {
     setupNodeEvents(on) {
       on('before:browser:launch', (_, launchOptions) => {
@@ -30,4 +31,5 @@ export default defineConfig({
       // rootSuiteTitle: "Cypress tests",
     },
   },
+  chromeWebSecurity: false,
 })
