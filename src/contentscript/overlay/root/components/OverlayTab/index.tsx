@@ -1,11 +1,11 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useEffect, useRef } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { StorageRef } from '../../../../../common/types'
 import { ReactComponent as Help } from '../../assets/icons/iconsWidgetButton/help.svg'
-import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
 import { ReactComponent as Pause } from '../../assets/icons/iconsWidgetButton/pause.svg'
+import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
 import { StorageRefImage } from '../../components/StorageRefImage'
 import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTabMenu } from '../../types'
@@ -44,6 +44,8 @@ export interface OverlayTabProps {
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const visibleMenus = p.menus.filter((x) => x.hidden !== true)
   const [menuVisible, setMenuVisible] = useToggle(false)
+  const nodeVisibleMenu = useRef<HTMLDivElement>()
+  useEffect(() => {}, [nodeVisibleMenu])
   const onOpenDappletAction = async (f: string) => {
     if (!p.modules) return
     let isModuleActive
@@ -99,10 +101,15 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
 
   return (
     <div
-    onBlur={()=>setMenuVisible()}
-      onClick={() => {
+      tabIndex={0}
+      onBlur={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        e.relatedTarget?.hasAttribute('data-visible') ? null : setMenuVisible()
+      }}
+      onClick={(e) => {
         // !p.isActive && p.onTabClick()
-        setMenuVisible()
+
         // p.pinned ? visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu)) :  !p.isActive&&   onOpenDappletAction(p.tabId)
         p.pinned && visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu))
         // p.setOpenWallet()
@@ -114,12 +121,32 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       })}
     >
       {!p.pinned && menuVisible && (
-        <div className={styles.menuWidgets}>
-          {p.getWigetsConstructor(p.menuWidgets)}
+        <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
+          {p.getWigetsConstructor(p.menuWidgets, true)}
+          <div className={styles.delimeterMenuWidgets}></div>
           <div className={styles.blockStandartFunction}>
-            <SquaredButton disabled appearance={'big'} icon={Help} />
-            <SquaredButton appearance={'big'} icon={Store} />
-            <SquaredButton disabled appearance={'big'} icon={Pause} />
+            <SquaredButton
+              style={{ cursor: 'auto' }}
+              className={styles.squaredButtonMenuWidget}
+              data-visible
+              disabled={true}
+              appearance={'big'}
+              icon={Help}
+            />
+            <SquaredButton
+              className={styles.squaredButtonMenuWidget}
+              data-visible
+              appearance={'big'}
+              icon={Store}
+            />
+            <SquaredButton
+              style={{ cursor: 'auto' }}
+              className={styles.squaredButtonMenuWidget}
+              data-visible
+              disabled={true}
+              appearance={'big'}
+              icon={Pause}
+            />
           </div>
         </div>
       )}
@@ -129,10 +156,10 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           'moduleName' in p.icon ? (
           <ModuleIcon
             onClick={() => {
+              setMenuVisible()
               // !p.isActive&&
               // onOpenDappletAction(p.tabId)
               // !p.isActive && p.onTabClick()
-              console.log(p.menuWidgets)
             }}
             className={cn(
               styles.image,
@@ -151,6 +178,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
 
               // !p.isActive&&
               // onOpenDappletAction(p.tabId)
+              setMenuVisible()
               console.log(p.menuWidgets)
             }}
             className={cn(

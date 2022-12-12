@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { widgets } from '../../../../injector'
 import {
   ReactComponent as Account,
@@ -73,14 +73,12 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
   const noSystemTabs = p.tabs.filter((f) => f.title !== 'Dapplets')
   const [isShowTabs, onShowTabs] = useToggle(false)
-  const [isClick,onClick]=useToggle(false)
+  const [isClick, onClick] = useToggle(false)
 
-  const [newWidgets,setNewWidgets]=useState(widgets)
-//tab.id
- console.log(newWidgets);
- 
-  useEffect(() => { 
-  },[newWidgets,widgets,nodeOverlayToolbar,isClick])
+  const [newWidgets, setNewWidgets] = useState(widgets)
+  //tab.id
+
+  useEffect(() => {}, [newWidgets, widgets, nodeOverlayToolbar, isClick])
   const handleClickGetNodeOverlayToolbar = () => {
     if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
       nodeOverlayToolbar.current.value = ''
@@ -96,34 +94,41 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       }
     }
   }
- 
-  const getWigetsConstructor = (widgets) => {
+
+  const getWigetsConstructor = (widgets, isMenu?: boolean) => {
     if (widgets && widgets.length > 0) {
       const widgetsInConstructor = widgets
       const widgetsParse = [widgetsInConstructor].map((x, i) => {
         const widgetsObject = x.map((x, i) => {
           const newKey = x.orderIndex
           const widgetsObjectActivate = x.MENU_ACTION().map((x, i) => {
-      
-            const newWidgetButton = (
-              x().state.action?  <WidgetButton
-              data-testid="dapplet-active-button"
+            // x.state.pinned? x.state.pinned: x.state.pinned =false
+            const newWidgetButton = x().state.action ? (
+              <WidgetButton
+                isMenu={isMenu ? isMenu : false}
+                data-testid="dapplet-active-button"
                 key={`${newKey}` + i}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
                   x().state.action(x().state.ctx, x().state)
-                 onClick()
-                  
+                  onClick()
                 }}
-                hidden={x().state.hidden?x().state.hidden:false}
-                icon={x().state.icon?x().state.icon:null}
+                hidden={x().state.hidden ? x().state.hidden : false}
+                icon={x().state.icon ? x().state.icon : null}
                 title={x().state.title}
-              />:<LabelButton hidden={x().state.hidden?x().state.hidden:false} icon={x().state.icon?x().state.icon:null} key={`${newKey}` + i} title={x().state.title}/>
+              />
+            ) : (
+              <LabelButton
+                hidden={x().state.hidden ? x().state.hidden : false}
+                icon={x().state.icon ? x().state.icon : null}
+                key={`${newKey}` + i}
+                title={x().state.title}
+              />
             )
             return newWidgetButton
           })
-          
+
           return widgetsObjectActivate
         })
         return widgetsObject
@@ -192,7 +197,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     })
     return newSet
   }
-  
+
   return (
     <div
       ref={nodeOverlayToolbar}
@@ -211,7 +216,9 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             className={cn(styles.TabList, { [styles.isOpenWallet]: p.isOpenWallet })}
           >
             {getNewButtonTab('Connected Accounts')}
-            {newWidgets && newWidgets.length > 0 ? getWigetsConstructor(newWidgets).map((x, y) => x) : null}
+            {newWidgets && newWidgets.length > 0
+              ? getWigetsConstructor(newWidgets).map((x, y) => x)
+              : null}
 
             <div
               className={cn(styles.toggleTabs, {
@@ -220,9 +227,11 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             >
               {noSystemTabs.length > 0 &&
                 noSystemTabs.map((tab) => {
-               const menuWidgets =  newWidgets && newWidgets.length > 0  && newWidgets.filter((x)=> x.moduleName === tab.id)
-            
-               
+                  const menuWidgets =
+                    newWidgets &&
+                    newWidgets.length > 0 &&
+                    newWidgets.filter((x) => x.moduleName === tab.id)
+
                   return (
                     <OverlayTab
                       setOpenWallet={p.setOpenWallet}
@@ -245,7 +254,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                     />
                   )
                 })}
-             
+
               <ToggleOverlay
                 // getNode={handleClickGetNodeOverlayToolbar}
                 onClick={() => {
