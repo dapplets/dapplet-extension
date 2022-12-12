@@ -70,7 +70,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const regExpUserAgentName = new RegExp(/^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/)
   const inputOfFocusIPFS = useRef<HTMLInputElement>()
-  const inputOfFocusSia = useRef<HTMLInputElement>()
+  // const inputOfFocusSia = useRef<HTMLInputElement>()
   const inputOfFocusSwarmId = useRef<HTMLInputElement>()
   const inputOfFocusSwarm = useRef<HTMLInputElement>()
   const inputOfFocusEtn = useRef<HTMLInputElement>()
@@ -199,6 +199,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     try {
       const { setSwarmPostageStampId } = await initBGFunctions(browser)
       await setSwarmPostageStampId(id)
+
       loadSwarmPostageStampId()
     } catch (err) {
       setSwarmPostageStampIdInputError(err.message)
@@ -354,278 +355,227 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   return (
     <div className={styles.blockSettings}>
       <div className={styles.scrollBlock}>
-        <SettingWrapper
-          className={styles.wrapperSettings}
-          title="Social"
-          children={
-            <>
-              <SettingItem
-                title="Version"
-                component={
-                  <div className={styles.version}>
-                    <span className={styles.versionTitle}>{EXTENSION_VERSION}</span>
-                    {isUpdateAvailable ? (
-                      <button
-                        className={styles.versionButton}
-                        onClick={() =>
-                          window.open(
-                            `https://github.com/dapplets/dapplet-extension/releases`,
-                            '_blank'
-                          )
-                        }
-                      >
-                        Update
-                      </button>
-                    ) : null}
-                  </div>
-                }
-              />
-              <SettingItem
-                title="Trusted Users"
-                component={<></>}
-                children={<DropdownTrustedUsers />}
-              />
-
-              <SettingItem
-                title="Developer mode"
-                component={
-                  <>
-                    {isSvgLoaderDevMode ? (
-                      <span className={styles.loader}></span>
-                    ) : (
-                      <Switch checked={devModeProps} onChange={() => setDevMode(!devModeProps)} />
-                    )}
-                  </>
-                }
-              />
-              <SettingItem
-                title="Bug reports"
-                component={
-                  <>
-                    {isSvgErrorReporting ? (
-                      <span className={styles.loader}></span>
-                    ) : (
-                      <Switch
-                        checked={errorReporting}
-                        onChange={() => setErrorReporting(!errorReporting)}
-                      />
-                    )}
-                  </>
-                }
-              />
-              <SettingItem
-                title="Open popup"
-                component={
-                  <Switch onChange={() => setPopupInOverlay(!isPopup)} checked={isPopup} />
-                }
-              />
-              <SettingItem
-                title="User Agent Name"
-                component={<></>}
-                children={
-                  <>
-                    <form
-                      onBlur={() => {
-                        setUserAgentNameInputError(null)
-                      }}
-                      onSubmit={(e) => {
-                        e.preventDefault()
-
-                        setUserAgentName(userAgentNameInput)
-                        onPress(e, inputOfFocusAgentName)
-                      }}
-                      className={cn(styles.formDefault, {
-                        [styles.errorInputDefault]: !!userAgentNameInputError,
-                      })}
-                    >
-                      <input
-                        spellCheck={false}
-                        className={cn(styles.inputDefault, {})}
-                        placeholder={userAgentNameInput}
-                        ref={inputOfFocusAgentName}
-                        value={userAgentNameInput}
-                        onFocus={() => {
-                          setUserAgentNameInput('')
-                          setUserAgentNameInputError(null)
-                        }}
-                        onChange={(e) => {
-                          setUserAgentNameInput(e.target.value)
-                          setUserAgentNameInputError(null)
-                        }}
-                      />
-                    </form>
-                    {userAgentNameInputError ? (
-                      <div className={styles.errorMessage}>{userAgentNameInputError}</div>
-                    ) : null}
-                  </>
-                }
-              />
-            </>
-          }
-        />
-
-        <SettingWrapper
-          className={styles.wrapperSettings}
-          title="Parameters"
-          children={
-            <>
-              <SettingItem title="Registries" component={<></>} children={<DropdownRegistry />} />
-              <SettingItem
-                title="Dynamic Adapter"
-                component={<></>}
-                children={
-                  <InputPanelSettings
-                    isDynamycAdapter={true}
-                    isDefaultValueInput={dynamicAdapterInputDefault}
-                    isPostStampId={false}
-                    isValidHttpFunction={false}
-                    providerInputError={dynamicAdapterInputError}
-                    providerInput={dynamicAdapterInput}
-                    getDefaultValueProvider={() =>
-                      getDefaultValueProvider(
-                        dynamicAdapterInput,
-                        'dynamicAdapter',
-                        setDynamicAdapter
+        <SettingWrapper className={styles.wrapperSettings} title="Social">
+          <SettingItem
+            title="Version"
+            component={
+              <div className={styles.version}>
+                <span className={styles.versionTitle}>{EXTENSION_VERSION}</span>
+                {isUpdateAvailable ? (
+                  <button
+                    className={styles.versionButton}
+                    onClick={() =>
+                      window.open(
+                        `https://github.com/dapplets/dapplet-extension/releases`,
+                        '_blank'
                       )
                     }
-                    setProviderInputError={setDynamicAdapterInputError}
-                    setProviderInput={setDynamicAdapterInput}
-                    setProvider={setDynamicAdapter}
-                    onPress={onPress}
-                    inputOfFocusEtn={inputOfFocusAdapter}
-                  />
-                }
-              />
-              <SettingItem
-                title="Prefered Overlay Storage"
-                component={<></>}
-                children={<DropdownPreferedOverlayStorage />}
-              />
-              <SettingItem
-                title="Storages"
-                component={<></>}
-                children={
-                  <div className={styles.checkboxBlock}>
-                    <Checkbox isSupport isReadonly isCheckbox title="Centralized" />
+                  >
+                    Update
+                  </button>
+                ) : null}
+              </div>
+            }
+          />
+          <SettingItem title="Trusted Users" component={<></>}>
+            <DropdownTrustedUsers />
+          </SettingItem>
 
-                    <Checkbox
-                      isCheckbox={targetStorages?.includes(StorageTypes.Ipfs)}
-                      title="IPFS"
-                      onChange={(e) => {
-                        changeTargetStorage(StorageTypes.Ipfs, e.target.checked)
-                      }}
-                    />
+          <SettingItem
+            title="Developer mode"
+            component={
+              <>
+                {isSvgLoaderDevMode ? (
+                  <span className={styles.loader}></span>
+                ) : (
+                  <Switch checked={devModeProps} onChange={() => setDevMode(!devModeProps)} />
+                )}
+              </>
+            }
+          />
+          <SettingItem
+            title="Bug reports"
+            component={
+              <>
+                {isSvgErrorReporting ? (
+                  <span className={styles.loader}></span>
+                ) : (
+                  <Switch
+                    checked={errorReporting}
+                    onChange={() => setErrorReporting(!errorReporting)}
+                  />
+                )}
+              </>
+            }
+          />
+          <SettingItem
+            title="Open popup"
+            component={<Switch onChange={() => setPopupInOverlay(!isPopup)} checked={isPopup} />}
+          />
+          <SettingItem title="User Agent Name" component={<></>}>
+            <form
+              onBlur={() => {
+                setUserAgentNameInputError(null)
+              }}
+              onSubmit={(e) => {
+                e.preventDefault()
 
-                    <Checkbox
-                      title="Swarm"
-                      isCheckbox={targetStorages?.includes(StorageTypes.Swarm)}
-                      onChange={(e) => {
-                        changeTargetStorage(StorageTypes.Swarm, e.target.checked)
-                      }}
-                    />
-                  </div>
-                }
+                setUserAgentName(userAgentNameInput)
+                onPress(e, inputOfFocusAgentName)
+              }}
+              className={cn(styles.formDefault, {
+                [styles.errorInputDefault]: !!userAgentNameInputError,
+              })}
+            >
+              <input
+                spellCheck={false}
+                className={cn(styles.inputDefault, {})}
+                placeholder={userAgentNameInput}
+                ref={inputOfFocusAgentName}
+                value={userAgentNameInput}
+                onFocus={() => {
+                  setUserAgentNameInput('')
+                  setUserAgentNameInputError(null)
+                }}
+                onChange={(e) => {
+                  setUserAgentNameInput(e.target.value)
+                  setUserAgentNameInputError(null)
+                }}
               />
-            </>
-          }
-        />
-        <SettingWrapper
-          title="Providers"
-          children={
-            <>
-              <SettingItem
-                title="Ethereum Provider"
-                component={<></>}
-                children={
-                  <InputPanelSettings
-                    isDynamycAdapter={false}
-                    isDefaultValueInput={providerInputDefault}
-                    isPostStampId={false}
-                    isValidHttpFunction={true}
-                    providerInputError={providerInputError}
-                    providerInput={providerInput}
-                    getDefaultValueProvider={() =>
-                      getDefaultValueProvider(providerInput, 'providerUrl', setProvider)
-                    }
-                    setProviderInputError={setProviderInputError}
-                    setProviderInput={setProviderInput}
-                    setProvider={setProvider}
-                    onPress={onPress}
-                    inputOfFocusEtn={inputOfFocusEtn}
-                  />
-                }
+            </form>
+            {userAgentNameInputError ? (
+              <div className={styles.errorMessage}>{userAgentNameInputError}</div>
+            ) : null}
+          </SettingItem>
+        </SettingWrapper>
+
+        <SettingWrapper className={styles.wrapperSettings} title="Parameters">
+          <SettingItem title="Registries" component={<></>}>
+            <DropdownRegistry />
+          </SettingItem>
+          <SettingItem title="Dynamic Adapter" component={<></>}>
+            <InputPanelSettings
+              isDynamycAdapter={true}
+              isDefaultValueInput={dynamicAdapterInputDefault}
+              isPostStampId={false}
+              isValidHttpFunction={false}
+              providerInputError={dynamicAdapterInputError}
+              providerInput={dynamicAdapterInput}
+              getDefaultValueProvider={() =>
+                getDefaultValueProvider(dynamicAdapterInput, 'dynamicAdapter', setDynamicAdapter)
+              }
+              setProviderInputError={setDynamicAdapterInputError}
+              setProviderInput={setDynamicAdapterInput}
+              setProvider={setDynamicAdapter}
+              onPress={onPress}
+              inputOfFocusEtn={inputOfFocusAdapter}
+            />
+          </SettingItem>
+          <SettingItem title="Prefered Overlay Storage" component={<></>}>
+            <DropdownPreferedOverlayStorage />
+          </SettingItem>
+          <SettingItem title="Storages" component={<></>}>
+            <div className={styles.checkboxBlock}>
+              <Checkbox isSupport isReadonly isCheckbox title="Centralized" />
+
+              <Checkbox
+                isCheckbox={targetStorages?.includes(StorageTypes.Ipfs)}
+                title="IPFS"
+                onChange={(e) => {
+                  changeTargetStorage(StorageTypes.Ipfs, e.target.checked)
+                }}
               />
-              <SettingItem
-                title="Swarm Gateway"
-                component={<></>}
-                children={
-                  <InputPanelSettings
-                    isDynamycAdapter={false}
-                    isDefaultValueInput={swarmGatewayInputDefault}
-                    isPostStampId={false}
-                    isValidHttpFunction={true}
-                    providerInputError={swarmGatewayInputError}
-                    providerInput={swarmGatewayInput}
-                    getDefaultValueProvider={() =>
-                      getDefaultValueProvider(swarmGatewayInput, 'swarmGatewayUrl', setSwarmGateway)
-                    }
-                    setProviderInputError={setSwarmGatewayInputError}
-                    setProviderInput={setSwarmGatewayInput}
-                    setProvider={setSwarmGateway}
-                    onPress={onPress}
-                    inputOfFocusEtn={inputOfFocusSwarm}
-                  />
-                }
+
+              <Checkbox
+                title="Swarm"
+                isCheckbox={targetStorages?.includes(StorageTypes.Swarm)}
+                onChange={(e) => {
+                  changeTargetStorage(StorageTypes.Swarm, e.target.checked)
+                }}
               />
-              <SettingItem
-                title="Swarm Postage Stamp ID"
-                component={<></>}
-                children={
-                  <InputPanelSettings
-                    isDynamycAdapter={false}
-                    isDefaultValueInput={swarmPostageStampIdInputDefault}
-                    isPostStampId={true}
-                    isValidHttpFunction={false}
-                    isValidPostageStampId={isValidPostageStampId}
-                    providerInputError={swarmPostageStampIdInputError}
-                    providerInput={swarmPostageStampIdInput}
-                    getDefaultValueProvider={() =>
-                      getDefaultValueProvider(
-                        swarmPostageStampIdInput,
-                        'swarmPostageStampId',
-                        setSwarmPostageStampId
-                      )
-                    }
-                    setProviderInputError={setSwarmPostageStampIdInputError}
-                    setProviderInput={setSwarmPostageStampIdInput}
-                    setProvider={setSwarmPostageStampId}
-                    inputOfFocusEtn={inputOfFocusSwarmId}
-                  />
-                }
-              />
-              <SettingItem
-                title="IPFS Gateway"
-                component={<></>}
-                children={
-                  <InputPanelSettings
-                    isDynamycAdapter={false}
-                    isDefaultValueInput={ipfsGatewayInputDefault}
-                    isPostStampId={false}
-                    isValidHttpFunction={true}
-                    providerInputError={ipfsGatewayInputError}
-                    providerInput={ipfsGatewayInput}
-                    getDefaultValueProvider={() =>
-                      getDefaultValueProvider(ipfsGatewayInput, 'ipfsGatewayUrl', setIpfsGateway)
-                    }
-                    setProviderInputError={setIpfsGatewayInputError}
-                    setProviderInput={setIpfsGatewayInput}
-                    setProvider={setIpfsGateway}
-                    onPress={onPress}
-                    inputOfFocusEtn={inputOfFocusIPFS}
-                  />
-                }
-              />
-              {/* <SettingItem
+            </div>
+          </SettingItem>
+        </SettingWrapper>
+        <SettingWrapper title="Providers">
+          <SettingItem title="Ethereum Provider" component={<></>}>
+            <InputPanelSettings
+              isDynamycAdapter={false}
+              isDefaultValueInput={providerInputDefault}
+              isPostStampId={false}
+              isValidHttpFunction={true}
+              providerInputError={providerInputError}
+              providerInput={providerInput}
+              getDefaultValueProvider={() =>
+                getDefaultValueProvider(providerInput, 'providerUrl', setProvider)
+              }
+              setProviderInputError={setProviderInputError}
+              setProviderInput={setProviderInput}
+              setProvider={setProvider}
+              onPress={onPress}
+              inputOfFocusEtn={inputOfFocusEtn}
+            />
+          </SettingItem>
+          <SettingItem title="Swarm Gateway" component={<></>}>
+            <InputPanelSettings
+              isDynamycAdapter={false}
+              isDefaultValueInput={swarmGatewayInputDefault}
+              isPostStampId={false}
+              isValidHttpFunction={true}
+              providerInputError={swarmGatewayInputError}
+              providerInput={swarmGatewayInput}
+              getDefaultValueProvider={() =>
+                getDefaultValueProvider(swarmGatewayInput, 'swarmGatewayUrl', setSwarmGateway)
+              }
+              setProviderInputError={setSwarmGatewayInputError}
+              setProviderInput={setSwarmGatewayInput}
+              setProvider={setSwarmGateway}
+              onPress={onPress}
+              inputOfFocusEtn={inputOfFocusSwarm}
+            />
+          </SettingItem>
+          <SettingItem title="Swarm Postage Stamp ID" component={<></>}>
+            <InputPanelSettings
+              isDynamycAdapter={false}
+              isDefaultValueInput={swarmPostageStampIdInputDefault}
+              isPostStampId={true}
+              isValidHttpFunction={false}
+              isValidPostageStampId={isValidPostageStampId}
+              providerInputError={swarmPostageStampIdInputError}
+              providerInput={swarmPostageStampIdInput}
+              getDefaultValueProvider={() =>
+                getDefaultValueProvider(
+                  swarmPostageStampIdInput,
+                  'swarmPostageStampId',
+                  setSwarmPostageStampId
+                )
+              }
+              setProviderInputError={setSwarmPostageStampIdInputError}
+              setProviderInput={setSwarmPostageStampIdInput}
+              setProvider={setSwarmPostageStampId}
+              inputOfFocusEtn={inputOfFocusSwarmId}
+              loadProvider={loadSwarmPostageStampId}
+              // onPress={onPress}
+            />
+          </SettingItem>
+          <SettingItem title="IPFS Gateway" component={<></>}>
+            <InputPanelSettings
+              isDynamycAdapter={false}
+              isDefaultValueInput={ipfsGatewayInputDefault}
+              isPostStampId={false}
+              isValidHttpFunction={true}
+              providerInputError={ipfsGatewayInputError}
+              providerInput={ipfsGatewayInput}
+              getDefaultValueProvider={() =>
+                getDefaultValueProvider(ipfsGatewayInput, 'ipfsGatewayUrl', setIpfsGateway)
+              }
+              setProviderInputError={setIpfsGatewayInputError}
+              setProviderInput={setIpfsGatewayInput}
+              setProvider={setIpfsGateway}
+              onPress={onPress}
+              inputOfFocusEtn={inputOfFocusIPFS}
+            />
+          </SettingItem>
+          {/* <SettingItem
                 title="SIA Portal"
                 component={<></>}
                 children={
@@ -647,9 +597,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   />
                 }
               /> */}
-            </>
-          }
-        />
+        </SettingWrapper>
       </div>
     </div>
   )
