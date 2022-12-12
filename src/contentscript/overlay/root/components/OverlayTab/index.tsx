@@ -45,7 +45,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const visibleMenus = p.menus.filter((x) => x.hidden !== true)
   const [menuVisible, setMenuVisible] = useToggle(false)
   const nodeVisibleMenu = useRef<HTMLDivElement>()
-  useEffect(() => {}, [nodeVisibleMenu])
+  // useEffect(() => {}, [nodeVisibleMenu])
   const onOpenDappletAction = async (f: string) => {
     if (!p.modules) return
     let isModuleActive
@@ -109,7 +109,8 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       }}
       onClick={(e) => {
         // !p.isActive && p.onTabClick()
-
+        e.preventDefault()
+        e.stopPropagation()
         // p.pinned ? visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu)) :  !p.isActive&&   onOpenDappletAction(p.tabId)
         p.pinned && visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu))
         // p.setOpenWallet()
@@ -155,7 +156,9 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           typeof p.icon === 'object' &&
           'moduleName' in p.icon ? (
           <ModuleIcon
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
               setMenuVisible()
               // !p.isActive&&
               // onOpenDappletAction(p.tabId)
@@ -173,13 +176,15 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           />
         ) : (
           <StorageRefImage
-            onClick={() => {
+            onClick={(e) => {
               // !p.isActive && p.onTabClick()
 
               // !p.isActive&&
               // onOpenDappletAction(p.tabId)
+              e.preventDefault()
+              e.stopPropagation()
               setMenuVisible()
-              console.log(p.menuWidgets)
+            
             }}
             className={cn(
               styles.image,

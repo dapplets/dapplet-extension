@@ -58,7 +58,9 @@ const ToggleOverlay = ({ onClick, className, getNode }: TToggleOverlay): ReactEl
     <button
       data-testid="toggle-overlay-button"
       className={cn(styles.toggleOverlay, className)}
-      onClick={() => {
+      onClick={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
         onClick()
         // getNode()
       }}
@@ -109,8 +111,8 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 data-testid="dapplet-active-button"
                 key={`${newKey}` + i}
                 onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
+                  !isMenu&& e.preventDefault()
+                  !isMenu&& e.stopPropagation()
                   x().state.action(x().state.ctx, x().state)
                   onClick()
                 }}
