@@ -109,14 +109,32 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       onBlur={(e) => {
         e.preventDefault()
         e.stopPropagation()
-        e.relatedTarget?.hasAttribute('data-visible') ? null : setMenuVisible()
+        if (
+          document
+            .querySelector('#dapplets-overlay-manager')
+            .classList.contains('dapplets-overlay-collapsed')
+        ) {
+          e.relatedTarget?.hasAttribute('data-visible') ? null : setMenuVisible()
+        } else {
+          menuVisible && setMenuVisible()
+        }
       }}
       onClick={(e) => {
         // !p.isActive && p.onTabClick()
         e.preventDefault()
         e.stopPropagation()
-        // p.pinned ? visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu)) :  !p.isActive&&   onOpenDappletAction(p.tabId)
-        p.pinned && visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu))
+        if (
+          document
+            .querySelector('#dapplets-overlay-manager')
+            .classList.contains('dapplets-overlay-collapsed')
+        ) {
+          p.pinned && visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu))
+        } else {
+          p.pinned && visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu))
+
+          menuVisible && setMenuVisible()
+          onOpenDappletAction(p.tabId)
+        }
         // p.setOpenWallet()
       }}
       className={cn(styles.tab, p.classNameTab, {
@@ -125,37 +143,41 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
         // [styles.isOpenWallet]: p.isOpenWallet,
       })}
     >
-      {!p.pinned && menuVisible && (
-        <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
-          {p.getWigetsConstructor(p.menuWidgets, true)}
-          <div className={styles.delimeterMenuWidgets}></div>
-          <div className={styles.blockStandartFunction}>
-            <SquaredButton
-              style={{ cursor: 'auto' }}
-              className={styles.squaredButtonMenuWidget}
-              data-visible
-              disabled={true}
-              appearance={'big'}
-              icon={Help}
-            />
-            <SquaredButton
-              className={styles.squaredButtonMenuWidget}
-              data-visible
-              appearance={'big'}
-              icon={Store}
-              onClick={() => onOpenStore(p.tabId)}
-            />
-            <SquaredButton
-              style={{ cursor: 'auto' }}
-              className={styles.squaredButtonMenuWidget}
-              data-visible
-              disabled={true}
-              appearance={'big'}
-              icon={Pause}
-            />
+      {!p.pinned &&
+        menuVisible &&
+        document
+          .querySelector('#dapplets-overlay-manager')
+          .classList.contains('dapplets-overlay-collapsed') && (
+          <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
+            {p.getWigetsConstructor(p.menuWidgets, true)}
+            <div className={styles.delimeterMenuWidgets}></div>
+            <div className={styles.blockStandartFunction}>
+              <SquaredButton
+                style={{ cursor: 'auto' }}
+                className={styles.squaredButtonMenuWidget}
+                data-visible
+                disabled={true}
+                appearance={'big'}
+                icon={Help}
+              />
+              <SquaredButton
+                className={styles.squaredButtonMenuWidget}
+                data-visible
+                appearance={'big'}
+                icon={Store}
+                onClick={() => onOpenStore(p.tabId)}
+              />
+              <SquaredButton
+                style={{ cursor: 'auto' }}
+                className={styles.squaredButtonMenuWidget}
+                data-visible
+                disabled={true}
+                appearance={'big'}
+                icon={Pause}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
       <div className={styles.top}>
         {p.icon && typeof p.icon === 'function' ? null : p.icon && // /> //   })} //     [styles.cursor]: !p.isActive, //   className={cn(styles.image, { //   }} //     !p.isActive && p.onTabClick() //   onClick={() => { // <p.icon
           typeof p.icon === 'object' &&
@@ -164,10 +186,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              setMenuVisible()
-              // !p.isActive&&
-              // onOpenDappletAction(p.tabId)
-              // !p.isActive && p.onTabClick()
+              document
+                .querySelector('#dapplets-overlay-manager')
+                .classList.contains('dapplets-overlay-collapsed')
+                ? setMenuVisible()
+                : onOpenDappletAction(p.tabId) && (menuVisible ? setMenuVisible() : null)
             }}
             className={cn(
               styles.image,
@@ -182,13 +205,13 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
         ) : (
           <StorageRefImage
             onClick={(e) => {
-              // !p.isActive && p.onTabClick()
-
-              // !p.isActive&&
-              // onOpenDappletAction(p.tabId)
               e.preventDefault()
               e.stopPropagation()
-              setMenuVisible()
+              document
+                .querySelector('#dapplets-overlay-manager')
+                .classList.contains('dapplets-overlay-collapsed')
+                ? setMenuVisible()
+                : onOpenDappletAction(p.tabId) && (menuVisible ? setMenuVisible() : null)
             }}
             className={cn(
               styles.image,

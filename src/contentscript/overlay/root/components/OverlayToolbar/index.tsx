@@ -59,8 +59,8 @@ const ToggleOverlay = ({ onClick, className, getNode }: TToggleOverlay): ReactEl
       data-testid="toggle-overlay-button"
       className={cn(styles.toggleOverlay, className)}
       onClick={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
+        // e.preventDefault()
+        // e.stopPropagation()
         onClick()
         // getNode()
       }}
@@ -222,10 +222,13 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             className={cn(styles.TabList, { [styles.isOpenWallet]: p.isOpenWallet })}
           >
             {getNewButtonTab('Connected Accounts')}
-            {!isShowTabs&&(newWidgets && newWidgets.length > 0
-              ? getWigetsConstructor(newWidgets).map((x, y) => x)
-              : null)}
-            
+            {!isShowTabs &&
+              document
+                .querySelector('#dapplets-overlay-manager')
+                .classList.contains('dapplets-overlay-collapsed') &&
+              (newWidgets && newWidgets.length > 0
+                ? getWigetsConstructor(newWidgets).map((x, y) => x)
+                : null)}
 
             <div
               className={cn(styles.toggleTabs, {
