@@ -76,4 +76,5 @@ export class GlobalConfig extends Base {
   myDapplets: { registryUrl: string; name: string }[] = []
 
   connectedAccountsContractAddress: string = null
+  pinnedDappletActions: { dappletName: string; widgetPinId: string }[] = []
 }

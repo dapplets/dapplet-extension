@@ -33,8 +33,6 @@
   }
 }
 
-
-
 .menuWidgets {
   display: flex;
   justify-content: space-between;
@@ -148,6 +146,16 @@
     }
   }
 }
-.widgetHidden {
-    display: none;
+.isPinned {
+  svg {
+    width: 16px;
+    height: 16px;
+
+    path {
+      fill: $PrimaryHover;
+    }
   }
+}
+.widgetHidden {
+  display: none;
+}

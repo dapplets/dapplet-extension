@@ -13,6 +13,7 @@ export type Exports = {
     pinned?: string
     action: (ctx: any, me: ButtonProps) => void
     insPointName?: string
+    pinnedId?:string
   }
 
   export type WidgetConfig<T> = {
@@ -33,6 +34,7 @@ export type Exports = {
     insPointName?: string
     theme?: string
     pinned?:boolean
+    pinnedId?:string
   }
   export interface IWidget<T> {
     mount(): void;
@@ -60,4 +62,5 @@ export type Exports = {
     insPointName?: string
     theme?: string
     pinned?:boolean
+    pinnedId?:string
   }

@@ -105,6 +105,8 @@ const state = (() => {
         state.changedHandler = () => widget.mount()
         widget.mount() // ToDo: remove it?
       }
+      // console.log(widget.state);
+      
       return widget
     }
 

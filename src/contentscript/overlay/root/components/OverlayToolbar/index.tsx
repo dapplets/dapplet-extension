@@ -1,5 +1,7 @@
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import { widgets } from '../../../../injector'
 import {
   ReactComponent as Account,
@@ -78,22 +80,44 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [isClick, onClick] = useToggle(false)
 
   const [newWidgets, setNewWidgets] = useState(widgets)
-  //tab.id
+  const [pinnedActionButton, setPinnedActionButton] = useState(null)
 
-  useEffect(() => {}, [newWidgets, widgets, nodeOverlayToolbar, isClick])
-  const handleClickGetNodeOverlayToolbar = () => {
-    if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
-      nodeOverlayToolbar.current.value = ''
+  useEffect(() => {
+    const init = async () => {
+      await _refreshData()
+    }
 
-      const element = nodeOverlayToolbar.current.getBoundingClientRect()
+    init()
+    return () => {}
+  }, [newWidgets, widgets, nodeOverlayToolbar, isClick])
+  const _refreshData = async () => {
+    try {
+      const { getPinnedActions } = await initBGFunctions(browser)
 
-      const x = element.x
+      const pinnedAction = await getPinnedActions()
+      setPinnedActionButton(pinnedAction)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+  const addPinnedButton = async (name, pinId) => {
+    try {
+      const { addPinnedActions } = await initBGFunctions(browser)
 
-      if (x > 10 && x < 100) {
-        setNodeOverlayToolbar(true)
-      } else {
-        setNodeOverlayToolbar(false)
-      }
+      await addPinnedActions(name, pinId)
+      await _refreshData()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+  const removePinnedButton = async (name, pinId) => {
+    try {
+      const { removePinnedActions } = await initBGFunctions(browser)
+
+      await removePinnedActions(name, pinId)
+      await _refreshData()
+    } catch (err) {
+      console.error(err)
     }
   }
 
@@ -101,11 +125,21 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     if (widgets && widgets.length > 0) {
       const widgetsInConstructor = widgets
       const widgetsParse = [widgetsInConstructor].map((x, i) => {
-        const widgetsObject = x.map((x, i) => {
-          const newKey = x.orderIndex
-          const widgetsObjectActivate = x.MENU_ACTION().map((x, i) => {
-            // x.state.pinned? x.state.pinned: x.state.pinned =false
-            const newWidgetButton = x().state.action ? (
+        const widgetsObject = x.map((item, i) => {
+          const newKey = item.orderIndex
+          const widgetsObjectActivate = item.MENU_ACTION().map((widgetItem, i) => {
+            const isPinned = pinnedActionButton
+              ? pinnedActionButton.filter((x, i) => {
+                  const pinnedBoolean =
+                    x.dappletName === item.moduleName &&
+                    x.widgetPinId === widgetItem().state.pinnedID
+                      ? true
+                      : false
+                  return pinnedBoolean
+                })
+              : false
+
+            const newWidgetButton = widgetItem().state.action ? (
               <WidgetButton
                 isMenu={isMenu ? isMenu : false}
                 data-testid="dapplet-active-button"
@@ -113,23 +147,37 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 onClick={(e) => {
                   !isMenu && e.preventDefault()
                   !isMenu && e.stopPropagation()
-                  x().state.action(x().state.ctx, x().state)
+                  widgetItem().state.action(widgetItem().state.ctx, widgetItem().state)
                   onClick()
                 }}
-                hidden={x().state.hidden ? x().state.hidden : false}
-                icon={x().state.icon ? x().state.icon : null}
-                title={x().state.title}
+                hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
+                icon={widgetItem().state.icon ? widgetItem().state.icon : null}
+                title={widgetItem().state.title}
+                pinned={isPinned.length > 0 ? true : false}
                 onPinned={() => {
-                  x().state.pinned = !x().state.pinned
-                  onClick()
+                  widgetItem().state.pinned = !widgetItem().state.pinned
+                  if (pinnedActionButton) {
+                    pinnedActionButton.map((x, i) => {
+                      if (
+                        x.dappletName === item.moduleName &&
+                        x.widgetPinId === widgetItem().state.pinnedID
+                      ) {
+                        removePinnedButton(item.moduleName, widgetItem().state.pinnedID)
+                      } else {
+                        addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
+                      }
+                    })
+                  } else {
+                    addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
+                  }
                 }}
               />
             ) : (
               <LabelButton
-                hidden={x().state.hidden ? x().state.hidden : false}
-                icon={x().state.icon ? x().state.icon : null}
+                hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
+                icon={widgetItem().state.icon ? widgetItem().state.icon : null}
                 key={`${newKey}` + i}
-                title={x().state.title}
+                title={widgetItem().state.title}
               />
             )
             return newWidgetButton

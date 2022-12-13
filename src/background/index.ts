@@ -211,7 +211,9 @@ browser.runtime.onMessage.addListener(
     removeMyDapplet: globalConfigService.removeMyDapplet.bind(globalConfigService),
     updateTargetStorages: globalConfigService.updateTargetStorages.bind(globalConfigService),
     getTargetStorages: globalConfigService.getTargetStorages.bind(globalConfigService),
-
+    getPinnedActions: globalConfigService.getPinnedActions.bind(globalConfigService),
+    addPinnedActions: globalConfigService.addPinnedActions.bind(globalConfigService),
+    removePinnedActions: globalConfigService.removePinnedActions.bind(globalConfigService),
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),
     setUserSettings: (moduleName, key, value) =>
