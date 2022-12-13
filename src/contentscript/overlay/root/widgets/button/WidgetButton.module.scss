@@ -33,9 +33,7 @@
   }
 }
 
-.widgetHidden {
-  display: none;
-}
+
 
 .menuWidgets {
   display: flex;
@@ -90,7 +88,7 @@
 
 .blockDisabled {
   cursor: auto;
-  background: #1e1e1e;
+  background: inherit;
   border: 1px solid #e3e3e3;
   border-radius: 6px;
   img {
@@ -99,7 +97,7 @@
 
   &:hover {
     cursor: auto;
-    background: #1e1e1e;
+    background: inherit;
     border: 1px solid #e3e3e3;
     border-radius: 6px;
     img {
@@ -109,13 +107,13 @@
       color: #747376;
     }
     .widgetButton {
-      background: #1e1e1e;
+      background: inherit;
       cursor: auto;
     }
   }
   &:active {
     cursor: auto;
-    background: #1e1e1e;
+    background: inherit;
     border: 1px solid #e3e3e3;
     border-radius: 6px;
     img {
@@ -125,7 +123,7 @@
       color: #747376;
     }
     .widgetButton {
-      background: #1e1e1e;
+      background: inherit;
       cursor: auto;
     }
   }
@@ -150,3 +148,6 @@
     }
   }
 }
+.widgetHidden {
+    display: none;
+  }

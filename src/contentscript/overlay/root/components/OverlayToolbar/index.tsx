@@ -111,14 +111,18 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 data-testid="dapplet-active-button"
                 key={`${newKey}` + i}
                 onClick={(e) => {
-                  !isMenu&& e.preventDefault()
-                  !isMenu&& e.stopPropagation()
+                  !isMenu && e.preventDefault()
+                  !isMenu && e.stopPropagation()
                   x().state.action(x().state.ctx, x().state)
                   onClick()
                 }}
                 hidden={x().state.hidden ? x().state.hidden : false}
                 icon={x().state.icon ? x().state.icon : null}
                 title={x().state.title}
+                onPinned={() => {
+                  x().state.pinned = !x().state.pinned
+                  onClick()
+                }}
               />
             ) : (
               <LabelButton
@@ -218,9 +222,10 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             className={cn(styles.TabList, { [styles.isOpenWallet]: p.isOpenWallet })}
           >
             {getNewButtonTab('Connected Accounts')}
-            {newWidgets && newWidgets.length > 0
+            {!isShowTabs&&(newWidgets && newWidgets.length > 0
               ? getWigetsConstructor(newWidgets).map((x, y) => x)
-              : null}
+              : null)}
+            
 
             <div
               className={cn(styles.toggleTabs, {

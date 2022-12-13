@@ -49,11 +49,11 @@
   }
   &:disabled {
     cursor: auto !important;
-    background: #1e1e1e;
+    background: inherit;
     border: 1px solid #e3e3e3;
     svg {
       path {
-        stroke: #747376;
+        stroke: #e3e3e3;
       }
     }
   }

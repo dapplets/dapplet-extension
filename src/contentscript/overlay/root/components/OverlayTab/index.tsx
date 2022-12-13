@@ -1,7 +1,8 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { ReactElement, useEffect, useRef } from 'react'
+import React, { ReactElement, useRef } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import { DAPPLETS_STORE_URL } from '../../../../../common/constants'
 import { StorageRef } from '../../../../../common/types'
 import { ReactComponent as Help } from '../../assets/icons/iconsWidgetButton/help.svg'
 import { ReactComponent as Pause } from '../../assets/icons/iconsWidgetButton/pause.svg'
@@ -98,7 +99,10 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       }
     }
   }
-
+  const onOpenStore = async (f: string) => {
+    const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f}`
+    window.open(url, '_blank')
+  }
   return (
     <div
       tabIndex={0}
@@ -139,6 +143,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
               data-visible
               appearance={'big'}
               icon={Store}
+              onClick={() => onOpenStore(p.tabId)}
             />
             <SquaredButton
               style={{ cursor: 'auto' }}
@@ -184,7 +189,6 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
               e.preventDefault()
               e.stopPropagation()
               setMenuVisible()
-            
             }}
             className={cn(
               styles.image,

@@ -11,10 +11,11 @@ export interface WidgetButtonProps
   hidden?: boolean
   isMenu?: boolean
   onClick?: any
+  onPinned?:any
 }
 
 export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) => {
-  const { title, icon, disabled, hidden, isMenu = false, pinned, onClick, ...otherProps } = props
+  const { title, icon, disabled, hidden, isMenu = false, pinned,onPinned, onClick, ...otherProps } = props
 
   return (
     <div data-visible>
@@ -45,7 +46,7 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
             </button>
             <span className={styles.widgetButtonTitle}>{title}</span>
           </div>
-          <button className={styles.widgetButtonPinned} data-visible>
+          <button onClick={onPinned} className={styles.widgetButtonPinned} data-visible>
             <Pinned />
           </button>
         </div>
