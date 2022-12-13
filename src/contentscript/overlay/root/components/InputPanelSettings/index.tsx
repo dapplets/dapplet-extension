@@ -20,6 +20,7 @@ export interface InputPanelSettingsProps
   isValidPostageStampId?: any
   isDefaultValueInput: any
   isDynamycAdapter: boolean
+  loadProvider?:any
 }
 
 export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
@@ -38,6 +39,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
     isValidPostageStampId,
     isDefaultValueInput,
     isDynamycAdapter,
+    loadProvider,
     ...anotherProps
   } = props
   useEffect(() => {}, [isDefaultValueInput])
@@ -66,11 +68,13 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
                 getDefaultValueProvider()
               }
             } else {
-              if (!isValidHttp(providerInput)) {
+              if (!isValidHttp(providerInput) && !isPostStampId) {
+            
                 getDefaultValueProvider()
               }
               if (providerInput.length === 0) {
-                getDefaultValueProvider()
+              
+                loadProvider()
               }
             }
           }}
@@ -83,6 +87,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
             if (isPostStampId) {
               if (isValidPostageStampId(providerInput)) {
                 setProvider(providerInput)
+                inputOfFocusEtn.current?.blur()
               } else if (!isValidPostageStampId(providerInput)) {
                 setProviderInputError('Enter valid Swarm Postage Stamp ID')
                 getDefaultValueProvider()
