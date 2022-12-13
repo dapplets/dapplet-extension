@@ -1,11 +1,17 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useRef } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import { DAPPLETS_STORE_URL } from '../../../../../common/constants'
 import { StorageRef } from '../../../../../common/types'
+import { ReactComponent as Help } from '../../assets/icons/iconsWidgetButton/help.svg'
+import { ReactComponent as Pause } from '../../assets/icons/iconsWidgetButton/pause.svg'
+import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
 import { StorageRefImage } from '../../components/StorageRefImage'
+import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTabMenu } from '../../types'
 import { ModuleIcon, ModuleIconProps } from '../ModuleIcon'
+import { SquaredButton } from '../SquaredButton'
 import styles from './OverlayTab.module.scss'
 
 export interface OverlayTabProps {
@@ -32,11 +38,15 @@ export interface OverlayTabProps {
   pathname?: string
   overlays?: any
   onToggleClick?: any
+  menuWidgets?: any
+  getWigetsConstructor?: any
 }
 
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const visibleMenus = p.menus.filter((x) => x.hidden !== true)
-
+  const [menuVisible, setMenuVisible] = useToggle(false)
+  const nodeVisibleMenu = useRef<HTMLDivElement>()
+  // useEffect(() => {}, [nodeVisibleMenu])
   const onOpenDappletAction = async (f: string) => {
     if (!p.modules) return
     let isModuleActive
@@ -89,29 +99,74 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       }
     }
   }
-
+  const onOpenStore = async (f: string) => {
+    const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f}`
+    window.open(url, '_blank')
+  }
   return (
     <div
-      onClick={() => {
+      tabIndex={0}
+      onBlur={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        e.relatedTarget?.hasAttribute('data-visible') ? null : setMenuVisible()
+      }}
+      onClick={(e) => {
         // !p.isActive && p.onTabClick()
-
+        e.preventDefault()
+        e.stopPropagation()
         // p.pinned ? visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu)) :  !p.isActive&&   onOpenDappletAction(p.tabId)
         p.pinned && visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu))
         // p.setOpenWallet()
       }}
       className={cn(styles.tab, p.classNameTab, {
         [styles.tabNotActive]: !p.isActive,
+        // [styles.menuWidgets]: !p.pinned && menuVisible
         // [styles.isOpenWallet]: p.isOpenWallet,
       })}
     >
+      {!p.pinned && menuVisible && (
+        <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
+          {p.getWigetsConstructor(p.menuWidgets, true)}
+          <div className={styles.delimeterMenuWidgets}></div>
+          <div className={styles.blockStandartFunction}>
+            <SquaredButton
+              style={{ cursor: 'auto' }}
+              className={styles.squaredButtonMenuWidget}
+              data-visible
+              disabled={true}
+              appearance={'big'}
+              icon={Help}
+            />
+            <SquaredButton
+              className={styles.squaredButtonMenuWidget}
+              data-visible
+              appearance={'big'}
+              icon={Store}
+              onClick={() => onOpenStore(p.tabId)}
+            />
+            <SquaredButton
+              style={{ cursor: 'auto' }}
+              className={styles.squaredButtonMenuWidget}
+              data-visible
+              disabled={true}
+              appearance={'big'}
+              icon={Pause}
+            />
+          </div>
+        </div>
+      )}
       <div className={styles.top}>
         {p.icon && typeof p.icon === 'function' ? null : p.icon && // /> //   })} //     [styles.cursor]: !p.isActive, //   className={cn(styles.image, { //   }} //     !p.isActive && p.onTabClick() //   onClick={() => { // <p.icon
           typeof p.icon === 'object' &&
           'moduleName' in p.icon ? (
           <ModuleIcon
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              setMenuVisible()
               // !p.isActive&&
-              onOpenDappletAction(p.tabId)
+              // onOpenDappletAction(p.tabId)
               // !p.isActive && p.onTabClick()
             }}
             className={cn(
@@ -126,11 +181,14 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           />
         ) : (
           <StorageRefImage
-            onClick={() => {
+            onClick={(e) => {
               // !p.isActive && p.onTabClick()
 
               // !p.isActive&&
-              onOpenDappletAction(p.tabId)
+              // onOpenDappletAction(p.tabId)
+              e.preventDefault()
+              e.stopPropagation()
+              setMenuVisible()
             }}
             className={cn(
               styles.image,
@@ -164,8 +222,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             {visibleMenus.map((menu) => {
               return (
                 <li
-                data-testid={`system-tab-${menu.title}`}
-
+                  data-testid={`system-tab-${menu.title}`}
                   key={menu.id}
                   title={menu.title}
                   // onClick={() => {

@@ -101,6 +101,7 @@ const state = (() => {
         widget = new Widget() as IWidget<T>
         widget.state = state.state
         widget.insPointName = state.INITIAL_STATE
+        // widget.state.pinned = state.state.pinned?state.state.pinned:false 
         state.changedHandler = () => widget.mount()
         widget.mount() // ToDo: remove it?
       }

@@ -32,6 +32,7 @@ export type Exports = {
     ctx?: any
     insPointName?: string
     theme?: string
+    pinned?:boolean
   }
   export interface IWidget<T> {
     mount(): void;
@@ -58,4 +59,5 @@ export type Exports = {
     ctx?: any
     insPointName?: string
     theme?: string
+    pinned?:boolean
   }
