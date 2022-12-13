@@ -1,5 +1,8 @@
 import { defineConfig } from 'cypress'
+import dotenv from 'dotenv'
 import path from 'path'
+
+dotenv.config()
 
 export default defineConfig({
   defaultCommandTimeout: 25000,
@@ -20,7 +23,7 @@ export default defineConfig({
       charts: true,
     },
     cypressQaseReporterReporterOptions: {
-      apiToken: '1daa8793fe74e3780aebb625a35d76c84c18cbaf',
+      apiToken: process.env.CYPRESS_TOKEN,
       projectCode: 'DE',
       logging: true,
       // basePath: "https://api.qase.io/v1",
