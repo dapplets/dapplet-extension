@@ -61,8 +61,8 @@ const ToggleOverlay = ({ onClick, className, getNode }: TToggleOverlay): ReactEl
       data-testid="toggle-overlay-button"
       className={cn(styles.toggleOverlay, className)}
       onClick={(e) => {
-        // e.preventDefault()
-        // e.stopPropagation()
+        e.preventDefault()
+        e.stopPropagation()
         onClick()
         // getNode()
       }}
@@ -343,7 +343,10 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             </div>
             <div>
               <button
-                onClick={() => onShowTabs()}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onShowTabs()}}
                 data-testid="show-tabs-button"
                 className={cn(styles.miniButton, {
                   [styles.hideTabsBtn]: isShowTabs,
