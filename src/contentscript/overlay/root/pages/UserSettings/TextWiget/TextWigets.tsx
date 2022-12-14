@@ -1,5 +1,5 @@
-import { utils } from '@rjsf/core'
-import { rangeSpec } from '@rjsf/core/lib/utils'
+import { getDisplayLabel } from '@rjsf/utils'
+import { rangeSpec } from '@rjsf/utils'
 
 import cn from 'classnames'
 import React, { useEffect } from 'react'
@@ -7,8 +7,6 @@ import React, { useEffect } from 'react'
 import { getSemanticProps } from '../utils'
 
 import styles from './TextWiget.module.scss'
-
-const { getDisplayLabel } = utils
 
 const MyCustomWidget = (props, step) => {
   return (
