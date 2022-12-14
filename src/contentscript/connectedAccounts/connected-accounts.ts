@@ -99,6 +99,9 @@ class ConnectedAccounts {
           }
     )
 
+    const firstAccountStatus = await this.getStatus(firstAccountId, firstOriginId)
+    const secondAccountStatus = await this.getStatus(secondAccountId, secondOriginId)
+
     const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     const { requestId } = await openConnectedAccountsPopup(
@@ -108,11 +111,13 @@ class ConnectedAccounts {
             name: firstAccountId,
             origin: firstOriginId,
             img: firstAccountImage ? firstAccountImage : makeBlockie(firstAccountId),
+            accountActive: firstAccountStatus,
           },
           {
             name: secondAccountId,
             origin: secondOriginId,
             img: secondAccountImage ? secondAccountImage : makeBlockie(secondAccountId),
+            accountActive: secondAccountStatus,
           },
         ],
         condition: !canConnect,

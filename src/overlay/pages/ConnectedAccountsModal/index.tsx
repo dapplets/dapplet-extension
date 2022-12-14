@@ -20,7 +20,20 @@ const UserButton = ({ user }: { user: IConnectedAccountUser }) => {
   )
 }
 
-const ConnectedAccountsModal = (props: any) => {
+interface IConnectedAccountsModalProps {
+  data: {
+    accountsToConnect?: [IConnectedAccountUser, IConnectedAccountUser]
+    accountsToDisconnect?: [IConnectedAccountUser, IConnectedAccountUser]
+    accountToChangeStatus?: IConnectedAccountUser
+    condition?: boolean
+    frameId: string
+  }
+  onCloseClick: () => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  bus: any
+}
+
+const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const { data, onCloseClick, bus } = props
   const { accountsToConnect, accountsToDisconnect, accountToChangeStatus, condition } = data
 
@@ -66,11 +79,7 @@ const ConnectedAccountsModal = (props: any) => {
 
     try {
       setIsWaiting(true)
-      const res = await changeConnectedAccountStatus(
-        account.name,
-        account.origin,
-        !account.accountActive
-      )
+      await changeConnectedAccountStatus(account.name, account.origin, !account.accountActive)
     } catch (err) {
       if (err.message !== 'User rejected the transaction.')
         console.log('Error in changeConnectedAccountStatus().', err)
