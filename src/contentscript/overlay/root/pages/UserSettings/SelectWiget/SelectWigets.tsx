@@ -1,12 +1,10 @@
-import { utils } from '@rjsf/core'
+import { asNumber, guessType } from '@rjsf/utils'
 import _ from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { getSemanticProps } from '../utils'
 
 import cn from 'classnames'
 import styles from './SelectWiget.module.scss'
-
-const { asNumber, guessType } = utils
 
 const nums = new Set(['number', 'integer'])
 

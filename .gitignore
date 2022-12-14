@@ -6,3 +6,5 @@ lib
 cypress/screenshots
 cypress/videos
 cypress/downloads
+cypress/reports
+.env
