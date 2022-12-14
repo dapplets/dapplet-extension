@@ -148,11 +148,11 @@ const ConnectedAccountsModal = (props: any) => {
           onConfirmLabel="Confirm"
         />
       )}
-      {!!condition && (
+      {condition && (
         <Modal
           isWaiting={isWaiting}
           title={'Add your NEAR account ID'}
-          content={`Add your NEAR account ID to your ${socialNetworkToConnect} username. This is done so the Orace can confirm your ownership of the ${socialNetworkToConnect} account`}
+          content={`Add your NEAR account ID to your ${socialNetworkToConnect} username. This is done so the Oracle can confirm your ownership of the ${socialNetworkToConnect} account`}
           onClose={onCloseClick}
           onConfirm={async () => {
             const frameId = data.frameId
