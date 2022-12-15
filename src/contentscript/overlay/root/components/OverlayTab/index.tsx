@@ -332,7 +332,9 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     </span>
                   </li>
                   <li
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
                       p.navigate(`/system/connectedAccounts`)
                       p.onToggleClick()
                       setMenuVisible(false)
@@ -345,9 +347,12 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     </span>
                   </li>
                   <li
-                    onClick={() => {
-                      p.navigate(`/system/notifications`)
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
                       p.onToggleClick()
+                      p.navigate(`/system/notifications`)
+
                       setMenuVisible(false)
                     }}
                     className={styles.mainMenuItem}
@@ -364,9 +369,12 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     </span>
                   </li> */}
                   <li
-                    onClick={() => {
-                      p.navigate(`/system/dapplets`)
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
                       p.onToggleClick()
+                      p.navigate(`/system/dapplets`)
+
                       setMenuVisible(false)
                     }}
                     className={styles.mainMenuItem}
