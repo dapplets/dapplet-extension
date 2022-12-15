@@ -57,9 +57,9 @@ export const Modal = ({
           </div>
         )}
         {!accounts && isWaiting && <img src={Loader} className={styles.loader} />}
-        {onConfirm && onConfirmLabel && (
-          <div className={styles.modalFooter}>
-            <div className={styles.wrapperModalWantLink}>
+        <div className={styles.modalFooter}>
+          <div className={styles.wrapperModalWantLink}>
+            {onConfirm && onConfirmLabel && (
               <button
                 onClick={onConfirm}
                 className={cn(styles.button, styles.primary)}
@@ -67,16 +67,19 @@ export const Modal = ({
               >
                 {onConfirmLabel}
               </button>
-              <button
-                onClick={onClose}
-                className={cn(styles.button, styles.secondary)}
-                disabled={isWaiting}
-              >
-                Cancel
-              </button>
-            </div>
+            )}
+            <button
+              onClick={onClose}
+              className={cn(
+                onConfirm && onConfirmLabel && styles.button,
+                onConfirm && onConfirmLabel ? styles.secondary : styles.tertiary
+              )}
+              disabled={isWaiting}
+            >
+              {onConfirm && onConfirmLabel ? 'Cancel' : 'Close'}
+            </button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   )

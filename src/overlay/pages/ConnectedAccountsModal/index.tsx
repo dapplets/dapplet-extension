@@ -3,7 +3,7 @@ import cn from 'classnames'
 import React, { useState, useEffect } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { resources } from '../../../common/resources'
-import { IConnectedAccountUser } from '../../../common/types'
+import { IConnectedAccountUser, TConnectedAccount } from '../../../common/types'
 import styles from './ConnectedAccountsModal.module.scss'
 import { Modal } from './modal'
 
@@ -42,47 +42,68 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const [areThereSameRequests, setAreThereSameRequests] = useState(false)
   const [wait, setWait] = useState(true)
   const [isWaiting, setIsWaiting] = useState(false)
+  const [requestWasDoneBefore, setRequestWasDoneBefore] = useState(false)
 
-  const getSameRequests = async (accounts: [IConnectedAccountUser, IConnectedAccountUser]) => {
+  const askIfSameRequestsExist = async (
+    accounts: [IConnectedAccountUser, IConnectedAccountUser]
+  ) => {
     const [firstAccount, secondAccount] = accounts
     const firstAccountGlobalId = firstAccount.name + '/' + firstAccount.origin
-    // console.log('firstAccountGlobalId', firstAccountGlobalId)
     const secondAccountGlobalId = secondAccount.name + '/' + secondAccount.origin
-    // console.log('secondAccountGlobalId', secondAccountGlobalId)
     const { getConnectedAccountsPendingRequests, getConnectedAccountsVerificationRequest } =
       await initBGFunctions(browser)
     const a = await getConnectedAccountsPendingRequests()
-    // console.log('pending requests', a)
     for (let i = 0; i < a.length; i++) {
-      // console.log('a[i]', a[i])
       const b: { firstAccount: string; secondAccount: string } =
         await getConnectedAccountsVerificationRequest(a[i])
-      // console.log('verification request', b)
       const first = b.firstAccount
-      // console.log('first', first)
       const second = b.secondAccount
-      // console.log('second', second)
       const res =
         (first === firstAccountGlobalId && second === secondAccountGlobalId) ||
         (first === secondAccountGlobalId && second === firstAccountGlobalId)
-      // console.log('res', res)
       return res
     }
     return false
   }
 
+  const checkIfTheAccountsHaveBeenAlreadyConnected = async (
+    accounts: [IConnectedAccountUser, IConnectedAccountUser]
+  ) => {
+    const { getConnectedAccounts } = await initBGFunctions(browser)
+    const accountFirstCA: TConnectedAccount[][] = await getConnectedAccounts(
+      accounts[0].name,
+      accounts[0].origin,
+      1
+    )
+    const caGlobalNames = accountFirstCA[0].map((acc) => acc.id)
+    const secondAccountGlobalId = accounts[1].name + '/' + accounts[1].origin
+    return caGlobalNames.includes(secondAccountGlobalId)
+  }
+
   useEffect(() => {
-    if (accountsToConnect) {
-      getSameRequests(accountsToConnect)
-        .then((x) => setAreThereSameRequests(x))
-        .finally(() => setWait(false))
-    } else if (accountsToDisconnect) {
-      getSameRequests(accountsToDisconnect)
-        .then((x) => setAreThereSameRequests(x))
-        .finally(() => setWait(false))
-    } else {
-      setWait(false)
+    const makeCheckup = async () => {
+      if (accountsToConnect) {
+        const answerAboutTheSameRequests = await askIfSameRequestsExist(accountsToConnect)
+        const areAccountsAlreadyConnected = await checkIfTheAccountsHaveBeenAlreadyConnected(
+          accountsToConnect
+        )
+        setAreThereSameRequests(answerAboutTheSameRequests)
+        setRequestWasDoneBefore(areAccountsAlreadyConnected)
+        setWait(false)
+      } else if (accountsToDisconnect) {
+        const answerAboutTheSameRequests = await askIfSameRequestsExist(accountsToDisconnect)
+        const areAccountsAlreadyConnected = await checkIfTheAccountsHaveBeenAlreadyConnected(
+          accountsToDisconnect
+        )
+        setAreThereSameRequests(answerAboutTheSameRequests)
+        setRequestWasDoneBefore(!areAccountsAlreadyConnected)
+        setWait(false)
+      } else {
+        setWait(false)
+      }
     }
+
+    makeCheckup()
   }, [accountsToConnect, accountsToDisconnect])
 
   const handleConnectOrDisconnect = async (
@@ -146,8 +167,6 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     (accountsToConnect || accountsToDisconnect) &&
     getTitle(accountsToConnect || accountsToDisconnect)
 
-  // console.log('areThereSameRequests', areThereSameRequests)
-
   if (wait) {
     return <Modal isWaiting={true} onClose={onCloseClick} />
   }
@@ -157,7 +176,18 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
       <Modal
         isWaiting={isWaiting}
         title={'You have already sent a request'}
-        content={'Check connected account list to see connection status'}
+        content={'Check the connected accounts list to see connection status'}
+        onClose={onCloseClick}
+      />
+    )
+  }
+
+  if (requestWasDoneBefore) {
+    return (
+      <Modal
+        isWaiting={isWaiting}
+        title={`You have already ${accountsToConnect ? 'connected' : 'disconnected'} the accounts`}
+        content={'Check the connected accounts list'}
         onClose={onCloseClick}
       />
     )
