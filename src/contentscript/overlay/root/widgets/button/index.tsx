@@ -32,6 +32,7 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
     <div data-visible>
       {isMenu ? (
         <div
+          data-testid="dapplet-active-menu"
           className={cn(styles.menuWidgets, {
             [styles.widgetHidden]: hidden,
           })}
@@ -58,7 +59,9 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
             <span className={styles.widgetButtonTitle}>{title}</span>
           </div>
           <button
-            onClick={onPinned}
+            onClick={() => {
+              onPinned()
+            }}
             className={cn(styles.widgetButtonPinned, {
               [styles.isPinned]: pinned,
             })}
@@ -70,6 +73,7 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
       ) : (
         pinned && (
           <button
+            data-testid="dapplet-active-button"
             data-visible
             className={cn(styles.widgetButton, {
               [styles.widgetHidden]: hidden,

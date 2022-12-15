@@ -35,12 +35,12 @@ describe('dapplets action test', () => {
 
       // it('activate test dapplet', ()=>{
       cy.get('dapplets-overlay-manager', { includeShadowDom: true })
-        .getByTestId('system-tab-Settings', { includeShadowDom: true })
+        .getByTestId('system-tab-settings', { includeShadowDom: true })
         .click()
         .wait(5000)
 
       cy.get('dapplets-overlay-manager', { includeShadowDom: true })
-        .getByTestId('settings-page-Developer', { includeShadowDom: true })
+        .getByTestId('settings-page-developer', { includeShadowDom: true })
         .click()
 
       cy.get('dapplets-overlay-manager', { includeShadowDom: true }).wait(5000)

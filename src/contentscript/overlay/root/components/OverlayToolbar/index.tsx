@@ -83,7 +83,10 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
   const [newWidgets, setNewWidgets] = useState(widgets)
   const [pinnedActionButton, setPinnedActionButton] = useState(null)
-
+  const [isVisibleAnimation, setVisibleAnimation] = useState(false)
+  const [iconAnimateWidget, setIconAnimateWidget] = useState('')
+  const [isPinnedAnimateWidget, setPinnedAnimateWidget] = useState(false)
+  const btnRef = useRef<HTMLDivElement>()
   useEffect(() => {
     const init = async () => {
       await _refreshData()
@@ -144,7 +147,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             const newWidgetButton = widgetItem().state.action ? (
               <WidgetButton
                 isMenu={isMenu ? isMenu : false}
-                data-testid="dapplet-active-button"
                 key={`${newKey}` + i}
                 onClick={(e) => {
                   !isMenu && e.preventDefault()
@@ -158,6 +160,13 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 pinned={isPinned.length > 0 ? true : false}
                 onPinned={() => {
                   widgetItem().state.pinned = !widgetItem().state.pinned
+                  setVisibleAnimation(true)
+
+                  setIconAnimateWidget(widgetItem().state.icon ? widgetItem().state.icon : null)
+                  setPinnedAnimateWidget(isPinned.length > 0 ? true : false)
+                  setTimeout(() => {
+                    setVisibleAnimation(false)
+                  }, 1100)
                   if (pinnedActionButton) {
                     pinnedActionButton.map((x, i) => {
                       if (
@@ -251,6 +260,21 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     return newSet
   }
 
+  const getAnimateButtonWidget = (icon: string, isPinned: boolean) => {
+    return (
+      <span
+        ref={btnRef}
+        className={cn(styles.widgetButtonAnimate, {
+          [styles.widgetButtonAnimatePinned]: isPinnedAnimateWidget,
+        })}
+      >
+        {icon && icon.length > 0 ? (
+          <img data-visible className={cn(styles.widgetButtonImgAnimate)} src={icon} />
+        ) : null}
+      </span>
+    )
+  }
+
   return (
     <div
       ref={nodeOverlayToolbar}
@@ -269,15 +293,17 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             className={cn(styles.TabList, { [styles.isOpenWallet]: p.isOpenWallet })}
           >
             {getNewButtonTab('Connected Accounts')}
+            {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget, isPinnedAnimateWidget)}
             {!isShowTabs &&
               document
                 .querySelector('#dapplets-overlay-manager')
                 .classList.contains('dapplets-overlay-collapsed') &&
               (newWidgets && newWidgets.length > 0
-                ? getWigetsConstructor(newWidgets).map((x, y) => x)
+                ? getWigetsConstructor(newWidgets).map((x) => x)
                 : null)}
 
             <div
+              data-testid={isShowTabs ? 'toolbar-show' : 'toolbar-hide'}
               className={cn(styles.toggleTabs, {
                 [styles.hideTabs]: !isShowTabs,
               })}
