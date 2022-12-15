@@ -8,8 +8,8 @@ interface IModalProps {
   content?: ReactElement | string
   accounts?: ReactElement
   onClose: () => void
-  onConfirm: () => Promise<void>
-  onConfirmLabel: string
+  onConfirm?: () => Promise<void>
+  onConfirmLabel?: string
   isWaiting?: boolean
 }
 
@@ -57,24 +57,26 @@ export const Modal = ({
           </div>
         )}
         {!accounts && isWaiting && <img src={Loader} className={styles.loader} />}
-        <div className={styles.modalFooter}>
-          <div className={styles.wrapperModalWantLink}>
-            <button
-              onClick={onConfirm}
-              className={cn(styles.button, styles.primary)}
-              disabled={isWaiting}
-            >
-              {onConfirmLabel}
-            </button>
-            <button
-              onClick={onClose}
-              className={cn(styles.button, styles.secondary)}
-              disabled={isWaiting}
-            >
-              Cancel
-            </button>
+        {onConfirm && onConfirmLabel && (
+          <div className={styles.modalFooter}>
+            <div className={styles.wrapperModalWantLink}>
+              <button
+                onClick={onConfirm}
+                className={cn(styles.button, styles.primary)}
+                disabled={isWaiting}
+              >
+                {onConfirmLabel}
+              </button>
+              <button
+                onClick={onClose}
+                className={cn(styles.button, styles.secondary)}
+                disabled={isWaiting}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
