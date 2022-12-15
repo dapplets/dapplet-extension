@@ -47,6 +47,8 @@ export interface OverlayToolbarProps {
   module?: any
   overlays?: any
   widgets?: any
+  connectedDescriptors?: any
+  selectedWallet?: any
 }
 
 type TToggleOverlay = {
@@ -191,12 +193,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     } else null
   }
   const getNewButtonTab = (parametersFilter: string) => {
-    // if(document
-    //   .querySelector('#dapplets-overlay-manager')
-    //   .classList.contains('dapplets-overlay-hidden')){
-    //     p.navigate!('/system/dapplets')
-    //   }
-    // if (!p.module) return
     const clone = Object.assign({}, SYSTEM_TAB)
     const newSystemTab = [clone]
     const newSet = newSystemTab.map((tab) => {
@@ -209,17 +205,21 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
       return (
         <div key={NewTabs.id}>
-          {/* {!p.module ? (
-            <div className={styles.loaderAccount}></div>
-          ) : ( */}
           <OverlayTab
             {...newTab}
+            isToolbar={true}
             isActive={activeTabId === NewTabs.id}
             activeTabMenuId={activeTabMenuId}
             classNameTab={styles.tabConnectedWrapper}
             onCloseClick={() => p.onCloseClick(NewTabs)}
             overlays={p.overlays}
             modules={p.module}
+            navigate={p.navigate}
+            pathname={p.pathname}
+            onToggleClick={p.onToggleClick}
+            selectedWallet={p.selectedWallet}
+            connectedDescriptors={p.connectedDescriptors}
+            setOpenWallet={p.setOpenWallet}
             onMenuClick={(menu) => {
               if (
                 document
@@ -245,7 +245,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               p.onTabClick(NewTabs)
             }}
           />
-          {/* )} */}
         </div>
       )
     })
@@ -309,6 +308,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                       onToggleClick={p.onToggleClick}
                       getWigetsConstructor={getWigetsConstructor}
                       menuWidgets={menuWidgets}
+                      mainMenuNavigation={p.onMenuClick}
                     />
                   )
                 })}
@@ -346,7 +346,8 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  onShowTabs()}}
+                  onShowTabs()
+                }}
                 data-testid="show-tabs-button"
                 className={cn(styles.miniButton, {
                   [styles.hideTabsBtn]: isShowTabs,

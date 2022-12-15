@@ -103,8 +103,6 @@ function SelectWidget(props) {
     // eslint-disable-next-line no-shadow
     { value }
   ) => {
-    // console.log(value)
-
     onChange && onChange(processValue(schema, value))
   }
   // eslint-disable-next-line no-shadow
@@ -113,7 +111,6 @@ function SelectWidget(props) {
     // eslint-disable-next-line no-shadow
     target: { value },
   }) => onFocus && onFocus(id, processValue(schema, value))
-  // console.log(value)
 
   return (
     <Form.Dropdown

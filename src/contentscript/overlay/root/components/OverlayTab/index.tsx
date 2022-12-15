@@ -1,14 +1,18 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { ReactElement, useRef } from 'react'
+import makeBlockie from 'ethereum-blockies-base64'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { DAPPLETS_STORE_URL } from '../../../../../common/constants'
-import { StorageRef } from '../../../../../common/types'
+import { DefaultSigners, StorageRef } from '../../../../../common/types'
+import { ReactComponent as Account } from '../../assets/icons/iconsWidgetButton/account.svg'
 import { ReactComponent as Help } from '../../assets/icons/iconsWidgetButton/help.svg'
+import { ReactComponent as Login } from '../../assets/icons/iconsWidgetButton/login.svg'
+import { ReactComponent as Max } from '../../assets/icons/iconsWidgetButton/max.svg'
+import { ReactComponent as Notification } from '../../assets/icons/iconsWidgetButton/notification.svg'
 import { ReactComponent as Pause } from '../../assets/icons/iconsWidgetButton/pause.svg'
 import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
 import { StorageRefImage } from '../../components/StorageRefImage'
-import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTabMenu } from '../../types'
 import { ModuleIcon, ModuleIconProps } from '../ModuleIcon'
 import { SquaredButton } from '../SquaredButton'
@@ -40,13 +44,45 @@ export interface OverlayTabProps {
   onToggleClick?: any
   menuWidgets?: any
   getWigetsConstructor?: any
+  mainMenuNavigation?: any
+  connectedDescriptors?: any
+  selectedWallet?: any
+  isToolbar?: boolean
 }
 
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const visibleMenus = p.menus.filter((x) => x.hidden !== true)
-  const [menuVisible, setMenuVisible] = useToggle(false)
   const nodeVisibleMenu = useRef<HTMLDivElement>()
-  // useEffect(() => {}, [nodeVisibleMenu])
+  const [menuVisible, setMenuVisible] = useState(false)
+
+  useEffect(() => {
+    !document
+      .querySelector('#dapplets-overlay-manager')
+      .classList.contains('dapplets-overlay-collapsed') && setMenuVisible(false)
+  }, [menuVisible])
+
+  const connectWallet = async () => {
+    const { pairWalletViaOverlay } = await initBGFunctions(browser)
+    try {
+      await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
+      p.setOpenWallet()
+    } catch (error) {
+    } finally {
+    }
+  }
+  const getIconSelectedWallet = () => {
+    if (p.selectedWallet) {
+      const newIcon =
+        p.connectedDescriptors &&
+        p.connectedDescriptors.length > 0 &&
+        p.connectedDescriptors.filter((x) => x.type === p.selectedWallet)
+
+      const iconLogin =
+        newIcon && newIcon[0]?.account && makeBlockie(newIcon[0]?.account.toLowerCase())
+      return iconLogin
+    } else null
+  }
+
   const onOpenDappletAction = async (f: string) => {
     if (!p.modules) return
     let isModuleActive
@@ -114,28 +150,26 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             .querySelector('#dapplets-overlay-manager')
             .classList.contains('dapplets-overlay-collapsed')
         ) {
-          e.relatedTarget?.hasAttribute('data-visible') ? null : setMenuVisible()
+          e.relatedTarget?.hasAttribute('data-visible') && menuVisible
+            ? null
+            : setMenuVisible(false)
         } else {
-          menuVisible && setMenuVisible()
+          setMenuVisible(false)
         }
       }}
       onClick={(e) => {
-        // !p.isActive && p.onTabClick()
         e.preventDefault()
         e.stopPropagation()
+
         if (
           document
             .querySelector('#dapplets-overlay-manager')
             .classList.contains('dapplets-overlay-collapsed')
         ) {
-          p.pinned && visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu))
+          setMenuVisible(!menuVisible)
         } else {
-          p.pinned && visibleMenus.length > 0 && visibleMenus.map((menu) => p.onMenuClick(menu))
-
-          menuVisible && setMenuVisible()
-          onOpenDappletAction(p.tabId)
+          onOpenDappletAction(p.tabId) && setMenuVisible(false)
         }
-        // p.setOpenWallet()
       }}
       className={cn(styles.tab, p.classNameTab, {
         [styles.tabNotActive]: !p.isActive,
@@ -183,15 +217,6 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           typeof p.icon === 'object' &&
           'moduleName' in p.icon ? (
           <ModuleIcon
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              document
-                .querySelector('#dapplets-overlay-manager')
-                .classList.contains('dapplets-overlay-collapsed')
-                ? setMenuVisible()
-                : onOpenDappletAction(p.tabId) && (menuVisible ? setMenuVisible() : null)
-            }}
             className={cn(
               styles.image,
               {
@@ -204,15 +229,6 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           />
         ) : (
           <StorageRefImage
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              document
-                .querySelector('#dapplets-overlay-manager')
-                .classList.contains('dapplets-overlay-collapsed')
-                ? setMenuVisible()
-                : onOpenDappletAction(p.tabId) && (menuVisible ? setMenuVisible() : null)
-            }}
             className={cn(
               styles.image,
               {
@@ -248,10 +264,25 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   data-testid={`system-tab-${menu.title}`}
                   key={menu.id}
                   title={menu.title}
-                  // onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault
+                    e.stopPropagation()
+                    if (
+                      document
+                        .querySelector('#dapplets-overlay-manager')
+                        .classList.contains('dapplets-overlay-collapsed')
+                    ) {
+                      menu.id === 'connectedAccounts' && setMenuVisible(!menuVisible)
+                      // menuVisible && setMenuVisible()
+                    } else {
+                      p.pinned &&
+                        visibleMenus.length > 0 &&
+                        visibleMenus.map((menu) => p.onMenuClick(menu))
 
-                  //   p.onMenuClick(menu)
-                  // }}
+                      setMenuVisible(false)
+                      onOpenDappletAction(p.tabId)
+                    }
+                  }}
                   className={cn(
                     styles.item,
                     {
@@ -260,7 +291,22 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     p.classNameItem
                   )}
                 >
-                  {menu.icon && typeof menu.icon === 'function' ? (
+                  {menu.id === 'connectedAccounts' ? (
+                    menu.icon && typeof menu.icon === 'function' ? (
+                      p.selectedWallet && p.isToolbar ? (
+                        <StorageRefImage storageRef={getIconSelectedWallet() as any} />
+                      ) : (
+                        <menu.icon />
+                      )
+                    ) : menu.icon && typeof menu.icon === 'object' && 'moduleName' in menu.icon ? (
+                      <ModuleIcon
+                        moduleName={menu.icon.moduleName}
+                        registryUrl={menu.icon.registryUrl}
+                      />
+                    ) : (
+                      <StorageRefImage storageRef={menu.icon as any} />
+                    )
+                  ) : menu.icon && typeof menu.icon === 'function' ? (
                     <menu.icon />
                   ) : menu.icon && typeof menu.icon === 'object' && 'moduleName' in menu.icon ? (
                     <ModuleIcon
@@ -273,6 +319,71 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                 </li>
               )
             })}
+            {p.pinned &&
+              menuVisible &&
+              document
+                .querySelector('#dapplets-overlay-manager')
+                .classList.contains('dapplets-overlay-collapsed') && (
+                <ul className={styles.mainMenu}>
+                  <li onClick={connectWallet} className={styles.mainMenuItem}>
+                    <span className={styles.mainMenuItemTitle}>Log in to extension</span>
+                    <span className={styles.mainMenuItemIcon}>
+                      <Login />
+                    </span>
+                  </li>
+                  <li
+                    onClick={() => {
+                      p.navigate(`/system/connectedAccounts`)
+                      p.onToggleClick()
+                      setMenuVisible(false)
+                    }}
+                    className={styles.mainMenuItem}
+                  >
+                    <span className={styles.mainMenuItemTitle}>Connected Accounts</span>
+                    <span className={styles.mainMenuItemIcon}>
+                      <Account />
+                    </span>
+                  </li>
+                  <li
+                    onClick={() => {
+                      p.navigate(`/system/notifications`)
+                      p.onToggleClick()
+                      setMenuVisible(false)
+                    }}
+                    className={styles.mainMenuItem}
+                  >
+                    <span className={styles.mainMenuItemTitle}>Notifications</span>
+                    <span className={styles.mainMenuItemIcon}>
+                      <Notification />
+                    </span>
+                  </li>
+                  {/* <li className={styles.mainMenuItem}>
+                    <span className={styles.mainMenuItemTitle}>Disable dapplets on this page</span>
+                    <span className={styles.mainMenuItemIcon}>
+                      <Power />
+                    </span>
+                  </li> */}
+                  <li
+                    onClick={() => {
+                      p.navigate(`/system/dapplets`)
+                      p.onToggleClick()
+                      setMenuVisible(false)
+                    }}
+                    className={styles.mainMenuItem}
+                  >
+                    <span className={styles.mainMenuItemTitle}>Maximize extension</span>
+                    <span className={styles.mainMenuItemIcon}>
+                      <Max />
+                    </span>
+                  </li>
+                  {/* <li className={styles.mainMenuItem}>
+                    <span className={styles.mainMenuItemTitle}>Edit lists</span>
+                    <span className={styles.mainMenuItemIcon}>
+                      <Edit />
+                    </span>
+                  </li> */}
+                </ul>
+              )}
           </ul>
         )
       }

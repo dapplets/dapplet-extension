@@ -11,13 +11,22 @@ export interface WidgetButtonProps
   hidden?: boolean
   isMenu?: boolean
   onClick?: any
-  onPinned?:any
-  pinnedId?:string
+  onPinned?: any
+  pinnedId?: string
 }
 
 export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) => {
-  const { title, icon, disabled, hidden, isMenu = false, pinned,onPinned, onClick, ...otherProps } = props
-// console.log(pinned);
+  const {
+    title,
+    icon,
+    disabled,
+    hidden,
+    isMenu = false,
+    pinned,
+    onPinned,
+    onClick,
+    ...otherProps
+  } = props
 
   return (
     <div data-visible>
@@ -48,27 +57,33 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
             </button>
             <span className={styles.widgetButtonTitle}>{title}</span>
           </div>
-          <button onClick={onPinned} className={cn(styles.widgetButtonPinned,{
-           [styles.isPinned] :pinned
-          })} data-visible>
+          <button
+            onClick={onPinned}
+            className={cn(styles.widgetButtonPinned, {
+              [styles.isPinned]: pinned,
+            })}
+            data-visible
+          >
             <Pinned />
           </button>
         </div>
       ) : (
-        pinned&&  <button
-          data-visible
-          className={cn(styles.widgetButton, {
-            [styles.widgetHidden]: hidden,
-          })}
-          title={title ? title : null}
-          disabled={disabled ? disabled : false}
-          onClick={onClick}
-          {...otherProps}
-        >
-          {icon && icon.length > 0 ? (
-            <img data-visible className={cn(styles.widgetButtonImg)} src={icon} />
-          ) : null}
-        </button>
+        pinned && (
+          <button
+            data-visible
+            className={cn(styles.widgetButton, {
+              [styles.widgetHidden]: hidden,
+            })}
+            title={title ? title : null}
+            disabled={disabled ? disabled : false}
+            onClick={onClick}
+            {...otherProps}
+          >
+            {icon && icon.length > 0 ? (
+              <img data-visible className={cn(styles.widgetButtonImg)} src={icon} />
+            ) : null}
+          </button>
+        )
       )}
     </div>
   )
