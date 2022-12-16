@@ -87,22 +87,26 @@
 .blockDisabled {
   cursor: auto;
   background: inherit;
-  border: 1px solid #e3e3e3;
+  // border: 1px solid #e3e3e3;
   border-radius: 6px;
+  .widgetButtonTitle {
+    color: #e3e3e3;
+  }
+
   img {
-    filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
+    filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(154%) contrast(100%) !important;
   }
 
   &:hover {
     cursor: auto;
     background: inherit;
-    border: 1px solid #e3e3e3;
+    border: none;
     border-radius: 6px;
     img {
-      filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
+      filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(154%) contrast(100%) !important;
     }
     .widgetButtonTitle {
-      color: #747376;
+      color: #e3e3e3;
     }
     .widgetButton {
       background: inherit;
@@ -112,13 +116,14 @@
   &:active {
     cursor: auto;
     background: inherit;
-    border: 1px solid #e3e3e3;
+    border: none;
     border-radius: 6px;
     img {
-      filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
+      // filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
+      filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(154%) contrast(100%) !important;
     }
     .widgetButtonTitle {
-      color: #747376;
+      color: #e3e3e3;
     }
     .widgetButton {
       background: inherit;
@@ -150,7 +155,6 @@
   svg {
     width: 16px;
     height: 16px;
-
     path {
       fill: $PrimaryHover;
     }
@@ -158,4 +162,23 @@
 }
 .widgetHidden {
   display: none;
+}
+
+.widgetDisabled {
+  cursor: auto;
+  background: inherit;
+
+  cursor: auto;
+  img {
+    filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(154%) contrast(100%) !important;
+  }
+  &:hover {
+    cursor: auto;
+    background: inherit;
+
+    cursor: auto;
+    img {
+      filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(154%) contrast(100%) !important;
+    }
+  }
 }

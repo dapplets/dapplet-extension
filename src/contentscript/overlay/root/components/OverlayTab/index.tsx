@@ -141,6 +141,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   }
   return (
     <div
+      data-testid={!p.pinned ? 'tab-not-pinned' : 'tab-pinned'}
       tabIndex={0}
       onBlur={(e) => {
         e.preventDefault()
@@ -261,7 +262,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             {visibleMenus.map((menu) => {
               return (
                 <li
-                  data-testid={`system-tab-${menu.title.toLowerCase()}`}
+                  data-testid={`system-tab-${menu.title}`}
                   key={menu.id}
                   title={menu.title}
                   onClick={(e) => {
@@ -324,7 +325,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
               document
                 .querySelector('#dapplets-overlay-manager')
                 .classList.contains('dapplets-overlay-collapsed') && (
-                <ul className={styles.mainMenu}>
+                <ul data-testid="main-menu-actions" className={styles.mainMenu}>
                   <li onClick={connectWallet} className={styles.mainMenuItem}>
                     <span className={styles.mainMenuItemTitle}>Log in to extension</span>
                     <span className={styles.mainMenuItemIcon}>

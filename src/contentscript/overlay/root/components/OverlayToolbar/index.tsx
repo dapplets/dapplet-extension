@@ -155,10 +155,13 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                   onClick()
                 }}
                 hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
+                disabled={widgetItem().state.disabled ? widgetItem().state.disabled : false}
                 icon={widgetItem().state.icon ? widgetItem().state.icon : null}
                 title={widgetItem().state.title}
                 pinned={isPinned.length > 0 ? true : false}
                 onPinned={() => {
+                 
+                  
                   widgetItem().state.pinned = !widgetItem().state.pinned
                   setVisibleAnimation(true)
 
@@ -181,6 +184,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                   } else {
                     addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
                   }
+                  onClick()
                 }}
               />
             ) : (

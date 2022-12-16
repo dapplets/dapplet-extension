@@ -1,6 +1,4 @@
 import { qase } from 'cypress-qase-reporter/dist/mocha'
-
-let title = 'new title'
 describe('dapplets action test', () => {
   qase(
     2,
@@ -30,19 +28,16 @@ describe('dapplets action test', () => {
         .click()
 
       cy.get('dapplets-overlay-manager').should('not.have.class', 'dapplets-overlay-collapsed')
-
-      // })
-
-      // it('activate test dapplet', ()=>{
+      // 'open developer page'
       cy.get('dapplets-overlay-manager', { includeShadowDom: true })
-        .getByTestId('system-tab-settings', { includeShadowDom: true })
+        .getByTestId('system-tab-Settings', { includeShadowDom: true })
         .click()
         .wait(5000)
 
       cy.get('dapplets-overlay-manager', { includeShadowDom: true })
-        .getByTestId('settings-page-developer', { includeShadowDom: true })
+        .getByTestId('settings-page-Developer', { includeShadowDom: true })
         .click()
-
+      // add localhost test dapplet
       cy.get('dapplets-overlay-manager', { includeShadowDom: true }).wait(5000)
       cy.get('dapplets-overlay-manager', { includeShadowDom: true })
         .getByTestId('input-add-localhost', { includeShadowDom: true })
@@ -64,9 +59,10 @@ describe('dapplets action test', () => {
             cy.get('dapplets-overlay-manager')
               .getByTestId('toggle-overlay-button', { includeShadowDom: true })
               .click()
+              .wait(10000)
           }
         })
-
+      // change activate dapplet
       cy.get('dapplets-overlay-manager')
         .wait(5000)
         .getByTestId('activation-dapplet', { includeShadowDom: true })
@@ -79,48 +75,22 @@ describe('dapplets action test', () => {
               .click()
         })
 
-      // })
-
-      // it('check dapplet attach-config', ()=>{
+      cy.get('dapplets-overlay-manager').should('not.have.class', 'dapplets-overlay-collapsed')
+      // minimize overlay
       cy.get('dapplets-overlay-manager')
-        .wait(15000)
-        .getByTestId('dapplet-active-button', { includeShadowDom: true })
-        .should('exist')
-
-      // })
-
-      // it('check dapplet action title', ()=>{
-      cy.get('dapplets-overlay-manager')
-        .getByTestId('dapplet-active-button', { includeShadowDom: true })
-        .first()
-        .invoke('prop', 'title')
-        .should('equal', 'new title')
-
-      cy.get('dapplets-overlay-manager')
-        .getByTestId('dapplet-active-button', { includeShadowDom: true })
-        .first()
-        .click()
-      // })
-      // it('check dapplet action new title', ()=>{
-      cy.get('dapplets-overlay-manager')
-        .getByTestId('dapplet-active-button', { includeShadowDom: true })
-        .first()
-        .invoke('prop', 'title')
-        .should('equal', 'new click')
-      // })
-
-      // it('check dapplet dettach-config', ()=>{
-      cy.get('dapplets-overlay-manager')
-        .getByTestId('activation-dapplet', { includeShadowDom: true })
-        .first()
-        .should('have.class', 'active-switch')
+        .getByTestId('toggle-overlay-button', { includeShadowDom: true })
         .click()
 
-      cy.get('dapplets-overlay-manager')
-        .getByTestId('dapplet-active-button', { includeShadowDom: true })
-        .should('not.exist')
+      cy.get('dapplets-overlay-manager').should('have.class', 'dapplets-overlay-collapsed')
 
-      // })
+      //  change hidden dapplet action
+      cy.get('dapplets-overlay-manager')
+        .getByTestId('tab-not-pinned', { includeShadowDom: true })
+        .click()
+      cy.get('dapplets-overlay-manager')
+        .getByTestId('button-not-pinned', { includeShadowDom: true })
+        .last()
+        .should('have.attr', 'disabled')
     })
   )
 })

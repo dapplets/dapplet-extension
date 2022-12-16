@@ -27,6 +27,7 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
     onClick,
     ...otherProps
   } = props
+  // console.log(pinned);
 
   return (
     <div data-visible>
@@ -38,12 +39,17 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
           })}
         >
           <div
-            onClick={() => !disabled && onClick()}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              !disabled && onClick()
+            }}
             className={cn(styles.blockButtonInfo, {
               [styles.blockDisabled]: disabled,
             })}
           >
             <button
+              data-testid={pinned ? 'button-pinned' : 'button-not-pinned'}
               data-visible
               className={cn(styles.widgetButton, {
                 [styles.menuWidgetsButton]: isMenu,
@@ -59,13 +65,17 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
             <span className={styles.widgetButtonTitle}>{title}</span>
           </div>
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
               onPinned()
             }}
             className={cn(styles.widgetButtonPinned, {
               [styles.isPinned]: pinned,
+              // 'pinned': pinned
             })}
             data-visible
+            data-testid="pinned"
           >
             <Pinned />
           </button>
@@ -77,6 +87,7 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
             data-visible
             className={cn(styles.widgetButton, {
               [styles.widgetHidden]: hidden,
+              [styles.widgetDisabled]: disabled,
             })}
             title={title ? title : null}
             disabled={disabled ? disabled : false}
