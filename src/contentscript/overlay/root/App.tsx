@@ -95,7 +95,6 @@ interface P {
   overlayManager: OverlayManager
   navigate?: NavigateFunction
   location?: Location
-  overlayAdapter?: any
 }
 
 interface S {
@@ -515,7 +514,6 @@ class _App extends React.Component<P, S> {
             overlays={overlays}
             selectedWallet={this.state.selectedWallet}
             connectedDescriptors={this.state.connectedDescriptors}
-            // widgets={p.overlayAdapter}
           />
 
           <div className={styles.inner}>

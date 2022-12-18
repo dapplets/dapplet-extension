@@ -75,42 +75,12 @@ export default class OverlayAdapter {
 
       let widget: any = null
 
-      if (Widget.prototype instanceof HTMLElement) {
-        // WebComponent-based widget
-        const ExtendedWidget = class extends Widget {}
-        customElements.define(
-          'dapplet-' + Widget.prototype.constructor.name.toLowerCase() + '-' + clazz,
-          ExtendedWidget
-        )
+      widget = new Widget() as IWidget<T>
+      widget.state = state.state
+      widget.insPointName = state.INITIAL_STATE
 
-        const webcomponent = new ExtendedWidget()
-        webcomponent.insPointName = state.INITIAL_STATE
-        webcomponent.ctx = context.parsed
-        webcomponent.state = state.state
-
-        widget = {
-          el: webcomponent,
-          insPointName: state.INITIAL_STATE, // for DemoDapplet
-          state: state.state, // for WidgetBuilder.findWidget()
-          unmount: () => {
-            webcomponent && webcomponent.remove()
-          },
-        }
-
-        const updateWebComponent = (values: any) => {
-          Object.entries(values).forEach(([k, v]) => (widget.el[k] = v))
-        }
-
-        updateWebComponent(state.getStateValues()) // initialize attributes from state
-        state.changedHandler = updateWebComponent // subscribe on state changes
-      } else {
-        widget = new Widget() as IWidget<T>
-        widget.state = state.state
-        widget.insPointName = state.INITIAL_STATE
-        // widget.state.pinned = state.state.pinned?state.state.pinned:false
-        state.changedHandler = () => widget.mount()
-        widget.mount() // ToDo: remove it?
-      }
+      state.changedHandler = () => widget.mount()
+      widget.mount() // ToDo: remove it?
 
       return widget
     }

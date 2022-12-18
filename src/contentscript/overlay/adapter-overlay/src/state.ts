@@ -104,7 +104,6 @@ export class State<T> {
         if (key === undefined || key === 'undefined') return
         const parseWidgetParam = (valueOrApConf, i?: number) => {
           // i - the index of the current element being processed in the array
-          // console.log(valueOrApConf,'valueOrApConf');
 
           if (isObservable(valueOrApConf)) {
             if (i === undefined) {

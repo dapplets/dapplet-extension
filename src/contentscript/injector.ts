@@ -17,7 +17,7 @@ import { AppStorage } from './appStorage'
 import Core from './core'
 import { __decorate } from './global'
 import OverlayAdapter from './overlay/adapter-overlay/src'
-import { IContentAdapter, IResolver, IOverlayAdapter } from './types'
+import { IContentAdapter, IResolver } from './types'
 
 type RegistriedModule = {
   manifest: VersionInfo
@@ -118,10 +118,10 @@ export class Injector {
       if (m.instance) continue
 
       m.instancedConstructorDeps = m.constructorDependencies.map((d) => {
-        return this._proxifyModule(this._getDependency(m.manifest, d, m), m)
+        return this._proxifyModule(this._getDependency(m.manifest, d), m)
       })
       m.instancedActivateMethodsDependencies = m.activateMethodsDependencies.map((d) => {
-        return this._proxifyModule(this._getDependency(m.manifest, d, m), m)
+        return this._proxifyModule(this._getDependency(m.manifest, d), m)
       })
 
       try {
@@ -501,48 +501,22 @@ export class Injector {
           }
           // Class Property Decorator
           else if (parameterIndex === undefined) {
-            if (name === 'overlay-adapter.dapplet-base.eth') {
-              if (delete target[propertyOrMethodName]) {
-                Object.defineProperty(target, propertyOrMethodName, {
-                  get: () => {
-                    const currentModule = this.registry.find((m) =>
-                      areModulesEqual(m.manifest, manifest)
-                    )
-                    if (!currentModule.instancedPropertyDependencies[name]) {
-                      const depModule = this._getDependency(manifest, name)
-                      if (name === 'overlay-adapter.dapplet-base.eth') {
-                        const featureModule = modules.find((x) => x.manifest.name === manifest.name)
-                        const instancedModule = this._proxifyModule(depModule, currentModule)
-                        currentModule.instancedPropertyDependencies[name] = instancedModule
-                      } else {
-                        const instancedModule = this._proxifyModule(depModule, currentModule)
-                        currentModule.instancedPropertyDependencies[name] = instancedModule
-                      }
-                    }
-                    return currentModule.instancedPropertyDependencies[name]
-                  },
-                  enumerable: true,
-                  configurable: true,
-                })
-              }
-            } else {
-              if (delete target[propertyOrMethodName]) {
-                Object.defineProperty(target, propertyOrMethodName, {
-                  get: () => {
-                    const currentModule = this.registry.find((m) =>
-                      areModulesEqual(m.manifest, manifest)
-                    )
-                    if (!currentModule.instancedPropertyDependencies[name]) {
-                      const depModule = this._getDependency(manifest, name)
-                      const instancedModule = this._proxifyModule(depModule, currentModule)
-                      currentModule.instancedPropertyDependencies[name] = instancedModule
-                    }
-                    return currentModule.instancedPropertyDependencies[name]
-                  },
-                  enumerable: true,
-                  configurable: true,
-                })
-              }
+            if (delete target[propertyOrMethodName]) {
+              Object.defineProperty(target, propertyOrMethodName, {
+                get: () => {
+                  const currentModule = this.registry.find((m) =>
+                    areModulesEqual(m.manifest, manifest)
+                  )
+                  if (!currentModule.instancedPropertyDependencies[name]) {
+                    const depModule = this._getDependency(manifest, name)
+                    const instancedModule = this._proxifyModule(depModule, currentModule)
+                    currentModule.instancedPropertyDependencies[name] = instancedModule
+                  }
+                  return currentModule.instancedPropertyDependencies[name]
+                },
+                enumerable: true,
+                configurable: true,
+              })
             }
           }
           // Method Parameter Decorator
@@ -648,7 +622,7 @@ export class Injector {
     }
   }
 
-  private _getDependency(manifest: VersionInfo, name: string, m?: any) {
+  private _getDependency(manifest: VersionInfo, name: string) {
     if (name === 'overlay-adapter.dapplet-base.eth') {
       // if the module can not be found by the name, then trying to find its implementation by interface name
       let modules = this.registry.filter((m) => m.manifest.name == name)
@@ -692,8 +666,7 @@ export class Injector {
         instance: {
           exports: new OverlayAdapter('overlay-adapter.dapplet-base.eth').exports(),
           config: new OverlayAdapter('overlay-adapter.dapplet-base.eth').config,
-          adapter: new OverlayAdapter('overlay-adapter.dapplet-base.eth')
-         
+          adapter: new OverlayAdapter('overlay-adapter.dapplet-base.eth'),
         },
         clazz: OverlayAdapter,
         order: undefined,
@@ -753,7 +726,7 @@ export class Injector {
         const cfgsKey = Symbol()
         const featureId = contextModule.manifest.name
         return new Proxy(proxiedModule.instance, {
-          get: function (target: IOverlayAdapter<any>, prop, receiver) {
+          get: function (target: IContentAdapter<any>, prop, receiver) {
             if (prop === 'attachConfig') {
               return (cfg: any) => {
                 if (contextModule.manifest.type === ModuleTypes.Feature) {
@@ -776,9 +749,8 @@ export class Injector {
                 const newWidgets = {
                   moduleName: contextModule.manifest.name,
                   MENU_ACTION: cfg.MENU_ACTION,
-                  contextIds:contextModule.contextIds,
-                  orderIndex:cfg.orderIndex
-
+                  contextIds: contextModule.contextIds,
+                  orderIndex: cfg.orderIndex,
                 }
                 widgets.push(newWidgets)
                 return cfg
@@ -788,8 +760,13 @@ export class Injector {
               return (cfg) => {
                 const cfgs = cfg ? [cfg] : Reflect.get(target, cfgsKey)
                 cfgs?.forEach((x) => {
-                  widgets.splice(0, widgets.length, ...widgets.filter(n => {
-                   return n.moduleName !== contextModule.manifest.name}))
+                  widgets.splice(
+                    0,
+                    widgets.length,
+                    ...widgets.filter((n) => {
+                      return n.moduleName !== contextModule.manifest.name
+                    })
+                  )
                   return target
                 })
               }

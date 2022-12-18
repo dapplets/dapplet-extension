@@ -31,7 +31,6 @@ async function init() {
     console.error('Cannot process the share link', e)
     return null
   })
-  // const widget = []
   const port = browser.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any)
 
   const jsonrpc = new JsonRpc()

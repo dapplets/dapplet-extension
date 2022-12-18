@@ -335,7 +335,7 @@ export default class GlobalConfigService {
     await this.updateConfig(
       (c) =>
         (c.pinnedDappletActions = c.pinnedDappletActions.filter(
-          (x) => !(x.dappletName === dappletName && x.widgetPinId === widgetPinId ),
+          (x) => !(x.dappletName === dappletName && x.widgetPinId === widgetPinId)
         ))
     )
     EventBus.emit('myactions_changed')

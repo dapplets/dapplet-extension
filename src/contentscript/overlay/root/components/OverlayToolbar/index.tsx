@@ -129,8 +129,8 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const getWigetsConstructor = (widgets, isMenu?: boolean) => {
     if (widgets && widgets.length > 0) {
       const widgetsInConstructor = widgets
-      const widgetsParse = [widgetsInConstructor].map((x, i) => {
-        const widgetsObject = x.map((item, i) => {
+      const widgetsParse = [widgetsInConstructor].map((widgetsItems, i) => {
+        const widgetsObject = widgetsItems.map((item, i) => {
           const newKey = item.orderIndex
           const widgetsObjectActivate = item.MENU_ACTION().map((widgetItem, i) => {
             const isPinned = pinnedActionButton
@@ -160,8 +160,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 title={widgetItem().state.title}
                 pinned={isPinned.length > 0 ? true : false}
                 onPinned={() => {
-                 
-                  
                   widgetItem().state.pinned = !widgetItem().state.pinned
                   setVisibleAnimation(true)
 
