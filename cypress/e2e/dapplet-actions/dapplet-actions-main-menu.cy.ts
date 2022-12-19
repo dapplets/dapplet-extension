@@ -18,13 +18,11 @@ describe('dapplets action main menu', () => {
       // })
 
       //   check main menu actions
-      cy.get('dapplets-overlay-manager')
-        .getByTestId('tab-pinned', { includeShadowDom: true })
+      cy.getByTestId('tab-pinned', { includeShadowDom: true })
         .first()
         .click()
 
-      cy.get('dapplets-overlay-manager')
-        .getByTestId('main-menu-actions', { includeShadowDom: true })
+      cy.getByTestId('main-menu-actions', { includeShadowDom: true })
         .should('exist')
     })
   )

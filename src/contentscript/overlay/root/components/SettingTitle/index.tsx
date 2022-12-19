@@ -18,7 +18,7 @@ export const SettingTitle = (props: SettingTitleProps): ReactElement => {
   return (
     <div className={cn(styles.wrapper, className)} onClick={onClick}>
       <h4
-        data-testid={'settings-page-' + title}
+        data-testid={'settings-page-' + title.toLowerCase()}
         className={cn(styles.title, { [styles.isActive]: isActive })}
         style={style}
       >
