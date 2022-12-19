@@ -1,7 +1,7 @@
 import { qase } from 'cypress-qase-reporter/dist/mocha'
 describe('disabled dapplet action', () => {
   qase(
-    2,
+    10,
     it('disabled dapplet action', () => {
       // it('opens context webpage', () => {
       cy.visit('https://example.com')

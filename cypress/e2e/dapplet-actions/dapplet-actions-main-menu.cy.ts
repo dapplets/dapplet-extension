@@ -2,7 +2,7 @@ import { qase } from 'cypress-qase-reporter/dist/mocha'
 
 describe('dapplets action main menu', () => {
   qase(
-    2,
+    12,
     it('dapplets action test', () => {
       // it('opens context webpage', () => {
       cy.visit('https://example.com')
