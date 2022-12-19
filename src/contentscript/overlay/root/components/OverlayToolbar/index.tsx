@@ -2,7 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { widgets } from '../../../../injector'
+import { widgets } from '../../../../modules/adapter-overlay/src'
 import {
   ReactComponent as Account,
   ReactComponent as DappletsLogo,

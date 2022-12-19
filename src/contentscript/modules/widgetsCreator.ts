@@ -1,34 +1,8 @@
-import { IFeature } from '../../../types'
-import { ButtonWidget, LabelWidget } from './classesWidget'
 import { State } from './state'
-import {
-  ButtonProps,
-  Exports,
-  IButtonWidgetState,
-  ILabelWidgetState,
-  IWidget,
-  WidgetConfig,
-} from './types'
-import { WidgetBuilder } from './widgetBildet'
+import { IWidget, WidgetConfig } from './types'
 
-export default class OverlayAdapter {
-  public state: ButtonProps
+export class WidgetsCreator {
   private stateStorage = new Map<string, State<any>>()
-  public exports = (): Exports => ({
-    button: this.createWidgetFactory<IButtonWidgetState>(ButtonWidget),
-    label: this.createWidgetFactory<ILabelWidgetState>(LabelWidget),
-  })
-  public config = {
-    MENU_ACTION: {},
-  }
-
-  constructor(readonly adapter: any) {}
-  public attachConfig(feature: IFeature): void {
-    this.adapter.attachConfig(feature)
-  }
-  public detachConfig(config, featureId) {
-    this.adapter.detachConfig(config, featureId)
-  }
   public createWidgetFactory<T>(Widget: any) {
     const me = this
 
@@ -41,7 +15,7 @@ export default class OverlayAdapter {
     }
     function createWidget(
       Widget: any,
-      builder: WidgetBuilder,
+      builder: any,
       _insPointName: string,
       config: { [state: string]: T },
       order: number,
@@ -87,7 +61,7 @@ export default class OverlayAdapter {
 
     return (config: WidgetConfig<T>) => {
       const uuid = uuidv4()
-      return (builder: WidgetBuilder, insPointName: string, order: number, contextNode: Element) =>
+      return (builder: any, insPointName: string, order: number, contextNode: Element) =>
         createWidget(Widget, builder, insPointName, config, order, contextNode, uuid)
     }
   }
