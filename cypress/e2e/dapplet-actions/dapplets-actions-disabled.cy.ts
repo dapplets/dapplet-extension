@@ -1,8 +1,8 @@
 import { qase } from 'cypress-qase-reporter/dist/mocha'
-describe('dapplets action test', () => {
+describe('disabled dapplet action', () => {
   qase(
     2,
-    it('dapplets action test', () => {
+    it('disabled dapplet action', () => {
       // it('opens context webpage', () => {
       cy.visit('https://example.com')
       // })
@@ -83,7 +83,7 @@ describe('dapplets action test', () => {
 
       cy.get('dapplets-overlay-manager').should('have.class', 'dapplets-overlay-collapsed')
 
-      //  change hidden dapplet action
+      //  change disabled dapplet action
       cy.get('dapplets-overlay-manager')
         .getByTestId('tab-not-pinned', { includeShadowDom: true })
         .click()

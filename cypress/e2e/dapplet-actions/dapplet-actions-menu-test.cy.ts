@@ -1,6 +1,6 @@
 import { qase } from 'cypress-qase-reporter/dist/mocha'
 
-describe('dapplets action test', () => {
+describe('dapplets action work', () => {
   qase(
     2,
     it('dapplets action test', () => {
