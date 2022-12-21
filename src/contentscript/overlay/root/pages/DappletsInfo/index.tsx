@@ -36,11 +36,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [newOwnerLoading, setNewOwnerLoading] = useState(false)
   const [editContextId, setEditContextId] = useState('')
   const [editContextIdLoading, setEditContextIdLoading] = useState(false)
-  const [targetStorages, setTargetStorages] = useState([
-    StorageTypes.Swarm,
- 
-    StorageTypes.Ipfs,
-  ])
+  const [targetStorages, setTargetStorages] = useState([StorageTypes.Swarm, StorageTypes.Ipfs])
   const fileInput = useRef<HTMLInputElement>()
   const [newState, setNewState] = useState([])
   const [isDisabledPush, setDisabledPush] = useState(true)

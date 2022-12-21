@@ -74,6 +74,8 @@ export default class GlobalConfigService {
       if (!config.connectedAccountsContractAddress)
         config.connectedAccountsContractAddress =
           this.getInitialConfig().connectedAccountsContractAddress
+      if (!config.pinnedDappletActions)
+        config.pinnedDappletActions = this.getInitialConfig().pinnedDappletActions
     }
 
     return config ?? this.getInitialConfig()
@@ -317,8 +319,41 @@ export default class GlobalConfigService {
     ]
     config.myDapplets = []
     config.connectedAccountsContractAddress = 'dev-1659683929908-36510272337320'
-
+    config.pinnedDappletActions = []
     return config
+  }
+  async getPinnedActions() {
+    const config = await this.get()
+    const registries = config.pinnedDappletActions.map((x) => ({
+      ...x,
+      dappletName: x.dappletName === undefined ? true : x.dappletName,
+      widgetPinId: x.widgetPinId === undefined ? true : x.widgetPinId,
+    }))
+    return registries
+  }
+  async removePinnedActions(dappletName: string, widgetPinId: string) {
+    await this.updateConfig(
+      (c) =>
+        (c.pinnedDappletActions = c.pinnedDappletActions.filter(
+          (x) => !(x.dappletName === dappletName && x.widgetPinId === widgetPinId)
+        ))
+    )
+    EventBus.emit('myactions_changed')
+  }
+
+  async addPinnedActions(dappletName: string, widgetPinId: string) {
+    const config = await this.get()
+
+    if (
+      config.pinnedDappletActions.find(
+        (x) => x.dappletName === dappletName && x.widgetPinId === widgetPinId
+      )
+    )
+      return
+    config.pinnedDappletActions.push({ dappletName, widgetPinId })
+
+    await this.set(config)
+    EventBus.emit('myactions_changed')
   }
 
   async getRegistries() {

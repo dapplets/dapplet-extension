@@ -230,3 +230,88 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+
+.widgetButtonAnimate {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 48px;
+  height: 22px;
+  margin: 0 auto;
+  background: #f5f5f5;
+  margin: 5px 0;
+  border-radius: 4px;
+  position: absolute;
+  top: 100px;
+  animation-name: AnimateisNotPinned;
+
+  animation-duration: 0.8s;
+
+  animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  animation-fill-mode: forwards;
+}
+@keyframes AnimateisPinned {
+  0% {
+    left: -60px;
+    top: 110px;
+    opacity: 1;
+  }
+  40% {
+    left: -105px;
+    top: 110px;
+    opacity: 1;
+  }
+  60% {
+    left: -105px;
+    top: 100px;
+    opacity: 0.8;
+  }
+
+  100% {
+    left: -105px;
+    top: 70px;
+    opacity: 0;
+  }
+}
+@keyframes AnimateisNotPinned {
+  0% {
+    left: -105px;
+    top: 150px;
+    opacity: 0;
+  }
+  40% {
+    left: -105px;
+    top: 120px;
+    opacity: 0.8;
+  }
+  60% {
+    left: -105px;
+    top: 110px;
+    opacity: 1;
+  }
+  95% {
+    left: -60px;
+    top: 110px;
+    opacity: 1;
+  }
+  100% {
+    left: -60px;
+    top: 110px;
+    opacity: 0;
+  }
+}
+.widgetButtonAnimatePinned {
+  animation-name: AnimateisPinned;
+
+  animation-duration: 1s;
+
+  animation-timing-function:cubic-bezier(0,.69,.45,1);
+  
+  animation-fill-mode: forwards;
+}
+.widgetButtonImgAnimate {
+  display: block;
+  width: 24px;
+  height: 14px;
+  margin: 0 auto;
+}

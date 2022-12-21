@@ -84,11 +84,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
   const [trustedUsers, setTrustedUsers] = useState([])
   const [mode, setMode] = useState<FormMode>(null)
-  const [targetStorages, setTargetStorages] = useState([
-    StorageTypes.Swarm,
-    
-    StorageTypes.Ipfs,
-  ])
+  const [targetStorages, setTargetStorages] = useState([StorageTypes.Swarm, StorageTypes.Ipfs])
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
   const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
   const [owner, setOwner] = useState(null)
@@ -185,10 +181,9 @@ export const DevModule: FC<PropsDevModule> = (props) => {
         _updateDeploymentStatus(),
         _checkDependencies(),
         updateDataLocalhost(),
-        
       ])
     }
-  // }
+    // }
   }
 
   const getModulesAdmins = async () => {
@@ -205,14 +200,13 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
   const _updateOwnership = async () => {
     if (!targetRegistry || !mi.name) return
-      const { getOwnership } = await initBGFunctions(browser)
-      const owner = await getOwnership(targetRegistry, mi.name)
-   
-      if (!abortController.signal.aborted) {
-        setOwner(owner)
-        setOwnerDev(owner)
-      }
-    
+    const { getOwnership } = await initBGFunctions(browser)
+    const owner = await getOwnership(targetRegistry, mi.name)
+
+    if (!abortController.signal.aborted) {
+      setOwner(owner)
+      setOwnerDev(owner)
+    }
   }
 
   const _updateDeploymentStatus = async () => {
@@ -297,8 +291,6 @@ export const DevModule: FC<PropsDevModule> = (props) => {
         if (deploymentStatus === 3) {
           setNewModule(true)
         } else {
-         
-          
           mode === FormMode.Creating
             ? await deployModule(mi, null, targetStorages, targetRegistry)
             : await deployModule(mi, vi, targetStorages, targetRegistry)
@@ -413,22 +405,15 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
           <div className={styles.blockInfo}>
             <h3 className={styles.dappletsTitle}>{mi.title}</h3>
-            {mi.isUnderConstruction ? (
-              // <span
-              //   onClick={() => {
-              //     onDetailsClick(mi, vi)
-
-              //     setUnderConstructionDetails(true)
-              //     setModuleInfo(mi)
-              //     setModuleVersion(vi)
-              //   }}
-              //   className={styles.dappletsSettingsIsUnderConstructionBlock}
-              // >
-              //   <button className={styles.dappletsSettingsIsUnderConstruction} />
-              //   <span className={styles.dappletsSettingsIsTocenomics} />
-              // </span>
-              null
-            ) : (
+            {mi.isUnderConstruction ? //     setModuleInfo(mi) //     setUnderConstructionDetails(true) //     onDetailsClick(mi, vi) //   onClick={() => { // <span
+            //     setModuleVersion(vi)
+            //   }}
+            //   className={styles.dappletsSettingsIsUnderConstructionBlock}
+            // >
+            //   <button className={styles.dappletsSettingsIsUnderConstruction} />
+            //   <span className={styles.dappletsSettingsIsTocenomics} />
+            // </span>
+            null : (
               <button
                 className={cn(styles.dappletsSettings, {
                   [styles.dappletsSettingsRegistry]: mi.author !== null,

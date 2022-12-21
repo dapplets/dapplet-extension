@@ -1,6 +1,8 @@
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
-import { widgets } from '../../../../injector'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
+import { widgets } from '../../../../modules/adapter-overlay/src'
 import {
   ReactComponent as Account,
   ReactComponent as DappletsLogo,
@@ -45,6 +47,8 @@ export interface OverlayToolbarProps {
   module?: any
   overlays?: any
   widgets?: any
+  connectedDescriptors?: any
+  selectedWallet?: any
 }
 
 type TToggleOverlay = {
@@ -58,7 +62,9 @@ const ToggleOverlay = ({ onClick, className, getNode }: TToggleOverlay): ReactEl
     <button
       data-testid="toggle-overlay-button"
       className={cn(styles.toggleOverlay, className)}
-      onClick={() => {
+      onClick={(e) => {
+        e.preventDefault()
+        e.stopPropagation()
         onClick()
         // getNode()
       }}
@@ -73,54 +79,123 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
   const noSystemTabs = p.tabs.filter((f) => f.title !== 'Dapplets')
   const [isShowTabs, onShowTabs] = useToggle(false)
-  const [isClick,onClick]=useToggle(false)
+  const [isClick, onClick] = useToggle(false)
 
-  const [newWidgets,setNewWidgets]=useState(widgets)
- 
-  useEffect(() => { 
-  },[newWidgets,widgets,nodeOverlayToolbar,isClick])
-  const handleClickGetNodeOverlayToolbar = () => {
-    if (nodeOverlayToolbar && nodeOverlayToolbar.current) {
-      nodeOverlayToolbar.current.value = ''
+  const [newWidgets, setNewWidgets] = useState(widgets)
+  const [pinnedActionButton, setPinnedActionButton] = useState(null)
+  const [isVisibleAnimation, setVisibleAnimation] = useState(false)
+  const [iconAnimateWidget, setIconAnimateWidget] = useState('')
+  const [isPinnedAnimateWidget, setPinnedAnimateWidget] = useState(false)
+  const btnRef = useRef<HTMLDivElement>()
+  useEffect(() => {
+    const init = async () => {
+      await _refreshData()
+    }
 
-      const element = nodeOverlayToolbar.current.getBoundingClientRect()
+    init()
+    return () => {}
+  }, [newWidgets, widgets, nodeOverlayToolbar, isClick])
+  const _refreshData = async () => {
+    try {
+      const { getPinnedActions } = await initBGFunctions(browser)
 
-      const x = element.x
-
-      if (x > 10 && x < 100) {
-        setNodeOverlayToolbar(true)
-      } else {
-        setNodeOverlayToolbar(false)
-      }
+      const pinnedAction = await getPinnedActions()
+      setPinnedActionButton(pinnedAction)
+    } catch (err) {
+      console.error(err)
     }
   }
- 
-  const getWigetsConstructor = () => {
-    if (newWidgets && newWidgets.length > 0) {
-      const widgetsInConstructor = newWidgets
-      const widgetsParse = [widgetsInConstructor].map((x, i) => {
-        const widgetsObject = x.map((x, i) => {
-          const newKey = x.orderIndex
-          const widgetsObjectActivate = x.MENU_ACTION().map((x, i) => {
-      
-            const newWidgetButton = (
-              x().state.action?  <WidgetButton
-              data-testid="dapplet-active-button"
+  const addPinnedButton = async (name, pinId) => {
+    try {
+      const { addPinnedActions } = await initBGFunctions(browser)
+
+      await addPinnedActions(name, pinId)
+      await _refreshData()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+  const removePinnedButton = async (name, pinId) => {
+    try {
+      const { removePinnedActions } = await initBGFunctions(browser)
+
+      await removePinnedActions(name, pinId)
+      await _refreshData()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const getWigetsConstructor = (widgets, isMenu?: boolean) => {
+    if (widgets && widgets.length > 0) {
+      const widgetsInConstructor = widgets
+      const widgetsParse = [widgetsInConstructor].map((widgetsItems, i) => {
+        const widgetsObject = widgetsItems.map((item, i) => {
+          const newKey = item.orderIndex
+          const widgetsObjectActivate = item.MENU_ACTION().map((widgetItem, i) => {
+            const isPinned = pinnedActionButton
+              ? pinnedActionButton.filter((x, i) => {
+                  const pinnedBoolean =
+                    x.dappletName === item.moduleName &&
+                    x.widgetPinId === widgetItem().state.pinnedID
+                      ? true
+                      : false
+                  return pinnedBoolean
+                })
+              : false
+
+            const newWidgetButton = widgetItem().state.action ? (
+              <WidgetButton
+                isMenu={isMenu ? isMenu : false}
                 key={`${newKey}` + i}
                 onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  x().state.action(x().state.ctx, x().state)
-                 onClick()
-                  
+                  !isMenu && e.preventDefault()
+                  !isMenu && e.stopPropagation()
+                  widgetItem().state.action(widgetItem().state.ctx, widgetItem().state)
+                  onClick()
                 }}
-                hidden={x().state.hidden?x().state.hidden:false}
-                icon={x().state.icon?x().state.icon:null}
-                title={x().state.title}
-              />:<LabelButton hidden={x().state.hidden?x().state.hidden:false} icon={x().state.icon?x().state.icon:null} key={`${newKey}` + i} title={x().state.title}/>
+                hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
+                disabled={widgetItem().state.disabled ? widgetItem().state.disabled : false}
+                icon={widgetItem().state.icon ? widgetItem().state.icon : null}
+                title={widgetItem().state.title}
+                pinned={isPinned.length > 0 ? true : false}
+                onPinned={() => {
+                  widgetItem().state.pinned = !widgetItem().state.pinned
+                  setVisibleAnimation(true)
+
+                  setIconAnimateWidget(widgetItem().state.icon ? widgetItem().state.icon : null)
+                  setPinnedAnimateWidget(isPinned.length > 0 ? true : false)
+                  setTimeout(() => {
+                    setVisibleAnimation(false)
+                  }, 1100)
+                  if (pinnedActionButton && pinnedActionButton.length !== 0) {
+                    pinnedActionButton.map((x, i) => {
+                      if (
+                        x.dappletName === item.moduleName &&
+                        x.widgetPinId === widgetItem().state.pinnedID
+                      ) {
+                        removePinnedButton(item.moduleName, widgetItem().state.pinnedID)
+                      } else {
+                        addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
+                      }
+                    })
+                  } else {
+                    addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
+                  }
+                  // onClick()
+                }}
+              />
+            ) : (
+              <LabelButton
+                hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
+                icon={widgetItem().state.icon ? widgetItem().state.icon : null}
+                key={`${newKey}` + i}
+                title={widgetItem().state.title}
+              />
             )
             return newWidgetButton
           })
+
           return widgetsObjectActivate
         })
         return widgetsObject
@@ -129,12 +204,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     } else null
   }
   const getNewButtonTab = (parametersFilter: string) => {
-    // if(document
-    //   .querySelector('#dapplets-overlay-manager')
-    //   .classList.contains('dapplets-overlay-hidden')){
-    //     p.navigate!('/system/dapplets')
-    //   }
-    // if (!p.module) return
     const clone = Object.assign({}, SYSTEM_TAB)
     const newSystemTab = [clone]
     const newSet = newSystemTab.map((tab) => {
@@ -147,17 +216,21 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
       return (
         <div key={NewTabs.id}>
-          {/* {!p.module ? (
-            <div className={styles.loaderAccount}></div>
-          ) : ( */}
           <OverlayTab
             {...newTab}
+            isToolbar={true}
             isActive={activeTabId === NewTabs.id}
             activeTabMenuId={activeTabMenuId}
             classNameTab={styles.tabConnectedWrapper}
             onCloseClick={() => p.onCloseClick(NewTabs)}
             overlays={p.overlays}
             modules={p.module}
+            navigate={p.navigate}
+            pathname={p.pathname}
+            onToggleClick={p.onToggleClick}
+            selectedWallet={p.selectedWallet}
+            connectedDescriptors={p.connectedDescriptors}
+            setOpenWallet={p.setOpenWallet}
             onMenuClick={(menu) => {
               if (
                 document
@@ -183,13 +256,27 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               p.onTabClick(NewTabs)
             }}
           />
-          {/* )} */}
         </div>
       )
     })
     return newSet
   }
-  
+
+  const getAnimateButtonWidget = (icon: string, isPinned: boolean) => {
+    return (
+      <span
+        ref={btnRef}
+        className={cn(styles.widgetButtonAnimate, {
+          [styles.widgetButtonAnimatePinned]: isPinnedAnimateWidget,
+        })}
+      >
+        {icon && icon.length > 0 ? (
+          <img data-visible className={cn(styles.widgetButtonImgAnimate)} src={icon} />
+        ) : null}
+      </span>
+    )
+  }
+
   return (
     <div
       ref={nodeOverlayToolbar}
@@ -208,13 +295,28 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             className={cn(styles.TabList, { [styles.isOpenWallet]: p.isOpenWallet })}
           >
             {getNewButtonTab('Connected Accounts')}
+            {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget, isPinnedAnimateWidget)}
+            {!isShowTabs &&
+              document
+                .querySelector('#dapplets-overlay-manager')
+                .classList.contains('dapplets-overlay-collapsed') &&
+              (newWidgets && newWidgets.length > 0
+                ? getWigetsConstructor(newWidgets).map((x) => x)
+                : null)}
+
             <div
+              data-testid={isShowTabs ? 'toolbar-show' : 'toolbar-hide'}
               className={cn(styles.toggleTabs, {
                 [styles.hideTabs]: !isShowTabs,
               })}
             >
               {noSystemTabs.length > 0 &&
                 noSystemTabs.map((tab) => {
+                  const menuWidgets =
+                    newWidgets &&
+                    newWidgets.length > 0 &&
+                    newWidgets.filter((x) => x.moduleName === tab.id)
+
                   return (
                     <OverlayTab
                       setOpenWallet={p.setOpenWallet}
@@ -232,11 +334,13 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                       navigate={p.navigate}
                       overlays={p.overlays}
                       onToggleClick={p.onToggleClick}
+                      getWigetsConstructor={getWigetsConstructor}
+                      menuWidgets={menuWidgets}
+                      mainMenuNavigation={p.onMenuClick}
                     />
                   )
                 })}
-             
-              {newWidgets && newWidgets.length > 0 ? getWigetsConstructor().map((x, y) => x) : null}
+
               <ToggleOverlay
                 // getNode={handleClickGetNodeOverlayToolbar}
                 onClick={() => {
@@ -267,7 +371,11 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             </div>
             <div>
               <button
-                onClick={() => onShowTabs()}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  onShowTabs()
+                }}
                 data-testid="show-tabs-button"
                 className={cn(styles.miniButton, {
                   [styles.hideTabsBtn]: isShowTabs,

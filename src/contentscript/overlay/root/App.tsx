@@ -95,7 +95,6 @@ interface P {
   overlayManager: OverlayManager
   navigate?: NavigateFunction
   location?: Location
-  overlayAdapter?:any
 }
 
 interface S {
@@ -281,7 +280,10 @@ class _App extends React.Component<P, S> {
 
   handleTabMenuClick = async (tabs: ToolbarTab, menu?: ToolbarTabMenu) => {
     const menuId = menu?.id ?? tabs.menus[0].id
-    this.props.navigate!(`/${tabs.id}/${menuId}`)
+    !document
+      .querySelector('#dapplets-overlay-manager')
+      .classList.contains('dapplets-overlay-collapsed') &&
+      this.props.navigate!(`/${tabs.id}/${menuId}`)
   }
 
   handleOpenSearchClick = () => {
@@ -455,6 +457,7 @@ class _App extends React.Component<P, S> {
           key={NewTabs.id}
           {...newTab}
           isActive={activeTabId === NewTabs.id}
+          navigate={this.props.navigate!}
           activeTabMenuId={activeTabMenuId}
           onCloseClick={() => this.handleCloseTabClick(NewTabs)}
           onMenuClick={(menu) => this.handleTabMenuClick(NewTabs, menu)}
@@ -472,7 +475,7 @@ class _App extends React.Component<P, S> {
     })
     return newSet
   }
-  
+
   render() {
     const p = this.props
     const s = this.state
@@ -491,7 +494,6 @@ class _App extends React.Component<P, S> {
 
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
 
-
     return (
       <div className={cn(styles.overlay)}>
         <div className={styles.wrapper}>
@@ -504,13 +506,14 @@ class _App extends React.Component<P, S> {
             onToggleClick={this.props.onToggle}
             activeTabId={activeTabId}
             activeTabMenuId={activeTabMenuId}
-            setOpenWallet={this.closeOpenWallet}
+            setOpenWallet={this.setOpenWallet}
             isOpenWallet={s.isOpenWallet}
             navigate={this.props.navigate!}
             pathname={pathname}
             module={s.module}
             overlays={overlays}
-            // widgets={p.overlayAdapter}
+            selectedWallet={this.state.selectedWallet}
+            connectedDescriptors={this.state.connectedDescriptors}
           />
 
           <div className={styles.inner}>

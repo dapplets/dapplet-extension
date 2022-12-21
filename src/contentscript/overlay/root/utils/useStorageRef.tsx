@@ -19,9 +19,8 @@ export const useStorageRef = (storageRef: StorageRef) => {
         }
       } catch (error) {
         // if (!abortController.signal.aborted) {
-          setImg(NO_LOGO)
+        setImg(NO_LOGO)
         // }
-       
       }
     }
     init()

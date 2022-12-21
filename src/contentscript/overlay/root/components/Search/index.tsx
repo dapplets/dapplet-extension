@@ -10,16 +10,24 @@ export interface SearchProps
   onCloseSearch?: () => void
   isOpenSearch: boolean
   className?: string
-  handleSearchChange?:any
+  handleSearchChange?: any
 }
 
 export const Search = (props: SearchProps): ReactElement => {
-  const { value, onChange, className, onClearValue, onCloseSearch, isOpenSearch,handleSearchChange, ...otherProps } =
-    props
+  const {
+    value,
+    onChange,
+    className,
+    onClearValue,
+    onCloseSearch,
+    isOpenSearch,
+    handleSearchChange,
+    ...otherProps
+  } = props
 
   return (
     <div className={cn(styles.wrapper, className)}>
-      <div className={styles.searchIcon} onClick={()=>handleSearchChange()}>
+      <div className={styles.searchIcon} onClick={() => handleSearchChange()}>
         <SearchIcon />
       </div>
       <label className={styles.labelSearchModule}>

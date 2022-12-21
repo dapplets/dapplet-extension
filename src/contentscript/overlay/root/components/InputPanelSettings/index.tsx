@@ -20,7 +20,7 @@ export interface InputPanelSettingsProps
   isValidPostageStampId?: any
   isDefaultValueInput: any
   isDynamycAdapter: boolean
-  loadProvider?:any
+  loadProvider?: any
 }
 
 export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
@@ -69,11 +69,9 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
               }
             } else {
               if (!isValidHttp(providerInput) && !isPostStampId) {
-            
                 getDefaultValueProvider()
               }
               if (providerInput.length === 0) {
-              
                 loadProvider()
               }
             }
