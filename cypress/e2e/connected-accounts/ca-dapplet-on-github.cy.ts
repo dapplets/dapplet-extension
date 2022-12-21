@@ -153,7 +153,7 @@ describe('CA: dapplet on GitHub', () => {
         .find('.accounts', { includeShadowDom: true })
         .should('be.visible')
 
-      cy.get('main').click()
+      cy.get('body').click({ force: true })
       cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
         .find('.accounts', { includeShadowDom: true })
         .should('not.be.visible')
