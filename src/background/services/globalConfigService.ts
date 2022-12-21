@@ -343,6 +343,7 @@ export default class GlobalConfigService {
 
   async addPinnedActions(dappletName: string, widgetPinId: string) {
     const config = await this.get()
+
     if (
       config.pinnedDappletActions.find(
         (x) => x.dappletName === dappletName && x.widgetPinId === widgetPinId
@@ -350,7 +351,7 @@ export default class GlobalConfigService {
     )
       return
     config.pinnedDappletActions.push({ dappletName, widgetPinId })
-    console.log(config.pinnedDappletActions)
+
     await this.set(config)
     EventBus.emit('myactions_changed')
   }

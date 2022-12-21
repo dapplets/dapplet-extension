@@ -168,7 +168,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                   setTimeout(() => {
                     setVisibleAnimation(false)
                   }, 1100)
-                  if (pinnedActionButton) {
+                  if (pinnedActionButton && pinnedActionButton.length !== 0) {
                     pinnedActionButton.map((x, i) => {
                       if (
                         x.dappletName === item.moduleName &&
@@ -182,7 +182,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                   } else {
                     addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
                   }
-                  onClick()
+                  // onClick()
                 }}
               />
             ) : (
