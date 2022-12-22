@@ -91,6 +91,8 @@ async function init() {
     } else if (!IS_IFRAME && message.type === 'OPEN_DAPPLET_HOME') {
       const { moduleName } = message.payload
       return injector.openDappletHome(moduleName)
+    } else if (!IS_IFRAME && message.type === 'EXEC_CA_UPDATE_HANDLER') {
+      return injector.executeConnectedAccountsUpdateHandler()
     }
   })
 
@@ -98,6 +100,10 @@ async function init() {
   EventBus.on('dapplet_activated', (m) => injector.loadModules([m]))
 
   EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]))
+
+  EventBus.on('wallet_changed', () => injector.executeWalletsUpdateHandler())
+
+  EventBus.on('connected_accounts_changed', () => injector.executeConnectedAccountsUpdateHandler())
 
   // destroy when background is disconnected
   port.onDisconnect.addListener(() => {

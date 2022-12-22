@@ -35,6 +35,8 @@ type RegistriedModule = {
   onActionHandler?: Function
   onHomeHandler?: Function
   onShareLinkHandler?: Function
+  onWalletsUpdateHandler?: Function
+  onConnectedAccountsUpdateHandler?: Function
 }
 export const widgets = []
 
@@ -254,6 +256,18 @@ export class Injector {
     module.onShareLinkHandler?.(data)
   }
 
+  public async executeWalletsUpdateHandler() {
+    this.registry.find((m) => {
+      m.onWalletsUpdateHandler?.()
+    })
+  }
+
+  public async executeConnectedAccountsUpdateHandler() {
+    this.registry.find((m) => {
+      m.onConnectedAccountsUpdateHandler?.()
+    })
+  }
+
   public setActionHandler(moduleName: string, handler: Function) {
     const module = this.registry.find((m) => m.manifest.name === moduleName)
     module.onActionHandler = handler
@@ -267,6 +281,16 @@ export class Injector {
   public setShareLinkHandler(moduleName: string, handler: Function) {
     const module = this.registry.find((m) => m.manifest.name === moduleName)
     module.onShareLinkHandler = handler
+  }
+
+  public setWalletsUpdateHandler(moduleName: string, handler: Function) {
+    const module = this.registry.find((m) => m.manifest.name === moduleName)
+    module.onWalletsUpdateHandler = handler
+  }
+
+  public setConnectedAccountsUpdate(moduleName: string, handler: Function) {
+    const module = this.registry.find((m) => m.manifest.name === moduleName)
+    module.onConnectedAccountsUpdateHandler = handler
   }
 
   public async dispose() {
@@ -365,6 +389,10 @@ export class Injector {
         onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
         onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
         onShareLink: (handler: Function) => this.setShareLinkHandler(manifest.name, handler),
+        onWalletsUpdate: (handler: Function) =>
+          this.setWalletsUpdateHandler(manifest.name, handler),
+        onConnectedAccountsUpdate: (handler: Function) =>
+          this.setConnectedAccountsUpdate(manifest.name, handler),
         getManifest: async (
           moduleName?: string
         ): Promise<Omit<ModuleInfo, 'interfaces'> & VersionInfo> => {

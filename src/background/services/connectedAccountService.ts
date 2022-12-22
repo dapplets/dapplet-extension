@@ -1,5 +1,6 @@
 import makeBlockie from 'ethereum-blockies-base64'
 import * as nearAPI from 'near-api-js'
+import * as EventBus from '../../common/global-event-bus'
 import {
   ConnectedAccountsPairStatus,
   ConnectedAccountsRequestStatus,
@@ -260,7 +261,7 @@ export default class ConnectedAccountService {
       secondProofUrl,
     } = props
     const contract = await this._getContract()
-    return contract.requestVerification(
+    const res = await contract.requestVerification(
       {
         firstAccountId,
         firstOriginId,
@@ -273,15 +274,19 @@ export default class ConnectedAccountService {
       undefined,
       stake
     )
+    EventBus.emit('connected_accounts_changed')
+    return res
   }
 
   public async changeStatus(accountId: string, originId: string, isMain: boolean): Promise<void> {
     const contract = await this._getContract()
-    return contract.changeStatus({
+    const res = await contract.changeStatus({
       accountId,
       originId,
       isMain,
     })
+    EventBus.emit('connected_accounts_changed')
+    return res
   }
 
   private _hasEqualIdsPair(pair: [string, string], list: [string, string][]): boolean {
