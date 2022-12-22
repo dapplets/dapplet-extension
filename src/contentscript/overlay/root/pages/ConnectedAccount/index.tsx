@@ -44,7 +44,9 @@ export const ConnectedAccount = () => {
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(true)
   const abortController = useAbortController()
   const updatePairs = async (prevPairs?: IConnectedAccountsPair[]) => {
-    const { getConnectedAccountsPairs } = await initBGFunctions(browser)
+    const { getConnectedAccountsPairs, execConnectedAccountsUpdateHandler } = await initBGFunctions(
+      browser
+    )
     const newPairs: IConnectedAccountsPair[] = await getConnectedAccountsPairs({ prevPairs })
     if (!abortController.signal.aborted) {
       setPairs(newPairs)
@@ -57,6 +59,7 @@ export const ConnectedAccount = () => {
     )
     if (processingAccountIdsPairs.length > 0) {
       await new Promise((res) => setTimeout(res, 5000))
+      await execConnectedAccountsUpdateHandler()
       updatePairs(newPairs)
     }
   }

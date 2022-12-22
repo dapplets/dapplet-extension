@@ -74,6 +74,10 @@ export class OverlayService {
     return this._openOverlay('OPEN_DAPPLET_ACTION', { moduleName }, tabId)
   }
 
+  public execConnectedAccountsUpdateHandler(moduleName: string, tabId: number) {
+    return this._openOverlay('EXEC_CA_UPDATE_HANDLER', { moduleName }, tabId)
+  }
+
   public openSettingsOverlay(
     mi: ManifestDTO,
     vi: VersionInfo,
