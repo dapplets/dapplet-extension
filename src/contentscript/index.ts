@@ -340,3 +340,9 @@ if (!IS_OVERLAY_IFRAME && !IS_E2E_ENV) {
     window.addEventListener('DOMContentLoaded', () => init())
   }
 }
+
+if (IS_E2E_ENV) {
+  initBGFunctions(browser).then(({ addTrustedUser }) =>
+    addTrustedUser('0xf64849376812667bda7d902666229f8b8dd90687')
+  )
+}

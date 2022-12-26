@@ -28,36 +28,18 @@ describe('dapplets action work', () => {
 
       // })
 
-      // it('activate test dapplet', ()=>{
-      cy.getByTestId('system-tab-settings', { includeShadowDom: true }).click().wait(5000)
-
-      cy.getByTestId('settings-page-developer', { includeShadowDom: true }).click()
-
-      cy.wait(5000)
-      cy.getByTestId('input-add-localhost', { includeShadowDom: true }).type(
-        'http://localhost:3003/dapplet.json'
-      )
-
-      cy.getByTestId('button-add-localhost', { includeShadowDom: true }).then((button) => {
-        if (button.prop('disabled')) {
-          cy.getByTestId('toggle-overlay-button', { includeShadowDom: true }).click()
-        } else {
-          cy.getByTestId('button-add-localhost', { includeShadowDom: true }).click().wait(5000)
-
-          cy.getByTestId('toggle-overlay-button', { includeShadowDom: true }).click()
-        }
-      })
-
-      cy.wait(5000)
-
-      cy.getByTestId('activation-dapplet', { includeShadowDom: true })
-        .first()
+      cy.get('dapplets-overlay-manager', { includeShadowDom: true })
+        .find('[data-testid=test-action]', { includeShadowDom: true })
+        .find('[data-testid=activation-dapplet]', { includeShadowDom: true })
         .then((button) => {
           button.hasClass('not-active-switch') &&
-            cy.getByTestId('activation-dapplet', { includeShadowDom: true }).click()
+            cy
+              .get('dapplets-overlay-manager', { includeShadowDom: true })
+              .find('[data-testid=test-action]', { includeShadowDom: true })
+              .find('[data-testid=activation-dapplet]', { includeShadowDom: true })
+              .click()
         })
-
-      // })
+      cy.wait(5000)
 
       cy.getByTestId('toggle-overlay-button', { includeShadowDom: true }).click()
 

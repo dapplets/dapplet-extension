@@ -57,7 +57,7 @@ type TToggleOverlay = {
   getNode?: () => void
 }
 
-const ToggleOverlay = ({ onClick, className, getNode }: TToggleOverlay): ReactElement => {
+const ToggleOverlay = ({ onClick, className }: TToggleOverlay): ReactElement => {
   return (
     <button
       data-testid="toggle-overlay-button"
