@@ -5,7 +5,7 @@ describe('No available dapplets', () => {
     4,
     it('No available dapplets', () => {
       // it('opens context webpage', () => {
-      cy.visit('https://example.com')
+      cy.visit('https://docs.dapplets.org/')
       // })
 
       // it('injects overlay', () => {
