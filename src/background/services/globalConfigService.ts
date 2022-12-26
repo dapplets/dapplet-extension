@@ -230,22 +230,22 @@ export default class GlobalConfigService {
         isEnabled: false,
       },
       {
-        url: 'https://localhost:8080/index.json',
+        url: 'http://localhost:8080/index.json',
         isDev: true,
         isEnabled: false,
       },
       {
-        url: 'https://localhost:3001/dapplet.json',
+        url: 'http://localhost:3001/dapplet.json',
         isDev: true,
         isEnabled: false,
       },
       {
-        url: 'https://localhost:3002/dapplet.json',
+        url: 'http://localhost:3002/dapplet.json',
         isDev: true,
         isEnabled: false,
       },
       {
-        url: 'https://localhost:3003/dapplet.json',
+        url: 'http://localhost:3003/dapplet.json',
         isDev: true,
         isEnabled: false,
       },
