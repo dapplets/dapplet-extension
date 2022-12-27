@@ -442,7 +442,7 @@ class _App extends React.Component<P, S> {
   }
 
   getNewButtonTab = (parametersFilter: string) => {
-    let clone = Object.assign({}, SYSTEM_TAB)
+    const clone = Object.assign({}, SYSTEM_TAB)
     const newSystemTab = [clone]
     const newSet = newSystemTab.map((tab) => {
       const NewTabs = tab
