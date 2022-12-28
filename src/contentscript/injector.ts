@@ -16,8 +16,8 @@ import { DefaultConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
 import { __decorate } from './global'
-import { IContentAdapter, IResolver } from './types'
 import { ManifestOverlayAdapter } from './modules/adapter-overlay/src'
+import { IContentAdapter, IResolver } from './types'
 
 type RegistriedModule = {
   manifest: VersionInfo
@@ -621,6 +621,7 @@ export class Injector {
   }
 
   private _getDependency(manifest: VersionInfo, name: string) {
+    // ToDo: remove hardcoded module name and use src/contentscript/modules/index.ts
     if (name === 'overlay-adapter.dapplet-base.eth') {
       // if the module can not be found by the name, then trying to find its implementation by interface name
       let modules = this.registry.filter((m) => m.manifest.name == name)
@@ -633,15 +634,6 @@ export class Injector {
           return null
         }
       }
-      // ToDo: Should be moved to the background?
-      // ToDo: Fetch prefix from global settings.
-      // ToDo: Replace '>=' to '^'
-      const prefix = '>=' // https://devhints.io/semver
-      const range = prefix + 'overlay-adapter.dapplet-base.eth'[DEFAULT_BRANCH_NAME]
-      const maxVer = maxSatisfying(
-        modules.map((m) => m.manifest.version),
-        range
-      )
 
       return ManifestOverlayAdapter
     } else {

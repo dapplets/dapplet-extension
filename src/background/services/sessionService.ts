@@ -66,7 +66,6 @@ export class SessionService {
   }
 
   async killSession(sessionId: string): Promise<void> {
-    const session = await this._loginSessionBrowserStorage.getById(sessionId) // ToDo: remove?
     await this.clearItems(sessionId)
     await this._loginSessionBrowserStorage.deleteById(sessionId)
   }

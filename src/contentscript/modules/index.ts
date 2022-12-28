@@ -1,4 +1,4 @@
-import OverlayAdapter, { ManifestOverlayAdapter } from './adapter-overlay/src'
+import { ManifestOverlayAdapter } from './adapter-overlay/src'
 
 export = {
   'overlay-adapter.dapplet-base.eth': ManifestOverlayAdapter,
