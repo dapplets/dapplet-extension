@@ -2,6 +2,7 @@ import INNER_STYLE from '!raw-loader!./overlayManager.css'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { JsonRpc } from '../../../common/jsonrpc'
+import { widgets } from '../../modules/adapter-overlay/src'
 import { IOverlayManager, OverlayConfig } from '../interfaces'
 import { App } from './App'
 import { Overlay } from './overlay'
@@ -232,6 +233,7 @@ export class OverlayManager implements IOverlayManager {
         hidden={this._panel.classList.contains(HiddenOverlayClass)}
         overlayManager={this}
         onToggle={this.toggle.bind(this)}
+     
       />,
       this._root
     )

@@ -1,8 +1,10 @@
 import { ModuleTypes } from '../../../../common/constants'
+import { browser } from 'webextension-polyfill-ts'
 import { ButtonWidget, IButtonWidgetState } from '../button'
 import { ILabelWidgetState, LabelWidget } from '../label'
 import { Exports } from '../../types'
 import { WidgetsCreator } from '../../widgetsCreator'
+import { OverlayManager } from '../../../overlay/root/overlayManager'
 export const widgets = []
 
 export default class OverlayAdapter {
@@ -24,8 +26,9 @@ export default class OverlayAdapter {
       contextIds: moduleName.contextIds,
       orderIndex: feature.orderIndex,
     }
-
     widgets.push(newWidgets)
+   
+    
   }
   public detachConfig(config, featureId) {
     widgets.splice(

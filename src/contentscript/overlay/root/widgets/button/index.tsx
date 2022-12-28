@@ -27,7 +27,7 @@ export const WidgetButton: FC<WidgetButtonProps> = (props: WidgetButtonProps) =>
     onClick,
     ...otherProps
   } = props
-  // console.log(pinned);
+ 
 
   return (
     <div data-visible>

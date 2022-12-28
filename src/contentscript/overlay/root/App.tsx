@@ -16,6 +16,7 @@ import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../background/dto/manifestDTO'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
+import { widgets } from '../../modules/adapter-overlay/src'
 
 import { ReactComponent as Notification } from './assets/newIcon/bell.svg'
 import { ReactComponent as Account } from './assets/newIcon/connected.svg'
@@ -95,6 +96,7 @@ interface P {
   overlayManager: OverlayManager
   navigate?: NavigateFunction
   location?: Location
+ 
 }
 
 interface S {
@@ -493,6 +495,7 @@ class _App extends React.Component<P, S> {
     const menu = tab?.menus.find((x) => x.id === activeTabMenuId)
 
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
+
 
     return (
       <div className={cn(styles.overlay)}>
