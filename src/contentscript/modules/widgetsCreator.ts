@@ -37,6 +37,7 @@ export class WidgetsCreator {
           return new State<T>(config, null, null)
         }
 
+        // ToDo: Why 'context.parsed.id' used as string. Looks like copypaste from dynamic-adater
         const key = clazz + '/' + 'context.parsed.id'
 
         if (!me.stateStorage.has(key)) {
