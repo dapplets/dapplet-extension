@@ -96,7 +96,6 @@ interface P {
   overlayManager: OverlayManager
   navigate?: NavigateFunction
   location?: Location
- 
 }
 
 interface S {
@@ -495,7 +494,6 @@ class _App extends React.Component<P, S> {
     const menu = tab?.menus.find((x) => x.id === activeTabMenuId)
 
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
-
 
     return (
       <div className={cn(styles.overlay)}>

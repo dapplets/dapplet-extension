@@ -233,7 +233,6 @@ export class OverlayManager implements IOverlayManager {
         hidden={this._panel.classList.contains(HiddenOverlayClass)}
         overlayManager={this}
         onToggle={this.toggle.bind(this)}
-     
       />,
       this._root
     )

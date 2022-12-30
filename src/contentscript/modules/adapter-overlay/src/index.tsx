@@ -27,8 +27,6 @@ export default class OverlayAdapter {
       orderIndex: feature.orderIndex,
     }
     widgets.push(newWidgets)
-   
-    
   }
   public detachConfig(config, featureId) {
     widgets.splice(

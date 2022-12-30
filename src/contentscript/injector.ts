@@ -158,7 +158,9 @@ export class Injector {
         const IS_E2E_IFRAME = isE2ETestingEnvironment(window.top)
         const IS_IFRAME = IS_E2E_IFRAME ? false : self !== top
         const jsonrpc = new JsonRpc()
-        const overlayManager = IS_IFRAME ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc)
+        const overlayManager = IS_IFRAME
+          ? new OverlayManagerIframe(jsonrpc)
+          : new OverlayManager(jsonrpc)
         overlayManager.getOverlays()
         console.log(
           `[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`
