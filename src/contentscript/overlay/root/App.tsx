@@ -16,7 +16,6 @@ import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../background/dto/manifestDTO'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
-import { widgets } from '../../modules/adapter-overlay/src'
 
 import { ReactComponent as Notification } from './assets/newIcon/bell.svg'
 import { ReactComponent as Account } from './assets/newIcon/connected.svg'
@@ -443,7 +442,7 @@ class _App extends React.Component<P, S> {
   }
 
   getNewButtonTab = (parametersFilter: string) => {
-    let clone = Object.assign({}, SYSTEM_TAB)
+    const clone = Object.assign({}, SYSTEM_TAB)
     const newSystemTab = [clone]
     const newSet = newSystemTab.map((tab) => {
       const NewTabs = tab

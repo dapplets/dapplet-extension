@@ -1,10 +1,8 @@
 import { ModuleTypes } from '../../../../common/constants'
-import { browser } from 'webextension-polyfill-ts'
 import { ButtonWidget, IButtonWidgetState } from '../button'
 import { ILabelWidgetState, LabelWidget } from '../label'
 import { Exports } from '../../types'
 import { WidgetsCreator } from '../../widgetsCreator'
-import { OverlayManager } from '../../../overlay/root/overlayManager'
 export const widgets = []
 
 export default class OverlayAdapter {
@@ -60,7 +58,6 @@ export const ManifestOverlayAdapter = {
   },
   instance: new OverlayAdapter('overlay-adapter.dapplet-base.eth'),
   clazz: OverlayAdapter,
-
   order: null,
   contextIds: null,
   constructorDependencies: [],

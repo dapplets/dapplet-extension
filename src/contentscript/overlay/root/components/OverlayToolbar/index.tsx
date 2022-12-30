@@ -95,7 +95,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     init()
     return () => {}
   }, [newWidgets, widgets, nodeOverlayToolbar, isClick])
-
   const _refreshData = async () => {
     try {
       const { getPinnedActions } = await initBGFunctions(browser)
