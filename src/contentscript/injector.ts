@@ -8,15 +8,19 @@ import * as EventBus from '../common/global-event-bus'
 import {
   areModulesEqual,
   formatModuleId,
+  isE2ETestingEnvironment,
   joinUrls,
   multipleReplace,
   parseModuleName,
 } from '../common/helpers'
+import { JsonRpc } from '../common/jsonrpc'
 import { DefaultConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
 import { __decorate } from './global'
 import { ManifestOverlayAdapter } from './modules/adapter-overlay/src'
+import { OverlayManagerIframe } from './overlay/iframe/overlayManager'
+import { OverlayManager } from './overlay/root/overlayManager'
 import { IContentAdapter, IResolver } from './types'
 
 type RegistriedModule = {
@@ -151,6 +155,13 @@ export class Injector {
             }
           }
         }
+        const IS_E2E_IFRAME = isE2ETestingEnvironment(window.top)
+        const IS_IFRAME = IS_E2E_IFRAME ? false : self !== top
+        const jsonrpc = new JsonRpc()
+        const overlayManager = IS_IFRAME
+          ? new OverlayManagerIframe(jsonrpc)
+          : new OverlayManager(jsonrpc)
+        overlayManager.getOverlays()
         console.log(
           `[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`
         )
