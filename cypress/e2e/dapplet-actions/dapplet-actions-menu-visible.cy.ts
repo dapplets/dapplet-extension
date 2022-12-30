@@ -26,17 +26,17 @@ describe('dapplets action test', () => {
       cy.get('dapplets-overlay-manager').should('not.have.class', 'dapplets-overlay-collapsed')
 
       cy.get('dapplets-overlay-manager', { includeShadowDom: true })
-        .find('[data-testid=test-action]', { includeShadowDom: true })
+        .find('[data-testid=action-test]', { includeShadowDom: true })
         .find('[data-testid=activation-dapplet]', { includeShadowDom: true })
         .then((button) => {
           button.hasClass('not-active-switch') &&
             cy
               .get('dapplets-overlay-manager', { includeShadowDom: true })
-              .find('[data-testid=test-action]', { includeShadowDom: true })
+              .find('[data-testid=action-test]', { includeShadowDom: true })
               .find('[data-testid=activation-dapplet]', { includeShadowDom: true })
               .click()
         })
-      cy.wait(5000)
+      cy.wait(10000)
 
       // minimize overlay
       cy.getByTestId('toggle-overlay-button', { includeShadowDom: true }).click()
