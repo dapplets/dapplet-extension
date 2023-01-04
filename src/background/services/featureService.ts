@@ -790,6 +790,12 @@ export default class FeatureService {
     return owner
   }
 
+  public async getModuleNftUrl(registryUri: string, moduleName: string) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    const url = await registry.getModuleNftUrl(moduleName)
+    return url
+  }
+
   public async getVersionInfo(
     registryUri: string,
     moduleName: string,
