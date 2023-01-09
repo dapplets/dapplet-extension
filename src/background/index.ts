@@ -115,6 +115,8 @@ browser.runtime.onMessage.addListener(
       featureService.deployModule(mi, vi, targetStorages, targetRegistry),
     getRegistries: () => featureService.getRegistries(),
     getOwnership: (registryUri, moduleName) => featureService.getOwnership(registryUri, moduleName),
+    getModuleNftUrl: (registryUri, moduleName) =>
+      featureService.getModuleNftUrl(registryUri, moduleName),
     getVersionInfo: (registryUri, moduleName, branch, version) =>
       featureService.getVersionInfo(registryUri, moduleName, branch, version),
     getModuleInfoByName: (registryUri, moduleName) =>

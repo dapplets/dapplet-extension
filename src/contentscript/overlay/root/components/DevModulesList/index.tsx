@@ -405,8 +405,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
           <div className={styles.blockInfo}>
             <h3 className={styles.dappletsTitle}>{mi.title}</h3>
-            {mi.isUnderConstruction ? //     setModuleInfo(mi) //     setUnderConstructionDetails(true) //     onDetailsClick(mi, vi) //   onClick={() => { // <span
-            //     setModuleVersion(vi)
+            {mi.isUnderConstruction ? //     setModuleVersion(vi) //     setModuleInfo(mi) //     setUnderConstructionDetails(true) //     onDetailsClick(mi, vi) //   onClick={() => { // <span
             //   }}
             //   className={styles.dappletsSettingsIsUnderConstructionBlock}
             // >

@@ -29,4 +29,5 @@ export interface Registry {
   addAdmin(moduleName: string, adressAdmin: string): Promise<void>
   removeAdmin(moduleName: string, adressAdmin: string): Promise<void>
   editModuleInfo(module: ModuleInfo): Promise<void>
+  getModuleNftUrl(moduleName: string): Promise<string>
 }

@@ -7,6 +7,7 @@ import { ReactComponent as DeleteIcon } from '../../assets/svg/newDelete.svg'
 import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
 import { ReactComponent as SearchIcon } from '../../assets/svg/newLinks.svg'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
+import { ReactComponent as OpenSeaIcon } from '../../assets/svg/opensea.svg'
 import useAbortController from '../../hooks/useAbortController'
 import { DappletImage } from '../DappletImage'
 import { DappletInfo } from '../DappletInfo'
@@ -30,6 +31,7 @@ export interface DappletProps
   onRemoveMyDapplet?: (x: any) => void
   onDeployDapplet: Function
   onOpenStore: (x: any) => void
+  onOpenNft: (x: any) => void
   loadShowButton: boolean
   onOpenStoreAuthor: Function
   getTabsForDapplet?: any
@@ -45,6 +47,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     onRemoveMyDapplet,
     onDeployDapplet,
     onOpenStore,
+    onOpenNft,
     loadShowButton,
     onOpenStoreAuthor,
     index,
@@ -159,6 +162,16 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 className={styles.squareButton}
                 title="Dapplet in the Store"
                 onClick={() => onOpenStore(dapplet)}
+              />
+            </div>
+
+            <div className={styles.blockButtons}>
+              <SquaredButton
+                appearance="smail"
+                icon={OpenSeaIcon}
+                className={styles.squareButton}
+                title="NFT at OpenSea"
+                onClick={() => onOpenNft(dapplet)}
               />
             </div>
 

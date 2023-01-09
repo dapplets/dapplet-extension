@@ -3,8 +3,8 @@ import { generateGuid } from '../../common/helpers'
 import { Event } from '../../common/models/event'
 import EventBrowserStorage from '../browserStorages/eventBrowserStorage'
 
-// добавить функцию удаления
-// EventBrowserStorage - реализует паттерн реппозиторий - чтение / удаление/ добавление
+// Add removing function
+// EventBrowserStorage - implements Repository pattern (read/add/remove)
 _updateBadge()
 
 export async function getEvents(): Promise<Event[]> {

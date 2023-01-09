@@ -24,7 +24,6 @@ export default class OverlayAdapter {
       contextIds: moduleName.contextIds,
       orderIndex: feature.orderIndex,
     }
-
     widgets.push(newWidgets)
   }
   public detachConfig(config, featureId) {
@@ -59,7 +58,6 @@ export const ManifestOverlayAdapter = {
   },
   instance: new OverlayAdapter('overlay-adapter.dapplet-base.eth'),
   clazz: OverlayAdapter,
-
   order: null,
   contextIds: null,
   constructorDependencies: [],

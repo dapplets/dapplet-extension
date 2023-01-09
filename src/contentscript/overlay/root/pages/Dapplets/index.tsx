@@ -241,6 +241,13 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f.name}`
     window.open(url, '_blank')
   }
+
+  const onOpenNft = async (f: ManifestAndDetails) => {
+    const { getModuleNftUrl } = await initBGFunctions(browser)
+    const nftUrl = await getModuleNftUrl(f.sourceRegistry.url, f.name)
+    window.open(nftUrl, '_blank')
+  }
+
   const onOpenStoreAuthor = async (f: ManifestAndDetails) => {
     const url = `${DAPPLETS_STORE_URL}/#sortType=Sort%20A-Z&addressFilter=${f.author}`
     window.open(url, '_blank')
@@ -292,6 +299,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                       onRemoveMyDapplet={dapplet.isMyDapplet ? onRemoveMyDapplet : undefined}
                       onDeployDapplet={onDeployDapplet}
                       onOpenStore={onOpenStore}
+                      onOpenNft={onOpenNft}
                       onOpenStoreAuthor={onOpenStoreAuthor}
                       getTabsForDapplet={getTabsForDapplet}
                     />

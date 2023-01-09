@@ -56,27 +56,5 @@ export class IpfsModuleStorage implements ModuleStorage {
 
   public async saveDir(tarBlob: DirectoryData): Promise<string> {
     throw new Error('Not implemented')
-    // const response = await fetch(joinUrls(this._gateway, 'bzz'), {
-    //     method: 'POST',
-    //     body: tarBlob,
-    //     headers: {
-    //         'swarm-index-document': 'index.html',
-    //         'swarm-collection': 'true',
-    //         'swarm-postage-batch-id': this._swarmPostageStampId
-    //     }
-    // });
-
-    // if (!response.ok) {
-    //     const error = await response.json()
-    //         .then(x => `${x.code} ${x.message}`)
-    //         .catch(() => `${response.status} ${response.statusText}`);
-
-    //     throw new Error(error);
-    // }
-
-    // const json = await response.json();
-    // if (!json.reference) throw new Error("Cannot upload file to Swarm."); // ToDo: show message
-    // const url = "bzz://" + json.reference;
-    // return url;
   }
 }

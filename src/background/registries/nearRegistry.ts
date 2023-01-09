@@ -322,6 +322,10 @@ export class NearRegistry implements Registry {
     throw new Error('Not implemented')
   }
 
+  public async getModuleNftUrl(moduleName: string): Promise<string> {
+    throw new Error('Not implemented')
+  }
+
   private _toNearStorageRef(ref: StorageRef): NearStorageRef {
     if (ref === null) return null
     return {
