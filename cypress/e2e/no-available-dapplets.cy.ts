@@ -12,7 +12,6 @@ describe('No available dapplets', () => {
       // should have no dapplets in the list
       cy.get('dapplets-overlay-manager').contains('No available dapplets for current site.', {
         timeout: 30000,
-        includeShadowDom: true,
       })
     })
   )

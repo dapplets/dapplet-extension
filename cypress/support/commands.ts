@@ -23,28 +23,28 @@ Cypress.Commands.add('openDappletsOverlay', (url) => {
   cy.get('dapplets-overlay-manager').should('not.have.class', 'dapplets-overlay-hidden')
 
   // expands to ubersausage mode
-  cy.getByTestId('show-tabs-button', { includeShadowDom: true }).click()
+  cy.getByTestId('show-tabs-button').click()
 
   // opens dapplets list
-  cy.getByTestId('toggle-overlay-button', { includeShadowDom: true }).click()
+  cy.getByTestId('toggle-overlay-button').click()
 
-  cy.getByTestId('system-tab-settings', { includeShadowDom: true }).click()
-  cy.getByTestId('toggle-overlay-button', { includeShadowDom: true }).click()
+  cy.getByTestId('system-tab-settings').click()
+  cy.getByTestId('toggle-overlay-button').click()
 
   cy.get('dapplets-overlay-manager').should('not.have.class', 'dapplets-overlay-collapsed')
 })
 
 Cypress.Commands.add('runDapplet', (dappletIdToActivate) =>
   cy
-    .get('dapplets-overlay-manager', { includeShadowDom: true })
-    .find(`[data-testid=${dappletIdToActivate}]`, { includeShadowDom: true })
-    .find('[data-testid=activation-dapplet]', { includeShadowDom: true })
+    .get('dapplets-overlay-manager')
+    .find(`[data-testid=${dappletIdToActivate}]`)
+    .find('[data-testid=activation-dapplet]')
     .then((button) => {
       button.hasClass('not-active-switch') &&
         cy
-          .get('dapplets-overlay-manager', { includeShadowDom: true })
-          .find(`[data-testid=${dappletIdToActivate}]`, { includeShadowDom: true })
-          .find('[data-testid=activation-dapplet]', { includeShadowDom: true })
+          .get('dapplets-overlay-manager')
+          .find(`[data-testid=${dappletIdToActivate}]`)
+          .find('[data-testid=activation-dapplet]')
           .click()
     })
 )

@@ -37,37 +37,32 @@ describe('CA: dapplet on GitHub', () => {
     9,
     it('popup widget has accounts', () => {
       // popup is not visible
-      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
-        .find('.accounts', { includeShadowDom: true })
-        .should('not.be.visible')
+      cy.get('.dapplets-connected-accounts-wrapper').find('.accounts').should('not.be.visible')
 
       // open popup and find more than 1 connected accounts
-      cy.get('.dapplet-widget').find('.profile-badge', { includeShadowDom: true }).click()
-      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
-        .find('.accounts', { includeShadowDom: true })
+      cy.get('.dapplet-widget').find('.profile-badge').click()
+      cy.get('.dapplets-connected-accounts-wrapper')
+        .find('.accounts')
         .should('be.visible')
-        .find('.account-container', { includeShadowDom: true })
+        .find('.account-container')
         .should('have.length.greaterThan', 1)
 
       // find nik3ter.testnet among accounts
-      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true }).contains(
-        'nik3ter.testnet',
-        { includeShadowDom: true }
-      )
+      cy.get('.dapplets-connected-accounts-wrapper').contains('nik3ter.testnet')
     })
   )
 
   qase(
     6,
     it('copy account name', () => {
-      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
-        .find('.account-container', { includeShadowDom: true })
+      cy.get('.dapplets-connected-accounts-wrapper')
+        .find('.account-container')
         .first()
         .find('.copy-button')
         .click()
 
-      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
-        .find('.account-container', { includeShadowDom: true })
+      cy.get('.dapplets-connected-accounts-wrapper')
+        .find('.account-container')
         .first()
         .invoke('text')
         .then((accountName) => {
@@ -86,17 +81,13 @@ describe('CA: dapplet on GitHub', () => {
   qase(
     7,
     it('Link to accounts page', () => {
-      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
-        .find('.accounts', { includeShadowDom: true })
-        .should('not.be.visible')
-      cy.get('.dapplet-widget').find('.profile-badge', { includeShadowDom: true }).click()
-      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
-        .find('.accounts', { includeShadowDom: true })
-        .should('be.visible')
+      cy.get('.dapplets-connected-accounts-wrapper').find('.accounts').should('not.be.visible')
+      cy.get('.dapplet-widget').find('.profile-badge').click()
+      cy.get('.dapplets-connected-accounts-wrapper').find('.accounts').should('be.visible')
 
-      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
-        .find('.account', { includeShadowDom: true })
-        .contains('teremovskii', { includeShadowDom: true })
+      cy.get('.dapplets-connected-accounts-wrapper')
+        .find('.account')
+        .contains('teremovskii')
         .should('have.attr', 'href', 'https://twitter.com/teremovskii')
         .should('have.attr', 'target', '_blank')
     })
@@ -105,14 +96,10 @@ describe('CA: dapplet on GitHub', () => {
   qase(
     5,
     it('popup closes after click', () => {
-      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
-        .find('.accounts', { includeShadowDom: true })
-        .should('be.visible')
+      cy.get('.dapplets-connected-accounts-wrapper').find('.accounts').should('be.visible')
 
       cy.get('body').click({ force: true })
-      cy.get('.dapplets-connected-accounts-wrapper', { includeShadowDom: true })
-        .find('.accounts', { includeShadowDom: true })
-        .should('not.be.visible')
+      cy.get('.dapplets-connected-accounts-wrapper').find('.accounts').should('not.be.visible')
     })
   )
 })

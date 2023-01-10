@@ -15,9 +15,9 @@ describe('dapplets action main menu', () => {
       cy.get('dapplets-overlay-manager').should('not.have.class', 'dapplets-overlay-hidden')
 
       // check main menu actions
-      cy.getByTestId('tab-pinned', { includeShadowDom: true }).first().click()
+      cy.getByTestId('tab-pinned').first().click()
 
-      cy.getByTestId('main-menu-actions', { includeShadowDom: true }).should('exist')
+      cy.getByTestId('main-menu-actions').should('exist')
     })
   )
 })

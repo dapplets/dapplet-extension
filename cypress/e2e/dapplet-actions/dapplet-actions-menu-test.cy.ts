@@ -13,20 +13,20 @@ describe('dapplets action work', () => {
       cy.wait(10000)
 
       // minimize overlay
-      cy.getByTestId('toggle-overlay-button', { includeShadowDom: true }).click()
+      cy.getByTestId('toggle-overlay-button').click()
 
-      cy.getByTestId('tab-not-pinned', { includeShadowDom: true }).click()
+      cy.getByTestId('tab-not-pinned').click()
 
       // check dapplet action title
-      cy.getByTestId('button-not-pinned', { includeShadowDom: true })
+      cy.getByTestId('button-not-pinned')
         .first()
         .invoke('prop', 'title')
         .should('equal', 'new title')
 
-      cy.getByTestId('button-not-pinned', { includeShadowDom: true }).first().click()
+      cy.getByTestId('button-not-pinned').first().click()
 
       // check dapplet action new title
-      cy.getByTestId('button-not-pinned', { includeShadowDom: true })
+      cy.getByTestId('button-not-pinned')
         .first()
         .invoke('prop', 'title')
         .should('equal', 'new click')

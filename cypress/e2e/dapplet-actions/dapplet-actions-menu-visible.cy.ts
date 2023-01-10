@@ -13,13 +13,13 @@ describe('dapplets action test', () => {
       cy.wait(10000)
 
       // minimize overlay
-      cy.getByTestId('toggle-overlay-button', { includeShadowDom: true }).click()
+      cy.getByTestId('toggle-overlay-button').click()
 
       cy.get('dapplets-overlay-manager').should('have.class', 'dapplets-overlay-collapsed')
 
       // change main menu dapplet
-      cy.getByTestId('tab-not-pinned', { includeShadowDom: true }).click()
-      cy.getByTestId('dapplet-active-menu', { includeShadowDom: true }).should('exist')
+      cy.getByTestId('tab-not-pinned').click()
+      cy.getByTestId('dapplet-active-menu').should('exist')
     })
   )
 })

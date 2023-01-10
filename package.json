@@ -20,7 +20,7 @@
     "test:e2e": "cross-env QASE_REPORT=1 npx cypress run --headed --browser chrome",
     "test:ca": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/connected-accounts\" --headed --browser chrome",
     "test:da": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/dapplet-actions\" --headed --browser chrome",
-    "test:wa": "npx cypress run --spec \"cypress/e2e/wallets\" --headed --browser chrome"
+    "test:wa": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/wallets\" --headed --browser chrome"
   },
   "devDependencies": {
     "@fontsource/montserrat": "^4.5.5",
