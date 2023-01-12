@@ -35,4 +35,5 @@ export default defineConfig({
     },
   },
   chromeWebSecurity: false,
+  includeShadowDom: true,
 })

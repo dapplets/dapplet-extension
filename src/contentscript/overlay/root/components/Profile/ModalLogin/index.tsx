@@ -175,6 +175,7 @@ export const ModalLogin = ({
               onClick={() => {
                 wallets.length >= 5 ? null : connectWallet()
               }}
+              data-testid="add-wallet-btn-profile-widget"
             >
               <span
                 data-title={

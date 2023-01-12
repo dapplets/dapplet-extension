@@ -185,7 +185,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   ])
 
   return (
-    <div className={cn(styles.wrapper, { [styles.mini]: isMini })}>
+    <div className={cn(styles.wrapper, { [styles.mini]: isMini })} data-testid="profile-widget">
       <header
         className={cn(styles.header, {
           [styles.mini]: isMini,
