@@ -291,7 +291,9 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       <div className={styles.inner}>
         <div className={cn(styles.tabs, {})}>
           <div
-            onClick={() => p.setOpenWallet()}
+            onClick={() => {
+              p.isOpenWallet && p.setOpenWallet()
+            }}
             className={cn(styles.TabList, { [styles.isOpenWallet]: p.isOpenWallet })}
           >
             {getNewButtonTab('Connected Accounts')}
