@@ -15,7 +15,6 @@ import { DappletTitle } from '../DappletTitle'
 import { SquaredButton } from '../SquaredButton'
 import { Switch } from '../Switch'
 import styles from './Dapplet.module.scss'
-// TODO: How will the dapplets be displayed during development?
 
 export interface DappletProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
