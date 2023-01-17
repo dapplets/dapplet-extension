@@ -147,17 +147,6 @@ export async function getCurrentTab(): Promise<Tabs.Tab | null> {
 
     if (!tab) return null
 
-    const popupUrl = browser.runtime.getURL('popup.html')
-
-    if (tab.url.indexOf(popupUrl) !== -1) {
-      const params = new URLSearchParams(new URL(tab.url).search) // For automated testing open popup in separated tab with URL /popup.html?tabUrl=https://example.com
-      const url = params.get('tabUrl')
-      if (url) {
-        const [currentTab] = await browser.tabs.query({ url: url })
-        return currentTab
-      }
-    }
-
     return tab
   } catch (_) {
     return null
@@ -570,4 +559,29 @@ export function isE2ETestingEnvironment(win: Window): boolean {
   if (href.indexOf('localhost:55618') !== -1) return true
 
   return false
+}
+
+export const isValidUrl = (input: string) => {
+  const type = typeOfUri(input)
+
+  if (type === UriTypes.Ens) return true
+  if (type === UriTypes.Ethereum) return true
+  if (type === UriTypes.Near) return true
+  if (type === UriTypes.Http) return true
+
+  return false
+}
+
+export const isValidHttp = (url: string) => {
+  try {
+    new URL(url)
+  } catch (_) {
+    return false
+  }
+
+  return true
+}
+
+export const isValidPostageStampId = (id: string) => {
+  return /^[0-9a-f]{64}$/gm.test(id)
 }

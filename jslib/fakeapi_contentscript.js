@@ -1,10 +1,5 @@
 import common_script from '!raw-loader!../build/common.js'
-import deploy_script from '!raw-loader!../build/deploy.js'
-import guide_script from '!raw-loader!../build/guide.js'
 import overlay_script from '!raw-loader!../build/overlay.js'
-import popup_script from '!raw-loader!../build/popup.js'
-import settings_script from '!raw-loader!../build/settings.js'
-import starter_script from '!raw-loader!../build/starter.js'
 
 import fakeapi_frame_script from '!raw-loader!./fakeapi_frame.js'
 
@@ -70,23 +65,7 @@ browser.runtime.getURL = function (url) {
 
   let script = null
 
-  if (url === 'popup.html') {
-    script = popup_script
-  } else if (url === 'deploy.html') {
-    script = deploy_script
-  } else if (url === 'pairing.html') {
-    script = pairing_script
-  } else if (url === 'sowa.html') {
-    script = sowa_script
-  } else if (url === 'starter.html') {
-    script = starter_script
-  } else if (url === 'settings.html') {
-    script = settings_script
-  } else if (url === 'login.html') {
-    script = login_script
-  } else if (url === 'guide.html') {
-    script = guide_script
-  } else if (url === 'overlay.html') {
+  if (url === 'overlay.html') {
     script = overlay_script
   }
 
@@ -98,7 +77,6 @@ browser.runtime.getURL = function (url) {
         <html>
         <head>
           <meta charset="UTF-8">
-          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
         </head>
         <body>
           <div id="app"></div>

@@ -350,7 +350,6 @@ export class Injector {
       // ToDo: elemenate the boilerplate
       const coreWrapper = {
         overlayManager: core.overlayManager,
-        waitPairingOverlay: core.waitPairingOverlay,
         contextStarted: (contextIds: any[], parentContext: string) =>
           this._setContextActivivty(contextIds, parentContext, true),
         contextFinished: (contextIds: any[], parentContext: string) =>
@@ -426,7 +425,6 @@ export class Injector {
         BigNumber: core.BigNumber,
         ethers: core.ethers,
         near: core.near,
-        starterOverlay: core.starterOverlay,
         createShareLink: (targetUrl: string, modulePayload: any) =>
           core.createShareLink(targetUrl, modulePayload, {
             contextIds: ['*'], // ToDo: Replace wildcard on real context IDs

@@ -2,80 +2,78 @@
 
 ## Glossary
 
-**Dapplet Extension** - 
+**Dapplet Extension** -
 
-**Background** - 
+**Background**-
 
-**ContentScript** - 
-
-**Popup** - 
+**ContentScript**-
 
 **Options** -
 
-**Контекст** - 
+**Context** -
 
 **Adapter** -
 
-**Feature** - 
+**Feature** -
 
-**Точка вставки** - 
+**Insert point** -
 
-**Виджет** - 
+**Widget** -
 
-**Дополненный контекст** - 
+**Additional context** -
 
 **Augmentation Server** -
 
 ## Dapplet Extension
 
-Диаграмма ниже описывает структуру расширения и его внешнее окружение.
+The diagram below describes the structure of the extension and its external environment.
 
 ![](images/dapplet-extension.png)
 
-Общая схема работы:
+General scheme of work:
 
-1. Background загружает модули из децентрализованного хранилища.
-2. Background кэширует модули во внутреннее хранилище браузера и читает настройки.
-3. Пользователь включает необходимые ему Features, доступные для текущей страницы, через Popup.
-4. contentscript при загрузке контекстной страницы получает тексты скриптов модулей от Background
-5. contentscript в ходе исполнения модулей парсит из веб-страницы контекстную информацию и вставляет в страницу кнопки (widgets).
-6. При необходимости из внешнего API (например, через WebSocket или HTTP) поставляются дополнительные данные для расширения контекста.
+1. Background loads modules from decentralized storage.
+2. Background caches modules in the browser's internal storage and reads the settings.
+3. The user turns on the Features he needs, available for the current page, via Popup.
+4. ContentScript, when loading the context page, receives the texts of module scripts from Background
+5. ContentScript parses contextual information from the web page during the execution of modules and inserts buttons (widgets) into the page.
+6. If necessary, additional data is supplied from an external API (for example, via WebSocket or HTTP) to expand the context.
 
 ## Injectable Modules
 
-Для разработки модулей предлагается архитектура, позволяющая разделить функциональную ответственность в отдельные модули:
+For the development of modules, an architecture is proposed that allows dividing functional responsibilities into separate modules:
 
-* Адаптер (adapter) - "низкоуровневое" взаимодействие с DOM страницы;
-* Возможность (feature) - "высокоуровневое" описание бизнес-кейсов.
+- Adapter (adapter) - "low-level" interaction with the DOM of the page;
+- Opportunity (feature) - "high-level" description of business cases.
 
-Целью такого разделения явялется упрощённая разработка виджетов для реализации бизнес-кейсов без необходимости погружения до уровня DOM веб-страницы. 
+The purpose of this separation is to simplify the development of widgets to implement business cases without having to dive down to the DOM level of a web page.
 
-Разработчик Feature оперируёт только высокоуровневыми классами, предоставляемыми адаптером, которые инкапсулируют всю логику взаимодействия с DOM веб-страницы. 
+The Feature developer operates only on the high-level classes provided by the adapter, which encapsulate all the logic for interacting with the DOM of the web page.
 
-Разработчик Feature получает возможность внедрять виджеты на веб-страницу без знания того, как устроен её DOM. Это позволяет полностью сфокусироваться на реализации бизнес-кейсов.
+A Feature developer can embed widgets on a web page without knowing how the DOM is structured. This allows you to fully focus on the implementation of business cases.
 
-Задачами модулей-адаптеров являются:
+The tasks of adapter modules are:
 
-1. Парсинг контекстной информации из DOM веб-страницы.
-2. Определение точек вставки, достпуных на веб-странице.
-3. Определение типов виджетов, доступных для размещения в каждой конкретной точке вставки.
-4. Внедрение виджетов в DOM веб-страницы.
-5. Наблюдение за изменениями DOM веб-страницы.
+1. Parsing contextual information from the DOM of a web page.
+2. Determining the insertion points available on the web page.
+3. Determining the types of widgets available for placement at each specific insertion point.
+4. Embedding widgets in the DOM of a web page.
+5. Watch for changes to the DOM of a web page.
 
-Задачами модулей-возможностей явялются:
+The tasks of the capability modules are:
 
-1. Конфигурация виджетов и их привязка к конкретной точке вставки.
-2. Описание поведения виджетов при взаимодействии с ними.
-3. Конфигурация точки входа во внешний API для загрузки дополненного контекста.
+1. Widget configuration and binding to a specific insertion point.
+2. Description of the behavior of widgets when interacting with them.
+3. Configuration of the entry point to the external API for loading the augmented context.
 
-### Зависимости между модулями
+### Dependencies between modules
 
-На диаграмме ниже показан пример того, как могут выглядеть зависимости между модулями.
+The diagram below shows an example of what dependencies between modules might look like.
 
-Feature-модули ```twitter-feature-1``` и ```twitter-feature-2``` используют адаптер ```twitter-adapter``` для внедрения виджетов. Модуль ```twitter-adapter``` взаимодействует с DOM веб-страницы. 
+The `twitter-feature-1` and `twitter-feature-2` feature modules use the `twitter-adapter` adapter to inject widgets. The `twitter-adapter` module interacts with the DOM of a web page.
 
-Возможно использование общих библиотек для вынесения повторяющегося кода в отдельные модули. На диаграмме ```twitter-adapter``` использует модуль ```common-lib```.
+It is possible to use shared libraries to move repetitive code into separate modules. In the diagram, `twitter-adapter` uses the `common-lib` module.
 
-![](images/typescript-examples.png) 
+![](images/typescript-examples.png)
 
-Примеры такой реализации можно найти в репозитории [typescript-examples](https://github.com/dapplets/typescript-examples).
+Examples of such an implementation can be found in the [typescript-examples](https://github.com/dapplets/typescript-examples) repository.

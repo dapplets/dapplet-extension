@@ -5,7 +5,7 @@ import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../../background/models/versionInfo'
 import { groupBy } from '../../../../../../common/helpers'
-import { isValidUrl } from '../../../../../../popup/helpers'
+import { isValidUrl } from '../../../../../../common/helpers'
 import { DevModule } from '../../../components/DevModulesList'
 import { Localhost } from '../../../components/Localhost'
 import { Registry } from '../../../components/Registry'
@@ -133,6 +133,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     // await openDeployOverlay(mi, vi)
     // window.close()
   }
+
   const enableRegistry = async (url: string) => {
     setLoadButtonLocalhost(true)
     const { enableRegistry } = await initBGFunctions(browser)

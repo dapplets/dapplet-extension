@@ -18,18 +18,9 @@ function modifyManifest(buffer) {
 
 module.exports = {
   entry: {
-    popup: path.join(__dirname, 'src/popup/index.tsx'),
     background: path.join(__dirname, 'src/background/index.ts'),
     contentscript: path.join(__dirname, 'src/contentscript/index.ts'),
     inpage: path.join(__dirname, 'src/inpage/index.ts'),
-    // pairing: path.join(__dirname, "src/pairing/index.tsx"),
-    // sowa: path.join(__dirname, "src/sowa/index.tsx"),
-    deploy: path.join(__dirname, 'src/deploy/index.tsx'),
-    starter: path.join(__dirname, 'src/starter/index.tsx'),
-    settings: path.join(__dirname, 'src/settings/index.tsx'),
-    // login: path.join(__dirname, "src/login/index.tsx"),
-    // welcome: path.join(__dirname, "src/welcome/index.tsx"),
-    guide: path.join(__dirname, 'src/guide/index.tsx'),
     overlay: path.join(__dirname, 'src/overlay/index.tsx'),
   },
   output: {
@@ -168,48 +159,8 @@ module.exports = {
           to: 'background.html',
         },
         {
-          from: 'src/popup/index.html',
-          to: 'popup.html',
-        },
-        // {
-        //   from: 'src/options/index.html',
-        //   to: 'options.html',
-        // },
-        {
-          from: 'src/pairing/index.html',
-          to: 'pairing.html',
-        },
-        // {
-        //   from: 'src/sowa/index.html',
-        //   to: 'sowa.html',
-        // },
-        {
-          from: 'src/deploy/index.html',
-          to: 'deploy.html',
-        },
-        {
-          from: 'src/starter/index.html',
-          to: 'starter.html',
-        },
-        {
-          from: 'src/settings/index.html',
-          to: 'settings.html',
-        },
-        // {
-        //   from: 'src/login/index.html',
-        //   to: 'login.html',
-        // },
-        {
           from: 'src/callback/index.html',
           to: 'callback.html',
-        },
-        // {
-        //   from: 'src/welcome/index.html',
-        //   to: 'welcome.html',
-        // },
-        {
-          from: 'src/guide/index.html',
-          to: 'guide.html',
         },
         {
           from: 'src/overlay/index.html',

@@ -13,10 +13,6 @@ import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 
 export class OverlayService {
-  public openDeployOverlay(mi: ModuleInfo, vi: VersionInfo) {
-    return this._openOverlay('OPEN_DEPLOY_OVERLAY', { mi, vi })
-  }
-
   public pairWalletViaOverlay(
     chains: ChainTypes | ChainTypes[] | null,
     app: string | DefaultSigners,
@@ -76,19 +72,6 @@ export class OverlayService {
 
   public execConnectedAccountsUpdateHandler(moduleName: string, tabId: number) {
     return this._openOverlay('EXEC_CA_UPDATE_HANDLER', { moduleName }, tabId)
-  }
-
-  public openSettingsOverlay(
-    mi: ManifestDTO,
-    vi: VersionInfo,
-    schemaConfig: any,
-    defaultConfig: DefaultConfig
-  ) {
-    return this._openOverlay('OPEN_SETTINGS_OVERLAY', { mi, vi, schemaConfig, defaultConfig })
-  }
-
-  public openGuideOverlay(): Promise<void> {
-    return this._openOverlay('OPEN_GUIDE_OVERLAY', { topic: 'pair', args: [] })
   }
 
   public sendDataToPairingOverlay(topic: string, args: any[]) {

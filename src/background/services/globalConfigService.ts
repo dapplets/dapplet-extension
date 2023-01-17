@@ -36,7 +36,6 @@ const EXPORTABLE_PROPERTIES = [
   'siaPortalUrl',
   // 'walletsUsage',
   'identityContract',
-  'popupInOverlay',
   'hostnames',
   //'lastDevMessageHash',
   //'ignoredUpdate',
@@ -264,7 +263,6 @@ export default class GlobalConfigService {
     config.swarmGatewayUrl = 'https://swarmgateway.mooo.com/'
     config.walletsUsage = {}
     config.identityContract = '0xf6b3a0B20281796D465bB8613e233BE30be07084'
-    config.popupInOverlay = true
     config.autoBackup = true
     config.errorReporting = true
     config.userAgentId = generateGuid()
@@ -594,18 +592,6 @@ export default class GlobalConfigService {
 
   async setErrorReporting(isActive: boolean) {
     return this.updateConfig((c) => (c.errorReporting = isActive))
-  }
-
-  async getPopupInOverlay() {
-    const config = await this.get()
-    return config.popupInOverlay
-  }
-
-  async setPopupInOverlay(isActive: boolean) {
-    await this.updateConfig((c) => (c.popupInOverlay = isActive))
-    await browser.browserAction.setPopup({
-      popup: isActive ? '' : 'popup.html',
-    })
   }
 
   async getAutoBackup() {

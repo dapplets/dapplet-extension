@@ -80,9 +80,6 @@ browser.runtime.onMessage.addListener(
     removeSessionItem: sessionService.removeItem.bind(sessionService),
     clearSessionItems: sessionService.clearItems.bind(sessionService),
 
-    // Upgrade Guide
-    openGuideOverlay: overlayService.openGuideOverlay.bind(overlayService),
-
     // SuspendService
     getSuspendityByHostname: suspendService.getSuspendityByHostname.bind(suspendService),
     getSuspendityEverywhere: suspendService.getSuspendityEverywhere.bind(suspendService),
@@ -136,10 +133,8 @@ browser.runtime.onMessage.addListener(
     editModuleInfo: (registryUri, targetStorages, module) =>
       featureService.editModuleInfo(registryUri, targetStorages, module),
     getVersions: (registryUri, moduleName) => featureService.getVersions(registryUri, moduleName),
-    openSettingsOverlay: (mi) => featureService.openSettingsOverlay(mi),
     removeDapplet: (name, hostnames) => featureService.removeDapplet(name, hostnames),
     getResource: (hashUris) => featureService.getResource(hashUris),
-    openDeployOverlayById: featureService.openDeployOverlayById.bind(featureService),
     getUserSettingsForOverlay: featureService.getUserSettingsForOverlay.bind(featureService),
 
     // GlobalConfigService
@@ -177,8 +172,6 @@ browser.runtime.onMessage.addListener(
     getErrorReporting: () => globalConfigService.getErrorReporting(),
     setErrorReporting: (isActive) => globalConfigService.setErrorReporting(isActive),
     getIdentityContract: globalConfigService.getIdentityContract.bind(globalConfigService),
-    getPopupInOverlay: () => globalConfigService.getPopupInOverlay(),
-    setPopupInOverlay: (isActive) => globalConfigService.setPopupInOverlay(isActive),
     getUserAgentId: globalConfigService.getUserAgentId.bind(globalConfigService),
     getUserAgentName: globalConfigService.getUserAgentName.bind(globalConfigService),
     setUserAgentName: globalConfigService.setUserAgentName.bind(globalConfigService),
@@ -261,7 +254,6 @@ browser.runtime.onMessage.addListener(
     queryTab: (queryInfo) => browser.tabs.query(queryInfo),
 
     // Overlay Service
-    openDeployOverlay: overlayService.openDeployOverlay.bind(overlayService),
     pairWalletViaOverlay: overlayService.pairWalletViaOverlay.bind(overlayService),
     openDappletHome: overlayService.openDappletHome.bind(overlayService),
     openDappletAction: overlayService.openDappletAction.bind(overlayService),
@@ -439,12 +431,6 @@ browser.runtime.onMessage.addListener((message, sender) => {
   }
 })
 
-globalConfigService.getPopupInOverlay().then((popupInOverlay) => {
-  browser.browserAction.setPopup({
-    popup: popupInOverlay ? '' : 'popup.html',
-  })
-})
-
 browser.browserAction.onClicked.addListener(() => overlayService.openPopupOverlay('dapplets'))
 
 // Set predefined configuration when extension is installed
@@ -507,8 +493,6 @@ browser.runtime.onInstalled.addListener(async () => {
   const currentExtId = browser.runtime.id
   const previousExts = exts.filter((x) => x.name === 'Dapplets' && x.id !== currentExtId)
   if (previousExts.length !== 0) {
-    // const welcomeUrl = new URL(browser.runtime.getURL('welcome.html'));
-    // await browser.tabs.create({ url: welcomeUrl.href });
     console.log(`Found ${previousExts.length} another instance(s) of the current extension.`)
     previousExts.forEach((x) => browser.management.setEnabled(x.id, false))
   }

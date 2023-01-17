@@ -9,8 +9,8 @@ import { IEtherneumWallet, ITransactionReceipt } from './types'
 async function _sendWalletConnectTx(
   app: string,
   chain: ChainTypes,
-  sowaIdOrRpcMethod,
-  sowaMetadataOrRpcParams,
+  rpcMethod,
+  rpcParams,
   callback: (e: { type: string; data?: any }) => void
 ): Promise<any> {
   const { eth_sendCustomRequest, eth_waitTransaction } = await initBGFunctions(browser)
@@ -18,12 +18,7 @@ async function _sendWalletConnectTx(
   callback({ type: 'pending' })
 
   try {
-    const txHash = await eth_sendCustomRequest(
-      app,
-      chain,
-      sowaIdOrRpcMethod,
-      sowaMetadataOrRpcParams
-    )
+    const txHash = await eth_sendCustomRequest(app, chain, rpcMethod, rpcParams)
     if (typeof txHash === 'string' && txHash.startsWith('0x') && txHash.length === 66) {
       callback({ type: 'result', data: txHash })
       callback({ type: 'created', data: txHash })
@@ -58,11 +53,9 @@ export async function createWalletConnection<T>(
   const transport = {
     _txCount: 0,
     _handler: null,
-    exec: (sowaIdOrRpcMethod: string, sowaMetadataOrRpcParams: any) => {
+    exec: (rpcMethod: string, rpcParams: any) => {
       const id = (++transport._txCount).toString()
-      _sendWalletConnectTx(app, chain, sowaIdOrRpcMethod, sowaMetadataOrRpcParams, (e) =>
-        transport._handler(id, e)
-      )
+      _sendWalletConnectTx(app, chain, rpcMethod, rpcParams, (e) => transport._handler(id, e))
       return Promise.resolve(id)
     },
     onMessage: (handler: (topic: string, message: any) => void) => {

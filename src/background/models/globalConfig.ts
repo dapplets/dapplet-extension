@@ -47,8 +47,6 @@ export class GlobalConfig extends Base {
 
   identityContract: string = null
 
-  popupInOverlay = false
-
   hostnames: {
     [hostname: string]: SiteConfig
   } = {}

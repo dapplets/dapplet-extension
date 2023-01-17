@@ -1,3 +1,5 @@
+import ManifestDTO from '../background/dto/manifestDTO'
+
 export type DefaultConfig = {
   [Environments.Dev]?: {
     [key: string]: any
@@ -153,4 +155,12 @@ export interface IConnectedAccountsPair {
   statusMessage: string
   closeness: number
   pendingRequestId?: number
+}
+
+export type ManifestAndDetails = ManifestDTO & {
+  isLoading: boolean
+  isActionLoading: boolean
+  isHomeLoading: boolean
+  error: string
+  versions: string[]
 }

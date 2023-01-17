@@ -1,6 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as React from 'react'
-import { Accordion, Button, Icon } from 'semantic-ui-react'
 import { browser } from 'webextension-polyfill-ts'
 import { bus } from '../..'
 import ModuleInfo from '../../../background/models/moduleInfo'
@@ -205,10 +204,10 @@ export class DappletConfirmation extends React.Component<Props, State> {
           </p>
           <p>The current webpage will be reloaded.</p>
 
-          <Button primary onClick={this.addRegistryClickHandler.bind(this)}>
-            OK
-          </Button>
-          <Button onClick={this.cancelButtonClickHandler.bind(this)}>Cancel</Button>
+          {/* ToDo: Here was semantic ui <Button primary> */}
+          <button onClick={this.addRegistryClickHandler.bind(this)}>OK</button>
+          {/* ToDo: Here was semantic ui <Button> */}
+          <button onClick={this.cancelButtonClickHandler.bind(this)}>Cancel</button>
         </React.Fragment>
       )
     }
@@ -223,10 +222,10 @@ export class DappletConfirmation extends React.Component<Props, State> {
           </p>
           <p>The current webpage will be reloaded.</p>
 
-          <Button primary onClick={this.enableRegistryClickHandler.bind(this)}>
-            OK
-          </Button>
-          <Button onClick={this.cancelButtonClickHandler.bind(this)}>Cancel</Button>
+          {/* ToDo: Here was semantic ui <Button primary> */}
+          <button onClick={this.enableRegistryClickHandler.bind(this)}>OK</button>
+          {/* ToDo: Here was semantic ui <Button> */}
+          <button onClick={this.cancelButtonClickHandler.bind(this)}>Cancel</button>
         </React.Fragment>
       )
     }
@@ -241,7 +240,8 @@ export class DappletConfirmation extends React.Component<Props, State> {
             <b>{p.data.registry}</b>.
           </p>
 
-          <Button onClick={this.cancelButtonClickHandler.bind(this)}>OK</Button>
+          {/* ToDo: Here was semantic ui <Button> */}
+          <button onClick={this.cancelButtonClickHandler.bind(this)}>OK</button>
         </React.Fragment>
       )
     }
@@ -297,7 +297,8 @@ export class DappletConfirmation extends React.Component<Props, State> {
 
         {!s.isTrustedUserExists ? <p>The current webpage will be reloaded.</p> : null}
 
-        <Accordion style={{ marginBottom: '14px' }}>
+        {/* ToDo: here was Accordion */}
+        {/* <Accordion style={{ marginBottom: '14px' }}>
           <Accordion.Title
             active={s.isDetailsVisible}
             onClick={() => this.setState({ isDetailsVisible: !s.isDetailsVisible })}
@@ -311,12 +312,30 @@ export class DappletConfirmation extends React.Component<Props, State> {
               <code>{JSON.stringify(p.data.payload, null, 2)}</code>
             </pre>
           </Accordion.Content>
-        </Accordion>
+        </Accordion> */}
 
-        <Button primary onClick={this.confirmButtonClickHandler.bind(this)}>
-          OK
-        </Button>
-        <Button onClick={this.cancelButtonClickHandler.bind(this)}>Cancel</Button>
+        <div style={{ marginBottom: '14px' }}>
+          <div
+            // active={s.isDetailsVisible}
+            onClick={() => this.setState({ isDetailsVisible: !s.isDetailsVisible })}
+          >
+            {/* <Icon name="dropdown" /> */}
+            Payload Details
+          </div>
+          <div
+          //active={s.isDetailsVisible}
+          >
+            <p>The following data is encoded in the share link and will be sent to the dapplet.</p>
+            <pre style={{ marginTop: '0', padding: '14px', backgroundColor: '#f7f7f7' }}>
+              <code>{JSON.stringify(p.data.payload, null, 2)}</code>
+            </pre>
+          </div>
+        </div>
+
+        {/* ToDo: Here was semantic ui <Button primary> */}
+        <button onClick={this.confirmButtonClickHandler.bind(this)}>OK</button>
+        {/* ToDo: Here was semantic ui <Button> */}
+        <button onClick={this.cancelButtonClickHandler.bind(this)}>Cancel</button>
       </React.Fragment>
     )
   }

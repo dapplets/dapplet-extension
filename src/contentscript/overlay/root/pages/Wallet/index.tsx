@@ -2,10 +2,8 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import makeBlockie from 'ethereum-blockies-base64'
 import React, { FC, useEffect, useState } from 'react'
 import ReactTimeAgo from 'react-time-ago'
-import { Button, Comment, Segment } from 'semantic-ui-react'
 import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../common/global-event-bus'
-import { CheckIcon } from '../../../../../common/react-components/CheckIcon'
 import * as walletIcons from '../../../../../common/resources/wallets'
 import {
   ChainTypes,
@@ -14,6 +12,7 @@ import {
   WalletTypes,
 } from '../../../../../common/types'
 import useAbortController from '../../hooks/useAbortController'
+
 export interface WalletProps {
   isOverlay?: boolean
   handleWalletLengthConnect?: () => void
@@ -69,12 +68,13 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
 
   return (
     <React.Fragment>
-      <Segment
+      <div
         className={isOverlay ? undefined : 'internalTab'}
         style={{ marginTop: isOverlay ? 0 : undefined }}
       >
         {connectedDescriptors.length > 0 ? (
-          <Comment.Group>
+          <div>
+            {/* ToDo: here was <Comment.Group> */}
             {connectedDescriptors.map((x, i) => (
               <div
                 key={i}
@@ -106,12 +106,14 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
                           : x.account}
                       </span>
                     ) : null}
+                    {/* 
+                    // ToDo: restore it
                     <CheckIcon
                       text="Copied"
                       name="copy"
                       style={{ marginLeft: '4px' }}
                       onClick={() => navigator.clipboard.writeText(x.account)}
-                    />
+                    /> */}
                   </div>
                   <div>
                     {walletIcons[x.type] ? (
@@ -139,23 +141,26 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
                   </div>
                 </div>
                 <div>
-                  <Button
+                  {/* ToDo: Here was semantic-ui <Button> */}
+                  <button
                     onClick={() => disconnectButtonClick(x.chain, x.type)}
-                    size="tiny"
+                    // size="tiny"
                     style={{ margin: '5px 0' }}
                   >
                     Disconnect
-                  </Button>
+                  </button>
                 </div>
               </div>
             ))}
-          </Comment.Group>
+            {/* ToDo: here was </Comment.Group> */}
+          </div>
         ) : (
           <div style={{ marginBottom: '10px' }}>No connected wallets</div>
         )}
 
-        <Button onClick={() => connectWallet()}>Connect</Button>
-      </Segment>
+        {/* ToDo: Here was semantic-ui <Button> */}
+        <button onClick={() => connectWallet()}>Connect</button>
+      </div>
     </React.Fragment>
   )
 }

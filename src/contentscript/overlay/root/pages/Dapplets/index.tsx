@@ -9,7 +9,7 @@ import {
   DAPPLETS_STORE_URL,
   ModuleTypes,
 } from '../../../../../common/constants'
-import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
+import { ManifestAndDetails } from '../../../../../common/types'
 import { Dapplet } from '../../components/Dapplet'
 import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
@@ -230,13 +230,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     setDapplets(newDappletsList)
   }
 
-  const onDeployDapplet = async (f: ManifestAndDetails) => {
-    const { openDeployOverlay } = await initBGFunctions(browser)
-
-    // TODO: activeVersion or lastVersion
-    await openDeployOverlay(f, f.activeVersion)
-  }
-
   const onOpenStore = async (f: ManifestAndDetails) => {
     const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f.name}`
     window.open(url, '_blank')
@@ -297,7 +290,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                       onSettingsModule={onUserSettingsClick}
                       onOpenDappletAction={onOpenDappletAction}
                       onRemoveMyDapplet={dapplet.isMyDapplet ? onRemoveMyDapplet : undefined}
-                      onDeployDapplet={onDeployDapplet}
                       onOpenStore={onOpenStore}
                       onOpenNft={onOpenNft}
                       onOpenStoreAuthor={onOpenStoreAuthor}

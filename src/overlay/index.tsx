@@ -1,6 +1,5 @@
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
-// import '../common/semantic-ui-css/semantic.min.css';
 import 'normalize.css'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
