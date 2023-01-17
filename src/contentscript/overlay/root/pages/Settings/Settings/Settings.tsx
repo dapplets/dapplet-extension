@@ -18,7 +18,7 @@ import { getDefaultValueProvider } from '../../../utils/getDefaultValue'
 import useAbortController from '../../../hooks/useAbortController'
 import styles from './Settings.module.scss'
 
-export interface SettingsListProps {
+interface SettingsListProps {
   devModeProps: boolean
   setDevMode: (x) => void
   errorReporting: boolean

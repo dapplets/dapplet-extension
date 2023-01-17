@@ -49,10 +49,6 @@ export class StorageAggregator {
       fetchController.abort()
 
       return buffer
-      // if (this._checkHash(buffer, hashUris.hash, uri)) {
-      //     if (hashUris.hash) this._globalConfigService.getAutoBackup().then(x => x && this._backup(buffer, hashUris.hash.replace('0x', ''))); // don't wait
-      //     return buffer;
-      // }
     } catch (err) {
       console.error(err)
     }

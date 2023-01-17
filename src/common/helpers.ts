@@ -167,10 +167,6 @@ export function networkName(chainId: number) {
   return map[chainId] ?? 'unknown'
 }
 
-export function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1)
-}
-
 export async function fetchWithTimeout(resource, options) {
   const { timeout = 8000 } = options
 
@@ -400,7 +396,7 @@ export function getBitFromHex(hex: string, bitnumber: number): boolean {
  */
 export function convertHexToBinary(hex: string): string {
   hex = hex.replace('0x', '').toLowerCase()
-  let out = ''
+  let out = '' // ToDo: out is unused?
   for (const c of hex) {
     switch (c) {
       case '0':

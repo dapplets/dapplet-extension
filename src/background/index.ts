@@ -14,14 +14,12 @@ import {
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
 import ConnectedAccountService from './services/connectedAccountService'
-import DiscordService from './services/discordService'
+// import DiscordService from './services/discordService'
 import EnsService from './services/ensService'
 import * as EventService from './services/eventService'
 import FeatureService from './services/featureService'
 import GithubService from './services/githubService'
 import GlobalConfigService from './services/globalConfigService'
-import { IdentityService } from './services/identityService'
-import * as NotificationService from './services/notificationService'
 import { OverlayService } from './services/overlayService'
 import ProxyService from './services/proxyService'
 import { SessionService } from './services/sessionService'
@@ -37,11 +35,10 @@ const suspendService = new SuspendService(globalConfigService)
 const overlayService = new OverlayService()
 const proxyService = new ProxyService(globalConfigService)
 const githubService = new GithubService(globalConfigService)
-const discordService = new DiscordService(globalConfigService)
+// const discordService = new DiscordService(globalConfigService)
 const walletService = new WalletService(globalConfigService, overlayService)
 const sessionService = new SessionService(walletService, overlayService)
 const featureService = new FeatureService(globalConfigService, walletService, overlayService)
-const identityService = new IdentityService(globalConfigService, walletService)
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
 
@@ -87,10 +84,6 @@ browser.runtime.onMessage.addListener(
     suspendEverywhere: suspendService.suspendEverywhere.bind(suspendService),
     resumeByHostname: suspendService.resumeByHostname.bind(suspendService),
     resumeEverywhere: suspendService.resumeEverywhere.bind(suspendService),
-
-    // NotificationService
-    transactionCreated: NotificationService.transactionCreated,
-    transactionRejected: NotificationService.transactionRejected,
 
     // FeatureService
     getFeaturesByHostnames: (hostnames, filter) =>
@@ -161,26 +154,21 @@ browser.runtime.onMessage.addListener(
     removeRegistry: (url) => globalConfigService.removeRegistry(url),
     enableRegistry: (url) => globalConfigService.enableRegistry(url),
     disableRegistry: (url) => globalConfigService.disableRegistry(url),
-    getIntro: () => globalConfigService.getIntro(),
-    setIntro: (intro) => globalConfigService.setIntro(intro),
     getTrustedUsers: () => globalConfigService.getTrustedUsers(),
     addTrustedUser: (account) => globalConfigService.addTrustedUser(account),
     containsTrustedUser: (account) => globalConfigService.containsTrustedUser(account),
     removeTrustedUser: (account) => globalConfigService.removeTrustedUser(account),
-    getAutoBackup: () => globalConfigService.getAutoBackup(),
-    setAutoBackup: (isActive) => globalConfigService.setAutoBackup(isActive),
     getErrorReporting: () => globalConfigService.getErrorReporting(),
     setErrorReporting: (isActive) => globalConfigService.setErrorReporting(isActive),
-    getIdentityContract: globalConfigService.getIdentityContract.bind(globalConfigService),
     getUserAgentId: globalConfigService.getUserAgentId.bind(globalConfigService),
     getUserAgentName: globalConfigService.getUserAgentName.bind(globalConfigService),
     setUserAgentName: globalConfigService.setUserAgentName.bind(globalConfigService),
-    getIgnoredUpdate: globalConfigService.getIgnoredUpdate.bind(globalConfigService),
-    setIgnoredUpdate: globalConfigService.setIgnoredUpdate.bind(globalConfigService),
-    getLastMessageSeenTimestamp:
-      globalConfigService.getLastMessageSeenTimestamp.bind(globalConfigService),
-    setLastMessageSeenTimestamp:
-      globalConfigService.setLastMessageSeenTimestamp.bind(globalConfigService),
+    // getIgnoredUpdate: globalConfigService.getIgnoredUpdate.bind(globalConfigService),
+    // setIgnoredUpdate: globalConfigService.setIgnoredUpdate.bind(globalConfigService),
+    // getLastMessageSeenTimestamp:
+    //   globalConfigService.getLastMessageSeenTimestamp.bind(globalConfigService),
+    // setLastMessageSeenTimestamp:
+    //   globalConfigService.setLastMessageSeenTimestamp.bind(globalConfigService),
     getPreferedOverlayStorage:
       globalConfigService.getPreferedOverlayStorage.bind(globalConfigService),
     setPreferedOverlayStorage:
@@ -226,16 +214,12 @@ browser.runtime.onMessage.addListener(
 
     // Github Service
     getNewExtensionVersion: githubService.getNewExtensionVersion.bind(githubService),
-    getDevMessage: githubService.getDevMessage.bind(githubService),
-    hideDevMessage: githubService.hideDevMessage.bind(githubService),
+    // getDevMessage: githubService.getDevMessage.bind(githubService),
+    // hideDevMessage: githubService.hideDevMessage.bind(githubService),
 
     // Discord Service
-    getDiscordMessages: discordService.getDiscordMessages.bind(discordService),
-    hideDiscordMessages: discordService.hideDiscordMessages.bind(discordService),
-
-    // Identity Service
-    getIdentityAccounts: identityService.getAccounts.bind(identityService),
-    addIdentityAccount: identityService.addAccount.bind(identityService),
+    // getDiscordMessages: discordService.getDiscordMessages.bind(discordService),
+    // hideDiscordMessages: discordService.hideDiscordMessages.bind(discordService),
 
     // LocalStorage
     localStorage_setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
