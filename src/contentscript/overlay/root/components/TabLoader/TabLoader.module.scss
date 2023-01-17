@@ -1,8 +1,6 @@
 .loadingListDapplets {
   z-index: 3;
-
   display: flex;
-
   width: 100%;
   height: calc(100vh - 140px);
   margin: 0 auto;
@@ -15,4 +13,4 @@
   background-size: 139px 139px;
 }
 
-@import './adaptive.scss';
+@import "./adaptive";

@@ -1,15 +1,13 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
 
 .inputPanel {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 100%;
   padding: 5px 13px;
-
   border: 1px solid $StrokeColor;
   border-radius: 5px;
   background: $AppBG;
@@ -18,10 +16,8 @@
 .inputInfo {
   width: 100%;
   height: 31px;
-
   color: #919191;
   background: inherit;
-
   font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
@@ -30,7 +26,6 @@
 
 .inputInfo::placeholder {
   color: $MainGrey;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -41,7 +36,6 @@
 .inputButton {
   width: 24px;
   height: 24px;
-
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='16' viewBox='0 0 15 16' fill='none'%3E%3Cpath d='M0.998869 0H2.99887V2.55709C4.18888 1.622 5.68947 1.0643 7.32031 1.0643C11.1863 1.0643 14.3203 4.19831 14.3203 8.0643C14.3203 11.9303 11.1863 15.0643 7.32031 15.0643C5.16982 15.0643 3.24583 14.0946 1.96176 12.5685L3.58108 11.3837C4.49698 12.4147 5.83279 13.0643 7.32031 13.0643C10.0817 13.0643 12.3203 10.8257 12.3203 8.0643C12.3203 5.30288 10.0817 3.0643 7.32031 3.0643C6.23347 3.0643 5.22762 3.41107 4.40737 4L6.99887 4V6H0.998869V0Z' fill='%23919191'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -59,7 +53,6 @@
 .inputDefault {
   width: 100%;
   padding: 5px 13px;
-
   border-radius: 10px;
   background: #fff;
 }
@@ -68,15 +61,11 @@
   width: 49px;
   height: 31px;
   margin-left: 5px;
-
   content: "add";
-
   text-transform: uppercase;
-
   color: $PureWhite;
   border-radius: 4px;
   background: $Primary;
-
   font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 400;

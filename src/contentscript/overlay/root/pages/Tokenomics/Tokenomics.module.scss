@@ -1,16 +1,13 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
 
 .wrapper {
   display: flex;
   overflow: hidden;
-
   flex: 1 1 auto;
   flex-direction: column;
-
   width: 100%;
-
   height: calc(100vh - 123px);
 }
 
@@ -33,7 +30,6 @@
   flex: 1 1 auto;
   flex-direction: column;
   justify-content: center;
-
   width: 100%;
   height: 100%;
 }
@@ -41,24 +37,17 @@
 .applyButtonDisabled {
   display: flex;
   align-items: center;
-
   justify-content: center;
-
   width: 73px;
   height: 32px;
   padding: 0 10px;
-
   cursor: default;
-
   color: $StrokeColor;
   border: 1px solid $StrokeColor;
-
   border-radius: 4px;
   background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
 
@@ -74,24 +63,17 @@
 .createTokenomics {
   display: flex;
   align-items: center;
-
   justify-content: center;
-
   width: 73px;
   height: 32px;
   padding: 0 10px;
-
   cursor: pointer;
   text-transform: uppercase;
-
   color: $PureWhite;
   border-radius: 4px;
-
   background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
 
@@ -107,11 +89,9 @@
 .blockTokenParameters {
   display: flex;
   overflow: hidden;
-
   align-items: center;
   flex: 1 1 auto;
   flex-direction: column;
-
   width: 100%;
   height: 100%;
 }
@@ -123,7 +103,6 @@
 .blockTokenInfo {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
@@ -135,25 +114,18 @@
   position: absolute;
   top: 11px;
   left: 95px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 14px;
   height: 14px;
   padding: 2px;
-
   cursor: pointer;
-
   color: $PureWhite;
   border-radius: 50%;
-
   background: $MainGrey;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 500;
   line-height: 10px;
 
@@ -183,27 +155,21 @@
   z-index: 9998;
   top: 0;
   left: 0;
-
   display: none;
-
   width: 150px;
   height: auto;
   min-height: 20px;
   margin: -15px 0 0 10px;
   padding: 5px;
-
   content: attr(data-title);
   cursor: default;
   text-align: left;
-
   opacity: 0.9;
-
   color: #2a2a2a;
   border: 1px solid #e3e3e3;
   border-radius: 10px 10px 10px 0;
   background: #fff;
   box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
-
   font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 500;
@@ -213,21 +179,17 @@
 .support:hover::before,
 .support:focus::before {
   display: flex;
-
   align-items: center;
 }
 
 .inputTokenName {
   display: flex;
-
   width: 100%;
   padding: 5px 13px;
-
   color: $MainGrey;
   border: 1px solid $StrokeColor;
   border-radius: 5px;
   background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -242,11 +204,9 @@
 
 .linkNavigation {
   position: relative;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 100%;
   height: 60px;
   margin: 20px 0 0;
@@ -255,26 +215,19 @@
     position: absolute;
     top: -10px;
     left: 0;
-
     width: 100%;
     height: 2px;
-
     content: "";
-
     background: $WebBG;
   }
 }
 
 .back {
   position: relative;
-
   display: block;
-
   margin: 0 0 0 14.5px;
-
   color: $MainGrey;
   background: inherit;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -284,12 +237,9 @@
     position: absolute;
     top: 0;
     left: -14.5px;
-
     width: 11px;
     height: 14px;
-
     content: "";
-
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%23919191'/%3E%3C/svg%3E");
   }
 
@@ -312,10 +262,8 @@
 
 .finalWarning {
   color: $MainGrey;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 500;
   line-height: 16px;
 }
@@ -329,22 +277,16 @@
 .footerContentModalButton {
   display: flex;
   align-items: center;
-
   justify-content: center;
-
   width: 140px;
   height: 32px;
   margin: 10px 0 9px;
   padding: 0 10px;
-
   color: $PureWhite;
   border-radius: 4px;
-
   background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
 
@@ -359,13 +301,10 @@
 
 .footerContentModalLink {
   color: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
-
 
   &:hover {
     color: $PrimaryHover;

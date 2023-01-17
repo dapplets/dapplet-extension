@@ -1,46 +1,33 @@
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
+@import "../../assets/styles/null";
 
 .wrapper {
   position: relative;
-
   box-sizing: border-box;
   width: 100%;
-
   max-width: 421px;
   margin: 0 0 19px;
   padding: 17px 15px 10px;
-
   transition: all 0.5s cubic-bezier(0.36, -0.64, 0.34, 1.76);
   transform: none;
-
   opacity: 1;
-
   border: 1px solid $WebBG;
   border-radius: 10px;
-
   background: #fff;
-
   font-family: Roboto, sans-serif;
 }
 
 .header {
   position: absolute;
   top: -10px;
-
   padding: 5px 10px;
-
   text-transform: uppercase;
-
   color: $ContentBlack;
   border: 1px solid $WebBG;
   border-radius: 10px;
-
   background-color: #fff;
-
   font-family: Roboto, sans-serif;
-
   font-size: 10px;
   line-height: 100%;
 }
@@ -48,9 +35,7 @@
 .title {
   display: flex;
   align-items: center;
-
   color: $MainBlack;
-
   font-family: Roboto, sans-serif;
   font-size: 16px;
   font-weight: 700;
@@ -59,14 +44,10 @@
 
 .date {
   display: block;
-
   margin-top: 5px;
   margin-bottom: 5px;
-
   text-transform: uppercase;
-
   color: #2a2a2a;
-
   font-size: 10px;
   line-height: 100%;
 }
@@ -74,16 +55,12 @@
 .description {
   display: inline-block;
   overflow: hidden;
-
   width: 90%;
-
   margin-top: 8px;
 
   // 
   text-overflow: ellipsis;
-
   color: $MainBlack;
-
   font-size: 14px;
   line-height: 149%;
 }
@@ -96,13 +73,9 @@
 
 .link {
   display: block;
-
   margin-top: 10px;
-
   text-transform: uppercase;
-
   color: $Primary;
-
   font-size: 10px;
   line-height: 100%;
 }
@@ -110,7 +83,6 @@
 .delete {
   transition: all 0.7s cubic-bezier(0.36, -0.64, 0.34, 1.76);
   transform: rotateX(-90deg);
-
   opacity: 0;
 }
 
@@ -119,4 +91,4 @@
   align-items: flex-end;
 }
 
-@import "./adaptive.scss";
+@import "./adaptive";

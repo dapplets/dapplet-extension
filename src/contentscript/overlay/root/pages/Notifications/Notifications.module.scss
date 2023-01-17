@@ -1,13 +1,11 @@
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
+@import "../../assets/styles/null";
 
 .wrapper {
   display: flex;
-
   overflow: hidden;
   flex-direction: column;
-
   width: 100%;
   height: 100%;
 }
@@ -34,10 +32,8 @@
 
 .block {
   display: flex;
-
   overflow: hidden;
   flex-direction: column;
-
   height: calc(100% - 67px);
   padding: 20px 0 0 1px;
 }
@@ -46,23 +42,18 @@
   display: flex;
   overflow-y: scroll;
   flex: 1 1 auto;
-
   flex-direction: column;
-
   width: 100%;
-
   height: 50vh;
   padding: 8px 0 0;
   direction: rtl;
 
   &::-webkit-scrollbar {
     width: 4px;
-
     cursor: pointer;
   }
 
   &::-webkit-scrollbar-track {
-    background: rgb(244 244 244);
     background: rgb(244 244 244);
     background:
       linear-gradient(
@@ -76,7 +67,6 @@
   &::-webkit-scrollbar-thumb {
     width: 4px;
     height: 2px;
-
     border-radius: 2px;
     background: $Primary;
     box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
@@ -91,14 +81,12 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-
   min-height: 68px;
   padding: 20px 0 0;
 }
 
 .clearAll {
   color: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -108,19 +96,14 @@
 .noNot {
   position: absolute;
   z-index: 1;
-
   display: flex;
   align-items: center;
   flex: 1 1 auto;
   justify-content: center;
-
   width: 100%;
   height: 80%;
-
   text-align: center;
-
   color: $StrokeColor;
-
   font-family: Roboto;
   font-size: 22px;
   font-weight: 700;
@@ -128,4 +111,4 @@
   line-height: 26px;
 }
 
-@import "./adaptive.scss"
+@import "./adaptive"

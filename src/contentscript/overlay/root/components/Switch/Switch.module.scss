@@ -1,5 +1,5 @@
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/null.scss";
+@import "../../assets/styles/color.variables";
+@import "../../assets/styles/null";
 
 .wrapper {
   position: relative;
@@ -9,24 +9,18 @@
   position: absolute;
   top: 0;
   left: 0;
-
   width: 100%;
   height: 100%;
-
   opacity: 0;
 }
 
 .inputCheckbox {
   position: relative;
-
   display: block;
-
   width: 32px;
   height: 20px;
-
   cursor: pointer;
   transition: all 0.3s ease 0s;
-
   border-radius: 20px;
   background: $MainGrey;
 
@@ -40,15 +34,11 @@
     position: absolute;
     top: 50%;
     left: 2px;
-
     width: 16px;
     height: 16px;
-
     content: "";
-
     transition: all 0.3s ease 0s;
     transform: translateY(-50%);
-
     border-radius: 50%;
     background: $PureWhite;
   }

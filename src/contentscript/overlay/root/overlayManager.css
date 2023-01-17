@@ -3,14 +3,11 @@
   z-index: 2147483647;
   top: 0;
   left: 100%;
-
   height: 100%;
   margin: 0;
   padding: 0;
-
   border: 0;
   background: #fff;
-
   font-family:
     -apple-system,
     BlinkMacSystemFont,
@@ -46,7 +43,6 @@
 @media screen and (min-width: 0) {
   .dapplets-overlay-frame {
     width: 470px !important;
-
     transition: transform 0.15s cubic-bezier(0.55, 0, 0.2, 0.8);
     transform: translateX(-100%);
   }
@@ -67,7 +63,6 @@
 @media screen and (min-width: 0) and (max-width: 640px) {
   .dapplets-overlay-frame {
     width: 100% !important;
-
     transition: transform 0.15s cubic-bezier(0.55, 0, 0.2, 0.8);
     transform: translateX(-100%);
 

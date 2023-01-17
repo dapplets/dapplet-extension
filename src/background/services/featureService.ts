@@ -52,7 +52,7 @@ export default class FeatureService {
    */
   async getFeaturesByHostnames(
     contextIds: string[],
-    filter: 'all' | 'public' | 'trusted' | 'local' | null
+    filter: 'all' | 'public' | 'trusted' | 'local' | 'active' | null
   ): Promise<ManifestDTO[]> {
     if (!filter) filter = 'all'
 
@@ -72,6 +72,12 @@ export default class FeatureService {
       const walletDescriptors = await this._walletService.getWalletDescriptors()
       const accounts = walletDescriptors.filter((x) => x.connected).map((x) => x.account)
       listingAccounts.push(...accounts)
+    }
+
+    if (filter === 'all' || filter === 'active') {
+      const trustedUsers = await this._globalConfigService.getTrustedUsers()
+      const accounts = trustedUsers.map((u) => u.account)
+      console.log(accounts)
     }
 
     const contextIdsByRegsitries =
@@ -171,6 +177,7 @@ export default class FeatureService {
 
     // MyDapplets
     if (filter === 'all' || filter === 'local') {
+      console.log('MyDapplets')
       const myDapplets = await this._globalConfigService.getMyDapplets()
       const myDappletsToAdd = await Promise.all(
         myDapplets.map(async (x) => {
@@ -200,6 +207,97 @@ export default class FeatureService {
               ...myDappletsToAdd.filter((x) => x.registryUrl === registryUrl).map((x) => x.author),
             ])
           )
+          const registry = await this._moduleManager.registryAggregator.getRegistryByUri(
+            registryUrl
+          )
+          // console.log({ owners, listingAccounts, myDappletsToAdd })
+          const moduleInfosByContextId = await registry.getModuleInfo(contextIds, owners)
+
+          for (const [contextId, moduleInfos] of Object.entries(moduleInfosByContextId)) {
+            for (const moduleInfo of moduleInfos) {
+              if (
+                !myDappletsToAdd.find(
+                  (x) => x.registryUrl === moduleInfo.registryUrl && x.name === moduleInfo.name
+                )
+              )
+                continue
+
+              const dto = dtos.find((d) => d.name === moduleInfo.name)
+              if (!dto) {
+                const dto: ManifestDTO = moduleInfo as any
+                const config = await this._globalConfigService.getSiteConfigById(contextId) // ToDo: which contextId should we compare?
+                dto.isActive =
+                  config.activeFeatures[dto.name]?.isActive ||
+                  everywhereConfig.activeFeatures[dto.name]?.isActive ||
+                  false
+                dto.isActionHandler =
+                  config.activeFeatures[dto.name]?.runtime?.isActionHandler ||
+                  everywhereConfig.activeFeatures[dto.name]?.runtime?.isActionHandler ||
+                  false
+                dto.isHomeHandler =
+                  config.activeFeatures[dto.name]?.runtime?.isHomeHandler ||
+                  everywhereConfig.activeFeatures[dto.name]?.runtime?.isHomeHandler ||
+                  false
+                dto.activeVersion = dto.isActive
+                  ? config.activeFeatures[dto.name]?.version ||
+                    everywhereConfig.activeFeatures[dto.name]?.version ||
+                    null
+                  : null
+                dto.lastVersion = dto.isActive
+                  ? await this.getVersions(registryUrl, dto.name).then((x) => x.sort(rcompare)[0])
+                  : null // ToDo: how does this affect performance?
+                dto.order = i++
+                dto.sourceRegistry = {
+                  url: registryUrl,
+                  isDev: configRegistries.find((r) => r.url === registryUrl).isDev,
+                }
+                if (!dto.hostnames) dto.hostnames = []
+                dto.hostnames = mergeDedupe([dto.hostnames, [contextId]])
+                dto.available = true
+                dto.isMyDapplet = true
+                dtos.push(dto)
+              } else {
+                // ToDo: move this merging logic to aggragator
+                if (!dto.hostnames) dto.hostnames = []
+                dto.hostnames = mergeDedupe([dto.hostnames, [contextId]])
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (filter === 'all' || filter === 'active') {
+      const myDapplets = await this._globalConfigService.getMyDapplets()
+      const myDappletsToAdd = await Promise.all(
+        myDapplets.map(async (x) => {
+          if (!activeRegistries.find((r) => r.url === x.registryUrl)) return
+
+          const existingMyDappletDto = dtos.find(
+            (y) => y.sourceRegistry.url === x.registryUrl && y.name === x.name
+          )
+          if (existingMyDappletDto) {
+            existingMyDappletDto.isMyDapplet = true
+            return
+          }
+
+          const moduleInfo = await this.getModuleInfoByName(x.registryUrl, x.name)
+          if (!moduleInfo) return
+
+          return moduleInfo
+        })
+      ).then((x) => x.filter((y) => !!y))
+
+      if (myDappletsToAdd.length > 0) {
+        const registryUrls = Array.from(new Set(myDappletsToAdd.map((x) => x.registryUrl)))
+        for (const registryUrl of registryUrls) {
+          const owners = Array.from(
+            new Set([
+              ...listingAccounts,
+              ...myDappletsToAdd.filter((x) => x.registryUrl === registryUrl).map((x) => x.author),
+            ])
+          )
+          console.log(owners, 'owners')
           const registry = await this._moduleManager.registryAggregator.getRegistryByUri(
             registryUrl
           )

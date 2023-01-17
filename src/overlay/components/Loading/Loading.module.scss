@@ -1,9 +1,7 @@
 .wrapper {
   display: flex;
   flex-direction: column;
-
   max-width: 240px;
-
   background-color: #fff;
 }
 
@@ -11,23 +9,17 @@
   max-width: 208px;
   margin-right: auto;
   margin-left: auto;
-
   text-align: center;
 }
 
 .loading {
   position: relative;
-
   overflow: hidden;
-
   width: 143px;
   height: 143px;
   margin: 20px auto;
-
   border-radius: 50%;
-
   background-image: url("../../assests/loader.svg");
-
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;

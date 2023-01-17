@@ -1,20 +1,22 @@
-@import '../../assets/styles/color.variables.scss';
+@import "../../assets/styles/color.variables";
 
 .tab {
   position: relative;
-
   box-sizing: border-box;
   width: 52px;
+
   // max-width: 52px;
   // margin-top: 6px;
   padding: 10px;
+
   // padding-bottom: 15px;
 
   // border-radius: 10px 0 0 10px;
   // background: #f5f5f5;
   background: #fff;
-  border-radius: 4px 0 0 0;
+  border-radius: 4px 0 0;
   cursor: pointer;
+
   img {
     width: 30px !important;
     height: 30px !important;
@@ -30,14 +32,12 @@
   align-items: center;
   flex-direction: column;
   justify-content: space-around;
-
   margin-top: 4px;
   margin-bottom: 0;
   padding-left: 0;
-
   list-style: none;
   width: 100%;
-    height: 100%;
+  height: 100%;
 }
 
 .top {
@@ -49,16 +49,11 @@
   position: absolute;
   top: -7px;
   right: -7px;
-
   display: block;
-
   width: 18px;
   height: 18px;
-
   cursor: pointer;
-
   border-radius: 50%;
-
   background-color: #fff;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 17 17' fill='none'%3E%3Crect x='0.5' y='0.5' width='16' height='16' rx='8' fill='%23D9304F'/%3E%3Cpath d='M10.7438 5.375L8.5 7.61875L6.25625 5.375L5.375 6.25625L7.61875 8.5L5.375 10.7438L6.25625 11.625L8.5 9.38125L10.7438 11.625L11.625 10.7438L9.38125 8.5L11.625 6.25625L10.7438 5.375Z' fill='white'/%3E%3Crect x='0.5' y='0.5' width='16' height='16' rx='8' stroke='%23F5F5F5'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -75,10 +70,8 @@
 
 .image {
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   width: 30px;
   height: 30px;
   margin-right: auto;
@@ -109,7 +102,6 @@
   .top {
     position: relative;
     top: 2px;
-
     cursor: pointer;
 
     svg {
@@ -140,17 +132,12 @@
   &::before {
     position: absolute;
     z-index: 10;
-
     top: 0;
     left: 0;
-
     display: inline-block;
-
     width: 100%;
     height: 100%;
-
-    content: '';
-
+    content: "";
     border-radius: 10px 0 0 10px;
     background-color: rgb(0 0 0 / 30%);
   }
@@ -158,13 +145,10 @@
 
 .item {
   position: relative;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   margin-top: 11px;
-
   cursor: pointer;
   width: 100%;
   height: 100%;
@@ -179,14 +163,10 @@
       position: absolute;
       top: 0;
       right: 8px;
-
       width: 8px;
       height: 8px;
-
-      content: '';
-
+      content: "";
       opacity: 0;
-
       border: 1px solid #f5f5f5;
       border-radius: 50%;
       background-color: $Primary;
@@ -213,6 +193,7 @@
       }
     }
   }
+
   &:active {
     svg {
       path {
@@ -243,10 +224,11 @@
 
 .listNotPadding {
   margin-top: 0;
+
   .item {
     margin-top: 0;
   }
 }
 
-@import './adaptive.scss';
-@import './menuWidgets.scss';
+@import "./adaptive";
+@import "./menuWidgets";

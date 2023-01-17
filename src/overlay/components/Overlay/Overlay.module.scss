@@ -2,10 +2,8 @@
   box-sizing: border-box;
   height: 100%;
   padding: 18px;
-
   border-radius: 10px;
   background-color: #fff;
-
   font-family: Roboto, sans-serif;
 }
 
@@ -18,12 +16,9 @@
 .title {
   // max-width: 140px;
   margin: 0;
-
   text-align: center;
   text-transform: uppercase;
-
   color: #2a2a2a;
-
   font-size: 10px;
   font-weight: 700;
   line-height: 100%;
@@ -31,16 +26,11 @@
 
 .step {
   position: relative;
-
   display: flex;
   align-items: center;
-
   min-width: 20px;
-
   text-transform: uppercase;
-
   color: #2a2a2a;
-
   font-size: 10px;
   line-height: 100%;
 
@@ -67,6 +57,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   min-height: calc(100% - 20px);
 }

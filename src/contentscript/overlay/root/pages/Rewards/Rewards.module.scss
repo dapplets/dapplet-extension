@@ -1,16 +1,13 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
 
 .wrapper {
   display: flex;
   overflow: hidden;
-
   flex: 1 1 auto;
   flex-direction: column;
-
   width: 100%;
-
   height: calc(100vh - 117px);
   margin-top: -7.5px;
 }
@@ -30,18 +27,15 @@
 .blockRewards {
   display: flex;
   overflow: hidden;
-
   align-items: center;
   flex: 1 1 auto;
   flex-direction: column;
-
   width: 100%;
   height: 100%;
 }
 
 .customPoolBlock {
   display: flex;
-
   width: 100%;
 }
 
@@ -49,26 +43,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   min-width: 105px;
 }
 
 .customPoolLabel {
   color: #979696;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 500;
   line-height: 16px;
 }
 
 .customPoolButton {
   display: block;
-
   width: 20px;
   height: 20px;
-
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%235EC280'/%3E%3C/svg%3E");
 
@@ -92,22 +81,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   min-width: 100px;
   margin: 0 0 0 16px;
 }
 
 .customLabelDistributed {
   display: inline-block;
-
   margin-bottom: 1px;
   margin-left: 5px;
-
   color: $Primary;
-
   font-family: Roboto;
   font-size: 16px;
-
   font-weight: 500;
   line-height: 149%;
 }
@@ -132,17 +116,12 @@
 
 .createRewards {
   display: block;
-
   margin: 3.5px 0 0;
-
   cursor: pointer;
-
   color: $Primary;
   background: inherit;
-
   font-family: Roboto;
   font-size: 16px;
-
   font-weight: 500;
   line-height: 19px;
 
@@ -159,23 +138,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 110px;
   margin: 0 5px;
 }
 
 .inputNewCustomPool {
   display: block;
-
   width: 100%;
   height: 31px;
   padding: 5px 13px;
-
   color: $MainGrey;
   border: 1px solid $StrokeColor;
   border-radius: 5px;
   background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -185,27 +160,20 @@
 
 .inputNewCustomPoolLabel {
   display: block;
-
   padding: 0 10px;
-
   color: $MainGrey;
   background: inherit;
-
   font-family: Roboto;
   font-size: 16px;
-
   font-weight: 500;
   line-height: 19px;
 }
 
 .buttonDeleteNewCustomPool {
   display: block;
-
   width: 18px;
   height: 20px;
-
   cursor: pointer;
-
   border-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='21' viewBox='0 0 18 21' fill='none'%3E%3Cpath d='M14 20.5H4C2.89543 20.5 2 19.6046 2 18.5V5.5H0V3.5H4V2.5C4 1.39543 4.89543 0.5 6 0.5H12C13.1046 0.5 14 1.39543 14 2.5V3.5H18V5.5H16V18.5C16 19.6046 15.1046 20.5 14 20.5ZM4 5.5V18.5H14V5.5H4ZM6 2.5V3.5H12V2.5H6ZM12 16.5H10V7.5H12V16.5ZM8 16.5H6V7.5H8V16.5Z' fill='%23D9304F'/%3E%3C/svg%3E");
 
@@ -221,19 +189,14 @@
 .pushChanges {
   display: flex;
   align-items: center;
-
   justify-content: center;
-
   width: 108px;
   height: 32px;
   margin: -8px 0 0;
   padding: 9px 0;
-
   color: $PureWhite;
   border-radius: 4px;
-
   background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -257,9 +220,7 @@
 
 .newRewardDisabled {
   display: flex;
-
   cursor: default;
-
   color: $StrokeColor;
   border: 1px solid $StrokeColor;
   background: $AppBG;
@@ -277,7 +238,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   min-width: 80px;
   margin: 0 0 0 10px;
 }
@@ -286,27 +246,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 100%;
 }
 
 .rewardNameBlock {
   display: flex;
   align-items: center;
-
   width: 65%;
   margin: 0 2px 0 0;
-
   padding: 10px;
-
   border-radius: 10px;
-
   background: $WebBG;
 }
 
 .nameLabel {
   color: #2a2a2a;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
@@ -315,20 +269,14 @@
 
 .nameInput {
   display: inline-block;
-
   width: 68%;
   height: 31px;
   margin: 0 0 0 4px;
   padding: 5px 13px;
-
   color: $MainGrey;
-
   border: 1px solid $StrokeColor;
-
   border-radius: 5px;
-
   background: $PureWhite;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -339,11 +287,8 @@
 .rewardPoolBlock {
   display: flex;
   align-items: center;
-
   padding: 10px;
-
   border-radius: 10px;
-
   background: $WebBG;
 }
 
@@ -351,20 +296,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 46px;
   height: 31px;
   margin: 0 0 0 4px;
   padding: 5px;
-
   color: $MainGrey;
-
   border: 1px solid $StrokeColor;
-
   border-radius: 5px;
-
   background: $PureWhite;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -379,13 +318,9 @@
 
 .poolInputInvalidText {
   width: 100%;
-
   margin-top: 5px;
-
   text-align: right;
-
   color: #ff6442;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -397,14 +332,10 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-
   width: 100%;
   margin: 8px 0 0;
-
   padding: 10px;
-
   border-radius: 10px;
-
   background: $WebBG;
 }
 
@@ -412,11 +343,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-
   width: 100%;
-
   border-radius: 10px;
-
   background: $WebBG;
 }
 
@@ -424,7 +352,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 100%;
 }
 
@@ -432,26 +359,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 100%;
   margin: 12px 0 0;
 }
 
 .recepientInput {
   display: inline-block;
-
   width: 100%;
-
   padding: 5px 13px;
-
   color: $MainGrey;
-
   border: 1px solid $StrokeColor;
-
   border-radius: 5px;
-
   background: $PureWhite;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -463,11 +382,8 @@
   width: 21px;
   height: 21px;
   margin: 0 0 0 2px;
-
   border-radius: 50%;
-
   background-color: $Primary;
-
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11.25' height='12.5' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='white'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
@@ -484,20 +400,15 @@
 .recepientConditionalBlock {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
 .conditionalLabel {
   display: flex;
   justify-content: center;
-
   padding: 2px 0;
-
   text-align: center;
-
   color: $MainGrey;
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 500;
@@ -509,17 +420,14 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-
   width: 100%;
   margin: 5.5px 0 0;
 }
 
 .recepientConditionalButton {
   display: block;
-
   width: 12.5px;
   height: 12.5px;
-
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12.5' height='12.5' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%235EC280'/%3E%3C/svg%3E");
 
@@ -536,14 +444,10 @@
 
 .recepientConditionalLabel {
   display: inline-block;
-
   margin: 0 0 0 3.25px;
-
   color: #5ec280;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
 }
@@ -561,26 +465,18 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-
   width: 100%;
 }
 
 .inputConditional {
   display: inline-block;
-
   width: 83%;
   height: 31px;
-
   padding: 5px 13px;
-
   color: $MainGrey;
-
   border: 1px solid $StrokeColor;
-
   border-radius: 5px;
-
   background: $PureWhite;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -592,11 +488,8 @@
   width: 21px;
   height: 21px;
   margin: 0 0 0 2px;
-
   border-radius: 50%;
-
   background-color: $Primary;
-
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11.25' height='12.5' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='white'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
@@ -613,23 +506,16 @@
 .applyButtonDisabled {
   display: flex;
   align-items: center;
-
   justify-content: center;
-
   width: 62px;
   height: 32px;
-
   cursor: default;
-
   color: $StrokeColor;
   border: 1px solid $StrokeColor;
-
   border-radius: 4px;
   background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
 
@@ -645,21 +531,15 @@
 .applyButton {
   display: flex;
   align-items: center;
-
   justify-content: center;
-
   width: 62px;
   height: 32px;
   margin-top: 10px;
-
   color: $PureWhite;
   border-radius: 4px;
-
   background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
 
@@ -674,9 +554,7 @@
 
 .createdRewardsWrapper {
   position: relative;
-
   display: flex;
-
   width: 97%;
   margin-top: 15px;
   margin-bottom: 21px;
@@ -685,20 +563,15 @@
 .settingWrapperCreatedRewards {
   h5 {
     left: 14px;
-
     display: inline-block;
     overflow: hidden;
-
     max-width: 50%;
     height: 20px;
     padding: 0 10px;
-
     text-align: center;
     white-space: nowrap;
     text-overflow: ellipsis;
-
     color: $MainGrey;
-
     font-size: 14px;
     font-style: italic;
   }
@@ -709,20 +582,16 @@
   z-index: 3;
   top: -11px;
   right: 15px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   height: 20px;
   padding: 0 10px;
   padding-top: 1.5px;
-
   color: $MainGrey;
   border: 1px solid $MainGrey;
   border-radius: 4px;
   background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -735,20 +604,16 @@
   z-index: 3;
   bottom: 7px;
   left: 14px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 86px;
   height: 20px;
-
   color: $Primary;
   border: 1px solid $MainGrey;
   border-radius: 4px;
   background: inherit;
   background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -768,20 +633,16 @@
   z-index: 3;
   bottom: 7px;
   left: 104px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 76px;
   height: 20px;
-
   color: $Primary;
   border: 1px solid $MainGrey;
   border-radius: 4px;
   background: inherit;
   background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -799,13 +660,10 @@
 .createdRewardsBlock {
   display: flex;
   flex-direction: column;
-
   width: 100%;
   margin: 0 0 10px;
   padding: 10px;
-
   border-radius: 10px;
-
   background: $PureWhite;
 
   &:last-child {
@@ -817,30 +675,23 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-
   width: 100%;
 }
 
 .createdRewardsBlockLabel {
   display: inline-block;
-
   margin: 0 4px 0 0;
-
   color: $ContentBlack;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 500;
   line-height: 16px;
 }
 
 .createdRewardsBlockLabelUser {
   color: $ContentBlack;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 500;
   line-height: 16px;
 }
@@ -849,13 +700,11 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-
   width: 100%;
 }
 
 .createdRewardsBlockLabelAdapter {
   color: #5ab5e8;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -865,11 +714,9 @@
 
 .linkNavigation {
   position: relative;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 100%;
   height: 60px;
   margin: 20px 0 0;
@@ -878,35 +725,28 @@
     position: absolute;
     top: -10px;
     left: 0;
-
     width: 100%;
     height: 2px;
-
     content: "";
-
     background: $WebBG;
   }
 }
 
 .wrapperChanges {
   display: flex;
-
   overflow-y: scroll;
   align-items: center;
   flex-direction: column;
-
   width: 100%;
   margin: 20px 0 0;
   direction: rtl;
 
   &::-webkit-scrollbar {
     width: 4px;
-
     cursor: pointer;
   }
 
   &::-webkit-scrollbar-track {
-    background: rgb(244 244 244);
     background: rgb(244 244 244);
     background:
       linear-gradient(
@@ -920,7 +760,6 @@
   &::-webkit-scrollbar-thumb {
     width: 4px;
     height: 2px;
-
     border-radius: 2px;
     background: $Primary;
     box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
@@ -933,14 +772,10 @@
 
 .back {
   position: relative;
-
   display: block;
-
   margin: 0 0 0 14.5px;
-
   color: $MainGrey;
   background: inherit;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -950,12 +785,9 @@
     position: absolute;
     top: 0;
     left: -14.5px;
-
     width: 11px;
     height: 14px;
-
     content: "";
-
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%23919191'/%3E%3C/svg%3E");
   }
 
@@ -982,9 +814,7 @@
 
 .createTokenomics {
   cursor: pointer;
-
   color: $Primary;
-
   font-family: Roboto;
   font-size: 16px;
   font-weight: 700;
@@ -1003,6 +833,5 @@
 .newPoolInput::-webkit-outer-spin-button,
 ::-webkit-inner-spin-button {
   appearance: none;
-
   margin: 0;
 }

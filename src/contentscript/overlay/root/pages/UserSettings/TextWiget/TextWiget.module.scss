@@ -1,12 +1,11 @@
-@import "../../../assets/styles/null.scss";
-@import "../../../assets/styles/fonts.scss";
-@import "../../../assets/styles/color.variables.scss";
+@import "../../../assets/styles/null";
+@import "../../../assets/styles/fonts";
+@import "../../../assets/styles/color.variables";
 
 .inputBlock {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 100%;
 }
 
@@ -14,29 +13,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 40%;
   margin-top: 10px;
 }
 
 .inputOverlay {
   display: flex;
-
   align-items: flex-start;
-
   width: 100%;
   height: 31px;
   margin-top: 10px;
   padding: 5px 13px;
-
   color: $MainGrey;
-
   border: 1px solid $StrokeColor;
-
   border-radius: 5px;
-
   background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -46,23 +37,19 @@
 
 .inputOverlay::-webkit-outer-spin-button,
 .inputOverlay::-webkit-inner-spin-button {
-
   appearance: none;
-
   margin: 0;
 }
 
 .inputOverlayNumber {
   width: 110px;
   margin-top: 0;
-
   text-align: center;
 }
 
 .buttonMin {
   width: 11px;
   height: 14px;
-
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 -9.53674e-07L-6.11959e-07 7L11 14L11 -9.53674e-07Z' fill='%23747376'/%3E%3C/svg%3E");
 
@@ -74,7 +61,6 @@
 .buttonMax {
   width: 11px;
   height: 14px;
-
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M0 14L11 7L0 0V14Z' fill='%23747376'/%3E%3C/svg%3E");
 
@@ -89,13 +75,10 @@
   align-items: flex-start;
   flex-direction: column;
   justify-content: center;
-
   width: 100%;
   height: auto;
   margin-top: 10px;
   padding: 10px;
-
   border-radius: 10px;
-
   background: $PureWhite;
 }

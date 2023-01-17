@@ -1,29 +1,27 @@
-@import '../../assets/styles/null.scss';
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
-/* Segoe UI Regular*/
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
+
+/* Segoe UI Regular */
 @font-face {
-  font-family: "SegoeUIRegular";
+  font-family: SegoeUIRegular;
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('../../assets/fonts/SegoeUI.woff') format('woff');
+  src: url("../../assets/fonts/SegoeUI.woff") format("woff");
   unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 
 .wrapper {
   display: flex;
   flex-direction: column;
-
   width: 100%;
-
   margin-top: 25px;
 }
 
 .block {
   display: flex;
   flex-direction: column;
-
   width: 100%;
   padding: 0 12px;
 }
@@ -31,29 +29,22 @@
 .wrapperInfoCard {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
 .cardTitle {
   margin-bottom: 5px;
-
   color: $MainBlack;
-
   font-family: Roboto, sans-serif;
   font-size: 22px;
-
   font-weight: 700;
   line-height: 26px;
 }
 
 .cardType {
   margin-bottom: 5px;
-
   text-transform: uppercase;
-
   color: $Secondary;
-
   font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
@@ -63,9 +54,7 @@
 
 .cardDescription {
   margin-bottom: 20px;
-
   color: $ContentBlack;
-
   font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
@@ -75,9 +64,7 @@
 
 .cardName {
   padding-bottom: 5px;
-
   color: $ContentBlack;
-
   font-family: Roboto;
   font-size: 12px;
   font-weight: 500;
@@ -89,16 +76,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 60%;
   margin-bottom: 20px;
 }
 
 .cardOwner {
   text-transform: lowercase;
-
   color: $ContentBlack;
-
   font-family: Roboto;
   font-size: 12px;
   font-weight: 400;
@@ -108,13 +92,9 @@
 
 .cardVersion {
   display: inline-block;
-
   margin-left: 5px;
-
   text-transform: lowercase;
-
   color: $Secondary;
-
   font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
@@ -124,14 +104,10 @@
 
 .cardLink {
   display: inline-block;
-
   margin-left: 5px;
-
   cursor: pointer;
   text-transform: lowercase;
-
   color: $Secondary;
-
   font-family: Roboto;
   font-size: 12px;
   font-weight: 400;
@@ -151,24 +127,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 45%;
   margin-top: 15px;
 }
 
 .buttonSubmit {
   display: inline-block;
-
   height: 32px;
-
   padding: 9px 10px;
-
   color: $PureWhite;
-
   border-radius: 4px;
-
   background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -185,7 +154,6 @@
 
   &:disabled {
     cursor: default;
-
     color: $StrokeColor;
     border: 1px solid $StrokeColor;
     background: inherit;
@@ -196,13 +164,10 @@
   width: 100%;
   height: min-content;
   padding: 14px 0 14px 18px;
-
   color: $PureWhite;
-
   border-radius: 10px;
   background: #5ab5e8;
   box-shadow: 0 0 5px rgb(0 0 0 / 10%);
-
   font-family: Roboto;
   font-size: 12px;
   font-weight: 400;
@@ -211,9 +176,7 @@
 
   h6 {
     margin-left: 0;
-
     color: $PureWhite;
-
     font-family: Roboto;
     font-size: 16px;
     font-weight: 500;
@@ -223,11 +186,8 @@
 
   p {
     margin-left: 0;
-
     text-transform: lowercase;
-
     color: $PureWhite;
-
     font-family: Roboto;
     font-size: 12px;
     font-weight: 400;
@@ -248,8 +208,9 @@
   position: relative;
   align-items: center;
   padding: 12px 15px;
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 15px;
@@ -259,15 +220,18 @@
     border-radius: 2px;
   }
 }
+
 .leftBlock {
   display: flex;
 }
+
 .imgBlock {
   width: 34px;
   height: 34px;
 }
+
 .title {
-  font-family: 'SegoeUIRegular';
+  font-family: SegoeUIRegular;
   font-size: 16px !important;
   font-weight: 400 !important;
   color: #2a2a2a !important;
@@ -277,9 +241,10 @@
 .squareButton {
   width: 34px;
   height: 34px;
-  background: #ffffff;
+  background: #fff;
   border-radius: 50px;
-  svg{
+
+  svg {
     width: 16px;
     height: 16px;
   }

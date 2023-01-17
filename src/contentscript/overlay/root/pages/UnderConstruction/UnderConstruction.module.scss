@@ -1,13 +1,12 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
 
 .wrapper {
   display: flex;
   overflow: hidden;
   flex: 1 1 auto;
   flex-direction: column;
-
   width: 100%;
   height: calc(100vh - 93px);
 }
@@ -26,16 +25,10 @@
 
 .mainInfoBlock {
   display: flex;
-
   overflow: hidden;
-
   overflow-y: scroll;
-
   flex: 1 1 auto;
   flex-direction: column;
-
-  flex-direction: column;
-
   width: 100%;
   height: 80vh;
   padding: 15px 0 0 15px;
@@ -43,12 +36,10 @@
 
   &::-webkit-scrollbar {
     width: 4px;
-
     cursor: pointer;
   }
 
   &::-webkit-scrollbar-track {
-    background: rgb(244 244 244);
     background: rgb(244 244 244);
     background:
       linear-gradient(
@@ -62,7 +53,6 @@
   &::-webkit-scrollbar-thumb {
     width: 4px;
     height: 2px;
-
     border-radius: 2px;
     background: $Primary;
     box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
@@ -76,7 +66,6 @@
 .socialBlock {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
@@ -87,18 +76,14 @@
 .moduleTitle {
   display: flex;
   align-items: center;
-
   width: 100%;
   height: 44px;
   margin: 0 0 10px;
   padding: 10px;
-
   text-transform: uppercase;
-
   color: #2a2a2a;
   border-radius: 10px;
   background: #fff;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
@@ -107,15 +92,12 @@
 
 .inputTitle {
   display: flex;
-
   width: 100%;
   padding: 5px 13px;
-
   color: $MainGrey;
   border: 1px solid $StrokeColor;
   border-radius: 5px;
   background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -130,19 +112,14 @@
 
 .fullDescription {
   display: flex;
-
   width: 100%;
   min-height: 128px;
   padding: 5px 13px;
-
   resize: none;
-
   color: $MainGrey;
   border: 1px solid $StrokeColor;
   border-radius: 5px;
-
   background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -154,12 +131,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 100%;
   padding: 10px;
-
   border-radius: 10px;
-
   background: $PureWhite;
 }
 
@@ -171,10 +145,8 @@
 
 .img {
   display: block;
-
   width: 42px;
   height: 42px;
-
   border: 1px solid $WebBG;
   border-radius: 20px;
   background: #c4c4c4;
@@ -183,11 +155,8 @@
 
 .imgTitle {
   display: inline-block;
-
   margin: 0 0 0 14px;
-
   color: #2a2a2a;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
@@ -201,18 +170,13 @@
 
 .addIcon {
   z-index: 4;
-
   display: block;
-
   width: 66px;
   height: 20px;
   padding: 5px;
-
   color: $ContentBlack;
   border-radius: 10px;
-
   background: $WebBG;
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 500;
@@ -230,31 +194,22 @@
 .inputfile {
   position: absolute;
   z-index: -1;
-
   overflow: hidden;
-
   width: 0.1px;
   height: 0.1px;
-
   opacity: 0;
 }
 
 .inputfile + label {
   z-index: 4;
-
   display: block;
-
   width: 66px;
   height: 20px;
   padding: 5px;
-
   cursor: pointer;
-
   color: $ContentBlack;
   border-radius: 10px;
-
   background: $WebBG;
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 500;
@@ -272,18 +227,13 @@
 .inputfile:focus + label,
 .inputfile + label:hover {
   z-index: 4;
-
   display: block;
-
   width: 66px;
   height: 20px;
   padding: 5px;
-
   color: $ContentBlack;
   border-radius: 10px;
-
   background: $WebBG;
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 500;
@@ -301,31 +251,23 @@
 .ownershipBlock {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
 .inputOwnershipBlock {
   display: flex;
   align-items: center;
-
   width: 100%;
 }
 
 .inputOwnership {
   display: flex;
-
   width: 100%;
   padding: 5px 13px;
-
   color: $MainGrey;
-
   border: 1px solid $StrokeColor;
-
   border-radius: 5px;
-
   background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -337,22 +279,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 67px;
   height: 32px;
   margin: 0 0 0 5px;
   padding: 0 10px;
-
   text-transform: uppercase;
-
   color: #fff;
   border-radius: 4px;
-
   background: $Primary;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 400;
   line-height: 100%;
 
@@ -368,15 +304,10 @@
 .wrapperAdmins {
   display: flex;
   flex-direction: column;
-
   width: 100%;
-
   height: auto;
-
   padding: 10px;
-
   border-radius: 10px;
-
   background: $PureWhite;
 }
 
@@ -384,7 +315,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 100%;
   height: auto;
   padding: 10px;
@@ -394,12 +324,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   box-sizing: border-box;
   width: 100%;
   height: auto;
   padding: 5px 13px;
-
   border: 1px solid $StrokeColor;
   border-radius: 5px;
   background: $AppBG;
@@ -407,7 +335,6 @@
 
 .authorTitle {
   color: $MainGrey;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -417,9 +344,7 @@
 
 .adminsTitle {
   display: inline-block;
-
   color: #2a2a2a;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
@@ -429,10 +354,8 @@
 
 .adminsButton {
   display: block;
-
   width: 20px;
   height: 20px;
-
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%235EC280'/%3E%3C/svg%3E");
 
@@ -449,10 +372,8 @@
 
 .linkNavigation {
   position: relative;
-
   display: flex;
   align-items: center;
-
   width: 100%;
   height: 60px;
   margin: 20px 0 0;
@@ -461,26 +382,19 @@
     position: absolute;
     top: -10px;
     left: 0;
-
     width: 100%;
     height: 2px;
-
     content: "";
-
     background: $WebBG;
   }
 }
 
 .back {
   position: relative;
-
   display: block;
-
   margin: 0 0 0 14.5px;
-
   color: $MainGrey;
   background: inherit;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -490,12 +404,9 @@
     position: absolute;
     top: 0;
     left: -14.5px;
-
     width: 11px;
     height: 14px;
-
     content: "";
-
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%23919191'/%3E%3C/svg%3E");
   }
 
@@ -518,15 +429,11 @@
 
 .push {
   display: inline-block;
-
   margin: 0 auto;
   padding: 0 30.36px 0 0;
-
   cursor: pointer;
-
   color: $Primary;
   background: inherit;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
@@ -543,7 +450,6 @@
 
 .pushDisabled {
   cursor: default;
-
   color: $MainGrey;
 
   &:hover {
@@ -557,11 +463,8 @@
 
 .modalDefaultContent {
   width: 263px;
-
   text-align: center;
-
   color: $MainGrey;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
@@ -571,11 +474,8 @@
 
 .modalCreationContent {
   width: 214px;
-
   text-align: center;
-
   color: $MainGrey;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
@@ -586,21 +486,15 @@
 .modalCreationContentButton {
   display: flex;
   align-items: center;
-
   justify-content: center;
-
   min-width: 157px;
   height: 32px;
   padding: 0 10px;
-
   color: $PureWhite;
   border-radius: 4px;
-
   background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
 
@@ -615,17 +509,13 @@
 
 .titleModalEndCreation {
   width: 307px;
-
   text-align: center;
 }
 
 .modalEndCreationContent {
   width: 263px;
-
   text-align: center;
-
   color: $MainGrey;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
@@ -637,29 +527,22 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-
   width: 100%;
 }
 
 .modalEndCreationFooterButton {
   display: flex;
   align-items: center;
-
   justify-content: center;
-
   min-width: 157px;
   height: 32px;
   margin-bottom: 10px;
   padding: 0 10px;
-
   color: $PureWhite;
   border-radius: 4px;
-
   background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
 
@@ -674,12 +557,9 @@
 
 .modalEndCreationFooterLink {
   cursor: pointer;
-
   color: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
 

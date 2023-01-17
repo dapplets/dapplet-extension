@@ -492,6 +492,7 @@ export default class GlobalConfigService {
 
   async getTrustedUsers() {
     const config = await this.get()
+    console.log(config)
     return config.trustedUsers
   }
 

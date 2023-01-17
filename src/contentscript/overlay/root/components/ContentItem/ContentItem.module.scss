@@ -1,15 +1,17 @@
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
-@import '../../assets/styles/null.scss';
-/* Segoe UI Regular*/
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
+@import "../../assets/styles/null";
+
+/* Segoe UI Regular */
 @font-face {
-  font-family: "SegoeUIRegular";
+  font-family: SegoeUIRegular;
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('../../assets/fonts/SegoeUI.woff') format('woff');
+  src: url("../../assets/fonts/SegoeUI.woff") format("woff");
   unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
+
 .contentItem {
   display: none;
 }
@@ -17,10 +19,9 @@
 .contentItemActive {
   display: block;
   overflow: hidden;
-
   width: 100%;
-
   height: 100%;
+
   // margin-top: 17px;
 
   > .frameContainer {
@@ -29,6 +30,7 @@
     > iframe {
       width: 100%;
       height: 97%;
+
       // padding: 0 15px 0 15px;
     }
   }
@@ -36,12 +38,10 @@
 
 .loaderContainer {
   z-index: 1;
-
   display: flex;
   align-items: center;
   flex-direction: column;
   justify-content: center;
-
   width: 100%;
   height: calc(100vh - 100px);
 }
@@ -49,28 +49,20 @@
 .loadTitle {
   width: 80%;
   padding-bottom: 5px;
-
   text-align: center;
-
   color: $ContentBlack;
-
   font-family: Roboto;
   font-size: 22px;
   font-weight: 700;
-
   line-height: 26px;
 }
 
 .loadText {
   width: 80%;
   padding-bottom: 10px;
-
   text-align: center;
-
   color: $ContentBlack;
-
   font-family: Roboto;
-
   font-size: 14px;
   font-style: normal;
   line-height: 16px;
@@ -80,20 +72,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding-bottom: 10px;
 
   .loadButton {
     display: inline-block;
-
     text-align: center;
-
     color: $Primary;
     background: inherit;
-
     font-family: Roboto;
     font-size: 14px;
-
     font-weight: 500;
     line-height: 16px;
 
@@ -115,8 +102,9 @@
   position: relative;
   align-items: center;
   padding: 12px 15px;
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 15px;
@@ -126,15 +114,18 @@
     border-radius: 2px;
   }
 }
+
 .leftBlock {
   display: flex;
 }
+
 .imgBlock {
   width: 34px;
   height: 34px;
 }
+
 .title {
-  font-family: "SegoeUIRegular";
+  font-family: SegoeUIRegular;
   font-size: 16px !important;
   font-weight: 400 !important;
   color: #2a2a2a !important;
@@ -144,6 +135,6 @@
 .squareButton {
   width: 34px;
   height: 34px;
-  background: #ffffff;
+  background: #fff;
   border-radius: 50px;
 }

@@ -1,30 +1,26 @@
-@import '../../assets/styles/null.scss';
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
-/* Segoe UI Regular*/
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
+
+/* Segoe UI Regular */
 @font-face {
-  font-family: 'SegoeUIRegular';
+  font-family: SegoeUIRegular;
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('../../assets/fonts/SegoeUI.woff') format('woff');
+  src: url("../../assets/fonts/SegoeUI.woff") format("woff");
   unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 
 .dropdownBlock {
   position: relative;
-
   display: inline-block;
-
   box-sizing: border-box;
   width: 100%;
   min-width: 150px;
   max-width: 202px;
   height: auto;
-
   cursor: pointer;
-
-  border-radius: 10px;
   background-color: $PureWhite;
 
   // font-family: 'SegoeUIRegular';
@@ -37,23 +33,19 @@
 
 .spanBlock {
   position: relative;
-
   display: block;
   overflow: hidden;
-
   width: 100%;
-
   max-width: 150px;
   padding: 5px 27px 5px 8px;
-
   white-space: nowrap;
   text-overflow: ellipsis;
-
   color: #2a2a2a;
 
   // font-family: "SegoeUIRegular";
   font-size: 12px;
   font-weight: 400;
+
   // font-style: italic;
   // line-height: 149%;
 }
@@ -62,18 +54,13 @@
   position: absolute;
   top: 30%;
   right: 8px;
-
-  right: 8px;
   width: 8px;
   height: 7px;
-  content: '';
+  content: "";
   animation-name: rotateIsClose;
-
   animation-duration: 0.2s;
-
   animation-timing-function: ease;
   animation-fill-mode: forwards;
-
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='7' viewBox='0 0 18 10' fill='none'%3E%3Cpath d='M0.515015 1.46495L9.00001 9.94995L17.485 1.46495L16.071 0.0499516L9.00001 7.12195L1.92901 0.0499516L0.515015 1.46495Z' fill='%23919191'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
@@ -95,12 +82,9 @@
 
 .isOpenAnimationIcon {
   animation-name: rotateIsOpen;
-
   animation-duration: 0.2s;
-
   animation-timing-function: ease;
   animation-fill-mode: forwards;
-
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='7' viewBox='0 0 18 10' fill='none'%3E%3Cpath d='M0.515015 1.46501L9.00001 9.95001L17.485 1.46501L16.071 0.0500126L9.00001 7.12201L1.92901 0.0500126L0.515015 1.46501Z' fill='%23588CA3'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
@@ -138,19 +122,13 @@
   position: absolute;
   z-index: 2;
   bottom: 5px;
-  left: 0px;
-
+  left: 0;
   width: 148px;
-
   list-style: none;
-
   transform: translateY(100%);
   animation-name: listVisible;
-
   animation-duration: 0.2s;
-
   animation-timing-function: ease;
-
   border-radius: 0 0 10px 10px;
   background-color: #fff;
   box-shadow: -1px 4px 4px rgb(0 0 0 / 25%);
@@ -177,20 +155,17 @@
 
 .item {
   position: relative;
-
   display: flex;
-
   padding-top: 7px;
   padding-bottom: 7px;
-
   padding-left: 8px;
-
   cursor: pointer;
-
   color: #2a2a2a;
+
   // font-family: "SegoeUIRegular";
   font-size: 12px;
   font-weight: 400;
+
   // font-style: italic;
   line-height: 149%;
 
@@ -210,12 +185,10 @@
 
 .title {
   margin-right: 10px;
-
   white-space: nowrap;
 
   // text-transform: uppercase;
   pointer-events: none;
-
   color: $MainBlack;
 
   // font-family: "SegoeUIRegular";

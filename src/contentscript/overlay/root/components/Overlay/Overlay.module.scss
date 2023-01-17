@@ -1,19 +1,17 @@
-@import '../../assets/styles/color.variables.scss';
-@import '../../overlayManager.css';
+@import "../../assets/styles/color.variables";
+@import "../../overlayManager.css";
 
 .overlay {
   z-index: 9999;
-
   overflow: -moz-scrollbars-none;
-
   min-width: 468px;
   max-width: 468px;
   height: 100vh;
-
   transition: transform 0.3s ease;
+
   // filter: drop-shadow(-4px 0 4px rgb(0 0 0 / 25%));
   // -ms-overflow-style: none;
-  box-shadow: 0px 4px 5px rgb(45 52 60 / 10%), 0px 4px 20px rgb(11 87 111 / 15%);
+  box-shadow: 0 4px 5px rgb(45 52 60 / 10%), 0 4px 20px rgb(11 87 111 / 15%);
 }
 
 .overlay::-webkit-scrollbar {
@@ -41,8 +39,7 @@
   overflow: -moz-scrollbars-none;
 
   // padding: 10px 15px 5px;
-  padding: 0px 0px 5px;
-
+  padding: 0 0 5px;
   background: $OverlayBG;
   -ms-overflow-style: none;
 }
@@ -76,6 +73,7 @@
   & > div {
     margin-right: 4px;
   }
+
   & > button {
     margin-right: 4px;
   }
@@ -90,11 +88,11 @@
 
   & > *:last-child {
     margin-right: 0;
+
     &:hover {
       svg {
         path {
           fill: none;
-
           stroke: $PrimaryHover;
         }
       }
@@ -104,7 +102,6 @@
       svg {
         path {
           fill: none;
-
           stroke: $PrimaryPressed;
         }
       }
@@ -115,17 +112,13 @@
 .balance {
   display: flex;
   align-items: center;
-
   margin-left: 5px;
 }
 
 .amount {
   margin-left: 5px;
-
   text-transform: uppercase;
-
   color: #747376;
-
   font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 700;
@@ -134,27 +127,26 @@
 
 .inner {
   overflow: hidden;
-
   width: 100%;
   height: 100vh;
 }
 
 .children {
   overflow: hidden;
-
   width: 100%;
   height: 100%;
+
   // padding: 0 0 0 1px;
   background: #fff;
   padding: 10px 15px 0 16px;
 }
 
-.newChildren{
-  padding: 0px 0px 0 0px;
+.newChildren {
+  padding: 0;
 }
 
-.newHeight{
-  height: calc(100vh - 139px)!important;
+.newHeight {
+  height: calc(100vh - 139px) !important;
 }
 
 .noSystemDapplets {
@@ -162,7 +154,6 @@
     position: absolute;
     top: 0;
     left: 0;
-
     width: 100%;
     height: calc(100vh - 75px);
   }
@@ -173,11 +164,8 @@
   position: absolute;
   top: 0;
   left: 0;
-
   width: 100%;
-
   height: calc(100vh - 75px);
-
   pointer-events: none;
 }
 
@@ -191,21 +179,20 @@
 
 .overlayActive {
   position: relative;
-
   margin-top: 0 !important;
-
   pointer-events: all;
-
   opacity: 1;
 }
 
 .searchBlock {
   // position: absolute;
   z-index: 1;
+
   /* top: 12px; */
+
   /* right: 15px; */
   width: 100%;
-  padding: 0 15px 7px 15px;
+  padding: 0 15px 7px;
   transition: all 0.5s;
 }
 
@@ -216,8 +203,11 @@
   border-radius: 4px !important;
   display: flex;
   justify-content: center;
-  box-shadow: inset 0px 1px 2px rgb(225 225 225 / 20%), inset 0px -1px 2px rgb(225 225 225 / 20%),
-    inset 0px -1px 2px rgb(255 255 255 / 90%), inset 0px 1px 3px rgb(225 225 225 / 90%);
+  box-shadow:
+    inset 0 1px 2px rgb(225 225 225 / 20%),
+    inset 0 -1px 2px rgb(225 225 225 / 20%),
+    inset 0 -1px 2px rgb(255 255 255 / 90%),
+    inset 0 1px 3px rgb(225 225 225 / 90%);
 }
 
 .overlayTabWrapperAccounts {
@@ -227,11 +217,15 @@
   border-radius: 4px !important;
   display: flex;
   justify-content: center;
-  box-shadow: inset 0px 1px 2px rgb(225 225 225 / 20%), inset 0px -1px 2px rgb(225 225 225 / 20%),
-    inset 0px -1px 2px rgb(255 255 255 / 90%), inset 0px 1px 3px rgb(225 225 225 / 90%);
+  box-shadow:
+    inset 0 1px 2px rgb(225 225 225 / 20%),
+    inset 0 -1px 2px rgb(225 225 225 / 20%),
+    inset 0 -1px 2px rgb(255 255 255 / 90%),
+    inset 0 1px 3px rgb(225 225 225 / 90%);
 }
+
 .overlayTabList {
   // background: #000;
 }
 
-@import './adaptive.scss';
+@import "./adaptive";

@@ -2,17 +2,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   box-sizing: border-box;
   width: 100%;
 
   // max-width: 357px;
   min-height: 55px;
-
   padding: 10px;
-
   border-radius: 5px;
-
   background-color: #f5f5f5;
 }
 
@@ -27,7 +23,6 @@
 
 .iconLogin {
   display: block;
-
   width: 35px;
   height: 35px;
 }
@@ -35,10 +30,8 @@
 .icons {
   display: flex;
   align-items: center;
-
   margin: 0;
   padding-left: 0;
-
   list-style: none;
 }
 
@@ -54,15 +47,12 @@
 .info {
   display: flex;
   align-items: center;
-
   margin-top: 3px;
 }
 
 .hash {
   margin: 0;
-
   color: #2a2a2a;
-
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
@@ -70,9 +60,7 @@
 
 .time {
   margin-left: 6px;
-
   color: #2a2a2a;
-
   font-size: 10px;
   font-weight: 600;
   line-height: 100%;
