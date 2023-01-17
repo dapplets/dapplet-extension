@@ -159,10 +159,6 @@ module.exports = {
           to: 'background.html',
         },
         {
-          from: 'src/callback/index.html',
-          to: 'callback.html',
-        },
-        {
           from: 'src/overlay/index.html',
           to: 'overlay.html',
         },

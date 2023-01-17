@@ -1,6 +1,5 @@
 import { ethers } from 'ethers'
 import { StorageTypes } from '../../common/constants'
-import { promiseAny } from '../../common/helpers'
 import { Tar } from '../../common/tar'
 import { StorageRef } from '../../common/types'
 import GlobalConfigService from '../services/globalConfigService'
@@ -31,11 +30,20 @@ export class StorageAggregator {
       )
     }
 
+    const storageErrors = []
     for (const uri of hashUris.uris) {
-      const protocol = uri.substr(0, uri.indexOf('://'))
-      const decentStorage = await this._getStorageByProtocol(protocol)
-      const decentStBuffer = getVerifiedResource(decentStorage, uri)
-      buffers.push(decentStBuffer)
+      try {
+        const protocol = uri.substr(0, uri.indexOf('://'))
+        const decentStorage = await this._getStorageByProtocol(protocol)
+        const decentStBuffer = getVerifiedResource(decentStorage, uri)
+        buffers.push(decentStBuffer)
+      } catch (e) {
+        storageErrors.push(e)
+      }
+    }
+
+    if (buffers.length === 0) {
+      throw new Error('No supported storages found', { cause: storageErrors })
     }
 
     if (hashUris.hash) {
@@ -45,7 +53,7 @@ export class StorageAggregator {
     }
 
     try {
-      const buffer = await promiseAny(buffers)
+      const buffer = await Promise.any(buffers)
       fetchController.abort()
 
       return buffer

@@ -296,19 +296,6 @@ browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   suspendService.updateContextMenus()
 })
 
-browser.notifications.onClicked.addListener(function (notificationId) {
-  if (
-    notificationId &&
-    notificationId.length > 2 &&
-    notificationId[0] == '0' &&
-    notificationId[1] == 'x'
-  ) {
-    // ToDo: it's incorrect to be linked with Ethereum and Goerli only.
-    const url = 'https://goerli.etherscan.io/tx/' + notificationId
-    browser.tabs.create({ url: url })
-  }
-})
-
 browser.commands.onCommand.addListener((cmd) => {
   if (cmd === 'toggle-overlay') {
     return getCurrentTab().then(

@@ -364,17 +364,6 @@ export function parseShareLink(url: string) {
   }
 }
 
-export async function promiseAny<T>(iterable: Iterable<T | PromiseLike<T>>): Promise<T> {
-  return Promise.all(
-    [...iterable].map((promise) => {
-      return new Promise((resolve, reject) => Promise.resolve(promise).then(reject, resolve))
-    })
-  ).then(
-    (errors) => Promise.reject(errors),
-    (value) => Promise.resolve<T>(value)
-  )
-}
-
 export function groupBy<T>(array: T[], predicate: (v: T) => string) {
   return array.reduce((acc, value) => {
     ;(acc[predicate(value)] ||= []).push(value)
