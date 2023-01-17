@@ -33,7 +33,6 @@ const EXPORTABLE_PROPERTIES = [
   'xdaiProviderUrl',
   'swarmGatewayUrl',
   'ipfsGatewayUrl',
-  'siaPortalUrl',
   // 'walletsUsage',
   'identityContract',
   'hostnames',
@@ -63,7 +62,6 @@ export default class GlobalConfigService {
       if (!config.preferedOverlayStorage)
         config.preferedOverlayStorage = this.getInitialConfig().preferedOverlayStorage
       if (!config.ipfsGatewayUrl) config.ipfsGatewayUrl = this.getInitialConfig().ipfsGatewayUrl
-      if (!config.siaPortalUrl) config.siaPortalUrl = this.getInitialConfig().siaPortalUrl
       if (!config.nearNetworks) config.nearNetworks = this.getInitialConfig().nearNetworks
       if (!config.ethereumNetworks)
         config.ethereumNetworks = this.getInitialConfig().ethereumNetworks
@@ -272,7 +270,6 @@ export default class GlobalConfigService {
     config.preferedOverlayStorage = 'centralized'
     config.swarmPostageStampId = '1149efd4cce752c75e815e9b9dbe322afd0c8dce7f86d78e26182b9923403965'
     config.ipfsGatewayUrl = 'https://ipfs-gateway.mooo.com'
-    config.siaPortalUrl = 'https://siasky.net'
     config.ethereumNetworks = [
       {
         networkId: 'rinkeby',
@@ -749,15 +746,6 @@ export default class GlobalConfigService {
   async setIpfsGateway(url: string) {
     if (typeOfUri(url) !== UriTypes.Http) throw new Error('URL must be a valid HTTP(S) address.')
     await this.updateConfig((c) => (c.ipfsGatewayUrl = url))
-  }
-
-  async getSiaPortal() {
-    return this.get().then((x) => x.siaPortalUrl)
-  }
-
-  async setSiaPortal(url: string) {
-    if (typeOfUri(url) !== UriTypes.Http) throw new Error('URL must be a valid HTTP(S) address.')
-    await this.updateConfig((c) => (c.siaPortalUrl = url))
   }
 
   async getNearNetworks() {

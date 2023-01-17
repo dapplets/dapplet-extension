@@ -7,7 +7,6 @@ import GlobalConfigService from '../services/globalConfigService'
 import { CentralizedModuleStorage } from './centralizedModuleStorage'
 import { HttpModuleStorage } from './httpModuleStorage'
 import { IpfsModuleStorage } from './ipfsModuleStorage'
-import { SiaModuleStorage } from './siaModuleStorage'
 import { Storage } from './storage'
 import { SwarmModuleStorage } from './swarmModuleStorage'
 
@@ -135,9 +134,6 @@ export class StorageAggregator {
       case 'ipfs':
         const ipfsGatewayUrl = await this._globalConfigService.getIpfsGateway()
         return new IpfsModuleStorage({ ipfsGatewayUrl })
-      case 'sia':
-        const siaPortalUrl = await this._globalConfigService.getSiaPortal()
-        return new SiaModuleStorage({ siaPortalUrl })
       default:
         throw new Error('Unsupported protocol')
     }
@@ -156,10 +152,6 @@ export class StorageAggregator {
       case StorageTypes.Ipfs:
         const ipfsGatewayUrl = await this._globalConfigService.getIpfsGateway()
         return new IpfsModuleStorage({ ipfsGatewayUrl })
-
-      // case StorageTypes.Sia:
-      //   const siaPortalUrl = await this._globalConfigService.getSiaPortal()
-      //   return new SiaModuleStorage({ siaPortalUrl })
 
       default:
         throw new Error('Unsupported storage type')

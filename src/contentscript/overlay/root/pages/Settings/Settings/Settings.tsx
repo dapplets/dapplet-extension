@@ -524,28 +524,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
               inputOfFocusEtn={inputOfFocusIPFS}
             />
           </SettingItem>
-          {/* <SettingItem
-                title="SIA Portal"
-                component={<></>}
-                children={
-                  <InputPanelSettings
-                    isDynamycAdapter={false}
-                    isDefaultValueInput={siaPortalInputDefault}
-                    isPostStampId={false}
-                    isValidHttpFunction={true}
-                    providerInputError={siaPortalInputError}
-                    providerInput={siaPortalInput}
-                    getDefaultValueProvider={() =>
-                      getDefaultValueProvider(siaPortalInput, 'siaPortalUrl', setSiaPortal)
-                    }
-                    setProviderInputError={setSiaPortalInputError}
-                    setProviderInput={setSiaPortalInput}
-                    setProvider={setSiaPortal}
-                    onPress={onPress}
-                    inputOfFocusEtn={inputOfFocusSia}
-                  />
-                }
-              /> */}
         </SettingWrapper>
       </div>
     </div>

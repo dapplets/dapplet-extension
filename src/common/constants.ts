@@ -9,7 +9,6 @@ export const enum StorageTypes {
   Swarm = 'swarm',
   TestRegsitry = 'test-registry',
   Ipfs = 'ipfs',
-  Sia = 'sia',
 }
 
 export type WalletInfo = {

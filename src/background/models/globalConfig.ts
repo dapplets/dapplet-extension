@@ -65,8 +65,6 @@ export class GlobalConfig extends Base {
 
   ipfsGatewayUrl: string = null
 
-  siaPortalUrl: string = null
-
   ethereumNetworks: EthereumNetwrokConfig[] = []
 
   nearNetworks: NearNetworkConfig[] = []
