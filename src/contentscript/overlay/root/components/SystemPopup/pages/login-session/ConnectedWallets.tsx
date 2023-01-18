@@ -2,11 +2,10 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
 import * as React from 'react'
-import { Navigate } from 'react-router-dom'
 import { browser } from 'webextension-polyfill-ts'
-import { Bus } from '../../../common/bus'
-import * as walletIcons from '../../../common/resources/wallets'
-import { LoginRequest, WalletDescriptor, WalletTypes } from '../../../common/types'
+import { Bus } from '../../../../../../../common/bus'
+import * as walletIcons from '../../../../../../../common/resources/wallets'
+import { LoginRequest, WalletDescriptor, WalletTypes } from '../../../../../../../common/types'
 import base from '../../components/Base.module.scss'
 import { Button } from '../../components/Button'
 import { Loading } from '../../components/Loading'
@@ -19,12 +18,12 @@ interface Props {
     loginRequest: LoginRequest
   }
   bus: Bus
+  redirect: (route: string) => void
 }
 
 interface State {
   loading: boolean
   descriptors: WalletDescriptor[]
-  redirect: string | null
   signing: {
     wallet: string
     error?: string | null
@@ -39,7 +38,6 @@ export class ConnectedWallets extends React.Component<Props, State> {
     this.state = {
       loading: true,
       descriptors: [],
-      redirect: null,
       signing: null,
       error: null,
     }
@@ -81,15 +79,10 @@ export class ConnectedWallets extends React.Component<Props, State> {
   }
 
   render() {
-    const p = this.props,
-      s = this.state
+    const s = this.state
 
     const chains = this.props.data.loginRequest.authMethods
     const secureLogin = this.props.data.loginRequest.secureLogin
-
-    if (s.redirect) {
-      return <Navigate to={s.redirect} />
-    }
 
     if (s.error) {
       return (
@@ -97,7 +90,7 @@ export class ConnectedWallets extends React.Component<Props, State> {
           title="Error"
           subtitle={s.error}
           content={<div></div>}
-          onBackButtonClick={() => this.setState({ redirect: '/' })}
+          onBackButtonClick={() => this.props.redirect('/')}
         />
       )
     }
@@ -114,7 +107,7 @@ export class ConnectedWallets extends React.Component<Props, State> {
         <Loading
           title={title}
           subtitle="Please confirm signing in your wallet to continue"
-          onBackButtonClick={() => this.setState({ redirect: '/' })}
+          onBackButtonClick={() => this.props.redirect('/')}
         />
       )
     }
@@ -170,7 +163,7 @@ export class ConnectedWallets extends React.Component<Props, State> {
         {disconnectedWallets.length > 0 ? (
           <button
             className={cn(base.createSession, base.link)}
-            onClick={() => this.setState({ redirect: '/pairing' })}
+            onClick={() => this.props.redirect('/pairing')}
           >
             Connect another wallet
           </button>

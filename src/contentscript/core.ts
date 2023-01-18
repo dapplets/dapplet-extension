@@ -68,12 +68,13 @@ export default class Core {
         } else if (typeof message === 'object' && message.type !== undefined) {
           // ToDo: refactor this messaging. May be use global event bus?
           if (message.type === 'OPEN_PAIRING_OVERLAY') {
-            if (message.payload.topic === 'walletconnect' && message.payload.args[1]) {
-              const [, overlayId] = message.payload.args
-              const targetOverlay = this.overlayManager
-                .getOverlays()
-                .find((x) => x.id === overlayId)
-              targetOverlay?.send(message.payload.topic, message.payload.args)
+            if (message.payload.topic === 'walletconnect') {
+              // const [, overlayId] = message.payload.args
+              // ToDo: utilize target overlayId
+              this.overlayManager.systemPopupEventBus.publish(
+                message.payload.topic,
+                message.payload.args
+              )
               return Promise.resolve([null, 'ready'])
             }
           } else if (message.type === 'OPEN_POPUP_OVERLAY') {
@@ -111,45 +112,36 @@ export default class Core {
     const frameRequestId = generateGuid()
 
     return new Promise<void>((resolve, reject) => {
-      const overlayUrl = browser.runtime.getURL('overlay.html')
-
-      const isTargetLoginSession =
-        data.activeTab === SystemOverlayTabs.LOGIN_SESSION && data.payload?.loginRequest?.target
-      const parentOverlay = isTargetLoginSession
-        ? this.overlayManager.getOverlays().find((x) => x.id === data.payload.loginRequest.target)
-        : null
-
       data.popup = true
 
-      const popupOverlay = parentOverlay
-        ? this.overlayManager.getOverlays().find((x) => x.parent?.id === parentOverlay.id)
-        : null
-      const overlay =
-        popupOverlay ??
-        this.overlayManager.createOverlay({
-          url: overlayUrl,
-          title: 'System',
-          source: null,
-          hidden: null,
-          parent: parentOverlay,
-          isSystemPopup: true,
-        })
+      // ToDo: utilize target overlayId
+      // const isTargetLoginSession =
+      //   data.activeTab === SystemOverlayTabs.LOGIN_SESSION && data.payload?.loginRequest?.target
+      // const parentOverlay = isTargetLoginSession
+      //   ? this.overlayManager.getOverlays().find((x) => x.id === data.payload.loginRequest.target)
+      //   : null
 
-      overlay.open(() => overlay.send('data', [frameRequestId, data]))
-      overlay.onMessage((topic, data) => {
-        const [frameResponseId, message] = data ?? []
-        if (frameResponseId === frameRequestId || !frameResponseId) {
-          if (topic === 'cancel') {
-            overlay.close()
-            reject(message ?? 'Unexpected error.')
-          } else if (topic === 'ready') {
-            if (!frameRequestId) overlay.close()
-            overlay.send('close_frame', [frameResponseId])
-            resolve(message)
-          } else if (topic === 'close') {
-            overlay.close()
-          }
-        }
+      // const popupOverlay = parentOverlay
+      //   ? this.overlayManager.getOverlays().find((x) => x.parent?.id === parentOverlay.id)
+      //   : null
+
+      // ToDo: unify open/show
+      this.overlayManager.openPopup()
+      this.overlayManager.open()
+
+      const eventBus = this.overlayManager.systemPopupEventBus!
+
+      eventBus.publish('data', [frameRequestId, data])
+      eventBus.subscribe('cancel', () => {
+        eventBus.publish('close_frame', [frameRequestId])
+        reject('Unexpected error.')
+      })
+      eventBus.subscribe('ready', ([frameResponseId, message]) => {
+        eventBus.publish('close_frame', [frameRequestId])
+        resolve(message)
+      })
+      eventBus.subscribe('close', () => {
+        resolve()
       })
     })
   }

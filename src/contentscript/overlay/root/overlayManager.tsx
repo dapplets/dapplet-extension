@@ -1,6 +1,7 @@
 import INNER_STYLE from '!raw-loader!./overlayManager.css'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
+import { Bus } from '../../../common/bus'
 import { JsonRpc } from '../../../common/jsonrpc'
 import { IOverlayManager, OverlayConfig } from '../interfaces'
 import { App } from './App'
@@ -13,6 +14,7 @@ const OverlayFrameClass = 'dapplets-overlay-frame'
 
 export class OverlayManager implements IOverlayManager {
   private _panel: HTMLElement = null
+  public readonly systemPopupEventBus = new Bus()
   public activeOverlay: Overlay = null
   public onActiveOverlayChanged: (newOverlay: Overlay | null) => void | null = null
 
@@ -213,12 +215,13 @@ export class OverlayManager implements IOverlayManager {
   }
 
   public openPopup() {
-    this.togglePanel()
+    this.show()
   }
 
   public destroy() {
     this.unregisterAll()
     this._panel.remove()
+    this.systemPopupEventBus.destroy()
   }
 
   public createOverlay(config: OverlayConfig): Overlay {
@@ -232,6 +235,7 @@ export class OverlayManager implements IOverlayManager {
         hidden={this._panel.classList.contains(HiddenOverlayClass)}
         overlayManager={this}
         onToggle={this.toggle.bind(this)}
+        systemPopupEventBus={this.systemPopupEventBus}
       />,
       this._root
     )

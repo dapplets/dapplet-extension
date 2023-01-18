@@ -2,12 +2,11 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
 import * as React from 'react'
-import { Navigate } from 'react-router-dom'
 import { browser } from 'webextension-polyfill-ts'
-import LoginConfirmation from '../../../background/models/loginConfirmation'
-import { Bus } from '../../../common/bus'
-import * as walletIcons from '../../../common/resources/wallets'
-import { LoginRequest, WalletDescriptor } from '../../../common/types'
+import LoginConfirmation from '../../../../../../../background/models/loginConfirmation'
+import { Bus } from '../../../../../../../common/bus'
+import * as walletIcons from '../../../../../../../common/resources/wallets'
+import { LoginRequest, WalletDescriptor } from '../../../../../../../common/types'
 import base from '../../components/Base.module.scss'
 import { Button } from '../../components/Button'
 import { Session } from '../../components/Session'
@@ -19,13 +18,13 @@ interface Props {
     loginRequest: LoginRequest
   }
   bus: Bus
+  redirect: (route: string) => void
 }
 
 interface State {
   loading: boolean
   descriptors: WalletDescriptor[]
   confirmations: LoginConfirmation[]
-  redirect: string | null
 }
 
 export class LoginConfirmations extends React.Component<Props, State> {
@@ -36,7 +35,6 @@ export class LoginConfirmations extends React.Component<Props, State> {
       loading: true,
       descriptors: [],
       confirmations: [],
-      redirect: null,
     }
   }
 
@@ -66,14 +64,9 @@ export class LoginConfirmations extends React.Component<Props, State> {
   }
 
   render() {
-    const p = this.props,
-      s = this.state
+    const s = this.state
 
     const chains = this.props.data.loginRequest.authMethods
-
-    if (s.redirect) {
-      return <Navigate to={s.redirect} />
-    }
 
     if (s.loading) return null
 
@@ -129,7 +122,7 @@ export class LoginConfirmations extends React.Component<Props, State> {
         {connectedWallets.length > 0 ? (
           <button
             className={cn(base.createSession, base.link)}
-            onClick={() => this.setState({ redirect: '/connected-wallets' })}
+            onClick={() => this.props.redirect('/connected-wallets')}
           >
             Sign new confirmation
           </button>

@@ -6,10 +6,9 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-
+  margin-top: 12px;
   margin-bottom: 0;
   padding-left: 0;
-
   list-style: none;
 }
 
@@ -21,24 +20,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 77px;
   height: 77px;
   margin-right: 5px;
   margin-bottom: 5px;
-
   cursor: pointer;
-
   border-radius: 5px;
 
-  // &:not(:last-child) {
-  //   margin-right: 5px;
-  // }
+  img {
+    width: 100%;
+  }
 }
 
 .item:hover {
   filter: brightness(0.9);
-
   background: #00000010;
 }
 

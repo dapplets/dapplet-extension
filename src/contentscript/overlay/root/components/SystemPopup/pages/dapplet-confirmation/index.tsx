@@ -1,10 +1,10 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as React from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { bus } from '../..'
-import ModuleInfo from '../../../background/models/moduleInfo'
-import VersionInfo from '../../../background/models/versionInfo'
-import { parseModuleName } from '../../../common/helpers'
+import ModuleInfo from '../../../../../../../background/models/moduleInfo'
+import VersionInfo from '../../../../../../../background/models/versionInfo'
+import { Bus } from '../../../../../../../common/bus'
+import { parseModuleName } from '../../../../../../../common/helpers'
 import { DappletCard } from '../../components/DappletCard'
 
 interface Props {
@@ -15,6 +15,7 @@ interface Props {
     registry: string
     payload: any
   }
+  bus: Bus
 }
 
 interface State {
@@ -158,12 +159,11 @@ export class DappletConfirmation extends React.Component<Props, State> {
     }
 
     // this.setState({ isLoading: false });
-    bus.publish('ready')
+    p.bus.publish('ready')
   }
 
   async addRegistryClickHandler() {
-    const s = this.state,
-      p = this.props
+    const p = this.props
     this.setState({ isLoading: true })
     const { addRegistry, enableRegistry, reloadCurrentPage } = await initBGFunctions(browser)
     await addRegistry(p.data.registry, false)
@@ -173,8 +173,7 @@ export class DappletConfirmation extends React.Component<Props, State> {
   }
 
   async enableRegistryClickHandler() {
-    const s = this.state,
-      p = this.props
+    const p = this.props
     this.setState({ isLoading: true })
     const { enableRegistry, reloadCurrentPage } = await initBGFunctions(browser)
     await enableRegistry(p.data.registry)
@@ -183,7 +182,7 @@ export class DappletConfirmation extends React.Component<Props, State> {
   }
 
   cancelButtonClickHandler() {
-    bus.publish('cancel')
+    this.props.bus.publish('cancel')
   }
 
   render() {

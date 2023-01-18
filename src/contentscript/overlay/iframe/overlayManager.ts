@@ -10,11 +10,12 @@ export class OverlayManagerIframe implements IOverlayManager {
     return overlay
   }
 
-  openPopup(path: string): void {}
+  openPopup(): void {}
   unregisterAll(source: string): void {
     this._iframeMessenger.call('OVERLAY_MANAGER_UNREGISTER_ALL', [source], window.top)
   }
   close(): void {}
+  open(): void {}
   getOverlays(): OverlayIframe[] {
     return []
   }

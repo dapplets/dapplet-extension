@@ -1,8 +1,8 @@
 import * as React from 'react'
-import ModuleInfo from '../../background/models/moduleInfo'
-import VersionInfo from '../../background/models/versionInfo'
-import { joinUrls } from '../../common/helpers'
-import NOLOGO_PNG from '../../common/resources/no-logo.png'
+import ModuleInfo from '../../../../../../background/models/moduleInfo'
+import VersionInfo from '../../../../../../background/models/versionInfo'
+import { joinUrls } from '../../../../../../common/helpers'
+import NOLOGO_PNG from '../../../../../../common/resources/no-logo.png'
 
 export function DappletCard({
   vi,

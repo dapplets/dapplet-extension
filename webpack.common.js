@@ -21,7 +21,6 @@ module.exports = {
     background: path.join(__dirname, 'src/background/index.ts'),
     contentscript: path.join(__dirname, 'src/contentscript/index.ts'),
     inpage: path.join(__dirname, 'src/inpage/index.ts'),
-    overlay: path.join(__dirname, 'src/overlay/index.tsx'),
   },
   output: {
     path: path.join(__dirname, 'build'),
@@ -157,10 +156,6 @@ module.exports = {
         {
           from: 'src/background/index.html',
           to: 'background.html',
-        },
-        {
-          from: 'src/overlay/index.html',
-          to: 'overlay.html',
         },
       ],
     }),

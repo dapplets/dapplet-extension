@@ -1,6 +1,4 @@
 import common_script from '!raw-loader!../build/common.js'
-import overlay_script from '!raw-loader!../build/overlay.js'
-
 import fakeapi_frame_script from '!raw-loader!./fakeapi_frame.js'
 
 const browser = {}
@@ -64,10 +62,6 @@ browser.runtime.getURL = function (url) {
   if (_blobUriCache[url] !== undefined) return _blobUriCache[url]
 
   let script = null
-
-  if (url === 'overlay.html') {
-    script = overlay_script
-  }
 
   if (script === null) return
 

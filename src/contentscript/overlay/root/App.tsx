@@ -6,14 +6,17 @@ import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import React from 'react'
 import {
+  BrowserRouter,
   MemoryRouter,
   Navigate,
   NavigateFunction,
+  Routes,
   useLocation,
   useNavigate,
 } from 'react-router-dom'
 import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../background/dto/manifestDTO'
+import { Bus } from '../../../common/bus'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import { groupBy } from '../../../common/helpers'
 
@@ -34,6 +37,7 @@ import { Profile } from './components/Profile'
 import { Search } from './components/Search'
 import { ShareButton } from './components/ShareButton'
 import { SquaredButton } from './components/SquaredButton'
+import { SystemPopup } from './components/SystemPopup'
 import { Overlay } from './overlay'
 import { OverlayManager } from './overlayManager'
 import { ConnectedAccount } from './pages/ConnectedAccount'
@@ -95,6 +99,7 @@ interface P {
   overlayManager: OverlayManager
   navigate?: NavigateFunction
   location?: Location
+  systemPopupEventBus: Bus
 }
 
 interface S {
@@ -495,162 +500,164 @@ class _App extends React.Component<P, S> {
     const systemPopups = overlays.filter((x) => x.isSystemPopup)
 
     return (
-      <div className={cn(styles.overlay)}>
-        <div className={styles.wrapper}>
-          <OverlayToolbar
-            className={styles.toolbar}
-            tabs={this.getTabs()}
-            onTabClick={this.handleTabMenuClick}
-            onCloseClick={this.handleCloseTabClick}
-            onMenuClick={this.handleTabMenuClick}
-            onToggleClick={this.props.onToggle}
-            activeTabId={activeTabId}
-            activeTabMenuId={activeTabMenuId}
-            setOpenWallet={this.setOpenWallet}
-            isOpenWallet={s.isOpenWallet}
-            navigate={this.props.navigate!}
-            pathname={pathname}
-            module={s.module}
-            overlays={overlays}
-            selectedWallet={this.state.selectedWallet}
-            connectedDescriptors={this.state.connectedDescriptors}
-          />
+      <>
+        <div className={cn(styles.overlay)}>
+          <div className={styles.wrapper}>
+            <OverlayToolbar
+              className={styles.toolbar}
+              tabs={this.getTabs()}
+              onTabClick={this.handleTabMenuClick}
+              onCloseClick={this.handleCloseTabClick}
+              onMenuClick={this.handleTabMenuClick}
+              onToggleClick={this.props.onToggle}
+              activeTabId={activeTabId}
+              activeTabMenuId={activeTabMenuId}
+              setOpenWallet={this.setOpenWallet}
+              isOpenWallet={s.isOpenWallet}
+              navigate={this.props.navigate!}
+              pathname={pathname}
+              module={s.module}
+              overlays={overlays}
+              selectedWallet={this.state.selectedWallet}
+              connectedDescriptors={this.state.connectedDescriptors}
+            />
 
-          <div className={styles.inner}>
-            <header className={styles.header}>
-              <div className={styles.left}>
-                <SquaredButton
-                  title="hide"
-                  // className={s.classNameSearchButton}
-                  onClick={this.props.onToggle}
-                  appearance="big"
-                  icon={Hide}
-                />
-                <Profile
-                  setSelectedWallet={this.setSelectedWallet}
-                  setConnectedDescriptors={this.setConnectedDescriptors}
-                  isMini={s.isMiniWallets}
-                  handleWalletLengthConnect={this.handleWalletLengthConnect}
-                  isWalletLength={s.isWalletLength}
-                  handleWalletConnect={this.handleWalletConnect}
-                  isOverlay={true}
-                  setOpenWallet={this.setOpenWallet}
-                  isOpenWallet={s.isOpenWallet}
-                  setOpenWalletMini={this.setOpenWalletMini}
-                  // isOpenSearch={s.isOpenSearch}
-                />
-                {this.getNewButtonTab('Connected Accounts')}
-              </div>
-
-              <div className={styles.right}>
-                {pathname === '/system/dapplets' && (
+            <div className={styles.inner}>
+              <header className={styles.header}>
+                <div className={styles.left}>
                   <SquaredButton
-                    title="Search dapplets"
-                    className={s.classNameSearchButton}
-                    onClick={() =>
-                      s.isOpenSearch ? this.handleCloseSearch() : this.handleOpenSearchClick()
-                    }
+                    title="hide"
+                    // className={s.classNameSearchButton}
+                    onClick={this.props.onToggle}
                     appearance="big"
-                    icon={SearchIcon}
+                    icon={Hide}
+                  />
+                  <Profile
+                    setSelectedWallet={this.setSelectedWallet}
+                    setConnectedDescriptors={this.setConnectedDescriptors}
+                    isMini={s.isMiniWallets}
+                    handleWalletLengthConnect={this.handleWalletLengthConnect}
+                    isWalletLength={s.isWalletLength}
+                    handleWalletConnect={this.handleWalletConnect}
+                    isOverlay={true}
+                    setOpenWallet={this.setOpenWallet}
+                    isOpenWallet={s.isOpenWallet}
+                    setOpenWalletMini={this.setOpenWalletMini}
+                    // isOpenSearch={s.isOpenSearch}
+                  />
+                  {this.getNewButtonTab('Connected Accounts')}
+                </div>
+
+                <div className={styles.right}>
+                  {pathname === '/system/dapplets' && (
+                    <SquaredButton
+                      title="Search dapplets"
+                      className={s.classNameSearchButton}
+                      onClick={() =>
+                        s.isOpenSearch ? this.handleCloseSearch() : this.handleOpenSearchClick()
+                      }
+                      appearance="big"
+                      icon={SearchIcon}
+                    />
+                  )}
+
+                  {this.getNewButtonTab('Notifications')}
+
+                  <SquaredButton
+                    appearance="big"
+                    title="Dapplets Store"
+                    icon={StoreIcon}
+                    onClick={this.handleStoreButtonClick}
+                  />
+                  <ShareButton />
+                  {this.getNewButtonTab('Settings')}
+                </div>
+              </header>
+              {s.isOpenSearch && pathname === '/system/dapplets' && (
+                <div className={styles.searchBlock} tabIndex={1}>
+                  <Search
+                    className={s.classNameSearch}
+                    value={s.search}
+                    isOpenSearch={s.isOpenSearch}
+                    onChange={this.handleSearchChange}
+                    onClearValue={this.handleSearchClear}
+                    onCloseSearch={this.handleCloseSearch}
+                  />
+                </div>
+              )}
+              <div
+                onClick={() => this.handleCloseSearch()}
+                className={cn(styles.children, 'dapplets-overlay-nav-content-list', {
+                  [styles.newChildren]:
+                    pathname !== '/system/dapplets' &&
+                    pathname !== '/system/notifications' &&
+                    pathname !== '/system/connectedAccounts' &&
+                    pathname !== '/system/settings',
+                  // [styles.newHeight]:s.isOpenSearch && pathname === '/system/dapplets'
+                })}
+              >
+                {pathname === '/system/dapplets' && (
+                  <Dapplets
+                    search={s.search}
+                    onUserSettingsClick={this.handleUserSettingsClick}
+                    setDropdownListValue={this.setDropdownListValue}
+                    dropdownListValue={s.dropdownListValue}
+                    getTabsForDapplet={this.getTabsForDapplet}
+                    handleCloseTabClick={this.handleCloseTabClick}
+                    tabs={this.getTabs()}
+                    setModule={this.setModule}
+                    classNameBlock={
+                      s.isOpenSearch && pathname === '/system/dapplets' ? styles.newHeight : null
+                    }
                   />
                 )}
 
-                {this.getNewButtonTab('Notifications')}
+                {pathname === '/system/notifications' && <Notifications />}
+                {pathname === '/system/connectedAccounts' && <ConnectedAccount />}
+                {pathname === '/system/settings' && (
+                  <SettingsOverlay
+                    selectedWallet={s.selectedWallet}
+                    connectedDescriptors={s.connectedDescriptors}
+                    setOpenWallet={this.setOpenWallet}
+                    isLoadingDeploy={s.isLoadingDeploy}
+                    setLoadingDeploy={this.setLoadingDeploy}
+                    setLoadingDeployFinally={this.setLoadingDeployFinally}
+                  />
+                )}
 
-                <SquaredButton
-                  appearance="big"
-                  title="Dapplets Store"
-                  icon={StoreIcon}
-                  onClick={this.handleStoreButtonClick}
-                />
-                <ShareButton />
-                {this.getNewButtonTab('Settings')}
+                {overlays
+                  .filter((x) => !x.isSystemPopup)
+                  .map((x) => {
+                    return (
+                      <ContentItem
+                        overlay={x}
+                        isActive={pathname === `/${x.source ? x.source : x.id}/${x.id}`}
+                        overlayManager={p.overlayManager}
+                        key={x.id}
+                        module={s.module}
+                        onSettingsModule={this.handleUserSettingsClick}
+                      />
+                    )
+                  })}
+
+                {activeTabId !== 'system' && activeTabMenuId === 'settings' && menu && (
+                  <UserSettings
+                    navigation={p.navigate}
+                    overlays={overlays}
+                    module={s.module}
+                    dappletName={activeTabId}
+                    registryUrl={menu.props!.registryUrl}
+                  />
+                )}
+
+                {systemPopups.map((x) => (
+                  <PopupItem key={x.id} overlay={x} />
+                ))}
               </div>
-            </header>
-            {s.isOpenSearch && pathname === '/system/dapplets' && (
-              <div className={styles.searchBlock} tabIndex={1}>
-                <Search
-                  className={s.classNameSearch}
-                  value={s.search}
-                  isOpenSearch={s.isOpenSearch}
-                  onChange={this.handleSearchChange}
-                  onClearValue={this.handleSearchClear}
-                  onCloseSearch={this.handleCloseSearch}
-                />
-              </div>
-            )}
-            <div
-              onClick={() => this.handleCloseSearch()}
-              className={cn(styles.children, 'dapplets-overlay-nav-content-list', {
-                [styles.newChildren]:
-                  pathname !== '/system/dapplets' &&
-                  pathname !== '/system/notifications' &&
-                  pathname !== '/system/connectedAccounts' &&
-                  pathname !== '/system/settings',
-                // [styles.newHeight]:s.isOpenSearch && pathname === '/system/dapplets'
-              })}
-            >
-              {pathname === '/system/dapplets' && (
-                <Dapplets
-                  search={s.search}
-                  onUserSettingsClick={this.handleUserSettingsClick}
-                  setDropdownListValue={this.setDropdownListValue}
-                  dropdownListValue={s.dropdownListValue}
-                  getTabsForDapplet={this.getTabsForDapplet}
-                  handleCloseTabClick={this.handleCloseTabClick}
-                  tabs={this.getTabs()}
-                  setModule={this.setModule}
-                  classNameBlock={
-                    s.isOpenSearch && pathname === '/system/dapplets' ? styles.newHeight : null
-                  }
-                />
-              )}
-
-              {pathname === '/system/notifications' && <Notifications />}
-              {pathname === '/system/connectedAccounts' && <ConnectedAccount />}
-              {pathname === '/system/settings' && (
-                <SettingsOverlay
-                  selectedWallet={s.selectedWallet}
-                  connectedDescriptors={s.connectedDescriptors}
-                  setOpenWallet={this.setOpenWallet}
-                  isLoadingDeploy={s.isLoadingDeploy}
-                  setLoadingDeploy={this.setLoadingDeploy}
-                  setLoadingDeployFinally={this.setLoadingDeployFinally}
-                />
-              )}
-
-              {overlays
-                .filter((x) => !x.isSystemPopup)
-                .map((x) => {
-                  return (
-                    <ContentItem
-                      overlay={x}
-                      isActive={pathname === `/${x.source ? x.source : x.id}/${x.id}`}
-                      overlayManager={p.overlayManager}
-                      key={x.id}
-                      module={s.module}
-                      onSettingsModule={this.handleUserSettingsClick}
-                    />
-                  )
-                })}
-
-              {activeTabId !== 'system' && activeTabMenuId === 'settings' && menu && (
-                <UserSettings
-                  navigation={p.navigate}
-                  overlays={overlays}
-                  module={s.module}
-                  dappletName={activeTabId}
-                  registryUrl={menu.props!.registryUrl}
-                />
-              )}
-
-              {systemPopups.map((x) => (
-                <PopupItem key={x.id} overlay={x} />
-              ))}
             </div>
           </div>
         </div>
-      </div>
+      </>
     )
   }
 }
@@ -660,5 +667,6 @@ const __App = withRouter(_App)
 export const App = (props: any) => (
   <MemoryRouter>
     <__App {...props} />
+    <SystemPopup bus={props.systemPopupEventBus} />
   </MemoryRouter>
 )

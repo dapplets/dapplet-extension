@@ -1,10 +1,14 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as React from 'react'
-import { Navigate } from 'react-router-dom'
 import { browser } from 'webextension-polyfill-ts'
 // import * as logos from '../../../common/resources/wallets';
-import { Bus } from '../../../common/bus'
-import { ChainTypes, LoginRequest, WalletDescriptor, WalletTypes } from '../../../common/types'
+import { Bus } from '../../../../../../../common/bus'
+import {
+  ChainTypes,
+  LoginRequest,
+  WalletDescriptor,
+  WalletTypes,
+} from '../../../../../../../common/types'
 import DappletsLogo from '../../assests/dapplets.svg'
 import MetaMaskLogo from '../../assests/metamask.svg'
 import NearMainnetLogo from '../../assests/near_mainnet.svg'
@@ -20,12 +24,12 @@ interface IWalletPairingProps {
   }
   bus: Bus
   chains: ChainTypes[]
+  redirect: (route: string) => void
 }
 
 interface IWalletPairingState {
   loading: boolean
   descriptors: WalletDescriptor[]
-  redirect: string | null
   wallets: {
     id: string
     label: string
@@ -40,7 +44,6 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
     this.state = {
       loading: true,
       descriptors: [],
-      redirect: null,
       wallets: [],
     }
   }
@@ -68,7 +71,7 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
     const wallets = disconnectedWallets.map((x) => this.getMeta(x.type, x.chain))
 
     if (wallets.length === 0) {
-      this.setState({ redirect: '/connected-wallets' })
+      this.props.redirect('/connected-wallets')
     } else {
       this.setState({
         descriptors,
@@ -142,15 +145,11 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
   }
 
   render() {
-    if (this.state.redirect) {
-      return <Navigate to={this.state.redirect} />
-    }
-
     if (this.state.loading) return null
 
     return (
       <ConnectWallet
-        onWalletClick={(id) => this.setState({ redirect: '/pairing/' + id })}
+        onWalletClick={(id) => this.props.redirect('/pairing/' + id)}
         wallets={this.state.wallets}
       />
     )
