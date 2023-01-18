@@ -315,7 +315,10 @@ export const Dapplets: FC<DappletsProps> = (props) => {
               })
             ) : (
               <div className={styles.noDapplets}>
-                No available dapplets for current site
+                {dropdownListValue === 'active'
+                  ? `You don't have active dapplets`
+                  : 'No available dapplets for current site'}
+
                 <span>
                   There are dapplets for{' '}
                   <span

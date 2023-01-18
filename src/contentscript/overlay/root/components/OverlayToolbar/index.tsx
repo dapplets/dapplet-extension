@@ -372,17 +372,19 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               /> */}
             </div>
             <div>
-              <button
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  onShowTabs()
-                }}
-                data-testid="show-tabs-button"
-                className={cn(styles.miniButton, {
-                  [styles.hideTabsBtn]: isShowTabs,
-                })}
-              ></button>
+              {noSystemTabs.length > 0 && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    onShowTabs()
+                  }}
+                  data-testid="show-tabs-button"
+                  className={cn(styles.miniButton, {
+                    [styles.hideTabsBtn]: isShowTabs,
+                  })}
+                ></button>
+              )}
             </div>
           </div>
         </div>
