@@ -37,6 +37,7 @@ export interface IOverlay extends IPubSub {
 export interface IOverlayManager {
   systemPopupEventBus?: Bus
   openPopup(path?: string): void
+  togglePanel(): void
   unregisterAll(source?: string): void
   open(): void
   close(): void

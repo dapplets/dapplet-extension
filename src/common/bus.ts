@@ -57,8 +57,12 @@ export class Bus {
     }
   }
 
-  unsubscribe(topic: string) {
-    this._callbacks[topic] = []
+  unsubscribe(topic: string, handler?: (...args: any[]) => void) {
+    if (handler) {
+      this._callbacks[topic] = (this._callbacks[topic] ?? []).filter((x) => x !== handler)
+    } else {
+      this._callbacks[topic] = []
+    }
   }
 
   destroy() {

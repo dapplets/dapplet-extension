@@ -2,15 +2,11 @@ import { browser } from 'webextension-polyfill-ts'
 import { getCurrentTab } from '../../common/helpers'
 import {
   ChainTypes,
-  DefaultConfig,
   DefaultSigners,
   LoginRequest,
   SystemOverlayTabs,
   WalletTypes,
 } from '../../common/types'
-import ManifestDTO from '../dto/manifestDTO'
-import ModuleInfo from '../models/moduleInfo'
-import VersionInfo from '../models/versionInfo'
 
 export class OverlayService {
   public pairWalletViaOverlay(

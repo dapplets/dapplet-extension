@@ -49,6 +49,8 @@ interface State {
 }
 
 export class DappletConfirmation extends React.Component<Props, State> {
+  private _isMounted = false
+
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -71,6 +73,8 @@ export class DappletConfirmation extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
+    this._isMounted = true
+
     const p = this.props
     const { moduleId, registry, contextIds } = this.props.data
     const {
@@ -114,22 +118,28 @@ export class DappletConfirmation extends React.Component<Props, State> {
       isModuleActivated &&
       isModuleVersionEqual
 
-    this.setState({
-      isLoading: false,
-      mi,
-      vi,
-      swarmGatewayUrl,
-      trustedUsers,
-      registries,
-      activeModule,
-      isRegistryExists,
-      isRegistryEnabled,
-      isTrustedUserExists,
-      isTrustedUserEnabled,
-      isModuleActivated,
-      isModuleVersionEqual,
-      isAllOk,
-    })
+    if (this._isMounted) {
+      this.setState({
+        isLoading: false,
+        mi,
+        vi,
+        swarmGatewayUrl,
+        trustedUsers,
+        registries,
+        activeModule,
+        isRegistryExists,
+        isRegistryEnabled,
+        isTrustedUserExists,
+        isTrustedUserEnabled,
+        isModuleActivated,
+        isModuleVersionEqual,
+        isAllOk,
+      })
+    }
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   async confirmButtonClickHandler() {

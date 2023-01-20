@@ -60,7 +60,6 @@ export class ConnectedWallets extends React.Component<Props, State> {
   async selectWallet(wallet: string, chain: string) {
     const frameId = this.props.data.frameId
     this.props.bus.publish('ready', [frameId, { wallet, chain }])
-    await this.componentDidMount()
   }
 
   async loginWallet(wallet: string, chain: string) {

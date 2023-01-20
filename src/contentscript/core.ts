@@ -78,7 +78,7 @@ export default class Core {
               return Promise.resolve([null, 'ready'])
             }
           } else if (message.type === 'OPEN_POPUP_OVERLAY') {
-            return Promise.resolve(this.overlayManager.openPopup(message.payload.path)) // ToDo: make toggle of the overlay
+            return Promise.resolve(this.overlayManager.togglePanel())
           } else if (message.type === 'OPEN_SYSTEM_OVERLAY') {
             return this.waitSystemOverlay(message.payload)
               .then((x) => [null, x])
@@ -91,7 +91,7 @@ export default class Core {
       window.addEventListener('message', ({ data }) => {
         if (typeof data === 'object' && data.type !== undefined) {
           if (data.type === 'OPEN_POPUP_OVERLAY') {
-            return Promise.resolve(this.overlayManager.openPopup(data.payload.path))
+            return Promise.resolve(this.overlayManager.togglePanel())
           } else if (data.type === 'CLOSE_OVERLAY') {
             this.closeOverlay()
           }
@@ -131,18 +131,23 @@ export default class Core {
 
       const eventBus = this.overlayManager.systemPopupEventBus!
 
-      eventBus.publish('data', [frameRequestId, data])
-      eventBus.subscribe('cancel', () => {
+      const handleCancel = () => {
+        // ToDo: compare frameResponseId and frameRequestId
         eventBus.publish('close_frame', [frameRequestId])
+        eventBus.unsubscribe('cancel', handleCancel)
         reject('Unexpected error.')
-      })
-      eventBus.subscribe('ready', ([frameResponseId, message]) => {
+      }
+
+      const handleReady = (frameResponseId, message) => {
+        // ToDo: compare frameResponseId and frameRequestId
         eventBus.publish('close_frame', [frameRequestId])
+        eventBus.unsubscribe('ready', handleReady)
         resolve(message)
-      })
-      eventBus.subscribe('close', () => {
-        resolve()
-      })
+      }
+
+      eventBus.publish('data', [frameRequestId, data])
+      eventBus.subscribe('cancel', handleCancel)
+      eventBus.subscribe('ready', handleReady)
     })
   }
 

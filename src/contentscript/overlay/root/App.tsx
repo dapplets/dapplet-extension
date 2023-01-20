@@ -501,6 +501,8 @@ class _App extends React.Component<P, S> {
 
     return (
       <>
+        <SystemPopup bus={p.systemPopupEventBus} />
+
         <div className={cn(styles.overlay)}>
           <div className={styles.wrapper}>
             <OverlayToolbar
@@ -667,6 +669,5 @@ const __App = withRouter(_App)
 export const App = (props: any) => (
   <MemoryRouter>
     <__App {...props} />
-    <SystemPopup bus={props.systemPopupEventBus} />
   </MemoryRouter>
 )
