@@ -16,24 +16,25 @@ export default defineConfig({
     },
     video: false,
   },
-  reporter: 'cypress-multi-reporters',
-  reporterOptions: {
-    reporterEnabled: 'cypress-mochawesome-reporter, cypress-qase-reporter',
-    cypressMochawesomeReporterReporterOptions: {
-      charts: true,
-    },
-    cypressQaseReporterReporterOptions: {
-      apiToken: process.env.CYPRESS_TOKEN,
-      projectCode: 'DE',
-      logging: true,
-      // basePath: "https://api.qase.io/v1",
-      screenshotFolder: 'screenshots',
-      sendScreenshot: true,
-      runComplete: true,
-      // environmentId: 1,
-      // rootSuiteTitle: "Cypress tests",
-    },
-  },
   chromeWebSecurity: false,
   includeShadowDom: true,
+  ...(process.env.CYPRESS_TOKEN
+    ? {
+        reporter: 'cypress-multi-reporters',
+        reporterOptions: {
+          reporterEnabled: 'cypress-mochawesome-reporter, cypress-qase-reporter',
+          cypressMochawesomeReporterReporterOptions: {
+            charts: true,
+          },
+          cypressQaseReporterReporterOptions: {
+            apiToken: process.env.CYPRESS_TOKEN,
+            projectCode: 'DE',
+            logging: true,
+            screenshotFolder: 'screenshots',
+            sendScreenshot: true,
+            runComplete: true,
+          },
+        },
+      }
+    : {}),
 })
