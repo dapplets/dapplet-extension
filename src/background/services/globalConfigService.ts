@@ -21,22 +21,17 @@ const EXPORTABLE_PROPERTIES = [
   // 'suspended',
   // 'walletInfo',
   'registries',
-  // 'intro',
   'devMode',
   'trustedUsers',
   // 'userSettings',
   'errorReporting',
   // 'userAgentId',
   'userAgentName',
-  // 'autoBackup',
   'providerUrl',
   'xdaiProviderUrl',
   'swarmGatewayUrl',
   'ipfsGatewayUrl',
-  'siaPortalUrl',
   // 'walletsUsage',
-  'identityContract',
-  'popupInOverlay',
   'hostnames',
   //'lastDevMessageHash',
   //'ignoredUpdate',
@@ -64,7 +59,6 @@ export default class GlobalConfigService {
       if (!config.preferedOverlayStorage)
         config.preferedOverlayStorage = this.getInitialConfig().preferedOverlayStorage
       if (!config.ipfsGatewayUrl) config.ipfsGatewayUrl = this.getInitialConfig().ipfsGatewayUrl
-      if (!config.siaPortalUrl) config.siaPortalUrl = this.getInitialConfig().siaPortalUrl
       if (!config.nearNetworks) config.nearNetworks = this.getInitialConfig().nearNetworks
       if (!config.ethereumNetworks)
         config.ethereumNetworks = this.getInitialConfig().ethereumNetworks
@@ -263,9 +257,6 @@ export default class GlobalConfigService {
     config.xdaiProviderUrl = 'https://rpc.gnosischain.com/'
     config.swarmGatewayUrl = 'https://swarmgateway.mooo.com/'
     config.walletsUsage = {}
-    config.identityContract = '0xf6b3a0B20281796D465bB8613e233BE30be07084'
-    config.popupInOverlay = true
-    config.autoBackup = true
     config.errorReporting = true
     config.userAgentId = generateGuid()
     config.userAgentName = ''
@@ -274,7 +265,6 @@ export default class GlobalConfigService {
     config.preferedOverlayStorage = 'centralized'
     config.swarmPostageStampId = '1149efd4cce752c75e815e9b9dbe322afd0c8dce7f86d78e26182b9923403965'
     config.ipfsGatewayUrl = 'https://ipfs-gateway.mooo.com'
-    config.siaPortalUrl = 'https://siasky.net'
     config.ethereumNetworks = [
       {
         networkId: 'rinkeby',
@@ -452,17 +442,6 @@ export default class GlobalConfigService {
     return this.updateConfig((c) => (c.registries.find((x) => x.url === url).isEnabled = false))
   }
 
-  async getIntro() {
-    const config = await this.get()
-    return config.intro
-  }
-
-  async setIntro(intro: any) {
-    return this.updateConfig((c) =>
-      Object.entries(intro).forEach(([key, value]) => (c.intro[key] = value))
-    )
-  }
-
   async getDevMode() {
     const config = await this.get()
     return config.devMode
@@ -596,27 +575,6 @@ export default class GlobalConfigService {
     return this.updateConfig((c) => (c.errorReporting = isActive))
   }
 
-  async getPopupInOverlay() {
-    const config = await this.get()
-    return config.popupInOverlay
-  }
-
-  async setPopupInOverlay(isActive: boolean) {
-    await this.updateConfig((c) => (c.popupInOverlay = isActive))
-    await browser.browserAction.setPopup({
-      popup: isActive ? '' : 'popup.html',
-    })
-  }
-
-  async getAutoBackup() {
-    const config = await this.get()
-    return config.autoBackup
-  }
-
-  async setAutoBackup(isActive: boolean) {
-    return this.updateConfig((c) => (c.autoBackup = isActive))
-  }
-
   async setEthereumProvider(url: string) {
     if (typeOfUri(url) !== UriTypes.Http) throw new Error('URL must be a valid HTTP(S) address.')
     await this._checkEthereumProvider(url)
@@ -666,14 +624,6 @@ export default class GlobalConfigService {
     return this.updateConfig((c) => (c.walletsUsage = walletsUsage))
   }
 
-  async getIdentityContract() {
-    return this.get().then((x) => x.identityContract)
-  }
-
-  async setIdentityContract(address: string) {
-    return this.updateConfig((c) => (c.identityContract = address))
-  }
-
   async getUserAgentId() {
     return this.get().then((x) => x.userAgentId)
   }
@@ -708,29 +658,29 @@ export default class GlobalConfigService {
     await this.set(globalConfig)
   }
 
-  async getLastDevMessageHash() {
-    return this.get().then((x) => x.lastDevMessageHash)
-  }
+  // async getLastDevMessageHash() {
+  //   return this.get().then((x) => x.lastDevMessageHash)
+  // }
 
-  async setLastDevMessageHash(hash: string) {
-    return this.updateConfig((c) => (c.lastDevMessageHash = hash))
-  }
+  // async setLastDevMessageHash(hash: string) {
+  //   return this.updateConfig((c) => (c.lastDevMessageHash = hash))
+  // }
 
-  async getIgnoredUpdate() {
-    return this.get().then((x) => x.ignoredUpdate)
-  }
+  // async getIgnoredUpdate() {
+  //   return this.get().then((x) => x.ignoredUpdate)
+  // }
 
-  async setIgnoredUpdate(version: string) {
-    return this.updateConfig((c) => (c.ignoredUpdate = version))
-  }
+  // async setIgnoredUpdate(version: string) {
+  //   return this.updateConfig((c) => (c.ignoredUpdate = version))
+  // }
 
-  async getLastMessageSeenTimestamp() {
-    return this.get().then((x) => x.lastMessageSeenTimestamp)
-  }
+  // async getLastMessageSeenTimestamp() {
+  //   return this.get().then((x) => x.lastMessageSeenTimestamp)
+  // }
 
-  async setLastMessageSeenTimestamp(lastMessageSeenTimestamp: string) {
-    return this.updateConfig((c) => (c.lastMessageSeenTimestamp = lastMessageSeenTimestamp))
-  }
+  // async setLastMessageSeenTimestamp(lastMessageSeenTimestamp: string) {
+  //   return this.updateConfig((c) => (c.lastMessageSeenTimestamp = lastMessageSeenTimestamp))
+  // }
 
   async getDynamicAdapter() {
     return this.get().then((x) => x.dynamicAdapter)
@@ -763,15 +713,6 @@ export default class GlobalConfigService {
   async setIpfsGateway(url: string) {
     if (typeOfUri(url) !== UriTypes.Http) throw new Error('URL must be a valid HTTP(S) address.')
     await this.updateConfig((c) => (c.ipfsGatewayUrl = url))
-  }
-
-  async getSiaPortal() {
-    return this.get().then((x) => x.siaPortalUrl)
-  }
-
-  async setSiaPortal(url: string) {
-    if (typeOfUri(url) !== UriTypes.Http) throw new Error('URL must be a valid HTTP(S) address.')
-    await this.updateConfig((c) => (c.siaPortalUrl = url))
   }
 
   async getNearNetworks() {

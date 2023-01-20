@@ -27,7 +27,6 @@
     "@fontsource/roboto": "^4.5.3",
     "@metamask/providers": "^8.1.1",
     "@rjsf/core": "^5.0.0-beta.14",
-    "@rjsf/semantic-ui": "^5.0.0-beta.14",
     "@rjsf/utils": "^5.0.0-beta.14",
     "@rjsf/validator-ajv8": "^5.0.0-beta.14",
     "@semantic-release/exec": "^6.0.3",
@@ -76,9 +75,7 @@
     "raw-loader": "^4.0.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-linkify": "1.0.0-alpha",
     "react-router-dom": "^6.2.1",
-    "react-secure-link": "^3.0.3",
     "react-time-ago": "^7.1.9",
     "resolve-url-loader": "^5.0.0",
     "rxjs": "^6.6.7",
@@ -86,11 +83,8 @@
     "sass": "^1.49.7",
     "sass-loader": "^12.6.0",
     "semantic-release": "^19.0.2",
-    "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^2.1.1",
     "semver": "^7.3.5",
     "simple-mapper": "^2.2.0",
-    "skynet-js": "^4.0.25-beta",
     "stream-browserify": "^3.0.0",
     "style-loader": "^3.3.1",
     "styled-components": "^5.3.3",
@@ -108,12 +102,10 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@types/react-jsonschema-form": "^1.7.8",
     "animejs": "^3.2.1",
     "copy-to-clipboard": "^3.3.1",
     "ethers": "^5.5.4",
-    "near-api-js": "^0.39.0",
-    "react-select": "^5.3.2"
+    "near-api-js": "^0.39.0"
   },
   "directories": {
     "doc": "docs"

@@ -2,7 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { ManifestAndDetails } from '../../../../../popup/components/dapplet'
+import { ManifestAndDetails } from '../../../../../common/types'
 import { ReactComponent as DeleteIcon } from '../../assets/svg/newDelete.svg'
 import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
 import { ReactComponent as SearchIcon } from '../../assets/svg/newLinks.svg'
@@ -28,7 +28,6 @@ export interface DappletProps
   onSettingsModule: (x: any) => void
   onOpenDappletAction: (dapplet: any) => void
   onRemoveMyDapplet?: (x: any) => void
-  onDeployDapplet: Function
   onOpenStore: (x: any) => void
   onOpenNft: (x: any) => void
   loadShowButton: boolean
@@ -44,7 +43,6 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     onSettingsModule,
     onOpenDappletAction,
     onRemoveMyDapplet,
-    onDeployDapplet,
     onOpenStore,
     onOpenNft,
     loadShowButton,

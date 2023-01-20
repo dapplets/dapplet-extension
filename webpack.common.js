@@ -16,21 +16,39 @@ function modifyManifest(buffer) {
   return manifest_JSON
 }
 
+function handleInsertStyles(element) {
+  const extensionHostID = 'dapplets-overlay-manager'
+  let extensionHost = document.getElementById(extensionHostID)
+
+  if (!extensionHost) {
+    const CollapsedOverlayClass = 'dapplets-overlay-collapsed'
+    const HiddenOverlayClass = 'dapplets-overlay-hidden'
+    const DappletsOverlayManagerClass = 'dapplets-overlay-manager'
+    const OverlayFrameClass = 'dapplets-overlay-frame'
+
+    const panel = document.createElement(DappletsOverlayManagerClass)
+    panel.id = 'dapplets-overlay-manager'
+    panel.classList.add(OverlayFrameClass, CollapsedOverlayClass, HiddenOverlayClass)
+
+    panel.attachShadow({ mode: 'open' })
+
+    const container = document.createElement('div')
+    container.id = 'app'
+
+    // Add style tag to shadow host
+    panel.shadowRoot.appendChild(element)
+    panel.shadowRoot.appendChild(container)
+    document.body.appendChild(panel)
+  } else {
+    extensionHost.shadowRoot.appendChild(element)
+  }
+}
+
 module.exports = {
   entry: {
-    popup: path.join(__dirname, 'src/popup/index.tsx'),
     background: path.join(__dirname, 'src/background/index.ts'),
     contentscript: path.join(__dirname, 'src/contentscript/index.ts'),
     inpage: path.join(__dirname, 'src/inpage/index.ts'),
-    // pairing: path.join(__dirname, "src/pairing/index.tsx"),
-    // sowa: path.join(__dirname, "src/sowa/index.tsx"),
-    deploy: path.join(__dirname, 'src/deploy/index.tsx'),
-    starter: path.join(__dirname, 'src/starter/index.tsx'),
-    settings: path.join(__dirname, 'src/settings/index.tsx'),
-    // login: path.join(__dirname, "src/login/index.tsx"),
-    // welcome: path.join(__dirname, "src/welcome/index.tsx"),
-    guide: path.join(__dirname, 'src/guide/index.tsx'),
-    overlay: path.join(__dirname, 'src/overlay/index.tsx'),
   },
   output: {
     path: path.join(__dirname, 'build'),
@@ -54,53 +72,10 @@ module.exports = {
       {
         test: /\.scss$/,
         use: [
-          'style-loader',
-          {
-            loader: 'css-loader',
-            options: {
-              modules: {
-                auto: (resourcePath) => resourcePath.endsWith('.module.scss'),
-              },
-            },
-          },
-          'sass-loader',
-        ],
-        include: path.resolve(__dirname, 'src'),
-        exclude: path.resolve(__dirname, 'src/contentscript'),
-      },
-      {
-        test: /\.scss$/,
-        use: [
           {
             loader: 'style-loader',
             options: {
-              insert: function (element) {
-                const extensionHostID = 'dapplets-overlay-manager'
-                let extensionHost = document.getElementById(extensionHostID)
-
-                if (!extensionHost) {
-                  const CollapsedOverlayClass = 'dapplets-overlay-collapsed'
-                  const HiddenOverlayClass = 'dapplets-overlay-hidden'
-                  const DappletsOverlayManagerClass = 'dapplets-overlay-manager'
-                  const OverlayFrameClass = 'dapplets-overlay-frame'
-
-                  const panel = document.createElement(DappletsOverlayManagerClass)
-                  panel.id = 'dapplets-overlay-manager'
-                  panel.classList.add(OverlayFrameClass, CollapsedOverlayClass, HiddenOverlayClass)
-
-                  panel.attachShadow({ mode: 'open' })
-
-                  const container = document.createElement('div')
-                  container.id = 'app'
-
-                  // Add style tag to shadow host
-                  panel.shadowRoot.appendChild(element)
-                  panel.shadowRoot.appendChild(container)
-                  document.body.appendChild(panel)
-                } else {
-                  extensionHost.shadowRoot.appendChild(element)
-                }
-              },
+              insert: handleInsertStyles,
             },
           },
           {
@@ -121,25 +96,20 @@ module.exports = {
         include: [path.resolve(__dirname, 'src'), /node_modules/],
       },
       {
-        test: [
-          /\.bmp$/,
-          /\.gif$/,
-          /\.jpe?g$/,
-          /\.png$/,
-          /\.svg$/,
-          /\.eot$/,
-          /\.ttf$/,
-          /\.woff$/,
-          /\.woff2$/,
-        ],
+        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.eot$/, /\.ttf$/, /\.woff$/, /\.woff2$/],
         type: 'asset/inline',
-        include: [path.resolve(__dirname, 'src'), /node_modules/],
-        exclude: [path.resolve(__dirname, 'src/contentscript')],
       },
       {
         test: /\.svg$/,
-        include: [path.resolve(__dirname, 'src/contentscript')],
-        use: ['@svgr/webpack', 'url-loader'],
+        oneOf: [
+          {
+            issuer: /\.tsx$/,
+            use: ['@svgr/webpack', 'url-loader'],
+          },
+          {
+            type: 'asset/inline',
+          },
+        ],
       },
     ],
   },
@@ -166,54 +136,6 @@ module.exports = {
         {
           from: 'src/background/index.html',
           to: 'background.html',
-        },
-        {
-          from: 'src/popup/index.html',
-          to: 'popup.html',
-        },
-        // {
-        //   from: 'src/options/index.html',
-        //   to: 'options.html',
-        // },
-        {
-          from: 'src/pairing/index.html',
-          to: 'pairing.html',
-        },
-        // {
-        //   from: 'src/sowa/index.html',
-        //   to: 'sowa.html',
-        // },
-        {
-          from: 'src/deploy/index.html',
-          to: 'deploy.html',
-        },
-        {
-          from: 'src/starter/index.html',
-          to: 'starter.html',
-        },
-        {
-          from: 'src/settings/index.html',
-          to: 'settings.html',
-        },
-        // {
-        //   from: 'src/login/index.html',
-        //   to: 'login.html',
-        // },
-        {
-          from: 'src/callback/index.html',
-          to: 'callback.html',
-        },
-        // {
-        //   from: 'src/welcome/index.html',
-        //   to: 'welcome.html',
-        // },
-        {
-          from: 'src/guide/index.html',
-          to: 'guide.html',
-        },
-        {
-          from: 'src/overlay/index.html',
-          to: 'overlay.html',
         },
       ],
     }),

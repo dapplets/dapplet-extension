@@ -1,5 +1,5 @@
 import * as React from 'react'
-import PopupLoader from '../../../../../overlay/assests/loader.svg'
+import PopupLoader from '../SystemPopup/assests/loader.svg'
 import { Overlay } from '../../overlay'
 import styles from './PopupItem.module.scss'
 
@@ -24,9 +24,16 @@ export class PopupItem extends React.Component<P, S> {
 
   componentDidMount() {
     this.ref.current.appendChild(this.props.overlay.frame)
-    this.props.overlay.frame.addEventListener('load', () => {
-      this.setState({ isLoading: false })
-    })
+    this.props.overlay.frame.addEventListener('load', this.handleFrameLoaded)
+  }
+
+  componentWillUnmount() {
+    this.ref.current.removeChild(this.props.overlay.frame)
+    this.props.overlay.frame.removeEventListener('load', this.handleFrameLoaded)
+  }
+
+  handleFrameLoaded = () => {
+    this.setState({ isLoading: false })
   }
 
   render() {

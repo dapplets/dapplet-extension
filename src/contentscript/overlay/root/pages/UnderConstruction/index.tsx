@@ -70,11 +70,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
 
   const [mode, setMode] = useState(FormMode.Creating)
 
-  const [targetStorages, setTargetStorages] = useState([
-    StorageTypes.Swarm,
-    // StorageTypes.Sia,
-    StorageTypes.Ipfs,
-  ])
+  const [targetStorages, setTargetStorages] = useState([StorageTypes.Swarm, StorageTypes.Ipfs])
   const [isModal, setModal] = useState(false)
   const [inputNameError, setInputNameError] = useState(null)
   const [inputTitleError, setInputTitleError] = useState(null)

@@ -75,11 +75,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
 
   const [mode, setMode] = useState(null)
 
-  const [targetStorages, setTargetStorages] = useState([
-    StorageTypes.Swarm,
-    // StorageTypes.Sia,
-    StorageTypes.Ipfs,
-  ])
+  const [targetStorages, setTargetStorages] = useState([StorageTypes.Swarm, StorageTypes.Ipfs])
 
   const [author, setAuthor] = useState({ authorForm: [] })
 
@@ -251,7 +247,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   // const isNotNullCurrentAccount = !(
   //   !currentAccount || currentAccount === '0x0000000000000000000000000000000000000000'
   // )
-  let isNotNullCurrentAccount = true
+  const isNotNullCurrentAccount = true
 
   const onChange = (e) => {
     const files = e.target.files

@@ -49,6 +49,10 @@ export class ContentItem extends React.Component<P, S> {
     this.loadFrame()
   }
 
+  componentWillUnmount() {
+    this.ref.current.removeChild(this.props.overlay.frame)
+  }
+
   loadFrame() {
     const timeoutId = setTimeout(
       () => this.setState({ loadingMode: LoadingMode.SlowLoading }),
@@ -99,6 +103,7 @@ export class ContentItem extends React.Component<P, S> {
     const overlay = this.props.overlay
     window.open(overlay.url, '_blank')
   }
+
   addModuleInfo() {
     const module = this.props.module
       .filter((x) => x.name === this.props.overlay.source)

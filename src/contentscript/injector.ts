@@ -325,12 +325,10 @@ export class Injector {
       addEvent,
       getSwarmGateway,
       getPreferedOverlayStorage,
-      getSiaPortal,
     } = await initBGFunctions(browser)
     const { core } = this
 
     const swarmGatewayUrl = await getSwarmGateway()
-    const siaPortal = await getSiaPortal()
     const preferedOverlayStorage = await getPreferedOverlayStorage()
 
     for (const { manifest, script, order, contextIds, defaultConfig, schemaConfig } of modules) {
@@ -350,7 +348,6 @@ export class Injector {
       // ToDo: elemenate the boilerplate
       const coreWrapper = {
         overlayManager: core.overlayManager,
-        waitPairingOverlay: core.waitPairingOverlay,
         contextStarted: (contextIds: any[], parentContext: string) =>
           this._setContextActivivty(contextIds, parentContext, true),
         contextFinished: (contextIds: any[], parentContext: string) =>
@@ -374,9 +371,6 @@ export class Injector {
               return core.overlay(cfg, eventDef)
             } else if (url.protocol === 'bzz:') {
               cfg.url = joinUrls(swarmGatewayUrl, `bzz/${url.pathname.slice(2)}`)
-              return core.overlay(cfg, eventDef)
-            } else if (url.protocol === 'sia:') {
-              cfg.url = joinUrls(siaPortal, `${url.pathname.slice(2)}`)
               return core.overlay(cfg, eventDef)
             } else if (url.protocol === 'http:' || url.protocol === 'https:') {
               cfg.url = url.href
@@ -426,7 +420,6 @@ export class Injector {
         BigNumber: core.BigNumber,
         ethers: core.ethers,
         near: core.near,
-        starterOverlay: core.starterOverlay,
         createShareLink: (targetUrl: string, modulePayload: any) =>
           core.createShareLink(targetUrl, modulePayload, {
             contextIds: ['*'], // ToDo: Replace wildcard on real context IDs

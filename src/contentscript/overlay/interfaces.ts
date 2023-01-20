@@ -1,3 +1,4 @@
+import { Bus } from '../../common/bus'
 import { IPubSub } from '../types'
 
 export type OverlaySourceModule = {
@@ -34,8 +35,11 @@ export interface IOverlay extends IPubSub {
 }
 
 export interface IOverlayManager {
-  openPopup(path: string): void
+  systemPopupEventBus?: Bus
+  openPopup(path?: string): void
+  togglePanel(): void
   unregisterAll(source?: string): void
+  open(): void
   close(): void
   getOverlays(): IOverlay[]
   toggle(): void

@@ -25,15 +25,8 @@
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
   "content_scripts": [
     {
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ],
-      "js": [
-        "custom-elements.min.js",
-        "common.js",
-        "contentscript.js"
-      ],
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["custom-elements.min.js", "common.js", "contentscript.js"],
       "run_at": "document_idle",
       "all_frames": true
     },
@@ -43,28 +36,16 @@
         "https://wallet.mainnet.near.org/*",
         "https://wallet.testnet.near.org/*"
       ],
-      "js": [
-        "documentstart.js"
-      ],
+      "js": ["documentstart.js"],
       "run_at": "document_start",
       "all_frames": true
     }
   ],
-  "web_accessible_resources": [
-    "popup.html",
-    "deploy.html",
-    "starter.html",
-    "settings.html",
-    "callback.html",
-    "guide.html",
-    "overlay.html",
-    "inpage.js"
-  ],
+  "web_accessible_resources": ["callback.html", "inpage.js"],
   "permissions": [
     "tabs",
     "storage",
     "contextMenus",
-    "notifications",
     "downloads",
     "management",
     "*://localhost/*",

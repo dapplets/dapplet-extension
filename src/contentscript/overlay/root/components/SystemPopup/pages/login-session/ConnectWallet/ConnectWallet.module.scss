@@ -1,0 +1,42 @@
+.wrapper {
+  // margin-top: 124px;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 12px;
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.otherServices {
+  margin-top: 20px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 77px;
+  height: 77px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+
+  img {
+    width: 100%;
+  }
+}
+
+.item:hover {
+  filter: brightness(0.9);
+  background: #00000010;
+}
+
+.FAQ {
+  margin-top: 80px;
+}

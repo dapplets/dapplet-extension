@@ -3,7 +3,7 @@ import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { typeOfUri, UriTypes } from '../../../../../common/helpers'
-import { isValidUrl } from '../../../../../popup/helpers'
+import { isValidUrl } from '../../../../../common/helpers'
 
 import useAbortController from '../../hooks/useAbortController'
 import { IDropdown } from '../../models/dropdown.model'

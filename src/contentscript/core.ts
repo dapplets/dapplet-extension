@@ -52,8 +52,6 @@ type ContentDetector = {
 }
 
 export default class Core {
-  private _popupOverlay: IOverlay = null
-
   constructor(isIframe: boolean, public overlayManager: IOverlayManager) {
     if (!isIframe) {
       browser.runtime.onMessage.addListener((message, sender) => {
@@ -68,35 +66,19 @@ export default class Core {
             this.closeOverlay()
           }
         } else if (typeof message === 'object' && message.type !== undefined) {
-          if (message.type === 'OPEN_DEPLOY_OVERLAY') {
-            return this.waitDeployOverlay(message.payload)
-          } else if (message.type === 'APPROVE_SOWA_TRANSACTION') {
-            return this._approveSowaTransaction(message.payload.sowaId, message.payload.metadata)
-              .then(() => [null, 'approved'])
-              .catch(() => ['error'])
-          } else if (message.type === 'OPEN_SETTINGS_OVERLAY') {
-            return this.waitSettingsOverlay(message.payload)
-          } else if (message.type === 'OPEN_GUIDE_OVERLAY') {
-            return this.waitGuideOverlay(message.payload)
-          } else if (message.type === 'OPEN_PAIRING_OVERLAY') {
-            if (message.payload.topic === 'walletconnect' && message.payload.args[1]) {
-              const [, overlayId] = message.payload.args
-              const targetOverlay = this.overlayManager
-                .getOverlays()
-                .find((x) => x.id === overlayId)
-              targetOverlay?.send(message.payload.topic, message.payload.args)
+          // ToDo: refactor this messaging. May be use global event bus?
+          if (message.type === 'OPEN_PAIRING_OVERLAY') {
+            if (message.payload.topic === 'walletconnect') {
+              // const [, overlayId] = message.payload.args
+              // ToDo: utilize target overlayId
+              this.overlayManager.systemPopupEventBus.publish(
+                message.payload.topic,
+                message.payload.args
+              )
               return Promise.resolve([null, 'ready'])
-            } else {
-              return this.waitPairingOverlay(message.payload.topic, message.payload.args)
-                .then(() => [null, 'ready'])
-                .catch(() => ['error'])
             }
-          } else if (message.type === 'OPEN_LOGIN_OVERLAY') {
-            return this.waitLoginOverlay(message.payload.topic, message.payload.args)
-              .then(() => [null, 'ready'])
-              .catch((err) => [err])
           } else if (message.type === 'OPEN_POPUP_OVERLAY') {
-            return Promise.resolve(this.overlayManager.openPopup(message.payload.path)) // ToDo: make toggle of the overlay
+            return Promise.resolve(this.overlayManager.togglePanel())
           } else if (message.type === 'OPEN_SYSTEM_OVERLAY') {
             return this.waitSystemOverlay(message.payload)
               .then((x) => [null, x])
@@ -109,7 +91,7 @@ export default class Core {
       window.addEventListener('message', ({ data }) => {
         if (typeof data === 'object' && data.type !== undefined) {
           if (data.type === 'OPEN_POPUP_OVERLAY') {
-            return Promise.resolve(this.overlayManager.openPopup(data.payload.path))
+            return Promise.resolve(this.overlayManager.togglePanel())
           } else if (data.type === 'CLOSE_OVERLAY') {
             this.closeOverlay()
           }
@@ -122,133 +104,6 @@ export default class Core {
     }
   }
 
-  public waitPairingOverlay(topic?: string, args?: any[]): Promise<void> {
-    const me = this
-    return new Promise<void>((resolve, reject) => {
-      const pairingUrl = browser.runtime.getURL('pairing.html')
-      let overlay = me.overlayManager.getOverlays().find((x) => x.url === pairingUrl)
-      if (!overlay)
-        overlay = me.overlayManager.createOverlay({
-          url: pairingUrl,
-          title: 'Wallet',
-        })
-
-      overlay.open()
-
-      // ToDo: add overlay.onclose
-
-      // ToDo: add timeout?
-      overlay.onMessage((topic, message) => {
-        if (topic === 'ready') {
-          overlay.close()
-          resolve()
-        }
-
-        if (topic === 'error') {
-          reject()
-        }
-      })
-
-      if (topic) {
-        overlay.send(topic, args)
-      }
-    })
-  }
-
-  public waitLoginOverlay(topic?: string, args?: any[]): Promise<void> {
-    const me = this
-    return new Promise<void>((resolve, reject) => {
-      const url = browser.runtime.getURL('login.html')
-      //let overlay = this.overlayManager.getOverlays().find(x => x.uri === pairingUrl);
-      const overlay = me.overlayManager.createOverlay({
-        url,
-        title: 'Login',
-      })
-
-      overlay.open()
-
-      overlay.onclose = () => reject('Login rejected')
-
-      // ToDo: add timeout?
-      overlay.onMessage((topic, message) => {
-        if (topic === 'ready') {
-          overlay.onclose = null
-          overlay.close()
-          resolve()
-        }
-
-        if (topic === 'error') {
-          reject()
-        }
-      })
-
-      if (topic) {
-        overlay.send(topic, args)
-      }
-    })
-  }
-
-  public waitDeployOverlay(payload: any): Promise<void> {
-    const me = this
-    return new Promise<void>((resolve, reject) => {
-      const pairingUrl = browser.runtime.getURL('deploy.html')
-      const overlay = me.overlayManager.createOverlay({
-        url: pairingUrl,
-        title: 'Deploy',
-      })
-      overlay.open(() => overlay.send('data', [payload]))
-
-      // ToDo: add overlay.onclose
-
-      // ToDo: add timeout?
-      overlay.onMessage((topic, message) => {
-        if (topic === 'ready') {
-          overlay.close()
-          resolve()
-        }
-
-        if (topic === 'error') {
-          reject()
-        }
-      })
-    })
-  }
-
-  public waitSettingsOverlay(payload: any): Promise<void> {
-    const me = this
-    return new Promise<void>((resolve, reject) => {
-      const pairingUrl = browser.runtime.getURL('settings.html')
-      const overlay = me.overlayManager.createOverlay({
-        url: pairingUrl,
-        title: 'User Settings',
-      })
-      overlay.open(() => overlay.send('data', [payload]))
-
-      // ToDo: add overlay.onclose
-
-      // ToDo: add timeout?
-      overlay.onMessage((topic, message) => {
-        if (topic === 'ready') {
-          overlay.close()
-          resolve()
-        }
-
-        if (topic === 'error') {
-          reject()
-        }
-      })
-    })
-  }
-
-  public async waitGuideOverlay(payload: any): Promise<void> {
-    const pairingUrl = browser.runtime.getURL('guide.html')
-    const overlay = this.overlayManager.createOverlay({
-      url: pairingUrl,
-      title: 'Upgrade Guide',
-    })
-    overlay.open(() => overlay.send('data', [payload]))
-  }
-
   public async waitSystemOverlay(data: {
     activeTab: SystemOverlayTabs
     payload: any
@@ -257,62 +112,47 @@ export default class Core {
     const frameRequestId = generateGuid()
 
     return new Promise<void>((resolve, reject) => {
-      const pairingUrl = browser.runtime.getURL('overlay.html')
-
-      const isTargetLoginSession =
-        data.activeTab === SystemOverlayTabs.LOGIN_SESSION && data.payload?.loginRequest?.target
-      const parentOverlay = isTargetLoginSession
-        ? this.overlayManager.getOverlays().find((x) => x.id === data.payload.loginRequest.target)
-        : null
-
       data.popup = true
 
-      const popupOverlay = parentOverlay
-        ? this.overlayManager.getOverlays().find((x) => x.parent?.id === parentOverlay.id)
-        : null
-      const overlay =
-        popupOverlay ??
-        this.overlayManager.createOverlay({
-          url: pairingUrl,
-          title: 'System',
-          source: null,
-          hidden: null,
-          parent: parentOverlay,
-          isSystemPopup: true,
-        })
+      // ToDo: utilize target overlayId
+      // const isTargetLoginSession =
+      //   data.activeTab === SystemOverlayTabs.LOGIN_SESSION && data.payload?.loginRequest?.target
+      // const parentOverlay = isTargetLoginSession
+      //   ? this.overlayManager.getOverlays().find((x) => x.id === data.payload.loginRequest.target)
+      //   : null
 
-      overlay.open(() => overlay.send('data', [frameRequestId, data]))
-      overlay.onMessage((topic, data) => {
-        const [frameResponseId, message] = data ?? []
-        if (frameResponseId === frameRequestId || !frameResponseId) {
-          if (topic === 'cancel') {
-            overlay.close()
-            reject(message ?? 'Unexpected error.')
-          } else if (topic === 'ready') {
-            if (!frameRequestId) overlay.close()
-            overlay.send('close_frame', [frameResponseId])
-            resolve(message)
-          } else if (topic === 'close') {
-            overlay.close()
-          }
-        }
-      })
+      // const popupOverlay = parentOverlay
+      //   ? this.overlayManager.getOverlays().find((x) => x.parent?.id === parentOverlay.id)
+      //   : null
+
+      // ToDo: unify open/show
+      this.overlayManager.openPopup()
+      this.overlayManager.open()
+
+      const eventBus = this.overlayManager.systemPopupEventBus!
+
+      const handleCancel = () => {
+        // ToDo: compare frameResponseId and frameRequestId
+        eventBus.publish('close_frame', [frameRequestId])
+        eventBus.unsubscribe('cancel', handleCancel)
+        reject('Unexpected error.')
+      }
+
+      const handleReady = (frameResponseId, message) => {
+        // ToDo: compare frameResponseId and frameRequestId
+        eventBus.publish('close_frame', [frameRequestId])
+        eventBus.unsubscribe('ready', handleReady)
+        resolve(message)
+      }
+
+      eventBus.publish('data', [frameRequestId, data])
+      eventBus.subscribe('cancel', handleCancel)
+      eventBus.subscribe('ready', handleReady)
     })
   }
 
   public toggleOverlay() {
-    if (!this._popupOverlay?.registered) {
-      const pairingUrl = browser.runtime.getURL('popup.html')
-      this._popupOverlay = this.overlayManager.createOverlay({
-        url: pairingUrl,
-        title: 'Dapplets',
-        source: null,
-        hidden: true,
-      })
-      this._popupOverlay.open()
-    } else {
-      this.overlayManager.toggle()
-    }
+    this.overlayManager.toggle()
   }
 
   public closeOverlay() {
@@ -320,37 +160,7 @@ export default class Core {
   }
 
   public openOverlay() {
-    if (this._popupOverlay == null) {
-      this.toggleOverlay()
-    } else {
-      this._popupOverlay.open()
-    }
-  }
-
-  private async _approveSowaTransaction(sowaId, metadata): Promise<void> {
-    const me = this
-
-    return new Promise<void>((resolve, reject) => {
-      const pairingUrl = browser.runtime.getURL('sowa.html')
-      const overlay = me.overlayManager.createOverlay({
-        url: pairingUrl,
-        title: 'SOWA',
-      })
-      // ToDo: implement multiframe
-      overlay.open(() => overlay.send('txmeta', [sowaId, metadata]))
-      // ToDo: add timeout?
-      overlay.onMessage((topic, message) => {
-        if (topic === 'approved') {
-          resolve()
-          overlay.close()
-        }
-
-        if (topic === 'error') {
-          reject()
-          overlay.close()
-        }
-      })
-    })
+    this.toggleOverlay()
   }
 
   public connect<T>(cfg: { url: string }, defaultState: T): Connection<T> {
@@ -643,13 +453,6 @@ export default class Core {
 
   ethers = ethers
   near = NearApi
-
-  public starterOverlay() {
-    return this.overlay({
-      url: browser.runtime.getURL('starter.html'),
-      title: 'Starter',
-    })
-  }
 
   public createShareLink(
     targetUrl: string,

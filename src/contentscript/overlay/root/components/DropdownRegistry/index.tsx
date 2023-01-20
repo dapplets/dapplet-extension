@@ -2,14 +2,16 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { isValidUrl } from '../../../../../popup/helpers'
+import { isValidUrl } from '../../../../../common/helpers'
 import useAbortController from '../../hooks/useAbortController'
 import { addSettingsValueDropdown } from '../../utils/addSettingsValueDropdown'
 
 import styles from './DropdownRegistry.module.scss'
 
-export interface DropdownRegistryProps
-  extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {}
+export type DropdownRegistryProps = DetailedHTMLProps<
+  HTMLAttributes<HTMLDivElement>,
+  HTMLDivElement
+>
 
 export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegistryProps) => {
   const { ...anotherProps } = props

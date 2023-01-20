@@ -16,10 +16,6 @@ export class GlobalConfig extends Base {
 
   registries: { url: string; isDev: boolean; isEnabled: boolean }[] = []
 
-  intro = {
-    popupDeveloperWelcome: true,
-  }
-
   devMode = false
 
   trustedUsers: { account: string }[] = []
@@ -35,8 +31,6 @@ export class GlobalConfig extends Base {
 
   userAgentName: string = null
 
-  autoBackup = true
-
   providerUrl: string = null
 
   xdaiProviderUrl: string = null
@@ -44,10 +38,6 @@ export class GlobalConfig extends Base {
   swarmGatewayUrl: string = null
 
   walletsUsage: { [moduleName: string]: { [chain: string]: string } } = {} // { 'extension': { 'ethereum': 'metamask', 'near': 'near' }}
-
-  identityContract: string = null
-
-  popupInOverlay = false
 
   hostnames: {
     [hostname: string]: SiteConfig
@@ -66,8 +56,6 @@ export class GlobalConfig extends Base {
   swarmPostageStampId: string = null
 
   ipfsGatewayUrl: string = null
-
-  siaPortalUrl: string = null
 
   ethereumNetworks: EthereumNetwrokConfig[] = []
 
