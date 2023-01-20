@@ -479,7 +479,6 @@ export default class GlobalConfigService {
   }
 
   async updateTargetStorages(storages: StorageTypes[]) {
-    console.log('storages', storages)
     const config = await this.get()
     config.targetStorages = storages
     await this.set(config)
@@ -492,6 +491,7 @@ export default class GlobalConfigService {
 
   async getTrustedUsers() {
     const config = await this.get()
+
     return config.trustedUsers
   }
 

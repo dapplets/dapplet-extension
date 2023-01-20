@@ -52,4 +52,31 @@
   direction: ltr;
 }
 
+.noDapplets {
+  text-align: center;
+  color: #797979;
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 16px;
+  height: calc(100% - 100px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.noDappletsLink {
+  cursor: pointer;
+  color: $Primary;
+
+  &:hover {
+    color: $PrimaryHover;
+  }
+
+  &:active {
+    color: $PrimaryPressed;
+  }
+}
+
 @import './adaptive.scss';

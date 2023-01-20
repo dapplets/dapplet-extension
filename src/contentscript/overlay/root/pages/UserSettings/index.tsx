@@ -65,7 +65,7 @@ export const UserSettings = ({
             title={mi.title}
           ></DappletTitle>
         </div>
-        {modules[0].isActionHandler ? (
+        {modules.length > 0 && modules[0] && modules[0].isActionHandler ? (
           <div className={styles.blockButtons}>
             <SquaredButton
               appearance="smail"

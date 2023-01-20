@@ -15,6 +15,7 @@ import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { TabLoader } from '../../components/TabLoader'
 import useAbortController from '../../hooks/useAbortController'
+import { openLink } from '../../utils/openLink'
 import styles from './Dapplets.module.scss'
 export type Module = ManifestDTO & {
   isLoading: boolean
@@ -262,6 +263,13 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     return _getFilteredDapplets(dapplets)
   }, [search, dapplets])
 
+  const transitionLink = (x: string) => {
+    return (event: React.MouseEvent) => {
+      event.preventDefault()
+      event.stopPropagation()
+      openLink(x)
+    }
+  }
   return (
     <>
       <div className={styles.wrapper}>
@@ -306,10 +314,34 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                   )
               })
             ) : (
-              <div>No available dapplets for current site.</div>
+              <div className={styles.noDapplets}>
+                {dropdownListValue === 'active' ? (
+                  `You don't have active dapplets`
+                ) : (
+                  <>
+                    No available dapplets for current site
+                    <span>
+                      There are dapplets for{' '}
+                      <span
+                        onClick={transitionLink('https://twitter.com/')}
+                        className={styles.noDappletsLink}
+                      >
+                        twitter
+                      </span>{' '}
+                      and{' '}
+                      <span
+                        onClick={transitionLink('https://www.youtube.com/')}
+                        className={styles.noDappletsLink}
+                      >
+                        youtube
+                      </span>
+                    </span>
+                  </>
+                )}
+              </div>
             )
           ) : (
-            <div>No connection with context webpage.</div>
+            <div className={styles.noDapplets}>No connection with context webpage.</div>
           )}
         </div>
       )}

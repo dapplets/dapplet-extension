@@ -22,9 +22,9 @@ const SYSTEM_TAB: ToolbarTab = {
   icon: DappletsLogo,
   menus: [
     {
-      id: 'connectedAccounts',
+      id: 'dapplets',
       icon: Account,
-      title: 'Connected Accounts',
+      title: 'Dapplets',
     },
   ],
 }
@@ -296,7 +296,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             }}
             className={cn(styles.TabList, { [styles.isOpenWallet]: p.isOpenWallet })}
           >
-            {getNewButtonTab('Connected Accounts')}
+            {getNewButtonTab('Dapplets')}
             {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget, isPinnedAnimateWidget)}
             {!isShowTabs &&
               document
@@ -343,7 +343,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                   )
                 })}
 
-              <ToggleOverlay
+              {/* <ToggleOverlay
                 // getNode={handleClickGetNodeOverlayToolbar}
                 onClick={() => {
                   if (
@@ -369,20 +369,22 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 className={cn(styles.toggleOverlay, {
                   // [styles.isOpenWallet]: p.isOpenWallet,
                 })}
-              />
+              /> */}
             </div>
             <div>
-              <button
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  onShowTabs()
-                }}
-                data-testid="show-tabs-button"
-                className={cn(styles.miniButton, {
-                  [styles.hideTabsBtn]: isShowTabs,
-                })}
-              ></button>
+              {noSystemTabs.length > 0 && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    onShowTabs()
+                  }}
+                  data-testid="show-tabs-button"
+                  className={cn(styles.miniButton, {
+                    [styles.hideTabsBtn]: isShowTabs,
+                  })}
+                ></button>
+              )}
             </div>
           </div>
         </div>
