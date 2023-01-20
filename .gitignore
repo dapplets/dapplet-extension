@@ -8,3 +8,4 @@ cypress/videos
 cypress/downloads
 cypress/reports
 .env
+.DS_Store
