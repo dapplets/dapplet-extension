@@ -108,7 +108,7 @@ export type StorageRef = {
   uris: string[]
 }
 
-export type TConnectedAccountsVerificationRequest = {
+export type TConnectedAccountsVerificationRequestInfo = {
   firstAccount: string
   secondAccount: string
   isUnlink: boolean
@@ -153,4 +153,10 @@ export interface IConnectedAccountsPair {
   statusMessage: string
   closeness: number
   pendingRequestId?: number
+}
+
+export type EthSignature = {
+  sig: string
+  v: number
+  mc: boolean
 }

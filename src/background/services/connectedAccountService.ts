@@ -8,10 +8,16 @@ import {
   IConnectedAccountsPair,
   IConnectedAccountUser,
   TConnectedAccount,
-  TConnectedAccountsVerificationRequest,
+  TConnectedAccountsVerificationRequestInfo,
 } from '../../common/types'
 import GlobalConfigService from './globalConfigService'
 import { WalletService } from './walletService'
+
+type EthSignature = {
+  sig: string
+  v: number
+  mc: boolean
+}
 
 export default class ConnectedAccountService {
   _contract: any
@@ -69,7 +75,7 @@ export default class ConnectedAccountService {
 
   public async getVerificationRequest(
     id: number
-  ): Promise<TConnectedAccountsVerificationRequest | null> {
+  ): Promise<TConnectedAccountsVerificationRequestInfo | null> {
     const contract = await this._getContract()
     return contract.getVerificationRequest({ id })
   }
@@ -153,7 +159,7 @@ export default class ConnectedAccountService {
       const pendingRequestsIds: number[] = await this.getPendingRequests()
       if (pendingRequestsIds && pendingRequestsIds.length > 0) {
         for (const pendingRequestId of pendingRequestsIds) {
-          const verificationRequest: TConnectedAccountsVerificationRequest =
+          const verificationRequest: TConnectedAccountsVerificationRequestInfo =
             await this.getVerificationRequest(pendingRequestId)
           const { firstAccount, secondAccount } = verificationRequest
           if (firstAccount === globalId) {
@@ -248,8 +254,9 @@ export default class ConnectedAccountService {
       isUnlink: boolean
       firstProofUrl?: string
       secondProofUrl?: string
+      signature?: EthSignature
     },
-    stake: number
+    stake?: number
   ): Promise<number> {
     const {
       firstAccountId,
@@ -259,6 +266,7 @@ export default class ConnectedAccountService {
       isUnlink,
       firstProofUrl,
       secondProofUrl,
+      signature,
     } = props
     const contract = await this._getContract()
     const res = await contract.requestVerification(
@@ -270,9 +278,10 @@ export default class ConnectedAccountService {
         isUnlink,
         firstProofUrl: firstProofUrl === null ? undefined : firstProofUrl,
         secondProofUrl: secondProofUrl === null ? undefined : secondProofUrl,
+        signature: signature === null ? undefined : signature,
       },
-      undefined,
-      stake
+      signature ? 100_000_000_000_000 : undefined,
+      stake === null ? undefined : stake
     )
     EventBus.emit('connected_accounts_changed')
     return res

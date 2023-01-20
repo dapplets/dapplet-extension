@@ -318,7 +318,7 @@ export default class GlobalConfigService {
       },
     ]
     config.myDapplets = []
-    config.connectedAccountsContractAddress = 'dev-1659683929908-36510272337320'
+    config.connectedAccountsContractAddress = 'dev-1674030565054-86753306727026'
     config.pinnedDappletActions = []
     return config
   }

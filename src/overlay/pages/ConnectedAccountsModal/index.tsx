@@ -1,24 +1,11 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import cn from 'classnames'
 import React, { useState, useEffect } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { resources } from '../../../common/resources'
-import { IConnectedAccountUser, TConnectedAccount } from '../../../common/types'
-import styles from './ConnectedAccountsModal.module.scss'
+import { IConnectedAccountUser, TConnectedAccount, EthSignature } from '../../../common/types'
 import { Modal } from './modal'
-
-const UserButton = ({ user }: { user: IConnectedAccountUser }) => {
-  return (
-    <div
-      className={cn(styles.account, {
-        [styles.nameUserActive]: user.accountActive,
-      })}
-    >
-      <img src={resources[user.origin].icon} className={styles.imgUser} />
-      <h4 className={styles.nameUser}>{user.name}</h4>
-    </div>
-  )
-}
+import { getSignature } from './helpers'
+import UserButton from './UserButton'
 
 interface IConnectedAccountsModalProps {
   data: {
@@ -111,24 +98,77 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     secondAccount: IConnectedAccountUser,
     isUnlink: boolean
   ) => {
+    setIsWaiting(true)
     const { getConnectedAccountsMinStakeAmount, requestConnectingAccountsVerification } =
       await initBGFunctions(browser)
     const minStakeAmount: number = await getConnectedAccountsMinStakeAmount()
     const firstProofUrl = resources[firstAccount.origin].proofUrl(firstAccount.name)
     const secondProofUrl = resources[secondAccount.origin].proofUrl(secondAccount.name)
-    const requestBody = {
-      firstAccountId: firstAccount.name,
-      firstOriginId: firstAccount.origin,
-      secondAccountId: secondAccount.name,
-      secondOriginId: secondAccount.origin,
-      firstProofUrl,
-      secondProofUrl,
-      isUnlink,
+
+    let requestBody: {
+      firstAccountId: string
+      firstOriginId: string
+      secondAccountId: string
+      secondOriginId: string
+      isUnlink: boolean
+      signature?: EthSignature
+      firstProofUrl?: string
+      secondProofUrl?: string
+    }
+    if (
+      !firstProofUrl &&
+      !secondProofUrl &&
+      resources[firstAccount.origin].type === 'wallet' &&
+      resources[secondAccount.origin].type === 'wallet'
+    ) {
+      let ethSignature: EthSignature
+      if (firstAccount.origin.indexOf('ethereum') === 0) {
+        ethSignature = await getSignature(
+          secondAccount.name,
+          firstAccount.name,
+          firstAccount.origin
+        )
+        requestBody = {
+          firstAccountId: firstAccount.name,
+          firstOriginId: 'ethereum',
+          secondAccountId: secondAccount.name,
+          secondOriginId: secondAccount.origin,
+          isUnlink,
+          signature: ethSignature,
+        }
+      } else if (secondAccount.origin.indexOf('ethereum') === 0) {
+        ethSignature = await getSignature(
+          firstAccount.name,
+          secondAccount.name,
+          secondAccount.origin
+        )
+        requestBody = {
+          firstAccountId: firstAccount.name,
+          firstOriginId: firstAccount.origin,
+          secondAccountId: secondAccount.name,
+          secondOriginId: 'ethereum',
+          isUnlink,
+          signature: ethSignature,
+        }
+      } else {
+        throw new Error(
+          'Wrong wallet types to connect: ' + firstAccount.origin + ', ' + secondAccount.origin
+        ) // ERROR!!!!
+      }
+    } else {
+      requestBody = {
+        firstAccountId: firstAccount.name,
+        firstOriginId: firstAccount.origin,
+        secondAccountId: secondAccount.name,
+        secondOriginId: secondAccount.origin,
+        firstProofUrl,
+        secondProofUrl,
+        isUnlink,
+      }
     }
 
     let requestId: number
     try {
-      setIsWaiting(true)
       requestId = await requestConnectingAccountsVerification(requestBody, minStakeAmount)
     } catch (err) {
       if (err.message !== 'User rejected the transaction.')
