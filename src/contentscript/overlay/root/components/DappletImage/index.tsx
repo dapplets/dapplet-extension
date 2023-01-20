@@ -2,9 +2,9 @@ import cn from 'classnames'
 import React, { FC, useEffect } from 'react'
 import NO_LOGO from '../../../../../common/resources/no-logo.png'
 import { StorageRef } from '../../../../../common/types'
+import useAbortController from '../../hooks/useAbortController'
 import { useStorageRef } from '../../utils/useStorageRef'
 import styles from './DappletImage.module.scss'
-import useAbortController from '../../hooks/useAbortController'
 
 export interface DappletImageProps {
   storageRef: StorageRef

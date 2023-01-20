@@ -1,5 +1,5 @@
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/null.scss";
+@import "../../assets/styles/color.variables";
+@import "../../assets/styles/null";
 
 .wrapper {
   position: relative;
@@ -17,6 +17,8 @@
 }
 
 .inputCheckbox {
+  cursor: pointer;
+
   position: relative;
 
   display: block;
@@ -24,11 +26,27 @@
   width: 32px;
   height: 20px;
 
-  cursor: pointer;
+  background: $MainGrey;
+  border-radius: 20px;
+
   transition: all 0.3s ease 0s;
 
-  border-radius: 20px;
-  background: $MainGrey;
+  &::before {
+    content: "";
+
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    transform: translateY(-50%);
+
+    width: 16px;
+    height: 16px;
+
+    background: $PureWhite;
+    border-radius: 50%;
+
+    transition: all 0.3s ease 0s;
+  }
 
   &:hover {
     &::before {
@@ -36,32 +54,15 @@
     }
   }
 
-  &::before {
-    position: absolute;
-    top: 50%;
-    left: 2px;
-
-    width: 16px;
-    height: 16px;
-
-    content: "";
-
-    transition: all 0.3s ease 0s;
-    transform: translateY(-50%);
-
-    border-radius: 50%;
-    background: $PureWhite;
-  }
-
   &.active {
     background: $Primary;
 
-    &:hover {
-      background: #f26680;
-    }
-
     &::before {
       transform: translateY(-50%) translateX(calc(100% - 4px));
+    }
+
+    &:hover {
+      background: #f26680;
     }
   }
 }

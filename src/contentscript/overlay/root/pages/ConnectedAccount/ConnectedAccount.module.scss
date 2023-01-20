@@ -1,10 +1,10 @@
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
+@import "../../assets/styles/null";
 
 .wrapper {
-  display: flex;
   overflow: hidden;
+  display: flex;
   flex-direction: column;
 
   width: 100%;
@@ -16,29 +16,27 @@
   position: relative;
 
   display: grid;
+  grid-template-columns: 362px 76px;
 
   padding-bottom: 7px;
-
-  text-transform: capitalize;
-
-  color: $MainGrey;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  grid-template-columns: 362px 76px;
+  color: $MainGrey;
+  text-transform: capitalize;
 
   &::after {
+    content: "";
+
     position: absolute;
     bottom: 0;
     left: 0;
 
     width: 100%;
     height: 1px;
-
-    content: "";
 
     background: $WebBG;
   }
@@ -59,18 +57,17 @@
 
 .mainBlock {
   display: grid;
+  grid-template-columns: 372px 35px 30px;
   align-items: center;
 
   width: 100%;
   margin: 6px 0;
   padding-left: 2px;
-  grid-template-columns: 372px 35px 30px;
 }
 
 .accountBlock {
   display: flex;
   align-items: center;
-
   width: 100%;
   padding: 0 10px 0 0;
 }
@@ -84,6 +81,8 @@
 }
 
 .account {
+  cursor: pointer;
+
   position: relative;
 
   display: flex;
@@ -94,11 +93,9 @@
   margin: 5px;
   padding: 2px 5px 2px 2px;
 
-  border-radius: 200px;
   background: $WebBG;
+  border-radius: 200px;
   box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-
-  cursor: pointer;
 }
 
 .imgUser {
@@ -106,23 +103,22 @@
 
   width: 42px;
   height: 42px;
-
   margin-right: 10px;
 
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
   border: 2px solid white;
   border-radius: 50%;
-  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
 }
 
 .nameUser {
-  color: $MainBlack;
+  padding-right: 14px;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  padding-right: 14px;
+  color: $MainBlack;
 }
 
 .nameUserActive {
@@ -161,6 +157,7 @@
 
   width: 23px;
   height: 23px;
+
   border-radius: 50%;
   box-shadow: 0 2px 2px rgb(0 0 0 / 10%);
 }
@@ -170,6 +167,8 @@
 }
 
 .accountStatus::before {
+  content: attr(data-title);
+
   position: absolute;
   z-index: 9998;
   top: 47%;
@@ -181,21 +180,18 @@
   height: auto;
   padding: 8px 10px;
 
-  content: attr(data-title);
-  text-align: center;
-
-  text-transform: capitalize;
-
-  color: $MainGrey;
-  border-radius: 10px 0 10px 10px;
-  background: $PureWhite;
-  box-shadow: 0 4px 4px rgb(0 0 0 / 10%);
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
+  color: $MainGrey;
+  text-align: center;
+  text-transform: capitalize;
+
+  background: $PureWhite;
+  border-radius: 10px 0 10px 10px;
+  box-shadow: 0 4px 4px rgb(0 0 0 / 10%);
 }
 
 .accountStatus:hover::before,
@@ -208,32 +204,27 @@
 
   padding-left: 5px;
 
-  text-transform: capitalize;
-
-  color: $MainBlack;
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
+  color: $MainBlack;
+  text-transform: capitalize;
 }
 
 .statusConnected {
   padding: 4px 5px;
-
   background: #5ec280;
 }
 
 .statusProcessing {
   padding: 6px 5px;
-
   background: #f5cf6c;
 }
 
 .statusError {
   padding: 4px 2px 7px;
-
   background: $Primary;
 }
 
@@ -241,7 +232,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 100%;
 }
 
@@ -251,28 +241,27 @@
   width: 27px;
   height: 27px;
 
-  border-radius: 50%;
-  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 4%));
-
   background-color: $PureWhite;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23919191'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 4%));
+  border-radius: 50%;
 
   &:hover {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23FFFFFF'/%3E%3C/svg%3E");
     background-color: $Primary;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23FFFFFF'/%3E%3C/svg%3E");
   }
 
   &:active {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23FFFFFF'/%3E%3C/svg%3E");
     background-color: $PrimaryPressed;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23FFFFFF'/%3E%3C/svg%3E");
   }
 
   &:disabled {
     cursor: default;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23919191'/%3E%3C/svg%3E");
     background-color: #e5e5e5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23919191'/%3E%3C/svg%3E");
   }
 }
 
@@ -281,26 +270,22 @@
   padding: 0 110px;
 
   h6 {
-    text-align: center;
-
-    color: $MainGrey;
-
     font-family: Roboto;
     font-size: 22px;
     font-weight: 700;
     font-style: normal;
     line-height: 26px;
+    color: $MainGrey;
+    text-align: center;
   }
 
   p {
-    text-align: center;
-
-    color: #797979;
-
     font-family: Roboto;
     font-size: 14px;
     font-weight: 500;
     font-style: normal;
     line-height: 16px;
+    color: #797979;
+    text-align: center;
   }
 }

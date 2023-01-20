@@ -1,30 +1,27 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
 
 .modalDefaultContent {
   display: flex;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
 
   width: 263px;
-
-  text-align: center;
-
-  color: $MainGrey;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
+  color: $MainGrey;
+  text-align: center;
 }
 
 .modalDefaultContentButton {
   display: flex;
   align-items: center;
-
   justify-content: center;
 
   width: 157px;
@@ -32,16 +29,14 @@
   margin-top: 10px;
   padding: 0 10px;
 
-  color: $PureWhite;
-  border-radius: 4px;
-
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
+  color: $PureWhite;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -54,26 +49,22 @@
 
 .modalContentOwnership {
   display: flex;
-
   width: 65%;
-
   text-align: center;
 }
 
 .messageModalDefault {
   justify-content: center;
-
   height: 70vh;
 
   p {
-    overflow-wrap: normal;
-
-    display: inline-block;
     overflow: hidden;
+    display: inline-block;
 
     width: 90%;
     height: 40vh;
 
     text-overflow: ellipsis;
+    overflow-wrap: normal;
   }
 }

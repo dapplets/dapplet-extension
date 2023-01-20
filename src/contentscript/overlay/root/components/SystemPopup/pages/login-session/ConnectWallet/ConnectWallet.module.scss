@@ -6,9 +6,11 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+
   margin-top: 12px;
   margin-bottom: 0;
   padding-left: 0;
+
   list-style: none;
 }
 
@@ -17,14 +19,17 @@
 }
 
 .item {
+  cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   width: 77px;
   height: 77px;
   margin-right: 5px;
   margin-bottom: 5px;
-  cursor: pointer;
+
   border-radius: 5px;
 
   img {
@@ -33,8 +38,8 @@
 }
 
 .item:hover {
-  filter: brightness(0.9);
   background: #00000010;
+  filter: brightness(0.9);
 }
 
 .FAQ {

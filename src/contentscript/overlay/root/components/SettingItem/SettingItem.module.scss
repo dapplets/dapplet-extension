@@ -1,18 +1,16 @@
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
+@import "../../assets/styles/null";
 
 .MainSettingsAuto {
   padding: 10px;
 
-  animation-name: openError;
-
-  animation-duration: 0.3s;
-
-  animation-timing-function: ease;
-
-  border-radius: 10px;
   background-color: $PureWhite;
+  border-radius: 10px;
+
+  animation-name: openError;
+  animation-duration: 0.3s;
+  animation-timing-function: ease;
   animation-fill-mode: forwards;
 
   &:not(:last-child) {
@@ -23,29 +21,27 @@
 .title {
   position: relative;
 
-  color: #2a2a2a;
-
   font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
+  color: #2a2a2a;
 }
 
 .additionalSettings {
   &::after {
+    content: "";
+
     position: absolute;
     top: 50%;
     right: -20px;
+    transform: translateY(-50%) rotate(180deg);
 
     width: 8px;
     height: 10px;
 
-    content: "";
-    transform: translateY(-50%) rotate(180deg);
-
     background-image: url("data:image/svg+xml,%3Csvg width='9' height='8' viewBox='0 0 9 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8.875 7.5L4.5 0.625L0.125 7.5L8.875 7.5Z' fill='%23747376'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-
     background-position: center;
     background-size: cover;
   }
@@ -59,7 +55,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 100%;
 }
 
@@ -67,8 +62,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-
   margin-top: 10px;
 }
 
-@import "./adaptive.scss"
+@import "./adaptive"

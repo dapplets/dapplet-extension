@@ -1,10 +1,10 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
 
 .wrapper {
-  display: flex;
   overflow: hidden;
+  display: flex;
   flex: 1 1 auto;
   flex-direction: column;
 
@@ -25,30 +25,23 @@
 }
 
 .mainInfoBlock {
-  display: flex;
-
+  direction: rtl;
   overflow: hidden;
-
   overflow-y: scroll;
-
+  display: flex;
   flex: 1 1 auto;
-  flex-direction: column;
-
   flex-direction: column;
 
   width: 100%;
   height: 80vh;
   padding: 15px 0 0 15px;
-  direction: rtl;
 
   &::-webkit-scrollbar {
-    width: 4px;
-
     cursor: pointer;
+    width: 4px;
   }
 
   &::-webkit-scrollbar-track {
-    background: rgb(244 244 244);
     background: rgb(244 244 244);
     background:
       linear-gradient(
@@ -63,8 +56,8 @@
     width: 4px;
     height: 2px;
 
-    border-radius: 2px;
     background: $Primary;
+    border-radius: 2px;
     box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
   }
 }
@@ -76,7 +69,6 @@
 .socialBlock {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
@@ -93,16 +85,15 @@
   margin: 0 0 10px;
   padding: 10px;
 
-  text-transform: uppercase;
-
-  color: #2a2a2a;
-  border-radius: 10px;
-  background: #fff;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
+  color: #2a2a2a;
+  text-transform: uppercase;
+
+  background: #fff;
+  border-radius: 10px;
 }
 
 .inputTitle {
@@ -111,16 +102,16 @@
   width: 100%;
   padding: 5px 13px;
 
-  color: $MainGrey;
-  border: 1px solid $StrokeColor;
-  border-radius: 5px;
-  background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
+  color: $MainGrey;
+
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
 }
 
 .inputNameDisabled {
@@ -129,25 +120,24 @@
 }
 
 .fullDescription {
+  resize: none;
+
   display: flex;
 
   width: 100%;
   min-height: 128px;
   padding: 5px 13px;
 
-  resize: none;
-
-  color: $MainGrey;
-  border: 1px solid $StrokeColor;
-  border-radius: 5px;
-
-  background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
+  color: $MainGrey;
+
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
 }
 
 .iconBlock {
@@ -158,9 +148,8 @@
   width: 100%;
   padding: 10px;
 
-  border-radius: 10px;
-
   background: $PureWhite;
+  border-radius: 10px;
 }
 
 .imgBlock {
@@ -175,9 +164,9 @@
   width: 42px;
   height: 42px;
 
+  background: #c4c4c4;
   border: 1px solid $WebBG;
   border-radius: 20px;
-  background: #c4c4c4;
   box-shadow: 0 0 4px rgb(0 0 0 / 25%);
 }
 
@@ -186,13 +175,12 @@
 
   margin: 0 0 0 14px;
 
-  color: #2a2a2a;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
+  color: #2a2a2a;
 }
 
 .buttonIcon {
@@ -208,15 +196,14 @@
   height: 20px;
   padding: 5px;
 
-  color: $ContentBlack;
-  border-radius: 10px;
-
-  background: $WebBG;
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
+  color: $ContentBlack;
+
+  background: $WebBG;
+  border-radius: 10px;
 
   &:hover {
     background: $StrokeColor;
@@ -240,6 +227,8 @@
 }
 
 .inputfile + label {
+  cursor: pointer;
+
   z-index: 4;
 
   display: block;
@@ -248,17 +237,14 @@
   height: 20px;
   padding: 5px;
 
-  cursor: pointer;
-
-  color: $ContentBlack;
-  border-radius: 10px;
-
-  background: $WebBG;
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
+  color: $ContentBlack;
+
+  background: $WebBG;
+  border-radius: 10px;
 
   &:hover {
     background: $StrokeColor;
@@ -279,15 +265,14 @@
   height: 20px;
   padding: 5px;
 
-  color: $ContentBlack;
-  border-radius: 10px;
-
-  background: $WebBG;
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
+  color: $ContentBlack;
+
+  background: $WebBG;
+  border-radius: 10px;
 
   &:hover {
     background: $StrokeColor;
@@ -301,14 +286,12 @@
 .ownershipBlock {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
 .inputOwnershipBlock {
   display: flex;
   align-items: center;
-
   width: 100%;
 }
 
@@ -318,19 +301,16 @@
   width: 100%;
   padding: 5px 13px;
 
-  color: $MainGrey;
-
-  border: 1px solid $StrokeColor;
-
-  border-radius: 5px;
-
-  background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
+  color: $MainGrey;
+
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
 }
 
 .ownershipButton {
@@ -343,18 +323,15 @@
   margin: 0 0 0 5px;
   padding: 0 10px;
 
-  text-transform: uppercase;
-
-  color: #fff;
-  border-radius: 4px;
-
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 400;
   line-height: 100%;
+  color: #fff;
+  text-transform: uppercase;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -370,14 +347,11 @@
   flex-direction: column;
 
   width: 100%;
-
   height: auto;
-
   padding: 10px;
 
-  border-radius: 10px;
-
   background: $PureWhite;
+  border-radius: 10px;
 }
 
 .blockAdmins {
@@ -400,31 +374,29 @@
   height: auto;
   padding: 5px 13px;
 
+  background: $AppBG;
   border: 1px solid $StrokeColor;
   border-radius: 5px;
-  background: $AppBG;
 }
 
 .authorTitle {
-  color: $MainGrey;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
+  color: $MainGrey;
 }
 
 .adminsTitle {
   display: inline-block;
-
-  color: #2a2a2a;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
+  color: #2a2a2a;
 }
 
 .adminsButton {
@@ -458,14 +430,14 @@
   margin: 20px 0 0;
 
   &::before {
+    content: "";
+
     position: absolute;
     top: -10px;
     left: 0;
 
     width: 100%;
     height: 2px;
-
-    content: "";
 
     background: $WebBG;
   }
@@ -478,23 +450,23 @@
 
   margin: 0 0 0 14.5px;
 
-  color: $MainGrey;
-  background: inherit;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
+  color: $MainGrey;
+
+  background: inherit;
 
   &::before {
+    content: "";
+
     position: absolute;
     top: 0;
     left: -14.5px;
 
     width: 11px;
     height: 14px;
-
-    content: "";
 
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%23919191'/%3E%3C/svg%3E");
   }
@@ -517,20 +489,20 @@
 }
 
 .push {
+  cursor: pointer;
+
   display: inline-block;
 
   margin: 0 auto;
   padding: 0 30.36px 0 0;
 
-  cursor: pointer;
-
-  color: $Primary;
-  background: inherit;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
+  color: $Primary;
+
+  background: inherit;
 
   &:hover {
     color: $PrimaryHover;
@@ -543,7 +515,6 @@
 
 .pushDisabled {
   cursor: default;
-
   color: $MainGrey;
 
   &:hover {
@@ -558,51 +529,44 @@
 .modalDefaultContent {
   width: 263px;
 
-  text-align: center;
-
-  color: $MainGrey;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
+  color: $MainGrey;
+  text-align: center;
 }
 
 .modalCreationContent {
   width: 214px;
 
-  text-align: center;
-
-  color: $MainGrey;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
+  color: $MainGrey;
+  text-align: center;
 }
 
 .modalCreationContentButton {
   display: flex;
   align-items: center;
-
   justify-content: center;
 
   min-width: 157px;
   height: 32px;
   padding: 0 10px;
 
-  color: $PureWhite;
-  border-radius: 4px;
-
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
+  color: $PureWhite;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -615,36 +579,31 @@
 
 .titleModalEndCreation {
   width: 307px;
-
   text-align: center;
 }
 
 .modalEndCreationContent {
   width: 263px;
 
-  text-align: center;
-
-  color: $MainGrey;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
+  color: $MainGrey;
+  text-align: center;
 }
 
 .modalEndCreationFooterBlock {
   display: flex;
-  align-items: center;
   flex-direction: column;
-
+  align-items: center;
   width: 100%;
 }
 
 .modalEndCreationFooterButton {
   display: flex;
   align-items: center;
-
   justify-content: center;
 
   min-width: 157px;
@@ -652,16 +611,14 @@
   margin-bottom: 10px;
   padding: 0 10px;
 
-  color: $PureWhite;
-  border-radius: 4px;
-
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
+  color: $PureWhite;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -675,13 +632,11 @@
 .modalEndCreationFooterLink {
   cursor: pointer;
 
-  color: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
+  color: $Primary;
 
   &:hover {
     color: $PrimaryHover;

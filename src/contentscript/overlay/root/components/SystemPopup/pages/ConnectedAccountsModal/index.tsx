@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { resources } from '../../../../../../../common/resources'
 import { IConnectedAccountUser, TConnectedAccount } from '../../../../../../../common/types'

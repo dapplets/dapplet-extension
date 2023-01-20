@@ -1,12 +1,11 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
 
 @media (min-width: 320px) and (max-width: 640px) {
   .label {
-    display: inline-block;
     overflow: hidden;
-
+    display: inline-block;
     width: 100%;
     max-width: 100%;
   }
@@ -17,7 +16,6 @@
 
   .labelLocalhost {
     flex: 1 1 auto;
-
     max-width: 65%;
   }
 }

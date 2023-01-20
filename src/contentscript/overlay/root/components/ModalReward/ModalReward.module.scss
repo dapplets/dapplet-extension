@@ -1,7 +1,7 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/animate.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
+@import "../../assets/styles/animate";
 
 .modal {
   position: fixed;
@@ -17,21 +17,20 @@
 
   width: 100%;
 
-  animation-name: appear;
-  animation-duration: 300ms;
-
   background: rgb(196 196 196 / 10%);
   backdrop-filter: blur(2px);
+
+  animation-name: appear;
+  animation-duration: 300ms;
 }
 
 .modalDialog {
   position: relative;
 
-  display: flex;
   overflow: hidden;
-
-  align-items: center;
+  display: flex;
   flex-direction: column;
+  align-items: center;
 
   width: 94%;
 
@@ -39,15 +38,14 @@
   height: 542px;
   padding: 22px 15px 16px;
 
+  background: $PureWhite;
+  border-radius: 10px;
+  box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
+
   animation-name: animatetop;
   animation-name: slide-in;
   animation-duration: 0.4s;
   animation-duration: 0.5s;
-
-  border-radius: 10px;
-
-  background: $PureWhite;
-  box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
 }
 
 .modalHeader {
@@ -55,6 +53,8 @@
 }
 
 .modalClose {
+  cursor: pointer;
+
   position: absolute;
   top: 15px;
   right: 14px;
@@ -64,13 +64,11 @@
   width: 20px;
   height: 20px;
 
-  cursor: pointer;
-
-  border-radius: 50%;
   background-color: $Primary;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 7 7' fill='none'%3E%3Cpath d='M5.74375 0.695312L3.5 2.93906L1.25625 0.695312L0.375 1.57656L2.61875 3.82031L0.375 6.06406L1.25625 6.94531L3.5 4.70156L5.74375 6.94531L6.625 6.06406L4.38125 3.82031L6.625 1.57656L5.74375 0.695312Z' fill='white'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
+  border-radius: 50%;
 
   &:hover {
     background-color: $PrimaryHover;
@@ -82,8 +80,8 @@
 }
 
 .modalBody {
-  display: flex;
   overflow: auto;
+  display: flex;
   flex: 1 1 auto;
 
   width: 100%;
@@ -99,13 +97,10 @@
 
   padding: 0 0 24px;
 
-  text-transform: uppercase;
-
-  color: #2a2a2a;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 700;
   line-height: 100%;
+  color: #2a2a2a;
+  text-transform: uppercase;
 }

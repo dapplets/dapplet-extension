@@ -3,10 +3,10 @@
   height: 100%;
   padding: 18px;
 
-  border-radius: 10px;
-  background-color: #fff;
-
   font-family: Roboto, sans-serif;
+
+  background-color: #fff;
+  border-radius: 10px;
 }
 
 .header {
@@ -19,14 +19,12 @@
   // max-width: 140px;
   margin: 0;
 
-  text-align: center;
-  text-transform: uppercase;
-
-  color: #2a2a2a;
-
   font-size: 10px;
   font-weight: 700;
   line-height: 100%;
+  color: #2a2a2a;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .step {
@@ -37,12 +35,10 @@
 
   min-width: 20px;
 
-  text-transform: uppercase;
-
-  color: #2a2a2a;
-
   font-size: 10px;
   line-height: 100%;
+  color: #2a2a2a;
+  text-transform: uppercase;
 
   span {
     margin: 0 9px;
@@ -67,6 +63,5 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   min-height: calc(100% - 20px);
 }

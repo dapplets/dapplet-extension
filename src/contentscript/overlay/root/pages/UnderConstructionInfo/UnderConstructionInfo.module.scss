@@ -1,16 +1,14 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
 
 .wrapper {
-  display: flex;
   overflow: hidden;
-
+  display: flex;
   flex: 1 1 auto;
   flex-direction: column;
 
   width: 100%;
-
   height: calc(100vh - 123px);
 }
 
@@ -27,32 +25,22 @@
 }
 
 .mainInfoBlock {
-  display: flex;
-
-  display: flex;
-
+  direction: rtl;
   overflow: hidden;
-
   overflow-y: scroll;
+  display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-
-  flex-direction: column;
-
-  width: 100%;
   width: 100%;
   height: 100%;
   padding: 15px 0 0 15px;
-  direction: rtl;
 
   &::-webkit-scrollbar {
-    width: 4px;
-
     cursor: pointer;
+    width: 4px;
   }
 
   &::-webkit-scrollbar-track {
-    background: rgb(244 244 244);
     background: rgb(244 244 244);
     background:
       linear-gradient(
@@ -67,8 +55,8 @@
     width: 4px;
     height: 2px;
 
-    border-radius: 2px;
     background: $Primary;
+    border-radius: 2px;
     box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
   }
 }
@@ -84,7 +72,6 @@
 .socialBlock {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
@@ -101,16 +88,15 @@
   margin: 0 0 10px;
   padding: 10px;
 
-  text-transform: uppercase;
-
-  color: #2a2a2a;
-  border-radius: 10px;
-  background: #fff;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
+  color: #2a2a2a;
+  text-transform: uppercase;
+
+  background: #fff;
+  border-radius: 10px;
 }
 
 .inputTitle {
@@ -119,38 +105,37 @@
   width: 100%;
   padding: 5px 13px;
 
-  color: $MainGrey;
-  border: 1px solid $StrokeColor;
-  border-radius: 5px;
-  background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
+  color: $MainGrey;
+
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
 }
 
 .fullDescription {
+  resize: none;
+
   display: flex;
 
   width: 100%;
   min-height: 128px;
   padding: 5px 13px;
 
-  resize: none;
-
-  color: $MainGrey;
-  border: 1px solid $StrokeColor;
-  border-radius: 5px;
-
-  background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
+  color: $MainGrey;
+
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
 }
 
 .iconBlock {
@@ -161,9 +146,8 @@
   width: 100%;
   padding: 10px;
 
-  border-radius: 10px;
-
   background: $PureWhite;
+  border-radius: 10px;
 }
 
 .imgBlock {
@@ -178,9 +162,9 @@
   width: 42px;
   height: 42px;
 
+  background: #c4c4c4;
   border: 1px solid $WebBG;
   border-radius: 20px;
-  background: #c4c4c4;
   box-shadow: 0 0 4px rgb(0 0 0 / 25%);
 }
 
@@ -189,13 +173,12 @@
 
   margin: 0 0 0 14px;
 
-  color: #2a2a2a;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
+  color: #2a2a2a;
 }
 
 .buttonIcon {
@@ -211,15 +194,14 @@
   height: 20px;
   padding: 5px;
 
-  color: $ContentBlack;
-  border-radius: 10px;
-
-  background: $WebBG;
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
+  color: $ContentBlack;
+
+  background: $WebBG;
+  border-radius: 10px;
 
   &:hover {
     background: $StrokeColor;
@@ -243,6 +225,8 @@
 }
 
 .inputfile + label {
+  cursor: pointer;
+
   z-index: 4;
 
   display: block;
@@ -251,17 +235,14 @@
   height: 20px;
   padding: 5px;
 
-  cursor: pointer;
-
-  color: $ContentBlack;
-  border-radius: 10px;
-
-  background: $WebBG;
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
+  color: $ContentBlack;
+
+  background: $WebBG;
+  border-radius: 10px;
 
   &:hover {
     background: $StrokeColor;
@@ -282,15 +263,14 @@
   height: 20px;
   padding: 5px;
 
-  color: $ContentBlack;
-  border-radius: 10px;
-
-  background: $WebBG;
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
+  color: $ContentBlack;
+
+  background: $WebBG;
+  border-radius: 10px;
 
   &:hover {
     background: $StrokeColor;
@@ -304,14 +284,12 @@
 .ownershipBlock {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
 .inputOwnershipBlock {
   display: flex;
   align-items: center;
-
   width: 100%;
 }
 
@@ -321,19 +299,16 @@
   width: 100%;
   padding: 5px 13px;
 
-  color: $MainGrey;
-
-  border: 1px solid $StrokeColor;
-
-  border-radius: 5px;
-
-  background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
+  color: $MainGrey;
+
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
 }
 
 .ownershipButton {
@@ -346,18 +321,15 @@
   margin: 0 0 0 5px;
   padding: 0 10px;
 
-  text-transform: uppercase;
-
-  color: #fff;
-  border-radius: 4px;
-
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 400;
   line-height: 100%;
+  color: #fff;
+  text-transform: uppercase;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -373,14 +345,11 @@
   flex-direction: column;
 
   width: 100%;
-
   height: auto;
-
   padding: 10px;
 
-  border-radius: 10px;
-
   background: $PureWhite;
+  border-radius: 10px;
 }
 
 .blockAdmins {
@@ -403,34 +372,33 @@
   height: auto;
   padding: 5px 13px;
 
+  background: $AppBG;
   border: 1px solid $StrokeColor;
   border-radius: 5px;
-  background: $AppBG;
 }
 
 .authorTitle {
   width: 100%;
-
-  color: $MainGrey;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
+  color: $MainGrey;
 }
 
 .adminsTitle {
   display: inline-block;
-
-  color: #2a2a2a;
-  background: inherit;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
+  color: #2a2a2a;
+
+  background: inherit;
 }
 
 .adminsButton {
@@ -456,7 +424,6 @@
 .parametersBlock {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
@@ -465,14 +432,11 @@
   flex-direction: column;
 
   width: 100%;
-
   height: auto;
-
   padding: 10px;
 
-  border-radius: 10px;
-
   background: $PureWhite;
+  border-radius: 10px;
 }
 
 .blockContextID {
@@ -496,9 +460,9 @@
   margin: 0 0 10px;
   padding: 5px 13px;
 
+  background: $AppBG;
   border: 1px solid $StrokeColor;
   border-radius: 5px;
-  background: $AppBG;
 
   &:last-child {
     margin: 0;
@@ -510,26 +474,25 @@
 
   width: 100%;
 
-  color: $MainGrey;
-  background: inherit;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
+  color: $MainGrey;
+
+  background: inherit;
 }
 
 .blockContextIDTitle {
   display: inline-block;
-
-  color: #2a2a2a;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
+  color: #2a2a2a;
 }
 
 .contextIDButton {
@@ -555,35 +518,32 @@
 
 .contextIDButtonDisabled {
   cursor: default;
-
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%23747376'/%3E%3C/svg%3E");
 
   &:hover {
     cursor: default;
-
     background-color: inherit;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%23747376'/%3E%3C/svg%3E");
   }
 
   &:active {
     cursor: default;
-
     background-color: inherit;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%23747376'/%3E%3C/svg%3E");
   }
 }
 
 .contextDelete {
+  cursor: pointer;
+
   display: block;
 
   width: 11.5px;
   height: 12.5px;
 
-  cursor: pointer;
-
-  border-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%23747376'/%3E%3C/svg%3E");
+  border-color: inherit;
 
   &:hover {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%23919191'/%3E%3C/svg%3E");
@@ -605,14 +565,14 @@
   margin: 20px 0 0;
 
   &::before {
+    content: "";
+
     position: absolute;
     top: -10px;
     left: 0;
 
     width: 100%;
     height: 2px;
-
-    content: "";
 
     background: $WebBG;
   }
@@ -625,23 +585,23 @@
 
   margin: 0 0 0 14.5px;
 
-  color: $MainGrey;
-  background: inherit;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
+  color: $MainGrey;
+
+  background: inherit;
 
   &::before {
+    content: "";
+
     position: absolute;
     top: 0;
     left: -14.5px;
 
     width: 11px;
     height: 14px;
-
-    content: "";
 
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%23919191'/%3E%3C/svg%3E");
   }
@@ -664,20 +624,20 @@
 }
 
 .push {
+  cursor: pointer;
+
   display: inline-block;
 
   margin: 0 auto;
   padding: 0 30.36px 0 0;
 
-  cursor: pointer;
-
-  color: $Primary;
-  background: inherit;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
+  color: $Primary;
+
+  background: inherit;
 
   &:hover {
     color: $PrimaryHover;
@@ -690,7 +650,6 @@
 
 .pushDisabled {
   cursor: default;
-
   color: $MainGrey;
 
   &:hover {
@@ -715,15 +674,15 @@
 }
 
 .authorDelete {
+  cursor: pointer;
+
   display: block;
 
   width: 11.5px;
   height: 12.5px;
 
-  cursor: pointer;
-
-  border-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%23747376'/%3E%3C/svg%3E");
+  border-color: inherit;
 
   &:hover {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%23919191'/%3E%3C/svg%3E");
@@ -744,18 +703,15 @@
   margin: 0 0 0 5px;
   padding: 0 10px;
 
-  text-transform: uppercase;
-
-  color: #fff;
-  border-radius: 4px;
-
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 400;
   line-height: 100%;
+  color: #fff;
+  text-transform: uppercase;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -768,9 +724,8 @@
 
 .addContextDisabled {
   color: $StrokeColor;
-
-  border: 1px solid $StrokeColor;
   background: $AppBG;
+  border: 1px solid $StrokeColor;
 
   &:hover {
     background: $AppBG;
@@ -783,33 +738,29 @@
 
 .wrapperContext {
   display: flex;
-
   width: 100%;
 }
 
 .modalDefaultContent {
   display: flex;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
 
   width: 263px;
-
-  text-align: center;
-
-  color: $MainGrey;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
+  color: $MainGrey;
+  text-align: center;
 }
 
 .modalDefaultContentButton {
   display: flex;
   align-items: center;
-
   justify-content: center;
 
   width: 157px;
@@ -817,16 +768,14 @@
   margin-top: 10px;
   padding: 0 10px;
 
-  color: $PureWhite;
-  border-radius: 4px;
-
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
+  color: $PureWhite;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -840,7 +789,6 @@
 .parametersBlock {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
@@ -849,14 +797,11 @@
   flex-direction: column;
 
   width: 100%;
-
   height: auto;
-
   padding: 10px;
 
-  border-radius: 10px;
-
   background: $PureWhite;
+  border-radius: 10px;
 }
 
 .blockContextID {
@@ -879,9 +824,9 @@
   height: auto;
   padding: 5px 13px;
 
+  background: $AppBG;
   border: 1px solid $StrokeColor;
   border-radius: 5px;
-  background: $AppBG;
 }
 
 .blockContextTitle {
@@ -889,14 +834,14 @@
 
   width: 100%;
 
-  color: $MainGrey;
-  background: inherit;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
+  color: $MainGrey;
+
+  background: inherit;
 }
 
 .blockContextIDTitle {
@@ -904,13 +849,12 @@
 
   width: 100%;
 
-  color: #2a2a2a;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
+  color: #2a2a2a;
 }
 
 .contextIDButton {
@@ -943,15 +887,15 @@
 }
 
 .contextDelete {
+  cursor: pointer;
+
   display: block;
 
   width: 11.5px;
   height: 12.5px;
 
-  cursor: pointer;
-
-  border-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%23747376'/%3E%3C/svg%3E");
+  border-color: inherit;
 
   &:hover {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%23919191'/%3E%3C/svg%3E");
@@ -964,20 +908,17 @@
 
 .contextIDButtonDisabled {
   cursor: default;
-
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='19' height='19' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%23747376'/%3E%3C/svg%3E");
 
   &:hover {
     cursor: default;
-
     background-color: inherit;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='19' height='19' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%23747376'/%3E%3C/svg%3E");
   }
 
   &:active {
     cursor: default;
-
     background-color: inherit;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='19' height='19' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%23747376'/%3E%3C/svg%3E");
   }
@@ -993,18 +934,15 @@
   margin: 0 0 0 5px;
   padding: 0 10px;
 
-  text-transform: uppercase;
-
-  color: #fff;
-  border-radius: 4px;
-
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 400;
   line-height: 100%;
+  color: #fff;
+  text-transform: uppercase;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -1017,9 +955,8 @@
 
 .addContextDisabled {
   color: $StrokeColor;
-
-  border: 1px solid $StrokeColor;
   background: $AppBG;
+  border: 1px solid $StrokeColor;
 
   &:hover {
     background: $AppBG;
@@ -1032,7 +969,6 @@
 
 .wrapperContext {
   display: flex;
-
   width: 100%;
 }
 
@@ -1050,21 +986,18 @@
 
 .adminsButtonDisabled {
   cursor: default;
-
   background-color: inherit;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='19' height='19' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%23747376'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
 
   &:hover {
     cursor: default;
-
     background-color: inherit;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='19' height='19' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%23747376'/%3E%3C/svg%3E");
   }
 
   &:active {
     cursor: default;
-
     background-color: inherit;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='19' height='19' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10 20C4.47967 19.994 0.00606237 15.5204 0 10V9.80002C0.109931 4.30455 4.63459 -0.0720257 10.1307 0.000898217C15.6268 0.0738221 20.0337 4.5689 19.9978 10.0654C19.9619 15.5618 15.4966 19.9989 10 20ZM5 9.00002V11H9V15H11V11H15V9.00002H11V5.00002H9V9.00002H5Z' fill='%23747376'/%3E%3C/svg%3E");
   }
@@ -1072,19 +1005,17 @@
 
 .messageModalDefault {
   justify-content: center;
-
   height: 70vh;
 
   p {
-    overflow-wrap: normal;
-
-    display: inline-block;
     overflow: hidden;
+    display: inline-block;
 
     width: 90%;
     height: 40vh;
 
     text-overflow: ellipsis;
+    overflow-wrap: normal;
   }
 }
 

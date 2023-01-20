@@ -1,4 +1,3 @@
-import { browser } from 'webextension-polyfill-ts'
 import { StorageTypes } from '../../common/constants'
 import * as EventBus from '../../common/global-event-bus'
 import {

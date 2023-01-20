@@ -1,6 +1,6 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
 
 .dappletsBlock {
   position: relative;
@@ -10,25 +10,21 @@
   width: 100%;
   height: auto;
   margin: 11.5px 0 0;
-
   padding: 12px 16px 7px;
 
-  border-radius: 10px;
-
   background: $WebBG;
+  border-radius: 10px;
 }
 
 .dappletsInfo {
   display: flex;
   flex-direction: column;
-
   width: 90%;
   padding: 0 0 0 12px;
 }
 
 .dappletsTags {
   display: flex;
-
   width: 65%;
 }
 
@@ -38,16 +34,14 @@
   margin: 0 3px 0 0;
   padding: 3px 3px 2px;
 
-  color: $WebBG;
-  border-radius: 4px;
-
-  background: #41bf55;
-
   font-family: Roboto, sans-serif;
   font-size: 10px;
-
   font-weight: 500;
   line-height: 100%;
+  color: $WebBG;
+
+  background: #41bf55;
+  border-radius: 4px;
 }
 
 .dappletsVersionUC {
@@ -56,16 +50,14 @@
   margin: 0 3px 0 0;
   padding: 3px 3px 2px;
 
-  color: $WebBG;
-  border-radius: 4px;
-
-  background: #f5cf6c;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 500;
   line-height: 100%;
+  color: $WebBG;
+
+  background: #f5cf6c;
+  border-radius: 4px;
 }
 
 .dappletsBranch {
@@ -73,16 +65,14 @@
 
   padding: 3px 3px 2px;
 
-  color: $WebBG;
-  border-radius: 4px;
-
-  background: #bf7d41;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 500;
   line-height: 100%;
+  color: $WebBG;
+
+  background: #bf7d41;
+  border-radius: 4px;
 }
 
 .dappletsNotDeploy {
@@ -90,22 +80,20 @@
 
   padding: 3px 3px 2px;
 
-  color: $WebBG;
-  border-radius: 4px;
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 500;
   line-height: 100%;
+  color: $WebBG;
+
+  background: $Primary;
+  border-radius: 4px;
 }
 
 .blockInfo {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   width: 100%;
 }
 
@@ -115,13 +103,11 @@
   width: 215px;
   padding: 5px 0;
 
-  color: $MainBlack;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 700;
   line-height: 100%;
+  color: $MainBlack;
 }
 
 .dappletsSettingsIsUnderConstructionBlock {
@@ -154,6 +140,8 @@
 }
 
 .dappletsSettingsIsTocenomics {
+  cursor: pointer;
+
   position: absolute;
   top: 0;
   right: -2px;
@@ -163,11 +151,8 @@
   width: 8px;
   height: 8px;
 
-  cursor: pointer;
-
-  border-radius: 50%;
-
   background: $Primary;
+  border-radius: 50%;
 }
 
 .dappletsReupload {
@@ -176,7 +161,6 @@
   right: 0;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
@@ -185,16 +169,14 @@
   margin: 0 16px 0 0;
   padding: 4px 10px;
 
-  color: $PureWhite;
-  border-radius: 10px;
-
-  background: $Primary;
-
   font-family: Roboto, sans-serif;
   font-size: 10px;
-
   font-weight: 500;
   line-height: 100%;
+  color: $PureWhite;
+
+  background: $Primary;
+  border-radius: 10px;
 
   &:hover {
     background: $PrimaryHover;
@@ -207,7 +189,6 @@
 
 .dappletDeploy {
   cursor: auto;
-
   color: $ContentBlack;
   background: $StrokeColor;
 
@@ -223,13 +204,11 @@
 .dappletsLabel {
   display: flex;
   flex-direction: column;
-
   padding: 5px 0 0;
 
   div {
     display: flex;
     justify-content: flex-start;
-
     width: 100%;
   }
 }
@@ -240,15 +219,12 @@
   width: 40%;
   padding: 0 0 5px;
 
-  text-align: start;
-
-  color: $Secondary;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 500;
   line-height: 100%;
+  color: $Secondary;
+  text-align: start;
 }
 
 .dappletsLabelSpanInfo {
@@ -257,6 +233,8 @@
 }
 
 [class*="dappletsIsLoadingDeploy"] {
+  cursor: default;
+
   position: absolute;
   top: 12px;
   right: 0;
@@ -269,8 +247,6 @@
   height: 20px;
   margin: 0 16px 0 0;
   padding: 4px 10px;
-
-  cursor: default;
 
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' id='eNePsFAH2aW1' viewBox='0 0 58 20' shape-rendering='geometricPrecision' text-rendering='geometricPrecision'%3E%3Cstyle%3E%3C!%5BCDATA%5B%23eNePsFAH2aW4_to %7Banimation: eNePsFAH2aW4_to__to 2000ms linear infinite normal forwards%7D@keyframes eNePsFAH2aW4_to__to %7B 0%25 %7Btransform: translate(14.01158px,9.29885px)%7D 50%25 %7Btransform: translate(46.01158px,9.29885px)%7D 100%25 %7Btransform: translate(46.01158px,9.29885px)%7D%7D %23eNePsFAH2aW4_ts %7Banimation: eNePsFAH2aW4_ts__ts 2000ms linear infinite normal forwards%7D@keyframes eNePsFAH2aW4_ts__ts %7B 0%25 %7Btransform: scale(0.304998,0.304998)%7D 10%25 %7Btransform: scale(1,1);animation-timing-function: cubic-bezier(0.42,0,1,1)%7D 40%25 %7Btransform: scale(1,1)%7D 50%25 %7Btransform: scale(0.304998,0.304998)%7D 100%25 %7Btransform: scale(0.304998,0.304998)%7D%7D %23eNePsFAH2aW4 %7Banimation: eNePsFAH2aW4_c_o 2000ms linear infinite normal forwards%7D@keyframes eNePsFAH2aW4_c_o %7B 0%25 %7Bopacity: 0%7D 10%25 %7Bopacity: 1%7D 40%25 %7Bopacity: 1%7D 50%25 %7Bopacity: 0%7D 100%25 %7Bopacity: 0%7D%7D %23eNePsFAH2aW5_to %7Banimation: eNePsFAH2aW5_to__to 2000ms linear infinite normal forwards%7D@keyframes eNePsFAH2aW5_to__to %7B 0%25 %7Btransform: translate(14.01158px,9.29885px)%7D 15%25 %7Btransform: translate(14.01158px,9.29885px)%7D 65%25 %7Btransform: translate(46.01158px,9.29885px)%7D 100%25 %7Btransform: translate(46.01158px,9.29885px)%7D%7D %23eNePsFAH2aW5_ts %7Banimation: eNePsFAH2aW5_ts__ts 2000ms linear infinite normal forwards%7D@keyframes eNePsFAH2aW5_ts__ts %7B 0%25 %7Btransform: scale(0.304998,0.304998)%7D 15%25 %7Btransform: scale(0.304998,0.304998)%7D 25%25 %7Btransform: scale(1,1);animation-timing-function: cubic-bezier(0.42,0,1,1)%7D 55%25 %7Btransform: scale(1,1)%7D 65%25 %7Btransform: scale(0.304998,0.304998)%7D 100%25 %7Btransform: scale(0.304998,0.304998)%7D%7D %23eNePsFAH2aW5 %7Banimation: eNePsFAH2aW5_c_o 2000ms linear infinite normal forwards%7D@keyframes eNePsFAH2aW5_c_o %7B 0%25 %7Bopacity: 0%7D 15%25 %7Bopacity: 0%7D 25%25 %7Bopacity: 1%7D 55%25 %7Bopacity: 1%7D 65%25 %7Bopacity: 0%7D 100%25 %7Bopacity: 0%7D%7D %23eNePsFAH2aW6_to %7Banimation: eNePsFAH2aW6_to__to 2000ms linear infinite normal forwards%7D@keyframes eNePsFAH2aW6_to__to %7B 0%25 %7Btransform: translate(14.01158px,9.29885px)%7D 30%25 %7Btransform: translate(14.01158px,9.29885px)%7D 80%25 %7Btransform: translate(46.01158px,9.29885px)%7D 100%25 %7Btransform: translate(46.01158px,9.29885px)%7D%7D %23eNePsFAH2aW6_ts %7Banimation: eNePsFAH2aW6_ts__ts 2000ms linear infinite normal forwards%7D@keyframes eNePsFAH2aW6_ts__ts %7B 0%25 %7Btransform: scale(0.304998,0.304998)%7D 30%25 %7Btransform: scale(0.304998,0.304998)%7D 40%25 %7Btransform: scale(1,1);animation-timing-function: cubic-bezier(0.42,0,1,1)%7D 70%25 %7Btransform: scale(1,1)%7D 80%25 %7Btransform: scale(0.304998,0.304998)%7D 100%25 %7Btransform: scale(0.304998,0.304998)%7D%7D %23eNePsFAH2aW6 %7Banimation: eNePsFAH2aW6_c_o 2000ms linear infinite normal forwards%7D@keyframes eNePsFAH2aW6_c_o %7B 0%25 %7Bopacity: 0%7D 30%25 %7Bopacity: 0%7D 40%25 %7Bopacity: 1%7D 70%25 %7Bopacity: 1%7D 80%25 %7Bopacity: 0%7D 100%25 %7Bopacity: 0%7D%7D%5D%5D%3E%3C/style%3E%3Cpath d='M0,10C0,4.47715,4.47715,0,10,0h38c5.5228,0,10,4.47715,10,10v0c0,5.5228-4.4772,10-10,10h-38C4.47715,20,0,15.5228,0,10v0Z' fill='%23D9304F'/%3E%3Cg id='eNePsFAH2aW4_to' transform='translate(14.01158,9.29885)'%3E%3Cg id='eNePsFAH2aW4_ts' transform='scale(0.304998,0.304998)'%3E%3Cellipse id='eNePsFAH2aW4' rx='3.68348' ry='3.79885' transform='translate(0,0)' opacity='0' fill='%23fff' stroke-width='0'/%3E%3C/g%3E%3C/g%3E%3Cg id='eNePsFAH2aW5_to' transform='translate(14.01158,9.29885)'%3E%3Cg id='eNePsFAH2aW5_ts' transform='scale(0.304998,0.304998)'%3E%3Cellipse id='eNePsFAH2aW5' rx='3.68348' ry='3.79885' transform='translate(0,0)' opacity='0' fill='%23fff' stroke-width='0'/%3E%3C/g%3E%3C/g%3E%3Cg id='eNePsFAH2aW6_to' transform='translate(14.01158,9.29885)'%3E%3Cg id='eNePsFAH2aW6_ts' transform='scale(0.304998,0.304998)'%3E%3Cellipse id='eNePsFAH2aW6' rx='3.68348' ry='3.79885' transform='translate(0,0)' opacity='0' fill='%23fff' stroke-width='0'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -288,20 +264,26 @@
 }
 
 .adminsListButton {
-  color: $Secondary;
   height: fit-content;
-  padding: 2px 5px;
   margin: -6px 12px 0 0;
+  padding: 2px 5px;
+
+  color: $Secondary;
+
   background: inherit;
+
   transition: all .2s ease-in-out;
 }
 
 .moreAdmins {
-  display: flex;
-  margin-bottom: 4px;
-  width: auto;
-  padding: 0 5px;
   cursor: pointer;
+
+  display: flex;
+
+  width: auto;
+  margin-bottom: 4px;
+  padding: 0 5px;
+
   transition: all .2s ease-in-out;
 }
 
@@ -315,5 +297,5 @@
   color: $SecondaryPressed;
 }
 
-@import "./modalWindowStyles.scss";
-@import "./adaptive.scss"
+@import "./modalWindowStyles";
+@import "./adaptive"

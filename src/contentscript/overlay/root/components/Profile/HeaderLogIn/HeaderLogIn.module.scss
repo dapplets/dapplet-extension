@@ -1,23 +1,22 @@
 /* stylelint-disable order/properties-order */
-@import "../../../assets/styles/null.scss";
-@import "../../../assets/styles/fonts.scss";
-@import "../../../assets/styles/color.variables.scss";
-@import "../../../assets/styles/animate.scss";
+@import "../../../assets/styles/null";
+@import "../../../assets/styles/fonts";
+@import "../../../assets/styles/color.variables";
+@import "../../../assets/styles/animate";
 
 .wrapper {
   display: inline-block;
 
   font-family: Roboto, sans-serif;
   margin: 0 4px;
-  &.mini {
 
+  &.mini {
     width: 39px;
     height: 39px;
   }
 }
 
 .avatar {
-
   width: 35px;
   height: 35px;
   min-width: 35px;

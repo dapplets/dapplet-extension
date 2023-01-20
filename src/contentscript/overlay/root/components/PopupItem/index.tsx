@@ -1,6 +1,6 @@
 import * as React from 'react'
-import PopupLoader from '../SystemPopup/assests/loader.svg'
 import { Overlay } from '../../overlay'
+import PopupLoader from '../SystemPopup/assests/loader.svg'
 import styles from './PopupItem.module.scss'
 
 interface P {

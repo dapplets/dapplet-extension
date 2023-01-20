@@ -1,38 +1,32 @@
 .title {
   margin: 0;
 
-  text-align: center;
-
-  color: #2a2a2a;
-
   font-size: 22px;
   line-height: 26px;
+  color: #2a2a2a;
+  text-align: center;
 }
 
 .subtitle {
   margin: 0;
   margin-top: 5px;
 
-  text-align: center;
-
-  color: #919191;
-
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
+  color: #919191;
+  text-align: center;
 }
 
 .link {
   display: block;
 
-  text-align: center;
-  text-decoration: none;
-
-  color: #d9304f;
-
   font-size: 14px;
   font-weight: 600;
   line-height: 16px;
+  color: #d9304f;
+  text-align: center;
+  text-decoration: none;
 }
 
 .link:hover {
@@ -44,14 +38,14 @@
 }
 
 .createSession {
+  cursor: pointer;
+
   margin-top: 20px;
   margin-right: auto;
   margin-left: auto;
 
-  cursor: pointer;
-
-  border: none;
   background-color: transparent;
+  border: none;
 }
 
 .wrapper {
@@ -73,15 +67,15 @@
   }
 
   &::-webkit-scrollbar-track {
-    border-left: 5px solid rgb(0 0 0 / 0%);
     background: #f5f5f5;
     background-clip: padding-box;
+    border-left: 5px solid rgb(0 0 0 / 0%);
   }
 
   &::-webkit-scrollbar-thumb {
-    border-left: 5px solid rgb(0 0 0 / 0%);
     background: #d9304f;
     background-clip: padding-box;
+    border-left: 5px solid rgb(0 0 0 / 0%);
   }
 
   &::-webkit-scrollbar-thumb:hover {

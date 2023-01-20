@@ -1,11 +1,9 @@
 .close {
+  cursor: pointer;
+
   width: 20px;
   height: 20px;
   padding: 0;
-
-  cursor: pointer;
-
-  border: none;
 
   background-color: transparent;
 
@@ -14,6 +12,7 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
+  border: none;
 }
 
 .close:hover {

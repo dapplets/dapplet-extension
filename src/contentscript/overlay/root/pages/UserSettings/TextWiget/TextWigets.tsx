@@ -1,5 +1,4 @@
-import { getDisplayLabel } from '@rjsf/utils'
-import { rangeSpec } from '@rjsf/utils'
+import { getDisplayLabel, rangeSpec } from '@rjsf/utils'
 
 import cn from 'classnames'
 import React, { useEffect } from 'react'

@@ -1,8 +1,10 @@
 {
-  "extends": ["stylelint-config-standard-scss"],
-  "plugins": ["stylelint-scss", "stylelint-order"],
+  "extends": [
+    "stylelint-config-standard-scss",
+    "stylelint-config-prettier-scss",
+    "stylelint-config-clean-order"
+  ],
   "rules": {
     "selector-class-pattern": null
-  },
-  "ignoreFiles": []
+  }
 }

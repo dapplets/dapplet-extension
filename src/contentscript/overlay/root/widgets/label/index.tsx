@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import React, { ButtonHTMLAttributes, DetailedHTMLProps, FC, FunctionComponent } from 'react'
+import React, { FC } from 'react'
 import styles from './WidgetLabel.module.scss'
 
 export interface LabelProps {

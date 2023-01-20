@@ -1,20 +1,24 @@
-@import '../../assets/styles/color.variables.scss';
+@import '../../assets/styles/color.variables';
+
 .widgetLabel {
     display: flex;
+
     width: 30px;
     height: 30px;
-    background: #f5f5f5;
-    border-radius: 6px;
     margin: 0 auto;
     margin: 5px 0;
+
+    background: #f5f5f5;
+    border-radius: 6px;
 }
 
 .widgetLabelImg {
     display: block;
     width: 18px;
     height: 18px;
-    margin: auto auto;
+    margin: auto;
 }
+
 .widgetHidden{
     display: none;
 }

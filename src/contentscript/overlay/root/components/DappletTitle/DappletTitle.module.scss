@@ -1,21 +1,19 @@
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
+@import "../../assets/styles/null";
 
 .BlockTitleCard {
   display: flex;
   align-items: center;
-
   width: 193px;
 
   .titleCard {
-    color: $MainBlack;
-
     font-family: Roboto, sans-serif;
     font-size: 14px;
     font-weight: 700;
     font-style: normal;
     line-height: 100%;
+    color: $MainBlack;
 
     .false {
       margin: 0 0 0 -3%;
@@ -37,4 +35,4 @@
   }
 }
 
-@import "./adaptive.scss"
+@import "./adaptive"

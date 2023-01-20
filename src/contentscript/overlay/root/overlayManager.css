@@ -3,11 +3,18 @@
   z-index: 2147483647;
   top: 0;
   left: 100%;
+
+  /* -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none; */
+
+  /* user-select: none; */
+  direction: ltr;
+
   height: 100%;
   margin: 0;
   padding: 0;
-  border: 0;
-  background: #fff;
+
   font-family:
     -apple-system,
     BlinkMacSystemFont,
@@ -23,12 +30,9 @@
   font-size: 14px;
   line-height: 20px;
 
-  /* -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none; */
+  background: #fff;
+  border: 0;
 
-  /* user-select: none; */
-  direction: ltr;
   -webkit-tap-highlight-color: rgb(255 255 255 / 0%);
 }
 
@@ -42,9 +46,9 @@
 
 @media screen and (min-width: 0) {
   .dapplets-overlay-frame {
+    transform: translateX(-100%);
     width: 470px !important;
     transition: transform 0.15s cubic-bezier(0.55, 0, 0.2, 0.8);
-    transform: translateX(-100%);
   }
 }
 
@@ -62,9 +66,9 @@
 
 @media screen and (min-width: 0) and (max-width: 640px) {
   .dapplets-overlay-frame {
+    transform: translateX(-100%);
     width: 100% !important;
     transition: transform 0.15s cubic-bezier(0.55, 0, 0.2, 0.8);
-    transform: translateX(-100%);
 
     /* width: 640px !important; */
   }

@@ -3,8 +3,10 @@
   z-index: 5;
   top: 0;
   left: 0;
+
   width: 100%;
   height: 100%;
+
   background: rgb(0 0 0 / 10%);
   backdrop-filter: blur(4px);
 }
@@ -13,7 +15,9 @@
   position: absolute;
   top: calc(50% - 271px);
   left: calc(50% - 187.5px);
+
   width: 375px;
   height: 542px;
+
   border: none;
 }

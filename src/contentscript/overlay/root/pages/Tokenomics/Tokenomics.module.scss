@@ -1,16 +1,14 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
 
 .wrapper {
-  display: flex;
   overflow: hidden;
-
+  display: flex;
   flex: 1 1 auto;
   flex-direction: column;
 
   width: 100%;
-
   height: calc(100vh - 123px);
 }
 
@@ -27,11 +25,11 @@
 }
 
 .blockMessage {
-  display: flex;
   overflow: hidden;
-  align-items: center;
+  display: flex;
   flex: 1 1 auto;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
 
   width: 100%;
@@ -39,28 +37,25 @@
 }
 
 .applyButtonDisabled {
+  cursor: default;
+
   display: flex;
   align-items: center;
-
   justify-content: center;
 
   width: 73px;
   height: 32px;
   padding: 0 10px;
 
-  cursor: default;
-
-  color: $StrokeColor;
-  border: 1px solid $StrokeColor;
-
-  border-radius: 4px;
-  background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
+  color: $StrokeColor;
+
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  border-radius: 4px;
 
   &:hover {
     background: $AppBG;
@@ -72,28 +67,25 @@
 }
 
 .createTokenomics {
+  cursor: pointer;
+
   display: flex;
   align-items: center;
-
   justify-content: center;
 
   width: 73px;
   height: 32px;
   padding: 0 10px;
 
-  cursor: pointer;
-  text-transform: uppercase;
-
-  color: $PureWhite;
-  border-radius: 4px;
-
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
+  color: $PureWhite;
+  text-transform: uppercase;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -105,12 +97,11 @@
 }
 
 .blockTokenParameters {
-  display: flex;
   overflow: hidden;
-
-  align-items: center;
+  display: flex;
   flex: 1 1 auto;
   flex-direction: column;
+  align-items: center;
 
   width: 100%;
   height: 100%;
@@ -123,7 +114,6 @@
 .blockTokenInfo {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
@@ -132,6 +122,8 @@
 }
 
 .tokenTitleInfo {
+  cursor: pointer;
+
   position: absolute;
   top: 11px;
   left: 95px;
@@ -144,18 +136,14 @@
   height: 14px;
   padding: 2px;
 
-  cursor: pointer;
-
-  color: $PureWhite;
-  border-radius: 50%;
-
-  background: $MainGrey;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 500;
   line-height: 10px;
+  color: $PureWhite;
+
+  background: $MainGrey;
+  border-radius: 50%;
 
   &:hover {
     background: $StrokeColor;
@@ -179,6 +167,9 @@
 }
 
 .support::before {
+  cursor: default;
+  content: attr(data-title);
+
   position: absolute;
   z-index: 9998;
   top: 0;
@@ -192,28 +183,23 @@
   margin: -15px 0 0 10px;
   padding: 5px;
 
-  content: attr(data-title);
-  cursor: default;
-  text-align: left;
-
-  opacity: 0.9;
-
-  color: #2a2a2a;
-  border: 1px solid #e3e3e3;
-  border-radius: 10px 10px 10px 0;
-  background: #fff;
-  box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
-
   font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
+  color: #2a2a2a;
+  text-align: left;
+
+  opacity: 0.9;
+  background: #fff;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px 10px 10px 0;
+  box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
 }
 
 .support:hover::before,
 .support:focus::before {
   display: flex;
-
   align-items: center;
 }
 
@@ -223,16 +209,16 @@
   width: 100%;
   padding: 5px 13px;
 
-  color: $MainGrey;
-  border: 1px solid $StrokeColor;
-  border-radius: 5px;
-  background: $AppBG;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
+  color: $MainGrey;
+
+  background: $AppBG;
+  border: 1px solid $StrokeColor;
+  border-radius: 5px;
 }
 
 .inputTokenTickerInvalid {
@@ -252,14 +238,14 @@
   margin: 20px 0 0;
 
   &::before {
+    content: "";
+
     position: absolute;
     top: -10px;
     left: 0;
 
     width: 100%;
     height: 2px;
-
-    content: "";
 
     background: $WebBG;
   }
@@ -272,23 +258,23 @@
 
   margin: 0 0 0 14.5px;
 
-  color: $MainGrey;
-  background: inherit;
-
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
+  color: $MainGrey;
+
+  background: inherit;
 
   &::before {
+    content: "";
+
     position: absolute;
     top: 0;
     left: -14.5px;
 
     width: 11px;
     height: 14px;
-
-    content: "";
 
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%23919191'/%3E%3C/svg%3E");
   }
@@ -311,25 +297,22 @@
 }
 
 .finalWarning {
-  color: $MainGrey;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 500;
   line-height: 16px;
+  color: $MainGrey;
 }
 
 .footerContentModal {
   display: flex;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
 }
 
 .footerContentModalButton {
   display: flex;
   align-items: center;
-
   justify-content: center;
 
   width: 140px;
@@ -337,16 +320,14 @@
   margin: 10px 0 9px;
   padding: 0 10px;
 
-  color: $PureWhite;
-  border-radius: 4px;
-
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
+  color: $PureWhite;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -358,13 +339,11 @@
 }
 
 .footerContentModalLink {
-  color: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
+  color: $Primary;
 
 
   &:hover {

@@ -1,14 +1,14 @@
 .button {
-  padding: 5px 10px;
-
   cursor: pointer;
 
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  background-color: #d9304f;
+  padding: 5px 10px;
 
   font-size: 14px;
+  color: #fff;
+
+  background-color: #d9304f;
+  border: none;
+  border-radius: 5px;
 }
 
 .button:hover {
@@ -20,18 +20,17 @@
 }
 
 .basic {
-  padding: 5px 10px;
-
   cursor: pointer;
 
-  color: #d9304f;
-  border: none;
-  border-radius: 5px;
-  background-color: #0000;
+  padding: 5px 10px;
 
   font-size: 14px;
-
   font-weight: 500;
+  color: #d9304f;
+
+  background-color: #0000;
+  border: none;
+  border-radius: 5px;
 }
 
 .basic:hover {

@@ -6,11 +6,9 @@ import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import React from 'react'
 import {
-  BrowserRouter,
   MemoryRouter,
   Navigate,
   NavigateFunction,
-  Routes,
   useLocation,
   useNavigate,
 } from 'react-router-dom'

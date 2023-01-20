@@ -1,5 +1,5 @@
-@import '../../assets/styles/color.variables.scss';
-@import '../../assets/styles/null.scss';
+@import '../../assets/styles/color.variables';
+@import '../../assets/styles/null';
 
 .wrapper {
   display: flex;
@@ -8,26 +8,24 @@
 
   // margin-top: 20px;
   margin-bottom: 5px;
+
   // display: none;
 }
 
 .dappletsBlock {
+  direction: rtl;
   overflow-y: scroll;
-
   width: 100%;
 
   // height: calc(100vh - 58px);
   height: calc(100vh - 97px);
-  direction: rtl;
 
   &::-webkit-scrollbar {
-    width: 4px;
-
     cursor: pointer;
+    width: 4px;
   }
 
   &::-webkit-scrollbar-track {
-    background: rgb(244 244 244);
     background: rgb(244 244 244);
     background: linear-gradient(
       90deg,
@@ -40,11 +38,11 @@
   &::-webkit-scrollbar-thumb {
     width: 4px;
     height: 2px;
-
-    border-radius: 2px;
-    background: $Primary;
-    box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
     margin-bottom: 15px;
+
+    background: $Primary;
+    border-radius: 2px;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
   }
 }
 
@@ -53,17 +51,19 @@
 }
 
 .noDapplets {
-  text-align: center;
-  color: #797979;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  height: calc(100% - 100px);
+
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
-  height: calc(100% - 100px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  color: #797979;
+  text-align: center;
 }
 
 .noDappletsLink {
@@ -79,4 +79,4 @@
   }
 }
 
-@import './adaptive.scss';
+@import './adaptive';
