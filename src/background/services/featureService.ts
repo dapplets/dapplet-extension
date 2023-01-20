@@ -52,7 +52,7 @@ export default class FeatureService {
    */
   async getFeaturesByHostnames(
     contextIds: string[],
-    filter: 'all' | 'public' | 'trusted' | 'local' | null
+    filter: 'all' | 'public' | 'trusted' | 'local' | 'active' | null
   ): Promise<ManifestDTO[]> {
     if (!filter) filter = 'all'
 
@@ -71,6 +71,12 @@ export default class FeatureService {
     if (filter === 'all' || filter === 'public') {
       const walletDescriptors = await this._walletService.getWalletDescriptors()
       const accounts = walletDescriptors.filter((x) => x.connected).map((x) => x.account)
+      listingAccounts.push(...accounts)
+    }
+
+    if (filter === 'active') {
+      const trustedUsers = await this._globalConfigService.getTrustedUsers()
+      const accounts = trustedUsers.map((u) => u.account)
       listingAccounts.push(...accounts)
     }
 
@@ -123,7 +129,11 @@ export default class FeatureService {
             dto.hostnames = mergeDedupe([dto.hostnames, [contextId]])
             dto.available = true
             dto.isMyDapplet = false
-            dtos.push(dto)
+            if (filter === 'active') {
+              dto.isActive && dtos.push(dto)
+            } else {
+              dtos.push(dto)
+            }
           } else {
             // ToDo: move this merging logic to aggragator
             if (!dto.hostnames) dto.hostnames = []
@@ -788,6 +798,12 @@ export default class FeatureService {
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     const owner = await registry.getOwnership(moduleName)
     return owner
+  }
+
+  public async getModuleNftUrl(registryUri: string, moduleName: string) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    const url = await registry.getModuleNftUrl(moduleName)
+    return url
   }
 
   public async getVersionInfo(

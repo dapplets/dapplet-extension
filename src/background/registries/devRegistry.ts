@@ -218,6 +218,10 @@ export class DevRegistry implements Registry {
     throw new Error('Not implemented')
   }
 
+  public async getModuleNftUrl(moduleName: string): Promise<string> {
+    throw new Error('Not implemented')
+  }
+
   private async _loadModuleAndVersionInfo(
     manifestUri: string,
     dm: DevManifest

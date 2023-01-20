@@ -66,7 +66,7 @@ function register(portOrWindow: Runtime.Port | Window) {
     message.from_env = environment
 
     message.from = currentContext // ToDo: change sender in relayed messages
-    // console.log(message)
+
     connections.filter((x) => x !== _conn).forEach((p) => p.postMessage(message)) // Notify all conections except itself
     callbacks.get(message.event)?.forEach((cb) => cb(message.data))
   }

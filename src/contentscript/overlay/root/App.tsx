@@ -280,7 +280,10 @@ class _App extends React.Component<P, S> {
 
   handleTabMenuClick = async (tabs: ToolbarTab, menu?: ToolbarTabMenu) => {
     const menuId = menu?.id ?? tabs.menus[0].id
-    this.props.navigate!(`/${tabs.id}/${menuId}`)
+    !document
+      .querySelector('#dapplets-overlay-manager')
+      .classList.contains('dapplets-overlay-collapsed') &&
+      this.props.navigate!(`/${tabs.id}/${menuId}`)
   }
 
   handleOpenSearchClick = () => {
@@ -439,7 +442,7 @@ class _App extends React.Component<P, S> {
   }
 
   getNewButtonTab = (parametersFilter: string) => {
-    let clone = Object.assign({}, SYSTEM_TAB)
+    const clone = Object.assign({}, SYSTEM_TAB)
     const newSystemTab = [clone]
     const newSet = newSystemTab.map((tab) => {
       const NewTabs = tab
@@ -454,6 +457,7 @@ class _App extends React.Component<P, S> {
           key={NewTabs.id}
           {...newTab}
           isActive={activeTabId === NewTabs.id}
+          navigate={this.props.navigate!}
           activeTabMenuId={activeTabMenuId}
           onCloseClick={() => this.handleCloseTabClick(NewTabs)}
           onMenuClick={(menu) => this.handleTabMenuClick(NewTabs, menu)}
@@ -502,12 +506,14 @@ class _App extends React.Component<P, S> {
             onToggleClick={this.props.onToggle}
             activeTabId={activeTabId}
             activeTabMenuId={activeTabMenuId}
-            setOpenWallet={this.closeOpenWallet}
+            setOpenWallet={this.setOpenWallet}
             isOpenWallet={s.isOpenWallet}
             navigate={this.props.navigate!}
             pathname={pathname}
             module={s.module}
             overlays={overlays}
+            selectedWallet={this.state.selectedWallet}
+            connectedDescriptors={this.state.connectedDescriptors}
           />
 
           <div className={styles.inner}>

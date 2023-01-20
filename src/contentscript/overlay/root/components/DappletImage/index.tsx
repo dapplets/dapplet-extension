@@ -9,15 +9,14 @@ import useAbortController from '../../hooks/useAbortController'
 export interface DappletImageProps {
   storageRef: StorageRef
   isFavourites: boolean
-  className?:string
+  className?: string
 }
 
 export const DappletImage: FC<DappletImageProps> = (props: DappletImageProps) => {
-  const { storageRef, isFavourites,className } = props
+  const { storageRef, isFavourites, className } = props
   const { img } = useStorageRef(storageRef)
-  const abortController = useAbortController();
-  useEffect(() => {
-  }, [abortController.signal.aborted,img])
+  const abortController = useAbortController()
+  useEffect(() => {}, [abortController.signal.aborted, img])
   return (
     <div className={cn(styles.icon)}>
       <div className={cn(styles.img, className)}>

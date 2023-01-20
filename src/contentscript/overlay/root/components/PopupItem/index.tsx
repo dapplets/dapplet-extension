@@ -33,7 +33,7 @@ export class PopupItem extends React.Component<P, S> {
     const s = this.state
 
     return (
-      <div ref={this.ref} className={styles['dapplets-popup-container']}>
+      <div data-testid="popup-item" ref={this.ref} className={styles['dapplets-popup-container']}>
         {s.isLoading && (
           <div className={styles['popup-loader-container']}>
             <div>

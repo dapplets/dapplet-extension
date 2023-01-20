@@ -8,6 +8,7 @@ import {
   mergeDedupe,
   typeOfUri,
   UriTypes,
+  networkName,
 } from '../../common/helpers'
 import { StorageRef } from '../../common/types'
 import ModuleInfo from '../models/moduleInfo'
@@ -383,6 +384,18 @@ export class EthRegistry implements Registry {
       ethMi.manifest,
       ethMi.icon
     )
+  }
+
+  public async getModuleNftUrl(moduleName: string): Promise<string> {
+    const contract = await this._contractPromise
+    const [moduleIdx, nftAddress, chainId] = await Promise.all([
+      contract.getModuleIndex(moduleName),
+      contract.getNftContractAddress(),
+      this._signer.getChainId(),
+    ])
+    const network = networkName(chainId)
+    const nftUrl = `https://testnets.opensea.io/assets/${network}/${nftAddress}/${moduleIdx}`
+    return nftUrl
   }
 
   private _convertFromEthMi(m: EthModuleInfo): ModuleInfo {

@@ -3,13 +3,11 @@
  * https://github.com/rjsf-team/react-jsonschema-form/blob/3537039e17c76330ec06376c19670c04eafe38db/packages/semantic-ui/src/util.js
  */
 
-import { utils } from '@rjsf/core'
-import { rangeSpec } from '@rjsf/core/lib/utils'
+import { getDisplayLabel, rangeSpec } from '@rjsf/utils'
 import React from 'react'
 import { Form } from 'semantic-ui-react'
 import { getSemanticProps } from './utils'
 
-const { getDisplayLabel } = utils
 function TextWidget(props) {
   const {
     id,

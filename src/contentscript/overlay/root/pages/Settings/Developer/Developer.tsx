@@ -178,6 +178,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
               className={cn(styles.input, {
                 [styles.errorInput]: !!registryInputError,
               })}
+              data-testid="input-add-localhost"
               value={registryInput}
               onChange={(e) => {
                 setRegistryInput(e.target.value)
@@ -192,6 +193,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
               <div className={styles.loadAdd}></div>
             ) : (
               <button
+                data-testid="button-add-localhost"
                 disabled={
                   isLoadButton ||
                   !(isValidUrl(registryInput) && !registries.find((r) => r.url === registryInput))

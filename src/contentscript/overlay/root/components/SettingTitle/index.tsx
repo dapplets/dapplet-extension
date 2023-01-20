@@ -17,7 +17,11 @@ export const SettingTitle = (props: SettingTitleProps): ReactElement => {
 
   return (
     <div className={cn(styles.wrapper, className)} onClick={onClick}>
-      <h4 className={cn(styles.title, { [styles.isActive]: isActive })} style={style}>
+      <h4
+        data-testid={'settings-page-' + title.toLowerCase()}
+        className={cn(styles.title, { [styles.isActive]: isActive })}
+        style={style}
+      >
         {title}
         {isVisibleFound ? <span className={styles.found}>{found}</span> : null}
       </h4>

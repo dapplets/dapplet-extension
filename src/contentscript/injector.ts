@@ -8,14 +8,19 @@ import * as EventBus from '../common/global-event-bus'
 import {
   areModulesEqual,
   formatModuleId,
+  isE2ETestingEnvironment,
   joinUrls,
   multipleReplace,
   parseModuleName,
 } from '../common/helpers'
+import { JsonRpc } from '../common/jsonrpc'
 import { DefaultConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
 import { __decorate } from './global'
+import { ManifestOverlayAdapter } from './modules/adapter-overlay/src'
+import { OverlayManagerIframe } from './overlay/iframe/overlayManager'
+import { OverlayManager } from './overlay/root/overlayManager'
 import { IContentAdapter, IResolver } from './types'
 
 type RegistriedModule = {
@@ -34,11 +39,13 @@ type RegistriedModule = {
   onActionHandler?: Function
   onHomeHandler?: Function
   onShareLinkHandler?: Function
+  onWalletsUpdateHandler?: Function
+  onConnectedAccountsUpdateHandler?: Function
 }
+export const widgets = []
 
 const DAPPLETS_ORIGINAL_HREF: string = window['DAPPLETS_ORIGINAL_HREF']
 const IS_LIBRARY = window['DAPPLETS_JSLIB'] === true
-
 export class Injector {
   public availableContextIds: string[] = []
   public registry: RegistriedModule[] = []
@@ -109,7 +116,6 @@ export class Injector {
         contextIds: m?.contextIds || [window.location.hostname],
       }
     })
-
     await this._processModules(orderedModules)
 
     // module initialization
@@ -117,17 +123,17 @@ export class Injector {
       const m = this.registry[i]
       if (m.instance) continue
 
-      m.instancedConstructorDeps = m.constructorDependencies.map((d) =>
-        this._proxifyModule(this._getDependency(m.manifest, d), m)
-      )
-      m.instancedActivateMethodsDependencies = m.activateMethodsDependencies.map((d) =>
-        this._proxifyModule(this._getDependency(m.manifest, d), m)
-      )
+      m.instancedConstructorDeps = m.constructorDependencies.map((d) => {
+        return this._proxifyModule(this._getDependency(m.manifest, d), m)
+      })
+      m.instancedActivateMethodsDependencies = m.activateMethodsDependencies.map((d) => {
+        return this._proxifyModule(this._getDependency(m.manifest, d), m)
+      })
 
       try {
         // ToDo: compare "m.instancedDeps.length" and "m.clazz.constructor.length"
-        m.instance = new m.clazz(...m.instancedConstructorDeps)
 
+        m.instance = new m.clazz(...m.instancedConstructorDeps)
         if (m.instance.activate !== undefined) {
           if (typeof m.instance.activate === 'function') {
             // ToDo: activate modules in parallel
@@ -149,7 +155,13 @@ export class Injector {
             }
           }
         }
-
+        const IS_E2E_IFRAME = isE2ETestingEnvironment(window.top)
+        const IS_IFRAME = IS_E2E_IFRAME ? false : self !== top
+        const jsonrpc = new JsonRpc()
+        const overlayManager = IS_IFRAME
+          ? new OverlayManagerIframe(jsonrpc)
+          : new OverlayManager(jsonrpc)
+        overlayManager.getOverlays()
         console.log(
           `[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`
         )
@@ -255,6 +267,18 @@ export class Injector {
     module.onShareLinkHandler?.(data)
   }
 
+  public async executeWalletsUpdateHandler() {
+    this.registry.find((m) => {
+      m.onWalletsUpdateHandler?.()
+    })
+  }
+
+  public async executeConnectedAccountsUpdateHandler() {
+    this.registry.find((m) => {
+      m.onConnectedAccountsUpdateHandler?.()
+    })
+  }
+
   public setActionHandler(moduleName: string, handler: Function) {
     const module = this.registry.find((m) => m.manifest.name === moduleName)
     module.onActionHandler = handler
@@ -268,6 +292,16 @@ export class Injector {
   public setShareLinkHandler(moduleName: string, handler: Function) {
     const module = this.registry.find((m) => m.manifest.name === moduleName)
     module.onShareLinkHandler = handler
+  }
+
+  public setWalletsUpdateHandler(moduleName: string, handler: Function) {
+    const module = this.registry.find((m) => m.manifest.name === moduleName)
+    module.onWalletsUpdateHandler = handler
+  }
+
+  public setConnectedAccountsUpdate(moduleName: string, handler: Function) {
+    const module = this.registry.find((m) => m.manifest.name === moduleName)
+    module.onConnectedAccountsUpdateHandler = handler
   }
 
   public async dispose() {
@@ -366,6 +400,10 @@ export class Injector {
         onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
         onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
         onShareLink: (handler: Function) => this.setShareLinkHandler(manifest.name, handler),
+        onWalletsUpdate: (handler: Function) =>
+          this.setWalletsUpdateHandler(manifest.name, handler),
+        onConnectedAccountsUpdate: (handler: Function) =>
+          this.setConnectedAccountsUpdate(manifest.name, handler),
         getManifest: async (
           moduleName?: string
         ): Promise<Omit<ModuleInfo, 'interfaces'> & VersionInfo> => {
@@ -405,6 +443,7 @@ export class Injector {
       let newBranch: string = null
 
       // ToDo: describe it
+
       const injectableDecorator = (constructor) => {
         if (constructor.prototype.getBranch) {
           const resolver: IResolver = new constructor()
@@ -428,6 +467,7 @@ export class Injector {
       }
 
       // ToDo: describe it
+      // adapter
       const injectDecorator = (name: string) => {
         if (!name)
           throw new Error(
@@ -441,12 +481,13 @@ export class Injector {
         ) => {
           // ToDo: check module_name with manifest
           // ToDo: add module source to error description
-
           // ContructorDecorator: class, undefined, parameterIndex
           // PropertyDecorator: class(obj), property_name, undefined
           // ParameterDecorator: class(obj), method_name, parameterIndex
-
           // Constructor Parameter Decorator
+          if (name === 'overlay-adapter.dapplet-base.eth') {
+            this.registry.push(ManifestOverlayAdapter)
+          }
           if (propertyOrMethodName === undefined) {
             if (!this.registry.find((m) => areModulesEqual(m.manifest, manifest))) {
               this.registry.push({
@@ -464,7 +505,6 @@ export class Injector {
                 schemaConfig: schemaConfig,
               })
             }
-
             const currentModule = this.registry.find((m) => areModulesEqual(m.manifest, manifest))
             currentModule.constructorDependencies[parameterIndex] = name
           }
@@ -506,7 +546,6 @@ export class Injector {
                 schemaConfig: schemaConfig,
               })
             }
-
             const currentModule = this.registry.find((m) => areModulesEqual(m.manifest, manifest))
             currentModule.activateMethodsDependencies[parameterIndex] = name
           }
@@ -572,7 +611,6 @@ export class Injector {
       })
 
       if (newContextIds.length > 0) {
-        // console.log('[DAPPLETS] Context started:', newContextIds);
         browser.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
         EventBus.emit('context_started', contextIds)
       }
@@ -587,7 +625,6 @@ export class Injector {
       })
 
       if (oldContextIds.length > 0) {
-        // console.log('[DAPPLETS] Context finished:', oldContextIds);
         browser.runtime.sendMessage({ type: 'CONTEXT_FINISHED', payload: { contextIds } })
         EventBus.emit('context_finished', contextIds)
       }
@@ -595,45 +632,60 @@ export class Injector {
   }
 
   private _getDependency(manifest: VersionInfo, name: string) {
-    const dependency = manifest.dependencies[name]
-
-    if (dependency === undefined) {
-      console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`)
-      return
-    }
-
-    if (valid(dependency as string) === null) {
-      console.error(
-        `Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`
-      )
-      return
-    }
-
-    // if the module can not be found by the name, then trying to find its implementation by interface name
-    let modules = this.registry.filter((m) => m.manifest.name == name)
-    if (modules.length === 0) {
-      modules = this.registry.filter((m) => m.manifest.interfaces?.[name] !== undefined)
+    // ToDo: remove hardcoded module name and use src/contentscript/modules/index.ts
+    if (name === 'overlay-adapter.dapplet-base.eth') {
+      // if the module can not be found by the name, then trying to find its implementation by interface name
+      let modules = this.registry.filter((m) => m.manifest.name == name)
       if (modules.length === 0) {
-        console.error(
-          `Can not find neither the module, nor an implementation of the interface "${name}".`
-        )
-        return null
+        modules = this.registry.filter((m) => m.manifest.interfaces?.[name] !== undefined)
+        if (modules.length === 0) {
+          console.error(
+            `Can not find neither the module, nor an implementation of the interface "${name}".`
+          )
+          return null
+        }
       }
+
+      return ManifestOverlayAdapter
+    } else {
+      const dependency = manifest.dependencies[name]
+      if (dependency === undefined) {
+        console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`)
+        return
+      }
+      if (valid(dependency as string) === null) {
+        console.error(
+          `Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`
+        )
+        return
+      }
+
+      // if the module can not be found by the name, then trying to find its implementation by interface name
+      let modules = this.registry.filter((m) => m.manifest.name == name)
+      if (modules.length === 0) {
+        modules = this.registry.filter((m) => m.manifest.interfaces?.[name] !== undefined)
+        if (modules.length === 0) {
+          console.error(
+            `Can not find neither the module, nor an implementation of the interface "${name}".`
+          )
+          return null
+        }
+      }
+
+      // ToDo: Should be moved to the background?
+      // ToDo: Fetch prefix from global settings.
+      // ToDo: Replace '>=' to '^'
+      const prefix = '>=' // https://devhints.io/semver
+      const range =
+        prefix + (typeof dependency === 'string' ? dependency : dependency[DEFAULT_BRANCH_NAME])
+      const maxVer = maxSatisfying(
+        modules.map((m) => m.manifest.version),
+        range
+      )
+
+      const module = modules.find((m) => m.manifest.version == maxVer)
+      return module
     }
-
-    // ToDo: Should be moved to the background?
-    // ToDo: Fetch prefix from global settings.
-    // ToDo: Replace '>=' to '^'
-    const prefix = '>=' // https://devhints.io/semver
-    const range =
-      prefix + (typeof dependency === 'string' ? dependency : dependency[DEFAULT_BRANCH_NAME])
-    const maxVer = maxSatisfying(
-      modules.map((m) => m.manifest.version),
-      range
-    )
-
-    const module = modules.find((m) => m.manifest.version == maxVer)
-    return module
   }
 
   private _proxifyModule(proxiedModule: RegistriedModule, contextModule: RegistriedModule) {
@@ -661,14 +713,17 @@ export class Injector {
               } else {
                 Reflect.get(target, cfgsKey).push(cfg)
               }
-
-              return target.attachConfig(cfg)
+              if (proxiedModule.manifest.name === 'overlay-adapter.dapplet-base.eth') {
+                return target.attachConfig(cfg, contextModule)
+              } else return target.attachConfig(cfg)
             }
           }
           if (prop === 'detachConfig') {
             return (cfg) => {
               const cfgs = cfg ? [cfg] : Reflect.get(target, cfgsKey)
-              cfgs?.forEach((x) => target.detachConfig(x, featureId))
+              cfgs?.forEach((x) => {
+                return target.detachConfig(x, featureId)
+              })
             }
           }
           if (prop === 'attachFeature') {
@@ -685,7 +740,9 @@ export class Injector {
             } else {
               return target.exports
             }
-          } else return target[prop]
+          } else {
+            return target[prop]
+          }
         },
       })
     } else {

@@ -115,6 +115,8 @@ browser.runtime.onMessage.addListener(
       featureService.deployModule(mi, vi, targetStorages, targetRegistry),
     getRegistries: () => featureService.getRegistries(),
     getOwnership: (registryUri, moduleName) => featureService.getOwnership(registryUri, moduleName),
+    getModuleNftUrl: (registryUri, moduleName) =>
+      featureService.getModuleNftUrl(registryUri, moduleName),
     getVersionInfo: (registryUri, moduleName, branch, version) =>
       featureService.getVersionInfo(registryUri, moduleName, branch, version),
     getModuleInfoByName: (registryUri, moduleName) =>
@@ -211,7 +213,9 @@ browser.runtime.onMessage.addListener(
     removeMyDapplet: globalConfigService.removeMyDapplet.bind(globalConfigService),
     updateTargetStorages: globalConfigService.updateTargetStorages.bind(globalConfigService),
     getTargetStorages: globalConfigService.getTargetStorages.bind(globalConfigService),
-
+    getPinnedActions: globalConfigService.getPinnedActions.bind(globalConfigService),
+    addPinnedActions: globalConfigService.addPinnedActions.bind(globalConfigService),
+    removePinnedActions: globalConfigService.removePinnedActions.bind(globalConfigService),
     // UserSettings (AppStorage)
     getUserSettings: (moduleName, key) => globalConfigService.getUserSettings(moduleName, key),
     setUserSettings: (moduleName, key, value) =>
@@ -263,6 +267,8 @@ browser.runtime.onMessage.addListener(
     openDappletAction: overlayService.openDappletAction.bind(overlayService),
     openPopupOverlay: overlayService.openPopupOverlay.bind(overlayService),
     openConnectedAccountsPopup: overlayService.openConnectedAccountsPopup.bind(overlayService),
+    execConnectedAccountsUpdateHandler:
+      overlayService.execConnectedAccountsUpdateHandler.bind(overlayService),
 
     // Connected Account Service
     getConnectedAccounts:

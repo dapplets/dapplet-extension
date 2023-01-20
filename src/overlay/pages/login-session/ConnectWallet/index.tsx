@@ -9,14 +9,20 @@ interface Props {
 
 export const ConnectWallet: FC<Props> = (p: Props) => {
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} data-testid="connect-wallet-to-extension-popup">
       <h2 className={base.title}>Connect new wallet</h2>
 
       <div className={styles.cryptoWallets}>
         <h3 className={base.subtitle}>select connection type</h3>
         <ul className={styles.list}>
           {p.wallets.map(({ id, label, icon }) => (
-            <li key={id} title={label} className={styles.item} onClick={() => p.onWalletClick(id)}>
+            <li
+              key={id}
+              title={label}
+              data-testid={`wallet-to-connect-${id}`}
+              className={styles.item}
+              onClick={() => p.onWalletClick(id)}
+            >
               <img src={icon} alt={label} />
             </li>
           ))}

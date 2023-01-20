@@ -6,7 +6,6 @@ import { Connection, EventDef } from '../connection'
 import { ProxySigner } from '../proxySigner'
 import { IEtherneumWallet, ITransactionReceipt } from './types'
 
-// ToDo: use sendSowaTransaction method from background
 async function _sendWalletConnectTx(
   app: string,
   chain: ChainTypes,

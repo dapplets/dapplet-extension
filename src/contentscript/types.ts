@@ -4,7 +4,7 @@ export interface IModule {}
 
 export interface IContentAdapter<IAdapterConfig> extends IModule {
   exports?: ((featureId: string) => any) | any
-  attachConfig(config: IAdapterConfig): { $: (ctx: any, id: string) => any }
+  attachConfig(config: IAdapterConfig, feature?: any): { $: (ctx: any, id: string) => any }
   detachConfig(config: IAdapterConfig, featureId?: string): void
 }
 

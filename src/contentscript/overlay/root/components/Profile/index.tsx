@@ -33,13 +33,11 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
 
   const [newProfile, setNewProfile] = useState([])
   useEffect(() => {
-    const init = async () => {
-    }
+    const init = async () => {}
 
     init()
 
-    return () => {
-    }
+    return () => {}
   }, [newProfile, isMini])
 
   return (

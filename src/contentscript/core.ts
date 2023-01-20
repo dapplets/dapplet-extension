@@ -582,6 +582,9 @@ export default class Core {
   onAction(handler: Function) {}
   onHome(handler: Function) {}
   onShareLink(handler: (data: any) => void) {}
+  onWalletsUpdate(handler: Function) {}
+  onConnectedAccountsUpdate(handler: Function) {}
+
   public async getManifest(
     moduleName?: string
   ): Promise<Omit<ModuleInfo, 'interfaces'> & VersionInfo> {

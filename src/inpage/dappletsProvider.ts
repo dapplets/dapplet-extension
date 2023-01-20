@@ -37,6 +37,10 @@ export class DappletsProvider {
     return this._rpc.call('pairWalletViaOverlay', [], window)
   }
 
+  async openPopup(): Promise<void> {
+    return this._rpc.call('openPopup', [], window)
+  }
+
   async openOverlay(): Promise<void> {
     return this._rpc.call('openOverlay', [], window)
   }

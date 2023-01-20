@@ -4,6 +4,7 @@ import { GLOBAL_EVENT_BUS_NAME } from '../common/chrome-extension-websocket-wrap
 import * as EventBus from '../common/global-event-bus'
 import {
   assertFullfilled,
+  isE2ETestingEnvironment,
   parseModuleName,
   parseShareLink,
   ShareLinkPayload,
@@ -19,20 +20,22 @@ import { IOverlay } from './overlay/interfaces'
 import { OverlayManager } from './overlay/root/overlayManager'
 
 const IS_OVERLAY_IFRAME = window.name.indexOf('dapplet-overlay') !== -1
+const IS_E2E_ENV = isE2ETestingEnvironment(window)
 
 async function init() {
   const IS_LIBRARY = window['DAPPLETS_JSLIB'] === true
-  const IS_IFRAME = self !== top
+  const IS_E2E_IFRAME = isE2ETestingEnvironment(window.top)
+  const IS_IFRAME = IS_E2E_IFRAME ? false : self !== top
 
   const shareLinkPayload = await processShareLink().catch((e) => {
     console.error('Cannot process the share link', e)
     return null
   })
-
   const port = browser.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any)
 
   const jsonrpc = new JsonRpc()
   const overlayManager = IS_IFRAME ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc)
+
   const core = new Core(IS_IFRAME, overlayManager) // ToDo: is it global for all modules?
   const injector = new Injector(core, { shareLinkPayload })
 
@@ -68,6 +71,7 @@ async function init() {
           } was activated.`
         )
       )
+
       return injector.loadModules(modules)
     } else if (message.type === 'FEATURE_DEACTIVATED') {
       const modules = message.payload
@@ -87,12 +91,19 @@ async function init() {
     } else if (!IS_IFRAME && message.type === 'OPEN_DAPPLET_HOME') {
       const { moduleName } = message.payload
       return injector.openDappletHome(moduleName)
+    } else if (!IS_IFRAME && message.type === 'EXEC_CA_UPDATE_HANDLER') {
+      return injector.executeConnectedAccountsUpdateHandler()
     }
   })
 
   // Handle module (de)activations from another tabs
   EventBus.on('dapplet_activated', (m) => injector.loadModules([m]))
+
   EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]))
+
+  EventBus.on('wallet_changed', () => injector.executeWalletsUpdateHandler())
+
+  EventBus.on('connected_accounts_changed', () => injector.executeConnectedAccountsUpdateHandler())
 
   // destroy when background is disconnected
   port.onDisconnect.addListener(() => {
@@ -171,6 +182,7 @@ async function init() {
   jsonrpc.on('openOverlay', () => Promise.resolve(core.openOverlay()))
   jsonrpc.on('closeOverlay', () => Promise.resolve(core.closeOverlay()))
   jsonrpc.on('toggleOverlay', () => Promise.resolve(core.toggleOverlay()))
+  jsonrpc.on('openPopup', () => Promise.resolve(core.overlayManager.openPopup('dapplets')))
 
   if (!IS_IFRAME && !IS_LIBRARY) {
     // ToDo: inject in dapplets store only
@@ -321,7 +333,7 @@ async function processShareLink() {
 }
 
 // do not inject to overlays frames
-if (!IS_OVERLAY_IFRAME) {
+if (!IS_OVERLAY_IFRAME && !IS_E2E_ENV) {
   if (window.document.body) {
     init()
   } else {

@@ -57,6 +57,7 @@ export class Overlay implements IOverlay {
       }
     })
     this.frame.name = 'dapplet-overlay/' + this.id // to distinguish foreign frames from overlays (see contentscript/index.ts)
+    this.frame.setAttribute('id', 'overlay-iframe')
   }
 
   /**

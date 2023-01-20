@@ -12,7 +12,6 @@ export interface RewardsProps {
   setActiveTabUnderConstructionDetails: any
 }
 
-
 enum UnderConstructionDetails {
   INFO = 0,
   TOKENOMICS = 1,

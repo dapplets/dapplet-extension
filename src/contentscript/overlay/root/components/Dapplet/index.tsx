@@ -7,6 +7,7 @@ import { ReactComponent as DeleteIcon } from '../../assets/svg/newDelete.svg'
 import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
 import { ReactComponent as SearchIcon } from '../../assets/svg/newLinks.svg'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
+import { ReactComponent as OpenSeaIcon } from '../../assets/svg/opensea.svg'
 import useAbortController from '../../hooks/useAbortController'
 import { DappletImage } from '../DappletImage'
 import { DappletInfo } from '../DappletInfo'
@@ -14,7 +15,6 @@ import { DappletTitle } from '../DappletTitle'
 import { SquaredButton } from '../SquaredButton'
 import { Switch } from '../Switch'
 import styles from './Dapplet.module.scss'
-// TODO: How will the dapplets be displayed during development?
 
 export interface DappletProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -30,6 +30,7 @@ export interface DappletProps
   onRemoveMyDapplet?: (x: any) => void
   onDeployDapplet: Function
   onOpenStore: (x: any) => void
+  onOpenNft: (x: any) => void
   loadShowButton: boolean
   onOpenStoreAuthor: Function
   getTabsForDapplet?: any
@@ -45,6 +46,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     onRemoveMyDapplet,
     onDeployDapplet,
     onOpenStore,
+    onOpenNft,
     loadShowButton,
     onOpenStoreAuthor,
     index,
@@ -93,7 +95,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   }
 
   return (
-    <div className={cn(styles.wrapperCard, className)} {...anotherProps}>
+    <div className={cn(styles.wrapperCard, className)} data-testid={name} {...anotherProps}>
       <DappletImage isFavourites={false} storageRef={icon} />
 
       <div className={cn(styles.wrapperBlock)}>
@@ -111,7 +113,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                   <span className={styles.loader}></span>
                 ) : (
                   <Switch
-                    // className={loadShowButton ? styles.loadShowButton : ''}
+                    className={isActive ? 'active-switch' : 'not-active-switch'}
                     checked={isActive}
                     onChange={(e) => {
                       onSwitchChange(dapplet, !isActive, index, e['shiftKey'], loadingHome)
@@ -159,6 +161,16 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 className={styles.squareButton}
                 title="Dapplet in the Store"
                 onClick={() => onOpenStore(dapplet)}
+              />
+            </div>
+
+            <div className={styles.blockButtons}>
+              <SquaredButton
+                appearance="smail"
+                icon={OpenSeaIcon}
+                className={styles.squareButton}
+                title="NFT at OpenSea"
+                onClick={() => onOpenNft(dapplet)}
               />
             </div>
 

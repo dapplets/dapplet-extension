@@ -1,4 +1,5 @@
-import { withTheme } from '@rjsf/core'
+import Form from '@rjsf/core'
+import validator from '@rjsf/validator-ajv8'
 import { Theme as SemanticUITheme } from '@rjsf/semantic-ui'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as React from 'react'
@@ -13,7 +14,6 @@ import TextWidget from './TextWidget'
 
 SemanticUITheme.widgets.SelectWidget = SelectWidget
 SemanticUITheme.widgets.TextWidget = TextWidget
-const Form = withTheme(SemanticUITheme)
 
 interface Props {
   mi?: ModuleInfo & {
@@ -192,6 +192,7 @@ export class SettingsPage extends React.Component<Props, State> {
                 onSubmit={(e) => this._saveData(e.formData)}
                 formData={data}
                 onChange={(e) => this.setState({ isEdited: true, data: e.formData })}
+                validator={validator}
               >
                 <div>
                   <Button

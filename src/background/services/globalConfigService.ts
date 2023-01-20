@@ -74,6 +74,8 @@ export default class GlobalConfigService {
       if (!config.connectedAccountsContractAddress)
         config.connectedAccountsContractAddress =
           this.getInitialConfig().connectedAccountsContractAddress
+      if (!config.pinnedDappletActions)
+        config.pinnedDappletActions = this.getInitialConfig().pinnedDappletActions
     }
 
     return config ?? this.getInitialConfig()
@@ -228,22 +230,22 @@ export default class GlobalConfigService {
         isEnabled: false,
       },
       {
-        url: 'https://localhost:8080/index.json',
+        url: 'http://localhost:8080/index.json',
         isDev: true,
         isEnabled: false,
       },
       {
-        url: 'https://localhost:3001/dapplet.json',
+        url: 'http://localhost:3001/dapplet.json',
         isDev: true,
         isEnabled: false,
       },
       {
-        url: 'https://localhost:3002/dapplet.json',
+        url: 'http://localhost:3002/dapplet.json',
         isDev: true,
         isEnabled: false,
       },
       {
-        url: 'https://localhost:3003/dapplet.json',
+        url: 'http://localhost:3003/dapplet.json',
         isDev: true,
         isEnabled: false,
       },
@@ -270,7 +272,7 @@ export default class GlobalConfigService {
     config.hostnames = {}
     config.dynamicAdapter = 'dynamic-adapter.dapplet-base.eth#default@latest'
     config.preferedOverlayStorage = 'centralized'
-    config.swarmPostageStampId = '59b7a1ef40a1b3143e9e80e7eb90175b83996fcf86f13480dbe0e21a732572e9'
+    config.swarmPostageStampId = '1149efd4cce752c75e815e9b9dbe322afd0c8dce7f86d78e26182b9923403965'
     config.ipfsGatewayUrl = 'https://ipfs-gateway.mooo.com'
     config.siaPortalUrl = 'https://siasky.net'
     config.ethereumNetworks = [
@@ -317,8 +319,41 @@ export default class GlobalConfigService {
     ]
     config.myDapplets = []
     config.connectedAccountsContractAddress = 'dev-1659683929908-36510272337320'
-
+    config.pinnedDappletActions = []
     return config
+  }
+  async getPinnedActions() {
+    const config = await this.get()
+    const registries = config.pinnedDappletActions.map((x) => ({
+      ...x,
+      dappletName: x.dappletName === undefined ? true : x.dappletName,
+      widgetPinId: x.widgetPinId === undefined ? true : x.widgetPinId,
+    }))
+    return registries
+  }
+  async removePinnedActions(dappletName: string, widgetPinId: string) {
+    await this.updateConfig(
+      (c) =>
+        (c.pinnedDappletActions = c.pinnedDappletActions.filter(
+          (x) => !(x.dappletName === dappletName && x.widgetPinId === widgetPinId)
+        ))
+    )
+    EventBus.emit('myactions_changed')
+  }
+
+  async addPinnedActions(dappletName: string, widgetPinId: string) {
+    const config = await this.get()
+
+    if (
+      config.pinnedDappletActions.find(
+        (x) => x.dappletName === dappletName && x.widgetPinId === widgetPinId
+      )
+    )
+      return
+    config.pinnedDappletActions.push({ dappletName, widgetPinId })
+
+    await this.set(config)
+    EventBus.emit('myactions_changed')
   }
 
   async getRegistries() {
@@ -444,7 +479,6 @@ export default class GlobalConfigService {
   }
 
   async updateTargetStorages(storages: StorageTypes[]) {
-    console.log('storages', storages)
     const config = await this.get()
     config.targetStorages = storages
     await this.set(config)
@@ -457,6 +491,7 @@ export default class GlobalConfigService {
 
   async getTrustedUsers() {
     const config = await this.get()
+
     return config.trustedUsers
   }
 

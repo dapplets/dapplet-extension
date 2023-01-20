@@ -3,13 +3,11 @@
  * https://github.com/rjsf-team/react-jsonschema-form/blob/d48eeaae8969a64c72429dcfd0df151b3e8bc730/packages/semantic-ui/src/util.js
  */
 
-import { utils } from '@rjsf/core'
+import { asNumber, guessType } from '@rjsf/utils'
 import _ from 'lodash'
 import React from 'react'
 import { Form } from 'semantic-ui-react'
 import { getSemanticProps } from './utils'
-
-const { asNumber, guessType } = utils
 
 const nums = new Set(['number', 'integer'])
 
@@ -103,8 +101,6 @@ function SelectWidget(props) {
     // eslint-disable-next-line no-shadow
     { value }
   ) => {
-    // console.log(value)
-
     onChange && onChange(processValue(schema, value))
   }
   // eslint-disable-next-line no-shadow
@@ -113,7 +109,6 @@ function SelectWidget(props) {
     // eslint-disable-next-line no-shadow
     target: { value },
   }) => onFocus && onFocus(id, processValue(schema, value))
-  // console.log(value)
 
   return (
     <Form.Dropdown
