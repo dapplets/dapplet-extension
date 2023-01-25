@@ -20,7 +20,7 @@ import HOME_ICON from './assets/newHome.svg'
 import Ok from './assets/ok.svg'
 import Time from './assets/time.svg'
 import styles from './ConnectedAccount.module.scss'
-import { areWeLinkingWallets } from '../../../../../overlay/pages/ConnectedAccountsModal/helpers'
+import { areWeLinkingWallets } from '../../components/SystemPopup/pages/ConnectedAccountsModal/helpers'
 
 const UserButton = ({
   user,
