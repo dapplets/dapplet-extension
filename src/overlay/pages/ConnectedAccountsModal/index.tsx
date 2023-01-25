@@ -4,7 +4,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { resources } from '../../../common/resources'
 import { IConnectedAccountUser, TConnectedAccount, EthSignature } from '../../../common/types'
 import { Modal } from './modal'
-import { getSignature } from './helpers'
+import { getSignature, areWeLinkingWallets } from './helpers'
 import UserButton from './UserButton'
 
 interface IConnectedAccountsModalProps {
@@ -30,6 +30,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const [wait, setWait] = useState(true)
   const [isWaiting, setIsWaiting] = useState(false)
   const [requestWasDoneBefore, setRequestWasDoneBefore] = useState(false)
+  const [areAccountsWallets, setAreAccountsWallets] = useState(false)
 
   const askIfSameRequestsExist = async (
     accounts: [IConnectedAccountUser, IConnectedAccountUser]
@@ -74,6 +75,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         const areAccountsAlreadyConnected = await checkIfTheAccountsHaveBeenAlreadyConnected(
           accountsToConnect
         )
+        setAreAccountsWallets(areWeLinkingWallets(...accountsToConnect))
         setAreThereSameRequests(answerAboutTheSameRequests)
         setRequestWasDoneBefore(areAccountsAlreadyConnected)
         setWait(false)
@@ -82,6 +84,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         const areAccountsAlreadyConnected = await checkIfTheAccountsHaveBeenAlreadyConnected(
           accountsToDisconnect
         )
+        setAreAccountsWallets(areWeLinkingWallets(...accountsToDisconnect))
         setAreThereSameRequests(answerAboutTheSameRequests)
         setRequestWasDoneBefore(!areAccountsAlreadyConnected)
         setWait(false)
@@ -114,46 +117,63 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
       signature?: EthSignature
       firstProofUrl?: string
       secondProofUrl?: string
+      statement?: string
     }
-    if (
-      !firstProofUrl &&
-      !secondProofUrl &&
-      resources[firstAccount.origin].type === 'wallet' &&
-      resources[secondAccount.origin].type === 'wallet'
-    ) {
-      let ethSignature: EthSignature
-      if (firstAccount.origin.indexOf('ethereum') === 0) {
-        ethSignature = await getSignature(
-          secondAccount.name,
-          firstAccount.name,
-          firstAccount.origin
-        )
-        requestBody = {
-          firstAccountId: firstAccount.name,
-          firstOriginId: 'ethereum',
-          secondAccountId: secondAccount.name,
-          secondOriginId: secondAccount.origin,
-          isUnlink,
-          signature: ethSignature,
+    let requestId: number
+
+    if (areAccountsWallets) {
+      try {
+        const statement = `I confirm that I am the owner of Account A and Account B and I want to ${
+          isUnlink ? 'unlink' : 'link'
+        } them in the Connected Accounts service.`
+        let ethSignature: EthSignature
+        if (firstAccount.origin.indexOf('ethereum') === 0) {
+          ethSignature = await getSignature(
+            secondAccount.name,
+            firstAccount.name,
+            firstAccount.origin,
+            statement
+          )
+          requestBody = {
+            firstAccountId: firstAccount.name,
+            firstOriginId: 'ethereum',
+            secondAccountId: secondAccount.name,
+            secondOriginId: secondAccount.origin,
+            isUnlink,
+            signature: ethSignature,
+            statement,
+          }
+        } else if (secondAccount.origin.indexOf('ethereum') === 0) {
+          ethSignature = await getSignature(
+            firstAccount.name,
+            secondAccount.name,
+            secondAccount.origin,
+            statement
+          )
+          requestBody = {
+            firstAccountId: firstAccount.name,
+            firstOriginId: firstAccount.origin,
+            secondAccountId: secondAccount.name,
+            secondOriginId: 'ethereum',
+            isUnlink,
+            signature: ethSignature,
+            statement,
+          }
+        } else {
+          throw new Error(
+            'Wrong wallet types to connect: ' + firstAccount.origin + ', ' + secondAccount.origin
+          ) // ERROR!!!!
         }
-      } else if (secondAccount.origin.indexOf('ethereum') === 0) {
-        ethSignature = await getSignature(
-          firstAccount.name,
-          secondAccount.name,
-          secondAccount.origin
-        )
-        requestBody = {
-          firstAccountId: firstAccount.name,
-          firstOriginId: firstAccount.origin,
-          secondAccountId: secondAccount.name,
-          secondOriginId: 'ethereum',
-          isUnlink,
-          signature: ethSignature,
-        }
-      } else {
-        throw new Error(
-          'Wrong wallet types to connect: ' + firstAccount.origin + ', ' + secondAccount.origin
-        ) // ERROR!!!!
+      } catch (err) {
+        console.log(err)
+        onCloseClick()
+        return
+      }
+      try {
+        requestId = await requestConnectingAccountsVerification(requestBody, null)
+      } catch (err) {
+        if (err.message !== 'User rejected the transaction.')
+          console.log('Error in requestConnectingAccountsVerification().', err)
       }
     } else {
       requestBody = {
@@ -165,14 +185,12 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         secondProofUrl,
         isUnlink,
       }
-    }
-
-    let requestId: number
-    try {
-      requestId = await requestConnectingAccountsVerification(requestBody, minStakeAmount)
-    } catch (err) {
-      if (err.message !== 'User rejected the transaction.')
-        console.log('Error in requestConnectingAccountsVerification().', err)
+      try {
+        requestId = await requestConnectingAccountsVerification(requestBody, minStakeAmount)
+      } catch (err) {
+        if (err.message !== 'User rejected the transaction.')
+          console.log('Error in requestConnectingAccountsVerification().', err)
+      }
     }
 
     setIsWaiting(false)
@@ -211,7 +229,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     return <Modal isWaiting={true} onClose={onCloseClick} />
   }
 
-  if (areThereSameRequests) {
+  if (!areAccountsWallets && areThereSameRequests) {
     return (
       <Modal
         isWaiting={isWaiting}
@@ -222,7 +240,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     )
   }
 
-  if (requestWasDoneBefore) {
+  if (!areAccountsWallets && requestWasDoneBefore) {
     return (
       <Modal
         isWaiting={isWaiting}

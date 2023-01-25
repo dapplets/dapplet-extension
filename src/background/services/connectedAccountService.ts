@@ -255,6 +255,7 @@ export default class ConnectedAccountService {
       firstProofUrl?: string
       secondProofUrl?: string
       signature?: EthSignature
+      statement?: string
     },
     stake?: number
   ): Promise<number> {
@@ -267,22 +268,23 @@ export default class ConnectedAccountService {
       firstProofUrl,
       secondProofUrl,
       signature,
+      statement,
     } = props
     const contract = await this._getContract()
-    const res = await contract.requestVerification(
-      {
-        firstAccountId,
-        firstOriginId,
-        secondAccountId,
-        secondOriginId,
-        isUnlink,
-        firstProofUrl: firstProofUrl === null ? undefined : firstProofUrl,
-        secondProofUrl: secondProofUrl === null ? undefined : secondProofUrl,
-        signature: signature === null ? undefined : signature,
-      },
-      signature ? 100_000_000_000_000 : undefined,
-      stake === null ? undefined : stake
-    )
+    const requestBody = {
+      firstAccountId,
+      firstOriginId,
+      secondAccountId,
+      secondOriginId,
+      isUnlink,
+      firstProofUrl: firstProofUrl === null ? undefined : firstProofUrl,
+      secondProofUrl: secondProofUrl === null ? undefined : secondProofUrl,
+      signature: signature === undefined ? null : signature,
+      statement: statement === null ? undefined : statement,
+    }
+    const gas = signature ? 100_000_000_000_000 : null
+    const amount = stake === null ? undefined : stake
+    const res = await contract.requestVerification(requestBody, gas, amount)
     EventBus.emit('connected_accounts_changed')
     return res
   }

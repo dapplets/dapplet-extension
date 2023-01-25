@@ -8,7 +8,43 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: 16px 0 0;
+  padding: 14px 0 0;
+}
+
+.scrollContent {
+  overflow-y: scroll;
+  width: 100%;
+  height: calc(100vh - 75px);
+  direction: rtl;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    cursor: pointer;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgb(244 244 244);
+    background:
+      linear-gradient(
+        90deg,
+        rgb(244 244 244 / 0%) 10%,
+        rgb(227 227 227 / 100%) 50%,
+        rgb(244 244 244 / 0%) 90%
+      );
+  }
+
+  &::-webkit-scrollbar-thumb {
+    width: 4px;
+    height: 2px;
+    border-radius: 2px;
+    background: $Primary;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
+    margin-bottom: 15px;
+  }
+}
+
+.scrollContent > * {
+  direction: ltr;
 }
 
 .title {
@@ -22,7 +58,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  grid-template-columns: 344px 90px;
+  grid-template-columns: 330px 90px;
 
   &::after {
     position: absolute;
@@ -42,18 +78,17 @@
 .accountsWrapper {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 97%;
   height: 100%;
-  margin-top: 20px;
+  margin-top: 14px;
 }
 
 .mainBlock {
   display: grid;
   align-items: center;
   width: 100%;
-  padding-left: 2px;
-  grid-template-columns: 344px 90px;
-  margin-top: 17px;
+  grid-template-columns: 330px 90px;
+  margin-top: 10px;
 }
 
 .accountBlock {
@@ -76,9 +111,9 @@
   display: flex;
   align-items: center;
   width: fit-content;
-  height: 46px;
-  margin: 5px;
-  padding: 2px 5px 2px 2px;
+  height: 44px;
+  margin: 3px;
+  padding: 0 5px 0 2px;
   border-radius: 200px;
   background: white;
 
@@ -88,8 +123,8 @@
 
 .imgUser {
   display: inline-block;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   margin-right: 10px;
   border: 2px solid $WebBG;
   border-radius: 50%;
@@ -143,7 +178,7 @@
   box-shadow: 0 2px 2px rgb(0 0 0 / 10%);
 }
 
-.accountStatus::before {
+.accountStatus > div::before {
   position: absolute;
   z-index: 9998;
   top: 47%;
@@ -166,8 +201,8 @@
   line-height: 100%;
 }
 
-.accountStatus:hover::before,
-.accountStatus:focus::before {
+.accountStatus > div:hover::before,
+.accountStatus > div:focus::before {
   display: inline-block;
 }
 

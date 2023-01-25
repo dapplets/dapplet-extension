@@ -1,11 +1,18 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { browser } from 'webextension-polyfill-ts'
-import { EthSignature, DefaultSigners, ChainTypes } from '../../../common/types'
+import {
+  EthSignature,
+  DefaultSigners,
+  ChainTypes,
+  IConnectedAccountUser,
+} from '../../../common/types'
+import { resources } from '../../../common/resources'
 
 export const getSignature = async (
   firstAccountName: string,
   secondAccountName: string,
-  origin: string
+  origin: string,
+  statement: string
 ): Promise<EthSignature> => {
   const msgParams = {
     types: {
@@ -18,6 +25,7 @@ export const getSignature = async (
       LinkingAccounts: [
         { name: 'account_a', type: 'LinkingAccount' },
         { name: 'account_b', type: 'LinkingAccount' },
+        { name: 'statement', type: 'string' },
       ],
       LinkingAccount: [
         { name: 'origin_id', type: 'string' },
@@ -40,12 +48,11 @@ export const getSignature = async (
         origin_id: 'ethereum',
         account_id: secondAccountName,
       },
+      statement,
     },
   }
 
   const msgParamsStr = JSON.stringify(msgParams)
-  console.log('msgParamsStr', msgParamsStr)
-  console.log('secondAccountName', secondAccountName)
 
   const {
     eth_sendCustomRequest,
@@ -74,3 +81,12 @@ export const getSignature = async (
   }
   return signature
 }
+
+export const areWeLinkingWallets = (
+  firstAccount: IConnectedAccountUser,
+  secondAccount: IConnectedAccountUser
+) =>
+  !resources[firstAccount.origin].proofUrl(firstAccount.name) &&
+  !resources[secondAccount.origin].proofUrl(secondAccount.name) &&
+  resources[firstAccount.origin].type === 'wallet' &&
+  resources[secondAccount.origin].type === 'wallet'
