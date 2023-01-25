@@ -1,4 +1,4 @@
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/color.variables";
 
 @media (min-width: 320px) and (max-width: 640px) {
   .overlayToolbar {
@@ -13,16 +13,14 @@
 
   .inner {
     display: flex;
-
     width: 100%;
     margin-top: 0;
   }
 
   .toggleOverlay {
     margin: 0 5px 0 0;
-
-    border-radius: 10px;
     background: $PureWhite;
+    border-radius: 10px;
   }
 
   .mobileToolbar {
@@ -46,22 +44,20 @@
     }
 
     .toggleOverlay {
+      cursor: pointer;
+
       top: 48px;
       left: 32px;
 
       width: 52px;
       height: 52px;
       margin: 0;
-
       padding: 10px;
 
-      cursor: pointer;
-
+      background: transparent;
+      background: $AppBG;
       border: none;
       border-radius: 10px 0 0 10px;
-      background: transparent;
-
-      background: $AppBG;
 
       svg path {
         fill: $Secondary;
@@ -83,17 +79,16 @@
     left: 60px;
 
     display: flex;
-
     flex-direction: column;
 
     width: 52px;
     height: 52px;
 
-    border-radius: 10px;
     background:
       $PureWhite
       url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='32' height='32' rx='16' fill='%23E3E3E3'/%3E%3Cpath d='M21.5001 17.8333C20.4876 17.8333 19.6667 17.0125 19.6667 16C19.6667 14.9874 20.4876 14.1666 21.5001 14.1666C22.5126 14.1666 23.3334 14.9874 23.3334 16C23.3334 16.4862 23.1403 16.9525 22.7964 17.2963C22.4526 17.6401 21.9863 17.8333 21.5001 17.8333ZM16.0001 17.8333C14.9876 17.8333 14.1667 17.0125 14.1667 16C14.1667 14.9874 14.9876 14.1666 16.0001 14.1666C17.0126 14.1666 17.8334 14.9874 17.8334 16C17.8334 16.4862 17.6403 16.9525 17.2964 17.2963C16.9526 17.6401 16.4863 17.8333 16.0001 17.8333ZM10.5001 17.8333C9.48756 17.8333 8.66675 17.0125 8.66675 16C8.66675 14.9874 9.48756 14.1666 10.5001 14.1666C11.5126 14.1666 12.3334 14.9874 12.3334 16C12.3334 16.4862 12.1403 16.9525 11.7964 17.2963C11.4526 17.6401 10.9863 17.8333 10.5001 17.8333Z' fill='white'/%3E%3C/svg%3E")
       center no-repeat;
+    border-radius: 10px;
 
     > :nth-child(n+2) {
       display: none;
@@ -106,7 +101,7 @@
     right: 14px;
 
     display: flex;
-    align-items: flex-end;
     flex-direction: column;
+    align-items: flex-end;
   }
 }

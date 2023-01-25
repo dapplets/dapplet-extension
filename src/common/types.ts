@@ -1,3 +1,5 @@
+import ManifestDTO from '../background/dto/manifestDTO'
+
 export type DefaultConfig = {
   [Environments.Dev]?: {
     [key: string]: any
@@ -159,4 +161,12 @@ export type EthSignature = {
   sig: string
   v: number
   mc: boolean
+}
+
+export type ManifestAndDetails = ManifestDTO & {
+  isLoading: boolean
+  isActionLoading: boolean
+  isHomeLoading: boolean
+  error: string
+  versions: string[]
 }

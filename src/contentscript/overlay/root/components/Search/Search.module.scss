@@ -1,12 +1,13 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/animate.scss";
-/* Segoe UI Regular*/
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
+@import "../../assets/styles/animate";
+
+/* Segoe UI Regular */
 @font-face {
-  font-family: "SegoeUIRegular";
-  font-style: normal;
+  font-family: SegoeUIRegular;
   font-weight: 400;
+  font-style: normal;
   font-display: swap;
   src: url('../../assets/fonts/SegoeUI.woff') format('woff');
   unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
@@ -18,18 +19,17 @@
   display: flex;
   align-items: center;
 
+  font-family: Roboto, sans-serif;
+
+  border: 1px solid #E3E3E3;
+  border-radius: 4px;
+
   // height: 35px;
 // transition: all .5s;
   animation-name: isOpenSearch;
-
   animation-duration: 0.2s;
-
   animation-timing-function: ease;
   animation-fill-mode: forwards;
-
-  font-family: Roboto, sans-serif;
-  border: 1px solid #E3E3E3;
-  border-radius: 4px;
 }
 
 @keyframes isOpenSearch {
@@ -52,24 +52,20 @@
 [class*=" close"] {
   // background: #000;
   animation-name: isCloseSearch;
-
   animation-duration: 0.2s;
-
   animation-timing-function: ease;
   animation-fill-mode: forwards;
+
   .searchIcon{
     animation-name: isCloseSearch;
-
     animation-duration: 0.2s;
-  
     animation-timing-function: ease;
     animation-fill-mode: forwards;
   }
+
   .labelSearchModule{
     animation-name: isCloseSearch;
-
     animation-duration: 0.2s;
-  
     animation-timing-function: ease;
     animation-fill-mode: forwards
   }
@@ -78,14 +74,14 @@
 
 .labelSearchModule {
   width: 100%;
+
   // height: 33px;
   animation-name: isOpenSearchLabel;
-
   animation-duration: 0.2s;
-
   animation-timing-function: ease;
   animation-fill-mode: forwards;
 }
+
 @keyframes isOpenSearchLabel {
   0% {
     height: 0;
@@ -107,35 +103,35 @@
   }
 
   50% {
-    opacity: 0.7;
     height: 10px;
+    opacity: 0.7;
   }
 
   100% {
+    height: 0;
    opacity: 0;
-    height: 0px;
   }
 }
 
 
 .searchIcon {
+  cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
   width: 35px;
+
   // height: 100%;
   padding: 10px 8px;
 
-  cursor: pointer;
-
+  background: #f6f8fa;
   border: none;
   border-radius: 4px 0 0 4px;
-  background: #f6f8fa;
+
   animation-name: isOpenSearchLabel;
-
   animation-duration: 0.2s;
-
   animation-timing-function: ease;
   animation-fill-mode: forwards;
 
@@ -165,31 +161,28 @@
   width: 100%;
   height: 100%;
   padding: 0 30px 0 10px;
-  font-family: "SegoeUIRegular";
-  color: $MainGrey;
 
-  border-radius: 0 4px 4px 0;
-
-  background: #fff;
-
+  font-family: SegoeUIRegular;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 16px;
+  color: $MainGrey;
+
+  background: #fff;
+  border-radius: 0 4px 4px 0;
 }
 
 .close {
-  position: absolute;
+  cursor: pointer;
 
+  position: absolute;
   z-index: 50;
   top: 85%;
-
   left: 95%;
+  transform: translateY(-50%);
 
   height: 100%;
 
-  cursor: pointer;
-  transform: translateY(-50%);
   // animation-name: slideRightClose;
 
   // animation-duration: 0.4s;
@@ -212,4 +205,4 @@ span {
   }
 }
 
-@import "./adaptive.scss";
+@import "./adaptive";

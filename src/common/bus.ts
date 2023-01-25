@@ -6,40 +6,42 @@ export class Bus {
   } = {}
 
   constructor() {
-    window.addEventListener('message', async (e) => {
-      let data = null
-
-      try {
-        if (typeof e.data === 'object' && typeof e.data.message === 'string') {
-          data = JSON.parse(e.data.message)
-        } else {
-          data = JSON.parse(e.data)
-        }
-      } catch {
-        return
-      }
-
-      if (!data || !data.topic) return
-
-      const callbacks = this._callbacks[data.topic] || []
-
-      if (callbacks.length === 0) {
-        if (this._queue[data.topic]) {
-          this._queue[data.topic].push(data.args)
-        } else {
-          this._queue[data.topic] = [data.args]
-        }
-      } else {
-        for (const callback of callbacks) {
-          callback.apply({}, data.args)
-        }
-      }
-    })
+    window.addEventListener('message', this._eventListener)
   }
 
-  publish(topic: string, message?: any) {
+  private _eventListener = async (e) => {
+    let data = null
+
+    try {
+      if (typeof e.data === 'object' && typeof e.data.message === 'string') {
+        data = JSON.parse(e.data.message)
+      } else {
+        data = JSON.parse(e.data)
+      }
+    } catch {
+      return
+    }
+
+    if (!data || !data.topic) return
+
+    const callbacks = this._callbacks[data.topic] || []
+
+    if (callbacks.length === 0) {
+      if (this._queue[data.topic]) {
+        this._queue[data.topic].push(data.args)
+      } else {
+        this._queue[data.topic] = [data.args]
+      }
+    } else {
+      for (const callback of callbacks) {
+        callback.apply({}, data.args)
+      }
+    }
+  }
+
+  publish(topic: string, args?: any) {
     const windowName = window.name
-    const msg = JSON.stringify({ topic, message, windowName })
+    const msg = JSON.stringify({ topic, args, windowName })
     window.parent.postMessage(msg, '*')
   }
 
@@ -55,7 +57,17 @@ export class Bus {
     }
   }
 
-  unsubscribe(topic: string) {
-    this._callbacks[topic] = []
+  unsubscribe(topic: string, handler?: (...args: any[]) => void) {
+    if (handler) {
+      this._callbacks[topic] = (this._callbacks[topic] ?? []).filter((x) => x !== handler)
+    } else {
+      this._callbacks[topic] = []
+    }
+  }
+
+  destroy() {
+    this._callbacks = {}
+    this._queue = {}
+    window.removeEventListener('message', this._eventListener)
   }
 }

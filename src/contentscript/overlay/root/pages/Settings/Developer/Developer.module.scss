@@ -1,11 +1,11 @@
-@import "../../../assets/styles/null.scss";
-@import "../../../assets/styles/fonts.scss";
-@import "../../../assets/styles/color.variables.scss";
-@import "../../../assets/styles/animate.scss";
+@import "../../../assets/styles/null";
+@import "../../../assets/styles/fonts";
+@import "../../../assets/styles/color.variables";
+@import "../../../assets/styles/animate";
 
 .wrapper {
-  display: flex;
   overflow: hidden;
+  display: flex;
   flex: 1 1 auto;
   flex-direction: column;
 
@@ -28,33 +28,23 @@
 }
 
 .blockModules {
-  display: flex;
-
-  display: flex;
-
+  direction: rtl;
   overflow: hidden;
-
   overflow-y: scroll;
+  display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-
-  flex-direction: column;
-
-  width: 100%;
   width: 100%;
   height: 100%;
   height: calc(100% - 120px);
   padding: 0 0 0 15px;
-  direction: rtl;
 
   &::-webkit-scrollbar {
-    width: 4px;
-
     cursor: pointer;
+    width: 4px;
   }
 
   &::-webkit-scrollbar-track {
-    background: rgb(244 244 244);
     background: rgb(244 244 244);
     background:
       linear-gradient(
@@ -69,8 +59,8 @@
     width: 4px;
     height: 2px;
 
-    border-radius: 2px;
     background: $Primary;
+    border-radius: 2px;
     box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
   }
 }
@@ -87,33 +77,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   padding: 10px 0;
 }
 
 .btnCreate {
   display: flex;
   align-items: center;
-
   justify-content: center;
 
   width: 228px;
   height: 33px;
   padding: 0 10px;
 
+  font-family: Roboto;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 100%;
+  color: $PureWhite;
   text-align: center;
   text-transform: uppercase;
 
-  color: $PureWhite;
-  border-radius: 4px;
-
   background: $Primary;
-
-  font-family: Roboto;
-  font-size: 10px;
-
-  font-weight: 400;
-  line-height: 100%;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -131,7 +116,6 @@
 .form {
   display: flex;
   align-items: center;
-
   width: 100%;
 }
 
@@ -139,21 +123,19 @@
   display: flex;
 
   width: 100%;
-
   height: 31px;
   margin: 0 7px 0 0;
   padding: 10px;
-
-  color: $ContentBlack;
-  border-radius: 10px;
-
-  background: #fff;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
+  color: $ContentBlack;
+
+  background: #fff;
   border: 1px solid #e5e5e5;
+  border-radius: 10px;
 }
 
 .errorInput {
@@ -163,25 +145,21 @@
 .buttonInput {
   display: flex;
   align-items: center;
-
   justify-content: center;
 
   width: 40px;
   height: 31px;
   padding: 0 10px;
 
-  text-transform: uppercase;
-
-  color: #fff;
-  border-radius: 4px;
-
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 10px;
-
   font-weight: 400;
   line-height: 100%;
+  color: #fff;
+  text-transform: uppercase;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -193,17 +171,15 @@
 
   &:disabled {
     color: $StrokeColor;
-
-    border: 1px solid $StrokeColor;
     background: $AppBG;
+    border: 1px solid $StrokeColor;
   }
 }
 
 .buttonInputDisabled {
   color: $StrokeColor;
-
-  border: 1px solid $StrokeColor;
   background: $AppBG;
+  border: 1px solid $StrokeColor;
 
   &:hover {
     background: $AppBG;
@@ -219,18 +195,13 @@
 
   width: 100%;
 
-  animation-name: openError;
-
-  animation-duration: 3s;
-
-  animation-timing-function: linear;
-
+  font-family: Roboto;
+  font-weight: 400;
   color: #d9304f;
 
-  font-family: Roboto;
-
-  font-weight: 400;
-
+  animation-name: openError;
+  animation-duration: 3s;
+  animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
 
@@ -249,16 +220,15 @@
 .loadAdd {
   display: flex;
   align-items: center;
-
   justify-content: center;
 
   width: 42px;
   height: 31px;
   padding: 0 10px;
 
-  border-radius: 4px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' id='eivy6ZaYVtP1' viewBox='0 0 40 31' shape-rendering='geometricPrecision' text-rendering='geometricPrecision'%3E%3Cstyle%3E%3C!%5BCDATA%5B%23eivy6ZaYVtP5_tr %7Banimation: eivy6ZaYVtP5_tr__tr 1000ms linear infinite normal forwards%7D@keyframes eivy6ZaYVtP5_tr__tr %7B 0%25 %7Btransform: translate(19.999999px,14.9453px) rotate(0deg)%7D 100%25 %7Btransform: translate(19.999999px,14.9453px) rotate(179.999997deg)%7D%7D%5D%5D%3E%3C/style%3E%3Cpath d='M0,4C0,1.79086,1.79086,0,4,0h32c2.2091,0,4,1.79086,4,4v23c0,2.2091-1.7909,4-4,4h-32c-2.20914,0-4-1.7909-4-4L0,4Z' fill='%23d9304f'/%3E%3Cellipse rx='4.932092' ry='4.932092' transform='translate(20 14.9453)' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Cg id='eivy6ZaYVtP5_tr' transform='translate(19.999999,14.9453) rotate(0)'%3E%3Crect width='14.932263' height='1.762836' rx='0' ry='0' transform='translate(-7.466131,-0.881418)' fill='%23d9304f' stroke-width='0'/%3E%3C/g%3E%3C/svg%3E");
   background-repeat: no-repeat;
+  border-radius: 4px;
 }
 
-@import "./adaptive.scss"
+@import "./adaptive"

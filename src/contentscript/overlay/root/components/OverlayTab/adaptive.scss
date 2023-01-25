@@ -1,4 +1,4 @@
-@import '../../assets/styles/color.variables.scss';
+@import '../../assets/styles/color.variables';
 
 @media (min-width: 320px) and (max-width: 640px) {
   .tab {
@@ -10,20 +10,21 @@
     height: 52px;
     margin: 0;
 
-    border-radius: 10px;
     background: #fff;
+    border-radius: 10px;
   }
 
   .list {
     display: flex;
-    align-items: center;
     flex-direction: row;
+    align-items: center;
 
     // padding-left: 10px;
   }
 
   .item {
     margin-top: 0;
+
     // padding: 0 10px;
 
     &:not(:last-child) {
@@ -37,13 +38,14 @@
 
   .isOpenWallet {
     &::before {
-      border-radius: 10px;
       background-color: rgb(255 255 255 / 0%);
+      border-radius: 10px;
     }
   }
 
   .tabNotActive {
     width: auto;
+
     // max-width: min-content;
   }
 }

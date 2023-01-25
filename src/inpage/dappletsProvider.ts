@@ -77,18 +77,6 @@ export class DappletsProvider {
     return this._rpc.call('callBackground', ['removeMyDapplet', [registryUrl, moduleName]], window)
   }
 
-  async openDeployOverlay(
-    registryUrl: string,
-    name: string,
-    branch: string | null = null,
-    version: string | null = null
-  ): Promise<void> {
-    return this._rpc.call('callBackground', [
-      'openDeployOverlayById',
-      [registryUrl, name, branch, version],
-    ])
-  }
-
   async openDeveloperOverlay(): Promise<void> {
     return this._rpc.call('callBackground', ['openPopupOverlay', ['developer']])
   }

@@ -101,7 +101,7 @@ export class Overlay implements IOverlay {
   }
 
   private _send(data: any) {
-    if (!this._isFrameLoaded) {
+    if (!this._isFrameLoaded || !this.frame.contentWindow) {
       this._queue.push(data)
       this.open()
     } else {

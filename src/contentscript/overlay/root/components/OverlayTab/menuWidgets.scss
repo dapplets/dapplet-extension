@@ -1,30 +1,36 @@
-@import '../../assets/styles/null.scss';
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
+
 .menuWidgets {
   position: absolute;
+  left: -160px;
+
   width: 160px;
   min-height: 50px;
-  left: -160px;
+
   background: #fff;
+  border-radius: 8px 0 0 8px;
   box-shadow: -5px 4px 10px rgb(45 52 60 / 15%);
-  border-radius: 8px 0px 0px 8px;
 }
 
 .blockStandartFunction {
   display: flex;
-  padding: 0 6px 6px 6px;
   align-items: center;
   justify-content: space-between;
+  padding: 0 6px 6px;
 }
+
 .delimeterMenuWidgets {
   display: flex;
   align-items: center;
-  height: 1px;
+
   width: 90%;
-  background: #e3e3e3;
+  height: 1px;
   margin: 0 auto;
   margin-bottom: 6px;
+
+  background: #e3e3e3;
 }
 
 .squaredButtonMenuWidget {
@@ -32,8 +38,10 @@
   background: #f5f5f5;
   border: 1px solid #e3e3e3;
   border-radius: 6px;
+
   &:hover {
     background: #d9304f;
+
     svg {
       path {
         fill: none;
@@ -41,8 +49,10 @@
       }
     }
   }
+
   &:active {
     background: #a6253c;
+
     svg {
       path {
         fill: none;
@@ -50,10 +60,12 @@
       }
     }
   }
+
   &:disabled {
     cursor: auto !important;
     background: inherit;
     border: 1px solid #e3e3e3;
+
     svg {
       path {
         stroke: #e3e3e3;
@@ -64,57 +76,67 @@
 
 .mainMenu {
   position: absolute;
-
+  top: -10px;
   left: -210px;
 
-  width: 202px;
-  // height: 186px;
-  height: auto;
-
-  background: #f5f5f5;
-  box-shadow: 0px 4px 5px rgba(45, 52, 60, 0.1), 0px 4px 20px rgba(11, 87, 111, 0.15);
-  border-radius: 4px;
-  padding: 6px;
   display: flex;
   flex-direction: column;
   align-items: end;
-  top: -10px;
+
+  width: 202px;
+
+  // height: 186px;
+  height: auto;
+  padding: 6px;
+
+  background: #f5f5f5;
+  border-radius: 4px;
+  box-shadow: 0 4px 5px rgb(45 52 60 / 10%), 0 4px 20px rgb(11 87 111 / 15%);
+
   :last-child {
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
 }
+
 .mainMenuItem {
   display: flex;
-  height: 24px;
   align-items: center;
-  margin-bottom: 6px;
-  width: 100%;
   justify-content: flex-end;
+
+  width: 100%;
+  height: 24px;
+  margin-bottom: 6px;
   padding: 0 6px;
+
   &:hover {
-    background: #ffffff;
+    background: #fff;
     border-radius: 6px;
   }
 }
+
 .mainMenuItemTitle {
   font-family: Roboto;
   font-size: 12px;
   line-height: 100%;
   color: #747376;
 }
+
 .mainMenuItemIcon {
   display: inline-block;
-  height: 16px;
   width: 16px;
+  height: 16px;
   margin-left: 5px;
+
   svg {
     width: 16px !important;
     height: 16px !important;
   }
+
   &:hover {
     svg {
       path {
         fill: none;
+
         stroke {
           fill: none;
         }

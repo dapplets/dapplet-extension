@@ -6,9 +6,9 @@ import {
   convertTimestampToISODate,
   getBitFromHex,
   mergeDedupe,
+  networkName,
   typeOfUri,
   UriTypes,
-  networkName,
 } from '../../common/helpers'
 import { StorageRef } from '../../common/types'
 import ModuleInfo from '../models/moduleInfo'

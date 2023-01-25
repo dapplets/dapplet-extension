@@ -1,11 +1,11 @@
 .dapplets-overlay-bucket-bar {
+  pointer-events: none;
+
   position: absolute;
   left: -22px;
 
   width: 22px;
   height: 100%;
-
-  pointer-events: none;
 
   background: rgb(0 0 0 / 8%);
 }
@@ -17,15 +17,14 @@
   width: 100%;
   height: 100%;
 
-  border: none;
   background-color: #e6ecf0;
+  border: none;
 }
 
 .dapplets-overlay-toolbar {
   position: absolute;
   z-index: 2;
   left: -33px;
-
   width: 37px;
 }
 
@@ -45,29 +44,28 @@
 }
 
 .dapplets-overlay-frame-button {
+  cursor: pointer;
+
   width: 30px;
   height: 30px;
   margin-bottom: 5px;
   padding: 0;
 
-  cursor: pointer;
-  transition: background-color 0.25s 0.25s;
-  text-decoration: none;
-
+  font-size: 16px;
   color: #969696;
-  border: solid 1px #d3d3d3;
-  border-radius: 4px;
+  text-decoration: none;
 
   // box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   background: #fff;
+  border: solid 1px #d3d3d3;
+  border-radius: 4px;
 
-  font-size: 16px;
+  transition: background-color 0.25s 0.25s;
 }
 
 .dapplets-overlay-frame-button:active {
-  transition: background-color 0.25s;
-
   background-color: #969696;
+  transition: background-color 0.25s;
 }
 
 .dapplets-overlay-frame-button:focus,
@@ -104,8 +102,8 @@
 }
 
 .dapplets-overlay-nav-tab-list {
-  display: flex;
   overflow-x: auto;
+  display: flex;
   flex: auto;
 }
 
@@ -121,26 +119,22 @@
 }
 
 /* divider between inactive tabs */
-.dapplets-overlay-nav-tab-item:not(.dapplets-overlay-nav-tab-item-active):not(:last-child)::after {
+.dapplets-overlay-nav-tab-item:not(.dapplets-overlay-nav-tab-item-active, :last-child)::after {
+  content: "";
   position: relative;
   right: -12px;
-
-  content: "";
-
   border-right: 1px #aaa solid;
 }
 
 .dapplets-overlay-nav-tab-item-active {
   position: relative;
   left: -1px;
-
-  border-left: 1px solid #fff;
   background: #fff;
+  border-left: 1px solid #fff;
 }
 
 .dapplets-overlay-nav-top-panel {
   display: flex;
-
   background: #f3f3f3;
 }
 
@@ -154,9 +148,7 @@
 
 .dapplets-overlay-nav-content-item {
   position: relative;
-
   display: none;
-
   height: 100%;
 }
 
@@ -168,21 +160,20 @@
 .frame-container > iframe {
   width: 100%;
   height: 100%;
-
   border: none;
 }
 
 .dapplets-overlay-nav-tab-item-close-btn {
+  cursor: pointer;
+
   float: right;
 
   margin: 0 0 0 0.5em;
   padding: 0 5px;
 
-  cursor: pointer;
+  font-weight: 600;
 
   border-radius: 10px;
-
-  font-weight: 600;
 }
 
 .dapplets-overlay-nav-tab-item-close-btn:hover {
@@ -191,24 +182,23 @@
 
 .dapplets-overlay-nav-tab-item-title {
   overflow: hidden;
-
-  white-space: nowrap;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dapplets-action-dropdown {
   position: relative;
-
   display: inline-block;
 }
 
 .dapplets-action-dropdown button {
+  cursor: pointer;
+
   height: 100%;
   padding: 0 8px;
 
-  cursor: pointer;
-
   color: rgb(0 0 0 / 60%);
+
   border: none;
 }
 
@@ -224,21 +214,22 @@
 
   min-width: 160px;
 
+  background-color: #fff;
+
   // box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
   border: 1px solid rgb(34 36 38 / 15%);
   border-radius: 4px;
-  background-color: #fff;
 }
 
 .dapplets-action-dropdown > div > div {
+  cursor: pointer;
+
   display: block;
 
   padding: 10px 16px;
 
-  cursor: pointer;
-  text-decoration: none;
-
   color: black;
+  text-decoration: none;
 }
 
 .dapplets-action-dropdown div > div:hover {
@@ -248,7 +239,6 @@
 /* stylelint-disable-next-line no-descending-specificity */
 .dapplets-action-dropdown:hover > div {
   right: 0;
-
   display: block;
 }
 
@@ -262,8 +252,8 @@
   z-index: -1;
 
   display: flex;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
 }
 
@@ -277,11 +267,11 @@
   margin-right: auto;
   margin-left: auto;
 
-  animation: spin 2s linear infinite;
-
   border: 5px solid #f1f1f1;
   border-top: 5px solid #000;
   border-radius: 50%;
+
+  animation: spin 2s linear infinite;
 }
 
 @keyframes spin {
@@ -299,9 +289,7 @@
   padding-right: 15px;
   padding-left: 15px;
 
-  text-align: center;
-
-  color:#2A2A2A;
-
   font: 14pt "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color:#2A2A2A;
+  text-align: center;
 }

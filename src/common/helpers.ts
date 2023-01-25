@@ -40,7 +40,6 @@ export enum UriTypes {
   Ethereum,
   Ens,
   Near,
-  Sia,
 }
 
 /**
@@ -59,10 +58,6 @@ export function typeOfUri(uri: string): UriTypes {
 
   if (uriLower.indexOf('ipfs://') === 0) {
     return UriTypes.Ipfs
-  }
-
-  if (uriLower.indexOf('sia://') === 0) {
-    return UriTypes.Sia
   }
 
   // ToDo: add Ethereum address validator
@@ -147,17 +142,6 @@ export async function getCurrentTab(): Promise<Tabs.Tab | null> {
 
     if (!tab) return null
 
-    const popupUrl = browser.runtime.getURL('popup.html')
-
-    if (tab.url.indexOf(popupUrl) !== -1) {
-      const params = new URLSearchParams(new URL(tab.url).search) // For automated testing open popup in separated tab with URL /popup.html?tabUrl=https://example.com
-      const url = params.get('tabUrl')
-      if (url) {
-        const [currentTab] = await browser.tabs.query({ url: url })
-        return currentTab
-      }
-    }
-
     return tab
   } catch (_) {
     return null
@@ -181,10 +165,6 @@ export function networkName(chainId: number) {
   }
 
   return map[chainId] ?? 'unknown'
-}
-
-export function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
 export async function fetchWithTimeout(resource, options) {
@@ -384,17 +364,6 @@ export function parseShareLink(url: string) {
   }
 }
 
-export async function promiseAny<T>(iterable: Iterable<T | PromiseLike<T>>): Promise<T> {
-  return Promise.all(
-    [...iterable].map((promise) => {
-      return new Promise((resolve, reject) => Promise.resolve(promise).then(reject, resolve))
-    })
-  ).then(
-    (errors) => Promise.reject(errors),
-    (value) => Promise.resolve<T>(value)
-  )
-}
-
 export function groupBy<T>(array: T[], predicate: (v: T) => string) {
   return array.reduce((acc, value) => {
     ;(acc[predicate(value)] ||= []).push(value)
@@ -416,7 +385,7 @@ export function getBitFromHex(hex: string, bitnumber: number): boolean {
  */
 export function convertHexToBinary(hex: string): string {
   hex = hex.replace('0x', '').toLowerCase()
-  let out = ''
+  let out = '' // ToDo: out is unused?
   for (const c of hex) {
     switch (c) {
       case '0':
@@ -563,11 +532,42 @@ export function blobToDataURL(blob: Blob): Promise<string> {
 
 export function isE2ETestingEnvironment(win: Window): boolean {
   // ToDo: find another way to determine Cypress
-  const href = win.location.href
 
-  if (href.indexOf('cypress') !== -1) return true
-  if (href.indexOf('specs') !== -1) return true
-  if (href.indexOf('localhost:55618') !== -1) return true
+  try {
+    // Reading of href can throw Error when cross-origin
+    const href = win.location.href
+
+    if (href.indexOf('cypress') !== -1) return true
+    if (href.indexOf('specs') !== -1) return true
+    if (href.indexOf('localhost:55618') !== -1) return true
+
+    return false
+  } catch (_) {
+    return false
+  }
+}
+
+export const isValidUrl = (input: string) => {
+  const type = typeOfUri(input)
+
+  if (type === UriTypes.Ens) return true
+  if (type === UriTypes.Ethereum) return true
+  if (type === UriTypes.Near) return true
+  if (type === UriTypes.Http) return true
 
   return false
+}
+
+export const isValidHttp = (url: string) => {
+  try {
+    new URL(url)
+  } catch (_) {
+    return false
+  }
+
+  return true
+}
+
+export const isValidPostageStampId = (id: string) => {
+  return /^[0-9a-f]{64}$/gm.test(id)
 }

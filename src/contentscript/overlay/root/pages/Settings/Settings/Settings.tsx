@@ -3,7 +3,7 @@ import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { StorageTypes } from '../../../../../../common/constants'
-import { isValidPostageStampId } from '../../../../../../popup/helpers'
+import { isValidPostageStampId } from '../../../../../../common/helpers'
 import { Checkbox } from '../../../components/Checkbox'
 import { DropdownPreferedOverlayStorage } from '../../../components/DropdownPreferedOverlayStorage'
 
@@ -18,7 +18,7 @@ import { getDefaultValueProvider } from '../../../utils/getDefaultValue'
 import useAbortController from '../../../hooks/useAbortController'
 import styles from './Settings.module.scss'
 
-export interface SettingsListProps {
+interface SettingsListProps {
   devModeProps: boolean
   setDevMode: (x) => void
   errorReporting: boolean
@@ -26,6 +26,7 @@ export interface SettingsListProps {
   isSvgLoaderDevMode: boolean
   isSvgErrorReporting: boolean
 }
+
 export const SettingsList: FC<SettingsListProps> = (props) => {
   const {
     devModeProps,
@@ -60,17 +61,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [ipfsGatewayInputError, setIpfsGatewayInputError] = useState(null)
   const [ipfsGatewayInputDefault, setIpfsGatewayInputDefault] = useState('')
 
-  // const [siaPortalInput, setSiaPortalInput] = useState('')
-  // const [siaPortalInputError, setSiaPortalInputError] = useState(null)
-  // const [siaPortalInputDefault, setSiaPortalInputDefault] = useState('')
-
   const [targetStorages, setTargetStorages] = useState([])
-
-  const [isPopup, setPopup] = useState(false)
 
   const regExpUserAgentName = new RegExp(/^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/)
   const inputOfFocusIPFS = useRef<HTMLInputElement>()
-  // const inputOfFocusSia = useRef<HTMLInputElement>()
   const inputOfFocusSwarmId = useRef<HTMLInputElement>()
   const inputOfFocusSwarm = useRef<HTMLInputElement>()
   const inputOfFocusEtn = useRef<HTMLInputElement>()
@@ -91,8 +85,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       await loadUserAgentId()
       await loadUserAgentName()
       await loadIpfsGateway()
-      // await loadSiaPortal()
-      await loadPopupInOverlay()
       await loadTargetStorages()
     }
     init()
@@ -291,32 +283,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     }
   }
 
-  // const loadSiaPortal = async () => {
-  //   const { getInitialConfig } = await initBGFunctions(browser)
-  //   const config = await getInitialConfig()
-
-  //   if (config.siaPortalUrl && !abortController.signal.aborted) {
-  //     setSiaPortalInputDefault(config.siaPortalUrl)
-  //   }
-  //   const { getSiaPortal } = await initBGFunctions(browser)
-  //   const gateway = await getSiaPortal()
-  //   if (!abortController.signal.aborted) {
-  //     setSiaPortalInput(gateway)
-  //   }
-  // }
-
-  // const setSiaPortal = async (gateway: string) => {
-  //   try {
-  //     const { setSiaPortal } = await initBGFunctions(browser)
-  //     await setSiaPortal(gateway)
-  //     loadSiaPortal()
-  //   } catch (err) {
-  //     setSiaPortalInputError(err.message)
-  //     setTimeout(() => {
-  //       setSiaPortalInputError(null)
-  //     }, 3000)
-  //   }
-  // }
   const changeTargetStorage = async (storage: StorageTypes, checked: boolean) => {
     const { updateTargetStorages } = await initBGFunctions(browser)
 
@@ -326,26 +292,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     await updateTargetStorages(newTarget)
     loadTargetStorages()
   }
+
   const loadTargetStorages = async () => {
     const { getTargetStorages } = await initBGFunctions(browser)
     const loadTarget = await getTargetStorages()
     if (!abortController.signal.aborted) {
       setTargetStorages(loadTarget)
     }
-  }
-
-  const loadPopupInOverlay = async () => {
-    const { getPopupInOverlay } = await initBGFunctions(browser)
-    const popupInOverlay = await getPopupInOverlay()
-    if (!abortController.signal.aborted) {
-      setPopup(popupInOverlay)
-    }
-  }
-
-  const setPopupInOverlay = async (isActive: boolean) => {
-    const { setPopupInOverlay } = await initBGFunctions(browser)
-    await setPopupInOverlay(isActive)
-    loadPopupInOverlay()
   }
 
   const onPress = (e, ref) => {
@@ -407,10 +360,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 )}
               </>
             }
-          />
-          <SettingItem
-            title="Open popup"
-            component={<Switch onChange={() => setPopupInOverlay(!isPopup)} checked={isPopup} />}
           />
           <SettingItem title="User Agent Name" component={<></>}>
             <form
@@ -575,28 +524,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
               inputOfFocusEtn={inputOfFocusIPFS}
             />
           </SettingItem>
-          {/* <SettingItem
-                title="SIA Portal"
-                component={<></>}
-                children={
-                  <InputPanelSettings
-                    isDynamycAdapter={false}
-                    isDefaultValueInput={siaPortalInputDefault}
-                    isPostStampId={false}
-                    isValidHttpFunction={true}
-                    providerInputError={siaPortalInputError}
-                    providerInput={siaPortalInput}
-                    getDefaultValueProvider={() =>
-                      getDefaultValueProvider(siaPortalInput, 'siaPortalUrl', setSiaPortal)
-                    }
-                    setProviderInputError={setSiaPortalInputError}
-                    setProviderInput={setSiaPortalInput}
-                    setProvider={setSiaPortal}
-                    onPress={onPress}
-                    inputOfFocusEtn={inputOfFocusSia}
-                  />
-                }
-              /> */}
         </SettingWrapper>
       </div>
     </div>

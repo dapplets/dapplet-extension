@@ -1,31 +1,27 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
 
 .wrapperCard {
   display: flex;
 
   max-width: 97%;
+  margin-top: 2px;
+  margin-right: 2px;
   margin-bottom: 10px;
-
   padding: 10px 17px;
-
-  border-radius: 10px;
-
-  background: #fff;
 
   font-family: Montserrat, sans-serif;
 
-  margin-right: 2px;
-  margin-top: 2px;
-  box-shadow: 0px 1px 2px rgb(225 225 225 / 20%), 0px -1px 2px rgb(225 225 225 / 20%), 0px -1px 2px rgb(255 255 255 / 90%), 0px 1px 3px rgb(225 225 225 / 90%);
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgb(225 225 225 / 20%), 0 -1px 2px rgb(225 225 225 / 20%), 0 -1px 2px rgb(255 255 255 / 90%), 0 1px 3px rgb(225 225 225 / 90%);
 }
 
 .wrapperBlock {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-
   padding: 0 0 0 13px;
 }
 
@@ -35,7 +31,6 @@
   .blockIcons {
     display: flex;
     justify-content: space-between;
-
     width: 34px;
     margin: 0 57px 0 13px;
   }
@@ -47,17 +42,15 @@
   width: 277px;
   padding: 5px 0 13px;
 
-  color: $ContentBlack;
-
   font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
   line-height: 120%;
+  color: $ContentBlack;
 }
 
 .blockBottom {
   position: relative;
-
   display: flex;
   justify-content: space-between;
 }
@@ -66,7 +59,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   height: 22px;
 }
 
@@ -99,20 +91,19 @@
 
 .avatars {
   position: relative;
-
   margin-right: 5px;
   padding-right: 5px;
 
   &::after {
+    content: "";
+
     position: absolute;
     top: 50%;
     right: 0;
+    transform: translateY(-50%);
 
     width: 1px;
     height: 16px;
-
-    content: "";
-    transform: translateY(-50%);
 
     background-color: #e3e3e3;
   }
@@ -123,18 +114,16 @@
 
   margin-left: 5px;
 
-  color: #588ca3;
-
   font-size: 10px;
   line-height: 149%;
+  color: #588ca3;
   text-decoration-line: underline;
 }
 
 .activeUsers {
-  color: #919191;
-
   font-size: 10px;
   line-height: 149%;
+  color: #919191;
 }
 
 .descriptionBottom {
@@ -167,14 +156,14 @@
   height: 20px;
   margin-left: 10px;
 
-  color: $PureWhite;
-  border-radius: 4px;
-  background: $Secondary;
-
   font-family: Roboto;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
+  color: $PureWhite;
+
+  background: $Secondary;
+  border-radius: 4px;
 }
 
 .blockButtons {
@@ -197,4 +186,4 @@
   background-repeat: no-repeat;
 }
 
-@import "./adaptive.scss";
+@import "./adaptive";

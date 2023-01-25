@@ -1,8 +1,8 @@
 import { ModuleTypes } from '../../../../common/constants'
-import { ButtonWidget, IButtonWidgetState } from '../button'
-import { ILabelWidgetState, LabelWidget } from '../label'
 import { Exports } from '../../types'
 import { WidgetsCreator } from '../../widgetsCreator'
+import { ButtonWidget, IButtonWidgetState } from '../button'
+import { ILabelWidgetState, LabelWidget } from '../label'
 export const widgets = []
 
 export default class OverlayAdapter {

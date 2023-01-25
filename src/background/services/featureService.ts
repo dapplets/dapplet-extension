@@ -52,7 +52,7 @@ export default class FeatureService {
    */
   async getFeaturesByHostnames(
     contextIds: string[],
-    filter: 'all' | 'public' | 'trusted' | 'local' | null
+    filter: 'all' | 'public' | 'trusted' | 'local' | 'active' | null
   ): Promise<ManifestDTO[]> {
     if (!filter) filter = 'all'
 
@@ -71,6 +71,12 @@ export default class FeatureService {
     if (filter === 'all' || filter === 'public') {
       const walletDescriptors = await this._walletService.getWalletDescriptors()
       const accounts = walletDescriptors.filter((x) => x.connected).map((x) => x.account)
+      listingAccounts.push(...accounts)
+    }
+
+    if (filter === 'active') {
+      const trustedUsers = await this._globalConfigService.getTrustedUsers()
+      const accounts = trustedUsers.map((u) => u.account)
       listingAccounts.push(...accounts)
     }
 
@@ -123,7 +129,11 @@ export default class FeatureService {
             dto.hostnames = mergeDedupe([dto.hostnames, [contextId]])
             dto.available = true
             dto.isMyDapplet = false
-            dtos.push(dto)
+            if (filter === 'active') {
+              dto.isActive && dtos.push(dto)
+            } else {
+              dtos.push(dto)
+            }
           } else {
             // ToDo: move this merging logic to aggragator
             if (!dto.hostnames) dto.hostnames = []
@@ -888,23 +898,6 @@ export default class FeatureService {
     return versions
   }
 
-  public async openSettingsOverlay(mi: ManifestDTO) {
-    const versions = await this.getVersions(mi.sourceRegistry.url, mi.name)
-    const version = versions.sort(rcompare)[0] // Last version by SemVer
-    const vi = await this._moduleManager.registryAggregator.getVersionInfo(
-      mi.name,
-      DEFAULT_BRANCH_NAME,
-      version
-    )
-    const dist = await this._moduleManager.loadModule(vi)
-    return await this._overlayService.openSettingsOverlay(
-      mi,
-      vi,
-      dist.schemaConfig,
-      dist.defaultConfig
-    )
-  }
-
   public async getUserSettingsForOverlay(registryUrl: string, moduleName: string) {
     const mi = await this.getModuleInfoByName(registryUrl, moduleName)
     const versions = await this.getVersions(registryUrl, moduleName)
@@ -935,31 +928,6 @@ export default class FeatureService {
     const arr = await this._storageAggregator.getResource(hashUris)
     const base64 = base64ArrayBuffer(arr)
     return base64
-  }
-
-  public async openDeployOverlayById(
-    registryUri: string,
-    name: string,
-    branch: string | null,
-    version: string | null
-  ) {
-    if (!branch) branch = DEFAULT_BRANCH_NAME
-
-    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
-    if (!registry) throw new Error('No registry with this url exists in config.')
-
-    if (!version) {
-      const versions = await registry.getVersionNumbers(name, branch)
-      if (versions.length > 0) {
-        version = versions[versions.length - 1] // the last version by default
-      }
-    }
-
-    const mi = await this.getModuleInfoByName(registryUri, name)
-    const vi =
-      version !== null ? await this.getVersionInfo(registryUri, name, branch, version) : null
-
-    await this._overlayService.openDeployOverlay(mi, vi)
   }
 
   private async _generateNftImage({

@@ -1,17 +1,20 @@
-@import '../../assets/styles/null.scss';
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
-/* Segoe UI Regular*/
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
+
+/* Segoe UI Regular */
 @font-face {
-  font-family: 'SegoeUIRegular';
-  font-style: normal;
+  font-family: SegoeUIRegular;
   font-weight: 400;
+  font-style: normal;
   font-display: swap;
   src: url('../../assets/fonts/SegoeUI.woff') format('woff');
   unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 
 .dropdownBlock {
+  cursor: pointer;
+
   position: relative;
 
   display: inline-block;
@@ -22,61 +25,56 @@
   max-width: 202px;
   height: auto;
 
-  cursor: pointer;
-
-  border-radius: 10px;
-  background-color: $PureWhite;
-
   // font-family: 'SegoeUIRegular';
   font-size: 12px;
   font-weight: 400;
   line-height: 100%;
+
+  background-color: $PureWhite;
   border: 1px solid #e3e3e3;
+  border-radius: 10px;
   border-radius: 8px;
 }
 
 .spanBlock {
   position: relative;
 
-  display: block;
   overflow: hidden;
+  display: block;
 
   width: 100%;
-
   max-width: 150px;
   padding: 5px 27px 5px 8px;
-
-  white-space: nowrap;
-  text-overflow: ellipsis;
-
-  color: #2a2a2a;
 
   // font-family: "SegoeUIRegular";
   font-size: 12px;
   font-weight: 400;
+  color: #2a2a2a;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
   // font-style: italic;
   // line-height: 149%;
 }
 
 .isOpenIcon {
+  content: '';
+
   position: absolute;
   top: 30%;
   right: 8px;
 
-  right: 8px;
   width: 8px;
   height: 7px;
-  content: '';
-  animation-name: rotateIsClose;
-
-  animation-duration: 0.2s;
-
-  animation-timing-function: ease;
-  animation-fill-mode: forwards;
 
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='7' viewBox='0 0 18 10' fill='none'%3E%3Cpath d='M0.515015 1.46495L9.00001 9.94995L17.485 1.46495L16.071 0.0499516L9.00001 7.12195L1.92901 0.0499516L0.515015 1.46495Z' fill='%23919191'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
+
+  animation-name: rotateIsClose;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
 
   &:hover {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='7' viewBox='0 0 18 10' fill='none'%3E%3Cpath d='M0.515015 1.46501L9.00001 9.95001L17.485 1.46501L16.071 0.0500126L9.00001 7.12201L1.92901 0.0500126L0.515015 1.46501Z' fill='%23747376'/%3E%3C/svg%3E");
@@ -94,16 +92,14 @@
 }
 
 .isOpenAnimationIcon {
-  animation-name: rotateIsOpen;
-
-  animation-duration: 0.2s;
-
-  animation-timing-function: ease;
-  animation-fill-mode: forwards;
-
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='7' viewBox='0 0 18 10' fill='none'%3E%3Cpath d='M0.515015 1.46501L9.00001 9.95001L17.485 1.46501L16.071 0.0500126L9.00001 7.12201L1.92901 0.0500126L0.515015 1.46501Z' fill='%23588CA3'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
+
+  animation-name: rotateIsOpen;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
 }
 
 @keyframes rotateIsOpen {
@@ -138,22 +134,20 @@
   position: absolute;
   z-index: 2;
   bottom: 5px;
-  left: 0px;
+  left: 0;
+  transform: translateY(100%);
 
   width: 148px;
 
   list-style: none;
 
-  transform: translateY(100%);
-  animation-name: listVisible;
-
-  animation-duration: 0.2s;
-
-  animation-timing-function: ease;
-
-  border-radius: 0 0 10px 10px;
   background-color: #fff;
+  border-radius: 0 0 10px 10px;
   box-shadow: -1px 4px 4px rgb(0 0 0 / 25%);
+
+  animation-name: listVisible;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
   animation-fill-mode: forwards;
 
   li:last-child {
@@ -176,23 +170,23 @@
 }
 
 .item {
+  cursor: pointer;
+
   position: relative;
 
   display: flex;
 
   padding-top: 7px;
   padding-bottom: 7px;
-
   padding-left: 8px;
 
-  cursor: pointer;
-
-  color: #2a2a2a;
   // font-family: "SegoeUIRegular";
   font-size: 12px;
   font-weight: 400;
+
   // font-style: italic;
   line-height: 149%;
+  color: #2a2a2a;
 
   &:hover {
     color: $MainGrey;
@@ -209,17 +203,16 @@
 }
 
 .title {
-  margin-right: 10px;
-
-  white-space: nowrap;
 
   // text-transform: uppercase;
   pointer-events: none;
 
-  color: $MainBlack;
+  margin-right: 10px;
 
   // font-family: "SegoeUIRegular";
 
   font-size: 12px;
   line-height: 100%;
+  color: $MainBlack;
+  white-space: nowrap;
 }

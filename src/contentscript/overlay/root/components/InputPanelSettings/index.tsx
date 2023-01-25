@@ -1,7 +1,6 @@
 import cn from 'classnames'
 import React, { FC, useEffect } from 'react'
-import { parseModuleName } from '../../../../../common/helpers'
-import { isValidHttp } from '../../../../../popup/helpers'
+import { isValidHttp, parseModuleName } from '../../../../../common/helpers'
 import styles from './InputPanelSettings.module.scss'
 export interface InputPanelSettingsProps
   extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {

@@ -1,0 +1,42 @@
+.button {
+  cursor: pointer;
+
+  padding: 5px 10px;
+
+  font-size: 14px;
+  color: #fff;
+
+  background-color: #d9304f;
+  border: none;
+  border-radius: 5px;
+}
+
+.button:hover {
+  background-color: #e52347;
+}
+
+.button:active {
+  background-color: #95132b;
+}
+
+.basic {
+  cursor: pointer;
+
+  padding: 5px 10px;
+
+  font-size: 14px;
+  font-weight: 500;
+  color: #d9304f;
+
+  background-color: #0000;
+  border: none;
+  border-radius: 5px;
+}
+
+.basic:hover {
+  color: #e52347;
+}
+
+.basic:active {
+  color: #95132b;
+}

@@ -1,19 +1,18 @@
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
-@import "../../assets/styles/null.scss";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
+@import "../../assets/styles/null";
 
 .wrapper {
   position: relative;
 
   width: 100%;
   margin: 0 0 15px;
-
   padding: 25px 17px 15px;
+
+  font-family: Roboto, sans-serif;
 
   border: 1px solid $MainGrey;
   border-radius: 5px;
-
-  font-family: Roboto, sans-serif;
 }
 
 .title {
@@ -26,14 +25,16 @@
 
   padding: 0 10px;
 
+  font-size: 10px;
+  font-weight: 500;
   color: $ContentBlack;
+
   border: 1px solid $MainGrey;
   border-radius: 4px;
 
-  font-size: 10px;
-  font-weight: 500;
-
   &::before {
+    content: "";
+
     position: absolute;
     z-index: -1;
     top: 0;
@@ -42,11 +43,9 @@
     width: 100%;
     height: 100%;
 
-    content: "";
-
-    border-radius: 3px;
     background-color: $OverlayBG;
+    border-radius: 3px;
   }
 }
 
-@import "./adaptive.scss"
+@import "./adaptive"

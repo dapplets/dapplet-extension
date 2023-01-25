@@ -268,20 +268,32 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   onClick={(e) => {
                     e.preventDefault
                     e.stopPropagation()
+
                     if (
                       document
                         .querySelector('#dapplets-overlay-manager')
                         .classList.contains('dapplets-overlay-collapsed')
                     ) {
-                      menu.id === 'connectedAccounts' && setMenuVisible(!menuVisible)
+                      menu.id === 'dapplets' && setMenuVisible(!menuVisible)
+
+                      p.onToggleClick()
+
                       // menuVisible && setMenuVisible()
                     } else {
-                      p.pinned &&
-                        visibleMenus.length > 0 &&
-                        visibleMenus.map((menu) => p.onMenuClick(menu))
+                      if (menu.id === 'dapplets') {
+                        if (p.pathname === '/system/dapplets') {
+                          p.onToggleClick()
+                        } else {
+                          p.navigate('/system/dapplets')
+                        }
+                      } else {
+                        p.pinned &&
+                          visibleMenus.length > 0 &&
+                          visibleMenus.map((menu) => p.onMenuClick(menu))
 
-                      setMenuVisible(false)
-                      onOpenDappletAction(p.tabId)
+                        setMenuVisible(false)
+                        onOpenDappletAction(p.tabId)
+                      }
                     }
                   }}
                   className={cn(

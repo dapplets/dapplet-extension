@@ -1,7 +1,7 @@
-@import "../../../assets/styles/null.scss";
-@import "../../../assets/styles/fonts.scss";
-@import "../../../assets/styles/color.variables.scss";
-@import "../../../assets/styles/animate.scss";
+@import "../../../assets/styles/null";
+@import "../../../assets/styles/fonts";
+@import "../../../assets/styles/color.variables";
+@import "../../../assets/styles/animate";
 
 .wrapperSelectWiget {
   position: relative;
@@ -12,26 +12,23 @@
 
   width: 100%;
   margin-top: 10px;
-
   padding: 6.5px 13px;
-
-  color: $MainGrey;
-
-  border-radius: 10px;
-
-  background: #ebebeb;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
+  color: $MainGrey;
+
+  background: #ebebeb;
+  border-radius: 10px;
 }
 
 [class*="field-string"] {
   display: flex;
-  align-items: flex-start;
   flex-direction: column;
+  align-items: flex-start;
   justify-content: center;
 
   width: 100%;
@@ -39,9 +36,8 @@
   margin-top: 10px;
   padding: 10px;
 
-  border-radius: 10px;
-
   background: $PureWhite;
+  border-radius: 10px;
 
   [class*="field"] {
     width: 100%;
@@ -55,7 +51,6 @@
 .delimiterSpan {
   display: flex;
   justify-content: flex-start;
-
   width: 97%;
 }
 
@@ -71,15 +66,12 @@
   width: 101%;
   height: auto;
 
-  animation-name: listVisible;
-
-  animation-duration: 0.2s;
-
-  animation-timing-function: ease;
-
+  background: #ebebeb;
   border-radius: 10px;
 
-  background: #ebebeb;
+  animation-name: listVisible;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
   animation-fill-mode: forwards;
 
   :last-child {
@@ -91,27 +83,24 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-
   padding: 6.5px 13px;
 }
 
 .openList {
+  cursor: pointer;
+
   display: block;
 
   width: 24px;
   height: 24px;
 
-  cursor: pointer;
-  animation-name: rotateIsClose;
-
-  animation-duration: 0.2s;
-
-  animation-timing-function: ease;
-
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='10' viewBox='0 0 18 10' fill='none'%3E%3Cpath d='M0.515015 1.46495L9.00001 9.94995L17.485 1.46495L16.071 0.0499516L9.00001 7.12195L1.92901 0.0499516L0.515015 1.46495Z' fill='%23919191'/%3E%3C/svg%3E");
-
   background-repeat: no-repeat;
   background-position: center;
+
+  animation-name: rotateIsClose;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
   animation-fill-mode: forwards;
 
   &:hover {
@@ -124,22 +113,19 @@
 }
 
 .isOpen {
-  animation-name: rotateIsOpen;
-
-  animation-duration: 0.2s;
-
-  animation-timing-function: ease;
-  animation-fill-mode: forwards;
-
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='10' viewBox='0 0 18 10' fill='none'%3E%3Cpath d='M0.515015 1.46501L9.00001 9.95001L17.485 1.46501L16.071 0.0500126L9.00001 7.12201L1.92901 0.0500126L0.515015 1.46501Z' fill='%23588CA3'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
+
+  animation-name: rotateIsOpen;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
 }
 
 .item {
-  padding: 6.5px 13px;
-
   cursor: pointer;
+  padding: 6.5px 13px;
 
   &:hover {
     background: $StrokeColor;

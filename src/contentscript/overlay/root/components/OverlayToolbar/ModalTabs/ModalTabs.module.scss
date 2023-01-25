@@ -12,11 +12,11 @@
 
   width: 100%;
 
-  animation-name: appear;
-  animation-duration: 300ms;
-
   background: rgb(196 196 196 / 10%);
   backdrop-filter: blur(2px);
+
+  animation-name: appear;
+  animation-duration: 300ms;
 
   span {
     position: absolute;

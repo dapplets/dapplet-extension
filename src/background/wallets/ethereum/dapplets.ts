@@ -88,7 +88,7 @@ export default class extends ethers.Signer implements EthereumWallet {
     return {
       name: 'Built-in Wallet',
       description: 'Dapplets Browser Extension',
-      icon: 'https://raw.githubusercontent.com/dapplets/brand-resources/f2e83ff2fb2c6fe627502ffb3ee838299f38505f/svg/dapplets-pluggy.svg',
+      icon: null,
     }
   }
 

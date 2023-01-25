@@ -16,8 +16,6 @@ $/
   src/
     background/
     contentscript/
-    options/
-    popup/
     manifest.json
   utils/
 ```
@@ -28,10 +26,8 @@ $/
 - `src` - Main projects (the product code)
 - `src\backgorund` - Background service of extension. It works globally in browser
 - `src\contentscript` - These scripts are running in the context of each viewing webpage
-- `src\options` - The settings page. It's available in browser's settings => extensions => Injector Extension => options
-- `src\popup` - The popup window that is displayed when extension icon is clicked
 - `src\manifest.json` - The manifest of browser extension
-- `utils` - Utils for project building 
+- `utils` - Utils for project building
 
 ### Building
 
@@ -41,9 +37,9 @@ $/
 
 ## Built With
 
-* [React](https://reactjs.org/) - The web framework used
+- [React](https://reactjs.org/) - The web framework used
 
 ## Authors
 
-* **Dmitry Palchun** - *Initial work* - [ethernian](https://github.com/ethernian)
-* **Alexander Sakhaev** - *Initial work* - [alsakhaev](https://github.com/alsakhaev)
+- **Dmitry Palchun** - _Initial work_ - [ethernian](https://github.com/ethernian)
+- **Alexander Sakhaev** - _Initial work_ - [alsakhaev](https://github.com/alsakhaev)

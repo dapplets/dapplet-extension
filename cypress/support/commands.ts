@@ -1,7 +1,3 @@
-///<reference types="cypress-iframe" />
-
-import 'cypress-iframe'
-
 const trustedUser = '0xF64849376812667BDa7D902666229f8b8dd90687'
 
 Cypress.Commands.add('getByTestId', (selector, ...args) => {

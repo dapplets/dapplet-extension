@@ -1,11 +1,12 @@
-@import '../../assets/styles/null.scss';
-@import '../../assets/styles/fonts.scss';
-@import '../../assets/styles/color.variables.scss';
-/* Segoe UI Regular*/
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
+
+/* Segoe UI Regular */
 @font-face {
-  font-family: "SegoeUIRegular";
-  font-style: normal;
+  font-family: SegoeUIRegular;
   font-weight: 400;
+  font-style: normal;
   font-display: swap;
   src: url('../../assets/fonts/SegoeUI.woff') format('woff');
   unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
@@ -14,16 +15,13 @@
 .wrapper {
   display: flex;
   flex-direction: column;
-
   width: 100%;
-
   margin-top: 25px;
 }
 
 .block {
   display: flex;
   flex-direction: column;
-
   width: 100%;
   padding: 0 12px;
 }
@@ -31,58 +29,51 @@
 .wrapperInfoCard {
   display: flex;
   flex-direction: column;
-
   width: 100%;
 }
 
 .cardTitle {
   margin-bottom: 5px;
 
-  color: $MainBlack;
-
   font-family: Roboto, sans-serif;
   font-size: 22px;
-
   font-weight: 700;
   line-height: 26px;
+  color: $MainBlack;
 }
 
 .cardType {
   margin-bottom: 5px;
 
-  text-transform: uppercase;
-
-  color: $Secondary;
-
   font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
   line-height: 120%;
+  color: $Secondary;
+  text-transform: uppercase;
 }
 
 .cardDescription {
   margin-bottom: 20px;
 
-  color: $ContentBlack;
-
   font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
   line-height: 120%;
+  color: $ContentBlack;
 }
 
 .cardName {
   padding-bottom: 5px;
-
-  color: $ContentBlack;
 
   font-family: Roboto;
   font-size: 12px;
   font-weight: 500;
   font-style: normal;
   line-height: 120%;
+  color: $ContentBlack;
 }
 
 .blockInfo {
@@ -95,15 +86,13 @@
 }
 
 .cardOwner {
-  text-transform: lowercase;
-
-  color: $ContentBlack;
-
   font-family: Roboto;
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
   line-height: 120%;
+  color: $ContentBlack;
+  text-transform: lowercase;
 }
 
 .cardVersion {
@@ -111,32 +100,29 @@
 
   margin-left: 5px;
 
-  text-transform: lowercase;
-
-  color: $Secondary;
-
   font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
   line-height: 120%;
+  color: $Secondary;
+  text-transform: lowercase;
 }
 
 .cardLink {
+  cursor: pointer;
+
   display: inline-block;
 
   margin-left: 5px;
-
-  cursor: pointer;
-  text-transform: lowercase;
-
-  color: $Secondary;
 
   font-family: Roboto;
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
+  color: $Secondary;
+  text-transform: lowercase;
 
   &:hover {
     color: $SecondaryHover;
@@ -160,20 +146,17 @@
   display: inline-block;
 
   height: 32px;
-
   padding: 9px 10px;
-
-  color: $PureWhite;
-
-  border-radius: 4px;
-
-  background: $Primary;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
+  color: $PureWhite;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -185,10 +168,9 @@
 
   &:disabled {
     cursor: default;
-
     color: $StrokeColor;
-    border: 1px solid $StrokeColor;
     background: inherit;
+    border: 1px solid $StrokeColor;
   }
 }
 
@@ -197,42 +179,38 @@
   height: min-content;
   padding: 14px 0 14px 18px;
 
-  color: $PureWhite;
-
-  border-radius: 10px;
-  background: #5ab5e8;
-  box-shadow: 0 0 5px rgb(0 0 0 / 10%);
-
   font-family: Roboto;
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
   line-height: 120%;
+  color: $PureWhite;
+
+  background: #5ab5e8;
+  border-radius: 10px;
+  box-shadow: 0 0 5px rgb(0 0 0 / 10%);
 
   h6 {
     margin-left: 0;
-
-    color: $PureWhite;
 
     font-family: Roboto;
     font-size: 16px;
     font-weight: 500;
     font-style: normal;
     line-height: 120%;
+    color: $PureWhite;
   }
 
   p {
     margin-left: 0;
-
-    text-transform: lowercase;
-
-    color: $PureWhite;
 
     font-family: Roboto;
     font-size: 12px;
     font-weight: 400;
     font-style: normal;
     line-height: 120%;
+    color: $PureWhite;
+    text-transform: lowercase;
   }
 
   div {
@@ -241,44 +219,56 @@
 }
 
 .wrapperCard {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  background: #f5f5f5;
   position: relative;
+
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
   padding: 12px 15px;
+
+  background: #f5f5f5;
+
   &::before {
     content: '';
+
     position: absolute;
     top: 0;
     left: 15px;
+
     width: calc(100% - 30px);
     height: 1px;
+
     background: #e3e3e3;
     border-radius: 2px;
   }
 }
+
 .leftBlock {
   display: flex;
 }
+
 .imgBlock {
   width: 34px;
   height: 34px;
 }
+
 .title {
-  font-family: 'SegoeUIRegular';
+  margin-left: 5px;
+
+  font-family: SegoeUIRegular;
   font-size: 16px !important;
   font-weight: 400 !important;
   color: #2a2a2a !important;
-  margin-left: 5px;
 }
 
 .squareButton {
   width: 34px;
   height: 34px;
-  background: #ffffff;
+  background: #fff;
   border-radius: 50px;
+
   svg{
     width: 16px;
     height: 16px;

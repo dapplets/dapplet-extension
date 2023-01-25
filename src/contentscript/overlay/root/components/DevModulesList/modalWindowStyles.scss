@@ -1,31 +1,28 @@
-@import "../../assets/styles/null.scss";
-@import "../../assets/styles/fonts.scss";
-@import "../../assets/styles/color.variables.scss";
+@import "../../assets/styles/null";
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
 
 .modalDefaultContent {
   display: flex;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
 
   width: 80%;
   margin: 0 auto;
-
-  text-align: center;
-
-  color: $MainGrey;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
+  color: $MainGrey;
+  text-align: center;
 }
 
 .modalDefaultContentButton {
   display: flex;
   align-items: center;
-
   justify-content: center;
 
   width: 157px;
@@ -33,16 +30,14 @@
   margin-top: 10px;
   padding: 0 10px;
 
-  color: $PureWhite;
-  border-radius: 4px;
-
-  background: $Primary;
-
   font-family: Roboto;
   font-size: 14px;
-
   font-weight: 400;
   line-height: 100%;
+  color: $PureWhite;
+
+  background: $Primary;
+  border-radius: 4px;
 
   &:hover {
     background: $PrimaryHover;
@@ -56,14 +51,13 @@
 .isNotAccountModalOwner {
   p {
     width: 100%;
-
     text-align: center;
   }
 }
 
 .modalDefaultContentText {
-  display: inline-block;
   overflow: hidden;
+  display: inline-block;
 
   max-width: 100%;
   max-height: 60vh;
@@ -74,15 +68,12 @@
 
 .modalDefaultWrapper {
   justify-content: center;
-
   height: 80vh;
 }
 
 .modalDefaultTitleAttension {
   display: inline-block;
-
   padding: 20px;
-
   font-size: 24px;
   font-weight: 700;
 }

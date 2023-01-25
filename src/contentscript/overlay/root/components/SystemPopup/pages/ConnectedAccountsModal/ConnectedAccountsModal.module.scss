@@ -1,0 +1,48 @@
+@import "../../../../assets/styles/null";
+@import "../../../../assets/styles/fonts";
+@import "../../../../assets/styles/color.variables";
+
+.account {
+  cursor: default;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  height: 46px;
+  margin: 5px;
+  padding: 2px 5px 2px 2px;
+  border-radius: 200px;
+  cursor: default;
+}
+
+.hasAction {
+  cursor: pointer;
+}
+
+.imgUser {
+  display: inline-block;
+  width: 42px;
+  height: 42px;
+  margin-right: 10px;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.nameUser {
+  color: $MainBlack;
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 100%;
+  color: $MainBlack;
+}
+
+.nameUserActive {
+  background: $Primary;
+
+  .nameUser {
+    color: $PureWhite;
+  }
+}

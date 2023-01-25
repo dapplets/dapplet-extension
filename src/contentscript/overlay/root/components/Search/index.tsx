@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import React, { DetailedHTMLProps, InputHTMLAttributes, ReactElement } from 'react'
-import { ReactComponent as MiniIcon } from '../../assets/svg/refresh_search.svg'
 import { ReactComponent as SearchIcon } from '../../assets/newIcon/search.svg'
+import { ReactComponent as MiniIcon } from '../../assets/svg/refresh_search.svg'
 import styles from './Search.module.scss'
 
 export interface SearchProps
