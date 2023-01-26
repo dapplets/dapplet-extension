@@ -15,6 +15,7 @@ import useAbortController from '../../hooks/useAbortController'
 import { _addInfoItemInputGroup } from '../../utils/addInfoInputGroup'
 import { _removeInfoItemInputGroup } from '../../utils/removeInfoInputGroup'
 import styles from './DappletsInfo.module.scss'
+import { ReactComponent as Back } from '../../assets/svg/back.svg'
 
 export interface DappletsMainInfoProps {
   setDappletsDetail: (x) => void
@@ -449,6 +450,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
           }}
           className={styles.back}
         >
+          <Back/>
           Back
         </button>
         <button

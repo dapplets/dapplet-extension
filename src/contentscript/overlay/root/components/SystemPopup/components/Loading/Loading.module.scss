@@ -21,9 +21,8 @@
   height: 143px;
   margin: 20px auto;
 
-  background-image: url("../../assests/loader.svg");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border-radius: 50%;
 }
