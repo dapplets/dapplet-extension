@@ -5,7 +5,8 @@ import { browser } from 'webextension-polyfill-ts'
 import { isValidUrl } from '../../../../../common/helpers'
 import useAbortController from '../../hooks/useAbortController'
 import { addSettingsValueDropdown } from '../../utils/addSettingsValueDropdown'
-
+import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
+import { ReactComponent as Delete } from '../../assets/icons/mini-close.svg'
 import styles from './DropdownRegistry.module.scss'
 
 export type DropdownRegistryProps = DetailedHTMLProps<
@@ -115,7 +116,7 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
                   <span
                     className={cn(styles.openList, { [styles.isOpen]: isOpen })}
                     onClick={() => setOpen(true)}
-                  />
+                  ><DropdownIcon/></span>
                 </form>
               </div>
             )
@@ -128,7 +129,7 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
               <span
                 className={cn(styles.openList, { [styles.isOpen]: isOpen })}
                 onClick={() => setOpen(false)}
-              />
+              ><DropdownIcon/></span>
             </div>
 
             {registries.map((r, i) => (
@@ -151,7 +152,7 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
                     <span
                       onClick={() => removeRegistry(r.url)}
                       className={styles.deleteRegistryes}
-                    />
+                    ><Delete/></span>
                   </span>
                 )}
               </div>

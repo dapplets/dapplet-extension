@@ -2,6 +2,7 @@ import cn from 'classnames'
 import React, { FC, useEffect } from 'react'
 import { isValidHttp, parseModuleName } from '../../../../../common/helpers'
 import styles from './InputPanelSettings.module.scss'
+import { ReactComponent as Default } from '../../assets/svg/default.svg'
 export interface InputPanelSettingsProps
   extends React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   onSubmit?: () => void
@@ -144,7 +145,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
               getDefaultValueProvider()
             }}
             className={cn(styles.buttonInputDefault, styles.btnAbsolute)}
-          />
+          ><Default/></button>
         )}
       </div>
       {providerInputError ? <div className={styles.errorMessage}>{providerInputError}</div> : null}

@@ -12,10 +12,12 @@ import { ReactComponent as Max } from '../../assets/icons/iconsWidgetButton/max.
 import { ReactComponent as Notification } from '../../assets/icons/iconsWidgetButton/notification.svg'
 import { ReactComponent as Pause } from '../../assets/icons/iconsWidgetButton/pause.svg'
 import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
+// import { ReactComponent as Close } from '../../assets/icons/close.svg'
 import { StorageRefImage } from '../../components/StorageRefImage'
 import { ToolbarTabMenu } from '../../types'
 import { ModuleIcon, ModuleIconProps } from '../ModuleIcon'
 import { SquaredButton } from '../SquaredButton'
+// import { Close } from '../SystemPopup/components/Close'
 import styles from './OverlayTab.module.scss'
 
 export interface OverlayTabProps {
@@ -241,8 +243,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           />
         )}
         {/* {!p.pinned && (
-          <span className={cn(styles.close, p.classNameClose)} onClick={_handleCloseClick}>
-            <Close />
+          <span className={cn(styles.close, p.classNameClose)} 
+          onClick={_handleCloseClick}
+          >
+   
+            <Close/>
           </span>
         )} */}
       </div>

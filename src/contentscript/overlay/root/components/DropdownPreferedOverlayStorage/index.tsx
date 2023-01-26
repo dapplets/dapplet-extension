@@ -5,6 +5,7 @@ import { browser } from 'webextension-polyfill-ts'
 import useAbortController from '../../hooks/useAbortController'
 import { IDropdown } from '../../models/dropdown.model'
 import styles from './DropdownPreferedOverlayStorage.module.scss'
+import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
 
 export interface DropdownProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
@@ -48,7 +49,7 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (props: Dropdow
       tabIndex={0}
     >
       <div className={styles.dropdownLabel}>{preferedOverlayStorage}</div>
-      <span className={cn(styles.openList, { [styles.isOpen]: isOpen })} />
+      <span className={cn(styles.openList, { [styles.isOpen]: isOpen })} ><DropdownIcon/></span>
       {isOpen && (
         <div className={styles.openOverlay}>
           <div className={styles.blockIcon}>
@@ -57,7 +58,7 @@ export const DropdownPreferedOverlayStorage: FC<DropdownProps> = (props: Dropdow
               className={cn(styles.openList, { [styles.isOpen]: isOpen })}
               onClick={() => setOpen(false)}
               tabIndex={1}
-            />
+            ><DropdownIcon/></span>
           </div>
           {[
             { id: 'centralized', text: 'centralized' },

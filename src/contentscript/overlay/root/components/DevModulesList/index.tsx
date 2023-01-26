@@ -11,6 +11,7 @@ import useAbortController from '../../hooks/useAbortController'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
+import {ReactComponent as Settings} from '../../assets/svg/setting.svg'
 
 enum DeploymentStatus {
   Unknown,
@@ -423,7 +424,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
                   setModuleInfo(mi)
                   setModuleVersion(vi)
                 }}
-              />
+              ><Settings/></button>
             )}
             {mi.isUnderConstruction || !isLocalhost ? null : (
               <button

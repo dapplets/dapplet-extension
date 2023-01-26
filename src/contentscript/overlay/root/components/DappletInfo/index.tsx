@@ -2,6 +2,7 @@ import cn from 'classnames'
 import React, { FC } from 'react'
 import useCopied from '../../hooks/useCopyed'
 import styles from './DappletInfo.module.scss'
+import { ReactComponent as Copy } from '../../assets/icons/copyShare.svg'
 
 export interface DappletInfoProps {
   title: string
@@ -49,7 +50,7 @@ export const DappletInfo: FC<DappletInfoProps> = ({
           {title}:
           <span className={styles.copied}>
             {value}
-            <span className={styles.copiedIcon}></span>
+            <span className={styles.copiedIcon}><Copy/></span>
           </span>
         </h6>
       ) : null}

@@ -2,6 +2,7 @@ import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useState } from 'react'
 import { IDropdown } from '../../models/dropdown.model'
 import styles from './Dropdown.module.scss'
+import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
 
 export type DropdownProps = Omit<
   DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>,
@@ -39,7 +40,7 @@ export const Dropdown: FC<DropdownProps> = (props: DropdownProps) => {
             className={cn(styles.isOpenIcon, {
               [styles.isOpenAnimationIcon]: isOpen,
             })}
-          ></span>
+          ><DropdownIcon/></span>
         </span>
 
         {isOpen && (

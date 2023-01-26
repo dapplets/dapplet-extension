@@ -8,6 +8,7 @@ import {
   ReactComponent as DappletsLogo,
 } from '../../assets/newIcon/mustache.svg'
 import { ReactComponent as Coolicon } from '../../assets/newIcon/squares.svg'
+import { ReactComponent as Show } from '../../assets/icons/iconsWidgetButton/show.svg'
 import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { WidgetButton } from '../../widgets/button'
@@ -383,7 +384,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                   className={cn(styles.miniButton, {
                     [styles.hideTabsBtn]: isShowTabs,
                   })}
-                ></button>
+                ><Show/></button>
               )}
             </div>
           </div>
