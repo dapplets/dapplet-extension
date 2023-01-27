@@ -7,6 +7,7 @@ export interface ButtonProps
   disabled?: boolean
   appearance: 'smail' | 'big'
   icon: FunctionComponent
+  dataTestid?: string
 }
 
 export const SquaredButton: FC<ButtonProps> = (props: ButtonProps) => {
@@ -15,11 +16,13 @@ export const SquaredButton: FC<ButtonProps> = (props: ButtonProps) => {
     appearance,
     className,
     icon: Icon,
+    dataTestid,
 
     ...anotherProps
   } = props
   return (
     <button
+      data-testid={dataTestid}
       className={cn(
         styles.button,
         {

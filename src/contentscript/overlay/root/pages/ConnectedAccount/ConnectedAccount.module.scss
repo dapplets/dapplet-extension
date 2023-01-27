@@ -3,42 +3,71 @@
 @import "../../assets/styles/null";
 
 .wrapper {
-  overflow: hidden;
   display: flex;
+  overflow: hidden;
   flex-direction: column;
-
   width: 100%;
   height: 100%;
-  padding: 30px 0 0;
+  padding: 14px 0 0;
+}
+
+.scrollContent {
+  overflow-y: scroll;
+  width: 100%;
+  height: calc(100vh - 75px);
+  direction: rtl;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+    cursor: pointer;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgb(244 244 244);
+    background:
+      linear-gradient(
+        90deg,
+        rgb(244 244 244 / 0%) 10%,
+        rgb(227 227 227 / 100%) 50%,
+        rgb(244 244 244 / 0%) 90%
+      );
+  }
+
+  &::-webkit-scrollbar-thumb {
+    width: 4px;
+    height: 2px;
+    border-radius: 2px;
+    background: $Primary;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
+    margin-bottom: 15px;
+  }
+}
+
+.scrollContent > * {
+  direction: ltr;
 }
 
 .title {
   position: relative;
-
   display: grid;
-  grid-template-columns: 362px 76px;
-
   padding-bottom: 7px;
-
-  font-family: Roboto;
+  text-transform: capitalize;
+  color: $MainGrey;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainGrey;
-  text-transform: capitalize;
+  grid-template-columns: 330px 90px;
 
   &::after {
-    content: "";
-
     position: absolute;
     bottom: 0;
     left: 0;
-
     width: 100%;
     height: 1px;
-
-    background: $WebBG;
+    content: "";
+    background: #ced3d3;
   }
 }
 
@@ -49,27 +78,24 @@
 .accountsWrapper {
   display: flex;
   flex-direction: column;
-
-  width: 100%;
+  width: 97%;
   height: 100%;
-  margin-top: 7px;
+  margin-top: 14px;
 }
 
 .mainBlock {
   display: grid;
-  grid-template-columns: 372px 35px 30px;
   align-items: center;
-
   width: 100%;
-  margin: 6px 0;
-  padding-left: 2px;
+  grid-template-columns: 330px 90px;
+  margin-top: 10px;
 }
 
 .accountBlock {
   display: flex;
-  align-items: center;
   width: 100%;
-  padding: 0 10px 0 0;
+  padding: 10px;
+  background-color: $WebBG;
 }
 
 .accountBlockHorizontal {
@@ -77,48 +103,42 @@
 }
 
 .accountBlockVertical {
-  flex-direction: column
+  flex-direction: column;
 }
 
 .account {
-  cursor: pointer;
-
   position: relative;
-
   display: flex;
   align-items: center;
-
   width: fit-content;
-  height: 46px;
-  margin: 5px;
-  padding: 2px 5px 2px 2px;
+  height: 44px;
+  margin: 3px;
+  padding: 0 5px 0 2px;
+  border-radius: 200px 140px 140px 200px;
+  background: white;
 
-  background: $WebBG;
-  border-radius: 200px;
-  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+  // box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+  cursor: pointer;
 }
 
 .imgUser {
   display: inline-block;
-
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   margin-right: 10px;
-
-  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
-  border: 2px solid white;
+  border: 2px solid $WebBG;
   border-radius: 50%;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
 }
 
 .nameUser {
-  padding-right: 14px;
-
-  font-family: Roboto;
+  color: $MainBlack;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainBlack;
+  padding-right: 14px;
 }
 
 .nameUserActive {
@@ -131,11 +151,9 @@
 
 .arrowsAccount {
   display: block;
-
   width: 22px;
   min-width: 22px;
   height: 11px;
-
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='11' viewBox='0 0 16 11' fill='none'%3E%3Cpath d='M0.221076 1.96378L1.63608 0.550781L6.58508 5.50078L1.63008 10.4448L0.222076 9.03678L3.75808 5.50078L0.221076 1.96478L0.221076 1.96378ZM9.41408 5.50078L14.3691 0.555781L15.7781 1.96478L12.2431 5.50078L15.7781 9.03578L14.3641 10.4508L9.41508 5.50178L9.41408 5.50078Z' fill='%23B5B5B5'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
@@ -144,124 +162,113 @@
 
 .accountStatus {
   position: relative;
-
   display: flex;
   align-items: center;
-  justify-content: start;
-
+  justify-content: center;
   width: 100%;
+  background-color: #dadada;
+  height: 100%;
 }
 
 .statusLabel {
   display: block;
-
-  width: 23px;
-  height: 23px;
-
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   box-shadow: 0 2px 2px rgb(0 0 0 / 10%);
 }
 
-.accountStatus::before {
-  content: attr(data-title);
-}
-
-.accountStatus::before {
-  content: attr(data-title);
-
+.accountStatus > div::before {
   position: absolute;
   z-index: 9998;
   top: 47%;
   right: 87%;
-
   display: none;
-
   width: max-content;
   height: auto;
   padding: 8px 10px;
-
-  font-family: Roboto;
+  content: attr(data-title);
+  text-align: center;
+  text-transform: capitalize;
+  color: $MainGrey;
+  border-radius: 10px 0 10px 10px;
+  background: $PureWhite;
+  box-shadow: 0 4px 4px rgb(0 0 0 / 10%);
+  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainGrey;
-  text-align: center;
-  text-transform: capitalize;
-
-  background: $PureWhite;
-  border-radius: 10px 0 10px 10px;
-  box-shadow: 0 4px 4px rgb(0 0 0 / 10%);
 }
 
-.accountStatus:hover::before,
-.accountStatus:focus::before {
+.accountStatus > div:hover::before,
+.accountStatus > div:focus::before {
   display: inline-block;
 }
 
 .statusName {
   display: inline-block;
-
   padding-left: 5px;
-
-  font-family: Roboto;
+  text-transform: capitalize;
+  color: $MainBlack;
+  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainBlack;
-  text-transform: capitalize;
 }
 
 .statusConnected {
   padding: 4px 5px;
   background: #5ec280;
+  margin: 3px;
 }
 
 .statusProcessing {
   padding: 6px 5px;
   background: #f5cf6c;
+  margin: 3px;
 }
 
 .statusError {
   padding: 4px 2px 7px;
   background: $Primary;
+  margin: 3px;
 }
 
-.accountDelete {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
+// .accountDelete {
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   width: 100%;
+// }
 
 .buttonDelete {
   display: inline-block;
-
-  width: 27px;
-  height: 27px;
-
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 4%));
   background-color: $PureWhite;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23919191'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
-  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 4%));
-  border-radius: 50%;
+  margin: 3px;
 
   &:hover {
-    background-color: $Primary;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23FFFFFF'/%3E%3C/svg%3E");
+    background-color: $Primary;
   }
 
   &:active {
-    background-color: $PrimaryPressed;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23FFFFFF'/%3E%3C/svg%3E");
+    background-color: $PrimaryPressed;
   }
 
   &:disabled {
     cursor: default;
-    background-color: #e5e5e5;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23919191'/%3E%3C/svg%3E");
+    background-color: #e5e5e5;
   }
 }
 
@@ -270,22 +277,39 @@
   padding: 0 110px;
 
   h6 {
-    font-family: Roboto;
+    text-align: center;
+    color: $MainGrey;
+    font-family: Roboto, sans-serif;
     font-size: 22px;
     font-weight: 700;
     font-style: normal;
     line-height: 26px;
-    color: $MainGrey;
-    text-align: center;
   }
 
   p {
-    font-family: Roboto;
+    text-align: center;
+    color: #797979;
+    font-family: Roboto, sans-serif;
     font-size: 14px;
     font-weight: 500;
     font-style: normal;
     line-height: 16px;
-    color: #797979;
-    text-align: center;
   }
+}
+
+.connectWalletsBtn {
+  display: block;
+  padding: 12px 20px;
+  background: #d9304f;
+  border-radius: 4px;
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 100%;
+  color: #fff;
+  width: fit-content;
+}
+
+.connectWalletsBtn:disabled {
+  cursor: default;
+  background-color: #999;
 }

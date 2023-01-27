@@ -3,7 +3,8 @@ import makeBlockie from 'ethereum-blockies-base64'
 import { browser } from 'webextension-polyfill-ts'
 import { resources } from '../../common/resources'
 import { socialNetworkConnectionCondition } from './connected-accounts-assembly'
-import { Account, VerificationRequest } from './types'
+import { Account } from './types'
+import { TConnectedAccountsVerificationRequestInfo } from '../../common/types'
 
 interface IRequestVerificationProps {
   firstAccountId: string
@@ -39,7 +40,9 @@ class ConnectedAccounts {
     return getConnectedAccountsPendingRequests()
   }
 
-  public async getVerificationRequest(id: number): Promise<VerificationRequest | null> {
+  public async getVerificationRequest(
+    id: number
+  ): Promise<TConnectedAccountsVerificationRequestInfo | null> {
     const { getConnectedAccountsVerificationRequest } = await initBGFunctions(browser)
     return getConnectedAccountsVerificationRequest(id)
   }

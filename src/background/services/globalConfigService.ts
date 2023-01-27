@@ -307,7 +307,7 @@ export default class GlobalConfigService {
       },
     ]
     config.myDapplets = []
-    config.connectedAccountsContractAddress = 'dev-1659683929908-36510272337320'
+    config.connectedAccountsContractAddress = 'dev-1674551865700-67703371677231'
     config.pinnedDappletActions = []
     return config
   }
@@ -457,6 +457,7 @@ export default class GlobalConfigService {
   }
 
   async updateTargetStorages(storages: StorageTypes[]) {
+    // console.log('storages', storages)
     const config = await this.get()
     config.targetStorages = storages
     await this.set(config)
@@ -469,7 +470,6 @@ export default class GlobalConfigService {
 
   async getTrustedUsers() {
     const config = await this.get()
-
     return config.trustedUsers
   }
 

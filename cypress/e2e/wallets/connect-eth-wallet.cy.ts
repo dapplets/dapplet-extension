@@ -2,7 +2,7 @@ import { qase } from 'cypress-qase-reporter/dist/mocha'
 
 const url = 'https://example.com'
 
-describe('No available dapplets', () => {
+describe('connect Ethereum build-in wallet', () => {
   qase(
     14,
     it('connect Ethereum build-in wallet', () => {

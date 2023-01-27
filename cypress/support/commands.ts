@@ -19,13 +19,14 @@ Cypress.Commands.add('openDappletsOverlay', (url) => {
   cy.get('dapplets-overlay-manager').should('not.have.class', 'dapplets-overlay-hidden')
 
   // expands to ubersausage mode
-  cy.getByTestId('show-tabs-button').click()
+  // cy.getByTestId('show-tabs-button').click()
 
   // opens dapplets list
-  cy.getByTestId('toggle-overlay-button').click()
+  // cy.getByTestId('toggle-overlay-button').click()
+  cy.getByTestId('system-tab-dapplets').click()
 
-  cy.getByTestId('system-tab-settings').click()
-  cy.getByTestId('toggle-overlay-button').click()
+  // cy.getByTestId('system-tab-settings').click()
+  // cy.getByTestId('toggle-overlay-button').click()
 
   cy.get('dapplets-overlay-manager').should('not.have.class', 'dapplets-overlay-collapsed')
 })

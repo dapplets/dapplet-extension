@@ -81,61 +81,43 @@
   }
 }
 
-.modalBody {
-  overflow: auto;
-  padding: 10px;
+.loader {
+  height: 104px;
 }
 
 .modalTitle {
   display: block;
 
   width: 300px;
-  padding: 0 0 5px;
+  padding: 20px 0 5px;
 
   font-family: Roboto, sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 26px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 115%;
   color: $MainBlack;
 }
 
 .modalAccounts {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 265px;
-  max-width: 100%;
-  min-height: 167px;
-  margin: 20px;
-  padding: 20px;
-
-  background: #f6f8f9;
-  border-radius: 3em;
-  box-shadow: 2px 6px 8px rgb(0 0 0 / 8%);
+  margin-top: 4px;
 }
 
-.loader {
-  position: relative;
-
-  overflow: hidden;
-
-  width: 143px;
-  height: 143px;
-  margin: 20px auto;
-
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-  border-radius: 50%;
+.modalBody {
+  margin-top: 12px;
+  width: 80%;
+  font-size: 16px;
+  line-height: 150%;
+  color: #797979;
 }
 
-.wrapperModalWantLink {
+.modalFooter {
   display: flex;
+  flex-direction: column;
   align-items: center;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 
 .button {
@@ -143,52 +125,53 @@
   align-items: center;
   justify-content: center;
 
-  width: max-content;
-  height: 32px;
-  margin: 5px;
-  padding: 0 10px;
+  // width: max-content;
+  // height: 32px;
+  margin: 3px;
+  padding: 5px;
 
   font-family: Roboto, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 100%;
+  font-size: 16px;
+  font-weight: 600;
+  // line-height: 100%;
 
-  border-radius: 4px;
+  // border-radius: 4px;
+  background: none;
 }
 
 .primary {
-  color: $PureWhite;
-  background: $Primary;
+  color: $Primary;
+  background: $PureWhite;
 
   &:hover {
-    background: hsl(349deg 66% 44%);
+    color: hsl(349deg 66% 44%);
   }
 
   &:active {
-    background: $PrimaryPressed;
+    color: $PrimaryPressed;
   }
 
   &:disabled {
     cursor: default;
-    background-color: $PrimaryHover;
+    color: $PrimaryHover;
   }
 }
 
 .secondary {
-  color: $PureWhite;
-  background: $Secondary;
+  color: #30A6D9;
+  background: $PureWhite;
 
   &:hover {
-    background: hsl(200deg 63% 49%);
+    color: hsl(200deg 63% 49%);
   }
 
   &:active {
-    background: hsl(200deg 66% 44%);
+    color: hsl(200deg 66% 44%);
   }
 
   &:disabled {
     cursor: default;
-    background-color: $SecondaryHover;
+    color: $SecondaryHover;
   }
 }
 
