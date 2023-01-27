@@ -136,11 +136,12 @@ export const ConnectedAccount = () => {
       setWalletsForConnectOrDisconnect([connectedAccountUser1, connectedAccountUser2])
     }
 
+    // console.log('pairs', pairs)
     if (!pairs.length) {
       setAreAuthorizedWalletsConnected(false)
     } else {
       let areSameWallets = false
-      for (const pair of pairs) {
+      for (const pair of pairs.filter((x) => x.closeness === 1)) {
         if (
           (pair.firstAccount.name === connectedEthWallet.account &&
             pair.firstAccount.origin === 'ethereum' &&
@@ -299,7 +300,7 @@ export const ConnectedAccount = () => {
                         disabled={
                           x.closeness > 1 ||
                           (!areWallets && x.statusName !== ConnectedAccountsPairStatus.Connected) ||
-                          !canDisconnectWallets
+                          (areWallets && !canDisconnectWallets)
                         }
                       />
                     </div>

@@ -10,6 +10,7 @@ import {
 import { Modal } from './modal'
 import { getSignature, areWeLinkingWallets } from './helpers'
 import UserButton from './UserButton'
+import { Bus } from '../../../../../../../common/bus'
 
 interface IConnectedAccountsModalProps {
   data: {
@@ -21,7 +22,19 @@ interface IConnectedAccountsModalProps {
   }
   onCloseClick: () => void
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  bus: any
+  bus: Bus
+}
+
+type TRequestBody = {
+  firstAccountId: string
+  firstOriginId: string
+  secondAccountId: string
+  secondOriginId: string
+  isUnlink: boolean
+  signature?: EthSignature
+  firstProofUrl?: string
+  secondProofUrl?: string
+  statement?: string
 }
 
 const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
@@ -35,6 +48,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const [isWaiting, setIsWaiting] = useState(false)
   const [requestWasDoneBefore, setRequestWasDoneBefore] = useState(false)
   const [areAccountsWallets, setAreAccountsWallets] = useState(false)
+  const [requestBody, setRequestBody] = useState<TRequestBody>()
 
   const askIfSameRequestsExist = async (
     accounts: [IConnectedAccountUser, IConnectedAccountUser]
@@ -100,6 +114,27 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     makeCheckup()
   }, [accountsToConnect, accountsToDisconnect])
 
+  useEffect(() => {
+    const fn = async () => {
+      // let requestId: number
+      const { requestConnectingAccountsVerification } = await initBGFunctions(browser)
+      try {
+        /*requestId = */ await requestConnectingAccountsVerification(requestBody, null)
+      } catch (err) {
+        if (err.message !== 'User rejected the transaction.')
+          console.log('Error in requestConnectingAccountsVerification().', err)
+      }
+
+      setIsWaiting(false)
+      // const frameId = data.frameId
+      // bus.publish('ready', [frameId, { requestId }])
+      bus.publish('ready')
+      setRequestBody(null)
+      onCloseClick()
+    }
+    if (requestBody) fn()
+  }, [requestBody])
+
   const handleConnectOrDisconnect = async (
     firstAccount: IConnectedAccountUser,
     secondAccount: IConnectedAccountUser,
@@ -112,33 +147,21 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     const firstProofUrl = resources[firstAccount.origin].proofUrl(firstAccount.name)
     const secondProofUrl = resources[secondAccount.origin].proofUrl(secondAccount.name)
 
-    let requestBody: {
-      firstAccountId: string
-      firstOriginId: string
-      secondAccountId: string
-      secondOriginId: string
-      isUnlink: boolean
-      signature?: EthSignature
-      firstProofUrl?: string
-      secondProofUrl?: string
-      statement?: string
-    }
-    let requestId: number
+    let body: TRequestBody
 
     if (areAccountsWallets) {
       try {
         const statement = `I confirm that I am the owner of Account A and Account B and I want to ${
           isUnlink ? 'unlink' : 'link'
         } them in the Connected Accounts service.`
-        let ethSignature: EthSignature
         if (firstAccount.origin.indexOf('ethereum') === 0) {
-          ethSignature = await getSignature(
+          const ethSignature = await getSignature(
             secondAccount.name,
             firstAccount.name,
             firstAccount.origin,
             statement
           )
-          requestBody = {
+          body = {
             firstAccountId: firstAccount.name,
             firstOriginId: 'ethereum',
             secondAccountId: secondAccount.name,
@@ -148,13 +171,13 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
             statement,
           }
         } else if (secondAccount.origin.indexOf('ethereum') === 0) {
-          ethSignature = await getSignature(
+          const ethSignature = await getSignature(
             firstAccount.name,
             secondAccount.name,
             secondAccount.origin,
             statement
           )
-          requestBody = {
+          body = {
             firstAccountId: firstAccount.name,
             firstOriginId: firstAccount.origin,
             secondAccountId: secondAccount.name,
@@ -173,14 +196,10 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         onCloseClick()
         return
       }
-      try {
-        requestId = await requestConnectingAccountsVerification(requestBody, null)
-      } catch (err) {
-        if (err.message !== 'User rejected the transaction.')
-          console.log('Error in requestConnectingAccountsVerification().', err)
-      }
+      setRequestBody(body)
+      return
     } else {
-      requestBody = {
+      const body = {
         firstAccountId: firstAccount.name,
         firstOriginId: firstAccount.origin,
         secondAccountId: secondAccount.name,
@@ -189,18 +208,19 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         secondProofUrl,
         isUnlink,
       }
+      // let requestId: number
       try {
-        requestId = await requestConnectingAccountsVerification(requestBody, minStakeAmount)
+        /*requestId =*/ await requestConnectingAccountsVerification(body, minStakeAmount)
       } catch (err) {
         if (err.message !== 'User rejected the transaction.')
           console.log('Error in requestConnectingAccountsVerification().', err)
       }
+      setIsWaiting(false)
+      // const frameId = data.frameId
+      // bus.publish('ready', [frameId, { requestId }])
+      bus.publish('ready')
+      onCloseClick()
     }
-
-    setIsWaiting(false)
-    const frameId = data.frameId
-    bus.publish('ready', [frameId, { requestId }])
-    onCloseClick()
   }
 
   const handleSetMainAccount = async (account: IConnectedAccountUser) => {
@@ -215,8 +235,9 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     }
 
     setIsWaiting(false)
-    const frameId = data.frameId
-    bus.publish('ready', [frameId, 'ok'])
+    // const frameId = data.frameId
+    // bus.publish('ready', [frameId, 'ok'])
+    bus.publish('ready')
     onCloseClick()
   }
 
@@ -263,8 +284,9 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         content={`Add your NEAR account ID to your ${socialNetworkToConnect} username. This is done so the Oracle can confirm your ownership of the ${socialNetworkToConnect} account`}
         onClose={onCloseClick}
         onConfirm={async () => {
-          const frameId = data.frameId
-          bus.publish('ready', [frameId, 'ok'])
+          // const frameId = data.frameId
+          // bus.publish('ready', [frameId, 'ok'])
+          bus.publish('ready')
           onCloseClick()
         }}
         onConfirmLabel="Already done"
@@ -276,7 +298,22 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     return (
       <Modal
         isWaiting={isWaiting}
-        title="Do you want to connect these accounts?"
+        title={isWaiting ? 'Connecting' : 'Do you want to connect these accounts?'}
+        content={
+          areAccountsWallets
+            ? isWaiting
+              ? requestBody
+                ? 'Please approve NEAR transaction'
+                : 'Please sign the message in MetaMask'
+              : 'You need to sign a message in MetaMask and approve the transaction to the Connected Accounts NEAR contract in order to link your Ethereum and NEAR accounts.'
+            : isWaiting
+            ? 'Please approve NEAR transaction'
+            : accountsToConnect[0].origin === 'twitter' || accountsToConnect[1].origin === 'twitter'
+            ? 'You need to have your NEAR account name listed in your Twitter profile name to link your accounts.\nExample: Sam Green (sam.testnet)'
+            : accountsToConnect[0].origin === 'github' || accountsToConnect[1].origin === 'github'
+            ? 'You need to have your NEAR account name listed in your GitHub profile name to link your accounts.\nExample: Sam Green (sam.testnet)'
+            : undefined
+        }
         accounts={
           <>
             <UserButton user={accountsToConnect[0]} />
@@ -296,7 +333,24 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     return (
       <Modal
         isWaiting={isWaiting}
-        title="Do you want to disconnect these accounts?"
+        title={isWaiting ? 'Disconnecting' : 'Do you want to disconnect these accounts?'}
+        content={
+          areAccountsWallets
+            ? isWaiting
+              ? requestBody
+                ? 'Please approve NEAR transaction'
+                : 'Please sign the message in MetaMask'
+              : 'You need to sign a message in MetaMask and approve the transaction to the Connected Accounts NEAR contract in order to unlink your Ethereum and NEAR accounts.'
+            : isWaiting
+            ? 'Please approve NEAR transaction'
+            : accountsToDisconnect[0].origin === 'twitter' ||
+              accountsToDisconnect[1].origin === 'twitter'
+            ? 'You need to have your NEAR account name listed in your Twitter profile name to unlink your accounts.\nExample: Sam Green (sam.testnet)'
+            : accountsToDisconnect[0].origin === 'github' ||
+              accountsToDisconnect[1].origin === 'github'
+            ? 'You need to have your NEAR account name listed in your GitHub profile name to unlink your accounts.\nExample: Sam Green (sam.testnet)'
+            : undefined
+        }
         accounts={
           <>
             <UserButton user={accountsToDisconnect[0]} />

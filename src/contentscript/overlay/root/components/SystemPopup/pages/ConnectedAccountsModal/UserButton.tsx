@@ -13,7 +13,7 @@ const UserButton = ({ user }: { user: IConnectedAccountUser }) => {
     >
       <img src={resources[user.origin].icon} className={styles.imgUser} />
       <h4 className={styles.nameUser}>
-        {user.name.length > 30 ? user.name.slice(0, 6) + '...' + user.name.slice(-4) : user.name}
+        {user.name.length > 25 ? user.name.slice(0, 11) + '...' + user.name.slice(-11) : user.name}
       </h4>
     </div>
   )

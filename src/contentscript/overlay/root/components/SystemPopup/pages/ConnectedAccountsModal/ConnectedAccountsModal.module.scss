@@ -8,12 +8,12 @@
   position: relative;
   display: flex;
   align-items: center;
-  width: fit-content;
-  height: 46px;
-  margin: 5px;
-  padding: 2px 5px 2px 2px;
-  border-radius: 200px;
-  cursor: default;
+  width: 250px;
+  height: 44px;
+  margin: 3px;
+  padding: 0 5px 0 2px;
+  border-radius: 200px 140px 140px 200px;
+  background-color: $WebBG;  
 }
 
 .hasAction {
@@ -22,11 +22,12 @@
 
 .imgUser {
   display: inline-block;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   margin-right: 10px;
-  border: 2px solid white;
+  border: 2px solid #BFBFBF;
   border-radius: 50%;
+  background-color: white;
 }
 
 .nameUser {

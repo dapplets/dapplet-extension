@@ -5,7 +5,7 @@ import styles from './Modal.module.scss'
 
 interface IModalProps {
   title?: string
-  content?: ReactElement | string
+  content?: string
   accounts?: ReactElement
   onClose: () => void
   onConfirm?: () => Promise<void>
@@ -40,45 +40,45 @@ export const Modal = ({
       <div
         className={cn(styles.modalDialog, styles.contentModal)}
         onClick={(e) => e.stopPropagation()}
+        style={{ paddingTop: isWaiting ? '0' : '46px' }}
       >
+        {/* {!accounts && isWaiting && <img src={Loader} className={styles.loader} />} */}
+        {isWaiting && <img src={Loader} className={styles.loader} />}
         <div className={styles.modalHeader}>
           <h3 className={styles.modalTitle}>{title}</h3>
           {onClose ? <span className={styles.modalClose} onClick={onClose} /> : null}
         </div>
+        {accounts && <div className={styles.modalAccounts}>{accounts}</div>}
         {content && (
           <div className={styles.modalBody}>
-            <div className={styles.modalContent}>{content}</div>
+            {/* <div className={styles.modalContent}>{content}</div> */}
+            {content.split('\n').map((t, i) => (
+              <p key={i}>{t}</p>
+            ))}
           </div>
         )}
-        {accounts && (
-          <div className={styles.modalAccounts}>
-            {accounts}
-            {isWaiting && <img src={Loader} className={styles.loader} />}
-          </div>
-        )}
-        {!accounts && isWaiting && <img src={Loader} className={styles.loader} />}
         <div className={styles.modalFooter}>
-          <div className={styles.wrapperModalWantLink}>
-            {onConfirm && onConfirmLabel && (
-              <button
-                onClick={onConfirm}
-                className={cn(styles.button, styles.primary)}
-                disabled={isWaiting}
-              >
-                {onConfirmLabel}
-              </button>
-            )}
+          {/* <div className={styles.wrapperModalWantLink}> */}
+          {onConfirm && onConfirmLabel && !isWaiting && (
             <button
-              onClick={onClose}
-              className={cn(
-                onConfirm && onConfirmLabel && styles.button,
-                onConfirm && onConfirmLabel ? styles.secondary : styles.tertiary
-              )}
+              onClick={onConfirm}
+              className={cn(styles.button, styles.primary)}
               disabled={isWaiting}
             >
-              {onConfirm && onConfirmLabel ? 'Cancel' : 'Close'}
+              {onConfirmLabel}
             </button>
-          </div>
+          )}
+          <button
+            onClick={onClose}
+            className={cn(
+              onConfirm && onConfirmLabel && styles.button,
+              onConfirm && onConfirmLabel ? styles.secondary : styles.tertiary
+            )}
+            // disabled={isWaiting}
+          >
+            {onConfirm && onConfirmLabel ? 'Cancel' : 'Close'}
+          </button>
+          {/* </div> */}
         </div>
       </div>
     </div>
