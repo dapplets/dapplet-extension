@@ -531,6 +531,7 @@ class _App extends React.Component<P, S> {
                     onClick={this.props.onToggle}
                     appearance="big"
                     icon={Hide}
+                    dataTestid="minimize-overlay-button"
                   />
                   <Profile
                     setSelectedWallet={this.setSelectedWallet}

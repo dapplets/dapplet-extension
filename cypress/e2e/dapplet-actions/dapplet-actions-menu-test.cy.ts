@@ -10,10 +10,13 @@ describe('dapplets action work', () => {
       // open overlay and run the dapplet
       cy.openDappletsOverlay(url)
       cy.runDapplet(dappletIdToActivate)
+
+      // expands to ubersausage mode
+      cy.getByTestId('show-tabs-button').click()
       cy.wait(10000)
 
       // minimize overlay
-      cy.getByTestId('toggle-overlay-button').click()
+      cy.getByTestId('minimize-overlay-button').click()
 
       cy.getByTestId('tab-not-pinned').click()
 
