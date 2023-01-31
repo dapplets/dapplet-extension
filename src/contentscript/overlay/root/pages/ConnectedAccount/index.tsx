@@ -5,14 +5,15 @@ import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../common/global-event-bus'
 import { resources } from '../../../../../common/resources'
 import {
+  ChainTypes,
   ConnectedAccountsPairStatus,
   IConnectedAccountsPair,
   IConnectedAccountUser,
   WalletDescriptor,
-  ChainTypes,
   WalletTypes,
 } from '../../../../../common/types'
 import { Message } from '../../components/Message'
+import { areWeLinkingWallets } from '../../components/SystemPopup/pages/ConnectedAccountsModal/helpers'
 import { TabLoader } from '../../components/TabLoader'
 import useAbortController from '../../hooks/useAbortController'
 import Attention from './assets/attention.svg'
@@ -20,7 +21,6 @@ import HOME_ICON from './assets/newHome.svg'
 import Ok from './assets/ok.svg'
 import Time from './assets/time.svg'
 import styles from './ConnectedAccount.module.scss'
-import { areWeLinkingWallets } from '../../components/SystemPopup/pages/ConnectedAccountsModal/helpers'
 
 const UserButton = ({
   user,

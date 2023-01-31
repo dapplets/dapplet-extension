@@ -1,16 +1,16 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import { Bus } from '../../../../../../../common/bus'
 import { resources } from '../../../../../../../common/resources'
 import {
+  EthSignature,
   IConnectedAccountUser,
   TConnectedAccount,
-  EthSignature,
 } from '../../../../../../../common/types'
+import { areWeLinkingWallets, getSignature } from './helpers'
 import { Modal } from './modal'
-import { getSignature, areWeLinkingWallets } from './helpers'
 import UserButton from './UserButton'
-import { Bus } from '../../../../../../../common/bus'
 
 interface IConnectedAccountsModalProps {
   data: {

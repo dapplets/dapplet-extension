@@ -1,7 +1,7 @@
 import GITHUB_ICON from './resources/social/github.svg'
 import TWITTER_ICON from './resources/social/twitter-icon.svg'
-import NEAR_ICON from './resources/wallets/near-black.svg'
 import ETH_ICON from './resources/wallets/eth.svg'
+import NEAR_ICON from './resources/wallets/near-black.svg'
 
 export interface Resources {
   [name: string]: {

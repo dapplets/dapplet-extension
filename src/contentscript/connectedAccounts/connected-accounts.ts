@@ -2,9 +2,9 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import makeBlockie from 'ethereum-blockies-base64'
 import { browser } from 'webextension-polyfill-ts'
 import { resources } from '../../common/resources'
+import { TConnectedAccountsVerificationRequestInfo } from '../../common/types'
 import { socialNetworkConnectionCondition } from './connected-accounts-assembly'
 import { Account } from './types'
-import { TConnectedAccountsVerificationRequestInfo } from '../../common/types'
 
 interface IRequestVerificationProps {
   firstAccountId: string
