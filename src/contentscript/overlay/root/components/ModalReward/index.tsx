@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect } from 'react'
+import { ReactComponent as Close } from '../../assets/svg/modalClose.svg'
 import styles from './ModalReward.module.scss'
-
 interface ModalRewardProps {
   visible: boolean
   title: string
@@ -36,7 +36,9 @@ export const ModalReward = ({
       <div className={styles.modalDialog} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <h3 className={styles.modalTitle}>{title}</h3>
-          <span className={styles.modalClose} onClick={onClose} />
+          <span className={styles.modalClose} onClick={onClose}>
+            <Close />
+          </span>
         </div>
         <div className={styles.modalBody}>
           <div className={styles.modalContent}>{content}</div>

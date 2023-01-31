@@ -1,8 +1,9 @@
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
+import { ReactComponent as Close } from '../../assets/icons/close.svg'
+import { ReactComponent as Up } from '../../assets/icons/up.svg'
 import { useToggle } from '../../hooks/useToggle'
 import styles from './Localhost.module.scss'
-
 export interface LocalhostProps {
   isEnabled: false
   error: string
@@ -80,10 +81,14 @@ export const Localhost: FC<LocalhostProps> = (props) => {
               className={cn(styles.spanLabel, {
                 [styles.isShowDescriptionLabel]: isShowDescription,
               })}
-            ></span>
+            >
+              <Up />
+            </span>
           )}
         </div>
-        <button className={styles.closeLocalhost} onClick={closeHost} />
+        <button className={styles.closeLocalhost} onClick={closeHost}>
+          <Close />
+        </button>
       </div>
       {isShowDescription && isEnabled && !error && children}
     </div>

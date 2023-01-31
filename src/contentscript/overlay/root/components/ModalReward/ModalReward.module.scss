@@ -1,7 +1,7 @@
-@import "../../assets/styles/null";
-@import "../../assets/styles/fonts";
-@import "../../assets/styles/color.variables";
-@import "../../assets/styles/animate";
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
+@import '../../assets/styles/animate';
 
 .modal {
   position: fixed;
@@ -59,15 +59,14 @@
   top: 15px;
   right: 14px;
 
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   width: 20px;
   height: 20px;
 
   background-color: $Primary;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 7 7' fill='none'%3E%3Cpath d='M5.74375 0.695312L3.5 2.93906L1.25625 0.695312L0.375 1.57656L2.61875 3.82031L0.375 6.06406L1.25625 6.94531L3.5 4.70156L5.74375 6.94531L6.625 6.06406L4.38125 3.82031L6.625 1.57656L5.74375 0.695312Z' fill='white'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center;
   border-radius: 50%;
 
   &:hover {

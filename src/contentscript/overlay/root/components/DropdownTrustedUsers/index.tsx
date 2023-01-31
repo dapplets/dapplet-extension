@@ -3,7 +3,8 @@ import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { isValidUrl, typeOfUri, UriTypes } from '../../../../../common/helpers'
-
+import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
+import { ReactComponent as Delete } from '../../assets/icons/mini-close.svg'
 import useAbortController from '../../hooks/useAbortController'
 import { IDropdown } from '../../models/dropdown.model'
 import { addSettingsValueDropdown } from '../../utils/addSettingsValueDropdown'
@@ -132,7 +133,9 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
             <span
               className={cn(styles.openList, { [styles.isOpen]: isOpen })}
               onClick={() => setOpen(true)}
-            />
+            >
+              <DropdownIcon />
+            </span>
           </form>
         </div>
 
@@ -143,7 +146,9 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
               <span
                 className={cn(styles.openList, { [styles.isOpen]: isOpen })}
                 onClick={() => setOpen(false)}
-              />
+              >
+                <DropdownIcon />
+              </span>
             </div>
             {trustedUsers.map((user, i) => (
               <div key={i} className={styles.itemUser}>
@@ -154,7 +159,9 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
                   <span
                     className={styles.deleteUsers}
                     onClick={() => removeTrustedUser(user.account)}
-                  />
+                  >
+                    <Delete />
+                  </span>
                 </span>
               </div>
             ))}

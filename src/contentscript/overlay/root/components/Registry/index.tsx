@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
+import { ReactComponent as Up } from '../../assets/icons/up.svg'
 import styles from './Registry.module.scss'
-
 export interface RegistryProps {
   isShowChildrenRegistry?: boolean
   label: string
@@ -44,7 +44,9 @@ export const Registry: FC<RegistryProps> = (props) => {
             className={cn(styles.spanLabel, {
               [styles.isShowDescriptionLabel]: isShowChildrenRegistry,
             })}
-          ></span>
+          >
+            <Up />
+          </span>
         </div>
       </div>
       {isShowChildrenRegistry && children}

@@ -1,5 +1,7 @@
 import cn from 'classnames'
 import React, { FC } from 'react'
+import { ReactComponent as Delete } from '../../assets/svg/garbage.svg'
+import { ReactComponent as Plus } from '../../assets/svg/plus.svg'
 import styles from './InputGroup.module.scss'
 export interface InputGroupProps {
   newArray: any
@@ -58,7 +60,9 @@ export const InputGroup: FC<InputGroupProps> = (props: InputGroupProps) => {
             setVisibleArray(!visibleArray)
           }}
           className={cn(styles.adminsButton, {})}
-        />
+        >
+          <Plus />
+        </button>
       </div>
       {visibleArray && (
         <div className={styles.wrapperContext}>
@@ -82,7 +86,9 @@ export const InputGroup: FC<InputGroupProps> = (props: InputGroupProps) => {
                 setEditInput('')
               }}
               className={cn(styles.contextDelete)}
-            />
+            >
+              <Delete />
+            </button>
           </div>
           <button
             disabled={editInput.length < 2 || addDisabled}
@@ -140,7 +146,9 @@ export const InputGroup: FC<InputGroupProps> = (props: InputGroupProps) => {
                     )
                   }
                   className={styles.authorDelete}
-                />
+                >
+                  <Delete />
+                </button>
               </div>
             ))}
         </>

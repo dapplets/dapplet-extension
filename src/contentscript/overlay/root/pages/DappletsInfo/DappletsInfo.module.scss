@@ -1,6 +1,6 @@
-@import "../../assets/styles/null";
-@import "../../assets/styles/fonts";
-@import "../../assets/styles/color.variables";
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
 
 .wrapper {
   overflow: hidden;
@@ -43,13 +43,12 @@
 
   &::-webkit-scrollbar-track {
     background: rgb(244 244 244);
-    background:
-      linear-gradient(
-        90deg,
-        rgb(244 244 244 / 0%) 10%,
-        rgb(227 227 227 / 100%) 50%,
-        rgb(244 244 244 / 0%) 90%
-      );
+    background: linear-gradient(
+      90deg,
+      rgb(244 244 244 / 0%) 10%,
+      rgb(227 227 227 / 100%) 50%,
+      rgb(244 244 244 / 0%) 90%
+    );
   }
 
   &::-webkit-scrollbar-thumb {
@@ -344,7 +343,7 @@
   margin: 20px 0 0;
 
   &::before {
-    content: "";
+    content: '';
 
     position: absolute;
     top: -10px;
@@ -360,7 +359,9 @@
 .back {
   position: relative;
 
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   margin: 0 0 0 14.5px;
 
@@ -372,32 +373,27 @@
 
   background: inherit;
 
-  &::before {
-    content: "";
-
-    position: absolute;
-    top: 0;
-    left: -14.5px;
-
-    width: 11px;
-    height: 14px;
-
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%23919191'/%3E%3C/svg%3E");
+  svg {
+    margin-right: 5px;
   }
 
   &:hover {
     color: $ContentBlack;
 
-    &::before {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill=' %23747376'/%3E%3C/svg%3E");
+    svg {
+      path {
+        fill: $ContentBlack;
+      }
     }
   }
 
   &:active {
     color: $MainBlack;
 
-    &::before {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%232A2A2A'/%3E%3C/svg%3E");
+    svg {
+      path {
+        fill: $MainBlack;
+      }
     }
   }
 }
@@ -446,5 +442,5 @@
   width: 100%;
 }
 
-@import "./modalStyles";
-@import "./adaptive";
+@import './modalStyles';
+@import './adaptive';

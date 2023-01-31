@@ -1,5 +1,6 @@
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes } from 'react'
+import { ReactComponent as Check } from '../../assets/icons/checkboxOnMainSettingsNotification.svg'
 import styles from './Checkbox.module.scss'
 
 export interface CheckboxProps
@@ -32,7 +33,9 @@ export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
             className={cn(styles.fakeInputCheckbox, {
               [styles.active]: isCheckbox,
             })}
-          />
+          >
+            <Check />
+          </span>
         </label>
         <span className={cn(styles.inputCheckboxTitle)}>{title}</span>
       </div>

@@ -6,6 +6,7 @@ import ModuleInfo from '../../../../../background/models/moduleInfo'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
+import { ReactComponent as Back } from '../../assets/svg/back.svg'
 import { InputGroup } from '../../components/InputGroup'
 import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
@@ -449,6 +450,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
           }}
           className={styles.back}
         >
+          <Back />
           Back
         </button>
         <button

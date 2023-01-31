@@ -1,5 +1,6 @@
 import cn from 'classnames'
 import React, { ReactElement, useEffect } from 'react'
+import { ReactComponent as Close } from '../../assets/svg/modalClose.svg'
 import styles from './Modal.module.scss'
 
 interface ModalProps {
@@ -56,7 +57,9 @@ export const Modal = ({
                 onFewFunction ? onFewFunction() : null
                 onClose()
               }}
-            />
+            >
+              <Close />
+            </span>
           ) : null}
         </div>
         <div className={cn(styles.modalBod, classNameContent)}>

@@ -3,6 +3,7 @@ import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { widgets } from '../../../../modules/adapter-overlay/src'
+import { ReactComponent as Show } from '../../assets/icons/iconsWidgetButton/show.svg'
 import {
   ReactComponent as Account,
   ReactComponent as DappletsLogo,
@@ -383,7 +384,9 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                   className={cn(styles.miniButton, {
                     [styles.hideTabsBtn]: isShowTabs,
                   })}
-                ></button>
+                >
+                  <Show />
+                </button>
               )}
             </div>
           </div>

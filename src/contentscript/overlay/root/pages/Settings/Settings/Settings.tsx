@@ -6,7 +6,6 @@ import { StorageTypes } from '../../../../../../common/constants'
 import { isValidPostageStampId } from '../../../../../../common/helpers'
 import { Checkbox } from '../../../components/Checkbox'
 import { DropdownPreferedOverlayStorage } from '../../../components/DropdownPreferedOverlayStorage'
-
 import { DropdownRegistry } from '../../../components/DropdownRegistry'
 import { DropdownTrustedUsers } from '../../../components/DropdownTrustedUsers'
 import { InputPanelSettings } from '../../../components/InputPanelSettings'

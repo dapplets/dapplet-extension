@@ -50,21 +50,30 @@
 .spanLabel {
   cursor: pointer;
 
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   width: 10px;
   height: 6px;
   margin-top: 5px;
   margin-left: 7px;
 
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M5 0.5L4.37114e-07 5.5L10 5.5L5 0.5Z' fill='%23979696'/%3E%3C/svg%3E");
+  svg {
+    transform: scaleX(1.5);
+    fill: none !important;
 
-  &:hover {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M5 0.5L4.37114e-07 5.5L10 5.5L5 0.5Z' fill='%23E3E3E3'/%3E%3C/svg%3E");
-  }
+    path {
+      fill: #979696;
+    }
 
-  &:active {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M5 0.5L4.37114e-07 5.5L10 5.5L5 0.5Z' fill='%23E3E3E3'/%3E%3C/svg%3E");
+    &:hover {
+      fill: none !important;
+
+      path {
+        fill: #e3e3e3;
+      }
+    }
   }
 }
 

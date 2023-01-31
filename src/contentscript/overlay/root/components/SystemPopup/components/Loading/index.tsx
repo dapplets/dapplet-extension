@@ -1,5 +1,6 @@
 import cn from 'classnames'
 import React, { FC, ReactElement } from 'react'
+import { ReactComponent as Load } from '../../assests/loader.svg'
 import base from '../Base.module.scss'
 import { Button } from '../Button'
 import styles from './Loading.module.scss'
@@ -22,7 +23,11 @@ export const Loading: FC<LoadingProps> = ({
       <h2 className={base.title}>{title}</h2>
       <p className={cn(base.subtitle, styles.subtitle)}>{subtitle}</p>
 
-      {content ?? <div className={styles.loading} />}
+      {content ?? (
+        <div className={styles.loading}>
+          <Load />
+        </div>
+      )}
 
       <Button basic onClick={onBackButtonClick}>
         Back

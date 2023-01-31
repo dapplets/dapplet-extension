@@ -7,6 +7,7 @@ import VersionInfo from '../../../../../background/models/versionInfo'
 import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
+import { ReactComponent as Settings } from '../../assets/svg/setting.svg'
 import useAbortController from '../../hooks/useAbortController'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
@@ -405,10 +406,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
           <div className={styles.blockInfo}>
             <h3 className={styles.dappletsTitle}>{mi.title}</h3>
-            {mi.isUnderConstruction ? //   <button className={styles.dappletsSettingsIsUnderConstruction} /> // > //   className={styles.dappletsSettingsIsUnderConstructionBlock} //   }} //     setModuleVersion(vi) //     setModuleInfo(mi) //     setUnderConstructionDetails(true) //     onDetailsClick(mi, vi) //   onClick={() => { // <span
-            //   <span className={styles.dappletsSettingsIsTocenomics} />
-            // </span>
-            null : (
+            {mi.isUnderConstruction ? null : ( // </span> //   <span className={styles.dappletsSettingsIsTocenomics} /> //   <button className={styles.dappletsSettingsIsUnderConstruction} /> // > //   className={styles.dappletsSettingsIsUnderConstructionBlock} //   }} //     setModuleVersion(vi) //     setModuleInfo(mi) //     setUnderConstructionDetails(true) //     onDetailsClick(mi, vi) //   onClick={() => { // <span
               <button
                 className={cn(styles.dappletsSettings, {
                   [styles.dappletsSettingsRegistry]: mi.author !== null,
@@ -423,7 +421,9 @@ export const DevModule: FC<PropsDevModule> = (props) => {
                   setModuleInfo(mi)
                   setModuleVersion(vi)
                 }}
-              />
+              >
+                <Settings />
+              </button>
             )}
             {mi.isUnderConstruction || !isLocalhost ? null : (
               <button
