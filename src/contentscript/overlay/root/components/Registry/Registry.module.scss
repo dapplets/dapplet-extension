@@ -51,8 +51,8 @@
   cursor: pointer;
 
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 
   width: 10px;
   height: 6px;
@@ -61,15 +61,15 @@
 
   svg {
     transform: scaleX(1.5);
+    fill: none !important;
+
     path {
       fill: #979696;
     }
 
-    fill: none !important;
-
     &:hover {
-      
       fill: none !important;
+
       path {
         fill: #e3e3e3;
       }

@@ -74,38 +74,45 @@
   width: 24px;
   height: 24px;
 
+  animation-name: rotateIsClose;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+
   svg {
     width: 18px;
     height: 18px;
     margin-top: 3px;
-    path {
-      stroke: #919191;
-      fill: none !important;
-    }
+
     //
     fill: none !important;
+
+    path {
+      fill: none !important;
+      stroke: #919191;
+    }
+
     path {
       fill: none !important;
     }
+
     &:hover {
       fill: none !important;
+
       path {
-        stroke: $ContentBlack;
         fill: none !important;
+        stroke: $ContentBlack;
       }
     }
+
     &:active {
       fill: none !important;
+
       path {
         fill: none !important;
       }
     }
   }
-
-  animation-name: rotateIsClose;
-  animation-duration: 0.2s;
-  animation-timing-function: ease;
-  animation-fill-mode: forwards;
 }
 
 .isOpen {

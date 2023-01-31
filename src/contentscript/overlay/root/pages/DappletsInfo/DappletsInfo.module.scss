@@ -360,8 +360,8 @@
   position: relative;
 
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 
   margin: 0 0 0 14.5px;
 
@@ -379,6 +379,7 @@
 
   &:hover {
     color: $ContentBlack;
+
     svg {
       path {
         fill: $ContentBlack;

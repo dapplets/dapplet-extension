@@ -39,10 +39,8 @@
 
 .adminsButton {
   display: block;
-
   width: 20px;
   height: 20px;
-
   background-color: inherit;
 
   &:hover {
@@ -52,12 +50,14 @@
   &:active {
     background-color: inherit;
   }
+
   svg {
     &:hover {
       path {
         fill: $success-hover;
       }
     }
+
     &:active {
       path {
         fill: $success-hover;
@@ -125,6 +125,7 @@
         fill: $MainGrey;
       }
     }
+
     &:active {
       path {
         fill: $MainGrey;
@@ -253,6 +254,7 @@
         fill: $MainGrey;
       }
     }
+
     &:active {
       path {
         fill: $MainGrey;

@@ -5,9 +5,9 @@ import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import * as walletIcons from '../../../../../../common/resources/wallets'
 import { DefaultSigners, WalletDescriptor } from '../../../../../../common/types'
+import { ReactComponent as Copy } from '../../../assets/svg/copyModal.svg'
 import { ReactComponent as Disconnect } from '../../../assets/svg/disconnect.svg'
 import { ReactComponent as WalletImg } from '../../../assets/svg/wallet.svg'
-import { ReactComponent as Copy } from '../../../assets/svg/copyModal.svg'
 import useCopied from '../../../hooks/useCopyed'
 import styles from './Modal.module.scss'
 
@@ -160,8 +160,8 @@ export const ModalLogin = ({
                   className={styles.copy}
                 >
                   <span>
-                    <Copy/>
-                    </span>
+                    <Copy />
+                  </span>
                 </div>
                 <div className={styles.profileImgButtonBlock}>
                   <button

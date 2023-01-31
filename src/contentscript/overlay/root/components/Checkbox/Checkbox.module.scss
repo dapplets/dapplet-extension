@@ -139,15 +139,15 @@ div.supportLabel:focus::before {
 
   svg {
     position: absolute;
-
     transform: translate(50%, 80%);
-
     width: 8px;
     height: 6px;
   }
+
   &:hover {
     svg {
       fill: white !important;
+
       path {
         fill: white !important;
       }

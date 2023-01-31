@@ -62,21 +62,23 @@
   height: 18px;
 
   background-color: #fff;
- 
   border-radius: 50%;
-svg{
 
-  margin-left: -4px;
-  margin-top: -3px;
+svg{
   transform: scale(0.7);
+  margin-top: -3px;
+  margin-left: -4px;
+
   path{
     fill: $Primary!important;
   }
+
   &:hover{
     fill: $PrimaryHover!important;
   }
 
 }
+
   &:hover{
     svg{
       path{

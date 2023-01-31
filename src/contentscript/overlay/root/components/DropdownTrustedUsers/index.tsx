@@ -133,7 +133,9 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
             <span
               className={cn(styles.openList, { [styles.isOpen]: isOpen })}
               onClick={() => setOpen(true)}
-            ><DropdownIcon/></span>
+            >
+              <DropdownIcon />
+            </span>
           </form>
         </div>
 
@@ -144,7 +146,9 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
               <span
                 className={cn(styles.openList, { [styles.isOpen]: isOpen })}
                 onClick={() => setOpen(false)}
-              ><DropdownIcon/></span>
+              >
+                <DropdownIcon />
+              </span>
             </div>
             {trustedUsers.map((user, i) => (
               <div key={i} className={styles.itemUser}>
@@ -155,7 +159,9 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
                   <span
                     className={styles.deleteUsers}
                     onClick={() => removeTrustedUser(user.account)}
-                  ><Delete/></span>
+                  >
+                    <Delete />
+                  </span>
                 </span>
               </div>
             ))}

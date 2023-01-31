@@ -139,14 +139,13 @@
   margin-top: 10px;
 
   background: #f5f5f5;
-
   border-radius: 4px;
 
   &:hover {
     background: #e3e3e3;
-
     background-position: center;
   }
+
   svg {
     &:hover {
       path {

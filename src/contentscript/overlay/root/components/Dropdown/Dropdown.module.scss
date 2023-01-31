@@ -61,7 +61,6 @@
   content: '';
 
   position: absolute;
-
   right: 8px;
 
   width: 8px;
@@ -71,20 +70,26 @@
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
+
   svg {
     fill: none !important;
+
     path {
       fill: none !important;
     }
+
     &:hover {
       fill: none !important;
+
       path {
-        stroke: $ContentBlack;
         fill: none !important;
+        stroke: $ContentBlack;
       }
     }
+
     &:active {
       fill: none !important;
+
       path {
         fill: none !important;
       }
@@ -100,6 +105,7 @@
 
 .isOpenAnimationIcon {
   margin-top: 5px;
+
   animation-name: rotateIsOpen;
   animation-duration: 0.2s;
   animation-timing-function: ease;

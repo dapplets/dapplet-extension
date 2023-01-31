@@ -104,32 +104,38 @@ h6.title:checked .copied {
   height: 20px;
 
   background: $AppBG;
-
   border-radius: 100px;
   box-shadow: 0 2px 2px rgb(0 0 0 / 10%);
+
+  transition: all 0.5s;
+
   svg {
-    margin-right: 5px;
     transform: translateY(10%);
+    margin-right: 5px;
     fill: none !important;
+
     path {
       fill: none !important;
     }
+
     &:hover {
       fill: none !important;
+
       path {
         fill: none !important;
         stroke: $PrimaryHover;
       }
     }
+
     &:active {
       fill: none !important;
+
       path {
         fill: none !important;
         stroke: $PrimaryPressed;
       }
     }
   }
-  transition: all 0.5s;
 
   &:hover {
     width: 22px;

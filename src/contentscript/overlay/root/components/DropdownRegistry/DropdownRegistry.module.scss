@@ -50,24 +50,31 @@
     width: 18px;
     height: 18px;
     margin-top: 3px;
-    path {
-      stroke: #919191;
-      fill: none !important;
-    }
+
     //
     fill: none !important;
+
+    path {
+      fill: none !important;
+      stroke: #919191;
+    }
+
     path {
       fill: none !important;
     }
+
     &:hover {
       fill: none !important;
+
       path {
-        stroke: $ContentBlack;
         fill: none !important;
+        stroke: $ContentBlack;
       }
     }
+
     &:active {
       fill: none !important;
+
       path {
         fill: none !important;
       }
@@ -199,41 +206,48 @@
   cursor: pointer;
 
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+
   width: 20px;
   height: 20px;
 
   background: #f5f5f5;
+  border-radius: 100px;
+  box-shadow: 0 2px 2px rgb(0 0 0 / 10%);
+
+  transition: 0.5s all;
 
   svg {
-    path {
-      stroke: #919191;
-      fill: none !important;
-    }
     //
     fill: none !important;
+
+    path {
+      fill: none !important;
+      stroke: #919191;
+    }
+
     path {
       fill: none !important;
     }
+
     &:hover {
-      fill: none !important;
       transform: scale(1.5);
+      fill: none !important;
+
       path {
         fill: none !important;
       }
     }
+
     &:active {
       fill: none !important;
+
       path {
         fill: none !important;
       }
     }
   }
-  border-radius: 100px;
-  box-shadow: 0 2px 2px rgb(0 0 0 / 10%);
-
-  transition: 0.5s all;
 
   &:hover {
     width: 25px;

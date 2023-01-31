@@ -3,12 +3,12 @@ import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { widgets } from '../../../../modules/adapter-overlay/src'
+import { ReactComponent as Show } from '../../assets/icons/iconsWidgetButton/show.svg'
 import {
   ReactComponent as Account,
   ReactComponent as DappletsLogo,
 } from '../../assets/newIcon/mustache.svg'
 import { ReactComponent as Coolicon } from '../../assets/newIcon/squares.svg'
-import { ReactComponent as Show } from '../../assets/icons/iconsWidgetButton/show.svg'
 import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { WidgetButton } from '../../widgets/button'
@@ -384,7 +384,9 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                   className={cn(styles.miniButton, {
                     [styles.hideTabsBtn]: isShowTabs,
                   })}
-                ><Show/></button>
+                >
+                  <Show />
+                </button>
               )}
             </div>
           </div>

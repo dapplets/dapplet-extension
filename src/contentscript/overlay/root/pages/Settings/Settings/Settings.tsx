@@ -13,7 +13,6 @@ import { SettingItem } from '../../../components/SettingItem'
 import { SettingWrapper } from '../../../components/SettingWrapper'
 import { Switch } from '../../../components/Switch'
 import { getDefaultValueProvider } from '../../../utils/getDefaultValue'
-import {ReactComponent as Loader} from '../../../assets/svg/loaderSettings.svg'
 
 import useAbortController from '../../../hooks/useAbortController'
 import styles from './Settings.module.scss'
