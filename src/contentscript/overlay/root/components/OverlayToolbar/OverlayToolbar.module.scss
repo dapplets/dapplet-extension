@@ -153,6 +153,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  // position: relative;
 }
 
 .miniButton {
@@ -195,19 +196,6 @@
 
   background: #f5f5f5 !important;
   border-radius: 50% !important;
-
-  &::after {
-    content: '';
-
-    position: absolute;
-    bottom: -10px;
-    left: 0;
-
-    width: 100%;
-    height: 1px;
-
-    background: #e3e3e3;
-  }
 
   svg {
     width: 30px;
@@ -329,7 +317,7 @@
 .widgetButtonAnimatePinned {
   animation-name: AnimateisPinned;
   animation-duration: 1s;
-  animation-timing-function:cubic-bezier(0,.69,.45,1);
+  animation-timing-function: cubic-bezier(0, 0.69, 0.45, 1);
   animation-fill-mode: forwards;
 }
 
@@ -339,3 +327,245 @@
   height: 14px;
   margin: 0 auto;
 }
+
+.widgetButtonNotification {
+  position: absolute;
+  top: 125px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 139px;
+  overflow: hidden;
+
+  height: 29px;
+
+  background: #ffffff;
+  box-shadow: rgba(45, 52, 60, 0.09) 0px 2px 4px -3px, rgba(255, 255, 255, 0.5) 0px 2px 4px -3px;
+
+  border-radius: 8px;
+  svg {
+    transform: scale(0.7);
+    fill: none!important;
+    path {
+      fill: none!important;
+      
+    }
+  }
+  &:hover {
+    svg {
+      fill: none!important;
+      path {
+        fill: none!important;
+        stroke: $PrimaryHover;
+      }
+    }
+  }
+  &:active {
+    svg {
+      fill: none!important;
+      path {
+        fill: none!important;
+        stroke: $PrimaryPressed;
+      }
+    }
+  }
+  animation-name: AnimateisNotNotifications;
+  animation-duration: 8s;
+  animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  animation-fill-mode: forwards;
+}
+.widgetButtonAnimatePinnedNotification {
+  animation-name: AnimateNotification;
+  animation-duration: 8s;
+  animation-timing-function: cubic-bezier(0, 0.69, 0.45, 1);
+  animation-fill-mode: forwards;
+}
+.widgetButtonImgAnimateNotifiction {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 16px;
+  height: 14px;
+  // margin: 7px 7px;
+  // margin: auto;
+}
+.titleNotification {
+  display: inline-block;
+  width: 103px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 149%;
+  color: #5ab5e8;
+}
+.counter {
+  font-size: 12px;
+  color: #747376;
+}
+.notificationCounter {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  align-items: center;
+  width: 100%;
+  height: 39px;
+  &:hover {
+   .counter {color: $PrimaryHover!important;}
+    svg {
+      fill: none!important;
+      path {
+        fill: none!important;
+        stroke: $PrimaryHover;
+      }
+    }
+  }
+  &:active {
+   .counter {color: $PrimaryPressed!important;}
+    svg {
+      fill: none!important;
+      path {
+        fill: none!important;
+        stroke: $PrimaryPressed;
+      }
+    }
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    top: 38px;
+    left: 0;
+    width: 48px;
+    height: 1px;
+    background: #e3e3e3;
+    margin: 0px 2px 0px 2px;
+  }
+}
+@keyframes AnimateNotification {
+  0% {
+    // top: 110px;
+    left: -95px;
+    width: 60px;
+    opacity: 1;
+  }
+
+  10% {
+    // top: 110px;
+    left: -200px;
+    width: 139px;
+    opacity: 1;
+  }
+  90% {
+    // top: 110px;
+    left: -200px;
+    width: 139px;
+    opacity: 1;
+  }
+  95% {
+    // top: 100px;
+    left: -150px;
+    width: 100px;
+    opacity: 0.8;
+  }
+
+  100% {
+    // top: 70px;
+    left: -100px;
+    width: 60px;
+    opacity: 0;
+  }
+}
+@keyframes AnimateisNotNotifications {
+  0% {
+    // top: 150px;
+    left: -200px;
+    opacity: 0;
+  }
+
+  40% {
+    // top: 120px;
+    left: -200px;
+    opacity: 0.8;
+  }
+
+  60% {
+    // top: 110px;
+    left: -200px;
+    opacity: 1;
+  }
+
+  95% {
+    // top: 110px;
+    left: -180px;
+
+    opacity: 1;
+  }
+
+  100% {
+    // top: 110px;
+    left: -180px;
+    opacity: 0;
+  }
+}
+.notificationCounterAnimate {
+  top: -2px;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  height: 30px;
+  border-radius: 4px;
+  background: $PureWhite;
+  background-image: url('../../assets/icons/notificationIcons/bellWithNotification.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow: 0px 4px 5px rgba(45, 52, 60, 0.1), 0px 4px 20px rgba(11, 87, 111, 0.15);
+  animation-name: AnimateisCounterNotification;
+  animation-duration: 8s;
+  animation-timing-function: cubic-bezier(0, 0.69, 0.45, 1);
+  animation-fill-mode: forwards;
+}
+
+@keyframes AnimateisCounterNotification {
+  0% {
+    // top: 150px;
+    // left: -200px;
+    opacity: 0;
+  }
+
+  40% {
+    // top: 120px;
+    // left: -200px;
+    opacity: 0;
+  }
+
+  60% {
+    // top: 110px;
+    // left: -200px;
+    opacity: 0;
+  }
+  // 15% {
+  //   // top: 110px;
+  //   // left: -180px;
+
+  //   opacity: 1;
+  // }
+
+  95% {
+    // top: 110px;
+    // left: -180px;
+
+    opacity: 1;
+  }
+
+  100% {
+    // top: 110px;
+    // left: -180px;
+    opacity: 0;
+  }
+}
+
