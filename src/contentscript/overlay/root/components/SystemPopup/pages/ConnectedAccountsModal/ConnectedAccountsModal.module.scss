@@ -6,14 +6,17 @@
   cursor: default;
 
   position: relative;
+
   display: flex;
   align-items: center;
+
   width: 250px;
   height: 44px;
   margin: 3px;
   padding: 0 5px 0 2px;
-  border-radius: 200px 140px 140px 200px;
-  background-color: $WebBG;  
+
+  background-color: $WebBG;
+  border-radius: 200px 140px 140px 200px;  
 }
 
 .hasAction {
@@ -22,16 +25,17 @@
 
 .imgUser {
   display: inline-block;
+
   width: 40px;
   height: 40px;
   margin-right: 10px;
+
+  background-color: white;
   border: 2px solid #BFBFBF;
   border-radius: 50%;
-  background-color: white;
 }
 
 .nameUser {
-  color: $MainBlack;
   font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;

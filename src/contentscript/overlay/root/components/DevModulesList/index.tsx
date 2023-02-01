@@ -405,8 +405,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
           <div className={styles.blockInfo}>
             <h3 className={styles.dappletsTitle}>{mi.title}</h3>
-            {mi.isUnderConstruction ? //   <button className={styles.dappletsSettingsIsUnderConstruction} /> // > //   className={styles.dappletsSettingsIsUnderConstructionBlock} //   }} //     setModuleVersion(vi) //     setModuleInfo(mi) //     setUnderConstructionDetails(true) //     onDetailsClick(mi, vi) //   onClick={() => { // <span
-            //   <span className={styles.dappletsSettingsIsTocenomics} />
+            {mi.isUnderConstruction ? //   <span className={styles.dappletsSettingsIsTocenomics} /> //   <button className={styles.dappletsSettingsIsUnderConstruction} /> // > //   className={styles.dappletsSettingsIsUnderConstructionBlock} //   }} //     setModuleVersion(vi) //     setModuleInfo(mi) //     setUnderConstructionDetails(true) //     onDetailsClick(mi, vi) //   onClick={() => { // <span
             // </span>
             null : (
               <button

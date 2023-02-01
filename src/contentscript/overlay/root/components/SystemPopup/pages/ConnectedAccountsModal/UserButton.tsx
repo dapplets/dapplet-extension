@@ -1,8 +1,8 @@
-import React from 'react'
 import cn from 'classnames'
-import styles from './ConnectedAccountsModal.module.scss'
+import React from 'react'
 import { resources } from '../../../../../../../common/resources'
 import { IConnectedAccountUser } from '../../../../../../../common/types'
+import styles from './ConnectedAccountsModal.module.scss'
 
 const UserButton = ({ user }: { user: IConnectedAccountUser }) => {
   return (

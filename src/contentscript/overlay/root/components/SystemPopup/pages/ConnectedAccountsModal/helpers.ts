@@ -1,12 +1,12 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { browser } from 'webextension-polyfill-ts'
+import { resources } from '../../../../../../../common/resources'
 import {
-  EthSignature,
-  DefaultSigners,
   ChainTypes,
+  DefaultSigners,
+  EthSignature,
   IConnectedAccountUser,
 } from '../../../../../../../common/types'
-import { resources } from '../../../../../../../common/resources'
 
 export const getSignature = async (
   firstAccountName: string,
