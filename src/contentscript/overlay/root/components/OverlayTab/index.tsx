@@ -50,6 +50,7 @@ export interface OverlayTabProps {
   connectedDescriptors?: any
   selectedWallet?: any
   isToolbar?: boolean
+  events?:any;
 }
 
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
@@ -281,7 +282,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     ) {
                       menu.id === 'dapplets' && setMenuVisible(!menuVisible)
 
-                      p.onToggleClick()
+                      if (p.pathname === '/system/dapplets') {
+                        p.onToggleClick()
+                      } else {
+                        p.navigate('/system/dapplets')
+                      }
 
                       // menuVisible && setMenuVisible()
                     } else {

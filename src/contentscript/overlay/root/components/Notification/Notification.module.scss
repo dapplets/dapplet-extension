@@ -1,6 +1,6 @@
-@import "../../assets/styles/fonts";
-@import "../../assets/styles/color.variables";
-@import "../../assets/styles/null";
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
+@import '../../assets/styles/null';
 
 .wrapper {
   position: relative;
@@ -8,16 +8,16 @@
 
   box-sizing: border-box;
   width: 100%;
-  max-width: 421px;
-  margin: 0 0 19px;
-  padding: 17px 15px 10px;
+  max-width: 431px;
+  margin: 0 0 10px;
+  padding: 6px;
 
   font-family: Roboto, sans-serif;
 
   opacity: 1;
   background: #fff;
   border: 1px solid $WebBG;
-  border-radius: 10px;
+  border-radius: 6px;
 
   transition: all 0.5s cubic-bezier(0.36, -0.64, 0.34, 1.76);
 }
@@ -31,7 +31,9 @@
   font-family: Roboto, sans-serif;
   font-size: 10px;
   line-height: 100%;
-  color: $ContentBlack;
+
+  // color: $ContentBlack;
+
   text-transform: uppercase;
 
   background-color: #fff;
@@ -39,15 +41,32 @@
   border-radius: 10px;
 }
 
+.blockTitle {
+  display: flex;
+  justify-content: space-between;
+}
+
+.blockIcon {
+  display: flex;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+}
+
 .title {
   display: flex;
   align-items: center;
 
   font-family: Roboto, sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 16px;
-  color: $MainBlack;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 149%;
+
+  // color: $MainBlack;
+  color: $ContentBlack;
 }
 
 .date {
@@ -58,29 +77,40 @@
 
   font-size: 10px;
   line-height: 100%;
-  color: #2a2a2a;
+
+  // color: #2a2a2a;
+  color: #919191;
   text-transform: uppercase;
+}
+
+.blockDesccription {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .description {
   overflow: hidden;
   display: inline-block;
 
-  width: 90%;
+  width: 98%;
   margin-top: 8px;
 
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 400;
   line-height: 149%;
-  color: $MainBlack;
 
-  // 
+  // color: $MainBlack;
+  color: $ContentBlack;
+
+  //
   text-overflow: ellipsis;
 }
 
 .button {
-  position: absolute;
-  top: 14px;
-  right: 10px;
+  // position: absolute;
+  // top: 14px;
+  // right: 10px;
 }
 
 .link {
@@ -105,4 +135,5 @@
   align-items: flex-end;
 }
 
-@import "./adaptive";
+
+@import './adaptive';

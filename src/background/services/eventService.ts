@@ -9,8 +9,8 @@ _updateBadge()
 
 export async function getEvents(): Promise<Event[]> {
   const eventBrowserStorage = new EventBrowserStorage()
-  // const events: Event[] = await eventBrowserStorage.getAll()
-  const events: Event[] = [] // !!! ToDo: change it !!!
+  const events: Event[] = await eventBrowserStorage.getAll()
+  // const events: Event[] = [] // !!! ToDo: change it !!!
   // DESC by Created Date
   return events.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
 }

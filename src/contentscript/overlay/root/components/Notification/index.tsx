@@ -2,7 +2,6 @@ import cn from 'classnames'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
-import ReactTimeAgo from 'react-time-ago'
 import { CloseIcon } from '../CloseIcon'
 import styles from './Notification.module.scss'
 
@@ -10,7 +9,7 @@ TimeAgo.addLocale(en)
 
 export interface NotificationProps {
   label: string
-
+  icon?: string
   title: string
   date: any
   onClear?: Function
@@ -21,11 +20,19 @@ export interface NotificationProps {
 }
 
 export const Notification = (props: NotificationProps): ReactElement => {
-  const { label, title, date, onClear, _id, description, href, onChange } = props
+  const { icon, label, title, date, onClear, _id, description, href, onChange } = props
   const [isDelete, onDelete] = useState(false)
   const [newDescription, setDescription] = useState(description)
   const refComponent = useRef<HTMLInputElement>()
   const newDateNum = new Date(date)
+  // console.log(newDateNum);
+  const addZero = (num) => {
+    if (num >= 0 && num <= 9) {
+      return '0' + num
+    } else {
+      return num
+    }
+  }
   const booleanNode = refComponent.current?.classList.contains('more')
 
   useEffect(() => {
@@ -61,29 +68,43 @@ export const Notification = (props: NotificationProps): ReactElement => {
       })}
       onChange={onChange}
     >
-      <header className={styles.header}>{label}</header>
-      <span className={styles.date}>
-        <ReactTimeAgo date={newDateNum} locale="en-US" />
-      </span>
-      <h4 className={styles.title}>{title}</h4>
+      <div className={styles.blockTitle}>
+        <div className={styles.blockIcon}>
+       { icon? <img src={icon} className={styles.icon} />:null}
+          <h4 className={styles.title}>{title}</h4>
+        </div>
 
-      <div className={styles.blockInfo}>
-        <p ref={refComponent} className={cn(styles.description, {})}>
-          {newDescription}
-        </p>
+        <span className={styles.date}>
+          {/* <ReactTimeAgo date={newDateNum} locale="en-US" /> */}
+          <span>
+            {addZero(newDateNum.getFullYear()) +
+              '.' +
+              addZero(newDateNum.getMonth() + 1) +
+              '.' +
+              addZero(newDateNum.getDate())}
+          </span>{' '}
+          <span>{addZero(newDateNum.getHours()) + ':' + addZero(newDateNum.getMinutes())}</span>
+        </span>
       </div>
-
-      {href && (
-        <a href="" className={styles.link}>
-          Go to store
-        </a>
-      )}
-      <CloseIcon
-        appearance="small"
-        color="black"
-        className={styles.button}
-        onClick={onClick(_id)}
-      />
+      {/* <header className={styles.header}>{label}</header> */}
+      <div className={styles.blockDesccription}>
+        <div className={styles.blockInfo}>
+          <p ref={refComponent} className={cn(styles.description, {})}>
+            {newDescription}
+          </p>
+        </div>
+        {href && (
+          <a href="" className={styles.link}>
+            Go to store
+          </a>
+        )}
+        <CloseIcon
+          appearance="small"
+          color="notification"
+          className={styles.button}
+          onClick={onClick(_id)}
+        />
+      </div>
     </div>
   )
 }
