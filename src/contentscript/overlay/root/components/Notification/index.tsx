@@ -16,11 +16,12 @@ export interface NotificationProps {
   href?: string
   _id: any
   description: any
-  onChange?: () => void
+  onChange?: any
+  isRead?: boolean
 }
 
 export const Notification = (props: NotificationProps): ReactElement => {
-  const { icon, label, title, date, onClear, _id, description, href, onChange } = props
+  const { icon, label, title, date, onClear, _id, description, href, onChange, isRead } = props
   const [isDelete, onDelete] = useState(false)
   const [newDescription, setDescription] = useState(description)
   const refComponent = useRef<HTMLInputElement>()
@@ -65,12 +66,13 @@ export const Notification = (props: NotificationProps): ReactElement => {
     <div
       className={cn(styles.wrapper, {
         [styles.delete]: isDelete,
+        [styles.isRead]: isRead,
       })}
-      onChange={onChange}
+      onClick={() => onChange && onChange(_id)}
     >
       <div className={styles.blockTitle}>
         <div className={styles.blockIcon}>
-       { icon? <img src={icon} className={styles.icon} />:null}
+          {icon ? <img src={icon} className={styles.icon} /> : null}
           <h4 className={styles.title}>{title}</h4>
         </div>
 

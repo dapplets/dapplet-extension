@@ -372,7 +372,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 }
               }}
             >
-              {event && event.length > 0 && <span className={styles.counter}>+{event.length}</span>}
+              {event && event.length > 0 && <span className={styles.counter}>+{event.filter((x)=>!x.isRead).length}</span>}
               {event && event.length > 0 ? <NotificationWithCircle /> : <Notification />}
 
               <span

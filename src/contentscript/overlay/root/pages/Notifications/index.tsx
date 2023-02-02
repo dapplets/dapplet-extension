@@ -17,7 +17,7 @@ export const Notifications = () => {
   const [event, setEvent] = useState([])
   const [load, setLoad] = useState(true)
   const [isOlder, setOlder] = useState(false)
-  const [isUpdateAvailable, onUpdateAvailable] = useState(false)
+  // const [isUpdateAvailable, onUpdateAvailable] = useState(false)
   const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
@@ -25,7 +25,7 @@ export const Notifications = () => {
       if (!abortController.signal.aborted) {
         setEvent(notifications)
         setLoad(false)
-        checkUpdates()
+        // checkUpdates()
       }
     }
     init()
@@ -62,11 +62,21 @@ export const Notifications = () => {
   const checkUpdates = async () => {
     const { getNewExtensionVersion } = await initBGFunctions(browser)
     const isUpdateAvailable = await getNewExtensionVersion()
-    if (!abortController.signal.aborted) {
-      onUpdateAvailable(isUpdateAvailable)
-    }
+    // if (!abortController.signal.aborted) {
+    // onUpdateAvailable(isUpdateAvailable)
+    // }
   }
+  const getReadNotifications = async (id) => {
+    console.log(event)
 
+    const backgroundFunctions = await initBGFunctions(browser)
+    const { setRead } = backgroundFunctions
+
+    await setRead(id)
+
+    await getNotifications
+    console.log(event)
+  }
   return (
     <div className={styles.wrapper}>
       <>
@@ -98,26 +108,29 @@ export const Notifications = () => {
                       <div className={styles.delimeter}></div>
                     </div>
                     {event.length > 0 &&
-                      event.map((x, i) => {
-                        return (
-                          <Notification
-                            onClear={() => {
-                              setTimeout(() => {
-                                onRemoveEvent(x)
-                              }, 500)
-                            }}
-                            // todo: mocked
-                            icon={IconDefault}
-                            //
-                            key={x.id}
-                            label={'System'}
-                            title={x.title}
-                            description={x.description}
-                            _id={x.id}
-                            date={x.created}
-                          />
-                        )
-                      })}
+                      event
+                        .filter((x) => !x.isRead)
+                        .map((x, i) => {
+                          return (
+                            <Notification
+                              onClear={() => {
+                                setTimeout(() => {
+                                  onRemoveEvent(x)
+                                }, 500)
+                              }}
+                              // todo: mocked
+                              icon={IconDefault}
+                              //
+                              key={x.id}
+                              label={'System'}
+                              title={x.title}
+                              description={x.description}
+                              _id={x.id}
+                              date={x.created}
+                              onChange={getReadNotifications}
+                            />
+                          )
+                        })}
                     <button className={styles.btnNotification} onClick={() => setOlder(!isOlder)}>
                       Show old
                     </button>
@@ -131,7 +144,37 @@ export const Notifications = () => {
                         <span className={styles.titleBlock}>Older notifications</span>
                         <div className={styles.delimeter}></div>
                       </div>
-                      <span className={styles.notOlder}>Nothing here</span>
+                      {event.length > 0 &&
+                        event
+                          .filter((x) => x.isRead)
+                          .map((x, i) => {
+                            return (
+                              x ? (
+                                  <Notification
+                                    onClear={() => {
+                                      setTimeout(() => {
+                                        onRemoveEvent(x)
+                                      }, 500)
+                                    }}
+                                    // todo: mocked
+                                    icon={IconDefault}
+                                    //
+                                    key={x.id}
+                                    label={'System'}
+                                    title={x.title}
+                                    description={x.description}
+                                    _id={x.id}
+                                    date={x.created}
+                                    isRead={x.isRead}
+                                    // onChange={getReadNotifications}
+                                  />
+                                ) : (
+                                  <span className={styles.notOlder}>Nothing here</span>
+                                )
+                             
+                            )
+                          })}
+
                       <button
                         disabled
                         className={styles.btnNotification}
