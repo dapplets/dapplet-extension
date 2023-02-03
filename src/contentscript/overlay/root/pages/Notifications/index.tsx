@@ -67,15 +67,12 @@ export const Notifications = () => {
     // }
   }
   const getReadNotifications = async (id) => {
-    console.log(event)
-
     const backgroundFunctions = await initBGFunctions(browser)
     const { setRead } = backgroundFunctions
 
     await setRead(id)
 
     await getNotifications
-    console.log(event)
   }
   return (
     <div className={styles.wrapper}>
@@ -148,30 +145,27 @@ export const Notifications = () => {
                         event
                           .filter((x) => x.isRead)
                           .map((x, i) => {
-                            return (
-                              x ? (
-                                  <Notification
-                                    onClear={() => {
-                                      setTimeout(() => {
-                                        onRemoveEvent(x)
-                                      }, 500)
-                                    }}
-                                    // todo: mocked
-                                    icon={IconDefault}
-                                    //
-                                    key={x.id}
-                                    label={'System'}
-                                    title={x.title}
-                                    description={x.description}
-                                    _id={x.id}
-                                    date={x.created}
-                                    isRead={x.isRead}
-                                    // onChange={getReadNotifications}
-                                  />
-                                ) : (
-                                  <span className={styles.notOlder}>Nothing here</span>
-                                )
-                             
+                            return x ? (
+                              <Notification
+                                onClear={() => {
+                                  setTimeout(() => {
+                                    onRemoveEvent(x)
+                                  }, 500)
+                                }}
+                                // todo: mocked
+                                icon={IconDefault}
+                                //
+                                key={x.id}
+                                label={'System'}
+                                title={x.title}
+                                description={x.description}
+                                _id={x.id}
+                                date={x.created}
+                                isRead={x.isRead}
+                                // onChange={getReadNotifications}
+                              />
+                            ) : (
+                              <span className={styles.notOlder}>Nothing here</span>
                             )
                           })}
 

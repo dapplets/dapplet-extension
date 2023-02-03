@@ -372,8 +372,14 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 }
               }}
             >
-              {event && event.length > 0 && <span className={styles.counter}>+{event.filter((x)=>!x.isRead).length}</span>}
-              {event && event.length > 0 ? <NotificationWithCircle /> : <Notification />}
+              {event && event.filter((x) => !x.isRead).length > 0 ? (
+                <span className={styles.counter}>+{event.filter((x) => !x.isRead).length}</span>
+              ) : null}
+              {event && event.filter((x) => !x.isRead).length > 0 ? (
+                <NotificationWithCircle />
+              ) : (
+                <Notification />
+              )}
 
               <span
                 className={cn({
@@ -425,7 +431,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                       getWigetsConstructor={getWigetsConstructor}
                       menuWidgets={menuWidgets}
                       mainMenuNavigation={p.onMenuClick}
-                      
                     />
                   )
                 })}

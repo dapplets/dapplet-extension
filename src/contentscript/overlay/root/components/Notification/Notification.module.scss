@@ -16,14 +16,16 @@
 
   opacity: 1;
   background: #fff;
+
   // border: 1px solid $WebBG;
   border-radius: 6px;
 
   transition: all 0.5s cubic-bezier(0.36, -0.64, 0.34, 1.76);
 }
+
 .isRead {
-  border: 1px solid $StrokeColor;
   background: #f5f5f5;
+  border: 1px solid $StrokeColor;
 }
 
 .header {
