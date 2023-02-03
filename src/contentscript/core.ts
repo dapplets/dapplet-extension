@@ -51,6 +51,26 @@ type ContentDetector = {
   selector: string
 }
 
+type NotificationAction ={
+  action: string // unique id
+  title: string
+  icon: string
+}
+
+type NotificationPayload= {
+  title: string
+  message?: string
+  actions?: NotificationAction[]
+  timeout?: number // ms
+  payload?: any // serializable object
+}
+
+// All Events from EventBus must be typed
+type NotificationActionEvent = {
+  action: string;
+  payload: any;
+}
+
 export default class Core {
   constructor(isIframe: boolean, public overlayManager: IOverlayManager) {
     if (!isIframe) {
@@ -149,6 +169,12 @@ export default class Core {
       eventBus.subscribe('cancel', handleCancel)
       eventBus.subscribe('ready', handleReady)
     })
+  }
+
+  public async notify(payload: NotificationPayload): Promise<void>  {
+    const { createAndShowNotification } = await initBGFunctions(browser)
+  const newNotification = await createAndShowNotification(payload)
+   console.log(newNotification);
   }
 
   public toggleOverlay() {

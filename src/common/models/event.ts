@@ -8,3 +8,4 @@ export class Event extends Base {
   created: Date = null
   isRead = false
 }
+
