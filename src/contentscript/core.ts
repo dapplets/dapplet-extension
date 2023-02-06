@@ -5,6 +5,7 @@ import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
 import { generateGuid, parseShareLink } from '../common/helpers'
+import { Notification, NotificationPayload } from '../common/models/event'
 import { LoginRequest, SystemOverlayTabs } from '../common/types'
 import { AppStorage } from './appStorage'
 import ConnectedAccounts from './connectedAccounts/connected-accounts'
@@ -49,26 +50,6 @@ export type INearWallet = NearApi.ConnectedWalletAccount &
 type ContentDetector = {
   contextId: string
   selector: string
-}
-
-type NotificationAction ={
-  action: string // unique id
-  title: string
-  icon: string
-}
-
-type NotificationPayload= {
-  title: string
-  message?: string
-  actions?: NotificationAction[]
-  timeout?: number // ms
-  payload?: any // serializable object
-}
-
-// All Events from EventBus must be typed
-type NotificationActionEvent = {
-  action: string;
-  payload: any;
 }
 
 export default class Core {
@@ -171,10 +152,17 @@ export default class Core {
     })
   }
 
-  public async notify(payload: NotificationPayload): Promise<void>  {
-    const { createAndShowNotification } = await initBGFunctions(browser)
-  const newNotification = await createAndShowNotification(payload)
-   console.log(newNotification);
+  public async notify(payload: NotificationPayload) {
+    const { createAndShowNotification, getThisTab } = await initBGFunctions(browser)
+    const thisTab = await getThisTab()
+    const notification = new Notification()
+    notification.id = generateGuid() // ToDo: autoincrement?
+    notification.title = payload.title
+    notification.message = payload.message
+    notification.createdAt = new Date()
+    notification.status = 0
+    notification.type = 2
+    await createAndShowNotification(notification, thisTab.id)
   }
 
   public toggleOverlay() {

@@ -144,7 +144,7 @@ browser.runtime.onMessage.addListener(
     getDevMode: () => globalConfigService.getDevMode(),
     setDevMode: (isActive) => globalConfigService.setDevMode(isActive),
     getEvents: EventService.getEvents,
-    getNotifications: EventService.getNotifications,
+    // getNotifications: EventService.getNotifications,
     createAndShowNotification: EventService.createAndShowNotification,
     addEvent: EventService.addEvent,
     setRead: EventService.setRead,

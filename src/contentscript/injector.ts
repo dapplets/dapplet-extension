@@ -431,6 +431,7 @@ export class Injector {
         state: core.state,
         connectedAccounts: core.connectedAccounts,
         fetch: core.fetch,
+        notify: (payload) => core.notify(payload),
       }
 
       let newBranch: string = null
