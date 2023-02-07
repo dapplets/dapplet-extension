@@ -1,9 +1,13 @@
+import { logStreamDisconnectWarning } from '@metamask/providers/dist/utils'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { widgets } from '../../../../modules/adapter-overlay/src'
 import { ReactComponent as Show } from '../../assets/icons/iconsWidgetButton/show.svg'
+import { ReactComponent as Notification } from '../../assets/icons/notificationIcons/bell.svg'
+import { ReactComponent as NotificationWithCircle } from '../../assets/icons/notificationIcons/bellWithNotification.svg'
+import { ReactComponent as Noties } from '../../assets/icons/notificationIcons/defaultIcon.svg'
 import {
   ReactComponent as Account,
   ReactComponent as DappletsLogo,
@@ -26,6 +30,11 @@ const SYSTEM_TAB: ToolbarTab = {
       id: 'dapplets',
       icon: Account,
       title: 'Dapplets',
+    },
+    {
+      id: 'notifications',
+      icon: Notification,
+      title: 'Notifications',
     },
   ],
 }
@@ -87,7 +96,10 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [isVisibleAnimation, setVisibleAnimation] = useState(false)
   const [iconAnimateWidget, setIconAnimateWidget] = useState('')
   const [isPinnedAnimateWidget, setPinnedAnimateWidget] = useState(false)
+  const [isPinnedNotification, setPinnedNotification] = useState(false)
+  const [event, setEvent] = useState([])
   const btnRef = useRef<HTMLDivElement>()
+  const notificationRef = useRef<HTMLDivElement>()
   useEffect(() => {
     const init = async () => {
       await _refreshData()
@@ -95,13 +107,15 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
     init()
     return () => {}
-  }, [newWidgets, widgets, nodeOverlayToolbar, isClick])
+  }, [newWidgets, widgets, nodeOverlayToolbar, isClick, event])
   const _refreshData = async () => {
     try {
       const { getPinnedActions } = await initBGFunctions(browser)
 
       const pinnedAction = await getPinnedActions()
       setPinnedActionButton(pinnedAction)
+      const notifications = await getNotifications()
+      setEvent(notifications)
     } catch (err) {
       console.error(err)
     }
@@ -277,6 +291,44 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       </span>
     )
   }
+  const getAnimateNotifification = (
+    // icon: string,
+    isPinned: boolean
+  ) => {
+    return (
+      <>
+        {event && event.length > 1
+          ? event.map((x, i) => (
+              <span
+                key={x.id}
+                ref={notificationRef}
+                className={cn(styles.widgetButtonNotification, {
+                  [styles.widgetButtonAnimatePinnedNotification]: isPinnedNotification,
+                })}
+              >
+                {/* {icon && icon.length > 0 ? (
+          <img data-visible className={cn(styles.widgetButtonImgAnimate)} src={icon} />
+        ) : null} */}
+                {/* <span className={cn(styles.widgetButtonImgAnimateNotifiction)}> */}
+                <Noties />
+                {/* </span> */}
+                <span className={styles.titleNotification}>{x.title}</span>
+              </span>
+            ))
+          : null}
+      </>
+    )
+  }
+  const getNotifications = async () => {
+    const backgroundFunctions = await initBGFunctions(browser)
+    const { getNotifications, setRead } = backgroundFunctions
+
+    const notifications: Notification[] = await getNotifications(2)
+    // console.log(notifications)
+    notifications && notifications.length > 0 && setPinnedNotification(true)
+// console.log(notifications)
+    return notifications
+  }
 
   return (
     <div
@@ -298,7 +350,47 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             className={cn(styles.TabList, { [styles.isOpenWallet]: p.isOpenWallet })}
           >
             {getNewButtonTab('Dapplets')}
+
+            <span
+              className={cn(styles.notificationCounter)}
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (
+                  document
+                    .querySelector('#dapplets-overlay-manager')
+                    .classList.contains('dapplets-overlay-collapsed')
+                ) {
+                  p.navigate('/system/notifications')
+
+                  p.onToggleClick()
+                } else if (
+                  !document
+                    .querySelector('#dapplets-overlay-manager')
+                    .classList.contains('dapplets-overlay-collapsed')
+                ) {
+                  p.navigate('/system/notifications')
+                }
+              }}
+            >
+              {event && event.filter((x) => x.status === 1).length > 0 ? (
+                <span className={styles.counter}>+{event.filter((x) => x.status === 1).length}</span>
+              ) : null}
+              {event && event.filter((x) => x.status === 1).length > 0 ? (
+                <NotificationWithCircle />
+              ) : (
+                <Notification />
+              )}
+
+              <span
+                className={cn({
+                  [styles.notificationCounterAnimate]: isPinnedNotification,
+                })}
+              ></span>
+            </span>
+            {getAnimateNotifification(isPinnedNotification)}
             {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget, isPinnedAnimateWidget)}
+
             {!isShowTabs &&
               document
                 .querySelector('#dapplets-overlay-manager')

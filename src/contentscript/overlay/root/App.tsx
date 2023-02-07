@@ -591,7 +591,7 @@ class _App extends React.Component<P, S> {
                 className={cn(styles.children, 'dapplets-overlay-nav-content-list', {
                   [styles.newChildren]:
                     pathname !== '/system/dapplets' &&
-                    pathname !== '/system/notifications' &&
+                    // pathname !== '/system/notifications' &&
                     pathname !== '/system/connectedAccounts' &&
                     pathname !== '/system/settings',
                   // [styles.newHeight]:s.isOpenSearch && pathname === '/system/dapplets'
