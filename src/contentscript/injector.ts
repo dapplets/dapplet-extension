@@ -15,7 +15,7 @@ import {
   parseModuleName,
 } from '../common/helpers'
 import { JsonRpc } from '../common/jsonrpc'
-import { Notification } from '../common/models/event'
+import { Notification } from '../common/models/notification'
 import { DefaultConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'

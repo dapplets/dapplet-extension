@@ -16,7 +16,7 @@ import * as tracing from '../common/tracing'
 import ConnectedAccountService from './services/connectedAccountService'
 // import DiscordService from './services/discordService'
 import EnsService from './services/ensService'
-import * as EventService from './services/eventService'
+import * as NotificationService from './services/notificationService'
 import FeatureService from './services/featureService'
 import GithubService from './services/githubService'
 import GlobalConfigService from './services/globalConfigService'
@@ -143,15 +143,14 @@ browser.runtime.onMessage.addListener(
     setGlobalConfig: (config) => globalConfigService.set(config),
     getDevMode: () => globalConfigService.getDevMode(),
     setDevMode: (isActive) => globalConfigService.setDevMode(isActive),
-    getNotifications: EventService.getNotifications,
-    createAndShowNotification: EventService.createAndShowNotification,
-    createNotification: EventService.createNotification,
-    showNotification: EventService.showNotification,
-    deleteNotification: EventService.deleteNotification,
-    deleteAllNotifications: EventService.deleteAllNotifications,
-    setRead: EventService.setRead,
-    markNotificationAsViewed: EventService.markNotificationAsViewed,
-    getUnreadNotificationsCount: EventService.getUnreadNotificationsCount,
+    getNotifications: NotificationService.getNotifications,
+    createAndShowNotification: NotificationService.createAndShowNotification,
+    createNotification: NotificationService.createNotification,
+    showNotification: NotificationService.showNotification,
+    deleteNotification: NotificationService.deleteNotification,
+    deleteAllNotifications: NotificationService.deleteAllNotifications,
+    markNotificationAsViewed: NotificationService.markNotificationAsViewed,
+    getUnreadNotificationsCount: NotificationService.getUnreadNotificationsCount,
     getInitialConfig: () => globalConfigService.getInitialConfig(),
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),

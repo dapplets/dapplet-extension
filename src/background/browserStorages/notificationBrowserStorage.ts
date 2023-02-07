@@ -1,4 +1,4 @@
-import { Notification } from '../../common/models/event'
+import { Notification } from '../../common/models/notification'
 import BaseBrowserStorage from './baseBrowserStorage'
 
 export default class NotificationBrowserStorage extends BaseBrowserStorage<Notification> {

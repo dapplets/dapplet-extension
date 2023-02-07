@@ -1,11 +1,10 @@
 import { browser } from 'webextension-polyfill-ts'
 import { getCurrentTab } from '../../common/helpers'
-import { Notification, NotificationType } from '../../common/models/event'
-import EventBrowserStorage from '../browserStorages/eventBrowserStorage'
+import { Notification, NotificationType } from '../../common/models/notification'
 import NotificationBrowserStorage from '../browserStorages/notificationBrowserStorage'
 
 // Add removing function
-// EventBrowserStorage - implements Repository pattern (read/add/remove)
+// NotificationBrowserStorage - implements Repository pattern (read/add/remove)
 _updateBadge()
 
 export async function getNotifications(type: NotificationType): Promise<Notification[]> {
@@ -74,18 +73,6 @@ export async function markNotificationAsViewed(id: string | string[]): Promise<v
   await _updateBadge()
 }
 
-export async function setRead(id: string | string[]): Promise<void> {
-  const ids = Array.isArray(id) ? id : [id]
-  const eventBrowserStorage = new EventBrowserStorage()
-  for (const i of ids) {
-    const event = await eventBrowserStorage.getById(i)
-    event.isRead = true
-    await eventBrowserStorage.update(event)
-  }
-
-  await _updateBadge()
-}
-
 export async function getUnreadNotificationsCount(source?: string): Promise<number> {
   const notificationBrowserStorage = new NotificationBrowserStorage()
   const notification: Notification[] = await notificationBrowserStorage.getAll()
@@ -94,7 +81,7 @@ export async function getUnreadNotificationsCount(source?: string): Promise<numb
 }
 
 async function _updateBadge() {
-  const count = 0 // await getNewEventsCount()  !!!! ToDo ACHTUNG !!!!
+  const count = 0 // await getUnreadNotificationsCount()  !!!! ToDo ACHTUNG !!!!
   browser.browserAction.setBadgeText({
     text: '', // count === 0 ? '' : count.toString(),  !!!! ToDo ACHTUNG !!!!
   })
