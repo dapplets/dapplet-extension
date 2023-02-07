@@ -1,12 +1,11 @@
 import cn from 'classnames'
-import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en'
+// import TimeAgo from 'javascript-time-ago'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
-import ReactTimeAgo from 'react-time-ago'
+// import ReactTimeAgo from 'react-time-ago'
 import { CloseIcon } from '../CloseIcon'
 import styles from './Notification.module.scss'
 
-TimeAgo.addLocale(en)
+// TimeAgo.addLocale(en)
 
 export interface NotificationProps {
   label: string
@@ -25,11 +24,11 @@ export const Notification = (props: NotificationProps): ReactElement => {
   const [isDelete, onDelete] = useState(false)
   const [newDescription, setDescription] = useState(description)
   const refComponent = useRef<HTMLInputElement>()
-  const newDateNum = new Date(date)
+  // const newDateNum = new Date(date)
   const booleanNode = refComponent.current?.classList.contains('more')
 
   useEffect(() => {
-    if (description.length > 235) {
+    if (description && description.length > 235) {
       useStyleRef(
         description,
         refComponent,
@@ -42,7 +41,7 @@ export const Notification = (props: NotificationProps): ReactElement => {
 
   const useStyleRef = (stroke, ref, func) => {
     if (ref && ref.current) {
-      stroke.length > 235
+      stroke && stroke.length > 235
         ? ref.current?.classList.add(styles.more)
         : ref.current?.classList.remove(styles.more),
         func
@@ -63,7 +62,7 @@ export const Notification = (props: NotificationProps): ReactElement => {
     >
       <header className={styles.header}>{label}</header>
       <span className={styles.date}>
-        <ReactTimeAgo date={newDateNum} locale="en-US" />
+        {/* {newDateNum?<ReactTimeAgo date={newDateNum} locale="en-US" />:'00'} */}
       </span>
       <h4 className={styles.title}>{title}</h4>
 

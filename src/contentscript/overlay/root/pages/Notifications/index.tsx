@@ -3,7 +3,7 @@ import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { Event } from '../../../../../common/models/event'
+import { Notification as Notify } from '../../../../../common/models/event'
 import { CloseIcon } from '../../components/CloseIcon'
 import { Notification } from '../../components/Notification'
 import { TabLoader } from '../../components/TabLoader'
@@ -32,25 +32,26 @@ export const Notifications = () => {
 
   const getNotifications = async () => {
     const backgroundFunctions = await initBGFunctions(browser)
-    const { getEvents, setRead } = backgroundFunctions
+    const { getNotifications } = backgroundFunctions
 
-    const notifications: Event[] = await getEvents()
+    const notifications: Notify[] = await getNotifications(2)
+
     return notifications
   }
 
   const onRemoveEvent = async (f) => {
-    const { deleteEvent, getCurrentContextIds } = await initBGFunctions(browser)
+    const { deleteNotification, getCurrentContextIds } = await initBGFunctions(browser)
 
     const contextIds = await getCurrentContextIds(null)
 
-    await deleteEvent(f.id, contextIds)
+    await deleteNotification(f.id, contextIds)
 
     const d = event.filter((x) => x.id !== f.id)
     setEvent(d)
   }
   const onRemoveEventsAll = async (f) => {
-    const { deleteAllEvents } = await initBGFunctions(browser)
-    await deleteAllEvents(f)
+    const { deleteAllNotifications } = await initBGFunctions(browser)
+    await deleteAllNotifications(f)
     setEvent(f)
   }
 
@@ -76,9 +77,9 @@ export const Notifications = () => {
                           key={x.id}
                           label={'System'}
                           title={x.title}
-                          description={x.description}
+                          description={x.message}
                           _id={x.id}
-                          date={x.created}
+                          date={x.createdAt}
                         />
                       )
                     })}

@@ -160,7 +160,7 @@ export default class Core {
     notification.title = payload.title
     notification.message = payload.message
     notification.createdAt = new Date()
-    notification.status = 0
+    notification.status = 1
     notification.type = 2
     await createAndShowNotification(notification, thisTab.id)
   }
