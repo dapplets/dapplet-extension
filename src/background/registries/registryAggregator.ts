@@ -58,17 +58,15 @@ export class RegistryAggregator {
     await this._initRegistries()
     const registries = this._getNonSkippedRegistries()
 
-    const registriesConfig = await this._globalConfigService.getRegistries()
-
     const uriWithErrors = await Promise.allSettled(
       registries.map((r) => {
-        const isDev = registriesConfig.find((c) => c.url === r.url).isDev
-        const promise = isDev
+        const promise = r.isDev
           ? r.getVersionInfo(name, branch, version)
           : this._cacheVersionInfo(r, name, branch, version)
+
         return promise.then((vi) => {
           if (!vi) return null
-          vi.environment = isDev ? Environments.Dev : Environments.Test
+          vi.environment = r.isDev ? Environments.Dev : Environments.Test
           return vi
         })
       })
@@ -203,15 +201,12 @@ export class RegistryAggregator {
     const reduced = validModules.length > 0 ? validModules.reduce((a, b) => a.concat(b)) : []
 
     // check deployment in prod registries
-    const registriesConfig = await this._globalConfigService.getRegistries()
-    const prodRegistries = registries.filter(
-      (r) => !registriesConfig.find((rc) => rc.url === r.url).isDev
-    )
+    const prodRegistries = registries.filter((r) => !r.isDev)
 
     let devModules: { module: ModuleInfo; versions: VersionInfo[]; isDeployed?: boolean[] }[] = []
 
     if (prodRegistries.length === 0) {
-      devModules = reduced.map((x, i) => ({ ...x, isDeployed: [] }))
+      devModules = reduced.map((x) => ({ ...x, isDeployed: [] }))
     } else {
       // ToDo: optimize amount of external requests
       const vis = await Promise.all(
@@ -271,9 +266,7 @@ export class RegistryAggregator {
     }
 
     // dev registries have priority
-    this.registries = this.registries.sort((a, b) =>
-      enabledRegistries.find((x) => x.url === a.url)?.isDev === false ? 1 : -1
-    )
+    this.registries = this.registries.sort((a, b) => (a === b ? 0 : a ? -1 : 1))
   }
 
   private _getNonSkippedRegistries() {
