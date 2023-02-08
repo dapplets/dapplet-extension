@@ -3,12 +3,16 @@ import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { ManifestAndDetails } from '../../../../../common/types'
+import { ReactComponent as CopiedIcon } from '../../assets/svg/copied.svg'
+import { ReactComponent as CopyIcon } from '../../assets/svg/copyModal.svg'
+import { ReactComponent as LoadingIcon } from '../../assets/svg/loaderCopy.svg'
 import { ReactComponent as DeleteIcon } from '../../assets/svg/newDelete.svg'
 import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
 import { ReactComponent as SearchIcon } from '../../assets/svg/newLinks.svg'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
 import { ReactComponent as OpenSeaIcon } from '../../assets/svg/opensea.svg'
 import useAbortController from '../../hooks/useAbortController'
+import { createUserEnvInfo } from '../../utils/createUserEnvInfo'
 import { DappletImage } from '../DappletImage'
 import { DappletInfo } from '../DappletInfo'
 import { DappletTitle } from '../DappletTitle'
@@ -35,6 +39,12 @@ export interface DappletProps
   getTabsForDapplet?: any
 }
 
+enum LoadingState {
+  LOADING,
+  LOADED,
+  READY,
+}
+
 export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const {
     dapplet,
@@ -58,6 +68,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const [loadHome, setLoadHome] = useState(false)
   const [registryActive, setRegistryActive] = useState(null)
   const [owner, setOwner] = useState(null)
+  const [copied, setCopied] = useState<LoadingState>(LoadingState.READY)
   const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
@@ -91,6 +102,24 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     }
     // if (isActive) getTabsForDapplet(dapplet)
   }
+
+  const copyUserEnvInfo = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setCopied(LoadingState.LOADING)
+    e.preventDefault()
+    e.stopPropagation()
+    const userEnvInfo = await createUserEnvInfo(dapplet)
+    navigator.clipboard.writeText(JSON.stringify(userEnvInfo))
+    setCopied(LoadingState.LOADED)
+  }
+
+  useEffect(() => {
+    if (copied) {
+      const timer = setTimeout(() => {
+        setCopied(LoadingState.READY)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [copied])
 
   return (
     <div className={cn(styles.wrapperCard, className)} data-testid={name} {...anotherProps}>
@@ -169,6 +198,23 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 className={styles.squareButton}
                 title="NFT at OpenSea"
                 onClick={() => onOpenNft(dapplet)}
+              />
+            </div>
+
+            <div className={styles.blockButtons}>
+              <SquaredButton
+                appearance="smail"
+                icon={
+                  copied === LoadingState.READY
+                    ? CopyIcon
+                    : copied === LoadingState.LOADING
+                    ? LoadingIcon
+                    : CopiedIcon
+                }
+                disabled={copied !== LoadingState.READY}
+                className={styles.squareButton}
+                title="Copy the environment info"
+                onClick={copyUserEnvInfo}
               />
             </div>
 

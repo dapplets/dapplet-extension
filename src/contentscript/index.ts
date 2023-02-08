@@ -21,6 +21,15 @@ import { OverlayManager } from './overlay/root/overlayManager'
 
 const IS_OVERLAY_IFRAME = window.name.indexOf('dapplet-overlay') !== -1
 const IS_E2E_ENV = isE2ETestingEnvironment(window)
+let injector: Injector // ToDo ------> look at the getRegistriesInfo() ToDo
+
+/* ToDo: The function is needed for ./overlay/root/utils/createUserEnvInfo.ts that's used in Dapplet.tsx.
+/        We cannot get the injector via props or context in Dapplet.tsx because it's mutable.
+/        The cyclic dependency needs refactoring.
+*/
+export function getRegistriesInfo() {
+  return injector.registry
+}
 
 async function init() {
   const IS_LIBRARY = window['DAPPLETS_JSLIB'] === true
@@ -37,7 +46,7 @@ async function init() {
   const overlayManager = IS_IFRAME ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc)
 
   const core = new Core(IS_IFRAME, overlayManager) // ToDo: is it global for all modules?
-  const injector = new Injector(core, { shareLinkPayload })
+  injector = new Injector(core, { shareLinkPayload })
 
   // Open confirmation overlay if checks are not passed
   if (!IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
