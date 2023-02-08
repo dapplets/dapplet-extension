@@ -4,6 +4,7 @@ import makeBlockie from 'ethereum-blockies-base64'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { DAPPLETS_STORE_URL } from '../../../../../common/constants'
+import * as EventBus from '../../../../../common/global-event-bus'
 import { DefaultSigners, StorageRef } from '../../../../../common/types'
 import { ReactComponent as Account } from '../../assets/icons/iconsWidgetButton/account.svg'
 import { ReactComponent as Help } from '../../assets/icons/iconsWidgetButton/help.svg'
@@ -63,6 +64,19 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     const init = async () => {
       const notifications = await getNotifications()
       setEvent(notifications && notifications.filter((x) => x.status === 1))
+      EventBus.on('SHOW NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications && notifications.filter((x) => x.status === 1))
+      })
+
+      EventBus.on('READ NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications && notifications.filter((x) => x.status === 1))
+      })
+      EventBus.on('READ ALL NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications && notifications.filter((x) => x.status === 1))
+      })
     }
 
     init()
@@ -70,8 +84,22 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     !document
       .querySelector('#dapplets-overlay-manager')
       .classList.contains('dapplets-overlay-collapsed') && setMenuVisible(false)
-    return () => {}
-  }, [menuVisible, event])
+    return () => {
+      EventBus.off('SHOW NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications && notifications.filter((x) => x.status === 1))
+      })
+
+      EventBus.off('READ NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications && notifications.filter((x) => x.status === 1))
+      })
+      EventBus.off('READ ALL NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications && notifications.filter((x) => x.status === 1))
+      })
+    }
+  }, [menuVisible])
 
   const connectWallet = async () => {
     const { pairWalletViaOverlay } = await initBGFunctions(browser)

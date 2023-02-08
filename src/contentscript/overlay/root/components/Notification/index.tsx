@@ -1,7 +1,6 @@
 import cn from 'classnames'
 // import TimeAgo from 'javascript-time-ago'
-import React, { ReactElement, useEffect, useRef, useState } from 'react'
-// import ReactTimeAgo from 'react-time-ago'
+import React, { ReactElement, useRef, useState } from 'react'
 import { CloseIcon } from '../CloseIcon'
 import styles from './Notification.module.scss'
 
@@ -12,7 +11,7 @@ export interface NotificationProps {
   icon?: string
   title: string
   date: any
-  onClear?: Function
+  onClear?: any
   href?: string
   _id: any
   description: any
@@ -26,40 +25,12 @@ export const Notification = (props: NotificationProps): ReactElement => {
   const [newDescription, setDescription] = useState(description)
   const refComponent = useRef<HTMLInputElement>()
   const newDateNum = new Date(date)
-  // console.log(newDateNum);
   const addZero = (num) => {
     if (num >= 0 && num <= 9) {
       return '0' + num
     } else {
       return num
     }
-  }
-  const booleanNode = refComponent.current?.classList.contains('more')
-
-  useEffect(() => {
-    if (description && description.length > 235) {
-      useStyleRef(
-        description,
-        refComponent,
-        setDescription(refComponent.current?.innerText.slice(0, 235))
-      )
-    } else {
-      useStyleRef(description, refComponent, setDescription(description))
-    }
-  }, [refComponent, booleanNode, description])
-
-  const useStyleRef = (stroke, ref, func) => {
-    if (ref && ref.current) {
-      stroke && stroke.length > 235
-        ? ref.current?.classList.add(styles.more)
-        : ref.current?.classList.remove(styles.more),
-        func
-    }
-  }
-
-  const onClick = (id: string) => (): void => {
-    onClear && onClear(id)
-    onDelete(true)
   }
 
   return (
@@ -68,7 +39,7 @@ export const Notification = (props: NotificationProps): ReactElement => {
         [styles.delete]: isDelete,
         [styles.isRead]: isRead === 0,
       })}
-      onClick={() => onChange && onChange(_id)}
+      // onClick={() => onChange && onChange(_id)}
     >
       <div className={styles.blockTitle}>
         <div className={styles.blockIcon}>
@@ -100,12 +71,14 @@ export const Notification = (props: NotificationProps): ReactElement => {
             Go to store
           </a>
         )}
-        <CloseIcon
-          appearance="small"
-          color="notification"
-          className={styles.button}
-          onClick={onClick(_id)}
-        />
+        {isRead !== 0 ? (
+          <CloseIcon
+            appearance="small"
+            color="notification"
+            className={styles.button}
+            onClick={() => onClear && onClear(_id)}
+          />
+        ) : null}
       </div>
     </div>
   )

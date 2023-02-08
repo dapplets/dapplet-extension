@@ -8,8 +8,8 @@ import { DefaultConfig, SchemaConfig, StorageRef } from '../../common/types'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 import { RegistryAggregator } from '../registries/registryAggregator'
-import { createAndShowNotification } from '../services/notificationService'
 import GlobalConfigService from '../services/globalConfigService'
+import { createAndShowNotification } from '../services/notificationService'
 import { WalletService } from '../services/walletService'
 
 export default class ModuleManager {

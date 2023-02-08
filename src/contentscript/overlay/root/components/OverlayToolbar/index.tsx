@@ -1,8 +1,8 @@
-import { logStreamDisconnectWarning } from '@metamask/providers/dist/utils'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import * as EventBus from '../../../../../common/global-event-bus'
 import { widgets } from '../../../../modules/adapter-overlay/src'
 import { ReactComponent as Show } from '../../assets/icons/iconsWidgetButton/show.svg'
 import { ReactComponent as Notification } from '../../assets/icons/notificationIcons/bell.svg'
@@ -19,7 +19,6 @@ import { WidgetButton } from '../../widgets/button'
 import { LabelButton } from '../../widgets/label'
 import { OverlayTab } from '../OverlayTab'
 import styles from './OverlayToolbar.module.scss'
-
 const SYSTEM_TAB: ToolbarTab = {
   id: 'system',
   pinned: true,
@@ -103,19 +102,54 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   useEffect(() => {
     const init = async () => {
       await _refreshData()
+      const notifications = await getNotifications()
+      setEvent(notifications)
+      //  return setEvent(notifications)
+      EventBus.on('SHOW NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        notifications && notifications.length > 0 && setPinnedNotification(true)
+        setTimeout(() => setPinnedNotification(false), 8000)
+        return setEvent(notifications)
+      })
+
+      EventBus.on('READ NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        return setEvent(notifications)
+      })
+      EventBus.on('READ ALL NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications)
+      })
     }
 
     init()
-    return () => {}
-  }, [newWidgets, widgets, nodeOverlayToolbar, isClick, event])
+
+    return () => {
+      // delete message event
+      // unsubscribe
+      EventBus.off('SHOW NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        notifications && notifications.length > 0 && setPinnedNotification(true)
+        setTimeout(() => setPinnedNotification(false), 8000)
+        return setEvent(notifications)
+      })
+
+      EventBus.off('READ NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        return setEvent(notifications)
+      })
+      EventBus.off('READ ALL NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications)
+      })
+    }
+  }, [newWidgets, widgets, isClick])
   const _refreshData = async () => {
     try {
       const { getPinnedActions } = await initBGFunctions(browser)
 
       const pinnedAction = await getPinnedActions()
       setPinnedActionButton(pinnedAction)
-      const notifications = await getNotifications()
-      setEvent(notifications)
     } catch (err) {
       console.error(err)
     }
@@ -297,7 +331,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   ) => {
     return (
       <>
-        {event && event.length > 1
+        {event && event.length > 0
           ? event.map((x, i) => (
               <span
                 key={x.id}
@@ -324,9 +358,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     const { getNotifications, setRead } = backgroundFunctions
 
     const notifications: Notification[] = await getNotifications(2)
-    // console.log(notifications)
-    notifications && notifications.length > 0 && setPinnedNotification(true)
-// console.log(notifications)
+
     return notifications
   }
 
@@ -374,7 +406,9 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               }}
             >
               {event && event.filter((x) => x.status === 1).length > 0 ? (
-                <span className={styles.counter}>+{event.filter((x) => x.status === 1).length}</span>
+                <span className={styles.counter}>
+                  +{event.filter((x) => x.status === 1).length}
+                </span>
               ) : null}
               {event && event.filter((x) => x.status === 1).length > 0 ? (
                 <NotificationWithCircle />
@@ -388,7 +422,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 })}
               ></span>
             </span>
-            {getAnimateNotifification(isPinnedNotification)}
+            {isPinnedNotification && getAnimateNotifification(true)}
             {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget, isPinnedAnimateWidget)}
 
             {!isShowTabs &&
