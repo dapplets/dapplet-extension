@@ -2,7 +2,7 @@ import { ModuleTypes } from '../../common/constants'
 import { fetchWithTimeout } from '../../common/helpers'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
-import { Registry } from './registry'
+import { Registry, RegistryConfig } from './registry'
 
 type DevManifest = {
   name: string
@@ -49,6 +49,8 @@ export class DevRegistry implements Registry {
   public isAvailable = true
   public error: string = null
   public blockchain = 'develop'
+  public url: string
+  public isDev: boolean
 
   private _cachePromise: Promise<void> = null
   private _devConfig: DevManifestRaw | string[] = null
@@ -57,8 +59,11 @@ export class DevRegistry implements Registry {
 
   readonly TIMEOUT = 3000 // 3 seconds
 
-  constructor(public url: string) {
+  constructor({ url, isDev }: RegistryConfig) {
     if (!url) throw new Error('Config Url is required')
+
+    this.url = url
+    this.isDev = isDev
     this._rootUrl = new URL(this.url).origin
   }
 

@@ -15,7 +15,7 @@ import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import abi from './ethRegistryAbi'
 import nftAbi from './nftContractAbi'
-import { Registry } from './registry'
+import { Registry, RegistryConfig } from './registry'
 
 type EthStorageRef = {
   hash: string // bytes32
@@ -85,7 +85,10 @@ export class EthRegistry implements Registry {
   public isAvailable = true
   public error: string = null
   public blockchain = 'ethereum'
+  public url: string
+  public isDev: boolean
 
+  private _signer: ethers.ethers.Signer
   private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>()
   private _contract: ethers.ethers.Contract = null
   private get _contractPromise(): Promise<ethers.ethers.Contract> {
@@ -99,8 +102,12 @@ export class EthRegistry implements Registry {
     }
   }
 
-  constructor(public url: string, private _signer: ethers.ethers.Signer) {
+  constructor({ url, isDev, signer }: RegistryConfig) {
     if (!url) throw new Error('Endpoint Url is required')
+
+    this.url = url
+    this.isDev = isDev
+    this._signer = signer
   }
 
   public async getModuleInfo(

@@ -5,7 +5,7 @@ import { typeOfUri, UriTypes } from '../../common/helpers'
 import { StorageRef } from '../../common/types'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
-import { Registry } from './registry'
+import { Registry, RegistryConfig } from './registry'
 
 type NearStorageRef = {
   hash: string // bytes32
@@ -51,11 +51,17 @@ export class NearRegistry implements Registry {
   public isAvailable = true
   public error: string = null
   public blockchain = 'near'
+  public url: string
+  public isDev: boolean
 
+  private _nearAccount: nearAPI.ConnectedWalletAccount
   private _contract: any
   private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>()
 
-  constructor(public url: string, private _nearAccount: nearAPI.ConnectedWalletAccount) {
+  constructor({ url, isDev, nearAccount }: RegistryConfig) {
+    this.url = url
+    this.isDev = isDev
+    this._nearAccount = nearAccount
     this._contract = new nearAPI.Contract(this._nearAccount, this.url, {
       viewMethods: [
         'getLastVersionInfo',

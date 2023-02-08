@@ -307,16 +307,20 @@ export class RegistryAggregator {
     const uriType = typeOfUri(registryConfig.url)
 
     if (uriType === UriTypes.Http && registryConfig.isDev) {
-      return new DevRegistry(registryConfig.url)
+      return new DevRegistry({ url: registryConfig.url, isDev: registryConfig.isDev })
     } else if (uriType === UriTypes.Ethereum || uriType === UriTypes.Ens) {
-      const eth_signer = await this._walletService.eth_getSignerFor(
+      const ethSigner = await this._walletService.eth_getSignerFor(
         DefaultSigners.EXTENSION,
         ChainTypes.ETHEREUM_GOERLI
       )
-      return new EthRegistry(registryConfig.url, eth_signer)
+      return new EthRegistry({
+        url: registryConfig.url,
+        isDev: registryConfig.isDev,
+        signer: ethSigner,
+      })
     } else if (uriType === UriTypes.Near) {
-      const near_account = await this._walletService.near_getAccount(DefaultSigners.EXTENSION)
-      return new NearRegistry(registryConfig.url, near_account)
+      const nearAccount = await this._walletService.near_getAccount(DefaultSigners.EXTENSION)
+      return new NearRegistry({ url: registryConfig.url, isDev: registryConfig.isDev, nearAccount })
     } else {
       return null
     }

@@ -1,10 +1,20 @@
+import { ethers } from 'ethers'
+import { ConnectedWalletAccount } from 'near-api-js'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
+
+export interface RegistryConfig {
+  url: string
+  isDev: boolean
+  signer?: ethers.Signer
+  nearAccount?: ConnectedWalletAccount
+}
 
 export interface Registry {
   isAvailable: boolean
   error: string
   url: string
+  isDev: boolean
   blockchain: string
 
   getModuleInfo(
