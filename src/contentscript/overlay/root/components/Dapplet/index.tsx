@@ -2,7 +2,11 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import { getRegistriesInfo } from '../../../..'
 import { ManifestAndDetails } from '../../../../../common/types'
+import { ReactComponent as CopiedIcon } from '../../assets/svg/copied.svg'
+import { ReactComponent as CopyIcon } from '../../assets/svg/copyModal.svg'
+import { ReactComponent as LoadingIcon } from '../../assets/svg/loaderSettings.svg'
 import { ReactComponent as DeleteIcon } from '../../assets/svg/newDelete.svg'
 import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
 import { ReactComponent as SearchIcon } from '../../assets/svg/newLinks.svg'
@@ -35,6 +39,12 @@ export interface DappletProps
   getTabsForDapplet?: any
 }
 
+enum LoadingState {
+  LOADING,
+  LOADED,
+  READY,
+}
+
 export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const {
     dapplet,
@@ -58,6 +68,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const [loadHome, setLoadHome] = useState(false)
   const [registryActive, setRegistryActive] = useState(null)
   const [owner, setOwner] = useState(null)
+  const [copied, setCopied] = useState<LoadingState>(LoadingState.READY)
   const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
@@ -91,6 +102,49 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     }
     // if (isActive) getTabsForDapplet(dapplet)
   }
+
+  const copyUserEnvInfo = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    setCopied(LoadingState.LOADING)
+    e.preventDefault()
+    e.stopPropagation()
+    const { getUserAgentName } = await initBGFunctions(browser)
+    const userAgentNameInput = await getUserAgentName()
+    // console.log('=== dapplet ===', dapplet)
+    const registries = getRegistriesInfo()
+    // console.log('=!!!!= registries =!!!!=', registries)
+    const activeAdaptersInfo = registries.filter((m) => m.manifest.type === 'ADAPTER')
+    // console.log('=!!!!= activeAdaptersInfo =!!!!=', activeAdaptersInfo)
+    const { userAgent, platform } = window.navigator
+    const result = {
+      dapplet: {
+        name: dapplet.name,
+        userVersion: dapplet.activeVersion,
+        lastVersion: dapplet.lastVersion,
+        author: dapplet.author,
+        registry: dapplet.sourceRegistry.url,
+      },
+      context: dapplet.hostnames,
+      extension: EXTENSION_VERSION,
+      browser: userAgent,
+      system: platform,
+      userAgent: userAgentNameInput,
+      activeAdapters: activeAdaptersInfo.map((a) => ({
+        name: a.manifest.name,
+        version: a.manifest.version,
+      })),
+    }
+    navigator.clipboard.writeText(JSON.stringify(result))
+    setCopied(LoadingState.LOADED)
+  }
+
+  useEffect(() => {
+    if (copied) {
+      const timer = setTimeout(() => {
+        setCopied(LoadingState.READY)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [copied])
 
   return (
     <div className={cn(styles.wrapperCard, className)} data-testid={name} {...anotherProps}>
@@ -169,6 +223,23 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                 className={styles.squareButton}
                 title="NFT at OpenSea"
                 onClick={() => onOpenNft(dapplet)}
+              />
+            </div>
+
+            <div className={styles.blockButtons}>
+              <SquaredButton
+                appearance="smail"
+                icon={
+                  copied === LoadingState.READY
+                    ? CopyIcon
+                    : copied === LoadingState.LOADING
+                    ? LoadingIcon
+                    : CopiedIcon
+                }
+                disabled={copied !== LoadingState.READY}
+                className={styles.squareButton}
+                title="Copy the environment info"
+                onClick={copyUserEnvInfo}
               />
             </div>
 
