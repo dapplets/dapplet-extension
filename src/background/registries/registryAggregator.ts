@@ -33,9 +33,13 @@ export class RegistryAggregator {
     private _walletService: WalletService
   ) {}
 
-  async getVersions(name: string, branch: string): Promise<string[]> {
+  async getVersions(name: string, branch: string, isDev?: boolean): Promise<string[]> {
     await this._initRegistries()
-    const registries = this._getNonSkippedRegistries()
+    const registries = this._getNonSkippedRegistries().filter((x) =>
+      isDev === undefined ? true : x.isDev === isDev
+    )
+
+    if (registries.length === 0) return []
 
     const versionsWithErrors = await Promise.allSettled(
       registries.map((r) => r.getVersionNumbers(name, branch))
@@ -48,8 +52,8 @@ export class RegistryAggregator {
     return versionsAsc
   }
 
-  async getLastVersion(name: string, branch: string): Promise<string | null> {
-    const versions = await this.getVersions(name, branch)
+  async getLastVersion(name: string, branch: string, isDev?: boolean): Promise<string | null> {
+    const versions = await this.getVersions(name, branch, isDev)
     if (versions.length === 0) return null
     return versions.sort(rcompare)[0]
   }

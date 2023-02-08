@@ -535,6 +535,23 @@ export default class FeatureService {
       }
     }
 
+    // Choose last dev-versions if available
+    const configuredRegistries = await this._globalConfigService.getRegistries()
+    const isDevRegistriesAvailable = configuredRegistries.filter((x) => x.isDev).length > 0
+
+    if (isDevRegistriesAvailable) {
+      for (const module of modules) {
+        const lastDevVersion = await this._moduleManager.registryAggregator.getLastVersion(
+          module.name,
+          module.branch,
+          true
+        )
+        if (lastDevVersion) {
+          module.version = lastDevVersion
+        }
+      }
+    }
+
     return modules
   }
 
