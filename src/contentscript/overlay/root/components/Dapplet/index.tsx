@@ -2,7 +2,6 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { getRegistriesInfo } from '../../../..'
 import { ManifestAndDetails } from '../../../../../common/types'
 import { ReactComponent as CopiedIcon } from '../../assets/svg/copied.svg'
 import { ReactComponent as CopyIcon } from '../../assets/svg/copyModal.svg'
@@ -13,6 +12,7 @@ import { ReactComponent as SearchIcon } from '../../assets/svg/newLinks.svg'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
 import { ReactComponent as OpenSeaIcon } from '../../assets/svg/opensea.svg'
 import useAbortController from '../../hooks/useAbortController'
+import { createUserEnvInfo } from '../../utils/createUserEnvInfo'
 import { DappletImage } from '../DappletImage'
 import { DappletInfo } from '../DappletInfo'
 import { DappletTitle } from '../DappletTitle'
@@ -107,33 +107,8 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     setCopied(LoadingState.LOADING)
     e.preventDefault()
     e.stopPropagation()
-    const { getUserAgentName } = await initBGFunctions(browser)
-    const userAgentNameInput = await getUserAgentName()
-    // console.log('=== dapplet ===', dapplet)
-    const registries = getRegistriesInfo()
-    // console.log('=!!!!= registries =!!!!=', registries)
-    const activeAdaptersInfo = registries.filter((m) => m.manifest.type === 'ADAPTER')
-    // console.log('=!!!!= activeAdaptersInfo =!!!!=', activeAdaptersInfo)
-    const { userAgent, platform } = window.navigator
-    const result = {
-      dapplet: {
-        name: dapplet.name,
-        userVersion: dapplet.activeVersion,
-        lastVersion: dapplet.lastVersion,
-        author: dapplet.author,
-        registry: dapplet.sourceRegistry.url,
-      },
-      context: dapplet.hostnames,
-      extension: EXTENSION_VERSION,
-      browser: userAgent,
-      system: platform,
-      userAgent: userAgentNameInput,
-      activeAdapters: activeAdaptersInfo.map((a) => ({
-        name: a.manifest.name,
-        version: a.manifest.version,
-      })),
-    }
-    navigator.clipboard.writeText(JSON.stringify(result))
+    const userEnvInfo = await createUserEnvInfo(dapplet)
+    navigator.clipboard.writeText(JSON.stringify(userEnvInfo))
     setCopied(LoadingState.LOADED)
   }
 
