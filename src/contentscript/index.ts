@@ -21,8 +21,12 @@ import { OverlayManager } from './overlay/root/overlayManager'
 
 const IS_OVERLAY_IFRAME = window.name.indexOf('dapplet-overlay') !== -1
 const IS_E2E_ENV = isE2ETestingEnvironment(window)
-let injector: Injector
+let injector: Injector // ToDo ------> look at the getRegistriesInfo() ToDo
 
+/* ToDo: The function is needed for ./overlay/root/utils/createUserEnvInfo.ts that's used in Dapplet.tsx.
+/        We cannot get the injector via props or context in Dapplet.tsx because it's mutable.
+/        The cyclic dependency needs refactoring.
+*/
 export function getRegistriesInfo() {
   return injector.registry
 }
