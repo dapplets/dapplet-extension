@@ -2,13 +2,14 @@ import JSZip from 'jszip'
 import { maxSatisfying } from 'semver'
 import { TopologicalSort } from 'topological-sort'
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
-import { areModulesEqual } from '../../common/helpers'
+import { areModulesEqual, generateGuid } from '../../common/helpers'
+import { Notification } from '../../common/models/notification'
 import { DefaultConfig, SchemaConfig, StorageRef } from '../../common/types'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 import { RegistryAggregator } from '../registries/registryAggregator'
-import { addEvent } from '../services/eventService'
 import GlobalConfigService from '../services/globalConfigService'
+import { createAndShowNotification } from '../services/notificationService'
 import { WalletService } from '../services/walletService'
 
 export default class ModuleManager {
@@ -267,10 +268,14 @@ export default class ModuleManager {
     // ToDo: catch null in optimizedVersion
 
     if (version != optimizedVersion) {
-      addEvent(
-        'Dependency Optimizer',
-        `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`
-      )
+      const notification = new Notification()
+      notification.id = generateGuid() // ToDo: autoincrement?
+      notification.title = 'Dependency Optimizer'
+      notification.message = `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`
+      notification.createdAt = new Date()
+      notification.status = 1
+      notification.type = 1
+      createAndShowNotification(notification)
     }
 
     return {

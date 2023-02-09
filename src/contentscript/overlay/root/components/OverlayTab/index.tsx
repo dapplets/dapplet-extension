@@ -4,6 +4,7 @@ import makeBlockie from 'ethereum-blockies-base64'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { DAPPLETS_STORE_URL } from '../../../../../common/constants'
+import * as EventBus from '../../../../../common/global-event-bus'
 import { DefaultSigners, StorageRef } from '../../../../../common/types'
 import { ReactComponent as Account } from '../../assets/icons/iconsWidgetButton/account.svg'
 import { ReactComponent as Help } from '../../assets/icons/iconsWidgetButton/help.svg'
@@ -12,6 +13,7 @@ import { ReactComponent as Max } from '../../assets/icons/iconsWidgetButton/max.
 import { ReactComponent as Notification } from '../../assets/icons/iconsWidgetButton/notification.svg'
 import { ReactComponent as Pause } from '../../assets/icons/iconsWidgetButton/pause.svg'
 import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
+import { ReactComponent as Event } from '../../assets/newIcon/notification.svg'
 // import { ReactComponent as Close } from '../../assets/icons/close.svg'
 import { StorageRefImage } from '../../components/StorageRefImage'
 import { ToolbarTabMenu } from '../../types'
@@ -50,17 +52,53 @@ export interface OverlayTabProps {
   connectedDescriptors?: any
   selectedWallet?: any
   isToolbar?: boolean
+  events?: any
 }
 
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const visibleMenus = p.menus.filter((x) => x.hidden !== true)
   const nodeVisibleMenu = useRef<HTMLDivElement>()
   const [menuVisible, setMenuVisible] = useState(false)
-
+  const [event, setEvent] = useState([])
   useEffect(() => {
+    const init = async () => {
+      const notifications = await getNotifications()
+      setEvent(notifications && notifications.filter((x) => x.status === 1))
+      EventBus.on('SHOW NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications && notifications.filter((x) => x.status === 1))
+      })
+
+      EventBus.on('READ NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications && notifications.filter((x) => x.status === 1))
+      })
+      EventBus.on('READ ALL NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications && notifications.filter((x) => x.status === 1))
+      })
+    }
+
+    init()
+
     !document
       .querySelector('#dapplets-overlay-manager')
       .classList.contains('dapplets-overlay-collapsed') && setMenuVisible(false)
+    return () => {
+      EventBus.off('SHOW NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications && notifications.filter((x) => x.status === 1))
+      })
+
+      EventBus.off('READ NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications && notifications.filter((x) => x.status === 1))
+      })
+      EventBus.off('READ ALL NOTIFICATION', async () => {
+        const notifications = await getNotifications()
+        setEvent(notifications && notifications.filter((x) => x.status === 1))
+      })
+    }
   }, [menuVisible])
 
   const connectWallet = async () => {
@@ -140,6 +178,14 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const onOpenStore = async (f: string) => {
     const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f}`
     window.open(url, '_blank')
+  }
+  const getNotifications = async () => {
+    const backgroundFunctions = await initBGFunctions(browser)
+    const { getNotifications, setRead } = backgroundFunctions
+
+    const notifications = await getNotifications(2)
+
+    return notifications
   }
   return (
     <div
@@ -281,7 +327,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     ) {
                       menu.id === 'dapplets' && setMenuVisible(!menuVisible)
 
-                      p.onToggleClick()
+                      if (p.pathname === '/system/dapplets') {
+                        p.onToggleClick()
+                      } else {
+                        p.navigate('/system/dapplets')
+                      }
 
                       // menuVisible && setMenuVisible()
                     } else {
@@ -325,7 +375,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                       <StorageRefImage storageRef={menu.icon as any} />
                     )
                   ) : menu.icon && typeof menu.icon === 'function' ? (
-                    <menu.icon />
+                    menu.id === 'notifications' && event.length > 0 ? (
+                      <Event />
+                    ) : (
+                      <menu.icon />
+                    )
                   ) : menu.icon && typeof menu.icon === 'object' && 'moduleName' in menu.icon ? (
                     <ModuleIcon
                       moduleName={menu.icon.moduleName}
