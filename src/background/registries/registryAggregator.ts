@@ -35,7 +35,7 @@ export class RegistryAggregator {
 
   async getVersions(name: string, branch: string, isDev?: boolean): Promise<string[]> {
     await this._initRegistries()
-    const registries = this._getNonSkippedRegistries().filter((x) =>
+    const registries = this.registries.filter((x) =>
       isDev === undefined ? true : x.isDev === isDev
     )
 
@@ -60,7 +60,7 @@ export class RegistryAggregator {
 
   async getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo> {
     await this._initRegistries()
-    const registries = this._getNonSkippedRegistries()
+    const registries = this.registries
 
     const uriWithErrors = await Promise.allSettled(
       registries.map((r) => {
@@ -109,7 +109,7 @@ export class RegistryAggregator {
     users: string[]
   ): Promise<{ [registryUrl: string]: { [hostname: string]: ModuleInfo[] } }> {
     await this._initRegistries()
-    const registries = this._getNonSkippedRegistries()
+    const registries = this.registries
 
     const regFeatures = await Promise.allSettled(
       registries.map((r) => r.getModuleInfo(contextIds, users).then((m) => [r.url, m]))
@@ -188,7 +188,7 @@ export class RegistryAggregator {
     users: { name: string; blockchain: string }[]
   }): Promise<{ module: ModuleInfo; versions: VersionInfo[]; isDeployed?: boolean[] }[]> {
     await this._initRegistries()
-    const registries = this._getNonSkippedRegistries()
+    const registries = this.registries
 
     // fetch all dev modules
     const modules = await Promise.allSettled(
@@ -270,14 +270,7 @@ export class RegistryAggregator {
     }
 
     // dev registries have priority
-    this.registries = this.registries.sort((a, b) => (a === b ? 0 : a ? -1 : 1))
-  }
-
-  private _getNonSkippedRegistries() {
-    // ToDo: make this logic smarter. Currently it generates bugs with error caching
-    // Skipping of errored registries
-    // return this.registries.filter(x => x.isAvailable);
-    return this.registries
+    this.registries = this.registries.sort((a, b) => (a.isDev === b.isDev ? 0 : a.isDev ? -1 : 1))
   }
 
   private async _cacheVersionInfo(
