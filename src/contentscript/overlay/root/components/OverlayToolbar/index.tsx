@@ -3,6 +3,7 @@ import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../common/global-event-bus'
+import { Notification as Notify } from '../../../../../common/models/notification'
 import { widgets } from '../../../../modules/adapter-overlay/src'
 import { ReactComponent as Show } from '../../assets/icons/iconsWidgetButton/show.svg'
 import { ReactComponent as Notification } from '../../assets/icons/notificationIcons/bell.svg'
@@ -97,6 +98,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [isPinnedAnimateWidget, setPinnedAnimateWidget] = useState(false)
   const [isPinnedNotification, setPinnedNotification] = useState(false)
   const [event, setEvent] = useState([])
+  const [payload, setPayload] = useState(null)
   const btnRef = useRef<HTMLDivElement>()
   const notificationRef = useRef<HTMLDivElement>()
   useEffect(() => {
@@ -104,11 +106,15 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       await _refreshData()
       const notifications = await getNotifications()
       setEvent(notifications)
-      //  return setEvent(notifications)
-      EventBus.on('SHOW NOTIFICATION', async () => {
+
+      EventBus.on('SHOW NOTIFICATION', async (payload) => {
         const notifications = await getNotifications()
-        notifications && notifications.length > 0 && setPinnedNotification(true)
-        setTimeout(() => setPinnedNotification(false), 8000)
+        payload && setPinnedNotification(true)
+        setPayload(payload)
+
+        setTimeout(() => {
+          setPinnedNotification(false)
+        }, 8000)
         return setEvent(notifications)
       })
 
@@ -125,22 +131,18 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     init()
 
     return () => {
-      // delete message event
-      // unsubscribe
-      EventBus.off('SHOW NOTIFICATION', async () => {
-        const notifications = await getNotifications()
-        notifications && notifications.length > 0 && setPinnedNotification(true)
-        setTimeout(() => setPinnedNotification(false), 8000)
-        return setEvent(notifications)
-      })
-
-      EventBus.off('READ NOTIFICATION', async () => {
-        const notifications = await getNotifications()
-        return setEvent(notifications)
-      })
-      EventBus.off('READ ALL NOTIFICATION', async () => {
-        const notifications = await getNotifications()
-        setEvent(notifications)
+      browser.runtime.onMessage.removeListener((message, sender) => {
+        if (!message || !message.type) return
+        if (
+          message.type === 'SHOW NOTIFICATION' ||
+          message.type === 'DELETED NOTIFICATION' ||
+          message.type === 'READ NOTIFICATION' ||
+          message.type === 'DELETE ALL NOTIFICATIONS' ||
+          'CREATE NOTIFICATION' ||
+          'READ ALL NOTIFICATION'
+        ) {
+          EventBus.destroy()
+        }
       })
     }
   }, [newWidgets, widgets, isClick])
@@ -331,25 +333,22 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   ) => {
     return (
       <>
-        {event && event.length > 0
-          ? event.map((x, i) => (
-              <span
-                key={x.id}
-                ref={notificationRef}
-                className={cn(styles.widgetButtonNotification, {
-                  [styles.widgetButtonAnimatePinnedNotification]: isPinnedNotification,
-                })}
-              >
-                {/* {icon && icon.length > 0 ? (
-          <img data-visible className={cn(styles.widgetButtonImgAnimate)} src={icon} />
-        ) : null} */}
-                {/* <span className={cn(styles.widgetButtonImgAnimateNotifiction)}> */}
-                <Noties />
-                {/* </span> */}
-                <span className={styles.titleNotification}>{x.title}</span>
-              </span>
-            ))
-          : null}
+        {payload ? (
+          <span
+            ref={notificationRef}
+            className={cn(styles.widgetButtonNotification, {
+              [styles.widgetButtonAnimatePinnedNotification]: isPinnedNotification,
+            })}
+          >
+            {payload.icon ? (
+              <img className={styles.iconNotification} src={payload.icon} />
+            ) : (
+              <Noties />
+            )}
+
+            <span className={styles.titleNotification}>{payload.title}</span>
+          </span>
+        ) : null}
       </>
     )
   }
@@ -357,7 +356,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     const backgroundFunctions = await initBGFunctions(browser)
     const { getNotifications, setRead } = backgroundFunctions
 
-    const notifications: Notification[] = await getNotifications(2)
+    const notifications: Notify[] = await getNotifications(2)
 
     return notifications
   }

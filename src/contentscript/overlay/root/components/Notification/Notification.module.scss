@@ -3,7 +3,6 @@
 @import '../../assets/styles/null';
 
 .wrapper {
- 
   position: relative;
   transform: none;
 
@@ -140,6 +139,7 @@
 .blockInfo {
   display: flex;
   align-items: flex-end;
+  width: 97%
 }
 
 @import './adaptive';

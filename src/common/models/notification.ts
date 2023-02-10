@@ -12,6 +12,7 @@ export type NotificationPayload = {
   actions?: NotificationAction[]
   timeout?: number
   payload?: any
+  icon?: string
 }
 export enum NotificationType {
   Announcement,
@@ -32,10 +33,10 @@ export class Notification extends Base {
   type: NotificationType = null
   group: string = null
   status?: NotificationStatus = null
-  createdAt?: Date = null
-
+  createdAt?: Date | number = null
+  icon?: string = null
   title: string = null
   message?: string = null
   actions?: NotificationAction[] = null
-  expiresAt?: Date = null
+  expiresAt?: Date | number = null
 }

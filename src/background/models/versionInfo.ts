@@ -7,6 +7,7 @@ export default class VersionInfo extends Base {
 
   registryUrl: string = null
   type: ModuleTypes = null
+
   name: string = null
   branch: string = null
   version: string = null

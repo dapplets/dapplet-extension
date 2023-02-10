@@ -7,6 +7,7 @@ import { Notification as Notify } from '../../../../../common/models/notificatio
 // import { CloseIcon } from '../../components/CloseIcon'
 import * as EventBus from '../../../../../common/global-event-bus'
 import IconDefault from '../../assets/icons/notificationIcons/defaultIcon.svg'
+import { ReactComponent as LoaderNotify } from '../../assets/svg/loaderNotification.svg'
 import { Notification } from '../../components/Notification'
 import { TabLoader } from '../../components/TabLoader'
 import useAbortController from '../../hooks/useAbortController'
@@ -16,10 +17,18 @@ TimeAgo.addLocale(en)
 
 export const Notifications = () => {
   const [event, setEvent] = useState([])
+
   const [load, setLoad] = useState(true)
   const [isOlder, setOlder] = useState(false)
+  const [count, setCount] = useState(5)
+  const [loadNotify,setLoadNotify]=useState(false)
   // const [isUpdateAvailable, onUpdateAvailable] = useState(false)
   const abortController = useAbortController()
+  let currentIndex = 0
+  let currentLimit = 5
+  const counter = () => {
+    setCount((prevState) => prevState + 5)
+  }
   useEffect(() => {
     const init = async () => {
       const notifications = await getNotifications()
@@ -82,9 +91,12 @@ export const Notifications = () => {
     setEvent(d)
   }
   const onRemoveEventsAll = async (f) => {
-    const { markNotificationAsViewedAll } = await initBGFunctions(browser)
+    setLoadNotify(true)
+    const { markNotificationAsViewedAll, deleteAllNotifications } = await initBGFunctions(browser)
     await markNotificationAsViewedAll(f)
+    setTimeout(() => setLoadNotify(false), 1000)
     setEvent(f)
+   
   }
 
   const checkUpdates = async () => {
@@ -102,6 +114,7 @@ export const Notifications = () => {
 
     await getNotifications
   }
+  // console.log(event)
   return (
     <div className={styles.wrapper}>
       <>
@@ -128,28 +141,45 @@ export const Notifications = () => {
                   <span className={styles.titleBlock}>From dapplets</span>
                   <div className={styles.delimeter}></div>
                 </div>
-                {event.length > 0 &&
-                  event
-                    .filter((x) => x.status === 1)
-                    .map((x, i) => {
-                      return (
-                        <Notification
-                          onClear={getReadNotifications}
-                          // todo: mocked
-                          icon={IconDefault}
-                          //
-                          key={x.id}
-                          label={'System'}
-                          title={x.title}
-                          description={x.message}
-                          _id={x.id}
-                          date={x.expiresAt}
-                        />
-                      )
-                    })}
-                <button className={styles.btnNotification} onClick={() => setOlder(!isOlder)}>
-                  Show old
-                </button>
+                {loadNotify ? (
+                  <div className={styles.loaderNotify}></div>
+                  // <LoaderNotify style={{ width: '50px', height: '50px' }} />
+                ) : (
+                  <>
+                    {event.length > 0 &&
+                      event
+                        .filter((x) => x.status === 1)
+                        .map((x, i) => {
+                          return (
+                            <Notification
+                              onClear={getReadNotifications}
+                              // todo: mocked
+                              icon={x.icon ? x.icon : IconDefault}
+                              //
+                              key={x.id}
+                              label={'System'}
+                              title={x.title}
+                              description={x.message}
+                              _id={x.id}
+                              date={x.createdAt}
+                            />
+                          )
+                        })}
+                  </>
+                )}
+
+                <div className={styles.btnGroup}>
+                  <button className={styles.btnNotification} onClick={() => setOlder(!isOlder)}>
+                    Show old
+                  </button>
+                  <button
+                    className={styles.btnNotification}
+                    onClick={() => onRemoveEventsAll(event)}
+                    disabled={event && event.filter((x) => x.status === 1).length === 0}
+                  >
+                    Dismiss all
+                  </button>
+                </div>
               </>
 
               {isOlder ? (
@@ -162,33 +192,33 @@ export const Notifications = () => {
                     event
                       .filter((x) => x.status === 0)
                       .map((x, i) => {
-                        return x ? (
-                          <Notification
-                            onClear={() => {
-                              setTimeout(() => {
+                        if (i < count) {
+                          return x ? (
+                            <Notification
+                              onClear={() => {
                                 onRemoveEvent(x)
-                              }, 500)
-                            }}
-                            // todo: mocked
-                            icon={IconDefault}
-                            //
-                            key={x.id}
-                            label={'System'}
-                            title={x.title}
-                            description={x.message}
-                            _id={x.id}
-                            date={x.expiresAt}
-                            isRead={x.status}
-                          />
-                        ) : (
-                          <span className={styles.notOlder}>Nothing here</span>
-                        )
+                              }}
+                              // todo: mocked
+                              icon={x.icon ? x.icon : IconDefault}
+                              //
+                              key={x.id}
+                              label={'System'}
+                              title={x.title}
+                              description={x.message}
+                              _id={x.id}
+                              date={x.createdAt}
+                              isRead={x.status}
+                            />
+                          ) : (
+                            <span className={styles.notOlder}>Nothing here</span>
+                          )
+                        }
                       })}
 
                   <button
-                    disabled
+                    disabled={count >= event.filter((x) => x.status === 0).length}
                     className={styles.btnNotification}
-                    onClick={() => setOlder(true)}
+                    onClick={() => counter()}
                   >
                     Load more
                   </button>

@@ -74,9 +74,11 @@ async function init() {
       message.type === 'SHOW NOTIFICATION' ||
       message.type === 'DELETED NOTIFICATION' ||
       message.type === 'READ NOTIFICATION' ||
-      message.type === 'DELETE ALL NOTIFICATIONS' || 'CREATE NOTIFICATION' || 'READ ALL NOTIFICATION'
+      message.type === 'DELETE ALL NOTIFICATIONS' ||
+      'CREATE NOTIFICATION' ||
+      'READ ALL NOTIFICATION'
     ) {
-      EventBus.emit(message.type)
+      EventBus.emit(message.type, message.payload)
     }
 
     if (message.type === 'FEATURE_ACTIVATED') {

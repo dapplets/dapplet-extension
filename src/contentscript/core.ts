@@ -152,7 +152,7 @@ export default class Core {
     })
   }
 
-  public async notify(payload: NotificationPayload) {
+  public async notify(payload: NotificationPayload, icon?) {
     const { createAndShowNotification, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     const notification = new Notification()
@@ -162,6 +162,8 @@ export default class Core {
     notification.createdAt = new Date()
     notification.status = 1
     notification.type = 2
+    notification.actions = payload.actions
+    notification.icon = payload.icon ? payload.icon : icon || null
     await createAndShowNotification(notification, thisTab.id)
   }
 

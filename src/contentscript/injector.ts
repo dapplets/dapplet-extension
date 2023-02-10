@@ -112,6 +112,7 @@ export class Injector {
 
     const orderedModules = loadedModules.map((l) => {
       const m = modules.find((m) => areModulesEqual(m, l.manifest))
+
       return {
         ...l,
         order: m?.order,
@@ -433,7 +434,13 @@ export class Injector {
         state: core.state,
         connectedAccounts: core.connectedAccounts,
         fetch: core.fetch,
-        notify: (payload) => core.notify(payload),
+        notify: async (payload) => {
+          const { getModuleInfoByName } = await initBGFunctions(browser)
+          const registry = manifest.registryUrl
+          const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, manifest.name)
+
+          core.notify(payload, moduleInfo.icon.uris[0])
+        },
       }
 
       let newBranch: string = null

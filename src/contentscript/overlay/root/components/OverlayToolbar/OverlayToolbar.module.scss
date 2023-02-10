@@ -294,10 +294,12 @@
 
   overflow: hidden;
   display: flex;
+  flex: 1 1 auto;
   align-items: center;
   justify-content: center;
 
-  width: 139px;
+  min-width: 139px;
+  max-width: 280px;
   height: 29px;
 
   background: #fff;
@@ -311,20 +313,19 @@
 
   svg {
     transform: scale(0.7);
-    fill: none!important;
+    fill: none !important;
 
     path {
-      fill: none!important;
-      
+      fill: none !important;
     }
   }
 
   &:hover {
     svg {
-      fill: none!important;
+      fill: none !important;
 
       path {
-        fill: none!important;
+        fill: none !important;
         stroke: $PrimaryHover;
       }
     }
@@ -332,10 +333,10 @@
 
   &:active {
     svg {
-      fill: none!important;
+      fill: none !important;
 
       path {
-        fill: none!important;
+        fill: none !important;
         stroke: $PrimaryPressed;
       }
     }
@@ -361,11 +362,18 @@
   // margin: auto;
 }
 
+.iconNotification {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+}
+
 .titleNotification {
   overflow: hidden;
   display: inline-block;
 
-  width: 103px;
+  min-width: 103px;
+  max-width: 220px;
 
   font-size: 14px;
   line-height: 149%;
@@ -406,26 +414,30 @@
   }
 
   &:hover {
-   .counter {color: $PrimaryHover!important;}
+    .counter {
+      color: $PrimaryHover !important;
+    }
 
     svg {
-      fill: none!important;
+      fill: none !important;
 
       path {
-        fill: none!important;
+        fill: none !important;
         stroke: $PrimaryHover;
       }
     }
   }
 
   &:active {
-   .counter {color: $PrimaryPressed!important;}
+    .counter {
+      color: $PrimaryPressed !important;
+    }
 
     svg {
-      fill: none!important;
+      fill: none !important;
 
       path {
-        fill: none!important;
+        fill: none !important;
         stroke: $PrimaryPressed;
       }
     }
@@ -435,36 +447,47 @@
 @keyframes AnimateNotification {
   0% {
     // top: 110px;
-    left: -95px;
-    width: 60px;
+    // left: -95px;
+    transform: translateX(-23%);
+    min-width: 60px;
+    max-width: 200px;
     opacity: 1;
   }
 
   10% {
     // top: 110px;
-    left: -200px;
-    width: 139px;
+
+    // left: -200px;
+    transform: translateX(-49%);
+    min-width: 139px;
+    max-width: 280px;
     opacity: 1;
   }
 
   90% {
     // top: 110px;
-    left: -200px;
-    width: 139px;
+    // left: -150px;
+    transform: translateX(-70%);
+    min-width: 139px;
+    max-width: 280px;
     opacity: 1;
   }
 
   95% {
     // top: 100px;
-    left: -150px;
-    width: 100px;
+    // left: -150px;
+    transform: translateX(-70%);
+    min-width: 100px;
+    max-width: 240px;
     opacity: 0.8;
   }
 
   100% {
     // top: 70px;
-    left: -100px;
-    width: 60px;
+    // left: -100px;
+    transform: translateX(-35%);
+    min-width: 60px;
+    max-width: 200px;
     opacity: 0;
   }
 }
@@ -565,4 +588,3 @@
     opacity: 0;
   }
 }
-
