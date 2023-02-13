@@ -282,7 +282,7 @@ export default class ConnectedAccountService {
       signature: signature === undefined ? null : signature,
       statement: statement === null ? undefined : statement,
     }
-    const gas = signature ? 100_000_000_000_000 : null
+    const gas = signature ? 300_000_000_000_000 : null
     const amount = stake === null ? undefined : stake
     const res = await contract.requestVerification(requestBody, gas, amount)
     EventBus.emit('connected_accounts_changed')
