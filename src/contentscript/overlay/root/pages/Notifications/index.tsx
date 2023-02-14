@@ -4,10 +4,9 @@ import en from 'javascript-time-ago/locale/en'
 import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { Notification as Notify } from '../../../../../common/models/notification'
-// import { CloseIcon } from '../../components/CloseIcon'
+
 import * as EventBus from '../../../../../common/global-event-bus'
 import IconDefault from '../../assets/icons/notificationIcons/defaultIcon.svg'
-import { ReactComponent as LoaderNotify } from '../../assets/svg/loaderNotification.svg'
 import { Notification } from '../../components/Notification'
 import { TabLoader } from '../../components/TabLoader'
 import useAbortController from '../../hooks/useAbortController'
@@ -21,7 +20,7 @@ export const Notifications = () => {
   const [load, setLoad] = useState(true)
   const [isOlder, setOlder] = useState(false)
   const [count, setCount] = useState(5)
-  const [loadNotify,setLoadNotify]=useState(false)
+  const [loadNotify, setLoadNotify] = useState(false)
   // const [isUpdateAvailable, onUpdateAvailable] = useState(false)
   const abortController = useAbortController()
   let currentIndex = 0
@@ -96,7 +95,6 @@ export const Notifications = () => {
     await markNotificationAsViewedAll(f)
     setTimeout(() => setLoadNotify(false), 1000)
     setEvent(f)
-   
   }
 
   const checkUpdates = async () => {
@@ -143,8 +141,8 @@ export const Notifications = () => {
                 </div>
                 {loadNotify ? (
                   <div className={styles.loaderNotify}></div>
-                  // <LoaderNotify style={{ width: '50px', height: '50px' }} />
                 ) : (
+                  // <LoaderNotify style={{ width: '50px', height: '50px' }} />
                   <>
                     {event.length > 0 &&
                       event
@@ -225,16 +223,9 @@ export const Notifications = () => {
                 </>
               ) : null}
             </div>
-
-            {/* <div className={styles.notificationClose}>
-              <CloseIcon onClick={() => onRemoveEventsAll(event)} appearance="big" color="red" />
-              <span className={styles.clearAll}>Clear all</span>
-            </div> */}
           </div>
         )}
       </>
-
-      {/* {!event.length && <div className={styles.noNot}>Nothing here</div>} */}
     </div>
   )
 }
