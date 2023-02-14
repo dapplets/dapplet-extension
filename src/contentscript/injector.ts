@@ -8,12 +8,14 @@ import * as EventBus from '../common/global-event-bus'
 import {
   areModulesEqual,
   formatModuleId,
+  generateGuid,
   isE2ETestingEnvironment,
   joinUrls,
   multipleReplace,
   parseModuleName,
 } from '../common/helpers'
 import { JsonRpc } from '../common/jsonrpc'
+import { Notification } from '../common/models/notification'
 import { DefaultConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
@@ -110,6 +112,7 @@ export class Injector {
 
     const orderedModules = loadedModules.map((l) => {
       const m = modules.find((m) => areModulesEqual(m, l.manifest))
+
       return {
         ...l,
         order: m?.order,
@@ -322,7 +325,7 @@ export class Injector {
     const {
       optimizeDependency,
       getModulesWithDeps,
-      addEvent,
+      createAndShowNotification,
       getSwarmGateway,
       getPreferedOverlayStorage,
     } = await initBGFunctions(browser)
@@ -431,6 +434,13 @@ export class Injector {
         state: core.state,
         connectedAccounts: core.connectedAccounts,
         fetch: core.fetch,
+        notify: async (payload) => {
+          const { getModuleInfoByName } = await initBGFunctions(browser)
+          const registry = manifest.registryUrl
+          const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, manifest.name)
+
+          core.notify(payload, moduleInfo.icon.uris[0])
+        },
       }
 
       let newBranch: string = null
@@ -561,10 +571,14 @@ export class Injector {
       }
 
       if (newBranch) {
-        addEvent(
-          'Branch resolving',
-          `Resolver of "${manifest.name}" defined the "${newBranch}" branch`
-        )
+        const notification = new Notification()
+        notification.id = generateGuid() // ToDo: autoincrement?
+        notification.title = 'Branch resolving'
+        notification.message = `Resolver of "${manifest.name}" defined the "${newBranch}" branch`
+        notification.createdAt = new Date()
+        notification.status = 1
+        notification.type = 1
+        createAndShowNotification(notification)
         const optimizedBranch = await optimizeDependency(
           manifest.name,
           newBranch,

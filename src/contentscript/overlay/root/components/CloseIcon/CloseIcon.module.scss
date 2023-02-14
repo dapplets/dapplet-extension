@@ -41,3 +41,13 @@
 .red:hover path {
   fill: $PrimaryHover;
 }
+
+.notification:active path{
+  fill: none;
+  stroke: $PrimaryPressed;
+}
+
+.notification:hover path{
+  fill: none;
+  stroke: $PrimaryHover;
+}

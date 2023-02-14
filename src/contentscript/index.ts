@@ -70,6 +70,16 @@ async function init() {
 
   browser.runtime.onMessage.addListener((message, sender) => {
     if (!message || !message.type) return
+    if (
+      message.type === 'SHOW NOTIFICATION' ||
+      message.type === 'DELETED NOTIFICATION' ||
+      message.type === 'READ NOTIFICATION' ||
+      message.type === 'DELETE ALL NOTIFICATIONS' ||
+      'CREATE NOTIFICATION' ||
+      'READ ALL NOTIFICATION'
+    ) {
+      EventBus.emit(message.type, message.payload)
+    }
 
     if (message.type === 'FEATURE_ACTIVATED') {
       const modules = message.payload
