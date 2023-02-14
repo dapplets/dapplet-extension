@@ -28,10 +28,10 @@ export enum NotificationStatus {
 
 export class Notification extends Base {
   getId = () => this.id
-  id: string = null
-  source: string = null
-  type: NotificationType = null
-  group: string = null
+  id?: string = null
+  source?: string = null
+  type?: NotificationType = null
+  group?: string = null
   status?: NotificationStatus = null
   createdAt?: Date | number = null
   icon?: string = null

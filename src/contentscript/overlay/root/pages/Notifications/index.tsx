@@ -1,33 +1,27 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en'
+
 import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { Notification as Notify } from '../../../../../common/models/notification'
+import { Notification as Notify, NotificationType } from '../../../../../common/models/notification'
 
 import * as EventBus from '../../../../../common/global-event-bus'
 import IconDefault from '../../assets/icons/notificationIcons/defaultIcon.svg'
 import { Notification } from '../../components/Notification'
 import { TabLoader } from '../../components/TabLoader'
-import useAbortController from '../../hooks/useAbortController'
 import styles from './Notifications.module.scss'
 
-TimeAgo.addLocale(en)
-
 export const Notifications = () => {
-  const [event, setEvent] = useState([])
+  const [event, setEvent] = useState<Notify[]>([])
 
   const [load, setLoad] = useState(true)
   const [isOlder, setOlder] = useState(false)
   const [count, setCount] = useState(5)
   const [loadNotify, setLoadNotify] = useState(false)
-  // const [isUpdateAvailable, onUpdateAvailable] = useState(false)
-  const abortController = useAbortController()
-  let currentIndex = 0
-  let currentLimit = 5
+
   const counter = () => {
     setCount((prevState) => prevState + 5)
   }
+
   useEffect(() => {
     const init = async () => {
       const notifications = await getNotifications()
@@ -36,36 +30,28 @@ export const Notifications = () => {
       setLoad(false)
       // checkUpdates()
 
-      EventBus.on('SHOW NOTIFICATION', async () => {
+      EventBus.on('SHOW_NOTIFICATION', async () => {
         const notifications = await getNotifications()
 
         return setEvent(notifications)
       })
 
-      EventBus.on('READ NOTIFICATION', async () => {
+      EventBus.on('NOTIFICATION_UPDATE', async () => {
         const notifications = await getNotifications()
         return setEvent(notifications)
-      })
-      EventBus.on('READ ALL NOTIFICATION', async () => {
-        const notifications = await getNotifications()
-        setEvent(notifications)
       })
     }
     init()
     return () => {
-      EventBus.off('SHOW NOTIFICATION', async () => {
+      EventBus.off('SHOW_NOTIFICATION', async () => {
         const notifications = await getNotifications()
 
         return setEvent(notifications)
       })
 
-      EventBus.off('READ NOTIFICATION', async () => {
+      EventBus.off('NOTIFICATION_UPDATE', async () => {
         const notifications = await getNotifications()
         return setEvent(notifications)
-      })
-      EventBus.off('READ ALL NOTIFICATION', async () => {
-        const notifications = await getNotifications()
-        setEvent(notifications)
       })
     }
   }, [load])
@@ -74,7 +60,7 @@ export const Notifications = () => {
     const backgroundFunctions = await initBGFunctions(browser)
     const { getNotifications } = backgroundFunctions
     // todo: argument mocked
-    const notifications: Notify[] = await getNotifications(2)
+    const notifications: Notify[] = await getNotifications(NotificationType.Application)
 
     return notifications
   }
@@ -89,10 +75,11 @@ export const Notifications = () => {
     const d = event.filter((x) => x.id !== f.id)
     setEvent(d)
   }
+
   const onRemoveEventsAll = async (f) => {
     setLoadNotify(true)
-    const { markNotificationAsViewedAll, deleteAllNotifications } = await initBGFunctions(browser)
-    await markNotificationAsViewedAll(f)
+    const { markAllNotificationsAsViewed, deleteAllNotifications } = await initBGFunctions(browser)
+    await markAllNotificationsAsViewed(f)
     setTimeout(() => setLoadNotify(false), 1000)
     setEvent(f)
   }
@@ -100,10 +87,8 @@ export const Notifications = () => {
   const checkUpdates = async () => {
     const { getNewExtensionVersion } = await initBGFunctions(browser)
     const isUpdateAvailable = await getNewExtensionVersion()
-    // if (!abortController.signal.aborted) {
-    // onUpdateAvailable(isUpdateAvailable)
-    // }
   }
+
   const getReadNotifications = async (id) => {
     const backgroundFunctions = await initBGFunctions(browser)
     const { markNotificationAsViewed } = backgroundFunctions
@@ -112,7 +97,7 @@ export const Notifications = () => {
 
     await getNotifications
   }
-  // console.log(event)
+
   return (
     <div className={styles.wrapper}>
       <>
@@ -142,7 +127,6 @@ export const Notifications = () => {
                 {loadNotify ? (
                   <div className={styles.loaderNotify}></div>
                 ) : (
-                  // <LoaderNotify style={{ width: '50px', height: '50px' }} />
                   <>
                     {event.length > 0 &&
                       event

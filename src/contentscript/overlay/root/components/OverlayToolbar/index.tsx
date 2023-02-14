@@ -3,7 +3,7 @@ import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../common/global-event-bus'
-import { Notification as Notify } from '../../../../../common/models/notification'
+import { Notification as Notify, NotificationType } from '../../../../../common/models/notification'
 import { widgets } from '../../../../modules/adapter-overlay/src'
 import { ReactComponent as Show } from '../../assets/icons/iconsWidgetButton/show.svg'
 import { ReactComponent as Notification } from '../../assets/icons/notificationIcons/bell.svg'
@@ -97,17 +97,18 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [iconAnimateWidget, setIconAnimateWidget] = useState('')
   const [isPinnedAnimateWidget, setPinnedAnimateWidget] = useState(false)
   const [isPinnedNotification, setPinnedNotification] = useState(false)
-  const [event, setEvent] = useState([])
+  const [event, setEvent] = useState<Notify[]>([])
   const [payload, setPayload] = useState(null)
   const btnRef = useRef<HTMLDivElement>()
   const notificationRef = useRef<HTMLDivElement>()
+
   useEffect(() => {
     const init = async () => {
       await _refreshData()
       const notifications = await getNotifications()
       setEvent(notifications)
 
-      EventBus.on('SHOW NOTIFICATION', async (payload) => {
+      EventBus.on('SHOW_NOTIFICATION', async (payload) => {
         const notifications = await getNotifications()
         payload && setPinnedNotification(true)
         setPayload(payload)
@@ -118,13 +119,9 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
         return setEvent(notifications)
       })
 
-      EventBus.on('READ NOTIFICATION', async () => {
+      EventBus.on('NOTIFICATION_UPDATE', async () => {
         const notifications = await getNotifications()
         return setEvent(notifications)
-      })
-      EventBus.on('READ ALL NOTIFICATION', async () => {
-        const notifications = await getNotifications()
-        setEvent(notifications)
       })
     }
 
@@ -133,14 +130,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     return () => {
       browser.runtime.onMessage.removeListener((message, sender) => {
         if (!message || !message.type) return
-        if (
-          message.type === 'SHOW NOTIFICATION' ||
-          message.type === 'DELETED NOTIFICATION' ||
-          message.type === 'READ NOTIFICATION' ||
-          message.type === 'DELETE ALL NOTIFICATIONS' ||
-          'CREATE NOTIFICATION' ||
-          'READ ALL NOTIFICATION'
-        ) {
+        if (message.type === 'SHOW_NOTIFICATION' || message.type === 'NOTIFICATION_UPDATE') {
           EventBus.destroy()
         }
       })
@@ -356,7 +346,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     const backgroundFunctions = await initBGFunctions(browser)
     const { getNotifications, setRead } = backgroundFunctions
 
-    const notifications: Notify[] = await getNotifications(2)
+    const notifications: Notify[] = await getNotifications(NotificationType.Application)
 
     return notifications
   }

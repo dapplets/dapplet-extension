@@ -150,7 +150,7 @@ browser.runtime.onMessage.addListener(
     deleteNotification: NotificationService.deleteNotification,
     deleteAllNotifications: NotificationService.deleteAllNotifications,
     markNotificationAsViewed: NotificationService.markNotificationAsViewed,
-    markNotificationAsViewedAll: NotificationService.markNotificationAsViewedAll,
+    markAllNotificationsAsViewed: NotificationService.markAllNotificationsAsViewed,
     getUnreadNotificationsCount: NotificationService.getUnreadNotificationsCount,
     getInitialConfig: () => globalConfigService.getInitialConfig(),
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),

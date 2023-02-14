@@ -7,15 +7,16 @@ import styles from './CloseIcon.module.scss'
 export interface CloseIconProps
   extends DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
   appearance: 'small' | 'big'
-  color: 'black' | 'red' | 'notification'
+  color: 'black' | 'red'
+  isNotification?: boolean
 }
 
 export const CloseIcon: FC<CloseIconProps> = (props: CloseIconProps) => {
-  const { appearance, color, className, onClick } = props
+  const { appearance, color, className, onClick, isNotification = false } = props
 
   return (
     <button className={cn(styles.button, className)} onClick={onClick}>
-      {color === 'notification' ? (
+      {isNotification ? (
         <CloseNotification className={styles.notification} />
       ) : (
         <Close

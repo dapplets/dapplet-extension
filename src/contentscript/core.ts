@@ -5,7 +5,7 @@ import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
 import { generateGuid, parseShareLink } from '../common/helpers'
-import { Notification, NotificationPayload } from '../common/models/notification'
+import { Notification, NotificationPayload, NotificationType } from '../common/models/notification'
 import { LoginRequest, SystemOverlayTabs } from '../common/types'
 import { AppStorage } from './appStorage'
 import ConnectedAccounts from './connectedAccounts/connected-accounts'
@@ -161,7 +161,7 @@ export default class Core {
     notification.message = payload.message
     notification.createdAt = new Date()
     notification.status = 1
-    notification.type = 2
+    notification.type = NotificationType.Application
     notification.actions = payload.actions
     notification.icon = payload.icon ? payload.icon : icon || null
     await createAndShowNotification(notification, thisTab.id)

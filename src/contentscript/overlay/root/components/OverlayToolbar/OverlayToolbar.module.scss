@@ -357,9 +357,6 @@
 
   width: 16px;
   height: 14px;
-
-  // margin: 7px 7px;
-  // margin: auto;
 }
 
 .iconNotification {
@@ -446,8 +443,6 @@
 
 @keyframes AnimateNotification {
   0% {
-    // top: 110px;
-    // left: -95px;
     transform: translateX(-23%);
     min-width: 60px;
     max-width: 200px;
@@ -455,9 +450,6 @@
   }
 
   10% {
-    // top: 110px;
-
-    // left: -200px;
     transform: translateX(-49%);
     min-width: 139px;
     max-width: 280px;
@@ -465,8 +457,6 @@
   }
 
   90% {
-    // top: 110px;
-    // left: -150px;
     transform: translateX(-70%);
     min-width: 139px;
     max-width: 280px;
@@ -474,8 +464,6 @@
   }
 
   95% {
-    // top: 100px;
-    // left: -150px;
     transform: translateX(-70%);
     min-width: 100px;
     max-width: 240px;
@@ -483,8 +471,6 @@
   }
 
   100% {
-    // top: 70px;
-    // left: -100px;
     transform: translateX(-35%);
     min-width: 60px;
     max-width: 200px;
@@ -494,31 +480,26 @@
 
 @keyframes AnimateisNotNotifications {
   0% {
-    // top: 150px;
     left: -200px;
     opacity: 0;
   }
 
   40% {
-    // top: 120px;
     left: -200px;
     opacity: 0.8;
   }
 
   60% {
-    // top: 110px;
     left: -200px;
     opacity: 1;
   }
 
   95% {
-    // top: 110px;
     left: -180px;
     opacity: 1;
   }
 
   100% {
-    // top: 110px;
     left: -180px;
     opacity: 0;
   }
@@ -551,40 +532,22 @@
 
 @keyframes AnimateisCounterNotification {
   0% {
-    // top: 150px;
-    // left: -200px;
     opacity: 0;
   }
 
   40% {
-    // top: 120px;
-    // left: -200px;
     opacity: 0;
   }
 
   60% {
-    // top: 110px;
-    // left: -200px;
     opacity: 0;
   }
 
-  // 15% {
-  //   // top: 110px;
-  //   // left: -180px;
-
-  //   opacity: 1;
-  // }
-
   95% {
-    // top: 110px;
-    // left: -180px;
-
     opacity: 1;
   }
 
   100% {
-    // top: 110px;
-    // left: -180px;
     opacity: 0;
   }
 }

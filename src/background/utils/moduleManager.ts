@@ -3,7 +3,7 @@ import { maxSatisfying } from 'semver'
 import { TopologicalSort } from 'topological-sort'
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
 import { areModulesEqual, generateGuid } from '../../common/helpers'
-import { Notification } from '../../common/models/notification'
+import { Notification, NotificationType } from '../../common/models/notification'
 import { DefaultConfig, SchemaConfig, StorageRef } from '../../common/types'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
@@ -274,7 +274,8 @@ export default class ModuleManager {
       notification.message = `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`
       notification.createdAt = new Date()
       notification.status = 1
-      notification.type = 1
+      notification.type = NotificationType.System
+
       createAndShowNotification(notification)
     }
 

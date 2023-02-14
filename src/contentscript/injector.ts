@@ -15,7 +15,7 @@ import {
   parseModuleName,
 } from '../common/helpers'
 import { JsonRpc } from '../common/jsonrpc'
-import { Notification } from '../common/models/notification'
+import { Notification, NotificationType } from '../common/models/notification'
 import { DefaultConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
@@ -439,7 +439,7 @@ export class Injector {
           const registry = manifest.registryUrl
           const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, manifest.name)
 
-          core.notify(payload, moduleInfo.icon.uris[0])
+          await core.notify(payload, moduleInfo.icon?.uris?.[0])
         },
       }
 
@@ -577,7 +577,7 @@ export class Injector {
         notification.message = `Resolver of "${manifest.name}" defined the "${newBranch}" branch`
         notification.createdAt = new Date()
         notification.status = 1
-        notification.type = 1
+        notification.type = NotificationType.System
         createAndShowNotification(notification)
         const optimizedBranch = await optimizeDependency(
           manifest.name,
