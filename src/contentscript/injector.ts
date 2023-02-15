@@ -619,7 +619,7 @@ export class Injector {
 
       if (newContextIds.length > 0) {
         browser.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
-        EventBus.emit('context_started', contextIds)
+        EventBus.emit('context_started', contextIds, { global: false })
       }
     } else {
       const oldContextIds = []
@@ -633,7 +633,7 @@ export class Injector {
 
       if (oldContextIds.length > 0) {
         browser.runtime.sendMessage({ type: 'CONTEXT_FINISHED', payload: { contextIds } })
-        EventBus.emit('context_finished', contextIds)
+        EventBus.emit('context_finished', contextIds, { global: false })
       }
     }
   }

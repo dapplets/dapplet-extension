@@ -28,6 +28,10 @@ type EventMessage = {
 
 type CallbackFunction = (data: any) => void
 
+type EmitParams = {
+  global?: boolean
+}
+
 interface Connection {
   postMessage(message: EventMessage): void
   disconnect(): void
@@ -123,16 +127,28 @@ if (environment === EnvType.BACKGROUND) {
   register(window)
 }
 
-export function emit(event: string, data?: any) {
-  connections.forEach((x) =>
-    x.postMessage({
-      event,
-      data,
-      bus: BUS_ID,
-      from: currentContext,
-      from_env: environment,
-    })
-  )
+export function emit(event: string, data?: any, params?: EmitParams) {
+  if (params === undefined) {
+    params = {}
+  }
+
+  // global by default
+  if (params.global === undefined) {
+    params.global = true
+  }
+
+  if (params.global) {
+    connections.forEach((x) =>
+      x.postMessage({
+        event,
+        data,
+        bus: BUS_ID,
+        from: currentContext,
+        from_env: environment,
+      })
+    )
+  }
+
   callbacks.get(event)?.forEach((cb) => cb(data))
 }
 

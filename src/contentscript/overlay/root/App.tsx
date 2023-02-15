@@ -16,6 +16,7 @@ import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../background/dto/manifestDTO'
 import { Bus } from '../../../common/bus'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
+import * as EventBus from '../../../common/global-event-bus'
 import { groupBy } from '../../../common/helpers'
 
 import { ReactComponent as Notification } from './assets/newIcon/bell.svg'
@@ -166,11 +167,21 @@ class _App extends React.Component<P, S> {
     const { getDevMode } = await initBGFunctions(browser)
     const isDevMode = await getDevMode()
 
+    // ToDo: rethink overlay update when background state changes
+    EventBus.on('dapplet_deactivated', this.handleDappletDeactivated)
+
     this.setState({ isDevMode })
+  }
+
+  handleDappletDeactivated = (dapplet: any) => {
+    // close tabs of deactivated dapplets (including their settings)
+    const tabsToBeClosed = this.getTabs().filter((x) => x.id === dapplet.name)
+    tabsToBeClosed.forEach((tab) => this.handleCloseTabClick(tab))
   }
 
   componentWillUnmount() {
     this.props.overlayManager.onActiveOverlayChanged = null
+    EventBus.off('dapplet_deactivated', this.handleDappletDeactivated)
   }
 
   getTabs = (): ToolbarTab[] => {

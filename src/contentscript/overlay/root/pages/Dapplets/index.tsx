@@ -9,6 +9,7 @@ import {
   DAPPLETS_STORE_URL,
   ModuleTypes,
 } from '../../../../../common/constants'
+import * as EventBus from '../../../../../common/global-event-bus'
 import { ManifestAndDetails } from '../../../../../common/types'
 import { Dapplet } from '../../components/Dapplet'
 import { Dropdown } from '../../components/Dropdown'
@@ -17,11 +18,13 @@ import { TabLoader } from '../../components/TabLoader'
 import useAbortController from '../../hooks/useAbortController'
 import { openLink } from '../../utils/openLink'
 import styles from './Dapplets.module.scss'
+
 export type Module = ManifestDTO & {
   isLoading: boolean
   error: string
   versions: string[]
 }
+
 export interface DappletsProps {
   search: string
   onUserSettingsClick: (mi: ManifestDTO) => void
@@ -46,14 +49,14 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     setModule,
     classNameBlock,
   } = props
+
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
-
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
-
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
   const [loadShowButton, setLoadShowButton] = useState(false)
 
   const abortController = useAbortController()
+
   useEffect(() => {
     const init = async () => {
       if (!abortController.signal.aborted) {
@@ -76,6 +79,16 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
     return () => {}
   }, [dropdownListValue, abortController.signal.aborted])
+
+  useEffect(() => {
+    EventBus.on('context_started', _refreshData)
+    EventBus.on('context_finished', _refreshData)
+
+    return () => {
+      EventBus.off('context_started', _refreshData)
+      EventBus.off('context_finished', _refreshData)
+    }
+  }, [])
 
   const _refreshData = async () => {
     try {
@@ -207,6 +220,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         getTabsForDapplet(module)
       } else {
         await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url)
+
+        // ToDo: rethink overlay update when background state changes
         const noSystemTabs = tabs.filter((f) => f.title !== 'Dapplets')
         noSystemTabs.length > 0 &&
           noSystemTabs
