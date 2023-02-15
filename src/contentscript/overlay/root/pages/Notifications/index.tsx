@@ -29,32 +29,23 @@ export const Notifications = () => {
       setEvent(notifications)
       setLoad(false)
       // checkUpdates()
-
-      EventBus.on('SHOW_NOTIFICATION', async () => {
-        const notifications = await getNotifications()
-
-        return setEvent(notifications)
-      })
-
-      EventBus.on('NOTIFICATION_UPDATE', async () => {
-        const notifications = await getNotifications()
-        return setEvent(notifications)
-      })
     }
     init()
-    return () => {
-      EventBus.off('SHOW_NOTIFICATION', async () => {
-        const notifications = await getNotifications()
-
-        return setEvent(notifications)
-      })
-
-      EventBus.off('NOTIFICATION_UPDATE', async () => {
-        const notifications = await getNotifications()
-        return setEvent(notifications)
-      })
-    }
+    return () => {}
   }, [load])
+
+  useEffect(() => {
+    const handleUpdateNotifications = async () => {
+      const notifications = await getNotifications()
+      setEvent(notifications && notifications.filter((x) => x.status === 1))
+    }
+
+    EventBus.on('notifications_updated', handleUpdateNotifications)
+
+    return () => {
+      EventBus.off('notifications_updated', handleUpdateNotifications)
+    }
+  }, [])
 
   const getNotifications = async () => {
     const backgroundFunctions = await initBGFunctions(browser)

@@ -105,37 +105,41 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   useEffect(() => {
     const init = async () => {
       await _refreshData()
-      const notifications = await getNotifications()
-      setEvent(notifications)
-
-      EventBus.on('SHOW_NOTIFICATION', async (payload) => {
-        const notifications = await getNotifications()
-        payload && setPinnedNotification(true)
-        setPayload(payload)
-
-        setTimeout(() => {
-          setPinnedNotification(false)
-        }, 8000)
-        return setEvent(notifications)
-      })
-
-      EventBus.on('NOTIFICATION_UPDATE', async () => {
-        const notifications = await getNotifications()
-        return setEvent(notifications)
-      })
     }
 
     init()
 
+    return () => {}
+  }, [newWidgets, widgets, isClick])
+
+  useEffect(() => {
+    const handleUpdateNotifications = async () => {
+      const notifications = await getNotifications()
+      setEvent(notifications && notifications.filter((x) => x.status === 1))
+    }
+    const updatePinnedNotifications = async (payload) => {
+      const notifications = await getNotifications()
+      payload && setPinnedNotification(true)
+      setPayload(payload)
+
+      setTimeout(() => {
+        setPinnedNotification(false)
+      }, 8000)
+      return setEvent(notifications)
+    }
+
+    EventBus.on('notifications_updated', handleUpdateNotifications)
+    EventBus.on('show_notification', (payload) => {
+      updatePinnedNotifications(payload)
+    })
     return () => {
-      browser.runtime.onMessage.removeListener((message, sender) => {
-        if (!message || !message.type) return
-        if (message.type === 'SHOW_NOTIFICATION' || message.type === 'NOTIFICATION_UPDATE') {
-          EventBus.destroy()
-        }
+      EventBus.off('notifications_updated', handleUpdateNotifications)
+      EventBus.off('show_notification', (payload) => {
+        updatePinnedNotifications(payload)
       })
     }
-  }, [newWidgets, widgets, isClick])
+  }, [])
+
   const _refreshData = async () => {
     try {
       const { getPinnedActions } = await initBGFunctions(browser)

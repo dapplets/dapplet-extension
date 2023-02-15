@@ -9,7 +9,7 @@ import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 import { RegistryAggregator } from '../registries/registryAggregator'
 import GlobalConfigService from '../services/globalConfigService'
-import { createAndShowNotification } from '../services/notificationService'
+import { createNotification } from '../services/notificationService'
 import { WalletService } from '../services/walletService'
 
 export default class ModuleManager {
@@ -275,8 +275,8 @@ export default class ModuleManager {
       notification.createdAt = new Date()
       notification.status = 1
       notification.type = NotificationType.System
-
-      createAndShowNotification(notification)
+      createNotification(notification)
+      // createAndShowNotification(notification)
     }
 
     return {

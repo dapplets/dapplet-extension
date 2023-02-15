@@ -1,11 +1,11 @@
 import { browser } from 'webextension-polyfill-ts'
-import { getCurrentTab } from '../../common/helpers'
+import * as EventBus from '../../common/global-event-bus'
+import { generateGuid } from '../../common/helpers'
 import { Notification, NotificationType } from '../../common/models/notification'
 import NotificationBrowserStorage from '../browserStorages/notificationBrowserStorage'
-
 // Add removing function
 // NotificationBrowserStorage - implements Repository pattern (read/add/remove)
-_updateBadge()
+// _updateBadge()
 
 export async function getNotifications(type: NotificationType): Promise<Notification[]> {
   const notificationBrowserStorage = new NotificationBrowserStorage()
@@ -17,25 +17,29 @@ export async function getNotifications(type: NotificationType): Promise<Notifica
   return filteredNotification
 }
 
-export async function createNotification(notify: Notification): Promise<string> {
+export async function createNotification(notify: Notification, icon?): Promise<string> {
   const notificationBrowserStorage = new NotificationBrowserStorage()
-
-  await notificationBrowserStorage.create(notify)
-
-  return notify.id
+  const notification = new Notification()
+  notification.id = generateGuid() // ToDo: autoincrement?
+  notification.title = notify.title
+  notification.message = notify.message
+  notification.createdAt = new Date()
+  notification.status = 1
+  notification.type = notify.type ? notify.type : NotificationType.Application
+  notification.actions = notify.actions
+  notification.icon = notify.icon ? notify.icon : icon || null
+  await notificationBrowserStorage.create(notification)
+  EventBus.emit('notifications_updated')
+  return notification.id
 }
 
 export async function createAndShowNotification(
   notify: Notification,
-  tabId?: number
+  tabId?: number,
+  icon?
 ): Promise<void> {
-  const notificationId = await createNotification(notify)
+  const notificationId = await createNotification(notify, icon)
   await showNotification(notificationId, tabId)
-
-  browser.tabs.sendMessage(tabId, {
-    type: 'CREATE_NOTIFICATION',
-    payload: notify,
-  })
   // todo: removed if unuse
   // await _updateBadge()
 }
@@ -44,7 +48,7 @@ export async function showNotification(notificationId: string, tabId: number): P
   const notificationBrowserStorage = new NotificationBrowserStorage()
 
   const notification = await notificationBrowserStorage.getById(notificationId)
-
+  EventBus.emit('show_notification', notification)
   browser.tabs.sendMessage(tabId, {
     type: 'SHOW_NOTIFICATION',
     payload: notification,
@@ -56,55 +60,39 @@ export async function deleteNotification(id: string): Promise<void> {
   const notificationBrowserStorage = new NotificationBrowserStorage()
   for (const i of ids) {
     const notification = await notificationBrowserStorage.deleteById(i)
-    const currentTab = await getCurrentTab()
     await notificationBrowserStorage.deleteById(ids)
-    browser.tabs.sendMessage(currentTab.id, {
-      type: 'NOTIFICATION_UPDATE',
-      payload: notification,
-    })
   }
+  EventBus.emit('notifications_updated')
 }
 
 export async function deleteAllNotifications(): Promise<void> {
   const notificationBrowserStorage = new NotificationBrowserStorage()
   await notificationBrowserStorage.deleteAll()
-  const currentTab = await getCurrentTab()
-  browser.tabs.sendMessage(currentTab.id, {
-    type: 'NOTIFICATION_UPDATE',
-    payload: null,
-  })
+  EventBus.emit('notifications_updated')
 }
 
 export async function markNotificationAsViewed(id: string | string[]): Promise<void> {
   const ids = Array.isArray(id) ? id : [id]
   const notificationBrowserStorage = new NotificationBrowserStorage()
-  const currentTab = await getCurrentTab()
   for (const i of ids) {
     const notification = await notificationBrowserStorage.getById(i)
     notification.status = 0
     await notificationBrowserStorage.update(notification)
-    browser.tabs.sendMessage(currentTab.id, {
-      type: 'NOTIFICATION_UPDATE',
-      payload: notification,
-    })
   }
+  EventBus.emit('notifications_updated')
   // todo: removed if unuse
   // await _updateBadge()
 }
 
 export async function markAllNotificationsAsViewed(): Promise<void> {
   const notificationBrowserStorage = new NotificationBrowserStorage()
-  const currentTab = await getCurrentTab()
   const notification = await notificationBrowserStorage.getAll((x) => x.status === 1)
 
   for (const i of notification) {
     i.status = 0
     await notificationBrowserStorage.update(i)
-    browser.tabs.sendMessage(currentTab.id, {
-      type: 'NOTIFICATION_UPDATE',
-      payload: notification,
-    })
   }
+  EventBus.emit('notifications_updated')
   // todo: removed if unuse
   // await _updateBadge()
 }

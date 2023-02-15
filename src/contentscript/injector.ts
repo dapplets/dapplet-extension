@@ -3,6 +3,7 @@ import { maxSatisfying, valid } from 'semver'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
+import { createNotification } from '../background/services/notificationService'
 import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, ModuleTypes } from '../common/constants'
 import * as EventBus from '../common/global-event-bus'
 import {
@@ -578,7 +579,7 @@ export class Injector {
         notification.createdAt = new Date()
         notification.status = 1
         notification.type = NotificationType.System
-        createAndShowNotification(notification)
+        createNotification(notification)
         const optimizedBranch = await optimizeDependency(
           manifest.name,
           newBranch,

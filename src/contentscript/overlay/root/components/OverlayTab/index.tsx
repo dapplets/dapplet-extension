@@ -58,38 +58,29 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const nodeVisibleMenu = useRef<HTMLDivElement>()
   const [menuVisible, setMenuVisible] = useState(false)
   const [event, setEvent] = useState<Notify[]>([])
+
   useEffect(() => {
-    const init = async () => {
-      const notifications = await getNotifications()
-      setEvent(notifications && notifications.filter((x) => x.status === 1))
-      EventBus.on('SHOW_NOTIFICATION', async () => {
-        const notifications = await getNotifications()
-        setEvent(notifications && notifications.filter((x) => x.status === 1))
-      })
-
-      EventBus.on('NOTIFICATION_UPDATE', async () => {
-        const notifications = await getNotifications()
-        setEvent(notifications && notifications.filter((x) => x.status === 1))
-      })
-    }
-
-    init()
-
     !document
       .querySelector('#dapplets-overlay-manager')
       .classList.contains('dapplets-overlay-collapsed') && setMenuVisible(false)
-    return () => {
-      EventBus.off('SHOW_NOTIFICATION', async () => {
-        const notifications = await getNotifications()
-        setEvent(notifications && notifications.filter((x) => x.status === 1))
-      })
-
-      EventBus.off('NOTIFICATION_UPDATE', async () => {
-        const notifications = await getNotifications()
-        setEvent(notifications && notifications.filter((x) => x.status === 1))
-      })
-    }
+    return () => {}
   }, [menuVisible])
+
+  useEffect(() => {
+    const handleUpdateNotifications = async () => {
+      const notifications = await getNotifications()
+      setEvent(notifications && notifications.filter((x) => x.status === 1))
+    }
+
+    handleUpdateNotifications()
+    EventBus.on('notifications_updated', handleUpdateNotifications)
+    EventBus.on('show_notification', handleUpdateNotifications)
+
+    return () => {
+      EventBus.off('notifications_updated', handleUpdateNotifications)
+      EventBus.off('show_notification', handleUpdateNotifications)
+    }
+  }, [])
 
   const connectWallet = async () => {
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
