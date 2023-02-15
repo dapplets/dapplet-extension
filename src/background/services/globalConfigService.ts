@@ -1,4 +1,4 @@
-import { StorageTypes } from '../../common/constants'
+import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants'
 import * as EventBus from '../../common/global-event-bus'
 import {
   generateGuid,
@@ -438,7 +438,30 @@ export default class GlobalConfigService {
   }
 
   async disableRegistry(url: string) {
-    return this.updateConfig((c) => (c.registries.find((x) => x.url === url).isEnabled = false))
+    await this.updateConfig((c) => {
+      // deactivate modules from this registry
+      for (const contextId in c.hostnames ?? {}) {
+        const activeModules = c.hostnames[contextId]?.activeFeatures ?? {}
+        for (const moduleName in activeModules) {
+          const module = activeModules[moduleName]
+          if (module.registryUrl === url && module.isActive) {
+            module.isActive = false
+
+            // ToDo: the same event is sent in FeatureService._setFeatureActive()
+            EventBus.emit('dapplet_deactivated', {
+              name: moduleName,
+              branch: DEFAULT_BRANCH_NAME,
+              version: module.version,
+              order: module.order,
+              contextIds: [contextId],
+            })
+          }
+        }
+      }
+
+      // deactivate registry
+      c.registries.find((x) => x.url === url).isEnabled = false
+    })
   }
 
   async getDevMode() {
