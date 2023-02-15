@@ -72,7 +72,8 @@ export const Notifications = () => {
     const { markAllNotificationsAsViewed, deleteAllNotifications } = await initBGFunctions(browser)
     await markAllNotificationsAsViewed(f)
     setTimeout(() => setLoadNotify(false), 1000)
-    setEvent(f)
+    const notification = await getNotifications()
+    setEvent(notification)
   }
 
   const checkUpdates = async () => {
@@ -81,12 +82,12 @@ export const Notifications = () => {
   }
 
   const getReadNotifications = async (id) => {
-    const backgroundFunctions = await initBGFunctions(browser)
-    const { markNotificationAsViewed } = backgroundFunctions
+    const { markNotificationAsViewed } = await initBGFunctions(browser)
 
     await markNotificationAsViewed(id)
 
-    await getNotifications
+    const notification = await getNotifications()
+    setEvent(notification)
   }
 
   return (

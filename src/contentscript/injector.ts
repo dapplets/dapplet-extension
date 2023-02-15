@@ -3,7 +3,7 @@ import { maxSatisfying, valid } from 'semver'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
-import { createNotification } from '../background/services/notificationService'
+import { NotificationService } from '../background/services/notificationService'
 import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, ModuleTypes } from '../common/constants'
 import * as EventBus from '../common/global-event-bus'
 import {
@@ -16,7 +16,7 @@ import {
   parseModuleName,
 } from '../common/helpers'
 import { JsonRpc } from '../common/jsonrpc'
-import { Notification, NotificationType } from '../common/models/notification'
+import { NotificationType } from '../common/models/notification'
 import { DefaultConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
@@ -439,7 +439,6 @@ export class Injector {
           const { getModuleInfoByName } = await initBGFunctions(browser)
           const registry = manifest.registryUrl
           const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, manifest.name)
-
           await core.notify(payload, moduleInfo.icon?.uris?.[0])
         },
       }
@@ -572,14 +571,14 @@ export class Injector {
       }
 
       if (newBranch) {
-        const notification = new Notification()
-        notification.id = generateGuid() // ToDo: autoincrement?
-        notification.title = 'Branch resolving'
-        notification.message = `Resolver of "${manifest.name}" defined the "${newBranch}" branch`
-        notification.createdAt = new Date()
-        notification.status = 1
-        notification.type = NotificationType.System
-        createNotification(notification)
+        const notificationService = new NotificationService()
+        notificationService.createNotification({
+          id: generateGuid(),
+          title: 'Branch resolving',
+          message: `Resolver of "${manifest.name}" defined the "${newBranch}" branch`,
+          type: NotificationType.System,
+          getId: null,
+        })
         const optimizedBranch = await optimizeDependency(
           manifest.name,
           newBranch,

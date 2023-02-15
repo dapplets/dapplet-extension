@@ -155,7 +155,7 @@ export default class Core {
   public async notify(payload: NotificationPayload, icon?) {
     const { createAndShowNotification, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
-    await createAndShowNotification(payload, thisTab.id, icon)
+    await createAndShowNotification(payload, thisTab.id, icon ? icon : null)
   }
 
   public toggleOverlay() {

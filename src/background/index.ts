@@ -19,7 +19,7 @@ import EnsService from './services/ensService'
 import FeatureService from './services/featureService'
 import GithubService from './services/githubService'
 import GlobalConfigService from './services/globalConfigService'
-import * as NotificationService from './services/notificationService'
+import { NotificationService as Notify } from './services/notificationService'
 import { OverlayService } from './services/overlayService'
 import ProxyService from './services/proxyService'
 import { SessionService } from './services/sessionService'
@@ -41,7 +41,7 @@ const sessionService = new SessionService(walletService, overlayService)
 const featureService = new FeatureService(globalConfigService, walletService, overlayService)
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
-
+const notificationService = new Notify()
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
 globalConfigService.ensService = ensService
@@ -143,15 +143,18 @@ browser.runtime.onMessage.addListener(
     setGlobalConfig: (config) => globalConfigService.set(config),
     getDevMode: () => globalConfigService.getDevMode(),
     setDevMode: (isActive) => globalConfigService.setDevMode(isActive),
-    getNotifications: NotificationService.getNotifications,
-    createAndShowNotification: NotificationService.createAndShowNotification,
-    createNotification: NotificationService.createNotification,
-    showNotification: NotificationService.showNotification,
-    deleteNotification: NotificationService.deleteNotification,
-    deleteAllNotifications: NotificationService.deleteAllNotifications,
-    markNotificationAsViewed: NotificationService.markNotificationAsViewed,
-    markAllNotificationsAsViewed: NotificationService.markAllNotificationsAsViewed,
-    getUnreadNotificationsCount: NotificationService.getUnreadNotificationsCount,
+    getNotifications: (type) => notificationService.getNotifications(type),
+    createAndShowNotification: (notify, tabId?, icon?) =>
+      notificationService.createAndShowNotification(notify, tabId, icon),
+    createNotification: (notify, icon) => notificationService.createNotification(notify, icon),
+    showNotification: (notificationId, tabId) =>
+      notificationService.showNotification(notificationId, tabId),
+    deleteNotification: (id) => notificationService.deleteNotification(id),
+    deleteAllNotifications: () => notificationService.deleteAllNotifications(),
+    markNotificationAsViewed: (id) => notificationService.markNotificationAsViewed(id),
+    markAllNotificationsAsViewed: () => notificationService.markAllNotificationsAsViewed(),
+    getUnreadNotificationsCount: (source?) =>
+      notificationService.getUnreadNotificationsCount(source),
     getInitialConfig: () => globalConfigService.getInitialConfig(),
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),
