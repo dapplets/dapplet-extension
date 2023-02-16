@@ -91,7 +91,7 @@ export const Notifications = () => {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} data-testid="notification">
       <>
         {load ? (
           <TabLoader />
@@ -143,7 +143,11 @@ export const Notifications = () => {
                 )}
 
                 <div className={styles.btnGroup}>
-                  <button className={styles.btnNotification} onClick={() => setOlder(!isOlder)}>
+                  <button
+                    data-testid="notification-show-old"
+                    className={styles.btnNotification}
+                    onClick={() => setOlder(!isOlder)}
+                  >
                     Show old
                   </button>
                   <button

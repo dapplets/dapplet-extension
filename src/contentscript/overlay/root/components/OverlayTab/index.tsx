@@ -357,7 +357,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     )
                   ) : menu.icon && typeof menu.icon === 'function' ? (
                     menu.id === 'notifications' && event.length > 0 ? (
-                      <Event />
+                      <Event data-testid="notification-page" />
                     ) : (
                       <menu.icon />
                     )

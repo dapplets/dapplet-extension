@@ -105,18 +105,18 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   useEffect(() => {
     const init = async () => {
       await _refreshData()
+      // await  handleUpdateNotifications()
     }
 
     init()
 
     return () => {}
   }, [newWidgets, widgets, isClick])
-
+  const handleUpdateNotifications = async () => {
+    const notifications = await getNotifications()
+    setEvent(notifications && notifications.filter((x) => x.status === 1))
+  }
   useEffect(() => {
-    const handleUpdateNotifications = async () => {
-      const notifications = await getNotifications()
-      setEvent(notifications && notifications.filter((x) => x.status === 1))
-    }
     const updatePinnedNotifications = async (payload) => {
       const notifications = await getNotifications()
       payload && setPinnedNotification(true)
@@ -329,6 +329,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       <>
         {payload ? (
           <span
+            data-testid="notification-label"
             ref={notificationRef}
             className={cn(styles.widgetButtonNotification, {
               [styles.widgetButtonAnimatePinnedNotification]: isPinnedNotification,
@@ -399,7 +400,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               }}
             >
               {event && event.filter((x) => x.status === 1).length > 0 ? (
-                <span className={styles.counter}>
+                <span className={styles.counter} data-testid="notification-counter">
                   +{event.filter((x) => x.status === 1).length}
                 </span>
               ) : null}

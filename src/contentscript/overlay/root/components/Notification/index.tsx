@@ -32,6 +32,7 @@ export const Notification = (props: NotificationProps): ReactElement => {
 
   return (
     <div
+      data-testid={isRead !== 0 ? 'new-notification' : 'old-notification'}
       className={cn(styles.wrapper, {
         [styles.delete]: isDelete,
         [styles.isRead]: isRead === 0,

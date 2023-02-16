@@ -17,7 +17,7 @@ export const CloseIcon: FC<CloseIconProps> = (props: CloseIconProps) => {
   return (
     <button className={cn(styles.button, className)} onClick={onClick}>
       {isNotification ? (
-        <CloseNotification className={styles.notification} />
+        <CloseNotification data-testid="notification-dismiss" className={styles.notification} />
       ) : (
         <Close
           className={cn({
