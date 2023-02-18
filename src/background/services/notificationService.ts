@@ -9,7 +9,6 @@ import {
 import NotificationBrowserStorage from '../browserStorages/notificationBrowserStorage'
 // Add removing function
 // NotificationBrowserStorage - implements Repository pattern (read/add/remove)
-// _updateBadge()
 
 export class NotificationService {
   async getNotifications(type: NotificationType): Promise<Notification[]> {
@@ -26,7 +25,6 @@ export class NotificationService {
     const notificationId = await this.createNotification(notify, icon ? icon : null)
 
     await this.showNotification(notificationId, tabId)
-    // todo: removed if unuse
     await this._updateBadge()
   }
 
@@ -84,7 +82,6 @@ export class NotificationService {
       await notificationBrowserStorage.update(notification)
     }
     EventBus.emit('notifications_updated')
-    // todo: removed if unuse
     await this._updateBadge()
   }
   async markAllNotificationsAsViewed(): Promise<void> {
@@ -98,7 +95,6 @@ export class NotificationService {
       await notificationBrowserStorage.update(i)
     }
     EventBus.emit('notifications_updated')
-    // todo: removed if unuse
     await this._updateBadge()
   }
 
