@@ -18,7 +18,7 @@ export class NotificationService {
     const filteredNotification = notification
       .filter((x) => x.type === type)
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-
+    await this._updateBadge()
     return filteredNotification
   }
 
@@ -27,7 +27,7 @@ export class NotificationService {
 
     await this.showNotification(notificationId, tabId)
     // todo: removed if unuse
-    // await _updateBadge()
+    await this._updateBadge()
   }
 
   async createNotification(notify: Notification, icon?): Promise<string> {
@@ -65,12 +65,14 @@ export class NotificationService {
       await notificationBrowserStorage.deleteById(i)
     }
     EventBus.emit('notifications_updated')
+    await this._updateBadge()
   }
 
   async deleteAllNotifications(): Promise<void> {
     const notificationBrowserStorage = new NotificationBrowserStorage()
     await notificationBrowserStorage.deleteAll()
     EventBus.emit('notifications_updated')
+    await this._updateBadge()
   }
 
   async markNotificationAsViewed(id: string | string[]): Promise<void> {
@@ -83,34 +85,38 @@ export class NotificationService {
     }
     EventBus.emit('notifications_updated')
     // todo: removed if unuse
-    // await _updateBadge()
+    await this._updateBadge()
   }
   async markAllNotificationsAsViewed(): Promise<void> {
     const notificationBrowserStorage = new NotificationBrowserStorage()
-    const notification = await notificationBrowserStorage.getAll((x) => x.status === 1)
+    const notification = await notificationBrowserStorage.getAll(
+      (x) => x.status === NotificationStatus.Highlighted
+    )
 
     for (const i of notification) {
-      i.status = 0
+      i.status = NotificationStatus.Default
       await notificationBrowserStorage.update(i)
     }
     EventBus.emit('notifications_updated')
     // todo: removed if unuse
-    // await _updateBadge()
+    await this._updateBadge()
   }
 
   // ToDo: optimize event counting without getting the whole array
   async getUnreadNotificationsCount(source?: string): Promise<number> {
     const notificationBrowserStorage = new NotificationBrowserStorage()
-    const notification: Notification[] = await notificationBrowserStorage.getAll()
-    const count = notification.filter((e) => e.status !== 1).length
+    const notification: Notification[] = await notificationBrowserStorage.getAll(
+      (x) => x.type === NotificationType.Application
+    )
+    const count = notification.filter((e) => e.status === NotificationStatus.Highlighted).length
     return count
   }
 
   async _updateBadge() {
-    const count = 0 // await getUnreadNotificationsCount()  !!!! ToDo ACHTUNG !!!!
+    const count = await this.getUnreadNotificationsCount()
     browser.browserAction.setBadgeText({
-      text: '', // count === 0 ? '' : count.toString(),  !!!! ToDo ACHTUNG !!!!
+      text: count === 0 ? '' : count.toString(),
     })
-    browser.browserAction.setBadgeBackgroundColor({ color: '#2185d0' })
+    browser.browserAction.setBadgeBackgroundColor({ color: '#f5f5f5' })
   }
 }
