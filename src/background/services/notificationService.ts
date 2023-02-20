@@ -12,7 +12,6 @@ import NotificationBrowserStorage from '../browserStorages/notificationBrowserSt
 // NotificationBrowserStorage - implements Repository pattern (read/add/remove)
 
 export class NotificationService {
-
   public notificationBrowserStorage = new NotificationBrowserStorage()
 
   async getNotifications(type: NotificationType): Promise<Notification[]> {
@@ -32,7 +31,6 @@ export class NotificationService {
   }
 
   async createNotification(notify: NotificationPayload | any, icon?): Promise<string> {
-
     const notification = new Notification()
     notification.id = generateGuid() // ToDo: autoincrement?
     notification.title = notify.title
@@ -48,7 +46,6 @@ export class NotificationService {
   }
 
   async showNotification(notificationId: string, tabId: number): Promise<void> {
-
     const notification = await this.notificationBrowserStorage.getById(notificationId)
     EventBus.emit('show_notification', notification)
     browser.tabs.sendMessage(tabId, {
@@ -59,7 +56,7 @@ export class NotificationService {
 
   async deleteNotification(id: string | string[]): Promise<void> {
     const ids = Array.isArray(id) ? id : [id]
-    await Promise.all(ids.map((id) => this.notificationBrowserStorage.deleteById(id)));
+    await Promise.all(ids.map((id) => this.notificationBrowserStorage.deleteById(id)))
     EventBus.emit('notifications_updated')
     await this._updateBadge()
   }
@@ -72,11 +69,15 @@ export class NotificationService {
 
   async markNotificationAsViewed(id: string | string[]): Promise<void> {
     const ids = Array.isArray(id) ? id : [id]
-    for (const i of ids) {
-      const notification = await this.notificationBrowserStorage.getById(i)
-      notification.status = 0
-      await this.notificationBrowserStorage.update(notification)
-    }
+
+    await Promise.all(
+      ids.map(async (id) => {
+        const notification = await this.notificationBrowserStorage.getById(id)
+        notification.status = 0
+        await this.notificationBrowserStorage.update(notification)
+      })
+    )
+
     EventBus.emit('notifications_updated')
     await this._updateBadge()
   }
@@ -90,19 +91,17 @@ export class NotificationService {
       i.status = NotificationStatus.Default
       await this.notificationBrowserStorage.update(i)
     }
+
     EventBus.emit('notifications_updated')
     await this._updateBadge()
   }
 
   // ToDo: optimize event counting without getting the whole array
   async getUnreadNotificationsCount(source?: string): Promise<number> {
-    const count = await (
-      await this.notificationBrowserStorage.getAll(
-        (x) =>
-          x.status === NotificationStatus.Highlighted && x.type === NotificationType.Application
-      )
-    ).length
-    return count
+    const unreadNotifications = await this.notificationBrowserStorage.getAll(
+      (x) => x.status === NotificationStatus.Highlighted && x.type === NotificationType.Application
+    )
+    return unreadNotifications.length
   }
 
   async _updateBadge() {

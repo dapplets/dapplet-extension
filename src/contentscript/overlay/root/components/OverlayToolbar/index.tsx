@@ -3,7 +3,11 @@ import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../common/global-event-bus'
-import { Notification as Notify, NotificationStatus, NotificationType } from '../../../../../common/models/notification'
+import {
+  Notification as Notify,
+  NotificationStatus,
+  NotificationType,
+} from '../../../../../common/models/notification'
 import { widgets } from '../../../../modules/adapter-overlay/src'
 import { ReactComponent as Show } from '../../assets/icons/iconsWidgetButton/show.svg'
 import { ReactComponent as Notification } from '../../assets/icons/notificationIcons/bell.svg'
@@ -114,7 +118,9 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   }, [newWidgets, widgets, isClick])
   const handleUpdateNotifications = async () => {
     const notifications = await getNotifications()
-    setEvent(notifications && notifications.filter((x) => x.status === NotificationStatus.Highlighted))
+    setEvent(
+      notifications && notifications.filter((x) => x.status === NotificationStatus.Highlighted)
+    )
   }
   useEffect(() => {
     const updatePinnedNotifications = async (payload) => {
@@ -125,19 +131,20 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       setTimeout(() => {
         setPinnedNotification(false)
       }, 8000)
+
       return setEvent(notifications)
     }
 
-    const getPayload = (payload)=>{
-     updatePinnedNotifications(payload)
+    const handleShowNotification = (payload) => {
+      updatePinnedNotifications(payload)
     }
 
     EventBus.on('notifications_updated', handleUpdateNotifications)
-    EventBus.on('show_notification',getPayload)
+    EventBus.on('show_notification', handleShowNotification)
 
     return () => {
       EventBus.off('notifications_updated', handleUpdateNotifications)
-      EventBus.off('show_notification',getPayload)
+      EventBus.off('show_notification', handleShowNotification)
     }
   }, [])
 
@@ -400,12 +407,14 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 }
               }}
             >
-              {event && event.filter((x) => x.status === NotificationStatus.Highlighted).length > 0 ? (
+              {event &&
+              event.filter((x) => x.status === NotificationStatus.Highlighted).length > 0 ? (
                 <span className={styles.counter} data-testid="notification-counter">
                   +{event.filter((x) => x.status === NotificationStatus.Highlighted).length}
                 </span>
               ) : null}
-              {event && event.filter((x) => x.status === NotificationStatus.Highlighted).length > 0 ? (
+              {event &&
+              event.filter((x) => x.status === NotificationStatus.Highlighted).length > 0 ? (
                 <NotificationWithCircle />
               ) : (
                 <Notification />

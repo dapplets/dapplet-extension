@@ -3,13 +3,11 @@ import { maxSatisfying, valid } from 'semver'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
-import { NotificationService } from '../background/services/notificationService'
 import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, ModuleTypes } from '../common/constants'
 import * as EventBus from '../common/global-event-bus'
 import {
   areModulesEqual,
   formatModuleId,
-  generateGuid,
   isE2ETestingEnvironment,
   joinUrls,
   multipleReplace,
@@ -436,6 +434,7 @@ export class Injector {
         connectedAccounts: core.connectedAccounts,
         fetch: core.fetch,
         notify: async (payload) => {
+          // ToDo: do not fetch manifest twice
           const { getModuleInfoByName } = await initBGFunctions(browser)
           const registry = manifest.registryUrl
           const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, manifest.name)
@@ -573,10 +572,9 @@ export class Injector {
       if (newBranch) {
         const { createNotification } = await initBGFunctions(browser)
         await createNotification({
-          id: generateGuid(),
           title: 'Branch resolving',
           message: `Resolver of "${manifest.name}" defined the "${newBranch}" branch`,
-          type: NotificationType.System
+          type: NotificationType.System,
         })
         const optimizedBranch = await optimizeDependency(
           manifest.name,
