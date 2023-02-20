@@ -49,6 +49,9 @@
 .dappletsBlock > * {
   direction: ltr;
 }
+.noScroll{
+  overflow-y: hidden!important;
+}
 
 .noDapplets {
   display: flex;
