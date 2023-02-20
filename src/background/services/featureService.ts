@@ -21,7 +21,7 @@ import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
 import { StorageRef } from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
 import GlobalConfigService from './globalConfigService'
-import { OverlayService } from './overlayService'
+import { NotificationService } from './notificationService'
 import { WalletService } from './walletService'
 
 export default class FeatureService {
@@ -29,16 +29,17 @@ export default class FeatureService {
   private _storageAggregator = new StorageAggregator(this._globalConfigService)
   // private _moduleInfoBrowserStorage = new ModuleInfoBrowserStorage();
 
-  private _requestId = 0
+  // private _requestId = 0
 
   constructor(
     private _globalConfigService: GlobalConfigService,
     private _walletService: WalletService,
-    private _overlayService: OverlayService
+    private _notificationService: NotificationService
   ) {
     this._moduleManager = new ModuleManager(
       this._globalConfigService,
       this._walletService,
+      this._notificationService,
       this._storageAggregator
     )
   }

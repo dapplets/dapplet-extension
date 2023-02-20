@@ -18,6 +18,7 @@ export default class ModuleManager {
   constructor(
     private _globalConfigService: GlobalConfigService,
     private _walletService: WalletService,
+    private _notificationService: NotificationService,
     private _storage: StorageAggregator
   ) {
     this.registryAggregator = new RegistryAggregator(this._globalConfigService, this._walletService)
@@ -256,7 +257,6 @@ export default class ModuleManager {
     // ToDo: Replace '>=' to '^'
     const prefix = '>=' // https://devhints.io/semver
     const range = prefix + version
-    const notificationService = new NotificationService()
     const allVersions = await this.registryAggregator.getVersions(name, branch)
 
     if (allVersions.length === 0) {
@@ -268,13 +268,12 @@ export default class ModuleManager {
     // ToDo: catch null in optimizedVersion
 
     if (version != optimizedVersion) {
-
-      notificationService.createNotification({
+      this._notificationService.createNotification({
         title: 'Dependency Optimizer',
         id: generateGuid(),
         type: NotificationType.System,
-        message: `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`
-      } )
+        message: `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`,
+      })
     }
 
     return {

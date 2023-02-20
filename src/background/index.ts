@@ -19,7 +19,7 @@ import EnsService from './services/ensService'
 import FeatureService from './services/featureService'
 import GithubService from './services/githubService'
 import GlobalConfigService from './services/globalConfigService'
-import { NotificationService as Notify } from './services/notificationService'
+import { NotificationService } from './services/notificationService'
 import { OverlayService } from './services/overlayService'
 import ProxyService from './services/proxyService'
 import { SessionService } from './services/sessionService'
@@ -30,6 +30,7 @@ import { WalletService } from './services/walletService'
 // ToDo: It looks like facade and requires a refactoring probably.
 tracing.startTracing()
 
+const notificationService = new NotificationService()
 const globalConfigService = new GlobalConfigService()
 const suspendService = new SuspendService(globalConfigService)
 const overlayService = new OverlayService()
@@ -38,10 +39,10 @@ const githubService = new GithubService(globalConfigService)
 // const discordService = new DiscordService(globalConfigService)
 const walletService = new WalletService(globalConfigService, overlayService)
 const sessionService = new SessionService(walletService, overlayService)
-const featureService = new FeatureService(globalConfigService, walletService, overlayService)
+const featureService = new FeatureService(globalConfigService, walletService, notificationService)
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
-const notificationService = new Notify()
+
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
 globalConfigService.ensService = ensService

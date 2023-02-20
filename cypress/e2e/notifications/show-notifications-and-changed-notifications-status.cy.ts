@@ -1,8 +1,11 @@
 import { qase } from 'cypress-qase-reporter/dist/mocha'
+
 const url = 'https://example.com'
 const dappletIdToActivate = 'test-notify'
+
 let counter
 let newCounter
+
 describe('show notification in notification`s page', () => {
   qase(
     16,

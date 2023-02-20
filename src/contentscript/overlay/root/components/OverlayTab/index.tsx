@@ -5,13 +5,17 @@ import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { DAPPLETS_STORE_URL } from '../../../../../common/constants'
 import * as EventBus from '../../../../../common/global-event-bus'
-import { Notification as Notify, NotificationStatus, NotificationType } from '../../../../../common/models/notification'
+import {
+  Notification,
+  NotificationStatus,
+  NotificationType,
+} from '../../../../../common/models/notification'
 import { DefaultSigners, StorageRef } from '../../../../../common/types'
 import { ReactComponent as Account } from '../../assets/icons/iconsWidgetButton/account.svg'
 import { ReactComponent as Help } from '../../assets/icons/iconsWidgetButton/help.svg'
 import { ReactComponent as Login } from '../../assets/icons/iconsWidgetButton/login.svg'
 import { ReactComponent as Max } from '../../assets/icons/iconsWidgetButton/max.svg'
-import { ReactComponent as Notification } from '../../assets/icons/iconsWidgetButton/notification.svg'
+import { ReactComponent as NotificationIcon } from '../../assets/icons/iconsWidgetButton/notification.svg'
 import { ReactComponent as Pause } from '../../assets/icons/iconsWidgetButton/pause.svg'
 import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
 import { ReactComponent as Event } from '../../assets/newIcon/notification.svg'
@@ -57,19 +61,20 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const visibleMenus = p.menus.filter((x) => x.hidden !== true)
   const nodeVisibleMenu = useRef<HTMLDivElement>()
   const [menuVisible, setMenuVisible] = useState(false)
-  const [event, setEvent] = useState<Notify[]>([])
+  const [event, setEvent] = useState<Notification[]>([])
 
   useEffect(() => {
     !document
       .querySelector('#dapplets-overlay-manager')
       .classList.contains('dapplets-overlay-collapsed') && setMenuVisible(false)
-    return () => {}
   }, [menuVisible])
 
   useEffect(() => {
     const handleUpdateNotifications = async () => {
       const notifications = await getNotifications()
-      setEvent(notifications && notifications.filter((x) => x.status === NotificationStatus.Highlighted))
+      setEvent(
+        notifications && notifications.filter((x) => x.status === NotificationStatus.Highlighted)
+      )
     }
 
     handleUpdateNotifications()
@@ -87,9 +92,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     try {
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       p.setOpenWallet()
-    } catch (error) {
-    } finally {
-    }
+    } catch (_) {}
   }
 
   const getIconSelectedWallet = () => {
@@ -164,11 +167,8 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   }
 
   const getNotifications = async () => {
-    const backgroundFunctions = await initBGFunctions(browser)
-    const { getNotifications, setRead } = backgroundFunctions
-
+    const { getNotifications } = await initBGFunctions(browser)
     const notifications = await getNotifications(NotificationType.Application)
-
     return notifications
   }
 
@@ -416,7 +416,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   >
                     <span className={styles.mainMenuItemTitle}>Notifications</span>
                     <span className={styles.mainMenuItemIcon}>
-                      <Notification />
+                      <NotificationIcon />
                     </span>
                   </li>
                   {/* <li className={styles.mainMenuItem}>
