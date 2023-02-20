@@ -5,7 +5,7 @@ import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { DAPPLETS_STORE_URL } from '../../../../../common/constants'
 import * as EventBus from '../../../../../common/global-event-bus'
-import { Notification as Notify, NotificationType } from '../../../../../common/models/notification'
+import { Notification as Notify, NotificationStatus, NotificationType } from '../../../../../common/models/notification'
 import { DefaultSigners, StorageRef } from '../../../../../common/types'
 import { ReactComponent as Account } from '../../assets/icons/iconsWidgetButton/account.svg'
 import { ReactComponent as Help } from '../../assets/icons/iconsWidgetButton/help.svg'
@@ -69,7 +69,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   useEffect(() => {
     const handleUpdateNotifications = async () => {
       const notifications = await getNotifications()
-      setEvent(notifications && notifications.filter((x) => x.status === 1))
+      setEvent(notifications && notifications.filter((x) => x.status === NotificationStatus.Highlighted))
     }
 
     handleUpdateNotifications()
@@ -91,6 +91,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     } finally {
     }
   }
+
   const getIconSelectedWallet = () => {
     if (p.selectedWallet) {
       const newIcon =
@@ -156,10 +157,12 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       }
     }
   }
+
   const onOpenStore = async (f: string) => {
     const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f}`
     window.open(url, '_blank')
   }
+
   const getNotifications = async () => {
     const backgroundFunctions = await initBGFunctions(browser)
     const { getNotifications, setRead } = backgroundFunctions
@@ -168,6 +171,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
 
     return notifications
   }
+
   return (
     <div
       data-testid={!p.pinned ? 'tab-not-pinned' : 'tab-pinned'}

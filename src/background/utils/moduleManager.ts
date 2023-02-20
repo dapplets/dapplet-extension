@@ -268,16 +268,13 @@ export default class ModuleManager {
     // ToDo: catch null in optimizedVersion
 
     if (version != optimizedVersion) {
-      // const notification = new Notification()
 
       notificationService.createNotification({
         title: 'Dependency Optimizer',
         id: generateGuid(),
         type: NotificationType.System,
-        message: `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`,
-        getId: null,
-      })
-      // createAndShowNotification(notification)
+        message: `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`
+      } )
     }
 
     return {

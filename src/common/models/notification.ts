@@ -14,6 +14,7 @@ export type NotificationPayload = {
   payload?: any
   icon?: string
 }
+
 export enum NotificationType {
   Announcement,
   System,

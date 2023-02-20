@@ -2,7 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 
 import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { Notification as Notify, NotificationType } from '../../../../../common/models/notification'
+import { Notification as Notify, NotificationStatus, NotificationType } from '../../../../../common/models/notification'
 
 import * as EventBus from '../../../../../common/global-event-bus'
 import IconDefault from '../../assets/icons/notificationIcons/defaultIcon.svg'
@@ -37,7 +37,7 @@ export const Notifications = () => {
   useEffect(() => {
     const handleUpdateNotifications = async () => {
       const notifications = await getNotifications()
-      setEvent(notifications && notifications.filter((x) => x.status === 1))
+      setEvent(notifications && notifications.filter((x) => x.status === NotificationStatus.Highlighted))
     }
 
     EventBus.on('notifications_updated', handleUpdateNotifications)
@@ -117,12 +117,14 @@ export const Notifications = () => {
                   <div className={styles.delimeter}></div>
                 </div>
                 {loadNotify ? (
+                  // todo: unificate loaders
+                  // todo: unificate bg in pages
                   <div className={styles.loaderNotify}></div>
                 ) : (
                   <>
                     {event.length > 0 &&
                       event
-                        .filter((x) => x.status === 1)
+                        .filter((x) => x.status === NotificationStatus.Highlighted)
                         .map((x, i) => {
                           return (
                             <Notification
@@ -153,7 +155,7 @@ export const Notifications = () => {
                   <button
                     className={styles.btnNotification}
                     onClick={() => onRemoveEventsAll(event)}
-                    disabled={event && event.filter((x) => x.status === 1).length === 0}
+                    disabled={event && event.filter((x) => x.status === NotificationStatus.Highlighted).length === 0}
                   >
                     Dismiss all
                   </button>
@@ -168,7 +170,7 @@ export const Notifications = () => {
                   </div>
                   {event.length > 0 &&
                     event
-                      .filter((x) => x.status === 0)
+                      .filter((x) => x.status === NotificationStatus.Default)
                       .map((x, i) => {
                         if (i < count) {
                           return x ? (
@@ -194,7 +196,7 @@ export const Notifications = () => {
                       })}
 
                   <button
-                    disabled={count >= event.filter((x) => x.status === 0).length}
+                    disabled={count >= event.filter((x) => x.status === NotificationStatus.Default).length}
                     className={styles.btnNotification}
                     onClick={() => counter()}
                   >

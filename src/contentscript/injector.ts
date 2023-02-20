@@ -571,13 +571,12 @@ export class Injector {
       }
 
       if (newBranch) {
-        const notificationService = new NotificationService()
-        notificationService.createNotification({
+        const { createNotification } = await initBGFunctions(browser)
+        await createNotification({
           id: generateGuid(),
           title: 'Branch resolving',
           message: `Resolver of "${manifest.name}" defined the "${newBranch}" branch`,
-          type: NotificationType.System,
-          getId: null,
+          type: NotificationType.System
         })
         const optimizedBranch = await optimizeDependency(
           manifest.name,

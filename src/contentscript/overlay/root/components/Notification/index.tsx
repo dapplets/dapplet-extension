@@ -45,7 +45,6 @@ export const Notification = (props: NotificationProps): ReactElement => {
         </div>
 
         <span className={styles.date}>
-          {/* <ReactTimeAgo date={newDateNum} locale="en-US" /> */}
           <span>
             {addZero(newDateNum.getFullYear()) +
               '.' +
@@ -56,7 +55,6 @@ export const Notification = (props: NotificationProps): ReactElement => {
           <span>{addZero(newDateNum.getHours()) + ':' + addZero(newDateNum.getMinutes())}</span>
         </span>
       </div>
-      {/* <header className={styles.header}>{label}</header> */}
       <div className={styles.blockDesccription}>
         <div className={styles.blockInfo}>
           <p ref={refComponent} className={cn(styles.description, {})}>
