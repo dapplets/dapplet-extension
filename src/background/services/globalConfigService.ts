@@ -24,6 +24,7 @@ const EXPORTABLE_PROPERTIES = [
   'trustedUsers',
   // 'userSettings',
   'errorReporting',
+  'userTracking',
   // 'userAgentId',
   'userAgentName',
   'providerUrl',
@@ -257,6 +258,7 @@ export default class GlobalConfigService {
     config.swarmGatewayUrl = 'https://swarmgateway.mooo.com/'
     config.walletsUsage = {}
     config.errorReporting = true
+    config.userTracking = true
     config.userAgentId = generateGuid()
     config.userAgentName = ''
     config.hostnames = {}
@@ -595,6 +597,15 @@ export default class GlobalConfigService {
 
   async setErrorReporting(isActive: boolean) {
     return this.updateConfig((c) => (c.errorReporting = isActive))
+  }
+
+  async getUserTracking() {
+    const config = await this.get()
+    return config.userTracking
+  }
+
+  async setUserTracking(isActive: boolean) {
+    return this.updateConfig((c) => (c.userTracking = isActive))
   }
 
   async setEthereumProvider(url: string) {

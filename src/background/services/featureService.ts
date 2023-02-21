@@ -20,6 +20,7 @@ import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
 import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
 import { StorageRef } from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
+import { AnalyticsGoals, AnalyticsService } from './analyticsService'
 import GlobalConfigService from './globalConfigService'
 import { NotificationService } from './notificationService'
 import { WalletService } from './walletService'
@@ -34,7 +35,8 @@ export default class FeatureService {
   constructor(
     private _globalConfigService: GlobalConfigService,
     private _walletService: WalletService,
-    private _notificationService: NotificationService
+    private _notificationService: NotificationService,
+    private _analyticsService: AnalyticsService
   ) {
     this._moduleManager = new ModuleManager(
       this._globalConfigService,
@@ -423,6 +425,7 @@ export default class FeatureService {
     order: number,
     registryUrl: string
   ): Promise<void> {
+    this._analyticsService.track({ idgoal: AnalyticsGoals.DappletActivated, dapplet: name })
     await this._setFeatureActive(name, version, hostnames, true, order, registryUrl)
   }
 
@@ -433,6 +436,7 @@ export default class FeatureService {
     order: number,
     registryUrl: string
   ): Promise<void> {
+    this._analyticsService.track({ idgoal: AnalyticsGoals.DappletDeactivated, dapplet: name })
     await this._setFeatureActive(name, version, hostnames, false, order, registryUrl)
   }
 

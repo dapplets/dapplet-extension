@@ -4,6 +4,7 @@ import React, { FC, useEffect, useMemo, useState } from 'react'
 import { rcompare } from 'semver'
 import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
+import { AnalyticsGoals } from '../../../../../background/services/analyticsService'
 import {
   CONTEXT_ID_WILDCARD,
   DAPPLETS_STORE_URL,
@@ -247,11 +248,25 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   }
 
   const onOpenStore = async (f: ManifestAndDetails) => {
+    initBGFunctions(browser).then((x) =>
+      x.track({
+        idgoal: AnalyticsGoals.MovedToStore,
+        dapplet: f.name,
+      })
+    )
+
     const url = `${DAPPLETS_STORE_URL}/#searchQuery=${f.name}`
     window.open(url, '_blank')
   }
 
   const onOpenNft = async (f: ManifestAndDetails) => {
+    initBGFunctions(browser).then((x) =>
+      x.track({
+        idgoal: AnalyticsGoals.MovedToNftMarketplace,
+        dapplet: f.name,
+      })
+    )
+
     const { getModuleNftUrl } = await initBGFunctions(browser)
     const nftUrl = await getModuleNftUrl(f.sourceRegistry.url, f.name)
     window.open(nftUrl, '_blank')

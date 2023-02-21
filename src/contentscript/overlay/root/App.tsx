@@ -14,6 +14,7 @@ import {
 } from 'react-router-dom'
 import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../background/dto/manifestDTO'
+import { AnalyticsGoals } from '../../../background/services/analyticsService'
 import { Bus } from '../../../common/bus'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import * as EventBus from '../../../common/global-event-bus'
@@ -173,6 +174,12 @@ class _App extends React.Component<P, S> {
     this.setState({ isDevMode })
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.location.pathname !== this.props.location.pathname) {
+      initBGFunctions(browser).then((x) => x.track({ url: this.props.location.pathname }))
+    }
+  }
+
   handleDappletDeactivated = (dapplet: any) => {
     // close tabs of deactivated dapplets (including their settings)
     const tabsToBeClosed = this.getTabs().filter((x) => x.id === dapplet.name)
@@ -289,6 +296,7 @@ class _App extends React.Component<P, S> {
   }
 
   handleStoreButtonClick = () => {
+    initBGFunctions(browser).then((x) => x.track({ idgoal: AnalyticsGoals.MovedToStore }))
     window.open(DAPPLETS_STORE_URL, '_blank')
   }
 

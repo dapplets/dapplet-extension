@@ -13,6 +13,7 @@ import {
   waitTab,
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
+import { AnalyticsGoals, AnalyticsService } from './services/analyticsService'
 import ConnectedAccountService from './services/connectedAccountService'
 // import DiscordService from './services/discordService'
 import EnsService from './services/ensService'
@@ -32,6 +33,7 @@ tracing.startTracing()
 
 const notificationService = new NotificationService()
 const globalConfigService = new GlobalConfigService()
+const analyticsService = new AnalyticsService(globalConfigService)
 const suspendService = new SuspendService(globalConfigService)
 const overlayService = new OverlayService()
 const proxyService = new ProxyService(globalConfigService)
@@ -39,7 +41,12 @@ const githubService = new GithubService(globalConfigService)
 // const discordService = new DiscordService(globalConfigService)
 const walletService = new WalletService(globalConfigService, overlayService)
 const sessionService = new SessionService(walletService, overlayService)
-const featureService = new FeatureService(globalConfigService, walletService, notificationService)
+const featureService = new FeatureService(
+  globalConfigService,
+  walletService,
+  notificationService,
+  analyticsService
+)
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
 
@@ -271,6 +278,9 @@ browser.runtime.onMessage.addListener(
       connectedAccountService.changeStatus.bind(connectedAccountService),
     getConnectedAccountsPairs: connectedAccountService.getPairs.bind(connectedAccountService),
 
+    // Analytics Service
+    track: analyticsService.track.bind(analyticsService),
+
     // Helpers
     waitTab: (url) => waitTab(url),
     waitClosingTab: (tabId, windowId) => waitClosingTab(tabId, windowId),
@@ -407,10 +417,15 @@ browser.runtime.onMessage.addListener((message, sender) => {
   }
 })
 
-browser.browserAction.onClicked.addListener(() => overlayService.openPopupOverlay('dapplets'))
+browser.browserAction.onClicked.addListener(() => {
+  overlayService.openPopupOverlay('dapplets')
+  analyticsService.track({ idgoal: AnalyticsGoals.ExtensionIconClicked })
+})
 
 // Set predefined configuration when extension is installed
 browser.runtime.onInstalled.addListener(async (details) => {
+  analyticsService.track({ idgoal: AnalyticsGoals.ExtensionInstalled })
+
   // Find predefined config URL in downloads
   if (details.reason !== 'install') return
   const downloads = await browser.downloads.search({
