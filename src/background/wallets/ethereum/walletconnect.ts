@@ -17,15 +17,16 @@ function getWalletConnect() {
 }
 
 export default class extends ethers.Signer implements EthereumWallet {
-  public provider: ethers.providers.JsonRpcProvider
+  public provider: ethers.providers.StaticJsonRpcProvider
   private _sendDataToPairingOverlay: (topic: string, args: any[]) => void
 
   constructor(config: {
     providerUrl: string
+    chainId: number
     sendDataToPairingOverlay: (topic: string, args: any[]) => void
   }) {
     super()
-    this.provider = new ethers.providers.JsonRpcProvider(config.providerUrl)
+    this.provider = new ethers.providers.StaticJsonRpcProvider(config.providerUrl, config.chainId)
     this._sendDataToPairingOverlay = config.sendDataToPairingOverlay
   }
 

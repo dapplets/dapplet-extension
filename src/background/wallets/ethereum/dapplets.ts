@@ -3,12 +3,12 @@ import { ethers } from 'ethers'
 import { EthereumWallet } from './interface'
 
 export default class extends ethers.Signer implements EthereumWallet {
-  public provider: ethers.providers.JsonRpcProvider
+  public provider: ethers.providers.StaticJsonRpcProvider
   private _wallet: ethers.Wallet = null
 
-  constructor(config: { providerUrl: string }) {
+  constructor(config: { providerUrl: string; chainId: number }) {
     super()
-    this.provider = new ethers.providers.JsonRpcProvider(config.providerUrl)
+    this.provider = new ethers.providers.StaticJsonRpcProvider(config.providerUrl, config.chainId)
     if (localStorage['dapplets_privateKey']) {
       this._wallet = new ethers.Wallet(localStorage['dapplets_privateKey'], this.provider)
     }

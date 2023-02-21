@@ -9,12 +9,12 @@ import { CacheMethod } from '../../../common/helpers'
 import { EthereumWallet } from './interface'
 
 export default class extends ethers.Signer implements EthereumWallet {
-  public provider: ethers.providers.JsonRpcProvider
+  public provider: ethers.providers.StaticJsonRpcProvider
   private _metamaskProviderPromise: Promise<MetaMaskInpageProvider> | null = null
 
-  constructor(config: { providerUrl: string }) {
+  constructor(config: { providerUrl: string; chainId: number }) {
     super()
-    this.provider = new ethers.providers.JsonRpcProvider(config.providerUrl)
+    this.provider = new ethers.providers.StaticJsonRpcProvider(config.providerUrl, config.chainId)
   }
 
   async getAddress(): Promise<string> {

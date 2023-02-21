@@ -494,8 +494,6 @@ class _App extends React.Component<P, S> {
     const p = this.props
     const s = this.state
 
-    // if (p.hidden) return null
-
     const overlays = this.getOverlays()
     // TODO: naming wallets is the notification
     const { pathname } = this.props.location!
@@ -608,7 +606,8 @@ class _App extends React.Component<P, S> {
                   // [styles.newHeight]:s.isOpenSearch && pathname === '/system/dapplets'
                 })}
               >
-                {pathname === '/system/dapplets' && (
+                {!p.hidden && pathname === '/system/dapplets' && (
+                  // ^ do not load the dapplets list until a user has opened the overlay
                   <Dapplets
                     search={s.search}
                     onUserSettingsClick={this.handleUserSettingsClick}
