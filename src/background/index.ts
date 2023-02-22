@@ -245,6 +245,10 @@ browser.runtime.onMessage.addListener(
       overlayService.execConnectedAccountsUpdateHandler.bind(overlayService),
 
     // Connected Account Service
+    getPreferredConnectedAccountsNetwork:
+      globalConfigService.getPreferredConnectedAccountsNetwork.bind(globalConfigService),
+    setPreferredConnectedAccountsNetwork:
+      globalConfigService.setPreferredConnectedAccountsNetwork.bind(globalConfigService),
     getConnectedAccounts:
       connectedAccountService.getConnectedAccounts.bind(connectedAccountService),
     getConnectedAccountsMinStakeAmount:

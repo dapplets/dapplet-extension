@@ -530,4 +530,9 @@ export default class Core {
   public connectedAccounts = new ConnectedAccounts()
 
   public fetch = proxyFetch
+
+  public async getPreferredConnectedAccountsNetwork() {
+    const bGFunctions = await initBGFunctions(browser)
+    return bGFunctions.getPreferredConnectedAccountsNetwork()
+  }
 }

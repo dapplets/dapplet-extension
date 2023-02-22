@@ -2,6 +2,7 @@ import makeBlockie from 'ethereum-blockies-base64'
 import * as nearAPI from 'near-api-js'
 import * as EventBus from '../../common/global-event-bus'
 import {
+  ChainTypes,
   ConnectedAccountsPairStatus,
   ConnectedAccountsRequestStatus,
   DefaultSigners,
@@ -20,32 +21,54 @@ type EthSignature = {
 }
 
 export default class ConnectedAccountService {
-  _contract: any
+  _testnetContract: nearAPI.Contract
+  _mainnetContract: nearAPI.Contract
 
   constructor(
     private _globalConfigService: GlobalConfigService,
     private _walletService: WalletService
   ) {}
 
-  private async _getContract() {
-    if (!this._contract) {
-      const contractAddress = await this._globalConfigService.getConnectedAccountsContractAddress()
-      const near_account = await this._walletService.near_getAccount(DefaultSigners.EXTENSION)
-      this._contract = new nearAPI.Contract(near_account, contractAddress, {
-        viewMethods: [
-          'getConnectedAccounts',
-          'getMinStakeAmount',
-          'getPendingRequests',
-          'getVerificationRequest',
-          'getStatus',
-          'getMainAccount',
-          'getRequestStatus',
-        ],
-        changeMethods: ['requestVerification', 'changeStatus'],
-      })
-    }
+  private _createContract = (near_account: nearAPI.Account, contractAddress: string) =>
+    new nearAPI.Contract(near_account, contractAddress, {
+      viewMethods: [
+        'getConnectedAccounts',
+        'getMinStakeAmount',
+        'getPendingRequests',
+        'getVerificationRequest',
+        'getStatus',
+        'getMainAccount',
+        'getRequestStatus',
+      ],
+      changeMethods: ['requestVerification', 'changeStatus'],
+    })
 
-    return this._contract
+  private async _getContract() {
+    const contractNetwork = await this._globalConfigService.getPreferredConnectedAccountsNetwork()
+    switch (contractNetwork) {
+      case 'mainnet':
+        if (!this._mainnetContract) {
+          const contractAddress =
+            await this._globalConfigService.getConnectedAccountsMainnetContractAddress()
+          const near_account = await this._walletService.near_getAccount(
+            DefaultSigners.EXTENSION,
+            ChainTypes.NEAR_MAINNET
+          )
+          this._mainnetContract = this._createContract(near_account, contractAddress)
+        }
+        return this._mainnetContract
+      case 'testnet':
+        if (!this._testnetContract) {
+          const contractAddress =
+            await this._globalConfigService.getConnectedAccountsTestnetContractAddress()
+          const near_account = await this._walletService.near_getAccount(
+            DefaultSigners.EXTENSION,
+            ChainTypes.NEAR_TESTNET
+          )
+          this._testnetContract = this._createContract(near_account, contractAddress)
+        }
+        return this._testnetContract
+    }
   }
 
   // ***** VIEW *****
@@ -56,7 +79,7 @@ export default class ConnectedAccountService {
     closeness?: number
   ): Promise<TConnectedAccount[][] | null> {
     const contract = await this._getContract()
-    return contract.getConnectedAccounts({
+    return contract['getConnectedAccounts']({
       accountId,
       originId,
       closeness: closeness === null ? undefined : closeness,
@@ -65,34 +88,34 @@ export default class ConnectedAccountService {
 
   public async getMinStakeAmount(): Promise<number> {
     const contract = await this._getContract()
-    return contract.getMinStakeAmount()
+    return contract['getMinStakeAmount']()
   }
 
   public async getPendingRequests(): Promise<number[]> {
     const contract = await this._getContract()
-    return contract.getPendingRequests()
+    return contract['getPendingRequests']()
   }
 
   public async getVerificationRequest(
     id: number
   ): Promise<TConnectedAccountsVerificationRequestInfo | null> {
     const contract = await this._getContract()
-    return contract.getVerificationRequest({ id })
+    return contract['getVerificationRequest']({ id })
   }
 
   public async getStatus(accountId: string, originId: string): Promise<boolean> {
     const contract = await this._getContract()
-    return contract.getStatus({ accountId, originId })
+    return contract['getStatus']({ accountId, originId })
   }
 
   public async getMainAccount(accountId: string, originId: string): Promise<string | null> {
     const contract = await this._getContract()
-    return contract.getMainAccount({ accountId, originId })
+    return contract['getMainAccount']({ accountId, originId })
   }
 
   public async getRequestStatus(id: number): Promise<ConnectedAccountsRequestStatus> {
     const contract = await this._getContract()
-    const status = await contract.getRequestStatus({ id })
+    const status = await contract['getRequestStatus']({ id })
     switch (status) {
       case 0:
         return ConnectedAccountsRequestStatus.NotFound
@@ -284,14 +307,14 @@ export default class ConnectedAccountService {
     }
     const gas = signature ? 300_000_000_000_000 : null
     const amount = stake === null ? undefined : stake
-    const res = await contract.requestVerification(requestBody, gas, amount)
+    const res = await contract['requestVerification'](requestBody, gas, amount)
     EventBus.emit('connected_accounts_changed')
     return res
   }
 
   public async changeStatus(accountId: string, originId: string, isMain: boolean): Promise<void> {
     const contract = await this._getContract()
-    const res = await contract.changeStatus({
+    const res = await contract['changeStatus']({
       accountId,
       originId,
       isMain,

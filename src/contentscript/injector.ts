@@ -431,6 +431,7 @@ export class Injector {
         state: core.state,
         connectedAccounts: core.connectedAccounts,
         fetch: core.fetch,
+        getPreferredConnectedAccountsNetwork: core.getPreferredConnectedAccountsNetwork,
       }
 
       let newBranch: string = null

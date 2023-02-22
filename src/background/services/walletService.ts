@@ -324,12 +324,11 @@ export class WalletService {
     return wallet.sendCustomRequest(method, params)
   }
 
-  public async near_getAccount(app: string | DefaultSigners) {
-    const wallet = (await this._getInternalSignerFor(
-      app,
-      ChainTypes.NEAR_TESTNET,
-      false
-    )) as NearWallet
+  public async near_getAccount(
+    app: string | DefaultSigners,
+    chain: ChainTypes.NEAR_MAINNET | ChainTypes.NEAR_TESTNET
+  ) {
+    const wallet = (await this._getInternalSignerFor(app, chain, false)) as NearWallet
     return wallet.getAccount()
   }
 

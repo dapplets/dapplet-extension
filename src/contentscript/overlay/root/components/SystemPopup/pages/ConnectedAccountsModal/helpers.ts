@@ -10,8 +10,9 @@ import {
 
 export const getSignature = async (
   firstAccountName: string,
+  firstAccountOrigin: string,
   secondAccountName: string,
-  origin: string,
+  secondAccountOrigin: string,
   statement: string
 ): Promise<EthSignature> => {
   const msgParams = {
@@ -41,7 +42,7 @@ export const getSignature = async (
     primaryType: 'LinkingAccounts',
     message: {
       account_a: {
-        origin_id: ChainTypes.NEAR_TESTNET,
+        origin_id: firstAccountOrigin,
         account_id: firstAccountName,
       },
       account_b: {
@@ -67,7 +68,9 @@ export const getSignature = async (
 
   const result = await eth_sendCustomRequest(
     DefaultSigners.EXTENSION,
-    origin === ChainTypes.ETHEREUM_GOERLI ? ChainTypes.ETHEREUM_GOERLI : ChainTypes.ETHEREUM_XDAI,
+    secondAccountOrigin === ChainTypes.ETHEREUM_GOERLI
+      ? ChainTypes.ETHEREUM_GOERLI
+      : ChainTypes.ETHEREUM_XDAI,
     'eth_signTypedData_v3',
     [secondAccountName, msgParamsStr]
   )

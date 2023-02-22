@@ -1,0 +1,140 @@
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
+@import '../../assets/styles/animate';
+
+.wrapper {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+  padding: 6.5px 13px;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
+  color: $MainGrey;
+
+  background: #ebebeb;
+  border-radius: 10px;
+}
+
+.dropdownLabel {
+  cursor: pointer;
+}
+
+.delimiterSpan {
+  display: flex;
+  justify-content: flex-start;
+  width: 97%;
+}
+
+.openOverlay {
+  position: absolute;
+  z-index: 3;
+  top: -1px;
+  right: -1px;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 101%;
+  height: auto;
+
+  background: #ebebeb;
+  border-radius: 10px;
+
+  animation-name: listVisible;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+
+  :last-child {
+    border-radius: 0 0 10px 10px;
+  }
+}
+
+.blockIcon {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 6.5px 13px;
+}
+
+.openList {
+  cursor: pointer;
+
+  display: block;
+
+  width: 24px;
+  height: 24px;
+
+  animation-name: rotateIsClose;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+
+    //
+    fill: none !important;
+
+    path {
+      fill: none !important;
+      stroke: #919191;
+    }
+
+    path {
+      fill: none !important;
+    }
+
+    &:hover {
+      fill: none !important;
+
+      path {
+        fill: none !important;
+        stroke: $ContentBlack;
+      }
+    }
+
+    &:active {
+      fill: none !important;
+
+      path {
+        fill: none !important;
+      }
+    }
+  }
+}
+
+.isOpen {
+  animation-name: rotateIsOpen;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+}
+
+.item {
+  cursor: pointer;
+  padding: 6.5px 13px;
+
+  &:hover {
+    background: $StrokeColor;
+  }
+
+  &:active {
+    background: #dad9d9;
+  }
+}
+
+.activeItem {
+  background: #dad9d9;
+}

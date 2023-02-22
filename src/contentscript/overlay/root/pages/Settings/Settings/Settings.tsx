@@ -6,6 +6,7 @@ import { StorageTypes } from '../../../../../../common/constants'
 import { isValidPostageStampId } from '../../../../../../common/helpers'
 import { Checkbox } from '../../../components/Checkbox'
 import { DropdownPreferedOverlayStorage } from '../../../components/DropdownPreferedOverlayStorage'
+import { DropdownPreferredCANetwork } from '../../../components/DropdownPreferredCANetwork'
 import { DropdownRegistry } from '../../../components/DropdownRegistry'
 import { DropdownTrustedUsers } from '../../../components/DropdownTrustedUsers'
 import { InputPanelSettings } from '../../../components/InputPanelSettings'
@@ -442,6 +443,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 }}
               />
             </div>
+          </SettingItem>
+          <SettingItem title="Preferred Connected Accounts Network" component={<></>}>
+            <DropdownPreferredCANetwork />
           </SettingItem>
         </SettingWrapper>
         <SettingWrapper title="Providers">

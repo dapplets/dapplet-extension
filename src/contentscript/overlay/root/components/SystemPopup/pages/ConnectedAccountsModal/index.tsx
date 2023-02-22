@@ -21,7 +21,6 @@ interface IConnectedAccountsModalProps {
     frameId: string
   }
   onCloseClick: () => void
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   bus: Bus
 }
 
@@ -116,18 +115,15 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
 
   useEffect(() => {
     const fn = async () => {
-      // let requestId: number
       const { requestConnectingAccountsVerification } = await initBGFunctions(browser)
       try {
-        /*requestId = */ await requestConnectingAccountsVerification(requestBody, null)
+        await requestConnectingAccountsVerification(requestBody, null)
       } catch (err) {
         if (err.message !== 'User rejected the transaction.')
           console.log('Error in requestConnectingAccountsVerification().', err)
       }
 
       setIsWaiting(false)
-      // const frameId = data.frameId
-      // bus.publish('ready', [frameId, { requestId }])
       bus.publish('ready')
       setRequestBody(null)
       onCloseClick()
@@ -157,6 +153,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         if (firstAccount.origin.indexOf('ethereum') === 0) {
           const ethSignature = await getSignature(
             secondAccount.name,
+            secondAccount.origin,
             firstAccount.name,
             firstAccount.origin,
             statement
@@ -173,6 +170,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         } else if (secondAccount.origin.indexOf('ethereum') === 0) {
           const ethSignature = await getSignature(
             firstAccount.name,
+            firstAccount.origin,
             secondAccount.name,
             secondAccount.origin,
             statement
@@ -189,7 +187,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         } else {
           throw new Error(
             'Wrong wallet types to connect: ' + firstAccount.origin + ', ' + secondAccount.origin
-          ) // ERROR!!!!
+          )
         }
       } catch (err) {
         console.log(err)
@@ -208,16 +206,13 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         secondProofUrl,
         isUnlink,
       }
-      // let requestId: number
       try {
-        /*requestId =*/ await requestConnectingAccountsVerification(body, minStakeAmount)
+        await requestConnectingAccountsVerification(body, minStakeAmount)
       } catch (err) {
         if (err.message !== 'User rejected the transaction.')
           console.log('Error in requestConnectingAccountsVerification().', err)
       }
       setIsWaiting(false)
-      // const frameId = data.frameId
-      // bus.publish('ready', [frameId, { requestId }])
       bus.publish('ready')
       onCloseClick()
     }
@@ -235,8 +230,6 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     }
 
     setIsWaiting(false)
-    // const frameId = data.frameId
-    // bus.publish('ready', [frameId, 'ok'])
     bus.publish('ready')
     onCloseClick()
   }
@@ -284,8 +277,6 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         content={`Add your NEAR account ID to your ${socialNetworkToConnect} username. This is done so the Oracle can confirm your ownership of the ${socialNetworkToConnect} account`}
         onClose={onCloseClick}
         onConfirm={async () => {
-          // const frameId = data.frameId
-          // bus.publish('ready', [frameId, 'ok'])
           bus.publish('ready')
           onCloseClick()
         }}
