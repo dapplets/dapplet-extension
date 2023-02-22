@@ -2,6 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import * as EventBus from '../../../../../common/global-event-bus'
 import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
 import useAbortController from '../../hooks/useAbortController'
 import styles from './DropdownSettings.module.scss'
@@ -10,10 +11,11 @@ type TDropdownSettingsProps = {
   values: { [s: number]: number | string }
   getterName: string
   setterName: string
+  event?: string
 }
 
 export const DropdownSettings = (props: TDropdownSettingsProps) => {
-  const { values, getterName, setterName } = props
+  const { values, getterName, setterName, event } = props
   const [isOpen, setOpen] = useState(false)
   const [selectedValue, setSelectedValue] = useState('')
   const abortController = useAbortController()
@@ -38,6 +40,7 @@ export const DropdownSettings = (props: TDropdownSettingsProps) => {
     await backgroundFunctions[setterName](storage)
     loadValueFromStorage()
     func(false)
+    event && EventBus.emit(event)
   }
   return !getterName ? (
     <></>

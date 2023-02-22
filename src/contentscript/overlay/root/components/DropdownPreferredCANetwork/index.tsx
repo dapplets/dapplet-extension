@@ -5,7 +5,8 @@ import { DropdownSettings } from '../DropdownSettings'
 export const DropdownPreferredCANetwork = () => (
   <DropdownSettings
     values={NearNetworks}
-    getterName={'getPreferredConnectedAccountsNetwork'}
-    setterName={'setPreferredConnectedAccountsNetwork'}
+    getterName="getPreferredConnectedAccountsNetwork"
+    setterName="setPreferredConnectedAccountsNetwork"
+    event="connected_accounts_changed"
   />
 )
