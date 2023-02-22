@@ -47,6 +47,7 @@ export class AnalyticsService {
     url.searchParams.set('h', time.getHours().toString())
     url.searchParams.set('m', time.getMinutes().toString())
     url.searchParams.set('s', time.getSeconds().toString())
+    url.searchParams.set('dimension2', EXTENSION_VERSION)
 
     if (userAgentName) {
       url.searchParams.set('uid', userAgentName)
