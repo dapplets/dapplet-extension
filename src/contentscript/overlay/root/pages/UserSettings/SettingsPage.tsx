@@ -1,4 +1,4 @@
-import Form from '@rjsf/core'
+import  { withTheme } from '@rjsf/core'
 import validator from '@rjsf/validator-ajv8'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { FC, useEffect, useState } from 'react'
@@ -28,7 +28,7 @@ export interface SettingsPageProps {
 }
 
 const theme = { widgets: { SelectWidget, TextWidget } }
-
+const Form = withTheme(theme)
 export const SettingsPage: FC<SettingsPageProps> = (props) => {
   const { mi, vi, schemaConfig, defaultConfig, isLoad, setLoad } = props
 
@@ -199,6 +199,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
                     setEdited(true)
                     setData(e.formData)
                   }}
+                  
                   validator={validator}
                 >
                   <div className={styles.wrapperButton}>
