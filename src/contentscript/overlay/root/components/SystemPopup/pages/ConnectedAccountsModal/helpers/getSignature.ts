@@ -1,14 +1,8 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { browser } from 'webextension-polyfill-ts'
-import { resources } from '../../../../../../../common/resources'
-import {
-  ChainTypes,
-  DefaultSigners,
-  EthSignature,
-  IConnectedAccountUser,
-} from '../../../../../../../common/types'
+import { ChainTypes, DefaultSigners, EthSignature } from '../../../../../../../../common/types'
 
-export const getSignature = async (
+const getSignature = async (
   firstAccountName: string,
   firstAccountOrigin: string,
   secondAccountName: string,
@@ -85,11 +79,4 @@ export const getSignature = async (
   return signature
 }
 
-export const areWeLinkingWallets = (
-  firstAccount: IConnectedAccountUser,
-  secondAccount: IConnectedAccountUser
-) =>
-  !resources[firstAccount.origin].proofUrl(firstAccount.name) &&
-  !resources[secondAccount.origin].proofUrl(secondAccount.name) &&
-  resources[firstAccount.origin].type === 'wallet' &&
-  resources[secondAccount.origin].type === 'wallet'
+export default getSignature

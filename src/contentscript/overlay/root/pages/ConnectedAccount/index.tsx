@@ -14,7 +14,7 @@ import {
   WalletTypes,
 } from '../../../../../common/types'
 import { Message } from '../../components/Message'
-import { areWeLinkingWallets } from '../../components/SystemPopup/pages/ConnectedAccountsModal/helpers'
+import areWeLinkingWallets from '../../components/SystemPopup/pages/ConnectedAccountsModal/helpers/areWeLinkingWallets'
 import { TabLoader } from '../../components/TabLoader'
 import useAbortController from '../../hooks/useAbortController'
 import Attention from './assets/attention.svg'
