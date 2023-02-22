@@ -292,10 +292,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         <TabLoader />
       ) : (
         <div
-          className={cn(styles.dappletsBlock, classNameBlock, {
-            [styles.noScroll]:
-              isNoContentScript || !filteredDapplets || filteredDapplets.length === 0,
-          })}
+          className={cn(styles.dappletsBlock, classNameBlock)}
         >
           {!isNoContentScript ? (
             filteredDapplets && filteredDapplets.length && filteredDapplets.length > 0 ? (
