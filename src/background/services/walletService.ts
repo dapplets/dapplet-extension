@@ -95,9 +95,9 @@ export class WalletService {
   async eth_getSignerFor(app: string | DefaultSigners, chain: ChainTypes): Promise<Signer> {
     if (!this._signersByApp.has(app)) {
       const me = this
-      const providerUrl = await this._globalConfigService.getEthereumProvider()
+      const { providerUrl, chainId } = await this._getChainParameters(chain)
       const signer = new (class extends Signer {
-        provider = new providers.JsonRpcProvider(providerUrl)
+        provider = new providers.StaticJsonRpcProvider(providerUrl, chainId)
 
         constructor() {
           super()
@@ -383,26 +383,17 @@ export class WalletService {
 
   private async _getWalletsMap() {
     if (!this._map) {
-      const promises = Promise.all([
-        this._globalConfigService.getEthereumProvider(),
-        this._globalConfigService.getXdaiProvider(),
-      ])
-
-      this._map = promises.then(([ethereumProviderUrl, xdaiProviderUrl]) => {
+      this._map = (async () => {
         const map = {}
 
         for (const chain in wallets) {
           map[chain] = {}
           for (const wallet in wallets[chain]) {
-            const providerUrl =
-              chain === ChainTypes.ETHEREUM_GOERLI
-                ? ethereumProviderUrl
-                : chain === ChainTypes.ETHEREUM_XDAI
-                ? xdaiProviderUrl
-                : null
+            const { providerUrl, chainId } = await this._getChainParameters(chain as ChainTypes)
 
             map[chain][wallet] = new wallets[chain][wallet]({
               providerUrl,
+              chainId,
               sendDataToPairingOverlay: this._overlayService.sendDataToPairingOverlay.bind(
                 this._overlayService
               ),
@@ -411,9 +402,28 @@ export class WalletService {
         }
 
         return map
-      })
+      })()
     }
 
     return this._map
+  }
+
+  private async _getChainParameters(chain: ChainTypes) {
+    switch (chain) {
+      case ChainTypes.ETHEREUM_GOERLI:
+        return {
+          chainId: 5,
+          providerUrl: await this._globalConfigService.getEthereumProvider(),
+        }
+
+      case ChainTypes.ETHEREUM_XDAI:
+        return {
+          chainId: 100,
+          providerUrl: await this._globalConfigService.getXdaiProvider(),
+        }
+
+      default:
+        return {}
+    }
   }
 }

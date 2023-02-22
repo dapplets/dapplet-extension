@@ -13,13 +13,14 @@ import {
   waitTab,
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
+import { AnalyticsGoals, AnalyticsService } from './services/analyticsService'
 import ConnectedAccountService from './services/connectedAccountService'
 // import DiscordService from './services/discordService'
 import EnsService from './services/ensService'
-import * as EventService from './services/eventService'
 import FeatureService from './services/featureService'
 import GithubService from './services/githubService'
 import GlobalConfigService from './services/globalConfigService'
+import { NotificationService } from './services/notificationService'
 import { OverlayService } from './services/overlayService'
 import ProxyService from './services/proxyService'
 import { SessionService } from './services/sessionService'
@@ -30,7 +31,9 @@ import { WalletService } from './services/walletService'
 // ToDo: It looks like facade and requires a refactoring probably.
 tracing.startTracing()
 
+const notificationService = new NotificationService()
 const globalConfigService = new GlobalConfigService()
+const analyticsService = new AnalyticsService(globalConfigService)
 const suspendService = new SuspendService(globalConfigService)
 const overlayService = new OverlayService()
 const proxyService = new ProxyService(globalConfigService)
@@ -38,7 +41,12 @@ const githubService = new GithubService(globalConfigService)
 // const discordService = new DiscordService(globalConfigService)
 const walletService = new WalletService(globalConfigService, overlayService)
 const sessionService = new SessionService(walletService, overlayService)
-const featureService = new FeatureService(globalConfigService, walletService, overlayService)
+const featureService = new FeatureService(
+  globalConfigService,
+  walletService,
+  notificationService,
+  analyticsService
+)
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
 
@@ -143,12 +151,18 @@ browser.runtime.onMessage.addListener(
     setGlobalConfig: (config) => globalConfigService.set(config),
     getDevMode: () => globalConfigService.getDevMode(),
     setDevMode: (isActive) => globalConfigService.setDevMode(isActive),
-    getEvents: EventService.getEvents,
-    addEvent: EventService.addEvent,
-    setRead: EventService.setRead,
-    deleteEvent: EventService.deleteEvent,
-    deleteAllEvents: EventService.deleteEventsAll,
-    getNewEventsCount: EventService.getNewEventsCount,
+    getNotifications: (type) => notificationService.getNotifications(type),
+    createAndShowNotification: (notify, tabId?, icon?) =>
+      notificationService.createAndShowNotification(notify, tabId, icon),
+    createNotification: (notify, icon) => notificationService.createNotification(notify, icon),
+    showNotification: (notificationId, tabId) =>
+      notificationService.showNotification(notificationId, tabId),
+    deleteNotification: (id) => notificationService.deleteNotification(id),
+    deleteAllNotifications: () => notificationService.deleteAllNotifications(),
+    markNotificationAsViewed: (id) => notificationService.markNotificationAsViewed(id),
+    markAllNotificationsAsViewed: () => notificationService.markAllNotificationsAsViewed(),
+    getUnreadNotificationsCount: (source?) =>
+      notificationService.getUnreadNotificationsCount(source),
     getInitialConfig: () => globalConfigService.getInitialConfig(),
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),
@@ -267,6 +281,9 @@ browser.runtime.onMessage.addListener(
     changeConnectedAccountStatus:
       connectedAccountService.changeStatus.bind(connectedAccountService),
     getConnectedAccountsPairs: connectedAccountService.getPairs.bind(connectedAccountService),
+
+    // Analytics Service
+    track: analyticsService.track.bind(analyticsService),
 
     // Helpers
     waitTab: (url) => waitTab(url),
@@ -404,10 +421,15 @@ browser.runtime.onMessage.addListener((message, sender) => {
   }
 })
 
-browser.browserAction.onClicked.addListener(() => overlayService.openPopupOverlay('dapplets'))
+browser.browserAction.onClicked.addListener(() => {
+  overlayService.openPopupOverlay('dapplets')
+  analyticsService.track({ idgoal: AnalyticsGoals.ExtensionIconClicked })
+})
 
 // Set predefined configuration when extension is installed
 browser.runtime.onInstalled.addListener(async (details) => {
+  analyticsService.track({ idgoal: AnalyticsGoals.ExtensionInstalled })
+
   // Find predefined config URL in downloads
   if (details.reason !== 'install') return
   const downloads = await browser.downloads.search({

@@ -27,6 +27,8 @@ export class GlobalConfig extends Base {
 
   errorReporting = true // indirectly affects on '/src/common/logger.ts'
 
+  userTracking = true
+
   userAgentId: string = null
 
   userAgentName: string = null

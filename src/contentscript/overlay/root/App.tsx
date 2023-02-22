@@ -14,6 +14,7 @@ import {
 } from 'react-router-dom'
 import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../background/dto/manifestDTO'
+import { AnalyticsGoals } from '../../../background/services/analyticsService'
 import { Bus } from '../../../common/bus'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import * as EventBus from '../../../common/global-event-bus'
@@ -173,6 +174,12 @@ class _App extends React.Component<P, S> {
     this.setState({ isDevMode })
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.location.pathname !== this.props.location.pathname) {
+      initBGFunctions(browser).then((x) => x.track({ url: this.props.location.pathname }))
+    }
+  }
+
   handleDappletDeactivated = (dapplet: any) => {
     // close tabs of deactivated dapplets (including their settings)
     const tabsToBeClosed = this.getTabs().filter((x) => x.id === dapplet.name)
@@ -289,6 +296,7 @@ class _App extends React.Component<P, S> {
   }
 
   handleStoreButtonClick = () => {
+    initBGFunctions(browser).then((x) => x.track({ idgoal: AnalyticsGoals.MovedToStore }))
     window.open(DAPPLETS_STORE_URL, '_blank')
   }
 
@@ -494,8 +502,6 @@ class _App extends React.Component<P, S> {
     const p = this.props
     const s = this.state
 
-    // if (p.hidden) return null
-
     const overlays = this.getOverlays()
     // TODO: naming wallets is the notification
     const { pathname } = this.props.location!
@@ -602,13 +608,14 @@ class _App extends React.Component<P, S> {
                 className={cn(styles.children, 'dapplets-overlay-nav-content-list', {
                   [styles.newChildren]:
                     pathname !== '/system/dapplets' &&
-                    pathname !== '/system/notifications' &&
+                    // pathname !== '/system/notifications' &&
                     pathname !== '/system/connectedAccounts' &&
                     pathname !== '/system/settings',
                   // [styles.newHeight]:s.isOpenSearch && pathname === '/system/dapplets'
                 })}
               >
-                {pathname === '/system/dapplets' && (
+                {!p.hidden && pathname === '/system/dapplets' && (
+                  // ^ do not load the dapplets list until a user has opened the overlay
                   <Dapplets
                     search={s.search}
                     onUserSettingsClick={this.handleUserSettingsClick}

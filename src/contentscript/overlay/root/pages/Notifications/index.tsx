@@ -1,105 +1,224 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en'
+
 import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { Event } from '../../../../../common/models/event'
-import { CloseIcon } from '../../components/CloseIcon'
+import {
+  Notification as Notify,
+  NotificationStatus,
+  NotificationType,
+} from '../../../../../common/models/notification'
+
+import * as EventBus from '../../../../../common/global-event-bus'
+import IconDefault from '../../assets/icons/notificationIcons/defaultIcon.svg'
 import { Notification } from '../../components/Notification'
 import { TabLoader } from '../../components/TabLoader'
-import useAbortController from '../../hooks/useAbortController'
 import styles from './Notifications.module.scss'
 
-TimeAgo.addLocale(en)
-
 export const Notifications = () => {
-  const [event, setEvent] = useState([])
+  const [event, setEvent] = useState<Notify[]>([])
+
   const [load, setLoad] = useState(true)
-  const abortController = useAbortController()
+  const [isOlder, setOlder] = useState(false)
+  const [count, setCount] = useState(5)
+  const [loadNotify, setLoadNotify] = useState(false)
+
+  const counter = () => {
+    setCount((prevState) => prevState + 5)
+  }
+
   useEffect(() => {
     const init = async () => {
       const notifications = await getNotifications()
-      if (!abortController.signal.aborted) {
-        setEvent(notifications)
-        setLoad(false)
-      }
+
+      setEvent(notifications)
+      setLoad(false)
+      // checkUpdates()
     }
     init()
-    return () => {
-      abortController.abort
+    return () => {}
+  }, [load])
+
+  useEffect(() => {
+    const handleUpdateNotifications = async () => {
+      const notifications = await getNotifications()
+      setEvent(
+        notifications && notifications.filter((x) => x.status === NotificationStatus.Highlighted)
+      )
     }
-  }, [event, load, abortController.signal.aborted])
+
+    EventBus.on('notifications_updated', handleUpdateNotifications)
+
+    return () => {
+      EventBus.off('notifications_updated', handleUpdateNotifications)
+    }
+  }, [])
 
   const getNotifications = async () => {
     const backgroundFunctions = await initBGFunctions(browser)
-    const { getEvents, setRead } = backgroundFunctions
+    const { getNotifications } = backgroundFunctions
+    // todo: argument mocked
+    const notifications: Notify[] = await getNotifications(NotificationType.Application)
 
-    const notifications: Event[] = await getEvents()
     return notifications
   }
 
   const onRemoveEvent = async (f) => {
-    const { deleteEvent, getCurrentContextIds } = await initBGFunctions(browser)
+    const { deleteNotification, getCurrentContextIds } = await initBGFunctions(browser)
 
     const contextIds = await getCurrentContextIds(null)
 
-    await deleteEvent(f.id, contextIds)
+    await deleteNotification(f.id, contextIds)
 
     const d = event.filter((x) => x.id !== f.id)
     setEvent(d)
   }
+
   const onRemoveEventsAll = async (f) => {
-    const { deleteAllEvents } = await initBGFunctions(browser)
-    await deleteAllEvents(f)
-    setEvent(f)
+    setLoadNotify(true)
+    const { markAllNotificationsAsViewed, deleteAllNotifications } = await initBGFunctions(browser)
+    await markAllNotificationsAsViewed(f)
+    setTimeout(() => setLoadNotify(false), 1000)
+    const notification = await getNotifications()
+    setEvent(notification)
+  }
+
+  const checkUpdates = async () => {
+    const { getNewExtensionVersion } = await initBGFunctions(browser)
+    const isUpdateAvailable = await getNewExtensionVersion()
+  }
+
+  const getReadNotifications = async (id) => {
+    const { markNotificationAsViewed } = await initBGFunctions(browser)
+
+    await markNotificationAsViewed(id)
+
+    const notification = await getNotifications()
+    setEvent(notification)
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} data-testid="notification">
       <>
         {load ? (
           <TabLoader />
         ) : (
-          <>
-            {(event.length && (
-              <div className={styles.block}>
-                <div className={styles.notification}>
-                  {event.length > 0 &&
-                    event.map((x, i) => {
-                      return (
-                        <Notification
-                          onClear={() => {
-                            setTimeout(() => {
-                              onRemoveEvent(x)
-                            }, 500)
-                          }}
-                          key={x.id}
-                          label={'System'}
-                          title={x.title}
-                          description={x.description}
-                          _id={x.id}
-                          date={x.created}
-                        />
-                      )
-                    })}
-                </div>
+          <div className={styles.block}>
+            <div className={styles.warning}>
+              <span>Some of the network functions are not available.</span>
+              <span>We are already working on a solution.</span>
+            </div>
 
-                <div className={styles.notificationClose}>
-                  <CloseIcon
-                    onClick={() => onRemoveEventsAll(event)}
-                    appearance="big"
-                    color="red"
-                  />
-                  <span className={styles.clearAll}>Clear all</span>
+            <div className={styles.notification}>
+              <>
+                <div className={styles.titleWrapper}>
+                  <span className={styles.titleBlock}>Announcements</span>
+                  <div className={styles.delimeter}></div>
                 </div>
-              </div>
-            )) ||
-              ''}
-          </>
+                <span className={styles.notOlder}>Nothing here</span>
+              </>
+
+              <>
+                <div className={styles.titleWrapper}>
+                  <span className={styles.titleBlock}>From dapplets</span>
+                  <div className={styles.delimeter}></div>
+                </div>
+                {loadNotify ? (
+                  // todo: unificate loaders
+                  // todo: unificate bg in pages
+                  <div className={styles.loaderNotify}></div>
+                ) : (
+                  <>
+                    {event.length > 0 &&
+                      event
+                        .filter((x) => x.status === NotificationStatus.Highlighted)
+                        .map((x, i) => {
+                          return (
+                            <Notification
+                              onClear={getReadNotifications}
+                              // todo: mocked
+                              icon={x.icon ? x.icon : IconDefault}
+                              //
+                              key={x.id}
+                              label={'System'}
+                              title={x.title}
+                              description={x.message}
+                              _id={x.id}
+                              date={x.createdAt}
+                            />
+                          )
+                        })}
+                  </>
+                )}
+
+                <div className={styles.btnGroup}>
+                  <button
+                    data-testid="notification-show-old"
+                    className={styles.btnNotification}
+                    onClick={() => setOlder(!isOlder)}
+                  >
+                    Show old
+                  </button>
+                  <button
+                    className={styles.btnNotification}
+                    onClick={() => onRemoveEventsAll(event)}
+                    disabled={
+                      event &&
+                      event.filter((x) => x.status === NotificationStatus.Highlighted).length === 0
+                    }
+                  >
+                    Dismiss all
+                  </button>
+                </div>
+              </>
+
+              {isOlder ? (
+                <>
+                  <div className={styles.titleWrapper}>
+                    <span className={styles.titleBlock}>Older notifications</span>
+                    <div className={styles.delimeter}></div>
+                  </div>
+                  {event.length > 0 &&
+                    event
+                      .filter((x) => x.status === NotificationStatus.Default)
+                      .map((x, i) => {
+                        if (i < count) {
+                          return x ? (
+                            <Notification
+                              onClear={() => {
+                                onRemoveEvent(x)
+                              }}
+                              // todo: mocked
+                              icon={x.icon ? x.icon : IconDefault}
+                              //
+                              key={x.id}
+                              label={'System'}
+                              title={x.title}
+                              description={x.message}
+                              _id={x.id}
+                              date={x.createdAt}
+                              isRead={x.status}
+                            />
+                          ) : (
+                            <span className={styles.notOlder}>Nothing here</span>
+                          )
+                        }
+                      })}
+
+                  <button
+                    disabled={
+                      count >= event.filter((x) => x.status === NotificationStatus.Default).length
+                    }
+                    className={styles.btnNotification}
+                    onClick={() => counter()}
+                  >
+                    Load more
+                  </button>
+                </>
+              ) : null}
+            </div>
+          </div>
         )}
       </>
-
-      {!event.length && <div className={styles.noNot}>There are no notifications</div>}
     </div>
   )
 }

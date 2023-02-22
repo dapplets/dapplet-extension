@@ -7,15 +7,8 @@
 
   box-sizing: border-box;
   width: 52px;
-
-  // max-width: 52px;
-  // margin-top: 6px;
   padding: 10px;
 
-  // padding-bottom: 15px;
-
-  // border-radius: 10px 0 0 10px;
-  // background: #f5f5f5;
   background: #fff;
   border-radius: 4px 0 0;
 
@@ -36,7 +29,7 @@
   justify-content: space-around;
 
   width: 100%;
-    height: 100%;
+  height: 100%;
   margin-top: 4px;
   margin-bottom: 0;
   padding-left: 0;
@@ -64,25 +57,24 @@
   background-color: #fff;
   border-radius: 50%;
 
-svg{
-  transform: scale(0.7);
-  margin-top: -3px;
-  margin-left: -4px;
+  svg {
+    transform: scale(0.7);
+    margin-top: -3px;
+    margin-left: -4px;
 
-  path{
-    fill: $Primary!important;
+    path {
+      fill: $Primary !important;
+    }
+
+    &:hover {
+      fill: $PrimaryHover !important;
+    }
   }
 
-  &:hover{
-    fill: $PrimaryHover!important;
-  }
-
-}
-
-  &:hover{
-    svg{
-      path{
-        fill: $PrimaryHover!important;
+  &:hover {
+    svg {
+      path {
+        fill: $PrimaryHover !important;
       }
     }
   }
@@ -107,14 +99,7 @@ svg{
 .tabNotActive {
   cursor: pointer;
 
-  // background: #eaf0f0;
-  // background-image: none !important;
-
-  // box-shadow: inset -2px 0 4px rgb(0 0 0 / 25%);
-
   img {
-    // filter: grayscale(100%);
-
     &:hover {
       filter: none;
     }
@@ -182,7 +167,6 @@ svg{
   margin-top: 11px;
 
   svg {
-    // width: 100%;
   }
 
   &:nth-child(2),
@@ -234,10 +218,6 @@ svg{
     }
   }
 }
-
-// .selected path {
-//   fill: $Primary !important;
-// }
 
 .icon {
   &:hover path {

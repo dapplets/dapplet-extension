@@ -14,6 +14,7 @@ import {
   parseModuleName,
 } from '../common/helpers'
 import { JsonRpc } from '../common/jsonrpc'
+import { NotificationType } from '../common/models/notification'
 import { DefaultConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
@@ -110,6 +111,7 @@ export class Injector {
 
     const orderedModules = loadedModules.map((l) => {
       const m = modules.find((m) => areModulesEqual(m, l.manifest))
+
       return {
         ...l,
         order: m?.order,
@@ -322,7 +324,7 @@ export class Injector {
     const {
       optimizeDependency,
       getModulesWithDeps,
-      addEvent,
+      createAndShowNotification,
       getSwarmGateway,
       getPreferedOverlayStorage,
     } = await initBGFunctions(browser)
@@ -432,6 +434,13 @@ export class Injector {
         connectedAccounts: core.connectedAccounts,
         fetch: core.fetch,
         getPreferredConnectedAccountsNetwork: core.getPreferredConnectedAccountsNetwork,
+        notify: async (payload) => {
+          // ToDo: do not fetch manifest twice
+          const { getModuleInfoByName } = await initBGFunctions(browser)
+          const registry = manifest.registryUrl
+          const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, manifest.name)
+          await core.notify(payload, moduleInfo.icon?.uris?.[0])
+        },
       }
 
       let newBranch: string = null
@@ -562,10 +571,12 @@ export class Injector {
       }
 
       if (newBranch) {
-        addEvent(
-          'Branch resolving',
-          `Resolver of "${manifest.name}" defined the "${newBranch}" branch`
-        )
+        const { createNotification } = await initBGFunctions(browser)
+        await createNotification({
+          title: 'Branch resolving',
+          message: `Resolver of "${manifest.name}" defined the "${newBranch}" branch`,
+          type: NotificationType.System,
+        })
         const optimizedBranch = await optimizeDependency(
           manifest.name,
           newBranch,

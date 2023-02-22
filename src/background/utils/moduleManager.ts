@@ -2,13 +2,14 @@ import JSZip from 'jszip'
 import { maxSatisfying } from 'semver'
 import { TopologicalSort } from 'topological-sort'
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
-import { areModulesEqual } from '../../common/helpers'
+import { areModulesEqual, generateGuid } from '../../common/helpers'
+import { NotificationType } from '../../common/models/notification'
 import { DefaultConfig, SchemaConfig, StorageRef } from '../../common/types'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 import { RegistryAggregator } from '../registries/registryAggregator'
-import { addEvent } from '../services/eventService'
 import GlobalConfigService from '../services/globalConfigService'
+import { NotificationService } from '../services/notificationService'
 import { WalletService } from '../services/walletService'
 
 export default class ModuleManager {
@@ -17,6 +18,7 @@ export default class ModuleManager {
   constructor(
     private _globalConfigService: GlobalConfigService,
     private _walletService: WalletService,
+    private _notificationService: NotificationService,
     private _storage: StorageAggregator
   ) {
     this.registryAggregator = new RegistryAggregator(this._globalConfigService, this._walletService)
@@ -255,7 +257,6 @@ export default class ModuleManager {
     // ToDo: Replace '>=' to '^'
     const prefix = '>=' // https://devhints.io/semver
     const range = prefix + version
-
     const allVersions = await this.registryAggregator.getVersions(name, branch)
 
     if (allVersions.length === 0) {
@@ -267,10 +268,12 @@ export default class ModuleManager {
     // ToDo: catch null in optimizedVersion
 
     if (version != optimizedVersion) {
-      addEvent(
-        'Dependency Optimizer',
-        `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`
-      )
+      this._notificationService.createNotification({
+        title: 'Dependency Optimizer',
+        id: generateGuid(),
+        type: NotificationType.System,
+        message: `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`,
+      })
     }
 
     return {
