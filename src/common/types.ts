@@ -43,6 +43,11 @@ export enum NearNetworks {
   Testnet = 'testnet',
 }
 
+export enum OverlayStorages {
+  Centralized = 'centralized',
+  Decentralized = 'decentralized',
+}
+
 export type WalletDescriptor = {
   chain: ChainTypes
   type: WalletTypes

@@ -35,9 +35,9 @@ export const DropdownSettings = (props: TDropdownSettingsProps) => {
     }
   }
 
-  const writeToStorageSelectedValue = async (storage: string, func: (x) => void) => {
+  const writeToStorageSelectedValue = async (value: string, func: (x) => void) => {
     const backgroundFunctions = await initBGFunctions(browser)
-    await backgroundFunctions[setterName](storage)
+    await backgroundFunctions[setterName](value)
     loadValueFromStorage()
     func(false)
     event && EventBus.emit(event)
