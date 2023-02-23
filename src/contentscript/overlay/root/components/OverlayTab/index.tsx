@@ -19,6 +19,7 @@ import { ReactComponent as NotificationIcon } from '../../assets/icons/iconsWidg
 import { ReactComponent as Pause } from '../../assets/icons/iconsWidgetButton/pause.svg'
 import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
 import { ReactComponent as Event } from '../../assets/newIcon/notification.svg'
+import { ReactComponent as Close } from '../../assets/icons/close.svg'
 import { StorageRefImage } from '../../components/StorageRefImage'
 import { ToolbarTabMenu } from '../../types'
 import { ModuleIcon, ModuleIconProps } from '../ModuleIcon'
@@ -171,6 +172,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     const notifications = await getNotifications(NotificationType.Application)
     return notifications
   }
+  const _handleCloseClick: React.MouseEventHandler<HTMLSpanElement> = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    p.onCloseClick()
+  }
 
   return (
     <div
@@ -273,14 +279,14 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             storageRef={p.icon as any}
           />
         )}
-        {/* {!p.pinned && (
+        {!p.pinned && (
           <span className={cn(styles.close, p.classNameClose)} 
           onClick={_handleCloseClick}
           >
    
             <Close/>
           </span>
-        )} */}
+        )}
       </div>
 
       {
