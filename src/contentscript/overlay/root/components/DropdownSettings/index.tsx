@@ -56,7 +56,7 @@ export const DropdownSettings = (props: TDropdownSettingsProps) => {
         <DropdownIcon />
       </span>
       {isOpen && (
-        <div className={styles.openOverlay}>
+        <div className={styles.openOverlay} data-testid="opened-dropdown">
           <div className={styles.blockIcon}>
             <div className={styles.delimiterSpan}>{'\u2013'}</div>
             <span
@@ -73,6 +73,7 @@ export const DropdownSettings = (props: TDropdownSettingsProps) => {
               const { id, text } = item
               return (
                 <div
+                  data-testid={id}
                   className={cn(styles.item, {
                     [styles.activeItem]: text === selectedValue,
                   })}

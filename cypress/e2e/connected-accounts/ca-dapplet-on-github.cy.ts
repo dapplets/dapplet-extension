@@ -47,7 +47,7 @@ describe('CA: dapplet on GitHub', () => {
         .find('.account-container')
         .should('have.length.greaterThan', 1)
 
-      // find nik3ter.testnet among accounts
+      // find nikter.near among accounts
       cy.get('.dapplets-connected-accounts-wrapper').contains('nikter.near')
       //   })
       // )

@@ -26,7 +26,10 @@ export const SettingItem: FC<SettingItemProps> = (props: SettingItemProps) => {
   const isShowSettings = isShowAdditionalSettings && isVisibleAdditionalSettings
 
   return (
-    <div className={cn(styles.MainSettingsAuto, className)}>
+    <div
+      className={cn(styles.MainSettingsAuto, className)}
+      data-testid={title.toLowerCase().replaceAll(' ', '-')}
+    >
       <div className={styles.header}>
         <h3
           onClick={onShowAdditionalSettings}
