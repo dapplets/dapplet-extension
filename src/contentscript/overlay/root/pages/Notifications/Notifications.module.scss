@@ -44,7 +44,7 @@
 
 .notification {
   direction: rtl;
-  overflow-y: scroll;
+  overflow-y: auto;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;

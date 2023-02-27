@@ -306,7 +306,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       {isLoadingListDapplets ? (
         <TabLoader />
       ) : (
-        <div className={cn(styles.dappletsBlock, classNameBlock)}>
+        <div
+          className={cn(styles.dappletsBlock, classNameBlock)}
+        >
           {!isNoContentScript ? (
             filteredDapplets && filteredDapplets.length && filteredDapplets.length > 0 ? (
               filteredDapplets.map((dapplet, i) => {
