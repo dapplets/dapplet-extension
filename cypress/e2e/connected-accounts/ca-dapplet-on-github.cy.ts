@@ -11,7 +11,7 @@ describe('CA: dapplet on GitHub', () => {
       cy.openDappletsOverlay(url)
 
       // find Connecting Accounts dapplet
-      cy.get('dapplets-overlay-manager').contains('Connecting Accounts', {
+      cy.get('dapplets-overlay-manager').contains('Connected Accounts', {
         timeout: 30000,
         includeShadowDom: true,
       })
@@ -48,7 +48,7 @@ describe('CA: dapplet on GitHub', () => {
         .should('have.length.greaterThan', 1)
 
       // find nik3ter.testnet among accounts
-      cy.get('.dapplets-connected-accounts-wrapper').contains('nik4ter.testnet')
+      cy.get('.dapplets-connected-accounts-wrapper').contains('nikter.near')
       //   })
       // )
 
