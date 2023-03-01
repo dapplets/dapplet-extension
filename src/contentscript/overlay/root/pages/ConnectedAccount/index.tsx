@@ -18,9 +18,11 @@ import areWeLinkingWallets from '../../components/SystemPopup/pages/ConnectedAcc
 import { TabLoader } from '../../components/TabLoader'
 import useAbortController from '../../hooks/useAbortController'
 import Attention from './assets/attention.svg'
+import { ReactComponent as Info } from './assets/info.svg'
 import HOME_ICON from './assets/newHome.svg'
 import Ok from './assets/ok.svg'
 import Time from './assets/time.svg'
+import { ReactComponent as Trash } from './assets/trash.svg'
 import styles from './ConnectedAccount.module.scss'
 
 const UserButton = ({
@@ -53,6 +55,7 @@ export const ConnectedAccount = () => {
   >([])
   const [areAuthorizedWalletsConnected, setAreAuthorizedWalletsConnected] = useState(false)
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(true)
+  const [showConnectWalletsInfo, setShowConnectWalletsInfo] = useState(false)
   const abortController = useAbortController()
 
   const updatePairs = async (prevPairs?: IConnectedAccountsPair[]) => {
@@ -242,7 +245,7 @@ export const ConnectedAccount = () => {
         <TabLoader />
       ) : (
         <div className={cn(styles.wrapper, styles.scrollContent)}>
-          <div style={{ width: '97%' }}>
+          <div className={styles.connectWalletsBtnModule}>
             <button
               disabled={!walletsForConnectOrDisconnect.length || areAuthorizedWalletsConnected}
               className={styles.connectWalletsBtn}
@@ -250,6 +253,25 @@ export const ConnectedAccount = () => {
             >
               Connect wallets
             </button>
+            <button
+              className={cn(styles.connectWalletsBtnInfo, showConnectWalletsInfo && styles.active)}
+              onClick={() => setShowConnectWalletsInfo(!showConnectWalletsInfo)}
+            >
+              <Info />
+            </button>
+          </div>
+          <div className={styles.connectWalletsInfoWrapper}>
+            <div
+              className={cn(
+                styles.connectWalletsInfo,
+                showConnectWalletsInfo && styles.connectWalletsInfoVisible
+              )}
+            >
+              <p>You can connect your Ethereum account to your NEAR account.</p>
+              <p>
+                Add the wallets you want to connect to the WALLETS list above and click the button.
+              </p>
+            </div>
           </div>
           {!pairs || pairs.length === 0 ? (
             <Message
@@ -312,7 +334,9 @@ export const ConnectedAccount = () => {
                           (!areWallets && x.statusName !== ConnectedAccountsPairStatus.Connected) ||
                           (areWallets && !canDisconnectWallets)
                         }
-                      />
+                      >
+                        <Trash />
+                      </button>
                     </div>
                   </div>
                 )
