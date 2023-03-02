@@ -433,6 +433,7 @@ export class Injector {
         state: core.state,
         connectedAccounts: core.connectedAccounts,
         fetch: core.fetch,
+        getPreferredConnectedAccountsNetwork: core.getPreferredConnectedAccountsNetwork,
         notify: async (payload) => {
           // ToDo: do not fetch manifest twice
           const { getModuleInfoByName } = await initBGFunctions(browser)

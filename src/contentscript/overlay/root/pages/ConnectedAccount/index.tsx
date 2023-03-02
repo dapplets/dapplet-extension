@@ -9,17 +9,19 @@ import {
   ConnectedAccountsPairStatus,
   IConnectedAccountsPair,
   IConnectedAccountUser,
+  NearNetworks,
   WalletDescriptor,
-  WalletTypes,
 } from '../../../../../common/types'
 import { Message } from '../../components/Message'
-import { areWeLinkingWallets } from '../../components/SystemPopup/pages/ConnectedAccountsModal/helpers'
+import areWeLinkingWallets from '../../components/SystemPopup/pages/ConnectedAccountsModal/helpers/areWeLinkingWallets'
 import { TabLoader } from '../../components/TabLoader'
 import useAbortController from '../../hooks/useAbortController'
 import Attention from './assets/attention.svg'
+import { ReactComponent as Info } from './assets/info.svg'
 import HOME_ICON from './assets/newHome.svg'
 import Ok from './assets/ok.svg'
 import Time from './assets/time.svg'
+import { ReactComponent as Trash } from './assets/trash.svg'
 import styles from './ConnectedAccount.module.scss'
 
 const UserButton = ({
@@ -45,12 +47,14 @@ const UserButton = ({
 }
 
 export const ConnectedAccount = () => {
+  const [contractNetwork, setContractNetwork] = useState<NearNetworks>()
   const [pairs, setPairs] = useState<IConnectedAccountsPair[]>([])
   const [walletsForConnectOrDisconnect, setWalletsForConnectOrDisconnect] = useState<
     [IConnectedAccountUser, IConnectedAccountUser] | []
   >([])
   const [areAuthorizedWalletsConnected, setAreAuthorizedWalletsConnected] = useState(false)
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(true)
+  const [showConnectWalletsInfo, setShowConnectWalletsInfo] = useState(false)
   const abortController = useAbortController()
 
   const updatePairs = async (prevPairs?: IConnectedAccountsPair[]) => {
@@ -75,17 +79,28 @@ export const ConnectedAccount = () => {
   }
 
   useEffect(() => {
-    updatePairs().then(() => {
-      if (!abortController.signal.aborted) {
-        setLoadingListDapplets(false)
-      }
+    initBGFunctions(browser).then(async ({ getPreferredConnectedAccountsNetwork }) => {
+      const preferredConnectedAccountsNetwork: NearNetworks =
+        await getPreferredConnectedAccountsNetwork()
+      setContractNetwork(preferredConnectedAccountsNetwork)
     })
+    return () => {}
+  }, [abortController.signal.aborted])
+
+  useEffect(() => {
+    if (contractNetwork) {
+      updatePairs().then(() => {
+        if (!abortController.signal.aborted) {
+          setLoadingListDapplets(false)
+        }
+      })
+    }
 
     EventBus.on('wallet_changed', updatePairs)
     return () => {
       EventBus.off('wallet_changed', updatePairs)
     }
-  }, [abortController.signal.aborted])
+  }, [abortController.signal.aborted, contractNetwork])
 
   const findWalletsToConnect = async () => {
     const { getWalletDescriptors, getConnectedAccountStatus } = await initBGFunctions(browser)
@@ -96,61 +111,58 @@ export const ConnectedAccount = () => {
       setAreAuthorizedWalletsConnected(false)
       return
     }
-    const connectedEthWallet = connectedWalletsDescriptors.filter(
+
+    const connectedEthWallet = connectedWalletsDescriptors.find(
       (d: WalletDescriptor) =>
-        d.type === WalletTypes.METAMASK &&
-        (d.chain === ChainTypes.ETHEREUM_GOERLI || d.chain === ChainTypes.ETHEREUM_XDAI)
-    )[0]
-    if (!connectedEthWallet) {
-      setWalletsForConnectOrDisconnect([])
-      setAreAuthorizedWalletsConnected(false)
-      return
-    }
-    const connectedNearTestWallet = connectedWalletsDescriptors.filter(
-      (d: WalletDescriptor) => d.chain === ChainTypes.NEAR_TESTNET
-    )[0]
-    if (!connectedNearTestWallet) {
+        d.chain === ChainTypes.ETHEREUM_GOERLI || d.chain === ChainTypes.ETHEREUM_XDAI
+    )
+    const connectedNearWallet = connectedWalletsDescriptors.find((d: WalletDescriptor) =>
+      contractNetwork === NearNetworks.Testnet
+        ? d.chain === ChainTypes.NEAR_TESTNET
+        : d.chain === ChainTypes.NEAR_MAINNET
+    )
+    if (!connectedEthWallet || !connectedNearWallet) {
       setWalletsForConnectOrDisconnect([])
       setAreAuthorizedWalletsConnected(false)
       return
     }
 
-    const setAccounts = async () => {
-      const status1 = await getConnectedAccountStatus(connectedEthWallet.account, 'ethereum')
-      const connectedAccountUser1: IConnectedAccountUser = {
-        img: resources.ethereum.icon,
-        name: connectedEthWallet.account,
-        origin: connectedEthWallet.chain,
-        accountActive: status1,
-      }
-      const status2 = await getConnectedAccountStatus(
-        connectedNearTestWallet.account,
-        ChainTypes.NEAR_TESTNET
-      )
-      const connectedAccountUser2: IConnectedAccountUser = {
-        img: resources['near/testnet'].icon,
-        name: connectedNearTestWallet.account,
-        origin: ChainTypes.NEAR_TESTNET,
-        accountActive: status2,
-      }
-      setWalletsForConnectOrDisconnect([connectedAccountUser1, connectedAccountUser2])
+    const ethereumAccountStatus = await getConnectedAccountStatus(
+      connectedEthWallet.account,
+      'ethereum'
+    )
+    const connectedAccountUserEth: IConnectedAccountUser = {
+      img: resources.ethereum.icon,
+      name: connectedEthWallet.account,
+      origin: connectedEthWallet.chain,
+      accountActive: ethereumAccountStatus,
     }
 
-    // console.log('pairs', pairs)
+    const nearAccountStatus = await getConnectedAccountStatus(
+      connectedNearWallet.account,
+      contractNetwork === NearNetworks.Testnet ? ChainTypes.NEAR_TESTNET : ChainTypes.NEAR_MAINNET
+    )
+    const connectedAccountUserNear: IConnectedAccountUser = {
+      img: resources[contractNetwork === NearNetworks.Testnet ? 'near/testnet' : 'near/mainnet']
+        .icon,
+      name: connectedNearWallet.account,
+      origin:
+        contractNetwork === NearNetworks.Testnet
+          ? ChainTypes.NEAR_TESTNET
+          : ChainTypes.NEAR_MAINNET,
+      accountActive: nearAccountStatus,
+    }
+
     if (!pairs.length) {
       setAreAuthorizedWalletsConnected(false)
     } else {
       let areSameWallets = false
       for (const pair of pairs.filter((x) => x.closeness === 1)) {
         if (
-          (pair.firstAccount.name === connectedEthWallet.account &&
-            pair.firstAccount.origin === 'ethereum' &&
-            pair.secondAccount.name === connectedNearTestWallet.account &&
-            pair.secondAccount.origin === 'near/testnet') ||
-          (pair.secondAccount.name === connectedEthWallet.account &&
-            pair.secondAccount.origin === 'ethereum' &&
-            pair.firstAccount.name === connectedNearTestWallet.account &&
-            pair.firstAccount.origin === 'near/testnet')
+          compareAccounts(
+            [pair.firstAccount, pair.secondAccount],
+            [connectedAccountUserEth, connectedAccountUserNear]
+          )
         ) {
           areSameWallets = true
           break
@@ -158,12 +170,13 @@ export const ConnectedAccount = () => {
       }
       setAreAuthorizedWalletsConnected(areSameWallets)
     }
-    setAccounts()
+
+    setWalletsForConnectOrDisconnect([connectedAccountUserEth, connectedAccountUserNear])
   }
 
   useEffect(() => {
-    findWalletsToConnect()
-  }, [pairs])
+    if (contractNetwork) findWalletsToConnect()
+  }, [pairs, contractNetwork])
 
   const handleOpenPopup = async (account: IConnectedAccountUser) => {
     const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
@@ -220,7 +233,7 @@ export const ConnectedAccount = () => {
         <TabLoader />
       ) : (
         <div className={cn(styles.wrapper, styles.scrollContent)}>
-          <div style={{ width: '97%' }}>
+          <div className={styles.connectWalletsBtnModule}>
             <button
               disabled={!walletsForConnectOrDisconnect.length || areAuthorizedWalletsConnected}
               className={styles.connectWalletsBtn}
@@ -228,6 +241,25 @@ export const ConnectedAccount = () => {
             >
               Connect wallets
             </button>
+            <button
+              className={cn(styles.connectWalletsBtnInfo, showConnectWalletsInfo && styles.active)}
+              onClick={() => setShowConnectWalletsInfo(!showConnectWalletsInfo)}
+            >
+              <Info />
+            </button>
+          </div>
+          <div className={styles.connectWalletsInfoWrapper}>
+            <div
+              className={cn(
+                styles.connectWalletsInfo,
+                showConnectWalletsInfo && styles.connectWalletsInfoVisible
+              )}
+            >
+              <p>You can connect your Ethereum account to your NEAR account.</p>
+              <p>
+                Add the wallets you want to connect to the WALLETS list above and click the button.
+              </p>
+            </div>
           </div>
           {!pairs || pairs.length === 0 ? (
             <Message
@@ -262,18 +294,8 @@ export const ConnectedAccount = () => {
                   compareAccounts(walletsForConnectOrDisconnect, [x.firstAccount, x.secondAccount])
                 return (
                   <div key={i} className={styles.mainBlock}>
-                    <div
-                      className={cn(
-                        styles.accountBlock,
-                        // (x.firstAccount.name + x.secondAccount.name).length > 30
-                        //   ? styles.accountBlockVertical
-                        //   : styles.accountBlockHorizontal
-                        // styles.accountBlockHorizontal
-                        styles.accountBlockVertical
-                      )}
-                    >
+                    <div className={cn(styles.accountBlock, styles.accountBlockVertical)}>
                       <UserButton user={x.firstAccount} handleOpenPopup={handleOpenPopup} />
-                      {/* <span className={styles.arrowsAccount} /> */}
                       <UserButton user={x.secondAccount} handleOpenPopup={handleOpenPopup} />
                     </div>
                     <div className={cn(styles.accountStatus)}>
@@ -291,8 +313,6 @@ export const ConnectedAccount = () => {
                           alt={x.statusMessage}
                         />
                       </div>
-                      {/* </div>
-                    <div className={cn(styles.accountDelete)}> */}
                       <button
                         type="button"
                         onClick={() => handleDisconnectAccounts(x)}
@@ -302,7 +322,9 @@ export const ConnectedAccount = () => {
                           (!areWallets && x.statusName !== ConnectedAccountsPairStatus.Connected) ||
                           (areWallets && !canDisconnectWallets)
                         }
-                      />
+                      >
+                        <Trash />
+                      </button>
                     </div>
                   </div>
                 )

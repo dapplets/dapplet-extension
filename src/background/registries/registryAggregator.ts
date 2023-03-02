@@ -309,7 +309,10 @@ export class RegistryAggregator {
         signer: ethSigner,
       })
     } else if (uriType === UriTypes.Near) {
-      const nearAccount = await this._walletService.near_getAccount(DefaultSigners.EXTENSION)
+      const nearAccount = await this._walletService.near_getAccount(
+        DefaultSigners.EXTENSION,
+        ChainTypes.NEAR_TESTNET
+      )
       return new NearRegistry({ url: registryConfig.url, isDev: registryConfig.isDev, nearAccount })
     } else {
       return null

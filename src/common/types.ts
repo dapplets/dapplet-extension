@@ -38,6 +38,16 @@ export enum WalletTypes {
   DAPPLETS = 'dapplets',
 }
 
+export enum NearNetworks {
+  Mainnet = 'mainnet',
+  Testnet = 'testnet',
+}
+
+export enum OverlayStorages {
+  Centralized = 'centralized',
+  Decentralized = 'decentralized',
+}
+
 export type WalletDescriptor = {
   chain: ChainTypes
   type: WalletTypes

@@ -6,9 +6,13 @@ import { resources } from '../../../../../../../common/resources'
 import {
   EthSignature,
   IConnectedAccountUser,
-  TConnectedAccount,
+  NearNetworks,
 } from '../../../../../../../common/types'
-import { areWeLinkingWallets, getSignature } from './helpers'
+import areWeLinkingWallets from './helpers/areWeLinkingWallets'
+import askIfSameRequestsExist from './helpers/askIfSameRequestsExist'
+import checkIfTheAccountsHaveBeenAlreadyConnected from './helpers/checkIfTheAccountsHaveBeenAlreadyConnected'
+import getSignature from './helpers/getSignature'
+import getSocialOriginTitle from './helpers/getSocialOriginTitle'
 import { Modal } from './modal'
 import UserButton from './UserButton'
 
@@ -21,7 +25,6 @@ interface IConnectedAccountsModalProps {
     frameId: string
   }
   onCloseClick: () => void
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   bus: Bus
 }
 
@@ -49,42 +52,15 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const [requestWasDoneBefore, setRequestWasDoneBefore] = useState(false)
   const [areAccountsWallets, setAreAccountsWallets] = useState(false)
   const [requestBody, setRequestBody] = useState<TRequestBody>()
+  const [contractNetwork, setContractNetwork] = useState<NearNetworks>()
 
-  const askIfSameRequestsExist = async (
-    accounts: [IConnectedAccountUser, IConnectedAccountUser]
-  ) => {
-    const [firstAccount, secondAccount] = accounts
-    const firstAccountGlobalId = firstAccount.name + '/' + firstAccount.origin
-    const secondAccountGlobalId = secondAccount.name + '/' + secondAccount.origin
-    const { getConnectedAccountsPendingRequests, getConnectedAccountsVerificationRequest } =
-      await initBGFunctions(browser)
-    const a = await getConnectedAccountsPendingRequests()
-    for (let i = 0; i < a.length; i++) {
-      const b: { firstAccount: string; secondAccount: string } =
-        await getConnectedAccountsVerificationRequest(a[i])
-      const first = b.firstAccount
-      const second = b.secondAccount
-      const res =
-        (first === firstAccountGlobalId && second === secondAccountGlobalId) ||
-        (first === secondAccountGlobalId && second === firstAccountGlobalId)
-      return res
-    }
-    return false
-  }
-
-  const checkIfTheAccountsHaveBeenAlreadyConnected = async (
-    accounts: [IConnectedAccountUser, IConnectedAccountUser]
-  ) => {
-    const { getConnectedAccounts } = await initBGFunctions(browser)
-    const accountFirstCA: TConnectedAccount[][] = await getConnectedAccounts(
-      accounts[0].name,
-      accounts[0].origin,
-      1
-    )
-    const caGlobalNames = accountFirstCA[0].map((acc) => acc.id)
-    const secondAccountGlobalId = accounts[1].name + '/' + accounts[1].origin
-    return caGlobalNames.includes(secondAccountGlobalId)
-  }
+  useEffect(() => {
+    initBGFunctions(browser).then(async ({ getPreferredConnectedAccountsNetwork }) => {
+      const preferredConnectedAccountsNetwork: NearNetworks =
+        await getPreferredConnectedAccountsNetwork()
+      setContractNetwork(preferredConnectedAccountsNetwork)
+    })
+  }, [])
 
   useEffect(() => {
     const makeCheckup = async () => {
@@ -116,18 +92,15 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
 
   useEffect(() => {
     const fn = async () => {
-      // let requestId: number
       const { requestConnectingAccountsVerification } = await initBGFunctions(browser)
       try {
-        /*requestId = */ await requestConnectingAccountsVerification(requestBody, null)
+        await requestConnectingAccountsVerification(requestBody, null)
       } catch (err) {
         if (err.message !== 'User rejected the transaction.')
           console.log('Error in requestConnectingAccountsVerification().', err)
       }
 
       setIsWaiting(false)
-      // const frameId = data.frameId
-      // bus.publish('ready', [frameId, { requestId }])
       bus.publish('ready')
       setRequestBody(null)
       onCloseClick()
@@ -157,6 +130,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         if (firstAccount.origin.indexOf('ethereum') === 0) {
           const ethSignature = await getSignature(
             secondAccount.name,
+            secondAccount.origin,
             firstAccount.name,
             firstAccount.origin,
             statement
@@ -173,6 +147,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         } else if (secondAccount.origin.indexOf('ethereum') === 0) {
           const ethSignature = await getSignature(
             firstAccount.name,
+            firstAccount.origin,
             secondAccount.name,
             secondAccount.origin,
             statement
@@ -189,7 +164,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         } else {
           throw new Error(
             'Wrong wallet types to connect: ' + firstAccount.origin + ', ' + secondAccount.origin
-          ) // ERROR!!!!
+          )
         }
       } catch (err) {
         console.log(err)
@@ -208,16 +183,13 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         secondProofUrl,
         isUnlink,
       }
-      // let requestId: number
       try {
-        /*requestId =*/ await requestConnectingAccountsVerification(body, minStakeAmount)
+        await requestConnectingAccountsVerification(body, minStakeAmount)
       } catch (err) {
         if (err.message !== 'User rejected the transaction.')
           console.log('Error in requestConnectingAccountsVerification().', err)
       }
       setIsWaiting(false)
-      // const frameId = data.frameId
-      // bus.publish('ready', [frameId, { requestId }])
       bus.publish('ready')
       onCloseClick()
     }
@@ -235,20 +207,13 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
     }
 
     setIsWaiting(false)
-    // const frameId = data.frameId
-    // bus.publish('ready', [frameId, 'ok'])
     bus.publish('ready')
     onCloseClick()
   }
 
-  const getTitle = ([firstAccount, secondAccount]: IConnectedAccountUser[]) =>
-    resources[firstAccount.origin].type === 'social'
-      ? resources[firstAccount.origin].title
-      : resources[secondAccount.origin].title
-
   const socialNetworkToConnect =
     (accountsToConnect || accountsToDisconnect) &&
-    getTitle(accountsToConnect || accountsToDisconnect)
+    getSocialOriginTitle(accountsToConnect || accountsToDisconnect)
 
   if (wait) {
     return <Modal isWaiting={true} onClose={onCloseClick} />
@@ -284,8 +249,6 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         content={`Add your NEAR account ID to your ${socialNetworkToConnect} username. This is done so the Oracle can confirm your ownership of the ${socialNetworkToConnect} account`}
         onClose={onCloseClick}
         onConfirm={async () => {
-          // const frameId = data.frameId
-          // bus.publish('ready', [frameId, 'ok'])
           bus.publish('ready')
           onCloseClick()
         }}
@@ -309,9 +272,13 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
             : isWaiting
             ? 'Please approve NEAR transaction'
             : accountsToConnect[0].origin === 'twitter' || accountsToConnect[1].origin === 'twitter'
-            ? 'You need to have your NEAR account name listed in your Twitter profile name to link your accounts.\nExample: Sam Green (sam.testnet)'
+            ? `You need to have your NEAR account name listed in your Twitter profile name to link your accounts.\nExample: Sam Green (sam.${
+                contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'
+              })`
             : accountsToConnect[0].origin === 'github' || accountsToConnect[1].origin === 'github'
-            ? 'You need to have your NEAR account name listed in your GitHub profile name to link your accounts.\nExample: Sam Green (sam.testnet)'
+            ? `You need to have your NEAR account name listed in your GitHub profile name to link your accounts.\nExample: Sam Green (sam.${
+                contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'
+              })`
             : undefined
         }
         accounts={
@@ -345,10 +312,14 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
             ? 'Please approve NEAR transaction'
             : accountsToDisconnect[0].origin === 'twitter' ||
               accountsToDisconnect[1].origin === 'twitter'
-            ? 'You need to have your NEAR account name listed in your Twitter profile name to unlink your accounts.\nExample: Sam Green (sam.testnet)'
+            ? `You need to have your NEAR account name listed in your Twitter profile name to unlink your accounts.\nExample: Sam Green (sam.${
+                contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'
+              })`
             : accountsToDisconnect[0].origin === 'github' ||
               accountsToDisconnect[1].origin === 'github'
-            ? 'You need to have your NEAR account name listed in your GitHub profile name to unlink your accounts.\nExample: Sam Green (sam.testnet)'
+            ? `You need to have your NEAR account name listed in your GitHub profile name to unlink your accounts.\nExample: Sam Green (sam.${
+                contractNetwork === NearNetworks.Mainnet ? 'near' : 'testnet'
+              })`
             : undefined
         }
         accounts={

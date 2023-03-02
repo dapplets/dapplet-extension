@@ -31,6 +31,12 @@ export const resources: Resources = {
     icon: NEAR_ICON,
     proofUrl: () => null,
   },
+  'near/mainnet': {
+    title: 'NEAR Testnet',
+    type: 'wallet',
+    icon: NEAR_ICON,
+    proofUrl: () => null,
+  },
   ethereum: {
     title: 'Ethereum',
     type: 'wallet',

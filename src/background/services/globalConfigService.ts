@@ -8,6 +8,7 @@ import {
   typeOfUri,
   UriTypes,
 } from '../../common/helpers'
+import { NearNetworks } from '../../common/types'
 import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserStorage'
 import { GlobalConfig } from '../models/globalConfig'
 import SiteConfig from '../models/siteConfig'
@@ -38,7 +39,9 @@ const EXPORTABLE_PROPERTIES = [
   'dynamicAdapter',
   'preferedOverlayStorage',
   'myDapplets',
-  'connectedAccountContractAddress',
+  'connectedAccountsTestnetContractAddress',
+  'connectedAccountsMainnetContractAddress',
+  'preferredConnectedAccountsNetwork',
 ]
 
 export default class GlobalConfigService {
@@ -65,9 +68,15 @@ export default class GlobalConfigService {
       if (!config.myDapplets) config.myDapplets = this.getInitialConfig().myDapplets
       if (!config.targetStorages) config.targetStorages = this.getInitialConfig().targetStorages
       if (!config.xdaiProviderUrl) config.xdaiProviderUrl = this.getInitialConfig().xdaiProviderUrl
-      if (!config.connectedAccountsContractAddress)
-        config.connectedAccountsContractAddress =
-          this.getInitialConfig().connectedAccountsContractAddress
+      if (!config.connectedAccountsTestnetContractAddress)
+        config.connectedAccountsTestnetContractAddress =
+          this.getInitialConfig().connectedAccountsTestnetContractAddress
+      if (!config.connectedAccountsMainnetContractAddress)
+        config.connectedAccountsMainnetContractAddress =
+          this.getInitialConfig().connectedAccountsMainnetContractAddress
+      if (!config.preferredConnectedAccountsNetwork)
+        config.preferredConnectedAccountsNetwork =
+          this.getInitialConfig().preferredConnectedAccountsNetwork
       if (!config.pinnedDappletActions)
         config.pinnedDappletActions = this.getInitialConfig().pinnedDappletActions
     }
@@ -309,7 +318,9 @@ export default class GlobalConfigService {
       },
     ]
     config.myDapplets = []
-    config.connectedAccountsContractAddress = 'dev-1674551865700-67703371677231'
+    config.connectedAccountsTestnetContractAddress = 'dev-1674551865700-67703371677231'
+    config.connectedAccountsMainnetContractAddress = 'connected-accounts.near'
+    config.preferredConnectedAccountsNetwork = NearNetworks.Mainnet
     config.pinnedDappletActions = []
     return config
   }
@@ -800,8 +811,21 @@ export default class GlobalConfigService {
     }
   }
 
-  async getConnectedAccountsContractAddress() {
+  async getConnectedAccountsTestnetContractAddress() {
     const config = await this.get()
-    return config.connectedAccountsContractAddress
+    return config.connectedAccountsTestnetContractAddress
+  }
+
+  async getConnectedAccountsMainnetContractAddress() {
+    const config = await this.get()
+    return config.connectedAccountsMainnetContractAddress
+  }
+
+  async getPreferredConnectedAccountsNetwork() {
+    return this.get().then((x) => x.preferredConnectedAccountsNetwork)
+  }
+
+  async setPreferredConnectedAccountsNetwork(network: NearNetworks) {
+    return this.updateConfig((c) => (c.preferredConnectedAccountsNetwork = network))
   }
 }
