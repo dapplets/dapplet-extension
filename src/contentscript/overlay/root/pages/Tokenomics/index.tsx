@@ -12,7 +12,7 @@ export interface TokenomicsProps {
   isSupport?: boolean
 }
 
-export const Tokenimics: FC<TokenomicsProps> = (props) => {
+export const Tokenomics: FC<TokenomicsProps> = (props) => {
   const { setUnderConstructionDetails, isSupport = true, setTokenomics } = props
   const [isCreate, SetCreate] = useState(false)
   const [tokenName, setTokenName] = useState('')
