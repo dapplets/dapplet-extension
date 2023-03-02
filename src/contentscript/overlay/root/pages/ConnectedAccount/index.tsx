@@ -11,7 +11,6 @@ import {
   IConnectedAccountUser,
   NearNetworks,
   WalletDescriptor,
-  WalletTypes,
 } from '../../../../../common/types'
 import { Message } from '../../components/Message'
 import areWeLinkingWallets from '../../components/SystemPopup/pages/ConnectedAccountsModal/helpers/areWeLinkingWallets'
@@ -112,50 +111,46 @@ export const ConnectedAccount = () => {
       setAreAuthorizedWalletsConnected(false)
       return
     }
-    const connectedEthWallet = connectedWalletsDescriptors.filter(
+
+    const connectedEthWallet = connectedWalletsDescriptors.find(
       (d: WalletDescriptor) =>
-        d.type === WalletTypes.METAMASK &&
-        (d.chain === ChainTypes.ETHEREUM_GOERLI || d.chain === ChainTypes.ETHEREUM_XDAI)
-    )[0]
-    if (!connectedEthWallet) {
-      setWalletsForConnectOrDisconnect([])
-      setAreAuthorizedWalletsConnected(false)
-      return
-    }
-    const connectedNearWallet = connectedWalletsDescriptors.filter((d: WalletDescriptor) =>
+        d.chain === ChainTypes.ETHEREUM_GOERLI || d.chain === ChainTypes.ETHEREUM_XDAI
+    )
+    const connectedNearWallet = connectedWalletsDescriptors.find((d: WalletDescriptor) =>
       contractNetwork === NearNetworks.Testnet
         ? d.chain === ChainTypes.NEAR_TESTNET
         : d.chain === ChainTypes.NEAR_MAINNET
-    )[0]
-    if (!connectedNearWallet) {
+    )
+    if (!connectedEthWallet || !connectedNearWallet) {
       setWalletsForConnectOrDisconnect([])
       setAreAuthorizedWalletsConnected(false)
       return
     }
 
-    const setAccounts = async () => {
-      const status1 = await getConnectedAccountStatus(connectedEthWallet.account, 'ethereum')
-      const connectedAccountUser1: IConnectedAccountUser = {
-        img: resources.ethereum.icon,
-        name: connectedEthWallet.account,
-        origin: connectedEthWallet.chain,
-        accountActive: status1,
-      }
-      const status2 = await getConnectedAccountStatus(
-        connectedNearWallet.account,
-        contractNetwork === NearNetworks.Testnet ? ChainTypes.NEAR_TESTNET : ChainTypes.NEAR_MAINNET
-      )
-      const connectedAccountUser2: IConnectedAccountUser = {
-        img: resources[contractNetwork === NearNetworks.Testnet ? 'near/testnet' : 'near/mainnet']
-          .icon,
-        name: connectedNearWallet.account,
-        origin:
-          contractNetwork === NearNetworks.Testnet
-            ? ChainTypes.NEAR_TESTNET
-            : ChainTypes.NEAR_MAINNET,
-        accountActive: status2,
-      }
-      setWalletsForConnectOrDisconnect([connectedAccountUser1, connectedAccountUser2])
+    const ethereumAccountStatus = await getConnectedAccountStatus(
+      connectedEthWallet.account,
+      'ethereum'
+    )
+    const connectedAccountUserEth: IConnectedAccountUser = {
+      img: resources.ethereum.icon,
+      name: connectedEthWallet.account,
+      origin: connectedEthWallet.chain,
+      accountActive: ethereumAccountStatus,
+    }
+
+    const nearAccountStatus = await getConnectedAccountStatus(
+      connectedNearWallet.account,
+      contractNetwork === NearNetworks.Testnet ? ChainTypes.NEAR_TESTNET : ChainTypes.NEAR_MAINNET
+    )
+    const connectedAccountUserNear: IConnectedAccountUser = {
+      img: resources[contractNetwork === NearNetworks.Testnet ? 'near/testnet' : 'near/mainnet']
+        .icon,
+      name: connectedNearWallet.account,
+      origin:
+        contractNetwork === NearNetworks.Testnet
+          ? ChainTypes.NEAR_TESTNET
+          : ChainTypes.NEAR_MAINNET,
+      accountActive: nearAccountStatus,
     }
 
     if (!pairs.length) {
@@ -164,18 +159,10 @@ export const ConnectedAccount = () => {
       let areSameWallets = false
       for (const pair of pairs.filter((x) => x.closeness === 1)) {
         if (
-          (pair.firstAccount.name === connectedEthWallet.account &&
-          pair.firstAccount.origin === 'ethereum' &&
-          pair.secondAccount.name === connectedNearWallet.account &&
-          contractNetwork === NearNetworks.Testnet
-            ? pair.secondAccount.origin === 'near/testnet'
-            : pair.secondAccount.origin === 'near/mainnet') ||
-          (pair.secondAccount.name === connectedEthWallet.account &&
-          pair.secondAccount.origin === 'ethereum' &&
-          pair.firstAccount.name === connectedNearWallet.account &&
-          contractNetwork === NearNetworks.Testnet
-            ? pair.firstAccount.origin === 'near/testnet'
-            : pair.firstAccount.origin === 'near/mainnet')
+          compareAccounts(
+            [pair.firstAccount, pair.secondAccount],
+            [connectedAccountUserEth, connectedAccountUserNear]
+          )
         ) {
           areSameWallets = true
           break
@@ -183,7 +170,8 @@ export const ConnectedAccount = () => {
       }
       setAreAuthorizedWalletsConnected(areSameWallets)
     }
-    setAccounts()
+
+    setWalletsForConnectOrDisconnect([connectedAccountUserEth, connectedAccountUserNear])
   }
 
   useEffect(() => {
