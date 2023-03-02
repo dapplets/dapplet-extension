@@ -68,6 +68,12 @@ export default class GlobalConfigService {
       if (!config.myDapplets) config.myDapplets = this.getInitialConfig().myDapplets
       if (!config.targetStorages) config.targetStorages = this.getInitialConfig().targetStorages
       if (!config.xdaiProviderUrl) config.xdaiProviderUrl = this.getInitialConfig().xdaiProviderUrl
+      if (!config.connectedAccountsTestnetContractAddress)
+        config.connectedAccountsTestnetContractAddress =
+          this.getInitialConfig().connectedAccountsTestnetContractAddress
+      if (!config.connectedAccountsMainnetContractAddress)
+        config.connectedAccountsMainnetContractAddress =
+          this.getInitialConfig().connectedAccountsMainnetContractAddress
       if (!config.preferredConnectedAccountsNetwork)
         config.preferredConnectedAccountsNetwork =
           this.getInitialConfig().preferredConnectedAccountsNetwork
