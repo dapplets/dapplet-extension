@@ -1,4 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
@@ -214,8 +215,18 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
       )}
 
       {!isUnderConstruction && !isDappletsDetails && isUnderConstructionDetails && (
-        <div className={styles.wrapper}>
-          <div className={styles.title}>
+        <div
+          className={cn(styles.wrapper, {
+            [styles.wrapperTokenomics]:
+              activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS,
+          })}
+        >
+          <div
+            className={cn(styles.title, {
+              [styles.titleTokenomics]:
+                activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS,
+            })}
+          >
             <SettingTitle
               title="Info"
               onClick={() => setActiveTabUnderConstructionDetails(UnderConstructionDetails.INFO)}

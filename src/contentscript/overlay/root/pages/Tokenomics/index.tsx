@@ -1,9 +1,9 @@
 import cn from 'classnames'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useRef, useState } from 'react'
 import { Message } from '../../components/Message'
 import { Modal } from '../../components/Modal'
-import { SettingItem } from '../../components/SettingItem'
-import { SettingWrapper } from '../../components/SettingWrapper'
+import { RadioButtons } from './radioButtons'
+import { SelectToken } from './selectToken'
 import styles from './Tokenomics.module.scss'
 
 export interface TokenomicsProps {
@@ -11,167 +11,127 @@ export interface TokenomicsProps {
   setTokenomics: (x) => void
   isSupport?: boolean
 }
+enum ChoiseType {
+  New = 0,
+  Existing = 1,
+}
+export interface TokenInfo {
+  name: string
+  address: string
+  symbol: string
+  logoURI: string | null
+  price?: string | number
+  marketCup?: string | number
+  trading?: string | number
+}
 
 export const Tokenomics: FC<TokenomicsProps> = (props) => {
   const { setUnderConstructionDetails, isSupport = true, setTokenomics } = props
-  const [isCreate, SetCreate] = useState(false)
-  const [tokenName, setTokenName] = useState('')
-  const [tokenListing, setTokenListing] = useState('')
 
+  const [activeChoise, setActiveChoise] = useState(ChoiseType.Existing)
   const [isModal, setModal] = useState(false)
-  const [isInvalidTokenTicker, setInvalidTokenTicker] = useState(false)
-  const [isInvalidTokenName, setInvalidTokenName] = useState(false)
+  const [isAnimate, setAnimate] = useState(false)
+  const [selectToken, setSelectToken] = useState<TokenInfo>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
   const onClose = () => setModal(false)
-  const [visibleConfirm, setVisibleConfirm] = useState(true)
 
-  useEffect(() => {}, [
-    tokenListing,
-    tokenName,
-    isInvalidTokenTicker,
-    isInvalidTokenName,
-    visibleConfirm,
-  ])
+  // useEffect(() => {
+  //   const init = () => {
+  //     anime({
+  //       targets: wrapperRef.current,
+  //       translateX: () => {
+  //         if (isAnimate) {
+  //           return ['100%', '0%']
+  //         }
+  //       },
+  //       easing: 'linear',
+  //       duration: 300,
+  //     })
+  //   }
+  //   init()
+  //   return () => {}
+  // }, [isAnimate, wrapperRef])
+
   return (
-    <div className={styles.wrapper}>
-      {!isCreate && (
-        <div className={styles.blockMessage}>
-          <Message
-            title="Do you want to add tokenomics?"
-            subtitle="Be careful - this can only be done once"
-            link="F.A.Q"
-            linkText="F.A.Q"
-            children={
-              <button onClick={() => SetCreate(true)} className={styles.createTokenomics}>
-                CREATE
+    <div className={styles.wrapper} ref={wrapperRef}>
+      <div className={styles.blockMessage}>
+        <Message
+          title="Create new token or select existing?"
+          subtitle="Be careful - this can only be done once"
+          parentPage="tokenomics"
+          className={styles.messageWrapper}
+          children={
+            <div className={styles.choiseTokenWrapper}>
+              <div className={styles.radioButtonsBlock}>
+                <RadioButtons
+                  value="New token"
+                  title="New token"
+                  name="TokenChoise"
+                  id="1_choise"
+                  checked={activeChoise === ChoiseType.New}
+                  onChange={() => setActiveChoise(ChoiseType.New)}
+                />
+                <RadioButtons
+                  value="Existing token"
+                  title="Existing token"
+                  name="TokenChoise"
+                  id="2_choise"
+                  checked={activeChoise === ChoiseType.Existing}
+                  onChange={() => setActiveChoise(ChoiseType.Existing)}
+                />
+              </div>
+              {activeChoise === ChoiseType.Existing && (
+                <SelectToken
+                  setSelectToken={setSelectToken}
+                  selectToken={selectToken}
+                  setAnimate={setAnimate}
+                />
+              )}
+
+              <button
+                disabled={!selectToken}
+                onClick={() => setModal(true)}
+                className={styles.createTokenomics}
+              >
+                {activeChoise === ChoiseType.New ? 'Create new token' : 'Select token'}
               </button>
-            }
-          />
-        </div>
-      )}
-      {isCreate && (
-        <div className={styles.blockTokenParameters}>
-          <SettingWrapper
-            title="Token parameters"
-            className={styles.wrapperSettings}
-            children={
-              <div className={styles.blockTokenInfo}>
-                <SettingItem
-                  className={styles.titleToken}
-                  title="Token Name"
-                  component={
-                    <span
-                      data-title="for ex. - Ethereum, Tether, AugmentedWeb."
-                      className={cn(styles.tokenTitleInfo, {
-                        [styles.support]: isSupport,
-                      })}
-                    >
-                      i
-                    </span>
-                  }
-                  children={
-                    <input
-                      placeholder="Enter token name"
-                      className={cn(styles.inputTokenName, {
-                        [styles.inputTokenTickerInvalid]: isInvalidTokenName,
-                      })}
-                      value={tokenName}
-                      onChange={(e) => {
-                        setTokenName(e.target.value)
-                        if (tokenName.length < 1 || tokenName.length > 16) {
-                          setInvalidTokenName(true)
-                        } else {
-                          setInvalidTokenName(false)
-                        }
-                      }}
-                      onFocus={() => setInvalidTokenName(false)}
-                    />
-                  }
-                />
-                <SettingItem
-                  title="Token Ticker"
-                  className={styles.titleToken}
-                  component={
-                    <span
-                      style={{ margin: '0 0 0 1px' }}
-                      data-title="for ex. - ETH, USDT, AUGE"
-                      className={cn(styles.tokenTitleInfo, {
-                        [styles.support]: isSupport,
-                      })}
-                    >
-                      i
-                    </span>
-                  }
-                  children={
-                    <input
-                      placeholder="Enter token name"
-                      className={cn(styles.inputTokenName, styles.inputTokenTicker, {
-                        [styles.inputTokenTickerInvalid]: isInvalidTokenTicker,
-                      })}
-                      value={tokenListing}
-                      onFocus={() => setInvalidTokenTicker(false)}
-                      onChange={(e) => {
-                        setTokenListing(e.target.value)
+            </div>
+          }
+        />
+      </div>
 
-                        if (e.target.value.length <= 2 || e.target.value.length >= 5) {
-                          setInvalidTokenTicker(true)
-                        } else {
-                          setInvalidTokenTicker(false)
-                        }
-                      }}
-                    />
-                  }
-                />
-              </div>
-            }
-          />
-          {visibleConfirm && (
+      <Modal
+        classNameWrapper={styles.wraperModal}
+        visible={isModal}
+        title="Are you sure?"
+        content={
+          <div className={styles.finalWarning}>Final warning - you can't change it anymore</div>
+        }
+        footer={
+          <div className={styles.footerContentModal}>
             <button
-              disabled={
-                !(
-                  tokenName.length >= 1 &&
-                  tokenListing.length >= 1 &&
-                  !isInvalidTokenName &&
-                  !isInvalidTokenTicker
-                )
-              }
-              className={cn(styles.applyButtonDisabled, {
-                [styles.createTokenomics]:
-                  tokenName.length >= 1 &&
-                  tokenListing.length >= 1 &&
-                  !isInvalidTokenName &&
-                  !isInvalidTokenTicker,
-              })}
-              onClick={() => setModal(true)}
+              className={cn(styles.footerContentModalButton)}
+              onClick={() => {
+                onClose()
+                // setTokenomics(true)
+                // setVisibleConfirm(false)
+              }}
             >
-              Confirm
+              Accept
             </button>
-          )}
-
-          <Modal
-            visible={isModal}
-            title="Create Tokenomy"
-            content={
-              <div className={styles.finalWarning}>Final warning - you can't change it anymore</div>
-            }
-            footer={
-              <div className={styles.footerContentModal}>
-                <button
-                  className={cn(styles.footerContentModalButton)}
-                  onClick={() => {
-                    onClose()
-                    setTokenomics(true)
-                    setVisibleConfirm(false)
-                  }}
-                >
-                  Yes, I`m sure
-                </button>
-                <a className={styles.footerContentModalLink}>F.A.Q.</a>
-              </div>
-            }
-            onClose={onClose}
-          />
-        </div>
-      )}
+            {/* todo: correct src */}
+            <a
+              href="https://docs.dapplets.org/docs/whitepapers/auge-token-usage"
+              target="_blank"
+              className={styles.footerContentModalLink}
+            >
+              F.A.Q.
+            </a>
+          </div>
+        }
+        onClose={onClose}
+      />
 
       <div className={styles.linkNavigation}>
         <button onClick={() => setUnderConstructionDetails(false)} className={styles.back}>

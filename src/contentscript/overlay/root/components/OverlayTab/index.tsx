@@ -11,6 +11,7 @@ import {
   NotificationType,
 } from '../../../../../common/models/notification'
 import { DefaultSigners, StorageRef } from '../../../../../common/types'
+import { ReactComponent as Close } from '../../assets/icons/close.svg'
 import { ReactComponent as Account } from '../../assets/icons/iconsWidgetButton/account.svg'
 import { ReactComponent as Help } from '../../assets/icons/iconsWidgetButton/help.svg'
 import { ReactComponent as Login } from '../../assets/icons/iconsWidgetButton/login.svg'
@@ -19,7 +20,6 @@ import { ReactComponent as NotificationIcon } from '../../assets/icons/iconsWidg
 import { ReactComponent as Pause } from '../../assets/icons/iconsWidgetButton/pause.svg'
 import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
 import { ReactComponent as Event } from '../../assets/newIcon/notification.svg'
-import { ReactComponent as Close } from '../../assets/icons/close.svg'
 import { StorageRefImage } from '../../components/StorageRefImage'
 import { ToolbarTabMenu } from '../../types'
 import { ModuleIcon, ModuleIconProps } from '../ModuleIcon'
@@ -280,11 +280,8 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           />
         )}
         {!p.pinned && (
-          <span className={cn(styles.close, p.classNameClose)} 
-          onClick={_handleCloseClick}
-          >
-   
-            <Close/>
+          <span className={cn(styles.close, p.classNameClose)} onClick={_handleCloseClick}>
+            <Close />
           </span>
         )}
       </div>

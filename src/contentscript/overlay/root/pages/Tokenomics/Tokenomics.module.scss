@@ -1,6 +1,6 @@
-@import "../../assets/styles/null";
-@import "../../assets/styles/fonts";
-@import "../../assets/styles/color.variables";
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
 
 .wrapper {
   overflow: hidden;
@@ -8,8 +8,11 @@
   flex: 1 1 auto;
   flex-direction: column;
 
+  // padding: 25px 15px 0 16px;
   width: 100%;
   height: calc(100vh - 123px);
+
+  background: $OverlayBG;
 }
 
 .wrapper::-webkit-scrollbar {
@@ -34,6 +37,23 @@
 
   width: 100%;
   height: 100%;
+}
+
+.messageWrapper {
+  padding-bottom: 40px;
+}
+
+.choiseTokenWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.radioButtonsBlock {
+  display: flex;
+  justify-content: space-between;
+  width: 222px;
 }
 
 .applyButtonDisabled {
@@ -73,16 +93,14 @@
   align-items: center;
   justify-content: center;
 
-  width: 73px;
+  width: 140px;
   height: 32px;
-  padding: 0 10px;
+  margin-top: 20px;
 
   font-family: Roboto;
   font-size: 14px;
   font-weight: 400;
-  line-height: 100%;
   color: $PureWhite;
-  text-transform: uppercase;
 
   background: $Primary;
   border-radius: 4px;
@@ -94,71 +112,12 @@
   &:active {
     background: $PrimaryPressed;
   }
-}
 
-.blockTokenParameters {
-  overflow: hidden;
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  align-items: center;
-
-  width: 100%;
-  height: 100%;
-}
-
-.wrapperSettings {
-  margin: 15px 0 118px;
-}
-
-.blockTokenInfo {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.titleToken {
-  position: relative;
-}
-
-.tokenTitleInfo {
-  cursor: pointer;
-
-  position: absolute;
-  top: 11px;
-  left: 95px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 14px;
-  height: 14px;
-  padding: 2px;
-
-  font-family: Roboto;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 10px;
-  color: $PureWhite;
-
-  background: $MainGrey;
-  border-radius: 50%;
-
-  &:hover {
-    background: $StrokeColor;
-  }
-
-  &:active {
-    background: $MainBlack;
-  }
-}
-
-.inputTokenTicker {
-  text-transform: uppercase;
-
-  &::placeholder {
-    text-transform: none;
+  &:disabled {
+    cursor: default;
+    color: $MainGrey;
+    background: $AppBG;
+    border: 1px solid $StrokeColor;
   }
 }
 
@@ -203,29 +162,6 @@
   align-items: center;
 }
 
-.inputTokenName {
-  display: flex;
-
-  width: 100%;
-  padding: 5px 13px;
-
-  font-family: Roboto;
-  font-size: 14px;
-  font-weight: 400;
-  font-style: italic;
-  line-height: 149%;
-  color: $MainGrey;
-
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
-  border-radius: 5px;
-}
-
-.inputTokenTickerInvalid {
-  color: #ff6442;
-  border: 1px solid #ff6442;
-}
-
 .linkNavigation {
   position: relative;
 
@@ -238,7 +174,7 @@
   margin: 20px 0 0;
 
   &::before {
-    content: "";
+    content: '';
 
     position: absolute;
     top: -10px;
@@ -267,7 +203,7 @@
   background: inherit;
 
   &::before {
-    content: "";
+    content: '';
 
     position: absolute;
     top: 0;
@@ -294,6 +230,10 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%232A2A2A'/%3E%3C/svg%3E");
     }
   }
+}
+
+.wraperModal {
+  height: 542px;
 }
 
 .finalWarning {
@@ -344,7 +284,6 @@
   font-weight: 400;
   line-height: 100%;
   color: $Primary;
-
 
   &:hover {
     color: $PrimaryHover;

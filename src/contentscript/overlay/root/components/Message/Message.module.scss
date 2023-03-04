@@ -14,6 +14,7 @@
   font-family: Roboto, sans-serif;
 }
 
+
 .title,
 .subtitle {
   margin-right: auto;
@@ -30,6 +31,12 @@
   color: $MainBlack;
 }
 
+.titleMessageTokenomics{
+  width: 252px;
+  padding-bottom: 20px;
+  text-align: center;
+}
+
 .subtitle {
   display: block;
 
@@ -40,6 +47,17 @@
   font-weight: 500;
   line-height: 16px;
   color: $MainGrey;
+}
+
+.subTitleMessageTokenomics{
+  padding-bottom: 20px;
+}
+
+.children{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0 30px;
 }
 
 .link {
