@@ -3,7 +3,7 @@ import React, { FC, useRef, useState } from 'react'
 import { Message } from '../../components/Message'
 import { Modal } from '../../components/Modal'
 import { NewToken } from './newToken'
-import { RadioButtons } from './radioButtons'
+import { RadioButtons } from './RadioButton/radioButtons'
 import { SelectToken } from './selectToken'
 import styles from './Tokenomics.module.scss'
 
@@ -120,8 +120,6 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
                   className={cn(styles.footerContentModalButton)}
                   onClick={() => {
                     onClose()
-                    // setTokenomics(true)
-                    // setVisibleConfirm(false)
                   }}
                 >
                   Accept

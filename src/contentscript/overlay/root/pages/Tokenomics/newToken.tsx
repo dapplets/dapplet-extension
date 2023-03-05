@@ -70,7 +70,6 @@ export const NewToken: FC<NewTokenProps> = (props) => {
         <Formik
           initialValues={DEFAULT_VALUES}
           onSubmit={(values) => {
-            //   handleSubmit(values)
             setModal(true)
           }}
           validationSchema={CreateTokenSchema}
@@ -191,8 +190,6 @@ export const NewToken: FC<NewTokenProps> = (props) => {
                   className={cn(styles.footerContentModalButton)}
                   onClick={() => {
                     onClose()
-                    // setTokenomics(true)
-                    // setVisibleConfirm(false)
                   }}
                 >
                   Accept

@@ -42,7 +42,7 @@ export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
             onChange={(e) => {
               setChooseToken(e.target.value)
             }}
-            // onFocus={onFocusInput}
+          
           />
         </form>
       </div>
