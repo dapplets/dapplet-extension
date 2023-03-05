@@ -12,8 +12,7 @@ export const RadioButtons: FC<RadioButtonsProps> = (props: RadioButtonsProps) =>
   const { name, id, value, ...anotherProps } = props
   return (
     <div className={cn(styles.form_radio)}>
-      <input
-        disabled={value === 'New token'}
+      <input    
         type="radio"
         name={name}
         id={id}
