@@ -1,6 +1,6 @@
-@import '../../assets/styles/null';
-@import '../../assets/styles/fonts';
-@import '../../assets/styles/color.variables';
+@import '../../../assets/styles/null';
+@import '../../../assets/styles/fonts';
+@import '../../../assets/styles/color.variables';
 
 .inputRadioTitle {
     padding: 0 0 0 2px;
@@ -69,6 +69,6 @@
   }
   
   .form_radio input[type="radio"]:checked + label::before {
-    background: $Primary url("../../assets/icons/tokenomics/dot.svg") 50% 50% no-repeat;
+    background: $Primary url("../../../assets/icons/tokenomics/dot.svg") 50% 50% no-repeat;
     border: none;
   }
