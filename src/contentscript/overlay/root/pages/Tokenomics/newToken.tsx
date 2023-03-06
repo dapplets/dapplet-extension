@@ -8,7 +8,7 @@ import Field from './Field/Field'
 import IconField from './IconField/IconField'
 import styles from './newToken.module.scss'
 export interface NewTokenProps {
-
+  setNewToken?:(x)=>void
 }
 
 interface CreateTokenForm {
@@ -26,7 +26,7 @@ export const DEFAULT_VALUES: CreateTokenForm = {
 }
 
 export const NewToken: FC<NewTokenProps> = (props) => {
-
+const {setNewToken}=props
   const [isPendingTx, setPendingTx] = useState(false)
   const [isModal, setModal] = useState(false)
   const { network, ecosystemTokens } = useEcosystem() //todo: mocked
@@ -206,6 +206,11 @@ export const NewToken: FC<NewTokenProps> = (props) => {
             }
             onClose={onClose}
           />
+           <div className={styles.linkNavigation}>
+            <button onClick={() => setNewToken(false)} className={styles.back}>
+              Back
+            </button>
+          </div>
     </>
   )
 }

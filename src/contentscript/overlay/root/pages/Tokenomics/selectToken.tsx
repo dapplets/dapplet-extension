@@ -8,15 +8,19 @@ export interface SelectTokenProps {
   setAnimate: (x) => void
   setSelectToken: (x) => void
   selectToken: TokenInfo
+  chooseToken:string
+  setChooseToken:(x)=>void
 }
 
 export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
-  const { setAnimate, setSelectToken, selectToken, ...anotherProps } = props
-  const [chooseToken, setChooseToken] = useState('')
+  const { setAnimate, setSelectToken,chooseToken, selectToken,setChooseToken, ...anotherProps } = props
+  
 
   const [isImg, setImg] = useState(false)
-  const handleInputChange = (e: any) => {
-    const searchToken = LIST_TOKEN.filter((x) => x.address.toLowerCase() === e.toLowerCase())
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    const searchToken = LIST_TOKEN.filter((x) => x.address.toLowerCase() === newValue.toLowerCase())
+    setChooseToken(newValue)
     setAnimate(true)
     setSelectToken(searchToken[0])
     setTimeout(() => setAnimate(false), 400)
@@ -28,10 +32,7 @@ export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
         <div className={styles.inputTitle}>Contract address</div>
         <form
           className={cn(styles.labelInputSearch)}
-          onSubmit={(e) => {
-            e.preventDefault()
-            handleInputChange(chooseToken)
-          }}
+         
         >
           <input
             spellCheck="false"
@@ -39,9 +40,7 @@ export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
             type="text"
             value={chooseToken ? chooseToken : ''}
             placeholder="Contract address"
-            onChange={(e) => {
-              setChooseToken(e.target.value)
-            }}
+            onChange={handleInputChange}
           
           />
         </form>

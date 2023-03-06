@@ -34,7 +34,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
   const [isAnimate, setAnimate] = useState(false)
   const [selectToken, setSelectToken] = useState<TokenInfo>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
-
+  const [chooseToken, setChooseToken] = useState('')
   const onClose = () => setModal(false)
 
   // useEffect(() => {
@@ -75,6 +75,8 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
                       checked={activeChoise === ChoiseType.New}
                       onChange={() => {
                         setActiveChoise(ChoiseType.New)
+                        setChooseToken('')
+                        setSelectToken(null)
                       }}
                     />
                     <RadioButtons
@@ -88,7 +90,9 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
                   </div>
                   {activeChoise === ChoiseType.Existing && (
                     <SelectToken
+                    chooseToken={chooseToken}
                       setSelectToken={setSelectToken}
+                      setChooseToken={setChooseToken}
                       selectToken={selectToken}
                       setAnimate={setAnimate}
                     />
@@ -145,7 +149,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
         </div>
       ) : (
         <div className={styles.wrapper} ref={wrapperRef}>
-          <NewToken  />
+          <NewToken setNewToken={setNewToken}  />
         </div>
       )}
     </>
