@@ -8,13 +8,13 @@ import {
   IConnectedAccountUser,
   NearNetworks,
 } from '../../../../../../../common/types'
+import { CAUserButton } from '../../../CAUserButton'
 import areWeLinkingWallets from './helpers/areWeLinkingWallets'
 import askIfSameRequestsExist from './helpers/askIfSameRequestsExist'
 import checkIfTheAccountsHaveBeenAlreadyConnected from './helpers/checkIfTheAccountsHaveBeenAlreadyConnected'
 import getSignature from './helpers/getSignature'
 import getSocialOriginTitle from './helpers/getSocialOriginTitle'
 import { Modal } from './modal'
-import UserButton from './UserButton'
 
 interface IConnectedAccountsModalProps {
   data: {
@@ -39,6 +39,10 @@ type TRequestBody = {
   secondProofUrl?: string
   statement?: string
 }
+
+const ModalCAUserButton = ({ user }: { user: IConnectedAccountUser }) => (
+  <CAUserButton user={user} maxLength={24} colour="#eaf0f0" />
+)
 
 const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const { data, onCloseClick, bus } = props
@@ -283,8 +287,8 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         }
         accounts={
           <>
-            <UserButton user={accountsToConnect[0]} />
-            <UserButton user={accountsToConnect[1]} />
+            <ModalCAUserButton user={accountsToConnect[0]} />
+            <ModalCAUserButton user={accountsToConnect[1]} />
           </>
         }
         onClose={onCloseClick}
@@ -324,8 +328,8 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
         }
         accounts={
           <>
-            <UserButton user={accountsToDisconnect[0]} />
-            <UserButton user={accountsToDisconnect[1]} />
+            <ModalCAUserButton user={accountsToDisconnect[0]} />
+            <ModalCAUserButton user={accountsToDisconnect[1]} />
           </>
         }
         onClose={onCloseClick}
@@ -346,7 +350,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
             ? 'Set this account to non-main?"'
             : 'Select this account as main?'
         }
-        accounts={<UserButton user={accountToChangeStatus} />}
+        accounts={<ModalCAUserButton user={accountToChangeStatus} />}
         content={
           accountToChangeStatus.accountActive
             ? ''

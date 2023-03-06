@@ -10,6 +10,7 @@ import {
   IConnectedAccountUser,
   TConnectedAccount,
   TConnectedAccountsVerificationRequestInfo,
+  WalletDescriptor,
 } from '../../common/types'
 import GlobalConfigService from './globalConfigService'
 import { WalletService } from './walletService'
@@ -131,93 +132,89 @@ export default class ConnectedAccountService {
   }
 
   public async getPairs({
+    receiver,
     prevPairs,
   }: {
+    receiver: WalletDescriptor
     prevPairs: IConnectedAccountsPair[] | null
   }): Promise<IConnectedAccountsPair[]> {
-    const descriptors: {
-      account: string
-      chain: string
-      connected: boolean
-    }[] = await this._walletService.getWalletDescriptors()
-    const connectedDescriptors = descriptors.filter((d) => d.connected === true)
-    if (!connectedDescriptors || connectedDescriptors.length === 0) return
-
     let newPairs: IConnectedAccountsPair[] = []
     const processingAccountIdsPairs: [string, string][] = []
     const newPendingIds: number[] = []
 
-    for (const d of connectedDescriptors) {
-      const connectedAccStatus: boolean = await this.getStatus(d.account, d.chain)
-      const connectedAccount: IConnectedAccountUser = {
-        name: d.account,
-        origin: d.chain,
-        img: makeBlockie(d.account),
-        accountActive: connectedAccStatus,
-      }
-      const globalId = d.account + '/' + d.chain
+    const connectedAccStatus: boolean = await this.getStatus(receiver.account, receiver.chain)
+    const cAOrigin =
+      receiver.chain === ChainTypes.ETHEREUM_GOERLI || receiver.chain === ChainTypes.ETHEREUM_XDAI
+        ? 'ethereum'
+        : receiver.chain
+    const connectedAccount: IConnectedAccountUser = {
+      name: receiver.account,
+      origin: cAOrigin,
+      img: makeBlockie(receiver.account),
+      accountActive: connectedAccStatus,
+    }
+    const globalId = receiver.account + '/' + cAOrigin
 
-      // *** PENDING ***
-      const addPendingPair = async (accountGlobalId: string, pendingRequestId: number) => {
-        const [name, origin1, origin2] = accountGlobalId.split('/')
-        const origin = origin2 ? origin1 + '/' + origin2 : origin1
-        const accStatus: boolean = await this.getStatus(name, origin)
+    // *** PENDING ***
+    const addPendingPair = async (accountGlobalId: string, pendingRequestId: number) => {
+      const [name, origin1, origin2] = accountGlobalId.split('/')
+      const origin = origin2 ? origin1 + '/' + origin2 : origin1
+      const accStatus: boolean = await this.getStatus(name, origin)
+      newPairs.push({
+        firstAccount: connectedAccount,
+        secondAccount: {
+          name,
+          origin,
+          img: makeBlockie(name),
+          accountActive: accStatus,
+        },
+        statusName: ConnectedAccountsPairStatus.Processing,
+        statusMessage: 'Processing',
+        closeness: 1,
+        pendingRequestId,
+      })
+      processingAccountIdsPairs.push([globalId, accountGlobalId])
+      newPendingIds.push(pendingRequestId)
+    }
+
+    const pendingRequestsIds: number[] = await this.getPendingRequests()
+    if (pendingRequestsIds && pendingRequestsIds.length > 0) {
+      for (const pendingRequestId of pendingRequestsIds) {
+        const verificationRequest: TConnectedAccountsVerificationRequestInfo =
+          await this.getVerificationRequest(pendingRequestId)
+        const { firstAccount, secondAccount } = verificationRequest
+        if (firstAccount === globalId) {
+          await addPendingPair(secondAccount, pendingRequestId)
+        } else if (secondAccount === globalId) {
+          await addPendingPair(firstAccount, pendingRequestId)
+        }
+      }
+    }
+
+    // *** CONNECTED ***
+    const connectedAccounts: TConnectedAccount[][] = await this.getConnectedAccounts(
+      receiver.account,
+      cAOrigin,
+      null
+    )
+    connectedAccounts.forEach((level, i) =>
+      level.forEach((ca) => {
+        if (this._hasEqualIdsPair([globalId, ca.id], processingAccountIdsPairs)) return
+        const [caName, caOrigin1, caOrigin2] = ca.id.split('/')
         newPairs.push({
           firstAccount: connectedAccount,
           secondAccount: {
-            name,
-            origin,
-            img: makeBlockie(name),
-            accountActive: accStatus,
+            name: caName,
+            origin: caOrigin2 ? caOrigin1 + '/' + caOrigin2 : caOrigin1,
+            img: makeBlockie(caName),
+            accountActive: ca.status.isMain,
           },
-          statusName: ConnectedAccountsPairStatus.Processing,
-          statusMessage: 'Processing',
-          closeness: 1,
-          pendingRequestId,
+          statusName: ConnectedAccountsPairStatus.Connected,
+          statusMessage: 'Connected',
+          closeness: i + 1,
         })
-        processingAccountIdsPairs.push([globalId, accountGlobalId])
-        newPendingIds.push(pendingRequestId)
-      }
-
-      const pendingRequestsIds: number[] = await this.getPendingRequests()
-      if (pendingRequestsIds && pendingRequestsIds.length > 0) {
-        for (const pendingRequestId of pendingRequestsIds) {
-          const verificationRequest: TConnectedAccountsVerificationRequestInfo =
-            await this.getVerificationRequest(pendingRequestId)
-          const { firstAccount, secondAccount } = verificationRequest
-          if (firstAccount === globalId) {
-            await addPendingPair(secondAccount, pendingRequestId)
-          } else if (secondAccount === globalId) {
-            await addPendingPair(firstAccount, pendingRequestId)
-          }
-        }
-      }
-
-      // *** CONNECTED ***
-      const connectedAccounts: TConnectedAccount[][] = await this.getConnectedAccounts(
-        d.account,
-        d.chain,
-        null
-      )
-      connectedAccounts.forEach((level, i) =>
-        level.forEach((ca) => {
-          if (this._hasEqualIdsPair([globalId, ca.id], processingAccountIdsPairs)) return
-          const [caName, caOrigin1, caOrigin2] = ca.id.split('/')
-          newPairs.push({
-            firstAccount: connectedAccount,
-            secondAccount: {
-              name: caName,
-              origin: caOrigin2 ? caOrigin1 + '/' + caOrigin2 : caOrigin1,
-              img: makeBlockie(caName),
-              accountActive: ca.status.isMain,
-            },
-            statusName: ConnectedAccountsPairStatus.Connected,
-            statusMessage: 'Connected',
-            closeness: i + 1,
-          })
-        })
-      )
-    }
+      })
+    )
 
     // *** REJECTED ***
     if (prevPairs) {
