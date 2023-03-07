@@ -10,6 +10,10 @@
   border-radius: 20px;
   padding: 20px 0;
   margin-bottom: 10px;
+  
+}
+.lastWrapper{
+  margin-bottom: 70px;
 }
 
 .titleForm {
@@ -167,8 +171,9 @@
 .link {
   display: inline-block;
   margin-top: auto;
-  padding: 40px 20px 20px 20px;
+  padding: 40px 20px 0px 20px;
   color: #85ccc7;
+
   &:hover {
     color: #67aea9;
   }
@@ -229,7 +234,7 @@
   font-weight: 400;
   line-height: 100%;
   color: $Primary;
-
+ 
   &:hover {
     color: $PrimaryHover;
   }

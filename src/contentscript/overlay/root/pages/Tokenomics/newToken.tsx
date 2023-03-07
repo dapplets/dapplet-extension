@@ -143,7 +143,7 @@ const {setNewToken}=props
           }}
         </Formik>
       </div>
-      <div className={cn(styles.wrapper)}>
+      <div className={cn(styles.wrapper, styles.lastWrapper)}>
         <div className={cn(styles.titleForm)}>Your own token creation</div>
         <div className={cn(styles.formDescription, styles.descriptionBlock)}>
           You can create your token that will be using a bounding curve with TEST as a collateral

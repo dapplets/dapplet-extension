@@ -32,7 +32,7 @@
   }
 
   &::-webkit-scrollbar-track {
-    margin-bottom: 13px;
+    margin-bottom: 63px;
     background: rgb(244 244 244);
     background: linear-gradient(
       90deg,
@@ -45,7 +45,7 @@
   &::-webkit-scrollbar-thumb {
     width: 4px;
     height: 2px;
-    margin-bottom: 13px;
+    margin-bottom: 63px;
 
     background: $Primary;
     border-radius: 2px;
