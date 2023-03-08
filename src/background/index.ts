@@ -25,6 +25,7 @@ import { OverlayService } from './services/overlayService'
 import ProxyService from './services/proxyService'
 import { SessionService } from './services/sessionService'
 import { SuspendService } from './services/suspendService'
+import { TokenRegistryService } from './services/tokenomicsService'
 import { WalletService } from './services/walletService'
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
@@ -32,6 +33,7 @@ import { WalletService } from './services/walletService'
 tracing.startTracing()
 
 const notificationService = new NotificationService()
+
 const globalConfigService = new GlobalConfigService()
 const analyticsService = new AnalyticsService(globalConfigService)
 const suspendService = new SuspendService(globalConfigService)
@@ -49,7 +51,7 @@ const featureService = new FeatureService(
 )
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
-
+const tokenomicsService = new TokenRegistryService(globalConfigService, walletService)
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
 globalConfigService.ensService = ensService
@@ -163,6 +165,32 @@ browser.runtime.onMessage.addListener(
     markAllNotificationsAsViewed: () => notificationService.markAllNotificationsAsViewed(),
     getUnreadNotificationsCount: (source?) =>
       notificationService.getUnreadNotificationsCount(source),
+    getTokensByApp: (appId) => tokenomicsService.getTokensByApp(appId),
+    getAppsByToken: (symbol) => tokenomicsService.getAppsByToken(symbol),
+    createAppToken: (
+      appType,
+      appId,
+      ecosystemCode,
+      symbol,
+      name,
+      referenceUrl,
+      curveTemplate,
+      tokenTemplate,
+      additionalCollaterals?
+    ) =>
+      tokenomicsService.createAppToken(
+        appType,
+        appId,
+        ecosystemCode,
+        symbol,
+        name,
+        referenceUrl,
+        curveTemplate,
+        tokenTemplate,
+        additionalCollaterals
+      ),
+    linkAppWithToken: (appType, appId, tokenAddress) =>
+      tokenomicsService.linkAppWithToken(appType, appId, tokenAddress),
     getInitialConfig: () => globalConfigService.getInitialConfig(),
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),
