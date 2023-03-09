@@ -166,31 +166,11 @@ browser.runtime.onMessage.addListener(
     getUnreadNotificationsCount: (source?) =>
       notificationService.getUnreadNotificationsCount(source),
     getTokensByApp: (appId) => tokenomicsService.getTokensByApp(appId),
-    getAppsByToken: (symbol) => tokenomicsService.getAppsByToken(symbol),
-    createAppToken: (
-      appType,
-      appId,
-      ecosystemCode,
-      symbol,
-      name,
-      referenceUrl,
-      curveTemplate,
-      tokenTemplate,
-      additionalCollaterals?
-    ) =>
-      tokenomicsService.createAppToken(
-        appType,
-        appId,
-        ecosystemCode,
-        symbol,
-        name,
-        referenceUrl,
-        curveTemplate,
-        tokenTemplate,
-        additionalCollaterals
-      ),
-    linkAppWithToken: (appType, appId, tokenAddress) =>
-      tokenomicsService.linkAppWithToken(appType, appId, tokenAddress),
+    getAppsByToken: (addressToken) => tokenomicsService.getAppsByToken(addressToken),
+    createAppToken: (appId, symbol, name, referenceUrl, additionalCollaterals?) =>
+      tokenomicsService.createAppToken(appId, symbol, name, referenceUrl, additionalCollaterals),
+    linkAppWithToken: (appId, tokenAddress) =>
+      tokenomicsService.linkAppWithToken(appId, tokenAddress),
     getInitialConfig: () => globalConfigService.getInitialConfig(),
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),

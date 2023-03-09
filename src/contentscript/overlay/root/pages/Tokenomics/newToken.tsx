@@ -1,14 +1,17 @@
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import { Form, Formik } from 'formik'
 import React, { FC, useEffect, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import { Modal } from '../../components/Modal'
+import saveBlobToIpfs from '../../utils/saveBlobToIpfs'
 import Button from './Button'
 import CreateTokenSchema from './CreateTokenSchema'
 import Field from './Field/Field'
 import IconField from './IconField/IconField'
 import styles from './newToken.module.scss'
 export interface NewTokenProps {
-  setNewToken?:(x)=>void
+  setNewToken?: (x) => void
 }
 
 interface CreateTokenForm {
@@ -26,35 +29,36 @@ export const DEFAULT_VALUES: CreateTokenForm = {
 }
 
 export const NewToken: FC<NewTokenProps> = (props) => {
-const {setNewToken}=props
+  const { setNewToken } = props
   const [isPendingTx, setPendingTx] = useState(false)
   const [isModal, setModal] = useState(false)
   const { network, ecosystemTokens } = useEcosystem() //todo: mocked
   //   const { createToken, status: tokenCreatingTx } = useCreateToken()
   const [valuesProps, setValuesProps] = useState(DEFAULT_VALUES)
   const onClose = () => setModal(false)
-  useEffect(
-    () => {
-      // if (tokenCreatingTx.status === 'Mining' || tokenCreatingTx.status === 'PendingSignature') {
-      //   setPendingTx(true)
-      // } else {
-      //   setPendingTx(false)
-      // }
-    },
-    [
-      // tokenCreatingTx
-    ]
-  )
+  useEffect(() => {
+    const init = async () => {
+      await _updateData()
+    }
+    init()
+
+    return () => {}
+  }, [])
+  const _updateData = async () => {
+    const { getTokensByApp } = await initBGFunctions(browser)
+    const tokens = await getTokensByApp('uc-test-1')
+    console.log(tokens)
+  }
   const handleSubmit = async (values: CreateTokenForm) => {
     const { symbol, name, icon } = values
     const iconUrl = await saveBlobToIpfs(icon) // ToDo: move to hook?
     try {
+      const { createAppToken } = await initBGFunctions(browser)
       if (!icon) return
       setPendingTx(true)
-
-      //   await createToken(symbol, name, iconUrl)
-    } catch (_: any) {
-      // TBD
+      await createAppToken('uc-test-1', symbol, name, iconUrl, [])
+    } catch (e) {
+      console.log(e)
     } finally {
       setPendingTx(false)
     }
@@ -70,6 +74,7 @@ const {setNewToken}=props
         <Formik
           initialValues={DEFAULT_VALUES}
           onSubmit={(values) => {
+            setValuesProps(values)
             setModal(true)
           }}
           validationSchema={CreateTokenSchema}
@@ -178,47 +183,43 @@ const {setNewToken}=props
         </a>
       </div>
       <Modal
-            classNameWrapper={styles.wraperModal}
-            visible={isModal}
-            title="Are you sure?"
-            content={
-              <div className={styles.finalWarning}>Final warning - you can't change it anymore</div>
-            }
-            footer={
-              <div className={styles.footerContentModal}>
-                <button
-                  className={cn(styles.footerContentModalButton)}
-                  onClick={() => {
-                    onClose()
-                  }}
-                >
-                  Accept
-                </button>
-                {/* todo: correct src */}
-                <a
-                  href="https://docs.dapplets.org/docs/whitepapers/auge-token-usage"
-                  target="_blank"
-                  className={styles.footerContentModalLink}
-                >
-                  F.A.Q.
-                </a>
-              </div>
-            }
-            onClose={onClose}
-          />
-           <div className={styles.linkNavigation}>
-            <button onClick={() => setNewToken(false)} className={styles.back}>
-              Back
+        classNameWrapper={styles.wraperModal}
+        visible={isModal}
+        title="Are you sure?"
+        content={
+          <div className={styles.finalWarning}>Final warning - you can't change it anymore</div>
+        }
+        footer={
+          <div className={styles.footerContentModal}>
+            <button
+              className={cn(styles.footerContentModalButton)}
+              onClick={() => {
+                handleSubmit(valuesProps)
+              }}
+            >
+              Accept
             </button>
+            {/* todo: correct src */}
+            <a
+              href="https://docs.dapplets.org/docs/whitepapers/auge-token-usage"
+              target="_blank"
+              className={styles.footerContentModalLink}
+            >
+              F.A.Q.
+            </a>
           </div>
+        }
+        onClose={onClose}
+      />
+      <div className={styles.linkNavigation}>
+        <button onClick={() => setNewToken(false)} className={styles.back}>
+          Back
+        </button>
+      </div>
     </>
   )
 }
-//todo: empty function
-function saveBlobToIpfs(icon: File | null) {
-  // throw new Error('Function not implemented.');
-  return ''
-}
+
 //todo: empty function
 function useEcosystem(): { network: any; ecosystemTokens: any } {
   return { network: 'testnet', ecosystemTokens: 'ZOO' }
