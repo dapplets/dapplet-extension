@@ -1,10 +1,11 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import { Form, Formik } from 'formik'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect, useMemo, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { Modal } from '../../components/Modal'
 import saveBlobToIpfs from '../../utils/saveBlobToIpfs'
+import { UnderConstructionDetails } from '../Settings'
 import Button from './Button'
 import CreateTokenSchema from './CreateTokenSchema'
 import Field from './Field/Field'
@@ -13,6 +14,8 @@ import styles from './newToken.module.scss'
 export interface NewTokenProps {
   setNewToken?: (x) => void
   ModuleName?: string
+  setActiveTabUnderConstructionDetails?: any
+ 
 }
 
 interface CreateTokenForm {
@@ -28,15 +31,29 @@ export const DEFAULT_VALUES: CreateTokenForm = {
   icon: null,
   decimals: '16',
 }
-
+type Message = {
+  type: 'negative' | 'positive'
+  header: string
+  message: string[]
+}
 export const NewToken: FC<NewTokenProps> = (props) => {
-  const { setNewToken, ModuleName } = props
-  const [isPendingTx, setPendingTx] = useState(false)
+  const { setNewToken, ModuleName, setActiveTabUnderConstructionDetails } = props
+
   const [isModal, setModal] = useState(false)
   const { network, ecosystemTokens } = useEcosystem() //todo: mocked
   //   const { createToken, status: tokenCreatingTx } = useCreateToken()
   const [valuesProps, setValuesProps] = useState(DEFAULT_VALUES)
+  const [isModalTransaction, setModalTransaction] = useState(false)
+  const [isModalEndCreation, setModalEndCreation] = useState(false)
+  const [message, setMessage] = useState<Message>(null)
+  const [isModalError, setModalError] = useState(false)
+  const [isLoading, setLoading] = useState(false)
   const onClose = () => setModal(false)
+  const onCloseError = () => {
+    setModalError(false)
+    setMessage(null)
+  }
+
   useEffect(() => {
     const init = async () => {
       await _updateData()
@@ -53,20 +70,34 @@ export const NewToken: FC<NewTokenProps> = (props) => {
     const { symbol, name, icon } = values
     const iconUrl = await saveBlobToIpfs(icon) // ToDo: move to hook?
     try {
+      setModalTransaction(true)
       const { createAppToken } = await initBGFunctions(browser)
       if (!icon) return
-      setPendingTx(true)
-      console.log(iconUrl)
 
       await createAppToken(ModuleName, symbol, name, iconUrl, [])
+      setModalTransaction(false)
+      setModalEndCreation(true)
     } catch (e) {
-      console.log(e)
+      setMessage({
+        type: 'negative',
+        header: 'Transaction error',
+        message: [e.message],
+      })
+      setModalError(true)
     } finally {
-      setPendingTx(false)
+      setModalTransaction(false)
     }
   }
+  const _updatePage = async () => {
+    setModalEndCreation(false)
+
+    setActiveTabUnderConstructionDetails(UnderConstructionDetails.INFO)
+  }
+
+
   return (
     <>
+      {' '}
       <div className={cn(styles.wrapper)}>
         <div className={cn(styles.titleForm)}>Custom token creation</div>
         <div className={cn(styles.titleDependecies)}>
@@ -90,7 +121,6 @@ export const NewToken: FC<NewTokenProps> = (props) => {
               <Form className={styles.form}>
                 <div className={styles.fieldGroup}>
                   <Field
-                    disabled={isPendingTx}
                     data-testid="create-token-name-field"
                     label="Token Name"
                     name="name"
@@ -108,7 +138,6 @@ export const NewToken: FC<NewTokenProps> = (props) => {
                 </div>
                 <div className={styles.fieldGroup}>
                   <Field
-                    disabled={isPendingTx}
                     data-testid="create-token-symbol-field"
                     label="Token ID"
                     name="symbol"
@@ -131,7 +160,7 @@ export const NewToken: FC<NewTokenProps> = (props) => {
                 </div>
 
                 <div className={cn(styles.fieldGroup, styles.iconGroup)}>
-                  <IconField disabled={isPendingTx} label="Upload your icon" />
+                  <IconField label="Upload your icon" />
                 </div>
 
                 <div className={styles.controls}>
@@ -140,7 +169,7 @@ export const NewToken: FC<NewTokenProps> = (props) => {
                     type="submit"
                     lg
                     primary
-                    disabled={isDisabled || isPendingTx}
+                    disabled={isDisabled}
                   >
                     Create token
                   </Button>
@@ -219,6 +248,39 @@ export const NewToken: FC<NewTokenProps> = (props) => {
         }
         onClose={onClose}
       />
+      <Modal
+        visible={isModalTransaction}
+        title={'Transaction started'}
+        content={''}
+        footer={''}
+        onClose={() => !isModalTransaction}
+      />
+      <Modal
+        visible={isModalEndCreation}
+        title={'Transaction finished'}
+        content={''}
+        footer={''}
+        onClose={() => _updatePage()}
+      />
+      {message ? (
+        <Modal
+          visible={isModalError}
+          title={message.header}
+          content={
+            <div className={styles.modalDefaultContent}>
+              {message.message.map((m, i) => (
+                <p key={i} style={{ overflowWrap: 'break-word' }}>
+                  {m === `Cannot read properties of null (reading 'length')`
+                    ? 'Please fill in the empty fields'
+                    : m}
+                </p>
+              ))}
+            </div>
+          }
+          footer={''}
+          onClose={() => onCloseError()}
+        />
+      ) : null}
       <div className={styles.linkNavigation}>
         <button onClick={() => setNewToken(false)} className={styles.back}>
           Back

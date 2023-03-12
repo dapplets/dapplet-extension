@@ -1,16 +1,14 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
-import { useToken } from '../../../../../background/services/tokenomicsService/erc20Token'
 import { ReactComponent as Copy } from '../../assets/icons/tokenomics/copy.svg'
-import { regExpIndexEthereum } from '../../common/constants'
-import { getValidationAddress } from '../../common/helpers'
 import { Message } from '../../components/Message'
 import { Modal } from '../../components/Modal'
 import useCopied from '../../hooks/useCopyed'
 import formatIconRefUrl from '../../utils/formatIconRefUrl'
+import { UnderConstructionDetails } from '../Settings'
 import { NewToken } from './newToken'
 import { RadioButtons } from './RadioButton/radioButtons'
 import { SelectToken } from './selectToken'
@@ -20,6 +18,7 @@ export interface TokenomicsProps {
   setTokenomics: (x) => void
   isSupport?: boolean
   ModuleInfo: any
+  setActiveTabUnderConstructionDetails: any
 }
 enum ChoiseType {
   New = 0,
@@ -34,9 +33,20 @@ export interface TokenInfo {
   marketCup?: string | number
   trading?: string | number
 }
+type Message = {
+  type: 'negative' | 'positive'
+  header: string
+  message: string[]
+}
 
 export const Tokenomics: FC<TokenomicsProps> = (props) => {
-  const { setUnderConstructionDetails, ModuleInfo, isSupport = true, setTokenomics } = props
+  const {
+    setUnderConstructionDetails,
+    ModuleInfo,
+    isSupport = true,
+    setTokenomics,
+    setActiveTabUnderConstructionDetails,
+  } = props
   const [isNewToken, setNewToken] = useState(false)
   const [activeChoise, setActiveChoise] = useState(ChoiseType.New)
   const [isModal, setModal] = useState(false)
@@ -44,43 +54,68 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
   const [selectToken, setSelectToken] = useState<TokenInfo>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const [chooseToken, setChooseToken] = useState('')
-  const onClose = () => setModal(false)
+
   const [daiInfo, setdaiInfo] = useState(null)
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
   const [TokensByApp, setTokensByApp] = useState(null)
   const [value, setValue] = useState('')
   const [, copy] = useCopied(value)
   const [isImg, setImg] = useState(false)
+  const [isModalTransaction, setModalTransaction] = useState(false)
+  const [isModalEndCreation, setModalEndCreation] = useState(false)
+  const [message, setMessage] = useState<Message>(null)
+  const [isModalError, setModalError] = useState(false)
+  const onClose = () => setModal(false)
+  const onCloseError = () => {
+    setModalError(false)
+    setMessage(null)
+  }
+
   useEffect(() => {
     const init = async () => {
-      const { getTokensByApp } = await initBGFunctions(browser)
-      const TokensByApp = await getTokensByApp(mi.name)
-
-      setTokensByApp(TokensByApp)
-
-      if (chooseToken) {
-        const daiInfoN = await useToken(
-          getValidationAddress(chooseToken, regExpIndexEthereum) !== null ? chooseToken : null
-        )
-        setdaiInfo(daiInfoN)
-      }
+      await _updateData()
     }
     init()
     return () => {}
-  }, [chooseToken, selectToken])
+  }, [])
+
+  const _updateData = async () => {
+    const { getTokensByApp } = await initBGFunctions(browser)
+    const TokensByApp = await getTokensByApp(mi.name)
+
+    setTokensByApp(TokensByApp)
+  }
   const handleSubmit = async (values) => {
     try {
+      setModalTransaction(true)
       const { linkAppWithToken } = await initBGFunctions(browser)
       await linkAppWithToken(mi.name, values.address)
+      setModalTransaction(false)
+      setModalEndCreation(true)
     } catch (e) {
-      console.log(e)
+      setMessage({
+        type: 'negative',
+        header: 'Transaction error',
+        message: [e.message],
+      })
+      setModalError(true)
     } finally {
+      setModalTransaction(false)
     }
   }
 
+  const tokenCreated = useMemo(() => {
+    setTokensByApp(TokensByApp)
+    return TokensByApp
+  }, [TokensByApp])
+  const _updatePage = async () => {
+    setModalEndCreation(false)
+
+    setActiveTabUnderConstructionDetails(UnderConstructionDetails.INFO)
+  }
   return (
     <>
-      {!TokensByApp || TokensByApp.length === 0 ? (
+      {!tokenCreated || tokenCreated.length === 0 ? (
         !isNewToken ? (
           <div className={styles.wrapper} ref={wrapperRef}>
             <div className={styles.blockMessage}>
@@ -102,6 +137,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
                           setActiveChoise(ChoiseType.New)
                           setChooseToken('')
                           setSelectToken(null)
+                          setdaiInfo(null)
                         }}
                       />
                       <RadioButtons
@@ -121,6 +157,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
                         selectToken={selectToken}
                         setAnimate={setAnimate}
                         daiInfo={daiInfo}
+                        setdaiInfo={setdaiInfo}
                       />
                     )}
 
@@ -177,7 +214,39 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
               }
               onClose={onClose}
             />
-
+            <Modal
+              visible={isModalTransaction}
+              title={'Transaction started'}
+              content={''}
+              footer={''}
+              onClose={() => !isModalTransaction}
+            />
+            <Modal
+              visible={isModalEndCreation}
+              title={'Transaction finished'}
+              content={''}
+              footer={''}
+              onClose={()=>_updatePage()}
+            />
+            {message ? (
+              <Modal
+                visible={isModalError}
+                title={message.header}
+                content={
+                  <div className={styles.modalDefaultContent}>
+                    {message.message.map((m, i) => (
+                      <p key={i} style={{ overflowWrap: 'break-word' }}>
+                        {m === `Cannot read properties of null (reading 'length')`
+                          ? 'Please fill in the empty fields'
+                          : m}
+                      </p>
+                    ))}
+                  </div>
+                }
+                footer={''}
+                onClose={() => onCloseError()}
+              />
+            ) : null}
             <div className={styles.linkNavigation}>
               <button onClick={() => setUnderConstructionDetails(false)} className={styles.back}>
                 Back
@@ -186,7 +255,11 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
           </div>
         ) : (
           <div className={styles.wrapper} ref={wrapperRef}>
-            <NewToken setNewToken={setNewToken} ModuleName={mi.name} />
+            <NewToken
+              setNewToken={setNewToken}
+              ModuleName={mi.name}
+              setActiveTabUnderConstructionDetails={setActiveTabUnderConstructionDetails}
+            />
           </div>
         )
       ) : (
@@ -197,30 +270,30 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
           <div className={styles.blockTokenApp}>
             <div className={styles.firstLine}>
               {isImg ? (
-                <div className={styles.icon}>{TokensByApp[0][0]}</div>
+                <div className={styles.icon}>{tokenCreated[0][0]}</div>
               ) : (
                 <img
                   className={styles.icon}
                   onError={() => setImg(true)}
-                  src={formatIconRefUrl(TokensByApp[0][5])}
+                  src={formatIconRefUrl(tokenCreated[0][5])}
                 />
               )}
-              <div className={styles.name}>{TokensByApp[0][1]}</div>
-              <div className={styles.ticker}>{TokensByApp[0][0]}</div>
+              <div className={styles.name}>{tokenCreated[0][1]}</div>
+              <div className={styles.ticker}>{tokenCreated[0][0]}</div>
             </div>
             <div className={styles.secondLine}>
               <a
                 onClick={() =>
-                  window.open(`https://goerli.etherscan.io/address/${TokensByApp[0][2]}`, '_blank')
+                  window.open(`https://goerli.etherscan.io/address/${tokenCreated[0][2]}`, '_blank')
                 }
                 className={styles.address}
               >
-                {TokensByApp[0][2]}
+                {tokenCreated[0][2]}
               </a>
               <span
                 className={styles.tokenCopy}
                 onClick={() => {
-                  setValue(TokensByApp[0][2])
+                  setValue(tokenCreated[0][2])
                   setTimeout(() => {
                     copy()
                   }, 500)
@@ -230,26 +303,26 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
               </span>
             </div>
             {/* <div className={styles.thirdLine}>
-             
-              <div className={styles.blockRightInfo}>
-                <span className={cn(styles.infoValue)}>n/a</span>
-                <span
-                  className={cn(styles.infoPercent, {
-                    [styles.infoPercentHight]: false,
-                  })}
-                >
-                  price
-                </span>
-              </div>
-              <div className={styles.blockRightInfo}>
-                <span className={styles.infoValue}>n/a</span>
-                <span className={styles.infoName}>market cap</span>
-              </div>
-              <div className={styles.blockRightInfo}>
-                <span className={styles.infoValue}>n/a</span>
-                <span className={styles.infoName}>24H trading vol</span>
-              </div>
-            </div> */}
+               
+                <div className={styles.blockRightInfo}>
+                  <span className={cn(styles.infoValue)}>n/a</span>
+                  <span
+                    className={cn(styles.infoPercent, {
+                      [styles.infoPercentHight]: false,
+                    })}
+                  >
+                    price
+                  </span>
+                </div>
+                <div className={styles.blockRightInfo}>
+                  <span className={styles.infoValue}>n/a</span>
+                  <span className={styles.infoName}>market cap</span>
+                </div>
+                <div className={styles.blockRightInfo}>
+                  <span className={styles.infoValue}>n/a</span>
+                  <span className={styles.infoName}>24H trading vol</span>
+                </div>
+              </div> */}
           </div>
           <div className={styles.linkNavigation} style={{ marginTop: 'auto' }}>
             <button onClick={() => setUnderConstructionDetails(false)} className={styles.back}>

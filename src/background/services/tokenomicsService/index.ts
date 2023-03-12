@@ -3,17 +3,14 @@ import { ChainTypes, DefaultSigners } from '../../../common/types'
 import GlobalConfigService from '../globalConfigService'
 import { WalletService } from '../walletService'
 import abi from './app-token-registry.json'
+import * as EventBus from '../../../common/global-event-bus'
 // todo: create cycle
 const PAGE_SIZE = 20
 const ZERO_SIZE = 0
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 const DEFAULT_ECOSYSTEM = 'zoo'
 const DEFAULT_APP_TYPE = 1
- type Falsy = false | 0 | '' | null | undefined
- 
-
-
-
+type Falsy = false | 0 | '' | null | undefined
 
 interface I_TokenFactory {}
 
@@ -61,7 +58,7 @@ export class TokenRegistryService {
     additionalCollaterals?: { addr: string; referenceUrl: string }[]
   ) {
     await this._init()
-    return await this.tokenFactory.createAppToken(
+    await this.tokenFactory.createAppToken(
       DEFAULT_APP_TYPE, //todo: mocked
       appId,
       DEFAULT_ECOSYSTEM, //todo: mocked
@@ -72,12 +69,15 @@ export class TokenRegistryService {
       ZERO_ADDRESS, //todo: mocked
       additionalCollaterals
     )
+    await this.getTokensByApp(appId)
+    EventBus.emit('token create')
   }
 
   public async linkAppWithToken(appId: string, tokenAddress: string) {
     await this._init()
-    return await this.tokenFactory.linkAppWithToken(DEFAULT_APP_TYPE, appId, tokenAddress)
-  }
 
- 
+    await this.tokenFactory.linkAppWithToken(DEFAULT_APP_TYPE, appId, tokenAddress)
+    await this.getTokensByApp(appId)
+    EventBus.emit('token create')
+  }
 }

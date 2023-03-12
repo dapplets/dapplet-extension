@@ -21,7 +21,7 @@ enum DappletsDetails {
   MAININFO = 0,
 }
 
-enum UnderConstructionDetails {
+export enum UnderConstructionDetails {
   INFO = 0,
   TOKENOMICS = 1,
   // REWARDS = 2,
@@ -261,6 +261,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
               ModuleInfo={ModuleInfo}
                 setUnderConstructionDetails={setUnderConstructionDetails}
                 setTokenomics={setTokenomics}
+                setActiveTabUnderConstructionDetails={setActiveTabUnderConstructionDetails}
               />
             )}
             {/* {activeTabUnderConstructionDetails === UnderConstructionDetails.REWARDS && (

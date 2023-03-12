@@ -7,6 +7,7 @@ import { WalletService } from '../walletService'
 
 export const useToken = async (tokenAddress: string | Falsy) => {
   if (!tokenAddress) return undefined
+
   const globalConfigService = new GlobalConfigService()
   const overlayService = new OverlayService()
   const _walletService = new WalletService(globalConfigService, overlayService)

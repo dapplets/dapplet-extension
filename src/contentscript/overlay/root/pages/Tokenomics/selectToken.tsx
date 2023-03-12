@@ -1,5 +1,6 @@
 import cn from 'classnames'
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
+import { useToken } from '../../../../../background/services/tokenomicsService/erc20Token'
 import { regExpIndexEthereum } from '../../common/constants'
 import { getValidationAddress } from '../../common/helpers'
 import { TokenInfo } from './index'
@@ -12,6 +13,7 @@ export interface SelectTokenProps {
   chooseToken: string
   setChooseToken: (x) => void
   daiInfo: any
+  setdaiInfo: any
 }
 
 export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
@@ -22,11 +24,25 @@ export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
     selectToken,
     setChooseToken,
     daiInfo,
+    setdaiInfo,
     ...anotherProps
   } = props
 
   const [isImg, setImg] = useState(false)
 
+  useEffect(() => {
+    const init = async () => {
+      if (chooseToken) {
+        const daiInfoToken = await useToken(
+          getValidationAddress(chooseToken, regExpIndexEthereum) !== null ? chooseToken : null
+        )
+        setdaiInfo(daiInfoToken)
+      }
+    }
+    init()
+    return () => {}
+  }, [chooseToken])
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault()
     const newValue = e.target.value
