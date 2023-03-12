@@ -28,7 +28,7 @@ const Field = ({
 }: Props) => {
 	return (
 		<div className={cn(styles.root,{ [styles.divName]: label === "Token Name" })}>
-			<label className={styles.label} htmlFor={name}>
+			<label aria-autocomplete="none" className={styles.label} htmlFor={name}>
 				{label}
 			</label>
 			<FormikField
@@ -40,6 +40,7 @@ const Field = ({
 				disabled={disabled}
 				required={required}
 				value={value}
+				
 			/>
 		</div>
 	);

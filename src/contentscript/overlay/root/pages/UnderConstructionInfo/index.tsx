@@ -131,7 +131,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-    if (!abortController.signal.aborted) {
+   
       setRegistryOptions(
         prodRegistries.map((r) => ({
           key: r.url,
@@ -142,17 +142,19 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       setTargetRegistry(prodRegistries[0]?.url || null)
       setTrustedUsers(trustedUsers)
       setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-    }
+    
 
     await _updateCurrentAccount()
   }
 
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
-    const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-    if (!abortController.signal.aborted) {
+    if (targetChain) { const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
+    
       setCurrentAccount(currentAccount)
-    }
+    }else return
+   
+    
   }
 
   const iconInputChangeHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {

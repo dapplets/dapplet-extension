@@ -56,7 +56,6 @@
   direction: ltr;
 }
 
-
 .blockMessage {
   overflow: hidden;
   display: flex;
@@ -270,8 +269,14 @@
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
-  line-height: 16px;
+  line-height: 130%;
   color: $MainGrey;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .footerContentModal {
@@ -322,4 +327,157 @@
   &:active {
     color: $PrimaryPressed;
   }
+}
+.blockTokenApp {
+  background: #ffffff;
+  border: 1px solid #efefef;
+  border-radius: 5px;
+  margin: 15px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+.titleTokenApp {
+  font-family: "Roboto";
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 149%;
+    text-align: center;
+    color: #747376;
+}
+.firstLine {
+  display: flex;
+  padding-bottom: 10px;
+  align-items: center;
+}
+.icon {
+  width: 29px;
+  height: 29px;
+  border-radius: 50%;
+  border: 1px solid #e3e3e3;
+  color: $Primary;
+  font-size: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #e3e3e3;
+}
+
+.ticker {
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+  text-transform: uppercase;
+
+  color: #ababab;
+  padding-left: 10px;
+}
+
+.name {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+
+  color: #444444;
+  padding-left: 10px;
+  padding-bottom: 2px;
+}
+.secondLine {
+  display: flex;
+
+  align-items: center;
+}
+.address {
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+
+  text-decoration-line: underline;
+  cursor: pointer;
+  color: #46a3e2;
+  &:hover {
+    color: #7dd0ff;
+  }
+  &:active {
+    color: #468db5;
+  }
+}
+.tokenCopy {
+  cursor: pointer;
+  background: #f5f5f5;
+  border-radius: 50%;
+  margin-left: 5px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    svg {
+      path {
+        fill: #7dd0ff;
+      }
+    }
+  }
+
+  &:active {
+    svg {
+      path {
+        fill: #7dd0ff;
+      }
+    }
+  }
+}
+.thirdLine {
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+}
+
+.blockRight {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+
+  width: 50%;
+}
+
+.blockRightInfo {
+  display: flex;
+}
+
+.infoValue {
+  display: inline-block;
+
+  padding-right: 5px;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 149%;
+  color: #444;
+}
+
+.infoPercent {
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 149%;
+  color: $Primary;
+}
+
+.infoPercentHight {
+  color: $success;
+}
+
+.infoName {
+  color: #afacac;
 }

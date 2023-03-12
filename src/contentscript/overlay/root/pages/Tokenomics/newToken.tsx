@@ -12,6 +12,7 @@ import IconField from './IconField/IconField'
 import styles from './newToken.module.scss'
 export interface NewTokenProps {
   setNewToken?: (x) => void
+  ModuleName?: string
 }
 
 interface CreateTokenForm {
@@ -29,7 +30,7 @@ export const DEFAULT_VALUES: CreateTokenForm = {
 }
 
 export const NewToken: FC<NewTokenProps> = (props) => {
-  const { setNewToken } = props
+  const { setNewToken, ModuleName } = props
   const [isPendingTx, setPendingTx] = useState(false)
   const [isModal, setModal] = useState(false)
   const { network, ecosystemTokens } = useEcosystem() //todo: mocked
@@ -46,8 +47,7 @@ export const NewToken: FC<NewTokenProps> = (props) => {
   }, [])
   const _updateData = async () => {
     const { getTokensByApp } = await initBGFunctions(browser)
-    const tokens = await getTokensByApp('uc-test-1')
-    console.log(tokens)
+    const tokens = await getTokensByApp(ModuleName)
   }
   const handleSubmit = async (values: CreateTokenForm) => {
     const { symbol, name, icon } = values
@@ -56,7 +56,9 @@ export const NewToken: FC<NewTokenProps> = (props) => {
       const { createAppToken } = await initBGFunctions(browser)
       if (!icon) return
       setPendingTx(true)
-      await createAppToken('uc-test-1', symbol, name, iconUrl, [])
+      console.log(iconUrl)
+
+      await createAppToken(ModuleName, symbol, name, iconUrl, [])
     } catch (e) {
       console.log(e)
     } finally {
@@ -179,15 +181,21 @@ export const NewToken: FC<NewTokenProps> = (props) => {
           href="https://docs.dapplets.org/docs/whitepapers/connected-bonding-curves"
           target="_blank"
         >
-          Whant to learn more aboun bonding curves and custom tokens?
+          Want to learn more aboun bonding curves and custom tokens?
         </a>
       </div>
       <Modal
         classNameWrapper={styles.wraperModal}
         visible={isModal}
-        title="Are you sure?"
+        title="Transaction Confirmation"
         content={
-          <div className={styles.finalWarning}>Final warning - you can't change it anymore</div>
+          <div className={styles.finalWarning}>
+            You are creating {valuesProps.name} {valuesProps.symbol.toUpperCase()} in GOERLY
+            network.
+            <br /> It will use a bonding curve with ZOO token as the collateral. This token will be
+            associated with your project {ModuleName}.<br />
+            You won't be able to change this connection late
+          </div>
         }
         footer={
           <div className={styles.footerContentModal}>
@@ -223,20 +231,4 @@ export const NewToken: FC<NewTokenProps> = (props) => {
 //todo: empty function
 function useEcosystem(): { network: any; ecosystemTokens: any } {
   return { network: 'testnet', ecosystemTokens: 'ZOO' }
-}
-//todo: empty function
-function useCreateToken(): {
-  status: any
-  createToken: (
-    symbol: string,
-    name: string,
-    icon: string,
-    curveTemplate?: string,
-    tokenTemplate?: string,
-    additionalCollaterals?: { addr: string; referenceUrl: string }[]
-  ) => Promise<any | undefined>
-  resetState: () => void
-} {
-  // throw new Error('Function not implemented.');
-  return null
 }

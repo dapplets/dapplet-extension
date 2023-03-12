@@ -258,6 +258,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
             )}
             {activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS && (
               <Tokenomics
+              ModuleInfo={ModuleInfo}
                 setUnderConstructionDetails={setUnderConstructionDetails}
                 setTokenomics={setTokenomics}
               />

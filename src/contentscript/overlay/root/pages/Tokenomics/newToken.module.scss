@@ -190,8 +190,14 @@
   font-family: Roboto;
   font-size: 14px;
   font-weight: 500;
-  line-height: 16px;
+  line-height: 130%;
   color: $MainGrey;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .footerContentModal {

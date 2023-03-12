@@ -9,6 +9,11 @@ const ZERO_SIZE = 0
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 const DEFAULT_ECOSYSTEM = 'zoo'
 const DEFAULT_APP_TYPE = 1
+ type Falsy = false | 0 | '' | null | undefined
+ 
+
+
+
 
 interface I_TokenFactory {}
 
@@ -73,4 +78,6 @@ export class TokenRegistryService {
     await this._init()
     return await this.tokenFactory.linkAppWithToken(DEFAULT_APP_TYPE, appId, tokenAddress)
   }
+
+ 
 }
