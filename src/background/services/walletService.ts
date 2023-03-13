@@ -290,6 +290,19 @@ export class WalletService {
     return wallet.sendCustomRequest(method, params)
   }
 
+  public async eth_sendCustomRequestToWallet(
+    chain: ChainTypes,
+    walletType: WalletTypes,
+    method: string,
+    params: any[]
+  ): Promise<any> {
+    const map = await this._getWalletsMap()
+    const wallet = map[chain][walletType] as EthereumWallet
+    if (!(await wallet.isAvailable())) throw new Error('The wallet is not available')
+    if (!(await wallet.isConnected())) await wallet.connectWallet({})
+    return wallet.sendCustomRequest(method, params)
+  }
+
   public async eth_waitTransaction(
     app: string | DefaultSigners,
     chain: ChainTypes,

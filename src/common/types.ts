@@ -48,7 +48,7 @@ export enum OverlayStorages {
   Decentralized = 'decentralized',
 }
 
-export type WalletDescriptor = {
+export interface WalletDescriptor {
   chain: ChainTypes
   type: WalletTypes
   meta: {
@@ -63,6 +63,10 @@ export type WalletDescriptor = {
   apps: string[]
   default: boolean
   lastUsage: string
+}
+
+export interface WalletDescriptorWithCAMainStatus extends WalletDescriptor {
+  accountActive: boolean
 }
 
 export type ModuleId = {
@@ -156,6 +160,7 @@ export interface IConnectedAccountUser {
   name: string
   origin: string
   accountActive: boolean
+  walletType?: WalletTypes
 }
 
 export interface IConnectedAccountsPair {

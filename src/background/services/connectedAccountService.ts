@@ -10,7 +10,7 @@ import {
   IConnectedAccountUser,
   TConnectedAccount,
   TConnectedAccountsVerificationRequestInfo,
-  WalletDescriptor,
+  WalletDescriptorWithCAMainStatus,
 } from '../../common/types'
 import GlobalConfigService from './globalConfigService'
 import { WalletService } from './walletService'
@@ -135,25 +135,24 @@ export default class ConnectedAccountService {
     receiver,
     prevPairs,
   }: {
-    receiver: WalletDescriptor
+    receiver: WalletDescriptorWithCAMainStatus
     prevPairs: IConnectedAccountsPair[] | null
   }): Promise<IConnectedAccountsPair[]> {
     let newPairs: IConnectedAccountsPair[] = []
     const processingAccountIdsPairs: [string, string][] = []
     const newPendingIds: number[] = []
 
-    const connectedAccStatus: boolean = await this.getStatus(receiver.account, receiver.chain)
-    const cAOrigin =
+    const receiverOrigin =
       receiver.chain === ChainTypes.ETHEREUM_GOERLI || receiver.chain === ChainTypes.ETHEREUM_XDAI
         ? 'ethereum'
         : receiver.chain
-    const connectedAccount: IConnectedAccountUser = {
+    const receiverConnectedAccountUser: IConnectedAccountUser = {
       name: receiver.account,
-      origin: cAOrigin,
+      origin: receiverOrigin,
       img: makeBlockie(receiver.account),
-      accountActive: connectedAccStatus,
+      accountActive: receiver.accountActive,
     }
-    const globalId = receiver.account + '/' + cAOrigin
+    const globalId = receiver.account + '/' + receiverOrigin
 
     // *** PENDING ***
     const addPendingPair = async (accountGlobalId: string, pendingRequestId: number) => {
@@ -161,7 +160,7 @@ export default class ConnectedAccountService {
       const origin = origin2 ? origin1 + '/' + origin2 : origin1
       const accStatus: boolean = await this.getStatus(name, origin)
       newPairs.push({
-        firstAccount: connectedAccount,
+        firstAccount: receiverConnectedAccountUser,
         secondAccount: {
           name,
           origin,
@@ -194,7 +193,7 @@ export default class ConnectedAccountService {
     // *** CONNECTED ***
     const connectedAccounts: TConnectedAccount[][] = await this.getConnectedAccounts(
       receiver.account,
-      cAOrigin,
+      receiverOrigin,
       null
     )
     connectedAccounts.forEach((level, i) =>
@@ -202,7 +201,7 @@ export default class ConnectedAccountService {
         if (this._hasEqualIdsPair([globalId, ca.id], processingAccountIdsPairs)) return
         const [caName, caOrigin1, caOrigin2] = ca.id.split('/')
         newPairs.push({
-          firstAccount: connectedAccount,
+          firstAccount: receiverConnectedAccountUser,
           secondAccount: {
             name: caName,
             origin: caOrigin2 ? caOrigin1 + '/' + caOrigin2 : caOrigin1,
