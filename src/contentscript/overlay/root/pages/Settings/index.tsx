@@ -17,8 +17,9 @@ enum SettingsTabs {
   SETTINGS = 0,
   DEVELOPER = 2,
 }
-enum DappletsDetails {
+export enum DappletsDetails {
   MAININFO = 0,
+  TOKENOMICS = 1,
 }
 
 export enum UnderConstructionDetails {
@@ -64,7 +65,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   const [isDappletsDetails, setDappletsDetail] = useState(false)
   const [isUnderConstruction, setUnderConstruction] = useState(false)
   const [isUnderConstructionDetails, setUnderConstructionDetails] = useState(false)
-  const [ModuleInfo, setModuleInfo] = useState([])
+  const [ModuleInfo, setModuleInfo] = useState(null)
   const [ModuleVersion, setModuleVersion] = useState([])
 
   const [isTokenomics, setTokenomics] = useState(false)
@@ -181,13 +182,28 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
         </div>
       )}
       {isDappletsDetails && !isUnderConstructionDetails && !isUnderConstruction && (
-        <div className={styles.wrapper}>
-          <div className={styles.title}>
+        <div
+          className={cn(styles.wrapper, {
+            [styles.wrapperTokenomics]: activeTaDappletsDetails === DappletsDetails.TOKENOMICS,
+          })}
+        >
+          <div
+            className={cn(styles.title, {
+              [styles.titleTokenomics]: activeTaDappletsDetails === DappletsDetails.TOKENOMICS,
+            })}
+          >
             <SettingTitle
               title="Main info"
               onClick={() => setActiveTabDappletsDetails(DappletsDetails.MAININFO)}
               isActive={activeTaDappletsDetails === DappletsDetails.MAININFO}
             />
+            {ModuleInfo && ModuleInfo.type === 'FEATURE' ? (
+              <SettingTitle
+                title="Tokenomics"
+                onClick={() => setActiveTabDappletsDetails(DappletsDetails.TOKENOMICS)}
+                isActive={activeTaDappletsDetails === DappletsDetails.TOKENOMICS}
+              />
+            ) : null}
           </div>
           <div className={styles.settingMain}>
             {activeTaDappletsDetails === DappletsDetails.MAININFO && (
@@ -198,6 +214,16 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                 setShowChildrenRegistry={setShowChildrenRegistry}
               />
             )}
+            {activeTaDappletsDetails === DappletsDetails.TOKENOMICS &&
+            ModuleInfo &&
+            ModuleInfo.type === 'FEATURE' ? (
+              <Tokenomics
+                ModuleInfo={ModuleInfo}
+                setPageDetails={setDappletsDetail}
+                setTokenomics={setTokenomics}
+                setActiveTab={setActiveTabDappletsDetails}
+              />
+            ) : null}
           </div>
         </div>
       )}
@@ -258,10 +284,10 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
             )}
             {activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS && (
               <Tokenomics
-              ModuleInfo={ModuleInfo}
-                setUnderConstructionDetails={setUnderConstructionDetails}
+                ModuleInfo={ModuleInfo}
+                setPageDetails={setUnderConstructionDetails}
                 setTokenomics={setTokenomics}
-                setActiveTabUnderConstructionDetails={setActiveTabUnderConstructionDetails}
+                setActiveTab={setActiveTabUnderConstructionDetails}
               />
             )}
             {/* {activeTabUnderConstructionDetails === UnderConstructionDetails.REWARDS && (

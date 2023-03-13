@@ -8,17 +8,17 @@ import { Message } from '../../components/Message'
 import { Modal } from '../../components/Modal'
 import useCopied from '../../hooks/useCopyed'
 import formatIconRefUrl from '../../utils/formatIconRefUrl'
-import { UnderConstructionDetails } from '../Settings'
+import { DappletsDetails, UnderConstructionDetails } from '../Settings'
 import { NewToken } from './newToken'
 import { RadioButtons } from './RadioButton/radioButtons'
 import { SelectToken } from './selectToken'
 import styles from './Tokenomics.module.scss'
 export interface TokenomicsProps {
-  setUnderConstructionDetails: (x) => void
+  setPageDetails: (x) => void
   setTokenomics: (x) => void
   isSupport?: boolean
   ModuleInfo: any
-  setActiveTabUnderConstructionDetails: any
+  setActiveTab: any
 }
 enum ChoiseType {
   New = 0,
@@ -41,11 +41,11 @@ type Message = {
 
 export const Tokenomics: FC<TokenomicsProps> = (props) => {
   const {
-    setUnderConstructionDetails,
+    setPageDetails,
     ModuleInfo,
     isSupport = true,
     setTokenomics,
-    setActiveTabUnderConstructionDetails,
+    setActiveTab,
   } = props
   const [isNewToken, setNewToken] = useState(false)
   const [activeChoise, setActiveChoise] = useState(ChoiseType.New)
@@ -111,7 +111,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
   const _updatePage = async () => {
     setModalEndCreation(false)
 
-    setActiveTabUnderConstructionDetails(UnderConstructionDetails.INFO)
+    setActiveTab(ModuleInfo.isUnderConstruction ? UnderConstructionDetails.INFO : DappletsDetails.MAININFO)
   }
   return (
     <>
@@ -248,7 +248,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
               />
             ) : null}
             <div className={styles.linkNavigation}>
-              <button onClick={() => setUnderConstructionDetails(false)} className={styles.back}>
+              <button onClick={() => setPageDetails(false)} className={styles.back}>
                 Back
               </button>
             </div>
@@ -257,8 +257,8 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
           <div className={styles.wrapper} ref={wrapperRef}>
             <NewToken
               setNewToken={setNewToken}
-              ModuleName={mi.name}
-              setActiveTabUnderConstructionDetails={setActiveTabUnderConstructionDetails}
+              module={mi}
+              setActiveTab={setActiveTab}
             />
           </div>
         )
@@ -325,7 +325,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
               </div> */}
           </div>
           <div className={styles.linkNavigation} style={{ marginTop: 'auto' }}>
-            <button onClick={() => setUnderConstructionDetails(false)} className={styles.back}>
+            <button onClick={() => setPageDetails(false)} className={styles.back}>
               Back
             </button>
           </div>

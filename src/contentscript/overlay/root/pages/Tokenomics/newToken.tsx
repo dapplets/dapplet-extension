@@ -1,11 +1,11 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import { Form, Formik } from 'formik'
-import React, { FC, useEffect, useMemo, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { Modal } from '../../components/Modal'
 import saveBlobToIpfs from '../../utils/saveBlobToIpfs'
-import { UnderConstructionDetails } from '../Settings'
+import { DappletsDetails, UnderConstructionDetails } from '../Settings'
 import Button from './Button'
 import CreateTokenSchema from './CreateTokenSchema'
 import Field from './Field/Field'
@@ -13,9 +13,8 @@ import IconField from './IconField/IconField'
 import styles from './newToken.module.scss'
 export interface NewTokenProps {
   setNewToken?: (x) => void
-  ModuleName?: string
-  setActiveTabUnderConstructionDetails?: any
- 
+  module?: any
+  setActiveTab?: any
 }
 
 interface CreateTokenForm {
@@ -37,7 +36,7 @@ type Message = {
   message: string[]
 }
 export const NewToken: FC<NewTokenProps> = (props) => {
-  const { setNewToken, ModuleName, setActiveTabUnderConstructionDetails } = props
+  const { setNewToken, module, setActiveTab } = props
 
   const [isModal, setModal] = useState(false)
   const { network, ecosystemTokens } = useEcosystem() //todo: mocked
@@ -64,7 +63,7 @@ export const NewToken: FC<NewTokenProps> = (props) => {
   }, [])
   const _updateData = async () => {
     const { getTokensByApp } = await initBGFunctions(browser)
-    const tokens = await getTokensByApp(ModuleName)
+    const tokens = await getTokensByApp(module.name)
   }
   const handleSubmit = async (values: CreateTokenForm) => {
     const { symbol, name, icon } = values
@@ -74,7 +73,7 @@ export const NewToken: FC<NewTokenProps> = (props) => {
       const { createAppToken } = await initBGFunctions(browser)
       if (!icon) return
 
-      await createAppToken(ModuleName, symbol, name, iconUrl, [])
+      await createAppToken(module.name, symbol, name, iconUrl, [])
       setModalTransaction(false)
       setModalEndCreation(true)
     } catch (e) {
@@ -91,9 +90,10 @@ export const NewToken: FC<NewTokenProps> = (props) => {
   const _updatePage = async () => {
     setModalEndCreation(false)
 
-    setActiveTabUnderConstructionDetails(UnderConstructionDetails.INFO)
+    setActiveTab(
+      module.isUnderConstruction ? UnderConstructionDetails.INFO : DappletsDetails.MAININFO
+    )
   }
-
 
   return (
     <>
@@ -222,7 +222,7 @@ export const NewToken: FC<NewTokenProps> = (props) => {
             You are creating {valuesProps.name} {valuesProps.symbol.toUpperCase()} in GOERLY
             network.
             <br /> It will use a bonding curve with ZOO token as the collateral. This token will be
-            associated with your project {ModuleName}.<br />
+            associated with your project {module.name}.<br />
             You won't be able to change this connection late
           </div>
         }
