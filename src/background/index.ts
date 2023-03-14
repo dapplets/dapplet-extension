@@ -15,7 +15,7 @@ import {
 import * as tracing from '../common/tracing'
 import { AnalyticsGoals, AnalyticsService } from './services/analyticsService'
 import ConnectedAccountService from './services/connectedAccountService'
-// import DiscordService from './services/discordService'
+import DiscordService from './services/discordService'
 import EnsService from './services/ensService'
 import FeatureService from './services/featureService'
 import GithubService from './services/githubService'
@@ -38,7 +38,7 @@ const suspendService = new SuspendService(globalConfigService)
 const overlayService = new OverlayService()
 const proxyService = new ProxyService(globalConfigService)
 const githubService = new GithubService(globalConfigService)
-// const discordService = new DiscordService(globalConfigService)
+const discordService = new DiscordService(globalConfigService)
 const walletService = new WalletService(globalConfigService, overlayService)
 const sessionService = new SessionService(walletService, overlayService)
 const featureService = new FeatureService(
@@ -177,12 +177,12 @@ browser.runtime.onMessage.addListener(
     getUserAgentId: globalConfigService.getUserAgentId.bind(globalConfigService),
     getUserAgentName: globalConfigService.getUserAgentName.bind(globalConfigService),
     setUserAgentName: globalConfigService.setUserAgentName.bind(globalConfigService),
-    // getIgnoredUpdate: globalConfigService.getIgnoredUpdate.bind(globalConfigService),
-    // setIgnoredUpdate: globalConfigService.setIgnoredUpdate.bind(globalConfigService),
-    // getLastMessageSeenTimestamp:
-    //   globalConfigService.getLastMessageSeenTimestamp.bind(globalConfigService),
-    // setLastMessageSeenTimestamp:
-    //   globalConfigService.setLastMessageSeenTimestamp.bind(globalConfigService),
+    getIgnoredUpdate: globalConfigService.getIgnoredUpdate.bind(globalConfigService),
+    setIgnoredUpdate: globalConfigService.setIgnoredUpdate.bind(globalConfigService),
+    getLastMessageSeenTimestamp:
+      globalConfigService.getLastMessageSeenTimestamp.bind(globalConfigService),
+    setLastMessageSeenTimestamp:
+      globalConfigService.setLastMessageSeenTimestamp.bind(globalConfigService),
     getPreferedOverlayStorage:
       globalConfigService.getPreferedOverlayStorage.bind(globalConfigService),
     setPreferedOverlayStorage:
@@ -228,12 +228,12 @@ browser.runtime.onMessage.addListener(
 
     // Github Service
     getNewExtensionVersion: githubService.getNewExtensionVersion.bind(githubService),
-    // getDevMessage: githubService.getDevMessage.bind(githubService),
-    // hideDevMessage: githubService.hideDevMessage.bind(githubService),
+    getDevMessage: githubService.getDevMessage.bind(githubService),
+    hideDevMessage: githubService.hideDevMessage.bind(githubService),
 
     // Discord Service
-    // getDiscordMessages: discordService.getDiscordMessages.bind(discordService),
-    // hideDiscordMessages: discordService.hideDiscordMessages.bind(discordService),
+    getDiscordMessages: discordService.getDiscordMessages.bind(discordService),
+    hideDiscordMessages: discordService.hideDiscordMessages.bind(discordService),
 
     // LocalStorage
     localStorage_setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
