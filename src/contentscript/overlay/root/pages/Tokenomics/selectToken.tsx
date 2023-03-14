@@ -42,7 +42,7 @@ export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
     init()
     return () => {}
   }, [chooseToken])
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault()
     const newValue = e.target.value
@@ -118,7 +118,9 @@ export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
             </div>
           </div>
         </div>
-      ) : selectToken === undefined ? (
+      ) : selectToken === undefined ||
+        (chooseToken.length > 0 &&
+          getValidationAddress(chooseToken, regExpIndexEthereum) === null) ? (
         <div style={{ marginTop: '20px' }}>Token not found</div>
       ) : null}
     </>

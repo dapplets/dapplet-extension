@@ -4,6 +4,8 @@ import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import { ReactComponent as Copy } from '../../assets/icons/tokenomics/copy.svg'
+import { regExpIndexEthereum } from '../../common/constants'
+import { getValidationAddress } from '../../common/helpers'
 import { Message } from '../../components/Message'
 import { Modal } from '../../components/Modal'
 import useCopied from '../../hooks/useCopyed'
@@ -40,13 +42,7 @@ type Message = {
 }
 
 export const Tokenomics: FC<TokenomicsProps> = (props) => {
-  const {
-    setPageDetails,
-    ModuleInfo,
-    isSupport = true,
-    setTokenomics,
-    setActiveTab,
-  } = props
+  const { setPageDetails, ModuleInfo, isSupport = true, setTokenomics, setActiveTab } = props
   const [isNewToken, setNewToken] = useState(false)
   const [activeChoise, setActiveChoise] = useState(ChoiseType.New)
   const [isModal, setModal] = useState(false)
@@ -111,7 +107,9 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
   const _updatePage = async () => {
     setModalEndCreation(false)
 
-    setActiveTab(ModuleInfo.isUnderConstruction ? UnderConstructionDetails.INFO : DappletsDetails.MAININFO)
+    setActiveTab(
+      ModuleInfo.isUnderConstruction ? UnderConstructionDetails.INFO : DappletsDetails.MAININFO
+    )
   }
   return (
     <>
@@ -164,7 +162,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
                     <button
                       disabled={
                         activeChoise === ChoiseType.Existing &&
-                        !selectToken &&
+                        getValidationAddress(chooseToken, regExpIndexEthereum) === null &&
                         activeChoise === ChoiseType.Existing &&
                         !daiInfo
                       }
@@ -181,15 +179,13 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
             </div>
             <Modal
               classNameWrapper={styles.wraperModal}
-              visible={isModal}
+              visible={isModal && daiInfo}
               title="Transaction Confirmation"
               content={
                 <div className={styles.finalWarning}>
-                  You are creating {daiInfo && daiInfo.name} {daiInfo && daiInfo.symbol} in GOERLY
-                  network.
-                  <br /> It will use a bonding curve with ZOO token as the collateral. This token
-                  will be associated with your project {mi.name}.<br />
-                  You won't be able to change this connection late
+                  You are associate token {daiInfo && daiInfo.name} to your project {mi.name}
+                  <br />
+                  You won&#39;t be able to change this connection late
                 </div>
               }
               footer={
@@ -226,7 +222,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
               title={'Transaction finished'}
               content={''}
               footer={''}
-              onClose={()=>_updatePage()}
+              onClose={() => _updatePage()}
             />
             {message ? (
               <Modal
@@ -255,11 +251,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
           </div>
         ) : (
           <div className={styles.wrapper} ref={wrapperRef}>
-            <NewToken
-              setNewToken={setNewToken}
-              module={mi}
-              setActiveTab={setActiveTab}
-            />
+            <NewToken setNewToken={setNewToken} module={mi} setActiveTab={setActiveTab} />
           </div>
         )
       ) : (

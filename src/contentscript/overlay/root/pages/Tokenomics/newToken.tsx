@@ -219,10 +219,10 @@ export const NewToken: FC<NewTokenProps> = (props) => {
         title="Transaction Confirmation"
         content={
           <div className={styles.finalWarning}>
-            You are creating {valuesProps.name} {valuesProps.symbol.toUpperCase()} in GOERLY
+            You are creating {valuesProps.name} {valuesProps.symbol.toUpperCase()} in GOERLI 
             network.
             <br /> It will use a bonding curve with ZOO token as the collateral. This token will be
-            associated with your project {module.name}.<br />
+            associated to your project {module.name}.<br />
             You won't be able to change this connection late
           </div>
         }
