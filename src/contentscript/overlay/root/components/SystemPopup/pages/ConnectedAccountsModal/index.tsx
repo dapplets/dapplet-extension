@@ -43,7 +43,7 @@ type TRequestBody = {
 }
 
 const ModalCAUserButton = ({ user }: { user: IConnectedAccountUser }) => (
-  <CAUserButton user={user} maxLength={24} colour="#eaf0f0" />
+  <CAUserButton user={user} maxLength={24} color="#eaf0f0" />
 )
 
 const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {

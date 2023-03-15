@@ -369,8 +369,8 @@ export const ConnectedAccount = () => {
                     return (
                       <div key={i} className={styles.mainBlock}>
                         <div className={cn(styles.accountBlock, styles.accountBlockVertical)}>
-                          <CAUserButton user={x.firstAccount} handleOpenPopup={handleOpenPopup} />
-                          <CAUserButton user={x.secondAccount} handleOpenPopup={handleOpenPopup} />
+                          <CAUserButton user={x.firstAccount} onClick={handleOpenPopup} />
+                          <CAUserButton user={x.secondAccount} onClick={handleOpenPopup} />
                         </div>
                         <div className={cn(styles.accountStatus)}>
                           <div data-title={x.statusMessage}>

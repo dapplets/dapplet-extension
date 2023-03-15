@@ -6,22 +6,22 @@ import styles from './CAUserButton.module.scss'
 
 export const CAUserButton = ({
   user,
-  handleOpenPopup,
+  onClick,
   maxLength = 32,
-  colour = 'white',
+  color = 'white',
 }: {
   user?: IConnectedAccountUser
-  handleOpenPopup?: (account: IConnectedAccountUser) => Promise<void>
+  onClick?: (account: IConnectedAccountUser) => Promise<void>
   maxLength?: number
-  colour?: string
+  color?: string
 }) => {
   return (
     <div
       className={cn(styles.account, {
         [styles.nameUserActive]: user?.accountActive,
       })}
-      style={{ backgroundColor: colour }}
-      onClick={handleOpenPopup && (() => user && handleOpenPopup(user))}
+      style={{ backgroundColor: color }}
+      onClick={onClick && (() => user && onClick(user))}
     >
       {user ? (
         <>

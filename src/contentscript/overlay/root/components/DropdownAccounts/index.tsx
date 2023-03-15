@@ -47,7 +47,7 @@ export function DropdownAccounts<T>(props: TDropdownAccountsProps<T>) {
               }
             }
             maxLength={20}
-            colour="#eaf0f0"
+            color="#eaf0f0"
           />
         </div>
         {values && values.length > 1 && (
@@ -80,7 +80,7 @@ export function DropdownAccounts<T>(props: TDropdownAccountsProps<T>) {
                       accountActive: value['accountActive'],
                     }}
                     maxLength={20}
-                    colour="#eaf0f0"
+                    color="#eaf0f0"
                   />
                 </div>
               ))}
