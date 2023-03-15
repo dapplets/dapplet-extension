@@ -152,9 +152,9 @@ browser.runtime.onMessage.addListener(
     getDevMode: () => globalConfigService.getDevMode(),
     setDevMode: (isActive) => globalConfigService.setDevMode(isActive),
     getNotifications: (type) => notificationService.getNotifications(type),
-    createAndShowNotification: (notify, tabId?, icon?) =>
-      notificationService.createAndShowNotification(notify, tabId, icon),
-    createNotification: (notify, icon) => notificationService.createNotification(notify, icon),
+    createAndShowNotification: (notify, tabId) =>
+      notificationService.createAndShowNotification(notify, tabId),
+    createNotification: (notify) => notificationService.createNotification(notify),
     showNotification: (notificationId, tabId) =>
       notificationService.showNotification(notificationId, tabId),
     deleteNotification: (id) => notificationService.deleteNotification(id),
