@@ -102,6 +102,7 @@
   },
   "dependencies": {
     "animejs": "^3.2.1",
+    "caching-decorator": "^1.0.2",
     "copy-to-clipboard": "^3.3.3",
     "ethers": "^5.7.2",
     "near-api-js": "^0.39.0"

@@ -8,6 +8,7 @@ import {
   areModulesEqual,
   blobToDataURL,
   getCurrentTab,
+  Measure,
   mergeDedupe,
   parseModuleName,
 } from '../../common/helpers'
@@ -279,6 +280,7 @@ export default class FeatureService {
     return dtos
   }
 
+  @Measure()
   private async _setFeatureActive(
     name: string,
     version: string | undefined,
@@ -457,9 +459,6 @@ export default class FeatureService {
     const globalConfig = await this._globalConfigService.get()
     if (globalConfig.suspended) return []
 
-    const configs = await Promise.all(
-      contextIds.map((h) => this._globalConfigService.getSiteConfigById(h))
-    )
     const modules: {
       name: string
       branch: string
@@ -467,6 +466,34 @@ export default class FeatureService {
       order: number
       hostnames: string[]
     }[] = []
+
+    // Activate dynamic adapter for dynamic contexts searching
+    const hostnames = contextIds.filter((x) => /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/gm.test(x))
+    if (hostnames.length > 0) {
+      const dynamicAdapter = await this._globalConfigService.getDynamicAdapter()
+      if (dynamicAdapter) {
+        const parsed = parseModuleName(dynamicAdapter)
+        if (parsed) {
+          modules.push({
+            name: parsed.name,
+            branch: parsed.branch,
+            version: parsed.version,
+            order: -1,
+            hostnames: hostnames,
+          })
+        }
+      }
+    }
+
+    // Skip if there is no active dapplets
+    const wildcardConfig = await this._globalConfigService.getSiteConfigById(CONTEXT_ID_WILDCARD)
+    if (!Object.values(wildcardConfig.activeFeatures).find((x) => x.isActive === true)) {
+      return modules
+    }
+
+    const configs = await Promise.all(
+      contextIds.map((h) => this._globalConfigService.getSiteConfigById(h))
+    )
 
     let i = 0
     for (const config of configs) {
@@ -517,24 +544,6 @@ export default class FeatureService {
             version: moduleId.version,
             order: i++,
             hostnames: dto.hostnames,
-          })
-        }
-      }
-    }
-
-    // Activate dynamic adapter for dynamic contexts searching
-    const hostnames = contextIds.filter((x) => /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/gm.test(x))
-    if (hostnames.length > 0) {
-      const dynamicAdapter = await this._globalConfigService.getDynamicAdapter()
-      if (dynamicAdapter) {
-        const parsed = parseModuleName(dynamicAdapter)
-        if (parsed) {
-          modules.push({
-            name: parsed.name,
-            branch: parsed.branch,
-            version: parsed.version,
-            order: -1,
-            hostnames: hostnames,
           })
         }
       }
