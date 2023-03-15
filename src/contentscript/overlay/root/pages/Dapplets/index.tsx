@@ -37,6 +37,9 @@ export interface DappletsProps {
   tabs?: any
   setModule: any
   classNameBlock?: string
+  overlays: any
+  pathname: string
+  navigate: any
 }
 
 export const Dapplets: FC<DappletsProps> = (props) => {
@@ -50,6 +53,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     tabs,
     setModule,
     classNameBlock,
+    overlays,
+    pathname,
+    navigate,
   } = props
 
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
@@ -141,12 +147,17 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
     try {
-      _updateFeatureState(f.name, { isActionLoading: true })
-      const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
-      const tab = await getCurrentTab()
+      const isOverlayActive = overlays.find((x) => x.source === f.name)
+      if ((pathname.includes('system') && overlays.lenght === 0) || !isOverlayActive) {
+        _updateFeatureState(f.name, { isActionLoading: true })
+        const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
+        const tab = await getCurrentTab()
 
-      if (!tab) return
-      await openDappletAction(f.name, tab.id)
+        if (!tab) return
+        await openDappletAction(f.name, tab.id)
+      } else {
+        overlays.filter((x) => x.source === f.name).map((x) => navigate!(`/${f.name}/${x.id}`))
+      }
     } catch (err) {
       console.error(err)
     } finally {
@@ -307,9 +318,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       {isLoadingListDapplets ? (
         <TabLoader />
       ) : (
-        <div
-          className={cn(styles.dappletsBlock, classNameBlock)}
-        >
+        <div className={cn(styles.dappletsBlock, classNameBlock)}>
           <DevMessage/>
           {!isNoContentScript ? (
             filteredDapplets && filteredDapplets.length && filteredDapplets.length > 0 ? (

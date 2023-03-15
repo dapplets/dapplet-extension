@@ -618,6 +618,7 @@ class _App extends React.Component<P, S> {
                   // ^ do not load the dapplets list until a user has opened the overlay
                   <Dapplets
                     search={s.search}
+                    overlays={overlays}
                     onUserSettingsClick={this.handleUserSettingsClick}
                     setDropdownListValue={this.setDropdownListValue}
                     dropdownListValue={s.dropdownListValue}
@@ -625,6 +626,8 @@ class _App extends React.Component<P, S> {
                     handleCloseTabClick={this.handleCloseTabClick}
                     tabs={this.getTabs()}
                     setModule={this.setModule}
+                    pathname={pathname}
+                    navigate={this.props.navigate!}
                     classNameBlock={
                       s.isOpenSearch && pathname === '/system/dapplets' ? styles.newHeight : null
                     }
