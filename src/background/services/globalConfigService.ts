@@ -34,8 +34,8 @@ const EXPORTABLE_PROPERTIES = [
   'ipfsGatewayUrl',
   // 'walletsUsage',
   'hostnames',
-  //'lastDevMessageHash',
-  //'ignoredUpdate',
+  'lastDevMessageHash',
+  'ignoredUpdate',
   'dynamicAdapter',
   'preferedOverlayStorage',
   'myDapplets',
@@ -702,29 +702,29 @@ export default class GlobalConfigService {
     await this.set(globalConfig)
   }
 
-  // async getLastDevMessageHash() {
-  //   return this.get().then((x) => x.lastDevMessageHash)
-  // }
+  async getLastDevMessageHash() {
+    return this.get().then((x) => x.lastDevMessageHash)
+  }
 
-  // async setLastDevMessageHash(hash: string) {
-  //   return this.updateConfig((c) => (c.lastDevMessageHash = hash))
-  // }
+  async setLastDevMessageHash(hash: string) {
+    return this.updateConfig((c) => (c.lastDevMessageHash = hash))
+  }
 
-  // async getIgnoredUpdate() {
-  //   return this.get().then((x) => x.ignoredUpdate)
-  // }
+  async getIgnoredUpdate() {
+    return this.get().then((x) => x.ignoredUpdate)
+  }
 
-  // async setIgnoredUpdate(version: string) {
-  //   return this.updateConfig((c) => (c.ignoredUpdate = version))
-  // }
+  async setIgnoredUpdate(version: string) {
+    return this.updateConfig((c) => (c.ignoredUpdate = version))
+  }
 
-  // async getLastMessageSeenTimestamp() {
-  //   return this.get().then((x) => x.lastMessageSeenTimestamp)
-  // }
+  async getLastMessageSeenTimestamp() {
+    return this.get().then((x) => x.lastMessageSeenTimestamp)
+  }
 
-  // async setLastMessageSeenTimestamp(lastMessageSeenTimestamp: string) {
-  //   return this.updateConfig((c) => (c.lastMessageSeenTimestamp = lastMessageSeenTimestamp))
-  // }
+  async setLastMessageSeenTimestamp(lastMessageSeenTimestamp: string) {
+    return this.updateConfig((c) => (c.lastMessageSeenTimestamp = lastMessageSeenTimestamp))
+  }
 
   async getDynamicAdapter() {
     return this.get().then((x) => x.dynamicAdapter)

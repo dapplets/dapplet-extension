@@ -19,6 +19,7 @@ import { TabLoader } from '../../components/TabLoader'
 import useAbortController from '../../hooks/useAbortController'
 import { openLink } from '../../utils/openLink'
 import styles from './Dapplets.module.scss'
+import { DevMessage } from './DevMessage'
 
 export type Module = ManifestDTO & {
   isLoading: boolean
@@ -318,6 +319,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         <TabLoader />
       ) : (
         <div className={cn(styles.dappletsBlock, classNameBlock)}>
+          <DevMessage/>
           {!isNoContentScript ? (
             filteredDapplets && filteredDapplets.length && filteredDapplets.length > 0 ? (
               filteredDapplets.map((dapplet, i) => {

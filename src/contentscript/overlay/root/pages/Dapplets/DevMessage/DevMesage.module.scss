@@ -1,0 +1,101 @@
+@import '../../../assets/styles/color.variables';
+@import '../../../assets/styles/null';
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  margin: 10px 0;
+  padding: 6px;
+  margin-left: 10px;
+  border-radius: 6px;
+  margin-right: 2px;
+  box-shadow: 0 1px 2px rgba(225, 225, 225, 0.2), 0 -1px 2px rgba(225, 225, 225, 0.2),
+    0 -1px 2px rgba(255, 255, 255, 0.9), 0 1px 3px rgba(225, 225, 225, 0.9);
+}
+
+.fisrtLine {
+  display: flex;
+  justify-content: space-between;
+}
+.versionBlock {
+  display: flex;
+  flex-direction: column;
+}
+.newVersion {
+  font-family: Roboto;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+  color: #26a651;
+  display: inline-block;
+  padding-bottom: 6px;
+}
+.version {
+  font-family: Roboto;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 100%;
+  color: #919191;
+  display: inline-block;
+  padding-bottom: 6px;
+}
+.buttonBlock {
+  display: flex;
+  align-items: center;
+}
+
+.buttonIgnore {
+  font-family: Roboto;
+  background: inherit;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+  text-decoration-line: underline;
+  color: #919191;
+  margin-right: 10px;
+  &:hover {
+    color: $ContentBlack;
+  }
+}
+
+.buttonUpgrade {
+  font-family: Roboto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #5ec280;
+  border-radius: 8px;
+  width: 64px;
+  height: 28px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+  color: #ffffff;
+  &:hover {
+    background: #198638;
+  }
+  &:active {
+    background: #69d688;
+  }
+}
+
+.secondLine {
+  display: flex;
+  font-family: Roboto;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 149%;
+  a {
+    display: inline-block;
+    color: #26a651;
+    text-decoration-line: underline;
+    cursor: pointer;
+    &:hover {
+      color: #198638;
+    }
+    &:active {
+      color: #69d688;
+    }
+  }
+}
