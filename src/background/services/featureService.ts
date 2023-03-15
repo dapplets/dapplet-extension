@@ -584,16 +584,6 @@ export default class FeatureService {
     }))
   }
 
-  public async optimizeDependency(
-    name: string,
-    branch: string,
-    version: string,
-    contextIds: string[]
-  ) {
-    // ToDo: fix this hack
-    return this._moduleManager.optimizeDependency(name, version, branch, contextIds)
-  }
-
   public async getAllDevModules() {
     const descriptors = await this._walletService.getWalletDescriptors()
     const users = descriptors

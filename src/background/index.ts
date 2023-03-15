@@ -105,8 +105,6 @@ browser.runtime.onMessage.addListener(
     getActiveModulesByHostnames: (hostnames) =>
       featureService.getActiveModulesByHostnames(hostnames),
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
-    optimizeDependency: (name, branch, version, contextIds) =>
-      featureService.optimizeDependency(name, branch, version, contextIds),
     getAllDevModules: () => featureService.getAllDevModules(),
     uploadModule: (mi, vi, targetStorages) => featureService.uploadModule(mi, vi, targetStorages),
     deployModule: (mi, vi, targetStorages, targetRegistry) =>
