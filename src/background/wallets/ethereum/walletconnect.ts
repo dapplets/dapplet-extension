@@ -33,7 +33,7 @@ export default class extends ethers.Signer implements EthereumWallet {
   async getAddress(): Promise<string> {
     const walletconnect = getWalletConnect()
     return Promise.resolve(
-      walletconnect.accounts[0] || '0x0000000000000000000000000000000000000000'
+      walletconnect.accounts[0]?.toLowerCase() || '0x0000000000000000000000000000000000000000'
     )
   }
 

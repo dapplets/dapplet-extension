@@ -1,12 +1,13 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { browser } from 'webextension-polyfill-ts'
-import { ChainTypes, DefaultSigners, EthSignature } from '../../../../../../../../common/types'
+import { ChainTypes, EthSignature, WalletTypes } from '../../../../../../../../common/types'
 
 const getSignature = async (
   firstAccountName: string,
   firstAccountOrigin: string,
   secondAccountName: string,
   secondAccountOrigin: string,
+  walletType: WalletTypes,
   statement: string
 ): Promise<EthSignature> => {
   const msgParams = {
@@ -50,21 +51,21 @@ const getSignature = async (
   const msgParamsStr = JSON.stringify(msgParams)
 
   const {
-    eth_sendCustomRequest,
+    eth_sendCustomRequestToWallet,
   }: {
-    eth_sendCustomRequest: (
-      app: string | DefaultSigners,
+    eth_sendCustomRequestToWallet: (
       chain: ChainTypes,
+      walletType: WalletTypes,
       method: string,
-      params: [string, string]
-    ) => Promise<string>
+      params: any[]
+    ) => Promise<any>
   } = await initBGFunctions(browser)
 
-  const result = await eth_sendCustomRequest(
-    DefaultSigners.EXTENSION,
+  const result: string = await eth_sendCustomRequestToWallet(
     secondAccountOrigin === ChainTypes.ETHEREUM_GOERLI
       ? ChainTypes.ETHEREUM_GOERLI
       : ChainTypes.ETHEREUM_XDAI,
+    walletType,
     'eth_signTypedData_v3',
     [secondAccountName, msgParamsStr]
   )

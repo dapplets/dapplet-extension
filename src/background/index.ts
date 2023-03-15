@@ -69,6 +69,7 @@ browser.runtime.onMessage.addListener(
 
     eth_sendTransactionOutHash: walletService.eth_sendTransactionOutHash.bind(walletService),
     eth_sendCustomRequest: walletService.eth_sendCustomRequest.bind(walletService),
+    eth_sendCustomRequestToWallet: walletService.eth_sendCustomRequestToWallet.bind(walletService),
     eth_waitTransaction: walletService.eth_waitTransaction.bind(walletService),
     near_sendCustomRequest: walletService.near_sendCustomRequest.bind(walletService),
 
