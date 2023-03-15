@@ -2,7 +2,9 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { browser } from 'webextension-polyfill-ts'
 import { IConnectedAccountUser } from '../../../../../../../../common/types'
 
-const askIfSameRequestsExist = async (accounts: [IConnectedAccountUser, IConnectedAccountUser]) => {
+const isThereAPendingRequestForThisCAUsers = async (
+  accounts: [IConnectedAccountUser, IConnectedAccountUser]
+) => {
   const [firstAccount, secondAccount] = accounts
   const firstAccountGlobalId = firstAccount.name + '/' + firstAccount.origin
   const secondAccountGlobalId = secondAccount.name + '/' + secondAccount.origin
@@ -22,4 +24,4 @@ const askIfSameRequestsExist = async (accounts: [IConnectedAccountUser, IConnect
   return false
 }
 
-export default askIfSameRequestsExist
+export default isThereAPendingRequestForThisCAUsers

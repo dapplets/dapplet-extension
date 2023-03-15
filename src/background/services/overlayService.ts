@@ -75,13 +75,20 @@ export class OverlayService {
   }
 
   public openConnectedAccountsPopup(
-    { accountsToConnect, accountsToDisconnect, accountToChangeStatus, condition },
+    {
+      accountsToConnect,
+      bunchOfAccountsToConnect,
+      accountsToDisconnect,
+      accountToChangeStatus,
+      condition,
+    },
     tabId: number
   ) {
     return this._openOverlay(
       'OPEN_SYSTEM_OVERLAY',
       {
         accountsToConnect,
+        bunchOfAccountsToConnect,
         accountsToDisconnect,
         accountToChangeStatus,
         condition,
