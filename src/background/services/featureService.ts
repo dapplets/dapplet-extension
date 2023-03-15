@@ -315,8 +315,26 @@ export default class FeatureService {
       const runtime = await new Promise<void>(async (resolve, reject) => {
         // listening of loading/unloading from contentscript
         const listener = (message) => {
-          if (!message || !message.type || !message.payload) return
+          setTimeout(async () => {
+            if (!message || !message.type || !message.payload) {
+              browser.runtime.onMessage.removeListener(listener)
+              for (const hostname of hostnames) {
+                const config = await this._globalConfigService.getSiteConfigById(hostname)
+                config.activeFeatures[name] = {
+                  version,
+                  isActive: !isActive,
+                  order,
+                  runtime: null,
+                  registryUrl,
+                }
+
+                await this._globalConfigService.updateSiteConfig(config)
+              }
+            }
+          }, 10000)
+          // if (!message || !message.type || !message.payload) return
           const p = message.payload
+
           if (message.type === 'FEATURE_LOADED') {
             if (
               p.name === name &&
@@ -325,6 +343,7 @@ export default class FeatureService {
               isActive === true
             ) {
               browser.runtime.onMessage.removeListener(listener)
+
               resolve(p.runtime)
             }
           } else if (message.type === 'FEATURE_UNLOADED') {
