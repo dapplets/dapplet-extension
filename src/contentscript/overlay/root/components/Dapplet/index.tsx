@@ -1,7 +1,5 @@
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import { ManifestAndDetails } from '../../../../../common/types'
 import { ReactComponent as CopiedIcon } from '../../assets/svg/copied.svg'
 import { ReactComponent as CopyIcon } from '../../assets/svg/copyModal.svg'
@@ -11,7 +9,6 @@ import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
 import { ReactComponent as SearchIcon } from '../../assets/svg/newLinks.svg'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
 import { ReactComponent as OpenSeaIcon } from '../../assets/svg/opensea.svg'
-import useAbortController from '../../hooks/useAbortController'
 import { createUserEnvInfo } from '../../utils/createUserEnvInfo'
 import { DappletImage } from '../DappletImage'
 import { DappletInfo } from '../DappletInfo'
@@ -34,9 +31,7 @@ export interface DappletProps
   onRemoveMyDapplet?: (x: any) => void
   onOpenStore: (x: any) => void
   onOpenNft: (x: any) => void
-  loadShowButton: boolean
   onOpenStoreAuthor: Function
-  getTabsForDapplet?: any
 }
 
 enum LoadingState {
@@ -55,10 +50,8 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     onRemoveMyDapplet,
     onOpenStore,
     onOpenNft,
-    loadShowButton,
     onOpenStoreAuthor,
     index,
-    getTabsForDapplet,
     ...anotherProps
   } = props
 
@@ -66,41 +59,10 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     dapplet
 
   const [loadHome, setLoadHome] = useState(false)
-  const [registryActive, setRegistryActive] = useState(null)
-  const [owner, setOwner] = useState(null)
   const [copied, setCopied] = useState<LoadingState>(LoadingState.READY)
-  const abortController = useAbortController()
-  useEffect(() => {
-    const init = async () => {
-      // if (!abortController.signal.aborted) {
-      await updateData()
-      // }
-    }
-    init()
-    return () => {
-      // abortController.abort()
-    }
-  }, [loadHome, abortController.signal.aborted])
+
   const loadingHome = () => {
     setLoadHome(false)
-  }
-
-  const updateData = async () => {
-    const { getRegistries, getOwnership } = await initBGFunctions(browser)
-    const registries = await getRegistries()
-
-    const newRegistries = registries
-      .filter((r) => r.isDev === false && r.isEnabled !== false)
-      .map((x, i) => x.url)
-    if (!abortController.signal.aborted) {
-      setRegistryActive(newRegistries[0])
-    }
-
-    const newOwner = await getOwnership(newRegistries[0], name)
-    if (!abortController.signal.aborted) {
-      setOwner(newOwner)
-    }
-    // if (isActive) getTabsForDapplet(dapplet)
   }
 
   const copyUserEnvInfo = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -220,7 +182,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
             <DappletInfo
               title="Owner"
-              value={dapplet.sourceRegistry.isDev ? owner : author}
+              value={author}
               className={styles.cardInfo}
               onClick={() => onOpenStoreAuthor(dapplet)}
             />
