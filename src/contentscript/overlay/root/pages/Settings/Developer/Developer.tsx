@@ -4,6 +4,7 @@ import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../../background/models/versionInfo'
+import * as EventBus from '../../../../../../common/global-event-bus'
 import { groupBy, isValidUrl } from '../../../../../../common/helpers'
 import { DevModule } from '../../../components/DevModulesList'
 import { Localhost } from '../../../components/Localhost'
@@ -55,33 +56,46 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     selectedWallet,
   } = props
   const abortController = useAbortController()
+
   useEffect(() => {
     const init = async () => {
-      setLoadButton(true)
-      await loadRegistries()
-      const { getCurrentTab } = await initBGFunctions(browser)
-      const currentTab = await getCurrentTab()
-      if (!currentTab) return
-      const currentUrl = currentTab.url
-      const urlEnding = currentUrl.split('/').reverse()[0]
-      if (['index.json', 'dapplet.json'].includes(urlEnding)) {
-        setRegistryInput(currentUrl)
-        if (isUpdate) {
-          await loadRegistries()
-          if (!abortController.signal.aborted) {
-            setUpdate(false)
-          }
-        }
-      }
-      if (!abortController.signal.aborted) {
-        setLoadButton(false)
-      }
+      await _updateData()
     }
     init()
     return () => {
       // abortController.abort()
     }
-  }, [isUpdate, selectedWallet, abortController.signal.aborted])
+  }, [abortController.signal.aborted])
+
+  useEffect(() => {
+    EventBus.on('wallet_changed', _updateData)
+
+    return () => {
+      EventBus.off('wallet_changed', _updateData)
+    }
+  }, [])
+
+  const _updateData = async () => {
+    setLoadButton(true)
+    await loadRegistries()
+    const { getCurrentTab } = await initBGFunctions(browser)
+    const currentTab = await getCurrentTab()
+    if (!currentTab) return
+    const currentUrl = currentTab.url
+    const urlEnding = currentUrl.split('/').reverse()[0]
+    if (['index.json', 'dapplet.json'].includes(urlEnding)) {
+      setRegistryInput(currentUrl)
+      if (isUpdate) {
+        await loadRegistries()
+        if (!abortController.signal.aborted) {
+          setUpdate(false)
+        }
+      }
+    }
+    if (!abortController.signal.aborted) {
+      setLoadButton(false)
+    }
+  }
 
   const loadRegistries = async () => {
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)

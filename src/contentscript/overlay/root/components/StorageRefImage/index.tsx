@@ -5,7 +5,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { StorageRef } from '../../../../../common/types'
 import useAbortController from '../../hooks/useAbortController'
 import styles from './StorageRefImage.module.scss'
-
+import * as EventBus from '../../../../../common/global-event-bus'
 interface PropsStorageRefImage {
   storageRef: StorageRef | string
   className?: string
@@ -17,16 +17,23 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
   const { storageRef, className, title, onClick } = props
   const [dataUri, setDataUri] = useState(null)
   const abortController = useAbortController()
-
+  const init = async () => {
+    await _updateStorageRef(storageRef)
+  }
   useEffect(() => {
-    const init = async () => {
-      await _updateStorageRef(storageRef)
-    }
+   
     init()
     return () => {
       // abortController.abort()
     }
-  }, [storageRef, abortController.signal.aborted])
+  }, [ abortController.signal.aborted])
+  useEffect(() => {
+    EventBus.on('get_base64', init)
+
+    return () => {
+      EventBus.off('get_base64', init)
+    }
+  }, [])
   const _updateStorageRef = async (storageRef) => {
     if (!storageRef) return
 

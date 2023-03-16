@@ -12,13 +12,7 @@ export const RadioButtons: FC<RadioButtonsProps> = (props: RadioButtonsProps) =>
   const { name, id, value, ...anotherProps } = props
   return (
     <div className={cn(styles.form_radio)}>
-      <input    
-        type="radio"
-        name={name}
-        id={id}
-        value={value}
-        {...anotherProps}
-      />
+      <input type="radio" name={name} id={id} value={value} {...anotherProps} />
       <label htmlFor={id} className={cn(styles.inputRadioTitle)}>
         {value}
       </label>

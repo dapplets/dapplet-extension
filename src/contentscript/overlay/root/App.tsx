@@ -607,9 +607,10 @@ class _App extends React.Component<P, S> {
                 onClick={() => this.handleCloseSearch()}
                 className={cn(styles.children, 'dapplets-overlay-nav-content-list', {
                   [styles.newChildren]:
-                    pathname !== '/system/dapplets' &&
+                    pathname !== '/system/dapplets'
+                    //  &&
                     // pathname !== '/system/notifications' &&
-                    pathname !== '/system/settings',
+                    // pathname !== '/system/settings',
                   // [styles.newHeight]:s.isOpenSearch && pathname === '/system/dapplets'
                 })}
               >

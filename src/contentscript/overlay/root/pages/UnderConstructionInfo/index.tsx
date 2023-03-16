@@ -131,30 +131,28 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-   
-      setRegistryOptions(
-        prodRegistries.map((r) => ({
-          key: r.url,
-          text: r.url,
-          value: r.url,
-        }))
-      )
-      setTargetRegistry(prodRegistries[0]?.url || null)
-      setTrustedUsers(trustedUsers)
-      setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-    
+
+    setRegistryOptions(
+      prodRegistries.map((r) => ({
+        key: r.url,
+        text: r.url,
+        value: r.url,
+      }))
+    )
+    setTargetRegistry(prodRegistries[0]?.url || null)
+    setTrustedUsers(trustedUsers)
+    setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
     await _updateCurrentAccount()
   }
 
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
-    if (targetChain) { const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-    
+    if (targetChain) {
+      const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
+
       setCurrentAccount(currentAccount)
-    }else return
-   
-    
+    } else return
   }
 
   const iconInputChangeHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {

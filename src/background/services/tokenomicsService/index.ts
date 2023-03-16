@@ -1,9 +1,9 @@
 import * as ethers from 'ethers'
+import * as EventBus from '../../../common/global-event-bus'
 import { ChainTypes, DefaultSigners } from '../../../common/types'
 import GlobalConfigService from '../globalConfigService'
 import { WalletService } from '../walletService'
 import abi from './app-token-registry.json'
-import * as EventBus from '../../../common/global-event-bus'
 // todo: create cycle
 const PAGE_SIZE = 20
 const ZERO_SIZE = 0

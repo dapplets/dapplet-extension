@@ -318,7 +318,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         <TabLoader />
       ) : (
         <div className={cn(styles.dappletsBlock, classNameBlock)}>
-          <DevMessage/>
+          <DevMessage />
           {!isNoContentScript ? (
             filteredDapplets && filteredDapplets.length && filteredDapplets.length > 0 ? (
               filteredDapplets.map((dapplet, i) => {

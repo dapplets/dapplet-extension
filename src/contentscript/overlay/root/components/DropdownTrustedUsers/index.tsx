@@ -39,7 +39,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
     return () => {
       // abortController.abort()
     }
-  }, [trustedUserInput, abortController.signal.aborted])
+  }, [abortController.signal.aborted])
 
   const removeTrustedUser = async (account: string) => {
     const { removeTrustedUser } = await initBGFunctions(browser)
@@ -74,9 +74,9 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
     }
   }
   const visible = (hash: string): string => {
-    if (hash.length > 38) {
-      const firstFourCharacters = hash.substring(0, 20)
-      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 18)
+    if (hash.length > 33) {
+      const firstFourCharacters = hash.substring(0, 15)
+      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 15)
 
       return `${firstFourCharacters}...${lastFourCharacters}`
     } else {
