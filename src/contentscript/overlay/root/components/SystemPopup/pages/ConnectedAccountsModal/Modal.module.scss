@@ -101,7 +101,12 @@
 .modalAccounts {
   display: flex;
   flex-direction: column;
+  width: 236px;
   margin-top: 4px;
+}
+
+.modalAccounts > div {
+  margin: 4px 0;;
 }
 
 .modalBody {
