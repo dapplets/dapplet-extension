@@ -1,6 +1,6 @@
-@import "../../assets/styles/null";
-@import "../../assets/styles/fonts";
-@import "../../assets/styles/color.variables";
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
 
 .wrapper {
   overflow: hidden;
@@ -9,7 +9,7 @@
   flex-direction: column;
 
   width: 100%;
-  height: calc(100vh - 93px);
+  height: calc(100vh - 83px);
 }
 
 .wrapper::-webkit-scrollbar {
@@ -43,13 +43,12 @@
 
   &::-webkit-scrollbar-track {
     background: rgb(244 244 244);
-    background:
-      linear-gradient(
-        90deg,
-        rgb(244 244 244 / 0%) 10%,
-        rgb(227 227 227 / 100%) 50%,
-        rgb(244 244 244 / 0%) 90%
-      );
+    background: linear-gradient(
+      90deg,
+      rgb(244 244 244 / 0%) 10%,
+      rgb(227 227 227 / 100%) 50%,
+      rgb(244 244 244 / 0%) 90%
+    );
   }
 
   &::-webkit-scrollbar-thumb {
@@ -426,11 +425,11 @@
   align-items: center;
 
   width: 100%;
-  height: 60px;
+  height: 50px;
   margin: 20px 0 0;
 
   &::before {
-    content: "";
+    content: '';
 
     position: absolute;
     top: -10px;
@@ -459,7 +458,7 @@
   background: inherit;
 
   &::before {
-    content: "";
+    content: '';
 
     position: absolute;
     top: 0;
@@ -567,7 +566,7 @@
 
   background: $Primary;
   border-radius: 4px;
-
+  margin-top: 10px;
   &:hover {
     background: $PrimaryHover;
   }
@@ -619,7 +618,7 @@
 
   background: $Primary;
   border-radius: 4px;
-
+margin-top: 10px;
   &:hover {
     background: $PrimaryHover;
   }

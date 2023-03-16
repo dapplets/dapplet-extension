@@ -13,7 +13,8 @@
     "downlevelIteration": true,
     "declaration": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
   },
   "exclude": ["tests", "lib", "jslib", "build", "node_modules", "cypress"],
   "include": ["src/**/*"]

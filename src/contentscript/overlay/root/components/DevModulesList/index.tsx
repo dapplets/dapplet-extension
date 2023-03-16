@@ -406,7 +406,21 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
           <div className={styles.blockInfo}>
             <h3 className={styles.dappletsTitle}>{mi.title}</h3>
-            {mi.isUnderConstruction ? null : ( // </span> //   <span className={styles.dappletsSettingsIsTocenomics} /> //   <button className={styles.dappletsSettingsIsUnderConstruction} /> // > //   className={styles.dappletsSettingsIsUnderConstructionBlock} //   }} //     setModuleVersion(vi) //     setModuleInfo(mi) //     setUnderConstructionDetails(true) //     onDetailsClick(mi, vi) //   onClick={() => { // <span
+            {mi.isUnderConstruction ? (
+              <span
+                onClick={() => {
+                  onDetailsClick(mi, vi)
+
+                  setUnderConstructionDetails(true)
+                  setModuleInfo(mi)
+                  setModuleVersion(vi)
+                }}
+                className={styles.dappletsSettingsIsUnderConstructionBlock}
+              >
+                <button className={styles.dappletsSettingsIsUnderConstruction} />
+                <span className={styles.dappletsSettingsIsTocenomics} />
+              </span>
+            ) : (
               <button
                 className={cn(styles.dappletsSettings, {
                   [styles.dappletsSettingsRegistry]: mi.author !== null,

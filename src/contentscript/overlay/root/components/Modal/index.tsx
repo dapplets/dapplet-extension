@@ -14,6 +14,7 @@ interface ModalProps {
   id?: any
   classNameContent?: string
   onFewFunction?: any
+  wrapperModalStyles?: string
 }
 
 export const Modal = ({
@@ -26,6 +27,7 @@ export const Modal = ({
   classNameWrapper,
   classNameContent,
   onFewFunction,
+  wrapperModalStyles,
 }: ModalProps) => {
   const onKeydown = ({ key }: KeyboardEvent) => {
     switch (key) {
@@ -43,7 +45,7 @@ export const Modal = ({
   if (!visible) return null
 
   return (
-    <div className={styles.modal} onClick={onClose}>
+    <div className={cn(styles.modal, wrapperModalStyles)} onClick={onClose}>
       <div
         className={cn(styles.modalDialog, classNameWrapper)}
         onClick={(e) => e.stopPropagation()}

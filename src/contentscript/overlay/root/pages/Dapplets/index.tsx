@@ -152,7 +152,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         _updateFeatureState(f.name, { isActionLoading: true })
         const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
         const tab = await getCurrentTab()
-
         if (!tab) return
         await openDappletAction(f.name, tab.id)
       } else {

@@ -9,6 +9,7 @@ export interface MessageProps {
   linkText?: string
   children?: ReactNode
   className?: string
+  parentPage?: string
 }
 
 export const Message = ({
@@ -18,12 +19,27 @@ export const Message = ({
   linkText,
   children,
   className,
+  parentPage,
 }: MessageProps): ReactElement => {
   return (
     <div className={cn(styles.wrapper, className)}>
-      <h6 className={styles.title}>{title}</h6>
+      <h6
+        className={cn(styles.title, {
+          [styles.titleMessageTokenomics]: parentPage === 'tokenomics',
+        })}
+      >
+        {title}
+      </h6>
       {subtitle && typeof subtitle === 'string'
-        ? subtitle?.length > 0 && <p className={styles.subtitle}>{subtitle}</p>
+        ? subtitle?.length > 0 && (
+            <p
+              className={cn(styles.subtitle, {
+                [styles.subTitleMessageTokenomics]: parentPage === 'tokenomics',
+              })}
+            >
+              {subtitle}
+            </p>
+          )
         : subtitle}
       {children && <div className={styles.children}>{children}</div>}
       {link?.length > 0 && (
