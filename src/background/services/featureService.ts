@@ -473,9 +473,6 @@ export default class FeatureService {
     const globalConfig = await this._globalConfigService.get()
     if (globalConfig.suspended) return []
 
-    const isThereActiveDapplets = await this._globalConfigService.isThereActiveDapplets()
-    if (!isThereActiveDapplets) return []
-
     const modules: {
       name: string
       branch: string
@@ -501,6 +498,9 @@ export default class FeatureService {
         }
       }
     }
+
+    const isThereActiveDapplets = await this._globalConfigService.isThereActiveDapplets()
+    if (!isThereActiveDapplets) return modules
 
     const configs = await Promise.all(
       contextIds.map((h) => this._globalConfigService.getSiteConfigById(h))
