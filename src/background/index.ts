@@ -97,12 +97,9 @@ browser.runtime.onMessage.addListener(
     // FeatureService
     getFeaturesByHostnames: (hostnames, filter) =>
       featureService.getFeaturesByHostnames(hostnames, filter),
-    activateFeature: (name, version, hostnames, order, registry) =>
-      featureService.activateFeature(name, version, hostnames, order, registry),
-    deactivateFeature: (name, version, hostnames, order, registry) =>
-      featureService.deactivateFeature(name, version, hostnames, order, registry),
-    reloadFeature: (name, version, hostnames, order, registry) =>
-      featureService.reloadFeature(name, version, hostnames, order, registry),
+    activateFeature: featureService.activateFeature.bind(featureService),
+    deactivateFeature: featureService.deactivateFeature.bind(featureService),
+    reloadFeature: featureService.reloadFeature.bind(featureService),
     getActiveModulesByHostnames: (hostnames) =>
       featureService.getActiveModulesByHostnames(hostnames),
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
