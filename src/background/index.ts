@@ -223,12 +223,12 @@ browser.runtime.onMessage.addListener(
     fetchJsonRpc: proxyService.fetchJsonRpc.bind(proxyService),
 
     // Github Service
-    getNewExtensionVersion: githubService.getNewExtensionVersion.bind(githubService),
-    getDevMessage: githubService.getDevMessage.bind(githubService),
+    getNewExtensionVersion: () => githubService.getNewExtensionVersion(),
+    getDevMessage: () => githubService.getDevMessage(),
     hideDevMessage: githubService.hideDevMessage.bind(githubService),
 
     // Discord Service
-    getDiscordMessages: discordService.getDiscordMessages.bind(discordService),
+    getDiscordMessages: () => discordService.getDiscordMessages(),
     hideDiscordMessages: discordService.hideDiscordMessages.bind(discordService),
 
     // LocalStorage
