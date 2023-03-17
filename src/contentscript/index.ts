@@ -204,6 +204,8 @@ async function init() {
   if (IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
     confirmShareLink(shareLinkPayload)
   }
+
+  console.log('[DAPPLETS]: Content script initialized.')
 }
 
 function injectScript(url: string) {

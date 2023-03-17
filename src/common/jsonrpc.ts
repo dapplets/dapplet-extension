@@ -105,7 +105,7 @@ export class JsonRpc {
       jsonrpc: '2.0',
       error: {
         code: -32601,
-        message: 'Method not found',
+        message: `Method not found: ${rpcRequest.method}`,
       },
       id: rpcRequest.id,
     })
