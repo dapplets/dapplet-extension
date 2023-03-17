@@ -106,7 +106,10 @@ async function init() {
   })
 
   // Handle module (de)activations from another tabs
-  EventBus.on('dapplet_activated', (m) => injector.loadModules([m]))
+  EventBus.on('dapplet_activated', async () => {
+    const contextIds = await getAllContextIds()
+    browser.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
+  })
 
   EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]))
 
