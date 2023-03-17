@@ -247,6 +247,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       await _refreshData()
       _updateFeatureState(name, { isLoading: false })
     } catch (err) {
+      console.error(err)
       _updateFeatureState(name, { isActive: !isActive, error: err.message })
     }
   }
