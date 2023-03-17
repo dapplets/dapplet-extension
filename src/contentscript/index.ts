@@ -122,7 +122,7 @@ async function init() {
     console.log(
       '[DAPPLETS]: The connection to the background service has been lost. Content script is unloading...'
     )
-    jsonrpc.call(GLOBAL_EVENT_BUS_NAME, ['disconnect', []])
+    EventBus.emit('disconnect')
     EventBus.destroy()
     jsonrpc.destroy()
     injector.dispose()
