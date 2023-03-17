@@ -1,3 +1,4 @@
+import { Cacheable } from 'caching-decorator'
 import JSZip from 'jszip'
 import { maxSatisfying } from 'semver'
 import { TopologicalSort } from 'topological-sort'
@@ -171,6 +172,7 @@ export default class ModuleManager {
     }
   }
 
+  @Cacheable()
   private async _getOptimizedChildDependenciesAndManifest(module: {
     name: string
     version: string | null

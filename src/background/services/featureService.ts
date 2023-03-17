@@ -26,6 +26,7 @@ import GlobalConfigService from './globalConfigService'
 import { NotificationService } from './notificationService'
 import { WalletService } from './walletService'
 import { Runtime } from 'webextension-polyfill'
+import { globalClear } from 'caching-decorator'
 
 export default class FeatureService {
   private _moduleManager: ModuleManager
@@ -291,6 +292,9 @@ export default class FeatureService {
     registryUrl: string,
     tabId: number
   ) {
+    // Clear cached dependencies
+    globalClear(this._moduleManager, '_getOptimizedChildDependenciesAndManifest')
+
     hostnames = Array.from(new Set(hostnames)) // deduplicate
 
     if (!version && isActive) {
