@@ -469,6 +469,9 @@ export default class FeatureService {
     const globalConfig = await this._globalConfigService.get()
     if (globalConfig.suspended) return []
 
+    const isThereActiveDapplets = await this._globalConfigService.isThereActiveDapplets()
+    if (!isThereActiveDapplets) return []
+
     const modules: {
       name: string
       branch: string
@@ -493,12 +496,6 @@ export default class FeatureService {
           })
         }
       }
-    }
-
-    // Skip if there is no active dapplets
-    const wildcardConfig = await this._globalConfigService.getSiteConfigById(CONTEXT_ID_WILDCARD)
-    if (!Object.values(wildcardConfig.activeFeatures).find((x) => x.isActive === true)) {
-      return modules
     }
 
     const configs = await Promise.all(
