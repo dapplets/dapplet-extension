@@ -185,3 +185,16 @@ export type ManifestAndDetails = ManifestDTO & {
   error: string
   versions: string[]
 }
+
+export type DappletLoadingResult = {
+  name: string
+  branch: string
+  version: string
+  runtime?: DappletRuntimeResult
+  error?: string
+}
+
+export type DappletRuntimeResult = {
+  isActionHandler: boolean
+  isHomeHandler: boolean
+}

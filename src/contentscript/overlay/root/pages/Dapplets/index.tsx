@@ -130,15 +130,18 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
   }
 
-  const _updateFeatureState = (name: string, f: any) => {
-    const newDapplets = dapplets.map((feature) => {
-      if (feature.name == name) {
-        Object.entries(f).forEach(([k, v]) => (feature[k] = v))
-      }
-
-      return feature
-    })
-    return newDapplets
+  const _updateFeatureState = (name: string, f: Partial<ManifestAndDetails>) => {
+    setDapplets((dapplets) => {
+      return dapplets.map((dapplet) => {
+        if (dapplet.name == name) {
+          const copy = { ...dapplet }
+          Object.entries(f).forEach(([k, v]) => (copy[k] = v))
+          return copy
+        } else {
+          return dapplet
+        }
+      })
+    });
   }
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
@@ -212,8 +215,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     try {
       if (isActive) {
-        await activateFeature(name, version, targetContextIds, order, sourceRegistry.url)
+        const {isActionHandler, isHomeHandler} = await activateFeature(name, version, targetContextIds, order, sourceRegistry.url)
         getTabsForDapplet(module)
+        _updateFeatureState(name, { isLoading: false, isActionHandler, isHomeHandler })
       } else {
         await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url)
 
@@ -225,10 +229,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
             .map((tab) => {
               handleCloseTabClick(tab)
             })
-      }
 
-      // await _refreshData()
-      _updateFeatureState(name, { isLoading: false })
+        _updateFeatureState(name, { isLoading: false, isActionHandler: false, isHomeHandler: false })
+      }
     } catch (err) {
       console.error(err)
       _updateFeatureState(name, { isActive: !isActive, error: err.message })

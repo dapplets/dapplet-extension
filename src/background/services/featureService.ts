@@ -19,7 +19,7 @@ import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
 import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
 import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
-import { StorageRef } from '../../common/types'
+import { DappletLoadingResult, DappletRuntimeResult, StorageRef } from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
 import { AnalyticsGoals, AnalyticsService } from './analyticsService'
 import GlobalConfigService from './globalConfigService'
@@ -291,7 +291,7 @@ export default class FeatureService {
     order: number,
     registryUrl: string,
     tabId: number
-  ) {
+  ): Promise<DappletRuntimeResult | null> {
     // Clear cached dependencies
     globalClear(this._moduleManager, '_getOptimizedChildDependenciesAndManifest')
 
@@ -320,13 +320,13 @@ export default class FeatureService {
     }
 
     try {
-      const runtime = await new Promise<void>(async (resolve, reject) => {
+      const runtime = await new Promise<DappletRuntimeResult>(async (resolve, reject) => {
         // listening of loading/unloading from contentscript
         const listener = (message, sender: Runtime.MessageSender) => {
           if (sender.tab.id !== tabId) return
           if (!message || !message.type || !message.payload) return
           
-          const p = message.payload
+          const p = message.payload as DappletLoadingResult
           if (message.type === 'FEATURE_LOADED') {
             if (
               p.name === name &&
@@ -405,6 +405,8 @@ export default class FeatureService {
         config.activeFeatures[name].runtime = runtime
         await this._globalConfigService.updateSiteConfig(config)
       }
+
+      return runtime
     } catch (err) {
       // revert config if error
       for (const hostname of hostnames) {
@@ -432,11 +434,11 @@ export default class FeatureService {
     order: number,
     registryUrl: string,
     caller: any
-  ): Promise<void> {
+  ): Promise<DappletRuntimeResult | null> {
     const tabId = caller?.sender?.tab?.id
     if (!tabId) throw new Error("Tab ID is required")
     this._analyticsService.track({ idgoal: AnalyticsGoals.DappletActivated, dapplet: name })
-    await this._setFeatureActive(name, version, hostnames, true, order, registryUrl, tabId)
+    return await this._setFeatureActive(name, version, hostnames, true, order, registryUrl, tabId)
   }
 
   async deactivateFeature(
@@ -446,11 +448,11 @@ export default class FeatureService {
     order: number,
     registryUrl: string,
     caller: any
-  ): Promise<void> {
+  ): Promise<DappletRuntimeResult | null> {
     const tabId = caller?.sender?.tab?.id
     if (!tabId) throw new Error("Tab ID is required")
     this._analyticsService.track({ idgoal: AnalyticsGoals.DappletDeactivated, dapplet: name })
-    await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
+    return await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
   }
 
   async reloadFeature(
