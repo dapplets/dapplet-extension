@@ -56,7 +56,7 @@
   font-size: 22px;
   font-weight: 700;
   line-height: 26px;
-  color: $ContentBlack;
+  color: $content-black;
   text-align: center;
 }
 
@@ -68,7 +68,7 @@
   font-size: 14px;
   font-style: normal;
   line-height: 16px;
-  color: $ContentBlack;
+  color: $content-black;
   text-align: center;
 }
 
@@ -85,17 +85,17 @@
     font-size: 14px;
     font-weight: 500;
     line-height: 16px;
-    color: $Primary;
+    color: $primary;
     text-align: center;
 
     background: inherit;
 
     &:hover {
-      color: $PrimaryHover;
+      color: $primary-hover;
     }
 
     &:active {
-      color: $PrimaryPressed;
+      color: $primary-pressed;
     }
   }
 }

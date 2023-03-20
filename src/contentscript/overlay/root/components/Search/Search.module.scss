@@ -136,18 +136,18 @@
   animation-fill-mode: forwards;
 
   svg path {
-    // fill: $MainGrey;
+    // fill: $main-grey;
   }
 
   &:hover {
     svg path{
-      stroke: $PrimaryHover;
+      stroke: $primary-hover;
     }
   }
 
   &:active {
     svg path {
-      stroke: $PrimaryPressed;
+      stroke: $primary-pressed;
     }
   }
 }
@@ -166,7 +166,7 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 16px;
-  color: $MainGrey;
+  color: $main-grey;
 
   background: #fff;
   border-radius: 0 4px 4px 0;
@@ -194,13 +194,13 @@
 span {
   &:hover {
     svg path {
-      fill: $PrimaryHover;
+      fill: $primary-hover;
     }
   }
 
   &:active {
     svg path {
-      fill: $PrimaryPressed;
+      fill: $primary-pressed;
     }
   }
 }

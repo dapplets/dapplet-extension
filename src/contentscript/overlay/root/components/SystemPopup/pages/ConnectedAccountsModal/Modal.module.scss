@@ -29,7 +29,7 @@
   width: 100%;
   height: 100%;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
 }
 
@@ -39,7 +39,7 @@
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
-  color: $MainGrey;
+  color: $main-grey;
   text-align: center;
 }
 
@@ -66,18 +66,18 @@
   width: 20px;
   height: 20px;
 
-  background-color: $Primary;
+  background-color: $primary;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 7 7' fill='none'%3E%3Cpath d='M5.74375 0.695312L3.5 2.93906L1.25625 0.695312L0.375 1.57656L2.61875 3.82031L0.375 6.06406L1.25625 6.94531L3.5 4.70156L5.74375 6.94531L6.625 6.06406L4.38125 3.82031L6.625 1.57656L5.74375 0.695312Z' fill='white'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
   border-radius: 50%;
 
   &:hover {
-    background-color: $PrimaryHover;
+    background-color: $primary-hover;
   }
 
   &:active {
-    background-color: $PrimaryPressed;
+    background-color: $primary-pressed;
   }
 }
 
@@ -95,7 +95,7 @@
   font-size: 24px;
   font-weight: 600;
   line-height: 115%;
-  color: $MainBlack;
+  color: $main-black;
 }
 
 .modalAccounts {
@@ -148,26 +148,26 @@
 }
 
 .primary {
-  color: $Primary;
-  background: $PureWhite;
+  color: $primary;
+  background: $pure-white;
 
   &:hover {
     color: hsl(349deg 66% 44%);
   }
 
   &:active {
-    color: $PrimaryPressed;
+    color: $primary-pressed;
   }
 
   &:disabled {
     cursor: default;
-    color: $PrimaryHover;
+    color: $primary-hover;
   }
 }
 
 .secondary {
   color: #30A6D9;
-  background: $PureWhite;
+  background: $pure-white;
 
   &:hover {
     color: hsl(200deg 63% 49%);
@@ -179,13 +179,13 @@
 
   &:disabled {
     cursor: default;
-    color: $SecondaryHover;
+    color: $secondary-hover;
   }
 }
 
 .tertiary {
   font-family: Roboto, sans-serif;
-  color: $Primary;
+  color: $primary;
   background: none;
 
   &:hover {
@@ -193,11 +193,11 @@
   }
 
   &:active {
-    color: $PrimaryPressed;
+    color: $primary-pressed;
   }
 
   &:disabled {
     cursor: default;
-    color: $MainBlack;
+    color: $main-black;
   }
 }

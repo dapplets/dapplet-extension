@@ -29,8 +29,8 @@
 }
 
 .errorInputDefault {
-  color: $Primary;
-  border: 1px solid $Primary;
+  color: $primary;
+  border: 1px solid $primary;
 }
 
 .buttonInputDefault {
@@ -41,7 +41,7 @@
   svg {
     &:hover {
       path {
-        fill: $ContentBlack;
+        fill: $content-black;
       }
     }
   }

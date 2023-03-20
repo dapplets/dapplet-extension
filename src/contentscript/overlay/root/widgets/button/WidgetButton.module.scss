@@ -169,13 +169,13 @@
 
     &:hover {
       path {
-        fill: $PrimaryHover;
+        fill: $primary-hover;
       }
     }
 
     &:active {
       path {
-        fill: $PrimaryPressed;
+        fill: $primary-pressed;
       }
     }
   }
@@ -187,7 +187,7 @@
     height: 16px;
 
     path {
-      fill: $PrimaryHover;
+      fill: $primary-hover;
     }
   }
 }

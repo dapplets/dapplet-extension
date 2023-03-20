@@ -40,7 +40,7 @@
     height: 2px;
     margin-bottom: 15px;
 
-    background: $Primary;
+    background: $primary;
     border-radius: 2px;
     box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
   }
@@ -68,14 +68,14 @@
 
 .noDappletsLink {
   cursor: pointer;
-  color: $Primary;
+  color: $primary;
 
   &:hover {
-    color: $PrimaryHover;
+    color: $primary-hover;
   }
 
   &:active {
-    color: $PrimaryPressed;
+    color: $primary-pressed;
   }
 }
 

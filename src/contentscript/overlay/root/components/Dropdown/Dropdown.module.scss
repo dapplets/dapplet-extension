@@ -30,7 +30,7 @@
   font-weight: 400;
   line-height: 100%;
 
-  background-color: $PureWhite;
+  background-color: $pure-white;
   border: 1px solid #e3e3e3;
   border-radius: 10px;
   border-radius: 8px;
@@ -83,7 +83,7 @@
 
       path {
         fill: none !important;
-        stroke: $ContentBlack;
+        stroke: $content-black;
       }
     }
 
@@ -199,11 +199,11 @@
   color: #2a2a2a;
 
   &:hover {
-    color: $MainGrey;
+    color: $main-grey;
   }
 
   &:active {
-    background: $StrokeColor;
+    background: $stroke-color;
   }
 }
 
@@ -222,6 +222,6 @@
 
   font-size: 12px;
   line-height: 100%;
-  color: $MainBlack;
+  color: $main-black;
   white-space: nowrap;
 }

@@ -19,35 +19,35 @@
 }
 
 .black path {
-  fill: $MainBlack;
+  fill: $main-black;
 }
 
 .black:hover path {
-  fill: $ContentBlack;
+  fill: $content-black;
 }
 
 .black:active path {
-  fill: $MainGrey;
+  fill: $main-grey;
 }
 
 .red path {
-  fill: $Primary;
+  fill: $primary;
 }
 
 .red:active path {
-  fill: $PrimaryPressed;
+  fill: $primary-pressed;
 }
 
 .red:hover path {
-  fill: $PrimaryHover;
+  fill: $primary-hover;
 }
 
 .notification:active path{
   fill: none;
-  stroke: $PrimaryPressed;
+  stroke: $primary-pressed;
 }
 
 .notification:hover path{
   fill: none;
-  stroke: $PrimaryHover;
+  stroke: $primary-hover;
 }

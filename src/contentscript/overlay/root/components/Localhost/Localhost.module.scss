@@ -40,32 +40,32 @@
   font-weight: 500;
   font-style: normal;
   line-height: 100%;
-  color: $PureWhite;
+  color: $pure-white;
 
   border-radius: 10px;
 }
 
 .disabled {
-  background: $MainGrey;
+  background: $main-grey;
 
   &:hover {
-    background: $StrokeColor;
+    background: $stroke-color;
   }
 
   &:active {
-    background: $ContentBlack;
+    background: $content-black;
   }
 }
 
 .error {
-  background: $Primary;
+  background: $primary;
 
   &:hover {
-    background: $PrimaryHover;
+    background: $primary-hover;
   }
 
   &:active {
-    background: $PrimaryPressed;
+    background: $primary-pressed;
   }
 }
 
@@ -98,7 +98,7 @@
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
-  color: $ContentBlack;
+  color: $content-black;
 }
 
 .closeLocalhost {

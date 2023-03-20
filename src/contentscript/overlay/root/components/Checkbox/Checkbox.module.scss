@@ -19,8 +19,8 @@
   width: 16px;
   height: 16px;
 
-  background: $PureWhite;
-  border: 1px solid $MainGrey;
+  background: $pure-white;
+  border: 1px solid $main-grey;
   border-radius: 4px;
 }
 
@@ -40,7 +40,7 @@
   width: 16px;
 
   .fakeInputCheckbox {
-    background: $Primary;
+    background: $primary;
     border: none;
 
     &::before {
@@ -68,7 +68,7 @@
 
 .supportLabel {
   .fakeInputCheckbox {
-    background: $MainGrey;
+    background: $main-grey;
   }
 }
 
@@ -97,12 +97,12 @@ div.supportLabel::before {
   font-size: 12px;
   font-weight: 500;
   line-height: 100%;
-  color: $MainBlack;
+  color: $main-black;
   text-align: left;
 
   opacity: 0.9;
-  background: $PureWhite;
-  border: 1px solid $StrokeColor;
+  background: $pure-white;
+  border: 1px solid $stroke-color;
   border-radius: 10px 10px 10px 0;
   box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
 }
@@ -134,7 +134,7 @@ div.supportLabel:focus::before {
 
 .active {
   cursor: pointer;
-  background: $Primary;
+  background: $primary;
   border: none;
 
   svg {
@@ -167,7 +167,7 @@ div.supportLabel:focus::before {
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainBlack;
+  color: $main-black;
 }
 
 @import './adaptive';

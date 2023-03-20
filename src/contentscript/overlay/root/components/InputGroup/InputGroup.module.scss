@@ -10,7 +10,7 @@
   height: auto;
   padding: 10px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
 }
 
@@ -81,8 +81,8 @@
   height: auto;
   padding: 5px 13px;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 5px;
 }
 
@@ -104,7 +104,7 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
   background: inherit;
 }
@@ -122,13 +122,13 @@
   svg {
     &:hover {
       path {
-        fill: $MainGrey;
+        fill: $main-grey;
       }
     }
 
     &:active {
       path {
-        fill: $MainGrey;
+        fill: $main-grey;
       }
     }
   }
@@ -151,29 +151,29 @@
   color: #fff;
   text-transform: uppercase;
 
-  background: $Primary;
+  background: $primary;
   border-radius: 4px;
 
   &:hover {
-    background: $PrimaryHover;
+    background: $primary-hover;
   }
 
   &:active {
-    background: $PrimaryPressed;
+    background: $primary-pressed;
   }
 }
 
 .addContextDisabled {
-  color: $StrokeColor;
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  color: $stroke-color;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
 
   &:hover {
-    background: $AppBG;
+    background: $app-bg;
   }
 
   &:active {
-    background: $AppBG;
+    background: $app-bg;
   }
 }
 
@@ -199,8 +199,8 @@
   height: auto;
   padding: 5px 13px;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 5px;
 }
 
@@ -221,7 +221,7 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
   border: 0;
 }
@@ -251,13 +251,13 @@
   svg {
     &:hover {
       path {
-        fill: $MainGrey;
+        fill: $main-grey;
       }
     }
 
     &:active {
       path {
-        fill: $MainGrey;
+        fill: $main-grey;
       }
     }
   }

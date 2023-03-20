@@ -56,7 +56,7 @@
     width: 4px;
     height: 2px;
 
-    background: $Primary;
+    background: $primary;
     border-radius: 2px;
     box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
   }
@@ -111,10 +111,10 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 5px;
 }
 
@@ -132,10 +132,10 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 5px;
 }
 
@@ -147,7 +147,7 @@
   width: 100%;
   padding: 10px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
 }
 
@@ -164,7 +164,7 @@
   height: 42px;
 
   background: #c4c4c4;
-  border: 1px solid $WebBG;
+  border: 1px solid $web-bg;
   border-radius: 20px;
   box-shadow: 0 0 4px rgb(0 0 0 / 25%);
 }
@@ -199,17 +199,17 @@
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
-  color: $ContentBlack;
+  color: $content-black;
 
-  background: $WebBG;
+  background: $web-bg;
   border-radius: 10px;
 
   &:hover {
-    background: $StrokeColor;
+    background: $stroke-color;
   }
 
   &:active {
-    background: $MainGrey;
+    background: $main-grey;
   }
 }
 
@@ -240,17 +240,17 @@
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
-  color: $ContentBlack;
+  color: $content-black;
 
-  background: $WebBG;
+  background: $web-bg;
   border-radius: 10px;
 
   &:hover {
-    background: $StrokeColor;
+    background: $stroke-color;
   }
 
   &:active {
-    background: $MainGrey;
+    background: $main-grey;
   }
 }
 
@@ -268,17 +268,17 @@
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
-  color: $ContentBlack;
+  color: $content-black;
 
-  background: $WebBG;
+  background: $web-bg;
   border-radius: 10px;
 
   &:hover {
-    background: $StrokeColor;
+    background: $stroke-color;
   }
 
   &:active {
-    background: $MainGrey;
+    background: $main-grey;
   }
 }
 
@@ -305,10 +305,10 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 5px;
 }
 
@@ -329,15 +329,15 @@
   color: #fff;
   text-transform: uppercase;
 
-  background: $Primary;
+  background: $primary;
   border-radius: 4px;
 
   &:hover {
-    background: $PrimaryHover;
+    background: $primary-hover;
   }
 
   &:active {
-    background: $PrimaryPressed;
+    background: $primary-pressed;
   }
 }
 
@@ -349,7 +349,7 @@
   height: auto;
   padding: 10px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
 }
 
@@ -373,8 +373,8 @@
   height: auto;
   padding: 5px 13px;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 5px;
 }
 
@@ -386,7 +386,7 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 }
 
 .adminsTitle {
@@ -436,7 +436,7 @@
   height: auto;
   padding: 10px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
 }
 
@@ -461,8 +461,8 @@
   margin: 0 0 10px;
   padding: 5px 13px;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 5px;
 
   &:last-child {
@@ -480,7 +480,7 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
   background: inherit;
 }
@@ -575,7 +575,7 @@
     width: 100%;
     height: 2px;
 
-    background: $WebBG;
+    background: $web-bg;
   }
 }
 
@@ -590,7 +590,7 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
-  color: $MainGrey;
+  color: $main-grey;
 
   background: inherit;
 
@@ -608,7 +608,7 @@
   }
 
   &:hover {
-    color: $ContentBlack;
+    color: $content-black;
 
     &::before {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill=' %23747376'/%3E%3C/svg%3E");
@@ -616,7 +616,7 @@
   }
 
   &:active {
-    color: $MainBlack;
+    color: $main-black;
 
     &::before {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%232A2A2A'/%3E%3C/svg%3E");
@@ -636,29 +636,29 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
-  color: $Primary;
+  color: $primary;
 
   background: inherit;
 
   &:hover {
-    color: $PrimaryHover;
+    color: $primary-hover;
   }
 
   &:active {
-    color: $PrimaryPressed;
+    color: $primary-pressed;
   }
 }
 
 .pushDisabled {
   cursor: default;
-  color: $MainGrey;
+  color: $main-grey;
 
   &:hover {
-    color: $MainGrey;
+    color: $main-grey;
   }
 
   &:active {
-    color: $MainGrey;
+    color: $main-grey;
   }
 }
 
@@ -711,29 +711,29 @@
   color: #fff;
   text-transform: uppercase;
 
-  background: $Primary;
+  background: $primary;
   border-radius: 4px;
 
   &:hover {
-    background: $PrimaryHover;
+    background: $primary-hover;
   }
 
   &:active {
-    background: $PrimaryPressed;
+    background: $primary-pressed;
   }
 }
 
 .addContextDisabled {
-  color: $StrokeColor;
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  color: $stroke-color;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
 
   &:hover {
-    background: $AppBG;
+    background: $app-bg;
   }
 
   &:active {
-    background: $AppBG;
+    background: $app-bg;
   }
 }
 
@@ -755,7 +755,7 @@
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
-  color: $MainGrey;
+  color: $main-grey;
   text-align: center;
 }
 
@@ -773,17 +773,17 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
-  color: $PureWhite;
+  color: $pure-white;
 
-  background: $Primary;
+  background: $primary;
   border-radius: 4px;
 
   &:hover {
-    background: $PrimaryHover;
+    background: $primary-hover;
   }
 
   &:active {
-    background: $PrimaryPressed;
+    background: $primary-pressed;
   }
 }
 
@@ -801,7 +801,7 @@
   height: auto;
   padding: 10px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
 }
 
@@ -825,8 +825,8 @@
   height: auto;
   padding: 5px 13px;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 5px;
 }
 
@@ -840,7 +840,7 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
   background: inherit;
 }
@@ -942,29 +942,29 @@
   color: #fff;
   text-transform: uppercase;
 
-  background: $Primary;
+  background: $primary;
   border-radius: 4px;
 
   &:hover {
-    background: $PrimaryHover;
+    background: $primary-hover;
   }
 
   &:active {
-    background: $PrimaryPressed;
+    background: $primary-pressed;
   }
 }
 
 .addContextDisabled {
-  color: $StrokeColor;
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  color: $stroke-color;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
 
   &:hover {
-    background: $AppBG;
+    background: $app-bg;
   }
 
   &:active {
-    background: $AppBG;
+    background: $app-bg;
   }
 }
 

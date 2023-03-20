@@ -44,7 +44,7 @@
   // padding: 10px 15px 5px;
   padding: 0 0 5px;
 
-  background: $OverlayBG;
+  background: $overlay-bg;
 
   -ms-overflow-style: none;
 }
@@ -98,7 +98,7 @@
       svg {
         path {
           fill: none;
-          stroke: $PrimaryHover;
+          stroke: $primary-hover;
         }
       }
     }
@@ -107,7 +107,7 @@
       svg {
         path {
           fill: none;
-          stroke: $PrimaryPressed;
+          stroke: $primary-pressed;
         }
       }
     }

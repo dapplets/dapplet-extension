@@ -18,7 +18,7 @@
 
 .smail {
   padding: 2px;
-  background: $WebBG;
+  background: $web-bg;
   border-radius: 5px;
   transition: all 0.5s;
 
@@ -31,8 +31,8 @@
 
     svg {
       path {
-        fill: $PrimaryHover;
-        stroke: $PrimaryHover;
+        fill: $primary-hover;
+        stroke: $primary-hover;
       }
     }
   }
@@ -40,8 +40,8 @@
   &:active {
     svg {
       path {
-        fill: $PrimaryPressed;
-        stroke: $PrimaryPressed;
+        fill: $primary-pressed;
+        stroke: $primary-pressed;
       }
     }
   }
@@ -55,7 +55,7 @@
   // min-height: 35px;
 
   // border-radius: 10px;
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 4px;
   box-shadow: inset 0 1px 2px rgb(225 225 225 / 20%), inset 0 -1px 2px rgb(225 225 225 / 20%),
     inset 0 -1px 2px rgb(255 255 255 / 90%), inset 0 1px 3px rgb(225 225 225 / 90%);
@@ -63,8 +63,8 @@
   &:hover {
     svg {
       path {
-        fill: $PrimaryHover;
-        stroke: $PrimaryHover;
+        fill: $primary-hover;
+        stroke: $primary-hover;
       }
     }
   }
@@ -72,8 +72,8 @@
   &:active {
     svg {
       path {
-        fill: $PrimaryPressed;
-        stroke: $PrimaryPressed;
+        fill: $primary-pressed;
+        stroke: $primary-pressed;
       }
     }
   }

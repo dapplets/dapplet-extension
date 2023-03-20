@@ -17,7 +17,7 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
   background: #ebebeb;
   border-radius: 10px;
@@ -68,7 +68,7 @@
 
       path {
         fill: none !important;
-        stroke: $ContentBlack;
+        stroke: $content-black;
       }
     }
 
@@ -138,16 +138,16 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
   background: inherit;
 }
 
 .errorInput {
-  border: 1px solid $Primary;
+  border: 1px solid $primary;
 
   input {
-    color: $Primary;
+    color: $primary;
   }
 }
 
@@ -179,7 +179,7 @@
   padding: 6.5px 13px;
 
   &:hover {
-    background: $StrokeColor;
+    background: $stroke-color;
   }
 
   &:active {

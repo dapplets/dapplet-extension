@@ -19,7 +19,7 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
   background: #ebebeb;
   border-radius: 10px;
@@ -36,7 +36,7 @@
   margin-top: 10px;
   padding: 10px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
 
   [class*="field"] {
@@ -128,7 +128,7 @@
   padding: 6.5px 13px;
 
   &:hover {
-    background: $StrokeColor;
+    background: $stroke-color;
   }
 
   &:active {
