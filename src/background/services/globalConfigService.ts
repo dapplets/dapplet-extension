@@ -834,14 +834,14 @@ export default class GlobalConfigService {
     if (!globalConfig.hostnames) return false
 
     for (const contextId in globalConfig.hostnames) {
-      const activeDapplets = globalConfig.hostnames[contextId]?.activeFeatures ?? {};
+      const activeDapplets = globalConfig.hostnames[contextId]?.activeFeatures ?? {}
       for (const dapplet in activeDapplets) {
         if (activeDapplets[dapplet].isActive) {
           return true
         }
       }
     }
-    
+
     return false
   }
 }

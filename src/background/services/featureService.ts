@@ -17,6 +17,8 @@ import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
+import { globalClear } from 'caching-decorator'
+import { Runtime } from 'webextension-polyfill'
 import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
 import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
 import { DappletLoadingResult, DappletRuntimeResult, StorageRef } from '../../common/types'
@@ -25,8 +27,6 @@ import { AnalyticsGoals, AnalyticsService } from './analyticsService'
 import GlobalConfigService from './globalConfigService'
 import { NotificationService } from './notificationService'
 import { WalletService } from './walletService'
-import { Runtime } from 'webextension-polyfill'
-import { globalClear } from 'caching-decorator'
 
 export default class FeatureService {
   private _moduleManager: ModuleManager
@@ -325,7 +325,7 @@ export default class FeatureService {
         const listener = (message, sender: Runtime.MessageSender) => {
           if (sender.tab.id !== tabId) return
           if (!message || !message.type || !message.payload) return
-          
+
           const p = message.payload as DappletLoadingResult
           if (message.type === 'FEATURE_LOADED') {
             if (
@@ -436,7 +436,7 @@ export default class FeatureService {
     caller: any
   ): Promise<DappletRuntimeResult | null> {
     const tabId = caller?.sender?.tab?.id
-    if (!tabId) throw new Error("Tab ID is required")
+    if (!tabId) throw new Error('Tab ID is required')
     this._analyticsService.track({ idgoal: AnalyticsGoals.DappletActivated, dapplet: name })
     return await this._setFeatureActive(name, version, hostnames, true, order, registryUrl, tabId)
   }
@@ -450,7 +450,7 @@ export default class FeatureService {
     caller: any
   ): Promise<DappletRuntimeResult | null> {
     const tabId = caller?.sender?.tab?.id
-    if (!tabId) throw new Error("Tab ID is required")
+    if (!tabId) throw new Error('Tab ID is required')
     this._analyticsService.track({ idgoal: AnalyticsGoals.DappletDeactivated, dapplet: name })
     return await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
   }
@@ -464,7 +464,7 @@ export default class FeatureService {
     caller: any
   ): Promise<void> {
     const tabId = caller?.sender?.tab?.id
-    if (!tabId) throw new Error("Tab ID is required")
+    if (!tabId) throw new Error('Tab ID is required')
     const modules = await this.getActiveModulesByHostnames(hostnames)
     if (!modules.find((m) => m.name === name)) return
     await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
