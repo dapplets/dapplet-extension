@@ -41,7 +41,7 @@
   background: #fff;
   border-radius: 20px;
 
-  animation-name: slideRight;
+  animation-name: slide-right;
   animation-duration: 0.5s;
   animation-timing-function: ease;
 }
@@ -51,7 +51,7 @@
 }
 
 .isNotVisible {
-  animation-name: slideLeft;
+  animation-name: slide-left;
   animation-duration: 0.3s;
   animation-timing-function: ease;
 }

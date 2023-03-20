@@ -41,7 +41,7 @@
   width: 24px;
   height: 24px;
 
-  animation-name: rotateIsClose;
+  animation-name: rotate-is-close;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
@@ -50,17 +50,11 @@
     width: 18px;
     height: 18px;
     margin-top: 3px;
-
-    //
     fill: none !important;
 
     path {
       fill: none !important;
       stroke: #919191;
-    }
-
-    path {
-      fill: none !important;
     }
 
     &:hover {
@@ -83,7 +77,7 @@
 }
 
 .isOpen {
-  animation-name: rotateIsOpen;
+  animation-name: rotate-is-open;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
@@ -110,7 +104,7 @@
   background: #ebebeb;
   border-radius: 10px;
 
-  animation-name: listVisible;
+  animation-name: list-visible;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
@@ -160,7 +154,7 @@
   font-weight: 400;
   color: #d9304f;
 
-  animation-name: openError;
+  animation-name: open-error;
   animation-duration: 3s;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
@@ -218,17 +212,14 @@
 
   transition: 0.5s all;
 
+  // ToDo: looks that the code below is duplicated
+
   svg {
-    //
     fill: none !important;
 
     path {
       fill: none !important;
       stroke: #919191;
-    }
-
-    path {
-      fill: none !important;
     }
 
     &:hover {

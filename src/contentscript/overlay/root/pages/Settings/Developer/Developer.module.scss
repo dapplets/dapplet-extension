@@ -2,9 +2,13 @@
 @import "../../../assets/styles/fonts";
 @import "../../../assets/styles/color.variables";
 @import "../../../assets/styles/animate";
+@import "./adaptive";
+
+// ToDo: looks that the code below is duplicated
 
 .wrapper {
   overflow: hidden;
+  overflow: -moz-scrollbars-none;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -12,19 +16,12 @@
   width: 100%;
   max-height: calc(100vh - 120px);
   padding-bottom: 15px;
-}
 
-
-.wrapper::-webkit-scrollbar {
-  width: 0;
-}
-
-.wrapper {
   -ms-overflow-style: none;
 }
 
-.wrapper {
-  overflow: -moz-scrollbars-none;
+.wrapper::-webkit-scrollbar {
+  width: 0;
 }
 
 .blockModules {
@@ -200,7 +197,7 @@
   font-weight: 400;
   color: #d9304f;
 
-  animation-name: openError;
+  animation-name: open-error;
   animation-duration: 3s;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
@@ -231,5 +228,3 @@
   background-repeat: no-repeat;
   border-radius: 4px;
 }
-
-@import "./adaptive"

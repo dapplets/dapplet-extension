@@ -1,23 +1,18 @@
 @import '../../assets/styles/color.variables';
 @import '../../assets/styles/null';
+@import './adaptive';
 
 .wrapper {
   display: flex;
   align-items: center;
   justify-content: end;
-
-  // margin-top: 20px;
   margin-bottom: 5px;
-
-  // display: none;
 }
 
 .dappletsBlock {
   direction: rtl;
   overflow-y: auto;
   width: 100%;
-
-  // height: calc(100vh - 58px);
   height: calc(100vh - 97px);
 
   &::-webkit-scrollbar {
@@ -78,5 +73,3 @@
     color: $primary-pressed;
   }
 }
-
-@import './adaptive';

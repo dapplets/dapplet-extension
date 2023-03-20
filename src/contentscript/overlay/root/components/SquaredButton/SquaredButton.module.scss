@@ -23,10 +23,6 @@
   transition: all 0.5s;
 
   &:hover {
-    // width: 22px;
-
-    // height: 22px;
-
     transition: all 0.5s;
 
     svg {
@@ -51,10 +47,6 @@
   min-width: 32px;
   min-height: 32px;
 
-  // min-width: 35px;
-  // min-height: 35px;
-
-  // border-radius: 10px;
   background: $pure-white;
   border-radius: 4px;
   box-shadow: inset 0 1px 2px rgb(225 225 225 / 20%), inset 0 -1px 2px rgb(225 225 225 / 20%),

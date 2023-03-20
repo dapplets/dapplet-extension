@@ -9,7 +9,6 @@
   width: 16px;
   min-height: 30vh;
 
-  // background: $app-bg;
   background: #fff;
 }
 
@@ -25,7 +24,6 @@
 }
 
 .inner {
-  // margin-top: 6px;
   margin-top: 55px;
   margin-right: 16px;
 }
@@ -49,10 +47,6 @@
   border: 1px solid #e3e3e3;
   border-radius: 50%;
 
-  // svg path {
-  //   fill: $primary;
-  // }
-
   &:hover svg path {
     fill: $primary-hover;
   }
@@ -69,7 +63,6 @@
 }
 
 .isOpenWallet {
-  // background: rgb(0 0 0 / 30%);
   position: relative;
 
   &::before {
@@ -92,11 +85,6 @@
 
 .tabsMobile {
   display: none;
-}
-
-.noActive {
-  // background: #eaf0f0 !important;
-  // box-shadow: inset -2px 0 4px rgb(0 0 0 / 25%);
 }
 
 .TabListMobile {
@@ -122,8 +110,6 @@
     background: #fff;
   }
 }
-
-// @import './adaptive.scss';
 
 .TabList {
   display: flex;
