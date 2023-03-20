@@ -73,7 +73,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     init()
 
     return () => {
-      // abortController.abort()
+      abortController.abort()
     }
   }, [mi, newState, targetChain, editContextId, editAdmin, abortController.signal.aborted])
 
@@ -81,10 +81,9 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     const { getRegistries } = await initBGFunctions(browser)
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-    if (!abortController.signal.aborted) {
-      setTargetRegistry(prodRegistries[0]?.url || null)
-      setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-    }
+
+    setTargetRegistry(prodRegistries[0]?.url || null)
+    setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
     await _updateCurrentAccount()
     if (!targetRegistry) return
@@ -95,9 +94,8 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     if (targetChain) {
       const { getAddress } = await initBGFunctions(browser)
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-      if (!abortController.signal.aborted) {
-        setCurrentAccount(currentAccount)
-      }
+
+      setCurrentAccount(currentAccount)
     } else {
       return
     }
@@ -181,16 +179,14 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const getContextId = async () => {
     const { getContextIds } = await initBGFunctions(browser)
     const newContextID = await getContextIds(targetRegistry, mi.name)
-    if (!abortController.signal.aborted) {
-      setContextId(newContextID)
-    }
+
+    setContextId(newContextID)
   }
   const getAdmins = async () => {
     const { getAdmins } = await initBGFunctions(browser)
     const authors = await getAdmins(targetRegistry, mi.name)
-    if (!abortController.signal.aborted) {
-      setAdmins(authors)
-    }
+
+    setAdmins(authors)
   }
 
   function containsValue(arr, elem: string) {

@@ -7,65 +7,50 @@ import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 // import TimeAgo from 'javascript-time-ago'
 import cn from 'classnames'
+import useAbortController from '../../../hooks/useAbortController'
 import styles from './DevMesage.module.scss'
 
 interface DevMessageProps {}
 export const DevMessage: FC<DevMessageProps> = (props) => {
-  const [devMessage, setDevMessage] = useState(null)
-  const [newExtensionVersion, setNewExtensionVersion] = useState(null)
-  const [discordMessages, setDiscordMessages] = useState([])
-
+  const [newVersion, setNewExtensionVersion] = useState(null)
+  const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
-      _updateData()
+      await _updateData()
     }
     init()
-    return () => {}
-  }, [])
+    return () => {
+      abortController.abort()
+    }
+  }, [abortController.signal.aborted])
   const _updateData = async () => {
-    const { getDevMessage, getNewExtensionVersion, getIgnoredUpdate, getDiscordMessages } =
-      await initBGFunctions(browser)
-    const devMessage = await getDevMessage()
+    const { getNewExtensionVersion, getIgnoredUpdate } = await initBGFunctions(browser)
+
     const ignoredUpdate = await getIgnoredUpdate()
-    // const ignoredUpdate = '0.50.1'
+
     const newExtensionVersion = await getNewExtensionVersion()
-    const discordMessages = await getDiscordMessages()
-
-    setDevMessage(devMessage)
-
-    setNewExtensionVersion(ignoredUpdate === newExtensionVersion ? null : newExtensionVersion)
-    setDiscordMessages(discordMessages)
-  }
-
-  const _hideDevMessage = async () => {
-    const { hideDevMessage } = await initBGFunctions(browser)
-    await hideDevMessage(devMessage)
-    setDevMessage(null)
-  }
-
-  const _hideDiscordMessages = async () => {
-    const { hideDiscordMessages } = await initBGFunctions(browser)
-    await hideDiscordMessages(discordMessages[0].timestamp)
-    setDiscordMessages([])
+    if (!abortController.signal.aborted) {
+      setNewExtensionVersion(ignoredUpdate === newExtensionVersion ? null : newExtensionVersion)
+    }
   }
 
   const _ignoreUpdate = async () => {
     const { setIgnoredUpdate } = await initBGFunctions(browser)
-    setIgnoredUpdate(newExtensionVersion)
+    setIgnoredUpdate(newVersion)
     setNewExtensionVersion(null)
   }
   const _showUpgradeGuide = async () => {
     window.open(
-      `https://github.com/dapplets/dapplet-extension/releases/download/v${newExtensionVersion}/dapplet-extension.zip`
+      `https://github.com/dapplets/dapplet-extension/releases/download/v${newVersion}/dapplet-extension.zip`
     )
   }
   const getNewExtensionVersion = () => {
-    if (newExtensionVersion) {
+    if (newVersion) {
       return (
         <div className={cn(styles.wrapper)}>
           <div className={styles.fisrtLine}>
             <div className={styles.versionBlock}>
-              <span className={styles.newVersion}>Extension v. {newExtensionVersion} released</span>
+              <span className={styles.newVersion}>Extension v.{newVersion} released</span>
               <span className={styles.version}>v. {EXTENSION_VERSION} installed</span>
             </div>
             <div className={styles.buttonBlock}>

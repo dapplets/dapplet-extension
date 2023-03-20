@@ -63,7 +63,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     }
     init()
     return () => {
-      // abortController.abort()
+      abortController.abort()
     }
   }, [abortController.signal.aborted])
 
@@ -87,14 +87,12 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       setRegistryInput(currentUrl)
       if (isUpdate) {
         await loadRegistries()
-        if (!abortController.signal.aborted) {
-          setUpdate(false)
-        }
+
+        setUpdate(false)
       }
     }
-    if (!abortController.signal.aborted) {
-      setLoadButton(false)
-    }
+
+    setLoadButton(false)
   }
 
   const loadRegistries = async () => {
@@ -104,14 +102,12 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       versions: VersionInfo[]
       isDeployed: boolean[]
     }[] = await getAllDevModules()
-    if (!abortController.signal.aborted) {
-      setModules(modules)
-    }
+
+    setModules(modules)
 
     const registries = await getRegistries()
-    if (!abortController.signal.aborted) {
-      setRegistries(registries.filter((r) => r.isDev === true))
-    }
+
+    setRegistries(registries.filter((r) => r.isDev === true))
   }
 
   const addRegistry = async (url: string, newFunction: () => void) => {
@@ -153,9 +149,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     await enableRegistry(url)
     loadRegistries()
     setTimeout(() => {
-      if (!abortController.signal.aborted) {
-        setLoadButtonLocalhost(false)
-      }
+      setLoadButtonLocalhost(false)
     }, 1500)
   }
 
@@ -165,9 +159,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     await disableRegistry(url)
     loadRegistries()
     setTimeout(() => {
-      if (!abortController.signal.aborted) {
-        setLoadButtonLocalhost(false)
-      }
+      setLoadButtonLocalhost(false)
     }, 1500)
   }
 

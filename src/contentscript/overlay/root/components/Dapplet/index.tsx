@@ -72,13 +72,11 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
-      // if (!abortController.signal.aborted) {
       await updateData()
-      // }
     }
     init()
     return () => {
-      // abortController.abort()
+      abortController.abort()
     }
   }, [abortController.signal.aborted])
   const loadingHome = () => {
@@ -92,15 +90,12 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     const newRegistries = registries
       .filter((r) => r.isDev === false && r.isEnabled !== false)
       .map((x, i) => x.url)
-    if (!abortController.signal.aborted) {
-      setRegistryActive(newRegistries[0])
-    }
+
+    setRegistryActive(newRegistries[0])
 
     const newOwner = await getOwnership(newRegistries[0], name)
-    if (!abortController.signal.aborted) {
-      setOwner(newOwner)
-    }
-    // if (isActive) getTabsForDapplet(dapplet)
+
+    setOwner(newOwner)
   }
 
   const copyUserEnvInfo = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

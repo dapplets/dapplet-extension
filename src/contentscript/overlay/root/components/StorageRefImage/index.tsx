@@ -2,10 +2,10 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import * as EventBus from '../../../../../common/global-event-bus'
 import { StorageRef } from '../../../../../common/types'
 import useAbortController from '../../hooks/useAbortController'
 import styles from './StorageRefImage.module.scss'
-import * as EventBus from '../../../../../common/global-event-bus'
 interface PropsStorageRefImage {
   storageRef: StorageRef | string
   className?: string
@@ -21,12 +21,11 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
     await _updateStorageRef(storageRef)
   }
   useEffect(() => {
-   
     init()
     return () => {
-      // abortController.abort()
+      abortController.abort()
     }
-  }, [ abortController.signal.aborted])
+  }, [abortController.signal.aborted])
   useEffect(() => {
     EventBus.on('get_base64', init)
 
@@ -54,9 +53,8 @@ export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
         ) {
           const base64 = await getResource(storageRef)
           const dataUri = 'data:text/plain;base64,' + base64
-          if (!abortController.signal.aborted) {
-            setDataUri(dataUri)
-          }
+
+          setDataUri(dataUri)
         } else {
           setDataUri(null)
         }

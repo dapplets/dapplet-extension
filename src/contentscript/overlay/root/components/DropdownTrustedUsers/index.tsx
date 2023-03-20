@@ -37,23 +37,21 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
     }
     init()
     return () => {
-      // abortController.abort()
+      abortController.abort()
     }
   }, [abortController.signal.aborted])
 
   const removeTrustedUser = async (account: string) => {
     const { removeTrustedUser } = await initBGFunctions(browser)
     await removeTrustedUser(account)
-    if (!abortController.signal.aborted) {
-      loadTrustedUsers()
-    }
+
+    loadTrustedUsers()
   }
   const loadTrustedUsers = async () => {
     const { getTrustedUsers } = await initBGFunctions(browser)
     const trustedUsers = await getTrustedUsers()
-    if (!abortController.signal.aborted) {
-      setTrustedUsers(trustedUsers)
-    }
+
+    setTrustedUsers(trustedUsers)
   }
   const _openEtherscan = async (address: string) => {
     if (typeOfUri(address) === UriTypes.Ens) {
@@ -69,9 +67,8 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
   const loadRegistries = async () => {
     const { getRegistries } = await initBGFunctions(browser)
     const registries = await getRegistries()
-    if (!abortController.signal.aborted) {
-      setRegistries(registries.filter((r) => r.isDev === false))
-    }
+
+    setRegistries(registries.filter((r) => r.isDev === false))
   }
   const visible = (hash: string): string => {
     if (hash.length > 33) {

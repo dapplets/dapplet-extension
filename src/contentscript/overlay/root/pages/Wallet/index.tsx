@@ -41,10 +41,9 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
     const { getWalletDescriptors } = await initBGFunctions(browser)
 
     const descriptors = await getWalletDescriptors()
-    if (!abortController.signal.aborted) {
-      setDescriptors(descriptors)
-      setLoading(false)
-    }
+
+    setDescriptors(descriptors)
+    setLoading(false)
   }
 
   const disconnectButtonClick = async (chain: ChainTypes, wallet: WalletTypes) => {

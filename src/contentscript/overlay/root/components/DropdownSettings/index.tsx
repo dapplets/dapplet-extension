@@ -24,15 +24,16 @@ export const DropdownSettings = (props: TDropdownSettingsProps) => {
       getterName && (await loadValueFromStorage())
     }
     init()
-    return () => {}
+    return () => {
+      abortController.abort()
+    }
   }, [abortController.signal.aborted, getterName])
 
   const loadValueFromStorage = async () => {
     const backgroundFunctions = await initBGFunctions(browser)
     const storageValue = await backgroundFunctions[getterName]()
-    if (!abortController.signal.aborted) {
-      setSelectedValue(storageValue)
-    }
+
+    setSelectedValue(storageValue)
   }
 
   const writeToStorageSelectedValue = async (value: string, func: (x) => void) => {
