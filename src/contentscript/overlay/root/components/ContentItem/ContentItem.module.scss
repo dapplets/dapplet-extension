@@ -4,7 +4,7 @@
 
 /* Segoe UI Regular */
 @font-face {
-  font-family: SegoeUIRegular;
+  font-family: SegoeUIRegular, sans-serif;
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -52,7 +52,7 @@
   width: 80%;
   padding-bottom: 5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 22px;
   font-weight: 700;
   line-height: 26px;
@@ -64,7 +64,7 @@
   width: 80%;
   padding-bottom: 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-style: normal;
   line-height: 16px;
@@ -81,7 +81,7 @@
   .loadButton {
     display: inline-block;
 
-    font-family: Roboto;
+    font-family: Roboto, sans-serif;
     font-size: 14px;
     font-weight: 500;
     line-height: 16px;
@@ -139,7 +139,7 @@
 .title {
   margin-left: 5px;
 
-  font-family: SegoeUIRegular;
+  font-family: SegoeUIRegular, sans-serif;
   font-size: 16px !important;
   font-weight: 400 !important;
   color: #2a2a2a !important;
