@@ -2,26 +2,23 @@
 @import "../../assets/styles/fonts";
 @import "../../assets/styles/color.variables";
 
+// ToDo: code duplication
+
 .wrapper {
   overflow: hidden;
+  overflow: -moz-scrollbars-none;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
 
   width: 100%;
   height: calc(100vh - 123px);
+
+  -ms-overflow-style: none;
 }
 
 .wrapper::-webkit-scrollbar {
   width: 0;
-}
-
-.wrapper {
-  -ms-overflow-style: none;
-}
-
-.wrapper {
-  overflow: -moz-scrollbars-none;
 }
 
 .blockMessage {
@@ -160,10 +157,6 @@
   &::placeholder {
     text-transform: none;
   }
-}
-
-.support::before {
-  content: attr(data-title);
 }
 
 .support::before {
@@ -344,7 +337,6 @@
   font-weight: 400;
   line-height: 100%;
   color: $primary;
-
 
   &:hover {
     color: $primary-hover;

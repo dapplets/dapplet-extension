@@ -1,6 +1,7 @@
 @import '../../assets/styles/null';
 @import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
+@import './adaptive';
 
 .wrapperCard {
   display: flex;
@@ -174,5 +175,3 @@
   background-image: url("../../assets/svg/loaderSettings.svg");
   background-repeat: no-repeat;
 }
-
-@import './adaptive';

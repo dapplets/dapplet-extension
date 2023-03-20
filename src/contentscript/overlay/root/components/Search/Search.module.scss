@@ -24,13 +24,13 @@
   border: 1px solid #E3E3E3;
   border-radius: 4px;
 
-  animation-name: isOpenSearch;
+  animation-name: is-open-search;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
 }
 
-@keyframes isOpenSearch {
+@keyframes is-open-search {
   0% {
     height: 0;
     opacity: 0;
@@ -48,20 +48,20 @@
 }
 
 [class*=" close"] {
-  animation-name: isCloseSearch;
+  animation-name: is-close-search;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
 
   .searchIcon{
-    animation-name: isCloseSearch;
+    animation-name: is-close-search;
     animation-duration: 0.2s;
     animation-timing-function: ease;
     animation-fill-mode: forwards;
   }
 
   .labelSearchModule{
-    animation-name: isCloseSearch;
+    animation-name: is-close-search;
     animation-duration: 0.2s;
     animation-timing-function: ease;
     animation-fill-mode: forwards
@@ -72,13 +72,13 @@
 .labelSearchModule {
   width: 100%;
 
-  animation-name: isOpenSearchLabel;
+  animation-name: is-open-search-label;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
 }
 
-@keyframes isOpenSearchLabel {
+@keyframes is-open-search-label {
   0% {
     height: 0;
   }
@@ -92,7 +92,7 @@
   }
 }
 
-@keyframes isCloseSearch {
+@keyframes is-close-search {
   0% {
     height: 35px;
     opacity: 1;
@@ -109,7 +109,6 @@
   }
 }
 
-
 .searchIcon {
   cursor: pointer;
 
@@ -124,7 +123,7 @@
   border: none;
   border-radius: 4px 0 0 4px;
 
-  animation-name: isOpenSearchLabel;
+  animation-name: is-open-search-label;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;

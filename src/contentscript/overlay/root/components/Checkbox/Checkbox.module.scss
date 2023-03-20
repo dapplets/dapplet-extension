@@ -1,6 +1,7 @@
 @import '../../assets/styles/color.variables';
 @import '../../assets/styles/null';
 @import '../../assets/styles/fonts';
+@import './adaptive';
 
 .checkboxBlock {
   display: flex;
@@ -73,10 +74,6 @@
 }
 
 div.supportLabel::before {
-  content: attr(data-title);
-}
-
-div.supportLabel::before {
   cursor: default;
   content: attr(data-title);
 
@@ -128,10 +125,6 @@ div.supportLabel:focus::before {
   opacity: 0;
 }
 
-.fakeInputCheckbox {
-  width: 16px;
-}
-
 .active {
   cursor: pointer;
   background: $primary;
@@ -169,5 +162,3 @@ div.supportLabel:focus::before {
   line-height: 100%;
   color: $main-black;
 }
-
-@import './adaptive';

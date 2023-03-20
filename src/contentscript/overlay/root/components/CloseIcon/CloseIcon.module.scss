@@ -18,20 +18,12 @@
   height: 39px;
 }
 
-.black path {
-  fill: $main-black;
-}
-
-.black:hover path {
-  fill: $content-black;
-}
-
-.black:active path {
-  fill: $main-grey;
-}
-
 .red path {
   fill: $primary;
+}
+
+.black path {
+  fill: $main-black;
 }
 
 .red:active path {
@@ -40,6 +32,14 @@
 
 .red:hover path {
   fill: $primary-hover;
+}
+
+.black:hover path {
+  fill: $content-black;
+}
+
+.black:active path {
+  fill: $main-grey;
 }
 
 .notification:active path{

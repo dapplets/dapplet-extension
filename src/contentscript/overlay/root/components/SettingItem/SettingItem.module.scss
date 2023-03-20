@@ -1,6 +1,7 @@
 @import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
 @import '../../assets/styles/null';
+@import './adaptive';
 
 .MainSettingsAuto {
   padding: 10px;
@@ -59,5 +60,3 @@
   justify-content: space-between;
   margin-top: 10px;
 }
-
-@import './adaptive';

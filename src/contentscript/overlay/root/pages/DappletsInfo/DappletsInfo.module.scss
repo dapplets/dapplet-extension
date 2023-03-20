@@ -1,27 +1,26 @@
 @import '../../assets/styles/null';
 @import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
+@import './modalStyles';
+@import './adaptive';
+
+// ToDo: code duplication
 
 .wrapper {
   overflow: hidden;
+  overflow: -moz-scrollbars-none;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
 
   width: 100%;
   height: calc(100vh - 130px);
+
+  -ms-overflow-style: none;
 }
 
 .wrapper::-webkit-scrollbar {
   width: 0;
-}
-
-.wrapper {
-  -ms-overflow-style: none;
-}
-
-.wrapper {
-  overflow: -moz-scrollbars-none;
 }
 
 .mainInfoBlock {
@@ -441,6 +440,3 @@
   flex-direction: column;
   width: 100%;
 }
-
-@import './modalStyles';
-@import './adaptive';

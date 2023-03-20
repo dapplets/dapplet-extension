@@ -46,6 +46,10 @@
   }
 }
 
+.copied {
+  position: relative;
+}
+
 h6.title .copied {
   content: attr(data-title);
 
@@ -85,10 +89,6 @@ h6.title:checked .copied {
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-}
-
-.copied {
-  position: relative;
 }
 
 .copiedIcon {

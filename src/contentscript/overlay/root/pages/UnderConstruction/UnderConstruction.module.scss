@@ -2,26 +2,23 @@
 @import "../../assets/styles/fonts";
 @import "../../assets/styles/color.variables";
 
+// ToDo: code duplication
+
 .wrapper {
   overflow: hidden;
+  overflow: -moz-scrollbars-none;
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
 
   width: 100%;
   height: calc(100vh - 93px);
+
+  -ms-overflow-style: none;
 }
 
 .wrapper::-webkit-scrollbar {
   width: 0;
-}
-
-.wrapper {
-  -ms-overflow-style: none;
-}
-
-.wrapper {
-  overflow: -moz-scrollbars-none;
 }
 
 .mainInfoBlock {

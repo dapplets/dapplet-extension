@@ -31,6 +31,7 @@
 
 .activeLink {
   display: inline-block;
+  background: #dad9d9;
 }
 
 .openList {
@@ -265,8 +266,4 @@
 
 :focus:input-placeholder {
   color: transparent;
-}
-
-.activeLink {
-  background: #dad9d9;
 }

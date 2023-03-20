@@ -71,7 +71,6 @@ export const Notification = (props: NotificationProps): ReactElement => {
             appearance="small"
             color="red"
             isNotification
-            className={styles.button}
             onClick={() => onClear && onClear(_id)}
           />
         ) : null}

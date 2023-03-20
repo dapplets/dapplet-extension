@@ -1,6 +1,8 @@
 @import '../../assets/styles/null';
 @import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
+@import './modalWindowStyles';
+@import './adaptive';
 
 .dappletsBlock {
   position: relative;
@@ -289,6 +291,3 @@
 .moreAdmins:active {
   color: $secondary-pressed;
 }
-
-@import './modalWindowStyles';
-@import './adaptive';

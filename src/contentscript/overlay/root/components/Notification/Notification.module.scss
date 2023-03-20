@@ -1,6 +1,7 @@
 @import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
 @import '../../assets/styles/null';
+@import './adaptive';
 
 .wrapper {
   position: relative;
@@ -100,9 +101,6 @@
   text-overflow: ellipsis;
 }
 
-.button {
-}
-
 .link {
   display: block;
 
@@ -125,5 +123,3 @@
   align-items: flex-end;
   width: 97%;
 }
-
-@import './adaptive';
