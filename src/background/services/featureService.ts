@@ -21,7 +21,12 @@ import { globalClear } from 'caching-decorator'
 import { Runtime } from 'webextension-polyfill'
 import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
 import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
-import { DappletLoadingResult, DappletRuntimeResult, StorageRef } from '../../common/types'
+import {
+  DappletLoadingResult,
+  DappletRuntimeResult,
+  MessageWrapperRequest,
+  StorageRef,
+} from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
 import { AnalyticsGoals, AnalyticsService } from './analyticsService'
 import GlobalConfigService from './globalConfigService'
@@ -433,9 +438,9 @@ export default class FeatureService {
     hostnames: string[],
     order: number,
     registryUrl: string,
-    caller: any
+    req: MessageWrapperRequest
   ): Promise<DappletRuntimeResult | null> {
-    const tabId = caller?.sender?.tab?.id
+    const tabId = req?.sender?.tab?.id
     if (!tabId) throw new Error('Tab ID is required')
     this._analyticsService.track({ idgoal: AnalyticsGoals.DappletActivated, dapplet: name })
     return await this._setFeatureActive(name, version, hostnames, true, order, registryUrl, tabId)
@@ -447,9 +452,9 @@ export default class FeatureService {
     hostnames: string[],
     order: number,
     registryUrl: string,
-    caller: any
+    req: MessageWrapperRequest
   ): Promise<DappletRuntimeResult | null> {
-    const tabId = caller?.sender?.tab?.id
+    const tabId = req?.sender?.tab?.id
     if (!tabId) throw new Error('Tab ID is required')
     this._analyticsService.track({ idgoal: AnalyticsGoals.DappletDeactivated, dapplet: name })
     return await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
@@ -461,9 +466,9 @@ export default class FeatureService {
     hostnames: string[],
     order: number,
     registryUrl: string,
-    caller: any
+    req: MessageWrapperRequest
   ): Promise<void> {
-    const tabId = caller?.sender?.tab?.id
+    const tabId = req?.sender?.tab?.id
     if (!tabId) throw new Error('Tab ID is required')
     const modules = await this.getActiveModulesByHostnames(hostnames)
     if (!modules.find((m) => m.name === name)) return

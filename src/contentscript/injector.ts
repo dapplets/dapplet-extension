@@ -682,7 +682,7 @@ export class Injector {
       const cfgsKey = Symbol()
       const featureId = contextModule.manifest.name
       return new Proxy(proxiedModule.instance, {
-        get: function (target: IContentAdapter<any>, prop, receiver) {
+        get: function (target: IContentAdapter<any>, prop) {
           if (prop === 'attachConfig') {
             return (cfg: any) => {
               if (contextModule.manifest.type === ModuleTypes.Feature) {

@@ -1,6 +1,7 @@
 import { ethers } from 'ethers'
 import * as nearAPI from 'near-api-js'
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
+import { NotImplementedError } from '../../common/errors'
 import { typeOfUri, UriTypes } from '../../common/helpers'
 import { StorageRef } from '../../common/types'
 import ModuleInfo from '../models/moduleInfo'
@@ -55,7 +56,7 @@ export class NearRegistry implements Registry {
   public isDev: boolean
 
   private _nearAccount: nearAPI.ConnectedWalletAccount
-  private _contract: any
+  private _contract
   private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>()
 
   constructor({ url, isDev, nearAccount }: RegistryConfig) {
@@ -223,11 +224,7 @@ export class NearRegistry implements Registry {
     }
   }
 
-  public async getAllDevModules({
-    users,
-  }: {
-    users: string[]
-  }): Promise<{ module: ModuleInfo; versions: VersionInfo[] }[]> {
+  public async getAllDevModules(): Promise<{ module: ModuleInfo; versions: VersionInfo[] }[]> {
     return Promise.resolve([])
   }
 
@@ -236,7 +233,7 @@ export class NearRegistry implements Registry {
       throw new Error("NEAR Registry doesn't support uploading of modules under construction.")
 
     const moduleType = parseInt(
-      Object.entries(moduleTypesMap).find(([k, v]) => v === module.type)[0]
+      Object.entries(moduleTypesMap).find(([, v]) => v === module.type)[0]
     )
 
     const mInfo: NearModuleInfo = {
@@ -294,15 +291,15 @@ export class NearRegistry implements Registry {
     }
   }
 
-  public async transferOwnership(moduleName: string, newAccount: string, oldAccount: string) {
+  public async transferOwnership(moduleName: string, newAccount: string) {
     await this._contract.transferOwnership({
       moduleName: moduleName,
       newOwner: newAccount,
     })
   }
 
-  public async getContextIds(moduleName: string): Promise<string[]> {
-    throw new Error('Method not implemented.')
+  public async getContextIds(): Promise<string[]> {
+    throw new NotImplementedError()
   }
 
   public async addContextId(moduleName: string, contextId: string) {
@@ -312,24 +309,24 @@ export class NearRegistry implements Registry {
   public async removeContextId(moduleName: string, contextId: string) {
     await this._contract.removeContextId({ contextId, moduleName })
   }
-  public async getAdmins(moduleName: string): Promise<string[]> {
-    throw new Error('Method not implemented.')
+  public async getAdmins(): Promise<string[]> {
+    throw new NotImplementedError()
   }
 
-  public async addAdmin(moduleName: string, adressAdmin: string) {
+  public async addAdmin() {
     return
   }
 
-  public async removeAdmin(moduleName: string, adressAdmin: string) {
-    return
+  public async removeAdmin() {
+    throw new NotImplementedError()
   }
 
-  public async editModuleInfo(module: ModuleInfo): Promise<void> {
-    throw new Error('Not implemented')
+  public async editModuleInfo() {
+    throw new NotImplementedError()
   }
 
-  public async getModuleNftUrl(moduleName: string): Promise<string> {
-    throw new Error('Not implemented')
+  public async getModuleNftUrl(): Promise<string> {
+    throw new NotImplementedError()
   }
 
   private _toNearStorageRef(ref: StorageRef): NearStorageRef {

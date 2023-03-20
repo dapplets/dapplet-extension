@@ -1,5 +1,6 @@
+import { NotImplementedError } from '../../common/errors'
 import { joinUrls, timeoutPromise } from '../../common/helpers'
-import { DirectoryData, Storage as ModuleStorage } from './storage'
+import { Storage as ModuleStorage } from './storage'
 
 export class IpfsModuleStorage implements ModuleStorage {
   private _gateway: string
@@ -54,7 +55,7 @@ export class IpfsModuleStorage implements ModuleStorage {
     return url
   }
 
-  public async saveDir(tarBlob: DirectoryData): Promise<string> {
-    throw new Error('Not implemented')
+  public async saveDir(): Promise<string> {
+    throw new NotImplementedError()
   }
 }

@@ -12,7 +12,7 @@ export default class DiscordService {
   constructor(private _globalConfigService: GlobalConfigService) {}
 
   @Cacheable({ ttl: 60 * 60 * 1000 })
-  async getDiscordMessages(): Promise<any> {
+  async getDiscordMessages(): Promise<IDiscordMessage[]> {
     const url = `https://dapplets-api.mooo.com/announcements`
     try {
       const resp = await fetch(url)

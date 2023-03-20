@@ -1,10 +1,10 @@
-import { Provider, TransactionRequest } from '@ethersproject/providers'
+import { TransactionRequest } from '@ethersproject/providers'
 import { MetaMaskInpageProvider } from '@metamask/providers'
 import { detect } from 'detect-browser'
 import { ethers } from 'ethers'
-import { Deferrable } from 'ethers/lib/utils'
 import PortStream from 'extension-port-stream'
 import { browser } from 'webextension-polyfill-ts'
+import { NotImplementedError } from '../../../common/errors'
 import { CacheMethod } from '../../../common/helpers'
 import { EthereumWallet } from './interface'
 
@@ -36,8 +36,8 @@ export default class extends ethers.Signer implements EthereumWallet {
     })) as string
   }
 
-  async signTransaction(transaction: Deferrable<TransactionRequest>): Promise<string> {
-    throw new Error('Not implemented')
+  async signTransaction(): Promise<string> {
+    throw new NotImplementedError()
   }
 
   async sendTransaction(
@@ -73,8 +73,8 @@ export default class extends ethers.Signer implements EthereumWallet {
     return metamask.request({ method, params })
   }
 
-  connect(provider: Provider): ethers.Signer {
-    throw new Error('Method not implemented.')
+  connect(): ethers.Signer {
+    throw new NotImplementedError()
   }
 
   async isAvailable() {
