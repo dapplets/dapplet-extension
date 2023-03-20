@@ -107,7 +107,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         ? await getFeaturesByHostnames(contextIds, dropdownListValue)
         : []
 
-      const newDappletsList = features
+      const rightDapplets = features
         .filter((f) => f.type === ModuleTypes.Feature)
         .map((f) => ({
           ...f,
@@ -117,12 +117,21 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           error: null,
           versions: [],
         }))
-      setModule(newDappletsList)
-      if (!abortController.signal.aborted) {
-        setDapplets(newDappletsList)
-      }
-      newDappletsList.map((x) => {
-        if (x.isActive) getTabsForDapplet(x)
+
+      if (abortController.signal.aborted) return
+
+      setDapplets((leftDapplets) => {
+        // remove disappeared dapplets from the list
+        // leave existing dapplets at the beginning of the list (innerJoin)
+        // add new dapplets to the end of the list (exclusiveRightJoin)
+        const innerJoin = leftDapplets.filter((x) => rightDapplets.find((y) => y.name === x.name))
+        const exclusiveRightJoin = rightDapplets.filter(
+          (x) => !leftDapplets.find((y) => y.name === x.name)
+        )
+        const rightJoin = [...innerJoin, ...exclusiveRightJoin]
+        setModule(rightJoin)
+        rightJoin.filter((x) => x.isActive).forEach(getTabsForDapplet)
+        return rightJoin
       })
     } catch (err) {
       console.error(err)
@@ -141,7 +150,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           return dapplet
         }
       })
-    });
+    })
   }
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
@@ -215,7 +224,13 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     try {
       if (isActive) {
-        const {isActionHandler, isHomeHandler} = await activateFeature(name, version, targetContextIds, order, sourceRegistry.url)
+        const { isActionHandler, isHomeHandler } = await activateFeature(
+          name,
+          version,
+          targetContextIds,
+          order,
+          sourceRegistry.url
+        )
         getTabsForDapplet(module)
         _updateFeatureState(name, { isLoading: false, isActionHandler, isHomeHandler })
       } else {
@@ -230,7 +245,11 @@ export const Dapplets: FC<DappletsProps> = (props) => {
               handleCloseTabClick(tab)
             })
 
-        _updateFeatureState(name, { isLoading: false, isActionHandler: false, isHomeHandler: false })
+        _updateFeatureState(name, {
+          isLoading: false,
+          isActionHandler: false,
+          isHomeHandler: false,
+        })
       }
     } catch (err) {
       console.error(err)
@@ -301,7 +320,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         <TabLoader />
       ) : (
         <div className={cn(styles.dappletsBlock, classNameBlock)}>
-          <DevMessage/>
+          <DevMessage />
           {!isNoContentScript ? (
             filteredDapplets && filteredDapplets.length && filteredDapplets.length > 0 ? (
               filteredDapplets.map((dapplet, i) => {
