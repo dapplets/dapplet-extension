@@ -58,8 +58,6 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const { name, title, description, author, icon, isActive, isActionHandler, isUnderConstruction } =
     dapplet
 
-   
-
   const [loadHome, setLoadHome] = useState(false)
   const [copied, setCopied] = useState<LoadingState>(LoadingState.READY)
 
