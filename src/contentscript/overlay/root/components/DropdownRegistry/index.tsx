@@ -27,16 +27,15 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
     }
     init()
     return () => {
-      // abortController.abort()
+      abortController.abort()
     }
   }, [abortController.signal.aborted])
 
   const loadRegistries = async () => {
     const { getRegistries } = await initBGFunctions(browser)
     const registries = await getRegistries()
-    if (!abortController.signal.aborted) {
-      setRegistries(registries.filter((r) => r.isDev === false))
-    }
+
+    setRegistries(registries.filter((r) => r.isDev === false))
   }
 
   const removeRegistry = async (url: string) => {

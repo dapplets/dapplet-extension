@@ -1,0 +1,46 @@
+@import '../../../assets/styles/null';
+@import '../../../assets/styles/fonts';
+@import '../../../assets/styles/color.variables';
+.root {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-family: Roboto;
+
+  color: $PureBlack;
+
+  font-size: 14px;
+  line-height: 16px;
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.field {
+  height: 31px;
+  padding: 5px 13px;
+  outline: none;
+  font-family: Roboto;
+  font-weight: 400;
+  line-height: 149%;
+  background: #f5f5f5;
+  border: 1px solid #e3e3e3;
+  border-radius: 5px;
+  margin: 10px;
+  color: #919191;
+  font-size: 14px;
+}
+
+.error {
+  border: 1px solid $error;
+}
+
+.disabled {
+  background-color: $median-price-bg;
+}
+
+.divName {
+  display: flex;
+  flex-direction: column;
+}

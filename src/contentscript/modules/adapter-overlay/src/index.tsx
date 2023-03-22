@@ -1,4 +1,5 @@
 import { ModuleTypes } from '../../../../common/constants'
+import * as EventBus from '../../../../common/global-event-bus'
 import { Exports } from '../../types'
 import { WidgetsCreator } from '../../widgetsCreator'
 import { ButtonWidget, IButtonWidgetState } from '../button'
@@ -25,6 +26,8 @@ export default class OverlayAdapter {
       orderIndex: feature.orderIndex,
     }
     widgets.push(newWidgets)
+
+    EventBus.emit('create_widgets')
   }
   public detachConfig(config, featureId) {
     widgets.splice(

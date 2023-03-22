@@ -116,9 +116,11 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
 
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
-    const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-    setCurrentAccount(currentAccount)
-    setLoading(false)
+    if (targetChain) {
+      const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
+      setCurrentAccount(currentAccount)
+      setLoading(false)
+    } else return
   }
 
   const deployButtonClickHandler = async () => {

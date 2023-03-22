@@ -14,18 +14,15 @@ export const useStorageRef = (storageRef: StorageRef) => {
         const { getResource } = await initBGFunctions(browser)
         const base64 = await getResource(storageRef)
         const dataUri = 'data:text/plain;base64,' + base64
-        if (!abortController.signal.aborted) {
-          setImg(dataUri)
-        }
+
+        setImg(dataUri)
       } catch (error) {
-        // if (!abortController.signal.aborted) {
         setImg(NO_LOGO)
-        // }
       }
     }
     init()
     return () => {
-      // abortController.abort()
+      abortController.abort()
     }
   }, [abortController.signal.aborted])
 

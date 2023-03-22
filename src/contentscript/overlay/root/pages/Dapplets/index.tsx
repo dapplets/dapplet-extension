@@ -65,13 +65,13 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
   useEffect(() => {
     const init = async () => {
-      if (!abortController.signal.aborted) {
-        setLoadingListDapplets(true)
-      }
+      setLoadingListDapplets(true)
+
       await _refreshData()
-      if (!abortController.signal.aborted) {
-        setLoadingListDapplets(false)
-      }
+
+      setLoadingListDapplets(false)
+
+      await loadTrustedUsers()
     }
 
     init()
@@ -81,7 +81,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     } else {
       setLoadingListDapplets(false)
     }
-    return () => {}
+    return () => {
+      abortController.abort()
+    }
   }, [dropdownListValue, abortController.signal.aborted])
 
   useEffect(() => {
@@ -118,9 +120,9 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           versions: [],
         }))
       setModule(newDappletsList)
-      if (!abortController.signal.aborted) {
-        setDapplets(newDappletsList)
-      }
+
+      setDapplets(newDappletsList)
+
       newDappletsList.map((x) => {
         if (x.isActive) getTabsForDapplet(x)
       })
@@ -148,7 +150,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         _updateFeatureState(f.name, { isActionLoading: true })
         const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
         const tab = await getCurrentTab()
-
         if (!tab) return
         await openDappletAction(f.name, tab.id)
       } else {
@@ -272,6 +273,10 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     const url = `${DAPPLETS_STORE_URL}/#sortType=Sort%20A-Z&addressFilter=${f.author}`
     window.open(url, '_blank')
   }
+  const loadTrustedUsers = async () => {
+    const { getTrustedUsers } = await initBGFunctions(browser)
+    const trustedUsers = await getTrustedUsers()
+  }
 
   const filteredDapplets = useMemo(() => {
     return _getFilteredDapplets(dapplets)
@@ -298,7 +303,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         <TabLoader />
       ) : (
         <div className={cn(styles.dappletsBlock, classNameBlock)}>
-          <DevMessage/>
+          <DevMessage />
           {!isNoContentScript ? (
             filteredDapplets && filteredDapplets.length && filteredDapplets.length > 0 ? (
               filteredDapplets.map((dapplet, i) => {

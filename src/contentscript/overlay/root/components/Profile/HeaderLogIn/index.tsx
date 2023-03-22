@@ -73,23 +73,15 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
 
     init()
 
+    return () => {}
+  }, [])
+  useEffect(() => {
+    EventBus.on('wallet_changed', refresh)
+
     return () => {
       EventBus.off('wallet_changed', refresh)
     }
-  }, [
-    isOpen,
-    isMini,
-    newProfile,
-    isModal,
-    walletImage,
-    walletAccount,
-    walletIcon,
-    walletTypeWalletConnect,
-    isMini,
-    liRef,
-    // isOpenSearch,
-    selectedWallet,
-  ])
+  }, [])
 
   const refresh = async () => {
     const { getWalletDescriptors, getDefaultWalletFor } = await initBGFunctions(browser)

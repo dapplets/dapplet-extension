@@ -43,6 +43,7 @@
     "@types/webextension-polyfill": "^0.10.0",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
+    "@usedapp/core": "^1.2.7",
     "@walletconnect/client": "^1.8.0",
     "assert-browserify": "^2.0.0",
     "buffer": "^6.0.3",
@@ -64,6 +65,7 @@
     "ethereum-blockies-base64": "^1.0.2",
     "extension-port-stream": "^2.0.1",
     "fork-ts-checker-webpack-plugin": "^7.3.0",
+    "formik": "^2.2.9",
     "javascript-time-ago": "^2.5.9",
     "jszip": "^3.10.1",
     "normalize.css": "^8.0.1",
@@ -100,9 +102,11 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1",
-    "webpack-merge": "^5.8.0"
+    "webpack-merge": "^5.8.0",
+    "yup": "^1.0.2"
   },
   "dependencies": {
+    "@usedapp/coingecko": "^1.1.13",
     "animejs": "^3.2.1",
     "caching-decorator": "^1.0.2",
     "copy-to-clipboard": "^3.3.3",

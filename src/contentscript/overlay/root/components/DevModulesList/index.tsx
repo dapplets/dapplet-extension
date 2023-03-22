@@ -111,21 +111,9 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     }
     init()
     return () => {
-      // abortController.abort()
+      abortController.abort()
     }
-  }, [
-    targetChain,
-    abortController.signal.aborted,
-    // currentAccount,
-    // modules,
-    // admins,
-    // isLoadingDeploy,
-    // isModalError,
-    // isModalErrorOwner,
-    // owner,
-    // isNewModule,
-    // nodeButton,
-  ])
+  }, [targetChain, abortController.signal.aborted])
 
   const _updateData = async () => {
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
@@ -153,23 +141,19 @@ export const DevModule: FC<PropsDevModule> = (props) => {
           }))
         : []
       const dependenciesChecking = [...dependencies, ...interfaces]
-      //setMi(mi)
-      //setVi(vi)
 
-      if (!abortController.signal.aborted) {
-        setDpendenciesChecking(dependenciesChecking)
-        setTargetStorages(
-          Object.keys(vi?.overlays ?? {}).length > 0
-            ? [StorageTypes.Swarm]
-            : [StorageTypes.Swarm, StorageTypes.Ipfs]
-        )
-        setMode(FormMode.Deploying)
-        setTargetRegistry(prodRegistries[0]?.url || null)
-        setTrustedUsers(trustedUsers)
-        setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-      }
+      setDpendenciesChecking(dependenciesChecking)
+      setTargetStorages(
+        Object.keys(vi?.overlays ?? {}).length > 0
+          ? [StorageTypes.Swarm]
+          : [StorageTypes.Swarm, StorageTypes.Ipfs]
+      )
+      setMode(FormMode.Deploying)
+      setTargetRegistry(prodRegistries[0]?.url || null)
+      setTrustedUsers(trustedUsers)
+      setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
     }
-    // if (!abortController.signal.aborted) {
+
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
       await updateDataLocalhost()
@@ -184,7 +168,6 @@ export const DevModule: FC<PropsDevModule> = (props) => {
         updateDataLocalhost(),
       ])
     }
-    // }
   }
 
   const getModulesAdmins = async () => {
@@ -193,9 +176,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     const authors: string[] = await getAdmins(targetRegistry, mi.name)
 
     if (authors.length > 0) {
-      if (!abortController.signal.aborted) {
-        setAdmins(authors)
-      }
+      setAdmins(authors)
     }
   }
 
@@ -204,16 +185,12 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     const { getOwnership } = await initBGFunctions(browser)
     const owner = await getOwnership(targetRegistry, mi.name)
 
-    if (!abortController.signal.aborted) {
-      setOwner(owner)
-      setOwnerDev(owner)
-    }
+    setOwner(owner)
+    setOwnerDev(owner)
   }
 
   const _updateDeploymentStatus = async () => {
-    if (!abortController.signal.aborted) {
-      setDeploymentStatus(DeploymentStatus.Unknown)
-    }
+    setDeploymentStatus(DeploymentStatus.Unknown)
 
     const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
     const miF = await getModuleInfoByName(targetRegistry, mi.name)
@@ -225,18 +202,16 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       : deployed
       ? DeploymentStatus.Deployed
       : DeploymentStatus.NotDeployed
-    if (!abortController.signal.aborted) {
-      setDeploymentStatus(deploymentStatus)
-    }
+
+    setDeploymentStatus(deploymentStatus)
   }
 
   const _updateCurrentAccount = async () => {
     if (targetChain) {
       const { getAddress } = await initBGFunctions(browser)
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-      if (!abortController.signal.aborted) {
-        setCurrentAccount(currentAccount)
-      }
+
+      setCurrentAccount(currentAccount)
     } else {
       return
     }
@@ -376,9 +351,8 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       .filter((r) => r.isDev === false && r.isEnabled !== false)
       .map((x, i) => x.url)
     const newOwner = await getOwnership(newRegistries[0], mi.name)
-    if (!abortController.signal.aborted) {
-      setOwnerDev(newOwner)
-    }
+
+    setOwnerDev(newOwner)
   }
 
   return (
@@ -406,7 +380,21 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
           <div className={styles.blockInfo}>
             <h3 className={styles.dappletsTitle}>{mi.title}</h3>
-            {mi.isUnderConstruction ? null : ( // </span> //   <span className={styles.dappletsSettingsIsTocenomics} /> //   <button className={styles.dappletsSettingsIsUnderConstruction} /> // > //   className={styles.dappletsSettingsIsUnderConstructionBlock} //   }} //     setModuleVersion(vi) //     setModuleInfo(mi) //     setUnderConstructionDetails(true) //     onDetailsClick(mi, vi) //   onClick={() => { // <span
+            {mi.isUnderConstruction ? (
+              <span
+                onClick={() => {
+                  onDetailsClick(mi, vi)
+
+                  setUnderConstructionDetails(true)
+                  setModuleInfo(mi)
+                  setModuleVersion(vi)
+                }}
+                className={styles.dappletsSettingsIsUnderConstructionBlock}
+              >
+                <button className={styles.dappletsSettingsIsUnderConstruction} />
+                <span className={styles.dappletsSettingsIsTocenomics} />
+              </span>
+            ) : (
               <button
                 className={cn(styles.dappletsSettings, {
                   [styles.dappletsSettingsRegistry]: mi.author !== null,

@@ -158,7 +158,9 @@
 }
 
 .img {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   width: 42px;
   height: 42px;
