@@ -12,6 +12,7 @@ import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
+import { TabLoader } from '../../components/TabLoader'
 import useAbortController from '../../hooks/useAbortController'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
@@ -94,11 +95,20 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [isModalTransaction, setModalTransaction] = useState(false)
 
   const [isNotAccountModal, setNotAccountModal] = useState(false)
+  const [isLoad, setLoad] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const node = useRef<HTMLButtonElement>()
+  const nodeInput = useRef<HTMLInputElement>()
+  const [visibleContextId, setVisibleContextId] = useState([])
+  const [contextDeleteNone, setContextDeleteNone] = useState(false)
+  const [addDisabled, setAddDisabled] = useState(false)
   const abortController = useAbortController()
 
   useEffect(() => {
     const init = async () => {
+      setLoad(true)
       await _updateData()
+      setLoad(false)
       if (!isNotNullCurrentAccount) {
         setNotAccountModal(true)
       } else {
@@ -106,13 +116,15 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       }
     }
     init()
-    if (author.authorForm.length === 0) {
-      setAuthorDisabled(false)
-    }
+    // if (author.authorForm.length === 0) {
+
+    //   setAuthorDisabled(false)
+
+    // }
     return () => {
-      // abortController.abort()
+      abortController.abort()
     }
-  }, [mi, st, targetChain, autorDisabled, author, editContextId, abortController.signal.aborted])
+  }, [abortController.signal.aborted])
   const addButtonClickHandler = () => {
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.push(newAuthorObject)
@@ -126,12 +138,12 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   }
 
   const _updateData = async () => {
-    const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
+    const { getRegistries, getTrustedUsers, getContextIds } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-
+    const contextId = await getContextIds(prodRegistries[0]?.url, mi.name)
     setRegistryOptions(
       prodRegistries.map((r) => ({
         key: r.url,
@@ -139,6 +151,9 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
         value: r.url,
       }))
     )
+
+    setVisibleContextId(contextId)
+    contextId.length && setVisible(true)
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTrustedUsers(trustedUsers)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
@@ -208,39 +223,28 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     newContext.contextIds.splice(id, 1)
     setMi(newContext)
   }
-  const [visible, setVisible] = useState(false)
-  const node = useRef<HTMLButtonElement>()
-  const nodeInput = useRef<HTMLInputElement>()
-  const [visibleContextId, setVisibleContextId] = useState({
-    visibleContext: [],
-  })
-  const [contextDeleteNone, setContextDeleteNone] = useState(false)
-  const [addDisabled, setAddDisabled] = useState(false)
+
   const _addContextId = async (contextId: string) => {
     setEditContextIdLoading(true)
     setAddDisabled(true)
 
     try {
-      const { addContextId } = await initBGFunctions(browser)
+      const { addContextId, getContextIds } = await initBGFunctions(browser)
+      if (!targetRegistry || !mi.name || !contextId) return
+
       await addContextId(targetRegistry, mi.name, contextId)
-      const newForm = Object.assign({}, visibleContextId)
+      const contextIds = await getContextIds(targetRegistry, mi.name)
 
-      newForm.visibleContext.push(editContextId)
-      setVisibleContextId(newForm)
-
-      setEditContextIdDone(true)
+      setVisibleContextId(contextIds)
       setVisible(true)
-      setEditContextId('')
-      setEditContextIdLoading(false)
-      setAddDisabled(false)
-      node.current?.classList.remove('valid')
-      setEditContextId('')
     } catch (error) {
-      setEditContextIdDone(true)
       setVisible(false)
+    } finally {
+      setEditContextIdDone(true)
       setEditContextIdLoading(false)
       setAddDisabled(false)
       node.current?.classList.remove('valid')
+      setEditContextId('')
     }
   }
 
@@ -320,87 +324,90 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
           />
         )
       ) : null}
+      {isLoad ? (
+        <TabLoader />
+      ) : (
+        <>
+          <div className={styles.mainInfoBlock}>
+            <SettingWrapper
+              className={styles.wrapperSettings}
+              title="Social"
+              children={
+                <div className={styles.socialBlock}>
+                  <div className={styles.moduleTitle}> {mi.name}</div>
 
-      <div className={styles.mainInfoBlock}>
-        <SettingWrapper
-          className={styles.wrapperSettings}
-          title="Social"
-          children={
-            <div className={styles.socialBlock}>
-              <div className={styles.moduleTitle}> {mi.name}</div>
+                  <SettingItem
+                    title="Title"
+                    className={styles.item}
+                    component={<></>}
+                    children={
+                      <input
+                        value={mi.title ?? ''}
+                        onChange={(e) => {
+                          setMi({ ...mi, title: e.target.value })
 
-              <SettingItem
-                title="Title"
-                className={styles.item}
-                component={<></>}
-                children={
-                  <input
-                    value={mi.title ?? ''}
-                    onChange={(e) => {
-                      setMi({ ...mi, title: e.target.value })
-
-                      setDisabledPush(false)
-                    }}
-                    className={styles.inputTitle}
+                          setDisabledPush(false)
+                        }}
+                        className={styles.inputTitle}
+                      />
+                    }
                   />
-                }
-              />
-              <SettingItem
-                title="Description"
-                component={<></>}
-                className={styles.item}
-                children={
-                  <input
-                    className={styles.inputTitle}
-                    value={mi.description ?? ''}
-                    onChange={(e) => {
-                      setMi({ ...mi, description: e.target.value })
+                  <SettingItem
+                    title="Description"
+                    component={<></>}
+                    className={styles.item}
+                    children={
+                      <input
+                        className={styles.inputTitle}
+                        value={mi.description ?? ''}
+                        onChange={(e) => {
+                          setMi({ ...mi, description: e.target.value })
 
-                      setDisabledPush(false)
-                    }}
+                          setDisabledPush(false)
+                        }}
+                      />
+                    }
                   />
-                }
-              />
-              {/* <SettingItem
+                  {/* <SettingItem
                 title="Full description"
                 component={<></>}
                 className={styles.item}
                 children={<textarea className={styles.fullDescription} />}
               /> */}
 
-              <div className={styles.iconBlock}>
-                <div className={styles.imgBlock}>
-                  <StorageRefImage className={styles.img} storageRef={mi.icon} />
+                  <div className={styles.iconBlock}>
+                    <div className={styles.imgBlock}>
+                      <StorageRefImage className={styles.img} storageRef={mi.icon} />
 
-                  {st.map((x, i) => (
-                    <span className={styles.imgTitle} key={i}>
-                      {visibleNameFile(x.name)}
-                    </span>
-                  ))}
+                      {st.map((x, i) => (
+                        <span className={styles.imgTitle} key={i}>
+                          {visibleNameFile(x.name)}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className={styles.buttonIcon}>
+                      <input
+                        ref={fileInput}
+                        type="file"
+                        name="file"
+                        id="file"
+                        accept=".png"
+                        className={styles.inputfile}
+                        onChange={(e) => {
+                          onChange(e)
+                          iconInputChangeHandler(e)
+
+                          setDisabledPush(false)
+                        }}
+                      />
+                      <label htmlFor="file">Change icon</label>
+                    </div>
+                  </div>
                 </div>
-
-                <div className={styles.buttonIcon}>
-                  <input
-                    ref={fileInput}
-                    type="file"
-                    name="file"
-                    id="file"
-                    accept=".png"
-                    className={styles.inputfile}
-                    onChange={(e) => {
-                      onChange(e)
-                      iconInputChangeHandler(e)
-
-                      setDisabledPush(false)
-                    }}
-                  />
-                  <label htmlFor="file">Change icon</label>
-                </div>
-              </div>
-            </div>
-          }
-        />
-        {/* <SettingWrapper
+              }
+            />
+            {/* <SettingWrapper
           title="Team"
           className={styles.wrapperSettings}
           children={
@@ -440,106 +447,110 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
             </div>
           }
         /> */}
-        <SettingWrapper
-          title="Parameters"
-          className={styles.wrapperSettings}
-          children={
-            <div className={styles.parametersBlock}>
-              <div className={styles.wrapperContextID}>
-                <div className={styles.blockContextID}>
-                  <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
-                  <button
-                    disabled={mi.contextIds.length >= 1}
-                    onClick={addButtonClickHandlerContext}
-                    className={cn(styles.contextIDButton, {
-                      [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
-                    })}
-                  />
-                </div>
-                {mi.contextIds.map((x, i) => (
-                  <div key={i} className={styles.wrapperContext}>
-                    <div className={styles.blockContext}>
-                      <input
-                        key={i}
-                        ref={nodeInput}
-                        className={styles.blockContextTitle}
-                        value={editContextId}
-                        placeholder={'Context ID (ex: example.com)'}
-                        onChange={(e) => {
-                          setEditContextId(e.target.value)
-                        }}
-                      />
-
+            <SettingWrapper
+              title="Parameters"
+              className={styles.wrapperSettings}
+              children={
+                <div className={styles.parametersBlock}>
+                  <div className={styles.wrapperContextID}>
+                    <div className={styles.blockContextID}>
+                      <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
                       <button
-                        ref={node}
-                        onClick={() => {
-                          onDeleteChildContext(i)
-                          setEditContextId('')
-                        }}
-                        className={cn(styles.contextDelete, {
-                          [styles.contextDeleteNone]: contextDeleteNone,
+                        disabled={mi.contextIds.length >= 1}
+                        onClick={addButtonClickHandlerContext}
+                        className={cn(styles.contextIDButton, {
+                          [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
                         })}
                       />
                     </div>
-                    <button
-                      disabled={nodeInput.current?.value.length < 2 || addDisabled}
-                      onClick={() => {
-                        node.current?.classList.add('valid')
-                        _addContextId(editContextId)
-                      }}
-                      className={cn(styles.addContext, {
-                        [styles.addContextDisabled]:
-                          nodeInput.current?.value.length < 2 || addDisabled,
-                      })}
-                    >
-                      ADD
-                    </button>
+                    {mi.contextIds.map((x, i) => (
+                      <div key={i} className={styles.wrapperContext}>
+                        <div className={styles.blockContext}>
+                          <input
+                            key={i}
+                            ref={nodeInput}
+                            className={styles.blockContextTitle}
+                            value={editContextId}
+                            placeholder={'Context ID (ex: example.com)'}
+                            onChange={(e) => {
+                              setEditContextId(e.target.value)
+                            }}
+                          />
+
+                          <button
+                            ref={node}
+                            onClick={() => {
+                              onDeleteChildContext(i)
+                              setEditContextId('')
+                            }}
+                            className={cn(styles.contextDelete, {
+                              [styles.contextDeleteNone]: contextDeleteNone,
+                            })}
+                          />
+                        </div>
+                        <button
+                          disabled={nodeInput.current?.value.length < 2 || addDisabled}
+                          onClick={() => {
+                            node.current?.classList.add('valid')
+                            _addContextId(editContextId)
+                          }}
+                          className={cn(styles.addContext, {
+                            [styles.addContextDisabled]:
+                              nodeInput.current?.value.length < 2 || addDisabled,
+                          })}
+                        >
+                          ADD
+                        </button>
+                      </div>
+                    ))}
+                    {editContextIdLoading ? (
+                      <div className={styles.editContextIdLoading}></div>
+                    ) : (
+                      <>
+                        {visible &&
+                          visibleContextId &&
+                          visibleContextId.length &&
+                          visibleContextId.map((x, i) => (
+                            <input
+                              key={i}
+                              className={styles.blockContext}
+                              placeholder={x}
+                              value={x}
+                              readOnly
+                            />
+                          ))}
+                      </>
+                    )}
                   </div>
-                ))}
-                {editContextIdLoading ? (
-                  <div className={styles.editContextIdLoading}></div>
-                ) : (
-                  <>
-                    {visible &&
-                      visibleContextId &&
-                      visibleContextId.visibleContext.map((x, i) => (
-                        <input
-                          key={i}
-                          className={styles.blockContext}
-                          placeholder={x}
-                          value={x}
-                          readOnly
-                        />
-                      ))}
-                  </>
-                )}
-              </div>
-            </div>
-          }
-        />
-      </div>
-      <div className={styles.linkNavigation}>
-        <button
-          onClick={() => {
-            setUnderConstructionDetails(false)
-            setShowChildrenUnderConstraction(true)
-          }}
-          className={styles.back}
-        >
-          Back
-        </button>
-        <button
-          disabled={isDisabledPush || !isNotNullCurrentAccount}
-          onClick={() => {
-            saveChanges()
-          }}
-          className={cn(styles.push, {
-            [styles.pushDisabled]: isDisabledPush || !isNotNullCurrentAccount,
-          })}
-        >
-          Push changes
-        </button>
-      </div>
+                </div>
+              }
+            />
+          </div>
+          <div className={styles.linkNavigation}>
+            <button
+              onClick={() => {
+                setUnderConstructionDetails(false)
+                setShowChildrenUnderConstraction(true)
+              }}
+              className={styles.back}
+            >
+              Back
+            </button>
+            <button
+              disabled={isDisabledPush || !isNotNullCurrentAccount}
+              onClick={() => {
+                saveChanges()
+              }}
+              className={cn(styles.push, {
+                [styles.pushDisabled]: isDisabledPush || !isNotNullCurrentAccount,
+              })}
+            >
+              Push changes
+            </button>
+          </div>
+        </>
+      )}
+
       <Modal
         classNameWrapper={styles.modalDialog}
         visible={isModalPush}
