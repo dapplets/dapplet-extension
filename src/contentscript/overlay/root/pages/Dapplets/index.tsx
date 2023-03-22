@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useMemo, useState } from 'react'
-import { rcompare } from 'semver'
 import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
 import { AnalyticsGoals } from '../../../../../background/services/analyticsService'
@@ -61,7 +60,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
-  const [loadShowButton, setLoadShowButton] = useState(false)
 
   const abortController = useAbortController()
 
@@ -74,8 +72,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       if (!abortController.signal.aborted) {
         setLoadingListDapplets(false)
       }
-
-      await loadTrustedUsers()
     }
 
     init()
@@ -184,7 +180,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   ) => {
     const { name } = module
     // TODO : try catch
-    setLoadShowButton(true)
     if (selectVersions && isActive) {
       _updateFeatureState(name, { isLoading: true })
       const { getVersions } = await initBGFunctions(browser)
@@ -192,9 +187,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       _updateFeatureState(name, { versions: allVersions, isLoading: false })
       return
     } else {
-      await toggleFeature(module, null, isActive, order, null)
+      await toggleFeature(module, null, isActive, order)
     }
-    setLoadShowButton(false)
     isLoad()
   }
 
@@ -202,26 +196,15 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     module: Module,
     version: string | null,
     isActive: boolean,
-    order: number,
-    allVersions: string[] | null
+    order: number
   ) => {
     const { name, hostnames, sourceRegistry } = module
-    const { getVersions, activateFeature, deactivateFeature } = await initBGFunctions(browser)
-
-    _updateFeatureState(name, { isActive, isLoading: true })
-
-    if (!version || !allVersions) {
-      allVersions = await getVersions(module.sourceRegistry.url, module.name)
-      version = allVersions.sort(rcompare)[0]
-    }
+    const { activateFeature, deactivateFeature } = await initBGFunctions(browser)
 
     _updateFeatureState(name, {
       isActive,
       isLoading: true,
-      error: null,
-      versions: [],
       activeVersion: isActive ? version : null,
-      lastVersion: allVersions.sort(rcompare)[0],
     })
 
     const isEverywhere = true
@@ -244,7 +227,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
             })
       }
 
-      await _refreshData()
+      // await _refreshData()
       _updateFeatureState(name, { isLoading: false })
     } catch (err) {
       console.error(err)
@@ -290,11 +273,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     window.open(url, '_blank')
   }
 
-  const loadTrustedUsers = async () => {
-    const { getTrustedUsers } = await initBGFunctions(browser)
-    const trustedUsers = await getTrustedUsers()
-  }
-
   const filteredDapplets = useMemo(() => {
     return _getFilteredDapplets(dapplets)
   }, [search, dapplets])
@@ -337,7 +315,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                         users: [],
                       }}
                       index={i}
-                      loadShowButton={loadShowButton}
                       onSwitchChange={onSwitchChange}
                       onSettingsModule={onUserSettingsClick}
                       onOpenDappletAction={onOpenDappletAction}
@@ -345,7 +322,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
                       onOpenStore={onOpenStore}
                       onOpenNft={onOpenNft}
                       onOpenStoreAuthor={onOpenStoreAuthor}
-                      getTabsForDapplet={getTabsForDapplet}
                     />
                   )
               })

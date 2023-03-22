@@ -2,6 +2,8 @@ import { ethers } from 'ethers'
 import { StorageTypes } from '../../common/constants'
 import { Tar } from '../../common/tar'
 import { StorageRef } from '../../common/types'
+import FileBrowserStorage from '../browserStorages/fileBrowserStorage'
+import File from '../models/file'
 import GlobalConfigService from '../services/globalConfigService'
 import { CentralizedModuleStorage } from './centralizedModuleStorage'
 import { HttpModuleStorage } from './httpModuleStorage'
@@ -10,11 +12,20 @@ import { Storage } from './storage'
 import { SwarmModuleStorage } from './swarmModuleStorage'
 
 export class StorageAggregator {
+  private _fileBrowserStorage = new FileBrowserStorage()
+
   constructor(private _globalConfigService: GlobalConfigService) {}
 
   async getResource(hashUris: StorageRef): Promise<ArrayBuffer> {
     if (hashUris.uris.length === 0) {
       throw Error(`Resource doesn't have any URIs. Hash: ${hashUris.hash}`)
+    }
+
+    if (hashUris.hash) {
+      const cachedFile = await this._fileBrowserStorage.getById(hashUris.hash)
+      if (cachedFile) {
+        return cachedFile.getData()
+      }
     }
 
     const fetchController = new AbortController()
@@ -55,6 +66,14 @@ export class StorageAggregator {
     try {
       const buffer = await Promise.any(buffers)
       fetchController.abort()
+
+      // Cache to the browser storage
+      if (hashUris.hash) {
+        const file = new File()
+        file.id = hashUris.hash
+        file.setData(buffer)
+        await this._fileBrowserStorage.create(file)
+      }
 
       return buffer
     } catch (err) {

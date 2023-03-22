@@ -103,8 +103,6 @@ browser.runtime.onMessage.addListener(
     getActiveModulesByHostnames: (hostnames) =>
       featureService.getActiveModulesByHostnames(hostnames),
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
-    optimizeDependency: (name, branch, version, contextIds) =>
-      featureService.optimizeDependency(name, branch, version, contextIds),
     getAllDevModules: () => featureService.getAllDevModules(),
     uploadModule: (mi, vi, targetStorages) => featureService.uploadModule(mi, vi, targetStorages),
     deployModule: (mi, vi, targetStorages, targetRegistry) =>
@@ -150,9 +148,9 @@ browser.runtime.onMessage.addListener(
     getDevMode: () => globalConfigService.getDevMode(),
     setDevMode: (isActive) => globalConfigService.setDevMode(isActive),
     getNotifications: (type) => notificationService.getNotifications(type),
-    createAndShowNotification: (notify, tabId?, icon?) =>
-      notificationService.createAndShowNotification(notify, tabId, icon),
-    createNotification: (notify, icon) => notificationService.createNotification(notify, icon),
+    createAndShowNotification: (notify, tabId) =>
+      notificationService.createAndShowNotification(notify, tabId),
+    createNotification: (notify) => notificationService.createNotification(notify),
     showNotification: (notificationId, tabId) =>
       notificationService.showNotification(notificationId, tabId),
     deleteNotification: (id) => notificationService.deleteNotification(id),
