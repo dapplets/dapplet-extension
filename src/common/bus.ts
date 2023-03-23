@@ -5,44 +5,20 @@ export class Bus {
     [topic: string]: any[]
   } = {}
 
-  constructor() {
-    window.addEventListener('message', this._eventListener)
-  }
-
-  private _eventListener = async (e) => {
-    let data = null
-
-    try {
-      if (typeof e.data === 'object' && typeof e.data.message === 'string') {
-        data = JSON.parse(e.data.message)
-      } else {
-        data = JSON.parse(e.data)
-      }
-    } catch {
-      return
-    }
-
-    if (!data || !data.topic) return
-
-    const callbacks = this._callbacks[data.topic] || []
+  publish(topic: string, args?: any) {
+    const callbacks = this._callbacks[topic] || []
 
     if (callbacks.length === 0) {
-      if (this._queue[data.topic]) {
-        this._queue[data.topic].push(data.args)
+      if (this._queue[topic]) {
+        this._queue[topic].push(args)
       } else {
-        this._queue[data.topic] = [data.args]
+        this._queue[topic] = [args]
       }
     } else {
       for (const callback of callbacks) {
-        callback.apply({}, data.args)
+        callback.apply({}, args)
       }
     }
-  }
-
-  publish(topic: string, args?: any) {
-    const windowName = window.name
-    const msg = JSON.stringify({ topic, args, windowName })
-    window.parent.postMessage(msg, '*')
   }
 
   subscribe(topic: string, handler: (...args: any[]) => void) {
@@ -68,6 +44,5 @@ export class Bus {
   destroy() {
     this._callbacks = {}
     this._queue = {}
-    window.removeEventListener('message', this._eventListener)
   }
 }
