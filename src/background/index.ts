@@ -51,7 +51,7 @@ const featureService = new FeatureService(
 )
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
-const tokenomicsService = new TokenRegistryService(globalConfigService, walletService)
+const tokenomicsService = new TokenRegistryService(globalConfigService, walletService,overlayService)
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
 globalConfigService.ensService = ensService
@@ -166,6 +166,7 @@ browser.runtime.onMessage.addListener(
     markAllNotificationsAsViewed: () => notificationService.markAllNotificationsAsViewed(),
     getUnreadNotificationsCount: (source?) =>
       notificationService.getUnreadNotificationsCount(source),
+      getErc20TokenInfo: (tokenAddress)=>tokenomicsService.getErc20TokenInfo(tokenAddress),
     getTokensByApp: (appId) => tokenomicsService.getTokensByApp(appId),
     getAppsByToken: (addressToken) => tokenomicsService.getAppsByToken(addressToken),
     createAppToken: (appId, symbol, name, referenceUrl, additionalCollaterals?) =>

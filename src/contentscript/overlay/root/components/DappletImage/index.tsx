@@ -17,16 +17,6 @@ export const DappletImage: FC<DappletImageProps> = (props: DappletImageProps) =>
   const { img } = useStorageRef(storageRef)
   const abortController = useAbortController()
   useEffect(() => {}, [abortController.signal.aborted])
-  useEffect(() => {
-    EventBus.on('get_base64', _refreshData)
-
-    return () => {
-      EventBus.off('get_base64', _refreshData)
-    }
-  }, [])
-  const _refreshData = async () => {
-    return img
-  }
   return (
     <div className={cn(styles.icon)}>
       <div className={cn(styles.img, className)}>
@@ -38,14 +28,6 @@ export const DappletImage: FC<DappletImageProps> = (props: DappletImageProps) =>
             currentTarget.src = NO_LOGO
           }}
         />
-        {/* <span
-					className={cn(styles.label, {
-						[styles.true]: isFavourites,
-						[styles.false]: !isFavourites,
-					})}
-				>
-					<Star />
-				</span> */}
       </div>
     </div>
   )

@@ -2,9 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import * as EventBus from '../../../../../common/global-event-bus'
 import { StorageRef } from '../../../../../common/types'
-import useAbortController from '../../hooks/useAbortController'
 import styles from './StorageRefImage.module.scss'
 interface PropsStorageRefImage {
   storageRef: StorageRef | string
@@ -16,23 +14,15 @@ interface PropsStorageRefImage {
 export const StorageRefImage: FC<PropsStorageRefImage> = (props) => {
   const { storageRef, className, title, onClick } = props
   const [dataUri, setDataUri] = useState(null)
-  const abortController = useAbortController()
-  const init = async () => {
-    await _updateStorageRef(storageRef)
-  }
-  useEffect(() => {
-    init()
-    return () => {
-      abortController.abort()
-    }
-  }, [abortController.signal.aborted])
-  useEffect(() => {
-    EventBus.on('get_base64', init)
 
-    return () => {
-      EventBus.off('get_base64', init)
+  useEffect(() => {
+    const init = async () => {
+      await _updateStorageRef(storageRef)
     }
+    init()
+    return () => {}
   }, [])
+
   const _updateStorageRef = async (storageRef) => {
     if (!storageRef) return
 

@@ -1,5 +1,5 @@
 import ManifestDTO from '../background/dto/manifestDTO'
-
+export type Falsy = false | 0 | '' | null | undefined
 export type DefaultConfig = {
   [Environments.Dev]?: {
     [key: string]: any

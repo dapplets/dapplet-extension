@@ -949,7 +949,6 @@ export default class FeatureService {
   public async getResource(hashUris: StorageRef) {
     const arr = await this._storageAggregator.getResource(hashUris)
     const base64 = base64ArrayBuffer(arr)
-    EventBus.emit('get_base64')
     return base64
   }
 

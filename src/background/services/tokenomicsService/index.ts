@@ -1,7 +1,8 @@
 import * as ethers from 'ethers'
-import * as EventBus from '../../../common/global-event-bus'
-import { ChainTypes, DefaultSigners } from '../../../common/types'
+import ERC20Interface from './ERC20Interface.json'
+import { ChainTypes, DefaultSigners, Falsy } from '../../../common/types'
 import GlobalConfigService from '../globalConfigService'
+import { OverlayService } from '../overlayService'
 import { WalletService } from '../walletService'
 import abi from './app-token-registry.json'
 // todo: create cycle
@@ -10,7 +11,7 @@ const ZERO_SIZE = 0
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 const DEFAULT_ECOSYSTEM = 'zoo'
 const DEFAULT_APP_TYPE = 1
-type Falsy = false | 0 | '' | null | undefined
+
 
 interface I_TokenFactory {}
 
@@ -19,7 +20,8 @@ export class TokenRegistryService {
 
   constructor(
     private _globalConfigService: GlobalConfigService,
-    private _walletService: WalletService
+    private _walletService: WalletService,
+    private overlayService: OverlayService
   ) {}
 
   private async _init() {
@@ -70,7 +72,6 @@ export class TokenRegistryService {
       additionalCollaterals
     )
     await this.getTokensByApp(appId)
-    EventBus.emit('token create')
   }
 
   public async linkAppWithToken(appId: string, tokenAddress: string) {
@@ -78,6 +79,24 @@ export class TokenRegistryService {
 
     await this.tokenFactory.linkAppWithToken(DEFAULT_APP_TYPE, appId, tokenAddress)
     await this.getTokensByApp(appId)
-    EventBus.emit('token create')
+  }
+  public async getErc20TokenInfo   (tokenAddress: string | Falsy){
+    if (!tokenAddress) return undefined
+  
+   
+    const signer = await this._walletService.eth_getSignerFor(
+      DefaultSigners.EXTENSION, //todo:mocked
+      ChainTypes.ETHEREUM_GOERLI //todo:mocked
+    )
+  
+    const data = new ethers.Contract(tokenAddress, ERC20Interface, signer)
+  
+    const newData = {
+      name: await data.name(),
+      address: data.address,
+      symbol: await data.symbol(),
+    }
+  
+    return newData
   }
 }

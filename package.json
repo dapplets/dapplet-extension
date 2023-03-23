@@ -43,7 +43,6 @@
     "@types/webextension-polyfill": "^0.10.0",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
-    "@usedapp/core": "^1.2.7",
     "@walletconnect/client": "^1.8.0",
     "assert-browserify": "^2.0.0",
     "buffer": "^6.0.3",
@@ -106,7 +105,6 @@
     "yup": "^1.0.2"
   },
   "dependencies": {
-    "@usedapp/coingecko": "^1.1.13",
     "animejs": "^3.2.1",
     "copy-to-clipboard": "^3.3.3",
     "ethers": "^5.7.2",
