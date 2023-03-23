@@ -291,6 +291,9 @@ browser.runtime.onMessage.addListener(
     getThisTab: getThisTab,
     getCurrentContextIds: getCurrentContextIds,
     checkUrlAvailability: (url) => checkUrlAvailability(url),
+
+    // For E2E tests only
+    wipeAllExtensionData: () => browser.storage.local.clear().then(() => localStorage.clear()),
   })
 )
 
