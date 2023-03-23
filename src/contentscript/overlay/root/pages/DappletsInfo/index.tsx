@@ -58,7 +58,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const node = useRef<HTMLButtonElement>()
   const nodeInput = useRef<HTMLInputElement>()
   const [visibleContextId, setVisibleContextId] = useState([])
-  const [contextDeleteNone, setContextDeleteNone] = useState(false)
   const nodeInputAdmin = useRef<HTMLInputElement>()
   const nodeBtnAdmin = useRef<HTMLButtonElement>()
 
@@ -201,15 +200,15 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
 
       await addContextId(targetRegistry, mi.name, contextId)
       const contextIds = await getContextIds(targetRegistry, mi.name)
-
+      // node.current?.classList.remove('valid')
       setVisibleContextId(contextIds)
       setEditContextId('')
     } catch (error) {
     } finally {
+      // node.current?.classList.remove('valid')
       setEditContextId('')
       setEditContextIdLoading(false)
       setAddDisabled(false)
-      node.current?.classList.remove('valid')
     }
   }
 
@@ -450,7 +449,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
           className={styles.wrapperSettings}
           children={
             <>
-              {isLoad ? (
+              {isLoad || !targetRegistry ? (
                 <div className={styles.miniLoader}></div>
               ) : (
                 <div className={styles.parametersBlock}>
@@ -478,29 +477,29 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                               setEditContextId(e.target.value)
                             }}
                           />
-
-                          <button
-                            ref={node}
-                            onClick={() => {
-                              onDeleteChildContext(i)
-                              setEditContextId('')
-                            }}
-                            className={cn(styles.contextDelete, {
-                              [styles.contextDeleteNone]: contextDeleteNone,
-                            })}
-                          >
-                            <Delete />
-                          </button>
+                          {editContextIdLoading ? null : (
+                            <button
+                              ref={node}
+                              onClick={() => {
+                                onDeleteChildContext(i)
+                                setEditContextId('')
+                              }}
+                              className={cn(styles.contextDelete)}
+                            >
+                              <Delete />
+                            </button>
+                          )}
                         </div>
                         <button
-                          disabled={nodeInput.current?.value.length < 2 || addDisabled}
+                          disabled={editContextId.length <= 2 || addDisabled}
                           onClick={() => {
                             node.current?.classList.add('valid')
                             _addContextId(editContextId)
                           }}
-                          className={cn(styles.addContext, {
-                            [styles.addContextDisabled]:
-                              nodeInput.current?.value.length < 2 || addDisabled,
+                          className={cn(styles.addContextDisabled, {
+                            [styles.addContext]:
+                              (editContextId.length >= 2 && !addDisabled) ||
+                              (nodeInput.current?.value.length >= 2 && !addDisabled),
                           })}
                         >
                           ADD

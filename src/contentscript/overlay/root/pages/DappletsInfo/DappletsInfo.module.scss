@@ -587,26 +587,40 @@ align-items: center;
   font-size: 10px;
   font-weight: 400;
   line-height: 100%;
-  color: #fff;
+ border-radius: 4px;
   text-transform: uppercase;
-
-  background: $Primary;
-  border-radius: 4px;
-
+ color: #fff!important;
+  background: $Primary!important;
+  
+  cursor: pointer!important;
   &:hover {
-    background: $PrimaryHover;
+    background: $PrimaryHover!important;
   }
 
   &:active {
-    background: $PrimaryPressed;
+    background: $PrimaryPressed!important;
   }
 }
-
 .addContextDisabled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 67px;
+  height: 32px;
+  margin: 0 0 0 5px;
+  padding: 0 10px;
+
+  font-family: Roboto;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 100%;
+ border-radius: 4px;
+  text-transform: uppercase;
   color: $StrokeColor;
   background: $AppBG;
   border: 1px solid $StrokeColor;
-
+cursor: auto;
   &:hover {
     background: $AppBG;
   }
