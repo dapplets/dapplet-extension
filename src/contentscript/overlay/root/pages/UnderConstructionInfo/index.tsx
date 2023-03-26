@@ -12,7 +12,6 @@ import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
-import useAbortController from '../../hooks/useAbortController'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
 
@@ -94,7 +93,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [isModalTransaction, setModalTransaction] = useState(false)
 
   const [isNotAccountModal, setNotAccountModal] = useState(false)
-  const abortController = useAbortController()
 
   useEffect(() => {
     const init = async () => {
@@ -109,10 +107,8 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     if (author.authorForm.length === 0) {
       setAuthorDisabled(false)
     }
-    return () => {
-      // abortController.abort()
-    }
-  }, [mi, st, targetChain, autorDisabled, author, editContextId, abortController.signal.aborted])
+    return () => {}
+  }, [mi, st, targetChain, autorDisabled, author, editContextId])
   const addButtonClickHandler = () => {
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.push(newAuthorObject)
@@ -152,7 +148,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
 
       setCurrentAccount(currentAccount)
-    } 
+    }
   }
 
   const iconInputChangeHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -258,7 +254,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   }
   const visibleNameFile = (hash: string): string => {
     const firstCharacters = hash.substring(0, 6)
-    const lastCharacters= hash.substring(hash.length - 1, hash.length - 6)
+    const lastCharacters = hash.substring(hash.length - 1, hash.length - 6)
 
     return `${firstCharacters}...${lastCharacters}`
   }

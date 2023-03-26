@@ -15,7 +15,6 @@ import { SettingWrapper } from '../../../components/SettingWrapper'
 import { Switch } from '../../../components/Switch'
 import { getDefaultValueProvider } from '../../../utils/getDefaultValue'
 
-import useAbortController from '../../../hooks/useAbortController'
 import styles from './Settings.module.scss'
 
 interface SettingsListProps {
@@ -71,7 +70,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const inputOfFocusAdapter = useRef<HTMLInputElement>()
   const inputOfFocusAgentName = useRef<HTMLInputElement>()
 
-  const abortController = useAbortController()
   useEffect(() => {
     const init = async () => {
       await checkUpdates()
@@ -89,10 +87,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     }
     init()
 
-    return () => {
-      abortController.abort()
-    }
-  }, [abortController.signal.aborted])
+    return () => {}
+  }, [])
 
   const getValidUserAgentName = (value, reg) => {
     try {
@@ -143,7 +139,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     const { getInitialConfig } = await initBGFunctions(browser)
     const config = await getInitialConfig()
 
-    if (config.swarmGatewayUrl && !abortController.signal.aborted) {
+    if (config.swarmGatewayUrl) {
       setSwarmGatewayInputDefault(config.swarmGatewayUrl)
     }
     const { getSwarmGateway } = await initBGFunctions(browser)

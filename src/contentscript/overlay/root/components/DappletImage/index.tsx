@@ -1,9 +1,7 @@
 import cn from 'classnames'
 import React, { FC, useEffect } from 'react'
-import * as EventBus from '../../../../../common/global-event-bus'
 import NO_LOGO from '../../../../../common/resources/no-logo.png'
 import { StorageRef } from '../../../../../common/types'
-import useAbortController from '../../hooks/useAbortController'
 import { useStorageRef } from '../../utils/useStorageRef'
 import styles from './DappletImage.module.scss'
 export interface DappletImageProps {
@@ -15,8 +13,8 @@ export interface DappletImageProps {
 export const DappletImage: FC<DappletImageProps> = (props: DappletImageProps) => {
   const { storageRef, isFavourites, className } = props
   const { img } = useStorageRef(storageRef)
-  const abortController = useAbortController()
-  useEffect(() => {}, [abortController.signal.aborted])
+
+  useEffect(() => {}, [])
   return (
     <div className={cn(styles.icon)}>
       <div className={cn(styles.img, className)}>

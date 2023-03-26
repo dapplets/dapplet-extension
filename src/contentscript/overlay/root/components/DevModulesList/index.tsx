@@ -8,7 +8,6 @@ import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constan
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
 import { ReactComponent as Settings } from '../../assets/svg/setting.svg'
-import useAbortController from '../../hooks/useAbortController'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
@@ -103,17 +102,14 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const onCloseNewModule = () => setNewModule(false)
   const [admins, setAdmins] = useState<string[]>([])
   const [adminsOpen, setAdminsOpen] = useState(false)
-  const abortController = useAbortController()
 
   useEffect(() => {
     const init = async () => {
       await _updateData()
     }
     init()
-    return () => {
-      abortController.abort()
-    }
-  }, [targetChain, abortController.signal.aborted])
+    return () => {}
+  }, [targetChain])
 
   const _updateData = async () => {
     const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)

@@ -140,7 +140,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   }
   const visible = (hash: string): string => {
     const firstCharacters = hash.substring(0, 6)
-    const lastCharacters= hash.substring(hash.length - 1, hash.length - 6)
+    const lastCharacters = hash.substring(hash.length - 1, hash.length - 6)
 
     return `${firstCharacters}...${lastCharacters}`
   }

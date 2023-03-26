@@ -120,7 +120,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
       setCurrentAccount(currentAccount)
       setLoading(false)
-    } 
+    }
   }
 
   const deployButtonClickHandler = async () => {

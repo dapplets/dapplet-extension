@@ -1,11 +1,11 @@
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 import { regExpIndexEthereum } from '../../common/constants'
 import { getValidationAddress } from '../../common/helpers'
 import { TokenInfo } from './index'
 import styles from './selectToken.module.scss'
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
 
 export interface SelectTokenProps {
   setAnimate: (x) => void
@@ -59,7 +59,7 @@ export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
 
     setTimeout(() => setAnimate(false), 400)
   }
-  
+
   const onChange = (value: string) => {
     if (getValidationAddress(value, regExpIndexEthereum) !== null) {
       return daiInfo

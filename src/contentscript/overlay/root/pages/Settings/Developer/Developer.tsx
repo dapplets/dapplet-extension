@@ -9,7 +9,6 @@ import { groupBy, isValidUrl } from '../../../../../../common/helpers'
 import { DevModule } from '../../../components/DevModulesList'
 import { Localhost } from '../../../components/Localhost'
 import { Registry } from '../../../components/Registry'
-import useAbortController from '../../../hooks/useAbortController'
 import styles from './Developer.module.scss'
 
 export interface DeveloperProps {
@@ -55,17 +54,14 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     connectedDescriptors,
     selectedWallet,
   } = props
-  const abortController = useAbortController()
 
   useEffect(() => {
     const init = async () => {
       await _updateData()
     }
     init()
-    return () => {
-      abortController.abort()
-    }
-  }, [abortController.signal.aborted])
+    return () => {}
+  }, [])
 
   useEffect(() => {
     EventBus.on('wallet_changed', _updateData)

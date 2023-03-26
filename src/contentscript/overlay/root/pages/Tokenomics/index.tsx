@@ -16,7 +16,7 @@ import { RadioButtons } from './RadioButton/radioButtons'
 import { SelectToken } from './selectToken'
 import styles from './Tokenomics.module.scss'
 export interface TokenomicsProps {
-  setPageDetails: (x:boolean) => void
+  setPageDetails: (x: boolean) => void
   isSupport?: boolean
   ModuleInfo: any
   setActiveTab: any

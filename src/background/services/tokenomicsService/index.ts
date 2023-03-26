@@ -1,18 +1,17 @@
 import * as ethers from 'ethers'
-import ERC20Interface from './ERC20Interface.json'
 import { ChainTypes, DefaultSigners, Falsy } from '../../../common/types'
+import { ERROR_MESSAGES, IPFS_GATEWAY } from '../../../contentscript/overlay/root/constants'
 import GlobalConfigService from '../globalConfigService'
 import { OverlayService } from '../overlayService'
 import { WalletService } from '../walletService'
 import abi from './app-token-registry.json'
-import { ERROR_MESSAGES, IPFS_GATEWAY } from '../../../contentscript/overlay/root/constants'
+import ERC20Interface from './ERC20Interface.json'
 // todo: create cycle
 const PAGE_SIZE = 20
 const ZERO_SIZE = 0
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 const DEFAULT_ECOSYSTEM = 'zoo'
 const DEFAULT_APP_TYPE = 1
-
 
 interface I_TokenFactory {}
 
@@ -81,42 +80,41 @@ export class TokenRegistryService {
     await this.tokenFactory.linkAppWithToken(DEFAULT_APP_TYPE, appId, tokenAddress)
     await this.getTokensByApp(appId)
   }
-  public async getErc20TokenInfo   (tokenAddress: string | Falsy){
+  public async getErc20TokenInfo(tokenAddress: string | Falsy) {
     if (!tokenAddress) return undefined
-  
-   
+
     const signer = await this._walletService.eth_getSignerFor(
       DefaultSigners.EXTENSION, //todo:mocked
       ChainTypes.ETHEREUM_GOERLI //todo:mocked
     )
-  
+
     const data = new ethers.Contract(tokenAddress, ERC20Interface, signer)
-  
+
     const newData = {
       name: await data.name(),
       address: data.address,
       symbol: await data.symbol(),
     }
-  
+
     return newData
   }
-  public async saveBlobToIpfs  (data: Blob) {
+  public async saveBlobToIpfs(data: Blob) {
     const response = await fetch(`${IPFS_GATEWAY}/ipfs/`, {
       method: 'POST',
       body: data,
     })
-  
+
     if (!response.ok) {
       const error = await response
         .json()
         .then((x) => `${x.code} ${x.message}`)
         .catch(() => `${response.status} ${response.statusText}`)
-  
+
       throw new Error(error)
     }
-  
+
     const cid = response.headers.get('ipfs-hash')
-  
+
     if (!cid) throw new Error(ERROR_MESSAGES.IPFS_UPLOAD_FAIL)
     const url = 'ipfs://' + cid
     return url

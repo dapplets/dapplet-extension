@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import NO_LOGO from '../../../../common/resources/no-logo.png'
 import { StorageRef } from '../../../../common/types'
-import useAbortController from '../hooks/useAbortController'
 
 export const useStorageRef = (storageRef: StorageRef) => {
   const [img, setImg] = useState<string>('')
-  const abortController = useAbortController()
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -21,10 +20,8 @@ export const useStorageRef = (storageRef: StorageRef) => {
       }
     }
     init()
-    return () => {
-      abortController.abort()
-    }
-  }, [abortController.signal.aborted])
+    return () => {}
+  }, [])
 
   return { img }
 }

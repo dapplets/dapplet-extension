@@ -1,5 +1,4 @@
 import { ModuleTypes } from '../../../../common/constants'
-import * as EventBus from '../../../../common/global-event-bus'
 import { Exports } from '../../types'
 import { WidgetsCreator } from '../../widgetsCreator'
 import { ButtonWidget, IButtonWidgetState } from '../button'

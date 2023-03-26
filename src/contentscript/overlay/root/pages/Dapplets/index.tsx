@@ -16,7 +16,6 @@ import { Dapplet } from '../../components/Dapplet'
 import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { TabLoader } from '../../components/TabLoader'
-import useAbortController from '../../hooks/useAbortController'
 import { openLink } from '../../utils/openLink'
 import styles from './Dapplets.module.scss'
 import { DevMessage } from './DevMessage'
@@ -63,8 +62,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
   const [loadShowButton, setLoadShowButton] = useState(false)
 
-  const abortController = useAbortController()
-
   useEffect(() => {
     const init = async () => {
       setLoadingListDapplets(true)
@@ -83,10 +80,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     } else {
       setLoadingListDapplets(false)
     }
-    return () => {
-      abortController.abort()
-    }
-  }, [dropdownListValue, abortController.signal.aborted])
+    return () => {}
+  }, [dropdownListValue])
 
   useEffect(() => {
     EventBus.on('context_started', _refreshData)

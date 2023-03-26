@@ -5,7 +5,6 @@ import { browser } from 'webextension-polyfill-ts'
 import { isValidUrl, typeOfUri, UriTypes } from '../../../../../common/helpers'
 import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
 import { ReactComponent as Delete } from '../../assets/icons/mini-close.svg'
-import useAbortController from '../../hooks/useAbortController'
 import { IDropdown } from '../../models/dropdown.model'
 import { addSettingsValueDropdown } from '../../utils/addSettingsValueDropdown'
 import styles from './DropdownTrustedUsers.module.scss'
@@ -29,17 +28,15 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
   const [trustedUserInputError, setTrustedUserInputError] = useState(null)
   const [trustedUsers, setTrustedUsers] = useState([])
   const [registries, setRegistries] = useState([])
-  const abortController = useAbortController()
+
   useEffect(() => {
     const init = async () => {
       await loadTrustedUsers()
       await loadRegistries()
     }
     init()
-    return () => {
-      abortController.abort()
-    }
-  }, [abortController.signal.aborted])
+    return () => {}
+  }, [])
 
   const removeTrustedUser = async (account: string) => {
     const { removeTrustedUser } = await initBGFunctions(browser)
@@ -73,7 +70,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
   const visible = (hash: string): string => {
     if (hash.length > 33) {
       const firstCharacters = hash.substring(0, 15)
-      const lastCharacters= hash.substring(hash.length - 0, hash.length - 15)
+      const lastCharacters = hash.substring(hash.length - 0, hash.length - 15)
 
       return `${firstCharacters}...${lastCharacters}`
     } else {

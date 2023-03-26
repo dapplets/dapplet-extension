@@ -52,14 +52,12 @@ export const NewToken: FC<NewTokenProps> = (props) => {
   }
 
   useEffect(() => {
-    const init = async () => {
-      
-    }
+    const init = async () => {}
     init()
 
     return () => {}
   }, [])
- 
+
   const handleSubmit = async (values: CreateTokenForm) => {
     const { symbol, name, icon } = values
     const { saveBlobToIpfs } = await initBGFunctions(browser)
@@ -247,13 +245,11 @@ export const NewToken: FC<NewTokenProps> = (props) => {
       <Modal
         visible={isModalTransaction}
         title={'Transaction started'}
-       
         onClose={() => !isModalTransaction}
       />
       <Modal
         visible={isModalEndCreation}
         title={'Transaction finished'}
-       
         onClose={() => _updatePage()}
       />
       {message ? (
@@ -271,7 +267,6 @@ export const NewToken: FC<NewTokenProps> = (props) => {
               ))}
             </div>
           }
-         
           onClose={() => onCloseError()}
         />
       ) : null}

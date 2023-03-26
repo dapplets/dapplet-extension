@@ -65,7 +65,7 @@ export const Modal = ({
           ) : null}
         </div>
         <div className={cn(styles.modalBod, classNameContent)}>
-         {content&& <div className={styles.modalContent}>{content}</div>}
+          {content && <div className={styles.modalContent}>{content}</div>}
         </div>
         {footer && <div className={styles.modalFooter}>{footer}</div>}
       </div>
