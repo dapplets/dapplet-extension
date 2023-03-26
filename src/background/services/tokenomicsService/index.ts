@@ -5,6 +5,7 @@ import GlobalConfigService from '../globalConfigService'
 import { OverlayService } from '../overlayService'
 import { WalletService } from '../walletService'
 import abi from './app-token-registry.json'
+import { ERROR_MESSAGES, IPFS_GATEWAY } from '../../../contentscript/overlay/root/constants'
 // todo: create cycle
 const PAGE_SIZE = 20
 const ZERO_SIZE = 0
@@ -98,5 +99,26 @@ export class TokenRegistryService {
     }
   
     return newData
+  }
+  public async saveBlobToIpfs  (data: Blob) {
+    const response = await fetch(`${IPFS_GATEWAY}/ipfs/`, {
+      method: 'POST',
+      body: data,
+    })
+  
+    if (!response.ok) {
+      const error = await response
+        .json()
+        .then((x) => `${x.code} ${x.message}`)
+        .catch(() => `${response.status} ${response.statusText}`)
+  
+      throw new Error(error)
+    }
+  
+    const cid = response.headers.get('ipfs-hash')
+  
+    if (!cid) throw new Error(ERROR_MESSAGES.IPFS_UPLOAD_FAIL)
+    const url = 'ipfs://' + cid
+    return url
   }
 }

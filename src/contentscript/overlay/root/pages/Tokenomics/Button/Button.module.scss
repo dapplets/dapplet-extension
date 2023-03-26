@@ -101,13 +101,6 @@
 .round {
   border-radius: 50%;
   background-color: $Primary;
-
-  &:hover {
-    // background-color: $PrimaryHover;
-  }
-  &:active {
-    // background-color: $PrimaryPressed;
-  }
 }
 
 .disabled {

@@ -214,7 +214,6 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
               <Tokenomics
                 ModuleInfo={ModuleInfo}
                 setPageDetails={setDappletsDetail}
-                setTokenomics={setTokenomics}
                 setActiveTab={setActiveTabDappletsDetails}
               />
             ) : null}
@@ -280,7 +279,6 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
               <Tokenomics
                 ModuleInfo={ModuleInfo}
                 setPageDetails={setUnderConstructionDetails}
-                setTokenomics={setTokenomics}
                 setActiveTab={setActiveTabUnderConstructionDetails}
               />
             )}

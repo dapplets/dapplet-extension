@@ -105,11 +105,11 @@
   cursor: auto;
   background: inherit;
 
-  // border: 1px solid #e3e3e3;
+  // border: 1px solid $StrokeColor;
   border-radius: 6px;
 
   .widgetButtonTitle {
-    color: #e3e3e3;
+    color: $StrokeColor;
   }
 
   img {
@@ -127,7 +127,7 @@
     }
 
     .widgetButtonTitle {
-      color: #e3e3e3;
+      color: $StrokeColor;
     }
 
     .widgetButton {
@@ -148,7 +148,7 @@
     }
 
     .widgetButtonTitle {
-      color: #e3e3e3;
+      color: $StrokeColor;
     }
 
     .widgetButton {

@@ -4,7 +4,6 @@ import { Form, Formik } from 'formik'
 import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { Modal } from '../../components/Modal'
-import saveBlobToIpfs from '../../utils/saveBlobToIpfs'
 import { DappletsDetails, UnderConstructionDetails } from '../Settings'
 import Button from './Button'
 import CreateTokenSchema from './CreateTokenSchema'
@@ -40,7 +39,6 @@ export const NewToken: FC<NewTokenProps> = (props) => {
 
   const [isModal, setModal] = useState(false)
   const { network, ecosystemTokens } = useEcosystem() //todo: mocked
-  //   const { createToken, status: tokenCreatingTx } = useCreateToken()
   const [valuesProps, setValuesProps] = useState(DEFAULT_VALUES)
   const [isModalTransaction, setModalTransaction] = useState(false)
   const [isModalEndCreation, setModalEndCreation] = useState(false)
@@ -55,18 +53,16 @@ export const NewToken: FC<NewTokenProps> = (props) => {
 
   useEffect(() => {
     const init = async () => {
-      await _updateData()
+      
     }
     init()
 
     return () => {}
   }, [])
-  const _updateData = async () => {
-    const { getTokensByApp } = await initBGFunctions(browser)
-    const tokens = await getTokensByApp(module.name)
-  }
+ 
   const handleSubmit = async (values: CreateTokenForm) => {
     const { symbol, name, icon } = values
+    const { saveBlobToIpfs } = await initBGFunctions(browser)
     const iconUrl = await saveBlobToIpfs(icon) // ToDo: move to hook?
     try {
       setModalTransaction(true)
@@ -251,15 +247,13 @@ export const NewToken: FC<NewTokenProps> = (props) => {
       <Modal
         visible={isModalTransaction}
         title={'Transaction started'}
-        content={''}
-        footer={''}
+       
         onClose={() => !isModalTransaction}
       />
       <Modal
         visible={isModalEndCreation}
         title={'Transaction finished'}
-        content={''}
-        footer={''}
+       
         onClose={() => _updatePage()}
       />
       {message ? (
@@ -277,7 +271,7 @@ export const NewToken: FC<NewTokenProps> = (props) => {
               ))}
             </div>
           }
-          footer={''}
+         
           onClose={() => onCloseError()}
         />
       ) : null}

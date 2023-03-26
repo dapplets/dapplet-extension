@@ -167,6 +167,7 @@ browser.runtime.onMessage.addListener(
     getUnreadNotificationsCount: (source?) =>
       notificationService.getUnreadNotificationsCount(source),
       getErc20TokenInfo: (tokenAddress)=>tokenomicsService.getErc20TokenInfo(tokenAddress),
+      saveBlobToIpfs:(blob)=>tokenomicsService.saveBlobToIpfs(blob),
     getTokensByApp: (appId) => tokenomicsService.getTokensByApp(appId),
     getAppsByToken: (addressToken) => tokenomicsService.getAppsByToken(addressToken),
     createAppToken: (appId, symbol, name, referenceUrl, additionalCollaterals?) =>

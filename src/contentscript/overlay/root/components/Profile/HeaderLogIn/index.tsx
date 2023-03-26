@@ -60,9 +60,9 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const liRef = useRef<HTMLDivElement>()
 
   const newVisible = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
-    return `${firstFourCharacters}...${lastFourCharacters}`
+    const firstCharacters = hash.substring(0, 6)
+    const lastCharacters= hash.substring(hash.length - 0, hash.length - 4)
+    return `${firstCharacters}...${lastCharacters}`
   }
   // const isEveryWalletConnected = descriptors.filter((x) => !x.connected).length === 0
 

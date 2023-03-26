@@ -5,7 +5,6 @@ import styles from './Button.module.scss'
 interface ButtonProps
   extends DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement> {
   primary?: boolean
-  secondary?: boolean
   outline?: boolean
   link?: boolean
   danger?: boolean
@@ -19,7 +18,6 @@ interface ButtonProps
 
 export const Button: FC<ButtonProps> = ({
   primary,
-  secondary,
   outline,
   link,
   danger,
@@ -38,7 +36,6 @@ export const Button: FC<ButtonProps> = ({
       className={classNames(
         styles.root,
         { [styles.primary]: primary },
-
         { [styles.outline]: outline },
         { [styles.link]: link },
         { [styles.danger]: danger },

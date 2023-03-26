@@ -171,9 +171,9 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
 
   const visibleNameFile = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 5)
-    return `${firstFourCharacters}...${lastFourCharacters}`
+    const firstCharacters = hash.substring(0, 6)
+    const lastCharacters= hash.substring(hash.length - 1, hash.length - 5)
+    return `${firstCharacters}...${lastCharacters}`
   }
 
   const getContextId = async () => {

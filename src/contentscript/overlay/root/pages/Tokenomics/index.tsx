@@ -16,8 +16,7 @@ import { RadioButtons } from './RadioButton/radioButtons'
 import { SelectToken } from './selectToken'
 import styles from './Tokenomics.module.scss'
 export interface TokenomicsProps {
-  setPageDetails: (x) => void
-  setTokenomics: (x) => void
+  setPageDetails: (x:boolean) => void
   isSupport?: boolean
   ModuleInfo: any
   setActiveTab: any
@@ -42,7 +41,7 @@ type Message = {
 }
 
 export const Tokenomics: FC<TokenomicsProps> = (props) => {
-  const { setPageDetails, ModuleInfo, isSupport = true, setTokenomics, setActiveTab } = props
+  const { setPageDetails, ModuleInfo, isSupport = true, setActiveTab } = props
   const [isNewToken, setNewToken] = useState(false)
   const [activeChoise, setActiveChoise] = useState(ChoiseType.New)
   const [isModal, setModal] = useState(false)
@@ -53,7 +52,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
 
   const [daiInfo, setdaiInfo] = useState(null)
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
-  const [TokensByApp, setTokensByApp] = useState(null)
+  const [tokensByApp, setTokensByApp] = useState(null)
   const [value, setValue] = useState('')
   const [, copy] = useCopied(value)
   const [isImg, setImg] = useState(false)
@@ -77,9 +76,9 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
 
   const _updateData = async () => {
     const { getTokensByApp } = await initBGFunctions(browser)
-    const TokensByApp = await getTokensByApp(mi.name)
+    const tokensByApp = await getTokensByApp(mi.name)
 
-    setTokensByApp(TokensByApp)
+    setTokensByApp(tokensByApp)
   }
   const handleSubmit = async (values) => {
     try {
@@ -101,9 +100,9 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
   }
 
   const tokenCreated = useMemo(() => {
-    setTokensByApp(TokensByApp)
-    return TokensByApp
-  }, [TokensByApp])
+    setTokensByApp(tokensByApp)
+    return tokensByApp
+  }, [tokensByApp])
   const _updatePage = async () => {
     setModalEndCreation(false)
 
@@ -120,7 +119,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
               <Message
                 title="Create new token or select existing?"
                 subtitle="You can create a new token on the bonding curve with the ZOO ecosystem token as a collateral or use an existing ERC-20 token" // todo: mocked ecosystem
-                parentPage="tokenomics"
+                otherSubtitle
                 className={styles.messageWrapper}
                 children={
                   <div className={styles.choiseTokenWrapper}>

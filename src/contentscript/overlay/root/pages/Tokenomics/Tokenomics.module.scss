@@ -20,7 +20,6 @@
   flex: 1 1 auto;
   flex-direction: column;
   overflow-y: auto;
-  // padding: 25px 15px 0 16px;
   width: 100%;
   height: calc(100vh - 123px);
 
@@ -96,7 +95,7 @@
   height: 32px;
   padding: 0 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
@@ -126,7 +125,7 @@
   height: 32px;
   margin-top: 20px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: $PureWhite;
@@ -180,7 +179,7 @@
 
   opacity: 0.9;
   background: #fff;
-  border: 1px solid #e3e3e3;
+  border: 1px solid $StrokeColor;
   border-radius: 10px 10px 10px 0;
   box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
 }
@@ -223,7 +222,7 @@
 
   margin: 0 0 0 14.5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
@@ -266,7 +265,7 @@
 }
 
 .finalWarning {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 130%;
@@ -295,7 +294,7 @@
   margin: 10px 0 9px;
   padding: 0 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
@@ -314,7 +313,7 @@
 }
 
 .footerContentModalLink {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
@@ -354,13 +353,13 @@
   width: 29px;
   height: 29px;
   border-radius: 50%;
-  border: 1px solid #e3e3e3;
+  border: 1px solid $StrokeColor;
   color: $Primary;
   font-size: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #e3e3e3;
+  background: $StrokeColor;
 }
 
 .ticker {
@@ -459,7 +458,7 @@
 
   padding-right: 5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
@@ -467,7 +466,7 @@
 }
 
 .infoPercent {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;

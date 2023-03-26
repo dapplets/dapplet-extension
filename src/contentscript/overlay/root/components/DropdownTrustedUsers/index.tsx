@@ -72,10 +72,10 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
   }
   const visible = (hash: string): string => {
     if (hash.length > 33) {
-      const firstFourCharacters = hash.substring(0, 15)
-      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 15)
+      const firstCharacters = hash.substring(0, 15)
+      const lastCharacters= hash.substring(hash.length - 0, hash.length - 15)
 
-      return `${firstFourCharacters}...${lastFourCharacters}`
+      return `${firstCharacters}...${lastCharacters}`
     } else {
       return hash
     }

@@ -24,14 +24,14 @@
 .title {
   padding: 0 0 4px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 22px;
   font-weight: 700;
   line-height: 26px;
   color: $MainBlack;
 }
 
-.titleMessageTokenomics{
+.otherTitle{
   width: 252px;
   padding-bottom: 20px;
   text-align: center;
@@ -40,7 +40,7 @@
 .subtitle {
   display: block;
   padding: 0 20px 10px;
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
@@ -48,7 +48,7 @@
   text-align: center;
 }
 
-.subTitleMessageTokenomics{
+.otherSubtitle{
   padding-bottom: 20px;
 }
 

@@ -53,10 +53,10 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
 
   const visible = (hash: string): string => {
     if (hash.length > 38) {
-      const firstFourCharacters = hash.substring(0, 20)
-      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 18)
+      const firstCharacters = hash.substring(0, 20)
+      const lastCharacters= hash.substring(hash.length - 0, hash.length - 18)
 
-      return `${firstFourCharacters}...${lastFourCharacters}`
+      return `${firstCharacters}...${lastCharacters}`
     } else {
       return hash
     }

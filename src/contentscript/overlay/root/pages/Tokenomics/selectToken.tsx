@@ -59,6 +59,7 @@ export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
 
     setTimeout(() => setAnimate(false), 400)
   }
+  
   const onChange = (value: string) => {
     if (getValidationAddress(value, regExpIndexEthereum) !== null) {
       return daiInfo

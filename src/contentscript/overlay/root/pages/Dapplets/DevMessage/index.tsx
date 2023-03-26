@@ -50,8 +50,8 @@ export const DevMessage: FC<DevMessageProps> = (props) => {
         <div className={cn(styles.wrapper)}>
           <div className={styles.fisrtLine}>
             <div className={styles.versionBlock}>
-              <span className={styles.newVersion}>Extension v.{newVersion} released</span>
-              <span className={styles.version}>v. {EXTENSION_VERSION} installed</span>
+              <span className={styles.newVersion}>Extension v{newVersion} released</span>
+              <span className={styles.version}>v{EXTENSION_VERSION} installed</span>
             </div>
             <div className={styles.buttonBlock}>
               <button className={styles.buttonIgnore} onClick={_ignoreUpdate}>

@@ -106,7 +106,7 @@
     width: 1px;
     height: 16px;
 
-    background-color: #e3e3e3;
+    background-color: $StrokeColor;
   }
 }
 
@@ -145,7 +145,7 @@
   height: 20px;
   margin-left: 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
