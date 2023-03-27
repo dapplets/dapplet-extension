@@ -25,7 +25,12 @@ export default class ModuleManager {
   }
 
   public async resolveDependencies(
-    modules: { name: string; version?: string; branch?: string; contextIds: string[] }[]
+    modules: {
+      name: string
+      version?: string
+      branch?: string
+      contextIds: string[]
+    }[]
   ) {
     // ToDo: Add dependency optimizer
     // Search for the following topics:
@@ -54,21 +59,18 @@ export default class ModuleManager {
       manifest: VersionInfo
     }) => {
       try {
-        const moduleDeps = await this._getChildDependenciesAndManifest(parent)
+        const depsAndManifest = await this._getOptimizedChildDependenciesAndManifest({
+          name: parent.name,
+          version: parent.version,
+          branch: parent.branch,
+          contextIds: parent.contextIds,
+        })
 
-        if (!moduleDeps) return
+        if (!depsAndManifest) return
 
-        parent.manifest = moduleDeps.manifest
+        parent.manifest = depsAndManifest.manifest
 
-        if (!moduleDeps.manifest || !moduleDeps.dependencies) return
-
-        const optimizedDeps = await Promise.all(
-          moduleDeps.dependencies.map((d) =>
-            this.optimizeDependency(d.name, d.version, d.branch, parent.contextIds)
-          )
-        )
-
-        for (const dep of optimizedDeps) {
+        for (const dep of depsAndManifest.dependencies) {
           if (!dependencies.find((d) => areModulesEqual(d, dep))) {
             const depToPush = { ...dep, manifest: null, contextIds: parent.contextIds }
             dependencies.push(depToPush)
@@ -167,6 +169,26 @@ export default class ModuleManager {
         m.schemaConfig && (await this._loadJson(m.schemaConfig).catch(() => null))
       return { script, defaultConfig, schemaConfig, internalManifest: null }
     }
+  }
+
+  private async _getOptimizedChildDependenciesAndManifest(module: {
+    name: string
+    version: string | null
+    branch: string | null
+    contextIds: string[]
+  }) {
+    const moduleDeps = await this._getChildDependenciesAndManifest(module)
+
+    if (!moduleDeps) return
+    if (!moduleDeps.manifest || !moduleDeps.dependencies) return
+
+    const optimizedDeps = await Promise.all(
+      moduleDeps.dependencies.map((d) =>
+        this.optimizeDependency(d.name, d.version, d.branch, module.contextIds)
+      )
+    )
+
+    return { dependencies: optimizedDeps, manifest: moduleDeps.manifest }
   }
 
   //ToDo: rework the _getChildDependencies and move it into ContentScript
@@ -292,6 +314,8 @@ export default class ModuleManager {
     const users = await this._globalConfigService
       .getTrustedUsers()
       .then((u) => u.map((a) => a.account))
+
+    // ToDo: optimize interface implementation lookup when the function is added to the registry
     const modules = await this.registryAggregator.getModuleInfoWithRegistries(contextIds, users)
 
     for (const registry in modules) {
