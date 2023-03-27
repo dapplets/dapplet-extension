@@ -606,6 +606,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
             <p className={styles.modalDefaultContentText}>
               When the dapplet is made this NFT will automatically be created and sent to this
               account
+              <br />
               <span className={styles.modalLabelAccount}>{currentAccount}</span>.
             </p>
             <p className={styles.modalDefaultContentText}>

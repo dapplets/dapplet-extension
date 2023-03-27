@@ -13,6 +13,7 @@ import {
   waitTab,
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
+import { StorageAggregator } from './moduleStorages/moduleStorage'
 import { AnalyticsGoals, AnalyticsService } from './services/analyticsService'
 import ConnectedAccountService from './services/connectedAccountService'
 import DiscordService from './services/discordService'
@@ -49,12 +50,14 @@ const featureService = new FeatureService(
   notificationService,
   analyticsService
 )
+const storageAggregator = new StorageAggregator(globalConfigService)
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
 const tokenomicsService = new TokenRegistryService(
   globalConfigService,
   walletService,
-  overlayService
+  overlayService,
+  storageAggregator
 )
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
@@ -171,7 +174,8 @@ browser.runtime.onMessage.addListener(
     getUnreadNotificationsCount: (source?) =>
       notificationService.getUnreadNotificationsCount(source),
     getErc20TokenInfo: (tokenAddress) => tokenomicsService.getErc20TokenInfo(tokenAddress),
-    saveBlobToIpfs: (blob) => tokenomicsService.saveBlobToIpfs(blob),
+    saveBlobToIpfs: (blob, targetStorages) =>
+      tokenomicsService.saveBlobToIpfs(blob, targetStorages),
     getTokensByApp: (appId) => tokenomicsService.getTokensByApp(appId),
     getAppsByToken: (addressToken) => tokenomicsService.getAppsByToken(addressToken),
     createAppToken: (appId, symbol, name, referenceUrl, additionalCollaterals?) =>

@@ -1,6 +1,6 @@
 import * as ethers from 'ethers'
 import { ChainTypes, DefaultSigners, Falsy } from '../../../common/types'
-import { ERROR_MESSAGES, IPFS_GATEWAY } from '../../../contentscript/overlay/root/constants'
+import { StorageAggregator } from '../../moduleStorages/moduleStorage'
 import GlobalConfigService from '../globalConfigService'
 import { OverlayService } from '../overlayService'
 import { WalletService } from '../walletService'
@@ -21,7 +21,8 @@ export class TokenRegistryService {
   constructor(
     private _globalConfigService: GlobalConfigService,
     private _walletService: WalletService,
-    private overlayService: OverlayService
+    private overlayService: OverlayService,
+    private _storageAggregator: StorageAggregator
   ) {}
 
   private async _init() {
@@ -56,17 +57,16 @@ export class TokenRegistryService {
     appId: string,
     symbol: string,
     name: string,
-    referenceUrl: File | string,
+    referenceUrl: any,
     additionalCollaterals?: { addr: string; referenceUrl: string }[]
   ) {
-    await this._init()
     await this.tokenFactory.createAppToken(
       DEFAULT_APP_TYPE, //todo: mocked
       appId,
       DEFAULT_ECOSYSTEM, //todo: mocked
       symbol,
       name,
-      referenceUrl,
+      referenceUrl.uris[1], // todo
       ZERO_ADDRESS, //todo: mocked
       ZERO_ADDRESS, //todo: mocked
       additionalCollaterals
@@ -98,25 +98,19 @@ export class TokenRegistryService {
 
     return newData
   }
-  public async saveBlobToIpfs(data: Blob) {
-    const response = await fetch(`${IPFS_GATEWAY}/ipfs/`, {
-      method: 'POST',
-      body: data,
-    })
-
-    if (!response.ok) {
-      const error = await response
-        .json()
-        .then((x) => `${x.code} ${x.message}`)
-        .catch(() => `${response.status} ${response.statusText}`)
-
-      throw new Error(error)
+  public async saveBlobToIpfs(data: any, targetStorages) {
+    const getData = () => {
+      const buf = new ArrayBuffer(data.length)
+      const bufView = new Uint8Array(buf)
+      for (let i = 0, strLen = data.length; i < strLen; i++) {
+        bufView[i] = data.charCodeAt(i)
+      }
+      return buf
     }
-
-    const cid = response.headers.get('ipfs-hash')
-
-    if (!cid) throw new Error(ERROR_MESSAGES.IPFS_UPLOAD_FAIL)
-    const url = 'ipfs://' + cid
-    return url
+    const hashUris = await this._storageAggregator.save(
+      new Blob([getData()], { type: 'image/png' }),
+      targetStorages
+    )
+    return hashUris
   }
 }

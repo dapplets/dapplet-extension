@@ -3,6 +3,8 @@ import cn from 'classnames'
 import { Form, Formik } from 'formik'
 import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import { base64ArrayBuffer } from '../../../../../common/base64ArrayBuffer'
+import { StorageTypes } from '../../../../../common/constants'
 import { Modal } from '../../components/Modal'
 import { DappletsDetails, UnderConstructionDetails } from '../Settings'
 import Button from './Button'
@@ -43,6 +45,7 @@ export const NewToken: FC<NewTokenProps> = (props) => {
   const [isModalTransaction, setModalTransaction] = useState(false)
   const [isModalEndCreation, setModalEndCreation] = useState(false)
   const [message, setMessage] = useState<Message>(null)
+  const [targetStorages, setTargetStorages] = useState([StorageTypes.Swarm, StorageTypes.Ipfs])
   const [isModalError, setModalError] = useState(false)
   const [isLoading, setLoading] = useState(false)
   const onClose = () => setModal(false)
@@ -60,13 +63,15 @@ export const NewToken: FC<NewTokenProps> = (props) => {
 
   const handleSubmit = async (values: CreateTokenForm) => {
     const { symbol, name, icon } = values
-    const { saveBlobToIpfs } = await initBGFunctions(browser)
-    const iconUrl = await saveBlobToIpfs(icon) // ToDo: move to hook?
+
+    // ToDo: move to hook?
     try {
       setModalTransaction(true)
-      const { createAppToken } = await initBGFunctions(browser)
+      const { createAppToken, saveBlobToIpfs } = await initBGFunctions(browser)
       if (!icon) return
 
+      const newIcon = base64ArrayBuffer(await icon.arrayBuffer())
+      const iconUrl = await saveBlobToIpfs(newIcon, targetStorages)
       await createAppToken(module.name, symbol, name, iconUrl, [])
       setModalTransaction(false)
       setModalEndCreation(true)
