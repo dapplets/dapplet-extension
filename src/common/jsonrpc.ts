@@ -91,7 +91,7 @@ export class JsonRpc {
         const rpcResponse = JSON.stringify({
           jsonrpc: '2.0',
           error: {
-            message: err.message,
+            message: typeof err === 'string' ? err : err.message,
           },
           id: rpcRequest.id,
         })
