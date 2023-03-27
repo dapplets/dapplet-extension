@@ -157,13 +157,6 @@ export class Injector {
             }
           }
         }
-        const IS_E2E_IFRAME = isE2ETestingEnvironment(window.top)
-        const IS_IFRAME = IS_E2E_IFRAME ? false : self !== top
-        const jsonrpc = new JsonRpc()
-        const overlayManager = IS_IFRAME
-          ? new OverlayManagerIframe(jsonrpc)
-          : new OverlayManager(jsonrpc)
-        overlayManager.getOverlays()
         console.log(
           `[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`
         )
@@ -703,13 +696,14 @@ export class Injector {
             return (cfg: any) => {
               if (contextModule.manifest.type === ModuleTypes.Feature) {
                 cfg.orderIndex = contextModule.order
+                // ToDo: the code below is commented for DAP-3272
                 // ToDo: fix context ids adding
-                cfg.contextIds = contextModule.contextIds
-                  .map((id) => {
-                    const [headContextId, ...tailContextId] = id.split('/') // ToDo: check head?
-                    return tailContextId.join('/')
-                  })
-                  .filter((id) => !!id)
+                // cfg.contextIds = contextModule.contextIds
+                //   .map((id) => {
+                //     const [headContextId, ...tailContextId] = id.split('/') // ToDo: check head?
+                //     return tailContextId.join('/')
+                //   })
+                //   .filter((id) => !!id)
               }
 
               // remember configs to detach it later
