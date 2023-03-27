@@ -16,6 +16,7 @@ import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
+import { Runtime } from 'webextension-polyfill'
 import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
 import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
 import { StorageRef } from '../../common/types'
@@ -285,7 +286,8 @@ export default class FeatureService {
     hostnames: string[],
     isActive: boolean,
     order: number,
-    registryUrl: string
+    registryUrl: string,
+    tabId: number
   ) {
     hostnames = Array.from(new Set(hostnames)) // deduplicate
 
@@ -314,8 +316,10 @@ export default class FeatureService {
     try {
       const runtime = await new Promise<void>(async (resolve, reject) => {
         // listening of loading/unloading from contentscript
-        const listener = (message) => {
+        const listener = (message, sender: Runtime.MessageSender) => {
+          if (sender.tab.id !== tabId) return
           if (!message || !message.type || !message.payload) return
+
           const p = message.payload
           if (message.type === 'FEATURE_LOADED') {
             if (
@@ -344,7 +348,6 @@ export default class FeatureService {
             //   p.version === version &&
             //   isActive === true
             // ){
-
             browser.runtime.onMessage.removeListener(listener)
             reject(p.error)
             // }
@@ -364,9 +367,7 @@ export default class FeatureService {
         browser.runtime.onMessage.addListener(listener)
 
         // sending command to contentscript
-        const activeTab = await getCurrentTab()
-        if (!activeTab) return
-        browser.tabs.sendMessage(activeTab.id, {
+        browser.tabs.sendMessage(tabId, {
           type: isActive ? 'FEATURE_ACTIVATED' : 'FEATURE_DEACTIVATED',
           payload: [
             {
@@ -423,10 +424,13 @@ export default class FeatureService {
     version: string | undefined,
     hostnames: string[],
     order: number,
-    registryUrl: string
+    registryUrl: string,
+    caller: any
   ): Promise<void> {
+    const tabId = caller?.sender?.tab?.id
+    if (!tabId) throw new Error('Tab ID is required')
     this._analyticsService.track({ idgoal: AnalyticsGoals.DappletActivated, dapplet: name })
-    await this._setFeatureActive(name, version, hostnames, true, order, registryUrl)
+    await this._setFeatureActive(name, version, hostnames, true, order, registryUrl, tabId)
   }
 
   async deactivateFeature(
@@ -434,10 +438,13 @@ export default class FeatureService {
     version: string | undefined,
     hostnames: string[],
     order: number,
-    registryUrl: string
+    registryUrl: string,
+    caller: any
   ): Promise<void> {
+    const tabId = caller?.sender?.tab?.id
+    if (!tabId) throw new Error('Tab ID is required')
     this._analyticsService.track({ idgoal: AnalyticsGoals.DappletDeactivated, dapplet: name })
-    await this._setFeatureActive(name, version, hostnames, false, order, registryUrl)
+    await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
   }
 
   async reloadFeature(
@@ -445,12 +452,15 @@ export default class FeatureService {
     version: string | undefined,
     hostnames: string[],
     order: number,
-    registryUrl: string
+    registryUrl: string,
+    caller: any
   ): Promise<void> {
+    const tabId = caller?.sender?.tab?.id
+    if (!tabId) throw new Error('Tab ID is required')
     const modules = await this.getActiveModulesByHostnames(hostnames)
     if (!modules.find((m) => m.name === name)) return
-    await this._setFeatureActive(name, version, hostnames, false, order, registryUrl)
-    await this._setFeatureActive(name, version, hostnames, true, order, registryUrl)
+    await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
+    await this._setFeatureActive(name, version, hostnames, true, order, registryUrl, tabId)
   }
 
   public async getActiveModulesByHostnames(contextIds: string[]) {
@@ -634,8 +644,7 @@ export default class FeatureService {
       // ToDo: check everything before publishing
 
       if (!mi.name) throw new Error('Module name is required.')
-      if (!/^[a-zA-Z0-9][a-zA-Z0-9-\.]*[a-zA-Z0-9]$/gm.test(mi.name))
-        throw new Error('Invalid module name.')
+      if (!/^[a-z0-9][a-z0-9-.]*[a-z0-9]$/gm.test(mi.name)) throw new Error('Invalid module name.')
       if (
         mi.icon &&
         mi.icon.uris.length > 0 &&
