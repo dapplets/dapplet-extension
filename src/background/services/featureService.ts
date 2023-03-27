@@ -651,8 +651,7 @@ export default class FeatureService {
       // ToDo: check everything before publishing
 
       if (!mi.name) throw new Error('Module name is required.')
-      if (!/^[a-zA-Z0-9][a-zA-Z0-9-\.]*[a-zA-Z0-9]$/gm.test(mi.name))
-        throw new Error('Invalid module name.')
+      if (!/^[a-z0-9][a-z0-9-.]*[a-z0-9]$/gm.test(mi.name)) throw new Error('Invalid module name.')
       if (
         mi.icon &&
         mi.icon.uris.length > 0 &&
