@@ -11,7 +11,7 @@ Cypress.Commands.add('openDappletsOverlay', (url, params?: Partial<{ wipe: boole
   // injects overlay
   cy.get('dapplets-overlay-manager')
 
-  if (params.wipe) {
+  if (params?.wipe) {
     cy.window().then((win) => win.dapplets.wipeAllExtensionData())
   }
 
