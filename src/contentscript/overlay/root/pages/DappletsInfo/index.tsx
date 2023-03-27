@@ -52,7 +52,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [addDisabled, setAddDisabled] = useState(false)
   const [addAdminDisabled, setAddAdminDisabled] = useState(false)
   const [editAdminsLoading, setEditAdminsLoading] = useState(false)
-  
+
   const [isLoad, setLoad] = useState(false)
   const node = useRef<HTMLButtonElement>()
   const nodeInput = useRef<HTMLInputElement>()
@@ -61,8 +61,6 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const nodeBtnAdmin = useRef<HTMLButtonElement>()
 
   const onClose = () => setModal(false)
-
- 
 
   let isNotNullCurrentAccount
   useEffect(() => {

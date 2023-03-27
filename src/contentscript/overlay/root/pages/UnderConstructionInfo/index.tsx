@@ -65,9 +65,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       }
     }
     init()
-    return () => {
-      
-    }
+    return () => {}
   }, [])
 
   const _updateData = async () => {
