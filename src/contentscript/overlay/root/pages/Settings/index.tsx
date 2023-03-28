@@ -4,6 +4,7 @@ import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
 import { DappletsMainInfo } from '../DappletsInfo'
+import { Rewards } from '../Rewards'
 import { Tokenomics } from '../Tokenomics'
 import { UnderConstruction } from '../UnderConstruction'
 import { UnderConstructionInfo } from '../UnderConstructionInfo'
@@ -24,7 +25,7 @@ export enum DappletsDetails {
 export enum UnderConstructionDetails {
   INFO = 0,
   TOKENOMICS = 1,
-  // REWARDS = 2,
+  REWARDS = 2,
 }
 
 export const NAVIGATION_LIST = [
@@ -254,11 +255,11 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
               }
               isActive={activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS}
             />
-            {/* <SettingTitle
+            <SettingTitle
               title="Rewards"
               onClick={() => setActiveTabUnderConstructionDetails(UnderConstructionDetails.REWARDS)}
               isActive={activeTabUnderConstructionDetails === UnderConstructionDetails.REWARDS}
-            /> */}
+            />
           </div>
           <div className={styles.settingMain}>
             {activeTabUnderConstructionDetails === UnderConstructionDetails.INFO && (
@@ -278,13 +279,13 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                 setActiveTab={setActiveTabUnderConstructionDetails}
               />
             )}
-            {/* {activeTabUnderConstructionDetails === UnderConstructionDetails.REWARDS && (
+            {activeTabUnderConstructionDetails === UnderConstructionDetails.REWARDS && (
               <Rewards
                 setUnderConstructionDetails={setUnderConstructionDetails}
-                isTokenomics={isTokenomics}
+                moduleInfo={ModuleInfo}
                 setActiveTabUnderConstructionDetails={setActiveTabUnderConstructionDetails}
               />
-            )} */}
+            )}
           </div>
         </div>
       )}

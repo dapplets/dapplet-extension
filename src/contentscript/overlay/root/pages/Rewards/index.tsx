@@ -1,4 +1,6 @@
 import cn from 'classnames'
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import { browser } from 'webextension-polyfill-ts'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import { Message } from '../../components/Message'
 import { ModalReward } from '../../components/ModalReward'
@@ -8,7 +10,7 @@ import './rewards.scss'
 
 export interface RewardsProps {
   setUnderConstructionDetails: (x) => void
-  isTokenomics: boolean
+  moduleInfo: any
   setActiveTabUnderConstructionDetails: any
 }
 
@@ -19,7 +21,7 @@ enum UnderConstructionDetails {
 }
 
 export const Rewards: FC<RewardsProps> = (props) => {
-  const { setUnderConstructionDetails, isTokenomics, setActiveTabUnderConstructionDetails } = props
+  const { setUnderConstructionDetails,moduleInfo, setActiveTabUnderConstructionDetails } = props
   let sumQuantity = 0
   const [distributed, onDistributed] = useState(`${sumQuantity}%`)
   const [items, setItems] = useState({
@@ -49,6 +51,25 @@ export const Rewards: FC<RewardsProps> = (props) => {
   const newRewardUserIdBlock = useRef<HTMLDivElement>()
   const [userIdDisabled, setUserIdDisabled] = useState(false)
   const [newUserIdDisabled, setNewUserIdDisabled] = useState(false)
+  const [isTokenomics, setTokenomics] = useState(false)
+  const [tokensByApp, setTokensByApp] = useState(null)
+  useEffect(()=>{
+    const init = async () => {
+      // setLoad(true)
+      await _updateData()
+      // setLoad(false)
+    }
+    init()
+    return () => {}
+  },[])
+  const _updateData = async () => {
+    const { getTokensByApp } = await initBGFunctions(browser)
+
+    const tokensByApp = await getTokensByApp(moduleInfo.name)
+console.log(tokensByApp);
+tokensByApp.length && setTokenomics(true)
+    setTokensByApp(tokensByApp)
+  }
 
   useEffect(() => {
     if (items && items.items) {
