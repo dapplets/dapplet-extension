@@ -72,27 +72,11 @@
   cursor: auto;
   background: inherit;
 
-  img {
-    filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(154%) contrast(100%) !important;
-  }
-
-  &:hover {
-    cursor: auto;
-    background: inherit;
-
-    img {
-      filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(154%) contrast(100%) !important;
-    }
-  }
-}
-
-.blockDisabled {
-  cursor: auto;
-  background: inherit;
+  // border: 1px solid $stroke-color;
   border-radius: 6px;
 
   .widgetButtonTitle {
-    color: #e3e3e3;
+    color: $stroke-color;
   }
 
   img {
@@ -110,7 +94,7 @@
     }
 
     .widgetButtonTitle {
-      color: #e3e3e3;
+      color: $stroke-color;
     }
 
     .widgetButton {
@@ -130,7 +114,7 @@
     }
 
     .widgetButtonTitle {
-      color: #e3e3e3;
+      color: $stroke-color;
     }
 
     .widgetButton {

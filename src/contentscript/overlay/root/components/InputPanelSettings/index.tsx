@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import React, { FC, useEffect } from 'react'
+import React, { FC } from 'react'
 import { isValidHttp, parseModuleName } from '../../../../../common/helpers'
 import { ReactComponent as Default } from '../../assets/svg/default.svg'
 import styles from './InputPanelSettings.module.scss'
@@ -42,7 +42,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
     loadProvider,
     ...anotherProps
   } = props
-  useEffect(() => {}, [isDefaultValueInput])
+
   return (
     <>
       <div
@@ -72,7 +72,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
                 getDefaultValueProvider()
               }
               if (providerInput.length === 0) {
-                loadProvider()
+                loadProvider && loadProvider()
               }
             }
           }}

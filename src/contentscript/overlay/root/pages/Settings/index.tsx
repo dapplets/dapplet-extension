@@ -1,10 +1,12 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
-import useAbortController from '../../hooks/useAbortController'
 import { DappletsMainInfo } from '../DappletsInfo'
-// import { UnderConstructionInfo } from '../UnderConstructionInfo'
+import { Tokenomics } from '../Tokenomics'
+import { UnderConstruction } from '../UnderConstruction'
+import { UnderConstructionInfo } from '../UnderConstructionInfo'
 import { Developer } from './Developer/Developer'
 import { SettingsList } from './Settings/Settings'
 import styles from './Settings/Settings.module.scss'
@@ -14,13 +16,14 @@ enum SettingsTabs {
   SETTINGS = 0,
   DEVELOPER = 2,
 }
-enum DappletsDetails {
+export enum DappletsDetails {
   MAININFO = 0,
+  TOKENOMICS = 1,
 }
 
-enum UnderConstructionDetails {
+export enum UnderConstructionDetails {
   INFO = 0,
-  // TOKENOMICS = 1,
+  TOKENOMICS = 1,
   // REWARDS = 2,
 }
 
@@ -61,13 +64,12 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   const [isDappletsDetails, setDappletsDetail] = useState(false)
   const [isUnderConstruction, setUnderConstruction] = useState(false)
   const [isUnderConstructionDetails, setUnderConstructionDetails] = useState(false)
-  const [ModuleInfo, setModuleInfo] = useState([])
+  const [ModuleInfo, setModuleInfo] = useState(null)
   const [ModuleVersion, setModuleVersion] = useState([])
 
-  // const [isTokenomics, setTokenomics] = useState(false)
-  // const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] = useState(false)
+  const [isTokenomics, setTokenomics] = useState(false)
+  const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] = useState(false)
   const [isShowChildrenRegistry, setShowChildrenRegistry] = useState(false)
-  const abortController = useAbortController()
 
   useEffect(() => {
     const init = async () => {
@@ -75,22 +77,17 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
       await loadErrorReporting()
     }
     init()
-    return () => {
-      // abortController.abort()
-    }
-  }, [abortController.signal.aborted])
+    return () => {}
+  }, [])
 
   const loadDevMode = async () => {
-    if (!abortController.signal.aborted) {
-      setSvgLoaderDevMode(true)
-    }
+    setSvgLoaderDevMode(true)
 
     const { getDevMode } = await initBGFunctions(browser)
     const devMode = await getDevMode()
-    if (!abortController.signal.aborted) {
-      setMode(devMode)
-      setSvgLoaderDevMode(false)
-    }
+
+    setMode(devMode)
+    setSvgLoaderDevMode(false)
   }
 
   const setDevmode = async (isActive: boolean) => {
@@ -100,16 +97,13 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   }
 
   const loadErrorReporting = async () => {
-    if (!abortController.signal.aborted) {
-      setSvgErrorReporting(true)
-    }
+    setSvgErrorReporting(true)
 
     const { getErrorReporting } = await initBGFunctions(browser)
     const errorReporting = await getErrorReporting()
-    if (!abortController.signal.aborted) {
-      onErrorReporting(errorReporting)
-      setSvgErrorReporting(false)
-    }
+
+    onErrorReporting(errorReporting)
+    setSvgErrorReporting(false)
   }
 
   const setErrorReporting = async (isActive: boolean) => {
@@ -178,13 +172,28 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
         </div>
       )}
       {isDappletsDetails && !isUnderConstructionDetails && !isUnderConstruction && (
-        <div className={styles.wrapper}>
-          <div className={styles.title}>
+        <div
+          className={cn(styles.wrapper, {
+            [styles.wrapperTokenomics]: activeTaDappletsDetails === DappletsDetails.TOKENOMICS,
+          })}
+        >
+          <div
+            className={cn(styles.title, {
+              [styles.titleTokenomics]: activeTaDappletsDetails === DappletsDetails.TOKENOMICS,
+            })}
+          >
             <SettingTitle
               title="Main info"
               onClick={() => setActiveTabDappletsDetails(DappletsDetails.MAININFO)}
               isActive={activeTaDappletsDetails === DappletsDetails.MAININFO}
             />
+            {ModuleInfo && ModuleInfo.type === 'FEATURE' ? (
+              <SettingTitle
+                title="Tokenomics"
+                onClick={() => setActiveTabDappletsDetails(DappletsDetails.TOKENOMICS)}
+                isActive={activeTaDappletsDetails === DappletsDetails.TOKENOMICS}
+              />
+            ) : null}
           </div>
           <div className={styles.settingMain}>
             {activeTaDappletsDetails === DappletsDetails.MAININFO && (
@@ -195,10 +204,19 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                 setShowChildrenRegistry={setShowChildrenRegistry}
               />
             )}
+            {activeTaDappletsDetails === DappletsDetails.TOKENOMICS &&
+            ModuleInfo &&
+            ModuleInfo.type === 'FEATURE' ? (
+              <Tokenomics
+                ModuleInfo={ModuleInfo}
+                setPageDetails={setDappletsDetail}
+                setActiveTab={setActiveTabDappletsDetails}
+              />
+            ) : null}
           </div>
         </div>
       )}
-      {/* {isUnderConstruction && !isDappletsDetails && !isUnderConstructionDetails && (
+      {isUnderConstruction && !isDappletsDetails && !isUnderConstructionDetails && (
         <div className={styles.wrapper}>
           <div className={styles.settingMain}>
             <UnderConstruction
@@ -209,31 +227,41 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
             />
           </div>
         </div>
-      )} */}
+      )}
 
       {!isUnderConstruction && !isDappletsDetails && isUnderConstructionDetails && (
-        <div className={styles.wrapper}>
-          <div className={styles.title}>
+        <div
+          className={cn(styles.wrapper, {
+            [styles.wrapperTokenomics]:
+              activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS,
+          })}
+        >
+          <div
+            className={cn(styles.title, {
+              [styles.titleTokenomics]:
+                activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS,
+            })}
+          >
             <SettingTitle
               title="Info"
               onClick={() => setActiveTabUnderConstructionDetails(UnderConstructionDetails.INFO)}
               isActive={activeTabUnderConstructionDetails === UnderConstructionDetails.INFO}
             />
-            {/* <SettingTitle
+            <SettingTitle
               title="Tokenomics"
               onClick={() =>
                 setActiveTabUnderConstructionDetails(UnderConstructionDetails.TOKENOMICS)
               }
               isActive={activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS}
             />
-            <SettingTitle
+            {/* <SettingTitle
               title="Rewards"
               onClick={() => setActiveTabUnderConstructionDetails(UnderConstructionDetails.REWARDS)}
               isActive={activeTabUnderConstructionDetails === UnderConstructionDetails.REWARDS}
             /> */}
           </div>
           <div className={styles.settingMain}>
-            {/* {activeTabUnderConstructionDetails === UnderConstructionDetails.INFO && (
+            {activeTabUnderConstructionDetails === UnderConstructionDetails.INFO && (
               <div>
                 <UnderConstructionInfo
                   ModuleInfo={ModuleInfo}
@@ -242,14 +270,15 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                   setShowChildrenUnderConstraction={setShowChildrenUnderConstraction}
                 />
               </div>
-            )} */}
-            {/* {activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS && (
-              <Tokenimics
-                setUnderConstructionDetails={setUnderConstructionDetails}
-                setTokenomics={setTokenomics}
+            )}
+            {activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS && (
+              <Tokenomics
+                ModuleInfo={ModuleInfo}
+                setPageDetails={setUnderConstructionDetails}
+                setActiveTab={setActiveTabUnderConstructionDetails}
               />
             )}
-            {activeTabUnderConstructionDetails === UnderConstructionDetails.REWARDS && (
+            {/* {activeTabUnderConstructionDetails === UnderConstructionDetails.REWARDS && (
               <Rewards
                 setUnderConstructionDetails={setUnderConstructionDetails}
                 isTokenomics={isTokenomics}

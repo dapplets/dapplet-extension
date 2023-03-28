@@ -12,7 +12,6 @@ import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
-import useAbortController from '../../hooks/useAbortController'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
 
@@ -94,7 +93,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [isModalTransaction, setModalTransaction] = useState(false)
 
   const [isNotAccountModal, setNotAccountModal] = useState(false)
-  const abortController = useAbortController()
 
   useEffect(() => {
     const init = async () => {
@@ -109,10 +107,8 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     if (author.authorForm.length === 0) {
       setAuthorDisabled(false)
     }
-    return () => {
-      // abortController.abort()
-    }
-  }, [mi, st, targetChain, autorDisabled, author, editContextId, abortController.signal.aborted])
+    return () => {}
+  }, [mi, st, targetChain, autorDisabled, author, editContextId])
   const addButtonClickHandler = () => {
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.push(newAuthorObject)
@@ -131,26 +127,26 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-    if (!abortController.signal.aborted) {
-      setRegistryOptions(
-        prodRegistries.map((r) => ({
-          key: r.url,
-          text: r.url,
-          value: r.url,
-        }))
-      )
-      setTargetRegistry(prodRegistries[0]?.url || null)
-      setTrustedUsers(trustedUsers)
-      setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-    }
+
+    setRegistryOptions(
+      prodRegistries.map((r) => ({
+        key: r.url,
+        text: r.url,
+        value: r.url,
+      }))
+    )
+    setTargetRegistry(prodRegistries[0]?.url || null)
+    setTrustedUsers(trustedUsers)
+    setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
     await _updateCurrentAccount()
   }
 
   const _updateCurrentAccount = async () => {
     const { getOwnership, getAddress } = await initBGFunctions(browser)
-    const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-    if (!abortController.signal.aborted) {
+    if (targetChain) {
+      const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
+
       setCurrentAccount(currentAccount)
     }
   }
@@ -257,10 +253,10 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     setSt([...filesArr])
   }
   const visibleNameFile = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 6)
+    const firstCharacters = hash.substring(0, 6)
+    const lastCharacters = hash.substring(hash.length - 1, hash.length - 6)
 
-    return `${firstFourCharacters}...${lastFourCharacters}`
+    return `${firstCharacters}...${lastCharacters}`
   }
 
   return (

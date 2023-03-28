@@ -188,6 +188,10 @@ async function init() {
   })
 
   jsonrpc.on('callBackground', (method: string, args: any[]) => {
+    if (method === 'wipeAllExtensionData' && !IS_E2E_IFRAME) {
+      return Promise.reject('This function is for E2E testing only.')
+    }
+
     return initBGFunctions(browser).then((x) => x[method](...args))
   })
 

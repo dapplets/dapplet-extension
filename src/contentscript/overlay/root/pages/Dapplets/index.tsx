@@ -15,7 +15,6 @@ import { Dapplet } from '../../components/Dapplet'
 import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { TabLoader } from '../../components/TabLoader'
-import useAbortController from '../../hooks/useAbortController'
 import { openLink } from '../../utils/openLink'
 import styles from './Dapplets.module.scss'
 import { DevMessage } from './DevMessage'
@@ -61,17 +60,13 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
 
-  const abortController = useAbortController()
-
   useEffect(() => {
     const init = async () => {
-      if (!abortController.signal.aborted) {
-        setLoadingListDapplets(true)
-      }
+      setLoadingListDapplets(true)
+
       await _refreshData()
-      if (!abortController.signal.aborted) {
-        setLoadingListDapplets(false)
-      }
+
+      setLoadingListDapplets(false)
     }
 
     init()
@@ -81,8 +76,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     } else {
       setLoadingListDapplets(false)
     }
-    return () => {}
-  }, [dropdownListValue, abortController.signal.aborted])
+  }, [dropdownListValue])
 
   useEffect(() => {
     EventBus.on('context_started', _refreshData)
@@ -117,8 +111,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           error: null,
           versions: [],
         }))
-
-      if (abortController.signal.aborted) return
 
       setDapplets((leftDapplets) => {
         // remove disappeared dapplets from the list
@@ -160,7 +152,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         _updateFeatureState(f.name, { isActionLoading: true })
         const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
         const tab = await getCurrentTab()
-
         if (!tab) return
         await openDappletAction(f.name, tab.id)
       } else {

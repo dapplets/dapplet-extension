@@ -326,6 +326,7 @@ export default class GlobalConfigService {
   }
   async getPinnedActions() {
     const config = await this.get()
+
     const registries = config.pinnedDappletActions.map((x) => ({
       ...x,
       dappletName: x.dappletName === undefined ? true : x.dappletName,

@@ -15,7 +15,7 @@
   padding: 10px;
 
   background: #fff;
-  border: 1px solid #e3e3e3;
+  border: 1px solid $stroke-color;
   border-radius: 10px;
 }
 
@@ -118,7 +118,7 @@
       fill: none !important;
 
       path {
-        fill: #e3e3e3;
+        fill: $stroke-color;
       }
     }
   }
@@ -191,7 +191,7 @@
       fill: none !important;
 
       path {
-        fill: #e3e3e3;
+        fill: $stroke-color;
       }
     }
   }

@@ -69,10 +69,22 @@
 
   &:hover {
     background-color: $primary-hover;
+
+    svg{
+      path{
+        fill: #fff;
+      }
+    }
   }
 
   &:active {
     background-color: $primary-pressed;
+
+    svg{
+      path{
+        fill: #fff;
+      }
+    }
   }
 }
 
