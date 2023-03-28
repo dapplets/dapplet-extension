@@ -1,0 +1,322 @@
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
+
+.wrapper {
+  margin: 0 18px;
+  border: 1px solid $StrokeColor;
+  background: $median-price-bg;
+  box-shadow: 0px 29.3608px 23.4887px rgb(171 192 191 / 17%);
+  border-radius: 20px;
+  padding: 20px 0;
+  margin-bottom: 10px;
+  
+}
+.lastWrapper{
+  margin-bottom: 70px;
+}
+
+.titleForm {
+  font-family: 'Roboto';
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 26px;
+
+  text-align: justify;
+
+  color: $MainBlack;
+  padding-left: 20px;
+  padding-bottom: 10px;
+}
+
+.titleDependecies {
+  display: flex;
+  padding-left: 20px;
+  padding-bottom: 45px;
+}
+
+.dependecies {
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+
+  display: flex;
+  align-items: center;
+  color: $MainBlack;
+  display: inline-block;
+  padding-right: 10px;
+}
+
+.ecosystem {
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 100%;
+  text-transform: uppercase;
+
+  color: #4187ae;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+  &:first-child {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.controls {
+}
+
+.fieldGroup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+
+  margin: 0px 10px 10px 20px;
+  border-radius: 10px;
+}
+
+.errorMessage {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+
+  display: flex;
+  justify-content: flex-end;
+
+  color: $error;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.iconGroup {
+  display: flex;
+  background: inherit;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formDescription {
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+
+  text-align: justify;
+
+  color: $ContentBlack;
+}
+.descriptionBlock {
+  padding: 0px 20px 20px 20px;
+}
+
+.formDelimeter {
+  width: 90%;
+  height: 1px;
+
+  background: $StrokeColor;
+  margin: 0 auto;
+}
+
+.descriptionField {
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+
+  text-align: justify;
+
+  color: $MainBlack;
+  padding: 20px 0px 20px 20px;
+}
+.fieldsBlocks {
+  display: flex;
+  flex-direction: column;
+  padding: 0px 20px;
+}
+.fieldValue {
+  display: flex;
+  padding-bottom: 10px;
+  &:last-child {
+    padding-bottom: 0px;
+  }
+}
+.fieldName {
+  font-family: 'Roboto';
+
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+  text-align: justify;
+
+  color: $MainBlack;
+  display: inline-block;
+  padding-right: 5px;
+}
+
+.link {
+  display: inline-block;
+  margin-top: auto;
+  padding: 40px 20px 0px 20px;
+  color: #85ccc7;
+
+  &:hover {
+    color: #67aea9;
+  }
+  &:active {
+    color: #539a95;
+  }
+}
+
+.wraperModal {
+  height: 542px;
+}
+
+.finalWarning {
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 130%;
+  color: $MainGrey;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.footerContentModal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footerContentModalButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 140px;
+  height: 32px;
+  margin: 10px 0 9px;
+  padding: 0 10px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+  color: $PureWhite;
+
+  background: $Primary;
+  border-radius: 4px;
+
+  &:hover {
+    background: $PrimaryHover;
+  }
+
+  &:active {
+    background: $PrimaryPressed;
+  }
+}
+
+.footerContentModalLink {
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+  color: $Primary;
+ 
+  &:hover {
+    color: $PrimaryHover;
+  }
+
+  &:active {
+    color: $PrimaryPressed;
+  }
+}
+
+.linkNavigation {
+  position: fixed;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 60px;
+  margin: 20px 0 0;
+  background: $OverlayBG;
+bottom: 0;
+  &::before {
+    content: '';
+
+    position: absolute;
+    top: 0px;
+    left: 0;
+
+    width: 95%;
+    height: 2px;
+margin: 0 20px;
+    background: $WebBG;
+  }
+}
+
+.back {
+  position: relative;
+
+  display: block;
+
+  margin: 0 0 0 14.5px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+  color: $MainGrey;
+
+  background: inherit;
+
+  &::before {
+    content: '';
+
+    position: absolute;
+    top: 0;
+    left: -14.5px;
+
+    width: 11px;
+    height: 14px;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%23919191'/%3E%3C/svg%3E");
+  }
+
+  &:hover {
+    color: $ContentBlack;
+
+    &::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill=' %23747376'/%3E%3C/svg%3E");
+    }
+  }
+
+  &:active {
+    color: $MainBlack;
+
+    &::before {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%232A2A2A'/%3E%3C/svg%3E");
+    }
+  }
+}

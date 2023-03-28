@@ -68,7 +68,7 @@
 .cardName {
   padding-bottom: 5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 500;
   font-style: normal;
@@ -86,7 +86,7 @@
 }
 
 .cardOwner {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
@@ -116,7 +116,7 @@
 
   margin-left: 5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
@@ -148,7 +148,7 @@
   height: 32px;
   padding: 9px 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   font-style: normal;
@@ -179,7 +179,7 @@
   height: min-content;
   padding: 14px 0 14px 18px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 12px;
   font-weight: 400;
   font-style: normal;
@@ -193,7 +193,7 @@
   h6 {
     margin-left: 0;
 
-    font-family: Roboto;
+    font-family: Roboto, sans-serif;
     font-size: 16px;
     font-weight: 500;
     font-style: normal;
@@ -204,7 +204,7 @@
   p {
     margin-left: 0;
 
-    font-family: Roboto;
+    font-family: Roboto, sans-serif;
     font-size: 12px;
     font-weight: 400;
     font-style: normal;
@@ -240,7 +240,7 @@
     width: calc(100% - 30px);
     height: 1px;
 
-    background: #e3e3e3;
+    background: $StrokeColor;
     border-radius: 2px;
   }
 }

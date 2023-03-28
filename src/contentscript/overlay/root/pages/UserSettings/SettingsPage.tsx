@@ -1,4 +1,4 @@
-import  { withTheme } from '@rjsf/core'
+import { withTheme } from '@rjsf/core'
 import validator from '@rjsf/validator-ajv8'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { FC, useEffect, useState } from 'react'
@@ -139,10 +139,10 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
     setEdited(false)
   }
   const visible = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 6)
+    const firstCharacters = hash.substring(0, 6)
+    const lastCharacters = hash.substring(hash.length - 1, hash.length - 6)
 
-    return `${firstFourCharacters}...${lastFourCharacters}`
+    return `${firstCharacters}...${lastCharacters}`
   }
 
   return (
@@ -199,7 +199,6 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
                     setEdited(true)
                     setData(e.formData)
                   }}
-                  
                   validator={validator}
                 >
                   <div className={styles.wrapperButton}>

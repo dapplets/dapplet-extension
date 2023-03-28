@@ -17,7 +17,7 @@ export const Registry: FC<RegistryProps> = (props) => {
     if (height > 22) {
       onHeightLabel(true)
     }
-  }, [nodeLabelBlock])
+  }, [])
 
   return (
     <div className={styles.localhost}>

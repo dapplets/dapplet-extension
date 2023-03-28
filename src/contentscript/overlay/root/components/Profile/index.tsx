@@ -12,7 +12,6 @@ export interface ProfileProps {
   setOpenWallet: () => void
   isOpenWallet: boolean
   setOpenWalletMini: () => void
-  // isOpenSearch: boolean
   setConnectedDescriptors: (x: []) => void
   setSelectedWallet: (x: string) => void
 }
@@ -26,7 +25,6 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
     setOpenWallet,
     isOpenWallet,
     setOpenWalletMini,
-    // isOpenSearch,
     setConnectedDescriptors,
     setSelectedWallet,
   } = props
@@ -38,7 +36,7 @@ export const Profile: FC<ProfileProps> = (props: ProfileProps) => {
     init()
 
     return () => {}
-  }, [newProfile, isMini])
+  }, [])
 
   return (
     <>

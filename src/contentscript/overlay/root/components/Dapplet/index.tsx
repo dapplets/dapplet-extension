@@ -11,7 +11,6 @@ import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
 import { ReactComponent as SearchIcon } from '../../assets/svg/newLinks.svg'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
 import { ReactComponent as OpenSeaIcon } from '../../assets/svg/opensea.svg'
-import useAbortController from '../../hooks/useAbortController'
 import { createUserEnvInfo } from '../../utils/createUserEnvInfo'
 import { DappletImage } from '../DappletImage'
 import { DappletInfo } from '../DappletInfo'
@@ -69,18 +68,14 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
   const [registryActive, setRegistryActive] = useState(null)
   const [owner, setOwner] = useState(null)
   const [copied, setCopied] = useState<LoadingState>(LoadingState.READY)
-  const abortController = useAbortController()
+
   useEffect(() => {
     const init = async () => {
-      // if (!abortController.signal.aborted) {
       await updateData()
-      // }
     }
     init()
-    return () => {
-      // abortController.abort()
-    }
-  }, [loadHome, abortController.signal.aborted])
+    return () => {}
+  }, [])
   const loadingHome = () => {
     setLoadHome(false)
   }
@@ -92,15 +87,12 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     const newRegistries = registries
       .filter((r) => r.isDev === false && r.isEnabled !== false)
       .map((x, i) => x.url)
-    if (!abortController.signal.aborted) {
-      setRegistryActive(newRegistries[0])
-    }
+
+    setRegistryActive(newRegistries[0])
 
     const newOwner = await getOwnership(newRegistries[0], name)
-    if (!abortController.signal.aborted) {
-      setOwner(newOwner)
-    }
-    // if (isActive) getTabsForDapplet(dapplet)
+
+    setOwner(newOwner)
   }
 
   const copyUserEnvInfo = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -123,7 +115,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
   return (
     <div className={cn(styles.wrapperCard, className)} data-testid={name} {...anotherProps}>
-      <DappletImage isFavourites={false} storageRef={icon} />
+      <DappletImage storageRef={icon} />
 
       <div className={cn(styles.wrapperBlock)}>
         <div className={styles.header}>

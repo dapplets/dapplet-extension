@@ -33,7 +33,7 @@ export const Localhost: FC<LocalhostProps> = (props) => {
     if (height > 22) {
       onHeightLabel(true)
     }
-  }, [isLoadButtonLocalhost, nodeBtn, nodeLabelBlock])
+  }, [])
 
   return (
     <div className={styles.localhost}>

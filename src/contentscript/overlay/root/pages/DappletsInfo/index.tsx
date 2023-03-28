@@ -12,7 +12,6 @@ import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
-import useAbortController from '../../hooks/useAbortController'
 import { _addInfoItemInputGroup } from '../../utils/addInfoInputGroup'
 import { _removeInfoItemInputGroup } from '../../utils/removeInfoInputGroup'
 import styles from './DappletsInfo.module.scss'
@@ -64,7 +63,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [addAdminDisabled, setAddAdminDisabled] = useState(false)
 
   const [editAdminsLoading, setEditAdminsLoading] = useState(false)
-  const abortController = useAbortController()
+
   let isNotNullCurrentAccount
   useEffect(() => {
     const init = async () => {
@@ -72,19 +71,16 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     }
     init()
 
-    return () => {
-      // abortController.abort()
-    }
-  }, [mi, newState, targetChain, editContextId, editAdmin, abortController.signal.aborted])
+    return () => {}
+  }, [mi, newState, targetChain, editContextId, editAdmin])
 
   const _updateData = async () => {
     const { getRegistries } = await initBGFunctions(browser)
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-    if (!abortController.signal.aborted) {
-      setTargetRegistry(prodRegistries[0]?.url || null)
-      setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-    }
+
+    setTargetRegistry(prodRegistries[0]?.url || null)
+    setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
     await _updateCurrentAccount()
     if (!targetRegistry) return
@@ -95,9 +91,8 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     if (targetChain) {
       const { getAddress } = await initBGFunctions(browser)
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-      if (!abortController.signal.aborted) {
-        setCurrentAccount(currentAccount)
-      }
+
+      setCurrentAccount(currentAccount)
     } else {
       return
     }
@@ -173,24 +168,22 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
 
   const visibleNameFile = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 5)
-    return `${firstFourCharacters}...${lastFourCharacters}`
+    const firstCharacters = hash.substring(0, 6)
+    const lastCharacters = hash.substring(hash.length - 1, hash.length - 5)
+    return `${firstCharacters}...${lastCharacters}`
   }
 
   const getContextId = async () => {
     const { getContextIds } = await initBGFunctions(browser)
     const newContextID = await getContextIds(targetRegistry, mi.name)
-    if (!abortController.signal.aborted) {
-      setContextId(newContextID)
-    }
+
+    setContextId(newContextID)
   }
   const getAdmins = async () => {
     const { getAdmins } = await initBGFunctions(browser)
     const authors = await getAdmins(targetRegistry, mi.name)
-    if (!abortController.signal.aborted) {
-      setAdmins(authors)
-    }
+
+    setAdmins(authors)
   }
 
   function containsValue(arr, elem: string) {

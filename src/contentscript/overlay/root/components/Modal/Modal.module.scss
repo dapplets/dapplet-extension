@@ -70,10 +70,20 @@
 
   &:hover {
     background-color: $PrimaryHover;
+    svg{
+      path{
+        fill: #fff;
+      }
+    }
   }
 
   &:active {
     background-color: $PrimaryPressed;
+    svg{
+      path{
+        fill: #fff;
+      }
+    }
   }
 }
 
@@ -87,7 +97,7 @@
 
   padding: 0 0 5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 22px;
   font-weight: 700;
   line-height: 26px;

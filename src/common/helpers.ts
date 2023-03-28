@@ -571,3 +571,9 @@ export const isValidHttp = (url: string) => {
 export const isValidPostageStampId = (id: string) => {
   return /^[0-9a-f]{64}$/gm.test(id)
 }
+
+export const numberWithCommas = (x: number) => {
+  const parts = x.toString().split('.')
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return parts.join('.')
+}

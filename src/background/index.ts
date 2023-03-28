@@ -13,6 +13,7 @@ import {
   waitTab,
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
+import { StorageAggregator } from './moduleStorages/moduleStorage'
 import { AnalyticsGoals, AnalyticsService } from './services/analyticsService'
 import ConnectedAccountService from './services/connectedAccountService'
 import DiscordService from './services/discordService'
@@ -25,6 +26,7 @@ import { OverlayService } from './services/overlayService'
 import ProxyService from './services/proxyService'
 import { SessionService } from './services/sessionService'
 import { SuspendService } from './services/suspendService'
+import { TokenRegistryService } from './services/tokenomicsService'
 import { WalletService } from './services/walletService'
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
@@ -32,6 +34,7 @@ import { WalletService } from './services/walletService'
 tracing.startTracing()
 
 const notificationService = new NotificationService()
+
 const globalConfigService = new GlobalConfigService()
 const analyticsService = new AnalyticsService(globalConfigService)
 const suspendService = new SuspendService(globalConfigService)
@@ -47,9 +50,15 @@ const featureService = new FeatureService(
   notificationService,
   analyticsService
 )
+const storageAggregator = new StorageAggregator(globalConfigService)
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
-
+const tokenomicsService = new TokenRegistryService(
+  globalConfigService,
+  walletService,
+  overlayService,
+  storageAggregator
+)
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
 globalConfigService.ensService = ensService
@@ -161,6 +170,15 @@ browser.runtime.onMessage.addListener(
     markAllNotificationsAsViewed: () => notificationService.markAllNotificationsAsViewed(),
     getUnreadNotificationsCount: (source?) =>
       notificationService.getUnreadNotificationsCount(source),
+    getErc20TokenInfo: (tokenAddress) => tokenomicsService.getErc20TokenInfo(tokenAddress),
+    saveBlobToIpfs: (blob, targetStorages) =>
+      tokenomicsService.saveBlobToIpfs(blob, targetStorages),
+    getTokensByApp: (appId) => tokenomicsService.getTokensByApp(appId),
+    getAppsByToken: (addressToken) => tokenomicsService.getAppsByToken(addressToken),
+    createAppToken: (appId, symbol, name, referenceUrl, additionalCollaterals?) =>
+      tokenomicsService.createAppToken(appId, symbol, name, referenceUrl, additionalCollaterals),
+    linkAppWithToken: (appId, tokenAddress) =>
+      tokenomicsService.linkAppWithToken(appId, tokenAddress),
     getInitialConfig: () => globalConfigService.getInitialConfig(),
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),

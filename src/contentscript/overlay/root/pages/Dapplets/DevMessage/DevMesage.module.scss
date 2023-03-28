@@ -23,7 +23,7 @@
   flex-direction: column;
 }
 .newVersion {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-weight: 400;
   font-size: 14px;
   line-height: 149%;
@@ -32,7 +32,7 @@
   padding-bottom: 6px;
 }
 .version {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-weight: 400;
   font-size: 10px;
   line-height: 100%;
@@ -46,7 +46,7 @@
 }
 
 .buttonIgnore {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   background: inherit;
   font-weight: 400;
   font-size: 14px;
@@ -60,7 +60,7 @@
 }
 
 .buttonUpgrade {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -82,7 +82,7 @@
 
 .secondLine {
   display: flex;
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-weight: 400;
   font-size: 12px;
   line-height: 149%;

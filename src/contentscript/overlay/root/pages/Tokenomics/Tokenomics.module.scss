@@ -1,17 +1,6 @@
-@import "../../assets/styles/null";
-@import "../../assets/styles/fonts";
-@import "../../assets/styles/color.variables";
-
-.wrapper {
-  overflow: hidden;
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-
-  width: 100%;
-  height: calc(100vh - 123px);
-}
-
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
 .wrapper::-webkit-scrollbar {
   width: 0;
 }
@@ -22,6 +11,48 @@
 
 .wrapper {
   overflow: -moz-scrollbars-none;
+}
+
+.wrapper {
+  direction: rtl;
+  overflow: hidden;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  overflow-y: auto;
+  width: 100%;
+  height: calc(100vh - 123px);
+
+  background: $OverlayBG;
+
+  &::-webkit-scrollbar {
+    cursor: pointer;
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    margin-bottom: 63px;
+    background: rgb(244 244 244);
+    background: linear-gradient(
+      90deg,
+      rgb(244 244 244 / 0%) 10%,
+      rgb(227 227 227 / 100%) 50%,
+      rgb(244 244 244 / 0%) 90%
+    );
+  }
+
+  &::-webkit-scrollbar-thumb {
+    width: 4px;
+    height: 2px;
+    margin-bottom: 63px;
+
+    background: $Primary;
+    border-radius: 2px;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
+  }
+}
+.wrapper > * {
+  direction: ltr;
 }
 
 .blockMessage {
@@ -36,6 +67,23 @@
   height: 100%;
 }
 
+.messageWrapper {
+  padding-bottom: 40px;
+}
+
+.choiseTokenWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.radioButtonsBlock {
+  display: flex;
+  justify-content: space-between;
+  width: 222px;
+}
+
 .applyButtonDisabled {
   cursor: default;
 
@@ -47,7 +95,7 @@
   height: 32px;
   padding: 0 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
@@ -73,16 +121,14 @@
   align-items: center;
   justify-content: center;
 
-  width: 73px;
+  width: 140px;
   height: 32px;
-  padding: 0 10px;
+  margin-top: 20px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
-  line-height: 100%;
   color: $PureWhite;
-  text-transform: uppercase;
 
   background: $Primary;
   border-radius: 4px;
@@ -94,71 +140,12 @@
   &:active {
     background: $PrimaryPressed;
   }
-}
 
-.blockTokenParameters {
-  overflow: hidden;
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  align-items: center;
-
-  width: 100%;
-  height: 100%;
-}
-
-.wrapperSettings {
-  margin: 15px 0 118px;
-}
-
-.blockTokenInfo {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.titleToken {
-  position: relative;
-}
-
-.tokenTitleInfo {
-  cursor: pointer;
-
-  position: absolute;
-  top: 11px;
-  left: 95px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 14px;
-  height: 14px;
-  padding: 2px;
-
-  font-family: Roboto;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 10px;
-  color: $PureWhite;
-
-  background: $MainGrey;
-  border-radius: 50%;
-
-  &:hover {
-    background: $StrokeColor;
-  }
-
-  &:active {
-    background: $MainBlack;
-  }
-}
-
-.inputTokenTicker {
-  text-transform: uppercase;
-
-  &::placeholder {
-    text-transform: none;
+  &:disabled {
+    cursor: default;
+    color: $MainGrey;
+    background: $AppBG;
+    border: 1px solid $StrokeColor;
   }
 }
 
@@ -192,7 +179,7 @@
 
   opacity: 0.9;
   background: #fff;
-  border: 1px solid #e3e3e3;
+  border: 1px solid $StrokeColor;
   border-radius: 10px 10px 10px 0;
   box-shadow: 5px 5px 0.5em -0.1em rgb(0 0 6 / 50%);
 }
@@ -201,29 +188,6 @@
 .support:focus::before {
   display: flex;
   align-items: center;
-}
-
-.inputTokenName {
-  display: flex;
-
-  width: 100%;
-  padding: 5px 13px;
-
-  font-family: Roboto;
-  font-size: 14px;
-  font-weight: 400;
-  font-style: italic;
-  line-height: 149%;
-  color: $MainGrey;
-
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
-  border-radius: 5px;
-}
-
-.inputTokenTickerInvalid {
-  color: #ff6442;
-  border: 1px solid #ff6442;
 }
 
 .linkNavigation {
@@ -238,7 +202,7 @@
   margin: 20px 0 0;
 
   &::before {
-    content: "";
+    content: '';
 
     position: absolute;
     top: -10px;
@@ -258,7 +222,7 @@
 
   margin: 0 0 0 14.5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
@@ -267,7 +231,7 @@
   background: inherit;
 
   &::before {
-    content: "";
+    content: '';
 
     position: absolute;
     top: 0;
@@ -296,12 +260,22 @@
   }
 }
 
+.wraperModal {
+  height: 542px;
+}
+
 .finalWarning {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
-  line-height: 16px;
+  line-height: 130%;
   color: $MainGrey;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .footerContentModal {
@@ -320,7 +294,7 @@
   margin: 10px 0 9px;
   padding: 0 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
@@ -339,12 +313,11 @@
 }
 
 .footerContentModalLink {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
   color: $Primary;
-
 
   &:hover {
     color: $PrimaryHover;
@@ -353,4 +326,157 @@
   &:active {
     color: $PrimaryPressed;
   }
+}
+.blockTokenApp {
+  background: #ffffff;
+  border: 1px solid #efefef;
+  border-radius: 5px;
+  margin: 15px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+.titleTokenApp {
+  font-family: "Roboto";
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 149%;
+    text-align: center;
+    color: #747376;
+}
+.firstLine {
+  display: flex;
+  padding-bottom: 10px;
+  align-items: center;
+}
+.icon {
+  width: 29px;
+  height: 29px;
+  border-radius: 50%;
+  border: 1px solid $StrokeColor;
+  color: $Primary;
+  font-size: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: $StrokeColor;
+}
+
+.ticker {
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+  text-transform: uppercase;
+
+  color: #ababab;
+  padding-left: 10px;
+}
+
+.name {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+
+  color: #444444;
+  padding-left: 10px;
+  padding-bottom: 2px;
+}
+.secondLine {
+  display: flex;
+
+  align-items: center;
+}
+.address {
+  font-family: 'Roboto';
+
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+
+  text-decoration-line: underline;
+  cursor: pointer;
+  color: #46a3e2;
+  &:hover {
+    color: #7dd0ff;
+  }
+  &:active {
+    color: #468db5;
+  }
+}
+.tokenCopy {
+  cursor: pointer;
+  background: #f5f5f5;
+  border-radius: 50%;
+  margin-left: 5px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    svg {
+      path {
+        fill: #7dd0ff;
+      }
+    }
+  }
+
+  &:active {
+    svg {
+      path {
+        fill: #7dd0ff;
+      }
+    }
+  }
+}
+.thirdLine {
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+}
+
+.blockRight {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: center;
+
+  width: 50%;
+}
+
+.blockRightInfo {
+  display: flex;
+}
+
+.infoValue {
+  display: inline-block;
+
+  padding-right: 5px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 149%;
+  color: #444;
+}
+
+.infoPercent {
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 149%;
+  color: $Primary;
+}
+
+.infoPercentHight {
+  color: $success;
+}
+
+.infoName {
+  color: #afacac;
 }

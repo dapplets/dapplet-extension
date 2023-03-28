@@ -46,7 +46,7 @@
 
   background: #f5f5f5;
   border: none;
-  border: 1px solid #e3e3e3;
+  border: 1px solid $StrokeColor;
   border-radius: 50%;
 
   // svg path {
@@ -142,7 +142,7 @@
   border-radius: 4px;
 
   &:hover {
-    background: #e3e3e3;
+    background: $StrokeColor;
     background-position: center;
   }
 
@@ -405,7 +405,7 @@
     height: 1px;
     margin: 0 2px;
 
-    background: #e3e3e3;
+    background: $StrokeColor;
   }
 
   &:hover {
@@ -548,4 +548,10 @@
   100% {
     opacity: 0;
   }
+}
+.miniButtonBlock{
+
+}
+.divHidden{
+ display: none;
 }

@@ -14,7 +14,7 @@
   padding: 10px;
 
   background: #fff;
-  border: 1px solid #e3e3e3;
+  border: 1px solid $StrokeColor;
   border-radius: 10px;
 }
 
@@ -35,7 +35,7 @@
   margin-right: 20px;
   padding: 5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 500;
   font-style: normal;
@@ -93,7 +93,7 @@
   min-height: 21px;
   padding-top: 2px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
@@ -117,7 +117,7 @@
       fill: none !important;
 
       path {
-        fill: #e3e3e3;
+        fill: $StrokeColor;
       }
     }
   }
@@ -190,7 +190,7 @@
       fill: none !important;
 
       path {
-        fill: #e3e3e3;
+        fill: $StrokeColor;
       }
     }
   }
