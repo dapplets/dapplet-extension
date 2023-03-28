@@ -84,8 +84,6 @@
   align-items: end;
 
   width: 202px;
-
-  // height: 186px;
   height: auto;
   padding: 6px;
 
@@ -115,7 +113,7 @@
 }
 
 .mainMenuItemTitle {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 12px;
   line-height: 100%;
   color: #747376;

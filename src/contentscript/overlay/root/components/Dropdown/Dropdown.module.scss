@@ -4,7 +4,7 @@
 
 /* Segoe UI Regular */
 @font-face {
-  font-family: SegoeUIRegular;
+  font-family: SegoeUIRegular, sans-serif;
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -25,12 +25,11 @@
   max-width: 202px;
   height: auto;
 
-  // font-family: 'SegoeUIRegular';
   font-size: 12px;
   font-weight: 400;
   line-height: 100%;
 
-  background-color: $PureWhite;
+  background-color: $pure-white;
   border: 1px solid #e3e3e3;
   border-radius: 10px;
   border-radius: 8px;
@@ -46,15 +45,11 @@
   max-width: 150px;
   padding: 5px 27px 5px 8px;
 
-  // font-family: "SegoeUIRegular";
   font-size: 12px;
   font-weight: 400;
   color: #2a2a2a;
   text-overflow: ellipsis;
   white-space: nowrap;
-
-  // font-style: italic;
-  // line-height: 149%;
 }
 
 .isOpenIcon {
@@ -66,7 +61,7 @@
   width: 8px;
   height: 7px;
 
-  animation-name: rotateIsClose;
+  animation-name: rotate-is-close;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
@@ -83,7 +78,7 @@
 
       path {
         fill: none !important;
-        stroke: $ContentBlack;
+        stroke: $content-black;
       }
     }
 
@@ -106,13 +101,13 @@
 .isOpenAnimationIcon {
   margin-top: 5px;
 
-  animation-name: rotateIsOpen;
+  animation-name: rotate-is-open;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
 }
 
-@keyframes rotateIsOpen {
+@keyframes rotate-is-open {
   0% {
     transform: rotate(0deg);
   }
@@ -126,7 +121,7 @@
   }
 }
 
-@keyframes rotateIsClose {
+@keyframes rotate-is-close {
   0% {
     transform: rotate(180deg);
   }
@@ -155,7 +150,7 @@
   border-radius: 0 0 10px 10px;
   box-shadow: -1px 4px 4px rgb(0 0 0 / 25%);
 
-  animation-name: listVisible;
+  animation-name: list-visible;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
@@ -165,7 +160,7 @@
   }
 }
 
-@keyframes listVisible {
+@keyframes list-visible {
   0% {
     opacity: 0;
   }
@@ -190,20 +185,17 @@
   padding-bottom: 7px;
   padding-left: 8px;
 
-  // font-family: "SegoeUIRegular";
   font-size: 12px;
   font-weight: 400;
-
-  // font-style: italic;
   line-height: 149%;
   color: #2a2a2a;
 
   &:hover {
-    color: $MainGrey;
+    color: $main-grey;
   }
 
   &:active {
-    background: $StrokeColor;
+    background: $stroke-color;
   }
 }
 
@@ -213,15 +205,12 @@
 }
 
 .title {
-  // text-transform: uppercase;
   pointer-events: none;
 
   margin-right: 10px;
 
-  // font-family: "SegoeUIRegular";
-
   font-size: 12px;
   line-height: 100%;
-  color: $MainBlack;
+  color: $main-black;
   white-space: nowrap;
 }

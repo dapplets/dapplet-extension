@@ -27,15 +27,15 @@
   margin-top: 10px;
   padding: 5px 13px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 5px;
 }
 
@@ -85,6 +85,6 @@
   margin-top: 10px;
   padding: 10px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
 }

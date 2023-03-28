@@ -1,6 +1,7 @@
 @import '../../assets/styles/null';
 @import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
+@import './adaptive';
 
 .localhost {
   display: flex;
@@ -35,37 +36,37 @@
   margin-right: 20px;
   padding: 5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 500;
   font-style: normal;
   line-height: 100%;
-  color: $PureWhite;
+  color: $pure-white;
 
   border-radius: 10px;
 }
 
 .disabled {
-  background: $MainGrey;
+  background: $main-grey;
 
   &:hover {
-    background: $StrokeColor;
+    background: $stroke-color;
   }
 
   &:active {
-    background: $ContentBlack;
+    background: $content-black;
   }
 }
 
 .error {
-  background: $Primary;
+  background: $primary;
 
   &:hover {
-    background: $PrimaryHover;
+    background: $primary-hover;
   }
 
   &:active {
-    background: $PrimaryPressed;
+    background: $primary-pressed;
   }
 }
 
@@ -93,12 +94,12 @@
   min-height: 21px;
   padding-top: 2px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
-  color: $ContentBlack;
+  color: $content-black;
 }
 
 .closeLocalhost {
@@ -205,5 +206,3 @@
 .isShowDescriptionLabel {
   transform: rotate(180deg);
 }
-
-@import './adaptive';

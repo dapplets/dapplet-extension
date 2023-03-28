@@ -27,7 +27,6 @@
 .modalDialog {
   position: relative;
 
-  // padding: 170px 0 202px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -37,7 +36,7 @@
   width: 90%;
   height: 80vh;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
   box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
 
@@ -65,15 +64,15 @@
   width: 20px;
   height: 20px;
 
-  background-color: $Primary;
+  background-color: $primary;
   border-radius: 50%;
 
   &:hover {
-    background-color: $PrimaryHover;
+    background-color: $primary-hover;
   }
 
   &:active {
-    background-color: $PrimaryPressed;
+    background-color: $primary-pressed;
   }
 }
 
@@ -87,9 +86,9 @@
 
   padding: 0 0 5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 22px;
   font-weight: 700;
   line-height: 26px;
-  color: $MainBlack;
+  color: $main-black;
 }

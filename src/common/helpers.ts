@@ -1,7 +1,13 @@
 import * as semver from 'semver'
 import { browser, Tabs } from 'webextension-polyfill-ts'
 import { DEFAULT_BRANCH_NAME } from './constants'
-import { ChainTypes, ModuleId, UrlAvailability, WalletDescriptor } from './types'
+import {
+  ChainTypes,
+  MessageWrapperRequest,
+  ModuleId,
+  UrlAvailability,
+  WalletDescriptor,
+} from './types'
 
 export function getHostName(url: string): string {
   return new URL(url).hostname
@@ -488,7 +494,7 @@ export function CacheMethod() {
   }
 }
 
-export async function getThisTab(callInfo: any) {
+export async function getThisTab(callInfo: MessageWrapperRequest) {
   const thisTab = callInfo?.sender?.tab
   return thisTab
 }
@@ -570,4 +576,41 @@ export const isValidHttp = (url: string) => {
 
 export const isValidPostageStampId = (id: string) => {
   return /^[0-9a-f]{64}$/gm.test(id)
+}
+
+export function Measure() {
+  return function (target, method: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value
+
+    descriptor.value = function (...args) {
+      const start = performance.now()
+      try {
+        const maybePromise = originalMethod.apply(this, args)
+        if (Promise.resolve(maybePromise) === maybePromise) {
+          return maybePromise
+            .then((result) => {
+              const end = performance.now()
+              console.log({ method, args, async: true, result, time: end - start })
+              return result
+            })
+            .catch((error) => {
+              const end = performance.now()
+              console.log({ method, args, async: true, error, time: end - start })
+              return Promise.reject(error)
+            })
+        } else {
+          const result = maybePromise
+          const end = performance.now()
+          console.log({ method, args, async: false, result, time: end - start })
+          return result
+        }
+      } catch (error) {
+        const end = performance.now()
+        console.log({ method, args, async: false, error, time: end - start })
+        throw error
+      }
+    }
+
+    return descriptor
+  }
 }

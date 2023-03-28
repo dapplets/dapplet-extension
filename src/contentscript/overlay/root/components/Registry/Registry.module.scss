@@ -13,7 +13,7 @@
   margin: 2.5px 0;
   padding: 10px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border: 1px solid #e3e3e3;
   border-radius: 10px;
 }
@@ -36,12 +36,12 @@
   height: 20px;
   padding: 5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 500;
   font-style: normal;
   line-height: 100%;
-  color: $PureWhite;
+  color: $pure-white;
 
   background: #5ab5e8;
   border-radius: 10px;
@@ -94,12 +94,12 @@
   padding: 0 0 0 20px;
   padding-top: 2px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
-  color: $ContentBlack;
+  color: $content-black;
 }
 
 .label {

@@ -828,4 +828,20 @@ export default class GlobalConfigService {
   async setPreferredConnectedAccountsNetwork(network: NearNetworks) {
     return this.updateConfig((c) => (c.preferredConnectedAccountsNetwork = network))
   }
+
+  async isThereActiveDapplets() {
+    const globalConfig = await this.get()
+    if (!globalConfig.hostnames) return false
+
+    for (const contextId in globalConfig.hostnames) {
+      const activeDapplets = globalConfig.hostnames[contextId]?.activeFeatures ?? {}
+      for (const dapplet in activeDapplets) {
+        if (activeDapplets[dapplet].isActive) {
+          return true
+        }
+      }
+    }
+
+    return false
+  }
 }

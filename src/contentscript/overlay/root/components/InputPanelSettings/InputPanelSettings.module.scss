@@ -18,7 +18,7 @@
 .inputDefault {
   width: 99%;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
@@ -29,8 +29,8 @@
 }
 
 .errorInputDefault {
-  color: $Primary;
-  border: 1px solid $Primary;
+  color: $primary;
+  border: 1px solid $primary;
 }
 
 .buttonInputDefault {
@@ -41,7 +41,7 @@
   svg {
     &:hover {
       path {
-        fill: $ContentBlack;
+        fill: $content-black;
       }
     }
   }
@@ -52,11 +52,11 @@
 
   width: 100%;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-weight: 400;
   color: #d9304f;
 
-  animation-name: openError;
+  animation-name: open-error;
   animation-duration: 3s;
   animation-timing-function: linear;
   animation-fill-mode: forwards;

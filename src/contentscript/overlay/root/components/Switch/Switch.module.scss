@@ -26,7 +26,7 @@
   width: 32px;
   height: 20px;
 
-  background: $MainGrey;
+  background: $main-grey;
   border-radius: 20px;
 
   transition: all 0.3s ease 0s;
@@ -42,7 +42,7 @@
     width: 16px;
     height: 16px;
 
-    background: $PureWhite;
+    background: $pure-white;
     border-radius: 50%;
 
     transition: all 0.3s ease 0s;
@@ -50,12 +50,12 @@
 
   &:hover {
     &::before {
-      background: $StrokeColor;
+      background: $stroke-color;
     }
   }
 
   &.active {
-    background: $Primary;
+    background: $primary;
 
     &::before {
       transform: translateY(-50%) translateX(calc(100% - 4px));

@@ -68,7 +68,7 @@ async function init() {
     return Array.from(new Set(contextIDs)) // deduplicate array
   }
 
-  browser.runtime.onMessage.addListener((message, sender) => {
+  browser.runtime.onMessage.addListener((message) => {
     if (!message || !message.type) return
 
     if (message.type === 'FEATURE_ACTIVATED') {
@@ -122,7 +122,7 @@ async function init() {
     console.log(
       '[DAPPLETS]: The connection to the background service has been lost. Content script is unloading...'
     )
-    jsonrpc.call(GLOBAL_EVENT_BUS_NAME, ['disconnect', []])
+    EventBus.emit('disconnect')
     EventBus.destroy()
     jsonrpc.destroy()
     injector.dispose()
@@ -208,6 +208,8 @@ async function init() {
   if (IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
     confirmShareLink(shareLinkPayload)
   }
+
+  console.log('[DAPPLETS]: Content script initialized.')
 }
 
 function injectScript(url: string) {

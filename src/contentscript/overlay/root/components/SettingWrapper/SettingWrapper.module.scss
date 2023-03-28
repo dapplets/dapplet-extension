@@ -1,6 +1,7 @@
 @import "../../assets/styles/fonts";
 @import "../../assets/styles/color.variables";
 @import "../../assets/styles/null";
+@import "./adaptive";
 
 .wrapper {
   position: relative;
@@ -11,7 +12,7 @@
 
   font-family: Roboto, sans-serif;
 
-  border: 1px solid $MainGrey;
+  border: 1px solid $main-grey;
   border-radius: 5px;
 }
 
@@ -27,9 +28,9 @@
 
   font-size: 10px;
   font-weight: 500;
-  color: $ContentBlack;
+  color: $content-black;
 
-  border: 1px solid $MainGrey;
+  border: 1px solid $main-grey;
   border-radius: 4px;
 
   &::before {
@@ -43,9 +44,8 @@
     width: 100%;
     height: 100%;
 
-    background-color: $OverlayBG;
+    background-color: $overlay-bg;
     border-radius: 3px;
   }
 }
 
-@import "./adaptive"

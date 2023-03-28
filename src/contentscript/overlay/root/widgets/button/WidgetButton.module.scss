@@ -1,5 +1,20 @@
 @import '../../assets/styles/color.variables';
 
+.widgetButtonImg {
+  display: block;
+  width: 24px;
+  height: 14px;
+  margin: 0 auto;
+
+  &:hover {
+    filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
+  }
+
+  &:active {
+    filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
+  }
+}
+
 .widgetButton {
   display: block;
 
@@ -28,21 +43,6 @@
   }
 }
 
-.widgetButtonImg {
-  display: block;
-  width: 24px;
-  height: 14px;
-  margin: 0 auto;
-
-  &:hover {
-    filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
-  }
-
-  &:active {
-    filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
-  }
-}
-
 .menuWidgets {
   display: flex;
   align-items: center;
@@ -62,50 +62,33 @@
   }
 }
 
-.blockButtonInfo {
-  display: flex;
-  align-items: center;
-  width: 120px;
-  padding-left: 4px;
-
-  &:hover {
-    background: #d9304f;
-    border-radius: 6px;
-
-    img {
-      filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
-    }
-
-    .widgetButtonTitle {
-      color: #fff;
-    }
-  }
-
-  &:active {
-    background: #a6253c;
-    border-radius: 6px;
-
-    img {
-      filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
-    }
-
-    .widgetButtonTitle {
-      color: #fff;
-    }
-  }
-}
-
 .widgetButtonTitle {
   font-size: 12px;
   line-height: 100%;
   color: #747376;
 }
 
-.blockDisabled {
+.widgetDisabled {
   cursor: auto;
   background: inherit;
 
-  // border: 1px solid #e3e3e3;
+  img {
+    filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(154%) contrast(100%) !important;
+  }
+
+  &:hover {
+    cursor: auto;
+    background: inherit;
+
+    img {
+      filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(154%) contrast(100%) !important;
+    }
+  }
+}
+
+.blockDisabled {
+  cursor: auto;
+  background: inherit;
   border-radius: 6px;
 
   .widgetButtonTitle {
@@ -143,7 +126,6 @@
     border-radius: 6px;
 
     img {
-      // filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
       filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(154%) contrast(100%) !important;
     }
 
@@ -154,6 +136,50 @@
     .widgetButton {
       cursor: auto;
       background: inherit;
+    }
+  }
+}
+
+.blockButtonInfo {
+  display: flex;
+  align-items: center;
+  width: 120px;
+  padding-left: 4px;
+
+  &:hover {
+    background: #d9304f;
+    border-radius: 6px;
+
+    img {
+      filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
+    }
+
+    .widgetButtonTitle {
+      color: #fff;
+    }
+  }
+
+  &:active {
+    background: #a6253c;
+    border-radius: 6px;
+
+    img {
+      filter: invert(100%) sepia(0%) saturate(1500%) brightness(500%) contrast(104%);
+    }
+
+    .widgetButtonTitle {
+      color: #fff;
+    }
+  }
+}
+
+.isPinned {
+  svg {
+    width: 16px;
+    height: 16px;
+
+    path {
+      fill: $primary-hover;
     }
   }
 }
@@ -169,47 +195,18 @@
 
     &:hover {
       path {
-        fill: $PrimaryHover;
+        fill: $primary-hover;
       }
     }
 
     &:active {
       path {
-        fill: $PrimaryPressed;
+        fill: $primary-pressed;
       }
-    }
-  }
-}
-
-.isPinned {
-  svg {
-    width: 16px;
-    height: 16px;
-
-    path {
-      fill: $PrimaryHover;
     }
   }
 }
 
 .widgetHidden {
   display: none;
-}
-
-.widgetDisabled {
-  cursor: auto;
-  background: inherit;
-
-  img {
-    filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(154%) contrast(100%) !important;
-  }
-
-  &:hover {
-    cursor: auto;
-    background: inherit;
-
-    img {
-      filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(154%) contrast(100%) !important;
-    }
-  }
 }
