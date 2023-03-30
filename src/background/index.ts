@@ -145,6 +145,8 @@ browser.runtime.onMessage.addListener(
     getUserSettingsForOverlay: featureService.getUserSettingsForOverlay.bind(featureService),
 
     // GlobalConfigService
+    setIsFirstInstallation: globalConfigService.setIsFirstInstallation.bind(globalConfigService),
+    getIsFirstInstallation: globalConfigService.getIsFirstInstallation.bind(globalConfigService),
     getProfiles: globalConfigService.getProfiles.bind(globalConfigService),
     setActiveProfile: globalConfigService.setActiveProfile.bind(globalConfigService),
     renameProfile: globalConfigService.renameProfile.bind(globalConfigService),

@@ -29,6 +29,7 @@ import { ReactComponent as DappletsLogo } from './assets/newIcon/mustache.svg'
 import { ReactComponent as SearchIcon } from './assets/newIcon/search.svg'
 import { ReactComponent as Home } from './assets/newIcon/squares.svg'
 import { ReactComponent as StoreIcon } from './assets/newIcon/store.svg'
+import { Onbording } from './components/BaseOnbording'
 import { ContentItem } from './components/ContentItem'
 import styles from './components/Overlay/Overlay.module.scss'
 import { OverlayTab } from './components/OverlayTab'
@@ -539,7 +540,7 @@ class _App extends React.Component<P, S> {
               selectedWallet={this.state.selectedWallet}
               connectedDescriptors={this.state.connectedDescriptors}
             />
-
+            <Onbording />
             <div className={styles.inner}>
               <header className={styles.header}>
                 <div className={styles.left}>

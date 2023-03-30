@@ -20,6 +20,7 @@ const EXPORTABLE_PROPERTIES = [
   // 'isActive',
   // 'suspended',
   // 'walletInfo',
+  'isFirstInstallation',
   'registries',
   'devMode',
   'trustedUsers',
@@ -87,6 +88,7 @@ export default class GlobalConfigService {
   async set(config: GlobalConfig): Promise<void> {
     await this._globalConfigRepository.update(config)
   }
+  async setFirstInstallation(): Promise<void> {}
 
   async mergeConfig(config: Partial<GlobalConfig>): Promise<void> {
     const previousConfig = await this.get()
@@ -224,6 +226,7 @@ export default class GlobalConfigService {
   getInitialConfig(): GlobalConfig {
     const config = new GlobalConfig()
     config.id = this._defaultConfigId
+    config.isFirstInstallation = true
     config.isActive = true
     config.registries = [
       { url: 'v2.registry.dapplet-base.eth', isDev: false, isEnabled: true },
@@ -324,6 +327,18 @@ export default class GlobalConfigService {
     config.pinnedDappletActions = []
     return config
   }
+
+  async setIsFirstInstallation(isActive: boolean) {
+    this.updateConfig((c) => (c.isFirstInstallation = isActive))
+    await this.getIsFirstInstallation()
+    EventBus.emit('onbording_update')
+  }
+  async getIsFirstInstallation() {
+    const config = await this.get()
+
+    return config.isFirstInstallation
+  }
+
   async getPinnedActions() {
     const config = await this.get()
 

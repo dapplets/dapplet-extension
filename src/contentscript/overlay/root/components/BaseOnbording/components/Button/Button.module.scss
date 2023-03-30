@@ -1,0 +1,26 @@
+@import '../../../../assets/styles/null';
+@import '../../../../assets/styles/fonts';
+@import '../../../../assets/styles/color.variables';
+.default{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Roboto, sans-serif;
+    width: 135px;
+    height: 32px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 149%;
+    background: inherit;
+    color: $primary;
+    border: 1px solid $primary;
+    border-radius: 8px;
+    &:hover{
+        color: $primary-hover;
+        border: 1px solid $primary-hover;
+    }
+}
+.big{
+    width: 100%;
+    border-radius: 8px;
+}
