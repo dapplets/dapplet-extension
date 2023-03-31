@@ -8,13 +8,13 @@ export type TitleProps = {
   setPage?: (x) => void
   step?: any
   isActive?: boolean
-  setTitleOnbording: any
+  setTitleOnboarding: any
   setStep: any
 }
 export const stepIndicator = ['1', '2', '3', '4', '5']
 
 export const Title: FC<TitleProps> = (props: TitleProps) => {
-  const { value, setPage, step, setTitleOnbording, setStep, isActive } = props
+  const { value, setPage, step, setTitleOnboarding, setStep, isActive } = props
 
   return (
     <div className={cn(styles.wrapper)}>
@@ -24,23 +24,23 @@ export const Title: FC<TitleProps> = (props: TitleProps) => {
           <Indicator
             setPage={() => {
               if (+x === 1) {
-                setTitleOnbording('Introduction')
+                setTitleOnboarding('Introduction')
                 setStep('1')
                 setPage(PagesTitle.PROMO)
               } else if (+x === 2) {
-                setTitleOnbording('Step 1 of 3')
+                setTitleOnboarding('Overview')
                 setStep('2')
                 setPage(PagesTitle.STEP_1)
               } else if (+x === 3) {
-                setTitleOnbording('Step 2 of 3')
+                setTitleOnboarding('Contexts')
                 setStep('3')
                 setPage(PagesTitle.STEP_2)
               } else if (+x === 4) {
-                setTitleOnbording('Step 3 of 3')
+                setTitleOnboarding('Enable dapplet')
                 setStep('4')
                 setPage(PagesTitle.STEP_3)
               } else if (+x === 5) {
-                setTitleOnbording('Congratulations')
+                setTitleOnboarding('Congratulations')
                 setStep('5')
                 setPage(PagesTitle.END)
               }

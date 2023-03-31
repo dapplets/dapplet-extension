@@ -5,11 +5,11 @@ import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../common/global-event-bus'
 import { ReactComponent as EndImg } from './assets/end.svg'
 import { ReactComponent as PromoImg } from './assets/promo.svg'
-import styles from './BaseOnbording.module.scss'
+import styles from './BaseOnboarding.module.scss'
 import { Button } from './components/Button'
 import { Skip } from './components/Skip'
 import { Title } from './components/Title'
-export type OnbordingProps = {}
+export type OnboardingProps = {}
 
 export enum PagesTitle {
   PROMO = 0,
@@ -19,9 +19,9 @@ export enum PagesTitle {
   END = 4,
 }
 
-export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
+export const Onboarding: FC<OnboardingProps> = (props: OnboardingProps) => {
   const [page, setPage] = useState(PagesTitle.PROMO)
-  const [titleOnbording, setTitleOnbording] = useState('Introduction')
+  const [titleOnboarding, setTitleOnboarding] = useState('Introduction')
   const [step, setStep] = useState('1')
 
   const [firstInstallation, setFirstInstallation] = useState(false)
@@ -33,9 +33,9 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
     return () => {}
   }, [])
   useEffect(() => {
-    EventBus.on('onbording_update', _updateData)
+    EventBus.on('onboarding_update', _updateData)
     return () => {
-      EventBus.off('onbording_update', _updateData)
+      EventBus.off('onboarding_update', _updateData)
     }
   }, [])
   const _updateData = async () => {
@@ -48,7 +48,7 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
     const { setIsFirstInstallation } = await initBGFunctions(browser)
     setFirstInstallation(false)
     setStep('1')
-    setTitleOnbording('Introduction')
+    setTitleOnboarding('Introduction')
     setPage(PagesTitle.PROMO)
     await setIsFirstInstallation(false)
   }
@@ -62,9 +62,9 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
               <Title
                 setPage={setPage}
                 setStep={setStep}
-                setTitleOnbording={setTitleOnbording}
+                setTitleOnboarding={setTitleOnboarding}
                 step={step}
-                value={titleOnbording}
+                value={titleOnboarding}
               />
               <PromoImg />
               <div className={styles.text}>
@@ -78,7 +78,7 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
                   value={'Next'}
                   onNext={() => {
                     setStep('2')
-                    setTitleOnbording(`Step 1 of 3`)
+                    setTitleOnboarding(`Overview`)
                     setPage(PagesTitle.STEP_1)
                   }}
                 />
@@ -89,11 +89,11 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
             <div className={cn(styles.promoBlock)}>
               <Title
                 setStep={setStep}
-                setTitleOnbording={setTitleOnbording}
+                setTitleOnboarding={setTitleOnboarding}
                 setPage={setPage}
                 step={step}
                 isActive
-                value={titleOnbording}
+                value={titleOnboarding}
               />
               <div className={styles.text}>
                 Our extension gives you the ability to <span className={styles.darkColor}>add</span>{' '}
@@ -108,7 +108,7 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
                   value={'Next'}
                   onNext={() => {
                     setStep('3')
-                    setTitleOnbording(`Step 2 of 3`)
+                    setTitleOnboarding(`Contexts`)
                     setPage(PagesTitle.STEP_2)
                   }}
                 />
@@ -119,16 +119,16 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
             <div className={cn(styles.promoBlock)}>
               <Title
                 setStep={setStep}
-                setTitleOnbording={setTitleOnbording}
+                setTitleOnboarding={setTitleOnboarding}
                 setPage={setPage}
                 step={step}
                 isActive
-                value={titleOnbording}
+                value={titleOnboarding}
               />
               <div className={styles.text}>
                 It's time to get to know the contexts. We call a context the environment (website)
                 in which the dapplet runs. Depending on the contexts, dapplets can be active or
-                inactive. For example, a dapplet for Twitter will not work on Youtube.
+                inactive. For example, a dapplet for Twitter will not work on YouTube.
               </div>
               <div className={styles.buttonBlock}>
                 <Skip onSkip={() => closeInstallation()} />
@@ -136,7 +136,7 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
                   value={'Next'}
                   onNext={() => {
                     setStep('4')
-                    setTitleOnbording(`Step 3 of 3`)
+                    setTitleOnboarding(`Enable dapplet`)
                     setPage(PagesTitle.STEP_3)
                   }}
                 />
@@ -147,11 +147,11 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
             <div className={cn(styles.promoBlock)}>
               <Title
                 setStep={setStep}
-                setTitleOnbording={setTitleOnbording}
+                setTitleOnboarding={setTitleOnboarding}
                 setPage={setPage}
                 step={step}
                 isActive
-                value={titleOnbording}
+                value={titleOnboarding}
               />
               <div className={styles.text}>
                 Dapplets can be turned on and off with these switches. Try it, it's easy. After
@@ -162,7 +162,7 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
                 value={'Finish onboarding'}
                 onNext={() => {
                   setStep('5')
-                  setTitleOnbording(`Congratulations!`)
+                  setTitleOnboarding(`Congratulations!`)
                   setPage(PagesTitle.END)
                 }}
               />
@@ -172,10 +172,10 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
             <div className={cn(styles.promoBlock)}>
               <Title
                 setStep={setStep}
-                setTitleOnbording={setTitleOnbording}
+                setTitleOnboarding={setTitleOnboarding}
                 setPage={setPage}
                 step={step}
-                value={titleOnbording}
+                value={titleOnboarding}
               />
               <EndImg />
               <div style={{ marginBottom: '10px' }} className={styles.text}>

@@ -331,7 +331,7 @@ export default class GlobalConfigService {
   async setIsFirstInstallation(isActive: boolean) {
     this.updateConfig((c) => (c.isFirstInstallation = isActive))
     await this.getIsFirstInstallation()
-    EventBus.emit('onbording_update')
+    EventBus.emit('onboarding_update')
   }
   async getIsFirstInstallation() {
     const config = await this.get()

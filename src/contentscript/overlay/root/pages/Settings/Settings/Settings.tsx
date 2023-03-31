@@ -283,7 +283,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const onPress = (e, ref) => {
     ref.current?.blur()
   }
-  const setOnbording = async () => {
+  const setOnboarding = async () => {
     const { setIsFirstInstallation, getIsFirstInstallation } = await initBGFunctions(browser)
     await setIsFirstInstallation(true)
   }
@@ -314,9 +314,9 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
             }
           />
           <SettingItem
-            title="Onbording"
+            title="Onboarding"
             component={
-              <button className={styles.versionButton} onClick={setOnbording}>
+              <button className={styles.versionButton} onClick={setOnboarding}>
                 Go
               </button>
             }
