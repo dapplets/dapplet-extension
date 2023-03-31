@@ -21,8 +21,9 @@ export enum PagesTitle {
 
 export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
   const [page, setPage] = useState(PagesTitle.PROMO)
-  const [titleOnbording, setTitleOnbording] = useState(null)
-  const [step, setStep] = useState(null)
+  const [titleOnbording, setTitleOnbording] = useState('Introduction')
+  const [step, setStep] = useState('1')
+
   const [firstInstallation, setFirstInstallation] = useState(false)
   useEffect(() => {
     const init = async () => {
@@ -46,6 +47,9 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
   const closeInstallation = async () => {
     const { setIsFirstInstallation } = await initBGFunctions(browser)
     setFirstInstallation(false)
+    setStep('1')
+    setTitleOnbording('Introduction')
+    setPage(PagesTitle.PROMO)
     await setIsFirstInstallation(false)
   }
 
@@ -55,11 +59,17 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
         <div className={cn(styles.wrapper)}>
           {page === PagesTitle.PROMO && (
             <div className={cn(styles.promoBlock)}>
-              <Title value={'Introduction'} />
+              <Title
+                setPage={setPage}
+                setStep={setStep}
+                setTitleOnbording={setTitleOnbording}
+                step={step}
+                value={titleOnbording}
+              />
               <PromoImg />
               <div className={styles.text}>
-                Hi. Dapplets Extension is your portalto the world of the augmented Internet.Real
-                WEB3 right in your browser.Fasten your seatbelts! Click the mustache button to open
+                Hi. Dapplets Extension is your portal to the world of the augmented Internet. Real
+                WEB3 right in your browser. Fasten your seatbelts! Click the mustache button to open
                 the dapplets list.
               </div>
               <div className={styles.buttonBlock}>
@@ -67,7 +77,7 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
                 <Button
                   value={'Next'}
                   onNext={() => {
-                    setStep('1')
+                    setStep('2')
                     setTitleOnbording(`Step 1 of 3`)
                     setPage(PagesTitle.STEP_1)
                   }}
@@ -77,7 +87,14 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
           )}
           {page === PagesTitle.STEP_1 && (
             <div className={cn(styles.promoBlock)}>
-              <Title step={step} isActive value={titleOnbording} />
+              <Title
+                setStep={setStep}
+                setTitleOnbording={setTitleOnbording}
+                setPage={setPage}
+                step={step}
+                isActive
+                value={titleOnbording}
+              />
               <div className={styles.text}>
                 Our extension gives you the ability to <span className={styles.darkColor}>add</span>{' '}
                 almost any <span className={styles.darkColor}>functionality</span> on top of
@@ -90,7 +107,7 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
                 <Button
                   value={'Next'}
                   onNext={() => {
-                    setStep('2')
+                    setStep('3')
                     setTitleOnbording(`Step 2 of 3`)
                     setPage(PagesTitle.STEP_2)
                   }}
@@ -100,7 +117,14 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
           )}
           {page === PagesTitle.STEP_2 && (
             <div className={cn(styles.promoBlock)}>
-              <Title step={step} isActive value={titleOnbording} />
+              <Title
+                setStep={setStep}
+                setTitleOnbording={setTitleOnbording}
+                setPage={setPage}
+                step={step}
+                isActive
+                value={titleOnbording}
+              />
               <div className={styles.text}>
                 It's time to get to know the contexts. We call a context the environment (website)
                 in which the dapplet runs. Depending on the contexts, dapplets can be active or
@@ -111,7 +135,7 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
                 <Button
                   value={'Next'}
                   onNext={() => {
-                    setStep('3')
+                    setStep('4')
                     setTitleOnbording(`Step 3 of 3`)
                     setPage(PagesTitle.STEP_3)
                   }}
@@ -121,7 +145,14 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
           )}
           {page === PagesTitle.STEP_3 && (
             <div className={cn(styles.promoBlock)}>
-              <Title step={step} isActive value={titleOnbording} />
+              <Title
+                setStep={setStep}
+                setTitleOnbording={setTitleOnbording}
+                setPage={setPage}
+                step={step}
+                isActive
+                value={titleOnbording}
+              />
               <div className={styles.text}>
                 Dapplets can be turned on and off with these switches. Try it, it's easy. After
                 enabling the dapplet, the result will immediately appear on the page.
@@ -130,7 +161,7 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
                 big
                 value={'Finish onboarding'}
                 onNext={() => {
-                  setStep(null)
+                  setStep('5')
                   setTitleOnbording(`Congratulations!`)
                   setPage(PagesTitle.END)
                 }}
@@ -139,7 +170,13 @@ export const Onbording: FC<OnbordingProps> = (props: OnbordingProps) => {
           )}
           {page === PagesTitle.END && (
             <div className={cn(styles.promoBlock)}>
-              <Title step={step} value={titleOnbording} />
+              <Title
+                setStep={setStep}
+                setTitleOnbording={setTitleOnbording}
+                setPage={setPage}
+                step={step}
+                value={titleOnbording}
+              />
               <EndImg />
               <div style={{ marginBottom: '10px' }} className={styles.text}>
                 There are many more interesting things you can do with our extension, which we will

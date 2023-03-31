@@ -24,14 +24,14 @@ align-items: center;
 padding: 4px;
 
 
-width: 58px;
+width: 78px;
 height: 18px;
 }
 .indicator{
     width: 10px;
     height: 10px;
 border-radius: 50%;
-    
+    cursor: pointer;
     background: $stroke-color; 
 }
 .indicatorActive{
