@@ -480,7 +480,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                     })}
                 </div>
                 <div
-                  className={cn(styles.miniButtonBlock, {
+                  className={cn({
                     [styles.divHidden]:
                       p.module &&
                       p.module.length &&
