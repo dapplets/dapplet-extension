@@ -75,6 +75,8 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [visibleContextId, setVisibleContextId] = useState([])
   const [addDisabled, setAddDisabled] = useState(false)
 
+  const onClose = () => setModal(false)
+
   useEffect(() => {
     const init = async () => {
       setLoad(true)
