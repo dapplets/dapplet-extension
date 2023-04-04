@@ -1,6 +1,7 @@
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes } from 'react'
 import styles from './radioButtons.module.scss'
+
 export interface RadioButtonsProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLInputElement>, HTMLInputElement> {
   name?: string
@@ -8,6 +9,7 @@ export interface RadioButtonsProps
   value?: string
   checked?: any
 }
+
 export const RadioButtons: FC<RadioButtonsProps> = (props: RadioButtonsProps) => {
   const { name, id, value, ...anotherProps } = props
   return (

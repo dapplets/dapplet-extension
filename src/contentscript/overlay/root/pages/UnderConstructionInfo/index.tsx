@@ -11,9 +11,33 @@ import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
-import useAbortController from '../../hooks/useAbortController'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
+
+enum DeploymentStatus {
+  Unknown,
+  Deployed,
+  NotDeployed,
+  NewModule,
+}
+
+enum DependencyType {
+  Dependency,
+  Interface,
+}
+
+enum FormMode {
+  Deploying,
+  Creating,
+  Editing,
+}
+
+type DependencyChecking = {
+  name: string
+  version: string
+  type: DependencyType
+  isExists?: boolean
+}
 
 export interface UnderConstructionInfoProps {
   ModuleInfo: any
@@ -49,9 +73,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const node = useRef<HTMLButtonElement>()
   const nodeInput = useRef<HTMLInputElement>()
   const [visibleContextId, setVisibleContextId] = useState([])
-  const [contextDeleteNone, setContextDeleteNone] = useState(false)
   const [addDisabled, setAddDisabled] = useState(false)
-  const abortController = useAbortController()
 
   const onClose = () => setModal(false)
 
@@ -67,13 +89,10 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       }
     }
     init()
-    return () => {
-      abortController.abort()
-    }
-  }, [abortController.signal.aborted])
+  }, [])
 
   const _updateData = async () => {
-    const { getRegistries, getTrustedUsers, getContextIds } = await initBGFunctions(browser)
+    const { getRegistries, getContextIds } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
@@ -146,14 +165,14 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
 
       await addContextId(targetRegistry, mi.name, contextId)
       const contextIds = await getContextIds(targetRegistry, mi.name)
-
+      // node.current?.classList.remove('valid')
       setVisibleContextId(contextIds)
     } catch (error) {
     } finally {
+      // node.current?.classList.remove('valid')
       setEditContextId('')
       setEditContextIdLoading(false)
       setAddDisabled(false)
-      node.current?.classList.remove('valid')
     }
   }
 
@@ -170,10 +189,10 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     setSt([...filesArr])
   }
   const visibleNameFile = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 6)
+    const firstCharacters = hash.substring(0, 6)
+    const lastCharacters = hash.substring(hash.length - 1, hash.length - 6)
 
-    return `${firstFourCharacters}...${lastFourCharacters}`
+    return `${firstCharacters}...${lastCharacters}`
   }
   const _removeContextID = async (contextId: string) => {
     setEditContextIdLoading(true)
@@ -332,7 +351,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
             className={styles.wrapperSettings}
             children={
               <>
-                {isLoad ? (
+                {isLoad || !targetRegistry ? (
                   <div className={styles.miniLoader}></div>
                 ) : (
                   <div className={styles.parametersBlock}>
@@ -361,28 +380,29 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
                               }}
                             />
 
-                            <button
-                              ref={node}
-                              onClick={() => {
-                                onDeleteChildContext(i)
-                                setEditContextId('')
-                              }}
-                              className={cn(styles.contextDelete, {
-                                [styles.contextDeleteNone]: contextDeleteNone,
-                              })}
-                            >
-                              <Delete />
-                            </button>
+                            {editContextIdLoading ? null : (
+                              <button
+                                ref={node}
+                                onClick={() => {
+                                  onDeleteChildContext(i)
+                                  setEditContextId('')
+                                }}
+                                className={cn(styles.contextDelete)}
+                              >
+                                <Delete />
+                              </button>
+                            )}
                           </div>
                           <button
-                            disabled={nodeInput.current?.value.length < 2 || addDisabled}
+                            disabled={editContextId.length <= 2 || addDisabled}
                             onClick={() => {
                               node.current?.classList.add('valid')
                               _addContextId(editContextId)
                             }}
-                            className={cn(styles.addContext, {
-                              [styles.addContextDisabled]:
-                                nodeInput.current?.value.length < 2 || addDisabled,
+                            className={cn(styles.addContextDisabled, {
+                              [styles.addContext]:
+                                (editContextId.length >= 2 && !addDisabled) ||
+                                (nodeInput.current?.value.length >= 2 && !addDisabled),
                             })}
                           >
                             ADD

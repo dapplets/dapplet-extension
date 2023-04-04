@@ -1,9 +1,9 @@
-import { Provider } from '@ethersproject/providers'
 import { ethers } from 'ethers'
 import * as nearAPI from 'near-api-js'
 import { Near } from 'near-api-js'
 import { JsonRpcProvider } from 'near-api-js/lib/providers'
 import { browser } from 'webextension-polyfill-ts'
+import { NotImplementedError } from '../../../../common/errors'
 import { CacheMethod, generateGuid, waitTab } from '../../../../common/helpers'
 import { NearNetworkConfig } from '../../../../common/types'
 import { NearWallet } from '../interface'
@@ -51,8 +51,8 @@ export default class implements NearWallet {
     return this._nearWallet.requestSignTransactions(transactions, callbackUrl)
   }
 
-  connect(provider: Provider): ethers.Signer {
-    throw new Error('connect() is not implemented')
+  connect(): ethers.Signer {
+    throw new NotImplementedError()
   }
 
   async isAvailable() {
@@ -123,7 +123,7 @@ export default class implements NearWallet {
     return this._nearWallet.account()
   }
 
-  async signMessage(message: string): Promise<string> {
-    throw new Error('Not implemented')
+  async signMessage(): Promise<string> {
+    throw new NotImplementedError()
   }
 }

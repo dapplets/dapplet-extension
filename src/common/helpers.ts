@@ -1,7 +1,13 @@
 import * as semver from 'semver'
 import { browser, Tabs } from 'webextension-polyfill-ts'
 import { DEFAULT_BRANCH_NAME } from './constants'
-import { ChainTypes, ModuleId, UrlAvailability, WalletDescriptor } from './types'
+import {
+  ChainTypes,
+  MessageWrapperRequest,
+  ModuleId,
+  UrlAvailability,
+  WalletDescriptor,
+} from './types'
 
 export function getHostName(url: string): string {
   return new URL(url).hostname
@@ -488,7 +494,7 @@ export function CacheMethod() {
   }
 }
 
-export async function getThisTab(callInfo: any) {
+export async function getThisTab(callInfo: MessageWrapperRequest) {
   const thisTab = callInfo?.sender?.tab
   return thisTab
 }
@@ -607,4 +613,10 @@ export function Measure() {
 
     return descriptor
   }
+}
+
+export const numberWithCommas = (x: number) => {
+  const parts = x.toString().split('.')
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return parts.join('.')
 }

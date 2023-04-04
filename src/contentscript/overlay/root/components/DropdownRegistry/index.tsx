@@ -5,7 +5,6 @@ import { browser } from 'webextension-polyfill-ts'
 import { isValidUrl } from '../../../../../common/helpers'
 import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
 import { ReactComponent as Delete } from '../../assets/icons/mini-close.svg'
-import useAbortController from '../../hooks/useAbortController'
 import { addSettingsValueDropdown } from '../../utils/addSettingsValueDropdown'
 import styles from './DropdownRegistry.module.scss'
 
@@ -20,16 +19,14 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
   const [registryInput, setRegistryInput] = useState('')
   const [registryInputError, setRegistryInputError] = useState(null)
   const [registries, setRegistries] = useState([])
-  const abortController = useAbortController()
+
   useEffect(() => {
     const init = async () => {
       await loadRegistries()
     }
     init()
-    return () => {
-      abortController.abort()
-    }
-  }, [abortController.signal.aborted])
+    return () => {}
+  }, [])
 
   const loadRegistries = async () => {
     const { getRegistries } = await initBGFunctions(browser)
@@ -53,10 +50,10 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
 
   const visible = (hash: string): string => {
     if (hash.length > 38) {
-      const firstFourCharacters = hash.substring(0, 20)
-      const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 18)
+      const firstCharacters = hash.substring(0, 20)
+      const lastCharacters = hash.substring(hash.length - 0, hash.length - 18)
 
-      return `${firstFourCharacters}...${lastFourCharacters}`
+      return `${firstCharacters}...${lastCharacters}`
     } else {
       return hash
     }

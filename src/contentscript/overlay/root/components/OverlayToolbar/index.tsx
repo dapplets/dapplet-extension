@@ -17,7 +17,6 @@ import {
   ReactComponent as Account,
   ReactComponent as DappletsLogo,
 } from '../../assets/newIcon/mustache.svg'
-import { ReactComponent as Coolicon } from '../../assets/newIcon/squares.svg'
 import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { WidgetButton } from '../../widgets/button'
@@ -71,23 +70,6 @@ type TToggleOverlay = {
   getNode?: () => void
 }
 
-const ToggleOverlay = ({ onClick, className }: TToggleOverlay): ReactElement => {
-  return (
-    <button
-      data-testid="toggle-overlay-button"
-      className={cn(styles.toggleOverlay, className)}
-      onClick={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        onClick()
-        // getNode()
-      }}
-    >
-      <Coolicon />
-    </button>
-  )
-}
-
 export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
@@ -109,7 +91,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   useEffect(() => {
     const init = async () => {
       await _refreshData()
-      // await  handleUpdateNotifications()
     }
 
     init()

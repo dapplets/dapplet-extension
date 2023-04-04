@@ -4,12 +4,16 @@ Cypress.Commands.add('getByTestId', (selector, ...args) => {
   return cy.get(`[data-testid="${selector}"]`, ...args)
 })
 
-Cypress.Commands.add('openDappletsOverlay', (url) => {
+Cypress.Commands.add('openDappletsOverlay', (url, params?: Partial<{ wipe: boolean }>) => {
   // open context webpage
   cy.visit(url)
 
   // injects overlay
   cy.get('dapplets-overlay-manager')
+
+  if (params?.wipe) {
+    cy.window().then((win) => win.dapplets.wipeAllExtensionData())
+  }
 
   // add test trusted user
   cy.window().then((win) => win.dapplets.addTrustedUser(trustedUser))

@@ -7,7 +7,7 @@
   margin-top: 20px;
   padding: 10px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
 
 }
@@ -15,34 +15,34 @@
 .inputTitle {
   padding-bottom: 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
-  color: $PureBlack;
+  color: $pure-black;
 }
 
 .inputSearch {
   width: 100%;
   padding: 5px 13px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 5px;
 
   &::placeholder {
-    font-family: Roboto;
+    font-family: Roboto, sans-serif;
     font-size: 14px;
     font-weight: 400;
     font-style: italic;
     line-height: 149%;
-    color: $MainGrey;
+    color: $main-grey;
   }
 }
 
@@ -69,7 +69,7 @@
 
   font-size: 8px;
 
-  background: $PrimaryHover;
+  background: $primary-hover;
   border-radius: 50%;
 }
 
@@ -80,7 +80,7 @@
 }
 
 .tokenName {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 16px;
   font-weight: 700;
   line-height: 19px;
@@ -88,7 +88,7 @@
 }
 
 .tokenTicker {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
@@ -114,7 +114,7 @@
 
   padding-right: 5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
@@ -122,11 +122,11 @@
 }
 
 .infoPercent {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
-  color: $Primary;
+  color: $primary;
 }
 
 .infoPercentHight {

@@ -111,7 +111,7 @@ export class ContentItem extends React.Component<P, S> {
         return (
           <div key={i} className={cn(styles.wrapperCard)}>
             <div className={cn(styles.leftBlock)}>
-              <DappletImage isFavourites={false} storageRef={x.icon} className={styles.imgBlock} />
+              <DappletImage storageRef={x.icon} className={styles.imgBlock} />
 
               <DappletTitle
                 className={styles.title}

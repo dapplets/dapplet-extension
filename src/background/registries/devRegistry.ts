@@ -1,5 +1,7 @@
 import { ModuleTypes } from '../../common/constants'
+import { NotImplementedError } from '../../common/errors'
 import { fetchWithTimeout } from '../../common/helpers'
+import { JsonValue } from '../../common/types'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import { Registry, RegistryConfig } from './registry'
@@ -67,10 +69,7 @@ export class DevRegistry implements Registry {
     this._rootUrl = new URL(this.url).origin
   }
 
-  public async getModuleInfo(
-    contextIds: string[],
-    users: string[]
-  ): Promise<{ [contextId: string]: ModuleInfo[] }> {
+  public async getModuleInfo(contextIds: string[]): Promise<{ [contextId: string]: ModuleInfo[] }> {
     await this._cacheDevConfig()
     const result = {}
 
@@ -81,7 +80,7 @@ export class DevRegistry implements Registry {
 
       for (const moduleName of modules) {
         const info = Array.from(this._infoByUrl)
-          .map(([url, info]) => info)
+          .map(([, info]) => info)
           .find((info) => info.module.name === moduleName)
         result[contextId].push(info.module)
       }
@@ -93,7 +92,7 @@ export class DevRegistry implements Registry {
   public async getModuleInfoByName(name: string): Promise<ModuleInfo> {
     await this._cacheDevConfig()
     const info = Array.from(this._infoByUrl)
-      .map(([k, v]) => v.module)
+      .map(([, v]) => v.module)
       .find((v) => v.name === name)
     return info
   }
@@ -101,7 +100,7 @@ export class DevRegistry implements Registry {
   public async getVersionNumbers(name: string, branch: string): Promise<string[]> {
     await this._cacheDevConfig()
     const versions = Array.from(this._infoByUrl)
-      .map(([k, v]) => v)
+      .map(([, v]) => v)
       .filter((v) => v.module.name === name && v.version.branch === branch)
       .map((x) => x.version.version)
     return versions
@@ -110,7 +109,7 @@ export class DevRegistry implements Registry {
   public async getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo> {
     await this._cacheDevConfig()
     const info = Array.from(this._infoByUrl)
-      .map(([k, v]) => v)
+      .map(([, v]) => v)
       .find(
         (v) =>
           v.module.name === name && v.version.branch === branch && v.version.version === version
@@ -125,11 +124,7 @@ export class DevRegistry implements Registry {
   }
 
   // ToDo: merge it into getModuleInfo
-  public async getAllDevModules({
-    users,
-  }: {
-    users: string[]
-  }): Promise<{ module: ModuleInfo; versions: VersionInfo[] }[]> {
+  public async getAllDevModules(): Promise<{ module: ModuleInfo; versions: VersionInfo[] }[]> {
     await this._cacheDevConfig()
     const modules: { module: ModuleInfo; versions: VersionInfo[] }[] = []
     this._infoByUrl.forEach((info) =>
@@ -180,51 +175,47 @@ export class DevRegistry implements Registry {
     }
   }
 
-  public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
-    throw new Error("Development Registry doesn't support a module deployment.")
+  public async addModule(): Promise<void> {
+    throw new NotImplementedError()
   }
 
-  public async getOwnership(moduleName: string): Promise<string> {
+  public async getOwnership(): Promise<string> {
     return null
   }
 
-  public async transferOwnership(
-    moduleName: string,
-    newAccount: string,
-    oldAccount: string
-  ): Promise<void> {
-    return
+  public async transferOwnership(): Promise<void> {
+    throw new NotImplementedError()
   }
 
-  public async getContextIds(moduleName: string): Promise<string[]> {
-    throw new Error('Method not implemented.')
+  public async getContextIds(): Promise<string[]> {
+    throw new NotImplementedError()
   }
 
-  public async addContextId(moduleName: string, contextId: string) {
-    return
+  public async addContextId() {
+    throw new NotImplementedError()
   }
 
-  public async removeContextId(moduleName: string, contextId: string) {
-    return
+  public async removeContextId() {
+    throw new NotImplementedError()
   }
-  public async getAdmins(moduleName: string): Promise<string[]> {
-    throw new Error('Method not implemented.')
-  }
-
-  public async addAdmin(moduleName: string, adressAdmin: string) {
-    return
+  public async getAdmins(): Promise<string[]> {
+    throw new NotImplementedError()
   }
 
-  public async removeAdmin(moduleName: string, adressAdmin: string) {
-    return
+  public async addAdmin() {
+    throw new NotImplementedError()
   }
 
-  public async editModuleInfo(module: ModuleInfo): Promise<void> {
-    throw new Error('Not implemented')
+  public async removeAdmin() {
+    throw new NotImplementedError()
   }
 
-  public async getModuleNftUrl(moduleName: string): Promise<string> {
-    throw new Error('Not implemented')
+  public async editModuleInfo(): Promise<void> {
+    throw new NotImplementedError()
+  }
+
+  public async getModuleNftUrl(): Promise<string> {
+    throw new NotImplementedError()
   }
 
   private async _loadModuleAndVersionInfo(
@@ -308,7 +299,8 @@ export class DevRegistry implements Registry {
     manifest: DevManifestRaw,
     manifestUri: string
   ): Promise<DevManifest> {
-    const cache = new Map<string, any>()
+    const cache = new Map<string, JsonValue>()
+
     for (const key of ['name', 'version', 'description', 'main', 'dist', 'metadata']) {
       if (typeof manifest[key] === 'object' && !!manifest[key]['$ref']) {
         const [jsonUrl, path] = manifest[key]['$ref'].split('#/')
@@ -339,7 +331,7 @@ export class DevRegistry implements Registry {
       return false
     }
 
-    for (const [url, manifest] of Array.from(this._manifestByUrl)) {
+    for (const [, manifest] of Array.from(this._manifestByUrl)) {
       if (areMatches(manifest.contextIds || [], contextIds)) {
         result.push(manifest.name)
         result.push(...this._fetchModulesByContextId([manifest.name]))

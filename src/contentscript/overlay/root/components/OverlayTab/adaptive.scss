@@ -18,14 +18,10 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-
-    // padding-left: 10px;
   }
 
   .item {
     margin-top: 0;
-
-    // padding: 0 10px;
 
     &:not(:last-child) {
       margin: 0;
@@ -45,7 +41,5 @@
 
   .tabNotActive {
     width: auto;
-
-    // max-width: min-content;
   }
 }

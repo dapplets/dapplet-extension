@@ -18,7 +18,7 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
   border-radius: 10px;
 }
@@ -86,7 +86,7 @@
   background: #ebebeb;
   border-radius: 10px;
 
-  animation-name: listVisible;
+  animation-name: list-visible;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
@@ -110,13 +110,13 @@
 
   padding: 0 10px;
 
-  animation-name: rotateIsClose;
+  animation-name: rotate-is-close;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
 
   &.isOpen {
-    animation-name: rotateIsOpen;
+    animation-name: rotate-is-open;
     animation-duration: 0.2s;
     animation-timing-function: ease;
     animation-fill-mode: forwards;

@@ -38,7 +38,7 @@
   height: 542px;
   padding: 22px 15px 16px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
   box-shadow: 0 4px 4px rgb(0 0 0 / 25%);
 
@@ -66,15 +66,15 @@
   width: 20px;
   height: 20px;
 
-  background-color: $Primary;
+  background-color: $primary;
   border-radius: 50%;
 
   &:hover {
-    background-color: $PrimaryHover;
+    background-color: $primary-hover;
   }
 
   &:active {
-    background-color: $PrimaryPressed;
+    background-color: $primary-pressed;
   }
 }
 
@@ -96,7 +96,7 @@
 
   padding: 0 0 24px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 700;
   line-height: 100%;

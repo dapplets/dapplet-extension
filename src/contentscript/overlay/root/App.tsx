@@ -5,6 +5,7 @@ import cn from 'classnames'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import {
   MemoryRouter,
   Navigate,
@@ -685,8 +686,12 @@ class _App extends React.Component<P, S> {
 
 const __App = withRouter(_App)
 
+const queryClient = new QueryClient()
+
 export const App = (props: any) => (
   <MemoryRouter>
-    <__App {...props} />
+    <QueryClientProvider client={queryClient}>
+      <__App {...props} />
+    </QueryClientProvider>
   </MemoryRouter>
 )

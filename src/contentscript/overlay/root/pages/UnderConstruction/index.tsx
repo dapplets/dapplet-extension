@@ -120,7 +120,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
       setCurrentAccount(currentAccount)
       setLoading(false)
-    } else return
+    }
   }
 
   const deployButtonClickHandler = async () => {
@@ -258,7 +258,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
                   <input
                     required
                     readOnly={mode === FormMode.Editing}
-                    placeholder="Module ID like module_name.dapplet-base.eth"
+                    placeholder="Module ID like module-name.dapplet-base.eth"
                     onChange={(e) => {
                       mi.name = e.target.value
                       if (mi.name.length < 2) {
