@@ -1,4 +1,5 @@
-import { providers, Signer, utils } from 'ethers'
+import { providers, Signer } from 'ethers'
+import { NotImplementedError } from '../../common/errors'
 import * as EventBus from '../../common/global-event-bus'
 import { mergeSameWallets } from '../../common/helpers'
 import {
@@ -111,14 +112,12 @@ export class WalletService {
           return address
         }
 
-        async signMessage(message: string | utils.Bytes): Promise<string> {
-          throw new Error('Method not implemented.')
+        async signMessage(): Promise<string> {
+          throw new NotImplementedError()
         }
 
-        async signTransaction(
-          transaction: utils.Deferrable<providers.TransactionRequest>
-        ): Promise<string> {
-          throw new Error('Method not implemented.')
+        async signTransaction(): Promise<string> {
+          throw new NotImplementedError()
         }
 
         async sendTransaction(
@@ -130,8 +129,8 @@ export class WalletService {
           return signer.sendTransaction(transaction)
         }
 
-        connect(provider: providers.Provider): Signer {
-          throw new Error('Method not implemented.')
+        connect(): Signer {
+          throw new NotImplementedError()
         }
       })()
 

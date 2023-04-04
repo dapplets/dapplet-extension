@@ -1,3 +1,5 @@
+@import './adaptive';
+
 .loadingListDapplets {
   z-index: 3;
 
@@ -7,13 +9,13 @@
   height: calc(100vh - 140px);
   margin: 0 auto;
 
-  // background: #f4f4f4;
   background: #fff;
   background-image: url("../../assets/svg/loaderSettings.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 139px 139px;
 }
-.isGrayPageColor{background: #f4f4f4;}
 
-@import './adaptive';
+.isGrayPageColor{
+  background: #f4f4f4;
+}

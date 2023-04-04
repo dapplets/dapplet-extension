@@ -430,6 +430,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 })}
               ></span>
             </span>
+
             {isPinnedNotification && getAnimateNotifification(true)}
             {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget, isPinnedAnimateWidget)}
 
@@ -440,7 +441,8 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               (newWidgets && newWidgets.length > 0
                 ? getWigetsConstructor(newWidgets).map((x) => x)
                 : null)}
-            {p.module && p.module.length && p.module.filter((x) => x.isActive) && (
+
+            {p.module && p.module.length && p.module.filter((x) => x.isActive) ? (
               <>
                 <div
                   data-testid={isShowTabs ? 'toolbar-show' : 'toolbar-hide'}
@@ -480,7 +482,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                     })}
                 </div>
                 <div
-                  className={cn(styles.miniButtonBlock, {
+                  className={cn({
                     [styles.divHidden]:
                       p.module &&
                       p.module.length &&
@@ -504,7 +506,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                   )}
                 </div>
               </>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

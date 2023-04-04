@@ -14,6 +14,31 @@ import { StorageRefImage } from '../../components/StorageRefImage'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
 
+enum DeploymentStatus {
+  Unknown,
+  Deployed,
+  NotDeployed,
+  NewModule,
+}
+
+enum DependencyType {
+  Dependency,
+  Interface,
+}
+
+enum FormMode {
+  Deploying,
+  Creating,
+  Editing,
+}
+
+type DependencyChecking = {
+  name: string
+  version: string
+  type: DependencyType
+  isExists?: boolean
+}
+
 export interface UnderConstructionInfoProps {
   ModuleInfo: any
   ModuleVersion: any
@@ -65,11 +90,10 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       }
     }
     init()
-    return () => {}
   }, [])
 
   const _updateData = async () => {
-    const { getRegistries, getTrustedUsers, getContextIds } = await initBGFunctions(browser)
+    const { getRegistries, getContextIds } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)

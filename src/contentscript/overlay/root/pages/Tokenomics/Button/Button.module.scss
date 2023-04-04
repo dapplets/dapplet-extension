@@ -1,8 +1,10 @@
 @import '../../../assets/styles/null';
 @import '../../../assets/styles/fonts';
 @import '../../../assets/styles/color.variables';
+
 .root {
   display: flex;
+  gap: 12px;
   align-items: center;
 
   padding: 6px 10px;
@@ -10,7 +12,6 @@
   border: 1px solid transparent;
   border-radius: 10px;
   outline: none;
-  gap: 12px;
 }
 
 .root:focus {
@@ -18,22 +19,23 @@
 }
 
 .primary {
-  color: $PureWhite;
-  background-color: $Primary;
+  color: $pure-white;
+  background-color: $primary;
 }
 
 .outline {
-  border: 1px solid $Primary;
   background-color: transparent;
+  border: 1px solid $primary;
 }
 
 .link {
   padding: 0;
 
-  color: $Primary;
+  color: $primary;
+
+  background-color: transparent;
   border: none;
   outline: none;
-  background-color: transparent;
 }
 
 .link:hover {
@@ -41,70 +43,72 @@
 }
 
 .outline.primary {
-  color: $Primary;
-  stroke: $Primary;
+  color: $primary;
   fill: transparent;
+  stroke: $primary;
 }
 
 .outline.primary:hover {
-  color: $PrimaryHover;
-  border: 1px solid $PrimaryHover;
+  color: $primary-hover;
+  border: 1px solid $primary-hover;
 }
+
 .outline.primary:active {
-  color: $PrimaryPressed;
-  border: 1px solid $PrimaryPressed;
+  color: $primary-pressed;
+  border: 1px solid $primary-pressed;
 }
 
 .outline.primary:hover svg {
   fill: transparent;
+
   path {
-    stroke: $PrimaryHover;
+    stroke: $primary-hover;
   }
 }
+
 .outline.primary:active svg {
   fill: transparent;
+
   path {
-    stroke: $PrimaryPressed;
+    stroke: $primary-pressed;
   }
 }
 
 .lg {
+  display: flex;
+  justify-content: center;
+
+  width: 94%;
+  margin: 0 auto;
   padding: 12px 72px;
 
   border-radius: 10px;
-  margin: 0 auto;
-  width: 94%;
 
-  display: flex;
-  justify-content: center;
   &:hover {
-    background-color: $PrimaryHover;
+    background-color: $primary-hover;
   }
 
   &:active {
-    background-color: $PrimaryPressed;
+    background-color: $primary-pressed;
   }
 }
 
 .sm {
   padding: 0 8px;
-
   border-radius: 4px;
 }
 
 .sv {
   padding: 12px 46.5px;
-
   border-radius: 10px;
 }
 
 .round {
+  background-color: $primary;
   border-radius: 50%;
-  background-color: $Primary;
 }
 
 .disabled {
   pointer-events: none;
-
   opacity: 0.9;
 }

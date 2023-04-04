@@ -107,7 +107,7 @@ class ConnectedAccounts {
 
     const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
-    const { requestId } = await openConnectedAccountsPopup(
+    const result = await openConnectedAccountsPopup(
       {
         [isUnlink ? 'accountsToDisconnect' : 'accountsToConnect']: [
           {
@@ -127,7 +127,7 @@ class ConnectedAccounts {
       },
       thisTab.id
     )
-    return canConnect ? requestId : -1
+    return canConnect && result ? result.requestId : -1
   }
 
   public async changeStatus({

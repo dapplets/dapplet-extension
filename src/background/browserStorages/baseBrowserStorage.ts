@@ -5,10 +5,7 @@ import Base from '../../common/models/base'
 export default abstract class BaseBrowserStorage<T extends Base> {
   private _mapperService = new MapperService()
 
-  public constructor(
-    private _TConstructor: new (...args: any[]) => T,
-    private _storageName: string
-  ) {}
+  public constructor(private _TConstructor: new () => T, private _storageName: string) {}
 
   async getAll(filter?: (item: T) => boolean): Promise<T[]> {
     const result = await browser.storage.local.get(null)

@@ -4,7 +4,7 @@
 
 /* Segoe UI Regular */
 @font-face {
-  font-family: SegoeUIRegular;
+  font-family: SegoeUIRegular, sans-serif;
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -39,7 +39,7 @@
   font-size: 22px;
   font-weight: 700;
   line-height: 26px;
-  color: $MainBlack;
+  color: $main-black;
 }
 
 .cardType {
@@ -50,7 +50,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 120%;
-  color: $Secondary;
+  color: $secondary;
   text-transform: uppercase;
 }
 
@@ -62,7 +62,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 120%;
-  color: $ContentBlack;
+  color: $content-black;
 }
 
 .cardName {
@@ -73,7 +73,7 @@
   font-weight: 500;
   font-style: normal;
   line-height: 120%;
-  color: $ContentBlack;
+  color: $content-black;
 }
 
 .blockInfo {
@@ -91,7 +91,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 120%;
-  color: $ContentBlack;
+  color: $content-black;
   text-transform: lowercase;
 }
 
@@ -105,7 +105,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 120%;
-  color: $Secondary;
+  color: $secondary;
   text-transform: lowercase;
 }
 
@@ -121,15 +121,15 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $Secondary;
+  color: $secondary;
   text-transform: lowercase;
 
   &:hover {
-    color: $SecondaryHover;
+    color: $secondary-hover;
   }
 
   &:active {
-    color: $SecondaryPressed;
+    color: $secondary-pressed;
   }
 }
 
@@ -153,24 +153,24 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $PureWhite;
+  color: $pure-white;
 
-  background: $Primary;
+  background: $primary;
   border-radius: 4px;
 
   &:hover {
-    background: $PrimaryHover;
+    background: $primary-hover;
   }
 
   &:active {
-    background: $PrimaryPressed;
+    background: $primary-pressed;
   }
 
   &:disabled {
     cursor: default;
-    color: $StrokeColor;
+    color: $stroke-color;
     background: inherit;
-    border: 1px solid $StrokeColor;
+    border: 1px solid $stroke-color;
   }
 }
 
@@ -184,7 +184,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 120%;
-  color: $PureWhite;
+  color: $pure-white;
 
   background: #5ab5e8;
   border-radius: 10px;
@@ -198,7 +198,7 @@
     font-weight: 500;
     font-style: normal;
     line-height: 120%;
-    color: $PureWhite;
+    color: $pure-white;
   }
 
   p {
@@ -209,7 +209,7 @@
     font-weight: 400;
     font-style: normal;
     line-height: 120%;
-    color: $PureWhite;
+    color: $pure-white;
     text-transform: lowercase;
   }
 
@@ -240,7 +240,7 @@
     width: calc(100% - 30px);
     height: 1px;
 
-    background: $StrokeColor;
+    background: $stroke-color;
     border-radius: 2px;
   }
 }
@@ -257,7 +257,7 @@
 .title {
   margin-left: 5px;
 
-  font-family: SegoeUIRegular;
+  font-family: SegoeUIRegular, sans-serif;
   font-size: 16px !important;
   font-weight: 400 !important;
   color: #2a2a2a !important;

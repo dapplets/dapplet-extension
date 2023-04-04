@@ -7,7 +7,7 @@
   margin-top: 20px;
   padding: 10px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
 
 }
@@ -19,7 +19,7 @@
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
-  color: $PureBlack;
+  color: $pure-black;
 }
 
 .inputSearch {
@@ -30,10 +30,10 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 5px;
 
   &::placeholder {
@@ -42,7 +42,7 @@
     font-weight: 400;
     font-style: italic;
     line-height: 149%;
-    color: $MainGrey;
+    color: $main-grey;
   }
 }
 
@@ -69,7 +69,7 @@
 
   font-size: 8px;
 
-  background: $PrimaryHover;
+  background: $primary-hover;
   border-radius: 50%;
 }
 
@@ -126,7 +126,7 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
-  color: $Primary;
+  color: $primary;
 }
 
 .infoPercentHight {

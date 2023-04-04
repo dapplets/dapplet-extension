@@ -19,7 +19,7 @@
   font-size: 14px;
   font-weight: 600;
   line-height: 16px;
-  color: $MainGrey;
+  color: $main-grey;
 
   &::before {
     content: "";
@@ -32,23 +32,23 @@
     width: 120%;
     height: 3px;
 
-    background-color: $MainGrey;
+    background-color: $main-grey;
     border-radius: 5px;
   }
 
   &:hover {
-    color: $ContentBlack;
+    color: $content-black;
 
     &::before {
-      background-color: $ContentBlack;
+      background-color: $content-black;
     }
   }
 
   &:active {
-    color: $MainBlack;
+    color: $main-black;
 
     &::before {
-      background-color: $MainBlack;
+      background-color: $main-black;
     }
   }
 }
@@ -66,34 +66,34 @@
   font-size: 10px;
   color: #fff;
 
-  background: $StrokeColor;
+  background: $stroke-color;
   border-radius: 100px;
 }
 
 .isActive {
-  color: $Primary;
+  color: $primary;
 
   &::before {
-    background-color: $Primary;
+    background-color: $primary;
   }
 
   &:hover {
-    color: $PrimaryHover;
+    color: $primary-hover;
 
     &::before {
-      background-color: $PrimaryHover;
+      background-color: $primary-hover;
     }
   }
 
   &:active {
-    color: $PrimaryPressed;
+    color: $primary-pressed;
 
     &::before {
-      background-color: $PrimaryPressed;
+      background-color: $primary-pressed;
     }
   }
 
   .found {
-    background-color: $Primary;
+    background-color: $primary;
   }
 }

@@ -30,7 +30,7 @@
   border-radius: 50%;
 
   &.empty {
-    background-color: $WebBG;
+    background-color: $web-bg;
   }
 }
 
@@ -42,13 +42,13 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainBlack;
+  color: $main-black;
 }
 
 .nameUserActive {
-  background: $Primary !important;
+  background: $primary !important;
 
   .nameUser {
-    color: $PureWhite;
+    color: $pure-white;
   }
 }

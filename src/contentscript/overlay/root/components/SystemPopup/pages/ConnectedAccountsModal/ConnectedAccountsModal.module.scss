@@ -15,7 +15,7 @@
   margin: 3px;
   padding: 0 5px 0 2px;
 
-  background-color: $WebBG;
+  background-color: $web-bg;
   border-radius: 200px 140px 140px 200px;  
 }
 
@@ -41,13 +41,13 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainBlack;
+  color: $main-black;
 }
 
 .nameUserActive {
-  background: $Primary;
+  background: $primary;
 
   .nameUser {
-    color: $PureWhite;
+    color: $pure-white;
   }
 }

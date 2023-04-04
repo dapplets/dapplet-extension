@@ -17,10 +17,16 @@ import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
+import { globalClear } from 'caching-decorator'
 import { Runtime } from 'webextension-polyfill'
 import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
 import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
-import { StorageRef } from '../../common/types'
+import {
+  DappletLoadingResult,
+  DappletRuntimeResult,
+  MessageWrapperRequest,
+  StorageRef,
+} from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
 import { AnalyticsGoals, AnalyticsService } from './analyticsService'
 import GlobalConfigService from './globalConfigService'
@@ -290,7 +296,10 @@ export default class FeatureService {
     order: number,
     registryUrl: string,
     tabId: number
-  ) {
+  ): Promise<DappletRuntimeResult | null> {
+    // Clear cached dependencies
+    globalClear(this._moduleManager, '_getOptimizedChildDependenciesAndManifest')
+
     hostnames = Array.from(new Set(hostnames)) // deduplicate
 
     if (!version && isActive) {
@@ -316,13 +325,13 @@ export default class FeatureService {
     }
 
     try {
-      const runtime = await new Promise<void>(async (resolve, reject) => {
+      const runtime = await new Promise<DappletRuntimeResult>(async (resolve, reject) => {
         // listening of loading/unloading from contentscript
         const listener = (message, sender: Runtime.MessageSender) => {
           if (sender.tab.id !== tabId) return
           if (!message || !message.type || !message.payload) return
 
-          const p = message.payload
+          const p = message.payload as DappletLoadingResult
           if (message.type === 'FEATURE_LOADED') {
             if (
               p.name === name &&
@@ -401,6 +410,8 @@ export default class FeatureService {
         config.activeFeatures[name].runtime = runtime
         await this._globalConfigService.updateSiteConfig(config)
       }
+
+      return runtime
     } catch (err) {
       // revert config if error
       for (const hostname of hostnames) {
@@ -427,12 +438,12 @@ export default class FeatureService {
     hostnames: string[],
     order: number,
     registryUrl: string,
-    caller: any
-  ): Promise<void> {
-    const tabId = caller?.sender?.tab?.id
+    req: MessageWrapperRequest
+  ): Promise<DappletRuntimeResult | null> {
+    const tabId = req?.sender?.tab?.id
     if (!tabId) throw new Error('Tab ID is required')
     this._analyticsService.track({ idgoal: AnalyticsGoals.DappletActivated, dapplet: name })
-    await this._setFeatureActive(name, version, hostnames, true, order, registryUrl, tabId)
+    return await this._setFeatureActive(name, version, hostnames, true, order, registryUrl, tabId)
   }
 
   async deactivateFeature(
@@ -441,12 +452,12 @@ export default class FeatureService {
     hostnames: string[],
     order: number,
     registryUrl: string,
-    caller: any
-  ): Promise<void> {
-    const tabId = caller?.sender?.tab?.id
+    req: MessageWrapperRequest
+  ): Promise<DappletRuntimeResult | null> {
+    const tabId = req?.sender?.tab?.id
     if (!tabId) throw new Error('Tab ID is required')
     this._analyticsService.track({ idgoal: AnalyticsGoals.DappletDeactivated, dapplet: name })
-    await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
+    return await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
   }
 
   async reloadFeature(
@@ -455,9 +466,9 @@ export default class FeatureService {
     hostnames: string[],
     order: number,
     registryUrl: string,
-    caller: any
+    req: MessageWrapperRequest
   ): Promise<void> {
-    const tabId = caller?.sender?.tab?.id
+    const tabId = req?.sender?.tab?.id
     if (!tabId) throw new Error('Tab ID is required')
     const modules = await this.getActiveModulesByHostnames(hostnames)
     if (!modules.find((m) => m.name === name)) return
@@ -495,11 +506,8 @@ export default class FeatureService {
       }
     }
 
-    // Skip if there is no active dapplets
-    const wildcardConfig = await this._globalConfigService.getSiteConfigById(CONTEXT_ID_WILDCARD)
-    if (!Object.values(wildcardConfig.activeFeatures).find((x) => x.isActive === true)) {
-      return modules
-    }
+    const isThereActiveDapplets = await this._globalConfigService.isThereActiveDapplets()
+    if (!isThereActiveDapplets) return modules
 
     const configs = await Promise.all(
       contextIds.map((h) => this._globalConfigService.getSiteConfigById(h))

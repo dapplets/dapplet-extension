@@ -13,8 +13,8 @@
   margin: 2.5px 0;
   padding: 10px;
 
-  background: $PureWhite;
-  border: 1px solid $StrokeColor;
+  background: $pure-white;
+  border: 1px solid $stroke-color;
   border-radius: 10px;
 }
 
@@ -41,7 +41,7 @@
   font-weight: 500;
   font-style: normal;
   line-height: 100%;
-  color: $PureWhite;
+  color: $pure-white;
 
   background: #5ab5e8;
   border-radius: 10px;
@@ -71,7 +71,7 @@
       fill: none !important;
 
       path {
-        fill: $StrokeColor;
+        fill: $stroke-color;
       }
     }
   }
@@ -99,7 +99,7 @@
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
-  color: $ContentBlack;
+  color: $content-black;
 }
 
 .label {

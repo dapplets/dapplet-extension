@@ -29,8 +29,8 @@
 }
 
 .errorInputDefault {
-  color: $Primary;
-  border: 1px solid $Primary;
+  color: $primary;
+  border: 1px solid $primary;
 }
 
 .buttonInputDefault {
@@ -41,7 +41,7 @@
   svg {
     &:hover {
       path {
-        fill: $ContentBlack;
+        fill: $content-black;
       }
     }
   }
@@ -56,7 +56,7 @@
   font-weight: 400;
   color: #d9304f;
 
-  animation-name: openError;
+  animation-name: open-error;
   animation-duration: 3s;
   animation-timing-function: linear;
   animation-fill-mode: forwards;

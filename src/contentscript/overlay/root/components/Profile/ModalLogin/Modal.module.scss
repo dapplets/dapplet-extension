@@ -41,7 +41,7 @@
   background: #fff;
   border-radius: 20px;
 
-  animation-name: slideRight;
+  animation-name: slide-right;
   animation-duration: 0.5s;
   animation-timing-function: ease;
 }
@@ -51,7 +51,7 @@
 }
 
 .isNotVisible {
-  animation-name: slideLeft;
+  animation-name: slide-left;
   animation-duration: 0.3s;
   animation-timing-function: ease;
 }
@@ -97,7 +97,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 19px;
-  color: $MainBlack;
+  color: $main-black;
   text-transform: capitalize;
 }
 
@@ -120,7 +120,7 @@
     width: 100%;
     height: 1px;
 
-    background: $StrokeColor;
+    background: $stroke-color;
   }
 }
 
@@ -140,7 +140,7 @@
   }
 
   &:active {
-    background: $StrokeColor;
+    background: $stroke-color;
   }
 }
 
@@ -178,7 +178,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainBlack;
+  color: $main-black;
   text-transform: capitalize;
 }
 
@@ -197,7 +197,7 @@
   width: 20px;
   height: 20px;
 
-  background-color: $AppBG;
+  background-color: $app-bg;
   filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
   border-radius: 50%;
 
@@ -213,7 +213,7 @@
       transition: all 0.5s;
 
       path {
-        fill: $PrimaryHover !important;
+        fill: $primary-hover !important;
       }
     }
   }
@@ -224,7 +224,7 @@
       transition: all 0.5s;
 
       path {
-        fill: $PrimaryPressed !important;
+        fill: $primary-pressed !important;
       }
     }
   }
@@ -241,7 +241,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainBlack;
+  color: $main-black;
   text-overflow: ellipsis;
   text-transform: capitalize;
   text-transform: lowercase;
@@ -271,14 +271,14 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainGrey;
+  color: $main-grey;
 
   &:hover {
-    color: $PrimaryHover;
+    color: $primary-hover;
   }
 
   &:active {
-    color: $PrimaryPressed;
+    color: $primary-pressed;
   }
 }
 
@@ -286,11 +286,11 @@
   cursor: default;
 
   &:hover {
-    color: $MainGrey;
+    color: $main-grey;
   }
 
   &:active {
-    color: $MainGrey;
+    color: $main-grey;
   }
 }
 
@@ -311,10 +311,10 @@
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $ContentBlack;
+  color: $content-black;
   text-align: center;
 
-  background: $WebBG;
+  background: $web-bg;
   border-radius: 100px;
   box-shadow: 0 2px 2px -1px rgb(0 0 6 / 50%);
 }
@@ -353,7 +353,7 @@
     width: 20px;
     height: 20px;
 
-    background: $AppBG;
+    background: $app-bg;
     border-radius: 100px;
     box-shadow: 0 2px 2px rgb(0 0 0 / 10%);
 
@@ -368,7 +368,7 @@
 
       svg {
         path {
-          fill: $PrimaryHover !important;
+          fill: $primary-hover !important;
         }
       }
     }
@@ -380,7 +380,7 @@
 
       svg {
         path {
-          fill: $PrimaryPressed !important;
+          fill: $primary-pressed !important;
         }
       }
     }

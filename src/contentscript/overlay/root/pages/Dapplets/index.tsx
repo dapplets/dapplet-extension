@@ -67,8 +67,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       await _refreshData()
 
       setLoadingListDapplets(false)
-
-      await loadTrustedUsers()
     }
 
     init()
@@ -78,7 +76,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     } else {
       setLoadingListDapplets(false)
     }
-    return () => {}
   }, [dropdownListValue])
 
   useEffect(() => {
@@ -104,7 +101,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         ? await getFeaturesByHostnames(contextIds, dropdownListValue)
         : []
 
-      const newDappletsList = features
+      const rightDapplets = features
         .filter((f) => f.type === ModuleTypes.Feature)
         .map((f) => ({
           ...f,
@@ -114,12 +111,19 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           error: null,
           versions: [],
         }))
-      setModule(newDappletsList)
 
-      setDapplets(newDappletsList)
-
-      newDappletsList.map((x) => {
-        if (x.isActive) getTabsForDapplet(x)
+      setDapplets((leftDapplets) => {
+        // remove disappeared dapplets from the list
+        // leave existing dapplets at the beginning of the list (innerJoin)
+        // add new dapplets to the end of the list (exclusiveRightJoin)
+        const innerJoin = leftDapplets.filter((x) => rightDapplets.find((y) => y.name === x.name))
+        const exclusiveRightJoin = rightDapplets.filter(
+          (x) => !leftDapplets.find((y) => y.name === x.name)
+        )
+        const rightJoin = [...innerJoin, ...exclusiveRightJoin]
+        setModule(rightJoin)
+        rightJoin.filter((x) => x.isActive).forEach(getTabsForDapplet)
+        return rightJoin
       })
     } catch (err) {
       console.error(err)
@@ -127,15 +131,18 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
   }
 
-  const _updateFeatureState = (name: string, f: any) => {
-    const newDapplets = dapplets.map((feature) => {
-      if (feature.name == name) {
-        Object.entries(f).forEach(([k, v]) => (feature[k] = v))
-      }
-
-      return feature
+  const _updateFeatureState = (name: string, f: Partial<ManifestAndDetails>) => {
+    setDapplets((dapplets) => {
+      return dapplets.map((dapplet) => {
+        if (dapplet.name == name) {
+          const copy = { ...dapplet }
+          Object.entries(f).forEach(([k, v]) => (copy[k] = v))
+          return copy
+        } else {
+          return dapplet
+        }
+      })
     })
-    return newDapplets
   }
 
   const onOpenDappletAction = async (f: ManifestAndDetails) => {
@@ -208,8 +215,15 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
     try {
       if (isActive) {
-        await activateFeature(name, version, targetContextIds, order, sourceRegistry.url)
+        const { isActionHandler, isHomeHandler } = await activateFeature(
+          name,
+          version,
+          targetContextIds,
+          order,
+          sourceRegistry.url
+        )
         getTabsForDapplet(module)
+        _updateFeatureState(name, { isLoading: false, isActionHandler, isHomeHandler })
       } else {
         await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url)
 
@@ -221,10 +235,13 @@ export const Dapplets: FC<DappletsProps> = (props) => {
             .map((tab) => {
               handleCloseTabClick(tab)
             })
-      }
 
-      // await _refreshData()
-      _updateFeatureState(name, { isLoading: false })
+        _updateFeatureState(name, {
+          isLoading: false,
+          isActionHandler: false,
+          isHomeHandler: false,
+        })
+      }
     } catch (err) {
       console.error(err)
       _updateFeatureState(name, { isActive: !isActive, error: err.message })
@@ -267,10 +284,6 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const onOpenStoreAuthor = async (f: ManifestAndDetails) => {
     const url = `${DAPPLETS_STORE_URL}/#sortType=Sort%20A-Z&addressFilter=${f.author}`
     window.open(url, '_blank')
-  }
-  const loadTrustedUsers = async () => {
-    const { getTrustedUsers } = await initBGFunctions(browser)
-    const trustedUsers = await getTrustedUsers()
   }
 
   const filteredDapplets = useMemo(() => {

@@ -2,10 +2,10 @@
 @import "../../assets/styles/fonts";
 @import "../../assets/styles/color.variables";
 @import "../../assets/styles/animate";
+@import "./adaptive";
 
-/* Segoe UI Regular */
 @font-face {
-  font-family: SegoeUIRegular;
+  font-family: SegoeUIRegular, sans-serif;
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -21,18 +21,16 @@
 
   font-family: Roboto, sans-serif;
 
-  border: 1px solid $StrokeColor;
+  border: 1px solid $stroke-color;
   border-radius: 4px;
 
-  // height: 35px;
-// transition: all .5s;
-  animation-name: isOpenSearch;
+  animation-name: is-open-search;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
 }
 
-@keyframes isOpenSearch {
+@keyframes is-open-search {
   0% {
     height: 0;
     opacity: 0;
@@ -50,21 +48,20 @@
 }
 
 [class*=" close"] {
-  // background: #000;
-  animation-name: isCloseSearch;
+  animation-name: is-close-search;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
 
   .searchIcon{
-    animation-name: isCloseSearch;
+    animation-name: is-close-search;
     animation-duration: 0.2s;
     animation-timing-function: ease;
     animation-fill-mode: forwards;
   }
 
   .labelSearchModule{
-    animation-name: isCloseSearch;
+    animation-name: is-close-search;
     animation-duration: 0.2s;
     animation-timing-function: ease;
     animation-fill-mode: forwards
@@ -75,14 +72,13 @@
 .labelSearchModule {
   width: 100%;
 
-  // height: 33px;
-  animation-name: isOpenSearchLabel;
+  animation-name: is-open-search-label;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
 }
 
-@keyframes isOpenSearchLabel {
+@keyframes is-open-search-label {
   0% {
     height: 0;
   }
@@ -96,7 +92,7 @@
   }
 }
 
-@keyframes isCloseSearch {
+@keyframes is-close-search {
   0% {
     height: 35px;
     opacity: 1;
@@ -109,10 +105,9 @@
 
   100% {
     height: 0;
-   opacity: 0;
+    opacity: 0;
   }
 }
-
 
 .searchIcon {
   cursor: pointer;
@@ -122,32 +117,26 @@
   justify-content: center;
 
   width: 35px;
-
-  // height: 100%;
   padding: 10px 8px;
 
   background: #f6f8fa;
   border: none;
   border-radius: 4px 0 0 4px;
 
-  animation-name: isOpenSearchLabel;
+  animation-name: is-open-search-label;
   animation-duration: 0.2s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
 
-  svg path {
-    // fill: $MainGrey;
-  }
-
   &:hover {
     svg path{
-      stroke: $PrimaryHover;
+      stroke: $primary-hover;
     }
   }
 
   &:active {
     svg path {
-      stroke: $PrimaryPressed;
+      stroke: $primary-pressed;
     }
   }
 }
@@ -162,11 +151,11 @@
   height: 100%;
   padding: 0 30px 0 10px;
 
-  font-family: SegoeUIRegular;
+  font-family: SegoeUIRegular, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 16px;
-  color: $MainGrey;
+  color: $main-grey;
 
   background: #fff;
   border-radius: 0 4px 4px 0;
@@ -182,27 +171,18 @@
   transform: translateY(-50%);
 
   height: 100%;
-
-  // animation-name: slideRightClose;
-
-  // animation-duration: 0.4s;
-
-  // animation-timing-function: ease;
-  // animation-fill-mode: forwards;
 }
 
 span {
   &:hover {
     svg path {
-      fill: $PrimaryHover;
+      fill: $primary-hover;
     }
   }
 
   &:active {
     svg path {
-      fill: $PrimaryPressed;
+      fill: $primary-pressed;
     }
   }
 }
-
-@import "./adaptive";

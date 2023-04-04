@@ -1,0 +1,25 @@
+@import '../../../../assets/styles/null';
+@import '../../../../assets/styles/fonts';
+@import '../../../../assets/styles/color.variables';
+
+.skip{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 135px;
+    height: 32px;
+
+    font-family: Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 149%;
+    color: $main-grey;
+    text-decoration-line: underline;
+
+    background: inherit;
+
+    &:hover{
+        color:   $content-black;
+    }
+}
