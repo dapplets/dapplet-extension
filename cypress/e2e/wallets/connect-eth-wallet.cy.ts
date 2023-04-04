@@ -7,8 +7,7 @@ describe('connect Ethereum build-in wallet', () => {
     14,
     it('connect Ethereum build-in wallet', () => {
       // open overlay and run the dapplet
-      cy.openDappletsOverlay(url)
-      cy.wait(10000)
+      cy.openDappletsOverlay(url, { wipe: true })
 
       cy.get('dapplets-overlay-manager').getByTestId('profile-widget').click()
 
@@ -17,11 +16,7 @@ describe('connect Ethereum build-in wallet', () => {
         .getByTestId('add-wallet-btn-profile-widget')
         .click()
 
-      cy.wait(4000)
-
-      cy.get('dapplets-overlay-manager').find('[data-testid=popup-item]')
-
-      cy.wait(4000)
+      cy.get('dapplets-overlay-manager').getByTestId('wallet-to-connect-dapplets_goerli').click()
 
       cy.get('dapplets-overlay-manager')
         .find('[data-testid=profile-widget]')

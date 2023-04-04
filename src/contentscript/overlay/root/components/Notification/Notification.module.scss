@@ -1,6 +1,7 @@
 @import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
 @import '../../assets/styles/null';
+@import './adaptive';
 
 .wrapper {
   position: relative;
@@ -23,7 +24,7 @@
 
 .isRead {
   background: #f5f5f5;
-  border: 1px solid $StrokeColor;
+  border: 1px solid $stroke-color;
 }
 
 .header {
@@ -38,7 +39,7 @@
   text-transform: uppercase;
 
   background-color: #fff;
-  border: 1px solid $WebBG;
+  border: 1px solid $web-bg;
   border-radius: 10px;
 }
 
@@ -65,7 +66,7 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
-  color: $ContentBlack;
+  color: $content-black;
 }
 
 .date {
@@ -96,11 +97,8 @@
   font-size: 12px;
   font-weight: 400;
   line-height: 149%;
-  color: $ContentBlack;
+  color: $content-black;
   text-overflow: ellipsis;
-}
-
-.button {
 }
 
 .link {
@@ -110,7 +108,7 @@
 
   font-size: 10px;
   line-height: 100%;
-  color: $Primary;
+  color: $primary;
   text-transform: uppercase;
 }
 
@@ -125,5 +123,3 @@
   align-items: flex-end;
   width: 97%;
 }
-
-@import './adaptive';

@@ -13,7 +13,6 @@ import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
 import { TabLoader } from '../../components/TabLoader'
-import useAbortController from '../../hooks/useAbortController'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
 
@@ -34,6 +33,7 @@ enum FormMode {
   Creating,
   Editing,
 }
+
 type DependencyChecking = {
   name: string
   version: string
@@ -102,7 +102,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [visibleContextId, setVisibleContextId] = useState([])
   const [contextDeleteNone, setContextDeleteNone] = useState(false)
   const [addDisabled, setAddDisabled] = useState(false)
-  const abortController = useAbortController()
 
   useEffect(() => {
     const init = async () => {
@@ -116,15 +115,8 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       }
     }
     init()
-    // if (author.authorForm.length === 0) {
+  }, [])
 
-    //   setAuthorDisabled(false)
-
-    // }
-    return () => {
-      abortController.abort()
-    }
-  }, [abortController.signal.aborted])
   const addButtonClickHandler = () => {
     const newAuthor = Object.assign({}, author)
     newAuthor.authorForm.push(newAuthorObject)
@@ -167,7 +159,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
 
       setCurrentAccount(currentAccount)
-    } else return
+    }
   }
 
   const iconInputChangeHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -261,10 +253,10 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     setSt([...filesArr])
   }
   const visibleNameFile = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 6)
+    const firstCharacters = hash.substring(0, 6)
+    const lastCharacters = hash.substring(hash.length - 1, hash.length - 6)
 
-    return `${firstFourCharacters}...${lastFourCharacters}`
+    return `${firstCharacters}...${lastCharacters}`
   }
 
   return (

@@ -1,6 +1,6 @@
 {
   "name": "@dapplets/dapplet-extension",
-  "version": "0.53.0",
+  "version": "0.55.0-alpha.6",
   "description": "The Bridge to the Augmented Web.",
   "main": "./lib/index.min.js",
   "types": "./lib/index.d.ts",
@@ -43,7 +43,6 @@
     "@types/webextension-polyfill": "^0.10.0",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "@typescript-eslint/parser": "^5.48.2",
-    "@usedapp/core": "^1.2.7",
     "@walletconnect/client": "^1.8.0",
     "assert-browserify": "^2.0.0",
     "buffer": "^6.0.3",
@@ -106,11 +105,12 @@
     "yup": "^1.0.2"
   },
   "dependencies": {
-    "@usedapp/coingecko": "^1.1.13",
     "animejs": "^3.2.1",
+    "caching-decorator": "^1.0.2",
     "copy-to-clipboard": "^3.3.3",
     "ethers": "^5.7.2",
-    "near-api-js": "^0.39.0"
+    "near-api-js": "^0.39.0",
+    "react-query": "^3.39.3"
   },
   "directories": {
     "doc": "docs"

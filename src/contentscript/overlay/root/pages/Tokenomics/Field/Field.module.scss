@@ -1,35 +1,37 @@
 @import '../../../assets/styles/null';
 @import '../../../assets/styles/fonts';
 @import '../../../assets/styles/color.variables';
+
 .root {
   display: flex;
   flex-direction: column;
 }
 
 .label {
-  font-family: Roboto;
+  margin-top: 10px;
+  margin-left: 10px;
 
-  color: $PureBlack;
-
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   line-height: 16px;
-  margin-left: 10px;
-  margin-top: 10px;
+  color: $pure-black;
 }
 
 .field {
   height: 31px;
+  margin: 10px;
   padding: 5px 13px;
-  outline: none;
-  font-family: Roboto;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
   font-weight: 400;
   line-height: 149%;
-  background: #f5f5f5;
-  border: 1px solid #e3e3e3;
-  border-radius: 5px;
-  margin: 10px;
   color: #919191;
-  font-size: 14px;
+
+  background: #f5f5f5;
+  border: 1px solid $stroke-color;
+  border-radius: 5px;
+  outline: none;
 }
 
 .error {

@@ -4,67 +4,66 @@
 
 .wrapper {
   margin: 0 18px;
-  border: 1px solid #e3e3e3;
-  background: #f9f9f9;
-  box-shadow: 0px 29.3608px 23.4887px rgb(171 192 191 / 17%);
-  border-radius: 20px;
-  padding: 20px 0;
   margin-bottom: 10px;
+  padding: 20px 0;
+
+  background: $median-price-bg;
+  border: 1px solid $stroke-color;
+  border-radius: 20px;
+  box-shadow: 0 29.3608px 23.4887px rgb(171 192 191 / 17%);
   
 }
+
 .lastWrapper{
   margin-bottom: 70px;
 }
 
 .titleForm {
-  font-family: 'Roboto';
-  font-weight: 700;
-  font-size: 22px;
-  line-height: 26px;
-
-  text-align: justify;
-
-  color: $MainBlack;
-  padding-left: 20px;
   padding-bottom: 10px;
+  padding-left: 20px;
+
+  font-family: Roboto;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 26px;
+  color: $main-black;
+  text-align: justify;
 }
 
 .titleDependecies {
   display: flex;
-  padding-left: 20px;
   padding-bottom: 45px;
+  padding-left: 20px;
 }
 
 .dependecies {
-  font-family: 'Roboto';
-
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
-
   display: flex;
-  align-items: center;
-  color: $MainBlack;
   display: inline-block;
+  align-items: center;
+
   padding-right: 10px;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+  color: $main-black;
 }
 
 .ecosystem {
-  font-family: 'Roboto';
-
-  font-weight: 400;
+  font-family: Roboto;
   font-size: 14px;
+  font-weight: 400;
   line-height: 100%;
-  text-transform: uppercase;
-
   color: #4187ae;
+  text-transform: uppercase;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-
   height: 100%;
+
   &:first-child {
     display: flex;
     flex-direction: column;
@@ -76,26 +75,27 @@
 
 .fieldGroup {
   position: relative;
+
   display: flex;
   flex-direction: column;
-  background: #ffffff;
 
-  margin: 0px 10px 10px 20px;
+  margin: 0 10px 10px 20px;
+
+  background: #fff;
   border-radius: 10px;
 }
 
 .errorMessage {
   position: absolute;
-  right: 10px;
   top: 10px;
+  right: 10px;
 
   display: flex;
   justify-content: flex-end;
 
-  color: $error;
-
   font-size: 12px;
   font-weight: 700;
+  color: $error;
 }
 
 .iconGroup {
@@ -109,74 +109,74 @@
 }
 
 .formDescription {
-  font-family: 'Roboto';
-
-  font-weight: 400;
+  font-family: Roboto;
   font-size: 14px;
+  font-weight: 400;
   line-height: 149%;
-
+  color: $content-black;
   text-align: justify;
-
-  color: $ContentBlack;
 }
+
 .descriptionBlock {
-  padding: 0px 20px 20px 20px;
+  padding: 0 20px 20px;
 }
 
 .formDelimeter {
   width: 90%;
   height: 1px;
-
-  background: $StrokeColor;
   margin: 0 auto;
+  background: $stroke-color;
 }
 
 .descriptionField {
-  font-family: 'Roboto';
+  padding: 20px 0 20px 20px;
 
-  font-weight: 400;
+  font-family: Roboto;
   font-size: 14px;
+  font-weight: 400;
   line-height: 149%;
-
+  color: $main-black;
   text-align: justify;
-
-  color: $MainBlack;
-  padding: 20px 0px 20px 20px;
 }
+
 .fieldsBlocks {
   display: flex;
   flex-direction: column;
-  padding: 0px 20px;
+  padding: 0 20px;
 }
+
 .fieldValue {
   display: flex;
   padding-bottom: 10px;
+
   &:last-child {
-    padding-bottom: 0px;
+    padding-bottom: 0;
   }
 }
+
 .fieldName {
-  font-family: 'Roboto';
-
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 19px;
-  text-align: justify;
-
-  color: $MainBlack;
   display: inline-block;
+
   padding-right: 5px;
+
+  font-family: Roboto;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 19px;
+  color: $main-black;
+  text-align: justify;
 }
 
 .link {
   display: inline-block;
   margin-top: auto;
-  padding: 40px 20px 0px 20px;
+  padding: 40px 20px 0;
   color: #85ccc7;
 
   &:hover {
     color: #67aea9;
   }
+
   &:active {
     color: #539a95;
   }
@@ -187,17 +187,18 @@
 }
 
 .finalWarning {
-  font-family: Roboto;
+  width: 90%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-top: 20px;
+  padding-bottom: 20px;
+
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 130%;
-  color: $MainGrey;
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
+  color: $main-grey;
   text-align: center;
-  padding-top: 20px;
-  padding-bottom: 20px;
 }
 
 .footerContentModal {
@@ -216,42 +217,43 @@
   margin: 10px 0 9px;
   padding: 0 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
-  color: $PureWhite;
+  color: $pure-white;
 
-  background: $Primary;
+  background: $primary;
   border-radius: 4px;
 
   &:hover {
-    background: $PrimaryHover;
+    background: $primary-hover;
   }
 
   &:active {
-    background: $PrimaryPressed;
+    background: $primary-pressed;
   }
 }
 
 .footerContentModalLink {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
-  color: $Primary;
+  color: $primary;
  
   &:hover {
-    color: $PrimaryHover;
+    color: $primary-hover;
   }
 
   &:active {
-    color: $PrimaryPressed;
+    color: $primary-pressed;
   }
 }
 
 .linkNavigation {
   position: fixed;
+  bottom: 0;
 
   display: flex;
   align-items: center;
@@ -260,19 +262,21 @@
   width: 100%;
   height: 60px;
   margin: 20px 0 0;
-  background: $OverlayBG;
-bottom: 0;
+
+  background: $overlay-bg;
+
   &::before {
     content: '';
 
     position: absolute;
-    top: 0px;
+    top: 0;
     left: 0;
 
     width: 95%;
     height: 2px;
-margin: 0 20px;
-    background: $WebBG;
+    margin: 0 20px;
+
+    background: $web-bg;
   }
 }
 
@@ -283,11 +287,11 @@ margin: 0 20px;
 
   margin: 0 0 0 14.5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
-  color: $MainGrey;
+  color: $main-grey;
 
   background: inherit;
 
@@ -305,7 +309,7 @@ margin: 0 20px;
   }
 
   &:hover {
-    color: $ContentBlack;
+    color: $content-black;
 
     &::before {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill=' %23747376'/%3E%3C/svg%3E");
@@ -313,7 +317,7 @@ margin: 0 20px;
   }
 
   &:active {
-    color: $MainBlack;
+    color: $main-black;
 
     &::before {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='14' viewBox='0 0 11 14' fill='none'%3E%3Cpath d='M11 0L-6.11959e-07 7L11 14L11 0Z' fill='%232A2A2A'/%3E%3C/svg%3E");

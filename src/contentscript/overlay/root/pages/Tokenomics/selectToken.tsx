@@ -1,6 +1,7 @@
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
-import { useToken } from '../../../../../background/services/tokenomicsService/erc20Token'
+import { browser } from 'webextension-polyfill-ts'
 import { regExpIndexEthereum } from '../../common/constants'
 import { getValidationAddress } from '../../common/helpers'
 import { TokenInfo } from './index'
@@ -33,7 +34,8 @@ export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
   useEffect(() => {
     const init = async () => {
       if (chooseToken) {
-        const daiInfoToken = await useToken(
+        const { getErc20TokenInfo } = await initBGFunctions(browser)
+        const daiInfoToken = await getErc20TokenInfo(
           getValidationAddress(chooseToken, regExpIndexEthereum) !== null ? chooseToken : null
         )
         setdaiInfo(daiInfoToken)
@@ -57,6 +59,7 @@ export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
 
     setTimeout(() => setAnimate(false), 400)
   }
+
   const onChange = (value: string) => {
     if (getValidationAddress(value, regExpIndexEthereum) !== null) {
       return daiInfo

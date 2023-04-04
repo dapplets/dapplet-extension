@@ -273,7 +273,7 @@ export default class GlobalConfigService {
     config.hostnames = {}
     config.dynamicAdapter = 'dynamic-adapter.dapplet-base.eth#default@latest'
     config.preferedOverlayStorage = 'centralized'
-    config.swarmPostageStampId = '1149efd4cce752c75e815e9b9dbe322afd0c8dce7f86d78e26182b9923403965'
+    config.swarmPostageStampId = '983601c2e0c8fedfe97ac316d51269f56c3ff99004b10bbd9bcdf8077200f32f'
     config.ipfsGatewayUrl = 'https://ipfs-gateway.mooo.com'
     config.ethereumNetworks = [
       {
@@ -828,5 +828,21 @@ export default class GlobalConfigService {
 
   async setPreferredConnectedAccountsNetwork(network: NearNetworks) {
     return this.updateConfig((c) => (c.preferredConnectedAccountsNetwork = network))
+  }
+
+  async isThereActiveDapplets() {
+    const globalConfig = await this.get()
+    if (!globalConfig.hostnames) return false
+
+    for (const contextId in globalConfig.hostnames) {
+      const activeDapplets = globalConfig.hostnames[contextId]?.activeFeatures ?? {}
+      for (const dapplet in activeDapplets) {
+        if (activeDapplets[dapplet].isActive) {
+          return true
+        }
+      }
+    }
+
+    return false
   }
 }

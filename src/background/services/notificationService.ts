@@ -23,14 +23,14 @@ export class NotificationService {
     return filteredNotification
   }
 
-  async createAndShowNotification(notify: Notification, tabId?: number, icon?): Promise<void> {
-    const notificationId = await this.createNotification(notify, icon ? icon : null)
+  async createAndShowNotification(notify: Notification, tabId: number): Promise<void> {
+    const notificationId = await this.createNotification(notify)
 
     await this.showNotification(notificationId, tabId)
     await this._updateBadge()
   }
 
-  async createNotification(notify: NotificationPayload | any, icon?): Promise<string> {
+  async createNotification(notify: NotificationPayload | any): Promise<string> {
     const notification = new Notification()
     notification.id = generateGuid() // ToDo: autoincrement?
     notification.title = notify.title
@@ -39,7 +39,7 @@ export class NotificationService {
     notification.status = NotificationStatus.Highlighted
     notification.type = notify.type ? notify.type : NotificationType.Application
     notification.actions = notify.actions ? notify.actions : null
-    notification.icon = notify.icon ? notify.icon : icon
+    notification.icon = notify.icon
     await this.notificationBrowserStorage.create(notification)
     EventBus.emit('notifications_updated')
     return notification.id

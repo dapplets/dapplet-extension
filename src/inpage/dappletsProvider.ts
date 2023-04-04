@@ -81,6 +81,10 @@ export class DappletsProvider {
     return this._rpc.call('callBackground', ['openPopupOverlay', ['developer']])
   }
 
+  async wipeAllExtensionData(): Promise<void> {
+    return this._rpc.call('callBackground', ['wipeAllExtensionData', []])
+  }
+
   onTrustedUsersChanged(callback: () => void): void {
     EventBus.on('trustedusers_changed', callback)
   }

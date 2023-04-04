@@ -12,7 +12,6 @@ import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
-import useAbortController from '../../hooks/useAbortController'
 import { _addInfoItemInputGroup } from '../../utils/addInfoInputGroup'
 import { _removeInfoItemInputGroup } from '../../utils/removeInfoInputGroup'
 import styles from './DappletsInfo.module.scss'
@@ -64,7 +63,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [addAdminDisabled, setAddAdminDisabled] = useState(false)
 
   const [editAdminsLoading, setEditAdminsLoading] = useState(false)
-  const abortController = useAbortController()
+
   let isNotNullCurrentAccount
   useEffect(() => {
     const init = async () => {
@@ -72,10 +71,8 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     }
     init()
 
-    return () => {
-      abortController.abort()
-    }
-  }, [mi, newState, targetChain, editContextId, editAdmin, abortController.signal.aborted])
+    return () => {}
+  }, [mi, newState, targetChain, editContextId, editAdmin])
 
   const _updateData = async () => {
     const { getRegistries } = await initBGFunctions(browser)
@@ -171,9 +168,9 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
 
   const visibleNameFile = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 5)
-    return `${firstFourCharacters}...${lastFourCharacters}`
+    const firstCharacters = hash.substring(0, 6)
+    const lastCharacters = hash.substring(hash.length - 1, hash.length - 5)
+    return `${firstCharacters}...${lastCharacters}`
   }
 
   const getContextId = async () => {

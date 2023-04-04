@@ -19,7 +19,7 @@ export class State<T> {
     this.state = new Proxy(
       {},
       {
-        get(target, property, receiver) {
+        get(_, property) {
           if (property === 'state') return me._currentStateName
           if (property === 'ctx') return me.config
           if (property === 'setState') return me.setState.bind(me)
@@ -38,7 +38,7 @@ export class State<T> {
             return value
           }
         },
-        set(target, property, value, receiver) {
+        set(_, property, value) {
           if (property === 'state') {
             me.setState(value)
           } else if (property === 'newState') {
