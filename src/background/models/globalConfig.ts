@@ -12,6 +12,8 @@ export class GlobalConfig extends Base {
 
   suspended = false
 
+  isFirstInstallation = true
+
   walletInfo: WalletInfo = null
 
   registries: { url: string; isDev: boolean; isEnabled: boolean }[] = []

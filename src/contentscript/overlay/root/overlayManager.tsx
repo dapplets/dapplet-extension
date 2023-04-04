@@ -104,7 +104,7 @@ export class OverlayManager implements IOverlayManager {
 
   public togglePanel() {
     this._panel.classList.toggle(HiddenOverlayClass)
-    this._panel.classList.toggle(CollapsedOverlayClass)
+    // this._panel.classList.toggle(CollapsedOverlayClass)
     this._render()
   }
 

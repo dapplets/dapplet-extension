@@ -14,7 +14,6 @@ import { SettingItem } from '../../../components/SettingItem'
 import { SettingWrapper } from '../../../components/SettingWrapper'
 import { Switch } from '../../../components/Switch'
 import { getDefaultValueProvider } from '../../../utils/getDefaultValue'
-
 import styles from './Settings.module.scss'
 
 interface SettingsListProps {
@@ -284,6 +283,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const onPress = (e, ref) => {
     ref.current?.blur()
   }
+  const setOnboarding = async () => {
+    const { setIsFirstInstallation, getIsFirstInstallation } = await initBGFunctions(browser)
+    await setIsFirstInstallation(true)
+  }
 
   return (
     <div className={styles.blockSettings}>
@@ -308,6 +311,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   </button>
                 ) : null}
               </div>
+            }
+          />
+          <SettingItem
+            title="Onboarding"
+            component={
+              <button className={styles.versionButton} onClick={setOnboarding}>
+                Go
+              </button>
             }
           />
           <SettingItem title="Trusted Users" component={<></>}>
