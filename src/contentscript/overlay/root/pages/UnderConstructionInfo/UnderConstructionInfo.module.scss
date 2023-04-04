@@ -780,15 +780,15 @@
   color: #fff!important;
   text-transform: uppercase;
 
-  background: $Primary!important;
+  background: $primary!important;
   border-radius: 4px;
 
   &:hover {
-    background: $PrimaryHover!important;
+    background: $primary-hover!important;
   }
 
   &:active {
-    background: $PrimaryPressed!important;
+    background: $primary-pressed!important;
   }
 }
 
@@ -804,15 +804,15 @@
   margin: 0 0 0 5px;
   padding: 0 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 400;
   line-height: 100%;
-  color: $StrokeColor;
+  color: $stroke-color;
   text-transform: uppercase;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 4px;
 
   &:hover {

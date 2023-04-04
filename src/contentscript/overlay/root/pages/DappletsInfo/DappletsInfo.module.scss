@@ -462,7 +462,7 @@
   height: auto;
   padding: 10px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
 }
 
@@ -479,7 +479,7 @@
 .blockContextIDTitle {
   display: inline-block;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
@@ -542,8 +542,8 @@
   margin: 0 0 10px;
   padding: 5px 13px;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 5px;
 
 }
@@ -553,12 +553,12 @@
 
   width: 100%;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
-  color: $MainGrey;
+  color: $main-grey;
 
   background: inherit;
 }
@@ -596,22 +596,22 @@
   margin: 0 0 0 5px;
   padding: 0 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 400;
   line-height: 100%;
   color: #fff!important;
   text-transform: uppercase;
 
-  background: $Primary!important;
+  background: $primary!important;
   border-radius: 4px;
 
   &:hover {
-    background: $PrimaryHover!important;
+    background: $primary-hover!important;
   }
 
   &:active {
-    background: $PrimaryPressed!important;
+    background: $primary-pressed!important;
   }
 }
 
@@ -627,23 +627,23 @@
   margin: 0 0 0 5px;
   padding: 0 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 400;
   line-height: 100%;
-  color: $StrokeColor;
+  color: $stroke-color;
   text-transform: uppercase;
 
-  background: $AppBG;
-  border: 1px solid $StrokeColor;
+  background: $app-bg;
+  border: 1px solid $stroke-color;
   border-radius: 4px;
 
   &:hover {
-    background: $AppBG;
+    background: $app-bg;
   }
 
   &:active {
-    background: $AppBG;
+    background: $app-bg;
   }
 }
 
