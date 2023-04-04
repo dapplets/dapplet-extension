@@ -1,7 +1,6 @@
-import { Provider, TransactionRequest } from '@ethersproject/providers'
 import WalletConnect from '@walletconnect/client'
 import { ethers } from 'ethers'
-import { Deferrable } from 'ethers/lib/utils'
+import { NotImplementedError } from '../../../common/errors'
 import { EthereumWallet } from './interface'
 
 let _walletconnect
@@ -33,7 +32,7 @@ export default class extends ethers.Signer implements EthereumWallet {
   async getAddress(): Promise<string> {
     const walletconnect = getWalletConnect()
     return Promise.resolve(
-      walletconnect.accounts[0] || '0x0000000000000000000000000000000000000000'
+      walletconnect.accounts[0]?.toLowerCase() || '0x0000000000000000000000000000000000000000'
     )
   }
 
@@ -46,8 +45,8 @@ export default class extends ethers.Signer implements EthereumWallet {
     })
   }
 
-  async signTransaction(transaction: Deferrable<TransactionRequest>): Promise<string> {
-    throw new Error('Not implemented')
+  async signTransaction(): Promise<string> {
+    throw new NotImplementedError()
   }
 
   async sendTransaction(
@@ -80,8 +79,8 @@ export default class extends ethers.Signer implements EthereumWallet {
     return walletconnect.sendCustomRequest({ method, params })
   }
 
-  connect(provider: Provider): ethers.Signer {
-    throw new Error('Method not implemented.')
+  connect(): ethers.Signer {
+    throw new NotImplementedError()
   }
 
   async isAvailable() {

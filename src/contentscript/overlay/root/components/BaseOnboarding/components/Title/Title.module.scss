@@ -1,0 +1,39 @@
+@import '../../../../assets/styles/null';
+@import '../../../../assets/styles/fonts';
+@import '../../../../assets/styles/color.variables';
+.wrapper{
+    display: flex;
+    width: 100%;;
+    height: 27px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    background: inherit;
+}
+.title{
+    font-family: Roboto, sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 149%;
+    color: #5AB5E8;
+}
+.indicatorBlock{
+    display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 4px;
+
+
+width: 78px;
+height: 18px;
+}
+.indicator{
+    width: 10px;
+    height: 10px;
+border-radius: 50%;
+    cursor: pointer;
+    background: $stroke-color; 
+}
+.indicatorActive{
+background: $primary;
+}

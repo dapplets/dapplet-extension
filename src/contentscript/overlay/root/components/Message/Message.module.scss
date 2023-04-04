@@ -14,6 +14,7 @@
   font-family: Roboto, sans-serif;
 }
 
+
 .title,
 .subtitle {
   margin-right: auto;
@@ -23,23 +24,41 @@
 .title {
   padding: 0 0 4px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 22px;
   font-weight: 700;
   line-height: 26px;
-  color: $MainBlack;
+  color: $main-black;
+}
+
+.otherTitle{
+  width: 252px;
+  padding-bottom: 20px;
+  text-align: center;
 }
 
 .subtitle {
   display: block;
 
-  padding: 0 0 10px;
+  padding: 0 20px 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
-  color: $MainGrey;
+  color: $main-grey;
+  text-align: center;
+}
+
+.otherSubtitle{
+  padding-bottom: 20px;
+}
+
+.children{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0 30px;
 }
 
 .link {
@@ -50,14 +69,14 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
-  color: $Primary;
+  color: $primary;
   text-align: center;
 
   &:hover {
-    color: $PrimaryHover;
+    color: $primary-hover;
   }
 
   &:active {
-    color: $PrimaryPressed;
+    color: $primary-pressed;
   }
 }

@@ -68,7 +68,7 @@ async function init() {
     return Array.from(new Set(contextIDs)) // deduplicate array
   }
 
-  browser.runtime.onMessage.addListener((message, sender) => {
+  browser.runtime.onMessage.addListener((message) => {
     if (!message || !message.type) return
 
     if (message.type === 'FEATURE_ACTIVATED') {
@@ -106,7 +106,10 @@ async function init() {
   })
 
   // Handle module (de)activations from another tabs
-  EventBus.on('dapplet_activated', (m) => injector.loadModules([m]))
+  EventBus.on('dapplet_activated', async () => {
+    const contextIds = await getAllContextIds()
+    browser.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
+  })
 
   EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]))
 
@@ -119,7 +122,7 @@ async function init() {
     console.log(
       '[DAPPLETS]: The connection to the background service has been lost. Content script is unloading...'
     )
-    jsonrpc.call(GLOBAL_EVENT_BUS_NAME, ['disconnect', []])
+    EventBus.emit('disconnect')
     EventBus.destroy()
     jsonrpc.destroy()
     injector.dispose()
@@ -185,6 +188,10 @@ async function init() {
   })
 
   jsonrpc.on('callBackground', (method: string, args: any[]) => {
+    if (method === 'wipeAllExtensionData' && !IS_E2E_IFRAME) {
+      return Promise.reject('This function is for E2E testing only.')
+    }
+
     return initBGFunctions(browser).then((x) => x[method](...args))
   })
 
@@ -201,6 +208,8 @@ async function init() {
   if (IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
     confirmShareLink(shareLinkPayload)
   }
+
+  console.log('[DAPPLETS]: Content script initialized.')
 }
 
 function injectScript(url: string) {

@@ -20,6 +20,7 @@ const EXPORTABLE_PROPERTIES = [
   // 'isActive',
   // 'suspended',
   // 'walletInfo',
+  'isFirstInstallation',
   'registries',
   'devMode',
   'trustedUsers',
@@ -87,6 +88,7 @@ export default class GlobalConfigService {
   async set(config: GlobalConfig): Promise<void> {
     await this._globalConfigRepository.update(config)
   }
+  async setFirstInstallation(): Promise<void> {}
 
   async mergeConfig(config: Partial<GlobalConfig>): Promise<void> {
     const previousConfig = await this.get()
@@ -224,6 +226,7 @@ export default class GlobalConfigService {
   getInitialConfig(): GlobalConfig {
     const config = new GlobalConfig()
     config.id = this._defaultConfigId
+    config.isFirstInstallation = true
     config.isActive = true
     config.registries = [
       { url: 'v2.registry.dapplet-base.eth', isDev: false, isEnabled: true },
@@ -273,7 +276,7 @@ export default class GlobalConfigService {
     config.hostnames = {}
     config.dynamicAdapter = 'dynamic-adapter.dapplet-base.eth#default@latest'
     config.preferedOverlayStorage = 'centralized'
-    config.swarmPostageStampId = '1149efd4cce752c75e815e9b9dbe322afd0c8dce7f86d78e26182b9923403965'
+    config.swarmPostageStampId = '983601c2e0c8fedfe97ac316d51269f56c3ff99004b10bbd9bcdf8077200f32f'
     config.ipfsGatewayUrl = 'https://ipfs-gateway.mooo.com'
     config.ethereumNetworks = [
       {
@@ -324,8 +327,20 @@ export default class GlobalConfigService {
     config.pinnedDappletActions = []
     return config
   }
+
+  async setIsFirstInstallation(isActive: boolean) {
+    await this.updateConfig((c) => (c.isFirstInstallation = isActive))
+    EventBus.emit('onboarding_update')
+  }
+  async getIsFirstInstallation() {
+    const config = await this.get()
+
+    return config.isFirstInstallation
+  }
+
   async getPinnedActions() {
     const config = await this.get()
+
     const registries = config.pinnedDappletActions.map((x) => ({
       ...x,
       dappletName: x.dappletName === undefined ? true : x.dappletName,
@@ -827,5 +842,21 @@ export default class GlobalConfigService {
 
   async setPreferredConnectedAccountsNetwork(network: NearNetworks) {
     return this.updateConfig((c) => (c.preferredConnectedAccountsNetwork = network))
+  }
+
+  async isThereActiveDapplets() {
+    const globalConfig = await this.get()
+    if (!globalConfig.hostnames) return false
+
+    for (const contextId in globalConfig.hostnames) {
+      const activeDapplets = globalConfig.hostnames[contextId]?.activeFeatures ?? {}
+      for (const dapplet in activeDapplets) {
+        if (activeDapplets[dapplet].isActive) {
+          return true
+        }
+      }
+    }
+
+    return false
   }
 }

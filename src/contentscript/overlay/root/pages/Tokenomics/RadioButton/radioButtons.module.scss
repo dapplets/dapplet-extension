@@ -1,0 +1,74 @@
+@import '../../../assets/styles/null';
+@import '../../../assets/styles/fonts';
+@import '../../../assets/styles/color.variables';
+
+.inputRadioTitle {
+  padding: 0 0 0 2px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 100%;
+  color: $main-black;
+}
+  
+.form_radio {
+  display: flex;
+  align-items: center;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 100%;
+  color: $main-black;
+}
+  
+.form_radio input[type="radio"] {
+  display: none;
+}
+
+input:disabled{
+  cursor: default;
+}
+  
+.form_radio label {
+  cursor: pointer;
+  user-select: none;
+
+  position: relative;
+
+  display: inline-block;
+
+  margin-right: 0;
+  padding-left: 20px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 100%;
+  color: $main-black;
+}
+  
+.form_radio label::before {
+  content: "";
+
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+
+  display: inline-block;
+
+  width: 16px;
+  height: 16px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 100%;
+  color: $main-black;
+
+  background: $pure-white;
+  border: 1px solid $main-grey;
+  border-radius: 50%;
+}
+  
+.form_radio input[type="radio"]:checked + label::before {
+  background: $primary url("../../../assets/icons/tokenomics/dot.svg") 50% 50% no-repeat;
+  border: none;
+}

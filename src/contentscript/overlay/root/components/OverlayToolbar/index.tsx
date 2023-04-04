@@ -17,7 +17,6 @@ import {
   ReactComponent as Account,
   ReactComponent as DappletsLogo,
 } from '../../assets/newIcon/mustache.svg'
-import { ReactComponent as Coolicon } from '../../assets/newIcon/squares.svg'
 import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { WidgetButton } from '../../widgets/button'
@@ -71,23 +70,6 @@ type TToggleOverlay = {
   getNode?: () => void
 }
 
-const ToggleOverlay = ({ onClick, className }: TToggleOverlay): ReactElement => {
-  return (
-    <button
-      data-testid="toggle-overlay-button"
-      className={cn(styles.toggleOverlay, className)}
-      onClick={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        onClick()
-        // getNode()
-      }}
-    >
-      <Coolicon />
-    </button>
-  )
-}
-
 export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
@@ -109,13 +91,12 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   useEffect(() => {
     const init = async () => {
       await _refreshData()
-      // await  handleUpdateNotifications()
     }
 
     init()
 
     return () => {}
-  }, [newWidgets, widgets, isClick])
+  }, [])
   const handleUpdateNotifications = async () => {
     const notifications = await getNotifications()
     setEvent(
@@ -145,6 +126,13 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     return () => {
       EventBus.off('notifications_updated', handleUpdateNotifications)
       EventBus.off('show_notification', handleShowNotification)
+    }
+  }, [])
+  useEffect(() => {
+    EventBus.on('myactions_changed', _refreshData)
+
+    return () => {
+      EventBus.off('myactions_changed', _refreshData)
     }
   }, [])
 
@@ -363,6 +351,22 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
     return notifications
   }
+  const isModuleActive = () => {
+    if (!p.module || !noSystemTabs.length) return
+
+    let isModuleActive
+
+    p.module
+      .filter((x) => noSystemTabs.filter((i) => i.id === x.name))
+      .map((x) => {
+        if (x.isActive) return (isModuleActive = true)
+        else {
+          return (isModuleActive = false)
+        }
+      })
+
+    return isModuleActive
+  }
 
   return (
     <div
@@ -426,6 +430,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 })}
               ></span>
             </span>
+
             {isPinnedNotification && getAnimateNotifification(true)}
             {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget, isPinnedAnimateWidget)}
 
@@ -437,88 +442,71 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 ? getWigetsConstructor(newWidgets).map((x) => x)
                 : null)}
 
-            <div
-              data-testid={isShowTabs ? 'toolbar-show' : 'toolbar-hide'}
-              className={cn(styles.toggleTabs, {
-                [styles.hideTabs]: !isShowTabs,
-              })}
-            >
-              {noSystemTabs.length > 0 &&
-                noSystemTabs.map((tab) => {
-                  const menuWidgets =
-                    newWidgets &&
-                    newWidgets.length > 0 &&
-                    newWidgets.filter((x) => x.moduleName === tab.id)
-
-                  return (
-                    <OverlayTab
-                      setOpenWallet={p.setOpenWallet}
-                      isOpenWallet={p.isOpenWallet}
-                      key={tab.id}
-                      tabId={tab.id}
-                      {...tab}
-                      isActive={p.activeTabId === tab.id}
-                      activeTabMenuId={p.activeTabMenuId}
-                      onCloseClick={() => p.onCloseClick(tab)}
-                      onMenuClick={(menu) => p.onMenuClick(tab, menu)}
-                      onTabClick={() => p.onTabClick(tab)}
-                      modules={p.module}
-                      pathname={p.pathname}
-                      navigate={p.navigate}
-                      overlays={p.overlays}
-                      onToggleClick={p.onToggleClick}
-                      getWigetsConstructor={getWigetsConstructor}
-                      menuWidgets={menuWidgets}
-                      mainMenuNavigation={p.onMenuClick}
-                    />
-                  )
-                })}
-
-              {/* <ToggleOverlay
-                // getNode={handleClickGetNodeOverlayToolbar}
-                onClick={() => {
-                  if (
-                    document
-                      .querySelector('#dapplets-overlay-manager')
-                      .classList.contains('dapplets-overlay-collapsed')
-                  ) {
-                    p.navigate('/system/dapplets')
-
-                    p.onToggleClick()
-                  } else if (
-                    !document
-                      .querySelector('#dapplets-overlay-manager')
-                      .classList.contains('dapplets-overlay-collapsed')
-                  ) {
-                    if (p.pathname === '/system/dapplets') {
-                      p.onToggleClick()
-                    } else {
-                      p.navigate('/system/dapplets')
-                    }
-                  }
-                }}
-                className={cn(styles.toggleOverlay, {
-                  // [styles.isOpenWallet]: p.isOpenWallet,
-                })}
-              /> */}
-            </div>
-            <div>
-              {noSystemTabs.length > 0 && (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    onShowTabs()
-                  }}
-                  data-testid="show-tabs-button"
-                  className={cn(styles.miniButton, {
-                    [styles.hideTabsBtn]: isShowTabs,
+            {p.module && p.module.length && p.module.filter((x) => x.isActive) ? (
+              <>
+                <div
+                  data-testid={isShowTabs ? 'toolbar-show' : 'toolbar-hide'}
+                  className={cn(styles.toggleTabs, {
+                    [styles.hideTabs]: !isShowTabs,
                   })}
                 >
-                  <Show />
-                </button>
-              )}
-            </div>
+                  {noSystemTabs.length > 0 &&
+                    noSystemTabs.map((tab) => {
+                      const menuWidgets =
+                        newWidgets &&
+                        newWidgets.length > 0 &&
+                        newWidgets.filter((x) => x.moduleName === tab.id)
+
+                      return (
+                        <OverlayTab
+                          setOpenWallet={p.setOpenWallet}
+                          isOpenWallet={p.isOpenWallet}
+                          key={tab.id}
+                          tabId={tab.id}
+                          {...tab}
+                          isActive={p.activeTabId === tab.id}
+                          activeTabMenuId={p.activeTabMenuId}
+                          onCloseClick={() => p.onCloseClick(tab)}
+                          onMenuClick={(menu) => p.onMenuClick(tab, menu)}
+                          onTabClick={() => p.onTabClick(tab)}
+                          modules={p.module}
+                          pathname={p.pathname}
+                          navigate={p.navigate}
+                          overlays={p.overlays}
+                          onToggleClick={p.onToggleClick}
+                          getWigetsConstructor={getWigetsConstructor}
+                          menuWidgets={menuWidgets}
+                          mainMenuNavigation={p.onMenuClick}
+                        />
+                      )
+                    })}
+                </div>
+                <div
+                  className={cn({
+                    [styles.divHidden]:
+                      p.module &&
+                      p.module.length &&
+                      p.module.filter((x) => x.isActive).length === 0,
+                  })}
+                >
+                  {noSystemTabs.length > 0 && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        onShowTabs()
+                      }}
+                      data-testid="show-tabs-button"
+                      className={cn(styles.miniButton, {
+                        [styles.hideTabsBtn]: isShowTabs,
+                      })}
+                    >
+                      <Show />
+                    </button>
+                  )}
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
       </div>

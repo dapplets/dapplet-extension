@@ -1,0 +1,54 @@
+@import "../../assets/styles/fonts";
+@import "../../assets/styles/color.variables";
+@import "../../assets/styles/null";
+
+.account {
+  cursor: pointer;
+
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  height: 44px;
+  margin: 3px;
+  padding: 0 5px 0 2px;
+
+  border-radius: 22px 12px 12px 22px;
+}
+
+.imgUser {
+  display: inline-block;
+
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+
+  background-color: white;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
+  border: 2px solid #bfbfbf;
+  border-radius: 50%;
+
+  &.empty {
+    background-color: $web-bg;
+  }
+}
+
+.nameUser {
+  padding-right: 14px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 100%;
+  color: $main-black;
+}
+
+.nameUserActive {
+  background: $primary !important;
+
+  .nameUser {
+    color: $pure-white;
+  }
+}

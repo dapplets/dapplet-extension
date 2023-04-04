@@ -4,11 +4,11 @@ import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../../background/models/versionInfo'
+import * as EventBus from '../../../../../../common/global-event-bus'
 import { groupBy, isValidUrl } from '../../../../../../common/helpers'
 import { DevModule } from '../../../components/DevModulesList'
 import { Localhost } from '../../../components/Localhost'
 import { Registry } from '../../../components/Registry'
-import useAbortController from '../../../hooks/useAbortController'
 import styles from './Developer.module.scss'
 
 export interface DeveloperProps {
@@ -54,34 +54,42 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     connectedDescriptors,
     selectedWallet,
   } = props
-  const abortController = useAbortController()
+
   useEffect(() => {
     const init = async () => {
-      setLoadButton(true)
-      await loadRegistries()
-      const { getCurrentTab } = await initBGFunctions(browser)
-      const currentTab = await getCurrentTab()
-      if (!currentTab) return
-      const currentUrl = currentTab.url
-      const urlEnding = currentUrl.split('/').reverse()[0]
-      if (['index.json', 'dapplet.json'].includes(urlEnding)) {
-        setRegistryInput(currentUrl)
-        if (isUpdate) {
-          await loadRegistries()
-          if (!abortController.signal.aborted) {
-            setUpdate(false)
-          }
-        }
-      }
-      if (!abortController.signal.aborted) {
-        setLoadButton(false)
-      }
+      await _updateData()
     }
     init()
+    return () => {}
+  }, [])
+
+  useEffect(() => {
+    EventBus.on('wallet_changed', _updateData)
+
     return () => {
-      // abortController.abort()
+      EventBus.off('wallet_changed', _updateData)
     }
-  }, [isUpdate, selectedWallet, abortController.signal.aborted])
+  }, [])
+
+  const _updateData = async () => {
+    setLoadButton(true)
+    await loadRegistries()
+    const { getCurrentTab } = await initBGFunctions(browser)
+    const currentTab = await getCurrentTab()
+    if (!currentTab) return
+    const currentUrl = currentTab.url
+    const urlEnding = currentUrl.split('/').reverse()[0]
+    if (['index.json', 'dapplet.json'].includes(urlEnding)) {
+      setRegistryInput(currentUrl)
+      if (isUpdate) {
+        await loadRegistries()
+
+        setUpdate(false)
+      }
+    }
+
+    setLoadButton(false)
+  }
 
   const loadRegistries = async () => {
     const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
@@ -90,14 +98,12 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       versions: VersionInfo[]
       isDeployed: boolean[]
     }[] = await getAllDevModules()
-    if (!abortController.signal.aborted) {
-      setModules(modules)
-    }
+
+    setModules(modules)
 
     const registries = await getRegistries()
-    if (!abortController.signal.aborted) {
-      setRegistries(registries.filter((r) => r.isDev === true))
-    }
+
+    setRegistries(registries.filter((r) => r.isDev === true))
   }
 
   const addRegistry = async (url: string, newFunction: () => void) => {
@@ -139,9 +145,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     await enableRegistry(url)
     loadRegistries()
     setTimeout(() => {
-      if (!abortController.signal.aborted) {
-        setLoadButtonLocalhost(false)
-      }
+      setLoadButtonLocalhost(false)
     }, 1500)
   }
 
@@ -151,9 +155,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     await disableRegistry(url)
     loadRegistries()
     setTimeout(() => {
-      if (!abortController.signal.aborted) {
-        setLoadButtonLocalhost(false)
-      }
+      setLoadButtonLocalhost(false)
     }, 1500)
   }
 
@@ -300,7 +302,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
           )}
         </div>
       </div>
-      {/* <div className={styles.createUnderConstraction}>
+      <div className={styles.createUnderConstraction}>
         <button
           className={styles.btnCreate}
           onClick={() => {
@@ -311,7 +313,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
         >
           Create «under construction» dapplet
         </button>
-      </div> */}
+      </div>
     </div>
   )
 }

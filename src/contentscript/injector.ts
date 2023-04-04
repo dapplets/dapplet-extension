@@ -8,20 +8,16 @@ import * as EventBus from '../common/global-event-bus'
 import {
   areModulesEqual,
   formatModuleId,
-  isE2ETestingEnvironment,
   joinUrls,
   multipleReplace,
   parseModuleName,
 } from '../common/helpers'
-import { JsonRpc } from '../common/jsonrpc'
 import { NotificationType } from '../common/models/notification'
 import { DefaultConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
 import { __decorate } from './global'
 import { ManifestOverlayAdapter } from './modules/adapter-overlay/src'
-import { OverlayManagerIframe } from './overlay/iframe/overlayManager'
-import { OverlayManager } from './overlay/root/overlayManager'
 import { IContentAdapter, IResolver } from './types'
 
 type RegistriedModule = {
@@ -43,6 +39,7 @@ type RegistriedModule = {
   onWalletsUpdateHandler?: Function
   onConnectedAccountsUpdateHandler?: Function
 }
+
 export const widgets = []
 
 const DAPPLETS_ORIGINAL_HREF: string = window['DAPPLETS_ORIGINAL_HREF']
@@ -157,13 +154,6 @@ export class Injector {
             }
           }
         }
-        const IS_E2E_IFRAME = isE2ETestingEnvironment(window.top)
-        const IS_IFRAME = IS_E2E_IFRAME ? false : self !== top
-        const jsonrpc = new JsonRpc()
-        const overlayManager = IS_IFRAME
-          ? new OverlayManagerIframe(jsonrpc)
-          : new OverlayManager(jsonrpc)
-        overlayManager.getOverlays()
         console.log(
           `[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`
         )
@@ -321,13 +311,8 @@ export class Injector {
       schemaConfig?: SchemaConfig
     }[]
   ) {
-    const {
-      optimizeDependency,
-      getModulesWithDeps,
-      createAndShowNotification,
-      getSwarmGateway,
-      getPreferedOverlayStorage,
-    } = await initBGFunctions(browser)
+    const { getModulesWithDeps, getSwarmGateway, getPreferedOverlayStorage } =
+      await initBGFunctions(browser)
     const { core } = this
 
     const swarmGatewayUrl = await getSwarmGateway()
@@ -577,14 +562,13 @@ export class Injector {
           message: `Resolver of "${manifest.name}" defined the "${newBranch}" branch`,
           type: NotificationType.System,
         })
-        const optimizedBranch = await optimizeDependency(
-          manifest.name,
-          newBranch,
-          manifest.version,
-          contextIds
-        )
         const missingDependencies = await getModulesWithDeps([
-          { ...optimizedBranch, contextIds: contextIds },
+          {
+            name: manifest.name,
+            branch: newBranch,
+            version: 'latest', // ToDo: fix: branch resolver automatically upgrades adapter to the latest version
+            contextIds: contextIds,
+          },
         ])
         await this._processModules(missingDependencies)
       }
@@ -698,18 +682,19 @@ export class Injector {
       const cfgsKey = Symbol()
       const featureId = contextModule.manifest.name
       return new Proxy(proxiedModule.instance, {
-        get: function (target: IContentAdapter<any>, prop, receiver) {
+        get: function (target: IContentAdapter<any>, prop) {
           if (prop === 'attachConfig') {
             return (cfg: any) => {
               if (contextModule.manifest.type === ModuleTypes.Feature) {
                 cfg.orderIndex = contextModule.order
+                // ToDo: the code below is commented for DAP-3272
                 // ToDo: fix context ids adding
-                cfg.contextIds = contextModule.contextIds
-                  .map((id) => {
-                    const [headContextId, ...tailContextId] = id.split('/') // ToDo: check head?
-                    return tailContextId.join('/')
-                  })
-                  .filter((id) => !!id)
+                // cfg.contextIds = contextModule.contextIds
+                //   .map((id) => {
+                //     const [headContextId, ...tailContextId] = id.split('/') // ToDo: check head?
+                //     return tailContextId.join('/')
+                //   })
+                //   .filter((id) => !!id)
               }
 
               // remember configs to detach it later

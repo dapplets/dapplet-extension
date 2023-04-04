@@ -3,16 +3,14 @@ import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
-import VersionInfo from '../../../../../background/models/versionInfo'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
-import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-
+import { ChainTypes } from '../../../../../common/types'
+import { ReactComponent as Delete } from '../../assets/icons/mini-close.svg'
 import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
-import useAbortController from '../../hooks/useAbortController'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
 
@@ -33,6 +31,7 @@ enum FormMode {
   Creating,
   Editing,
 }
+
 type DependencyChecking = {
   name: string
   version: string
@@ -54,51 +53,36 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     ModuleVersion,
     setShowChildrenUnderConstraction,
   } = props
-
-  const [originalMi, setOriginalMi] = useState(null)
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
-  const [vi, setVi] = useState<VersionInfo>(ModuleVersion)
-  const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>()
   const [loading, setLoading] = useState(false)
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
   const [message, setMessage] = useState(null)
-  const [registryOptions, setRegistryOptions] = useState([])
   const [owner, setOwner] = useState(null)
-  const [currentAccount, setCurrentAccount] = useState(null)
-
   const [editContextId, setEditContextId] = useState('')
   const [editContextIdLoading, setEditContextIdLoading] = useState(false)
-  const [editContextIdDone, setEditContextIdDone] = useState(false)
-  const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
-  const [trustedUsers, setTrustedUsers] = useState([])
-
-  const [mode, setMode] = useState(null)
-
   const [targetStorages, setTargetStorages] = useState([StorageTypes.Swarm, StorageTypes.Ipfs])
-
-  const [author, setAuthor] = useState({ authorForm: [] })
-
-  const newAuthorObject = {
-    author: 'New admins',
-  }
   const fileInput = useRef<HTMLInputElement>()
   const [st, setSt] = useState([])
-
   const [isDisabledPush, setDisabledPush] = useState(true)
   const [isModal, setModal] = useState(false)
-  const onClose = () => setModal(false)
-  const [autorDisabled, setAuthorDisabled] = useState(false)
   const [isModalPush, setModalPush] = useState(false)
-
   const [isModalTransaction, setModalTransaction] = useState(false)
-
   const [isNotAccountModal, setNotAccountModal] = useState(false)
-  const abortController = useAbortController()
+  const [isLoad, setLoad] = useState(false)
+  const node = useRef<HTMLButtonElement>()
+  const nodeInput = useRef<HTMLInputElement>()
+  const [visibleContextId, setVisibleContextId] = useState([])
+  const [contextDeleteNone, setContextDeleteNone] = useState(false)
+  const [addDisabled, setAddDisabled] = useState(false)
+
+  const onClose = () => setModal(false)
 
   useEffect(() => {
     const init = async () => {
+      setLoad(true)
       await _updateData()
+      setLoad(false)
       if (!isNotNullCurrentAccount) {
         setNotAccountModal(true)
       } else {
@@ -106,53 +90,18 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       }
     }
     init()
-    if (author.authorForm.length === 0) {
-      setAuthorDisabled(false)
-    }
-    return () => {
-      // abortController.abort()
-    }
-  }, [mi, st, targetChain, autorDisabled, author, editContextId, abortController.signal.aborted])
-  const addButtonClickHandler = () => {
-    const newAuthor = Object.assign({}, author)
-    newAuthor.authorForm.push(newAuthorObject)
-    setAuthor(newAuthor)
-  }
-
-  const onDeleteChild = (id: number) => {
-    const newAuthor = Object.assign({}, author)
-    newAuthor.authorForm.splice(id, 1)
-    setAuthor(newAuthor)
-  }
+  }, [])
 
   const _updateData = async () => {
-    const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
+    const { getRegistries, getContextIds } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
-    const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-    if (!abortController.signal.aborted) {
-      setRegistryOptions(
-        prodRegistries.map((r) => ({
-          key: r.url,
-          text: r.url,
-          value: r.url,
-        }))
-      )
-      setTargetRegistry(prodRegistries[0]?.url || null)
-      setTrustedUsers(trustedUsers)
-      setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
-    }
+    const contextId = await getContextIds(prodRegistries[0]?.url, mi.name)
 
-    await _updateCurrentAccount()
-  }
-
-  const _updateCurrentAccount = async () => {
-    const { getOwnership, getAddress } = await initBGFunctions(browser)
-    const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-    if (!abortController.signal.aborted) {
-      setCurrentAccount(currentAccount)
-    }
+    setVisibleContextId(contextId)
+    setTargetRegistry(prodRegistries[0]?.url || null)
+    setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
   }
 
   const iconInputChangeHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,8 +129,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       const { editModuleInfo } = await initBGFunctions(browser)
       await editModuleInfo(targetRegistry, targetStorages, mi)
 
-      setOriginalMi(JSON.parse(JSON.stringify(mi)))
-
       setModalTransaction(false)
       setModalPush(true)
     } catch (err) {
@@ -208,36 +155,22 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     newContext.contextIds.splice(id, 1)
     setMi(newContext)
   }
-  const [visible, setVisible] = useState(false)
-  const node = useRef<HTMLButtonElement>()
-  const nodeInput = useRef<HTMLInputElement>()
-  const [visibleContextId, setVisibleContextId] = useState({
-    visibleContext: [],
-  })
-  const [contextDeleteNone, setContextDeleteNone] = useState(false)
-  const [addDisabled, setAddDisabled] = useState(false)
+
   const _addContextId = async (contextId: string) => {
     setEditContextIdLoading(true)
     setAddDisabled(true)
 
     try {
-      const { addContextId } = await initBGFunctions(browser)
+      const { addContextId, getContextIds } = await initBGFunctions(browser)
+      if (!targetRegistry || !mi.name || !contextId) return
+
       await addContextId(targetRegistry, mi.name, contextId)
-      const newForm = Object.assign({}, visibleContextId)
+      const contextIds = await getContextIds(targetRegistry, mi.name)
 
-      newForm.visibleContext.push(editContextId)
-      setVisibleContextId(newForm)
-
-      setEditContextIdDone(true)
-      setVisible(true)
-      setEditContextId('')
-      setEditContextIdLoading(false)
-      setAddDisabled(false)
-      node.current?.classList.remove('valid')
-      setEditContextId('')
+      setVisibleContextId(contextIds)
     } catch (error) {
-      setEditContextIdDone(true)
-      setVisible(false)
+    } finally {
+      setEditContextId('')
       setEditContextIdLoading(false)
       setAddDisabled(false)
       node.current?.classList.remove('valid')
@@ -257,10 +190,28 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     setSt([...filesArr])
   }
   const visibleNameFile = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 6)
+    const firstCharacters = hash.substring(0, 6)
+    const lastCharacters = hash.substring(hash.length - 1, hash.length - 6)
 
-    return `${firstFourCharacters}...${lastFourCharacters}`
+    return `${firstCharacters}...${lastCharacters}`
+  }
+  const _removeContextID = async (contextId: string) => {
+    setEditContextIdLoading(true)
+    setAddDisabled(true)
+
+    try {
+      const { removeContextId, getContextIds } = await initBGFunctions(browser)
+      if (!targetRegistry || !mi.name || !contextId) return
+
+      await removeContextId(targetRegistry, mi.name, contextId)
+      const contextIds = await getContextIds(targetRegistry, mi.name)
+
+      setVisibleContextId(contextIds)
+    } catch (error) {
+    } finally {
+      setEditContextIdLoading(false)
+      setAddDisabled(false)
+    }
   }
 
   return (
@@ -321,225 +272,200 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
         )
       ) : null}
 
-      <div className={styles.mainInfoBlock}>
-        <SettingWrapper
-          className={styles.wrapperSettings}
-          title="Social"
-          children={
-            <div className={styles.socialBlock}>
-              <div className={styles.moduleTitle}> {mi.name}</div>
+      <>
+        <div className={styles.mainInfoBlock}>
+          <SettingWrapper
+            className={styles.wrapperSettings}
+            title="Social"
+            children={
+              <div className={styles.socialBlock}>
+                <div className={styles.moduleTitle}> {mi.name}</div>
 
-              <SettingItem
-                title="Title"
-                className={styles.item}
-                component={<></>}
-                children={
-                  <input
-                    value={mi.title ?? ''}
-                    onChange={(e) => {
-                      setMi({ ...mi, title: e.target.value })
-
-                      setDisabledPush(false)
-                    }}
-                    className={styles.inputTitle}
-                  />
-                }
-              />
-              <SettingItem
-                title="Description"
-                component={<></>}
-                className={styles.item}
-                children={
-                  <input
-                    className={styles.inputTitle}
-                    value={mi.description ?? ''}
-                    onChange={(e) => {
-                      setMi({ ...mi, description: e.target.value })
-
-                      setDisabledPush(false)
-                    }}
-                  />
-                }
-              />
-              {/* <SettingItem
-                title="Full description"
-                component={<></>}
-                className={styles.item}
-                children={<textarea className={styles.fullDescription} />}
-              /> */}
-
-              <div className={styles.iconBlock}>
-                <div className={styles.imgBlock}>
-                  <StorageRefImage className={styles.img} storageRef={mi.icon} />
-
-                  {st.map((x, i) => (
-                    <span className={styles.imgTitle} key={i}>
-                      {visibleNameFile(x.name)}
-                    </span>
-                  ))}
-                </div>
-
-                <div className={styles.buttonIcon}>
-                  <input
-                    ref={fileInput}
-                    type="file"
-                    name="file"
-                    id="file"
-                    accept=".png"
-                    className={styles.inputfile}
-                    onChange={(e) => {
-                      onChange(e)
-                      iconInputChangeHandler(e)
-
-                      setDisabledPush(false)
-                    }}
-                  />
-                  <label htmlFor="file">Change icon</label>
-                </div>
-              </div>
-            </div>
-          }
-        />
-        {/* <SettingWrapper
-          title="Team"
-          className={styles.wrapperSettings}
-          children={
-            <div className={styles.ownershipBlock}>
-              <div className={styles.wrapperAdmins}>
-                <div className={styles.blockAdmins}>
-                  <h3 className={styles.adminsTitle}>Admins</h3>
-                  <button
-                    disabled={autorDisabled}
-                    onClick={() => {
-                      addButtonClickHandler()
-                      setAuthorDisabled(true)
-                    }}
-                    className={cn(styles.adminsButton, {
-                      [styles.adminsButtonDisabled]: autorDisabled,
-                    })}
-                  />
-                </div>
-                {author.authorForm.map((x, i) => (
-                  <div key={i} className={styles.blockAuthors}>
+                <SettingItem
+                  title="Title"
+                  className={styles.item}
+                  component={<></>}
+                  children={
                     <input
-                      key={i}
-                      className={styles.authorTitle}
-                      placeholder={x.author}
+                      value={mi.title ?? ''}
                       onChange={(e) => {
-                        author.authorForm[i].author = e.target.value
-                        if (e.target.value.length !== 0) {
-                          setAuthorDisabled(false)
-                        }
+                        setMi({ ...mi, title: e.target.value })
+
+                        setDisabledPush(false)
+                      }}
+                      className={styles.inputTitle}
+                    />
+                  }
+                />
+                <SettingItem
+                  title="Description"
+                  component={<></>}
+                  className={styles.item}
+                  children={
+                    <input
+                      className={styles.inputTitle}
+                      value={mi.description ?? ''}
+                      onChange={(e) => {
+                        setMi({ ...mi, description: e.target.value })
+
                         setDisabledPush(false)
                       }}
                     />
-                    <button onClick={onDeleteChild.bind(null, i)} className={styles.authorDelete} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          }
-        /> */}
-        <SettingWrapper
-          title="Parameters"
-          className={styles.wrapperSettings}
-          children={
-            <div className={styles.parametersBlock}>
-              <div className={styles.wrapperContextID}>
-                <div className={styles.blockContextID}>
-                  <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
-                  <button
-                    disabled={mi.contextIds.length >= 1}
-                    onClick={addButtonClickHandlerContext}
-                    className={cn(styles.contextIDButton, {
-                      [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
-                    })}
-                  />
-                </div>
-                {mi.contextIds.map((x, i) => (
-                  <div key={i} className={styles.wrapperContext}>
-                    <div className={styles.blockContext}>
-                      <input
-                        key={i}
-                        ref={nodeInput}
-                        className={styles.blockContextTitle}
-                        value={editContextId}
-                        placeholder={'Context ID (ex: example.com)'}
-                        onChange={(e) => {
-                          setEditContextId(e.target.value)
-                        }}
-                      />
+                  }
+                />
 
-                      <button
-                        ref={node}
-                        onClick={() => {
-                          onDeleteChildContext(i)
-                          setEditContextId('')
-                        }}
-                        className={cn(styles.contextDelete, {
-                          [styles.contextDeleteNone]: contextDeleteNone,
-                        })}
-                      />
-                    </div>
-                    <button
-                      disabled={nodeInput.current?.value.length < 2 || addDisabled}
-                      onClick={() => {
-                        node.current?.classList.add('valid')
-                        _addContextId(editContextId)
-                      }}
-                      className={cn(styles.addContext, {
-                        [styles.addContextDisabled]:
-                          nodeInput.current?.value.length < 2 || addDisabled,
-                      })}
-                    >
-                      ADD
-                    </button>
+                <div className={styles.iconBlock}>
+                  <div className={styles.imgBlock}>
+                    <StorageRefImage className={styles.img} storageRef={mi.icon} />
+
+                    {st.map((x, i) => (
+                      <span className={styles.imgTitle} key={i}>
+                        {visibleNameFile(x.name)}
+                      </span>
+                    ))}
                   </div>
-                ))}
-                {editContextIdLoading ? (
-                  <div className={styles.editContextIdLoading}></div>
-                ) : (
-                  <>
-                    {visible &&
-                      visibleContextId &&
-                      visibleContextId.visibleContext.map((x, i) => (
-                        <input
-                          key={i}
-                          className={styles.blockContext}
-                          placeholder={x}
-                          value={x}
-                          readOnly
-                        />
-                      ))}
-                  </>
-                )}
+
+                  <div className={styles.buttonIcon}>
+                    <input
+                      ref={fileInput}
+                      type="file"
+                      name="file"
+                      id="file"
+                      accept=".png"
+                      className={styles.inputfile}
+                      onChange={(e) => {
+                        onChange(e)
+                        iconInputChangeHandler(e)
+
+                        setDisabledPush(false)
+                      }}
+                    />
+                    <label htmlFor="file">Change icon</label>
+                  </div>
+                </div>
               </div>
-            </div>
-          }
-        />
-      </div>
-      <div className={styles.linkNavigation}>
-        <button
-          onClick={() => {
-            setUnderConstructionDetails(false)
-            setShowChildrenUnderConstraction(true)
-          }}
-          className={styles.back}
-        >
-          Back
-        </button>
-        <button
-          disabled={isDisabledPush || !isNotNullCurrentAccount}
-          onClick={() => {
-            saveChanges()
-          }}
-          className={cn(styles.push, {
-            [styles.pushDisabled]: isDisabledPush || !isNotNullCurrentAccount,
-          })}
-        >
-          Push changes
-        </button>
-      </div>
+            }
+          />
+
+          <SettingWrapper
+            title="Parameters"
+            className={styles.wrapperSettings}
+            children={
+              <>
+                {isLoad ? (
+                  <div className={styles.miniLoader}></div>
+                ) : (
+                  <div className={styles.parametersBlock}>
+                    <div className={styles.wrapperContextID}>
+                      <div className={styles.blockContextID}>
+                        <h3 className={styles.blockContextIDTitle}>Context IDs</h3>
+                        <button
+                          disabled={mi.contextIds.length >= 1}
+                          onClick={addButtonClickHandlerContext}
+                          className={cn(styles.contextIDButton, {
+                            [styles.contextIDButtonDisabled]: mi.contextIds.length >= 1,
+                          })}
+                        />
+                      </div>
+                      {mi.contextIds.map((x, i) => (
+                        <div key={i} className={styles.wrapperContext}>
+                          <div className={styles.blockContext}>
+                            <input
+                              key={i}
+                              ref={nodeInput}
+                              className={styles.blockContextTitle}
+                              value={editContextId}
+                              placeholder={'Context ID (ex: example.com)'}
+                              onChange={(e) => {
+                                setEditContextId(e.target.value)
+                              }}
+                            />
+
+                            <button
+                              ref={node}
+                              onClick={() => {
+                                onDeleteChildContext(i)
+                                setEditContextId('')
+                              }}
+                              className={cn(styles.contextDelete, {
+                                [styles.contextDeleteNone]: contextDeleteNone,
+                              })}
+                            >
+                              <Delete />
+                            </button>
+                          </div>
+                          <button
+                            disabled={nodeInput.current?.value.length < 2 || addDisabled}
+                            onClick={() => {
+                              node.current?.classList.add('valid')
+                              _addContextId(editContextId)
+                            }}
+                            className={cn(styles.addContext, {
+                              [styles.addContextDisabled]:
+                                nodeInput.current?.value.length < 2 || addDisabled,
+                            })}
+                          >
+                            ADD
+                          </button>
+                        </div>
+                      ))}
+                      {editContextIdLoading ? (
+                        <div className={styles.editContextIdLoading}></div>
+                      ) : (
+                        <>
+                          {visibleContextId && visibleContextId.length
+                            ? visibleContextId.map((x, i) => (
+                                <div key={i} className={styles.blockContext}>
+                                  <input
+                                    className={styles.blockContextTitle}
+                                    placeholder={x}
+                                    value={x}
+                                    readOnly
+                                  />
+
+                                  <button
+                                    ref={node}
+                                    onClick={() => {
+                                      _removeContextID(x)
+                                    }}
+                                    className={cn(styles.addcontextDelete)}
+                                  />
+                                </div>
+                              ))
+                            : null}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </>
+            }
+          />
+        </div>
+        <div className={styles.linkNavigation}>
+          <button
+            onClick={() => {
+              setUnderConstructionDetails(false)
+              setShowChildrenUnderConstraction(true)
+            }}
+            className={styles.back}
+          >
+            Back
+          </button>
+          <button
+            disabled={isDisabledPush || !isNotNullCurrentAccount}
+            onClick={() => {
+              saveChanges()
+            }}
+            className={cn(styles.push, {
+              [styles.pushDisabled]: isDisabledPush || !isNotNullCurrentAccount,
+            })}
+          >
+            Push changes
+          </button>
+        </div>
+      </>
+
       <Modal
         classNameWrapper={styles.modalDialog}
         visible={isModalPush}

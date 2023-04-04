@@ -1,5 +1,6 @@
+import { Runtime } from 'webextension-polyfill'
 import ManifestDTO from '../background/dto/manifestDTO'
-
+export type Falsy = false | 0 | '' | null | undefined
 export type DefaultConfig = {
   [Environments.Dev]?: {
     [key: string]: any
@@ -48,7 +49,7 @@ export enum OverlayStorages {
   Decentralized = 'decentralized',
 }
 
-export type WalletDescriptor = {
+export interface WalletDescriptor {
   chain: ChainTypes
   type: WalletTypes
   meta: {
@@ -63,6 +64,10 @@ export type WalletDescriptor = {
   apps: string[]
   default: boolean
   lastUsage: string
+}
+
+export interface WalletDescriptorWithCAMainStatus extends WalletDescriptor {
+  accountActive: boolean
 }
 
 export type ModuleId = {
@@ -156,6 +161,7 @@ export interface IConnectedAccountUser {
   name: string
   origin: string
   accountActive: boolean
+  walletType?: WalletTypes
 }
 
 export interface IConnectedAccountsPair {
@@ -179,4 +185,37 @@ export type ManifestAndDetails = ManifestDTO & {
   isHomeLoading: boolean
   error: string
   versions: string[]
+}
+
+export type DappletLoadingResult = {
+  name: string
+  branch: string
+  version: string
+  runtime?: DappletRuntimeResult
+  error?: string
+}
+
+export type DappletRuntimeResult = {
+  isActionHandler: boolean
+  isHomeHandler: boolean
+}
+
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue }
+
+export type MessageWrapperRequest = {
+  request: {
+    handler: string
+    type: string
+    payload: {
+      path: string
+      args: JsonValue[]
+    }
+  }
+  sender: Runtime.MessageSender
 }

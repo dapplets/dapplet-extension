@@ -1,3 +1,4 @@
+import { Cacheable } from 'caching-decorator'
 import * as ethers from 'ethers'
 import * as semver from 'semver'
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
@@ -61,6 +62,7 @@ const moduleTypesMap: { [key: number]: ModuleTypes } = {
   4: ModuleTypes.Interface,
 }
 
+const BLOCKTIME_MS = 15000
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 const ZERO_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000'
 
@@ -110,6 +112,7 @@ export class EthRegistry implements Registry {
     this._signer = signer
   }
 
+  @Cacheable({ ttl: BLOCKTIME_MS })
   public async getModuleInfo(
     contextIds: string[],
     listers: string[]
@@ -123,7 +126,7 @@ export class EthRegistry implements Registry {
       )
       listers = await Promise.all(
         listers.map((u) =>
-          typeOfUri(u) === UriTypes.Ens ? this._signer.resolveName(u) : Promise.resolve(u)
+          typeOfUri(u) === UriTypes.Ens ? this._resolveEnsName(u) : Promise.resolve(u)
         )
       )
       listers = listers.filter((u) => u !== null)
@@ -175,6 +178,7 @@ export class EthRegistry implements Registry {
     }
   }
 
+  @Cacheable({ ttl: BLOCKTIME_MS })
   public async getModuleInfoByName(name: string): Promise<ModuleInfo> {
     try {
       const contract = await this._contractPromise
@@ -187,6 +191,7 @@ export class EthRegistry implements Registry {
     }
   }
 
+  @Cacheable({ ttl: BLOCKTIME_MS })
   public async getVersionNumbers(name: string, branch: string): Promise<string[]> {
     try {
       const contract = await this._contractPromise
@@ -210,6 +215,7 @@ export class EthRegistry implements Registry {
     }
   }
 
+  @Cacheable({ ttl: BLOCKTIME_MS })
   public async getVersionInfo(name: string, branch: string, version: string): Promise<VersionInfo> {
     try {
       const contract = await this._contractPromise
@@ -232,6 +238,7 @@ export class EthRegistry implements Registry {
     }
   }
 
+  @Cacheable({ ttl: BLOCKTIME_MS })
   public async getAllDevModules({
     users,
   }: {
@@ -328,6 +335,7 @@ export class EthRegistry implements Registry {
   }
 
   // ToDo: use getModuleInfoByName instead
+  @Cacheable({ ttl: BLOCKTIME_MS })
   public async getOwnership(moduleName: string) {
     try {
       const contract = await this._contractPromise
@@ -374,6 +382,7 @@ export class EthRegistry implements Registry {
     const tx = await contract.addAdmin(moduleName, adressAdmin)
     await tx.wait()
   }
+
   public async removeAdmin(moduleName: string, adressAdmin: string) {
     const contract = await this._contractPromise
     const tx = await contract.removeAdmin(moduleName, adressAdmin)
@@ -532,5 +541,10 @@ export class EthRegistry implements Registry {
     }
 
     return out
+  }
+
+  @Cacheable()
+  private async _resolveEnsName(name: string): Promise<string> {
+    return this._signer.resolveName(name)
   }
 }

@@ -1,6 +1,7 @@
 @import '../../assets/styles/null';
 @import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
+@import './adaptive';
 
 .wrapperCard {
   display: flex;
@@ -47,7 +48,7 @@
   font-size: 12px;
   font-weight: 400;
   line-height: 120%;
-  color: $ContentBlack;
+  color: $content-black;
 }
 
 .blockBottom {
@@ -106,7 +107,7 @@
     width: 1px;
     height: 16px;
 
-    background-color: #e3e3e3;
+    background-color: $stroke-color;
   }
 }
 
@@ -145,13 +146,13 @@
   height: 20px;
   margin-left: 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 500;
   line-height: 100%;
-  color: $PureWhite;
+  color: $pure-white;
 
-  background: $Secondary;
+  background: $secondary;
   border-radius: 4px;
 }
 
@@ -174,5 +175,3 @@
   background-image: url("../../assets/svg/loaderSettings.svg");
   background-repeat: no-repeat;
 }
-
-@import './adaptive';

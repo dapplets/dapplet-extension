@@ -2,6 +2,28 @@
 @import "../../assets/styles/color.variables";
 @import "../../assets/styles/null";
 
+.warningInfo {
+  display: block;
+
+  padding: 4px;
+
+  color: white;
+  text-align: center;
+
+  background-color: $primary;
+}
+
+.overlayPaddings {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  padding: 10px 15px 0 16px;
+
+  &.withWarning {
+    height: calc(100% - 28px);
+  }
+}
+
 .wrapper {
   overflow: hidden;
   display: flex;
@@ -9,14 +31,51 @@
 
   width: 100%;
   height: 100%;
-  padding: 14px 0 0;
+}
+
+.caHeaderTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.caHeaderTop > h3 {
+  margin: 5px 0;
+  color: rgb(145 145 145);
+}
+
+.caHeaderTop > div {
+  width: 118px;
+  height: 23px;
+
+  font-size: 12px;
+  font-style: inherit;
+  color: #444;
+
+  background: white;
+  border: 1px solid;
+}
+
+.caHeaderTop > div > div:last-child {
+  border: 1px solid;
+}
+
+.caHeaderTop > div > div:last-child > div {
+  width: 118px;
+  height: 23px;
+
+  font-size: 12px;
+  font-style: inherit;
+  color: #444;
+
+  background: white;
 }
 
 .scrollContent {
   direction: rtl;
   overflow-y: auto;
-  width: 100%;
-  height: calc(100vh - 75px);
+  height: calc(100vh - 162px);
+  padding-left: 7px;
 
   &::-webkit-scrollbar {
     cursor: pointer;
@@ -39,9 +98,17 @@
     height: 2px;
     margin-bottom: 15px;
 
-    background: $Primary;
+    background: $primary;
     border-radius: 2px;
     box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
+  }
+
+  &.withWarning {
+    height: calc(100vh - 190px);
+  }
+
+  &:first-child {
+    margin-top: 0;
   }
 }
 
@@ -49,63 +116,31 @@
   direction: ltr;
 }
 
-.title {
-  position: relative;
-
-  display: grid;
-  grid-template-columns: 330px 90px;
-
-  padding-bottom: 7px;
-
-  font-family: Roboto, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  font-style: normal;
-  line-height: 100%;
-  color: $MainGrey;
-  text-transform: capitalize;
-
-  &::after {
-    content: "";
-
-    position: absolute;
-    bottom: 0;
-    left: 0;
-
-    width: 100%;
-    height: 1px;
-
-    background: #ced3d3;
-  }
-}
-
-.title > h3 {
-  padding: 3px;
-}
-
 .accountsWrapper {
   display: flex;
   flex-direction: column;
-
-  width: 97%;
   height: 100%;
   margin-top: 14px;
 }
 
 .mainBlock {
   display: grid;
-  grid-template-columns: 330px 90px;
+  grid-template-columns: 333px 90px;
   align-items: center;
 
   width: 100%;
   margin-top: 10px;
+
+  &:first-child {
+    margin-top: 0;
+  }
 }
 
 .accountBlock {
   display: flex;
   width: 100%;
-  padding: 10px;
-  background-color: $WebBG;
+  padding: 10px 14px 10px 9px;
+  background-color: $web-bg;
 }
 
 .accountBlockHorizontal {
@@ -141,7 +176,7 @@
   margin-right: 10px;
 
   filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
-  border: 2px solid $WebBG;
+  border: 2px solid $web-bg;
   border-radius: 50%;
 }
 
@@ -153,14 +188,14 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainBlack;
+  color: $main-black;
 }
 
 .nameUserActive {
-  background: $Primary;
+  background: $primary;
 
   .nameUser {
-    color: $PureWhite;
+    color: $pure-white;
   }
 }
 
@@ -206,11 +241,11 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainGrey;
+  color: $main-grey;
   text-align: center;
   text-transform: capitalize;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px 0 10px 10px;
   box-shadow: 0 4px 4px rgb(0 0 0 / 10%);
 }
@@ -230,7 +265,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainBlack;
+  color: $main-black;
   text-transform: capitalize;
 }
 
@@ -249,7 +284,7 @@
 .statusError {
   margin: 3px;
   padding: 4px 2px 7px;
-  background: $Primary;
+  background: $primary;
 }
 
 .buttonDelete {
@@ -261,19 +296,19 @@
   height: 30px;
   margin: 3px;
 
-  background-color: $PureWhite;
+  background-color: $pure-white;
   filter: drop-shadow(0 2px 2px rgb(0 0 0 / 4%));
   border-radius: 50%;
 
   fill: #919191;
 
   &:hover {
-    background-color: $Primary;
+    background-color: $primary;
     fill: #fff;
   }
 
   &:active {
-    background-color: $PrimaryPressed;
+    background-color: $primary-pressed;
     fill: #fff;
   }
 
@@ -298,7 +333,7 @@
     font-weight: 700;
     font-style: normal;
     line-height: 26px;
-    color: $MainGrey;
+    color: $main-grey;
     text-align: center;
   }
 
@@ -316,34 +351,35 @@
 .connectWalletsBtnModule {
   display: flex;
   align-items: center;
-  width: 97%;
+  width: 44%;
 }
 
 .connectWalletsBtn {
   display: block;
 
   width: fit-content;
-  padding: 12px 20px;
+  margin-left: 10px;
+  padding: 15px 20px;
 
   font-family: Roboto, sans-serif;
   font-size: 14px;
   line-height: 100%;
   color: #fff;
 
-  background: $Primary;
-  border-radius: 4px;
+  background: $primary;
+  border-radius: 12px;
 
   &:hover {
     background: #c12f49;
   }
 
   &:active {
-    background: $PrimaryPressed;
+    background: $primary-pressed;
   }
 
   &:disabled {
     cursor: default;
-    background-color: $MainGrey;
+    background-color: $main-grey;
   }
 }
 
@@ -352,7 +388,7 @@
 
   width: 20px;
   height: 20px;
-  margin: 10px;
+  margin-left: 8px;
 
   border-radius: 99px;
 }
@@ -366,12 +402,12 @@
   }
 
   &:active {
-    fill: $MainGrey;
+    fill: $main-grey;
   }
 }
 
 .connectWalletsBtnInfo.active svg {
-  fill: $Primary;
+  fill: $primary;
 
   &:hover,
   &:focus {
@@ -379,23 +415,25 @@
   }
 
   &:active {
-    fill: $PrimaryPressed
+    fill: $primary-pressed
   }
 }
 
 .connectWalletsInfoWrapper {
+  position: absolute;
   z-index: 2;
+  right: 0;
   height: 0;
 }
 
 .connectWalletsInfo {
-  transform: translateX(-200%);
+  transform: translateX(200%);
 
   display: block;
 
   width: 296px;
-  margin-top: 6px;
-  margin-left: 13px;
+  margin-top: 4px;
+  margin-right: 10px;
   padding: 13px 16px;
 
   font-family: Roboto, sans-serif;
@@ -403,7 +441,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 149%;
-  color: $ContentBlack;
+  color: $content-black;
 
   opacity: 0;
   background: white;
