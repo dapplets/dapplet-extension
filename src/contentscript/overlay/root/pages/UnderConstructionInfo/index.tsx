@@ -14,6 +14,31 @@ import { StorageRefImage } from '../../components/StorageRefImage'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
 
+enum DeploymentStatus {
+  Unknown,
+  Deployed,
+  NotDeployed,
+  NewModule,
+}
+
+enum DependencyType {
+  Dependency,
+  Interface,
+}
+
+enum FormMode {
+  Deploying,
+  Creating,
+  Editing,
+}
+
+type DependencyChecking = {
+  name: string
+  version: string
+  type: DependencyType
+  isExists?: boolean
+}
+
 export interface UnderConstructionInfoProps {
   ModuleInfo: any
   ModuleVersion: any
@@ -50,8 +75,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [visibleContextId, setVisibleContextId] = useState([])
   const [addDisabled, setAddDisabled] = useState(false)
 
-  const onClose = () => setModal(false)
-
   useEffect(() => {
     const init = async () => {
       setLoad(true)
@@ -65,6 +88,18 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     }
     init()
   }, [])
+
+  const addButtonClickHandler = () => {
+    const newAuthor = Object.assign({}, author)
+    newAuthor.authorForm.push(newAuthorObject)
+    setAuthor(newAuthor)
+  }
+
+  const onDeleteChild = (id: number) => {
+    const newAuthor = Object.assign({}, author)
+    newAuthor.authorForm.splice(id, 1)
+    setAuthor(newAuthor)
+  }
 
   const _updateData = async () => {
     const { getRegistries, getContextIds } = await initBGFunctions(browser)
