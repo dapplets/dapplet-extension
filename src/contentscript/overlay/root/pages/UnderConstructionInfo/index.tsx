@@ -91,18 +91,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     init()
   }, [])
 
-  const addButtonClickHandler = () => {
-    const newAuthor = Object.assign({}, author)
-    newAuthor.authorForm.push(newAuthorObject)
-    setAuthor(newAuthor)
-  }
-
-  const onDeleteChild = (id: number) => {
-    const newAuthor = Object.assign({}, author)
-    newAuthor.authorForm.splice(id, 1)
-    setAuthor(newAuthor)
-  }
-
   const _updateData = async () => {
     const { getRegistries, getContextIds } = await initBGFunctions(browser)
 
