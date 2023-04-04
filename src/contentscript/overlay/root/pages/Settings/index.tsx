@@ -3,7 +3,6 @@ import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
-import useAbortController from '../../hooks/useAbortController'
 import { DappletsMainInfo } from '../DappletsInfo'
 import { Tokenomics } from '../Tokenomics'
 import { UnderConstruction } from '../UnderConstruction'
@@ -71,7 +70,6 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   const [isTokenomics, setTokenomics] = useState(false)
   const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] = useState(false)
   const [isShowChildrenRegistry, setShowChildrenRegistry] = useState(false)
-  const abortController = useAbortController()
 
   useEffect(() => {
     const init = async () => {
@@ -79,10 +77,8 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
       await loadErrorReporting()
     }
     init()
-    return () => {
-      abortController.abort()
-    }
-  }, [abortController.signal.aborted])
+    return () => {}
+  }, [])
 
   const loadDevMode = async () => {
     setSvgLoaderDevMode(true)
@@ -214,7 +210,6 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
               <Tokenomics
                 ModuleInfo={ModuleInfo}
                 setPageDetails={setDappletsDetail}
-                setTokenomics={setTokenomics}
                 setActiveTab={setActiveTabDappletsDetails}
               />
             ) : null}
@@ -280,7 +275,6 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
               <Tokenomics
                 ModuleInfo={ModuleInfo}
                 setPageDetails={setUnderConstructionDetails}
-                setTokenomics={setTokenomics}
                 setActiveTab={setActiveTabUnderConstructionDetails}
               />
             )}

@@ -19,7 +19,7 @@
 
   .toggleOverlay {
     margin: 0 5px 0 0;
-    background: $PureWhite;
+    background: $pure-white;
     border-radius: 10px;
   }
 
@@ -55,20 +55,20 @@
       padding: 10px;
 
       background: transparent;
-      background: $AppBG;
+      background: $app-bg;
       border: none;
       border-radius: 10px 0 0 10px;
 
       svg path {
-        fill: $Secondary;
+        fill: $secondary;
       }
 
       &:hover svg path {
-        fill: $SecondaryHover;
+        fill: $secondary-hover;
       }
 
       &:active svg path {
-        fill: $SecondaryPressed;
+        fill: $secondary-pressed;
       }
     }
   }
@@ -84,7 +84,7 @@
     width: 52px;
     height: 52px;
 
-    background: $PureWhite;
+    background: $pure-white;
     border-radius: 10px;
 
     > :nth-child(n + 2) {

@@ -1,4 +1,6 @@
 @import '../../assets/styles/color.variables';
+@import './adaptive';
+@import './menuWidgets';
 
 .tab {
   cursor: pointer;
@@ -63,18 +65,18 @@
     margin-left: -4px;
 
     path {
-      fill: $Primary !important;
+      fill: $primary !important;
     }
 
     &:hover {
-      fill: $PrimaryHover !important;
+      fill: $primary-hover !important;
     }
   }
 
   &:hover {
     svg {
       path {
-        fill: $PrimaryHover !important;
+        fill: $primary-hover !important;
       }
     }
   }
@@ -112,14 +114,14 @@
 
     svg {
       path {
-        fill: $MainGrey;
+        fill: $main-grey;
       }
     }
 
     &:hover {
       svg {
         path {
-          fill: $PrimaryHover;
+          fill: $primary-hover;
         }
       }
     }
@@ -166,9 +168,6 @@
   height: 100%;
   margin-top: 11px;
 
-  svg {
-  }
-
   &:nth-child(2),
   &:nth-child(4) {
     &::before {
@@ -182,7 +181,7 @@
       height: 8px;
 
       opacity: 0;
-      background-color: $Primary;
+      background-color: $primary;
       border: 1px solid #f5f5f5;
       border-radius: 50%;
     }
@@ -203,8 +202,8 @@
   &:hover {
     svg {
       path {
-        fill: $PrimaryHover;
-        stroke: $PrimaryHover;
+        fill: $primary-hover;
+        stroke: $primary-hover;
       }
     }
   }
@@ -212,8 +211,8 @@
   &:active {
     svg {
       path {
-        fill: $PrimaryPressed;
-        stroke: $PrimaryPressed;
+        fill: $primary-pressed;
+        stroke: $primary-pressed;
       }
     }
   }
@@ -221,11 +220,11 @@
 
 .icon {
   &:hover path {
-    fill: $PrimaryHover;
+    fill: $primary-hover;
   }
 
   &:active path {
-    fill: $PrimaryPressed;
+    fill: $primary-pressed;
   }
 
   svg {
@@ -240,6 +239,3 @@
     margin-top: 0;
   }
 }
-
-@import './adaptive';
-@import './menuWidgets';

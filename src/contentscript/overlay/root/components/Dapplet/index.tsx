@@ -85,7 +85,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
   return (
     <div className={cn(styles.wrapperCard, className)} data-testid={name} {...anotherProps}>
-      <DappletImage isFavourites={false} storageRef={icon} />
+      <DappletImage storageRef={icon} />
 
       <div className={cn(styles.wrapperBlock)}>
         <div className={styles.header}>

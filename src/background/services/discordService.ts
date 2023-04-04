@@ -1,3 +1,4 @@
+import { Cacheable } from 'caching-decorator'
 import GlobalConfigService from './globalConfigService'
 
 interface IDiscordMessage {
@@ -10,7 +11,8 @@ interface IDiscordMessage {
 export default class DiscordService {
   constructor(private _globalConfigService: GlobalConfigService) {}
 
-  async getDiscordMessages(): Promise<any> {
+  @Cacheable({ ttl: 60 * 60 * 1000 })
+  async getDiscordMessages(): Promise<IDiscordMessage[]> {
     const url = `https://dapplets-api.mooo.com/announcements`
     try {
       const resp = await fetch(url)

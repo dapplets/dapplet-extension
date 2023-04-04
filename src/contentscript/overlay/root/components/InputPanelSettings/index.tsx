@@ -46,7 +46,7 @@ export const InputPanelSettings: FC<InputPanelSettingsProps> = (props) => {
   return (
     <>
       <div
-        className={cn(styles.formDefault, styles.formAbsolute, {
+        className={cn(styles.formDefault, {
           [styles.errorInputDefault]:
             (!!providerInputError && isValidHttpFunction ? !isValidHttp(providerInput) : null) ||
             providerInputError,

@@ -1,4 +1,5 @@
 import Base from '../../common/models/base'
+import { DappletRuntimeResult } from '../../common/types'
 
 // ToDo: It should be UserConfig
 export default class SiteConfig extends Base {
@@ -11,8 +12,7 @@ export default class SiteConfig extends Base {
       version: string
       isActive: boolean
       order: number
-      runtime: { isActionHandler: boolean } & any
-      //moduleInfo: ModuleInfo;
+      runtime: DappletRuntimeResult
       registryUrl: string
     }
   } = {}

@@ -6,8 +6,8 @@ import styles from './Modal.module.scss'
 interface ModalProps {
   visible: boolean
   title?: string
-  content: ReactElement | string
-  footer: ReactElement | string
+  content?: ReactElement | string
+  footer?: ReactElement | string
   onClose?: () => void
   className?: string
   classNameWrapper?: string
@@ -65,7 +65,7 @@ export const Modal = ({
           ) : null}
         </div>
         <div className={cn(styles.modalBod, classNameContent)}>
-          <div className={styles.modalContent}>{content}</div>
+          {content && <div className={styles.modalContent}>{content}</div>}
         </div>
         {footer && <div className={styles.modalFooter}>{footer}</div>}
       </div>

@@ -11,7 +11,6 @@ import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
-import useAbortController from '../../hooks/useAbortController'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
 
@@ -50,7 +49,6 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const nodeInput = useRef<HTMLInputElement>()
   const [visibleContextId, setVisibleContextId] = useState([])
   const [addDisabled, setAddDisabled] = useState(false)
-  const abortController = useAbortController()
 
   const onClose = () => setModal(false)
 
@@ -66,13 +64,10 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       }
     }
     init()
-    return () => {
-      abortController.abort()
-    }
-  }, [abortController.signal.aborted])
+  }, [])
 
   const _updateData = async () => {
-    const { getRegistries, getTrustedUsers, getContextIds } = await initBGFunctions(browser)
+    const { getRegistries, getContextIds } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
@@ -169,10 +164,10 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     setSt([...filesArr])
   }
   const visibleNameFile = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 1, hash.length - 6)
+    const firstCharacters = hash.substring(0, 6)
+    const lastCharacters = hash.substring(hash.length - 1, hash.length - 6)
 
-    return `${firstFourCharacters}...${lastFourCharacters}`
+    return `${firstCharacters}...${lastCharacters}`
   }
   const _removeContextID = async (contextId: string) => {
     setEditContextIdLoading(true)

@@ -46,6 +46,8 @@ export const ConnectedAccount = () => {
   const [connectedAccountsListReceiver, setConnectedAccountsListReceiver] = useState<
     WalletDescriptorWithCAMainStatus | undefined
   >()
+
+  // ToDo: remove abort controller
   const abortController = useAbortController()
 
   const updatePairs = async (prevPairs?: IConnectedAccountsPair[]) => {

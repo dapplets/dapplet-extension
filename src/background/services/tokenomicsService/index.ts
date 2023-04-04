@@ -1,16 +1,17 @@
 import * as ethers from 'ethers'
-import * as EventBus from '../../../common/global-event-bus'
-import { ChainTypes, DefaultSigners } from '../../../common/types'
+import { ChainTypes, DefaultSigners, Falsy } from '../../../common/types'
+import { StorageAggregator } from '../../moduleStorages/moduleStorage'
 import GlobalConfigService from '../globalConfigService'
+import { OverlayService } from '../overlayService'
 import { WalletService } from '../walletService'
 import abi from './app-token-registry.json'
+import ERC20Interface from './ERC20Interface.json'
 // todo: create cycle
 const PAGE_SIZE = 20
 const ZERO_SIZE = 0
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 const DEFAULT_ECOSYSTEM = 'zoo'
 const DEFAULT_APP_TYPE = 1
-type Falsy = false | 0 | '' | null | undefined
 
 interface I_TokenFactory {}
 
@@ -19,7 +20,9 @@ export class TokenRegistryService {
 
   constructor(
     private _globalConfigService: GlobalConfigService,
-    private _walletService: WalletService
+    private _walletService: WalletService,
+    private overlayService: OverlayService,
+    private _storageAggregator: StorageAggregator
   ) {}
 
   private async _init() {
@@ -54,23 +57,21 @@ export class TokenRegistryService {
     appId: string,
     symbol: string,
     name: string,
-    referenceUrl: File | string,
+    referenceUrl: any,
     additionalCollaterals?: { addr: string; referenceUrl: string }[]
   ) {
-    await this._init()
     await this.tokenFactory.createAppToken(
       DEFAULT_APP_TYPE, //todo: mocked
       appId,
       DEFAULT_ECOSYSTEM, //todo: mocked
       symbol,
       name,
-      referenceUrl,
+      referenceUrl.uris[1], // todo
       ZERO_ADDRESS, //todo: mocked
       ZERO_ADDRESS, //todo: mocked
       additionalCollaterals
     )
     await this.getTokensByApp(appId)
-    EventBus.emit('token create')
   }
 
   public async linkAppWithToken(appId: string, tokenAddress: string) {
@@ -78,6 +79,38 @@ export class TokenRegistryService {
 
     await this.tokenFactory.linkAppWithToken(DEFAULT_APP_TYPE, appId, tokenAddress)
     await this.getTokensByApp(appId)
-    EventBus.emit('token create')
+  }
+  public async getErc20TokenInfo(tokenAddress: string | Falsy) {
+    if (!tokenAddress) return undefined
+
+    const signer = await this._walletService.eth_getSignerFor(
+      DefaultSigners.EXTENSION, //todo:mocked
+      ChainTypes.ETHEREUM_GOERLI //todo:mocked
+    )
+
+    const data = new ethers.Contract(tokenAddress, ERC20Interface, signer)
+
+    const newData = {
+      name: await data.name(),
+      address: data.address,
+      symbol: await data.symbol(),
+    }
+
+    return newData
+  }
+  public async saveBlobToIpfs(data: any, targetStorages) {
+    const getData = () => {
+      const buf = new ArrayBuffer(data.length)
+      const bufView = new Uint8Array(buf)
+      for (let i = 0, strLen = data.length; i < strLen; i++) {
+        bufView[i] = data.charCodeAt(i)
+      }
+      return buf
+    }
+    const hashUris = await this._storageAggregator.save(
+      new Blob([getData()], { type: 'image/png' }),
+      targetStorages
+    )
+    return hashUris
   }
 }

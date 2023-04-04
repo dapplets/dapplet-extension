@@ -1,6 +1,7 @@
 @import '../../../assets/styles/null';
 @import '../../../assets/styles/fonts';
 @import '../../../assets/styles/color.variables';
+
 .buttonGroup {
   display: flex;
   flex-direction: column;
@@ -13,47 +14,52 @@
 }
 
 .buttonLabel {
-  font-family: 'Roboto';
-  font-weight: 400;
+  padding: 7px 0;
+
+  font-family: Roboto;
   font-size: 14px;
+  font-weight: 400;
   line-height: 100%;
   color: #747376;
-  padding: 7px 0;
 }
 
 .preview {
-  display: flex;
+  cursor: pointer;
+
   overflow: hidden;
+  display: flex;
   align-items: center;
   justify-content: center;
 
   width: 96px;
   height: 96px;
 
-  cursor: pointer;
-
-  border: 1px solid $Primary;
-  border-radius: 50%;
   background-color: #f5f5f5;
+  border: 1px solid $primary;
+  border-radius: 50%;
+
   svg {
     path {
-      stroke: $Primary;
+      stroke: $primary;
     }
   }
+
   &:hover {
-    border: 1px solid $PrimaryHover;
+    border: 1px solid $primary-hover;
+
     svg {
       path {
-        stroke: $PrimaryHover;
+        stroke: $primary-hover;
       }
     }
   }
 
   &:active {
-    border: 1px solid $PrimaryPressed;
+    border: 1px solid $primary-pressed;
+
     svg {
       path {
-        stroke: $PrimaryPressed;
+        stroke: $primary-pressed;
       }
     }
   }
@@ -69,26 +75,27 @@
 }
 
 .label {
-  margin-bottom: 0;
-  font-family: 'Roboto';
-
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 100%;
-  color: $ContentBlack;
-  padding-bottom: 5px;
   display: inline-block;
+
+  margin-bottom: 0;
+  padding-bottom: 5px;
+
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+  color: $content-black;
 }
 
 .button {
   padding: 14px 78px;
-  white-space: nowrap;
   font-size: 14px;
   line-height: 100%;
+  white-space: nowrap;
 }
 
 .button svg {
-	margin-right: 5px;
+  margin-right: 5px;
 }
 
 .error {
@@ -96,13 +103,11 @@
 }
 
 .success {
-  color: $Primary;
+  color: $primary;
 }
 
 .errorMessage {
   display: flex;
-
-  color: $error;
-
   font-weight: 700;
+  color: $error;
 }

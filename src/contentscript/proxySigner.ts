@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as ethers from 'ethers'
 import { browser } from 'webextension-polyfill-ts'
+import { NotImplementedError } from '../common/errors'
 import { ChainTypes } from '../common/types'
 
 export class ProxySigner extends ethers.Signer {
@@ -12,8 +13,8 @@ export class ProxySigner extends ethers.Signer {
     super()
   }
 
-  connect(provider: ethers.ethers.providers.Provider): ethers.ethers.Signer {
-    throw new Error('Method not implemented.')
+  connect(): ethers.ethers.Signer {
+    throw new NotImplementedError()
   }
 
   async getAddress(): Promise<string> {
@@ -21,12 +22,12 @@ export class ProxySigner extends ethers.Signer {
     return getAddress(this._app, this._chain)
   }
 
-  async signMessage(message: ethers.utils.BytesLike): Promise<string> {
-    throw new Error('Method not implemented.')
+  async signMessage(): Promise<string> {
+    throw new NotImplementedError()
   }
 
-  async signTransaction(transaction: ethers.providers.TransactionRequest): Promise<string> {
-    throw new Error('Method not implemented.')
+  async signTransaction(): Promise<string> {
+    throw new NotImplementedError()
   }
 
   async sendTransaction(
