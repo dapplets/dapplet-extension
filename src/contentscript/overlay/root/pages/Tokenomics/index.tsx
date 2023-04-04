@@ -8,6 +8,7 @@ import { regExpIndexEthereum } from '../../common/constants'
 import { getValidationAddress } from '../../common/helpers'
 import { Message } from '../../components/Message'
 import { Modal } from '../../components/Modal'
+import { TabLoader } from '../../components/TabLoader'
 import useCopied from '../../hooks/useCopyed'
 import formatIconRefUrl from '../../utils/formatIconRefUrl'
 import { DappletsDetails, UnderConstructionDetails } from '../Settings'
@@ -60,6 +61,8 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
   const [isModalEndCreation, setModalEndCreation] = useState(false)
   const [message, setMessage] = useState<Message>(null)
   const [isModalError, setModalError] = useState(false)
+
+  const [isLoad, setLoad] = useState(false)
   const onClose = () => setModal(false)
   const onCloseError = () => {
     setModalError(false)
@@ -68,7 +71,9 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
 
   useEffect(() => {
     const init = async () => {
+      setLoad(true)
       await _updateData()
+      setLoad(false)
     }
     init()
     return () => {}
@@ -76,6 +81,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
 
   const _updateData = async () => {
     const { getTokensByApp } = await initBGFunctions(browser)
+
     const tokensByApp = await getTokensByApp(mi.name)
 
     setTokensByApp(tokensByApp)
@@ -112,188 +118,194 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
   }
   return (
     <>
-      {!tokenCreated || tokenCreated.length === 0 ? (
-        !isNewToken ? (
-          <div className={styles.wrapper} ref={wrapperRef}>
-            <div className={styles.blockMessage}>
-              <Message
-                title="Create new token or select existing?"
-                subtitle="You can create a new token on the bonding curve with the ZOO ecosystem token as a collateral or use an existing ERC-20 token" // todo: mocked ecosystem
-                otherSubtitle
-                className={styles.messageWrapper}
-                children={
-                  <div className={styles.choiseTokenWrapper}>
-                    <div className={styles.radioButtonsBlock}>
-                      <RadioButtons
-                        value="New token"
-                        title="New token"
-                        name="TokenChoise"
-                        id="1_choise"
-                        checked={activeChoise === ChoiseType.New}
-                        onChange={() => {
-                          setActiveChoise(ChoiseType.New)
-                          setChooseToken('')
-                          setSelectToken(null)
-                          setdaiInfo(null)
-                        }}
-                      />
-                      <RadioButtons
-                        value="Existing token"
-                        title="Existing token"
-                        name="TokenChoise"
-                        id="2_choise"
-                        checked={activeChoise === ChoiseType.Existing}
-                        onChange={() => setActiveChoise(ChoiseType.Existing)}
-                      />
-                    </div>
-                    {activeChoise === ChoiseType.Existing && (
-                      <SelectToken
-                        chooseToken={chooseToken}
-                        setSelectToken={setSelectToken}
-                        setChooseToken={setChooseToken}
-                        selectToken={selectToken}
-                        setAnimate={setAnimate}
-                        daiInfo={daiInfo}
-                        setdaiInfo={setdaiInfo}
-                      />
-                    )}
+      {' '}
+      {isLoad ? (
+        <TabLoader isGrayPageColor />
+      ) : (
+        <>
+          {!tokenCreated || tokenCreated.length === 0 ? (
+            !isNewToken ? (
+              <div className={styles.wrapper} ref={wrapperRef}>
+                <div className={styles.blockMessage}>
+                  <Message
+                    title="Create new token or select existing?"
+                    subtitle="You can create a new token on the bonding curve with the ZOO ecosystem token as a collateral or use an existing ERC-20 token" // todo: mocked ecosystem
+                    otherSubtitle
+                    className={styles.messageWrapper}
+                    children={
+                      <div className={styles.choiseTokenWrapper}>
+                        <div className={styles.radioButtonsBlock}>
+                          <RadioButtons
+                            value="New token"
+                            title="New token"
+                            name="TokenChoise"
+                            id="1_choise"
+                            checked={activeChoise === ChoiseType.New}
+                            onChange={() => {
+                              setActiveChoise(ChoiseType.New)
+                              setChooseToken('')
+                              setSelectToken(null)
+                              setdaiInfo(null)
+                            }}
+                          />
+                          <RadioButtons
+                            value="Existing token"
+                            title="Existing token"
+                            name="TokenChoise"
+                            id="2_choise"
+                            checked={activeChoise === ChoiseType.Existing}
+                            onChange={() => setActiveChoise(ChoiseType.Existing)}
+                          />
+                        </div>
+                        {activeChoise === ChoiseType.Existing && (
+                          <SelectToken
+                            chooseToken={chooseToken}
+                            setSelectToken={setSelectToken}
+                            setChooseToken={setChooseToken}
+                            selectToken={selectToken}
+                            setAnimate={setAnimate}
+                            daiInfo={daiInfo}
+                            setdaiInfo={setdaiInfo}
+                          />
+                        )}
 
-                    <button
-                      disabled={
-                        activeChoise === ChoiseType.Existing &&
-                        getValidationAddress(chooseToken, regExpIndexEthereum) === null &&
-                        activeChoise === ChoiseType.Existing &&
-                        !daiInfo
-                      }
-                      onClick={() => {
-                        activeChoise === ChoiseType.New ? setNewToken(true) : setModal(true)
-                      }}
-                      className={styles.createTokenomics}
-                    >
-                      {activeChoise === ChoiseType.New ? 'Create new token' : 'Select token'}
-                    </button>
-                  </div>
-                }
-              />
-            </div>
-            <Modal
-              classNameWrapper={styles.wraperModal}
-              visible={isModal && daiInfo}
-              title="Transaction Confirmation"
-              content={
-                <div className={styles.finalWarning}>
-                  You are associate token {daiInfo && daiInfo.name} to your project {mi.name}
-                  <br />
-                  You won&#39;t be able to change this connection late
+                        <button
+                          disabled={
+                            activeChoise === ChoiseType.Existing &&
+                            getValidationAddress(chooseToken, regExpIndexEthereum) === null &&
+                            activeChoise === ChoiseType.Existing &&
+                            !daiInfo
+                          }
+                          onClick={() => {
+                            activeChoise === ChoiseType.New ? setNewToken(true) : setModal(true)
+                          }}
+                          className={styles.createTokenomics}
+                        >
+                          {activeChoise === ChoiseType.New ? 'Create new token' : 'Select token'}
+                        </button>
+                      </div>
+                    }
+                  />
                 </div>
-              }
-              footer={
-                <div className={styles.footerContentModal}>
-                  <button
-                    className={cn(styles.footerContentModalButton)}
+                <Modal
+                  classNameWrapper={styles.wraperModal}
+                  visible={isModal && daiInfo}
+                  title="Transaction Confirmation"
+                  content={
+                    <div className={styles.finalWarning}>
+                      You are associate token {daiInfo && daiInfo.name} to your project {mi.name}
+                      <br />
+                      You won&#39;t be able to change this connection late
+                    </div>
+                  }
+                  footer={
+                    <div className={styles.footerContentModal}>
+                      <button
+                        className={cn(styles.footerContentModalButton)}
+                        onClick={() => {
+                          handleSubmit(daiInfo)
+                        }}
+                      >
+                        Accept
+                      </button>
+                      {/* todo: correct src */}
+                      <a
+                        href="https://docs.dapplets.org/docs/whitepapers/auge-token-usage"
+                        target="_blank"
+                        className={styles.footerContentModalLink}
+                      >
+                        F.A.Q.
+                      </a>
+                    </div>
+                  }
+                  onClose={onClose}
+                />
+                <Modal
+                  visible={isModalTransaction}
+                  title={'Transaction started'}
+                  content={''}
+                  footer={''}
+                  onClose={() => !isModalTransaction}
+                />
+                <Modal
+                  visible={isModalEndCreation}
+                  title={'Transaction finished'}
+                  content={''}
+                  footer={''}
+                  onClose={() => _updatePage()}
+                />
+                {message ? (
+                  <Modal
+                    visible={isModalError}
+                    title={message.header}
+                    content={
+                      <div className={styles.modalDefaultContent}>
+                        {message.message.map((m, i) => (
+                          <p key={i} style={{ overflowWrap: 'break-word' }}>
+                            {m === `Cannot read properties of null (reading 'length')`
+                              ? 'Please fill in the empty fields'
+                              : m}
+                          </p>
+                        ))}
+                      </div>
+                    }
+                    footer={''}
+                    onClose={() => onCloseError()}
+                  />
+                ) : null}
+                <div className={styles.linkNavigation}>
+                  <button onClick={() => setPageDetails(false)} className={styles.back}>
+                    Back
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className={styles.wrapper} ref={wrapperRef}>
+                <NewToken setNewToken={setNewToken} module={mi} setActiveTab={setActiveTab} />
+              </div>
+            )
+          ) : (
+            <div className={styles.wrapper}>
+              <div className={styles.titleTokenApp}>Dapplet {mi.name} is connected to token</div>
+              <div className={styles.blockTokenApp}>
+                <div className={styles.firstLine}>
+                  {isImg ? (
+                    <div className={styles.icon}>{tokenCreated[0][0]}</div>
+                  ) : (
+                    <img
+                      className={styles.icon}
+                      onError={() => setImg(true)}
+                      src={formatIconRefUrl(tokenCreated[0][5])}
+                    />
+                  )}
+                  <div className={styles.name}>{tokenCreated[0][1]}</div>
+                  <div className={styles.ticker}>{tokenCreated[0][0]}</div>
+                </div>
+                <div className={styles.secondLine}>
+                  <a
+                    onClick={() =>
+                      window.open(
+                        `https://goerli.etherscan.io/address/${tokenCreated[0][2]}`,
+                        '_blank'
+                      )
+                    }
+                    className={styles.address}
+                  >
+                    {tokenCreated[0][2]}
+                  </a>
+                  <span
+                    className={styles.tokenCopy}
                     onClick={() => {
-                      handleSubmit(daiInfo)
+                      setValue(tokenCreated[0][2])
+                      setTimeout(() => {
+                        copy()
+                      }, 500)
                     }}
                   >
-                    Accept
-                  </button>
-                  {/* todo: correct src */}
-                  <a
-                    href="https://docs.dapplets.org/docs/whitepapers/auge-token-usage"
-                    target="_blank"
-                    className={styles.footerContentModalLink}
-                  >
-                    F.A.Q.
-                  </a>
+                    <Copy />
+                  </span>
                 </div>
-              }
-              onClose={onClose}
-            />
-            <Modal
-              visible={isModalTransaction}
-              title={'Transaction started'}
-              content={''}
-              footer={''}
-              onClose={() => !isModalTransaction}
-            />
-            <Modal
-              visible={isModalEndCreation}
-              title={'Transaction finished'}
-              content={''}
-              footer={''}
-              onClose={() => _updatePage()}
-            />
-            {message ? (
-              <Modal
-                visible={isModalError}
-                title={message.header}
-                content={
-                  <div className={styles.modalDefaultContent}>
-                    {message.message.map((m, i) => (
-                      <p key={i} style={{ overflowWrap: 'break-word' }}>
-                        {m === `Cannot read properties of null (reading 'length')`
-                          ? 'Please fill in the empty fields'
-                          : m}
-                      </p>
-                    ))}
-                  </div>
-                }
-                footer={''}
-                onClose={() => onCloseError()}
-              />
-            ) : null}
-            <div className={styles.linkNavigation}>
-              <button onClick={() => setPageDetails(false)} className={styles.back}>
-                Back
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className={styles.wrapper} ref={wrapperRef}>
-            <NewToken setNewToken={setNewToken} module={mi} setActiveTab={setActiveTab} />
-          </div>
-        )
-      ) : (
-        <div className={styles.wrapper}>
-          <div className={styles.titleTokenApp}>
-            Dapplet {mi.name.toUpperCase()} is connected to token
-          </div>
-          <div className={styles.blockTokenApp}>
-            <div className={styles.firstLine}>
-              {isImg ? (
-                <div className={styles.icon}>{tokenCreated[0][0]}</div>
-              ) : (
-                <img
-                  className={styles.icon}
-                  onError={() => setImg(true)}
-                  src={formatIconRefUrl(tokenCreated[0][5])}
-                />
-              )}
-              <div className={styles.name}>{tokenCreated[0][1]}</div>
-              <div className={styles.ticker}>{tokenCreated[0][0]}</div>
-            </div>
-            <div className={styles.secondLine}>
-              <a
-                onClick={() =>
-                  window.open(`https://goerli.etherscan.io/address/${tokenCreated[0][2]}`, '_blank')
-                }
-                className={styles.address}
-              >
-                {tokenCreated[0][2]}
-              </a>
-              <span
-                className={styles.tokenCopy}
-                onClick={() => {
-                  setValue(tokenCreated[0][2])
-                  setTimeout(() => {
-                    copy()
-                  }, 500)
-                }}
-              >
-                <Copy />
-              </span>
-            </div>
-            {/* <div className={styles.thirdLine}>
+                {/* <div className={styles.thirdLine}>
                
                 <div className={styles.blockRightInfo}>
                   <span className={cn(styles.infoValue)}>n/a</span>
@@ -314,13 +326,15 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
                   <span className={styles.infoName}>24H trading vol</span>
                 </div>
               </div> */}
-          </div>
-          <div className={styles.linkNavigation} style={{ marginTop: 'auto' }}>
-            <button onClick={() => setPageDetails(false)} className={styles.back}>
-              Back
-            </button>
-          </div>
-        </div>
+              </div>
+              <div className={styles.linkNavigation} style={{ marginTop: 'auto' }}>
+                <button onClick={() => setPageDetails(false)} className={styles.back}>
+                  Back
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </>
   )

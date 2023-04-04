@@ -73,6 +73,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const node = useRef<HTMLButtonElement>()
   const nodeInput = useRef<HTMLInputElement>()
   const [visibleContextId, setVisibleContextId] = useState([])
+  const [contextDeleteNone, setContextDeleteNone] = useState(false)
   const [addDisabled, setAddDisabled] = useState(false)
 
   const onClose = () => setModal(false)
@@ -165,14 +166,14 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
 
       await addContextId(targetRegistry, mi.name, contextId)
       const contextIds = await getContextIds(targetRegistry, mi.name)
-      // node.current?.classList.remove('valid')
+
       setVisibleContextId(contextIds)
     } catch (error) {
     } finally {
-      // node.current?.classList.remove('valid')
       setEditContextId('')
       setEditContextIdLoading(false)
       setAddDisabled(false)
+      node.current?.classList.remove('valid')
     }
   }
 
@@ -351,7 +352,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
             className={styles.wrapperSettings}
             children={
               <>
-                {isLoad || !targetRegistry ? (
+                {isLoad ? (
                   <div className={styles.miniLoader}></div>
                 ) : (
                   <div className={styles.parametersBlock}>
@@ -380,29 +381,28 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
                               }}
                             />
 
-                            {editContextIdLoading ? null : (
-                              <button
-                                ref={node}
-                                onClick={() => {
-                                  onDeleteChildContext(i)
-                                  setEditContextId('')
-                                }}
-                                className={cn(styles.contextDelete)}
-                              >
-                                <Delete />
-                              </button>
-                            )}
+                            <button
+                              ref={node}
+                              onClick={() => {
+                                onDeleteChildContext(i)
+                                setEditContextId('')
+                              }}
+                              className={cn(styles.contextDelete, {
+                                [styles.contextDeleteNone]: contextDeleteNone,
+                              })}
+                            >
+                              <Delete />
+                            </button>
                           </div>
                           <button
-                            disabled={editContextId.length <= 2 || addDisabled}
+                            disabled={nodeInput.current?.value.length < 2 || addDisabled}
                             onClick={() => {
                               node.current?.classList.add('valid')
                               _addContextId(editContextId)
                             }}
-                            className={cn(styles.addContextDisabled, {
-                              [styles.addContext]:
-                                (editContextId.length >= 2 && !addDisabled) ||
-                                (nodeInput.current?.value.length >= 2 && !addDisabled),
+                            className={cn(styles.addContext, {
+                              [styles.addContextDisabled]:
+                                nodeInput.current?.value.length < 2 || addDisabled,
                             })}
                           >
                             ADD
