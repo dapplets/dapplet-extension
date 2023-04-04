@@ -4,12 +4,12 @@ import styles from './Button.module.scss'
 
 export type ButtonProps = {
   big?: boolean
-  value: string
-  onNext: () => void
+  label: string
+  onClick: () => void
 }
 
 export const Button: FC<ButtonProps> = (props: ButtonProps) => {
-  const { value, big, onNext } = props
+  const { label, big, onClick: onNext } = props
 
   return (
     <button
@@ -18,7 +18,7 @@ export const Button: FC<ButtonProps> = (props: ButtonProps) => {
         [styles.big]: big,
       })}
     >
-      {value}
+      {label}
     </button>
   )
 }
