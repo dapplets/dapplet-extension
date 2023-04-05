@@ -38,13 +38,13 @@ Cypress.Commands.add('openDappletsOverlay', (url, params?: Partial<{ wipe: boole
 Cypress.Commands.add('runDapplet', (dappletIdToActivate) =>
   cy
     .get('dapplets-overlay-manager')
-    .find(`[data-testid=${dappletIdToActivate}]`)
+    .find(`[data-testid="${dappletIdToActivate}"]`)
     .find('[data-testid=activation-dapplet]')
     .then((button) => {
       button.hasClass('not-active-switch') &&
         cy
           .get('dapplets-overlay-manager')
-          .find(`[data-testid=${dappletIdToActivate}]`)
+          .find(`[data-testid="${dappletIdToActivate}"]`)
           .find('[data-testid=activation-dapplet]')
           .click()
     })
