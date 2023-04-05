@@ -324,10 +324,10 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     isPinned: boolean
   ) => {
     async function handleActionButtonClick(actionId: string) {
+      setPayload(null)
       const { resolveNotificationAction, getThisTab } = await initBGFunctions(browser)
       const thisTab = await getThisTab()
       await resolveNotificationAction(payload.id, actionId, thisTab.id)
-      setPayload(null)
     }
 
     return (
@@ -349,13 +349,15 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             <span className={styles.titleNotification}>{payload.title}</span>
 
             {/* ToDo: design it */}
-            <div>
-              {payload.actions.map(({ action, title }) => (
-                <button key={action} onClick={() => handleActionButtonClick(action)}>
-                  {title}
-                </button>
-              ))}
-            </div>
+            {payload.actions?.length > 0 ? (
+              <div>
+                {payload.actions.map(({ action, title }) => (
+                  <button key={action} onClick={() => handleActionButtonClick(action)}>
+                    {title}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </span>
         ) : null}
       </>
