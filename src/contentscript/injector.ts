@@ -1,4 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import { Subject } from 'rxjs'
+import { filter } from 'rxjs/operators'
 import { maxSatisfying, valid } from 'semver'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../background/models/moduleInfo'
@@ -16,6 +18,8 @@ import { NotificationType } from '../common/models/notification'
 import { DefaultConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
+import { BaseEvent } from './events/baseEvent'
+import { EventBus as ModuleEventBus } from './events/eventBus'
 import { __decorate } from './global'
 import { ManifestOverlayAdapter } from './modules/adapter-overlay/src'
 import { IContentAdapter, IResolver } from './types'
@@ -38,18 +42,21 @@ type RegistriedModule = {
   onShareLinkHandler?: Function
   onWalletsUpdateHandler?: Function
   onConnectedAccountsUpdateHandler?: Function
+  moduleEventBus?: ModuleEventBus
 }
 
 export const widgets = []
 
 const DAPPLETS_ORIGINAL_HREF: string = window['DAPPLETS_ORIGINAL_HREF']
 const IS_LIBRARY = window['DAPPLETS_JSLIB'] === true
+
 export class Injector {
   public availableContextIds: string[] = []
   public registry: RegistriedModule[] = []
 
   constructor(
     public core: Core,
+    private eventStream: Subject<BaseEvent>,
     private env?: { shareLinkPayload: { moduleId: string; payload: any; isAllOk: boolean } }
   ) {
     this._setContextActivivty(
@@ -199,6 +206,8 @@ export class Injector {
         m.instancedConstructorDeps.forEach((d) => d.detachConfig())
         Object.values(m.instancedPropertyDependencies).forEach((x) => x.detachConfig())
 
+        m.moduleEventBus?.destroy()
+
         if (m.instance.deactivate !== undefined) {
           if (typeof m.instance.deactivate === 'function') {
             // ToDo: deactivate modules in parallel
@@ -332,6 +341,10 @@ export class Injector {
         continue
       }
 
+      const moduleEventBus = new ModuleEventBus(
+        this.eventStream.pipe(filter((e) => e.namespace === manifest.name))
+      )
+
       // ToDo: elemenate the boilerplate
       const coreWrapper = {
         overlayManager: core.overlayManager,
@@ -377,6 +390,7 @@ export class Injector {
         },
         wallet: (cfg, eventDef) => core.wallet(cfg, eventDef, manifest.name),
         storage: new AppStorage(manifest, defaultConfig, schemaConfig),
+        events: moduleEventBus,
         contract: (type, address, options) => core.contract(type, address, options, manifest.name),
         onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
         onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
@@ -424,7 +438,7 @@ export class Injector {
           const { getModuleInfoByName } = await initBGFunctions(browser)
           const registry = manifest.registryUrl
           const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, manifest.name)
-          await core.notify(payload, moduleInfo.icon?.uris?.[0])
+          await core.notify(payload, moduleInfo.icon?.uris?.[0], manifest.name)
         },
       }
 
@@ -450,6 +464,7 @@ export class Injector {
             schemaConfig: schemaConfig,
             activateMethodsDependencies: [],
             instancedActivateMethodsDependencies: [],
+            moduleEventBus,
           })
         }
       }
@@ -491,6 +506,7 @@ export class Injector {
                 instancedActivateMethodsDependencies: [],
                 defaultConfig: defaultConfig,
                 schemaConfig: schemaConfig,
+                moduleEventBus,
               })
             }
             const currentModule = this.registry.find((m) => areModulesEqual(m.manifest, manifest))
@@ -532,6 +548,7 @@ export class Injector {
                 instancedConstructorDeps: [],
                 defaultConfig: defaultConfig,
                 schemaConfig: schemaConfig,
+                moduleEventBus,
               })
             }
             const currentModule = this.registry.find((m) => areModulesEqual(m.manifest, manifest))
@@ -546,9 +563,23 @@ export class Injector {
         }
       }
 
+      const onEventDecorator = (type: string) => {
+        return function (_, __, descriptor: PropertyDescriptor) {
+          moduleEventBus.ofType(type).subscribe(descriptor.value)
+          return descriptor
+        }
+      }
+
       try {
-        const execScript = new Function('Core', 'Inject', 'Injectable', '__decorate', script)
-        execScript(coreWrapper, injectDecorator, injectableDecorator, __decorate)
+        const execScript = new Function(
+          'Core',
+          'Inject',
+          'Injectable',
+          'OnEvent',
+          '__decorate',
+          script
+        )
+        execScript(coreWrapper, injectDecorator, injectableDecorator, onEventDecorator, __decorate)
       } catch (err) {
         // ToDo: remove module from this.registry
         console.error(err)

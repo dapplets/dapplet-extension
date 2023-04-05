@@ -144,6 +144,7 @@ export const Notifications = () => {
                               description={x.message}
                               _id={x.id}
                               date={x.createdAt}
+                              actions={x.actions}
                             />
                           )
                         })}

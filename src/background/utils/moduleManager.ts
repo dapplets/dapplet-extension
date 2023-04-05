@@ -3,7 +3,7 @@ import JSZip from 'jszip'
 import { maxSatisfying } from 'semver'
 import { TopologicalSort } from 'topological-sort'
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
-import { areModulesEqual, generateGuid } from '../../common/helpers'
+import { areModulesEqual } from '../../common/helpers'
 import { NotificationType } from '../../common/models/notification'
 import { DefaultConfig, SchemaConfig, StorageRef } from '../../common/types'
 import VersionInfo from '../models/versionInfo'
@@ -294,7 +294,6 @@ export default class ModuleManager {
     if (version != optimizedVersion) {
       this._notificationService.createNotification({
         title: 'Dependency Optimizer',
-        id: generateGuid(),
         type: NotificationType.System,
         message: `Package "${name}#${branch}" version has been upgraded from ${version} to ${optimizedVersion}.`,
       })
