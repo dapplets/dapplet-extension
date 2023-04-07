@@ -8,12 +8,14 @@ Cypress.Commands.add('openDappletsOverlay', (url, params?: Partial<{ wipe: boole
   // open context webpage
   cy.visit(url)
 
+  if (params?.wipe) {
+    cy.get('dapplets-overlay-manager')
+    cy.window().then((win) => win.dapplets.wipeAllExtensionData())
+    cy.reload()
+  }
+
   // injects overlay
   cy.get('dapplets-overlay-manager')
-
-  if (params?.wipe) {
-    cy.window().then((win) => win.dapplets.wipeAllExtensionData())
-  }
 
   // add test trusted user
   cy.window().then((win) => win.dapplets.addTrustedUser(trustedUser))

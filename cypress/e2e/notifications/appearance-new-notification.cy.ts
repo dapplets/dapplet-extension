@@ -7,9 +7,8 @@ describe('appearance of a new notification', () => {
   qase(
     15,
     it('appearance of a new notification', () => {
-      cy.openDappletsOverlay(url)
+      cy.openDappletsOverlay(url, { wipe: true })
       cy.runDapplet(dappletIdToActivate)
-      cy.wait(10000)
       cy.getByTestId('notification-label').should('exist')
     })
   )
