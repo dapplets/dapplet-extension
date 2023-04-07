@@ -169,6 +169,8 @@ browser.runtime.onMessage.addListener(
     deleteAllNotifications: () => notificationService.deleteAllNotifications(),
     markNotificationAsViewed: (id) => notificationService.markNotificationAsViewed(id),
     markAllNotificationsAsViewed: () => notificationService.markAllNotificationsAsViewed(),
+    resolveNotificationAction:
+      notificationService.resolveNotificationAction.bind(notificationService),
     getUnreadNotificationsCount: (source?) =>
       notificationService.getUnreadNotificationsCount(source),
     getErc20TokenInfo: (tokenAddress) => tokenomicsService.getErc20TokenInfo(tokenAddress),

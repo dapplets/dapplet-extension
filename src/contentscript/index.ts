@@ -1,4 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import { Subject } from 'rxjs'
 import { browser } from 'webextension-polyfill-ts'
 import { GLOBAL_EVENT_BUS_NAME } from '../common/chrome-extension-websocket-wrapper/constants'
 import * as EventBus from '../common/global-event-bus'
@@ -14,6 +15,7 @@ import {
 import { JsonRpc } from '../common/jsonrpc'
 import { DefaultSigners, SystemOverlayTabs } from '../common/types'
 import Core from './core'
+import { BaseEvent } from './events/baseEvent'
 import { Injector } from './injector'
 import { OverlayManagerIframe } from './overlay/iframe/overlayManager'
 import { IOverlay } from './overlay/interfaces'
@@ -45,8 +47,10 @@ async function init() {
   const jsonrpc = new JsonRpc()
   const overlayManager = IS_IFRAME ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc)
 
+  const eventStream = new Subject<BaseEvent>()
+
   const core = new Core(IS_IFRAME, overlayManager) // ToDo: is it global for all modules?
-  injector = new Injector(core, { shareLinkPayload })
+  injector = new Injector(core, eventStream, { shareLinkPayload })
 
   // Open confirmation overlay if checks are not passed
   if (!IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
@@ -102,6 +106,8 @@ async function init() {
       return injector.openDappletHome(moduleName)
     } else if (!IS_IFRAME && message.type === 'EXEC_CA_UPDATE_HANDLER') {
       return injector.executeConnectedAccountsUpdateHandler()
+    } else if (!IS_IFRAME && message.type === 'MODULE_EVENT_STREAM_MESSAGE') {
+      return Promise.resolve(eventStream.next(message.payload))
     }
   })
 

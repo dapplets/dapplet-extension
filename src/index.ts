@@ -6,6 +6,7 @@ import { IContentAdapter, IFeature, IResolver, ISharedState } from './contentscr
 declare global {
   export function Injectable(constructor: Function)
   export function Inject(name: string): Function
+  export function OnEvent(type: string): Function
   export var Core: Core
 }
 
