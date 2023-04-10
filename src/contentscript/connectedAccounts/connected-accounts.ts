@@ -64,6 +64,16 @@ class ConnectedAccounts {
     return getConnectedAccountsRequestStatus(id)
   }
 
+  public async areConnected(accountGId1: string, accountGId2: string): Promise<boolean> {
+    const { areConnectedAccounts } = await initBGFunctions(browser)
+    return areConnectedAccounts(accountGId1, accountGId2)
+  }
+
+  public async getNet(accountGId: string): Promise<string[] | null> {
+    const { getConnectedAccountsNet } = await initBGFunctions(browser)
+    return getConnectedAccountsNet(accountGId)
+  }
+
   // ***** CALL *****
 
   public async requestVerification(
