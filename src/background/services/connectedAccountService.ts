@@ -121,6 +121,11 @@ export default class ConnectedAccountService {
     return contract['getNet']({ accountGId })
   }
 
+  public async getMainAccount(accountId: string, originId: string): Promise<string | null> {
+    const contract = await this._getContract()
+    return contract['getMainAccount']({ accountId, originId })
+  }
+
   public async getRequestStatus(id: number): Promise<ConnectedAccountsRequestStatus> {
     const contract = await this._getContract()
     const status = await contract['getRequestStatus']({ id })
@@ -136,11 +141,6 @@ export default class ConnectedAccountService {
       default:
         throw new Error('Error in Connected Accounts getRequestStatus()')
     }
-  }
-
-  public async getMainAccount(accountId: string, originId: string): Promise<string | null> {
-    const contract = await this._getContract()
-    return contract['getMainAccount']({ accountId, originId })
   }
 
   public async getPairs({
