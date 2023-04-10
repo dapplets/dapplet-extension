@@ -300,6 +300,8 @@ browser.runtime.onMessage.addListener(
     changeConnectedAccountStatus:
       connectedAccountService.changeStatus.bind(connectedAccountService),
     getConnectedAccountsPairs: connectedAccountService.getPairs.bind(connectedAccountService),
+    getConnectedAccountsNet: connectedAccountService.getNet.bind(connectedAccountService),
+    areConnectedAccounts: connectedAccountService.areConnected.bind(connectedAccountService),
 
     // Analytics Service
     track: analyticsService.track.bind(analyticsService),
