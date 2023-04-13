@@ -5,6 +5,7 @@ import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../common/global-event-bus'
 import { ReactComponent as EndImg } from './assets/end.svg'
 import { ReactComponent as PromoImg } from './assets/promo.svg'
+import { ReactComponent as NormalSwitch } from './assets/Normal_switch.svg'
 import styles from './BaseOnboarding.module.scss'
 import { Button } from './components/Button'
 import { SkipButton } from './components/SkipButton'
@@ -107,9 +108,12 @@ export const Onboarding: FC = () => {
               currentStep={step}
               stepsNumber={5}
             />
+             <div className={styles.text}>
+             With these switches you can turn the Dapplets on and off.
+            </div>
+            <NormalSwitch/>
             <div className={styles.text}>
-              Dapplets can be turned on and off with these switches. Try it, it&apos;s easy. After
-              enabling the dapplet, the result will immediately appear on the page.
+            Try it out, it is very simple. After you activate the dapplet, the result will be displayed on the page immediately.
             </div>
             <Button big label="Finish onboarding" onClick={() => setStep(OnboardingSteps.END)} />
           </>
