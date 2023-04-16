@@ -75,6 +75,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [visibleContextId, setVisibleContextId] = useState([])
   const [contextDeleteNone, setContextDeleteNone] = useState(false)
   const [addDisabled, setAddDisabled] = useState(false)
+  const [counterBurn, setCounterBurn] = useState(null)
 
   const onClose = () => setModal(false)
 
@@ -93,12 +94,13 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   }, [])
 
   const _updateData = async () => {
-    const { getRegistries, getContextIds } = await initBGFunctions(browser)
+    const { getRegistries, getContextIds, getCounterStake } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
     const contextId = await getContextIds(prodRegistries[0]?.url, mi.name)
-
+const counter = await getCounterStake(mi.name)
+setCounterBurn(counter)
     setVisibleContextId(contextId)
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
@@ -279,7 +281,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
             title="Social"
             children={
               <div className={styles.socialBlock}>
-                <div className={styles.moduleTitle}> {mi.name}</div>
+                <div className={styles.moduleTitle}> {mi.name} <div className={styles.counterBurn}> Days to burn: <span className={styles.counter}>{counterBurn}</span></div></div>  
 
                 <SettingItem
                   title="Title"
