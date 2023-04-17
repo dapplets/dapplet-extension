@@ -8,6 +8,7 @@ import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constan
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
 import { ReactComponent as Settings } from '../../assets/svg/setting.svg'
+import { ReactComponent as Burn } from '../../assets/svg/burn.svg'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
@@ -102,7 +103,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const onCloseNewModule = () => setNewModule(false)
   const [admins, setAdmins] = useState<string[]>([])
   const [adminsOpen, setAdminsOpen] = useState(false)
-
+  const [counterBurn, setCounterBurn] = useState(null)
   useEffect(() => {
     const init = async () => {
       await _updateData()
@@ -112,11 +113,14 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }, [targetChain])
 
   const _updateData = async () => {
-    const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
+    const { getRegistries, getTrustedUsers,getCounterStake } = await initBGFunctions(browser)
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-
+if(mi.isUnderConstruction){
+  const counter = await getCounterStake(mi.name)
+  setCounterBurn(counter)
+}
     if (mi === null && vi === null) {
       const newMi = new ModuleInfo()
       setMi(newMi)
@@ -363,7 +367,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
             ) : (
               <div className={styles.dappletsVersionUC}>Under Construction</div>
             )}
-
+{counterBurn&& <div className={styles.dappletsBurn}><Burn/>{counterBurn >= 1? counterBurn + "days":'burning'}</div> }
             {vi && vi.branch && vi.branch !== 'default' && (
               <div style={{ margin: '0 3px 0 0px' }} className={styles.dappletsBranch}>
                 {vi.branch}

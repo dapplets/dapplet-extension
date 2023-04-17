@@ -292,3 +292,19 @@
 .moreAdmins:active {
   color: $secondary-pressed;
 }
+.dappletsBurn{
+  margin-left: 5px;
+  display: flex;
+  background: $primary;
+  justify-content: center;
+  align-items: center;
+  width: 50px;
+height: 14px;
+border-radius: 4px;
+color: $web-bg;
+font-size: 10px;
+line-height: 100%;
+svg{
+
+}
+}
