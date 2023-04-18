@@ -7,8 +7,10 @@ import VersionInfo from '../../../../../background/models/versionInfo'
 import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { ReactComponent as Settings } from '../../assets/svg/setting.svg'
+import FireBurn from '../../assets/png/fireBurn.png'
 import { ReactComponent as Burn } from '../../assets/svg/burn.svg'
+import { ReactComponent as CloseBurnModal } from '../../assets/svg/closeBurnModal.svg'
+import { ReactComponent as Settings } from '../../assets/svg/setting.svg'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
@@ -104,6 +106,8 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const [admins, setAdmins] = useState<string[]>([])
   const [adminsOpen, setAdminsOpen] = useState(false)
   const [counterBurn, setCounterBurn] = useState(null)
+  const [isModalBurn, setModalBurn] = useState(false)
+  const onCloseModalBurn = () => setModalBurn(false)
   useEffect(() => {
     const init = async () => {
       await _updateData()
@@ -113,14 +117,14 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }, [targetChain])
 
   const _updateData = async () => {
-    const { getRegistries, getTrustedUsers,getCounterStake } = await initBGFunctions(browser)
+    const { getRegistries, getTrustedUsers, getCounterStake } = await initBGFunctions(browser)
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-if(mi.isUnderConstruction){
-  const counter = await getCounterStake(mi.name)
-  setCounterBurn(counter)
-}
+    if (mi.isUnderConstruction) {
+      const counter = await getCounterStake(mi.name)
+      setCounterBurn(counter)
+    }
     if (mi === null && vi === null) {
       const newMi = new ModuleInfo()
       setMi(newMi)
@@ -354,7 +358,10 @@ if(mi.isUnderConstruction){
 
     setOwnerDev(newOwner)
   }
-
+  const setBurnDucToken = async (appId) => {
+    const { setBurnDucToken } = await initBGFunctions(browser)
+    await setBurnDucToken(appId)
+  }
   return (
     <>
       <div className={styles.dappletsBlock}>
@@ -367,7 +374,12 @@ if(mi.isUnderConstruction){
             ) : (
               <div className={styles.dappletsVersionUC}>Under Construction</div>
             )}
-{counterBurn&& <div className={styles.dappletsBurn}><Burn/>{counterBurn >= 1? counterBurn + "days":'burning'}</div> }
+            {counterBurn && (
+              <button onClick={() => setModalBurn(true)} className={styles.dappletsBurn}>
+                <Burn />
+                {counterBurn >= 1 ? counterBurn + 'days' : 'burning'}
+              </button>
+            )}
             {vi && vi.branch && vi.branch !== 'default' && (
               <div style={{ margin: '0 3px 0 0px' }} className={styles.dappletsBranch}>
                 {vi.branch}
@@ -625,6 +637,40 @@ if(mi.isUnderConstruction){
         }
         footer={''}
         onClose={() => onCloseNewModule()}
+      />
+      <Modal
+        visible={isModalBurn}
+        title={'Reallocating the pledge fund'}
+        classNameWrapper={styles.modalDefaultWrapper}
+        content={
+          <div className={cn(styles.modalDefaultContent, styles.modalBurnDefaultContent)}>
+            <p className={cn(styles.modalDefaultContentText, styles.modalDefaultContentTextBurn)}>
+              You are reporting expired DUC pledge. If you proceed the pledge fund will be
+              redistributed.
+            </p>
+            <p className={cn(styles.modalDefaultContentText, styles.modalDefaultContentTextBurn)}>
+              You wil recive: <span className={styles.price}>5 ETH</span>
+            </p>
+            <img src={FireBurn} />
+          </div>
+        }
+        footer={
+          <div className={styles.buttonBlockBurn}>
+            <button
+              onClick={() => setBurnDucToken(mi.name)}
+              className={styles.modalDefaultContentButton}
+            >
+              <Burn /> Do it
+            </button>
+            <button
+              onClick={() => onCloseModalBurn()}
+              className={cn(styles.modalDefaultContentButton, styles.burnCancel)}
+            >
+              <CloseBurnModal /> Cancel
+            </button>
+          </div>
+        }
+        onClose={() => onCloseModalBurn()}
       />
     </>
   )

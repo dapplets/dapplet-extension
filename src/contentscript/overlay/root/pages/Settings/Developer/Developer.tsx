@@ -70,6 +70,13 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       EventBus.off('wallet_changed', _updateData)
     }
   }, [])
+  useEffect(() => {
+    EventBus.on('token_burned', _updateData)
+
+    return () => {
+      EventBus.off('token_burned', _updateData)
+    }
+  }, [])
 
   const _updateData = async () => {
     setLoadButton(true)

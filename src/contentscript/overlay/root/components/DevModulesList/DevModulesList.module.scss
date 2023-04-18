@@ -308,3 +308,41 @@ svg{
 
 }
 }
+.modalBurnDefaultContent{
+  font-size: 14px;
+    line-height: 149%;
+    color: $main-grey;
+    align-items: flex-start;
+    img{
+      margin-left: auto;
+      margin-right: auto;
+    }
+}
+.modalDefaultContentTextBurn{
+  text-align: left;
+}
+.price{
+  font-weight: 900;
+font-size: 16px;
+line-height: 149%;
+color: $primary;
+}
+.buttonBlockBurn{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  svg{
+    margin-right: 10px;
+  }
+}
+.burnCancel{
+  background: $app-bg;
+  border: 1px solid #919191;
+  border-radius: 2px;
+  color: #919191;
+  width: 145px;
+  margin-left: 10px;
+  &:hover{
+    background: $primary-hover;
+  }
+}

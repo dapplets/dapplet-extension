@@ -28,8 +28,8 @@ import ProxyService from './services/proxyService'
 import { SessionService } from './services/sessionService'
 import { SuspendService } from './services/suspendService'
 import { TokenRegistryService } from './services/tokenomicsService'
-import { WalletService } from './services/walletService'
 import { UnderConstructionService } from './services/underConstructionServices'
+import { WalletService } from './services/walletService'
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
@@ -61,10 +61,12 @@ const tokenomicsService = new TokenRegistryService(
   overlayService,
   storageAggregator
 )
-const underConstructionService = new UnderConstructionService( globalConfigService,
+const underConstructionService = new UnderConstructionService(
+  globalConfigService,
   walletService,
   overlayService,
-  storageAggregator)
+  storageAggregator
+)
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
 globalConfigService.ensService = ensService
@@ -175,7 +177,8 @@ browser.runtime.onMessage.addListener(
     markNotificationAsViewed: (id) => notificationService.markNotificationAsViewed(id),
     markAllNotificationsAsViewed: () => notificationService.markAllNotificationsAsViewed(),
     // todo: mocked ucservices
-    getCounterStake:(appId)=>underConstructionService.getCounterStake(appId),
+    getCounterStake: (appId) => underConstructionService.getCounterStake(appId),
+    setBurnDucToken: (appId) => underConstructionService.setBurnDucToken(appId),
     resolveNotificationAction:
       notificationService.resolveNotificationAction.bind(notificationService),
     getUnreadNotificationsCount: (source?) =>

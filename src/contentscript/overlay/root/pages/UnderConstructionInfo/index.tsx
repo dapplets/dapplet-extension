@@ -99,8 +99,8 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
     const contextId = await getContextIds(prodRegistries[0]?.url, mi.name)
-const counter = await getCounterStake(mi.name)
-setCounterBurn(counter)
+    const counter = await getCounterStake(mi.name)
+    setCounterBurn(counter)
     setVisibleContextId(contextId)
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
@@ -281,7 +281,17 @@ setCounterBurn(counter)
             title="Social"
             children={
               <div className={styles.socialBlock}>
-                <div className={styles.moduleTitle}> {mi.name} <div className={styles.counterBurn}> Days to burn: <span className={styles.counter}>{counterBurn}</span></div></div>  
+                <div className={styles.moduleTitle}>
+                  {' '}
+                  {mi.name}
+                  <div className={styles.counterBurn}>
+                    <div className={styles.counterBurnTitleBlock}>
+                      <span className={styles.counterBurnTitle}>Days left before pledge fails</span>
+                      <button className={styles.counterBurnButton}>Buy more time</button>
+                    </div>
+                    <span className={styles.counter}>{counterBurn}</span>
+                  </div>
+                </div>
 
                 <SettingItem
                   title="Title"
