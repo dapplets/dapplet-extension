@@ -36,12 +36,14 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
     if (options.contractId) {
       newUrl.searchParams.set('contract_id', options.contractId)
       const accessKey = nearAPI.utils.KeyPair.fromRandom('ed25519')
+      console.log('+++ accessKey', accessKey)
       newUrl.searchParams.set('public_key', accessKey.getPublicKey().toString())
-      await this._keyStore.setKey(
+      const res = await this._keyStore.setKey(
         this._networkId,
         PENDING_ACCESS_KEY_PREFIX + accessKey.getPublicKey(),
         accessKey
       )
+      console.log('+++ res', res)
     }
 
     const tab = await browser.tabs.create({ url: newUrl.toString() })
@@ -67,6 +69,10 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
 
     const tab = await browser.tabs.create({ url: newUrl.toString() })
     await waitClosingTab(tab.id, tab.windowId)
+  }
+
+  getConnectedAccount() {
+    return this._connectedAccount
   }
 
   async completeSignIn(accountId, publicKey, allKeys) {

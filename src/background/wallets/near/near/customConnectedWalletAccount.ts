@@ -9,6 +9,7 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     receiverId: string,
     actions: nearAPI.transactions.Action[]
   ): Promise<nearAPI.providers.FinalExecutionOutcome> {
+    console.log('in CustomConnectedWalletAccount')
     if (!this.accountId) throw new Error('this.accountId is undefined')
     const localKey = await this.connection.signer.getPublicKey(
       this.accountId,

@@ -22,6 +22,7 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     receiverId: string,
     actions: nearAPI.transactions.Action[]
   ): Promise<nearAPI.providers.FinalExecutionOutcome> {
+    console.log('in signAndSendTransaction')
     //if (!this.accountId) {
     const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser)
     // ToDo: remove it?
@@ -42,10 +43,7 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     this.accountId = authData.accountId
     //}
 
-    const localKey = await this.connection.signer.getPublicKey(
-      this.accountId,
-      this.connection.networkId
-    )
+    const localKey = await this.connection.signer.getPublicKey(this.accountId, this._network)
     let accessKey = await this.accessKeyForTransaction(receiverId, actions, localKey)
     if (!accessKey) {
       throw new Error(`Cannot find matching key for transaction sent to ${receiverId}`)

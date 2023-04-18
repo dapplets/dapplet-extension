@@ -59,8 +59,11 @@ export class WalletService {
 
   async getWalletDescriptors(): Promise<WalletDescriptor[]> {
     const defaults = await this.getWalletFor(DefaultSigners.EXTENSION)
+    console.log('in getWalletDescriptors - defaults', defaults)
     const usage = await this._globalConfigService.getWalletsUsage()
+    console.log('in getWalletDescriptors - usage', usage)
     const arr = await this._getWalletsArray()
+    console.log('in getWalletDescriptors - arr', arr)
 
     const getUsageApps = (chain: ChainTypes, wallet: WalletTypes) => {
       const arr: string[] = []
@@ -412,7 +415,7 @@ export class WalletService {
             })
           }
         }
-
+        console.log('into _getWalletsMap - map:', map)
         return map
       })()
     }

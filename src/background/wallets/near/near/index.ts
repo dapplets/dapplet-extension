@@ -30,6 +30,7 @@ export default class implements NearWallet {
   }
 
   constructor(config: NearNetworkConfig) {
+    console.log('into the NearWallet constructor')
     this._config = config
     this._lastUsageKey = `near_${config.networkId}_lastUsage`
   }
@@ -43,13 +44,26 @@ export default class implements NearWallet {
   }
 
   async sendCustomRequest(method: string, params: any): Promise<any> {
+    console.log('into the sendCustomRequest()')
+    console.log('method', method)
+    console.log('params', params)
     const provider: JsonRpcProvider = this._nearWallet.account().connection.provider as any
+    console.log('provider', provider)
     return provider.sendJsonRpc(method, params)
   }
 
   async requestSignTransactions(transactions: any, callbackUrl: any) {
+    console.log('into the requestSignTransactions()')
     return this._nearWallet.requestSignTransactions(transactions, callbackUrl)
   }
+
+  // async signAndSendTransaction(
+  //   receiverId: string,
+  //   actions: nearAPI.transactions.Action[]
+  // ): Promise<nearAPI.providers.FinalExecutionOutcome> {
+  //   console.log('into the NearWallet/signAndSendTransaction()')
+  //   return this._nearWallet.getConnectedAccount().signAndSendTransaction(receiverId, actions)
+  // }
 
   connect(): ethers.Signer {
     throw new NotImplementedError()
@@ -65,7 +79,8 @@ export default class implements NearWallet {
   }
 
   @CacheMethod()
-  async connectWallet(): Promise<void> {
+  async connectWallet({ contractId }: { contractId?: string }): Promise<void> {
+    console.log('into the connectWallet()')
     const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true })
     const currentTabId = currentTab.id
 
@@ -75,11 +90,13 @@ export default class implements NearWallet {
     let callbackTab = null
     const waitTabPromise = waitTab(callbackUrl).then((x) => (callbackTab = x))
     const requestPromise = this._nearWallet.requestSignIn({
+      contractId: contractId || 'dev-1674551865700-67703371677231',
       successUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=true`),
       failureUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=false`),
     })
 
-    await Promise.race([waitTabPromise, requestPromise])
+    const response = await Promise.race([waitTabPromise, requestPromise])
+    console.log('response', response)
 
     await browser.tabs.update(currentTabId, { active: true })
 
@@ -99,6 +116,7 @@ export default class implements NearWallet {
     // TODO: Handle situation when access key is not added
     if (!accountId) throw new Error('No account_id params in callback URL')
 
+    console.log('urlObject', urlObject)
     this._nearWallet.completeSignIn(accountId, publicKey, allKeys)
     localStorage[this._lastUsageKey] = new Date().toISOString()
   }

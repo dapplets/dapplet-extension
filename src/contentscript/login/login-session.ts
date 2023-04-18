@@ -28,7 +28,7 @@ export class LoginSession {
     return expiresAt < now
   }
 
-  constructor(serializedSession: any) {
+  constructor(serializedSession: any, public contractId?: string) {
     Object.assign(this, serializedSession)
   }
 
@@ -92,7 +92,10 @@ export class LoginSession {
       // ToDo: events def
       return ethereum.createWalletConnection(this.moduleName, { network: this._chain })
     } else if (this._network === 'near') {
-      return near.createWalletConnection(this.moduleName, { network: this._chain })
+      return near.createWalletConnection(this.moduleName, {
+        network: this._chain,
+        contractId: this.contractId,
+      })
     } else {
       throw new Error(`Current auth method "${this._network}" doesn't support wallet connections.`)
     }

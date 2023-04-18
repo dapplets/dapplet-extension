@@ -14,16 +14,22 @@ async function _getCurrentNetworkConfig(networkId: string) {
   return currentNetworkConfig
 }
 
-export async function createWalletConnection(app: string, cfg: { network: string }) {
+export async function createWalletConnection(
+  app: string,
+  cfg: { network: string; contractId?: string }
+) {
   const currentNetworkConfig = await _getCurrentNetworkConfig(cfg.network)
 
   const { localStorage_getItem } = await initBGFunctions(browser)
   const authDataKey = cfg.network + '_wallet_auth_key'
   const authData = JSON.parse(await localStorage_getItem(authDataKey))
+  console.log('* authData', authData)
   if (!authData) return null
 
   const near = new BackgroundNear(app, currentNetworkConfig)
+  console.log('* BackgroundNear', near)
   const wallet = new BackgroundWalletConnection(near, cfg.network, app)
+  console.log('* BackgroundWalletConnection', wallet)
   wallet._authData = authData
   return wallet.account()
 }
@@ -38,9 +44,13 @@ export async function createContractWrapper(
   }
 ) {
   const currentNetworkConfig = await _getCurrentNetworkConfig(cfg.network)
+  console.log('in createContractWrapper: currentNetworkConfig', currentNetworkConfig)
   const near = new BackgroundNear(app, currentNetworkConfig)
+  console.log('in createContractWrapper: BackgroundNear', near)
   const wallet = new BackgroundWalletConnection(near, cfg.network, app)
+  console.log('in createContractWrapper: BackgroundWalletConnection', wallet)
   const account = wallet.account()
   const contract = new NearAPI.Contract(account, address, options)
+  console.log('in createContractWrapper: contract', contract)
   return contract
 }

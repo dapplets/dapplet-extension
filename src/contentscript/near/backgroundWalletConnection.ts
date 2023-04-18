@@ -59,6 +59,7 @@ export class BackgroundWalletConnection extends nearAPI.WalletConnection {
         this._near.config.networkId
       )
     }
+    console.log('*** this._connectedAccount', this._connectedAccount)
     return this._connectedAccount
   }
 }

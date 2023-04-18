@@ -529,13 +529,16 @@ export default class Core {
 
     const { createSession, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
+    console.log('thisTab', thisTab)
     const session = await createSession(moduleName, _request, thisTab.id)
+    console.log('session', session)
 
     const ls = {} // ToDo: specify LoginInfo
     _request.onLogin?.call({}, ls)
 
-    const loginSession = new LoginSession(session)
+    const loginSession = new LoginSession(session, _request.contractId)
     loginSession.logoutHandler = _request.onLogout
+    console.log('loginSession', loginSession)
 
     return loginSession
   }

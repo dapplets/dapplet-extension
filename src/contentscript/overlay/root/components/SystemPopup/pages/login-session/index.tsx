@@ -37,6 +37,8 @@ export class LoginSession extends React.Component<Props, State> {
   }
 
   async routePages() {
+    console.log('in routePages() in LoginSession.tsx')
+    console.log('this.props.request', this.props.request)
     const loginRequest = this.props.request.loginRequest
     const chains = loginRequest.authMethods
     const secureLogin = loginRequest.secureLogin
@@ -48,6 +50,8 @@ export class LoginSession extends React.Component<Props, State> {
     const connectedWallets = descriptors
       .filter((x) => x.connected)
       .filter((x) => (chains.length > 0 ? chains.includes(x.chain) : true))
+    console.log('filtered connectedWallets', connectedWallets)
+    console.log('this.props.request.app', this.props.request.app)
 
     if (this.props.request.app === DefaultSigners.EXTENSION) {
       this.redirect('/pairing')

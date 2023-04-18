@@ -99,6 +99,7 @@ export type EthereumNetwrokConfig = {
 
 export type LoginRequest = {
   authMethods: string[]
+  contractId?: string
   timeout?: number
   role?: string
   help?: string

@@ -82,6 +82,10 @@ export class SessionService {
     request: LoginRequest,
     tabId: number
   ): Promise<LoginSession> {
+    console.log('into the createSession()')
+    console.log('moduleName', moduleName)
+    console.log('tabId', tabId)
+    console.log('request', request)
     request.timeout = request.timeout ?? DEFAULT_REQUEST_TIMEOUT
     request.secureLogin = request.secureLogin ?? 'disabled'
     request.from = request.from ?? 'any'
@@ -105,6 +109,9 @@ export class SessionService {
       request,
       tabId
     )
+    console.log('wallet', wallet)
+    console.log('chain', chain)
+    console.log('confirmationId', confirmationId)
 
     if (request.secureLogin === 'required' && !confirmationId)
       throw new Error('LoginConfirmation must be selected in secure login mode.')
@@ -124,6 +131,12 @@ export class SessionService {
       }
     }
 
+    await this._walletService.disconnectWallet(chain, wallet)
+    const res = await this._walletService.connectWallet(chain, wallet, {
+      contractId: request.contractId,
+    })
+    console.log('!!!res', res)
+
     const session = new LoginSession()
     const creationDate = new Date()
     session.sessionId = generateGuid()
@@ -133,6 +146,8 @@ export class SessionService {
     session.expiresAt = new Date(creationDate.getTime() + request.timeout).toISOString()
     session.createdAt = creationDate.toISOString()
     session.loginConfirmationId = confirmationId
+    session.contractId = request.contractId
+    console.log('LoginSession', session)
 
     await this._loginSessionBrowserStorage.create(session)
 
@@ -145,6 +160,11 @@ export class SessionService {
     chain: ChainTypes,
     wallet: WalletTypes
   ): Promise<LoginConfirmation> {
+    console.log('into createLoginConfirmation')
+    console.log('moduleName', moduleName)
+    console.log('request', request)
+    console.log('chain', chain)
+    console.log('wallet', wallet)
     const loginConfirmation = new LoginConfirmation()
     const creationDate = new Date()
     const expiresAt = new Date(creationDate.getTime() + request.timeout).toISOString()
@@ -169,6 +189,7 @@ export class SessionService {
 
     await this._loginConfirmationBrowserStorage.create(loginConfirmation)
 
+    console.log('loginConfirmation', loginConfirmation)
     return loginConfirmation
   }
 

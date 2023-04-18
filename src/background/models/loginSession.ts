@@ -10,6 +10,7 @@ export default class LoginSession extends Base {
   expiresAt: string = null
   createdAt: string = null
   loginConfirmationId: string = null
+  contractId: string = null
 
   isExpired() {
     const expiresAt = new Date(this.expiresAt).getTime()
