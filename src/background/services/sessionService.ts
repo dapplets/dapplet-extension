@@ -1,5 +1,6 @@
 import { hexlify } from '@ethersproject/bytes'
 import { toUtf8Bytes } from '@ethersproject/strings'
+import { SECURE_AUTH_METHODS } from '../../common/constants'
 import { generateGuid } from '../../common/helpers'
 import { ChainTypes, LoginRequest, WalletTypes } from '../../common/types'
 import LoginConfirmationBrowserStorage from '../browserStorages/loginConfirmationBrowserStorage'
@@ -8,6 +9,7 @@ import SessionEntryBrowserStorage from '../browserStorages/sessionEntryBrowserSt
 import LoginConfirmation from '../models/loginConfirmation'
 import LoginSession from '../models/loginSession'
 import SessionEntry from '../models/sessionEntry'
+import { NearWallet } from '../wallets/near/interface'
 import { OverlayService } from './overlayService'
 import { WalletService } from './walletService'
 
@@ -54,6 +56,12 @@ export class SessionService {
             (y) => y.chain === x.authMethod && y.type === x.wallet && x.address === y.account
           )
       )
+      .filter((x) =>
+        // do not include login confirmations from another contracts
+        x.authMethod === ChainTypes.NEAR_MAINNET || x.authMethod === ChainTypes.NEAR_TESTNET
+          ? x.contractId === request.contractId
+          : true
+      )
 
     return confirmations
   }
@@ -91,8 +99,17 @@ export class SessionService {
 
     if (request.secureLogin === 'required') {
       for (const authMethod of request.authMethods) {
-        if (ChainTypes.ETHEREUM_GOERLI !== authMethod && ChainTypes.ETHEREUM_XDAI !== authMethod) {
+        if (!SECURE_AUTH_METHODS.includes(authMethod)) {
           throw new Error(`${authMethod} doesn't support secure login.`)
+        }
+
+        if (
+          (authMethod === ChainTypes.NEAR_MAINNET || authMethod === ChainTypes.NEAR_TESTNET) &&
+          !request.contractId
+        ) {
+          throw new Error(
+            'The parameter `contractId` is required for secure login in NEAR Protocol'
+          )
         }
       }
     }
@@ -159,13 +176,27 @@ export class SessionService {
     loginConfirmation.createdAt = creationDate.toISOString()
 
     const genericWallet = await this._walletService.getGenericWallet(chain, wallet)
-    const signature = await genericWallet.signMessage(
-      hexlify(toUtf8Bytes(loginConfirmation.loginMessage()))
-    )
-    loginConfirmation.signature = signature
 
-    const address = await genericWallet.getAddress()
-    loginConfirmation.address = address
+    if (chain === ChainTypes.ETHEREUM_GOERLI || chain === ChainTypes.ETHEREUM_XDAI) {
+      loginConfirmation.address = await genericWallet.getAddress()
+      loginConfirmation.signature = await genericWallet.signMessage(
+        hexlify(toUtf8Bytes(loginConfirmation.loginMessage()))
+      )
+    } else if (chain === ChainTypes.NEAR_MAINNET || chain === ChainTypes.NEAR_TESTNET) {
+      if (!request.contractId) {
+        throw new Error('The parameter `contractId` is required for secure login in NEAR Protocol')
+      }
+
+      await (genericWallet as NearWallet).createAccessKey(
+        request.contractId,
+        loginConfirmation.loginConfirmationId
+      )
+
+      loginConfirmation.address = await genericWallet.getAddress()
+      loginConfirmation.contractId = request.contractId
+    } else {
+      throw new Error('Secure login is not supported for this auth method')
+    }
 
     await this._loginConfirmationBrowserStorage.create(loginConfirmation)
 

@@ -25,6 +25,7 @@ interface Props {
 interface State {
   error: string
   connected: boolean
+  signing: boolean
   descriptor: WalletDescriptor | null
 }
 
@@ -36,6 +37,7 @@ export default class Near extends React.Component<Props, State> {
     this.state = {
       error: null,
       connected: false,
+      signing: false,
       descriptor: null,
     }
   }
@@ -44,7 +46,8 @@ export default class Near extends React.Component<Props, State> {
     this._mounted = true
 
     try {
-      const { connectWallet, getWalletDescriptors } = await initBGFunctions(browser)
+      const { connectWallet, getWalletDescriptors, createLoginConfirmation } =
+        await initBGFunctions(browser)
       await connectWallet(this.props.chain, WalletTypes.NEAR, null)
       const descriptors = await getWalletDescriptors()
       const descriptor = descriptors.find(
@@ -52,14 +55,28 @@ export default class Near extends React.Component<Props, State> {
       )
 
       // sign message if required
+      let confirmationId = undefined
       const secureLogin = this.props.data.loginRequest.secureLogin
       if (secureLogin === 'required') {
-        throw new Error("NEAR Wallet doesn't support message signing.")
+        this.setState({ signing: true })
+        const app = this.props.data.app
+        const loginRequest = this.props.data.loginRequest
+        const chain = this.props.chain
+        const wallet = WalletTypes.NEAR
+        const confirmation = await createLoginConfirmation(app, loginRequest, chain, wallet)
+        confirmationId = confirmation.loginConfirmationId
       }
 
       if (this._mounted) {
         this.setState({ connected: true, descriptor })
-        this.continue()
+        this.props.bus.publish('ready', [
+          this.props.frameId,
+          {
+            wallet: WalletTypes.NEAR,
+            chain: this.props.chain,
+            confirmationId,
+          },
+        ])
       }
     } catch (err) {
       if (this._mounted) {
@@ -78,16 +95,6 @@ export default class Near extends React.Component<Props, State> {
   //     this.setState({ toBack: true });
   // }
 
-  async continue() {
-    this.props.bus.publish('ready', [
-      this.props.frameId,
-      {
-        wallet: WalletTypes.NEAR,
-        chain: this.props.chain,
-      },
-    ])
-  }
-
   goBack() {
     this.props.redirect('/pairing')
   }
@@ -101,6 +108,15 @@ export default class Near extends React.Component<Props, State> {
           title="Error"
           subtitle={s.error}
           content={<div></div>}
+          onBackButtonClick={this.goBack.bind(this)}
+        />
+      )
+
+    if (s.signing)
+      return (
+        <Loading
+          title="NEAR Wallet"
+          subtitle="Please confirm signing in your wallet to continue"
           onBackButtonClick={this.goBack.bind(this)}
         />
       )

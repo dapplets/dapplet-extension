@@ -66,41 +66,32 @@ export default class implements NearWallet {
 
   @CacheMethod()
   async connectWallet(): Promise<void> {
-    const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true })
-    const currentTabId = currentTab.id
+    await this._connectBrowserWallet(this._nearWallet)
+  }
 
-    const requestId = generateGuid()
-    const callbackUrl = browser.runtime.getURL(`callback.html?request_id=${requestId}`)
+  async createAccessKey(contractId: string, loginConfirmationId: string): Promise<void> {
+    /*
+        The `near-api-js` library does not support multiple access keys at the same time. 
+        When you try to create a second access key with the specified contract 
+        address, the first key is overwritten. Multiple key support is required 
+        to implement the Core.login() and Core.session() APIs. To avoid overwriting 
+        keys, we isolate the keystores within each login confirmation by prefixing 
+        their localstorages. This allowed us to separate keys from different login 
+        confirmations, which can be generated from different dapplets and for different contracts.
+    */
 
-    let callbackTab = null
-    const waitTabPromise = waitTab(callbackUrl).then((x) => (callbackTab = x))
-    const requestPromise = this._nearWallet.requestSignIn({
-      successUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=true`),
-      failureUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=false`),
+    const keyPrefix = `login-confirmation:${loginConfirmationId}:`
+
+    const near = new Near({
+      ...this._config,
+      deps: {
+        keyStore: new nearAPI.keyStores.BrowserLocalStorageKeyStore(window.localStorage, keyPrefix),
+      },
     })
 
-    await Promise.race([waitTabPromise, requestPromise])
+    const nearWallet = new CustomWalletConnection(near, this._config.networkId)
 
-    await browser.tabs.update(currentTabId, { active: true })
-
-    if (!callbackTab) throw new Error('Wallet connection request rejected.')
-
-    await browser.tabs.remove(callbackTab.id)
-
-    const urlObject = new URL(callbackTab.url)
-    const success = urlObject.searchParams.get('success') === 'true'
-
-    if (!success) throw new Error('Wallet connection request rejected')
-
-    const accountId = urlObject.searchParams.get('account_id')
-    const publicKey = urlObject.searchParams.get('public_key')
-    const allKeys = urlObject.searchParams.get('all_keys')
-
-    // TODO: Handle situation when access key is not added
-    if (!accountId) throw new Error('No account_id params in callback URL')
-
-    this._nearWallet.completeSignIn(accountId, publicKey, allKeys)
-    localStorage[this._lastUsageKey] = new Date().toISOString()
+    await this._connectBrowserWallet(nearWallet, contractId)
   }
 
   async disconnectWallet() {
@@ -125,5 +116,50 @@ export default class implements NearWallet {
 
   async signMessage(): Promise<string> {
     throw new NotImplementedError()
+  }
+
+  private async _connectBrowserWallet(nearWallet: CustomWalletConnection, contractId?: string) {
+    const expectedAccountId = nearWallet.getAccountId()
+
+    const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true })
+    const currentTabId = currentTab.id
+
+    const requestId = generateGuid()
+    const callbackUrl = browser.runtime.getURL(`callback.html?request_id=${requestId}`)
+
+    let callbackTab = null
+    const waitTabPromise = waitTab(callbackUrl).then((x) => (callbackTab = x))
+    const requestPromise = nearWallet.requestSignIn({
+      contractId: contractId,
+      successUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=true`),
+      failureUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=false`),
+    })
+
+    await Promise.race([waitTabPromise, requestPromise])
+
+    await browser.tabs.update(currentTabId, { active: true })
+
+    if (!callbackTab) throw new Error('Wallet connection request rejected.')
+
+    await browser.tabs.remove(callbackTab.id)
+
+    const urlObject = new URL(callbackTab.url)
+    const success = urlObject.searchParams.get('success') === 'true'
+
+    if (!success) throw new Error('Wallet connection request rejected')
+
+    const accountId = urlObject.searchParams.get('account_id')
+    const publicKey = urlObject.searchParams.get('public_key')
+    const allKeys = urlObject.searchParams.get('all_keys')
+
+    // TODO: Handle situation when access key is not added
+    if (!accountId) throw new Error('No account_id params in callback URL')
+
+    if (expectedAccountId !== '' && contractId && expectedAccountId !== accountId) {
+      throw new Error(`Account ${expectedAccountId} was expected, but ${accountId} is connected`)
+    }
+
+    nearWallet.completeSignIn(accountId, publicKey, allKeys)
+    localStorage[this._lastUsageKey] = new Date().toISOString()
   }
 }
