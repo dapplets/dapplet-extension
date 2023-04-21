@@ -130,7 +130,7 @@ export default class implements NearWallet {
     let callbackTab = null
     const waitTabPromise = waitTab(callbackUrl).then((x) => (callbackTab = x))
     const requestPromise = nearWallet.requestSignIn({
-      contractId: contractId,
+      contractId,
       successUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=true`),
       failureUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=false`),
     })
