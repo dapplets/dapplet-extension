@@ -105,6 +105,7 @@ export type LoginRequest = {
   target?: string | any
   secureLogin?: 'required' | 'optional' | 'disabled'
   from?: 'me' | 'any'
+  contractId?: string // ToDo: rethink this parameter, needed for NEAR only
 }
 
 export type SystemOverlayData = {

@@ -14,6 +14,7 @@ export default class LoginConfirmation extends Base {
   help: string = null
 
   signature: string = null
+  contractId: string = null // ToDo: rethink this parameter, needed for NEAR only
 
   expiresAt: string = null
   createdAt: string = null
