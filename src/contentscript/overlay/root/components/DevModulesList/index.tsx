@@ -113,6 +113,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }, [targetChain])
 
   const _updateData = async () => {
+    'test'
     const { getRegistries, getTrustedUsers,getCounterStake } = await initBGFunctions(browser)
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
@@ -291,7 +292,9 @@ if(mi.isUnderConstruction){
         setModalError(true)
         setNotAccountModal(false)
       } finally {
+       
         setLoadingDeployFinally()
+        nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
         await _updateData()
       }
     }
@@ -338,6 +341,7 @@ if(mi.isUnderConstruction){
       setModalError(true)
       setNotAccountModal(false)
     } finally {
+      nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
       setLoadingDeployFinally()
       await _updateData()
     }

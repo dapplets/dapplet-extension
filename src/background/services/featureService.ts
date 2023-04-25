@@ -637,7 +637,9 @@ export default class FeatureService {
     try {
       const scriptUrl = await this.uploadModule(mi, vi, targetStorages)
       await registry.addModule(mi, vi) // Register manifest in Registry
+      EventBus.emit('module_deployment')
       return { scriptUrl }
+      
     } catch (err) {
       console.error(err)
       throw err
