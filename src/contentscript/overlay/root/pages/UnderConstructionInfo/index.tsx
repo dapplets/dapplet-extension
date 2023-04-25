@@ -13,7 +13,9 @@ import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
-
+import { ReactComponent as Burn } from '../../assets/svg/burn.svg'
+import { ReactComponent as CloseBurnModal } from '../../assets/svg/closeBurnModal.svg'
+import { RadioButton } from '../UnderConstruction/RadioButton'
 enum DeploymentStatus {
   Unknown,
   Deployed,
@@ -78,6 +80,9 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [counterBurn, setCounterBurn] = useState(null)
 
   const onClose = () => setModal(false)
+  const [isModalBurn, setModalBurn] = useState(false)
+  const [timeState, setTimeState] = useState({time:'1', AUGE:'100'})
+  const onCloseModalBurn = () => setModalBurn(false)
 
   useEffect(() => {
     const init = async () => {
@@ -287,7 +292,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
                   <div className={styles.counterBurn}>
                     <div className={styles.counterBurnTitleBlock}>
                       <span className={styles.counterBurnTitle}>Days left before pledge fails</span>
-                      <button className={styles.counterBurnButton}>Buy more time</button>
+                      <button onClick={()=>setModalBurn(true)} className={styles.counterBurnButton}>Buy more time</button>
                     </div>
                     <span className={styles.counter}>{counterBurn}</span>
                   </div>
@@ -364,6 +369,18 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
             className={styles.wrapperSettings}
             children={
               <>
+               <SettingItem
+                  title="Staked"
+                  component={<></>}
+                  className={styles.item}
+                  children={
+                    <input
+                      className={styles.inputTitle}
+                      value={timeState.AUGE + ' AUGe'}
+                      readOnly
+                    />
+                  }
+                />
                 {isLoad ? (
                   <div className={styles.miniLoader}></div>
                 ) : (
@@ -511,6 +528,80 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
         onClose={() => {
           setModalTransaction(false)
         }}
+      />
+        <Modal
+        visible={isModalBurn}
+        className={styles.titleModalBurn}
+        title={'Reallocating the pledge fund'}
+        classNameWrapper={styles.modalDefaultWrapper}
+        content={
+          <div className={cn(styles.modalDefaultContent, styles.modalBurnDefaultContent)}>
+            <div className={styles.modalCreationContentDescription}>Select time before pledge fails</div>
+            <RadioButton
+          id={`time-1`}
+          value="1 month"
+          name={'time'}
+          checked={
+            timeState.time=== '1'
+          }
+          price={'100'}
+          onChange={(e) => {
+            // ToDo: how to make better?
+            if (e.target.checked) {
+             setTimeState({AUGE: '100',time : '1'})
+            }
+          }}
+        />
+          <RadioButton
+          id={`time-2`}
+          value="2 month"
+          name={'time'}
+          price={'300'}
+          checked={
+            timeState.time=== '2'
+          }
+          onChange={(e) => {
+            // ToDo: how to make better?
+            if (e.target.checked) {
+             setTimeState({AUGE: '300',time : '2'})
+            }
+          }}
+        />
+         <RadioButton
+          id={`time-3`}
+          value="3 month"
+          name={'time'}
+          price={'700'}
+          checked={
+            timeState.time=== '3'
+          }
+          onChange={(e) => {
+            // ToDo: how to make better?
+            if (e.target.checked) {
+             setTimeState({AUGE: '700',time : '3'})
+            }
+          }}
+        />
+           
+          </div>
+        }
+        footer={
+          <div className={styles.buttonBlockBurn}>
+            <button
+              // onClick={() => setBurnDucToken(mi.name)}
+              className={styles.modalDefaultContentButton}
+            >
+              <Burn /> Do it
+            </button>
+            <button
+              onClick={() => onCloseModalBurn()}
+              className={cn(styles.modalDefaultContentButton, styles.burnCancel)}
+            >
+              <CloseBurnModal /> Cancel
+            </button>
+          </div>
+        }
+        onClose={() => onCloseModalBurn()}
       />
     </div>
   )

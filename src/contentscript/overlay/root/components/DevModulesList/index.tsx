@@ -375,7 +375,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
               <div className={styles.dappletsVersionUC}>Under Construction</div>
             )}
             {counterBurn && (
-              <button onClick={() => setModalBurn(true)} className={styles.dappletsBurn}>
+              <button  className={styles.dappletsBurn}>
                 <Burn />
                 {counterBurn >= 1 ? counterBurn + 'days' : 'burning'}
               </button>
@@ -441,6 +441,16 @@ export const DevModule: FC<PropsDevModule> = (props) => {
                 nodeButton.current?.classList.contains('dappletsIsLoadingDeploy')
                   ? ''
                   : 'Deploy'}
+              </button>
+            )}
+            {!mi.isUnderConstruction ? null : (
+              <button
+              
+              
+              onClick={() => setModalBurn(true)}
+                className={cn(styles.dappletsReupload, styles.btnBurn)}
+              >
+              <Burn style={{marginRight:'5px'}} />  Burn
               </button>
             )}
           </div>

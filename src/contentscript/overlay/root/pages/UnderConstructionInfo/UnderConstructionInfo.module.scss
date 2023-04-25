@@ -39,12 +39,10 @@
   &::-webkit-scrollbar-track {
     background: rgb(244 244 244);
     background:
-      linear-gradient(
-        90deg,
+      linear-gradient(90deg,
         rgb(244 244 244 / 0%) 10%,
         rgb(227 227 227 / 100%) 50%,
-        rgb(244 244 244 / 0%) 90%
-      );
+        rgb(244 244 244 / 0%) 90%);
   }
 
   &::-webkit-scrollbar-thumb {
@@ -57,7 +55,7 @@
   }
 }
 
-.mainInfoBlock > * {
+.mainInfoBlock>* {
   direction: ltr;
 }
 
@@ -221,7 +219,7 @@
   opacity: 0;
 }
 
-.inputfile + label {
+.inputfile+label {
   cursor: pointer;
 
   z-index: 4;
@@ -250,8 +248,8 @@
   }
 }
 
-.inputfile:focus + label,
-.inputfile + label:hover {
+.inputfile:focus+label,
+.inputfile+label:hover {
   z-index: 4;
 
   display: block;
@@ -739,7 +737,7 @@
   &:hover {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' viewBox='0 0 6 6' fill='none'%3E%3Cpath d='M5.09409 0.083313L2.99992 2.17748L0.905752 0.083313L0.083252 0.905813L2.17742 2.99998L0.083252 5.09415L0.905752 5.91665L2.99992 3.82248L5.09409 5.91665L5.91658 5.09415L3.82242 2.99998L5.91658 0.905813L5.09409 0.083313Z' fill='%23747376'/%3E%3C/svg%3E");
   }
- 
+
 }
 
 .contextIDButtonDisabled {
@@ -762,7 +760,7 @@
 
 
 .addContext {
-  cursor: pointer!important;
+  cursor: pointer !important;
 
   display: flex;
   align-items: center;
@@ -777,18 +775,18 @@
   font-size: 10px;
   font-weight: 400;
   line-height: 100%;
-  color: #fff!important;
+  color: #fff !important;
   text-transform: uppercase;
 
-  background: $primary!important;
+  background: $primary !important;
   border-radius: 4px;
 
   &:hover {
-    background: $primary-hover!important;
+    background: $primary-hover !important;
   }
 
   &:active {
-    background: $primary-pressed!important;
+    background: $primary-pressed !important;
   }
 }
 
@@ -888,7 +886,7 @@
   background-position-x: center;
 }
 
-.addcontextDelete{
+.addcontextDelete {
   cursor: pointer;
 
   display: block;
@@ -907,50 +905,125 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.625 12.75H3.375C2.68464 12.75 2.125 12.1904 2.125 11.5V3.375H0.875V2.125H3.375V1.5C3.375 0.809644 3.93464 0.25 4.625 0.25H8.375C9.06536 0.25 9.625 0.809644 9.625 1.5V2.125H12.125V3.375H10.875V11.5C10.875 12.1904 10.3154 12.75 9.625 12.75ZM3.375 3.375V11.5H9.625V3.375H3.375ZM4.625 1.5V2.125H8.375V1.5H4.625ZM8.375 10.25H7.125V4.625H8.375V10.25ZM5.875 10.25H4.625V4.625H5.875V10.25Z' fill='%232A2A2A'/%3E%3C/svg%3E");
   }
 }
-.counterBurn{
- display: flex;
- width: 157px;
-height: 63px;
-padding: 10px;
-background: $app-bg;
-justify-content: space-between;
-border-radius: 10px;
-margin-left: auto;
-}
-.counterBurnTitleBlock{
-display: flex;
-flex-direction: column;
-width: 90px;
-}
-.counterBurnTitle{
-  font-weight: 300;
-font-size: 12px;
-line-height: 14px;
-display: flex;
-align-items: center;
 
-color: $counter-burn-title;
+.counterBurn {
+  display: flex;
+  width: 157px;
+  height: 63px;
+  padding: 10px;
+  background: $app-bg;
+  justify-content: space-between;
+  border-radius: 10px;
+  margin-left: auto;
 }
-.counterBurnButton{
+
+.counterBurnTitleBlock {
+  display: flex;
+  flex-direction: column;
+  width: 90px;
+}
+
+.counterBurnTitle {
+  font-weight: 300;
+  font-size: 12px;
+  line-height: 14px;
+  display: flex;
+  align-items: center;
+
+  color: $counter-burn-title;
+}
+
+.counterBurnButton {
   background: inherit;
   color: $primary;
   font-weight: 500;
-font-size: 10px;
-line-height: 100%;
-margin-right: auto;
-    margin-top: 5px;
-&:hover{
-  color: $primary-hover;
+  font-size: 10px;
+  line-height: 100%;
+  margin-right: auto;
+  margin-top: 5px;
+
+  &:hover {
+    color: $primary-hover;
+  }
 }
-}
-.counter{
+
+.counter {
   font-weight: 900;
-font-size: 25px;
-line-height: 29px;
+  font-size: 25px;
+  line-height: 29px;
 
 
-color: #F53A5C;
+  color: #F53A5C;
 }
+
+.modalBurnDefaultContent {
+  font-size: 14px;
+  line-height: 149%;
+  color: $main-grey;
+  align-items: flex-start;
+  width: 320px;
+  margin-left: -10px;
+  margin-top: -120px;
+
+  img {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.modalDefaultContentTextBurn {
+  text-align: left;
+}
+
+.buttonBlockBurn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+
+  svg {
+    margin-right: 10px;
+  }
+}
+
+.burnCancel {
+  background: $app-bg;
+  border: 1px solid #919191;
+  border-radius: 2px;
+  color: #919191;
+  width: 145px;
+  margin-left: 10px;
+
+  &:hover {
+    background: $primary-hover;
+  }
+}
+
+.btnBurn {
+  margin-right: 35px;
+  margin-top: 3px;
+}
+
+.modalCreationContentDescription {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+  color: $main-grey;
+  padding-left: 10px;
+
+}
+
+.modalDefaultWrapper {
+  justify-content: space-evenly;
+
+}
+
+.titleModalBurn {
+  font-weight: 900;
+  font-size: 26px;
+  line-height: 149%;
+  padding-left: 20px;
+}
+
 @media (min-width: 320px) and (max-width: 640px) {
   .wrapper {
     height: 85%;

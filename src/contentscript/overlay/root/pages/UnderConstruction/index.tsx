@@ -10,6 +10,7 @@ import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import styles from './UnderConstruction.module.scss'
+// import { RadioButton } from './RadioButton'
 
 enum DeploymentStatus {
   Unknown,
@@ -83,6 +84,13 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
   const [isModalEndCreation, setModalEndCreation] = useState(false)
 
   const [isModalTransaction, setModalTransaction] = useState(false)
+  const [timeState, setTimeState] = useState({ time: '2', AUGE: '1000' })
+  const [timeStateVariants, setTimeStateVariants] = useState([
+    { time: '2', AUGE: '1000' },
+    { time: '3', AUGE: '2000' },
+    { time: '4', AUGE: '4000' },
+  ])
+  const [timeStateFull, setTimeStateFull] = useState(false)
 
   useEffect(() => {
     const init = async () => {
@@ -90,7 +98,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
     }
     init()
 
-    return () => {}
+    return () => { }
   }, [mi, targetChain])
 
   const _updateData = async () => {
@@ -337,10 +345,40 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
                   />
                 }
               />
+              <div className={cn(styles.wrapperStake)}>
+                <div className={cn(styles.wrapperStakeTitle)}>Stake</div>
+                <div className={cn(styles.blockStake, {
+                  [styles.blockStakeFull]: timeStateFull
+                })}>
+                  {!timeStateFull ? <div onClick={() => setTimeStateFull(true)} className={cn(styles.inputTitle, styles.inputTitleStake)} >
+                    <div>{timeState.time} month</div> <div>{timeState.AUGE} AUGE</div>
+                  </div> : <>
+                    {timeStateVariants.map((x, i) => {
+                      return (
+                        <div onClick={()=>{
+                          setTimeState({time: x.time, AUGE:x.AUGE})
+                          setTimeStateFull(false)
+                       
+                          
+                        }} className={cn(styles.inputTitle, styles.inputTitleStake)} key={i}>
+                          <div>{x.time} month</div> <div>{x.AUGE} AUGE</div>
+                        </div>
+                      )
+                    })}</>}
+
+                  {!timeStateFull && <div className={cn(styles.blockStakeDescription)}>
+                    To create a DUC (and reserve a unique name for it) you will have to deposit a
+                    return stake. Its size depends on the period the existence of a DUC (but you can
+                    costly extend this later).
+                  </div>}
+
+                </div>
+              </div>
             </div>
           }
         />
       </div>
+
       <div className={styles.linkNavigation}>
         <button onClick={() => setUnderConstruction(false)} className={styles.back}>
           Back
@@ -372,23 +410,39 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
       </div>
       <Modal
         visible={isModalCreation}
-        title={'Initial Stake'}
+        title={'DUC CREATION'}
+        classNameContent={styles.modalCreationWrapper}
         content={
           <div className={styles.modalCreationContent}>
-            To create a Dapplet Under Construction you need to Stake 100 AUGe. You will get this
-            stake back if you deploy this module within 2 months. Otherwise you will lose it
+            <span className={styles.modalCreationContenTitle}>
+              You create DUС. You deposit {timeState.AUGE} AUGE stake by reserving a {mi.name} on{' '}
+              {timeState.time} months
+            </span>
+            If within this period you successfully replace the DUC with a working dapplet, then the
+            stake is returned to you in full. If you cannot do this, then if you "burn" the DUC
+            yourself, you will get the stake back minus 20% which will be "burnt". Also, any user
+            will be able to, after the expiration of the existence of the DUC delete it (via
+            Dapplets.Store). In this case, you will lose the steak completely.
           </div>
         }
         footer={
-          <button
-            className={styles.modalCreationContentButton}
-            onClick={() => {
-              deployButtonClickHandler()
-              onCloseModalCreation()
-            }}
-          >
-            Ok, I agree
-          </button>
+          <div className={styles.modalCreationContentButtonFooter}>
+            <button
+              className={styles.modalCreationContentButton}
+              onClick={() => {
+                deployButtonClickHandler()
+                onCloseModalCreation()
+              }}
+            >
+              Accept the terms
+            </button>
+            <button
+              onClick={() => onCloseModalCreation()}
+              className={styles.modalCreationContentButtonCancel}
+            >
+              Cancel
+            </button>
+          </div>
         }
         onClose={() => onCloseModalCreation()}
       />

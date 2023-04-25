@@ -533,7 +533,7 @@
 }
 
 .modalCreationContent {
-  width: 214px;
+  width: 100%;
 
   font-family: Roboto, sans-serif;
   font-size: 14px;
@@ -542,6 +542,7 @@
   line-height: 16px;
   color: $main-grey;
   text-align: center;
+  padding-top: 10px;
 }
 
 .modalCreationContentButton {
@@ -641,4 +642,79 @@
   &:active {
     color: $primary-pressed;
   }
+}
+
+.modalCreationContentDescription {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 149%;
+  color: $main-grey;
+  padding-left: 10px;
+}
+.modalCreationWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-left: 36px;
+  padding-right: 36px;
+}
+.modalCreationContenTitle {
+  font-size: 16px;
+  line-height: 149%;
+  display: block;
+  padding-bottom: 30px;
+}
+.modalCreationContentButtonFooter {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+}
+.modalCreationContentButtonCancel {
+  background: inherit;
+  color: #30a6d9;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 149%;
+  &:hover {
+    opacity: 0.5;
+  }
+}
+
+.wrapperStake{
+position: relative;
+min-height: 62px;
+}
+.wrapperStakeTitle{
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  color: #000000;
+  padding-bottom: 10px;
+}
+.blockStake{
+  transition: 0.5s ease all;
+  position: relative;
+}
+.blockStakeFull{
+  position: absolute;
+  width: 100%;
+  bottom: -60px;
+}
+.inputTitleStake{
+justify-content: space-between;
+cursor: pointer;
+&:hover{
+  color: $primary-hover;
+  border: 1px solid $primary-hover;
+}
+}
+.blockStakeDescription{
+  transition: 0.5s ease all;
+  font-style: italic;
+font-weight: 300;
+font-size: 14px;
+line-height: 16px;
+padding-top: 10px;
+color: #6A6A6A;
 }
