@@ -7,7 +7,7 @@ describe('No available dapplets', () => {
     4,
     it('No available dapplets', () => {
       // open overlay
-      cy.openDappletsOverlay(url)
+      cy.openDappletsOverlay(url, { wipe: true })
 
       // should have no dapplets in the list
       cy.get('dapplets-overlay-manager').contains('No available dapplets for current site', {

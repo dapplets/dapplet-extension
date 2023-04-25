@@ -2,13 +2,13 @@ import { qase } from 'cypress-qase-reporter/dist/mocha'
 
 const url = 'https://github.com/Ni-2'
 const dappletIdToActivate = 'connecting-accounts-dapplet'
-
+// todo: unwork
 describe('CA: dapplet on GitHub', () => {
   qase(
     3,
     it('CA: dapplet on GitHub', () => {
       // open overlay
-      cy.openDappletsOverlay(url)
+      cy.openDappletsOverlay(url, { wipe: true })
 
       // find Connecting Accounts dapplet
       cy.get('dapplets-overlay-manager').contains('Connected Accounts', {

@@ -2,13 +2,13 @@ import { qase } from 'cypress-qase-reporter/dist/mocha'
 
 const url = 'https://example.com'
 const dappletIdToActivate = 'action-test'
-
+// todo: unwork
 describe('disabled dapplet action', () => {
   qase(
     10,
     it('disabled dapplet action', () => {
       // open overlay and run the dapplet
-      cy.openDappletsOverlay(url)
+      cy.openDappletsOverlay(url, { wipe: true })
       cy.runDapplet(dappletIdToActivate)
 
       // expands to ubersausage mode

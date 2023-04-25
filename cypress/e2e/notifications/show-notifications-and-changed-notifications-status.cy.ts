@@ -5,12 +5,12 @@ const dappletIdToActivate = 'test-notify'
 
 let counter
 let newCounter
-
+// todo: unwork
 describe('show notification in notification`s page', () => {
   qase(
     16,
     it('show notification in notification`s page', () => {
-      cy.openDappletsOverlay(url)
+      cy.openDappletsOverlay(url, { wipe: true })
       cy.runDapplet(dappletIdToActivate)
       cy.wait(10000)
       cy.getByTestId('notification-page').click()

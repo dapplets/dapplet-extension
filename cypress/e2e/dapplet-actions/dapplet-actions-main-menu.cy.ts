@@ -1,11 +1,11 @@
 import { qase } from 'cypress-qase-reporter/dist/mocha'
-
+// todo: unwork
 describe('dapplets action main menu', () => {
   qase(
     12,
     it('dapplets action test', () => {
       // open context webpage
-      cy.visit('https://example.com')
+      cy.visit('https://example.com', { wipe: true })
 
       // inject overlay
       cy.get('dapplets-overlay-manager')
