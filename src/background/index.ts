@@ -176,9 +176,13 @@ browser.runtime.onMessage.addListener(
     deleteAllNotifications: () => notificationService.deleteAllNotifications(),
     markNotificationAsViewed: (id) => notificationService.markNotificationAsViewed(id),
     markAllNotificationsAsViewed: () => notificationService.markAllNotificationsAsViewed(),
-    // todo: mocked ucservices
-    getCounterStake: (appId) => underConstructionService.getCounterStake(appId),
-    setBurnDucToken: (appId) => underConstructionService.setBurnDucToken(appId),
+    // todo: underConstructionService
+    getStakeStatus: (appId) => underConstructionService.getStakeStatus(appId),
+    calcExtendedStake: (appId,secondsDuration) => underConstructionService.calcExtendedStake(appId,secondsDuration),
+    calcStake:(duration) => underConstructionService.calcStake(duration),
+    stakes:(appId) => underConstructionService.stakes(appId),
+    burnDUC:(moduleName) => underConstructionService.burnDUC(moduleName),
+    
     resolveNotificationAction:
       notificationService.resolveNotificationAction.bind(notificationService),
     getUnreadNotificationsCount: (source?) =>

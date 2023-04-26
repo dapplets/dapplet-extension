@@ -5,9 +5,13 @@ import { StorageAggregator } from '../../moduleStorages/moduleStorage'
 import GlobalConfigService from '../globalConfigService'
 import { OverlayService } from '../overlayService'
 import { WalletService } from '../walletService'
-import abi from './app-token-registry.json'
+import abi from './DappletRegistry.abi.json'
 interface I_DUC {}
-
+interface Stake {
+   amount: number
+   duration: number
+   endsAt: number
+}
 export class UnderConstructionService {
   private tokenFactory: ethers.Contract
 
@@ -24,24 +28,64 @@ export class UnderConstructionService {
       DefaultSigners.EXTENSION,
       ChainTypes.ETHEREUM_GOERLI
     )
-    const address = '0x0000000000000000000000000000000000000000'
+    const address = '0xa0D2FB6f71F09E60aF1eD7344D4BB8Bb4c83C9af'
     this.tokenFactory = new ethers.Contract(address, abi, signer)
   }
 
-  public async getCounterStake(appId: string): Promise<number> {
+
+  public async getStakeStatus(appId: string): Promise<number> {
     await this._init()
-    // const counter = await this.tokenFactory.getCounterStake(
-    //   appId
-    // )
-    // todo: mocked
-    function randomInteger(min, max) {
-      let rand = min - 0.5 + Math.random() * (max - min + 1)
-      return Math.round(rand)
-    }
-    const counter = randomInteger(0, 20)
-    return counter
+      const stakeStatus = await this.tokenFactory.getStakeStatus(
+      appId
+    )
+    return stakeStatus
   }
 
+  public async calcExtendedStake(
+    appId: string,
+    secondsDuration: number
+) : Promise<number> {
+  await this._init()
+  const extendedStake = await this.tokenFactory.calcExtendedStake(
+    appId,secondsDuration
+  )
+  return extendedStake
+}
+
+public async calcStake( duration:number): Promise<number> {
+  await this._init()
+  const price = await this.tokenFactory.calcStake(
+    duration
+  )
+  return price
+}
+public async stakes(appId: string): Promise<Stake>{
+  await this._init()
+  const stake = await this.tokenFactory.stakes(
+    appId
+  )
+  return stake
+}
+public async burnDUC(moduleName:string){
+  await this._init()
+ await this.tokenFactory.stakes(
+  moduleName
+)
+}
+
+public async getCounterStake(appId: string): Promise<number> {
+  await this._init()
+  // const counter = await this.tokenFactory.getCounterStake(
+  //   appId
+  // )
+  // todo: mocked
+  function randomInteger(min, max) {
+    let rand = min - 0.5 + Math.random() * (max - min + 1)
+    return Math.round(rand)
+  }
+  const counter = randomInteger(0, 20)
+  return counter
+}
   public async setBurnDucToken(appId: string) {
     //  await this.tokenFactory.setBurnDucToken(
     //     appId
