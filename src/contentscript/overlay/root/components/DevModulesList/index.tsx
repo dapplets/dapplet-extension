@@ -107,6 +107,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const [adminsOpen, setAdminsOpen] = useState(false)
   const [counterBurn, setCounterBurn] = useState(null)
   const [isModalBurn, setModalBurn] = useState(false)
+  const [isStakeStatus, setStakeStatus] = useState(false)
   const onCloseModalBurn = () => setModalBurn(false)
   useEffect(() => {
     const init = async () => {
@@ -117,14 +118,13 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }, [targetChain])
 
   const _updateData = async () => {
-    const { getRegistries, getTrustedUsers, getCounterStake } = await initBGFunctions(browser)
+    const { getRegistries, getTrustedUsers, stakes, getStakeStatus } = await initBGFunctions(
+      browser
+    )
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-    if (mi.isUnderConstruction) {
-      const counter = await getCounterStake(mi.name)
-      setCounterBurn(counter)
-    }
+
     if (mi === null && vi === null) {
       const newMi = new ModuleInfo()
       setMi(newMi)
@@ -157,7 +157,14 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       setTrustedUsers(trustedUsers)
       setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
     }
+    if (mi.isUnderConstruction) {
+      const counter = await stakes(mi.name, prodRegistries[0]?.url || null)
 
+      setCounterBurn(counter)
+
+      const statusStake = await getStakeStatus(mi.name, prodRegistries[0]?.url || null)
+      statusStake === 2 && setStakeStatus(true)
+    }
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
       await updateDataLocalhost()
@@ -272,8 +279,8 @@ export const DevModule: FC<PropsDevModule> = (props) => {
           setNewModule(true)
         } else {
           mode === FormMode.Creating
-            ? await deployModule(mi, null, targetStorages, targetRegistry)
-            : await deployModule(mi, vi, targetStorages, targetRegistry)
+            ? await deployModule(mi, null, targetStorages, targetRegistry, 0)
+            : await deployModule(mi, vi, targetStorages, targetRegistry, 0)
 
           setDeploymentStatus(DeploymentStatus.Deployed)
           setUpdate(true)
@@ -359,8 +366,8 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     setOwnerDev(newOwner)
   }
   const setBurnDucToken = async (appId) => {
-    const { setBurnDucToken } = await initBGFunctions(browser)
-    await setBurnDucToken(appId)
+    const { burnDUC } = await initBGFunctions(browser)
+    await burnDUC(appId, targetRegistry)
   }
   return (
     <>
@@ -375,7 +382,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
               <div className={styles.dappletsVersionUC}>Under Construction</div>
             )}
             {counterBurn && (
-              <button  className={styles.dappletsBurn}>
+              <button className={styles.dappletsBurn}>
                 <Burn />
                 {counterBurn >= 1 ? counterBurn + 'days' : 'burning'}
               </button>
@@ -443,16 +450,14 @@ export const DevModule: FC<PropsDevModule> = (props) => {
                   : 'Deploy'}
               </button>
             )}
-            {!mi.isUnderConstruction ? null : (
+            {isStakeStatus ? (
               <button
-              
-              
-              onClick={() => setModalBurn(true)}
+                onClick={() => setModalBurn(true)}
                 className={cn(styles.dappletsReupload, styles.btnBurn)}
               >
-              <Burn style={{marginRight:'5px'}} />  Burn
+                <Burn style={{ marginRight: '5px' }} /> Burn
               </button>
-            )}
+            ) : null}
           </div>
           <div className={styles.dappletsLabel}>
             {mi.name && (

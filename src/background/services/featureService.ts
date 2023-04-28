@@ -433,7 +433,33 @@ export default class FeatureService {
       throw new Error(err)
     }
   }
+  async getStakeStatus(appId: string, registryUri): Promise<string> {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
 
+    return registry.getStakeStatus(appId)
+  }
+
+  async calcExtendedStake(appId: string, secondsDuration: number, registryUri): Promise<number> {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    return registry.calcExtendedStake(appId, secondsDuration)
+  }
+
+  async calcStake(duration: number, registryUri): Promise<number> {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    return registry.calcStake(duration)
+  }
+  async stakes(appId: string, registryUri): Promise<number> {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    return registry.stakes(appId)
+  }
+  async burnDUC(moduleName: string, registryUri) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    await registry.burnDUC(moduleName)
+  }
+  async extendReservation(moduleName: string, reservationPeriod, registryUri) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    await registry.extendReservation(moduleName, reservationPeriod)
+  }
   async activateFeature(
     name: string,
     version: string | undefined,
@@ -629,14 +655,15 @@ export default class FeatureService {
     mi: ModuleInfo,
     vi: VersionInfo,
     targetStorages: StorageTypes[],
-    targetRegistry: string
+    targetRegistry: string,
+    reservationPeriod
   ): Promise<{ scriptUrl: string }> {
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(targetRegistry)
     if (!registry) throw new Error('No registry with this url exists in config.')
 
     try {
       const scriptUrl = await this.uploadModule(mi, vi, targetStorages)
-      await registry.addModule(mi, vi) // Register manifest in Registry
+      await registry.addModule(mi, vi, reservationPeriod) // Register manifest in Registry
       return { scriptUrl }
     } catch (err) {
       console.error(err)

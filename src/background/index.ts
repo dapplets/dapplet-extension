@@ -28,7 +28,6 @@ import ProxyService from './services/proxyService'
 import { SessionService } from './services/sessionService'
 import { SuspendService } from './services/suspendService'
 import { TokenRegistryService } from './services/tokenomicsService'
-import { UnderConstructionService } from './services/underConstructionServices'
 import { WalletService } from './services/walletService'
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
@@ -61,12 +60,7 @@ const tokenomicsService = new TokenRegistryService(
   overlayService,
   storageAggregator
 )
-const underConstructionService = new UnderConstructionService(
-  globalConfigService,
-  walletService,
-  overlayService,
-  storageAggregator
-)
+
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
 globalConfigService.ensService = ensService
@@ -122,8 +116,8 @@ browser.runtime.onMessage.addListener(
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
     getAllDevModules: () => featureService.getAllDevModules(),
     uploadModule: (mi, vi, targetStorages) => featureService.uploadModule(mi, vi, targetStorages),
-    deployModule: (mi, vi, targetStorages, targetRegistry) =>
-      featureService.deployModule(mi, vi, targetStorages, targetRegistry),
+    deployModule: (mi, vi, targetStorages, targetRegistry, reservationPeriod) =>
+      featureService.deployModule(mi, vi, targetStorages, targetRegistry, reservationPeriod),
     getRegistries: () => featureService.getRegistries(),
     getOwnership: (registryUri, moduleName) => featureService.getOwnership(registryUri, moduleName),
     getModuleNftUrl: (registryUri, moduleName) =>
@@ -176,13 +170,16 @@ browser.runtime.onMessage.addListener(
     deleteAllNotifications: () => notificationService.deleteAllNotifications(),
     markNotificationAsViewed: (id) => notificationService.markNotificationAsViewed(id),
     markAllNotificationsAsViewed: () => notificationService.markAllNotificationsAsViewed(),
-    // todo: underConstructionService
-    getStakeStatus: (appId) => underConstructionService.getStakeStatus(appId),
-    calcExtendedStake: (appId,secondsDuration) => underConstructionService.calcExtendedStake(appId,secondsDuration),
-    calcStake:(duration) => underConstructionService.calcStake(duration),
-    stakes:(appId) => underConstructionService.stakes(appId),
-    burnDUC:(moduleName) => underConstructionService.burnDUC(moduleName),
-    
+    // todo: featureService
+    getStakeStatus: (appId, registryUri) => featureService.getStakeStatus(appId, registryUri),
+    calcExtendedStake: (appId, secondsDuration, registryUri) =>
+      featureService.calcExtendedStake(appId, secondsDuration, registryUri),
+    calcStake: (duration, registryUri) => featureService.calcStake(duration, registryUri),
+    stakes: (appId, registryUri) => featureService.stakes(appId, registryUri),
+    burnDUC: (moduleName, registryUri) => featureService.burnDUC(moduleName, registryUri),
+    extendReservation: (moduleName, reservationPeriod, registryUri) =>
+      featureService.extendReservation(moduleName, reservationPeriod, registryUri),
+    //
     resolveNotificationAction:
       notificationService.resolveNotificationAction.bind(notificationService),
     getUnreadNotificationsCount: (source?) =>

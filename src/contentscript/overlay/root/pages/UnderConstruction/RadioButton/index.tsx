@@ -12,16 +12,14 @@ export interface RadioButtonProps
   price: string
 }
 export const RadioButton: FC<RadioButtonProps> = (props: RadioButtonProps) => {
-  const { id, value, name, radioHandler, isShow,price, ...otherProps } = props
+  const { id, value, name, radioHandler, isShow, price, ...otherProps } = props
 
   return (
     <div className={cn(styles.form_radio)}>
       <input type="radio" name={name} id={id} value={value} {...otherProps} />
       <label htmlFor={id} className={cn(styles.inputRadioTitle)}>
-        
         <span>{value}</span>
         <span>{price} AUGE</span>
-        
       </label>
     </div>
   )

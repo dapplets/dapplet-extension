@@ -17,7 +17,12 @@ import VersionInfo from '../models/versionInfo'
 import abi from './ethRegistryAbi'
 import nftAbi from './nftContractAbi'
 import { Registry, RegistryConfig } from './registry'
-
+import abiZoo from './tokenZooAbi'
+export interface Stake {
+  amount: number
+  duration: number
+  endsAt: number
+}
 type EthStorageRef = {
   hash: string // bytes32
   uris: string[] // bytes[]
@@ -93,15 +98,23 @@ export class EthRegistry implements Registry {
   private _signer: ethers.ethers.Signer
   private _moduleInfoCache = new Map<string, Map<string, ModuleInfo[]>>()
   private _contract: ethers.ethers.Contract = null
+  private _contractZoo: ethers.ethers.Contract = null
   private get _contractPromise(): Promise<ethers.ethers.Contract> {
     if (this._contract) {
       return Promise.resolve(this._contract)
     } else {
       return this._signer.resolveName(this.url).then((x) => {
         this._contract = new ethers.Contract(x, abi, this._signer)
+
         return this._contract
       })
     }
+  }
+  private async _init() {
+    if (this._contractZoo) return
+
+    const address = '0xdc3e16daa295e1e066283146d067040725cc5475'
+    this._contractZoo = new ethers.Contract(address, abiZoo, this._signer)
   }
 
   constructor({ url, isDev, signer }: RegistryConfig) {
@@ -271,9 +284,14 @@ export class EthRegistry implements Registry {
     return mergeDedupe(result)
   }
 
-  public async addModule(module: ModuleInfo, version: VersionInfo): Promise<void> {
+  public async addModule(
+    module: ModuleInfo,
+    version: VersionInfo,
+    reservationPeriod?
+  ): Promise<void> {
+    await this._init()
     const contract = await this._contractPromise
-
+    const contractZoo = await this._contractZoo
     const isModuleExist = await contract
       .getModuleInfoByName(module.name)
       .then(() => true)
@@ -325,7 +343,13 @@ export class EthRegistry implements Registry {
         }
       }
 
-      const tx = await contract.addModuleInfo(module.contextIds, links, mi, vi)
+      const txCalcStake = await this.calcStake(reservationPeriod)
+      const txAproove = await contractZoo.approve(
+        '0xa0D2FB6f71F09E60aF1eD7344D4BB8Bb4c83C9af',
+        txCalcStake
+      )
+      await txAproove.wait()
+      const tx = await contract.addModuleInfo(module.contextIds, links, mi, vi, reservationPeriod)
       await tx.wait()
     } else {
       const vi = this._convertToEthVi(version)
@@ -358,6 +382,57 @@ export class EthRegistry implements Registry {
   public async getContextIds(moduleName: string): Promise<string[]> {
     const contract = await this._contractPromise
     return contract.getContextIdsByModule(moduleName)
+  }
+  public async getStakeStatus(appId: string): Promise<string> {
+    const contract = await this._contractPromise
+    return contract.getStakeStatus(appId)
+  }
+
+  public async calcExtendedStake(appId: string, secondsDuration: number): Promise<number> {
+    const contract = await this._contractPromise
+
+    const parseStakeCalcExt = ethers.utils.formatUnits(
+      await contract.calcExtendedStake(appId, secondsDuration),
+      16
+    )
+
+    return parseInt(parseStakeCalcExt)
+  }
+  // public async approve(
+  //   amount
+  // ) {
+  // const contract = await this._contractPromise
+  // await contract.approve(
+  //   '0xa0D2FB6f71F09E60aF1eD7344D4BB8Bb4c83C9af',amount
+  // )
+  // }
+  public async calcStake(duration: number): Promise<number> {
+    const contract = await this._contractPromise
+
+    const parseStakeCalc = ethers.utils.formatUnits(await contract.calcStake(duration), 16)
+
+    return parseInt(parseStakeCalc)
+  }
+  public async stakes(appId: string): Promise<number> {
+    const contract = await this._contractPromise
+    const dateAt = await contract.stakes(appId)
+
+    const parseStakes = convertTimestampToISODate((await dateAt[2].toNumber()) * 1000)
+    let date = new Date(parseStakes)
+    let nowDate = new Date()
+    var daysLag = Math.ceil(Math.abs(date.getTime() - nowDate.getTime()) / (1000 * 3600 * 24))
+
+    return daysLag
+  }
+  public async burnDUC(moduleName: string) {
+    const contract = await this._contractPromise
+    const tx = await contract.burnDUC(moduleName)
+    await tx.wait()
+  }
+  public async extendReservation(moduleName: string, reservationPeriod: number) {
+    const contract = await this._contractPromise
+    const tx = await contract.extendReservation(moduleName, reservationPeriod)
+    await tx.wait()
   }
 
   public async addContextId(moduleName: string, contextId: string) {

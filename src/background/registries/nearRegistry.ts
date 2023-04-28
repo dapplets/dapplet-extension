@@ -329,6 +329,28 @@ export class NearRegistry implements Registry {
     throw new NotImplementedError()
   }
 
+  public async getStakeStatus(): Promise<string> {
+    throw new NotImplementedError()
+  }
+
+  public async calcExtendedStake(): Promise<number> {
+    throw new NotImplementedError()
+  }
+
+  public async calcStake(): Promise<number> {
+    throw new NotImplementedError()
+  }
+  public async stakes(): Promise<number> {
+    throw new NotImplementedError()
+  }
+  public async burnDUC() {
+    throw new NotImplementedError()
+  }
+
+  public async extendReservation() {
+    throw new NotImplementedError()
+  }
+
   private _toNearStorageRef(ref: StorageRef): NearStorageRef {
     if (ref === null) return null
     return {

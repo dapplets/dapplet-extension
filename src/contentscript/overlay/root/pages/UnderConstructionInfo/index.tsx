@@ -7,15 +7,15 @@ import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes } from '../../../../../common/types'
 import { ReactComponent as Delete } from '../../assets/icons/mini-close.svg'
+import { ReactComponent as Burn } from '../../assets/svg/burn.svg'
+import { ReactComponent as CloseBurnModal } from '../../assets/svg/closeBurnModal.svg'
 import { Modal } from '../../components/Modal'
 import { SettingItem } from '../../components/SettingItem'
 import { SettingWrapper } from '../../components/SettingWrapper'
 import { StorageRefImage } from '../../components/StorageRefImage'
+import { RadioButton } from '../UnderConstruction/RadioButton'
 import styles from './UnderConstructionInfo.module.scss'
 import './valid.scss'
-import { ReactComponent as Burn } from '../../assets/svg/burn.svg'
-import { ReactComponent as CloseBurnModal } from '../../assets/svg/closeBurnModal.svg'
-import { RadioButton } from '../UnderConstruction/RadioButton'
 enum DeploymentStatus {
   Unknown,
   Deployed,
@@ -81,7 +81,12 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
 
   const onClose = () => setModal(false)
   const [isModalBurn, setModalBurn] = useState(false)
-  const [timeState, setTimeState] = useState({time:'1', AUGE:'100'})
+  const [timeState, setTimeState] = useState(null)
+  const [timeStateVariants, setTimeStateVariants] = useState([
+    { time: '1', AUGE: null, sec: 60 * 60 * 24 * 30 },
+    { time: '2', AUGE: null, sec: 60 * 60 * 24 * 30 * 2 },
+    { time: '3', AUGE: null, sec: 60 * 60 * 24 * 30 * 3 },
+  ])
   const onCloseModalBurn = () => setModalBurn(false)
 
   useEffect(() => {
@@ -99,12 +104,39 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   }, [])
 
   const _updateData = async () => {
-    const { getRegistries, getContextIds, getCounterStake } = await initBGFunctions(browser)
+    const { getRegistries, getContextIds, stakes, calcExtendedStake } = await initBGFunctions(
+      browser
+    )
 
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
     const contextId = await getContextIds(prodRegistries[0]?.url, mi.name)
-    const counter = await getCounterStake(mi.name)
+    const counter = await stakes(mi.name, prodRegistries[0]?.url || null)
+    const oneMonth = await calcExtendedStake(
+      mi.name,
+      60 * 60 * 24 * 30,
+      prodRegistries[0]?.url || null
+    )
+    const twoMonth = await calcExtendedStake(
+      mi.name,
+      60 * 60 * 24 * 30 * 2,
+      prodRegistries[0]?.url || null
+    )
+    const threeMonth = await calcExtendedStake(
+      mi.name,
+      60 * 60 * 24 * 30 * 3,
+      prodRegistries[0]?.url || null
+    )
+    // if(!oneMonth || !twoMonth || !threeMonth)
+    const newPosts = timeStateVariants.map((post) =>
+      post.time === '1'
+        ? { ...post, AUGE: `${oneMonth}` }
+        : post.time === '2'
+        ? { ...post, AUGE: `${twoMonth}` }
+        : { ...post, AUGE: `${threeMonth}` }
+    )
+    setTimeStateVariants(newPosts)
+    setTimeState({ time: '1', AUGE: oneMonth, sec: 60 * 60 * 24 * 30 })
     setCounterBurn(counter)
     setVisibleContextId(contextId)
     setTargetRegistry(prodRegistries[0]?.url || null)
@@ -220,7 +252,18 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       setAddDisabled(false)
     }
   }
+  const extendStakeCalc = async () => {
+    try {
+      const { extendReservation } = await initBGFunctions(browser)
+      if (!targetRegistry || !mi.name || !timeState.sec) return
 
+      await extendReservation(mi.name, timeState.sec, targetRegistry)
+
+      await _updateData()
+    } catch (error) {
+    } finally {
+    }
+  }
   return (
     <div className={styles.wrapper}>
       {message ? (
@@ -292,7 +335,12 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
                   <div className={styles.counterBurn}>
                     <div className={styles.counterBurnTitleBlock}>
                       <span className={styles.counterBurnTitle}>Days left before pledge fails</span>
-                      <button onClick={()=>setModalBurn(true)} className={styles.counterBurnButton}>Buy more time</button>
+                      <button
+                        onClick={() => setModalBurn(true)}
+                        className={styles.counterBurnButton}
+                      >
+                        Buy more time
+                      </button>
                     </div>
                     <span className={styles.counter}>{counterBurn}</span>
                   </div>
@@ -369,14 +417,14 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
             className={styles.wrapperSettings}
             children={
               <>
-               <SettingItem
+                <SettingItem
                   title="Staked"
                   component={<></>}
                   className={styles.item}
                   children={
                     <input
                       className={styles.inputTitle}
-                      value={timeState.AUGE + ' AUGe'}
+                      value={timeState && timeState.AUGE + ' AUGe'}
                       readOnly
                     />
                   }
@@ -529,68 +577,37 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
           setModalTransaction(false)
         }}
       />
-        <Modal
+      <Modal
         visible={isModalBurn}
         className={styles.titleModalBurn}
         title={'Reallocating the pledge fund'}
         classNameWrapper={styles.modalDefaultWrapper}
         content={
           <div className={cn(styles.modalDefaultContent, styles.modalBurnDefaultContent)}>
-            <div className={styles.modalCreationContentDescription}>Select time before pledge fails</div>
-            <RadioButton
-          id={`time-1`}
-          value="1 month"
-          name={'time'}
-          checked={
-            timeState.time=== '1'
-          }
-          price={'100'}
-          onChange={(e) => {
-            // ToDo: how to make better?
-            if (e.target.checked) {
-             setTimeState({AUGE: '100',time : '1'})
-            }
-          }}
-        />
-          <RadioButton
-          id={`time-2`}
-          value="2 month"
-          name={'time'}
-          price={'300'}
-          checked={
-            timeState.time=== '2'
-          }
-          onChange={(e) => {
-            // ToDo: how to make better?
-            if (e.target.checked) {
-             setTimeState({AUGE: '300',time : '2'})
-            }
-          }}
-        />
-         <RadioButton
-          id={`time-3`}
-          value="3 month"
-          name={'time'}
-          price={'700'}
-          checked={
-            timeState.time=== '3'
-          }
-          onChange={(e) => {
-            // ToDo: how to make better?
-            if (e.target.checked) {
-             setTimeState({AUGE: '700',time : '3'})
-            }
-          }}
-        />
-           
+            <div className={styles.modalCreationContentDescription}>
+              Select time before pledge fails
+            </div>
+            {timeStateVariants.map((x, i) => (
+              <RadioButton
+                key={i}
+                id={`time-${x.time}`}
+                value={`${x.time} month`}
+                name={'time'}
+                checked={timeState && timeState.time == x.time}
+                price={x.AUGE}
+                onChange={(e) => {
+                  // ToDo: how to make better?
+                  if (e.target.checked) {
+                    setTimeState({ time: x.time, AUGE: x.AUGE, sec: x.sec })
+                  }
+                }}
+              />
+            ))}
           </div>
         }
         footer={
           <div className={styles.buttonBlockBurn}>
-            <button
-              // onClick={() => setBurnDucToken(mi.name)}
-              className={styles.modalDefaultContentButton}
-            >
+            <button onClick={() => extendStakeCalc()} className={styles.modalDefaultContentButton}>
               <Burn /> Do it
             </button>
             <button

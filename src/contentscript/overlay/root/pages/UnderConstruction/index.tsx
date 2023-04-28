@@ -41,6 +41,10 @@ type Message = {
   header: string
   message: string[]
 }
+export interface variantsStake {
+  time: string
+  AUGE: number
+}
 
 export interface UnderConstruction {
   setUnderConstruction: (x) => void
@@ -82,14 +86,14 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
   const [isModalCreation, setModalCreation] = useState(false)
   const onCloseModalCreation = () => setModalCreation(false)
   const [isModalEndCreation, setModalEndCreation] = useState(false)
-
-  const [isModalTransaction, setModalTransaction] = useState(false)
-  const [timeState, setTimeState] = useState({ time: '2', AUGE: '1000' })
   const [timeStateVariants, setTimeStateVariants] = useState([
-    { time: '2', AUGE: '1000' },
-    { time: '3', AUGE: '2000' },
-    { time: '4', AUGE: '4000' },
+    { time: '1', AUGE: null, sec: 60 * 60 * 24 * 30 },
+    { time: '2', AUGE: null, sec: 60 * 60 * 24 * 30 * 2 },
+    { time: '3', AUGE: null, sec: 60 * 60 * 24 * 30 * 3 },
   ])
+  const [isModalTransaction, setModalTransaction] = useState(false)
+  const [timeState, setTimeState] = useState(null)
+
   const [timeStateFull, setTimeStateFull] = useState(false)
 
   useEffect(() => {
@@ -98,12 +102,12 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
     }
     init()
 
-    return () => { }
+    return () => {}
   }, [mi, targetChain])
 
   const _updateData = async () => {
     setLoading(true)
-    const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
+    const { getRegistries, getTrustedUsers, calcStake } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
@@ -117,8 +121,21 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
     )
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTrustedUsers(trustedUsers)
-    setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
 
+    setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
+    const oneMonth = await calcStake(60 * 60 * 24 * 30, prodRegistries[0]?.url || null)
+    const twoMonth = await calcStake(60 * 60 * 24 * 30 * 2, prodRegistries[0]?.url || null)
+    const threeMonth = await calcStake(60 * 60 * 24 * 30 * 3, prodRegistries[0]?.url || null)
+    // if(!oneMonth || !twoMonth || !threeMonth)
+    const newPosts = timeStateVariants.map((post) =>
+      post.time === '1'
+        ? { ...post, AUGE: `${oneMonth}` }
+        : post.time === '2'
+        ? { ...post, AUGE: `${twoMonth}` }
+        : { ...post, AUGE: `${threeMonth}` }
+    )
+    setTimeStateVariants(newPosts)
+    setTimeState({ time: '1', AUGE: oneMonth, sec: 60 * 60 * 24 * 30 })
     await _updateCurrentAccount()
   }
 
@@ -150,7 +167,8 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
         await addTrustedUser(currentAccount.toLowerCase())
       }
       const result =
-        mode === FormMode.Creating && (await deployModule(mi, null, targetStorages, targetRegistry))
+        mode === FormMode.Creating &&
+        (await deployModule(mi, null, targetStorages, targetRegistry, timeState.sec))
       setMessage({
         type: 'positive',
         header: 'Module was deployed',
@@ -345,35 +363,50 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
                   />
                 }
               />
-              <div className={cn(styles.wrapperStake)}>
-                <div className={cn(styles.wrapperStakeTitle)}>Stake</div>
-                <div className={cn(styles.blockStake, {
-                  [styles.blockStakeFull]: timeStateFull
-                })}>
-                  {!timeStateFull ? <div onClick={() => setTimeStateFull(true)} className={cn(styles.inputTitle, styles.inputTitleStake)} >
-                    <div>{timeState.time} month</div> <div>{timeState.AUGE} AUGE</div>
-                  </div> : <>
-                    {timeStateVariants.map((x, i) => {
-                      return (
-                        <div onClick={()=>{
-                          setTimeState({time: x.time, AUGE:x.AUGE})
-                          setTimeStateFull(false)
-                       
-                          
-                        }} className={cn(styles.inputTitle, styles.inputTitleStake)} key={i}>
-                          <div>{x.time} month</div> <div>{x.AUGE} AUGE</div>
-                        </div>
-                      )
-                    })}</>}
+              {timeState && timeState.AUGE ? (
+                <div className={cn(styles.wrapperStake)}>
+                  <div className={cn(styles.wrapperStakeTitle)}>Stake</div>
+                  <div
+                    className={cn(styles.blockStake, {
+                      [styles.blockStakeFull]: timeStateFull,
+                    })}
+                  >
+                    {!timeStateFull ? (
+                      <div
+                        onClick={() => setTimeStateFull(true)}
+                        className={cn(styles.inputTitle, styles.inputTitleStake)}
+                      >
+                        <div>{timeState.time} month</div> <div>{timeState.AUGE} AUGE</div>
+                      </div>
+                    ) : (
+                      <>
+                        {timeStateVariants.map((x, i) => {
+                          return (
+                            <div
+                              onClick={() => {
+                                setTimeState({ time: x.time, AUGE: x.AUGE, sec: x.sec })
+                                setTimeStateFull(false)
+                              }}
+                              className={cn(styles.inputTitle, styles.inputTitleStake)}
+                              key={i}
+                            >
+                              <div>{x.time} month</div> <div>{x.AUGE} AUGE</div>
+                            </div>
+                          )
+                        })}
+                      </>
+                    )}
 
-                  {!timeStateFull && <div className={cn(styles.blockStakeDescription)}>
-                    To create a DUC (and reserve a unique name for it) you will have to deposit a
-                    return stake. Its size depends on the period the existence of a DUC (but you can
-                    costly extend this later).
-                  </div>}
-
+                    {!timeStateFull && (
+                      <div className={cn(styles.blockStakeDescription)}>
+                        To create a DUC (and reserve a unique name for it) you will have to deposit
+                        a return stake. Its size depends on the period the existence of a DUC (but
+                        you can costly extend this later).
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
           }
         />
@@ -415,8 +448,8 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
         content={
           <div className={styles.modalCreationContent}>
             <span className={styles.modalCreationContenTitle}>
-              You create DUС. You deposit {timeState.AUGE} AUGE stake by reserving a {mi.name} on{' '}
-              {timeState.time} months
+              You create DUС. You deposit {timeState ? timeState.AUGE : null} AUGE stake by
+              reserving a {mi.name} on {timeState ? timeState.time : null} months
             </span>
             If within this period you successfully replace the DUC with a working dapplet, then the
             stake is returned to you in full. If you cannot do this, then if you "burn" the DUC

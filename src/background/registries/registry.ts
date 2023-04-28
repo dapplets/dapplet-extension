@@ -29,7 +29,7 @@ export interface Registry {
   }: {
     users: string[]
   }): Promise<{ module: ModuleInfo; versions: VersionInfo[] }[]>
-  addModule(module: ModuleInfo, version: VersionInfo): Promise<void>
+  addModule(module: ModuleInfo, version: VersionInfo, reservationPeriod): Promise<void>
   getOwnership(moduleName: string): Promise<string>
   transferOwnership(moduleName: string, newAccount: string, oldAccount: string): Promise<void>
   getContextIds(moduleName: string): Promise<string[]>
@@ -40,4 +40,10 @@ export interface Registry {
   removeAdmin(moduleName: string, adressAdmin: string): Promise<void>
   editModuleInfo(module: ModuleInfo): Promise<void>
   getModuleNftUrl(moduleName: string): Promise<string>
+  getStakeStatus(appId: string): Promise<string>
+  calcExtendedStake(appId: string, secondsDuration: number): Promise<number>
+  calcStake(duration: number): Promise<number>
+  stakes(appId: string): Promise<number>
+  burnDUC(moduleName: string): Promise<void>
+  extendReservation(moduleName: string, reservationPeriod: number): Promise<void>
 }

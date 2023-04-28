@@ -217,6 +217,26 @@ export class DevRegistry implements Registry {
   public async getModuleNftUrl(): Promise<string> {
     throw new NotImplementedError()
   }
+  public async getStakeStatus(): Promise<string> {
+    throw new NotImplementedError()
+  }
+
+  public async calcExtendedStake(): Promise<number> {
+    throw new NotImplementedError()
+  }
+
+  public async calcStake(): Promise<number> {
+    throw new NotImplementedError()
+  }
+  public async stakes(): Promise<number> {
+    throw new NotImplementedError()
+  }
+  public async burnDUC() {
+    throw new NotImplementedError()
+  }
+  public async extendReservation() {
+    throw new NotImplementedError()
+  }
 
   private async _loadModuleAndVersionInfo(
     manifestUri: string,
