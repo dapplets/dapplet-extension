@@ -373,11 +373,11 @@ export default class FeatureService {
 
         browser.runtime.onMessage.addListener(listener)
 
-        // // reject if module is loading too long
-        // setTimeout(() => {
-        //   browser.runtime.onMessage.removeListener(listener)
-        //   reject('Loading timeout exceed')
-        // }, 10000)
+        // reject if module is loading too long
+        setTimeout(() => {
+          browser.runtime.onMessage.removeListener(listener)
+          reject('Loading timeout exceed')
+        }, 30000)
 
         // sending command to contentscript
         browser.tabs.sendMessage(tabId, {
