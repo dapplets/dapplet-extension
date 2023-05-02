@@ -78,7 +78,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const [contextDeleteNone, setContextDeleteNone] = useState(false)
   const [addDisabled, setAddDisabled] = useState(false)
   const [counterBurn, setCounterBurn] = useState(null)
-
+  const [amount, setAmount] = useState(null)
   const onClose = () => setModal(false)
   const [isModalBurn, setModalBurn] = useState(false)
   const [timeState, setTimeState] = useState(null)
@@ -111,7 +111,8 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
     const contextId = await getContextIds(prodRegistries[0]?.url, mi.name)
-    const counter = await stakes(mi.name, prodRegistries[0]?.url || null)
+    const counter = await stakes(mi.name, 'date', prodRegistries[0]?.url || null)
+    const amount = await stakes(mi.name, 'amount', prodRegistries[0]?.url || null)
     const oneMonth = await calcExtendedStake(
       mi.name,
       60 * 60 * 24 * 30,
@@ -138,6 +139,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     setTimeStateVariants(newPosts)
     setTimeState({ time: '1', AUGE: oneMonth, sec: 60 * 60 * 24 * 30 })
     setCounterBurn(counter)
+    setAmount(amount)
     setVisibleContextId(contextId)
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
@@ -261,6 +263,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
 
       await _updateData()
     } catch (error) {
+      console.log(error)
     } finally {
     }
   }
@@ -422,11 +425,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
                   component={<></>}
                   className={styles.item}
                   children={
-                    <input
-                      className={styles.inputTitle}
-                      value={timeState && timeState.AUGE + ' AUGe'}
-                      readOnly
-                    />
+                    <input className={styles.inputTitle} value={amount && amount} readOnly />
                   }
                 />
                 {isLoad ? (
@@ -580,12 +579,12 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       <Modal
         visible={isModalBurn}
         className={styles.titleModalBurn}
-        title={'Reallocating the pledge fund'}
+        title={'Adding time'}
         classNameWrapper={styles.modalDefaultWrapper}
         content={
           <div className={cn(styles.modalDefaultContent, styles.modalBurnDefaultContent)}>
             <div className={styles.modalCreationContentDescription}>
-              Select time before pledge fails
+              How long before the deployment of a regular dapplet instead of the DUC you want to add
             </div>
             {timeStateVariants.map((x, i) => (
               <RadioButton
@@ -603,12 +602,18 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
                 }}
               />
             ))}
+
+            <div className={styles.modalCreationContentDescription}>
+              The total time will be{' '}
+              {timeState ? counterBurn + Math.floor(timeState.sec / 60 / 60 / 24) : null} days total
+              steak {amount && timeState ? parseInt(+timeState.AUGE + amount) : null} AUGe
+            </div>
           </div>
         }
         footer={
           <div className={styles.buttonBlockBurn}>
             <button onClick={() => extendStakeCalc()} className={styles.modalDefaultContentButton}>
-              <Burn /> Do it
+              <Burn /> CONFIRM
             </button>
             <button
               onClick={() => onCloseModalBurn()}

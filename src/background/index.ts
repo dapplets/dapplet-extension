@@ -175,7 +175,8 @@ browser.runtime.onMessage.addListener(
     calcExtendedStake: (appId, secondsDuration, registryUri) =>
       featureService.calcExtendedStake(appId, secondsDuration, registryUri),
     calcStake: (duration, registryUri) => featureService.calcStake(duration, registryUri),
-    stakes: (appId, registryUri) => featureService.stakes(appId, registryUri),
+    stakes: (appId, parameters, registryUri) =>
+      featureService.stakes(appId, parameters, registryUri),
     burnDUC: (moduleName, registryUri) => featureService.burnDUC(moduleName, registryUri),
     extendReservation: (moduleName, reservationPeriod, registryUri) =>
       featureService.extendReservation(moduleName, reservationPeriod, registryUri),

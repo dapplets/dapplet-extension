@@ -448,9 +448,9 @@ export default class FeatureService {
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     return registry.calcStake(duration)
   }
-  async stakes(appId: string, registryUri): Promise<number> {
+  async stakes(appId: string, parameters, registryUri): Promise<number> {
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
-    return registry.stakes(appId)
+    return registry.stakes(appId, parameters)
   }
   async burnDUC(moduleName: string, registryUri) {
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
@@ -663,6 +663,7 @@ export default class FeatureService {
 
     try {
       const scriptUrl = await this.uploadModule(mi, vi, targetStorages)
+      console.log(mi, vi, reservationPeriod)
       await registry.addModule(mi, vi, reservationPeriod) // Register manifest in Registry
       return { scriptUrl }
     } catch (err) {

@@ -158,7 +158,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
       setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
     }
     if (mi.isUnderConstruction) {
-      const counter = await stakes(mi.name, prodRegistries[0]?.url || null)
+      const counter = await stakes(mi.name, 'date', prodRegistries[0]?.url || null)
 
       setCounterBurn(counter)
 

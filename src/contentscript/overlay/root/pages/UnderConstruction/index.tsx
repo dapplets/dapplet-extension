@@ -90,6 +90,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
     { time: '1', AUGE: null, sec: 60 * 60 * 24 * 30 },
     { time: '2', AUGE: null, sec: 60 * 60 * 24 * 30 * 2 },
     { time: '3', AUGE: null, sec: 60 * 60 * 24 * 30 * 3 },
+    { time: '1 min', AUGE: null, sec: 60 },
   ])
   const [isModalTransaction, setModalTransaction] = useState(false)
   const [timeState, setTimeState] = useState(null)
@@ -126,13 +127,15 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
     const oneMonth = await calcStake(60 * 60 * 24 * 30, prodRegistries[0]?.url || null)
     const twoMonth = await calcStake(60 * 60 * 24 * 30 * 2, prodRegistries[0]?.url || null)
     const threeMonth = await calcStake(60 * 60 * 24 * 30 * 3, prodRegistries[0]?.url || null)
-    // if(!oneMonth || !twoMonth || !threeMonth)
+    const fourMonth = await calcStake(60, prodRegistries[0]?.url || null)
     const newPosts = timeStateVariants.map((post) =>
       post.time === '1'
         ? { ...post, AUGE: `${oneMonth}` }
         : post.time === '2'
         ? { ...post, AUGE: `${twoMonth}` }
-        : { ...post, AUGE: `${threeMonth}` }
+        : post.time === '3'
+        ? { ...post, AUGE: `${threeMonth}` }
+        : { ...post, AUGE: `${fourMonth}` }
     )
     setTimeStateVariants(newPosts)
     setTimeState({ time: '1', AUGE: oneMonth, sec: 60 * 60 * 24 * 30 })
@@ -166,6 +169,8 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
       if (isNotTrustedUser) {
         await addTrustedUser(currentAccount.toLowerCase())
       }
+      console.log(mi, null, targetStorages, targetRegistry, timeState.sec)
+
       const result =
         mode === FormMode.Creating &&
         (await deployModule(mi, null, targetStorages, targetRegistry, timeState.sec))
@@ -376,7 +381,10 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
                         onClick={() => setTimeStateFull(true)}
                         className={cn(styles.inputTitle, styles.inputTitleStake)}
                       >
-                        <div>{timeState.time} month</div> <div>{timeState.AUGE} AUGE</div>
+                        <div>
+                          {timeState.time === '1 min' ? timeState.time : timeState.time + 'month'}
+                        </div>
+                        <div>{timeState.AUGE} AUGE</div>
                       </div>
                     ) : (
                       <>
@@ -390,7 +398,8 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
                               className={cn(styles.inputTitle, styles.inputTitleStake)}
                               key={i}
                             >
-                              <div>{x.time} month</div> <div>{x.AUGE} AUGE</div>
+                              <div>{x.time === '1 min' ? x.time : x.time + 'month'}</div>
+                              <div>{x.AUGE} AUGE</div>
                             </div>
                           )
                         })}
@@ -449,7 +458,8 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
           <div className={styles.modalCreationContent}>
             <span className={styles.modalCreationContenTitle}>
               You create DUС. You deposit {timeState ? timeState.AUGE : null} AUGE stake by
-              reserving a {mi.name} on {timeState ? timeState.time : null} months
+              reserving a {mi.name} on {timeState && timeState.time}
+              {timeState && timeState.time === '1 min' ? null : 'month'}
             </span>
             If within this period you successfully replace the DUC with a working dapplet, then the
             stake is returned to you in full. If you cannot do this, then if you "burn" the DUC
@@ -492,8 +502,10 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
         title={`Congratulations, your "${mi.name}" has been created`}
         content={
           <div className={styles.modalEndCreationContent}>
-            You have 2 months to deploy this dapplet. Otherwise, you will lose your Initial
-            Steak.Also now you can add additional details, Tokenomics and Rewards to your dapplet
+            You have {timeState && timeState.time}
+            {timeState && timeState.time === '1 min' ? timeState.time : 'month'} to deploy this
+            dapplet. Otherwise, you will lose your Initial Steak.Also now you can add additional
+            details, Tokenomics and Rewards to your dapplet
           </div>
         }
         footer={

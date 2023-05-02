@@ -1009,7 +1009,12 @@
   line-height: 149%;
   color: $main-grey;
   padding-left: 10px;
-
+padding-top: 50px;
+}
+.modalCreationContentDescription:last-of-type{
+  padding-top: 20px;
+  text-align: center;
+ 
 }
 
 .modalDefaultWrapper {

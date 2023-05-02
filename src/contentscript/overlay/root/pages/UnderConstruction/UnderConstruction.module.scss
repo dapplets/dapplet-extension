@@ -684,6 +684,8 @@
 .wrapperStake{
 position: relative;
 min-height: 62px;
+padding-left: 10px;
+padding-right: 10px;
 }
 .wrapperStakeTitle{
   font-weight: 500;
@@ -695,20 +697,44 @@ min-height: 62px;
 .blockStake{
   transition: 0.5s ease all;
   position: relative;
+ 
 }
 .blockStakeFull{
-  position: absolute;
+  // position: absolute;
   width: 100%;
-  bottom: -60px;
+  // bottom: -60px;
 }
 .inputTitleStake{
 justify-content: space-between;
 cursor: pointer;
+border-radius: 0;
+
 &:hover{
   color: $primary-hover;
   border: 1px solid $primary-hover;
 }
 }
+.blockStake{
+  .inputTitleStake{
+border-radius: 5px;
+  }
+}
+.blockStake.blockStakeFull{
+  .inputTitleStake{
+    border-radius: 0;
+  }
+  .inputTitleStake:first-of-type {
+
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+  .inputTitleStake:last-of-type {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+}
+
+
 .blockStakeDescription{
   transition: 0.5s ease all;
   font-style: italic;

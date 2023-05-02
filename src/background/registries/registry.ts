@@ -43,7 +43,7 @@ export interface Registry {
   getStakeStatus(appId: string): Promise<string>
   calcExtendedStake(appId: string, secondsDuration: number): Promise<number>
   calcStake(duration: number): Promise<number>
-  stakes(appId: string): Promise<number>
+  stakes(appId: string, parameters): Promise<number>
   burnDUC(moduleName: string): Promise<void>
   extendReservation(moduleName: string, reservationPeriod: number): Promise<void>
 }
