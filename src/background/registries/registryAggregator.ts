@@ -44,7 +44,6 @@ export class RegistryAggregator {
     const versionsWithErrors = await Promise.allSettled(
       registries.map((r) => r.getVersionNumbers(name, branch))
     )
-    console.log(registries)
     versionsWithErrors.filter(assertRejected).forEach((p) => console.error(p.reason))
     const versionsNoErrors = versionsWithErrors.filter(assertFullfilled).map((p) => p.value)
     const versionsNotSorted = mergeDedupe(versionsNoErrors)

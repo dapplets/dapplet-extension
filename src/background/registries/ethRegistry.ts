@@ -208,7 +208,7 @@ export class EthRegistry implements Registry {
   public async getVersionNumbers(name: string, branch: string): Promise<string[]> {
     try {
       const contract = await this._contractPromise
-      console.log(name, branch)
+      
       const versions = await this._paginateAll<EthVersionInfoDto>(
         (offset, limit) =>
           contract
@@ -221,8 +221,7 @@ export class EthRegistry implements Registry {
       this.error = null
 
       const result = versions.map((x) => this._convertFromEthVersion(x.version))
-      console.log(result)
-      console.log(versions)
+     
       return result
     } catch (err) {
       this.isAvailable = false
@@ -303,16 +302,16 @@ export class EthRegistry implements Registry {
     if (isModuleExist && !version) throw new Error('A module with such name already exists.')
 
     if (!isModuleExist) {
-      console.log('!isModuleExist')
+     
       const mi = this._convertToEthMi(module)
       const vi = version ? this._convertToEthVi(version) : EMPTY_VERSION
-      console.log(mi, vi)
+    
       // add module in the end of a listing
       let links: LinkString[] = []
 
       // only dapplets will be added to a listing
       if (module.type === ModuleTypes.Feature) {
-        console.log(module.type)
+      
         const signerAddress = await this._signer.getAddress()
         const { modules: listedModules } = await contract.getModulesOfListing(
           signerAddress,
@@ -321,7 +320,7 @@ export class EthRegistry implements Registry {
           1,
           true
         ) // ordered by version desc
-        console.log(signerAddress)
+      
         if (listedModules.length === 0) {
           links = [
             {
@@ -349,9 +348,9 @@ export class EthRegistry implements Registry {
       }
 
       const txCalcStake = await this.calcStake(reservationPeriod)
-      console.log(txCalcStake)
+   
       const txAproove = await contractZoo.approve(
-        '0xa0D2FB6f71F09E60aF1eD7344D4BB8Bb4c83C9af',
+        '0x194a500Cbe0369Ad916E4CDc85572BF0810Ba676',
         txCalcStake
       )
       await txAproove.wait()
@@ -433,7 +432,7 @@ export class EthRegistry implements Registry {
   }
   public async burnDUC(moduleName: string) {
     const contract = await this._contractPromise
-    console.log(moduleName)
+  
     const tx = await contract.burnDUC(moduleName)
     await tx.wait()
   }
@@ -442,9 +441,8 @@ export class EthRegistry implements Registry {
     const contract = await this._contractPromise
     const contractZoo = await this._contractZoo
     const txCalcStake = await this.calcStake(reservationPeriod)
-    console.log(txCalcStake)
     const txAproove = await contractZoo.approve(
-      '0xa0D2FB6f71F09E60aF1eD7344D4BB8Bb4c83C9af',
+      '0x194a500Cbe0369Ad916E4CDc85572BF0810Ba676',
       txCalcStake
     )
     await txAproove.wait()

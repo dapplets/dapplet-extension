@@ -128,6 +128,8 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
     const twoMonth = await calcStake(60 * 60 * 24 * 30 * 2, prodRegistries[0]?.url || null)
     const threeMonth = await calcStake(60 * 60 * 24 * 30 * 3, prodRegistries[0]?.url || null)
     const fourMonth = await calcStake(60, prodRegistries[0]?.url || null)
+    
+    
     const newPosts = timeStateVariants.map((post) =>
       post.time === '1'
         ? { ...post, AUGE: `${oneMonth}` }
@@ -169,7 +171,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
       if (isNotTrustedUser) {
         await addTrustedUser(currentAccount.toLowerCase())
       }
-      console.log(mi, null, targetStorages, targetRegistry, timeState.sec)
+   
 
       const result =
         mode === FormMode.Creating &&

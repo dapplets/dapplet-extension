@@ -455,6 +455,7 @@ export default class FeatureService {
   async burnDUC(moduleName: string, registryUri) {
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     await registry.burnDUC(moduleName)
+    EventBus.emit('burned')
   }
   async extendReservation(moduleName: string, reservationPeriod, registryUri) {
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
@@ -663,7 +664,6 @@ export default class FeatureService {
 
     try {
       const scriptUrl = await this.uploadModule(mi, vi, targetStorages)
-      console.log(mi, vi, reservationPeriod)
       await registry.addModule(mi, vi, reservationPeriod) // Register manifest in Registry
       return { scriptUrl }
     } catch (err) {

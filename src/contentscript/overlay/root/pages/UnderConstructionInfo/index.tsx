@@ -262,9 +262,11 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
       await extendReservation(mi.name, timeState.sec, targetRegistry)
 
       await _updateData()
+
     } catch (error) {
       console.log(error)
     } finally {
+      onCloseModalBurn()
     }
   }
   return (

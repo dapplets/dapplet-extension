@@ -14,6 +14,7 @@ import { ReactComponent as Settings } from '../../assets/svg/setting.svg'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
+import * as EventBus from '../../../../../common/global-event-bus'
 
 enum DeploymentStatus {
   Unknown,
@@ -116,6 +117,15 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     init()
     return () => {}
   }, [targetChain])
+  useEffect(() => {
+    EventBus.on('burned', _updateData)
+  
+
+    return () => {
+      EventBus.off('burned', _updateData)
+     
+    }
+  }, [])
 
   const _updateData = async () => {
     const { getRegistries, getTrustedUsers, stakes, getStakeStatus } = await initBGFunctions(
@@ -366,8 +376,16 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     setOwnerDev(newOwner)
   }
   const setBurnDucToken = async (appId) => {
-    const { burnDUC } = await initBGFunctions(browser)
-    await burnDUC(appId, targetRegistry)
+    try{
+      const { burnDUC } = await initBGFunctions(browser)
+      await burnDUC(appId, targetRegistry)
+      await _updateData()
+    }catch (error) {
+      console.log(error)
+    } finally {
+      onCloseModalBurn()
+    }
+    
   }
   return (
     <>
