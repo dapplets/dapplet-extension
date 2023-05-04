@@ -180,6 +180,10 @@ browser.runtime.onMessage.addListener(
     burnDUC: (moduleName, registryUri) => featureService.burnDUC(moduleName, registryUri),
     extendReservation: (moduleName, reservationPeriod, registryUri) =>
       featureService.extendReservation(moduleName, reservationPeriod, registryUri),
+      stakingToken: ( registryUri) =>
+      featureService.stakingToken( registryUri),
+      burnShare: ( registryUri) =>
+      featureService.burnShare( registryUri),
     //
     resolveNotificationAction:
       notificationService.resolveNotificationAction.bind(notificationService),

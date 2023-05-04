@@ -461,6 +461,14 @@ export default class FeatureService {
     const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
     await registry.extendReservation(moduleName, reservationPeriod)
   }
+  async stakingToken ( registryUri) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    await registry.stakingToken()
+  }
+  async burnShare ( registryUri) {
+    const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUri)
+    await registry.burnShare()
+  }
   async activateFeature(
     name: string,
     version: string | undefined,

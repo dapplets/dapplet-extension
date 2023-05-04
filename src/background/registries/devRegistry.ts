@@ -237,7 +237,12 @@ export class DevRegistry implements Registry {
   public async extendReservation() {
     throw new NotImplementedError()
   }
-
+  public async stakingToken(): Promise<string> {
+    throw new NotImplementedError()
+  }
+  public async burnShare(): Promise<number> {
+    throw new NotImplementedError()
+  };
   private async _loadModuleAndVersionInfo(
     manifestUri: string,
     dm: DevManifest

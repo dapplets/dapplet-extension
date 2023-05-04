@@ -128,7 +128,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }, [])
 
   const _updateData = async () => {
-    const { getRegistries, getTrustedUsers, stakes, getStakeStatus } = await initBGFunctions(
+    const { getRegistries, getTrustedUsers, stakes, getStakeStatus ,stakingToken,burnShare} = await initBGFunctions(
       browser
     )
     const registries = await getRegistries()
@@ -174,6 +174,10 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
       const statusStake = await getStakeStatus(mi.name, prodRegistries[0]?.url || null)
       statusStake === 2 && setStakeStatus(true)
+      // const r = await stakingToken(prodRegistries[0]?.url || null)
+      // console.log(r,'stakingToken')
+      // const u = await burnShare(prodRegistries[0]?.url || null)
+      // console.log(u,'burnShare')
     }
     if (mode === FormMode.Creating) {
       await _updateCurrentAccount()
@@ -379,7 +383,6 @@ export const DevModule: FC<PropsDevModule> = (props) => {
     try{
       const { burnDUC } = await initBGFunctions(browser)
       await burnDUC(appId, targetRegistry)
-      await _updateData()
     }catch (error) {
       console.log(error)
     } finally {
@@ -402,7 +405,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
             {counterBurn && (
               <button className={styles.dappletsBurn}>
                 <Burn />
-                {counterBurn >= 1 ? counterBurn + 'days' : 'burning'}
+                {counterBurn > 1 ? counterBurn + 'days' : 'Time Is Up'}
               </button>
             )}
             {vi && vi.branch && vi.branch !== 'default' && (

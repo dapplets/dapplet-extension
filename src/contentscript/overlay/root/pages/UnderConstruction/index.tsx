@@ -384,7 +384,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
                         className={cn(styles.inputTitle, styles.inputTitleStake)}
                       >
                         <div>
-                          {timeState.time === '1 min' ? timeState.time : timeState.time + 'month'}
+                          {timeState.time === '1 min' ? timeState.time : timeState.time + ' month'}
                         </div>
                         <div>{timeState.AUGE} AUGE</div>
                       </div>
@@ -400,7 +400,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
                               className={cn(styles.inputTitle, styles.inputTitleStake)}
                               key={i}
                             >
-                              <div>{x.time === '1 min' ? x.time : x.time + 'month'}</div>
+                              <div>{x.time === '1 min' ? x.time : x.time + ' month'}</div>
                               <div>{x.AUGE} AUGE</div>
                             </div>
                           )
@@ -461,7 +461,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
             <span className={styles.modalCreationContenTitle}>
               You create DUС. You deposit {timeState ? timeState.AUGE : null} AUGE stake by
               reserving a {mi.name} on {timeState && timeState.time}
-              {timeState && timeState.time === '1 min' ? null : 'month'}
+              {timeState && timeState.time === '1 min' ? null : ' month'}
             </span>
             If within this period you successfully replace the DUC with a working dapplet, then the
             stake is returned to you in full. If you cannot do this, then if you "burn" the DUC
@@ -505,7 +505,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
         content={
           <div className={styles.modalEndCreationContent}>
             You have {timeState && timeState.time}
-            {timeState && timeState.time === '1 min' ? timeState.time : 'month'} to deploy this
+            {timeState && timeState.time === '1 min' ? timeState.time : ' month'} to deploy this
             dapplet. Otherwise, you will lose your Initial Steak.Also now you can add additional
             details, Tokenomics and Rewards to your dapplet
           </div>

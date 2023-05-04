@@ -350,6 +350,12 @@ export class NearRegistry implements Registry {
   public async extendReservation() {
     throw new NotImplementedError()
   }
+  public async stakingToken(): Promise<string> {
+    throw new NotImplementedError()
+  }
+  public async burnShare(): Promise<number> {
+    throw new NotImplementedError()
+  };
 
   private _toNearStorageRef(ref: StorageRef): NearStorageRef {
     if (ref === null) return null

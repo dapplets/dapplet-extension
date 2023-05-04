@@ -46,4 +46,7 @@ export interface Registry {
   stakes(appId: string, parameters): Promise<number>
   burnDUC(moduleName: string): Promise<void>
   extendReservation(moduleName: string, reservationPeriod: number): Promise<void>
+  stakingToken(): Promise<string>
+  burnShare(): Promise<number> 
+  
 }

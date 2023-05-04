@@ -1,6 +1,7 @@
 import { Cacheable } from 'caching-decorator'
 import * as ethers from 'ethers'
 import * as semver from 'semver'
+import * as EventBus from '../../common/global-event-bus'
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
 import {
   convertISODateToTimestamp,
@@ -392,6 +393,15 @@ export class EthRegistry implements Registry {
     const contract = await this._contractPromise
     return contract.getStakeStatus(appId)
   }
+  public async stakingToken(): Promise<string>{
+    const contract = await this._contractPromise
+    return contract.stakingToken()
+  }
+  public async burnShare(): Promise<number> {
+    const contract = await this._contractPromise
+    const percent = ethers.utils.formatUnits(await contract.burnShare(), 16)
+    return parseInt(percent)
+  };
 
   public async calcExtendedStake(appId: string, secondsDuration: number): Promise<number> {
     const contract = await this._contractPromise
@@ -435,6 +445,7 @@ export class EthRegistry implements Registry {
   
     const tx = await contract.burnDUC(moduleName)
     await tx.wait()
+    EventBus.emit('burned')
   }
   public async extendReservation(moduleName: string, reservationPeriod: number) {
     await this._init()
