@@ -36,7 +36,7 @@ interface IContentItemProps {
 
 export const ContentItem = (props: IContentItemProps) => {
   const ref = useRef(null)
-  const [updateFrame, changeUpdateFtrame] = useState<boolean>(true)
+  const [updateFrame, changeUpdateFrame] = useState<boolean>(true)
   const [loadingMode, setloadingMode] = useState<LoadingMode>(LoadingMode.Loading)
   const [overlays, setOverlays] = useState<Overlay[]>()
   const [activeModuleInfo, setActiveModuleInfo] = useState<ManifestAndDetails>()
@@ -143,7 +143,7 @@ export const ContentItem = (props: IContentItemProps) => {
           <div className={styles.loadTitle}>No Internet Connection</div>
           <div className={styles.loadText}>Please check your internet connection and try again</div>
           <div className={styles.loadButtonBlock}>
-            <button className={styles.loadButton} onClick={() => changeUpdateFtrame(!updateFrame)}>
+            <button className={styles.loadButton} onClick={() => changeUpdateFrame(!updateFrame)}>
               Try again
             </button>
           </div>
@@ -158,7 +158,7 @@ export const ContentItem = (props: IContentItemProps) => {
             preferred overlay storage and try again.
           </div>
           <div className={styles.loadButtonBlock}>
-            <button className={styles.loadButton} onClick={() => changeUpdateFtrame(!updateFrame)}>
+            <button className={styles.loadButton} onClick={() => changeUpdateFrame(!updateFrame)}>
               Try again
             </button>
           </div>
@@ -193,7 +193,7 @@ export const ContentItem = (props: IContentItemProps) => {
             </p>
           </div>
           <div className={styles.loadButtonBlock}>
-            <button className={styles.loadButton} onClick={() => changeUpdateFtrame(!updateFrame)}>
+            <button className={styles.loadButton} onClick={() => changeUpdateFrame(!updateFrame)}>
               Try again
             </button>
           </div>
