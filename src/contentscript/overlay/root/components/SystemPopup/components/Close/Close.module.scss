@@ -11,13 +11,13 @@
   height: 20px;
   padding: 0;
 
-  background-color: $Primary;
+  background-color: $primary;
   border: none;
   border-radius: 50%;
 }
 
 .close:hover {
-  background-color: $PrimaryHover;
+  background-color: $primary-hover;
 
   svg{
     path{
@@ -27,7 +27,7 @@
 }
 
 .close:active {
-  background-color: $PrimaryPressed;
+  background-color: $primary-pressed;
 
   svg{
     path{

@@ -11,12 +11,12 @@
   width: 80%;
   margin: 0 auto;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   font-style: normal;
   line-height: 16px;
-  color: $MainGrey;
+  color: $main-grey;
   text-align: center;
 }
 
@@ -30,21 +30,21 @@
   margin-top: 10px;
   padding: 0 10px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 100%;
-  color: $PureWhite;
+  color: $pure-white;
 
-  background: $Primary;
+  background: $primary;
   border-radius: 4px;
 
   &:hover {
-    background: $PrimaryHover;
+    background: $primary-hover;
   }
 
   &:active {
-    background: $PrimaryPressed;
+    background: $primary-pressed;
   }
 }
 

@@ -8,6 +8,7 @@ import {
   areModulesEqual,
   blobToDataURL,
   getCurrentTab,
+  Measure,
   mergeDedupe,
   parseModuleName,
 } from '../../common/helpers'
@@ -16,15 +17,16 @@ import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
+import { globalClear } from 'caching-decorator'
+import { Runtime } from 'webextension-polyfill'
 import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
 import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
-import { StorageRef } from '../../common/types'
+import { DappletRuntimeResult, MessageWrapperRequest, StorageRef } from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
 import { AnalyticsGoals, AnalyticsService } from './analyticsService'
 import GlobalConfigService from './globalConfigService'
 import { NotificationService } from './notificationService'
 import { WalletService } from './walletService'
-import { Runtime } from 'webextension-polyfill'
 
 export default class FeatureService {
   private _moduleManager: ModuleManager
@@ -280,6 +282,7 @@ export default class FeatureService {
     return dtos
   }
 
+  @Measure()
   private async _setFeatureActive(
     name: string,
     version: string | undefined,
@@ -288,7 +291,10 @@ export default class FeatureService {
     order: number,
     registryUrl: string,
     tabId: number
-  ) {
+  ): Promise<DappletRuntimeResult | null> {
+    // Clear cached dependencies
+    globalClear(this._moduleManager, '_getOptimizedChildDependenciesAndManifest')
+
     hostnames = Array.from(new Set(hostnames)) // deduplicate
 
     if (!version && isActive) {
@@ -314,12 +320,12 @@ export default class FeatureService {
     }
 
     try {
-      const runtime = await new Promise<void>(async (resolve, reject) => {
+      const runtime = await new Promise<DappletRuntimeResult>(async (resolve, reject) => {
         // listening of loading/unloading from contentscript
         const listener = (message, sender: Runtime.MessageSender) => {
           if (sender.tab.id !== tabId) return
           if (!message || !message.type || !message.payload) return
-          
+
           const p = message.payload
           if (message.type === 'FEATURE_LOADED') {
             if (
@@ -329,6 +335,7 @@ export default class FeatureService {
               isActive === true
             ) {
               browser.runtime.onMessage.removeListener(listener)
+
               resolve(p.runtime)
             }
           } else if (message.type === 'FEATURE_UNLOADED') {
@@ -366,6 +373,12 @@ export default class FeatureService {
 
         browser.runtime.onMessage.addListener(listener)
 
+        // reject if module is loading too long
+        setTimeout(() => {
+          browser.runtime.onMessage.removeListener(listener)
+          reject('Loading timeout exceed')
+        }, 30000)
+
         // sending command to contentscript
         browser.tabs.sendMessage(tabId, {
           type: isActive ? 'FEATURE_ACTIVATED' : 'FEATURE_DEACTIVATED',
@@ -399,6 +412,8 @@ export default class FeatureService {
         config.activeFeatures[name].runtime = runtime
         await this._globalConfigService.updateSiteConfig(config)
       }
+
+      return runtime
     } catch (err) {
       // revert config if error
       for (const hostname of hostnames) {
@@ -425,12 +440,12 @@ export default class FeatureService {
     hostnames: string[],
     order: number,
     registryUrl: string,
-    caller: any
-  ): Promise<void> {
-    const tabId = caller?.sender?.tab?.id
-    if (!tabId) throw new Error("Tab ID is required")
+    req: MessageWrapperRequest
+  ): Promise<DappletRuntimeResult | null> {
+    const tabId = req?.sender?.tab?.id
+    if (!tabId) throw new Error('Tab ID is required')
     this._analyticsService.track({ idgoal: AnalyticsGoals.DappletActivated, dapplet: name })
-    await this._setFeatureActive(name, version, hostnames, true, order, registryUrl, tabId)
+    return await this._setFeatureActive(name, version, hostnames, true, order, registryUrl, tabId)
   }
 
   async deactivateFeature(
@@ -439,12 +454,12 @@ export default class FeatureService {
     hostnames: string[],
     order: number,
     registryUrl: string,
-    caller: any
-  ): Promise<void> {
-    const tabId = caller?.sender?.tab?.id
-    if (!tabId) throw new Error("Tab ID is required")
+    req: MessageWrapperRequest
+  ): Promise<DappletRuntimeResult | null> {
+    const tabId = req?.sender?.tab?.id
+    if (!tabId) throw new Error('Tab ID is required')
     this._analyticsService.track({ idgoal: AnalyticsGoals.DappletDeactivated, dapplet: name })
-    await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
+    return await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
   }
 
   async reloadFeature(
@@ -453,10 +468,10 @@ export default class FeatureService {
     hostnames: string[],
     order: number,
     registryUrl: string,
-    caller: any
+    req: MessageWrapperRequest
   ): Promise<void> {
-    const tabId = caller?.sender?.tab?.id
-    if (!tabId) throw new Error("Tab ID is required")
+    const tabId = req?.sender?.tab?.id
+    if (!tabId) throw new Error('Tab ID is required')
     const modules = await this.getActiveModulesByHostnames(hostnames)
     if (!modules.find((m) => m.name === name)) return
     await this._setFeatureActive(name, version, hostnames, false, order, registryUrl, tabId)
@@ -467,9 +482,6 @@ export default class FeatureService {
     const globalConfig = await this._globalConfigService.get()
     if (globalConfig.suspended) return []
 
-    const configs = await Promise.all(
-      contextIds.map((h) => this._globalConfigService.getSiteConfigById(h))
-    )
     const modules: {
       name: string
       branch: string
@@ -477,6 +489,31 @@ export default class FeatureService {
       order: number
       hostnames: string[]
     }[] = []
+
+    // Activate dynamic adapter for dynamic contexts searching
+    const hostnames = contextIds.filter((x) => /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/gm.test(x))
+    if (hostnames.length > 0) {
+      const dynamicAdapter = await this._globalConfigService.getDynamicAdapter()
+      if (dynamicAdapter) {
+        const parsed = parseModuleName(dynamicAdapter)
+        if (parsed) {
+          modules.push({
+            name: parsed.name,
+            branch: parsed.branch,
+            version: parsed.version,
+            order: -1,
+            hostnames: hostnames,
+          })
+        }
+      }
+    }
+
+    const isThereActiveDapplets = await this._globalConfigService.isThereActiveDapplets()
+    if (!isThereActiveDapplets) return modules
+
+    const configs = await Promise.all(
+      contextIds.map((h) => this._globalConfigService.getSiteConfigById(h))
+    )
 
     let i = 0
     for (const config of configs) {
@@ -532,24 +569,6 @@ export default class FeatureService {
       }
     }
 
-    // Activate dynamic adapter for dynamic contexts searching
-    const hostnames = contextIds.filter((x) => /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/gm.test(x))
-    if (hostnames.length > 0) {
-      const dynamicAdapter = await this._globalConfigService.getDynamicAdapter()
-      if (dynamicAdapter) {
-        const parsed = parseModuleName(dynamicAdapter)
-        if (parsed) {
-          modules.push({
-            name: parsed.name,
-            branch: parsed.branch,
-            version: parsed.version,
-            order: -1,
-            hostnames: hostnames,
-          })
-        }
-      }
-    }
-
     // Choose last dev-versions if available
     const configuredRegistries = await this._globalConfigService.getRegistries()
     const isDevRegistriesAvailable = configuredRegistries.filter((x) => x.isDev).length > 0
@@ -594,16 +613,6 @@ export default class FeatureService {
     }))
   }
 
-  public async optimizeDependency(
-    name: string,
-    branch: string,
-    version: string,
-    contextIds: string[]
-  ) {
-    // ToDo: fix this hack
-    return this._moduleManager.optimizeDependency(name, version, branch, contextIds)
-  }
-
   public async getAllDevModules() {
     const descriptors = await this._walletService.getWalletDescriptors()
     const users = descriptors
@@ -644,8 +653,7 @@ export default class FeatureService {
       // ToDo: check everything before publishing
 
       if (!mi.name) throw new Error('Module name is required.')
-      if (!/^[a-zA-Z0-9][a-zA-Z0-9-\.]*[a-zA-Z0-9]$/gm.test(mi.name))
-        throw new Error('Invalid module name.')
+      if (!/^[a-z0-9][a-z0-9-.]*[a-z0-9]$/gm.test(mi.name)) throw new Error('Invalid module name.')
       if (
         mi.icon &&
         mi.icon.uris.length > 0 &&

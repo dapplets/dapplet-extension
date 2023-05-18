@@ -4,9 +4,15 @@ Cypress.Commands.add('getByTestId', (selector, ...args) => {
   return cy.get(`[data-testid="${selector}"]`, ...args)
 })
 
-Cypress.Commands.add('openDappletsOverlay', (url) => {
+Cypress.Commands.add('openDappletsOverlay', (url, params?: Partial<{ wipe: boolean }>) => {
   // open context webpage
   cy.visit(url)
+
+  if (params?.wipe) {
+    cy.get('dapplets-overlay-manager')
+    cy.window().then((win) => win.dapplets.wipeAllExtensionData())
+    cy.reload()
+  }
 
   // injects overlay
   cy.get('dapplets-overlay-manager')
@@ -34,13 +40,13 @@ Cypress.Commands.add('openDappletsOverlay', (url) => {
 Cypress.Commands.add('runDapplet', (dappletIdToActivate) =>
   cy
     .get('dapplets-overlay-manager')
-    .find(`[data-testid=${dappletIdToActivate}]`)
+    .find(`[data-testid="${dappletIdToActivate}"]`)
     .find('[data-testid=activation-dapplet]')
     .then((button) => {
       button.hasClass('not-active-switch') &&
         cy
           .get('dapplets-overlay-manager')
-          .find(`[data-testid=${dappletIdToActivate}]`)
+          .find(`[data-testid="${dappletIdToActivate}"]`)
           .find('[data-testid=activation-dapplet]')
           .click()
     })

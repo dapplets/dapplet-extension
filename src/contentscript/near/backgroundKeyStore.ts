@@ -7,9 +7,9 @@ const LOCAL_STORAGE_KEY_PREFIX = 'near-api-js:keystore:'
 export class BackgroundKeyStore extends keyStores.KeyStore {
   private prefix: string
 
-  constructor() {
+  constructor(keyStorePrefix?: string) {
     super()
-    this.prefix = LOCAL_STORAGE_KEY_PREFIX
+    this.prefix = keyStorePrefix ?? LOCAL_STORAGE_KEY_PREFIX
   }
 
   async setKey(networkId: string, accountId: string, keyPair: KeyPair): Promise<void> {

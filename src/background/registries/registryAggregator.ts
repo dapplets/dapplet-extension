@@ -134,7 +134,7 @@ export class RegistryAggregator {
     const mergedModuleInfos = Object.values(merged)
       .map((x) => Object.values(x).reduce((a, b) => a.concat(b), []))
       .reduce((a, b) => a.concat(b), [])
-    for (const [registryUrl, contexts] of additionalContextIds) {
+    for (const [, contexts] of additionalContextIds) {
       for (const context of contexts) {
         context[1] = context[1].filter(
           (c) => mergedModuleInfos.find((x) => x.name === c)?.type !== ModuleTypes.Feature
@@ -309,7 +309,10 @@ export class RegistryAggregator {
         signer: ethSigner,
       })
     } else if (uriType === UriTypes.Near) {
-      const nearAccount = await this._walletService.near_getAccount(DefaultSigners.EXTENSION)
+      const nearAccount = await this._walletService.near_getAccount(
+        DefaultSigners.EXTENSION,
+        ChainTypes.NEAR_TESTNET
+      )
       return new NearRegistry({ url: registryConfig.url, isDev: registryConfig.isDev, nearAccount })
     } else {
       return null

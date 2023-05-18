@@ -13,9 +13,11 @@ import {
   waitTab,
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
+import { GlobalConfig } from './models/globalConfig'
+import { StorageAggregator } from './moduleStorages/moduleStorage'
 import { AnalyticsGoals, AnalyticsService } from './services/analyticsService'
 import ConnectedAccountService from './services/connectedAccountService'
-// import DiscordService from './services/discordService'
+import DiscordService from './services/discordService'
 import EnsService from './services/ensService'
 import FeatureService from './services/featureService'
 import GithubService from './services/githubService'
@@ -25,6 +27,8 @@ import { OverlayService } from './services/overlayService'
 import ProxyService from './services/proxyService'
 import { SessionService } from './services/sessionService'
 import { SuspendService } from './services/suspendService'
+import { TokenRegistryService } from './services/tokenomicsService'
+import { UnderConstructionService } from './services/underConstructionServices'
 import { WalletService } from './services/walletService'
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
@@ -32,13 +36,14 @@ import { WalletService } from './services/walletService'
 tracing.startTracing()
 
 const notificationService = new NotificationService()
+
 const globalConfigService = new GlobalConfigService()
 const analyticsService = new AnalyticsService(globalConfigService)
 const suspendService = new SuspendService(globalConfigService)
 const overlayService = new OverlayService()
 const proxyService = new ProxyService(globalConfigService)
 const githubService = new GithubService(globalConfigService)
-// const discordService = new DiscordService(globalConfigService)
+const discordService = new DiscordService(globalConfigService)
 const walletService = new WalletService(globalConfigService, overlayService)
 const sessionService = new SessionService(walletService, overlayService)
 const featureService = new FeatureService(
@@ -47,9 +52,21 @@ const featureService = new FeatureService(
   notificationService,
   analyticsService
 )
+const storageAggregator = new StorageAggregator(globalConfigService)
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
-
+const tokenomicsService = new TokenRegistryService(
+  globalConfigService,
+  walletService,
+  overlayService,
+  storageAggregator
+)
+const underConstructionService = new UnderConstructionService(
+  globalConfigService,
+  walletService,
+  overlayService,
+  storageAggregator
+)
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
 globalConfigService.ensService = ensService
@@ -69,6 +86,7 @@ browser.runtime.onMessage.addListener(
 
     eth_sendTransactionOutHash: walletService.eth_sendTransactionOutHash.bind(walletService),
     eth_sendCustomRequest: walletService.eth_sendCustomRequest.bind(walletService),
+    eth_sendCustomRequestToWallet: walletService.eth_sendCustomRequestToWallet.bind(walletService),
     eth_waitTransaction: walletService.eth_waitTransaction.bind(walletService),
     near_sendCustomRequest: walletService.near_sendCustomRequest.bind(walletService),
 
@@ -102,8 +120,6 @@ browser.runtime.onMessage.addListener(
     getActiveModulesByHostnames: (hostnames) =>
       featureService.getActiveModulesByHostnames(hostnames),
     getModulesWithDeps: (modules) => featureService.getModulesWithDeps(modules),
-    optimizeDependency: (name, branch, version, contextIds) =>
-      featureService.optimizeDependency(name, branch, version, contextIds),
     getAllDevModules: () => featureService.getAllDevModules(),
     uploadModule: (mi, vi, targetStorages) => featureService.uploadModule(mi, vi, targetStorages),
     deployModule: (mi, vi, targetStorages, targetRegistry) =>
@@ -136,6 +152,8 @@ browser.runtime.onMessage.addListener(
     getUserSettingsForOverlay: featureService.getUserSettingsForOverlay.bind(featureService),
 
     // GlobalConfigService
+    setIsFirstInstallation: globalConfigService.setIsFirstInstallation.bind(globalConfigService),
+    getIsFirstInstallation: globalConfigService.getIsFirstInstallation.bind(globalConfigService),
     getProfiles: globalConfigService.getProfiles.bind(globalConfigService),
     setActiveProfile: globalConfigService.setActiveProfile.bind(globalConfigService),
     renameProfile: globalConfigService.renameProfile.bind(globalConfigService),
@@ -149,17 +167,30 @@ browser.runtime.onMessage.addListener(
     getDevMode: () => globalConfigService.getDevMode(),
     setDevMode: (isActive) => globalConfigService.setDevMode(isActive),
     getNotifications: (type) => notificationService.getNotifications(type),
-    createAndShowNotification: (notify, tabId?, icon?) =>
-      notificationService.createAndShowNotification(notify, tabId, icon),
-    createNotification: (notify, icon) => notificationService.createNotification(notify, icon),
+    createAndShowNotification: (notify, tabId) =>
+      notificationService.createAndShowNotification(notify, tabId),
+    createNotification: (notify) => notificationService.createNotification(notify),
     showNotification: (notificationId, tabId) =>
       notificationService.showNotification(notificationId, tabId),
     deleteNotification: (id) => notificationService.deleteNotification(id),
     deleteAllNotifications: () => notificationService.deleteAllNotifications(),
     markNotificationAsViewed: (id) => notificationService.markNotificationAsViewed(id),
     markAllNotificationsAsViewed: () => notificationService.markAllNotificationsAsViewed(),
+    // todo: mocked ucservices
+    getCounterStake: (appId) => underConstructionService.getCounterStake(appId),
+    resolveNotificationAction:
+      notificationService.resolveNotificationAction.bind(notificationService),
     getUnreadNotificationsCount: (source?) =>
       notificationService.getUnreadNotificationsCount(source),
+    getErc20TokenInfo: (tokenAddress) => tokenomicsService.getErc20TokenInfo(tokenAddress),
+    saveBlobToIpfs: (blob, targetStorages) =>
+      tokenomicsService.saveBlobToIpfs(blob, targetStorages),
+    getTokensByApp: (appId) => tokenomicsService.getTokensByApp(appId),
+    getAppsByToken: (addressToken) => tokenomicsService.getAppsByToken(addressToken),
+    createAppToken: (appId, symbol, name, referenceUrl, additionalCollaterals?) =>
+      tokenomicsService.createAppToken(appId, symbol, name, referenceUrl, additionalCollaterals),
+    linkAppWithToken: (appId, tokenAddress) =>
+      tokenomicsService.linkAppWithToken(appId, tokenAddress),
     getInitialConfig: () => globalConfigService.getInitialConfig(),
     addRegistry: (url, isDev) => globalConfigService.addRegistry(url, isDev),
     removeRegistry: (url) => globalConfigService.removeRegistry(url),
@@ -174,12 +205,12 @@ browser.runtime.onMessage.addListener(
     getUserAgentId: globalConfigService.getUserAgentId.bind(globalConfigService),
     getUserAgentName: globalConfigService.getUserAgentName.bind(globalConfigService),
     setUserAgentName: globalConfigService.setUserAgentName.bind(globalConfigService),
-    // getIgnoredUpdate: globalConfigService.getIgnoredUpdate.bind(globalConfigService),
-    // setIgnoredUpdate: globalConfigService.setIgnoredUpdate.bind(globalConfigService),
-    // getLastMessageSeenTimestamp:
-    //   globalConfigService.getLastMessageSeenTimestamp.bind(globalConfigService),
-    // setLastMessageSeenTimestamp:
-    //   globalConfigService.setLastMessageSeenTimestamp.bind(globalConfigService),
+    getIgnoredUpdate: globalConfigService.getIgnoredUpdate.bind(globalConfigService),
+    setIgnoredUpdate: globalConfigService.setIgnoredUpdate.bind(globalConfigService),
+    getLastMessageSeenTimestamp:
+      globalConfigService.getLastMessageSeenTimestamp.bind(globalConfigService),
+    setLastMessageSeenTimestamp:
+      globalConfigService.setLastMessageSeenTimestamp.bind(globalConfigService),
     getPreferedOverlayStorage:
       globalConfigService.getPreferedOverlayStorage.bind(globalConfigService),
     setPreferedOverlayStorage:
@@ -224,13 +255,13 @@ browser.runtime.onMessage.addListener(
     fetchJsonRpc: proxyService.fetchJsonRpc.bind(proxyService),
 
     // Github Service
-    getNewExtensionVersion: githubService.getNewExtensionVersion.bind(githubService),
-    // getDevMessage: githubService.getDevMessage.bind(githubService),
-    // hideDevMessage: githubService.hideDevMessage.bind(githubService),
+    getNewExtensionVersion: () => githubService.getNewExtensionVersion(),
+    getDevMessage: () => githubService.getDevMessage(),
+    hideDevMessage: githubService.hideDevMessage.bind(githubService),
 
     // Discord Service
-    // getDiscordMessages: discordService.getDiscordMessages.bind(discordService),
-    // hideDiscordMessages: discordService.hideDiscordMessages.bind(discordService),
+    getDiscordMessages: () => discordService.getDiscordMessages(),
+    hideDiscordMessages: discordService.hideDiscordMessages.bind(discordService),
 
     // LocalStorage
     localStorage_setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
@@ -256,6 +287,10 @@ browser.runtime.onMessage.addListener(
       overlayService.execConnectedAccountsUpdateHandler.bind(overlayService),
 
     // Connected Account Service
+    getPreferredConnectedAccountsNetwork:
+      globalConfigService.getPreferredConnectedAccountsNetwork.bind(globalConfigService),
+    setPreferredConnectedAccountsNetwork:
+      globalConfigService.setPreferredConnectedAccountsNetwork.bind(globalConfigService),
     getConnectedAccounts:
       connectedAccountService.getConnectedAccounts.bind(connectedAccountService),
     getConnectedAccountsMinStakeAmount:
@@ -274,6 +309,8 @@ browser.runtime.onMessage.addListener(
     changeConnectedAccountStatus:
       connectedAccountService.changeStatus.bind(connectedAccountService),
     getConnectedAccountsPairs: connectedAccountService.getPairs.bind(connectedAccountService),
+    getConnectedAccountsNet: connectedAccountService.getNet.bind(connectedAccountService),
+    areConnectedAccounts: connectedAccountService.areConnected.bind(connectedAccountService),
 
     // Analytics Service
     track: analyticsService.track.bind(analyticsService),
@@ -286,6 +323,9 @@ browser.runtime.onMessage.addListener(
     getThisTab: getThisTab,
     getCurrentContextIds: getCurrentContextIds,
     checkUrlAvailability: (url) => checkUrlAvailability(url),
+
+    // For E2E tests only
+    wipeAllExtensionData: () => browser.storage.local.clear().then(() => localStorage.clear()),
   })
 )
 
@@ -299,13 +339,13 @@ suspendService.changeIcon()
 suspendService.updateContextMenus()
 
 //listen for new tab to be activated
-browser.tabs.onActivated.addListener(function (activeInfo) {
+browser.tabs.onActivated.addListener(() => {
   suspendService.changeIcon()
   suspendService.updateContextMenus()
 })
 
 //listen for current tab to be changed
-browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+browser.tabs.onUpdated.addListener(() => {
   suspendService.changeIcon()
   suspendService.updateContextMenus()
 })
@@ -436,7 +476,7 @@ browser.runtime.onInstalled.addListener(async (details) => {
   if (!config) return
 
   // Find override parameters in URL
-  const customParams = {}
+  const customParams: { [key: string]: string } = {}
   url.searchParams.forEach((value, key) => {
     if (key !== 'config') customParams[key] = value
   })
@@ -444,17 +484,15 @@ browser.runtime.onInstalled.addListener(async (details) => {
   try {
     const url = new URL(config)
     const resp = await fetch(url.href)
-    const json = await resp.json()
+    const json: Partial<GlobalConfig> | Partial<GlobalConfig>[] = await resp.json()
 
-    const addCustomParams = (defParamsConfig: any) => {
+    const addCustomParams = (defParamsConfig: Partial<GlobalConfig>) => {
       Object.entries(customParams).forEach(([name, value]) => {
-        let parsedValue: any
         try {
-          parsedValue = JSON.parse(<string>value)
+          defParamsConfig[name] = JSON.parse(<string>value)
         } catch (e) {
-          parsedValue = value
+          defParamsConfig[name] = value
         }
-        defParamsConfig[name] = parsedValue
       })
     }
 
@@ -497,7 +535,7 @@ if (window['DAPPLETS_JSLIB'] !== true) {
           browser.tabs
             .sendMessage(x.id, { type: 'CURRENT_CONTEXT_IDS' })
             .then(() => false)
-            .catch((e) => {
+            .catch(() => {
               browser.tabs
                 .executeScript(x.id, { file: 'common.js' })
                 .then(() => browser.tabs.executeScript(x.id, { file: 'contentscript.js' }))
@@ -517,7 +555,7 @@ if (window['DAPPLETS_JSLIB'] !== true) {
   // workaround for firefox which prevents redirect loop
   const loading = new Set<number>()
 
-  async function redirectFromProxyServer(tab: Tabs.Tab) {
+  const redirectFromProxyServer = async (tab: Tabs.Tab) => {
     if (tab.status === 'loading' && !loading.has(tab.id)) {
       const groups = /https:\/\/augm\.link\/live\/(.*)/gm.exec(tab.url)
       const [, targetUrl] = groups ?? []

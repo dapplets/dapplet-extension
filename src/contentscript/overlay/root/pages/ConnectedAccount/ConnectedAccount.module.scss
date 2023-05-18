@@ -2,6 +2,28 @@
 @import "../../assets/styles/color.variables";
 @import "../../assets/styles/null";
 
+.warningInfo {
+  display: block;
+
+  padding: 4px;
+
+  color: white;
+  text-align: center;
+
+  background-color: $primary;
+}
+
+.overlayPaddings {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  padding: 10px 15px 0 16px;
+
+  &.withWarning {
+    height: calc(100% - 28px);
+  }
+}
+
 .wrapper {
   overflow: hidden;
   display: flex;
@@ -9,14 +31,51 @@
 
   width: 100%;
   height: 100%;
-  padding: 14px 0 0;
+}
+
+.caHeaderTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.caHeaderTop > h3 {
+  margin: 5px 0;
+  color: rgb(145 145 145);
+}
+
+.caHeaderTop > div {
+  width: 118px;
+  height: 23px;
+
+  font-size: 12px;
+  font-style: inherit;
+  color: #444;
+
+  background: white;
+  border: 1px solid;
+}
+
+.caHeaderTop > div > div:last-child {
+  border: 1px solid;
+}
+
+.caHeaderTop > div > div:last-child > div {
+  width: 118px;
+  height: 23px;
+
+  font-size: 12px;
+  font-style: inherit;
+  color: #444;
+
+  background: white;
 }
 
 .scrollContent {
   direction: rtl;
-  overflow-y: scroll;
-  width: 100%;
-  height: calc(100vh - 75px);
+  overflow-y: auto;
+  height: calc(100vh - 162px);
+  padding-left: 7px;
 
   &::-webkit-scrollbar {
     cursor: pointer;
@@ -39,9 +98,17 @@
     height: 2px;
     margin-bottom: 15px;
 
-    background: $Primary;
+    background: $primary;
     border-radius: 2px;
     box-shadow: 0 2px 6px rgb(0 0 0 / 9%), 0 2px 2px rgb(38 117 209 / 4%);
+  }
+
+  &.withWarning {
+    height: calc(100vh - 190px);
+  }
+
+  &:first-child {
+    margin-top: 0;
   }
 }
 
@@ -49,63 +116,31 @@
   direction: ltr;
 }
 
-.title {
-  position: relative;
-
-  display: grid;
-  grid-template-columns: 330px 90px;
-
-  padding-bottom: 7px;
-
-  font-family: Roboto, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  font-style: normal;
-  line-height: 100%;
-  color: $MainGrey;
-  text-transform: capitalize;
-
-  &::after {
-    content: "";
-
-    position: absolute;
-    bottom: 0;
-    left: 0;
-
-    width: 100%;
-    height: 1px;
-
-    background: #ced3d3;
-  }
-}
-
-.title > h3 {
-  padding: 3px;
-}
-
 .accountsWrapper {
   display: flex;
   flex-direction: column;
-
-  width: 97%;
   height: 100%;
   margin-top: 14px;
 }
 
 .mainBlock {
   display: grid;
-  grid-template-columns: 330px 90px;
+  grid-template-columns: 333px 90px;
   align-items: center;
 
   width: 100%;
   margin-top: 10px;
+
+  &:first-child {
+    margin-top: 0;
+  }
 }
 
 .accountBlock {
   display: flex;
   width: 100%;
-  padding: 10px;
-  background-color: $WebBG;
+  padding: 10px 14px 10px 9px;
+  background-color: $web-bg;
 }
 
 .accountBlockHorizontal {
@@ -141,7 +176,7 @@
   margin-right: 10px;
 
   filter: drop-shadow(0 2px 2px rgb(0 0 0 / 10%));
-  border: 2px solid $WebBG;
+  border: 2px solid $web-bg;
   border-radius: 50%;
 }
 
@@ -153,28 +188,15 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainBlack;
+  color: $main-black;
 }
 
 .nameUserActive {
-  background: $Primary;
+  background: $primary;
 
   .nameUser {
-    color: $PureWhite;
+    color: $pure-white;
   }
-}
-
-.arrowsAccount {
-  display: block;
-
-  width: 22px;
-  min-width: 22px;
-  height: 11px;
-
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='11' viewBox='0 0 16 11' fill='none'%3E%3Cpath d='M0.221076 1.96378L1.63608 0.550781L6.58508 5.50078L1.63008 10.4448L0.222076 9.03678L3.75808 5.50078L0.221076 1.96478L0.221076 1.96378ZM9.41408 5.50078L14.3691 0.555781L15.7781 1.96478L12.2431 5.50078L15.7781 9.03578L14.3641 10.4508L9.41508 5.50178L9.41408 5.50078Z' fill='%23B5B5B5'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
 }
 
 .accountStatus {
@@ -219,11 +241,11 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainGrey;
+  color: $main-grey;
   text-align: center;
   text-transform: capitalize;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px 0 10px 10px;
   box-shadow: 0 4px 4px rgb(0 0 0 / 10%);
 }
@@ -243,7 +265,7 @@
   font-weight: 400;
   font-style: normal;
   line-height: 100%;
-  color: $MainBlack;
+  color: $main-black;
   text-transform: capitalize;
 }
 
@@ -262,45 +284,43 @@
 .statusError {
   margin: 3px;
   padding: 4px 2px 7px;
-  background: $Primary;
+  background: $primary;
 }
 
-// .accountDelete {
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   width: 100%;
-// }
-
 .buttonDelete {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   width: 30px;
   height: 30px;
   margin: 3px;
 
-  background-color: $PureWhite;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23919191'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center;
+  background-color: $pure-white;
   filter: drop-shadow(0 2px 2px rgb(0 0 0 / 4%));
   border-radius: 50%;
 
+  fill: #919191;
+
   &:hover {
-    background-color: $Primary;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23FFFFFF'/%3E%3C/svg%3E");
+    background-color: $primary;
+    fill: #fff;
   }
 
   &:active {
-    background-color: $PrimaryPressed;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23FFFFFF'/%3E%3C/svg%3E");
+    background-color: $primary-pressed;
+    fill: #fff;
   }
 
   &:disabled {
     cursor: default;
     background-color: #e5e5e5;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 13 13' fill='none'%3E%3Cpath d='M9.7146 12.9275H3.28603C2.57595 12.9275 2.00031 12.3518 2.00031 11.6417V3.2846H0.7146V1.99888H3.28603V1.35603C3.28603 0.645946 3.86166 0.0703125 4.57174 0.0703125H8.42889C9.13897 0.0703125 9.7146 0.645946 9.7146 1.35603V1.99888H12.286V3.2846H11.0003V11.6417C11.0003 12.3518 10.4247 12.9275 9.7146 12.9275ZM3.28603 3.2846V11.6417H9.7146V3.2846H3.28603ZM4.57174 1.35603V1.99888H8.42889V1.35603H4.57174ZM8.42889 10.356H7.14317V4.57031H8.42889V10.356ZM5.85746 10.356H4.57174V4.57031H5.85746V10.356Z' fill='%23919191'/%3E%3C/svg%3E");
+    fill: #919191;
   }
+}
+
+.buttonDelete svg {
+  fill: inherit;
 }
 
 .messageDelete {
@@ -313,7 +333,7 @@
     font-weight: 700;
     font-style: normal;
     line-height: 26px;
-    color: $MainGrey;
+    color: $main-grey;
     text-align: center;
   }
 
@@ -328,22 +348,115 @@
   }
 }
 
+.connectWalletsBtnModule {
+  display: flex;
+  align-items: center;
+  width: 44%;
+}
+
 .connectWalletsBtn {
   display: block;
 
   width: fit-content;
-  padding: 12px 20px;
+  margin-left: 10px;
+  padding: 15px 20px;
 
   font-family: Roboto, sans-serif;
   font-size: 14px;
   line-height: 100%;
   color: #fff;
 
-  background: #d9304f;
-  border-radius: 4px;
+  background: $primary;
+  border-radius: 12px;
+
+  &:hover {
+    background: #c12f49;
+  }
+
+  &:active {
+    background: $primary-pressed;
+  }
+
+  &:disabled {
+    cursor: default;
+    background-color: $main-grey;
+  }
 }
 
-.connectWalletsBtn:disabled {
-  cursor: default;
-  background-color: #999;
+.connectWalletsBtnInfo {
+  display: block;
+
+  width: 20px;
+  height: 20px;
+  margin-left: 8px;
+
+  border-radius: 99px;
+}
+
+.connectWalletsBtnInfo svg {
+  fill: #C9C9C9;
+
+  &:hover,
+  &:focus {
+    fill: #adadad;
+  }
+
+  &:active {
+    fill: $main-grey;
+  }
+}
+
+.connectWalletsBtnInfo.active svg {
+  fill: $primary;
+
+  &:hover,
+  &:focus {
+    fill: #c12f49;
+  }
+
+  &:active {
+    fill: $primary-pressed
+  }
+}
+
+.connectWalletsInfoWrapper {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  height: 0;
+}
+
+.connectWalletsInfo {
+  transform: translateX(200%);
+
+  display: block;
+
+  width: 296px;
+  margin-top: 4px;
+  margin-right: 10px;
+  padding: 13px 16px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 149%;
+  color: $content-black;
+
+  opacity: 0;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 25%);
+
+  transition: transform 0.01s ease-out 0.2s, opacity 0.2s ease-out 0s;
+}
+
+.connectWalletsInfoVisible {
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform 0.01s ease-in 0s, opacity 0.2s ease-in 0s;
+}
+
+.connectWalletsInfo p:first-child {
+  margin-bottom: 10px;
 }

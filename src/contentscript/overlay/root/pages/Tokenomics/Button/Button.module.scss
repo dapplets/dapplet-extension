@@ -1,0 +1,114 @@
+@import '../../../assets/styles/null';
+@import '../../../assets/styles/fonts';
+@import '../../../assets/styles/color.variables';
+
+.root {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  padding: 6px 10px;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+  outline: none;
+}
+
+.root:focus {
+  outline: 0;
+}
+
+.primary {
+  color: $pure-white;
+  background-color: $primary;
+}
+
+.outline {
+  background-color: transparent;
+  border: 1px solid $primary;
+}
+
+.link {
+  padding: 0;
+
+  color: $primary;
+
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.outline.primary {
+  color: $primary;
+  fill: transparent;
+  stroke: $primary;
+}
+
+.outline.primary:hover {
+  color: $primary-hover;
+  border: 1px solid $primary-hover;
+}
+
+.outline.primary:active {
+  color: $primary-pressed;
+  border: 1px solid $primary-pressed;
+}
+
+.outline.primary:hover svg {
+  fill: transparent;
+
+  path {
+    stroke: $primary-hover;
+  }
+}
+
+.outline.primary:active svg {
+  fill: transparent;
+
+  path {
+    stroke: $primary-pressed;
+  }
+}
+
+.lg {
+  display: flex;
+  justify-content: center;
+
+  width: 94%;
+  margin: 0 auto;
+  padding: 12px 72px;
+
+  border-radius: 10px;
+
+  &:hover {
+    background-color: $primary-hover;
+  }
+
+  &:active {
+    background-color: $primary-pressed;
+  }
+}
+
+.sm {
+  padding: 0 8px;
+  border-radius: 4px;
+}
+
+.sv {
+  padding: 12px 46.5px;
+  border-radius: 10px;
+}
+
+.round {
+  background-color: $primary;
+  border-radius: 50%;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.9;
+}

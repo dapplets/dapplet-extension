@@ -5,6 +5,7 @@ import cn from 'classnames'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import React from 'react'
+import { QueryClient, QueryClientProvider } from 'react-query'
 import {
   MemoryRouter,
   Navigate,
@@ -28,6 +29,8 @@ import { ReactComponent as DappletsLogo } from './assets/newIcon/mustache.svg'
 import { ReactComponent as SearchIcon } from './assets/newIcon/search.svg'
 import { ReactComponent as Home } from './assets/newIcon/squares.svg'
 import { ReactComponent as StoreIcon } from './assets/newIcon/store.svg'
+import { Onboarding } from './components/BaseOnboarding'
+
 import { ContentItem } from './components/ContentItem'
 import styles from './components/Overlay/Overlay.module.scss'
 import { OverlayTab } from './components/OverlayTab'
@@ -538,7 +541,7 @@ class _App extends React.Component<P, S> {
               selectedWallet={this.state.selectedWallet}
               connectedDescriptors={this.state.connectedDescriptors}
             />
-
+            <Onboarding />
             <div className={styles.inner}>
               <header className={styles.header}>
                 <div className={styles.left}>
@@ -606,11 +609,10 @@ class _App extends React.Component<P, S> {
               <div
                 onClick={() => this.handleCloseSearch()}
                 className={cn(styles.children, 'dapplets-overlay-nav-content-list', {
-                  [styles.newChildren]:
-                    pathname !== '/system/dapplets' &&
-                    // pathname !== '/system/notifications' &&
-                    pathname !== '/system/connectedAccounts' &&
-                    pathname !== '/system/settings',
+                  [styles.newChildren]: pathname !== '/system/dapplets',
+                  //  &&
+                  // pathname !== '/system/notifications' &&
+                  // pathname !== '/system/settings',
                   // [styles.newHeight]:s.isOpenSearch && pathname === '/system/dapplets'
                 })}
               >
@@ -618,6 +620,7 @@ class _App extends React.Component<P, S> {
                   // ^ do not load the dapplets list until a user has opened the overlay
                   <Dapplets
                     search={s.search}
+                    overlays={overlays}
                     onUserSettingsClick={this.handleUserSettingsClick}
                     setDropdownListValue={this.setDropdownListValue}
                     dropdownListValue={s.dropdownListValue}
@@ -625,6 +628,8 @@ class _App extends React.Component<P, S> {
                     handleCloseTabClick={this.handleCloseTabClick}
                     tabs={this.getTabs()}
                     setModule={this.setModule}
+                    pathname={pathname}
+                    navigate={this.props.navigate!}
                     classNameBlock={
                       s.isOpenSearch && pathname === '/system/dapplets' ? styles.newHeight : null
                     }
@@ -683,8 +688,12 @@ class _App extends React.Component<P, S> {
 
 const __App = withRouter(_App)
 
+const queryClient = new QueryClient()
+
 export const App = (props: any) => (
   <MemoryRouter>
-    <__App {...props} />
+    <QueryClientProvider client={queryClient}>
+      <__App {...props} />
+    </QueryClientProvider>
   </MemoryRouter>
 )

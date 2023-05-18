@@ -64,6 +64,16 @@ class ConnectedAccounts {
     return getConnectedAccountsRequestStatus(id)
   }
 
+  public async areConnected(accountGId1: string, accountGId2: string): Promise<boolean> {
+    const { areConnectedAccounts } = await initBGFunctions(browser)
+    return areConnectedAccounts(accountGId1, accountGId2)
+  }
+
+  public async getNet(accountGId: string): Promise<string[] | null> {
+    const { getConnectedAccountsNet } = await initBGFunctions(browser)
+    return getConnectedAccountsNet(accountGId)
+  }
+
   // ***** CALL *****
 
   public async requestVerification(
@@ -107,7 +117,7 @@ class ConnectedAccounts {
 
     const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
-    const { requestId } = await openConnectedAccountsPopup(
+    const result = await openConnectedAccountsPopup(
       {
         [isUnlink ? 'accountsToDisconnect' : 'accountsToConnect']: [
           {
@@ -127,7 +137,7 @@ class ConnectedAccounts {
       },
       thisTab.id
     )
-    return canConnect ? requestId : -1
+    return canConnect && result ? result.requestId : -1
   }
 
   public async changeStatus({

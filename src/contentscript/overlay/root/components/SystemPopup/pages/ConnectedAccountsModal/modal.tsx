@@ -42,7 +42,6 @@ export const Modal = ({
         onClick={(e) => e.stopPropagation()}
         style={{ paddingTop: isWaiting ? '0' : '46px' }}
       >
-        {/* {!accounts && isWaiting && <img src={Loader} className={styles.loader} />} */}
         {isWaiting && <img src={Loader} className={styles.loader} />}
         <div className={styles.modalHeader}>
           <h3 className={styles.modalTitle}>{title}</h3>
@@ -51,14 +50,12 @@ export const Modal = ({
         {accounts && <div className={styles.modalAccounts}>{accounts}</div>}
         {content && (
           <div className={styles.modalBody}>
-            {/* <div className={styles.modalContent}>{content}</div> */}
             {content.split('\n').map((t, i) => (
               <p key={i}>{t}</p>
             ))}
           </div>
         )}
         <div className={styles.modalFooter}>
-          {/* <div className={styles.wrapperModalWantLink}> */}
           {onConfirm && onConfirmLabel && !isWaiting && (
             <button
               onClick={onConfirm}
@@ -71,14 +68,12 @@ export const Modal = ({
           <button
             onClick={onClose}
             className={cn(
-              onConfirm && onConfirmLabel && styles.button,
+              styles.button,
               onConfirm && onConfirmLabel ? styles.secondary : styles.tertiary
             )}
-            // disabled={isWaiting}
           >
             {onConfirm && onConfirmLabel ? 'Cancel' : 'Close'}
           </button>
-          {/* </div> */}
         </div>
       </div>
     </div>

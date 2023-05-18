@@ -8,6 +8,7 @@ import {
   typeOfUri,
   UriTypes,
 } from '../../common/helpers'
+import { NearNetworks } from '../../common/types'
 import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserStorage'
 import { GlobalConfig } from '../models/globalConfig'
 import SiteConfig from '../models/siteConfig'
@@ -19,6 +20,7 @@ const EXPORTABLE_PROPERTIES = [
   // 'isActive',
   // 'suspended',
   // 'walletInfo',
+  'isFirstInstallation',
   'registries',
   'devMode',
   'trustedUsers',
@@ -33,12 +35,14 @@ const EXPORTABLE_PROPERTIES = [
   'ipfsGatewayUrl',
   // 'walletsUsage',
   'hostnames',
-  //'lastDevMessageHash',
-  //'ignoredUpdate',
+  'lastDevMessageHash',
+  'ignoredUpdate',
   'dynamicAdapter',
   'preferedOverlayStorage',
   'myDapplets',
-  'connectedAccountContractAddress',
+  'connectedAccountsTestnetContractAddress',
+  'connectedAccountsMainnetContractAddress',
+  'preferredConnectedAccountsNetwork',
 ]
 
 export default class GlobalConfigService {
@@ -65,9 +69,15 @@ export default class GlobalConfigService {
       if (!config.myDapplets) config.myDapplets = this.getInitialConfig().myDapplets
       if (!config.targetStorages) config.targetStorages = this.getInitialConfig().targetStorages
       if (!config.xdaiProviderUrl) config.xdaiProviderUrl = this.getInitialConfig().xdaiProviderUrl
-      if (!config.connectedAccountsContractAddress)
-        config.connectedAccountsContractAddress =
-          this.getInitialConfig().connectedAccountsContractAddress
+      if (!config.connectedAccountsTestnetContractAddress)
+        config.connectedAccountsTestnetContractAddress =
+          this.getInitialConfig().connectedAccountsTestnetContractAddress
+      if (!config.connectedAccountsMainnetContractAddress)
+        config.connectedAccountsMainnetContractAddress =
+          this.getInitialConfig().connectedAccountsMainnetContractAddress
+      if (!config.preferredConnectedAccountsNetwork)
+        config.preferredConnectedAccountsNetwork =
+          this.getInitialConfig().preferredConnectedAccountsNetwork
       if (!config.pinnedDappletActions)
         config.pinnedDappletActions = this.getInitialConfig().pinnedDappletActions
     }
@@ -78,6 +88,7 @@ export default class GlobalConfigService {
   async set(config: GlobalConfig): Promise<void> {
     await this._globalConfigRepository.update(config)
   }
+  async setFirstInstallation(): Promise<void> {}
 
   async mergeConfig(config: Partial<GlobalConfig>): Promise<void> {
     const previousConfig = await this.get()
@@ -215,6 +226,7 @@ export default class GlobalConfigService {
   getInitialConfig(): GlobalConfig {
     const config = new GlobalConfig()
     config.id = this._defaultConfigId
+    config.isFirstInstallation = true
     config.isActive = true
     config.registries = [
       { url: 'v2.registry.dapplet-base.eth', isDev: false, isEnabled: true },
@@ -309,12 +321,26 @@ export default class GlobalConfigService {
       },
     ]
     config.myDapplets = []
-    config.connectedAccountsContractAddress = 'dev-1674551865700-67703371677231'
+    config.connectedAccountsTestnetContractAddress = 'dev-1674551865700-67703371677231'
+    config.connectedAccountsMainnetContractAddress = 'connected-accounts.near'
+    config.preferredConnectedAccountsNetwork = NearNetworks.Mainnet
     config.pinnedDappletActions = []
     return config
   }
+
+  async setIsFirstInstallation(isActive: boolean) {
+    await this.updateConfig((c) => (c.isFirstInstallation = isActive))
+    EventBus.emit('onboarding_update')
+  }
+  async getIsFirstInstallation() {
+    const config = await this.get()
+
+    return config.isFirstInstallation
+  }
+
   async getPinnedActions() {
     const config = await this.get()
+
     const registries = config.pinnedDappletActions.map((x) => ({
       ...x,
       dappletName: x.dappletName === undefined ? true : x.dappletName,
@@ -691,29 +717,29 @@ export default class GlobalConfigService {
     await this.set(globalConfig)
   }
 
-  // async getLastDevMessageHash() {
-  //   return this.get().then((x) => x.lastDevMessageHash)
-  // }
+  async getLastDevMessageHash() {
+    return this.get().then((x) => x.lastDevMessageHash)
+  }
 
-  // async setLastDevMessageHash(hash: string) {
-  //   return this.updateConfig((c) => (c.lastDevMessageHash = hash))
-  // }
+  async setLastDevMessageHash(hash: string) {
+    return this.updateConfig((c) => (c.lastDevMessageHash = hash))
+  }
 
-  // async getIgnoredUpdate() {
-  //   return this.get().then((x) => x.ignoredUpdate)
-  // }
+  async getIgnoredUpdate() {
+    return this.get().then((x) => x.ignoredUpdate)
+  }
 
-  // async setIgnoredUpdate(version: string) {
-  //   return this.updateConfig((c) => (c.ignoredUpdate = version))
-  // }
+  async setIgnoredUpdate(version: string) {
+    return this.updateConfig((c) => (c.ignoredUpdate = version))
+  }
 
-  // async getLastMessageSeenTimestamp() {
-  //   return this.get().then((x) => x.lastMessageSeenTimestamp)
-  // }
+  async getLastMessageSeenTimestamp() {
+    return this.get().then((x) => x.lastMessageSeenTimestamp)
+  }
 
-  // async setLastMessageSeenTimestamp(lastMessageSeenTimestamp: string) {
-  //   return this.updateConfig((c) => (c.lastMessageSeenTimestamp = lastMessageSeenTimestamp))
-  // }
+  async setLastMessageSeenTimestamp(lastMessageSeenTimestamp: string) {
+    return this.updateConfig((c) => (c.lastMessageSeenTimestamp = lastMessageSeenTimestamp))
+  }
 
   async getDynamicAdapter() {
     return this.get().then((x) => x.dynamicAdapter)
@@ -800,8 +826,37 @@ export default class GlobalConfigService {
     }
   }
 
-  async getConnectedAccountsContractAddress() {
+  async getConnectedAccountsTestnetContractAddress() {
     const config = await this.get()
-    return config.connectedAccountsContractAddress
+    return config.connectedAccountsTestnetContractAddress
+  }
+
+  async getConnectedAccountsMainnetContractAddress() {
+    const config = await this.get()
+    return config.connectedAccountsMainnetContractAddress
+  }
+
+  async getPreferredConnectedAccountsNetwork() {
+    return this.get().then((x) => x.preferredConnectedAccountsNetwork)
+  }
+
+  async setPreferredConnectedAccountsNetwork(network: NearNetworks) {
+    return this.updateConfig((c) => (c.preferredConnectedAccountsNetwork = network))
+  }
+
+  async isThereActiveDapplets() {
+    const globalConfig = await this.get()
+    if (!globalConfig.hostnames) return false
+
+    for (const contextId in globalConfig.hostnames) {
+      const activeDapplets = globalConfig.hostnames[contextId]?.activeFeatures ?? {}
+      for (const dapplet in activeDapplets) {
+        if (activeDapplets[dapplet].isActive) {
+          return true
+        }
+      }
+    }
+
+    return false
   }
 }

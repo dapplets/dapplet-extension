@@ -1,0 +1,125 @@
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
+@import '../../assets/styles/animate';
+
+.wrapper {
+  cursor: pointer;
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 149%;
+  color: $main-grey;
+
+  border-radius: 10px;
+}
+
+.itemsContainer {
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+
+  width: 100%;
+
+  filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 20%));
+}
+
+.item > div {
+  margin: 0;
+  border-radius: 200px 0 0 200px;
+}
+
+.item:last-child > div {
+  border-radius: 200px 0 140px 200px;
+}
+
+.dropdownLabel {
+  cursor: default;
+  width: 100%;
+
+  &.clickable {
+    cursor: pointer;
+  }
+}
+
+.dropdownLabel > div:first-child {
+  cursor: default;
+  margin: 0;
+}
+
+.dropdownLabel.clickable > div:first-child {
+  cursor: pointer;
+}
+
+.dropdownLabel.isOpen > div:first-child {
+  filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 20%));
+  border-radius: 200px 140px 0 200px;
+}
+
+.delimiterSpan {
+  display: flex;
+  justify-content: flex-start;
+  width: 97%;
+}
+
+.openOverlay {
+  position: absolute;
+  z-index: 3;
+  top: -1px;
+  right: -1px;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 101%;
+  height: auto;
+
+  background: #ebebeb;
+  border-radius: 10px;
+
+  animation-name: list-visible;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+
+  :last-child {
+    border-radius: 0 0 10px 10px;
+  }
+}
+
+.blockIcon {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.openList {
+  position: absolute;
+  right: 10px;
+
+  display: block;
+
+  padding: 0 10px;
+
+  animation-name: rotate-is-close;
+  animation-duration: 0.2s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+
+  &.isOpen {
+    animation-name: rotate-is-open;
+    animation-duration: 0.2s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+  }
+}
+

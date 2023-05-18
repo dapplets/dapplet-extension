@@ -1,6 +1,6 @@
 import { StorageTypes, WalletInfo } from '../../common/constants'
 import Base from '../../common/models/base'
-import { EthereumNetwrokConfig, NearNetworkConfig } from '../../common/types'
+import { EthereumNetwrokConfig, NearNetworkConfig, NearNetworks } from '../../common/types'
 import SiteConfig from './siteConfig'
 
 export class GlobalConfig extends Base {
@@ -12,6 +12,8 @@ export class GlobalConfig extends Base {
 
   suspended = false
 
+  isFirstInstallation = true
+
   walletInfo: WalletInfo = null
 
   registries: { url: string; isDev: boolean; isEnabled: boolean }[] = []
@@ -21,8 +23,9 @@ export class GlobalConfig extends Base {
   trustedUsers: { account: string }[] = []
 
   userSettings: {
-    [moduleName: string]: { [key: string]: any }
+    [moduleName: string]: { [key: string]: string | number | boolean | null | undefined }
   } = {}
+
   targetStorages: StorageTypes[] = []
 
   errorReporting = true // indirectly affects on '/src/common/logger.ts'
@@ -65,7 +68,11 @@ export class GlobalConfig extends Base {
 
   myDapplets: { registryUrl: string; name: string }[] = []
 
-  connectedAccountsContractAddress: string = null
+  connectedAccountsTestnetContractAddress: string = null
+
+  connectedAccountsMainnetContractAddress: string = null
+
+  preferredConnectedAccountsNetwork: NearNetworks = null
 
   pinnedDappletActions: { dappletName: string; widgetPinId: string }[] = []
 }

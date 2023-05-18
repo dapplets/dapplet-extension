@@ -57,7 +57,7 @@ export const UserSettings = ({
     <div className={styles.userSettingsWrapper}>
       <div className={cn(styles.wrapperCard)}>
         <div className={cn(styles.leftBlock)}>
-          <DappletImage isFavourites={false} storageRef={mi.icon} className={styles.imgBlock} />
+          <DappletImage storageRef={mi.icon} className={styles.imgBlock} />
 
           <DappletTitle
             className={styles.title}

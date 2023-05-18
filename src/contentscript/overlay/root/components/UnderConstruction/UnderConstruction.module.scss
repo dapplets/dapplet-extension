@@ -13,7 +13,7 @@
   margin: 2.5px 0;
   padding: 10px;
 
-  background: $PureWhite;
+  background: $pure-white;
   border-radius: 10px;
 }
 
@@ -35,12 +35,12 @@
   height: 20px;
   padding: 5px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 10px;
   font-weight: 500;
   font-style: normal;
   line-height: 100%;
-  color: $PureWhite;
+  color: $pure-white;
 
   background: #f5cf6c;
   border-radius: 10px;
@@ -56,9 +56,9 @@
   height: 21px;
   padding: 0 0 0 20px;
 
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 16px;
-  color: $ContentBlack;
+  color: $content-black;
 }

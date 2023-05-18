@@ -7,9 +7,8 @@ describe('appearance of a new notification', () => {
   qase(
     17,
     it('appearance of a new notification', () => {
-      cy.openDappletsOverlay(url)
+      cy.openDappletsOverlay(url, { wipe: true })
       cy.runDapplet(dappletIdToActivate)
-      cy.wait(10000)
       cy.getByTestId('notification-page').click()
       cy.getByTestId('notification').should('exist')
       cy.getByTestId('notification-dismiss').first().click()

@@ -1,4 +1,5 @@
-import { providers, Signer, utils } from 'ethers'
+import { providers, Signer } from 'ethers'
+import { NotImplementedError } from '../../common/errors'
 import * as EventBus from '../../common/global-event-bus'
 import { mergeSameWallets } from '../../common/helpers'
 import {
@@ -111,14 +112,12 @@ export class WalletService {
           return address
         }
 
-        async signMessage(message: string | utils.Bytes): Promise<string> {
-          throw new Error('Method not implemented.')
+        async signMessage(): Promise<string> {
+          throw new NotImplementedError()
         }
 
-        async signTransaction(
-          transaction: utils.Deferrable<providers.TransactionRequest>
-        ): Promise<string> {
-          throw new Error('Method not implemented.')
+        async signTransaction(): Promise<string> {
+          throw new NotImplementedError()
         }
 
         async sendTransaction(
@@ -130,8 +129,8 @@ export class WalletService {
           return signer.sendTransaction(transaction)
         }
 
-        connect(provider: providers.Provider): Signer {
-          throw new Error('Method not implemented.')
+        connect(): Signer {
+          throw new NotImplementedError()
         }
       })()
 
@@ -290,6 +289,19 @@ export class WalletService {
     return wallet.sendCustomRequest(method, params)
   }
 
+  public async eth_sendCustomRequestToWallet(
+    chain: ChainTypes,
+    walletType: WalletTypes,
+    method: string,
+    params: any[]
+  ): Promise<any> {
+    const map = await this._getWalletsMap()
+    const wallet = map[chain][walletType] as EthereumWallet
+    if (!(await wallet.isAvailable())) throw new Error('The wallet is not available')
+    if (!(await wallet.isConnected())) await wallet.connectWallet({})
+    return wallet.sendCustomRequest(method, params)
+  }
+
   public async eth_waitTransaction(
     app: string | DefaultSigners,
     chain: ChainTypes,
@@ -324,12 +336,11 @@ export class WalletService {
     return wallet.sendCustomRequest(method, params)
   }
 
-  public async near_getAccount(app: string | DefaultSigners) {
-    const wallet = (await this._getInternalSignerFor(
-      app,
-      ChainTypes.NEAR_TESTNET,
-      false
-    )) as NearWallet
+  public async near_getAccount(
+    app: string | DefaultSigners,
+    chain: ChainTypes.NEAR_MAINNET | ChainTypes.NEAR_TESTNET
+  ) {
+    const wallet = (await this._getInternalSignerFor(app, chain, false)) as NearWallet
     return wallet.getAccount()
   }
 

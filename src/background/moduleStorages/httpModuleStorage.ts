@@ -1,5 +1,6 @@
+import { NotImplementedError } from '../../common/errors'
 import { timeoutPromise } from '../../common/helpers'
-import { DirectoryData, Storage as ModuleStorage } from './storage'
+import { Storage as ModuleStorage } from './storage'
 
 export class HttpModuleStorage implements ModuleStorage {
   public timeout = 60000
@@ -38,7 +39,7 @@ export class HttpModuleStorage implements ModuleStorage {
     return url
   }
 
-  saveDir(data: DirectoryData): Promise<string> {
-    throw new Error('Method not implemented.')
+  saveDir(): Promise<string> {
+    throw new NotImplementedError()
   }
 }

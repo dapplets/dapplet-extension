@@ -3,6 +3,7 @@ import * as React from 'react'
 import { browser } from 'webextension-polyfill-ts'
 // import * as logos from '../../../common/resources/wallets';
 import { Bus } from '../../../../../../../common/bus'
+import { SECURE_AUTH_METHODS } from '../../../../../../../common/constants'
 import {
   ChainTypes,
   LoginRequest,
@@ -62,11 +63,7 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
     const disconnectedWallets = descriptors
       .filter((x) => !x.connected)
       .filter((x) => (p.chains.length > 0 ? p.chains.includes(x.chain) : true))
-      .filter((x) =>
-        secureLogin === 'required'
-          ? x.chain === ChainTypes.ETHEREUM_GOERLI || x.chain === ChainTypes.ETHEREUM_XDAI
-          : true
-      )
+      .filter((x) => (secureLogin === 'required' ? SECURE_AUTH_METHODS.includes(x.chain) : true))
 
     const wallets = disconnectedWallets.map((x) => this.getMeta(x.type, x.chain))
 

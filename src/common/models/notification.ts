@@ -1,3 +1,4 @@
+import { JsonValue } from '../types'
 import Base from './base'
 
 export type NotificationAction = {
@@ -11,7 +12,7 @@ export type NotificationPayload = {
   message?: string
   actions?: NotificationAction[]
   timeout?: number
-  payload?: any
+  payload?: JsonValue
   icon?: string
 }
 
@@ -40,4 +41,5 @@ export class Notification extends Base {
   message?: string = null
   actions?: NotificationAction[] = null
   expiresAt?: Date | number = null
+  payload?: JsonValue = null
 }

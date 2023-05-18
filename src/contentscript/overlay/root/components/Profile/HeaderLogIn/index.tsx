@@ -60,9 +60,9 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const liRef = useRef<HTMLDivElement>()
 
   const newVisible = (hash: string): string => {
-    const firstFourCharacters = hash.substring(0, 6)
-    const lastFourCharacters = hash.substring(hash.length - 0, hash.length - 4)
-    return `${firstFourCharacters}...${lastFourCharacters}`
+    const firstCharacters = hash.substring(0, 6)
+    const lastCharacters = hash.substring(hash.length - 0, hash.length - 4)
+    return `${firstCharacters}...${lastCharacters}`
   }
   // const isEveryWalletConnected = descriptors.filter((x) => !x.connected).length === 0
 
@@ -73,23 +73,15 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
 
     init()
 
+    return () => {}
+  }, [])
+  useEffect(() => {
+    EventBus.on('wallet_changed', refresh)
+
     return () => {
       EventBus.off('wallet_changed', refresh)
     }
-  }, [
-    isOpen,
-    isMini,
-    newProfile,
-    isModal,
-    walletImage,
-    walletAccount,
-    walletIcon,
-    walletTypeWalletConnect,
-    isMini,
-    liRef,
-    // isOpenSearch,
-    selectedWallet,
-  ])
+  }, [])
 
   const refresh = async () => {
     const { getWalletDescriptors, getDefaultWalletFor } = await initBGFunctions(browser)
@@ -112,7 +104,14 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
       if (connectedDescriptors.length > 0) {
         const newDescriptors = connectedDescriptors?.find((x) => x.type === selectedWallet)
         setConnectedDescriptors(connectedDescriptors)
-        if (!newDescriptors) return
+
+        if (!newDescriptors) {
+          setWalletImage(null)
+          setWalletAccount(null)
+          setWalletIcon(null)
+          setWalletTypeWalletConnect(null)
+          return
+        }
         const newWalletImage = makeBlockie(newDescriptors.account)
         setWalletImage(newWalletImage)
         if (newDescriptors.type === 'near') {
