@@ -1,3 +1,5 @@
+import { ChainTypes } from './types'
+
 export const enum ModuleTypes {
   Feature = 'FEATURE',
   Adapter = 'ADAPTER',
@@ -26,3 +28,10 @@ export const DEFAULT_BRANCH_NAME = 'default'
 export const CONTEXT_ID_WILDCARD = '*'
 
 export const DAPPLETS_STORE_URL = 'https://store.dapplets.org'
+
+export const SECURE_AUTH_METHODS: string[] = [
+  ChainTypes.ETHEREUM_GOERLI,
+  ChainTypes.ETHEREUM_XDAI,
+  ChainTypes.NEAR_MAINNET,
+  ChainTypes.NEAR_TESTNET,
+]

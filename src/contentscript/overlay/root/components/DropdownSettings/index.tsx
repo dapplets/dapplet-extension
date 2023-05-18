@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../common/global-event-bus'
 import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
-import useAbortController from '../../hooks/useAbortController'
 import styles from './DropdownSettings.module.scss'
 
 type TDropdownSettingsProps = {
@@ -18,21 +17,20 @@ export const DropdownSettings = (props: TDropdownSettingsProps) => {
   const { values, getterName, setterName, event } = props
   const [isOpen, setOpen] = useState(false)
   const [selectedValue, setSelectedValue] = useState('')
-  const abortController = useAbortController()
+
   useEffect(() => {
     const init = async () => {
       getterName && (await loadValueFromStorage())
     }
     init()
     return () => {}
-  }, [abortController.signal.aborted, getterName])
+  }, [getterName])
 
   const loadValueFromStorage = async () => {
     const backgroundFunctions = await initBGFunctions(browser)
     const storageValue = await backgroundFunctions[getterName]()
-    if (!abortController.signal.aborted) {
-      setSelectedValue(storageValue)
-    }
+
+    setSelectedValue(storageValue)
   }
 
   const writeToStorageSelectedValue = async (value: string, func: (x) => void) => {

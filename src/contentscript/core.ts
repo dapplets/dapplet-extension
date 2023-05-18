@@ -12,6 +12,7 @@ import ConnectedAccounts from './connectedAccounts/connected-accounts'
 import { Connection, EventDef } from './connection'
 import * as ethereum from './ethereum'
 import { IEtherneumWallet } from './ethereum/types'
+import { EventBus } from './events/eventBus'
 import { LoginSession } from './login/login-session'
 import { LoginHooks, LoginRequestSettings } from './login/types'
 import * as near from './near'
@@ -152,10 +153,17 @@ export default class Core {
     })
   }
 
-  public async notify(payload: NotificationPayload, icon?) {
+  public async notify(payload: NotificationPayload, icon?: string, moduleName?: string) {
     const { createAndShowNotification, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
-    await createAndShowNotification(payload, thisTab.id, icon ? icon : null)
+
+    const notification = {
+      ...payload,
+      icon,
+      source: moduleName,
+    }
+
+    await createAndShowNotification(notification, thisTab.id)
   }
 
   public toggleOverlay() {
@@ -409,6 +417,8 @@ export default class Core {
   }
 
   public storage: AppStorage
+
+  public events: EventBus
 
   public async contract(
     type: 'ethereum' | 'ethereum/xdai',

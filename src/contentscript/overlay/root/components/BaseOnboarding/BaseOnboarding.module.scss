@@ -1,0 +1,67 @@
+@import '../../assets/styles/null';
+@import '../../assets/styles/fonts';
+@import '../../assets/styles/color.variables';
+
+.wrapper{
+  position: fixed;
+  z-index: 9999;
+  top: 55px;
+  left: -380px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 320px;
+  min-height: 194px;
+  max-height: 425px;
+  padding: 10px 20px;
+
+  background: $pure-white;
+  border-radius: 8px;
+  box-shadow: 0 4px 5px rgb(45 52 60 / 10%), 0 4px 20px rgb(11 87 111 / 15%);
+
+  &::after{
+    content: '';
+
+    position: absolute;
+    top: 50px;
+    right: -15px;
+    transform: rotate(-45deg);
+
+    width: 30px;
+    height: 30px;
+
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 7px 5px 7px rgb(45 52 60 / 10%), 5px 2px 5px rgb(11 87 111 / 15%);
+
+  }
+}
+
+.promoBlock{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.text{
+  margin: 10px 0;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 149%;
+  color: $content-black;
+}
+
+.darkColor{
+  color: $main-black;
+}
+
+.buttonBlock{
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}

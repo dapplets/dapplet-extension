@@ -1,14 +1,15 @@
 @import '../../assets/styles/fonts';
 @import '../../assets/styles/color.variables';
 @import '../../assets/styles/null';
+@import './adaptive';
 
 .MainSettingsAuto {
   padding: 10px;
 
-  background-color: $PureWhite;
+  background-color: $pure-white;
   border-radius: 10px;
 
-  animation-name: openError;
+  animation-name: open-error;
   animation-duration: 0.3s;
   animation-timing-function: ease;
   animation-fill-mode: forwards;
@@ -59,5 +60,3 @@
   justify-content: space-between;
   margin-top: 10px;
 }
-
-@import './adaptive';

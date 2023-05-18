@@ -2,30 +2,16 @@ import { serialize } from 'borsh'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as nearAPI from 'near-api-js'
 import { browser } from 'webextension-polyfill-ts'
+import { NotImplementedError } from '../../common/errors'
 import { CustomConnectedWalletAccount } from './customConnectedWalletAccount'
-
-const LOGIN_WALLET_URL_SUFFIX = '/login/'
-const PENDING_ACCESS_KEY_PREFIX = 'pending_key' // browser storage key for a pending access key (i.e. key has been generated but we are not sure it was added yet)
-
-interface SignInOptions {
-  contractId?: string
-  // TODO: Replace following with single callbackUrl
-  successUrl?: string
-  failureUrl?: string
-}
 
 export class BackgroundWalletConnection extends nearAPI.WalletConnection {
   constructor(near: nearAPI.Near, appKeyPrefix: string, private _app: string) {
     super(near, appKeyPrefix)
   }
 
-  async requestSignIn(
-    contractIdOrOptions: string | SignInOptions = {},
-    title?: string,
-    successUrl?: string,
-    failureUrl?: string
-  ) {
-    throw new Error('requestSignIn is not implemented')
+  async requestSignIn() {
+    throw new NotImplementedError()
   }
 
   async requestSignTransactions(

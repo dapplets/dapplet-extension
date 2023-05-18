@@ -30,13 +30,13 @@
   margin: 0 auto;
   margin-bottom: 6px;
 
-  background: #e3e3e3;
+  background: $stroke-color;
 }
 
 .squaredButtonMenuWidget {
   width: 45px;
   background: #f5f5f5;
-  border: 1px solid #e3e3e3;
+  border: 1px solid $stroke-color;
   border-radius: 6px;
 
   &:hover {
@@ -64,11 +64,11 @@
   &:disabled {
     cursor: auto !important;
     background: inherit;
-    border: 1px solid #e3e3e3;
+    border: 1px solid $stroke-color;
 
     svg {
       path {
-        stroke: #e3e3e3;
+        stroke: $stroke-color;
       }
     }
   }
@@ -84,8 +84,6 @@
   align-items: end;
 
   width: 202px;
-
-  // height: 186px;
   height: auto;
   padding: 6px;
 
@@ -115,7 +113,7 @@
 }
 
 .mainMenuItemTitle {
-  font-family: Roboto;
+  font-family: Roboto, sans-serif;
   font-size: 12px;
   line-height: 100%;
   color: #747376;

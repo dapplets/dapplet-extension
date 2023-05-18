@@ -31,6 +31,7 @@ export class AnalyticsService {
   }
 
   private async _request(params: { [key: string]: string }) {
+    if (EXTENSION_ENV !== 'production') return
     if (!(await this._isActive())) return
 
     const visitorId = await this._getUserAgentId()

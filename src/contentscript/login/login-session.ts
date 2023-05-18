@@ -10,7 +10,7 @@ export class LoginSession {
   walletType: string = null
   expiresAt: string = null
   createdAt: string = null
-  loginConfirmation?: { loginMessage: string; signature: string } = null
+  loginConfirmationId?: string = null
 
   logoutHandler?: (ls: any) => void
 
@@ -59,7 +59,15 @@ export class LoginSession {
         options
       )
     } else if (this._network === 'near') {
-      return near.createContractWrapper(this.sessionId, { network: this._chain }, address, options)
+      return near.createContractWrapper(
+        this.sessionId,
+        {
+          network: this._chain,
+          loginConfirmationId: this.loginConfirmationId,
+        },
+        address,
+        options
+      )
     } else {
       throw new Error(
         `Current auth method "${this._network}" doesn't support contract interactions.`
@@ -92,7 +100,10 @@ export class LoginSession {
       // ToDo: events def
       return ethereum.createWalletConnection(this.moduleName, { network: this._chain })
     } else if (this._network === 'near') {
-      return near.createWalletConnection(this.moduleName, { network: this._chain })
+      return near.createWalletConnection(this.moduleName, {
+        network: this._chain,
+        loginConfirmationId: this.loginConfirmationId,
+      })
     } else {
       throw new Error(`Current auth method "${this._network}" doesn't support wallet connections.`)
     }

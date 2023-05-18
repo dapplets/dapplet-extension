@@ -12,6 +12,8 @@ export class GlobalConfig extends Base {
 
   suspended = false
 
+  isFirstInstallation = true
+
   walletInfo: WalletInfo = null
 
   registries: { url: string; isDev: boolean; isEnabled: boolean }[] = []
@@ -21,8 +23,9 @@ export class GlobalConfig extends Base {
   trustedUsers: { account: string }[] = []
 
   userSettings: {
-    [moduleName: string]: { [key: string]: any }
+    [moduleName: string]: { [key: string]: string | number | boolean | null | undefined }
   } = {}
+
   targetStorages: StorageTypes[] = []
 
   errorReporting = true // indirectly affects on '/src/common/logger.ts'

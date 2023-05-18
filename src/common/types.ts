@@ -1,5 +1,6 @@
+import { Runtime } from 'webextension-polyfill'
 import ManifestDTO from '../background/dto/manifestDTO'
-
+export type Falsy = false | 0 | '' | null | undefined
 export type DefaultConfig = {
   [Environments.Dev]?: {
     [key: string]: any
@@ -104,6 +105,7 @@ export type LoginRequest = {
   target?: string | any
   secureLogin?: 'required' | 'optional' | 'disabled'
   from?: 'me' | 'any'
+  contractId?: string // ToDo: rethink this parameter, needed for NEAR only
 }
 
 export type SystemOverlayData = {
@@ -184,4 +186,37 @@ export type ManifestAndDetails = ManifestDTO & {
   isHomeLoading: boolean
   error: string
   versions: string[]
+}
+
+export type DappletLoadingResult = {
+  name: string
+  branch: string
+  version: string
+  runtime?: DappletRuntimeResult
+  error?: string
+}
+
+export type DappletRuntimeResult = {
+  isActionHandler: boolean
+  isHomeHandler: boolean
+}
+
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue }
+
+export type MessageWrapperRequest = {
+  request: {
+    handler: string
+    type: string
+    payload: {
+      path: string
+      args: JsonValue[]
+    }
+  }
+  sender: Runtime.MessageSender
 }

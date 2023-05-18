@@ -33,7 +33,7 @@ export class CentralizedModuleStorage implements ModuleStorage {
   }
 
   public async save(blob: Blob) {
-    const buffer = await (blob as any).arrayBuffer()
+    const buffer = await blob.arrayBuffer()
     const hash = ethers.utils.keccak256(new Uint8Array(buffer)).replace('0x', '')
 
     let presignResponse: PresignResponse = null

@@ -1,4 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import { Subject } from 'rxjs'
 import { browser } from 'webextension-polyfill-ts'
 import { GLOBAL_EVENT_BUS_NAME } from '../common/chrome-extension-websocket-wrapper/constants'
 import * as EventBus from '../common/global-event-bus'
@@ -14,6 +15,7 @@ import {
 import { JsonRpc } from '../common/jsonrpc'
 import { DefaultSigners, SystemOverlayTabs } from '../common/types'
 import Core from './core'
+import { BaseEvent } from './events/baseEvent'
 import { Injector } from './injector'
 import { OverlayManagerIframe } from './overlay/iframe/overlayManager'
 import { IOverlay } from './overlay/interfaces'
@@ -45,8 +47,10 @@ async function init() {
   const jsonrpc = new JsonRpc()
   const overlayManager = IS_IFRAME ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc)
 
+  const eventStream = new Subject<BaseEvent>()
+
   const core = new Core(IS_IFRAME, overlayManager) // ToDo: is it global for all modules?
-  injector = new Injector(core, { shareLinkPayload })
+  injector = new Injector(core, eventStream, { shareLinkPayload })
 
   // Open confirmation overlay if checks are not passed
   if (!IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
@@ -68,7 +72,7 @@ async function init() {
     return Array.from(new Set(contextIDs)) // deduplicate array
   }
 
-  browser.runtime.onMessage.addListener((message, sender) => {
+  browser.runtime.onMessage.addListener((message) => {
     if (!message || !message.type) return
 
     if (message.type === 'FEATURE_ACTIVATED') {
@@ -102,6 +106,8 @@ async function init() {
       return injector.openDappletHome(moduleName)
     } else if (!IS_IFRAME && message.type === 'EXEC_CA_UPDATE_HANDLER') {
       return injector.executeConnectedAccountsUpdateHandler()
+    } else if (!IS_IFRAME && message.type === 'MODULE_EVENT_STREAM_MESSAGE') {
+      return Promise.resolve(eventStream.next(message.payload))
     }
   })
 
@@ -122,7 +128,7 @@ async function init() {
     console.log(
       '[DAPPLETS]: The connection to the background service has been lost. Content script is unloading...'
     )
-    jsonrpc.call(GLOBAL_EVENT_BUS_NAME, ['disconnect', []])
+    EventBus.emit('disconnect')
     EventBus.destroy()
     jsonrpc.destroy()
     injector.dispose()
@@ -188,6 +194,10 @@ async function init() {
   })
 
   jsonrpc.on('callBackground', (method: string, args: any[]) => {
+    if (method === 'wipeAllExtensionData' && !IS_E2E_IFRAME) {
+      return Promise.reject('This function is for E2E testing only.')
+    }
+
     return initBGFunctions(browser).then((x) => x[method](...args))
   })
 
@@ -204,6 +214,8 @@ async function init() {
   if (IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
     confirmShareLink(shareLinkPayload)
   }
+
+  console.log('[DAPPLETS]: Content script initialized.')
 }
 
 function injectScript(url: string) {

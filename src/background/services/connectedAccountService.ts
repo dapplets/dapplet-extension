@@ -40,6 +40,8 @@ export default class ConnectedAccountService {
         'getStatus',
         'getMainAccount',
         'getRequestStatus',
+        'areConnected',
+        'getNet',
       ],
       changeMethods: ['requestVerification', 'changeStatus'],
     })
@@ -107,6 +109,16 @@ export default class ConnectedAccountService {
   public async getStatus(accountId: string, originId: string): Promise<boolean> {
     const contract = await this._getContract()
     return contract['getStatus']({ accountId, originId })
+  }
+
+  public async areConnected(accountGId1: string, accountGId2: string): Promise<boolean> {
+    const contract = await this._getContract()
+    return contract['areConnected']({ accountGId1, accountGId2 })
+  }
+
+  public async getNet(accountGId: string): Promise<string[] | null> {
+    const contract = await this._getContract()
+    return contract['getNet']({ accountGId })
   }
 
   public async getMainAccount(accountId: string, originId: string): Promise<string | null> {

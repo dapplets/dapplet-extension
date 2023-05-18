@@ -1,4 +1,4 @@
-@keyframes rotateIsOpen {
+@keyframes rotate-is-open {
   0% {
     transform: rotate(0deg);
   }
@@ -12,7 +12,7 @@
   }
 }
 
-@keyframes rotateIsClose {
+@keyframes rotate-is-close {
   0% {
     transform: rotate(180deg);
   }
@@ -26,7 +26,7 @@
   }
 }
 
-@keyframes listVisible {
+@keyframes list-visible {
   0% {
     opacity: 0;
   }
@@ -40,7 +40,7 @@
   }
 }
 
-@keyframes openError {
+@keyframes open-error {
   0% {
     margin: 0;
     padding: 0;
@@ -148,7 +148,7 @@
   }
 }
 
-@keyframes slideRight {
+@keyframes slide-right {
   0% {
     transform: translateX(150%);
   }
@@ -162,7 +162,7 @@
   }
 }
 
-@keyframes slideLeft {
+@keyframes slide-left {
   0% {
     transform: translateX(0%);
   }
@@ -172,7 +172,7 @@
   }
 }
 
-@keyframes slideRightSearch {
+@keyframes slide-right-search {
   0% {
     position: relative;
     right: -70%;
@@ -190,7 +190,7 @@
   }
 }
 
-@keyframes slideLeftSearch {
+@keyframes slide-left-search {
   0% {
     right: 0;
     width: 100%;
@@ -206,7 +206,7 @@
   }
 }
 
-@keyframes slideRightClose {
+@keyframes slide-right-close {
   0% {
     right: 12%;
   }

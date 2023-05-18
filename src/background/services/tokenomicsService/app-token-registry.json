@@ -1,0 +1,290 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_tokenFactory",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "ownershipAdapter",
+        "type": "address"
+      }
+    ],
+    "name": "addAppType",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "appType",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "appId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "ecosystemCode",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "symbol",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "referenceUrl",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "curveTemplate",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenTemplate",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "addr",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "referenceUrl",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct I_TokenFactory.AdditionalCollateralIn[]",
+        "name": "additionalCollaterals",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "createAppToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "offset",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "limit",
+        "type": "uint256"
+      }
+    ],
+    "name": "getAppsByToken",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "appType",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "appId",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct AppTokenRegistry.App[]",
+        "name": "out",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "appType",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "appId",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "offset",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "limit",
+        "type": "uint256"
+      }
+    ],
+    "name": "getTokensByApp",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "addr",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "bondingCurve",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "decimals",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "referenceUrl",
+            "type": "string"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "addr",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "symbol",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "decimals",
+                "type": "uint256"
+              },
+              {
+                "internalType": "address",
+                "name": "bondingCurve",
+                "type": "address"
+              },
+              {
+                "internalType": "string",
+                "name": "referenceUrl",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct I_TokenFactory.AdditionalBondingCurveOut[]",
+            "name": "additionalBondingCurves",
+            "type": "tuple[]"
+          }
+        ],
+        "internalType": "struct I_TokenFactory.TokenOut[]",
+        "name": "out",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "appType",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "appId",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "linkAppWithToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "ownershipAdapters",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "tokenFactory",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

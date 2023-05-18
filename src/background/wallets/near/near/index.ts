@@ -1,9 +1,9 @@
-import { Provider } from '@ethersproject/providers'
 import { ethers } from 'ethers'
 import * as nearAPI from 'near-api-js'
 import { Near } from 'near-api-js'
 import { JsonRpcProvider } from 'near-api-js/lib/providers'
 import { browser } from 'webextension-polyfill-ts'
+import { NotImplementedError } from '../../../../common/errors'
 import { CacheMethod, generateGuid, waitTab } from '../../../../common/helpers'
 import { NearNetworkConfig } from '../../../../common/types'
 import { NearWallet } from '../interface'
@@ -51,8 +51,8 @@ export default class implements NearWallet {
     return this._nearWallet.requestSignTransactions(transactions, callbackUrl)
   }
 
-  connect(provider: Provider): ethers.Signer {
-    throw new Error('connect() is not implemented')
+  connect(): ethers.Signer {
+    throw new NotImplementedError()
   }
 
   async isAvailable() {
@@ -66,6 +66,61 @@ export default class implements NearWallet {
 
   @CacheMethod()
   async connectWallet(): Promise<void> {
+    await this._connectBrowserWallet(this._nearWallet)
+  }
+
+  async createAccessKey(contractId: string, loginConfirmationId: string): Promise<void> {
+    /*
+        The `near-api-js` library does not support multiple access keys at the same time. 
+        When you try to create a second access key with the specified contract 
+        address, the first key is overwritten. Multiple key support is required 
+        to implement the Core.login() and Core.session() APIs. To avoid overwriting 
+        keys, we isolate the keystores within each login confirmation by prefixing 
+        their localstorages. This allowed us to separate keys from different login 
+        confirmations, which can be generated from different dapplets and for different contracts.
+    */
+
+    const keyPrefix = `login-confirmation:${loginConfirmationId}:`
+
+    const near = new Near({
+      ...this._config,
+      deps: {
+        keyStore: new nearAPI.keyStores.BrowserLocalStorageKeyStore(window.localStorage, keyPrefix),
+      },
+    })
+
+    const nearWallet = new CustomWalletConnection(near, this._config.networkId)
+
+    await this._connectBrowserWallet(nearWallet, contractId)
+  }
+
+  async disconnectWallet() {
+    this._nearWallet.signOut()
+  }
+
+  async getMeta() {
+    return {
+      name: 'NEAR Wallet',
+      description: 'NEAR Wallet',
+      icon: 'https://near.org/wp-content/themes/near-19/assets/downloads/near_icon.svg',
+    }
+  }
+
+  getLastUsage() {
+    return localStorage[this._lastUsageKey]
+  }
+
+  getAccount() {
+    return this._nearWallet.account()
+  }
+
+  async signMessage(): Promise<string> {
+    throw new NotImplementedError()
+  }
+
+  private async _connectBrowserWallet(nearWallet: CustomWalletConnection, contractId?: string) {
+    const expectedAccountId = nearWallet.getAccountId()
+
     const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true })
     const currentTabId = currentTab.id
 
@@ -74,7 +129,8 @@ export default class implements NearWallet {
 
     let callbackTab = null
     const waitTabPromise = waitTab(callbackUrl).then((x) => (callbackTab = x))
-    const requestPromise = this._nearWallet.requestSignIn({
+    const requestPromise = nearWallet.requestSignIn({
+      contractId,
       successUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=true`),
       failureUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=false`),
     })
@@ -99,31 +155,11 @@ export default class implements NearWallet {
     // TODO: Handle situation when access key is not added
     if (!accountId) throw new Error('No account_id params in callback URL')
 
-    this._nearWallet.completeSignIn(accountId, publicKey, allKeys)
-    localStorage[this._lastUsageKey] = new Date().toISOString()
-  }
-
-  async disconnectWallet() {
-    this._nearWallet.signOut()
-  }
-
-  async getMeta() {
-    return {
-      name: 'NEAR Wallet',
-      description: 'NEAR Wallet',
-      icon: 'https://near.org/wp-content/themes/near-19/assets/downloads/near_icon.svg',
+    if (expectedAccountId !== '' && contractId && expectedAccountId !== accountId) {
+      throw new Error(`Account ${expectedAccountId} was expected, but ${accountId} is connected`)
     }
-  }
 
-  getLastUsage() {
-    return localStorage[this._lastUsageKey]
-  }
-
-  getAccount() {
-    return this._nearWallet.account()
-  }
-
-  async signMessage(message: string): Promise<string> {
-    throw new Error('Not implemented')
+    nearWallet.completeSignIn(accountId, publicKey, allKeys)
+    localStorage[this._lastUsageKey] = new Date().toISOString()
   }
 }

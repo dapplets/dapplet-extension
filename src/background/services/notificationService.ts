@@ -23,23 +23,30 @@ export class NotificationService {
     return filteredNotification
   }
 
-  async createAndShowNotification(notify: Notification, tabId?: number, icon?): Promise<void> {
-    const notificationId = await this.createNotification(notify, icon ? icon : null)
+  async createAndShowNotification(
+    notify: NotificationPayload & { type?: NotificationType; source?: string },
+    tabId: number
+  ): Promise<void> {
+    const notificationId = await this.createNotification(notify)
 
     await this.showNotification(notificationId, tabId)
     await this._updateBadge()
   }
 
-  async createNotification(notify: NotificationPayload | any, icon?): Promise<string> {
+  async createNotification(
+    notify: NotificationPayload & { type?: NotificationType; source?: string }
+  ): Promise<string> {
     const notification = new Notification()
     notification.id = generateGuid() // ToDo: autoincrement?
+    notification.source = notify.source ? notify.source : null
     notification.title = notify.title
     notification.message = notify.message
     notification.createdAt = new Date()
     notification.status = NotificationStatus.Highlighted
     notification.type = notify.type ? notify.type : NotificationType.Application
     notification.actions = notify.actions ? notify.actions : null
-    notification.icon = notify.icon ? notify.icon : icon
+    notification.icon = notify.icon
+    notification.payload = notify.payload ? notify.payload : null
     await this.notificationBrowserStorage.create(notification)
     EventBus.emit('notifications_updated')
     return notification.id
@@ -73,7 +80,7 @@ export class NotificationService {
     await Promise.all(
       ids.map(async (id) => {
         const notification = await this.notificationBrowserStorage.getById(id)
-        notification.status = 0
+        notification.status = NotificationStatus.Default
         await this.notificationBrowserStorage.update(notification)
       })
     )
@@ -94,6 +101,31 @@ export class NotificationService {
 
     EventBus.emit('notifications_updated')
     await this._updateBadge()
+  }
+
+  async resolveNotificationAction(
+    notificationId: string,
+    action: string,
+    tabId: number
+  ): Promise<void> {
+    const notification = await this.notificationBrowserStorage.getById(notificationId)
+    notification.status = NotificationStatus.Resolved
+    // ToDo: save resolved actionId?
+
+    await this.notificationBrowserStorage.update(notification)
+    await this._updateBadge()
+
+    EventBus.emit('notifications_updated')
+
+    browser.tabs.sendMessage(tabId, {
+      type: 'MODULE_EVENT_STREAM_MESSAGE',
+      payload: {
+        namespace: notification.source,
+        type: 'notification_action',
+        action,
+        payload: notification.payload,
+      },
+    })
   }
 
   // ToDo: optimize event counting without getting the whole array

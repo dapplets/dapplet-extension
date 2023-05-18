@@ -9,6 +9,7 @@ export interface MessageProps {
   linkText?: string
   children?: ReactNode
   className?: string
+  otherSubtitle?: boolean
 }
 
 export const Message = ({
@@ -18,12 +19,27 @@ export const Message = ({
   linkText,
   children,
   className,
+  otherSubtitle,
 }: MessageProps): ReactElement => {
   return (
     <div className={cn(styles.wrapper, className)}>
-      <h6 className={styles.title}>{title}</h6>
+      <h6
+        className={cn(styles.title, {
+          [styles.otherTitle]: otherSubtitle,
+        })}
+      >
+        {title}
+      </h6>
       {subtitle && typeof subtitle === 'string'
-        ? subtitle?.length > 0 && <p className={styles.subtitle}>{subtitle}</p>
+        ? subtitle?.length > 0 && (
+            <p
+              className={cn(styles.subtitle, {
+                [styles.otherSubtitle]: otherSubtitle,
+              })}
+            >
+              {subtitle}
+            </p>
+          )
         : subtitle}
       {children && <div className={styles.children}>{children}</div>}
       {link?.length > 0 && (
