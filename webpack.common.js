@@ -46,7 +46,7 @@ function handleInsertStyles(element) {
 
 module.exports = {
   entry: {
-    background: path.join(__dirname, 'src/background/index.ts'),
+    'service-worker': path.join(__dirname, 'src/background/index.ts'),
     contentscript: path.join(__dirname, 'src/contentscript/index.ts'),
     inpage: path.join(__dirname, 'src/inpage/index.ts'),
   },
@@ -133,10 +133,10 @@ module.exports = {
           to: 'manifest.json',
           transform: (content) => modifyManifest(content),
         },
-        {
-          from: 'src/background/index.html',
-          to: 'background.html',
-        },
+        // {
+        //   from: 'src/background/index.html',
+        //   to: 'background.html',
+        // },
       ],
     }),
     new webpack.DefinePlugin({

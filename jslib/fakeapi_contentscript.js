@@ -317,4 +317,4 @@ async function sendMessage(message, callback) {
 Object.defineProperty(window, 'browser', { value: browser })
 Object.defineProperty(window, 'DAPPLETS_JSLIB', { value: true })
 
-eval(common_script)
+// eval(common_script)
