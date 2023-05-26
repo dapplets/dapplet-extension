@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
+import browser from 'webextension-polyfill'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
 import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
@@ -112,7 +113,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }, [targetChain])
 
   const _updateData = async () => {
-    const { getRegistries, getTrustedUsers, getCounterStake } = await initBGFunctions(chrome)
+    const { getRegistries, getTrustedUsers, getCounterStake } = await initBGFunctions(browser)
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
@@ -171,7 +172,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
   const getModulesAdmins = async () => {
     if (!targetRegistry || !mi.name) return
-    const { getAdmins } = await initBGFunctions(chrome)
+    const { getAdmins } = await initBGFunctions(browser)
     const authors: string[] = await getAdmins(targetRegistry, mi.name)
 
     if (authors.length > 0) {
@@ -181,7 +182,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
   const _updateOwnership = async () => {
     if (!targetRegistry || !mi.name) return
-    const { getOwnership } = await initBGFunctions(chrome)
+    const { getOwnership } = await initBGFunctions(browser)
     const owner = await getOwnership(targetRegistry, mi.name)
 
     setOwner(owner)
@@ -191,7 +192,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const _updateDeploymentStatus = async () => {
     setDeploymentStatus(DeploymentStatus.Unknown)
 
-    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(chrome)
+    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
     const miF = await getModuleInfoByName(targetRegistry, mi.name)
     const deployed = vi
       ? await getVersionInfo(targetRegistry, mi.name, vi.branch, vi.version)
@@ -207,7 +208,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
   const _updateCurrentAccount = async () => {
     if (targetChain) {
-      const { getAddress } = await initBGFunctions(chrome)
+      const { getAddress } = await initBGFunctions(browser)
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
 
       setCurrentAccount(currentAccount)
@@ -217,7 +218,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }
 
   const _checkDependencies = async () => {
-    const { getVersionInfo } = await initBGFunctions(chrome)
+    const { getVersionInfo } = await initBGFunctions(browser)
 
     await Promise.all(
       dependenciesChecking.map((x) =>
@@ -229,7 +230,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }
 
   const deployButtonClickHandler = async (e) => {
-    const { deployModule, addTrustedUser } = await initBGFunctions(chrome)
+    const { deployModule, addTrustedUser } = await initBGFunctions(browser)
     let newDescriptors
     let isOwner
     const unificationAdmins = admins.map((e) => e.toLowerCase())
@@ -298,7 +299,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
 
   const connectWallet = async () => {
     setNotAccountModal(false)
-    const { pairWalletViaOverlay } = await initBGFunctions(chrome)
+    const { pairWalletViaOverlay } = await initBGFunctions(browser)
     try {
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       await _updateData()
@@ -308,7 +309,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }
 
   const deployNewModule = async () => {
-    const { deployModule } = await initBGFunctions(chrome)
+    const { deployModule } = await initBGFunctions(browser)
     try {
       setLoadingDeploy()
       nodeButton.current.classList.add('dappletsIsLoadingDeploy')
@@ -343,7 +344,7 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }
 
   const updateDataLocalhost = async () => {
-    const { getRegistries, getOwnership } = await initBGFunctions(chrome)
+    const { getRegistries, getOwnership } = await initBGFunctions(browser)
     const registries = await getRegistries()
 
     const newRegistries = registries

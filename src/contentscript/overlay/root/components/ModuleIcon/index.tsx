@@ -1,5 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { useEffect, useState } from 'react'
+import browser from 'webextension-polyfill'
 import { StorageRef } from '../../../../../common/types'
 import { StorageRefImage } from '../../components/StorageRefImage'
 
@@ -19,7 +20,7 @@ export const ModuleIcon: React.FC<ModuleIconProps> = (props) => {
     let isSubscribed = true
 
     const fetchData = async () => {
-      const { getModuleInfoByName } = await initBGFunctions(chrome)
+      const { getModuleInfoByName } = await initBGFunctions(browser)
       const mi = await getModuleInfoByName(registryUrl, moduleName)
 
       if (isSubscribed) {

@@ -1,9 +1,11 @@
 import anime from 'animejs'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { RefObject } from 'react'
+import browser from 'webextension-polyfill'
 import { ReactComponent as CopyShare } from '../../assets/icons/copyShare.svg'
 import { ReactComponent as Share } from '../../assets/newIcon/share.svg'
 import { SquaredButton } from '../SquaredButton'
+
 interface Props {
   style?: React.CSSProperties
 }
@@ -52,7 +54,7 @@ export class ShareButton extends React.Component<Props, State> {
     this.setState({ isShareUploading: true })
 
     try {
-      const { createShareLink } = await initBGFunctions(chrome)
+      const { createShareLink } = await initBGFunctions(browser)
       const url = await createShareLink(null)
       await navigator.clipboard.writeText(url)
       this.setState({ isShareUploading: false, isShareCopied: true })

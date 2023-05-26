@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { useEffect, useState } from 'react'
+import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
 import { resources } from '../../../../../common/resources'
 import {
@@ -79,7 +80,7 @@ export const ConnectedAccount = () => {
       getPreferredConnectedAccountsNetwork,
       getWalletDescriptors,
       getConnectedAccountStatus,
-    } = await initBGFunctions(chrome)
+    } = await initBGFunctions(browser)
     const preferredConnectedAccountsNetwork: NearNetworks =
       await getPreferredConnectedAccountsNetwork()
     setContractNetwork(preferredConnectedAccountsNetwork)
@@ -136,7 +137,7 @@ export const ConnectedAccount = () => {
 
   const findWalletsToConnect = async () => {
     const { getWalletDescriptors, getConnectedAccountStatus, getConnectedAccounts } =
-      await initBGFunctions(chrome)
+      await initBGFunctions(browser)
     const descriptors: WalletDescriptor[] = await getWalletDescriptors()
     const connectedWalletsDescriptors = descriptors.filter((d) => d.connected === true)
     if (connectedWalletsDescriptors.length < 2) {
@@ -221,7 +222,7 @@ export const ConnectedAccount = () => {
   }, [pairsToDisplay, contractNetwork])
 
   const handleOpenPopup = async (account: IConnectedAccountUser) => {
-    const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(chrome)
+    const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     try {
       await openConnectedAccountsPopup({ accountToChangeStatus: account }, thisTab.id)
@@ -233,7 +234,7 @@ export const ConnectedAccount = () => {
     const disconnectedWallets = walletsForDisconnect.find((w) =>
       areSameAccounts([pair.firstAccount, pair.secondAccount], w)
     )
-    const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(chrome)
+    const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     try {
       await openConnectedAccountsPopup(
@@ -261,7 +262,7 @@ export const ConnectedAccount = () => {
         id: number
       ) => Promise<void>
       getThisTab: () => Promise<{ id: number }>
-    } = await initBGFunctions(chrome)
+    } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     try {
       await openConnectedAccountsPopup(

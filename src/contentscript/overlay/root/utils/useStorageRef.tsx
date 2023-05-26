@@ -1,5 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { useQuery } from 'react-query'
+import browser from 'webextension-polyfill'
 import { StorageRef } from '../../../../common/types'
 
 export const useStorageRef = (storageRef: StorageRef | string) => {
@@ -20,7 +21,7 @@ async function _getBase64ByStorageRef(storageRef: StorageRef | string): Promise<
     if (!hash && uris.length > 0 && uris[0].indexOf('data:') === 0) {
       return uris[0]
     } else {
-      const { getResource } = await initBGFunctions(chrome)
+      const { getResource } = await initBGFunctions(browser)
 
       if (
         storageRef.hash !== '0x0000000000000000000000000000000000000000000000000000000000000000' ||

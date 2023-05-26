@@ -1,4 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import browser from 'webextension-polyfill'
 import * as ethereum from '../ethereum'
 import * as near from '../near'
 
@@ -33,12 +34,12 @@ export class LoginSession {
 
   async isValid(): Promise<boolean> {
     if (this._isExpired) return false
-    const { isValidSession } = await initBGFunctions(chrome)
+    const { isValidSession } = await initBGFunctions(browser)
     return await isValidSession(this.sessionId)
   }
 
   async logout() {
-    const { killSession } = await initBGFunctions(chrome)
+    const { killSession } = await initBGFunctions(browser)
     await killSession(this.sessionId)
     const ls = {} // ToDo: specify session
     this.logoutHandler?.call({}, ls)
@@ -75,22 +76,22 @@ export class LoginSession {
   }
 
   async getItem(key: string): Promise<any> {
-    const { getSessionItem } = await initBGFunctions(chrome)
+    const { getSessionItem } = await initBGFunctions(browser)
     return getSessionItem(this.sessionId, key)
   }
 
   async setItem(key: string, value: any): Promise<void> {
-    const { setSessionItem } = await initBGFunctions(chrome)
+    const { setSessionItem } = await initBGFunctions(browser)
     return setSessionItem(this.sessionId, key, value)
   }
 
   async removeItem(key: string): Promise<void> {
-    const { removeSessionItem } = await initBGFunctions(chrome)
+    const { removeSessionItem } = await initBGFunctions(browser)
     return removeSessionItem(this.sessionId, key)
   }
 
   async clear(): Promise<void> {
-    const { clearSessionItems } = await initBGFunctions(chrome)
+    const { clearSessionItems } = await initBGFunctions(browser)
     return clearSessionItems(this.sessionId)
   }
 

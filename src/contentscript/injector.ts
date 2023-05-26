@@ -95,7 +95,7 @@ export class Injector {
 
     // ToDo: add modules to registry before loading
 
-    const { getModulesWithDeps } = await initBGFunctions(chrome)
+    const { getModulesWithDeps } = await initBGFunctions(browser)
     const loadedModules: {
       manifest: VersionInfo
       script: string
@@ -321,7 +321,7 @@ export class Injector {
     }[]
   ) {
     const { getModulesWithDeps, getSwarmGateway, getPreferedOverlayStorage } =
-      await initBGFunctions(chrome)
+      await initBGFunctions(browser)
     const { core } = this
 
     const swarmGatewayUrl = await getSwarmGateway()
@@ -408,7 +408,7 @@ export class Injector {
           } else {
             module = this.registry.find((m) => m.manifest.name === manifest.name)
           }
-          const { getModuleInfoByName } = await initBGFunctions(chrome)
+          const { getModuleInfoByName } = await initBGFunctions(browser)
           const registry = manifest.registryUrl
           const moduleInfo: ModuleInfo = await getModuleInfoByName(
             registry,
@@ -435,7 +435,7 @@ export class Injector {
         getPreferredConnectedAccountsNetwork: core.getPreferredConnectedAccountsNetwork,
         notify: async (payload) => {
           // ToDo: do not fetch manifest twice
-          const { getModuleInfoByName } = await initBGFunctions(chrome)
+          const { getModuleInfoByName } = await initBGFunctions(browser)
           const registry = manifest.registryUrl
           const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, manifest.name)
           await core.notify(payload, moduleInfo.icon?.uris?.[0], manifest.name)
@@ -587,7 +587,7 @@ export class Injector {
       }
 
       if (newBranch) {
-        const { createNotification } = await initBGFunctions(chrome)
+        const { createNotification } = await initBGFunctions(browser)
         await createNotification({
           title: 'Branch resolving',
           message: `Resolver of "${manifest.name}" defined the "${newBranch}" branch`,

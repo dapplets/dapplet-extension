@@ -184,13 +184,13 @@ async function init() {
   })
 
   jsonrpc.on('pairWalletViaOverlay', () => {
-    return initBGFunctions(chrome).then((x) =>
+    return initBGFunctions(browser).then((x) =>
       x.pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
     )
   })
 
   jsonrpc.on('getWalletDescriptors', () => {
-    return initBGFunctions(chrome).then((x) => x.getWalletDescriptors())
+    return initBGFunctions(browser).then((x) => x.getWalletDescriptors())
   })
 
   jsonrpc.on('callBackground', (method: string, args: any[]) => {
@@ -198,7 +198,7 @@ async function init() {
       return Promise.reject('This function is for E2E testing only.')
     }
 
-    return initBGFunctions(chrome).then((x) => x[method](...args))
+    return initBGFunctions(browser).then((x) => x[method](...args))
   })
 
   jsonrpc.on('openOverlay', () => Promise.resolve(core.openOverlay()))
@@ -245,7 +245,7 @@ async function confirmShareLink(payload: ShareLinkPayload) {
     activateFeature,
     reloadFeature,
     reloadCurrentPage,
-  } = await initBGFunctions(chrome)
+  } = await initBGFunctions(browser)
 
   const registries = await getRegistries()
   const targetRegistry = registries.find((x) => x.url === registry)
@@ -307,7 +307,7 @@ async function processShareLink() {
 
   const { moduleId, registry, contextIds } = payload
   const { getModuleInfoByName, containsTrustedUser, getRegistries, getActiveModulesByHostnames } =
-    await initBGFunctions(chrome)
+    await initBGFunctions(browser)
 
   const registries = await getRegistries()
   const targetRegistry = registries.find((x) => x.url === registry)

@@ -2,6 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import makeBlockie from 'ethereum-blockies-base64'
 import React, { FC, useEffect, useState } from 'react'
 import ReactTimeAgo from 'react-time-ago'
+import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
 import * as walletIcons from '../../../../../common/resources/wallets'
 import {
@@ -36,7 +37,7 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
     }
   }, [])
   const refresh = async () => {
-    const { getWalletDescriptors } = await initBGFunctions(chrome)
+    const { getWalletDescriptors } = await initBGFunctions(browser)
 
     const descriptors = await getWalletDescriptors()
 
@@ -45,12 +46,12 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
   }
 
   const disconnectButtonClick = async (chain: ChainTypes, wallet: WalletTypes) => {
-    const { disconnectWallet } = await initBGFunctions(chrome)
+    const { disconnectWallet } = await initBGFunctions(browser)
     await disconnectWallet(chain, wallet)
   }
 
   const connectWallet = async () => {
-    const { pairWalletViaOverlay } = await initBGFunctions(chrome)
+    const { pairWalletViaOverlay } = await initBGFunctions(browser)
     if (isOverlay) {
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
 

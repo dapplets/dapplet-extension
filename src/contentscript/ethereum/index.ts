@@ -1,5 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { ethers } from 'ethers'
+import browser from 'webextension-polyfill'
 import { ChainTypes } from '../../common/types'
 import { Connection, EventDef } from '../connection'
 import { ProxySigner } from '../proxySigner'
@@ -12,7 +13,7 @@ async function _sendWalletConnectTx(
   rpcParams,
   callback: (e: { type: string; data?: any }) => void
 ): Promise<any> {
-  const { eth_sendCustomRequest, eth_waitTransaction } = await initBGFunctions(chrome)
+  const { eth_sendCustomRequest, eth_waitTransaction } = await initBGFunctions(browser)
 
   callback({ type: 'pending' })
 

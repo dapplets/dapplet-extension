@@ -1,5 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { KeyPair, keyStores } from 'near-api-js'
+import browser from 'webextension-polyfill'
 
 const LOCAL_STORAGE_KEY_PREFIX = 'near-api-js:keystore:'
 
@@ -12,7 +13,7 @@ export class BackgroundKeyStore extends keyStores.KeyStore {
   }
 
   async setKey(networkId: string, accountId: string, keyPair: KeyPair): Promise<void> {
-    const { localStorage_setItem } = await initBGFunctions(chrome)
+    const { localStorage_setItem } = await initBGFunctions(browser)
     await localStorage_setItem(
       this.storageKeyForSecretKey(networkId, accountId),
       keyPair.toString()
@@ -20,7 +21,7 @@ export class BackgroundKeyStore extends keyStores.KeyStore {
   }
 
   async getKey(networkId: string, accountId: string): Promise<KeyPair> {
-    const { localStorage_getItem } = await initBGFunctions(chrome)
+    const { localStorage_getItem } = await initBGFunctions(browser)
     const value = await localStorage_getItem(this.storageKeyForSecretKey(networkId, accountId))
     if (!value) {
       return null
@@ -29,12 +30,12 @@ export class BackgroundKeyStore extends keyStores.KeyStore {
   }
 
   async removeKey(networkId: string, accountId: string): Promise<void> {
-    const { localStorage_removeItem } = await initBGFunctions(chrome)
+    const { localStorage_removeItem } = await initBGFunctions(browser)
     await localStorage_removeItem(this.storageKeyForSecretKey(networkId, accountId))
   }
 
   async clear(): Promise<void> {
-    const { localStorage_removeItem } = await initBGFunctions(chrome)
+    const { localStorage_removeItem } = await initBGFunctions(browser)
     const keys = await this.storageKeys()
     for (const key of keys) {
       if (key.startsWith(this.prefix)) {
@@ -74,7 +75,7 @@ export class BackgroundKeyStore extends keyStores.KeyStore {
   }
 
   private async storageKeys(): Promise<string[]> {
-    const { localStorage_length, localStorage_key } = await initBGFunctions(chrome)
+    const { localStorage_length, localStorage_key } = await initBGFunctions(browser)
     const length = await localStorage_length()
     const keys = []
     for (let i = 0; i < length; i++) {

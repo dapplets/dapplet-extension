@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
+import browser from 'webextension-polyfill'
 import { isValidUrl, typeOfUri, UriTypes } from '../../../../../common/helpers'
 import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
 import { ReactComponent as Delete } from '../../assets/icons/mini-close.svg'
@@ -38,20 +39,20 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
   }, [])
 
   const removeTrustedUser = async (account: string) => {
-    const { removeTrustedUser } = await initBGFunctions(chrome)
+    const { removeTrustedUser } = await initBGFunctions(browser)
     await removeTrustedUser(account)
 
     loadTrustedUsers()
   }
   const loadTrustedUsers = async () => {
-    const { getTrustedUsers } = await initBGFunctions(chrome)
+    const { getTrustedUsers } = await initBGFunctions(browser)
     const trustedUsers = await getTrustedUsers()
 
     setTrustedUsers(trustedUsers)
   }
   const _openEtherscan = async (address: string) => {
     if (typeOfUri(address) === UriTypes.Ens) {
-      const { resolveName } = await initBGFunctions(chrome)
+      const { resolveName } = await initBGFunctions(browser)
       const ethAddress = await resolveName(address)
       window.open(`https://goerli.etherscan.io/address/${ethAddress}`, '_blank')
     } else if (typeOfUri(address) === UriTypes.Ethereum) {
@@ -61,7 +62,7 @@ export const DropdownTrustedUsers: FC<DropdownTrustedProps> = (props: DropdownTr
     }
   }
   const loadRegistries = async () => {
-    const { getRegistries } = await initBGFunctions(chrome)
+    const { getRegistries } = await initBGFunctions(browser)
     const registries = await getRegistries()
 
     setRegistries(registries.filter((r) => r.isDev === false))

@@ -1,5 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as React from 'react'
+import browser from 'webextension-polyfill'
 import { Bus } from '../../../../../../../common/bus'
 import { ChainTypes, DefaultSigners, LoginRequest } from '../../../../../../../common/types'
 import { ConnectedWallets } from './ConnectedWallets'
@@ -40,7 +41,7 @@ export class LoginSession extends React.Component<Props, State> {
     const chains = loginRequest.authMethods
     const secureLogin = loginRequest.secureLogin
 
-    const { getWalletDescriptors, getSuitableLoginConfirmations } = await initBGFunctions(chrome)
+    const { getWalletDescriptors, getSuitableLoginConfirmations } = await initBGFunctions(browser)
 
     const descriptors = await getWalletDescriptors()
 

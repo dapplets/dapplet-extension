@@ -23,7 +23,7 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     actions: nearAPI.transactions.Action[]
   ): Promise<nearAPI.providers.FinalExecutionOutcome> {
     //if (!this.accountId) {
-    const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(chrome)
+    const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser)
     // ToDo: remove it?
     // await prepareWalletFor(this._app, 'near/' + this._network, null);
 
@@ -81,7 +81,7 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     const requestId = generateGuid()
     const callbackUrl = browser.runtime.getURL(`callback.html?request_id=${requestId}`)
 
-    const { waitTab, removeTab, updateTab, queryTab } = await initBGFunctions(chrome)
+    const { waitTab, removeTab, updateTab, queryTab } = await initBGFunctions(browser)
     const [currentTab] = await queryTab({ active: true, currentWindow: true })
 
     let callbackTab = null

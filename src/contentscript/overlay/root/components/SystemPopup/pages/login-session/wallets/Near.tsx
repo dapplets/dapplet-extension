@@ -1,5 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as React from 'react'
+import browser from 'webextension-polyfill'
 import { Bus } from '../../../../../../../../common/bus'
 import {
   ChainTypes,
@@ -46,7 +47,7 @@ export default class Near extends React.Component<Props, State> {
 
     try {
       const { connectWallet, getWalletDescriptors, createLoginConfirmation } =
-        await initBGFunctions(chrome)
+        await initBGFunctions(browser)
       await connectWallet(this.props.chain, WalletTypes.NEAR, null)
       const descriptors = await getWalletDescriptors()
       const descriptor = descriptors.find(
@@ -89,7 +90,7 @@ export default class Near extends React.Component<Props, State> {
   }
 
   // async disconnect() {
-  //     const { disconnectWallet } = await initBGFunctions(chrome);
+  //     const { disconnectWallet } = await initBGFunctions(browser);
   //     await disconnectWallet(this.props.chain, WalletTypes.NEAR);
   //     this.setState({ toBack: true });
   // }

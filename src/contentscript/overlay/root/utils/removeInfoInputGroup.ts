@@ -1,4 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import browser from 'webextension-polyfill'
 
 export const _removeInfoItemInputGroup = async (
   value: string,
@@ -16,10 +17,10 @@ export const _removeInfoItemInputGroup = async (
   setAddDisabled(true)
   try {
     if (parameters === 'contextId') {
-      const { removeContextId } = await initBGFunctions(chrome)
+      const { removeContextId } = await initBGFunctions(browser)
       await removeContextId(targetRegistry, mi.name, value)
     } else {
-      const { removeAdmin } = await initBGFunctions(chrome)
+      const { removeAdmin } = await initBGFunctions(browser)
       await removeAdmin(targetRegistry, mi.name, value)
     }
 

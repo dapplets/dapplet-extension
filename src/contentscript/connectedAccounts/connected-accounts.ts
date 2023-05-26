@@ -1,5 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import makeBlockie from 'ethereum-blockies-base64'
+import browser from 'webextension-polyfill'
 import { resources } from '../../common/resources'
 import { TConnectedAccountsVerificationRequestInfo } from '../../common/types'
 import { socialNetworkConnectionCondition } from './connected-accounts-assembly'
@@ -25,51 +26,51 @@ class ConnectedAccounts {
     originId: string,
     closeness?: number
   ): Promise<Account[][] | null> {
-    const { getConnectedAccounts } = await initBGFunctions(chrome)
+    const { getConnectedAccounts } = await initBGFunctions(browser)
     return getConnectedAccounts(accountId, originId, closeness)
   }
 
   public async getMinStakeAmount(): Promise<number> {
-    const { getConnectedAccountsMinStakeAmount } = await initBGFunctions(chrome)
+    const { getConnectedAccountsMinStakeAmount } = await initBGFunctions(browser)
     return getConnectedAccountsMinStakeAmount()
   }
 
   public async getPendingRequests(): Promise<number[]> {
-    const { getConnectedAccountsPendingRequests } = await initBGFunctions(chrome)
+    const { getConnectedAccountsPendingRequests } = await initBGFunctions(browser)
     return getConnectedAccountsPendingRequests()
   }
 
   public async getVerificationRequest(
     id: number
   ): Promise<TConnectedAccountsVerificationRequestInfo | null> {
-    const { getConnectedAccountsVerificationRequest } = await initBGFunctions(chrome)
+    const { getConnectedAccountsVerificationRequest } = await initBGFunctions(browser)
     return getConnectedAccountsVerificationRequest(id)
   }
 
   public async getStatus(accountId: string, originId: string): Promise<boolean> {
-    const { getConnectedAccountStatus } = await initBGFunctions(chrome)
+    const { getConnectedAccountStatus } = await initBGFunctions(browser)
     return getConnectedAccountStatus(accountId, originId)
   }
 
   public async getMainAccount(accountId: string, originId: string): Promise<string | null> {
-    const { getConnectedAccountsMainAccount } = await initBGFunctions(chrome)
+    const { getConnectedAccountsMainAccount } = await initBGFunctions(browser)
     return getConnectedAccountsMainAccount(accountId, originId)
   }
 
   public async getRequestStatus(
     id: number
   ): Promise<'not found' | 'pending' | 'approved' | 'rejected'> {
-    const { getConnectedAccountsRequestStatus } = await initBGFunctions(chrome)
+    const { getConnectedAccountsRequestStatus } = await initBGFunctions(browser)
     return getConnectedAccountsRequestStatus(id)
   }
 
   public async areConnected(accountGId1: string, accountGId2: string): Promise<boolean> {
-    const { areConnectedAccounts } = await initBGFunctions(chrome)
+    const { areConnectedAccounts } = await initBGFunctions(browser)
     return areConnectedAccounts(accountGId1, accountGId2)
   }
 
   public async getNet(accountGId: string): Promise<string[] | null> {
-    const { getConnectedAccountsNet } = await initBGFunctions(chrome)
+    const { getConnectedAccountsNet } = await initBGFunctions(browser)
     return getConnectedAccountsNet(accountGId)
   }
 
@@ -114,7 +115,7 @@ class ConnectedAccounts {
     const firstAccountStatus = await this.getStatus(firstAccountId, firstOriginId)
     const secondAccountStatus = await this.getStatus(secondAccountId, secondOriginId)
 
-    const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(chrome)
+    const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     const result = await openConnectedAccountsPopup(
       {
@@ -150,7 +151,7 @@ class ConnectedAccounts {
     accountImage: string
     isMain: boolean
   }): Promise<void> {
-    const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(chrome)
+    const { openConnectedAccountsPopup, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     const { requestId } = await openConnectedAccountsPopup(
       {

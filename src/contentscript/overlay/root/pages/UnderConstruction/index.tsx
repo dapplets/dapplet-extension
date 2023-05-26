@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
+import browser from 'webextension-polyfill'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import { ModuleTypes, StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
@@ -94,7 +95,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
 
   const _updateData = async () => {
     setLoading(true)
-    const { getRegistries, getTrustedUsers } = await initBGFunctions(chrome)
+    const { getRegistries, getTrustedUsers } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
@@ -114,7 +115,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
   }
 
   const _updateCurrentAccount = async () => {
-    const { getOwnership, getAddress } = await initBGFunctions(chrome)
+    const { getOwnership, getAddress } = await initBGFunctions(browser)
     if (targetChain) {
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
       setCurrentAccount(currentAccount)
@@ -123,7 +124,7 @@ export const UnderConstruction: FC<UnderConstruction> = (props: UnderConstructio
   }
 
   const deployButtonClickHandler = async () => {
-    const { deployModule, addTrustedUser } = await initBGFunctions(chrome)
+    const { deployModule, addTrustedUser } = await initBGFunctions(browser)
 
     mi.registryUrl = targetRegistry
     mi.author = currentAccount

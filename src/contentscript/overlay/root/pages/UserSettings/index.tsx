@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useState } from 'react'
+import browser from 'webextension-polyfill'
 import { ManifestAndDetails } from '../../../../../common/types'
 import { ReactComponent as Home } from '../../assets/svg/home.svg'
 import { DappletImage } from '../../components/DappletImage'
@@ -8,6 +9,7 @@ import { DappletTitle } from '../../components/DappletTitle'
 import { SquaredButton } from '../../components/SquaredButton'
 import { SettingsPage } from './SettingsPage'
 import styles from './UserSettings.module.scss'
+
 export interface UserSettingsProps {
   dappletName: string
   registryUrl: string
@@ -29,7 +31,7 @@ export const UserSettings = ({
     const init = async () => {
       setLoad(true)
       setSettingsContext(null)
-      const { getUserSettingsForOverlay } = await initBGFunctions(chrome)
+      const { getUserSettingsForOverlay } = await initBGFunctions(browser)
 
       const { mi, vi, schemaConfig, defaultConfig } = await getUserSettingsForOverlay(
         registryUrl,

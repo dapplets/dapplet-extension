@@ -2,6 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
 import * as React from 'react'
+import browser from 'webextension-polyfill'
 import LoginConfirmation from '../../../../../../../background/models/loginConfirmation'
 import { Bus } from '../../../../../../../common/bus'
 import * as walletIcons from '../../../../../../../common/resources/wallets'
@@ -42,7 +43,7 @@ export class LoginConfirmations extends React.Component<Props, State> {
   }
 
   async loadData() {
-    const { getWalletDescriptors, getSuitableLoginConfirmations } = await initBGFunctions(chrome)
+    const { getWalletDescriptors, getSuitableLoginConfirmations } = await initBGFunctions(browser)
     const descriptors = await getWalletDescriptors()
     const confirmations = await getSuitableLoginConfirmations(
       this.props.data.app,

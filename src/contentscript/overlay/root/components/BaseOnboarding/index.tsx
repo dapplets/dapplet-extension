@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
+import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
 import { ReactComponent as EndImg } from './assets/end.svg'
 import { ReactComponent as NormalSwitch } from './assets/Normal_switch.svg'
@@ -34,13 +35,13 @@ export const Onboarding: FC = () => {
   }, [])
 
   const _updateData = async () => {
-    const { getIsFirstInstallation } = await initBGFunctions(chrome)
+    const { getIsFirstInstallation } = await initBGFunctions(browser)
     const IsFirstInstallation = await getIsFirstInstallation()
     setFirstInstallation(IsFirstInstallation)
   }
 
   const handleSkipButtonClick = async () => {
-    const { setIsFirstInstallation } = await initBGFunctions(chrome)
+    const { setIsFirstInstallation } = await initBGFunctions(browser)
     setFirstInstallation(false)
     setStep(OnboardingSteps.PROMO)
     await setIsFirstInstallation(false)

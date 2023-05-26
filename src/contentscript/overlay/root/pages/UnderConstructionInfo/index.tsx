@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
+import browser from 'webextension-polyfill'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
@@ -93,7 +94,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   }, [])
 
   const _updateData = async () => {
-    const { getRegistries, getContextIds, getCounterStake } = await initBGFunctions(chrome)
+    const { getRegistries, getContextIds, getCounterStake } = await initBGFunctions(browser)
 
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
@@ -127,7 +128,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   const saveChanges = async () => {
     setModalTransaction(true)
     try {
-      const { editModuleInfo } = await initBGFunctions(chrome)
+      const { editModuleInfo } = await initBGFunctions(browser)
       await editModuleInfo(targetRegistry, targetStorages, mi)
 
       setModalTransaction(false)
@@ -162,7 +163,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     setAddDisabled(true)
 
     try {
-      const { addContextId, getContextIds } = await initBGFunctions(chrome)
+      const { addContextId, getContextIds } = await initBGFunctions(browser)
       if (!targetRegistry || !mi.name || !contextId) return
 
       await addContextId(targetRegistry, mi.name, contextId)
@@ -201,7 +202,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     setAddDisabled(true)
 
     try {
-      const { removeContextId, getContextIds } = await initBGFunctions(chrome)
+      const { removeContextId, getContextIds } = await initBGFunctions(browser)
       if (!targetRegistry || !mi.name || !contextId) return
 
       await removeContextId(targetRegistry, mi.name, contextId)

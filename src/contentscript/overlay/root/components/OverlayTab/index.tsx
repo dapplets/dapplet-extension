@@ -2,6 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import browser from 'webextension-polyfill'
 import { DAPPLETS_STORE_URL } from '../../../../../common/constants'
 import * as EventBus from '../../../../../common/global-event-bus'
 import {
@@ -10,7 +11,6 @@ import {
   NotificationType,
 } from '../../../../../common/models/notification'
 import { DefaultSigners, StorageRef } from '../../../../../common/types'
-
 import { ReactComponent as Account } from '../../assets/icons/iconsWidgetButton/account.svg'
 import { ReactComponent as Help } from '../../assets/icons/iconsWidgetButton/help.svg'
 import { ReactComponent as Login } from '../../assets/icons/iconsWidgetButton/login.svg'
@@ -87,7 +87,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   }, [])
 
   const connectWallet = async () => {
-    const { pairWalletViaOverlay } = await initBGFunctions(chrome)
+    const { pairWalletViaOverlay } = await initBGFunctions(browser)
     try {
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       p.setOpenWallet()
@@ -137,7 +137,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     if (isModuleActive) {
       if ((p.pathname.includes('system') && p.overlays.lenght === 0) || !isOverlayActive) {
         try {
-          const { openDappletAction, getCurrentTab } = await initBGFunctions(chrome)
+          const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
           const tab = await getCurrentTab()
           if (!tab) return
           await openDappletAction(f, tab.id)
@@ -179,7 +179,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   }
 
   const getNotifications = async () => {
-    const { getNotifications } = await initBGFunctions(chrome)
+    const { getNotifications } = await initBGFunctions(browser)
     const notifications = await getNotifications(NotificationType.Application)
     return notifications
   }

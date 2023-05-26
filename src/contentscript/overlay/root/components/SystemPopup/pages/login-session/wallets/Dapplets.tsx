@@ -1,5 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as React from 'react'
+import browser from 'webextension-polyfill'
 import { Bus } from '../../../../../../../../common/bus'
 import {
   ChainTypes,
@@ -44,7 +45,7 @@ export default class Dapplets extends React.Component<Props, State> {
 
     try {
       const { connectWallet, getWalletDescriptors, createLoginConfirmation } =
-        await initBGFunctions(chrome)
+        await initBGFunctions(browser)
 
       // connect wallet
       await connectWallet(this.props.chain, WalletTypes.DAPPLETS, null)
@@ -86,7 +87,7 @@ export default class Dapplets extends React.Component<Props, State> {
   }
 
   // async disconnect() {
-  //     const { disconnectWallet } = await initBGFunctions(chrome);
+  //     const { disconnectWallet } = await initBGFunctions(browser);
   //     await disconnectWallet(this.props.chain, WalletTypes.DAPPLETS);
   //     this.setState({ toBack: true });
   // }

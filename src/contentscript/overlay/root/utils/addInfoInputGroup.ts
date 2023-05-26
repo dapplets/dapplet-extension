@@ -1,4 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import browser from 'webextension-polyfill'
 import { regExpIndexEthereum } from '../common/constants'
 import { getValidationAddress } from '../common/helpers'
 
@@ -30,10 +31,10 @@ export const _addInfoItemInputGroup = async (
   } else {
     try {
       if (parameters === 'contextId') {
-        const { addContextId } = await initBGFunctions(chrome)
+        const { addContextId } = await initBGFunctions(browser)
         await addContextId(targetRegistry, mi.name, value)
       } else {
-        const { addAdmin } = await initBGFunctions(chrome)
+        const { addAdmin } = await initBGFunctions(browser)
         await addAdmin(targetRegistry, mi.name, value)
       }
 

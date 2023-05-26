@@ -1,4 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import browser from 'webextension-polyfill'
 import { generateGuid } from '../../../common/helpers'
 import { UrlAvailability } from '../../../common/types'
 import { IOverlay, OverlayConfig, OverlaySourceModule } from '../interfaces'
@@ -181,7 +182,7 @@ export class Overlay implements IOverlay {
   }
 
   public async checkAvailability() {
-    const { checkUrlAvailability } = await initBGFunctions(chrome)
+    const { checkUrlAvailability } = await initBGFunctions(browser)
     const availability: UrlAvailability = await checkUrlAvailability(this.url)
 
     if (availability === UrlAvailability.AVAILABLE) {

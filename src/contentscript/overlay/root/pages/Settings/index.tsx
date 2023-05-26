@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
+import browser from 'webextension-polyfill'
 import { SettingTitle } from '../../components/SettingTitle'
 import { DappletsMainInfo } from '../DappletsInfo'
 import { Tokenomics } from '../Tokenomics'
@@ -82,7 +83,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   const loadDevMode = async () => {
     setSvgLoaderDevMode(true)
 
-    const { getDevMode } = await initBGFunctions(chrome)
+    const { getDevMode } = await initBGFunctions(browser)
     const devMode = await getDevMode()
 
     setMode(devMode)
@@ -90,7 +91,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   }
 
   const setDevmode = async (isActive: boolean) => {
-    const { setDevMode } = await initBGFunctions(chrome)
+    const { setDevMode } = await initBGFunctions(browser)
     await setDevMode(isActive)
     loadDevMode()
   }
@@ -98,7 +99,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   const loadErrorReporting = async () => {
     setSvgErrorReporting(true)
 
-    const { getErrorReporting } = await initBGFunctions(chrome)
+    const { getErrorReporting } = await initBGFunctions(browser)
     const errorReporting = await getErrorReporting()
 
     onErrorReporting(errorReporting)
@@ -106,7 +107,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   }
 
   const setErrorReporting = async (isActive: boolean) => {
-    const { setErrorReporting } = await initBGFunctions(chrome)
+    const { setErrorReporting } = await initBGFunctions(browser)
     await setErrorReporting(isActive)
     loadErrorReporting()
   }

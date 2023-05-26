@@ -13,13 +13,13 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom'
+import browser from 'webextension-polyfill'
 import ManifestDTO from '../../../background/dto/manifestDTO'
 import { AnalyticsGoals } from '../../../background/services/analyticsService'
 import { Bus } from '../../../common/bus'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import * as EventBus from '../../../common/global-event-bus'
 import { groupBy } from '../../../common/helpers'
-
 import { ReactComponent as Notification } from './assets/newIcon/bell.svg'
 import { ReactComponent as Account } from './assets/newIcon/connected.svg'
 import { ReactComponent as Hide } from './assets/newIcon/hide.svg'
@@ -29,7 +29,6 @@ import { ReactComponent as SearchIcon } from './assets/newIcon/search.svg'
 import { ReactComponent as Home } from './assets/newIcon/squares.svg'
 import { ReactComponent as StoreIcon } from './assets/newIcon/store.svg'
 import { Onboarding } from './components/BaseOnboarding'
-
 import { ContentItem } from './components/ContentItem'
 import styles from './components/Overlay/Overlay.module.scss'
 import { OverlayTab } from './components/OverlayTab'
@@ -167,7 +166,7 @@ class _App extends React.Component<P, S> {
       }
     }
 
-    const { getDevMode } = await initBGFunctions(chrome)
+    const { getDevMode } = await initBGFunctions(browser)
     const isDevMode = await getDevMode()
 
     // ToDo: rethink overlay update when background state changes
@@ -178,7 +177,7 @@ class _App extends React.Component<P, S> {
 
   componentDidUpdate(prevProps) {
     if (prevProps.location.pathname !== this.props.location.pathname) {
-      initBGFunctions(chrome).then((x) => x.track({ url: this.props.location.pathname }))
+      initBGFunctions(browser).then((x) => x.track({ url: this.props.location.pathname }))
     }
   }
 
@@ -298,7 +297,7 @@ class _App extends React.Component<P, S> {
   }
 
   handleStoreButtonClick = () => {
-    initBGFunctions(chrome).then((x) => x.track({ idgoal: AnalyticsGoals.MovedToStore }))
+    initBGFunctions(browser).then((x) => x.track({ idgoal: AnalyticsGoals.MovedToStore }))
     window.open(DAPPLETS_STORE_URL, '_blank')
   }
 

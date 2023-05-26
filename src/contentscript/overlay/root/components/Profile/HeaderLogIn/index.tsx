@@ -3,6 +3,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
+import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../../common/global-event-bus'
 import * as walletIcons from '../../../../../../common/resources/wallets'
 import {
@@ -11,7 +12,6 @@ import {
   WalletDescriptor,
   WalletTypes,
 } from '../../../../../../common/types'
-
 import { ReactComponent as Card } from '../../../assets/svg/card.svg'
 import { Wallet } from '../../../pages/Wallet'
 import { Modal as ModalWallet } from '../../Modal'
@@ -83,7 +83,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   }, [])
 
   const refresh = async () => {
-    const { getWalletDescriptors, getDefaultWalletFor } = await initBGFunctions(chrome)
+    const { getWalletDescriptors, getDefaultWalletFor } = await initBGFunctions(browser)
     const descriptors = await getWalletDescriptors()
     const selectedWallet = await getDefaultWalletFor(
       DefaultSigners.EXTENSION,
@@ -138,12 +138,12 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   }
 
   const disconnectButtonClick = async (chain: ChainTypes, wallet: WalletTypes) => {
-    const { disconnectWallet } = await initBGFunctions(chrome)
+    const { disconnectWallet } = await initBGFunctions(browser)
     await disconnectWallet(chain, wallet)
     await refresh()
   }
   const connectWallet = async () => {
-    const { pairWalletViaOverlay } = await initBGFunctions(chrome)
+    const { pairWalletViaOverlay } = await initBGFunctions(browser)
     try {
       if (isOverlay) {
         setOpen()

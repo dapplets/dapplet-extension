@@ -1,4 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import browser from 'webextension-polyfill'
 import { IConnectedAccountUser } from '../../../../../../../../common/types'
 
 const isThereAPendingRequestForThisCAUsers = async (
@@ -8,7 +9,7 @@ const isThereAPendingRequestForThisCAUsers = async (
   const firstAccountGlobalId = firstAccount.name + '/' + firstAccount.origin
   const secondAccountGlobalId = secondAccount.name + '/' + secondAccount.origin
   const { getConnectedAccountsPendingRequests, getConnectedAccountsVerificationRequest } =
-    await initBGFunctions(chrome)
+    await initBGFunctions(browser)
   const a = await getConnectedAccountsPendingRequests()
   for (let i = 0; i < a.length; i++) {
     const b: { firstAccount: string; secondAccount: string } =

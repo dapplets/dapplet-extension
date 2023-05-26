@@ -154,7 +154,7 @@ export default class Core {
   }
 
   public async notify(payload: NotificationPayload, icon?: string, moduleName?: string) {
-    const { createAndShowNotification, getThisTab } = await initBGFunctions(chrome)
+    const { createAndShowNotification, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
 
     const notification = {
@@ -280,7 +280,7 @@ export default class Core {
     const _authMethods = cfg.authMethods ?? [cfg.type + '/' + cfg.network]
 
     const isConnected = async () => {
-      const { getWalletDescriptors } = await initBGFunctions(chrome)
+      const { getWalletDescriptors } = await initBGFunctions(browser)
       const sessions = await this.sessions(app)
       const session = sessions.find((x) => _authMethods.includes(x.authMethod))
       if (!session) return false
@@ -487,7 +487,7 @@ export default class Core {
   }
 
   public async sessions(moduleName?: string): Promise<LoginSession[]> {
-    const { getSessions } = await initBGFunctions(chrome)
+    const { getSessions } = await initBGFunctions(browser)
     const sessions = await getSessions(moduleName)
     return sessions.map((x) => new LoginSession(x))
   }
@@ -527,7 +527,7 @@ export default class Core {
       _request.target = _request.target.id
     }
 
-    const { createSession, getThisTab } = await initBGFunctions(chrome)
+    const { createSession, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     const session = await createSession(moduleName, _request, thisTab.id)
 
@@ -549,7 +549,7 @@ export default class Core {
   public fetch = proxyFetch
 
   public async getPreferredConnectedAccountsNetwork() {
-    const bGFunctions = await initBGFunctions(chrome)
+    const bGFunctions = await initBGFunctions(browser)
     return bGFunctions.getPreferredConnectedAccountsNetwork()
   }
 }

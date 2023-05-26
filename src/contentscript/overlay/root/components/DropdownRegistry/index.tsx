@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
+import browser from 'webextension-polyfill'
 import { isValidUrl } from '../../../../../common/helpers'
 import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
 import { ReactComponent as Delete } from '../../assets/icons/mini-close.svg'
@@ -28,20 +29,20 @@ export const DropdownRegistry: FC<DropdownRegistryProps> = (props: DropdownRegis
   }, [])
 
   const loadRegistries = async () => {
-    const { getRegistries } = await initBGFunctions(chrome)
+    const { getRegistries } = await initBGFunctions(browser)
     const registries = await getRegistries()
 
     setRegistries(registries.filter((r) => r.isDev === false))
   }
 
   const removeRegistry = async (url: string) => {
-    const { removeRegistry } = await initBGFunctions(chrome)
+    const { removeRegistry } = await initBGFunctions(browser)
     await removeRegistry(url)
     loadRegistries()
   }
 
   const enableRegistry = async (url: string, x: (x) => void) => {
-    const { enableRegistry } = await initBGFunctions(chrome)
+    const { enableRegistry } = await initBGFunctions(browser)
     await enableRegistry(url)
     loadRegistries()
     x(false)

@@ -7,18 +7,22 @@ import React, { FC, useState } from 'react'
 // import TimeAgo from 'javascript-time-ago'
 import cn from 'classnames'
 import { useQuery } from 'react-query'
+import browser from 'webextension-polyfill'
 import styles from './DevMesage.module.scss'
+
 export const useNewVersion = (newVersion: string, setNewVersion) => {
   return useQuery({
     queryKey: ['newversion', newVersion],
     queryFn: () => setNewVersion(),
   })
 }
+
 interface DevMessageProps {}
+
 export const DevMessage: FC<DevMessageProps> = (props) => {
   const [newVersion, setNewExtensionVersion] = useState(null)
   const _updateData = async () => {
-    const { getNewExtensionVersion, getIgnoredUpdate } = await initBGFunctions(chrome)
+    const { getNewExtensionVersion, getIgnoredUpdate } = await initBGFunctions(browser)
 
     const ignoredUpdate = await getIgnoredUpdate()
 
@@ -32,7 +36,7 @@ export const DevMessage: FC<DevMessageProps> = (props) => {
   const { data } = useNewVersion(newVersion, _updateData)
 
   const _ignoreUpdate = async () => {
-    const { setIgnoredUpdate } = await initBGFunctions(chrome)
+    const { setIgnoredUpdate } = await initBGFunctions(browser)
     setIgnoredUpdate(data)
     setNewExtensionVersion(null)
   }

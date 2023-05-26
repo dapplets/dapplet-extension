@@ -1,5 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as React from 'react'
+import browser from 'webextension-polyfill'
 import ModuleInfo from '../../../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../../../background/models/versionInfo'
 import { Bus } from '../../../../../../../common/bus'
@@ -83,7 +84,7 @@ export class DappletConfirmation extends React.Component<Props, State> {
       getTrustedUsers,
       getRegistries,
       getActiveModulesByHostnames,
-    } = await initBGFunctions(chrome)
+    } = await initBGFunctions(browser)
     const module = parseModuleName(moduleId)
     const vi = await getVersionInfo(registry, module.name, module.branch, module.version)
     const mi = await getModuleInfoByName(registry, module.name)
@@ -147,7 +148,7 @@ export class DappletConfirmation extends React.Component<Props, State> {
     const s = this.state,
       p = this.props
     const { addTrustedUser, activateFeature, reloadFeature, reloadCurrentPage } =
-      await initBGFunctions(chrome)
+      await initBGFunctions(browser)
 
     // ToDo: move it to the background?
 
@@ -174,7 +175,7 @@ export class DappletConfirmation extends React.Component<Props, State> {
   async addRegistryClickHandler() {
     const p = this.props
     this.setState({ isLoading: true })
-    const { addRegistry, enableRegistry, reloadCurrentPage } = await initBGFunctions(chrome)
+    const { addRegistry, enableRegistry, reloadCurrentPage } = await initBGFunctions(browser)
     await addRegistry(p.data.registry, false)
     await enableRegistry(p.data.registry)
     await reloadCurrentPage()
@@ -184,7 +185,7 @@ export class DappletConfirmation extends React.Component<Props, State> {
   async enableRegistryClickHandler() {
     const p = this.props
     this.setState({ isLoading: true })
-    const { enableRegistry, reloadCurrentPage } = await initBGFunctions(chrome)
+    const { enableRegistry, reloadCurrentPage } = await initBGFunctions(browser)
     await enableRegistry(p.data.registry)
     await reloadCurrentPage()
     await this.componentDidMount()

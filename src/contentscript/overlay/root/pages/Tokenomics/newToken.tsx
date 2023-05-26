@@ -2,6 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import { Form, Formik } from 'formik'
 import React, { FC, useEffect, useState } from 'react'
+import browser from 'webextension-polyfill'
 import { base64ArrayBuffer } from '../../../../../common/base64ArrayBuffer'
 import { StorageTypes } from '../../../../../common/constants'
 import { Modal } from '../../components/Modal'
@@ -11,6 +12,7 @@ import CreateTokenSchema from './CreateTokenSchema'
 import Field from './Field/Field'
 import IconField from './IconField/IconField'
 import styles from './newToken.module.scss'
+
 export interface NewTokenProps {
   setNewToken?: (x) => void
   module?: any
@@ -66,7 +68,7 @@ export const NewToken: FC<NewTokenProps> = (props) => {
     // ToDo: move to hook?
     try {
       setModalTransaction(true)
-      const { createAppToken, saveBlobToIpfs } = await initBGFunctions(chrome)
+      const { createAppToken, saveBlobToIpfs } = await initBGFunctions(browser)
       if (!icon) return
 
       const newIcon = base64ArrayBuffer(await icon.arrayBuffer())

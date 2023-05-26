@@ -1,10 +1,13 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import browser from 'webextension-polyfill'
 import ManifestDTO from '../../../../background/dto/manifestDTO'
 import { ModuleTypes } from '../../../../common/constants'
 import { ManifestAndDetails } from '../../../../common/types'
 
 export const getActualModules = async (filter = 'all'): Promise<ManifestAndDetails[]> => {
-  const { getThisTab, getCurrentContextIds, getFeaturesByHostnames } = await initBGFunctions(chrome)
+  const { getThisTab, getCurrentContextIds, getFeaturesByHostnames } = await initBGFunctions(
+    browser
+  )
   const currentTab = await getThisTab()
   const contextIds = await getCurrentContextIds(currentTab)
   const features: ManifestDTO[] = contextIds ? await getFeaturesByHostnames(contextIds, filter) : []

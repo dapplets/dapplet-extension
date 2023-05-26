@@ -1,4 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import browser from 'webextension-polyfill'
 import { ChainTypes, EthSignature, WalletTypes } from '../../../../../../../../common/types'
 
 const getSignature = async (
@@ -58,7 +59,7 @@ const getSignature = async (
       method: string,
       params: any[]
     ) => Promise<any>
-  } = await initBGFunctions(chrome)
+  } = await initBGFunctions(browser)
 
   const result: string = await eth_sendCustomRequestToWallet(
     secondAccountOrigin === ChainTypes.ETHEREUM_GOERLI

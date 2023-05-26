@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
+import browser from 'webextension-polyfill'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import { ReactComponent as Copy } from '../../assets/icons/tokenomics/copy.svg'
 import { regExpIndexEthereum } from '../../common/constants'
@@ -15,6 +16,7 @@ import { NewToken } from './newToken'
 import { RadioButtons } from './RadioButton/radioButtons'
 import { SelectToken } from './selectToken'
 import styles from './Tokenomics.module.scss'
+
 export interface TokenomicsProps {
   setPageDetails: (x: boolean) => void
   isSupport?: boolean
@@ -79,7 +81,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
   }, [])
 
   const _updateData = async () => {
-    const { getTokensByApp } = await initBGFunctions(chrome)
+    const { getTokensByApp } = await initBGFunctions(browser)
 
     const tokensByApp = await getTokensByApp(mi.name)
 
@@ -88,7 +90,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
   const handleSubmit = async (values) => {
     try {
       setModalTransaction(true)
-      const { linkAppWithToken } = await initBGFunctions(chrome)
+      const { linkAppWithToken } = await initBGFunctions(browser)
       await linkAppWithToken(mi.name, values.address)
       setModalTransaction(false)
       setModalEndCreation(true)
