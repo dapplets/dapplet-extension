@@ -17,7 +17,7 @@ import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
 import { globalClear } from 'caching-decorator'
-import { Runtime } from 'webextension-polyfill'
+import browser, { Runtime } from 'webextension-polyfill'
 import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
 import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
 import { DappletRuntimeResult, MessageWrapperRequest, StorageRef } from '../../common/types'
@@ -333,7 +333,7 @@ export default class FeatureService {
               p.version === version &&
               isActive === true
             ) {
-              chrome.runtime.onMessage.removeListener(listener)
+              browser.runtime.onMessage.removeListener(listener)
 
               resolve(p.runtime)
             }
@@ -344,7 +344,7 @@ export default class FeatureService {
               p.version === version &&
               isActive === false
             ) {
-              chrome.runtime.onMessage.removeListener(listener)
+              browser.runtime.onMessage.removeListener(listener)
               resolve(p.runtime)
             }
           } else if (message.type === 'FEATURE_LOADING_ERROR') {
@@ -354,7 +354,7 @@ export default class FeatureService {
             //   p.version === version &&
             //   isActive === true
             // ){
-            chrome.runtime.onMessage.removeListener(listener)
+            browser.runtime.onMessage.removeListener(listener)
             reject(p.error)
             // }
           } else if (message.type === 'FEATURE_UNLOADING_ERROR') {
@@ -364,22 +364,22 @@ export default class FeatureService {
               p.version === version &&
               isActive === false
             ) {
-              chrome.runtime.onMessage.removeListener(listener)
+              browser.runtime.onMessage.removeListener(listener)
               reject(p.error)
             }
           }
         }
 
-        chrome.runtime.onMessage.addListener(listener)
+        browser.runtime.onMessage.addListener(listener)
 
         // reject if module is loading too long
         setTimeout(() => {
-          chrome.runtime.onMessage.removeListener(listener)
+          browser.runtime.onMessage.removeListener(listener)
           reject('Loading timeout exceed')
         }, 30000)
 
         // sending command to contentscript
-        chrome.tabs.sendMessage(tabId, {
+        browser.tabs.sendMessage(tabId, {
           type: isActive ? 'FEATURE_ACTIVATED' : 'FEATURE_DEACTIVATED',
           payload: [
             {
@@ -804,7 +804,7 @@ export default class FeatureService {
       // sending command to contentscript
       const activeTab = await getCurrentTab()
       if (!activeTab) return
-      chrome.tabs.sendMessage(activeTab.id, {
+      browser.tabs.sendMessage(activeTab.id, {
         type: 'FEATURE_DEACTIVATED',
         payload: [
           {

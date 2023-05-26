@@ -1,3 +1,4 @@
+import browser from 'webextension-polyfill'
 import { getCurrentTab } from '../../common/helpers'
 import {
   ChainTypes,
@@ -112,7 +113,7 @@ export class OverlayService {
 
     const hasLoginRequest = type === 'OPEN_SYSTEM_OVERLAY' && !!payload.loginRequest
 
-    const response = await chrome.tabs.sendMessage(tabId, {
+    const response = await browser.tabs.sendMessage(tabId, {
       type,
       payload: hasLoginRequest ? { payload, activeTab } : payload,
     })

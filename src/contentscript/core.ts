@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as ethers from 'ethers'
 import * as NearApi from 'near-api-js'
+import browser from 'webextension-polyfill'
 import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
 import { generateGuid, parseShareLink } from '../common/helpers'
@@ -55,7 +56,7 @@ type ContentDetector = {
 export default class Core {
   constructor(isIframe: boolean, public overlayManager: IOverlayManager) {
     if (!isIframe) {
-      chrome.runtime.onMessage.addListener((message, sender) => {
+      browser.runtime.onMessage.addListener((message, sender) => {
         if (typeof message === 'string') {
           if (message === 'TOGGLE_OVERLAY') {
             this.toggleOverlay()

@@ -1,3 +1,4 @@
+import browser from 'webextension-polyfill'
 import * as EventBus from '../../common/global-event-bus'
 import { generateGuid } from '../../common/helpers'
 import {
@@ -7,6 +8,7 @@ import {
   NotificationType,
 } from '../../common/models/notification'
 import NotificationBrowserStorage from '../browserStorages/notificationBrowserStorage'
+
 // Add removing function
 // NotificationBrowserStorage - implements Repository pattern (read/add/remove)
 
@@ -54,7 +56,7 @@ export class NotificationService {
   async showNotification(notificationId: string, tabId: number): Promise<void> {
     const notification = await this.notificationBrowserStorage.getById(notificationId)
     EventBus.emit('show_notification', notification)
-    chrome.tabs.sendMessage(tabId, {
+    browser.tabs.sendMessage(tabId, {
       type: 'SHOW_NOTIFICATION',
       payload: notification,
     })
@@ -116,7 +118,7 @@ export class NotificationService {
 
     EventBus.emit('notifications_updated')
 
-    chrome.tabs.sendMessage(tabId, {
+    browser.tabs.sendMessage(tabId, {
       type: 'MODULE_EVENT_STREAM_MESSAGE',
       payload: {
         namespace: notification.source,
@@ -137,9 +139,9 @@ export class NotificationService {
 
   async _updateBadge() {
     const count = await this.getUnreadNotificationsCount()
-    chrome.action.setBadgeText({
+    browser.action.setBadgeText({
       text: count === 0 ? '' : count.toString(),
     })
-    chrome.action.setBadgeBackgroundColor({ color: '#f5f5f5' })
+    browser.action.setBadgeBackgroundColor({ color: '#f5f5f5' })
   }
 }

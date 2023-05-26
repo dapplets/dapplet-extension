@@ -3,6 +3,7 @@ import { MetaMaskInpageProvider } from '@metamask/providers'
 import { detect } from 'detect-browser'
 import { ethers } from 'ethers'
 // import PortStream from 'extension-port-stream'
+import browser from 'webextension-polyfill'
 import { NotImplementedError } from '../../../common/errors'
 import { CacheMethod } from '../../../common/helpers'
 import { EthereumWallet } from './interface'
@@ -178,9 +179,9 @@ export default class extends ethers.Signer implements EthereumWallet {
     if (!this._metamaskProviderPromise) {
       this._metamaskProviderPromise = new Promise((res, rej) => {
         const currentMetaMaskId = this._getMetaMaskId()
-        const metamaskPort = chrome.runtime.connect(currentMetaMaskId)
-        metamaskPort.onDisconnect.addListener(() => chrome.runtime.lastError) // mute "Unchecked runtime.lastError"
-        // const pluginStream = new PortStream(metamaskPort) // ToDo: PortStream don't support chrome.runtime.Port. Check if it is work without PortStream!
+        const metamaskPort = browser.runtime.connect(currentMetaMaskId)
+        metamaskPort.onDisconnect.addListener(() => browser.runtime.lastError) // mute "Unchecked runtime.lastError"
+        // const pluginStream = new PortStream(metamaskPort) // ToDo: PortStream don't support browser.runtime.Port. Check if it is work without PortStream!
         const metamask = new MetaMaskInpageProvider(metamaskPort as any, {
           // mute all messages from provider
           logger: {

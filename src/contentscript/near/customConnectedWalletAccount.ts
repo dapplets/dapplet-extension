@@ -2,6 +2,7 @@ import { baseDecode } from 'borsh'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as nearAPI from 'near-api-js'
 import { ConnectedWalletAccount } from 'near-api-js'
+import browser from 'webextension-polyfill'
 import { generateGuid } from '../../common/helpers'
 
 export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
@@ -78,7 +79,7 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     )
 
     const requestId = generateGuid()
-    const callbackUrl = chrome.runtime.getURL(`callback.html?request_id=${requestId}`)
+    const callbackUrl = browser.runtime.getURL(`callback.html?request_id=${requestId}`)
 
     const { waitTab, removeTab, updateTab, queryTab } = await initBGFunctions(chrome)
     const [currentTab] = await queryTab({ active: true, currentWindow: true })

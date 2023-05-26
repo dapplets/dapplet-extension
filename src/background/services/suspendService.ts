@@ -1,3 +1,4 @@
+import browser from 'webextension-polyfill'
 import * as Helpers from '../../common/helpers'
 import GlobalConfigService from './globalConfigService'
 
@@ -20,7 +21,7 @@ export class SuspendService {
 
     if (this.lastExtensionIcon != path) {
       this.lastExtensionIcon = path
-      chrome.action.setIcon({ path: path })
+      browser.action.setIcon({ path: path })
     }
   }
 
@@ -29,7 +30,7 @@ export class SuspendService {
     if (this.isContextMenusUpdating) return
 
     this.isContextMenusUpdating = true
-    chrome.contextMenus.removeAll()
+    browser.contextMenus.removeAll()
     const tab = await Helpers.getCurrentTab()
     if (!tab) return
     const url = tab.url || tab['pendingUrl'] // ToDo: check existance of pendingUrl
@@ -38,7 +39,7 @@ export class SuspendService {
     const suspendityByHostname = await this.getSuspendityByHostname(hostname)
 
     if (suspendityByHostname) {
-      chrome.contextMenus.create({
+      browser.contextMenus.create({
         id: 'res_this',
         title: 'Resume on this site',
         contexts: ['action'],
@@ -50,9 +51,9 @@ export class SuspendService {
           await this.updateContextMenus()
         }
       }
-      chrome.contextMenus.onClicked.addListener(contextClick)
+      browser.contextMenus.onClicked.addListener(contextClick)
     } else {
-      chrome.contextMenus.create({
+      browser.contextMenus.create({
         id: 'sus_this',
         title: 'Suspend on this site',
         contexts: ['action'],
@@ -64,13 +65,13 @@ export class SuspendService {
           await this.updateContextMenus()
         }
       }
-      chrome.contextMenus.onClicked.addListener(contextClick)
+      browser.contextMenus.onClicked.addListener(contextClick)
     }
 
     const suspendityEverywhere = await this.getSuspendityEverywhere()
 
     if (suspendityEverywhere) {
-      chrome.contextMenus.create({
+      browser.contextMenus.create({
         id: 'res_all',
         title: 'Resume on all sites',
         contexts: ['action'],
@@ -82,9 +83,9 @@ export class SuspendService {
           await this.updateContextMenus()
         }
       }
-      chrome.contextMenus.onClicked.addListener(contextClick)
+      browser.contextMenus.onClicked.addListener(contextClick)
     } else {
-      chrome.contextMenus.create({
+      browser.contextMenus.create({
         id: 'sus_all',
         title: 'Suspend on all sites',
         contexts: ['action'],
@@ -96,7 +97,7 @@ export class SuspendService {
           await this.updateContextMenus()
         }
       }
-      chrome.contextMenus.onClicked.addListener(contextClick)
+      browser.contextMenus.onClicked.addListener(contextClick)
     }
 
     this.isContextMenusUpdating = false

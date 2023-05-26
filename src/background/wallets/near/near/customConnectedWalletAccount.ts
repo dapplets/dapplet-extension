@@ -1,6 +1,7 @@
 import { baseDecode } from 'borsh'
 import * as nearAPI from 'near-api-js'
 import { ConnectedWalletAccount } from 'near-api-js'
+import browser from 'webextension-polyfill'
 import { generateGuid, waitTab } from '../../../../common/helpers'
 
 export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
@@ -46,9 +47,9 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     )
 
     const requestId = generateGuid()
-    const callbackUrl = chrome.runtime.getURL(`callback.html?request_id=${requestId}`)
+    const callbackUrl = browser.runtime.getURL(`callback.html?request_id=${requestId}`)
 
-    const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true })
+    const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true })
 
     let callbackTab = null
     const waitTabPromise = waitTab(callbackUrl).then((x) => (callbackTab = x))
@@ -58,8 +59,8 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
 
     if (!callbackTab) throw new Error(`User rejected the transaction.`)
 
-    await chrome.tabs.update(currentTab.id, { active: true })
-    await chrome.tabs.remove(callbackTab.id)
+    await browser.tabs.update(currentTab.id, { active: true })
+    await browser.tabs.remove(callbackTab.id)
 
     const callbackTabUrlObject = new URL(callbackTab.url)
     const transactionHashes = callbackTabUrlObject.searchParams.get('transactionHashes')

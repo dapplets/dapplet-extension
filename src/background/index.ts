@@ -1,4 +1,5 @@
 import { setupMessageListener } from 'chrome-extension-message-wrapper'
+import browser from 'webextension-polyfill'
 import { WebSocketProxy } from '../common/chrome-extension-websocket-wrapper'
 import { CONTEXT_ID_WILDCARD, ModuleTypes } from '../common/constants'
 import {
@@ -70,7 +71,7 @@ const underConstructionService = new UnderConstructionService(
 walletService.sessionService = sessionService
 globalConfigService.ensService = ensService
 
-chrome.runtime.onMessage.addListener(
+browser.runtime.onMessage.addListener(
   setupMessageListener({
     // WalletService
     prepareWalletFor: walletService.prepareWalletFor.bind(walletService),
@@ -271,10 +272,10 @@ chrome.runtime.onMessage.addListener(
     localStorage_length: () => Promise.resolve(localStorage.length),
 
     // Extension Basic
-    createTab: (url) => chrome.tabs.create({ url }),
-    removeTab: (tabId) => chrome.tabs.remove(tabId),
-    updateTab: (tabId, updateProperties) => chrome.tabs.update(tabId, updateProperties),
-    queryTab: (queryInfo) => chrome.tabs.query(queryInfo),
+    createTab: (url) => browser.tabs.create({ url }),
+    removeTab: (tabId) => browser.tabs.remove(tabId),
+    updateTab: (tabId, updateProperties) => browser.tabs.update(tabId, updateProperties),
+    queryTab: (queryInfo) => browser.tabs.query(queryInfo),
 
     // Overlay Service
     pairWalletViaOverlay: overlayService.pairWalletViaOverlay.bind(overlayService),
@@ -324,35 +325,35 @@ chrome.runtime.onMessage.addListener(
     checkUrlAvailability: (url) => checkUrlAvailability(url),
 
     // For E2E tests only
-    wipeAllExtensionData: () => chrome.storage.local.clear().then(() => localStorage.clear()),
+    wipeAllExtensionData: () => browser.storage.local.clear().then(() => localStorage.clear()),
   })
 )
 
 // WebSocket proxy
 // ToDo: Perhaps a separate class WebSocketProxy is redundant
 const wsproxy = new WebSocketProxy()
-chrome.runtime.onConnect.addListener(wsproxy.createConnectListener())
+browser.runtime.onConnect.addListener(wsproxy.createConnectListener())
 
 // ToDo: These lines are repeated many time
 suspendService.changeIcon()
 suspendService.updateContextMenus()
 
 //listen for new tab to be activated
-chrome.tabs.onActivated.addListener(() => {
+browser.tabs.onActivated.addListener(() => {
   suspendService.changeIcon()
   suspendService.updateContextMenus()
 })
 
 //listen for current tab to be changed
-chrome.tabs.onUpdated.addListener(() => {
+browser.tabs.onUpdated.addListener(() => {
   suspendService.changeIcon()
   suspendService.updateContextMenus()
 })
 
-chrome.commands.onCommand.addListener((cmd) => {
+browser.commands.onCommand.addListener((cmd) => {
   if (cmd === 'toggle-overlay') {
     return getCurrentTab().then(
-      (activeTab) => activeTab && chrome.tabs.sendMessage(activeTab.id, 'TOGGLE_OVERLAY')
+      (activeTab) => activeTab && browser.tabs.sendMessage(activeTab.id, 'TOGGLE_OVERLAY')
     )
   }
 })
@@ -388,7 +389,7 @@ async function fetchPlain({
 
 // Proxify fetch-requests to deal with CORS
 // It's used by Core.fetch()
-chrome.runtime.onMessage.addListener((message) => {
+browser.runtime.onMessage.addListener((message) => {
   if (!message || !message.type) return
 
   if (message.type === 'FETCH_REQUEST') {
@@ -396,14 +397,14 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 })
 
-chrome.runtime.onMessage.addListener((message, sender) => {
+browser.runtime.onMessage.addListener((message, sender) => {
   if (!message || !message.type) return
 
   if (message.type === 'CONTEXT_STARTED' || message.type === 'CONTEXT_FINISHED') {
     featureService.getActiveModulesByHostnames(message.payload.contextIds).then((manifests) => {
       if (manifests.length === 0) return
 
-      chrome.tabs.sendMessage(
+      browser.tabs.sendMessage(
         sender.tab.id,
         {
           type: message.type === 'CONTEXT_STARTED' ? 'FEATURE_ACTIVATED' : 'FEATURE_DEACTIVATED',
@@ -432,7 +433,7 @@ chrome.runtime.onMessage.addListener((message, sender) => {
         const adapters = manifests.filter((x) => x.type === ModuleTypes.Adapter)
         if (adapters.length === 0) return
 
-        chrome.tabs.sendMessage(
+        browser.tabs.sendMessage(
           sender.tab.id,
           {
             type: message.type === 'CONTEXT_STARTED' ? 'FEATURE_ACTIVATED' : 'FEATURE_DEACTIVATED',
@@ -453,18 +454,18 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   }
 })
 
-chrome.action.onClicked.addListener(() => {
+browser.action.onClicked.addListener(() => {
   overlayService.openPopupOverlay('dapplets')
   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionIconClicked })
 })
 
 // Set predefined configuration when extension is installed
-chrome.runtime.onInstalled.addListener(async (details) => {
+browser.runtime.onInstalled.addListener(async (details) => {
   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionInstalled })
 
   // Find predefined config URL in downloads
   if (details.reason !== 'install') return
-  const downloads = await chrome.downloads.search({
+  const downloads = await browser.downloads.search({
     filenameRegex: 'dapplet-extension',
   })
   if (downloads.length === 0) return
@@ -512,30 +513,30 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   }
 })
 
-chrome.runtime.onInstalled.addListener(async () => {
+browser.runtime.onInstalled.addListener(async () => {
   // disable all another instances of the current extension
-  const exts = await chrome.management.getAll()
-  const currentExtId = chrome.runtime.id
+  const exts = await browser.management.getAll()
+  const currentExtId = browser.runtime.id
   const previousExts = exts.filter((x) => x.name === 'Dapplets' && x.id !== currentExtId)
   if (previousExts.length !== 0) {
     console.log(`Found ${previousExts.length} another instance(s) of the current extension.`)
-    previousExts.forEach((x) => chrome.management.setEnabled(x.id, false))
+    previousExts.forEach((x) => browser.management.setEnabled(x.id, false))
   }
 })
 
 // Reinject content scripts
 if (typeof window === 'undefined') {
-  chrome.tabs
+  browser.tabs
     .query({ url: ['http://*/*', 'https://*/*'] })
     .then((x) => x.filter((x) => x.status === 'complete'))
     .then((foundTabs) =>
       Promise.all(
         foundTabs.map((x) =>
-          chrome.tabs
+          browser.tabs
             .sendMessage(x.id, { type: 'CURRENT_CONTEXT_IDS' })
             .then(() => false)
             .catch(() => {
-              chrome.scripting.executeScript({
+              browser.scripting.executeScript({
                 files: ['common.js', 'contentscript.js'],
                 target: { tabId: x.id },
               })
@@ -555,18 +556,20 @@ if (typeof window === 'undefined') {
   // workaround for firefox which prevents redirect loop
   const loading = new Set<number>()
 
-  const redirectFromProxyServer = async (tab: chrome.tabs.Tab) => {
+  const redirectFromProxyServer = async (tab: browser.Tabs.Tab) => {
     if (tab.status === 'loading' && !loading.has(tab.id)) {
       const groups = /https:\/\/augm\.link\/live\/(.*)/gm.exec(tab.url)
       const [, targetUrl] = groups ?? []
       if (targetUrl) {
         loading.add(tab.id)
-        await chrome.tabs.update(tab.id, { url: targetUrl })
+        await browser.tabs.update(tab.id, { url: targetUrl })
         setTimeout(() => loading.delete(tab.id), 300)
       }
     }
   }
 
-  chrome.tabs.onCreated.addListener(redirectFromProxyServer)
-  chrome.tabs.onUpdated.addListener((tabId) => chrome.tabs.get(tabId).then(redirectFromProxyServer))
+  browser.tabs.onCreated.addListener(redirectFromProxyServer)
+  browser.tabs.onUpdated.addListener((tabId) =>
+    browser.tabs.get(tabId).then(redirectFromProxyServer)
+  )
 }

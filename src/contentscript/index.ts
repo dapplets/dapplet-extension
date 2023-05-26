@@ -1,5 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { Subject } from 'rxjs'
+import browser from 'webextension-polyfill'
 import { GLOBAL_EVENT_BUS_NAME } from '../common/chrome-extension-websocket-wrapper/constants'
 import * as EventBus from '../common/global-event-bus'
 import {
@@ -41,7 +42,7 @@ async function init() {
     console.error('Cannot process the share link', e)
     return null
   })
-  const port = chrome.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any)
+  const port = browser.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any)
 
   const jsonrpc = new JsonRpc()
   const overlayManager = IS_IFRAME ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc)
@@ -71,7 +72,7 @@ async function init() {
     return Array.from(new Set(contextIDs)) // deduplicate array
   }
 
-  chrome.runtime.onMessage.addListener((message) => {
+  browser.runtime.onMessage.addListener((message) => {
     if (!message || !message.type) return
 
     if (message.type === 'FEATURE_ACTIVATED') {
@@ -113,7 +114,7 @@ async function init() {
   // Handle module (de)activations from another tabs
   EventBus.on('dapplet_activated', async () => {
     const contextIds = await getAllContextIds()
-    chrome.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
+    browser.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
   })
 
   EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]))
@@ -207,7 +208,7 @@ async function init() {
 
   if (!IS_IFRAME && !IS_LIBRARY) {
     // ToDo: inject in dapplets store only
-    injectScript(chrome.runtime.getURL('inpage.js'))
+    injectScript(browser.runtime.getURL('inpage.js'))
   }
 
   if (IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
