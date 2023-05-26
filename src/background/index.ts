@@ -524,7 +524,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 })
 
 // Reinject content scripts
-if (window['DAPPLETS_JSLIB'] !== true) {
+if (typeof window === 'undefined') {
   chrome.tabs
     .query({ url: ['http://*/*', 'https://*/*'] })
     .then((x) => x.filter((x) => x.status === 'complete'))

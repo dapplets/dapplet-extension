@@ -21,7 +21,8 @@
     "test:ca": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/connected-accounts\" --headed --browser chrome",
     "test:da": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/dapplet-actions\" --headed --browser chrome",
     "test:wa": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/wallets\" --headed --browser chrome",
-    "test:notify": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/notifications\" --headed --browser chrome"
+    "test:notify": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/notifications\" --headed --browser chrome",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@fontsource/montserrat": "^4.5.14",
@@ -72,6 +73,7 @@
     "javascript-time-ago": "^2.5.9",
     "jszip": "^3.10.1",
     "normalize.css": "^8.0.1",
+    "patch-package": "^7.0.0",
     "postcss-scss": "^4.0.6",
     "prettier": "^2.8.7",
     "prettier-plugin-organize-imports": "^3.2.2",

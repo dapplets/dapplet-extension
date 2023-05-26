@@ -40,14 +40,16 @@ interface Connection {
 let environment: EnvType
 
 try {
-  if (window === chrome.extension?.getBackgroundPage?.()) {
+  if (typeof window === 'undefined') {
     environment = EnvType.BACKGROUND
   } else if (self !== top) {
     environment = EnvType.CONTENT_FRAME
-  } else {
+  } else if (chrome.runtime) {
     environment = EnvType.CONTENT_SCRIPT
+  } else {
+    environment = EnvType.INPAGE_SCRIPT
   }
-} catch (err) {
+} catch (_) {
   environment = EnvType.INPAGE_SCRIPT
 }
 
@@ -58,7 +60,8 @@ const callbacks = new Map<string, Set<CallbackFunction>>()
 const connections: Connection[] = []
 
 function register(portOrWindow: chrome.runtime.Port | Window) {
-  const _conn: any = portOrWindow instanceof Window ? {} : portOrWindow
+  const _conn: any =
+    typeof Window !== 'undefined' && portOrWindow instanceof Window ? {} : portOrWindow
 
   const callback = (message: EventMessage) => {
     message.from_env = environment
@@ -69,7 +72,7 @@ function register(portOrWindow: chrome.runtime.Port | Window) {
     callbacks.get(message.event)?.forEach((cb) => cb(message.data))
   }
 
-  if (portOrWindow instanceof Window) {
+  if (typeof Window !== 'undefined' && portOrWindow instanceof Window) {
     const listener = (e) => {
       if (typeof e.data === 'object' && e.data.bus === BUS_ID && e.data.from !== currentContext) {
         callback(e.data)
