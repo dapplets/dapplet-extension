@@ -1,6 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import { Bus } from '../../../../../../../common/bus'
 import { resources } from '../../../../../../../common/resources'
 import {
@@ -70,7 +69,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const [areBothWallets, setAreBothWallets] = useState<boolean>()
 
   const init = async () => {
-    const { getPreferredConnectedAccountsNetwork } = await initBGFunctions(browser)
+    const { getPreferredConnectedAccountsNetwork } = await initBGFunctions(chrome)
     const preferredConnectedAccountsNetwork: NearNetworks =
       await getPreferredConnectedAccountsNetwork()
     setContractNetwork(preferredConnectedAccountsNetwork)
@@ -139,7 +138,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   }, [selectedFirstUser, selectedSecondUser])
 
   const sendVerivicationRequest = async () => {
-    const { requestConnectingAccountsVerification } = await initBGFunctions(browser)
+    const { requestConnectingAccountsVerification } = await initBGFunctions(chrome)
     try {
       await requestConnectingAccountsVerification(requestBody, null)
     } catch (err) {
@@ -160,7 +159,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   const handleConnectOrDisconnect = async () => {
     setIsWaiting(true)
     const { getConnectedAccountsMinStakeAmount, requestConnectingAccountsVerification } =
-      await initBGFunctions(browser)
+      await initBGFunctions(chrome)
     const minStakeAmount: number = await getConnectedAccountsMinStakeAmount()
     const firstProofUrl = resources[selectedFirstUser.origin].proofUrl(selectedFirstUser.name)
     const secondProofUrl = resources[selectedSecondUser.origin].proofUrl(selectedSecondUser.name)
@@ -246,7 +245,7 @@ const ConnectedAccountsModal = (props: IConnectedAccountsModalProps) => {
   }
 
   const handleSetMainAccount = async (account: IConnectedAccountUser) => {
-    const { changeConnectedAccountStatus } = await initBGFunctions(browser)
+    const { changeConnectedAccountStatus } = await initBGFunctions(chrome)
 
     try {
       setIsWaiting(true)

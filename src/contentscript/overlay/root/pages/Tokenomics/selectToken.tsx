@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import { regExpIndexEthereum } from '../../common/constants'
 import { getValidationAddress } from '../../common/helpers'
 import { TokenInfo } from './index'
@@ -34,7 +33,7 @@ export const SelectToken: FC<SelectTokenProps> = (props: SelectTokenProps) => {
   useEffect(() => {
     const init = async () => {
       if (chooseToken) {
-        const { getErc20TokenInfo } = await initBGFunctions(browser)
+        const { getErc20TokenInfo } = await initBGFunctions(chrome)
         const daiInfoToken = await getErc20TokenInfo(
           getValidationAddress(chooseToken, regExpIndexEthereum) !== null ? chooseToken : null
         )

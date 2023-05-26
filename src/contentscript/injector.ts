@@ -2,7 +2,6 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { Subject } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import { maxSatisfying, valid } from 'semver'
-import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
 import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, ModuleTypes } from '../common/constants'
@@ -95,7 +94,7 @@ export class Injector {
 
     // ToDo: add modules to registry before loading
 
-    const { getModulesWithDeps } = await initBGFunctions(browser)
+    const { getModulesWithDeps } = await initBGFunctions(chrome)
     const loadedModules: {
       manifest: VersionInfo
       script: string
@@ -164,7 +163,7 @@ export class Injector {
         console.log(
           `[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`
         )
-        browser.runtime.sendMessage({
+        chrome.runtime.sendMessage({
           type: 'FEATURE_LOADED',
           payload: {
             name: m.manifest.name,
@@ -181,7 +180,7 @@ export class Injector {
           `Error of loading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `,
           err
         )
-        browser.runtime.sendMessage({
+        chrome.runtime.sendMessage({
           type: 'FEATURE_LOADING_ERROR',
           payload: {
             name: m.manifest.name,
@@ -223,7 +222,7 @@ export class Injector {
         console.log(
           `[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is unloaded.`
         )
-        browser.runtime.sendMessage({
+        chrome.runtime.sendMessage({
           type: 'FEATURE_UNLOADED',
           payload: {
             name: m.manifest.name,
@@ -237,7 +236,7 @@ export class Injector {
           `Error of unloading the module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version}: `,
           err
         )
-        browser.runtime.sendMessage({
+        chrome.runtime.sendMessage({
           type: 'FEATURE_UNLOADING_ERROR',
           payload: {
             name: m.manifest.name,
@@ -321,7 +320,7 @@ export class Injector {
     }[]
   ) {
     const { getModulesWithDeps, getSwarmGateway, getPreferedOverlayStorage } =
-      await initBGFunctions(browser)
+      await initBGFunctions(chrome)
     const { core } = this
 
     const swarmGatewayUrl = await getSwarmGateway()
@@ -408,7 +407,7 @@ export class Injector {
           } else {
             module = this.registry.find((m) => m.manifest.name === manifest.name)
           }
-          const { getModuleInfoByName } = await initBGFunctions(browser)
+          const { getModuleInfoByName } = await initBGFunctions(chrome)
           const registry = manifest.registryUrl
           const moduleInfo: ModuleInfo = await getModuleInfoByName(
             registry,
@@ -435,7 +434,7 @@ export class Injector {
         getPreferredConnectedAccountsNetwork: core.getPreferredConnectedAccountsNetwork,
         notify: async (payload) => {
           // ToDo: do not fetch manifest twice
-          const { getModuleInfoByName } = await initBGFunctions(browser)
+          const { getModuleInfoByName } = await initBGFunctions(chrome)
           const registry = manifest.registryUrl
           const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, manifest.name)
           await core.notify(payload, moduleInfo.icon?.uris?.[0], manifest.name)
@@ -587,7 +586,7 @@ export class Injector {
       }
 
       if (newBranch) {
-        const { createNotification } = await initBGFunctions(browser)
+        const { createNotification } = await initBGFunctions(chrome)
         await createNotification({
           title: 'Branch resolving',
           message: `Resolver of "${manifest.name}" defined the "${newBranch}" branch`,
@@ -631,7 +630,7 @@ export class Injector {
       })
 
       if (newContextIds.length > 0) {
-        browser.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
+        chrome.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
         EventBus.emit('context_started', contextIds, { global: false })
       }
     } else {
@@ -645,7 +644,7 @@ export class Injector {
       })
 
       if (oldContextIds.length > 0) {
-        browser.runtime.sendMessage({ type: 'CONTEXT_FINISHED', payload: { contextIds } })
+        chrome.runtime.sendMessage({ type: 'CONTEXT_FINISHED', payload: { contextIds } })
         EventBus.emit('context_finished', contextIds, { global: false })
       }
     }

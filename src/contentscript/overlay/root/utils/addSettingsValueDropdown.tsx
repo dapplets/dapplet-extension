@@ -1,5 +1,4 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
 import {
   regExpIndexENS,
   regExpIndexEthereum,
@@ -9,6 +8,7 @@ import {
   regExpIndexNearTestnet,
 } from '../common/constants'
 import { getValidationAddress } from '../common/helpers'
+
 export const addSettingsValueDropdown = async (
   value: string,
   parameter,
@@ -34,10 +34,10 @@ export const addSettingsValueDropdown = async (
   ) {
     try {
       if (parameter === 'registry') {
-        const { addRegistry } = await initBGFunctions(browser)
+        const { addRegistry } = await initBGFunctions(chrome)
         await addRegistry(value, false)
       } else {
-        const { addTrustedUser } = await initBGFunctions(browser)
+        const { addTrustedUser } = await initBGFunctions(chrome)
         await addTrustedUser(value)
       }
 

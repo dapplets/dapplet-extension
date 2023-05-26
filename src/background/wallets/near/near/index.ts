@@ -2,7 +2,6 @@ import { ethers } from 'ethers'
 import * as nearAPI from 'near-api-js'
 import { Near } from 'near-api-js'
 import { JsonRpcProvider } from 'near-api-js/lib/providers'
-import { browser } from 'webextension-polyfill-ts'
 import { NotImplementedError } from '../../../../common/errors'
 import { CacheMethod, generateGuid, waitTab } from '../../../../common/helpers'
 import { NearNetworkConfig } from '../../../../common/types'
@@ -121,27 +120,27 @@ export default class implements NearWallet {
   private async _connectBrowserWallet(nearWallet: CustomWalletConnection, contractId?: string) {
     const expectedAccountId = nearWallet.getAccountId()
 
-    const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true })
+    const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true })
     const currentTabId = currentTab.id
 
     const requestId = generateGuid()
-    const callbackUrl = browser.runtime.getURL(`callback.html?request_id=${requestId}`)
+    const callbackUrl = chrome.runtime.getURL(`callback.html?request_id=${requestId}`)
 
     let callbackTab = null
     const waitTabPromise = waitTab(callbackUrl).then((x) => (callbackTab = x))
     const requestPromise = nearWallet.requestSignIn({
       contractId,
-      successUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=true`),
-      failureUrl: browser.runtime.getURL(`callback.html?request_id=${requestId}&success=false`),
+      successUrl: chrome.runtime.getURL(`callback.html?request_id=${requestId}&success=true`),
+      failureUrl: chrome.runtime.getURL(`callback.html?request_id=${requestId}&success=false`),
     })
 
     await Promise.race([waitTabPromise, requestPromise])
 
-    await browser.tabs.update(currentTabId, { active: true })
+    await chrome.tabs.update(currentTabId, { active: true })
 
     if (!callbackTab) throw new Error('Wallet connection request rejected.')
 
-    await browser.tabs.remove(callbackTab.id)
+    await chrome.tabs.remove(callbackTab.id)
 
     const urlObject = new URL(callbackTab.url)
     const success = urlObject.searchParams.get('success') === 'true'

@@ -1,5 +1,4 @@
 import { MapperService } from 'simple-mapper' // ToDo like [here](https://www.npmjs.com/package/simple-mapper)
-import { browser } from 'webextension-polyfill-ts'
 import Base from '../../common/models/base'
 
 export default abstract class BaseBrowserStorage<T extends Base> {
@@ -8,7 +7,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
   public constructor(private _TConstructor: new () => T, private _storageName: string) {}
 
   async getAll(filter?: (item: T) => boolean): Promise<T[]> {
-    const result = await browser.storage.local.get(null)
+    const result = await chrome.storage.local.get()
     const items: T[] = []
 
     for (const key in result) {
@@ -24,7 +23,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
 
   async getById(id: string): Promise<T> {
     const key = this._storageName + ':' + id
-    const result = await browser.storage.local.get(key)
+    const result = await chrome.storage.local.get(key)
     const value = result[key]
 
     // not found
@@ -42,12 +41,12 @@ export default abstract class BaseBrowserStorage<T extends Base> {
 
     const key = this._storageName + ':' + mappedItem.getId()
 
-    // const result = await browser.storage.local.get(key);
+    // const result = await chrome.storage.local.get(key);
     // if (!!result[key]) throw new Error(`Item [${key}] already exists`); // ToDo: Is it allowed to replace the object?
 
     const data = { [key]: mappedItem }
     const clone = JSON.parse(JSON.stringify(data))
-    await browser.storage.local.set(clone)
+    await chrome.storage.local.set(clone)
   }
 
   async update(item: T): Promise<void> {
@@ -56,7 +55,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
 
     const result = { [key]: mappedItem }
     const clone = JSON.parse(JSON.stringify(result))
-    await browser.storage.local.set(clone)
+    await chrome.storage.local.set(clone)
   }
 
   async delete(item: T): Promise<void> {
@@ -65,11 +64,11 @@ export default abstract class BaseBrowserStorage<T extends Base> {
 
   async deleteById(id: string): Promise<void> {
     const key = this._storageName + ':' + id
-    await browser.storage.local.remove(key)
+    await chrome.storage.local.remove(key)
   }
 
   async deleteAll(): Promise<void> {
-    const result = await browser.storage.local.get(null)
+    const result = await chrome.storage.local.get()
     const keys: string[] = []
 
     for (const key in result) {
@@ -79,7 +78,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
     }
 
     if (keys.length > 0) {
-      await browser.storage.local.remove(keys)
+      await chrome.storage.local.remove(keys)
     }
   }
 }

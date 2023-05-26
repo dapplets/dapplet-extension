@@ -1,4 +1,3 @@
-import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../common/global-event-bus'
 import { generateGuid } from '../../common/helpers'
 import {
@@ -55,7 +54,7 @@ export class NotificationService {
   async showNotification(notificationId: string, tabId: number): Promise<void> {
     const notification = await this.notificationBrowserStorage.getById(notificationId)
     EventBus.emit('show_notification', notification)
-    browser.tabs.sendMessage(tabId, {
+    chrome.tabs.sendMessage(tabId, {
       type: 'SHOW_NOTIFICATION',
       payload: notification,
     })
@@ -117,7 +116,7 @@ export class NotificationService {
 
     EventBus.emit('notifications_updated')
 
-    browser.tabs.sendMessage(tabId, {
+    chrome.tabs.sendMessage(tabId, {
       type: 'MODULE_EVENT_STREAM_MESSAGE',
       payload: {
         namespace: notification.source,
@@ -138,9 +137,9 @@ export class NotificationService {
 
   async _updateBadge() {
     const count = await this.getUnreadNotificationsCount()
-    browser.browserAction.setBadgeText({
+    chrome.action.setBadgeText({
       text: count === 0 ? '' : count.toString(),
     })
-    browser.browserAction.setBadgeBackgroundColor({ color: '#f5f5f5' })
+    chrome.action.setBadgeBackgroundColor({ color: '#f5f5f5' })
   }
 }

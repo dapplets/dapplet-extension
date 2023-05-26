@@ -1,7 +1,6 @@
 import { serialize } from 'borsh'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as nearAPI from 'near-api-js'
-import { browser } from 'webextension-polyfill-ts'
 import { NotImplementedError } from '../../common/errors'
 import { CustomConnectedWalletAccount } from './customConnectedWalletAccount'
 
@@ -31,7 +30,7 @@ export class BackgroundWalletConnection extends nearAPI.WalletConnection {
     newUrl.searchParams.set('callbackUrl', callbackUrl || currentUrl.href)
     newUrl.searchParams.set('referrer', 'Dapplets Extension')
 
-    const { createTab, waitClosingTab } = await initBGFunctions(browser)
+    const { createTab, waitClosingTab } = await initBGFunctions(chrome)
     const tab = await createTab(newUrl.toString())
     await waitClosingTab(tab.id, tab.windowId)
   }

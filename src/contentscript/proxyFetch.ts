@@ -1,11 +1,9 @@
-import { browser } from 'webextension-polyfill-ts'
-
 export const proxyFetch: typeof fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const request = new Request(input, init)
 
   const requestBlob = request.body ? await request.blob() : undefined
 
-  const bgResponse = await browser.runtime.sendMessage({
+  const bgResponse = await chrome.runtime.sendMessage({
     type: 'FETCH_REQUEST',
     payload: {
       url: request.url,

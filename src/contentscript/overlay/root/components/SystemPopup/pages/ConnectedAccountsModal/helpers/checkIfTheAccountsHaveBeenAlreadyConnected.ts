@@ -1,11 +1,10 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
 import { IConnectedAccountUser, TConnectedAccount } from '../../../../../../../../common/types'
 
 const checkIfTheAccountsHaveBeenAlreadyConnected = async (
   accounts: [IConnectedAccountUser, IConnectedAccountUser]
 ) => {
-  const { getConnectedAccounts } = await initBGFunctions(browser)
+  const { getConnectedAccounts } = await initBGFunctions(chrome)
   const accountFirstCA: TConnectedAccount[][] = await getConnectedAccounts(
     accounts[0].name,
     accounts[0].origin,

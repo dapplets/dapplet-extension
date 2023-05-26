@@ -1,6 +1,5 @@
 import { serialize } from 'borsh'
 import * as nearAPI from 'near-api-js'
-import { browser } from 'webextension-polyfill-ts'
 import { waitClosingTab } from '../../../../common/helpers'
 import { CustomConnectedWalletAccount } from './customConnectedWalletAccount'
 
@@ -44,7 +43,7 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
       )
     }
 
-    const tab = await browser.tabs.create({ url: newUrl.toString() })
+    const tab = await chrome.tabs.create({ url: newUrl.toString() })
     await waitClosingTab(tab.id, tab.windowId)
   }
 
@@ -65,7 +64,7 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
     newUrl.searchParams.set('callbackUrl', callbackUrl || currentUrl.href)
     newUrl.searchParams.set('referrer', 'Dapplets Extension')
 
-    const tab = await browser.tabs.create({ url: newUrl.toString() })
+    const tab = await chrome.tabs.create({ url: newUrl.toString() })
     await waitClosingTab(tab.id, tab.windowId)
   }
 

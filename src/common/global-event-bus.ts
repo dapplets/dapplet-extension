@@ -3,8 +3,6 @@
  * Provides the same interface in all parts of an extension.
  */
 
-import { Browser, Runtime } from 'webextension-polyfill-ts'
-
 // Constants
 
 const BUS_ID = 'GLOBAL_EVENT_BUS_UNIQUE'
@@ -40,13 +38,9 @@ interface Connection {
 // Detect an extension's module
 
 let environment: EnvType
-let browser: Browser | null
 
 try {
-  const module = require('webextension-polyfill-ts')
-  browser = module.browser
-
-  if (window === browser.extension?.getBackgroundPage?.()) {
+  if (window === chrome.extension?.getBackgroundPage?.()) {
     environment = EnvType.BACKGROUND
   } else if (self !== top) {
     environment = EnvType.CONTENT_FRAME
@@ -63,7 +57,7 @@ const currentContext = (crypto as any).randomUUID()
 const callbacks = new Map<string, Set<CallbackFunction>>()
 const connections: Connection[] = []
 
-function register(portOrWindow: Runtime.Port | Window) {
+function register(portOrWindow: chrome.runtime.Port | Window) {
   const _conn: any = portOrWindow instanceof Window ? {} : portOrWindow
 
   const callback = (message: EventMessage) => {
@@ -108,14 +102,14 @@ function register(portOrWindow: Runtime.Port | Window) {
 
 if (environment === EnvType.BACKGROUND) {
   // Listen incoming connections to the background
-  browser.runtime.onConnect.addListener((port) => {
+  chrome.runtime.onConnect.addListener((port) => {
     if (port.name === BUS_ID) {
       register(port)
     }
   })
 } else if (environment === EnvType.CONTENT_SCRIPT || environment === EnvType.CONTENT_FRAME) {
   // Connect to the background
-  const port = browser.runtime.connect({ name: BUS_ID } as any)
+  const port = chrome.runtime.connect({ name: BUS_ID } as any)
   register(port)
 
   if (environment === EnvType.CONTENT_SCRIPT) {

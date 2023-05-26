@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as ethers from 'ethers'
 import * as NearApi from 'near-api-js'
-import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
 import { generateGuid, parseShareLink } from '../common/helpers'
@@ -56,7 +55,7 @@ type ContentDetector = {
 export default class Core {
   constructor(isIframe: boolean, public overlayManager: IOverlayManager) {
     if (!isIframe) {
-      browser.runtime.onMessage.addListener((message, sender) => {
+      chrome.runtime.onMessage.addListener((message, sender) => {
         if (typeof message === 'string') {
           if (message === 'TOGGLE_OVERLAY') {
             this.toggleOverlay()
@@ -154,7 +153,7 @@ export default class Core {
   }
 
   public async notify(payload: NotificationPayload, icon?: string, moduleName?: string) {
-    const { createAndShowNotification, getThisTab } = await initBGFunctions(browser)
+    const { createAndShowNotification, getThisTab } = await initBGFunctions(chrome)
     const thisTab = await getThisTab()
 
     const notification = {
@@ -280,7 +279,7 @@ export default class Core {
     const _authMethods = cfg.authMethods ?? [cfg.type + '/' + cfg.network]
 
     const isConnected = async () => {
-      const { getWalletDescriptors } = await initBGFunctions(browser)
+      const { getWalletDescriptors } = await initBGFunctions(chrome)
       const sessions = await this.sessions(app)
       const session = sessions.find((x) => _authMethods.includes(x.authMethod))
       if (!session) return false
@@ -487,7 +486,7 @@ export default class Core {
   }
 
   public async sessions(moduleName?: string): Promise<LoginSession[]> {
-    const { getSessions } = await initBGFunctions(browser)
+    const { getSessions } = await initBGFunctions(chrome)
     const sessions = await getSessions(moduleName)
     return sessions.map((x) => new LoginSession(x))
   }
@@ -527,7 +526,7 @@ export default class Core {
       _request.target = _request.target.id
     }
 
-    const { createSession, getThisTab } = await initBGFunctions(browser)
+    const { createSession, getThisTab } = await initBGFunctions(chrome)
     const thisTab = await getThisTab()
     const session = await createSession(moduleName, _request, thisTab.id)
 
@@ -549,7 +548,7 @@ export default class Core {
   public fetch = proxyFetch
 
   public async getPreferredConnectedAccountsNetwork() {
-    const bGFunctions = await initBGFunctions(browser)
+    const bGFunctions = await initBGFunctions(chrome)
     return bGFunctions.getPreferredConnectedAccountsNetwork()
   }
 }

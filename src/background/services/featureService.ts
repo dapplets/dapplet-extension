@@ -1,6 +1,5 @@
 import JSZip from 'jszip'
 import { rcompare } from 'semver'
-import { browser } from 'webextension-polyfill-ts'
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer'
 import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants'
 import * as EventBus from '../../common/global-event-bus'
@@ -334,7 +333,7 @@ export default class FeatureService {
               p.version === version &&
               isActive === true
             ) {
-              browser.runtime.onMessage.removeListener(listener)
+              chrome.runtime.onMessage.removeListener(listener)
 
               resolve(p.runtime)
             }
@@ -345,7 +344,7 @@ export default class FeatureService {
               p.version === version &&
               isActive === false
             ) {
-              browser.runtime.onMessage.removeListener(listener)
+              chrome.runtime.onMessage.removeListener(listener)
               resolve(p.runtime)
             }
           } else if (message.type === 'FEATURE_LOADING_ERROR') {
@@ -355,7 +354,7 @@ export default class FeatureService {
             //   p.version === version &&
             //   isActive === true
             // ){
-            browser.runtime.onMessage.removeListener(listener)
+            chrome.runtime.onMessage.removeListener(listener)
             reject(p.error)
             // }
           } else if (message.type === 'FEATURE_UNLOADING_ERROR') {
@@ -365,22 +364,22 @@ export default class FeatureService {
               p.version === version &&
               isActive === false
             ) {
-              browser.runtime.onMessage.removeListener(listener)
+              chrome.runtime.onMessage.removeListener(listener)
               reject(p.error)
             }
           }
         }
 
-        browser.runtime.onMessage.addListener(listener)
+        chrome.runtime.onMessage.addListener(listener)
 
         // reject if module is loading too long
         setTimeout(() => {
-          browser.runtime.onMessage.removeListener(listener)
+          chrome.runtime.onMessage.removeListener(listener)
           reject('Loading timeout exceed')
         }, 30000)
 
         // sending command to contentscript
-        browser.tabs.sendMessage(tabId, {
+        chrome.tabs.sendMessage(tabId, {
           type: isActive ? 'FEATURE_ACTIVATED' : 'FEATURE_DEACTIVATED',
           payload: [
             {
@@ -805,7 +804,7 @@ export default class FeatureService {
       // sending command to contentscript
       const activeTab = await getCurrentTab()
       if (!activeTab) return
-      browser.tabs.sendMessage(activeTab.id, {
+      chrome.tabs.sendMessage(activeTab.id, {
         type: 'FEATURE_DEACTIVATED',
         payload: [
           {
@@ -877,7 +876,7 @@ export default class FeatureService {
       const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl)
       if (!registry) return null
       const moduleInfo = await registry.getModuleInfoByName(moduleName)
-      // if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
+      // if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into chrome storage
       return moduleInfo
       // }
     }

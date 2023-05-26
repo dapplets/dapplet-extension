@@ -2,7 +2,6 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
 import * as React from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import { Bus } from '../../../../../../../common/bus'
 import * as walletIcons from '../../../../../../../common/resources/wallets'
 import { LoginRequest, WalletDescriptor, WalletTypes } from '../../../../../../../common/types'
@@ -48,7 +47,7 @@ export class ConnectedWallets extends React.Component<Props, State> {
   }
 
   async loadData() {
-    const { getWalletDescriptors } = await initBGFunctions(browser)
+    const { getWalletDescriptors } = await initBGFunctions(chrome)
     const descriptors = await getWalletDescriptors()
 
     this.setState({
@@ -66,7 +65,7 @@ export class ConnectedWallets extends React.Component<Props, State> {
     try {
       this.setState({ signing: { wallet } })
       const { app, loginRequest } = this.props.data
-      const { createLoginConfirmation } = await initBGFunctions(browser)
+      const { createLoginConfirmation } = await initBGFunctions(chrome)
       const confirmation = await createLoginConfirmation(app, loginRequest, chain, wallet)
       const confirmationId = confirmation.loginConfirmationId
       const frameId = this.props.data.frameId

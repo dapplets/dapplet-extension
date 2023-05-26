@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
@@ -94,13 +93,13 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
   }, [])
 
   const _updateData = async () => {
-    const { getRegistries, getContextIds, getCounterStake } = await initBGFunctions(browser)
+    const { getRegistries, getContextIds, getCounterStake } = await initBGFunctions(chrome)
 
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
     const contextId = await getContextIds(prodRegistries[0]?.url, mi.name)
-const counter = await getCounterStake(mi.name)
-setCounterBurn(counter)
+    const counter = await getCounterStake(mi.name)
+    setCounterBurn(counter)
     setVisibleContextId(contextId)
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
@@ -128,7 +127,7 @@ setCounterBurn(counter)
   const saveChanges = async () => {
     setModalTransaction(true)
     try {
-      const { editModuleInfo } = await initBGFunctions(browser)
+      const { editModuleInfo } = await initBGFunctions(chrome)
       await editModuleInfo(targetRegistry, targetStorages, mi)
 
       setModalTransaction(false)
@@ -163,7 +162,7 @@ setCounterBurn(counter)
     setAddDisabled(true)
 
     try {
-      const { addContextId, getContextIds } = await initBGFunctions(browser)
+      const { addContextId, getContextIds } = await initBGFunctions(chrome)
       if (!targetRegistry || !mi.name || !contextId) return
 
       await addContextId(targetRegistry, mi.name, contextId)
@@ -202,7 +201,7 @@ setCounterBurn(counter)
     setAddDisabled(true)
 
     try {
-      const { removeContextId, getContextIds } = await initBGFunctions(browser)
+      const { removeContextId, getContextIds } = await initBGFunctions(chrome)
       if (!targetRegistry || !mi.name || !contextId) return
 
       await removeContextId(targetRegistry, mi.name, contextId)
@@ -281,7 +280,14 @@ setCounterBurn(counter)
             title="Social"
             children={
               <div className={styles.socialBlock}>
-                <div className={styles.moduleTitle}> {mi.name} <div className={styles.counterBurn}> Days to burn: <span className={styles.counter}>{counterBurn}</span></div></div>  
+                <div className={styles.moduleTitle}>
+                  {' '}
+                  {mi.name}{' '}
+                  <div className={styles.counterBurn}>
+                    {' '}
+                    Days to burn: <span className={styles.counter}>{counterBurn}</span>
+                  </div>
+                </div>
 
                 <SettingItem
                   title="Title"

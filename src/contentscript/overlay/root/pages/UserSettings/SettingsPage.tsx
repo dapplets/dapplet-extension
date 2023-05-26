@@ -2,7 +2,6 @@ import { withTheme } from '@rjsf/core'
 import validator from '@rjsf/validator-ajv8'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { FC, useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
 import { CONTEXT_ID_WILDCARD } from '../../../../../common/constants'
@@ -44,7 +43,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   useEffect(() => {
     const init = async () => {
       if (mi || vi || schemaConfig || defaultConfig) {
-        const { getDevMode, getSwarmGateway } = await initBGFunctions(browser)
+        const { getDevMode, getSwarmGateway } = await initBGFunctions(chrome)
         const devMode = await getDevMode()
         const swarmGatewayUrl = await getSwarmGateway()
 
@@ -79,7 +78,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   }, [])
 
   const _refreshData = async () => {
-    const { getAllUserSettings } = await initBGFunctions(browser)
+    const { getAllUserSettings } = await initBGFunctions(chrome)
     const customData = await getAllUserSettings(mi.name)
     const defaultData = (defaultConfig && defaultConfig[vi.environment]) || {}
     const data = { ...defaultData, ...customData }
@@ -89,7 +88,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
 
   const _updateOwnership = async () => {
     if (!mi.sourceRegistry.isDev) {
-      const { getOwnership } = await initBGFunctions(browser)
+      const { getOwnership } = await initBGFunctions(chrome)
       const owner = await getOwnership(mi.sourceRegistry.url, mi.name)
       setOwner(owner)
     } else {
@@ -98,7 +97,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   }
 
   const updateData = async () => {
-    const { getRegistries, getOwnership } = await initBGFunctions(browser)
+    const { getRegistries, getOwnership } = await initBGFunctions(chrome)
     const registries = await getRegistries()
 
     const newRegistries = registries
@@ -113,7 +112,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
     setLoading(true)
     setData(data)
 
-    const { setAllUserSettings } = await initBGFunctions(browser)
+    const { setAllUserSettings } = await initBGFunctions(chrome)
     await setAllUserSettings(mi.name, data)
     await _refreshData()
     await _reloadFeature()
@@ -122,7 +121,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   }
 
   const _reloadFeature = async () => {
-    const { reloadFeature } = await initBGFunctions(browser)
+    const { reloadFeature } = await initBGFunctions(chrome)
     const isEverywhere = true
     const targetContextIds = isEverywhere ? [CONTEXT_ID_WILDCARD] : mi.hostnames
     await reloadFeature(mi.name, vi.version, targetContextIds, mi.order, mi.sourceRegistry.url)
@@ -131,7 +130,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
   const _resetSettings = async () => {
     setLoading(true)
 
-    const { clearUserSettings } = await initBGFunctions(browser)
+    const { clearUserSettings } = await initBGFunctions(chrome)
     await clearUserSettings(mi.name)
     await _refreshData()
     await _reloadFeature()

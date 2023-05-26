@@ -1,11 +1,10 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../common/global-event-bus'
 import { ReactComponent as EndImg } from './assets/end.svg'
-import { ReactComponent as PromoImg } from './assets/promo.svg'
 import { ReactComponent as NormalSwitch } from './assets/Normal_switch.svg'
+import { ReactComponent as PromoImg } from './assets/promo.svg'
 import styles from './BaseOnboarding.module.scss'
 import { Button } from './components/Button'
 import { SkipButton } from './components/SkipButton'
@@ -35,13 +34,13 @@ export const Onboarding: FC = () => {
   }, [])
 
   const _updateData = async () => {
-    const { getIsFirstInstallation } = await initBGFunctions(browser)
+    const { getIsFirstInstallation } = await initBGFunctions(chrome)
     const IsFirstInstallation = await getIsFirstInstallation()
     setFirstInstallation(IsFirstInstallation)
   }
 
   const handleSkipButtonClick = async () => {
-    const { setIsFirstInstallation } = await initBGFunctions(browser)
+    const { setIsFirstInstallation } = await initBGFunctions(chrome)
     setFirstInstallation(false)
     setStep(OnboardingSteps.PROMO)
     await setIsFirstInstallation(false)
@@ -108,12 +107,13 @@ export const Onboarding: FC = () => {
               currentStep={step}
               stepsNumber={5}
             />
-             <div className={styles.text}>
-             With these switches you can turn the Dapplets on and off.
-            </div>
-            <NormalSwitch/>
             <div className={styles.text}>
-            Try it out, it is very simple. After you activate the dapplet, the result will be displayed on the page immediately.
+              With these switches you can turn the Dapplets on and off.
+            </div>
+            <NormalSwitch />
+            <div className={styles.text}>
+              Try it out, it is very simple. After you activate the dapplet, the result will be
+              displayed on the page immediately.
             </div>
             <Button big label="Finish onboarding" onClick={() => setStep(OnboardingSteps.END)} />
           </>

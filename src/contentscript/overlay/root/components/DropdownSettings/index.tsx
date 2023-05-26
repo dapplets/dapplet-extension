@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../common/global-event-bus'
 import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
 import styles from './DropdownSettings.module.scss'
@@ -27,14 +26,14 @@ export const DropdownSettings = (props: TDropdownSettingsProps) => {
   }, [getterName])
 
   const loadValueFromStorage = async () => {
-    const backgroundFunctions = await initBGFunctions(browser)
+    const backgroundFunctions = await initBGFunctions(chrome)
     const storageValue = await backgroundFunctions[getterName]()
 
     setSelectedValue(storageValue)
   }
 
   const writeToStorageSelectedValue = async (value: string, func: (x) => void) => {
-    const backgroundFunctions = await initBGFunctions(browser)
+    const backgroundFunctions = await initBGFunctions(chrome)
     await backgroundFunctions[setterName](value)
     loadValueFromStorage()
     func(false)

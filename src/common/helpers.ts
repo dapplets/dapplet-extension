@@ -1,5 +1,4 @@
 import * as semver from 'semver'
-import { browser, Tabs } from 'webextension-polyfill-ts'
 import { DEFAULT_BRANCH_NAME } from './constants'
 import {
   ChainTypes,
@@ -141,9 +140,9 @@ export function timeoutPromise<T>(ms: number, promise: Promise<T>, timeoutCallba
   })
 }
 
-export async function getCurrentTab(): Promise<Tabs.Tab | null> {
+export async function getCurrentTab(): Promise<chrome.tabs.Tab | null> {
   try {
-    const tabs = await browser.tabs.query({ currentWindow: true, active: true })
+    const tabs = await chrome.tabs.query({ currentWindow: true, active: true })
     const tab = tabs[0]
 
     if (!tab) return null
@@ -154,10 +153,10 @@ export async function getCurrentTab(): Promise<Tabs.Tab | null> {
   }
 }
 
-export const getCurrentContextIds = async (tab: Tabs.Tab | null): Promise<string[]> => {
+export const getCurrentContextIds = async (tab: chrome.tabs.Tab | null): Promise<string[]> => {
   if (!tab) tab = await getCurrentTab()
   if (!tab) return []
-  return browser.tabs.sendMessage(tab.id, { type: 'CURRENT_CONTEXT_IDS' })
+  return chrome.tabs.sendMessage(tab.id, { type: 'CURRENT_CONTEXT_IDS' })
 }
 
 export function networkName(chainId: number) {
@@ -226,16 +225,16 @@ export async function waitTab(url: string) {
     return true
   }
 
-  return new Promise<Tabs.Tab>((res, rej) => {
+  return new Promise<chrome.tabs.Tab>((res, rej) => {
     const handler = async (tabId: number) => {
-      const tab = await browser.tabs.get(tabId)
+      const tab = await chrome.tabs.get(tabId)
       const receivedUrl = new URL(tab.url)
       if (isEqualUrlParams(expectedUrl, receivedUrl)) {
         res(tab)
-        browser.tabs.onUpdated.removeListener(handler)
+        chrome.tabs.onUpdated.removeListener(handler)
       }
     }
-    browser.tabs.onUpdated.addListener(handler)
+    chrome.tabs.onUpdated.addListener(handler)
   })
 }
 
@@ -292,10 +291,10 @@ export async function waitClosingTab(tabId: number, windowId: number) {
     const handler = (_tabId, removeInfo) => {
       if (_tabId === tabId && windowId === removeInfo.windowId) {
         res()
-        browser.tabs.onRemoved.removeListener(handler)
+        chrome.tabs.onRemoved.removeListener(handler)
       }
     }
-    browser.tabs.onRemoved.addListener(handler)
+    chrome.tabs.onRemoved.addListener(handler)
   })
 }
 
@@ -303,7 +302,7 @@ export async function reloadCurrentPage() {
   if (window['DAPPLETS_JSLIB'] !== true) {
     const tab = await getCurrentTab()
     if (!tab) return
-    browser.tabs.reload(tab.id)
+    chrome.tabs.reload(tab.id)
   } else {
     window.location.reload()
   }

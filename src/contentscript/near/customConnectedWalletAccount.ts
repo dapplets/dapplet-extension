@@ -2,7 +2,6 @@ import { baseDecode } from 'borsh'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as nearAPI from 'near-api-js'
 import { ConnectedWalletAccount } from 'near-api-js'
-import { browser } from 'webextension-polyfill-ts'
 import { generateGuid } from '../../common/helpers'
 
 export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
@@ -23,7 +22,7 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     actions: nearAPI.transactions.Action[]
   ): Promise<nearAPI.providers.FinalExecutionOutcome> {
     //if (!this.accountId) {
-    const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser)
+    const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(chrome)
     // ToDo: remove it?
     // await prepareWalletFor(this._app, 'near/' + this._network, null);
 
@@ -79,9 +78,9 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     )
 
     const requestId = generateGuid()
-    const callbackUrl = browser.runtime.getURL(`callback.html?request_id=${requestId}`)
+    const callbackUrl = chrome.runtime.getURL(`callback.html?request_id=${requestId}`)
 
-    const { waitTab, removeTab, updateTab, queryTab } = await initBGFunctions(browser)
+    const { waitTab, removeTab, updateTab, queryTab } = await initBGFunctions(chrome)
     const [currentTab] = await queryTab({ active: true, currentWindow: true })
 
     let callbackTab = null

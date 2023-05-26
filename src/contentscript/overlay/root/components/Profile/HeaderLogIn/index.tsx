@@ -3,7 +3,6 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../../common/global-event-bus'
 import * as walletIcons from '../../../../../../common/resources/wallets'
 import {
@@ -84,7 +83,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   }, [])
 
   const refresh = async () => {
-    const { getWalletDescriptors, getDefaultWalletFor } = await initBGFunctions(browser)
+    const { getWalletDescriptors, getDefaultWalletFor } = await initBGFunctions(chrome)
     const descriptors = await getWalletDescriptors()
     const selectedWallet = await getDefaultWalletFor(
       DefaultSigners.EXTENSION,
@@ -139,12 +138,12 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   }
 
   const disconnectButtonClick = async (chain: ChainTypes, wallet: WalletTypes) => {
-    const { disconnectWallet } = await initBGFunctions(browser)
+    const { disconnectWallet } = await initBGFunctions(chrome)
     await disconnectWallet(chain, wallet)
     await refresh()
   }
   const connectWallet = async () => {
-    const { pairWalletViaOverlay } = await initBGFunctions(browser)
+    const { pairWalletViaOverlay } = await initBGFunctions(chrome)
     try {
       if (isOverlay) {
         setOpen()

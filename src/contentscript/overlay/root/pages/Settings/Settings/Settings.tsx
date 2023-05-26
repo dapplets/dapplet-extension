@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import { StorageTypes } from '../../../../../../common/constants'
 import { isValidPostageStampId } from '../../../../../../common/helpers'
 import { Checkbox } from '../../../components/Checkbox'
@@ -98,32 +97,32 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const loadErrorReporting = async () => {
-    const { getErrorReporting } = await initBGFunctions(browser)
+    const { getErrorReporting } = await initBGFunctions(chrome)
     const errorReporting = await getErrorReporting()
 
     setErrorReporting(errorReporting)
   }
   const checkUpdates = async () => {
-    const { getNewExtensionVersion } = await initBGFunctions(browser)
+    const { getNewExtensionVersion } = await initBGFunctions(chrome)
     const isUpdateAvailable = await getNewExtensionVersion()
 
     onUpdateAvailable(isUpdateAvailable)
   }
   const loadProvider = async () => {
-    const { getInitialConfig } = await initBGFunctions(browser)
+    const { getInitialConfig } = await initBGFunctions(chrome)
     const config = await getInitialConfig()
 
     if (config.providerUrl) {
       setProviderInputDefault(config.providerUrl)
     }
-    const { getEthereumProvider } = await initBGFunctions(browser)
+    const { getEthereumProvider } = await initBGFunctions(chrome)
     const provider = await getEthereumProvider()
 
     setProviderInput(provider)
   }
   const setProvider = async (provider: string) => {
     try {
-      const { setEthereumProvider } = await initBGFunctions(browser)
+      const { setEthereumProvider } = await initBGFunctions(chrome)
       await setEthereumProvider(provider)
       loadProvider()
     } catch (err) {
@@ -135,13 +134,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const loadSwarmGateway = async () => {
-    const { getInitialConfig } = await initBGFunctions(browser)
+    const { getInitialConfig } = await initBGFunctions(chrome)
     const config = await getInitialConfig()
 
     if (config.swarmGatewayUrl) {
       setSwarmGatewayInputDefault(config.swarmGatewayUrl)
     }
-    const { getSwarmGateway } = await initBGFunctions(browser)
+    const { getSwarmGateway } = await initBGFunctions(chrome)
     const gateway = await getSwarmGateway()
 
     setSwarmGatewayInput(gateway)
@@ -149,7 +148,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const setSwarmGateway = async (gateway: string) => {
     try {
-      const { setSwarmGateway } = await initBGFunctions(browser)
+      const { setSwarmGateway } = await initBGFunctions(chrome)
       await setSwarmGateway(gateway)
       loadSwarmGateway()
     } catch (err) {
@@ -161,13 +160,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const loadSwarmPostageStampId = async () => {
-    const { getInitialConfig } = await initBGFunctions(browser)
+    const { getInitialConfig } = await initBGFunctions(chrome)
     const config = await getInitialConfig()
 
     if (config.swarmPostageStampId) {
       setSwarmPostageStampIdInputDefault(config.swarmPostageStampId)
     }
-    const { getSwarmPostageStampId } = await initBGFunctions(browser)
+    const { getSwarmPostageStampId } = await initBGFunctions(chrome)
     const id = await getSwarmPostageStampId()
 
     setSwarmPostageStampIdInput(id)
@@ -175,7 +174,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const setSwarmPostageStampId = async (id: string) => {
     try {
-      const { setSwarmPostageStampId } = await initBGFunctions(browser)
+      const { setSwarmPostageStampId } = await initBGFunctions(chrome)
       await setSwarmPostageStampId(id)
 
       loadSwarmPostageStampId()
@@ -189,12 +188,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const loadDynamicAdapter = async () => {
-    const { getInitialConfig } = await initBGFunctions(browser)
+    const { getInitialConfig } = await initBGFunctions(chrome)
     const config = await getInitialConfig()
 
     setDynamicAdapterInputDefault(config.dynamicAdapter)
 
-    const { getDynamicAdapter } = await initBGFunctions(browser)
+    const { getDynamicAdapter } = await initBGFunctions(chrome)
     const dynamicAdapterInput = await getDynamicAdapter()
 
     setDynamicAdapterInput(dynamicAdapterInput)
@@ -202,7 +201,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const setDynamicAdapter = async (dynamicAdapter: string) => {
     try {
-      const { setDynamicAdapter } = await initBGFunctions(browser)
+      const { setDynamicAdapter } = await initBGFunctions(chrome)
       await setDynamicAdapter(dynamicAdapter)
       loadDynamicAdapter()
     } catch (error) {
@@ -211,12 +210,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const loadUserAgentId = async () => {
-    const { getUserAgentId } = await initBGFunctions(browser)
+    const { getUserAgentId } = await initBGFunctions(chrome)
     const userAgentId = await getUserAgentId()
   }
 
   const loadUserAgentName = async () => {
-    const { getUserAgentName } = await initBGFunctions(browser)
+    const { getUserAgentName } = await initBGFunctions(chrome)
     const userAgentNameInput = await getUserAgentName()
 
     setUserAgentNameInput(userAgentNameInput)
@@ -225,7 +224,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const setUserAgentName = async (userAgentName: string) => {
     const valueParse = getValidUserAgentName(userAgentNameInput, regExpUserAgentName)
     if (valueParse !== null) {
-      const { setUserAgentName } = await initBGFunctions(browser)
+      const { setUserAgentName } = await initBGFunctions(chrome)
       await setUserAgentName(userAgentName)
       loadUserAgentName()
     } else {
@@ -238,13 +237,13 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const loadIpfsGateway = async () => {
-    const { getInitialConfig } = await initBGFunctions(browser)
+    const { getInitialConfig } = await initBGFunctions(chrome)
     const config = await getInitialConfig()
 
     if (config.ipfsGatewayUrl) {
       setIpfsGatewayInputDefault(config.ipfsGatewayUrl)
     }
-    const { getIpfsGateway } = await initBGFunctions(browser)
+    const { getIpfsGateway } = await initBGFunctions(chrome)
     const gateway = await getIpfsGateway()
 
     setIpfsGatewayInput(gateway)
@@ -252,7 +251,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const setIpfsGateway = async (gateway: string) => {
     try {
-      const { setIpfsGateway } = await initBGFunctions(browser)
+      const { setIpfsGateway } = await initBGFunctions(chrome)
       await setIpfsGateway(gateway)
       loadIpfsGateway()
     } catch (err) {
@@ -264,7 +263,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const changeTargetStorage = async (storage: StorageTypes, checked: boolean) => {
-    const { updateTargetStorages } = await initBGFunctions(browser)
+    const { updateTargetStorages } = await initBGFunctions(chrome)
 
     const newTarget = targetStorages.filter((x) => x !== storage)
 
@@ -274,7 +273,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const loadTargetStorages = async () => {
-    const { getTargetStorages } = await initBGFunctions(browser)
+    const { getTargetStorages } = await initBGFunctions(chrome)
     const loadTarget = await getTargetStorages()
 
     setTargetStorages(loadTarget)
@@ -284,7 +283,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     ref.current?.blur()
   }
   const setOnboarding = async () => {
-    const { setIsFirstInstallation, getIsFirstInstallation } = await initBGFunctions(browser)
+    const { setIsFirstInstallation, getIsFirstInstallation } = await initBGFunctions(chrome)
     await setIsFirstInstallation(true)
   }
 

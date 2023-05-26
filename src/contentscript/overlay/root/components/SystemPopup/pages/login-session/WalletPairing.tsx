@@ -1,6 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as React from 'react'
-import { browser } from 'webextension-polyfill-ts'
 // import * as logos from '../../../common/resources/wallets';
 import { Bus } from '../../../../../../../common/bus'
 import { SECURE_AUTH_METHODS } from '../../../../../../../common/constants'
@@ -53,7 +52,7 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
     const p = this.props
     const secureLogin = this.props.data.loginRequest.secureLogin
 
-    const { getWalletDescriptors } = await initBGFunctions(browser)
+    const { getWalletDescriptors } = await initBGFunctions(chrome)
     const descriptors = await getWalletDescriptors()
 
     // const connectedWallets = this.state.descriptors
@@ -79,7 +78,7 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
   }
 
   async disconnectButtonClick(chain: ChainTypes, wallet: WalletTypes) {
-    const { disconnectWallet } = await initBGFunctions(browser)
+    const { disconnectWallet } = await initBGFunctions(chrome)
     await disconnectWallet(chain, wallet)
     await this.componentDidMount()
   }

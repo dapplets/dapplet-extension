@@ -13,7 +13,6 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom'
-import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../background/dto/manifestDTO'
 import { AnalyticsGoals } from '../../../background/services/analyticsService'
 import { Bus } from '../../../common/bus'
@@ -168,7 +167,7 @@ class _App extends React.Component<P, S> {
       }
     }
 
-    const { getDevMode } = await initBGFunctions(browser)
+    const { getDevMode } = await initBGFunctions(chrome)
     const isDevMode = await getDevMode()
 
     // ToDo: rethink overlay update when background state changes
@@ -179,7 +178,7 @@ class _App extends React.Component<P, S> {
 
   componentDidUpdate(prevProps) {
     if (prevProps.location.pathname !== this.props.location.pathname) {
-      initBGFunctions(browser).then((x) => x.track({ url: this.props.location.pathname }))
+      initBGFunctions(chrome).then((x) => x.track({ url: this.props.location.pathname }))
     }
   }
 
@@ -299,7 +298,7 @@ class _App extends React.Component<P, S> {
   }
 
   handleStoreButtonClick = () => {
-    initBGFunctions(browser).then((x) => x.track({ idgoal: AnalyticsGoals.MovedToStore }))
+    initBGFunctions(chrome).then((x) => x.track({ idgoal: AnalyticsGoals.MovedToStore }))
     window.open(DAPPLETS_STORE_URL, '_blank')
   }
 

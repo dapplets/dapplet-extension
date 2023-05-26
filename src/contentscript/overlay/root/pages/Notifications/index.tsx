@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 
 import React, { useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import {
   Notification as Notify,
   NotificationStatus,
@@ -54,7 +53,7 @@ export const Notifications = () => {
   }, [])
 
   const getNotifications = async () => {
-    const backgroundFunctions = await initBGFunctions(browser)
+    const backgroundFunctions = await initBGFunctions(chrome)
     const { getNotifications } = backgroundFunctions
     // todo: argument mocked
     const notifications: Notify[] = await getNotifications(NotificationType.Application)
@@ -63,7 +62,7 @@ export const Notifications = () => {
   }
 
   const onRemoveEvent = async (f) => {
-    const { deleteNotification, getCurrentContextIds } = await initBGFunctions(browser)
+    const { deleteNotification, getCurrentContextIds } = await initBGFunctions(chrome)
 
     const contextIds = await getCurrentContextIds(null)
 
@@ -75,7 +74,7 @@ export const Notifications = () => {
 
   const onRemoveEventsAll = async (f) => {
     setLoadNotify(true)
-    const { markAllNotificationsAsViewed, deleteAllNotifications } = await initBGFunctions(browser)
+    const { markAllNotificationsAsViewed, deleteAllNotifications } = await initBGFunctions(chrome)
     await markAllNotificationsAsViewed(f)
     setTimeout(() => setLoadNotify(false), 1000)
     const notification = await getNotifications()
@@ -83,12 +82,12 @@ export const Notifications = () => {
   }
 
   const checkUpdates = async () => {
-    const { getNewExtensionVersion } = await initBGFunctions(browser)
+    const { getNewExtensionVersion } = await initBGFunctions(chrome)
     const isUpdateAvailable = await getNewExtensionVersion()
   }
 
   const getReadNotifications = async (id) => {
-    const { markNotificationAsViewed } = await initBGFunctions(browser)
+    const { markNotificationAsViewed } = await initBGFunctions(chrome)
 
     await markNotificationAsViewed(id)
 

@@ -1,5 +1,4 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
 import { getRegistriesInfo } from '../../../'
 import { ManifestAndDetails } from '../../../../common/types'
 
@@ -29,7 +28,7 @@ export const createUserEnvInfo = async (
     isFavourites: boolean
   }
 ): Promise<TUserEnvInfo> => {
-  const { getUserAgentName } = await initBGFunctions(browser)
+  const { getUserAgentName } = await initBGFunctions(chrome)
   const userAgentNameInput = await getUserAgentName()
   const registries = getRegistriesInfo()
   const activeAdaptersInfo = registries.filter((m) => m.manifest.type === 'ADAPTER')

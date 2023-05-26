@@ -1,6 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { Subject } from 'rxjs'
-import { browser } from 'webextension-polyfill-ts'
 import { GLOBAL_EVENT_BUS_NAME } from '../common/chrome-extension-websocket-wrapper/constants'
 import * as EventBus from '../common/global-event-bus'
 import {
@@ -42,7 +41,7 @@ async function init() {
     console.error('Cannot process the share link', e)
     return null
   })
-  const port = browser.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any)
+  const port = chrome.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any)
 
   const jsonrpc = new JsonRpc()
   const overlayManager = IS_IFRAME ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc)
@@ -72,7 +71,7 @@ async function init() {
     return Array.from(new Set(contextIDs)) // deduplicate array
   }
 
-  browser.runtime.onMessage.addListener((message) => {
+  chrome.runtime.onMessage.addListener((message) => {
     if (!message || !message.type) return
 
     if (message.type === 'FEATURE_ACTIVATED') {
@@ -114,7 +113,7 @@ async function init() {
   // Handle module (de)activations from another tabs
   EventBus.on('dapplet_activated', async () => {
     const contextIds = await getAllContextIds()
-    browser.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
+    chrome.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
   })
 
   EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]))
@@ -184,13 +183,13 @@ async function init() {
   })
 
   jsonrpc.on('pairWalletViaOverlay', () => {
-    return initBGFunctions(browser).then((x) =>
+    return initBGFunctions(chrome).then((x) =>
       x.pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
     )
   })
 
   jsonrpc.on('getWalletDescriptors', () => {
-    return initBGFunctions(browser).then((x) => x.getWalletDescriptors())
+    return initBGFunctions(chrome).then((x) => x.getWalletDescriptors())
   })
 
   jsonrpc.on('callBackground', (method: string, args: any[]) => {
@@ -198,7 +197,7 @@ async function init() {
       return Promise.reject('This function is for E2E testing only.')
     }
 
-    return initBGFunctions(browser).then((x) => x[method](...args))
+    return initBGFunctions(chrome).then((x) => x[method](...args))
   })
 
   jsonrpc.on('openOverlay', () => Promise.resolve(core.openOverlay()))
@@ -208,7 +207,7 @@ async function init() {
 
   if (!IS_IFRAME && !IS_LIBRARY) {
     // ToDo: inject in dapplets store only
-    injectScript(browser.runtime.getURL('inpage.js'))
+    injectScript(chrome.runtime.getURL('inpage.js'))
   }
 
   if (IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
@@ -245,7 +244,7 @@ async function confirmShareLink(payload: ShareLinkPayload) {
     activateFeature,
     reloadFeature,
     reloadCurrentPage,
-  } = await initBGFunctions(browser)
+  } = await initBGFunctions(chrome)
 
   const registries = await getRegistries()
   const targetRegistry = registries.find((x) => x.url === registry)
@@ -307,7 +306,7 @@ async function processShareLink() {
 
   const { moduleId, registry, contextIds } = payload
   const { getModuleInfoByName, containsTrustedUser, getRegistries, getActiveModulesByHostnames } =
-    await initBGFunctions(browser)
+    await initBGFunctions(chrome)
 
   const registries = await getRegistries()
   const targetRegistry = registries.find((x) => x.url === registry)

@@ -2,7 +2,6 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import { DAPPLETS_STORE_URL } from '../../../../../common/constants'
 import * as EventBus from '../../../../../common/global-event-bus'
 import {
@@ -88,7 +87,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   }, [])
 
   const connectWallet = async () => {
-    const { pairWalletViaOverlay } = await initBGFunctions(browser)
+    const { pairWalletViaOverlay } = await initBGFunctions(chrome)
     try {
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       p.setOpenWallet()
@@ -138,7 +137,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     if (isModuleActive) {
       if ((p.pathname.includes('system') && p.overlays.lenght === 0) || !isOverlayActive) {
         try {
-          const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
+          const { openDappletAction, getCurrentTab } = await initBGFunctions(chrome)
           const tab = await getCurrentTab()
           if (!tab) return
           await openDappletAction(f, tab.id)
@@ -180,7 +179,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   }
 
   const getNotifications = async () => {
-    const { getNotifications } = await initBGFunctions(browser)
+    const { getNotifications } = await initBGFunctions(chrome)
     const notifications = await getNotifications(NotificationType.Application)
     return notifications
   }

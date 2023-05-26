@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import { StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
@@ -75,7 +74,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }, [mi, newState, targetChain, editContextId, editAdmin])
 
   const _updateData = async () => {
-    const { getRegistries, getContextIds } = await initBGFunctions(browser)
+    const { getRegistries, getContextIds } = await initBGFunctions(chrome)
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
     const contextId = await getContextIds(prodRegistries[0]?.url, mi.name)
@@ -89,7 +88,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
   const _updateCurrentAccount = async () => {
     if (targetChain) {
-      const { getAddress } = await initBGFunctions(browser)
+      const { getAddress } = await initBGFunctions(chrome)
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
 
       setCurrentAccount(currentAccount)
@@ -106,7 +105,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const _transferOwnership = async (newAccount: string) => {
     try {
       const oldAccount = mi.author
-      const { transferOwnership } = await initBGFunctions(browser)
+      const { transferOwnership } = await initBGFunctions(chrome)
       setNewOwnerLoading(true)
       await transferOwnership(targetRegistry, mi.name, newAccount, oldAccount)
       setNewOwnerLoading(false)
@@ -142,7 +141,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const saveChanges = async () => {
     setModalTransaction(true)
     try {
-      const { editModuleInfo } = await initBGFunctions(browser)
+      const { editModuleInfo } = await initBGFunctions(chrome)
       await editModuleInfo(targetRegistry, targetStorages, mi)
       setModalTransaction(false)
       setModalPush(true)
@@ -173,7 +172,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }
 
   const getAdmins = async () => {
-    const { getAdmins } = await initBGFunctions(browser)
+    const { getAdmins } = await initBGFunctions(chrome)
     const authors = await getAdmins(targetRegistry, mi.name)
 
     setAdmins(authors)
@@ -192,7 +191,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setAddDisabled(true)
 
     try {
-      const { addContextId, getContextIds } = await initBGFunctions(browser)
+      const { addContextId, getContextIds } = await initBGFunctions(chrome)
       if (!targetRegistry || !mi.name || !contextId) return
 
       await addContextId(targetRegistry, mi.name, contextId)
@@ -214,7 +213,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
     setAddDisabled(true)
 
     try {
-      const { removeContextId, getContextIds } = await initBGFunctions(browser)
+      const { removeContextId, getContextIds } = await initBGFunctions(chrome)
       if (!targetRegistry || !mi.name || !contextId) return
 
       await removeContextId(targetRegistry, mi.name, contextId)

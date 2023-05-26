@@ -1,6 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as React from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import { Bus } from '../../../../../../../../common/bus'
 import {
   ChainTypes,
@@ -47,7 +46,7 @@ export default class MetaMask extends React.Component<Props, State> {
 
     try {
       const { connectWallet, getWalletDescriptors, createLoginConfirmation } =
-        await initBGFunctions(browser)
+        await initBGFunctions(chrome)
       await connectWallet(this.props.chain, WalletTypes.METAMASK, null)
       const descriptors = await getWalletDescriptors()
       const descriptor = descriptors.find((x) => x.type === WalletTypes.METAMASK)
@@ -90,7 +89,7 @@ export default class MetaMask extends React.Component<Props, State> {
   }
 
   // async disconnect() {
-  //     const { disconnectWallet } = await initBGFunctions(browser);
+  //     const { disconnectWallet } = await initBGFunctions(chrome);
   //     await disconnectWallet(this.props.chain, WalletTypes.METAMASK);
   //     this.setState({ toBack: true });
   // }

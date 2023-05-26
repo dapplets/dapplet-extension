@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import { ManifestAndDetails } from '../../../../../common/types'
 import { ReactComponent as Home } from '../../assets/svg/home.svg'
 import { DappletImage } from '../../components/DappletImage'
@@ -30,7 +29,7 @@ export const UserSettings = ({
     const init = async () => {
       setLoad(true)
       setSettingsContext(null)
-      const { getUserSettingsForOverlay } = await initBGFunctions(browser)
+      const { getUserSettingsForOverlay } = await initBGFunctions(chrome)
 
       const { mi, vi, schemaConfig, defaultConfig } = await getUserSettingsForOverlay(
         registryUrl,

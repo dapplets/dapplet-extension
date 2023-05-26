@@ -2,7 +2,6 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
 import React, { useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import * as walletIcons from '../../../../../../common/resources/wallets'
 import { DefaultSigners, WalletDescriptor } from '../../../../../../common/types'
 import { ReactComponent as Copy } from '../../../assets/svg/copyModal.svg'
@@ -63,7 +62,7 @@ export const ModalLogin = ({
   }
 
   const handleWalletClick = async (wallet: WalletDescriptor) => {
-    const { setWalletFor } = await initBGFunctions(browser)
+    const { setWalletFor } = await initBGFunctions(chrome)
     await setWalletFor(wallet.type, DefaultSigners.EXTENSION, wallet.chain)
     refresh()
   }

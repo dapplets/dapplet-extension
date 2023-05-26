@@ -1,12 +1,11 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
 
 export const getDefaultValueProvider = async (
   inputValue: string,
   providerUrl: string,
   setProvider: any
 ) => {
-  const { getInitialConfig } = await initBGFunctions(browser)
+  const { getInitialConfig } = await initBGFunctions(chrome)
   const config = await getInitialConfig()
 
   if (config[providerUrl] !== inputValue) {

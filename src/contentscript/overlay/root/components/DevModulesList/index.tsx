@@ -1,14 +1,13 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
 import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
 import { chainByUri, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { ReactComponent as Settings } from '../../assets/svg/setting.svg'
 import { ReactComponent as Burn } from '../../assets/svg/burn.svg'
+import { ReactComponent as Settings } from '../../assets/svg/setting.svg'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
@@ -113,14 +112,14 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   }, [targetChain])
 
   const _updateData = async () => {
-    const { getRegistries, getTrustedUsers,getCounterStake } = await initBGFunctions(browser)
+    const { getRegistries, getTrustedUsers, getCounterStake } = await initBGFunctions(chrome)
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-if(mi.isUnderConstruction){
-  const counter = await getCounterStake(mi.name)
-  setCounterBurn(counter)
-}
+    if (mi.isUnderConstruction) {
+      const counter = await getCounterStake(mi.name)
+      setCounterBurn(counter)
+    }
     if (mi === null && vi === null) {
       const newMi = new ModuleInfo()
       setMi(newMi)
@@ -172,7 +171,7 @@ if(mi.isUnderConstruction){
 
   const getModulesAdmins = async () => {
     if (!targetRegistry || !mi.name) return
-    const { getAdmins } = await initBGFunctions(browser)
+    const { getAdmins } = await initBGFunctions(chrome)
     const authors: string[] = await getAdmins(targetRegistry, mi.name)
 
     if (authors.length > 0) {
@@ -182,7 +181,7 @@ if(mi.isUnderConstruction){
 
   const _updateOwnership = async () => {
     if (!targetRegistry || !mi.name) return
-    const { getOwnership } = await initBGFunctions(browser)
+    const { getOwnership } = await initBGFunctions(chrome)
     const owner = await getOwnership(targetRegistry, mi.name)
 
     setOwner(owner)
@@ -192,7 +191,7 @@ if(mi.isUnderConstruction){
   const _updateDeploymentStatus = async () => {
     setDeploymentStatus(DeploymentStatus.Unknown)
 
-    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
+    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(chrome)
     const miF = await getModuleInfoByName(targetRegistry, mi.name)
     const deployed = vi
       ? await getVersionInfo(targetRegistry, mi.name, vi.branch, vi.version)
@@ -208,7 +207,7 @@ if(mi.isUnderConstruction){
 
   const _updateCurrentAccount = async () => {
     if (targetChain) {
-      const { getAddress } = await initBGFunctions(browser)
+      const { getAddress } = await initBGFunctions(chrome)
       const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
 
       setCurrentAccount(currentAccount)
@@ -218,7 +217,7 @@ if(mi.isUnderConstruction){
   }
 
   const _checkDependencies = async () => {
-    const { getVersionInfo } = await initBGFunctions(browser)
+    const { getVersionInfo } = await initBGFunctions(chrome)
 
     await Promise.all(
       dependenciesChecking.map((x) =>
@@ -230,7 +229,7 @@ if(mi.isUnderConstruction){
   }
 
   const deployButtonClickHandler = async (e) => {
-    const { deployModule, addTrustedUser } = await initBGFunctions(browser)
+    const { deployModule, addTrustedUser } = await initBGFunctions(chrome)
     let newDescriptors
     let isOwner
     const unificationAdmins = admins.map((e) => e.toLowerCase())
@@ -299,7 +298,7 @@ if(mi.isUnderConstruction){
 
   const connectWallet = async () => {
     setNotAccountModal(false)
-    const { pairWalletViaOverlay } = await initBGFunctions(browser)
+    const { pairWalletViaOverlay } = await initBGFunctions(chrome)
     try {
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
       await _updateData()
@@ -309,7 +308,7 @@ if(mi.isUnderConstruction){
   }
 
   const deployNewModule = async () => {
-    const { deployModule } = await initBGFunctions(browser)
+    const { deployModule } = await initBGFunctions(chrome)
     try {
       setLoadingDeploy()
       nodeButton.current.classList.add('dappletsIsLoadingDeploy')
@@ -344,7 +343,7 @@ if(mi.isUnderConstruction){
   }
 
   const updateDataLocalhost = async () => {
-    const { getRegistries, getOwnership } = await initBGFunctions(browser)
+    const { getRegistries, getOwnership } = await initBGFunctions(chrome)
     const registries = await getRegistries()
 
     const newRegistries = registries
@@ -367,7 +366,12 @@ if(mi.isUnderConstruction){
             ) : (
               <div className={styles.dappletsVersionUC}>Under Construction</div>
             )}
-{counterBurn&& <div className={styles.dappletsBurn}><Burn/>{counterBurn >= 1? counterBurn + "days":'burning'}</div> }
+            {counterBurn && (
+              <div className={styles.dappletsBurn}>
+                <Burn />
+                {counterBurn >= 1 ? counterBurn + 'days' : 'burning'}
+              </div>
+            )}
             {vi && vi.branch && vi.branch !== 'default' && (
               <div style={{ margin: '0 3px 0 0px' }} className={styles.dappletsBranch}>
                 {vi.branch}

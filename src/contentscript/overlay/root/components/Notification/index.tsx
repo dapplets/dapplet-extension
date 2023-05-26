@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import { CloseIcon } from '../CloseIcon'
 import styles from './Notification.module.scss'
 
@@ -26,7 +25,7 @@ export const Notification = (props: NotificationProps): ReactElement => {
   const newDateNum = new Date(date)
 
   async function handleActionButtonClick(actionId: string) {
-    const { resolveNotificationAction, getThisTab } = await initBGFunctions(browser)
+    const { resolveNotificationAction, getThisTab } = await initBGFunctions(chrome)
     const thisTab = await getThisTab()
     await resolveNotificationAction(_id, actionId, thisTab.id)
   }

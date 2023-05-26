@@ -1,12 +1,11 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as NearAPI from 'near-api-js'
-import { browser } from 'webextension-polyfill-ts'
 import { NearNetworkConfig } from '../../common/types'
 import { BackgroundNear } from './backgroundNear'
 import { BackgroundWalletConnection } from './backgroundWalletConnection'
 
 async function _getCurrentNetworkConfig(networkId: string) {
-  const { getNearNetworks } = await initBGFunctions(browser)
+  const { getNearNetworks } = await initBGFunctions(chrome)
   const networkConfigs: NearNetworkConfig[] = await getNearNetworks()
   const currentNetworkConfig = networkConfigs.find((x) => x.networkId === networkId)
   if (!currentNetworkConfig)
@@ -20,7 +19,7 @@ export async function createWalletConnection(
 ) {
   const currentNetworkConfig = await _getCurrentNetworkConfig(cfg.network)
 
-  const { localStorage_getItem } = await initBGFunctions(browser)
+  const { localStorage_getItem } = await initBGFunctions(chrome)
   const authDataKey = cfg.network + '_wallet_auth_key'
   const authData = JSON.parse(await localStorage_getItem(authDataKey))
   if (!authData) return null

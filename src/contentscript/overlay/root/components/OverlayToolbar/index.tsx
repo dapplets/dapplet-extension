@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import * as EventBus from '../../../../../common/global-event-bus'
 import {
   Notification as Notify,
@@ -138,7 +137,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
   const _refreshData = async () => {
     try {
-      const { getPinnedActions } = await initBGFunctions(browser)
+      const { getPinnedActions } = await initBGFunctions(chrome)
 
       const pinnedAction = await getPinnedActions()
       setPinnedActionButton(pinnedAction)
@@ -148,7 +147,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   }
   const addPinnedButton = async (name, pinId) => {
     try {
-      const { addPinnedActions } = await initBGFunctions(browser)
+      const { addPinnedActions } = await initBGFunctions(chrome)
 
       await addPinnedActions(name, pinId)
       await _refreshData()
@@ -158,7 +157,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   }
   const removePinnedButton = async (name, pinId) => {
     try {
-      const { removePinnedActions } = await initBGFunctions(browser)
+      const { removePinnedActions } = await initBGFunctions(chrome)
 
       await removePinnedActions(name, pinId)
       await _refreshData()
@@ -325,7 +324,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   ) => {
     async function handleActionButtonClick(actionId: string) {
       setPayload(null)
-      const { resolveNotificationAction, getThisTab } = await initBGFunctions(browser)
+      const { resolveNotificationAction, getThisTab } = await initBGFunctions(chrome)
       const thisTab = await getThisTab()
       await resolveNotificationAction(payload.id, actionId, thisTab.id)
     }
@@ -364,7 +363,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     )
   }
   const getNotifications = async () => {
-    const backgroundFunctions = await initBGFunctions(browser)
+    const backgroundFunctions = await initBGFunctions(chrome)
     const { getNotifications, setRead } = backgroundFunctions
 
     const notifications: Notify[] = await getNotifications(NotificationType.Application)

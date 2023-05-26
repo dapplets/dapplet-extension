@@ -4,7 +4,6 @@ import React, { FC, useState } from 'react'
 // import Linkify from 'react-linkify'
 // import { SecureLink } from 'react-secure-link'
 // import ReactTimeAgo from 'react-time-ago'
-import { browser } from 'webextension-polyfill-ts'
 // import TimeAgo from 'javascript-time-ago'
 import cn from 'classnames'
 import { useQuery } from 'react-query'
@@ -19,7 +18,7 @@ interface DevMessageProps {}
 export const DevMessage: FC<DevMessageProps> = (props) => {
   const [newVersion, setNewExtensionVersion] = useState(null)
   const _updateData = async () => {
-    const { getNewExtensionVersion, getIgnoredUpdate } = await initBGFunctions(browser)
+    const { getNewExtensionVersion, getIgnoredUpdate } = await initBGFunctions(chrome)
 
     const ignoredUpdate = await getIgnoredUpdate()
 
@@ -33,7 +32,7 @@ export const DevMessage: FC<DevMessageProps> = (props) => {
   const { data } = useNewVersion(newVersion, _updateData)
 
   const _ignoreUpdate = async () => {
-    const { setIgnoredUpdate } = await initBGFunctions(browser)
+    const { setIgnoredUpdate } = await initBGFunctions(chrome)
     setIgnoredUpdate(data)
     setNewExtensionVersion(null)
   }
@@ -61,7 +60,11 @@ export const DevMessage: FC<DevMessageProps> = (props) => {
             </div>
           </div>
           <div className={styles.secondLine}>
-            <a href="https://github.com/dapplets/dapplet-extension/releases/latest" target="_blank">
+            <a
+              href="https://github.com/dapplets/dapplet-extension/releases/latest"
+              target="_blank"
+              rel="noreferrer"
+            >
               Read changelist
             </a>
           </div>

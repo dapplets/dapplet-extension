@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../../background/models/versionInfo'
 import * as EventBus from '../../../../../../common/global-event-bus'
@@ -74,7 +73,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   const _updateData = async () => {
     setLoadButton(true)
     await loadRegistries()
-    const { getCurrentTab } = await initBGFunctions(browser)
+    const { getCurrentTab } = await initBGFunctions(chrome)
     const currentTab = await getCurrentTab()
     if (!currentTab) return
     const currentUrl = currentTab.url
@@ -92,7 +91,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
   }
 
   const loadRegistries = async () => {
-    const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
+    const { getRegistries, getAllDevModules } = await initBGFunctions(chrome)
     const modules: {
       module: ModuleInfo
       versions: VersionInfo[]
@@ -108,7 +107,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
 
   const addRegistry = async (url: string, newFunction: () => void) => {
     setLoadAdd(true)
-    const { addRegistry } = await initBGFunctions(browser)
+    const { addRegistry } = await initBGFunctions(chrome)
 
     try {
       await addRegistry(url, true)
@@ -127,21 +126,21 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
 
   const removeRegistry = async (url: string) => {
     setLoadAdd(true)
-    const { removeRegistry } = await initBGFunctions(browser)
+    const { removeRegistry } = await initBGFunctions(chrome)
     await removeRegistry(url)
     loadRegistries()
     setTimeout(() => setLoadAdd(false), 3000)
   }
 
   const deployModule = async (mi: ModuleInfo, vi: VersionInfo) => {
-    // const { openDeployOverlay } = await initBGFunctions(browser)
+    // const { openDeployOverlay } = await initBGFunctions(chrome)
     // await openDeployOverlay(mi, vi)
     // window.close()
   }
 
   const enableRegistry = async (url: string) => {
     setLoadButtonLocalhost(true)
-    const { enableRegistry } = await initBGFunctions(browser)
+    const { enableRegistry } = await initBGFunctions(chrome)
     await enableRegistry(url)
     loadRegistries()
     setTimeout(() => {
@@ -151,7 +150,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
 
   const disableRegistry = async (url: string) => {
     setLoadButtonLocalhost(true)
-    const { disableRegistry } = await initBGFunctions(browser)
+    const { disableRegistry } = await initBGFunctions(chrome)
     await disableRegistry(url)
     loadRegistries()
     setTimeout(() => {

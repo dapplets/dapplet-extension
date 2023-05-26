@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import { ReactComponent as Copy } from '../../assets/icons/tokenomics/copy.svg'
 import { regExpIndexEthereum } from '../../common/constants'
@@ -80,7 +79,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
   }, [])
 
   const _updateData = async () => {
-    const { getTokensByApp } = await initBGFunctions(browser)
+    const { getTokensByApp } = await initBGFunctions(chrome)
 
     const tokensByApp = await getTokensByApp(mi.name)
 
@@ -89,7 +88,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
   const handleSubmit = async (values) => {
     try {
       setModalTransaction(true)
-      const { linkAppWithToken } = await initBGFunctions(browser)
+      const { linkAppWithToken } = await initBGFunctions(chrome)
       await linkAppWithToken(mi.name, values.address)
       setModalTransaction(false)
       setModalEndCreation(true)
@@ -213,6 +212,7 @@ export const Tokenomics: FC<TokenomicsProps> = (props) => {
                         href="https://docs.dapplets.org/docs/whitepapers/auge-token-usage"
                         target="_blank"
                         className={styles.footerContentModalLink}
+                        rel="noreferrer"
                       >
                         F.A.Q.
                       </a>

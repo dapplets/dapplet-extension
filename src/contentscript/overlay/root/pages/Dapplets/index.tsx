@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useMemo, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
 import { AnalyticsGoals } from '../../../../../background/services/analyticsService'
 import { CONTEXT_ID_WILDCARD, DAPPLETS_STORE_URL } from '../../../../../common/constants'
@@ -126,7 +125,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       const isOverlayActive = overlays.find((x) => x.source === f.name)
       if ((pathname.includes('system') && overlays.lenght === 0) || !isOverlayActive) {
         _updateFeatureState(f.name, { isActionLoading: true })
-        const { openDappletAction, getCurrentTab } = await initBGFunctions(browser)
+        const { openDappletAction, getCurrentTab } = await initBGFunctions(chrome)
         const tab = await getCurrentTab()
         if (!tab) return
         await openDappletAction(f.name, tab.id)
@@ -161,7 +160,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     // TODO : try catch
     if (selectVersions && isActive) {
       _updateFeatureState(name, { isLoading: true })
-      const { getVersions } = await initBGFunctions(browser)
+      const { getVersions } = await initBGFunctions(chrome)
       const allVersions = await getVersions(module.sourceRegistry.url, module.name)
       _updateFeatureState(name, { versions: allVersions, isLoading: false })
       return
@@ -178,7 +177,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     order: number
   ) => {
     const { name, hostnames, sourceRegistry } = module
-    const { activateFeature, deactivateFeature } = await initBGFunctions(browser)
+    const { activateFeature, deactivateFeature } = await initBGFunctions(chrome)
 
     _updateFeatureState(name, {
       isActive,
@@ -225,7 +224,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   }
 
   const onRemoveMyDapplet = async (f: ManifestAndDetails) => {
-    const { removeMyDapplet } = await initBGFunctions(browser)
+    const { removeMyDapplet } = await initBGFunctions(chrome)
     await removeMyDapplet(f.sourceRegistry.url, f.name)
     const newDappletsList = dapplets.filter((x) => x.name !== f.name)
 
@@ -233,7 +232,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   }
 
   const onOpenStore = async (f: ManifestAndDetails) => {
-    initBGFunctions(browser).then((x) =>
+    initBGFunctions(chrome).then((x) =>
       x.track({
         idgoal: AnalyticsGoals.MovedToStore,
         dapplet: f.name,
@@ -245,14 +244,14 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   }
 
   const onOpenNft = async (f: ManifestAndDetails) => {
-    initBGFunctions(browser).then((x) =>
+    initBGFunctions(chrome).then((x) =>
       x.track({
         idgoal: AnalyticsGoals.MovedToNftMarketplace,
         dapplet: f.name,
       })
     )
 
-    const { getModuleNftUrl } = await initBGFunctions(browser)
+    const { getModuleNftUrl } = await initBGFunctions(chrome)
     const nftUrl = await getModuleNftUrl(f.sourceRegistry.url, f.name)
     window.open(nftUrl, '_blank')
   }
