@@ -52,7 +52,7 @@ export const ConnectedAccount = () => {
 
   const updatePairs = async (prevPairs?: IConnectedAccountsPair[]) => {
     const { getConnectedAccountsPairs, execConnectedAccountsUpdateHandler } = await initBGFunctions(
-      chrome
+      browser
     )
     const newPairs: IConnectedAccountsPair[] = connectedAccountsListReceiver
       ? await getConnectedAccountsPairs({

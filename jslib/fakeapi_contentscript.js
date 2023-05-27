@@ -1,5 +1,6 @@
 import common_script from '!raw-loader!../build/common.js'
 import fakeapi_frame_script from '!raw-loader!./fakeapi_frame.js'
+import browserPolyfill from 'webextension-polyfill'
 
 const browser = {}
 
@@ -184,7 +185,9 @@ browser.runtime.sendMessage = async function (message, callback) {
 }
 browser.storage.local.get = async function (key, callback) {
   //console.log('browser.storage.local.get', arguments);
-  const _storage = JSON.parse(localStorage.getItem('dapplet-extension') || '{}')
+  const _storage = JSON.parse(
+    (await browserPolyfill.storage.local.get('dapplet-extension')) || '{}'
+  )
 
   let result = {}
   if (!key) {
@@ -213,7 +216,9 @@ browser.storage.local.get = async function (key, callback) {
 }
 browser.storage.local.remove = async function (key, callback) {
   //console.log('browser.storage.local.remove', arguments);
-  const _storage = JSON.parse(localStorage.getItem('dapplet-extension') || '{}')
+  const _storage = JSON.parse(
+    (await browserPolyfill.storage.local.get('dapplet-extension')) || '{}'
+  )
   if (Array.isArray(key)) {
     key.map((aKey) => {
       delete _storage[aKey]
@@ -222,22 +227,24 @@ browser.storage.local.remove = async function (key, callback) {
     delete _storage[key]
   }
 
-  localStorage.setItem('dapplet-extension', JSON.stringify(_storage))
+  await browserPolyfill.storage.local.set({ 'dapplet-extension': JSON.stringify(_storage) })
 
   callback !== undefined && typeof callback === 'function' && callback()
 }
 browser.storage.local.set = async function (key, value, callback) {
   //console.log('browser.storage.local.set', arguments);
-  const _storage = JSON.parse(localStorage.getItem('dapplet-extension') || '{}')
+  const _storage = JSON.parse(
+    (await browserPolyfill.storage.local.get('dapplet-extension')) || '{}'
+  )
   if (typeof key === 'object') {
     // TODO support nested objects
     Object.keys(key).map((oKey) => {
       _storage[oKey] = key[oKey]
     })
-    localStorage.setItem('dapplet-extension', JSON.stringify(_storage))
+    await browserPolyfill.storage.local.set({ 'dapplet-extension': JSON.stringify(_storage) })
   } else {
     _storage[key] = value
-    localStorage.setItem('dapplet-extension', JSON.stringify(_storage))
+    await browserPolyfill.storage.local.set({ 'dapplet-extension': JSON.stringify(_storage) })
   }
   callback !== undefined && typeof callback === 'function' && callback()
 }

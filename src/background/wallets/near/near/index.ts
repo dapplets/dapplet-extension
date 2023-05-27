@@ -85,7 +85,10 @@ export default class implements NearWallet {
     const near = new Near({
       ...this._config,
       deps: {
-        keyStore: new nearAPI.keyStores.BrowserLocalStorageKeyStore(window.localStorage, keyPrefix),
+        keyStore: new nearAPI.keyStores.BrowserLocalStorageKeyStore(
+          browser.storage.local,
+          keyPrefix
+        ),
       },
     })
 
@@ -107,7 +110,7 @@ export default class implements NearWallet {
   }
 
   getLastUsage() {
-    return localStorage[this._lastUsageKey]
+    return browser.storage.local.get(this._lastUsageKey)
   }
 
   getAccount() {
@@ -160,6 +163,6 @@ export default class implements NearWallet {
     }
 
     nearWallet.completeSignIn(accountId, publicKey, allKeys)
-    localStorage[this._lastUsageKey] = new Date().toISOString()
+    browser.storage.local.set({ [this._lastUsageKey]: new Date().toISOString() })
   }
 }

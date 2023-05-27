@@ -76,7 +76,7 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
         allKeys,
       }
 
-      window.localStorage.setItem(this._authDataKey, JSON.stringify(this._authData))
+      await browser.storage.local.set({ [this._authDataKey]: JSON.stringify(this._authData) })
 
       // It fixes the error "Cannot find matching key for transaction sent to <account_id>"
       if (this._connectedAccount) {

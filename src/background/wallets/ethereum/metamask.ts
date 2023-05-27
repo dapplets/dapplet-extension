@@ -58,7 +58,7 @@ export default class extends ethers.Signer implements EthereumWallet {
   async sendTransactionOutHash(transaction: TransactionRequest): Promise<string> {
     await this._prepareNetwork()
     const metamask = await this._getMetamaskProvider()
-    localStorage['metamask_lastUsage'] = new Date().toISOString()
+    await browser.storage.local.set({ metamask_lastUsage: new Date().toISOString() })
     transaction.from = await this.getAddress()
     const tx = await ethers.utils.resolveProperties(transaction)
     const txHash = (await metamask.request({
@@ -87,7 +87,7 @@ export default class extends ethers.Signer implements EthereumWallet {
   }
 
   async isConnected() {
-    const disabled = localStorage['metamask_disabled'] === 'true'
+    const disabled = (await browser.storage.local.get('metamask_disabled')) === 'true'
     if (disabled) return false
 
     try {
@@ -101,21 +101,21 @@ export default class extends ethers.Signer implements EthereumWallet {
   @CacheMethod()
   async connectWallet(): Promise<void> {
     const metamask = await this._getMetamaskProvider()
-    if (localStorage['metamask_disabled'] === 'true') {
+    if ((await browser.storage.local.get('metamask_disabled')) === 'true') {
       await metamask.request({
         method: 'wallet_requestPermissions',
         params: [{ eth_accounts: {} }],
       })
-      delete localStorage['metamask_disabled']
+      await browser.storage.local.remove('metamask_disabled')
     } else {
       await metamask.request({ method: 'eth_requestAccounts' })
     }
-    localStorage['metamask_lastUsage'] = new Date().toISOString()
+    await browser.storage.local.set({ metamask_disabled: new Date().toISOString() })
   }
 
   async disconnectWallet() {
-    localStorage['metamask_disabled'] = 'true'
-    delete localStorage['metamask_lastUsage']
+    await browser.storage.local.set({ metamask_disabled: 'true' })
+    browser.storage.local.remove('metamask_lastUsage')
   }
 
   async getMeta() {
@@ -127,7 +127,7 @@ export default class extends ethers.Signer implements EthereumWallet {
   }
 
   getLastUsage() {
-    return localStorage['metamask_lastUsage']
+    return browser.storage.local.get('metamask_lastUsage')
   }
 
   private async _prepareNetwork(): Promise<void> {

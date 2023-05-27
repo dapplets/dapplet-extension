@@ -263,13 +263,19 @@ browser.runtime.onMessage.addListener(
     getDiscordMessages: () => discordService.getDiscordMessages(),
     hideDiscordMessages: discordService.hideDiscordMessages.bind(discordService),
 
-    // LocalStorage
-    localStorage_setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
-    localStorage_getItem: (key) => Promise.resolve(localStorage.getItem(key)),
-    localStorage_removeItem: (key) => Promise.resolve(localStorage.removeItem(key)),
-    localStorage_clear: () => Promise.resolve(localStorage.clear()),
-    localStorage_key: (index) => Promise.resolve(localStorage.key(index)),
-    localStorage_length: () => Promise.resolve(localStorage.length),
+    // LocalStorage // ToDo!!! check if it's necessary??? browser.storage.local should be available in contentscript
+    localStorage_setItem: (key, value) =>
+      Promise.resolve(browser.storage.local.set({ [key]: value })),
+    localStorage_setItems: (obj) => Promise.resolve(browser.storage.local.set(obj)),
+    localStorage_getItem: (key: string) => Promise.resolve(browser.storage.local.get(key)),
+    localStorage_getItems: (keys: string[]) => Promise.resolve(browser.storage.local.get(keys)),
+    localStorage_getItemsWithDefaults: (obj) => Promise.resolve(browser.storage.local.get(obj)),
+    localStorage_removeItem: (key: string) => Promise.resolve(browser.storage.local.remove(key)),
+    localStorage_removeItems: (keys: string[]) =>
+      Promise.resolve(browser.storage.local.remove(keys)),
+    localStorage_clear: () => Promise.resolve(browser.storage.local.clear()),
+    localStorage_key: (index) => Promise.resolve(browser.storage.local.key(index)),
+    localStorage_length: () => Promise.resolve(browser.storage.local.length),
 
     // Extension Basic
     createTab: (url) => browser.tabs.create({ url }),
@@ -325,7 +331,7 @@ browser.runtime.onMessage.addListener(
     checkUrlAvailability: (url) => checkUrlAvailability(url),
 
     // For E2E tests only
-    wipeAllExtensionData: () => browser.storage.local.clear().then(() => localStorage.clear()),
+    wipeAllExtensionData: () => browser.storage.local.clear(),
   })
 )
 

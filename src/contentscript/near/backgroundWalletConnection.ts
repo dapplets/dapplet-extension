@@ -42,7 +42,7 @@ export class BackgroundWalletConnection extends nearAPI.WalletConnection {
         accountId,
         allKeys,
       }
-      window.localStorage.setItem(this._authDataKey, JSON.stringify(this._authData))
+      await browser.storage.local.set({ [this._authDataKey]: JSON.stringify(this._authData) })
       if (publicKey) {
         await this._moveKeyFromTempToPermanent(accountId, publicKey)
       }

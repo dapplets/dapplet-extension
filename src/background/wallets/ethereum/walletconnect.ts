@@ -1,5 +1,6 @@
 import WalletConnect from '@walletconnect/client'
 import { ethers } from 'ethers'
+import browser from 'webextension-polyfill'
 import { NotImplementedError } from '../../../common/errors'
 import { EthereumWallet } from './interface'
 
@@ -70,7 +71,7 @@ export default class extends ethers.Signer implements EthereumWallet {
     transaction.from = await this.getAddress()
     const tx = await ethers.utils.resolveProperties(transaction)
     const txHash = await walletconnect.sendTransaction(tx as any)
-    localStorage['walletconnect_lastUsage'] = new Date().toISOString()
+    await browser.storage.local.set({ walletconnect_lastUsage: new Date().toISOString() })
     return txHash
   }
 
@@ -109,11 +110,11 @@ export default class extends ethers.Signer implements EthereumWallet {
     await walletconnect.createSession()
 
     return new Promise((resolve, reject) => {
-      walletconnect.on('connect', (error, payload) => {
+      walletconnect.on('connect', async (error, payload) => {
         if (error) {
           reject(error)
         } else {
-          localStorage['walletconnect_lastUsage'] = new Date().toISOString()
+          await browser.storage.local.set({ walletconnect_lastUsage: new Date().toISOString() })
           resolve(payload)
         }
       })
@@ -124,8 +125,7 @@ export default class extends ethers.Signer implements EthereumWallet {
     const walletconnect = getWalletConnect()
     if (walletconnect.connected) {
       await walletconnect.killSession()
-      delete localStorage['walletconnect']
-      delete localStorage['walletconnect_lastUsage']
+      await browser.storage.local.remove(['walletconnect', 'walletconnect_lastUsage'])
       _walletconnect = null
     }
   }
@@ -143,7 +143,7 @@ export default class extends ethers.Signer implements EthereumWallet {
   }
 
   getLastUsage() {
-    return localStorage['walletconnect_lastUsage']
+    return browser.storage.local.get('walletconnect_lastUsage')
   }
 
   private async _checkNetwork(): Promise<void> {
