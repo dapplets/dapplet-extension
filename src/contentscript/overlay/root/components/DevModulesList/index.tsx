@@ -173,6 +173,7 @@ if(mi.isUnderConstruction){
   const getModulesAdmins = async () => {
     if (!targetRegistry || !mi.name) return
     const { getAdmins } = await initBGFunctions(browser)
+    
     const authors: string[] = await getAdmins(targetRegistry, mi.name)
 
     if (authors.length > 0) {

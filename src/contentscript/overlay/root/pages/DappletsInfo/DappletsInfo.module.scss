@@ -551,7 +551,7 @@
 .blockContextTitle {
   display: inline-block;
 
-  width: 100%;
+  width: 90%;
 
   font-family: Roboto, sans-serif;
   font-size: 14px;
@@ -561,6 +561,7 @@
   color: $main-grey;
 
   background: inherit;
+  text-overflow: ellipsis;
 }
 
 .contextDelete {
