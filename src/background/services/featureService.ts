@@ -377,7 +377,7 @@ export default class FeatureService {
         setTimeout(() => {
           browser.runtime.onMessage.removeListener(listener)
           reject('Loading timeout exceed')
-        }, 10000)
+        }, 30000)
 
         // sending command to contentscript
         browser.tabs.sendMessage(tabId, {

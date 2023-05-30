@@ -4,11 +4,7 @@ import React, { FC, useEffect, useMemo, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
 import { AnalyticsGoals } from '../../../../../background/services/analyticsService'
-import {
-  CONTEXT_ID_WILDCARD,
-  DAPPLETS_STORE_URL,
-  ModuleTypes,
-} from '../../../../../common/constants'
+import { CONTEXT_ID_WILDCARD, DAPPLETS_STORE_URL } from '../../../../../common/constants'
 import * as EventBus from '../../../../../common/global-event-bus'
 import { ManifestAndDetails } from '../../../../../common/types'
 import { Dapplet } from '../../components/Dapplet'
@@ -16,6 +12,7 @@ import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { TabLoader } from '../../components/TabLoader'
 import { openLink } from '../../utils/openLink'
+import { getActualModules } from '../../utils/refreshModules'
 import styles from './Dapplets.module.scss'
 import { DevMessage } from './DevMessage'
 
@@ -90,28 +87,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
   const _refreshData = async () => {
     try {
-      const { getThisTab, getCurrentContextIds, getFeaturesByHostnames } = await initBGFunctions(
-        browser
-      )
-
-      const currentTab = await getThisTab()
-      const contextIds = await getCurrentContextIds(currentTab)
-
-      const features: ManifestDTO[] = contextIds
-        ? await getFeaturesByHostnames(contextIds, dropdownListValue)
-        : []
-
-      const rightDapplets = features
-        .filter((f) => f.type === ModuleTypes.Feature)
-        .map((f) => ({
-          ...f,
-          isLoading: false,
-          isActionLoading: false,
-          isHomeLoading: false,
-          error: null,
-          versions: [],
-        }))
-
+      const rightDapplets = await getActualModules(dropdownListValue)
       setDapplets((leftDapplets) => {
         // remove disappeared dapplets from the list
         // leave existing dapplets at the beginning of the list (innerJoin)
