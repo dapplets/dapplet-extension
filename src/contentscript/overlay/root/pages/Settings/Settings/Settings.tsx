@@ -229,10 +229,10 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       await setUserAgentName(userAgentName)
       loadUserAgentName()
     } else {
-      setUserAgentNameInputError('Enter User Agent Name')
-      setUserAgentNameInput('')
+      setUserAgentNameInputError('Enter valid User Agent Name')
       setTimeout(() => {
         setUserAgentNameInputError(null)
+        setUserAgentNameInput('')
       }, 3000)
     }
   }
@@ -355,7 +355,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
           <SettingItem title="User Agent Name" component={<></>}>
             <form
               onBlur={() => {
-                setUserAgentNameInputError(null)
+                userAgentNameInputError ? setUserAgentNameInputError(null) : null
               }}
               onSubmit={(e) => {
                 e.preventDefault()
@@ -364,7 +364,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 onPress(e, inputOfFocusAgentName)
               }}
               className={cn(styles.formDefault, {
-                [styles.errorInputDefault]: !!userAgentNameInputError,
+                [styles.errorInputDefault]: userAgentNameInputError,
               })}
             >
               <input
@@ -375,7 +375,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 value={userAgentNameInput}
                 onFocus={() => {
                   setUserAgentNameInput('')
-                  setUserAgentNameInputError(null)
+                  userAgentNameInputError ? setUserAgentNameInputError(null) : null
                 }}
                 onChange={(e) => {
                   setUserAgentNameInput(e.target.value)
