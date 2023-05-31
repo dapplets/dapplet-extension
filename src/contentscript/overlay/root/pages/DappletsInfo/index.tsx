@@ -271,14 +271,15 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
         setEditAdminsLoading(false)
         setAddAdminDisabled(false)
         // nodeBtnAdmin.current?.classList.remove('valid')
-        nodeBtnAdmin.current?.classList.remove('valid')
+        // nodeBtnAdmin.current?.classList.remove('valid')
         setEditAdmin('')
+        await getAdmins()
       } catch (error) {
         setEditAdminDone(true)
         setVisibleAdmins(false)
         setEditAdminsLoading(false)
         setAddAdminDisabled(false)
-        nodeBtnAdmin.current?.classList.remove('valid')
+        // nodeBtnAdmin.current?.classList.remove('valid')
       }
     }
   }
@@ -300,6 +301,17 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
       setVisibleAdmins(false)
       setEditAdminsLoading(false)
       setAddAdminDisabled(false)
+    }
+  }
+  const getCompareAdminValue = (x) => {
+    let isCompare = false
+    const validValue = containsValue(admins, x)
+    const valueParse = getNumIndex(x, regExpIndexEthereum)
+
+    if (validValue || valueParse === null) {
+      return (isCompare = false)
+    } else {
+      return (isCompare = true)
     }
   }
 
@@ -497,7 +509,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                         <div className={styles.wrapperContext}>
                           <div
                             className={cn(styles.blockContext, {
-                              [styles.inputAdminInvalid]: isDisabledAddAdmin,
+                              // [styles.inputAdminInvalid]: isDisabledAddAdmin,
                             })}
                           >
                             <input
@@ -522,16 +534,23 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
                             </button>
                           </div>
                           <button
-                            disabled={editAdmin.length < 2 || addAdminDisabled}
+                            disabled={
+                              (editAdmin.length < 2 && !getCompareAdminValue(editAdmin)) ||
+                              (addAdminDisabled && !getCompareAdminValue(editAdmin))
+                            }
                             ref={nodeBtnAdmin}
                             onClick={() => {
-                              nodeBtnAdmin.current?.classList.add('valid')
+                              // nodeBtnAdmin.current?.classList.add('valid')
                               _addAdmin(editAdmin)
                             }}
                             className={cn(styles.addContextDisabled, {
                               [styles.addContext]:
-                                (nodeInputAdmin.current?.value.length >= 2 && !addAdminDisabled) ||
-                                (editAdmin.length >= 2 && !addAdminDisabled),
+                                (nodeInputAdmin.current?.value.length >= 2 &&
+                                  !addAdminDisabled &&
+                                  getCompareAdminValue(editAdmin)) ||
+                                (editAdmin.length >= 2 &&
+                                  !addAdminDisabled &&
+                                  getCompareAdminValue(editAdmin)),
                             })}
                           >
                             ADD
