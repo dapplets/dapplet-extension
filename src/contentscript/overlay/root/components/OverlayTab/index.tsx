@@ -200,17 +200,18 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           onBlur={(e) => {
             e.preventDefault()
             e.stopPropagation()
-            if (
-              document
-                .querySelector('#dapplets-overlay-manager')
-                .classList.contains('dapplets-overlay-collapsed')
-            ) {
-              e.relatedTarget?.hasAttribute('data-visible') && menuVisible
-                ? null
-                : setMenuVisible(false)
-            } else {
-              setMenuVisible(false)
-            }
+             // todo: uncomment when  top menu would be used
+            // if (
+            //   document
+            //     .querySelector('#dapplets-overlay-manager')
+            //     .classList.contains('dapplets-overlay-collapsed')
+            // ) {
+            //   e.relatedTarget?.hasAttribute('data-visible') && menuVisible
+            //     ? null
+            //     : setMenuVisible(false)
+            // } else {
+            //   setMenuVisible(false)
+            // }
           }}
           onClick={(e) => {
             e.preventDefault()
@@ -233,10 +234,10 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           })}
         >
           {!p.pinned &&
-            menuVisible &&
+            menuVisible && p.menuWidgets && p.menuWidgets.length &&
             document
               .querySelector('#dapplets-overlay-manager')
-              .classList.contains('dapplets-overlay-collapsed') && (
+              .classList.contains('dapplets-overlay-collapsed') ? (
               <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
                 {p.getWigetsConstructor(p.menuWidgets, true)}
                 <div className={styles.delimeterMenuWidgets}></div>
@@ -266,7 +267,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   />
                 </div>
               </div>
-            )}
+            ):<></>}
           <div className={styles.top}>
             {p.icon && typeof p.icon === 'function' ? null : p.icon && // /> //   })} //     [styles.cursor]: !p.isActive, //   className={cn(styles.image, { //   }} //     !p.isActive && p.onTabClick() //   onClick={() => { // <p.icon
               typeof p.icon === 'object' &&
@@ -281,6 +282,12 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                 )}
                 moduleName={p.icon.moduleName}
                 registryUrl={p.icon.registryUrl}
+                 // todo: remove onClick when would be work tab-menu
+                 onClick={() => {
+                  // !p.isActive && p.onTabClick()
+                  // !p.isActive&&
+                  onOpenDappletAction(p.tabId)
+                }}
               />
             ) : (
               <StorageRefImage
@@ -292,12 +299,18 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   p.classNameIcon
                 )}
                 storageRef={p.icon as any}
+                // todo: remove onClick when would be work tab-menu
+                onClick={() => {
+                  // !p.isActive && p.onTabClick()
+                  // !p.isActive&&
+                  onOpenDappletAction(p.tabId)
+                }}
               />
             )}
           </div>
 
           {
-            // p.isActive &&
+         
             p.pinned && visibleMenus.length > 0 && (
               <ul
                 className={cn(
@@ -323,12 +336,16 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                             .querySelector('#dapplets-overlay-manager')
                             .classList.contains('dapplets-overlay-collapsed')
                         ) {
-                          menu.id === 'dapplets' && setMenuVisible(!menuVisible)
+                          menu.id === 'dapplets' 
+                            // todo: uncomment when  top menu would be used
+                          // && setMenuVisible(!menuVisible)
 
                           if (p.pathname === '/system/dapplets') {
                             p.onToggleClick()
                           } else {
                             p.navigate('/system/dapplets')
+                            // todo: remove when uncomment top menu
+                            p.onToggleClick()
                           }
 
                           // menuVisible && setMenuVisible()
@@ -343,8 +360,8 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                             p.pinned &&
                               visibleMenus.length > 0 &&
                               visibleMenus.map((menu) => p.onMenuClick(menu))
-
-                            setMenuVisible(false)
+ // todo: uncomment when  top menu would be used
+                            // setMenuVisible(false)
                             onOpenDappletAction(p.tabId)
                           }
                         }
@@ -393,7 +410,9 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     </li>
                   )
                 })}
-                {p.pinned &&
+                {/* todo: menu top icon toolbar */}
+                {/* todo: uncomment when all functions will be available */}
+                {/* {p.pinned &&
                   menuVisible &&
                   document
                     .querySelector('#dapplets-overlay-manager')
@@ -436,12 +455,12 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                           <NotificationIcon />
                         </span>
                       </li>
-                      {/* <li className={styles.mainMenuItem}>
+                      <li className={styles.mainMenuItem}>
                     <span className={styles.mainMenuItemTitle}>Disable dapplets on this page</span>
                     <span className={styles.mainMenuItemIcon}>
                       <Power />
                     </span>
-                  </li> */}
+                  </li>
                       <li
                         onClick={(e) => {
                           e.preventDefault()
@@ -458,14 +477,14 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                           <Max />
                         </span>
                       </li>
-                      {/* <li className={styles.mainMenuItem}>
+                      <li className={styles.mainMenuItem}>
                     <span className={styles.mainMenuItemTitle}>Edit lists</span>
                     <span className={styles.mainMenuItemIcon}>
                       <Edit />
                     </span>
-                  </li> */}
+                  </li>
                     </ul>
-                  )}
+                  )} */}
               </ul>
             )
           }
