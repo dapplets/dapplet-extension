@@ -22,11 +22,12 @@ export class BackgroundKeyStore extends keyStores.KeyStore {
 
   async getKey(networkId: string, accountId: string): Promise<KeyPair> {
     const { localStorage_getItem } = await initBGFunctions(browser)
-    const value = await localStorage_getItem(this.storageKeyForSecretKey(networkId, accountId))
-    if (!value) {
+    const key = this.storageKeyForSecretKey(networkId, accountId)
+    const result = await localStorage_getItem(key)
+    if (!result || !result[key]) {
       return null
     }
-    return KeyPair.fromString(value)
+    return KeyPair.fromString(result[key])
   }
 
   async removeKey(networkId: string, accountId: string): Promise<void> {

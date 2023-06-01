@@ -111,12 +111,12 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
           setWalletTypeWalletConnect(null)
           return
         }
-        const newWalletImage = makeBlockie(newDescriptors.account)
+        const newWalletImage = newDescriptors.account && makeBlockie(newDescriptors.account)
         setWalletImage(newWalletImage)
         if (newDescriptors.type === 'near') {
           setWalletAccount(newDescriptors.account)
         } else {
-          setWalletAccount(newVisible(newDescriptors.account))
+          setWalletAccount(newDescriptors.account && newVisible(newDescriptors.account))
         }
         if (newDescriptors.type !== 'dapplets') {
           setWalletIcon(newDescriptors.meta.icon)

@@ -86,7 +86,7 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
               >
                 {x.account ? (
                   <img
-                    src={makeBlockie(x.account)}
+                    src={x.account && makeBlockie(x.account)}
                     style={{
                       width: '38px',
                       height: '38px',

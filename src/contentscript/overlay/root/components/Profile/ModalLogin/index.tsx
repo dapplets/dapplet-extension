@@ -96,7 +96,10 @@ export const ModalLogin = ({
             <span className={styles.profileImg}>
               {selectedWalletDescriptor && selectedWalletDescriptor.account ? (
                 <img
-                  src={makeBlockie(selectedWalletDescriptor.account)}
+                  src={
+                    selectedWalletDescriptor.account &&
+                    makeBlockie(selectedWalletDescriptor.account)
+                  }
                   className={styles.profileImg}
                 />
               ) : (
@@ -122,7 +125,10 @@ export const ModalLogin = ({
                   className={styles.newProfileBlockInfo}
                 >
                   {x.account ? (
-                    <img src={makeBlockie(x.account)} className={styles.newProfileBlockImg} />
+                    <img
+                      src={x.account && makeBlockie(x.account)}
+                      className={styles.newProfileBlockImg}
+                    />
                   ) : null}
                   {x.account ? (
                     <div className={styles.meta}>

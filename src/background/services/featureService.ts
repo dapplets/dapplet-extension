@@ -69,19 +69,22 @@ export default class FeatureService {
 
     if (filter === 'all' || filter === 'trusted') {
       const trustedUsers = await this._globalConfigService.getTrustedUsers()
-      const accounts = trustedUsers.map((u) => u.account)
+      const accounts = trustedUsers.map((u) => u.account).filter((x) => !!x)
       listingAccounts.push(...accounts)
     }
 
     if (filter === 'all' || filter === 'public') {
       const walletDescriptors = await this._walletService.getWalletDescriptors()
-      const accounts = walletDescriptors.filter((x) => x.connected).map((x) => x.account)
+      const accounts = walletDescriptors
+        .filter((x) => x.connected)
+        .map((x) => x.account)
+        .filter((x) => !!x)
       listingAccounts.push(...accounts)
     }
 
     if (filter === 'active') {
       const trustedUsers = await this._globalConfigService.getTrustedUsers()
-      const accounts = trustedUsers.map((u) => u.account)
+      const accounts = trustedUsers.map((u) => u.account).filter((x) => !!x)
       listingAccounts.push(...accounts)
     }
 

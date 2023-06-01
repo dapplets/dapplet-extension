@@ -22,7 +22,7 @@ export async function createWalletConnection(
 
   const { localStorage_getItem } = await initBGFunctions(browser)
   const authDataKey = cfg.network + '_wallet_auth_key'
-  const authData = JSON.parse(await localStorage_getItem(authDataKey))
+  const authData = JSON.parse((await localStorage_getItem(authDataKey))[authDataKey])
   if (!authData) return null
 
   const keyStorePrefix = cfg.loginConfirmationId

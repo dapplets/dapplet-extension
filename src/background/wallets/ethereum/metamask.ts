@@ -2,7 +2,7 @@ import { TransactionRequest } from '@ethersproject/providers'
 import { MetaMaskInpageProvider } from '@metamask/providers'
 import { detect } from 'detect-browser'
 import { ethers } from 'ethers'
-// import PortStream from 'extension-port-stream'
+import PortStream from 'extension-port-stream'
 import browser from 'webextension-polyfill'
 import { NotImplementedError } from '../../../common/errors'
 import { CacheMethod } from '../../../common/helpers'
@@ -87,7 +87,8 @@ export default class extends ethers.Signer implements EthereumWallet {
   }
 
   async isConnected() {
-    const disabled = (await browser.storage.local.get('metamask_disabled')) === 'true'
+    const disabled =
+      (await browser.storage.local.get('metamask_disabled')).metamask_disabled === 'true'
     if (disabled) return false
 
     try {
@@ -101,7 +102,7 @@ export default class extends ethers.Signer implements EthereumWallet {
   @CacheMethod()
   async connectWallet(): Promise<void> {
     const metamask = await this._getMetamaskProvider()
-    if ((await browser.storage.local.get('metamask_disabled')) === 'true') {
+    if ((await browser.storage.local.get('metamask_disabled')).metamask_disabled === 'true') {
       await metamask.request({
         method: 'wallet_requestPermissions',
         params: [{ eth_accounts: {} }],
@@ -126,8 +127,8 @@ export default class extends ethers.Signer implements EthereumWallet {
     }
   }
 
-  getLastUsage() {
-    return browser.storage.local.get('metamask_lastUsage')
+  async getLastUsage() {
+    return (await browser.storage.local.get('metamask_lastUsage')).metamask_lastUsage
   }
 
   private async _prepareNetwork(): Promise<void> {
@@ -181,8 +182,8 @@ export default class extends ethers.Signer implements EthereumWallet {
         const currentMetaMaskId = this._getMetaMaskId()
         const metamaskPort = browser.runtime.connect(currentMetaMaskId)
         metamaskPort.onDisconnect.addListener(() => browser.runtime.lastError) // mute "Unchecked runtime.lastError"
-        // const pluginStream = new PortStream(metamaskPort) // ToDo: PortStream don't support browser.runtime.Port. Check if it is work without PortStream!
-        const metamask = new MetaMaskInpageProvider(metamaskPort as any, {
+        const pluginStream = new PortStream(metamaskPort)
+        const metamask = new MetaMaskInpageProvider(pluginStream as any, {
           // mute all messages from provider
           logger: {
             warn: () => {},

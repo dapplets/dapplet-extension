@@ -83,8 +83,8 @@ browser.runtime.getURL = function (url) {
                 //console.log('browser.tabs.query2', arguments);
                 const result = [{
                     id: '1',
-                    url: '${window.location.href}',
-                    pendingUrl: '${window.location.href}'
+                    url: '${browserPolyfill.tabs.Tab.url}',
+                    pendingUrl: '${browserPolyfill.tabs.Tab.url}'
                 }];
                 callback !== undefined && typeof callback === 'function' && callback(result);
                 return Promise.resolve(result);
@@ -104,7 +104,7 @@ browser.runtime.getURL = function (url) {
     }
   )
 
-  const uri = window.URL.createObjectURL(blob)
+  const uri = URL.createObjectURL(blob)
   _blobUriCache[url] = uri
   return uri
 }
@@ -133,8 +133,8 @@ browser.runtime.onMessage.addListener = function (callback) {
             callback(payload.request, {
               tab: {
                 id: '1',
-                url: window.location.href,
-                pendingUrl: window.location.href,
+                url: browserPolyfill.tabs.Tab.url,
+                pendingUrl: browserPolyfill.tabs.Tab.url,
               },
             })
           )
@@ -186,7 +186,7 @@ browser.runtime.sendMessage = async function (message, callback) {
 browser.storage.local.get = async function (key, callback) {
   //console.log('browser.storage.local.get', arguments);
   const _storage = JSON.parse(
-    (await browserPolyfill.storage.local.get('dapplet-extension')) || '{}'
+    (await browserPolyfill.storage.local.get('dapplet-extension'))['dapplet-extension'] || '{}'
   )
 
   let result = {}
@@ -217,7 +217,7 @@ browser.storage.local.get = async function (key, callback) {
 browser.storage.local.remove = async function (key, callback) {
   //console.log('browser.storage.local.remove', arguments);
   const _storage = JSON.parse(
-    (await browserPolyfill.storage.local.get('dapplet-extension')) || '{}'
+    (await browserPolyfill.storage.local.get('dapplet-extension'))['dapplet-extension'] || '{}'
   )
   if (Array.isArray(key)) {
     key.map((aKey) => {
@@ -234,7 +234,7 @@ browser.storage.local.remove = async function (key, callback) {
 browser.storage.local.set = async function (key, value, callback) {
   //console.log('browser.storage.local.set', arguments);
   const _storage = JSON.parse(
-    (await browserPolyfill.storage.local.get('dapplet-extension')) || '{}'
+    (await browserPolyfill.storage.local.get('dapplet-extension'))['dapplet-extension'] || '{}'
   )
   if (typeof key === 'object') {
     // TODO support nested objects

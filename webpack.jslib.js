@@ -23,7 +23,7 @@ class RemoveUseStrictPlugin {
 const config = {
   mode: 'production',
   entry: __dirname + '/jslib/index.js',
-  //devtool: 'inline-source-map',
+  devtool: 'source-map',
   output: {
     path: __dirname + '/lib',
     filename: 'index.min.js',

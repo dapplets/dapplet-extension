@@ -60,7 +60,7 @@ export default class implements NearWallet {
   }
 
   async isConnected() {
-    const accountId = this._nearWallet.getAccountId()
+    const accountId = await this._nearWallet.getAccountId()
     return !!accountId && accountId.length > 0
   }
 
@@ -109,8 +109,8 @@ export default class implements NearWallet {
     }
   }
 
-  getLastUsage() {
-    return browser.storage.local.get(this._lastUsageKey)
+  async getLastUsage() {
+    return (await browser.storage.local.get(this._lastUsageKey))[this._lastUsageKey]
   }
 
   getAccount() {

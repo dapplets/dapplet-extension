@@ -28,10 +28,10 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     // await prepareWalletFor(this._app, 'near/' + this._network, null);
 
     const authDataKey = this._network + '_wallet_auth_key'
-    let authData = JSON.parse(await localStorage_getItem(authDataKey))
+    let authData = JSON.parse((await localStorage_getItem(authDataKey))[authDataKey])
     if (!authData) {
       await prepareWalletFor(this._app, 'near/' + this._network, null, null, null)
-      authData = JSON.parse(await localStorage_getItem(authDataKey))
+      authData = JSON.parse((await localStorage_getItem(authDataKey))[authDataKey])
     }
 
     if (!authData) {

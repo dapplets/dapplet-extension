@@ -142,8 +142,8 @@ export default class extends ethers.Signer implements EthereumWallet {
       : null
   }
 
-  getLastUsage() {
-    return browser.storage.local.get('walletconnect_lastUsage')
+  async getLastUsage() {
+    return (await browser.storage.local.get('walletconnect_lastUsage')).walletconnect_lastUsage
   }
 
   private async _checkNetwork(): Promise<void> {

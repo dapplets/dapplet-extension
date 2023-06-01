@@ -123,13 +123,17 @@ class ConnectedAccounts {
           {
             name: firstAccountId,
             origin: firstOriginId,
-            img: firstAccountImage ? firstAccountImage : makeBlockie(firstAccountId),
+            img: firstAccountImage
+              ? firstAccountImage
+              : firstAccountId && makeBlockie(firstAccountId),
             accountActive: firstAccountStatus,
           },
           {
             name: secondAccountId,
             origin: secondOriginId,
-            img: secondAccountImage ? secondAccountImage : makeBlockie(secondAccountId),
+            img: secondAccountImage
+              ? secondAccountImage
+              : secondAccountId && makeBlockie(secondAccountId),
             accountActive: secondAccountStatus,
           },
         ],
@@ -158,7 +162,7 @@ class ConnectedAccounts {
         accountToChangeStatus: {
           name: accountId,
           origin: originId,
-          img: accountImage ? accountImage : makeBlockie(accountId),
+          img: accountImage ? accountImage : accountId && makeBlockie(accountId),
           accountActive: isMain,
         },
       },

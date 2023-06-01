@@ -27,8 +27,8 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
     } else {
       options = contractIdOrOptions as SignInOptions
     }
-
-    const currentUrl = new URL(window.location.href)
+    const tabs = await browser.tabs.query({ active: true, lastFocusedWindow: true })
+    const currentUrl = new URL(tabs?.[0]?.url)
     const newUrl = new URL(this._walletBaseUrl + LOGIN_WALLET_URL_SUFFIX)
     newUrl.searchParams.set('success_url', options.successUrl || currentUrl.href)
     newUrl.searchParams.set('failure_url', options.failureUrl || currentUrl.href)
@@ -52,7 +52,8 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
     transactions: nearAPI.transactions.Transaction[],
     callbackUrl?: string
   ) {
-    const currentUrl = new URL(window.location.href)
+    const tabs = await browser.tabs.query({ active: true, lastFocusedWindow: true })
+    const currentUrl = new URL(tabs?.[0]?.url)
     const newUrl = new URL('sign', this._walletBaseUrl)
 
     newUrl.searchParams.set(
