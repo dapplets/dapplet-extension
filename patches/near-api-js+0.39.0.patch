@@ -1,5 +1,5 @@
 diff --git a/node_modules/near-api-js/lib/key_stores/browser_local_storage_key_store.js b/node_modules/near-api-js/lib/key_stores/browser_local_storage_key_store.js
-index 752481c..7a26b76 100644
+index a552820..bbb71d1 100644
 --- a/node_modules/near-api-js/lib/key_stores/browser_local_storage_key_store.js
 +++ b/node_modules/near-api-js/lib/key_stores/browser_local_storage_key_store.js
 @@ -3,11 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
@@ -25,22 +25,22 @@ index 752481c..7a26b76 100644
      }
      /**
       * Gets a key from local storage
-@@ -26,7 +26,7 @@ class BrowserLocalStorageKeyStore extends keystore_1.KeyStore {
+@@ -26,11 +26,12 @@ class BrowserLocalStorageKeyStore extends keystore_1.KeyStore {
       * @returns {Promise<KeyPair>}
       */
      async getKey(networkId, accountId) {
 -        const value = this.localStorage.getItem(this.storageKeyForSecretKey(networkId, accountId));
 -        if (!value) {
--            return null;
--        }
--        return key_pair_1.KeyPair.fromString(value);
-+        const key = this.storageKeyForSecretKey(networkId, accountId);
++      const key = this.storageKeyForSecretKey(networkId, accountId);
 +        const value = await browser.storage.local.get(key);
 +        if (!value || !value[key]) {
-+            return null;
-+        }
+             return null;
+         }
+-        return key_pair_1.KeyPair.fromString(value);
 +        return key_pair_1.KeyPair.fromString(value[key]);
      }
+     /**
+      * Removes a key from local storage
 @@ -38,15 +39,15 @@ class BrowserLocalStorageKeyStore extends keystore_1.KeyStore {
       * @param accountId The NEAR account tied to the key pair
       */
@@ -60,7 +60,7 @@ index 752481c..7a26b76 100644
              }
          }
      }
-@@ -90,9 +91,9 @@ class BrowserLocalStorageKeyStore extends keystore_1.KeyStore {
+@@ -90,10 +91,11 @@ class BrowserLocalStorageKeyStore extends keystore_1.KeyStore {
      storageKeyForSecretKey(networkId, accountId) {
          return `${this.prefix}${accountId}:${networkId}`;
      }
@@ -74,8 +74,11 @@ index 752481c..7a26b76 100644
          }
      }
  }
+-exports.BrowserLocalStorageKeyStore = BrowserLocalStorageKeyStore;
+\ No newline at end of file
++exports.BrowserLocalStorageKeyStore = BrowserLocalStorageKeyStore;
 diff --git a/node_modules/near-api-js/lib/utils/web.js b/node_modules/near-api-js/lib/utils/web.js
-index c42b96a..b7df14d 100644
+index 3ee906b..b7df14d 100644
 --- a/node_modules/near-api-js/lib/utils/web.js
 +++ b/node_modules/near-api-js/lib/utils/web.js
 @@ -10,31 +10,6 @@ const providers_1 = require("../providers");
@@ -110,8 +113,15 @@ index c42b96a..b7df14d 100644
  async function fetchJson(connection, json) {
      let url = null;
      if (typeof (connection) === 'string') {
+@@ -72,4 +47,4 @@ async function fetchJson(connection, json) {
+     }
+     return await response.json();
+ }
+-exports.fetchJson = fetchJson;
+\ No newline at end of file
++exports.fetchJson = fetchJson;
 diff --git a/node_modules/near-api-js/lib/wallet-account.js b/node_modules/near-api-js/lib/wallet-account.js
-index ad0fe85..c0c00e2 100644
+index 00fa93d..c865304 100644
 --- a/node_modules/near-api-js/lib/wallet-account.js
 +++ b/node_modules/near-api-js/lib/wallet-account.js
 @@ -10,6 +10,7 @@ const transaction_1 = require("./transaction");
@@ -122,7 +132,7 @@ index ad0fe85..c0c00e2 100644
  const LOGIN_WALLET_URL_SUFFIX = '/login/';
  const MULTISIG_HAS_METHOD = 'add_request_and_confirm';
  const LOCAL_STORAGE_KEY_SUFFIX = '_wallet_auth_key';
-@@ -18,23 +19,30 @@ class WalletConnection {
+@@ -18,23 +19,31 @@ class WalletConnection {
      constructor(near, appKeyPrefix) {
          this._near = near;
          const authDataKey = appKeyPrefix + LOCAL_STORAGE_KEY_SUFFIX;
@@ -175,12 +185,12 @@ index ad0fe85..c0c00e2 100644
       */
      async requestSignIn(contractIdOrOptions = {}, title, successUrl, failureUrl) {
 +        if (!this._authData){
-+            await this.init()
++          await this.init()
 +        }
          let options;
          if (typeof contractIdOrOptions === 'string') {
              const deprecate = depd_1.default('requestSignIn(contractId, title)');
-@@ -68,7 +83,7 @@ class WalletConnection {
+@@ -68,7 +83,8 @@ class WalletConnection {
          else {
              options = contractIdOrOptions;
          }
@@ -203,7 +213,7 @@ index ad0fe85..c0c00e2 100644
      }
      /**
       * Requests the user to quickly sign for a transaction or batch of transactions
-@@ -86,20 +106,27 @@ class WalletConnection {
+@@ -86,20 +106,29 @@ class WalletConnection {
       * @param callbackUrl The url to navigate to after the user is prompted to sign
       */
      async requestSignTransactions(transactions, callbackUrl) {
@@ -227,8 +237,7 @@ index ad0fe85..c0c00e2 100644
 +        )
      }
      /**
-      * Complete sign in for a given account id and public key. To be invoked by the app when getting a callback fr
-om the wallet.
+      * Complete sign in for a given account id and public key. To be invoked by the app when getting a callback from the wallet.
       */
      async _completeSignInWithAccessKey() {
 -        const currentUrl = new URL(window.location.href);
@@ -246,7 +255,7 @@ om the wallet.
              if (publicKey) {
                  await this._moveKeyFromTempToPermanent(accountId, publicKey);
              }
-@@ -117,7 +146,9 @@ class WalletConnection {
+@@ -117,7 +146,8 @@ class WalletConnection {
          currentUrl.searchParams.delete('public_key');
          currentUrl.searchParams.delete('all_keys');
          currentUrl.searchParams.delete('account_id');
@@ -285,14 +294,12 @@ om the wallet.
 +            await this.init()
 +        }
          if (!this._connectedAccount) {
-             this._connectedAccount = new ConnectedWalletAccount(this, this._near.connection, this._authData.accoun
-tId);
+             this._connectedAccount = new ConnectedWalletAccount(this, this._near.connection, this._authData.accountId);
          }
-@@ -184,7 +220,7 @@ class ConnectedWalletAccount extends account_1.Account {
+@@ -184,7 +220,9 @@ class ConnectedWalletAccount extends account_1.Account {
          // TODO: Cache & listen for nonce updates for given access key
          const nonce = accessKey.access_key.nonce + 1;
-         const transaction = transaction_1.createTransaction(this.accountId, publicKey, receiverId, nonce, actions,
- blockHash);
+         const transaction = transaction_1.createTransaction(this.accountId, publicKey, receiverId, nonce, actions, blockHash);
 -        await this.walletConnection.requestSignTransactions([transaction], window.location.href);
 +        const tabs = await browser.tabs.query({active: true, lastFocusedWindow: true});
 +        const currentUrl = new URL(tabs?.[0]?.url);
@@ -300,3 +307,10 @@ tId);
          return new Promise((resolve, reject) => {
              setTimeout(() => {
                  reject(new Error('Failed to redirect to sign transaction'));
+@@ -251,4 +289,4 @@ class ConnectedWalletAccount extends account_1.Account {
+         return null;
+     }
+ }
+-exports.ConnectedWalletAccount = ConnectedWalletAccount;
+\ No newline at end of file
++exports.ConnectedWalletAccount = ConnectedWalletAccount;
