@@ -30,19 +30,23 @@ index 752481c..7a26b76 100644
       */
      async getKey(networkId, accountId) {
 -        const value = this.localStorage.getItem(this.storageKeyForSecretKey(networkId, accountId));
-+      const key = this.storageKeyForSecretKey(networkId, accountId);
+-        if (!value) {
+-            return null;
+-        }
+-        return key_pair_1.KeyPair.fromString(value);
++        const key = this.storageKeyForSecretKey(networkId, accountId);
 +        const value = await browser.storage.local.get(key);
 +        if (!value || !value[key]) {
 +            return null;
 +        }
 +        return key_pair_1.KeyPair.fromString(value[key]);
      }
-@@ -38,15 +43,15 @@ class BrowserLocalStorageKeyStore extends keystore_1.KeyStore {
+@@ -38,15 +39,15 @@ class BrowserLocalStorageKeyStore extends keystore_1.KeyStore {
       * @param accountId The NEAR account tied to the key pair
       */
      async removeKey(networkId, accountId) {
 -        this.localStorage.removeItem(this.storageKeyForSecretKey(networkId, accountId));
-+      browser.storage.local.remove(this.storageKeyForSecretKey(networkId, accountId));
++        browser.storage.local.remove(this.storageKeyForSecretKey(networkId, accountId));
      }
      /**
       * Removes all items from local storage
@@ -52,11 +56,11 @@ index 752481c..7a26b76 100644
 +        for (const key of (await this.storageKeys())) {
              if (key.startsWith(this.prefix)) {
 -                this.localStorage.removeItem(key);
-+              browser.storage.local.remove(key);
++                browser.storage.local.remove(key);
              }
          }
      }
-@@ -90,9 +95,9 @@ class BrowserLocalStorageKeyStore extends keystore_1.KeyStore {
+@@ -90,9 +91,9 @@ class BrowserLocalStorageKeyStore extends keystore_1.KeyStore {
      storageKeyForSecretKey(networkId, accountId) {
          return `${this.prefix}${accountId}:${networkId}`;
      }
@@ -64,9 +68,9 @@ index 752481c..7a26b76 100644
 -        for (let i = 0; i < this.localStorage.length; i++) {
 -            yield this.localStorage.key(i);
 +    async *storageKeys() {
-+      const keys = Object.keys(await browser.storage.local.get())
++        const keys = Object.keys(await browser.storage.local.get())
 +        for (let i = 0; i < keys.length; i++) {
-+          yield keys[i];
++            yield keys[i];
          }
      }
  }
@@ -149,7 +153,7 @@ index ad0fe85..c0c00e2 100644
 -    isSignedIn() {
 +    async isSignedIn() {
 +        if (!this._authData){
-+          await this.init()
++            await this.init()
 +        }
          return !!this._authData.accountId;
      }
@@ -161,7 +165,7 @@ index ad0fe85..c0c00e2 100644
 -    getAccountId() {
 +    async getAccountId() {
 +        if (!this._authData){
-+          await this.init()
++            await this.init()
 +        }
          return this._authData.accountId || '';
      }
@@ -171,7 +175,7 @@ index ad0fe85..c0c00e2 100644
       */
      async requestSignIn(contractIdOrOptions = {}, title, successUrl, failureUrl) {
 +        if (!this._authData){
-+          await this.init()
++            await this.init()
 +        }
          let options;
          if (typeof contractIdOrOptions === 'string') {
@@ -193,8 +197,8 @@ index ad0fe85..c0c00e2 100644
 -        window.location.assign(newUrl.toString());
 +        const tab = await browser.tabs.query({ active: true, lastFocusedWindow: true })
 +        tab && tab[0] && browser.tabs.update(
-+          tab[0].id,
-+          { url: newUrl.toString() }
++            tab[0].id,
++            { url: newUrl.toString() }
 +        )
      }
      /**
@@ -205,7 +209,7 @@ index ad0fe85..c0c00e2 100644
      async requestSignTransactions(transactions, callbackUrl) {
 -        const currentUrl = new URL(window.location.href);
 +        if (!this._authData){
-+          await this.init()
++            await this.init()
 +        }
 +        const tabs = await browser.tabs.query({active: true, lastFocusedWindow: true});
 +        const currentUrl = new URL(tabs?.[0]?.url);
@@ -218,8 +222,8 @@ index ad0fe85..c0c00e2 100644
 -        window.location.assign(newUrl.toString());
 +        const tab = await browser.tabs.query({ active: true, lastFocusedWindow: true })
 +        tab && tab[0] && browser.tabs.update(
-+          tab[0].id,
-+          { url: newUrl.toString() }
++            tab[0].id,
++            { url: newUrl.toString() }
 +        )
      }
      /**
@@ -256,9 +260,9 @@ om the wallet.
       * @param publicKey The public key being set to the key store
       */
      async _moveKeyFromTempToPermanent(accountId, publicKey) {
-+      if (!this._authData){
-+        await this.init()
-+      }
++        if (!this._authData){
++            await this.init()
++        }
          const keyPair = await this._keyStore.getKey(this._networkId, PENDING_ACCESS_KEY_PREFIX + publicKey);
          await this._keyStore.setKey(this._networkId, accountId, keyPair);
          await this._keyStore.removeKey(this._networkId, PENDING_ACCESS_KEY_PREFIX + publicKey);
@@ -277,9 +281,9 @@ om the wallet.
       */
 -    account() {
 +    async account() {
-+      if (!this._authData){
-+        await this.init()
-+      }
++        if (!this._authData){
++            await this.init()
++        }
          if (!this._connectedAccount) {
              this._connectedAccount = new ConnectedWalletAccount(this, this._near.connection, this._authData.accoun
 tId);
