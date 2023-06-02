@@ -23,15 +23,15 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     actions: nearAPI.transactions.Action[]
   ): Promise<nearAPI.providers.FinalExecutionOutcome> {
     //if (!this.accountId) {
-    const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser)
+    const { prepareWalletFor } = await initBGFunctions(browser)
     // ToDo: remove it?
     // await prepareWalletFor(this._app, 'near/' + this._network, null);
 
     const authDataKey = this._network + '_wallet_auth_key'
-    let authData = JSON.parse((await localStorage_getItem(authDataKey))[authDataKey])
+    let authData = JSON.parse((await browser.storage.local.get(authDataKey))[authDataKey])
     if (!authData) {
       await prepareWalletFor(this._app, 'near/' + this._network, null, null, null)
-      authData = JSON.parse((await localStorage_getItem(authDataKey))[authDataKey])
+      authData = JSON.parse((await browser.storage.local.get(authDataKey))[authDataKey])
     }
 
     if (!authData) {

@@ -1,4 +1,3 @@
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { KeyPair, keyStores } from 'near-api-js'
 import browser from 'webextension-polyfill'
 
@@ -13,17 +12,14 @@ export class BackgroundKeyStore extends keyStores.KeyStore {
   }
 
   async setKey(networkId: string, accountId: string, keyPair: KeyPair): Promise<void> {
-    const { localStorage_setItem } = await initBGFunctions(browser)
-    await localStorage_setItem(
-      this.storageKeyForSecretKey(networkId, accountId),
-      keyPair.toString()
-    )
+    await browser.storage.local.set({
+      [this.storageKeyForSecretKey(networkId, accountId)]: keyPair.toString(),
+    })
   }
 
   async getKey(networkId: string, accountId: string): Promise<KeyPair> {
-    const { localStorage_getItem } = await initBGFunctions(browser)
     const key = this.storageKeyForSecretKey(networkId, accountId)
-    const result = await localStorage_getItem(key)
+    const result = await browser.storage.local.get(key)
     if (!result || !result[key]) {
       return null
     }
@@ -31,16 +27,14 @@ export class BackgroundKeyStore extends keyStores.KeyStore {
   }
 
   async removeKey(networkId: string, accountId: string): Promise<void> {
-    const { localStorage_removeItem } = await initBGFunctions(browser)
-    await localStorage_removeItem(this.storageKeyForSecretKey(networkId, accountId))
+    browser.storage.local.remove(this.storageKeyForSecretKey(networkId, accountId))
   }
 
   async clear(): Promise<void> {
-    const { localStorage_removeItem } = await initBGFunctions(browser)
     const keys = await this.storageKeys()
     for (const key of keys) {
       if (key.startsWith(this.prefix)) {
-        await localStorage_removeItem(key)
+        await browser.storage.local.remove(key)
       }
     }
   }
@@ -76,12 +70,7 @@ export class BackgroundKeyStore extends keyStores.KeyStore {
   }
 
   private async storageKeys(): Promise<string[]> {
-    const { localStorage_length, localStorage_key } = await initBGFunctions(browser)
-    const length = await localStorage_length()
-    const keys = []
-    for (let i = 0; i < length; i++) {
-      keys.push(localStorage_key(i))
-    }
-    return Promise.all(keys)
+    const storage = await browser.storage.local.get()
+    return Object.keys(storage)
   }
 }
