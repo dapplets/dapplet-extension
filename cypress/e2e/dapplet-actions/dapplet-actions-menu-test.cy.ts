@@ -2,7 +2,7 @@ import { qase } from 'cypress-qase-reporter/dist/mocha'
 
 const url = 'https://example.com'
 const dappletIdToActivate = 'action-test'
-// todo: unwork
+
 describe('dapplets action work', () => {
   qase(
     11,
@@ -10,12 +10,14 @@ describe('dapplets action work', () => {
       // open overlay and run the dapplet
       cy.openDappletsOverlay(url, { wipe: true })
       cy.runDapplet(dappletIdToActivate)
-
+      cy.wait(5000)
       // expands to ubersausage mode
+      cy.getByTestId('skip-tutorial').click()
+      cy.getByTestId('notification-button').click()
+      cy.wait(1000)
+      cy.getByTestId('system-tab-dapplets').click()
+      cy.wait(1000)
       cy.getByTestId('show-tabs-button').click()
-      cy.wait(10000)
-
-      // minimize overlay
       cy.getByTestId('minimize-overlay-button').click()
 
       cy.getByTestId('tab-not-pinned').click()
