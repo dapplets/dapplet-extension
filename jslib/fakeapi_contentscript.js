@@ -1,6 +1,5 @@
 import common_script from '!raw-loader!../build/common.js'
 import fakeapi_frame_script from '!raw-loader!./fakeapi_frame.js'
-import browserPolyfill from 'webextension-polyfill'
 
 const browser = {}
 
@@ -83,8 +82,8 @@ browser.runtime.getURL = function (url) {
                 //console.log('browser.tabs.query2', arguments);
                 const result = [{
                     id: '1',
-                    url: '${browserPolyfill.tabs.Tab.url}',
-                    pendingUrl: '${browserPolyfill.tabs.Tab.url}'
+                    url: '${window.location.href}',
+                    pendingUrl: '${window.location.href}'
                 }];
                 callback !== undefined && typeof callback === 'function' && callback(result);
                 return Promise.resolve(result);
@@ -104,7 +103,7 @@ browser.runtime.getURL = function (url) {
     }
   )
 
-  const uri = URL.createObjectURL(blob)
+  const uri = window.URL.createObjectURL(blob)
   _blobUriCache[url] = uri
   return uri
 }
@@ -133,8 +132,8 @@ browser.runtime.onMessage.addListener = function (callback) {
             callback(payload.request, {
               tab: {
                 id: '1',
-                url: browserPolyfill.tabs.Tab.url,
-                pendingUrl: browserPolyfill.tabs.Tab.url,
+                url: window.location.href,
+                pendingUrl: window.location.href,
               },
             })
           )
@@ -185,9 +184,7 @@ browser.runtime.sendMessage = async function (message, callback) {
 }
 browser.storage.local.get = async function (key, callback) {
   //console.log('browser.storage.local.get', arguments);
-  const _storage = JSON.parse(
-    (await browserPolyfill.storage.local.get('dapplet-extension'))['dapplet-extension'] || '{}'
-  )
+  const _storage = JSON.parse(localStorage.getItem('dapplet-extension') || '{}')
 
   let result = {}
   if (!key) {
@@ -216,9 +213,7 @@ browser.storage.local.get = async function (key, callback) {
 }
 browser.storage.local.remove = async function (key, callback) {
   //console.log('browser.storage.local.remove', arguments);
-  const _storage = JSON.parse(
-    (await browserPolyfill.storage.local.get('dapplet-extension'))['dapplet-extension'] || '{}'
-  )
+  const _storage = JSON.parse(localStorage.getItem('dapplet-extension') || '{}')
   if (Array.isArray(key)) {
     key.map((aKey) => {
       delete _storage[aKey]
@@ -227,24 +222,22 @@ browser.storage.local.remove = async function (key, callback) {
     delete _storage[key]
   }
 
-  await browserPolyfill.storage.local.set({ 'dapplet-extension': JSON.stringify(_storage) })
+  localStorage.setItem('dapplet-extension', JSON.stringify(_storage))
 
   callback !== undefined && typeof callback === 'function' && callback()
 }
 browser.storage.local.set = async function (key, value, callback) {
   //console.log('browser.storage.local.set', arguments);
-  const _storage = JSON.parse(
-    (await browserPolyfill.storage.local.get('dapplet-extension'))['dapplet-extension'] || '{}'
-  )
+  const _storage = JSON.parse(localStorage.getItem('dapplet-extension') || '{}')
   if (typeof key === 'object') {
     // TODO support nested objects
     Object.keys(key).map((oKey) => {
       _storage[oKey] = key[oKey]
     })
-    await browserPolyfill.storage.local.set({ 'dapplet-extension': JSON.stringify(_storage) })
+    localStorage.setItem('dapplet-extension', JSON.stringify(_storage))
   } else {
     _storage[key] = value
-    await browserPolyfill.storage.local.set({ 'dapplet-extension': JSON.stringify(_storage) })
+    localStorage.setItem('dapplet-extension', JSON.stringify(_storage))
   }
   callback !== undefined && typeof callback === 'function' && callback()
 }
@@ -324,4 +317,4 @@ async function sendMessage(message, callback) {
 Object.defineProperty(window, 'browser', { value: browser })
 Object.defineProperty(window, 'DAPPLETS_JSLIB', { value: true })
 
-// eval(common_script)
+eval(common_script)
