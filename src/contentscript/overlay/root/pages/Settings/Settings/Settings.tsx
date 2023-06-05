@@ -15,7 +15,7 @@ import { SettingWrapper } from '../../../components/SettingWrapper'
 import { Switch } from '../../../components/Switch'
 import { getDefaultValueProvider } from '../../../utils/getDefaultValue'
 import styles from './Settings.module.scss'
-
+import { ReactComponent as Delete } from '../../../assets/icons/mini-close.svg'
 interface SettingsListProps {
   devModeProps: boolean
   setDevMode: (x) => void
@@ -288,6 +288,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
     await setIsFirstInstallation(true)
   }
 
+  const setDeleteUserAgentName = async()=>{
+    const { setUserAgentName } = await initBGFunctions(browser)
+      await setUserAgentName('')
+      loadUserAgentName()
+  }
+
   return (
     <div className={styles.blockSettings}>
       <div className={styles.scrollBlock}>
@@ -382,6 +388,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   setUserAgentNameInputError(null)
                 }}
               />
+              {userAgentNameInput && <Delete onClick={()=> setDeleteUserAgentName()} className={styles.deleteUserAgentName}/>}
             </form>
             {userAgentNameInputError ? (
               <div className={styles.errorMessage}>{userAgentNameInputError}</div>
