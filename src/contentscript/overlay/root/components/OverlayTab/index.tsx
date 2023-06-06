@@ -65,7 +65,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   useEffect(() => {
     !document
       .querySelector('#dapplets-overlay-manager')
-      .classList.contains('dapplets-overlay-collapsed') && setMenuVisible(false)
+      ?.classList.contains('dapplets-overlay-collapsed') && setMenuVisible(false)
   }, [menuVisible])
 
   useEffect(() => {
@@ -144,7 +144,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           if (
             document
               .querySelector('#dapplets-overlay-manager')
-              .classList.contains('dapplets-overlay-collapsed')
+              ?.classList.contains('dapplets-overlay-collapsed')
           ) {
             p.onToggleClick()
           }
@@ -156,7 +156,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
         if (
           document
             .querySelector('#dapplets-overlay-manager')
-            .classList.contains('dapplets-overlay-collapsed')
+            ?.classList.contains('dapplets-overlay-collapsed')
         ) {
           p.onToggleClick()
         }
@@ -166,7 +166,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       if (
         document
           .querySelector('#dapplets-overlay-manager')
-          .classList.contains('dapplets-overlay-collapsed')
+          ?.classList.contains('dapplets-overlay-collapsed')
       ) {
         p.onToggleClick()
       }
@@ -202,7 +202,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             if (
               document
                 .querySelector('#dapplets-overlay-manager')
-                .classList.contains('dapplets-overlay-collapsed')
+                ?.classList.contains('dapplets-overlay-collapsed')
             ) {
               e.relatedTarget?.hasAttribute('data-visible') && menuVisible
                 ? null
@@ -218,7 +218,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             if (
               document
                 .querySelector('#dapplets-overlay-manager')
-                .classList.contains('dapplets-overlay-collapsed')
+                ?.classList.contains('dapplets-overlay-collapsed')
             ) {
               setMenuVisible(!menuVisible)
             } else {
@@ -235,7 +235,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             menuVisible &&
             document
               .querySelector('#dapplets-overlay-manager')
-              .classList.contains('dapplets-overlay-collapsed') && (
+              ?.classList.contains('dapplets-overlay-collapsed') && (
               <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
                 {p.getWigetsConstructor(p.menuWidgets, true)}
                 <div className={styles.delimeterMenuWidgets}></div>
@@ -320,7 +320,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                         if (
                           document
                             .querySelector('#dapplets-overlay-manager')
-                            .classList.contains('dapplets-overlay-collapsed')
+                            ?.classList.contains('dapplets-overlay-collapsed')
                         ) {
                           menu.id === 'dapplets' && setMenuVisible(!menuVisible)
 
@@ -396,7 +396,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   menuVisible &&
                   document
                     .querySelector('#dapplets-overlay-manager')
-                    .classList.contains('dapplets-overlay-collapsed') && (
+                    ?.classList.contains('dapplets-overlay-collapsed') && (
                     <ul data-testid="main-menu-actions" className={styles.mainMenu}>
                       <li onClick={connectWallet} className={styles.mainMenuItem}>
                         <span className={styles.mainMenuItemTitle}>Log in to extension</span>

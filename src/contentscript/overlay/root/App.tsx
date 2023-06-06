@@ -305,7 +305,7 @@ class _App extends React.Component<P, S> {
     const menuId = menu?.id ?? tabs.menus[0].id
     !document
       .querySelector('#dapplets-overlay-manager')
-      .classList.contains('dapplets-overlay-collapsed') &&
+      ?.classList.contains('dapplets-overlay-collapsed') &&
       this.props.navigate!(`/${tabs.id}/${menuId}`)
   }
 
