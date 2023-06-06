@@ -172,6 +172,35 @@
   height: 20px;
   margin-left: 12px;
 
-  background-image: url("../../assets/svg/loaderSettings.svg");
+  background-image: url('../../assets/svg/loaderSettings.svg');
   background-repeat: no-repeat;
+}
+.versionsList {
+  display: flex;
+  flex-wrap: wrap;
+  // justify-content: space-between;
+}
+.versionsItem {
+  display: inline-block;
+  padding: 4px 6px;
+  border: 1px solid $stroke-color;
+  border-radius: 4px;
+  background: $app-bg;
+  color: $main-grey;
+
+  font-family: Roboto, sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  margin-right: 6px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  &:hover{
+    opacity: 0.5;
+  }
+}
+
+.activeVersionItem {
+  background: $primary;
+  color: $pure-white;
+  border: none;
 }

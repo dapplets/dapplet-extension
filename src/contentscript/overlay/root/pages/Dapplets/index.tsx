@@ -88,11 +88,14 @@ export const Dapplets: FC<DappletsProps> = (props) => {
   const _refreshData = async () => {
     try {
       const rightDapplets = await getActualModules(dropdownListValue)
+      // console.log(rightDapplets,'rightDapplets');
+
       setDapplets((leftDapplets) => {
         // remove disappeared dapplets from the list
         // leave existing dapplets at the beginning of the list (innerJoin)
         // add new dapplets to the end of the list (exclusiveRightJoin)
         const innerJoin = leftDapplets.filter((x) => rightDapplets.find((y) => y.name === x.name))
+
         const exclusiveRightJoin = rightDapplets.filter(
           (x) => !leftDapplets.find((y) => y.name === x.name)
         )
@@ -155,7 +158,8 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     isActive,
     order,
     selectVersions: boolean,
-    isLoad
+    isLoad,
+    changeVersion?
   ) => {
     const { name } = module
     // TODO : try catch
@@ -163,10 +167,16 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       _updateFeatureState(name, { isLoading: true })
       const { getVersions } = await initBGFunctions(browser)
       const allVersions = await getVersions(module.sourceRegistry.url, module.name)
+
       _updateFeatureState(name, { versions: allVersions, isLoading: false })
       return
     } else {
-      await toggleFeature(module, null, isActive, order)
+      if (changeVersion) {
+        await toggleFeature(module, null, !isActive, order)
+        await toggleFeature(module, changeVersion, isActive, order)
+      } else {
+        await toggleFeature(module, null, isActive, order)
+      }
     }
     isLoad()
   }
@@ -178,7 +188,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     order: number
   ) => {
     const { name, hostnames, sourceRegistry } = module
-    const { activateFeature, deactivateFeature } = await initBGFunctions(browser)
+    const { activateFeature, deactivateFeature, getVersions } = await initBGFunctions(browser)
 
     _updateFeatureState(name, {
       isActive,
@@ -199,7 +209,14 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           sourceRegistry.url
         )
         getTabsForDapplet(module)
-        _updateFeatureState(name, { isLoading: false, isActionHandler, isHomeHandler })
+
+        const allVersions = await getVersions(module.sourceRegistry.url, module.name)
+        _updateFeatureState(name, {
+          isLoading: false,
+          versions: allVersions,
+          isActionHandler,
+          isHomeHandler,
+        })
       } else {
         await deactivateFeature(name, version, targetContextIds, order, sourceRegistry.url)
 
@@ -273,6 +290,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
       openLink(x)
     }
   }
+  console.log(filteredDapplets, 'filteredDapplets')
   return (
     <>
       <div className={styles.wrapper}>

@@ -55,8 +55,18 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     ...anotherProps
   } = props
 
-  const { name, title, description, author, icon, isActive, isActionHandler, isUnderConstruction } =
-    dapplet
+  const {
+    name,
+    title,
+    description,
+    author,
+    versions,
+    icon,
+    isActive,
+    isActionHandler,
+    isUnderConstruction,
+    lastVersion,
+  } = dapplet
 
   const [loadHome, setLoadHome] = useState(false)
   const [copied, setCopied] = useState<LoadingState>(LoadingState.READY)
@@ -117,6 +127,24 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
           <div className={cn(styles.blockText)}>{description}</div>
         </div>
 
+        {versions.length ? (
+          <div className={cn(styles.versionsList)}>
+            {versions.map((x, i) => (
+              <span
+                onClick={(e) => {
+                  onSwitchChange(dapplet, isActive, index, e['shiftKey'], loadingHome, x)
+                  setLoadHome(true)
+                }}
+                className={cn(styles.versionsItem, {
+                  [styles.activeVersionItem]: lastVersion === x,
+                })}
+                key={i}
+              >
+                {x}
+              </span>
+            ))}
+          </div>
+        ) : null}
         <div className={cn(styles.blockBottom)}>
           <div className={cn(styles.firstButtons)}>
             {isActive && isActionHandler ? (

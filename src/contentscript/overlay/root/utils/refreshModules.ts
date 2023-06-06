@@ -5,7 +5,7 @@ import { ModuleTypes } from '../../../../common/constants'
 import { ManifestAndDetails } from '../../../../common/types'
 
 export const getActualModules = async (filter = 'all'): Promise<ManifestAndDetails[]> => {
-  const { getThisTab, getCurrentContextIds, getFeaturesByHostnames } = await initBGFunctions(
+  const { getThisTab, getCurrentContextIds, getFeaturesByHostnames,getVersions } = await initBGFunctions(
     browser
   )
   const currentTab = await getThisTab()
