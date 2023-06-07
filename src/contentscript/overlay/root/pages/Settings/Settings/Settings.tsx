@@ -380,7 +380,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 ref={inputOfFocusAgentName}
                 value={userAgentNameInput}
                 onFocus={() => {
-                  setUserAgentNameInput('')
                   userAgentNameInputError ? setUserAgentNameInputError(null) : null
                 }}
                 onChange={(e) => {
