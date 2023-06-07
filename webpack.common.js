@@ -48,7 +48,9 @@ module.exports = {
   entry: {
     'service-worker': path.join(__dirname, 'src/background/index.ts'),
     contentscript: path.join(__dirname, 'src/contentscript/index.ts'),
+    cs: path.join(__dirname, 'src/cs/index.ts'),
     inpage: path.join(__dirname, 'src/inpage/index.ts'),
+    sandbox: path.join(__dirname, 'src/sandbox/index.ts'),
   },
   output: {
     path: path.join(__dirname, 'build'),
@@ -133,10 +135,14 @@ module.exports = {
           to: 'manifest.json',
           transform: (content) => modifyManifest(content),
         },
-        // {
-        //   from: 'src/background/index.html',
-        //   to: 'background.html',
-        // },
+        {
+          from: 'src/sandbox/index.html',
+          to: 'sandbox.html',
+        },
+        {
+          from: 'node_modules/@ampproject/worker-dom/dist/debug/worker/worker.mjs',
+          to: 'worker.mjs',
+        },
       ],
     }),
     new webpack.DefinePlugin({

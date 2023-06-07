@@ -32,15 +32,8 @@
   "manifest_version": 3,
   "content_scripts": [
     {
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ],
-      "js": [
-        "custom-elements.min.js",
-        "common.js",
-        "contentscript.js"
-      ],
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["custom-elements.min.js", "common.js", "cs.js"],
       "run_at": "document_idle",
       "all_frames": true
     },
@@ -50,9 +43,7 @@
         "https://wallet.mainnet.near.org/*",
         "https://wallet.testnet.near.org/*"
       ],
-      "js": [
-        "documentstart.js"
-      ],
+      "js": ["documentstart.js"],
       "run_at": "document_start",
       "all_frames": true
     }
@@ -61,13 +52,19 @@
     {
       "resources": [
         "callback.html",
-        "inpage.js"
+        "inpage.js",
+        "contentscript.js",
+        "worker.mjs",
+        "sandbox.html",
+        "common.js",
+        "sandbox.js"
       ],
-      "matches": [
-        "*://*/*"
-      ]
+      "matches": ["*://*/*"]
     }
   ],
+  "sandbox": {
+    "pages": ["sandbox.html"]
+  },
   "permissions": [
     "tabs",
     "activeTab",
@@ -77,13 +74,10 @@
     "downloads",
     "management",
     "scripting",
-    "history"
+    "history",
+    "offscreen"
   ],
-  "host_permissions": [
-    "*://localhost/*",
-    "http://*/*",
-    "https://*/*"
-  ],
+  "host_permissions": ["*://localhost/*", "http://*/*", "https://*/*"],
   "commands": {
     "toggle-overlay": {
       "suggested_key": {

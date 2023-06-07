@@ -25,6 +25,7 @@
     "postinstall": "patch-package"
   },
   "devDependencies": {
+    "@ampproject/worker-dom": "^0.34.0",
     "@fontsource/montserrat": "^4.5.14",
     "@fontsource/roboto": "^4.5.8",
     "@metamask/providers": "^11.0.0",
