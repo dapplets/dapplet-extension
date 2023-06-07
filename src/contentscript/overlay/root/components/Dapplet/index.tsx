@@ -1,6 +1,7 @@
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { ManifestAndDetails } from '../../../../../common/types'
+import { ReactComponent as Update } from '../../assets/icons/update.svg'
 import { ReactComponent as CopiedIcon } from '../../assets/svg/copied.svg'
 import { ReactComponent as CopyIcon } from '../../assets/svg/copyModal.svg'
 import { ReactComponent as LoadingIcon } from '../../assets/svg/loaderCopy.svg'
@@ -66,6 +67,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     isActionHandler,
     isUnderConstruction,
     lastVersion,
+    activeVersion,
   } = dapplet
 
   const [loadHome, setLoadHome] = useState(false)
@@ -103,8 +105,13 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
             <DappletTitle isShowDescription={false} title={title}>
               {dapplet.sourceRegistry.isDev && <span className={styles.isDev}>dev</span>}
             </DappletTitle>
-
-            <div className={cn(styles.blockIcons)}></div>
+            {isActive && activeVersion && lastVersion && lastVersion === activeVersion ? (
+              <span className={styles.update}>
+                <Update />
+                {lastVersion}
+              </span>
+            ) : null}
+            {/* <div className={cn(styles.blockIcons)}></div> */}
 
             {!isUnderConstruction && (
               <>
@@ -127,7 +134,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
           <div className={cn(styles.blockText)}>{description}</div>
         </div>
 
-        {versions.length ? (
+        {isActive && versions.length ? (
           <div className={cn(styles.versionsList)}>
             {versions.map((x, i) => (
               <span
@@ -136,7 +143,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
                   setLoadHome(true)
                 }}
                 className={cn(styles.versionsItem, {
-                  [styles.activeVersionItem]: lastVersion === x,
+                  [styles.activeVersionItem]: activeVersion === x,
                 })}
                 key={i}
               >

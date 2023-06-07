@@ -211,6 +211,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
         getTabsForDapplet(module)
 
         const allVersions = await getVersions(module.sourceRegistry.url, module.name)
+
         _updateFeatureState(name, {
           isLoading: false,
           versions: allVersions,

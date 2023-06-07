@@ -167,10 +167,10 @@
 
 .loader {
   display: inline-block;
-
+  margin-left: auto;
   width: 20px;
   height: 20px;
-  margin-left: 12px;
+  // margin-left: 12px;
 
   background-image: url('../../assets/svg/loaderSettings.svg');
   background-repeat: no-repeat;
@@ -194,7 +194,7 @@
   margin-right: 6px;
   margin-bottom: 10px;
   cursor: pointer;
-  &:hover{
+  &:hover {
     opacity: 0.5;
   }
 }
@@ -203,4 +203,19 @@
   background: $primary;
   color: $pure-white;
   border: none;
+}
+.update {
+  display: flex;
+  padding: 2px 4px;
+  background: $update-color;
+  border-radius: 14px;
+  height: 18px;
+  color: $pure-white;
+  font-weight: 400;
+  font-size: 12px;
+  font-family: Roboto, sans-serif;
+  align-items: center;
+  svg {
+    margin-right: 4px;
+  }
 }
