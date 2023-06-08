@@ -1,6 +1,7 @@
 import WalletConnect from '@walletconnect/client'
 import { ethers } from 'ethers'
 import browser from 'webextension-polyfill'
+import DAPPLETS_ICON from '../../../../resources/icons/icon128.png'
 import { NotImplementedError } from '../../../common/errors'
 import { EthereumWallet } from './interface'
 
@@ -10,6 +11,12 @@ function getWalletConnect() {
   if (!_walletconnect) {
     _walletconnect = new WalletConnect({
       bridge: 'https://bridge.walletconnect.org',
+      clientMeta: {
+        description: 'Dapplets browser extension',
+        icons: [DAPPLETS_ICON],
+        name: 'Dapplets',
+        url: browser.runtime.getURL(''),
+      },
     })
   }
 
