@@ -105,7 +105,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
             <DappletTitle isShowDescription={false} title={title}>
               {dapplet.sourceRegistry.isDev && <span className={styles.isDev}>dev</span>}
             </DappletTitle>
-            {isActive && activeVersion && lastVersion && lastVersion === activeVersion ? (
+            {isActive && activeVersion && lastVersion && lastVersion !== activeVersion ? (
               <span className={styles.update}>
                 <Update />
                 {lastVersion}
