@@ -49,6 +49,7 @@ module.exports = {
     'service-worker': path.join(__dirname, 'src/background/index.ts'),
     contentscript: path.join(__dirname, 'src/contentscript/index.ts'),
     inpage: path.join(__dirname, 'src/inpage/index.ts'),
+    offscreen: path.join(__dirname, 'src/offscreen.ts'),
   },
   output: {
     path: path.join(__dirname, 'build'),
@@ -133,10 +134,10 @@ module.exports = {
           to: 'manifest.json',
           transform: (content) => modifyManifest(content),
         },
-        // {
-        //   from: 'src/background/index.html',
-        //   to: 'background.html',
-        // },
+        {
+          from: 'src/offscreen.html',
+          to: 'offscreen.html',
+        },
       ],
     }),
     new webpack.DefinePlugin({

@@ -77,7 +77,8 @@
     "downloads",
     "management",
     "scripting",
-    "history"
+    "history",
+    "offscreen"
   ],
   "host_permissions": [
     "*://localhost/*",
