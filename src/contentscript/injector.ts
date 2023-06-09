@@ -2,6 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { Subject } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import { maxSatisfying, valid } from 'semver'
+import Sval from 'sval'
 import browser from 'webextension-polyfill'
 import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
@@ -571,15 +572,39 @@ export class Injector {
       }
 
       try {
-        const execScript = new Function(
-          'Core',
-          'Inject',
-          'Injectable',
-          'OnEvent',
-          '__decorate',
-          script
-        )
-        execScript(coreWrapper, injectDecorator, injectableDecorator, onEventDecorator, __decorate)
+        const interpreter = new Sval({
+          ecmaVer: 2019,
+        })
+        const bindings = [
+          'fetch',
+          'setInterval',
+          'clearInterval',
+          'setTimeout',
+          'clearTimeout',
+          'atob',
+          'btoa',
+          'requestAnimationFrame',
+        ]
+          .map((method) => `window.${method} = window.${method}.bind(null);\n`)
+          .join('')
+
+        interpreter.import('Core', coreWrapper)
+        interpreter.import('Inject', injectDecorator)
+        interpreter.import('Injectable', injectableDecorator)
+        interpreter.import('OnEvent', onEventDecorator)
+        interpreter.import('__decorate', __decorate)
+        interpreter.run(bindings)
+        interpreter.run(script)
+
+        //   const execScript = new Function(
+        //   'Core',
+        //   'Inject',
+        //   'Injectable',
+        //   'OnEvent',
+        //   '__decorate',
+        //   script
+        // )
+        // execScript(coreWrapper, injectDecorator, injectableDecorator, onEventDecorator, __decorate)
       } catch (err) {
         // ToDo: remove module from this.registry
         console.error(err)

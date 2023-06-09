@@ -115,7 +115,8 @@
   },
   "dependencies": {
     "ethers": "^5.7.2",
-    "near-api-js": "^0.39.0"
+    "near-api-js": "^0.39.0",
+    "sval": "^0.4.8"
   },
   "directories": {
     "doc": "docs"
