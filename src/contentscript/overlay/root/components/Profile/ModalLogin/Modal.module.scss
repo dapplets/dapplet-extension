@@ -218,7 +218,7 @@
       transition: all 0.5s;
 
       path {
-        fill: $primary-hover !important;
+        stroke: $primary-hover !important;
       }
     }
   }
@@ -229,7 +229,7 @@
       transition: all 0.5s;
 
       path {
-        fill: $primary-pressed !important;
+        stroke: $primary-pressed !important;
       }
     }
   }
