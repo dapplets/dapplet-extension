@@ -1,4 +1,4 @@
-import browser from 'webextension-polyfill'
+// import browser from 'webextension-polyfill' // ToDo: chrome.offscreen is not supported by webextension-polyfill@0.10.0. Need to be updated when it will.
 import { blobToDataURL, generateGuid } from '../../common/helpers'
 
 const OFFSCREEN_DOCUMENT_PATH = 'offscreen.html'
@@ -14,15 +14,15 @@ export const generateNftImage = async ({
 }): Promise<Blob> => {
   const iconToSend = icon && (await blobToDataURL(icon))
   const dataToSend = JSON.stringify({ name, title, icon: iconToSend })
-  if (!(await browser.offscreen.hasDocument())) {
-    await browser.offscreen.createDocument({
-      url: browser.runtime.getURL('') + OFFSCREEN_DOCUMENT_PATH,
-      reasons: [browser.offscreen.Reason.DOM_PARSER],
+  if (!(await chrome.offscreen.hasDocument())) {
+    await chrome.offscreen.createDocument({
+      url: chrome.runtime.getURL('') + OFFSCREEN_DOCUMENT_PATH,
+      reasons: [chrome.offscreen.Reason.DOM_PARSER],
       justification: 'Parse DOM',
     })
   }
   const requestId = generateGuid()
-  browser.runtime.sendMessage({
+  chrome.runtime.sendMessage({
     type: 'generate-nft-image',
     target: 'offscreen',
     data: dataToSend,
@@ -45,15 +45,15 @@ export const generateNftImage = async ({
       }
       res(fetch(message.data).then((res) => res.blob()))
       await closeOffscreenDocument()
-      browser.runtime.onMessage.removeListener(addNftImageResultListener)
+      chrome.runtime.onMessage.removeListener(addNftImageResultListener)
     }
-    browser.runtime.onMessage.addListener(addNftImageResultListener)
+    chrome.runtime.onMessage.addListener(addNftImageResultListener)
   })
 }
 
 async function closeOffscreenDocument() {
-  if (!(await browser.offscreen.hasDocument())) {
+  if (!(await chrome.offscreen.hasDocument())) {
     return
   }
-  browser.offscreen.closeDocument()
+  chrome.offscreen.closeDocument()
 }
