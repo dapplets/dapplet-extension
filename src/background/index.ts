@@ -529,7 +529,7 @@ if (typeof window === 'undefined') {
             .then(() => false)
             .catch(() => {
               browser.scripting.executeScript({
-                files: ['common.js', 'contentscript.js'],
+                files: ['contentscript.js'],
                 target: { tabId: x.id },
               })
               return true

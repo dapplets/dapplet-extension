@@ -9,6 +9,7 @@
     "service_worker": "service-worker.js",
     "type": "module"
   },
+  "minimum_chrome_version": "92",
   "action": {
     "default_icon": {
       "16": "icons/icon16.png",
@@ -32,15 +33,8 @@
   "manifest_version": 3,
   "content_scripts": [
     {
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ],
-      "js": [
-        "custom-elements.min.js",
-        "common.js",
-        "contentscript.js"
-      ],
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["custom-elements.min.js", "contentscript.js"],
       "run_at": "document_idle",
       "all_frames": true
     },
@@ -50,22 +44,15 @@
         "https://wallet.mainnet.near.org/*",
         "https://wallet.testnet.near.org/*"
       ],
-      "js": [
-        "documentstart.js"
-      ],
+      "js": ["documentstart.js"],
       "run_at": "document_start",
       "all_frames": true
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": [
-        "callback.html",
-        "inpage.js"
-      ],
-      "matches": [
-        "*://*/*"
-      ]
+      "resources": ["callback.html", "inpage.js"],
+      "matches": ["*://*/*"]
     }
   ],
   "permissions": [
@@ -80,11 +67,7 @@
     "history",
     "offscreen"
   ],
-  "host_permissions": [
-    "*://localhost/*",
-    "http://*/*",
-    "https://*/*"
-  ],
+  "host_permissions": ["*://localhost/*", "http://*/*", "https://*/*"],
   "commands": {
     "toggle-overlay": {
       "suggested_key": {

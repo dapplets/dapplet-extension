@@ -48,7 +48,7 @@ type RegistriedModule = {
 export const widgets = []
 
 const DAPPLETS_ORIGINAL_HREF: string = window['DAPPLETS_ORIGINAL_HREF']
-const IS_LIBRARY = window['DAPPLETS_JSLIB'] === true
+const IS_LIBRARY = typeof window !== 'undefined' && window['DAPPLETS_JSLIB'] === true
 
 export class Injector {
   public availableContextIds: string[] = []

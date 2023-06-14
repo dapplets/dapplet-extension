@@ -1,5 +1,5 @@
 import { ManifestOverlayAdapter } from './adapter-overlay/src'
 
-export = {
+export default {
   'overlay-adapter.dapplet-base.eth': ManifestOverlayAdapter,
 }

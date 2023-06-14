@@ -300,12 +300,12 @@ export async function waitClosingTab(tabId: number, windowId: number) {
 }
 
 export async function reloadCurrentPage() {
-  if (window['DAPPLETS_JSLIB'] !== true) {
+  if (typeof window !== 'undefined' && window['DAPPLETS_JSLIB'] === true) {
+    window.location.reload()
+  } else {
     const tab = await getCurrentTab()
     if (!tab) return
     browser.tabs.reload(tab.id)
-  } else {
-    window.location.reload()
   }
 }
 

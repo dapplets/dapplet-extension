@@ -34,7 +34,7 @@ export function getRegistriesInfo() {
 }
 
 async function init() {
-  const IS_LIBRARY = window['DAPPLETS_JSLIB'] === true
+  const IS_LIBRARY = typeof window !== 'undefined' && window['DAPPLETS_JSLIB'] === true
   const IS_E2E_IFRAME = isE2ETestingEnvironment(window.top)
   const IS_IFRAME = IS_E2E_IFRAME ? false : self !== top
 

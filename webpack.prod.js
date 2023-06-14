@@ -6,13 +6,13 @@ const TerserPlugin = require('terser-webpack-plugin')
 module.exports = merge(common, {
   mode: 'production',
   optimization: {
-    splitChunks: {
-      chunks(chunk) {
-        // exclude `inpage`
-        return chunk.name !== 'inpage'
-      },
-      name: 'common',
-    },
+    // splitChunks: {
+    //   chunks(chunk) {
+    //     // exclude `inpage`
+    //     return chunk.name !== 'inpage'
+    //   },
+    //   name: 'common',
+    // },
     minimize: true,
     minimizer: [
       new TerserPlugin({
