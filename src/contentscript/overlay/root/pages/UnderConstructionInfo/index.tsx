@@ -43,7 +43,7 @@ export interface UnderConstructionInfoProps {
   ModuleInfo: any
   ModuleVersion: any
   setUnderConstructionDetails: (x) => void
-  setShowChildrenUnderConstraction: (x) => void
+  // setShowChildrenUnderConstraction: (x) => void
 }
 
 export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => {
@@ -51,7 +51,7 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     setUnderConstructionDetails,
     ModuleInfo,
     ModuleVersion,
-    setShowChildrenUnderConstraction,
+    // setShowChildrenUnderConstraction,
   } = props
   const [mi, setMi] = useState<ModuleInfo>(ModuleInfo)
   const [loading, setLoading] = useState(false)
@@ -99,8 +99,8 @@ export const UnderConstructionInfo: FC<UnderConstructionInfoProps> = (props) => 
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
     const contextId = await getContextIds(prodRegistries[0]?.url, mi.name)
-const counter = await getCounterStake(mi.name)
-setCounterBurn(counter)
+    const counter = await getCounterStake(mi.name)
+    setCounterBurn(counter)
     setVisibleContextId(contextId)
     setTargetRegistry(prodRegistries[0]?.url || null)
     setTargetChain(chainByUri(typeOfUri(prodRegistries[0]?.url ?? '')))
@@ -281,7 +281,14 @@ setCounterBurn(counter)
             title="Social"
             children={
               <div className={styles.socialBlock}>
-                <div className={styles.moduleTitle}> {mi.name} <div className={styles.counterBurn}> Days to burn: <span className={styles.counter}>{counterBurn}</span></div></div>  
+                <div className={styles.moduleTitle}>
+                  {' '}
+                  {mi.name}{' '}
+                  <div className={styles.counterBurn}>
+                    {' '}
+                    Days to burn: <span className={styles.counter}>{counterBurn}</span>
+                  </div>
+                </div>
 
                 <SettingItem
                   title="Title"
@@ -448,7 +455,7 @@ setCounterBurn(counter)
           <button
             onClick={() => {
               setUnderConstructionDetails(false)
-              setShowChildrenUnderConstraction(true)
+              // setShowChildrenUnderConstraction(true)
             }}
             className={styles.back}
           >
@@ -478,7 +485,7 @@ setCounterBurn(counter)
             <button
               onClick={() => {
                 setUnderConstructionDetails(false)
-                setShowChildrenUnderConstraction(true)
+                // setShowChildrenUnderConstraction(true)
               }}
               className={styles.modalDefaultContentButton}
             >
@@ -489,7 +496,7 @@ setCounterBurn(counter)
         footer={''}
         onClose={() => {
           setUnderConstructionDetails(false)
-          setShowChildrenUnderConstraction(true)
+          // setShowChildrenUnderConstraction(true)
         }}
       />
       <Modal

@@ -1,11 +1,11 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, memo, useCallback, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../../background/models/versionInfo'
 import * as EventBus from '../../../../../../common/global-event-bus'
-import { groupBy, isValidUrl } from '../../../../../../common/helpers'
+import { groupBy, isValidUrl, makeCancelable } from '../../../../../../common/helpers'
 import { DevModule } from '../../../components/DevModulesList'
 import { Localhost } from '../../../components/Localhost'
 import { Registry } from '../../../components/Registry'
@@ -19,25 +19,12 @@ export interface DeveloperProps {
   setUnderConstructionDetails: (x) => void
   isShowChildrenRegistry: boolean
   setShowChildrenRegistry: (x) => void
-
-  isLoadingDeploy: boolean
-  setLoadingDeploy: () => void
-  setLoadingDeployFinally: () => void
   setOpenWallet: () => void
   connectedDescriptors: []
   selectedWallet: string
 }
-export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
-  const [registries, setRegistries] = useState([])
-  const [registryInput, setRegistryInput] = useState('')
-  const [registryInputError, setRegistryInputError] = useState(null)
-  const [modules, setModules] = useState([])
-  const [isLoadButton, setLoadButton] = useState(false)
-  const [isLocalhost, setLocalhost] = useState(true)
-  const [isLoadButtonLocalhost, setLoadButtonLocalhost] = useState(false)
-  const [isLoadAdd, setLoadAdd] = useState(false)
-  const [isUpdate, setUpdate] = useState(false)
-  const [currentAccount, setCurrentAccount] = useState(null)
+export const Developer: FC<DeveloperProps> = memo(function Developer(props: DeveloperProps) {
+  console.log('Developer rerender')
 
   const {
     setDappletsDetail,
@@ -47,40 +34,47 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     setUnderConstructionDetails,
     isShowChildrenRegistry,
     setShowChildrenRegistry,
-    isLoadingDeploy,
-    setLoadingDeploy,
-    setLoadingDeployFinally,
     setOpenWallet,
     connectedDescriptors,
     selectedWallet,
   } = props
 
-  useEffect(() => {
-    const init = async () => {
-      await _updateData()
-    }
-    init()
-    return () => {}
-  }, [])
+  const isLocalhost = true
+  const [registries, setRegistries] = useState([])
+  const [registryInput, setRegistryInput] = useState('')
+  const [registryInputError, setRegistryInputError] = useState(null)
+  const [modules, _setModules] = useState([])
+  const [isLoadButton, setLoadButton] = useState(false)
+  const [isLoadButtonLocalhost, setLoadButtonLocalhost] = useState(false)
+  const [isLoadAdd, setLoadAdd] = useState(false)
+  const [isUpdate, setUpdate] = useState(false)
+  const [currentAccount, _setCurrentAccount] = useState(null)
 
-  useEffect(() => {
-    EventBus.on('wallet_changed', _updateData)
+  const memorizedSetCurrentAccount = useCallback(
+    (newCurrentAccount) => _setCurrentAccount(newCurrentAccount),
+    []
+  )
 
-    return () => {
-      EventBus.off('wallet_changed', _updateData)
-    }
-  }, [])
-  useEffect(() => {
-    EventBus.on('module_deployment', _updateData)
+  const memorizedSetModules = useCallback((newModules) => _setModules(newModules), [])
 
-    return () => {
-      EventBus.off('module_deployment', _updateData)
-    }
-  }, [])
+  const memorizedLoadRegistries = useCallback(async () => {
+    const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
+    const modules: {
+      module: ModuleInfo
+      versions: VersionInfo[]
+      isDeployed: boolean[]
+    }[] = await getAllDevModules()
 
-  const _updateData = async () => {
+    memorizedSetModules(modules)
+
+    const registries = await getRegistries()
+
+    setRegistries(registries.filter((r) => r.isDev === true))
+  }, [memorizedSetModules])
+
+  const memorizedUpdateData = useCallback(async () => {
     setLoadButton(true)
-    await loadRegistries()
+    await memorizedLoadRegistries()
     const { getCurrentTab } = await initBGFunctions(browser)
     const currentTab = await getCurrentTab()
     if (!currentTab) return
@@ -89,29 +83,32 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     if (['index.json', 'dapplet.json'].includes(urlEnding)) {
       setRegistryInput(currentUrl)
       if (isUpdate) {
-        await loadRegistries()
+        await memorizedLoadRegistries()
 
         setUpdate(false)
       }
     }
 
     setLoadButton(false)
-  }
+  }, [isUpdate, memorizedLoadRegistries])
 
-  const loadRegistries = async () => {
-    const { getRegistries, getAllDevModules } = await initBGFunctions(browser)
-    const modules: {
-      module: ModuleInfo
-      versions: VersionInfo[]
-      isDeployed: boolean[]
-    }[] = await getAllDevModules()
+  useEffect(() => {
+    const cancelebleFn = makeCancelable(new Promise(() => memorizedUpdateData()))
+    cancelebleFn.promise.catch((reason) => console.warn('Cancelable Promise rejected:', reason))
+    return () => cancelebleFn.cancel()
+  }, [memorizedUpdateData])
 
-    setModules(modules)
-
-    const registries = await getRegistries()
-
-    setRegistries(registries.filter((r) => r.isDev === true))
-  }
+  useEffect(() => {
+    let cancelebleFn: any
+    EventBus.on('wallet_changed', () => {
+      cancelebleFn = makeCancelable(new Promise(() => memorizedUpdateData()))
+      cancelebleFn.promise.catch((reason) => console.warn('Cancelable Promise rejected:', reason))
+    })
+    return () => {
+      EventBus.off('wallet_changed', memorizedUpdateData)
+      cancelebleFn?.cancel()
+    }
+  }, [memorizedUpdateData])
 
   const addRegistry = async (url: string, newFunction: () => void) => {
     setLoadAdd(true)
@@ -121,7 +118,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       await addRegistry(url, true)
       setRegistryInput('')
 
-      loadRegistries()
+      memorizedLoadRegistries()
     } catch (msg) {
       setRegistryInputError(msg.toString())
 
@@ -136,21 +133,15 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     setLoadAdd(true)
     const { removeRegistry } = await initBGFunctions(browser)
     await removeRegistry(url)
-    loadRegistries()
+    memorizedLoadRegistries()
     setTimeout(() => setLoadAdd(false), 3000)
-  }
-
-  const deployModule = async (mi: ModuleInfo, vi: VersionInfo) => {
-    // const { openDeployOverlay } = await initBGFunctions(browser)
-    // await openDeployOverlay(mi, vi)
-    // window.close()
   }
 
   const enableRegistry = async (url: string) => {
     setLoadButtonLocalhost(true)
     const { enableRegistry } = await initBGFunctions(browser)
     await enableRegistry(url)
-    loadRegistries()
+    memorizedLoadRegistries()
     setTimeout(() => {
       setLoadButtonLocalhost(false)
     }, 1500)
@@ -160,7 +151,7 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
     setLoadButtonLocalhost(true)
     const { disableRegistry } = await initBGFunctions(browser)
     await disableRegistry(url)
-    loadRegistries()
+    memorizedLoadRegistries()
     setTimeout(() => {
       setLoadButtonLocalhost(false)
     }, 1500)
@@ -239,40 +230,35 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                         (r.isEnabled && r.error && disableRegistry(r.url)) ||
                         (r.isEnabled && !r.error && disableRegistry(r.url))
                     }}
-                    children={
-                      <div className={styles.modules}>
-                        {modules.length > 0 &&
-                          Object.entries(groupedModules).map(([registryUrl, modules]) => {
-                            return (
-                              modules.length > 0 &&
-                              registryUrl === r.url &&
-                              modules.map((x, i) => (
-                                <div key={registryUrl + i}>
-                                  <DevModule
-                                    currentAccount={currentAccount}
-                                    setCurrentAccount={setCurrentAccount}
-                                    selectedWallet={selectedWallet}
-                                    connectedDescriptors={connectedDescriptors}
-                                    setOpenWallet={setOpenWallet}
-                                    isLoadingDeploy={isLoadingDeploy}
-                                    setLoadingDeploy={setLoadingDeploy}
-                                    setLoadingDeployFinally={setLoadingDeployFinally}
-                                    setUpdate={setUpdate}
-                                    isLocalhost={isLocalhost}
-                                    setDappletsDetail={setDappletsDetail}
-                                    modules={x}
-                                    onDetailsClick={deployModule.bind(this)}
-                                    setModuleInfo={setModuleInfo}
-                                    setModuleVersion={setModuleVersion}
-                                    setUnderConstructionDetails={setUnderConstructionDetails}
-                                  />
-                                </div>
-                              ))
-                            )
-                          })}
-                      </div>
-                    }
-                  />
+                  >
+                    <div className={styles.modules}>
+                      {modules.length > 0 &&
+                        Object.entries(groupedModules).map(([registryUrl, modules]) => {
+                          return (
+                            modules.length > 0 &&
+                            registryUrl === r.url &&
+                            modules.map((x, i) => (
+                              <div key={registryUrl + i}>
+                                <DevModule
+                                  currentAccount={currentAccount}
+                                  setCurrentAccount={memorizedSetCurrentAccount}
+                                  selectedWallet={selectedWallet}
+                                  connectedDescriptors={connectedDescriptors}
+                                  setOpenWallet={setOpenWallet}
+                                  setUpdate={setUpdate}
+                                  isLocalhost={isLocalhost}
+                                  setDappletsDetail={setDappletsDetail}
+                                  modules={x}
+                                  setModuleInfo={setModuleInfo}
+                                  setModuleVersion={setModuleVersion}
+                                  setUnderConstructionDetails={setUnderConstructionDetails}
+                                />
+                              </div>
+                            ))
+                          )
+                        })}
+                    </div>
+                  </Localhost>
                 </div>
               ))}
 
@@ -286,21 +272,21 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
                           label={registryUrl}
                           isShowChildrenRegistry={isShowChildrenRegistry}
                           setShowChildrenRegistry={setShowChildrenRegistry}
-                          children={modules.map((x, i) => (
+                        >
+                          {modules.map((x, i) => (
                             <div key={i} className={styles.modules}>
                               <DevModule
                                 currentAccount={currentAccount}
-                                setCurrentAccount={setCurrentAccount}
+                                setCurrentAccount={memorizedSetCurrentAccount}
                                 setDappletsDetail={setDappletsDetail}
                                 modules={x}
-                                onDetailsClick={deployModule.bind(this)}
                                 setModuleInfo={setModuleInfo}
                                 setModuleVersion={setModuleVersion}
                                 setUnderConstructionDetails={setUnderConstructionDetails}
                               />
                             </div>
                           ))}
-                        />
+                        </Registry>
                       )}
                     </div>
                   ))}
@@ -323,4 +309,4 @@ export const Developer: FC<DeveloperProps> = (props: DeveloperProps) => {
       </div>
     </div>
   )
-}
+})

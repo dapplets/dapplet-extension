@@ -115,7 +115,6 @@ interface S {
   isOpenWallet: boolean
   classNameSearch: string
   classNameSearchButton: string
-  isLoadingDeploy: boolean
   dropdownListValue: string
   isMiniWallets: boolean
   connectedDescriptors: []
@@ -134,7 +133,6 @@ class _App extends React.Component<P, S> {
     isOpenWallet: false,
     classNameSearch: '',
     classNameSearchButton: '',
-    isLoadingDeploy: false,
     dropdownListValue: 'all',
     isMiniWallets: false,
     connectedDescriptors: null,
@@ -417,9 +415,11 @@ class _App extends React.Component<P, S> {
   handleWalletLengthConnect = () => {
     this.setState({ isWalletLength: true })
   }
+
   handleWalletLengthDisconnect = () => {
     this.setState({ isWalletLength: false })
   }
+
   setOpenWallet = () => {
     this.setState({
       isOpenWallet: !this.state.isOpenWallet,
@@ -428,6 +428,7 @@ class _App extends React.Component<P, S> {
       isMiniWallets: !this.state.isMiniWallets,
     })
   }
+
   closeOpenWallet = () => {
     this.setState({
       isOpenWallet: false,
@@ -436,20 +437,16 @@ class _App extends React.Component<P, S> {
     })
   }
 
-  setLoadingDeploy = () => {
-    this.setState({ isLoadingDeploy: true })
-  }
-  setLoadingDeployFinally = () => {
-    this.setState({ isLoadingDeploy: false })
-  }
   setDropdownListValue = (value: string) => {
     this.setState({ dropdownListValue: value })
   }
+
   setOpenWalletMini = () => {
     this.setState({
       isMiniWallets: false,
     })
   }
+
   setConnectedDescriptors = (descriptors: []) => {
     this.setState({
       connectedDescriptors: descriptors,
@@ -460,6 +457,7 @@ class _App extends React.Component<P, S> {
       selectedWallet: selectedWallet,
     })
   }
+
   setModule = (module: []) => {
     this.setState({
       module: module,
@@ -643,9 +641,6 @@ class _App extends React.Component<P, S> {
                     selectedWallet={s.selectedWallet}
                     connectedDescriptors={s.connectedDescriptors}
                     setOpenWallet={this.setOpenWallet}
-                    isLoadingDeploy={s.isLoadingDeploy}
-                    setLoadingDeploy={this.setLoadingDeploy}
-                    setLoadingDeployFinally={this.setLoadingDeployFinally}
                   />
                 )}
 
