@@ -61,7 +61,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const [targetStorages, setTargetStorages] = useState([])
 
-  const regExpUserAgentName = new RegExp(/^[a-zA-Z0-9-_\.\s]{2,41}$/)
+  const regExpUserAgentName = new RegExp(/^[a-zA-Z0-9-_\.\s]{3,40}$/)
   const regExpUserAgentNameFirstSymbol = new RegExp(/^[a-z0-9]+$/)
   const inputOfFocusIPFS = useRef<HTMLInputElement>()
   const inputOfFocusSwarmId = useRef<HTMLInputElement>()
