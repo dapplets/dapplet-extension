@@ -290,11 +290,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                 moduleName={p.icon.moduleName}
                 registryUrl={p.icon.registryUrl}
                  // todo: remove onClick when would be work tab-menu
-                 onClick={() => {
-                  // !p.isActive && p.onTabClick()
-                  // !p.isActive&&
-                  onOpenDappletAction(p.tabId)
-                }}
+                //  onClick={() => {
+                //   // !p.isActive && p.onTabClick()
+                //   // !p.isActive&&
+                //   onOpenDappletAction(p.tabId)
+                // }}
               />
             ) : (
               <StorageRefImage
@@ -307,11 +307,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                 )}
                 storageRef={p.icon as any}
                 // todo: remove onClick when would be work tab-menu
-                onClick={() => {
-                  // !p.isActive && p.onTabClick()
-                  // !p.isActive&&
-                  onOpenDappletAction(p.tabId)
-                }}
+                // onClick={() => {
+                //   // !p.isActive && p.onTabClick()
+                //   // !p.isActive&&
+                //   onOpenDappletAction(p.tabId)
+                // }}
               />
             )}
           </div>
