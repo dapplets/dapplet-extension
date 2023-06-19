@@ -61,7 +61,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const [targetStorages, setTargetStorages] = useState([])
 
-  const regExpUserAgentName = new RegExp(/^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/)
+  const regExpUserAgentName = new RegExp(/^[a-zA-Z][a-zA-Z0-9-_\.]{2,41}$/)
+  const regExpUserAgentNameFirstSymbol = new RegExp(/^[a-z0-9]+$/)
   const inputOfFocusIPFS = useRef<HTMLInputElement>()
   const inputOfFocusSwarmId = useRef<HTMLInputElement>()
   const inputOfFocusSwarm = useRef<HTMLInputElement>()
@@ -91,7 +92,16 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const getValidUserAgentName = (value, reg) => {
     try {
+
       const valueReg = value.match(reg)
+
+      return valueReg
+    } catch {}
+  }
+  const getValidUserAgentNameFirstSymbol = (value, reg) => {
+    try {
+const firsSymbolString = value.slice(0, 1)
+      const valueReg = firsSymbolString.match(reg)
 
       return valueReg
     } catch {}
@@ -223,18 +233,34 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const setUserAgentName = async (userAgentName: string) => {
-    const valueParse = getValidUserAgentName(userAgentNameInput, regExpUserAgentName)
-    if (valueParse !== null) {
-      const { setUserAgentName } = await initBGFunctions(browser)
-      await setUserAgentName(userAgentName)
-      loadUserAgentName()
-    } else {
-      setUserAgentNameInputError('Enter valid User Agent Name')
-      setTimeout(() => {
-        setUserAgentNameInputError(null)
-        setUserAgentNameInput('')
-      }, 3000)
+    if(userAgentName===' '){
+      setDeleteUserAgentName()
+    } else{
+
+     
+      const valueParseFirstSymbol = getValidUserAgentNameFirstSymbol(userAgentNameInput,regExpUserAgentNameFirstSymbol)
+      const valueParse = getValidUserAgentName(userAgentNameInput, regExpUserAgentName)
+      if(valueParseFirstSymbol === null){
+        setUserAgentNameInputError('Please start with a number or latin')
+        setTimeout(() => {
+          setUserAgentNameInputError(null)
+          setUserAgentNameInput('')
+        }, 3000)
+        return
+      }
+      if (valueParse !== null) {
+        const { setUserAgentName } = await initBGFunctions(browser)
+        await setUserAgentName(userAgentName)
+        loadUserAgentName()
+      } else {
+        setUserAgentNameInputError('Please use numbers, latin or . -_')
+        setTimeout(() => {
+          setUserAgentNameInputError(null)
+          setUserAgentNameInput('')
+        }, 3000)
+      }
     }
+   
   }
 
   const loadIpfsGateway = async () => {
@@ -383,7 +409,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   userAgentNameInputError ? setUserAgentNameInputError(null) : null
                 }}
                 onChange={(e) => {
-                  setUserAgentNameInput(e.target.value)
+                  setUserAgentNameInput(e.target.value.trim())
                   setUserAgentNameInputError(null)
                 }}
               />
