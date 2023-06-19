@@ -240,6 +240,14 @@ const firsSymbolString = value.slice(0, 1)
      
       const valueParseFirstSymbol = getValidUserAgentNameFirstSymbol(userAgentNameInput,regExpUserAgentNameFirstSymbol)
       const valueParse = getValidUserAgentName(userAgentNameInput, regExpUserAgentName)
+      if(userAgentName.length > 40 || userAgentName.length < 3){
+        setUserAgentNameInputError('Valid name length: 3-40 characters')
+        // setTimeout(() => {
+        //   setUserAgentNameInputError(null)
+        //   setUserAgentNameInput('')
+        // }, 3000)
+        return
+      }
       if(valueParseFirstSymbol === null){
         setUserAgentNameInputError('Please start with a number or latin')
         // setTimeout(() => {
