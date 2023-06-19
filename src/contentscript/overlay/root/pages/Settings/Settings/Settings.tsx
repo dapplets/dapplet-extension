@@ -242,10 +242,10 @@ const firsSymbolString = value.slice(0, 1)
       const valueParse = getValidUserAgentName(userAgentNameInput, regExpUserAgentName)
       if(valueParseFirstSymbol === null){
         setUserAgentNameInputError('Please start with a number or latin')
-        setTimeout(() => {
-          setUserAgentNameInputError(null)
-          setUserAgentNameInput('')
-        }, 3000)
+        // setTimeout(() => {
+        //   setUserAgentNameInputError(null)
+        //   setUserAgentNameInput('')
+        // }, 3000)
         return
       }
       if (valueParse !== null) {
@@ -253,11 +253,11 @@ const firsSymbolString = value.slice(0, 1)
         await setUserAgentName(userAgentName.trim())
         loadUserAgentName()
       } else {
-        setUserAgentNameInputError('Please use numbers, latin or . -_')
-        setTimeout(() => {
-          setUserAgentNameInputError(null)
-          setUserAgentNameInput('')
-        }, 3000)
+        setUserAgentNameInputError('Please use numbers, latin or ".", "-", "_"')
+        // setTimeout(() => {
+        //   setUserAgentNameInputError(null)
+        //   setUserAgentNameInput('')
+        // }, 3000)
       }
     }
    
