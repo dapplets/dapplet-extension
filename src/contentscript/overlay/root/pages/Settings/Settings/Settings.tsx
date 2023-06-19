@@ -61,7 +61,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const [targetStorages, setTargetStorages] = useState([])
 
-  const regExpUserAgentName = new RegExp(/^[a-zA-Z][a-zA-Z0-9-_\.]{2,41}$/)
+  const regExpUserAgentName = new RegExp(/^[a-zA-Z][a-zA-Z0-9-_\.\s]{2,41}$/)
   const regExpUserAgentNameFirstSymbol = new RegExp(/^[a-z0-9]+$/)
   const inputOfFocusIPFS = useRef<HTMLInputElement>()
   const inputOfFocusSwarmId = useRef<HTMLInputElement>()
@@ -250,7 +250,7 @@ const firsSymbolString = value.slice(0, 1)
       }
       if (valueParse !== null) {
         const { setUserAgentName } = await initBGFunctions(browser)
-        await setUserAgentName(userAgentName)
+        await setUserAgentName(userAgentName.trim())
         loadUserAgentName()
       } else {
         setUserAgentNameInputError('Please use numbers, latin or . -_')
@@ -409,7 +409,7 @@ const firsSymbolString = value.slice(0, 1)
                   userAgentNameInputError ? setUserAgentNameInputError(null) : null
                 }}
                 onChange={(e) => {
-                  setUserAgentNameInput(e.target.value.trim())
+                  setUserAgentNameInput(e.target.value)
                   setUserAgentNameInputError(null)
                 }}
               />
