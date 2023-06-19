@@ -12,14 +12,10 @@ import {
 } from '../../../../../common/models/notification'
 import { DefaultSigners, StorageRef } from '../../../../../common/types'
 
-import { ReactComponent as Account } from '../../assets/icons/iconsWidgetButton/account.svg'
-import { ReactComponent as Help } from '../../assets/icons/iconsWidgetButton/help.svg'
-import { ReactComponent as Login } from '../../assets/icons/iconsWidgetButton/login.svg'
-import { ReactComponent as Max } from '../../assets/icons/iconsWidgetButton/max.svg'
-import { ReactComponent as NotificationIcon } from '../../assets/icons/iconsWidgetButton/notification.svg'
-import { ReactComponent as Pause } from '../../assets/icons/iconsWidgetButton/pause.svg'
 import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
 import { ReactComponent as Event } from '../../assets/newIcon/notification.svg'
+import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
+import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
 import { StorageRefImage } from '../../components/StorageRefImage'
 import { ToolbarTabMenu } from '../../types'
 import { ModuleIcon, ModuleIconProps } from '../ModuleIcon'
@@ -62,12 +58,14 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const nodeVisibleMenu = useRef<HTMLDivElement>()
   const [menuVisible, setMenuVisible] = useState(false)
   const [event, setEvent] = useState<Notification[]>([])
+  const [isHome, setHome] = useState(false)
 
   useEffect(() => {
     !document
       .querySelector('#dapplets-overlay-manager')
       .classList.contains('dapplets-overlay-collapsed') && setMenuVisible(false)
-  }, [menuVisible])
+    getHome()
+  }, [menuVisible, isHome])
 
   useEffect(() => {
     const handleUpdateNotifications = async () => {
@@ -189,6 +187,19 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     e.stopPropagation()
     p.onCloseClick()
   }
+  // console.log(p.modules);
+  const getHome = () => {
+    if (!p.modules) return
+
+    p.modules
+      .filter((x) => x.name === p.tabId)
+      .map((x) => {
+        if (x.isActive && x.isActionHandler) return setHome(true)
+        else {
+          setHome(false)
+        }
+      })
+  }
 
   return (
     <>
@@ -233,40 +244,67 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           })}
         >
           {!p.pinned &&
-            menuVisible && p.menuWidgets.length &&
-            document
-              .querySelector('#dapplets-overlay-manager')
-              .classList.contains('dapplets-overlay-collapsed') ?(
-              <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
-                {p.getWigetsConstructor(p.menuWidgets, true)}
-                <div className={styles.delimeterMenuWidgets}></div>
-                <div className={styles.blockStandartFunction}>
-                  <SquaredButton
+          menuVisible &&
+          // p.menuWidgets.length &&
+          document
+            .querySelector('#dapplets-overlay-manager')
+            .classList.contains('dapplets-overlay-collapsed') ? (
+            <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
+              {p.getWigetsConstructor(p.menuWidgets, true)}
+              <div className={styles.delimeterMenuWidgets}></div>
+              <div className={styles.blockStandartFunction}>
+                {/* <SquaredButton
                     style={{ cursor: 'auto' }}
                     className={styles.squaredButtonMenuWidget}
                     data-visible
                     disabled={true}
                     appearance={'big'}
                     icon={Help}
-                  />
-                  <SquaredButton
-                    className={styles.squaredButtonMenuWidget}
-                    data-visible
-                    appearance={'big'}
-                    icon={Store}
-                    onClick={() => onOpenStore(p.tabId)}
-                  />
-                  <SquaredButton
+                  /> */}
+                <SquaredButton
+                  className={styles.squaredButtonMenuWidget}
+                  data-visible
+                  appearance={'big'}
+                  icon={HomeIcon}
+                  disabled={isHome ? false : true}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setMenuVisible(!menuVisible)
+                    onOpenDappletAction(p.tabId)
+                  }}
+                />
+                <SquaredButton
+                  className={styles.squaredButtonMenuWidget}
+                  data-visible
+                  appearance={'big'}
+                  icon={SettingsIcon}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setMenuVisible(!menuVisible)
+                    p.navigate(`/${p.tabId}/settings`)
+                    p.onToggleClick()
+                  }}
+                />
+                <SquaredButton
+                  className={styles.squaredButtonMenuWidget}
+                  data-visible
+                  appearance={'big'}
+                  icon={Store}
+                  onClick={() => onOpenStore(p.tabId)}
+                />
+                {/* <SquaredButton
                     style={{ cursor: 'auto' }}
                     className={styles.squaredButtonMenuWidget}
                     data-visible
                     disabled={true}
                     appearance={'big'}
                     icon={Pause}
-                  />
-                </div>
+                  /> */}
               </div>
-            ): null}
+            </div>
+          ) : null}
           <div className={styles.top}>
             {p.icon && typeof p.icon === 'function' ? null : p.icon && // /> //   })} //     [styles.cursor]: !p.isActive, //   className={cn(styles.image, { //   }} //     !p.isActive && p.onTabClick() //   onClick={() => { // <p.icon
               typeof p.icon === 'object' &&
@@ -325,14 +363,14 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                         ) {
                           // todo: uncomment when main menu will be works
                           // menu.id === 'dapplets' && setMenuVisible(!menuVisible)
-                          
+
                           if (p.pathname === '/system/dapplets') {
                             p.onToggleClick()
                           } else {
                             //todo: uncomment when main menu will be works
                             // p.navigate('/system/dapplets')
-                           //todo: remove when main menu will be works
-                            
+                            //todo: remove when main menu will be works
+
                             p.onToggleClick()
                           }
 
