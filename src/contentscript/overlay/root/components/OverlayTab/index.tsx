@@ -61,6 +61,8 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const visibleMenus = p.menus.filter((x) => x.hidden !== true)
   const nodeVisibleMenu = useRef<HTMLDivElement>()
   const [menuVisible, setMenuVisible] = useState(false)
+  // todo: remove when menu would be used
+  const [isMenuVisibleDapplet, setMenuVisibleDapplet] = useState(false)
   const [event, setEvent] = useState<Notification[]>([])
 
   useEffect(() => {
@@ -190,6 +192,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     p.onCloseClick()
   }
 
+
   return (
     <>
       {' '}
@@ -223,7 +226,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                 .classList.contains('dapplets-overlay-collapsed')
             ) {
               setMenuVisible(!menuVisible)
+               // todo: remove when menu would be used
+              setMenuVisibleDapplet(!isMenuVisibleDapplet)
             } else {
+              setMenuVisibleDapplet(false)
+               // todo: remove when menu would be used
               onOpenDappletAction(p.tabId) && setMenuVisible(false)
             }
           }}
@@ -233,7 +240,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             // [styles.isOpenWallet]: p.isOpenWallet,
           })}
         >
-          {!p.pinned &&
+          {!p.pinned && isMenuVisibleDapplet&&
             menuVisible && p.menuWidgets && p.menuWidgets.length &&
             document
               .querySelector('#dapplets-overlay-manager')
