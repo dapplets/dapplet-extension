@@ -233,14 +233,14 @@ const firsSymbolString = value.slice(0, 1)
   }
 
   const setUserAgentName = async (userAgentName: string) => {
-    if(userAgentName===' '){
+    if(userAgentName.trim().length === 0 ){
       setDeleteUserAgentName()
     } else{
 
      
-      const valueParseFirstSymbol = getValidUserAgentNameFirstSymbol(userAgentNameInput,regExpUserAgentNameFirstSymbol)
-      const valueParse = getValidUserAgentName(userAgentNameInput, regExpUserAgentName)
-      if(userAgentName.length > 40 || userAgentName.length < 3){
+      const valueParseFirstSymbol = getValidUserAgentNameFirstSymbol(userAgentNameInput.trimStart(),regExpUserAgentNameFirstSymbol)
+      const valueParse = getValidUserAgentName(userAgentNameInput.trimStart(), regExpUserAgentName)
+      if(userAgentName.length > 40 || userAgentName.trimStart().length < 3){
         setUserAgentNameInputError('Valid name length: 3-40 characters')
         // setTimeout(() => {
         //   setUserAgentNameInputError(null)
