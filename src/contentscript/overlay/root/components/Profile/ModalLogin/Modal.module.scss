@@ -207,6 +207,7 @@
   svg {
     transform: scale(0.5);
     margin: 0 auto;
+    transition: all 0.5s;
   }
   &:hover {
     width: 25px;
@@ -224,7 +225,9 @@
   }
 
   &:active {
+    transition: all 0.5s;
     svg {
+      
       transform: scale(0.7);
       transition: all 0.5s;
 
