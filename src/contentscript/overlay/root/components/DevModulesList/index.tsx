@@ -46,7 +46,6 @@ interface PropsDevModule {
 }
 
 export const DevModule: FC<PropsDevModule> = memo(function DevModule(props: PropsDevModule) {
-  console.log('DevModule rerender')
   const {
     modules,
     setDappletsDetail,

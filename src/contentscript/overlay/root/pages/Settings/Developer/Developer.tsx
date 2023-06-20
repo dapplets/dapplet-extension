@@ -24,8 +24,6 @@ export interface DeveloperProps {
   selectedWallet: string
 }
 export const Developer: FC<DeveloperProps> = memo(function Developer(props: DeveloperProps) {
-  console.log('Developer rerender')
-
   const {
     setDappletsDetail,
     setModuleInfo,
