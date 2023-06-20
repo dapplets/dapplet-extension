@@ -251,7 +251,10 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             .classList.contains('dapplets-overlay-collapsed') ? (
             <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
               {p.getWigetsConstructor(p.menuWidgets, true)}
-              <div className={styles.delimeterMenuWidgets}></div>
+              
+              <div className={cn(styles.delimeterMenuWidgets,{
+                [styles.invisibleDelimeter]:!p.menuWidgets.length
+              })}></div>
               <div className={styles.blockStandartFunction}>
                 {/* <SquaredButton
                     style={{ cursor: 'auto' }}
@@ -292,7 +295,10 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   data-visible
                   appearance={'big'}
                   icon={Store}
-                  onClick={() => onOpenStore(p.tabId)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    onOpenStore(p.tabId)}}
                 />
                 {/* <SquaredButton
                     style={{ cursor: 'auto' }}
