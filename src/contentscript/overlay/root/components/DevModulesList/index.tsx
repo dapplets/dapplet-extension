@@ -1,14 +1,14 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { FC, memo, useCallback, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import ModuleInfo from '../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../background/models/versionInfo'
-import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../../../../common/constants'
-import { chainByUri, typeOfUri } from '../../../../../common/helpers'
+import { StorageTypes } from '../../../../../common/constants'
+import { chainByUri, makeCancelable, typeOfUri } from '../../../../../common/helpers'
 import { ChainTypes, DefaultSigners } from '../../../../../common/types'
-import { ReactComponent as Settings } from '../../assets/svg/setting.svg'
 import { ReactComponent as Burn } from '../../assets/svg/burn.svg'
+import { ReactComponent as Settings } from '../../assets/svg/setting.svg'
 import { Modal } from '../Modal'
 import { StorageRefImage } from '../StorageRefImage'
 import styles from './DevModulesList.module.scss'
@@ -25,16 +25,6 @@ enum FormMode {
   Creating,
   Editing,
 }
-enum DependencyType {
-  Dependency,
-  Interface,
-}
-type DependencyChecking = {
-  name: string
-  version: string
-  type: DependencyType
-  isExists?: boolean
-}
 
 interface PropsDevModule {
   setDappletsDetail: (x) => void
@@ -43,15 +33,11 @@ interface PropsDevModule {
     versions: VersionInfo[]
     isDeployed: boolean[]
   }
-  onDetailsClick: (x: any, y: any) => void
   setModuleInfo: (x) => void
   setModuleVersion: (x) => void
   setUnderConstructionDetails: (x) => void
   isLocalhost?: boolean
   setUpdate?: (x) => void
-  isLoadingDeploy?: boolean
-  setLoadingDeploy?: () => void
-  setLoadingDeployFinally?: () => void
   setOpenWallet?: () => void
   connectedDescriptors?: []
   selectedWallet?: string
@@ -59,19 +45,15 @@ interface PropsDevModule {
   currentAccount?: any
 }
 
-export const DevModule: FC<PropsDevModule> = (props) => {
+export const DevModule: FC<PropsDevModule> = memo(function DevModule(props: PropsDevModule) {
   const {
     modules,
-    onDetailsClick,
     setDappletsDetail,
     setModuleInfo,
     setModuleVersion,
     setUnderConstructionDetails,
     isLocalhost = false,
     setUpdate,
-    isLoadingDeploy,
-    setLoadingDeploy,
-    setLoadingDeployFinally,
     setOpenWallet,
     connectedDescriptors,
     selectedWallet,
@@ -82,7 +64,6 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const [mi, setMi] = useState(modules.module)
   const vi = modules.versions[0]
   const [targetRegistry, setTargetRegistry] = useState(null)
-
   const [trustedUsers, setTrustedUsers] = useState([])
   const [mode, setMode] = useState<FormMode>(null)
   const [targetStorages, setTargetStorages] = useState([StorageTypes.Swarm, StorageTypes.Ipfs])
@@ -90,9 +71,6 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
   const [owner, setOwner] = useState(null)
   const [ownerDev, setOwnerDev] = useState(null)
-  const [dependenciesChecking, setDpendenciesChecking] = useState<DependencyChecking[]>([])
-  const nodeButton = useRef<HTMLButtonElement>()
-
   const [messageError, setMessageError] = useState(null)
   const [isModalError, setModalError] = useState(false)
   const [isModalErrorOwner, setModalErrorOwner] = useState(false)
@@ -104,45 +82,77 @@ export const DevModule: FC<PropsDevModule> = (props) => {
   const [admins, setAdmins] = useState<string[]>([])
   const [adminsOpen, setAdminsOpen] = useState(false)
   const [counterBurn, setCounterBurn] = useState(null)
-  useEffect(() => {
-    const init = async () => {
-      await _updateData()
-    }
-    init()
-    return () => {}
-  }, [targetChain])
+  const [isProcessing, setIsProcessing] = useState(false)
 
-  const _updateData = async () => {
-    const { getRegistries, getTrustedUsers,getCounterStake } = await initBGFunctions(browser)
+  const memorizedUpdateCurrentAccount = useCallback(async () => {
+    if (!targetChain) return
+    const { getAddress } = await initBGFunctions(browser)
+    const newCurrentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
+    if (currentAccount !== newCurrentAccount) setCurrentAccount(newCurrentAccount)
+  }, [currentAccount, setCurrentAccount, targetChain])
+
+  const memorizedUpdateData = useCallback(async () => {
+    const getModulesAdmins = async () => {
+      if (!targetRegistry || !mi.name) return
+      const { getAdmins } = await initBGFunctions(browser)
+      const authors: string[] = await getAdmins(targetRegistry, mi.name)
+
+      if (authors.length > 0) {
+        setAdmins(authors)
+      }
+    }
+
+    const _updateOwnership = async () => {
+      if (!targetRegistry || !mi.name) return
+      const { getOwnership } = await initBGFunctions(browser)
+      const owner = await getOwnership(targetRegistry, mi.name)
+
+      setOwner(owner)
+      setOwnerDev(owner)
+    }
+
+    const _updateDeploymentStatus = async () => {
+      setDeploymentStatus(DeploymentStatus.Unknown)
+
+      const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
+      const miF = await getModuleInfoByName(targetRegistry, mi.name)
+      const deployed = vi
+        ? await getVersionInfo(targetRegistry, mi.name, vi.branch, vi.version)
+        : true
+      const deploymentStatus = !miF
+        ? DeploymentStatus.NewModule
+        : deployed
+        ? DeploymentStatus.Deployed
+        : DeploymentStatus.NotDeployed
+
+      setDeploymentStatus(deploymentStatus)
+    }
+
+    const updateDataLocalhost = async () => {
+      const { getRegistries, getOwnership } = await initBGFunctions(browser)
+      const registries = await getRegistries()
+
+      const newRegistries = registries
+        .filter((r) => r.isDev === false && r.isEnabled !== false)
+        .map((x) => x.url)
+      const newOwner = await getOwnership(newRegistries[0], mi.name)
+
+      setOwnerDev(newOwner)
+    }
+
+    const { getRegistries, getTrustedUsers, getCounterStake } = await initBGFunctions(browser)
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
-if(mi.isUnderConstruction){
-  const counter = await getCounterStake(mi.name)
-  setCounterBurn(counter)
-}
+    if (mi.isUnderConstruction) {
+      const counter = await getCounterStake(mi.name)
+      setCounterBurn(counter)
+    }
     if (mi === null && vi === null) {
       const newMi = new ModuleInfo()
       setMi(newMi)
       setMode(FormMode.Creating)
     } else {
-      const dependencies = vi?.dependencies
-        ? Object.entries(vi.dependencies).map(([name, version]) => ({
-            name: name,
-            version: version,
-            type: DependencyType.Dependency,
-          }))
-        : []
-      const interfaces = vi?.interfaces
-        ? Object.entries(vi.interfaces).map(([name, version]) => ({
-            name: name,
-            version: version,
-            type: DependencyType.Interface,
-          }))
-        : []
-      const dependenciesChecking = [...dependencies, ...interfaces]
-
-      setDpendenciesChecking(dependenciesChecking)
       setTargetStorages(
         Object.keys(vi?.overlays ?? {}).length > 0
           ? [StorageTypes.Swarm]
@@ -155,82 +165,27 @@ if(mi.isUnderConstruction){
     }
 
     if (mode === FormMode.Creating) {
-      await _updateCurrentAccount()
+      await memorizedUpdateCurrentAccount()
       await updateDataLocalhost()
       await getModulesAdmins()
     } else {
-      return Promise.all([
+      Promise.all([
         _updateOwnership(),
         getModulesAdmins(),
-        _updateCurrentAccount(),
+        memorizedUpdateCurrentAccount(),
         _updateDeploymentStatus(),
-        _checkDependencies(),
         updateDataLocalhost(),
       ])
     }
-  }
+  }, [memorizedUpdateCurrentAccount, mi, mode, targetRegistry, vi])
 
-  const getModulesAdmins = async () => {
-    if (!targetRegistry || !mi.name) return
-    const { getAdmins } = await initBGFunctions(browser)
-    
-    const authors: string[] = await getAdmins(targetRegistry, mi.name)
+  useEffect(() => {
+    const cancelebleFn = makeCancelable(new Promise(() => memorizedUpdateData()))
+    cancelebleFn.promise.catch((reason) => console.warn('Cancelable Promise rejected:', reason))
+    return () => cancelebleFn.cancel()
+  }, [memorizedUpdateData])
 
-    if (authors.length > 0) {
-      setAdmins(authors)
-    }
-  }
-
-  const _updateOwnership = async () => {
-    if (!targetRegistry || !mi.name) return
-    const { getOwnership } = await initBGFunctions(browser)
-    const owner = await getOwnership(targetRegistry, mi.name)
-
-    setOwner(owner)
-    setOwnerDev(owner)
-  }
-
-  const _updateDeploymentStatus = async () => {
-    setDeploymentStatus(DeploymentStatus.Unknown)
-
-    const { getVersionInfo, getModuleInfoByName } = await initBGFunctions(browser)
-    const miF = await getModuleInfoByName(targetRegistry, mi.name)
-    const deployed = vi
-      ? await getVersionInfo(targetRegistry, mi.name, vi.branch, vi.version)
-      : true
-    const deploymentStatus = !miF
-      ? DeploymentStatus.NewModule
-      : deployed
-      ? DeploymentStatus.Deployed
-      : DeploymentStatus.NotDeployed
-
-    setDeploymentStatus(deploymentStatus)
-  }
-
-  const _updateCurrentAccount = async () => {
-    if (targetChain) {
-      const { getAddress } = await initBGFunctions(browser)
-      const currentAccount = await getAddress(DefaultSigners.EXTENSION, targetChain)
-
-      setCurrentAccount(currentAccount)
-    } else {
-      return
-    }
-  }
-
-  const _checkDependencies = async () => {
-    const { getVersionInfo } = await initBGFunctions(browser)
-
-    await Promise.all(
-      dependenciesChecking.map((x) =>
-        getVersionInfo(targetRegistry, x.name, DEFAULT_BRANCH_NAME, x.version).then(
-          (y) => (x.isExists = !!y)
-        )
-      )
-    )
-  }
-
-  const deployButtonClickHandler = async (e) => {
+  const deployButtonClickHandler = async () => {
     const { deployModule, addTrustedUser } = await initBGFunctions(browser)
     let newDescriptors
     let isOwner
@@ -262,9 +217,7 @@ if(mi.isUnderConstruction){
       setModalErrorOwner(true)
     } else {
       try {
-        setLoadingDeploy()
-        nodeButton.current.classList.add('dappletsIsLoadingDeploy')
-
+        setIsProcessing(true)
         if (deploymentStatus === 3) {
           setNewModule(true)
         } else {
@@ -277,23 +230,21 @@ if(mi.isUnderConstruction){
         }
       } catch (err) {
         console.log(err)
-
         setMessageError({
           type: 'negative',
           header: 'Publication error',
           message: [err.message],
         })
         if (err.message) {
-          nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
+          setIsProcessing(false)
           const messageErr = err.message.toLowerCase()
           messageErr.includes(' are not the owner of this module') ? setModalErrorOwner(true) : null
         }
-
         setModalError(true)
         setNotAccountModal(false)
       } finally {
-        setLoadingDeployFinally()
-        await _updateData()
+        setIsProcessing(false)
+        await memorizedUpdateData()
       }
     }
   }
@@ -303,7 +254,7 @@ if(mi.isUnderConstruction){
     const { pairWalletViaOverlay } = await initBGFunctions(browser)
     try {
       await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
-      await _updateData()
+      await memorizedUpdateData()
     } catch (e) {
       console.log(e)
     }
@@ -312,48 +263,31 @@ if(mi.isUnderConstruction){
   const deployNewModule = async () => {
     const { deployModule } = await initBGFunctions(browser)
     try {
-      setLoadingDeploy()
-      nodeButton.current.classList.add('dappletsIsLoadingDeploy')
-
+      setIsProcessing(true)
       onCloseNewModule()
       mode === FormMode.Creating
         ? await deployModule(mi, null, targetStorages, targetRegistry)
         : await deployModule(mi, vi, targetStorages, targetRegistry)
-
       setDeploymentStatus(DeploymentStatus.Deployed)
       setUpdate(true)
     } catch (err) {
       console.log(err)
-
       setMessageError({
         type: 'negative',
         header: 'Publication error',
         message: [err.message],
       })
       if (err.message) {
-        nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
+        setIsProcessing(false)
         const messageErr = err.message.toLowerCase()
         messageErr.includes(' are not the owner of this module') ? setModalErrorOwner(true) : null
       }
-
       setModalError(true)
       setNotAccountModal(false)
     } finally {
-      setLoadingDeployFinally()
-      await _updateData()
+      setIsProcessing(false)
+      await memorizedUpdateData()
     }
-  }
-
-  const updateDataLocalhost = async () => {
-    const { getRegistries, getOwnership } = await initBGFunctions(browser)
-    const registries = await getRegistries()
-
-    const newRegistries = registries
-      .filter((r) => r.isDev === false && r.isEnabled !== false)
-      .map((x, i) => x.url)
-    const newOwner = await getOwnership(newRegistries[0], mi.name)
-
-    setOwnerDev(newOwner)
   }
 
   return (
@@ -368,7 +302,12 @@ if(mi.isUnderConstruction){
             ) : (
               <div className={styles.dappletsVersionUC}>Under Construction</div>
             )}
-{counterBurn&& <div className={styles.dappletsBurn}><Burn/>{counterBurn >= 1? counterBurn + "days":'burning'}</div> }
+            {counterBurn && (
+              <div className={styles.dappletsBurn}>
+                <Burn />
+                {counterBurn >= 1 ? counterBurn + 'days' : 'burning'}
+              </div>
+            )}
             {vi && vi.branch && vi.branch !== 'default' && (
               <div style={{ margin: '0 3px 0 0px' }} className={styles.dappletsBranch}>
                 {vi.branch}
@@ -384,8 +323,6 @@ if(mi.isUnderConstruction){
             {mi.isUnderConstruction ? (
               <span
                 onClick={() => {
-                  onDetailsClick(mi, vi)
-
                   setUnderConstructionDetails(true)
                   setModuleInfo(mi)
                   setModuleVersion(vi)
@@ -404,9 +341,7 @@ if(mi.isUnderConstruction){
                 onClick={() => {
                   // TODO: DELETE J add contextID
                   mi.contextIds = []
-                  onDetailsClick(mi, vi)
                   setDappletsDetail(true)
-
                   setModuleInfo(mi)
                   setModuleVersion(vi)
                 }}
@@ -416,20 +351,17 @@ if(mi.isUnderConstruction){
             )}
             {mi.isUnderConstruction || !isLocalhost ? null : (
               <button
-                ref={nodeButton}
-                disabled={isLoadingDeploy}
-                onClick={(e) => {
+                disabled={isProcessing}
+                onClick={() => {
                   modules.isDeployed?.[0] === false &&
-                    _updateCurrentAccount().then(() => deployButtonClickHandler(e))
+                    memorizedUpdateCurrentAccount().then(deployButtonClickHandler)
                 }}
                 className={cn(styles.dappletsReupload, {
                   [styles.dappletDeploy]: modules.isDeployed?.[0] !== false,
+                  dappletsIsLoadingDeploy: isProcessing,
                 })}
               >
-                {nodeButton.current &&
-                nodeButton.current?.classList.contains('dappletsIsLoadingDeploy')
-                  ? ''
-                  : 'Deploy'}
+                {isProcessing ? '' : 'Deploy'}
               </button>
             )}
           </div>
@@ -555,13 +487,13 @@ if(mi.isUnderConstruction){
                 </p>
               ))}
 
-              <button onClick={() => onCloseError()} className={styles.modalDefaultContentButton}>
+              <button onClick={onCloseError} className={styles.modalDefaultContentButton}>
                 Ok
               </button>
             </div>
           }
           footer={''}
-          onClose={() => onCloseError()}
+          onClose={onCloseError}
         />
       ) : null}
 
@@ -585,20 +517,17 @@ if(mi.isUnderConstruction){
           </div>
         }
         footer={''}
-        onClose={() => onCloseErrorOwner()}
+        onClose={onCloseErrorOwner}
       />
       <Modal
         visible={isNewModule}
-        onFewFunction={() => {
-          nodeButton.current.classList.remove('dappletsIsLoadingDeploy')
-          setLoadingDeployFinally()
-        }}
+        onFewFunction={() => setIsProcessing(false)}
         title={'Deploy new module'}
         classNameWrapper={styles.modalDefaultWrapper}
         content={
           <div className={styles.modalDefaultContent}>
             <p className={styles.modalDefaultContentText}>
-              You deploy the first version of the "{mi.name}".
+              You deploy the first version of the &quot;{mi.name}&quot;.
             </p>
             <p className={styles.modalDefaultContentText}>
               After deployment the dapplet will be owned by this account -
@@ -625,8 +554,8 @@ if(mi.isUnderConstruction){
           </div>
         }
         footer={''}
-        onClose={() => onCloseNewModule()}
+        onClose={onCloseNewModule}
       />
     </>
   )
-}
+})
