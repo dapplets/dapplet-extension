@@ -620,3 +620,14 @@ export function Measure() {
     return descriptor
   }
 }
+
+export const makeCancelable = (promise: Promise<void>) => {
+  let onCancel: () => void
+  const cancelPromise = new Promise((resolve, reject) => {
+    onCancel = () => reject({ isCanceled: true })
+  })
+  return {
+    promise: Promise.race([promise, cancelPromise]),
+    cancel: onCancel,
+  }
+}

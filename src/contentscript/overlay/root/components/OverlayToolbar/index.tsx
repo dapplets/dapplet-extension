@@ -74,7 +74,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
   const noSystemTabs = p.tabs.filter((f) => f.title !== 'Dapplets')
-  const [isShowTabs, onShowTabs] = useToggle(false)
+  const [isShowTabs, onShowTabs] = useToggle(true)
   const [isClick, onClick] = useToggle(false)
 
   const [newWidgets, setNewWidgets] = useState(widgets)
@@ -135,6 +135,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       EventBus.off('myactions_changed', _refreshData)
     }
   }, [])
+
 
   const _refreshData = async () => {
     try {

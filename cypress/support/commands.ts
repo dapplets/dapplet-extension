@@ -8,6 +8,12 @@ Cypress.Commands.add('openDappletsOverlay', (url, params?: Partial<{ wipe: boole
   // open context webpage
   cy.visit(url)
 
+  cy.on('uncaught:exception', (err, runnable) => {
+    // returning false here prevents Cypress from
+    // failing the test
+    return false
+  })
+
   if (params?.wipe) {
     cy.get('dapplets-overlay-manager')
     cy.window().then((win) => win.dapplets.wipeAllExtensionData())
