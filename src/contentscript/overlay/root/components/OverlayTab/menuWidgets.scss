@@ -19,8 +19,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 6px 6px;
+
   svg{
-transform: scale(1.5);
+    transform: scale(1.5);
   }
   
 }
@@ -36,20 +37,25 @@ transform: scale(1.5);
 
   background: $stroke-color;
 }
+
 .invisibleDelimeter{
   background:inherit
 }
+
 .squaredButtonMenuWidget {
   width: 45px;
+
   background: #f5f5f5;
   border: 1px solid $stroke-color;
   border-radius: 6px;
-transition: 0.2s all ease;
+
+  transition: 0.1s all ease;
 
   &:hover {
-    box-shadow: none;
     background: #d9304f;
     border: 1px solid #d9304f;
+    box-shadow: none;
+
     svg {
       path {
         fill: none;
@@ -59,9 +65,10 @@ transition: 0.2s all ease;
   }
 
   &:active {
-    box-shadow: none;
     background: #a6253c;
     border: 1px solid #a6253c;
+    box-shadow: none;
+
     svg {
       path {
         fill: none;
@@ -72,14 +79,14 @@ transition: 0.2s all ease;
 
   &:disabled {
     cursor: auto !important;
-    box-shadow: none;
     background: inherit;
     border: 1px solid $stroke-color;
+    box-shadow: none;
 
     svg {
       path {
-        stroke: initial;
-        fill:initial
+        fill: #bdbdbd;
+        stroke: none;
       }
     }
   }

@@ -10,7 +10,7 @@ import {
   NotificationStatus,
   NotificationType,
 } from '../../../../../common/models/notification'
-import { DefaultSigners, StorageRef } from '../../../../../common/types'
+import { StorageRef } from '../../../../../common/types'
 
 import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
 import { ReactComponent as Event } from '../../assets/newIcon/notification.svg'
@@ -85,13 +85,13 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     }
   }, [])
 
-  const connectWallet = async () => {
-    const { pairWalletViaOverlay } = await initBGFunctions(browser)
-    try {
-      await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
-      p.setOpenWallet()
-    } catch (_) {}
-  }
+  // const connectWallet = async () => {
+  //   const { pairWalletViaOverlay } = await initBGFunctions(browser)
+  //   try {
+  //     await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
+  //     p.setOpenWallet()
+  //   } catch (_) {}
+  // }
   const isModuleActive = () => {
     if (!p.modules) return false
     let isModuleActive
@@ -182,11 +182,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     const notifications = await getNotifications(NotificationType.Application)
     return notifications
   }
-  const _handleCloseClick: React.MouseEventHandler<HTMLSpanElement> = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    p.onCloseClick()
-  }
+  // const _handleCloseClick: React.MouseEventHandler<HTMLSpanElement> = (e) => {
+  //   e.preventDefault()
+  //   e.stopPropagation()
+  //   p.onCloseClick()
+  // }
   // console.log(p.modules);
   const getHome = () => {
     if (!p.modules) return
@@ -251,10 +251,11 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
             .classList.contains('dapplets-overlay-collapsed') ? (
             <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
               {p.getWigetsConstructor(p.menuWidgets, true)}
-              
-              <div className={cn(styles.delimeterMenuWidgets,{
-                [styles.invisibleDelimeter]:!p.menuWidgets.length
-              })}></div>
+              <div
+                className={cn(styles.delimeterMenuWidgets, {
+                  [styles.invisibleDelimeter]: !p.menuWidgets.length,
+                })}
+              ></div>
               <div className={styles.blockStandartFunction}>
                 {/* <SquaredButton
                     style={{ cursor: 'auto' }}
@@ -298,7 +299,8 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    onOpenStore(p.tabId)}}
+                    onOpenStore(p.tabId)
+                  }}
                 />
                 {/* <SquaredButton
                     style={{ cursor: 'auto' }}
