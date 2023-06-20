@@ -551,16 +551,17 @@
 .blockContextTitle {
   display: inline-block;
 
-  width: 100%;
+  width: 90%;
 
   font-family: Roboto, sans-serif;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   font-style: italic;
   line-height: 149%;
   color: $main-grey;
 
   background: inherit;
+  text-overflow: ellipsis;
 }
 
 .contextDelete {
