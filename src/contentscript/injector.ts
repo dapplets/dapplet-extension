@@ -21,7 +21,7 @@ import Core from './core'
 import { BaseEvent } from './events/baseEvent'
 import { EventBus as ModuleEventBus } from './events/eventBus'
 import { __decorate } from './global'
-import { ManifestOverlayAdapter } from './modules/adapter-overlay/src'
+import BuiltInModules from './modules'
 import { IContentAdapter, IResolver } from './types'
 
 type RegistriedModule = {
@@ -43,6 +43,15 @@ type RegistriedModule = {
   onWalletsUpdateHandler?: Function
   onConnectedAccountsUpdateHandler?: Function
   moduleEventBus?: ModuleEventBus
+}
+
+type NotRegisteredModule = {
+  manifest: VersionInfo
+  script: string
+  order: number
+  contextIds: string[]
+  defaultConfig?: DefaultConfig
+  schemaConfig?: SchemaConfig
 }
 
 export const widgets = []
@@ -310,16 +319,7 @@ export class Injector {
     await this.unloadModules(modules)
   }
 
-  private async _processModules(
-    modules: {
-      manifest: VersionInfo
-      script: string
-      order: number
-      contextIds: string[]
-      defaultConfig?: DefaultConfig
-      schemaConfig?: SchemaConfig
-    }[]
-  ) {
+  private async _processModules(modules: NotRegisteredModule[]) {
     const { getModulesWithDeps, getSwarmGateway, getPreferedOverlayStorage } =
       await initBGFunctions(browser)
     const { core } = this
@@ -327,7 +327,9 @@ export class Injector {
     const swarmGatewayUrl = await getSwarmGateway()
     const preferedOverlayStorage = await getPreferedOverlayStorage()
 
-    for (const { manifest, script, order, contextIds, defaultConfig, schemaConfig } of modules) {
+    for (const module of modules) {
+      const { manifest, script, contextIds, defaultConfig, schemaConfig } = module
+
       // Module is loaded already
       const registeredModule = this.registry.find((m) => areModulesEqual(m.manifest, manifest))
       if (registeredModule) {
@@ -442,6 +444,21 @@ export class Injector {
         },
       }
 
+      // Built-in modules are loaded without eval
+      if (BuiltInModules[manifest.name]) {
+        const builtInModule = BuiltInModules[manifest.name]
+
+        // dynamic-adapter is loaded here usually
+        this._registerModule(
+          builtInModule,
+          builtInModule.clazz,
+          moduleEventBus,
+          new builtInModule.clazz(coreWrapper)
+        )
+
+        continue
+      }
+
       let newBranch: string = null
 
       // ToDo: describe it
@@ -450,22 +467,8 @@ export class Injector {
         if (constructor.prototype.getBranch) {
           const resolver: IResolver = new constructor()
           newBranch = resolver.getBranch()
-        } else if (!this.registry.find((m) => areModulesEqual(m.manifest, manifest))) {
-          this.registry.push({
-            manifest: manifest,
-            clazz: constructor,
-            instance: null,
-            order: order,
-            contextIds: contextIds,
-            constructorDependencies: [],
-            instancedPropertyDependencies: {},
-            instancedConstructorDeps: [],
-            defaultConfig: defaultConfig,
-            schemaConfig: schemaConfig,
-            activateMethodsDependencies: [],
-            instancedActivateMethodsDependencies: [],
-            moduleEventBus,
-          })
+        } else {
+          this._registerModule(module, constructor, moduleEventBus)
         }
       }
 
@@ -487,29 +490,25 @@ export class Injector {
           // ContructorDecorator: class, undefined, parameterIndex
           // PropertyDecorator: class(obj), property_name, undefined
           // ParameterDecorator: class(obj), method_name, parameterIndex
-          // Constructor Parameter Decorator
-          if (name === 'overlay-adapter.dapplet-base.eth') {
-            this.registry.push(ManifestOverlayAdapter)
+
+          // Built-in module
+          if (BuiltInModules[name]) {
+            const builtInModuleEventBus = new ModuleEventBus(
+              this.eventStream.pipe(filter((e) => e.namespace === name))
+            )
+
+            // overlay-adapter is loaded here usually
+            this._registerModule(
+              BuiltInModules[name],
+              BuiltInModules[name].clazz,
+              builtInModuleEventBus,
+              new BuiltInModules[name].clazz()
+            )
           }
+
+          // Constructor Parameter Decorator
           if (propertyOrMethodName === undefined) {
-            if (!this.registry.find((m) => areModulesEqual(m.manifest, manifest))) {
-              this.registry.push({
-                manifest: manifest,
-                clazz: target,
-                instance: null,
-                order: order,
-                contextIds: contextIds,
-                constructorDependencies: [],
-                instancedPropertyDependencies: {},
-                instancedConstructorDeps: [],
-                activateMethodsDependencies: [],
-                instancedActivateMethodsDependencies: [],
-                defaultConfig: defaultConfig,
-                schemaConfig: schemaConfig,
-                moduleEventBus,
-              })
-            }
-            const currentModule = this.registry.find((m) => areModulesEqual(m.manifest, manifest))
+            const currentModule = this._registerModule(module, target, moduleEventBus)
             currentModule.constructorDependencies[parameterIndex] = name
           }
           // Class Property Decorator
@@ -534,24 +533,7 @@ export class Injector {
           }
           // Method Parameter Decorator
           else if (propertyOrMethodName === 'activate') {
-            if (!this.registry.find((m) => areModulesEqual(m.manifest, manifest))) {
-              this.registry.push({
-                manifest: manifest,
-                clazz: target.constructor,
-                instance: null,
-                order: order,
-                contextIds: contextIds,
-                constructorDependencies: [],
-                instancedPropertyDependencies: {},
-                activateMethodsDependencies: [],
-                instancedActivateMethodsDependencies: [],
-                instancedConstructorDeps: [],
-                defaultConfig: defaultConfig,
-                schemaConfig: schemaConfig,
-                moduleEventBus,
-              })
-            }
-            const currentModule = this.registry.find((m) => areModulesEqual(m.manifest, manifest))
+            const currentModule = this._registerModule(module, target.constructor, moduleEventBus)
             currentModule.activateMethodsDependencies[parameterIndex] = name
           }
           // Invalid Decorator
@@ -652,60 +634,47 @@ export class Injector {
   }
 
   private _getDependency(manifest: VersionInfo, name: string) {
-    // ToDo: remove hardcoded module name and use src/contentscript/modules/index.ts
-    if (name === 'overlay-adapter.dapplet-base.eth') {
-      // if the module can not be found by the name, then trying to find its implementation by interface name
-      let modules = this.registry.filter((m) => m.manifest.name == name)
-      if (modules.length === 0) {
-        modules = this.registry.filter((m) => m.manifest.interfaces?.[name] !== undefined)
-        if (modules.length === 0) {
-          console.error(
-            `Can not find neither the module, nor an implementation of the interface "${name}".`
-          )
-          return null
-        }
-      }
-
-      return ManifestOverlayAdapter
-    } else {
-      const dependency = manifest.dependencies[name]
-      if (dependency === undefined) {
-        console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`)
-        return
-      }
-      if (valid(dependency as string) === null) {
-        console.error(
-          `Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`
-        )
-        return
-      }
-
-      // if the module can not be found by the name, then trying to find its implementation by interface name
-      let modules = this.registry.filter((m) => m.manifest.name == name)
-      if (modules.length === 0) {
-        modules = this.registry.filter((m) => m.manifest.interfaces?.[name] !== undefined)
-        if (modules.length === 0) {
-          console.error(
-            `Can not find neither the module, nor an implementation of the interface "${name}".`
-          )
-          return null
-        }
-      }
-
-      // ToDo: Should be moved to the background?
-      // ToDo: Fetch prefix from global settings.
-      // ToDo: Replace '>=' to '^'
-      const prefix = '>=' // https://devhints.io/semver
-      const range =
-        prefix + (typeof dependency === 'string' ? dependency : dependency[DEFAULT_BRANCH_NAME])
-      const maxVer = maxSatisfying(
-        modules.map((m) => m.manifest.version),
-        range
-      )
-
-      const module = modules.find((m) => m.manifest.version == maxVer)
-      return module
+    if (BuiltInModules[name]) {
+      return this.registry.find((m) => m.manifest.name == name)
     }
+
+    const dependency = manifest.dependencies[name]
+    if (dependency === undefined) {
+      console.error(`Module "${name}" doesn't exist in the manifest of "${manifest.name}"`)
+      return
+    }
+    if (valid(dependency as string) === null) {
+      console.error(
+        `Invalid semver version (${dependency}) of module "${name}" in the manifest of "${manifest.name}"`
+      )
+      return
+    }
+
+    // if the module can not be found by the name, then trying to find its implementation by interface name
+    let modules = this.registry.filter((m) => m.manifest.name == name)
+    if (modules.length === 0) {
+      modules = this.registry.filter((m) => m.manifest.interfaces?.[name] !== undefined)
+      if (modules.length === 0) {
+        console.error(
+          `Can not find neither the module, nor an implementation of the interface "${name}".`
+        )
+        return null
+      }
+    }
+
+    // ToDo: Should be moved to the background?
+    // ToDo: Fetch prefix from global settings.
+    // ToDo: Replace '>=' to '^'
+    const prefix = '>=' // https://devhints.io/semver
+    const range =
+      prefix + (typeof dependency === 'string' ? dependency : dependency[DEFAULT_BRANCH_NAME])
+    const maxVer = maxSatisfying(
+      modules.map((m) => m.manifest.version),
+      range
+    )
+
+    const module = modules.find((m) => m.manifest.version == maxVer)
+    return module
   }
 
   private _proxifyModule(proxiedModule: RegistriedModule, contextModule: RegistriedModule) {
@@ -734,9 +703,12 @@ export class Injector {
               } else {
                 Reflect.get(target, cfgsKey).push(cfg)
               }
-              if (proxiedModule.manifest.name === 'overlay-adapter.dapplet-base.eth') {
+
+              if (BuiltInModules[proxiedModule.manifest.name]) {
                 return target.attachConfig(cfg, contextModule)
-              } else return target.attachConfig(cfg)
+              } else {
+                return target.attachConfig(cfg)
+              }
             }
           }
           if (prop === 'detachConfig') {
@@ -769,5 +741,38 @@ export class Injector {
     } else {
       return proxiedModule.instance
     }
+  }
+
+  private _registerModule(
+    module: NotRegisteredModule,
+    clazz: any,
+    moduleEventBus: ModuleEventBus,
+    instance: any = null
+  ): RegistriedModule {
+    const existingModule = this.registry.find((m) => areModulesEqual(m.manifest, module.manifest))
+
+    if (existingModule) {
+      return existingModule
+    }
+
+    const newRegisteredModule: RegistriedModule = {
+      manifest: module.manifest,
+      clazz: clazz,
+      instance: instance,
+      order: module.order,
+      contextIds: module.contextIds,
+      constructorDependencies: [],
+      instancedPropertyDependencies: {},
+      instancedConstructorDeps: [],
+      defaultConfig: module.defaultConfig,
+      schemaConfig: module.schemaConfig,
+      activateMethodsDependencies: [],
+      instancedActivateMethodsDependencies: [],
+      moduleEventBus,
+    }
+
+    this.registry.push(newRegisteredModule)
+
+    return newRegisteredModule
   }
 }

@@ -5,7 +5,7 @@ import { ButtonWidget, IButtonWidgetState } from '../button'
 import { ILabelWidgetState, LabelWidget } from '../label'
 export const widgets = []
 
-export default class OverlayAdapter {
+class OverlayAdapter {
   public state: any
   public widgetsCreator = new WidgetsCreator()
   public exports = (): Exports => ({
@@ -16,7 +16,6 @@ export default class OverlayAdapter {
     MENU_ACTION: {},
   }
 
-  constructor(readonly adapter: any) {}
   public attachConfig(feature, moduleName): void {
     const newWidgets = {
       moduleName: moduleName.manifest.name,
@@ -37,33 +36,32 @@ export default class OverlayAdapter {
   }
 }
 
-export const ManifestOverlayAdapter = {
-  manifest: {
-    branch: 'default',
-    createdAt: '1970-01-20T05:35:11.280Z',
-    defaultConfig: null,
-    dependencies: {},
-    dist: { hash: '', uris: [] },
-    environment: null,
-    extensionVersion: '0.0.0-pre.0',
-    interfaces: {},
-    main: null,
-    name: 'overlay-adapter.dapplet-base.eth',
-    overlays: null,
-    registryUrl: 'v2.registry.dapplet-base.eth',
-    schemaConfig: null,
-    type: ModuleTypes.Adapter,
-    version: '0.1.0',
-    getId: null,
-  },
-  instance: new OverlayAdapter('overlay-adapter.dapplet-base.eth'),
-  clazz: OverlayAdapter,
-  order: null,
-  contextIds: null,
-  constructorDependencies: [],
-  instancedPropertyDependencies: {},
-  instancedConstructorDeps: [],
-  activateMethodsDependencies: [],
-  instancedActivateMethodsDependencies: [],
-  defaultConfig: null,
+const ManifestOverlayAdapter = {
+  branch: 'default',
+  createdAt: '1970-01-20T05:35:11.280Z',
+  defaultConfig: {},
+  dependencies: {},
+  dist: { hash: '', uris: [] },
+  environment: 'prod',
+  extensionVersion: '0.0.0-pre.0',
+  interfaces: {},
+  main: { hash: '', uris: [] },
+  name: 'overlay-adapter.dapplet-base.eth',
+  registryUrl: 'v2.registry.dapplet-base.eth',
+  schemaConfig: {},
+  type: ModuleTypes.Adapter,
+  version: '0.1.0',
+  overlays: {},
+  getId: () => 'overlay-adapter.dapplet-base.eth#default@0.1.0',
 }
+
+const Module = {
+  manifest: ManifestOverlayAdapter,
+  order: 0,
+  contextIds: [],
+  defaultConfig: {},
+  schemaConfig: {},
+  clazz: OverlayAdapter,
+}
+
+export default Module
