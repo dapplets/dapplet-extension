@@ -76,26 +76,9 @@ async function init() {
     if (!message || !message.type) return
 
     if (message.type === 'FEATURE_ACTIVATED') {
-      const modules = message.payload
-      modules.forEach((f) =>
-        console.log(
-          `[DAPPLETS]: The module ${f.name}${f.branch ? '#' + f.branch : ''}${
-            f.version ? '@' + f.version : ''
-          } was activated.`
-        )
-      )
-
-      return injector.loadModules(modules)
+      return injector.loadModules(message.payload.modules)
     } else if (message.type === 'FEATURE_DEACTIVATED') {
-      const modules = message.payload
-      modules.forEach((f) =>
-        console.log(
-          `[DAPPLETS]: The module ${f.name}${f.branch ? '#' + f.branch : ''}${
-            f.version ? '@' + f.version : ''
-          } was deactivated.`
-        )
-      )
-      return injector.unloadModules(modules)
+      return injector.unloadModules(message.payload.modules)
     } else if (!IS_IFRAME && message.type === 'CURRENT_CONTEXT_IDS') {
       return getAllContextIds()
     } else if (!IS_IFRAME && message.type === 'OPEN_DAPPLET_ACTION') {
@@ -112,11 +95,7 @@ async function init() {
   })
 
   // Handle module (de)activations from another tabs
-  EventBus.on('dapplet_activated', async () => {
-    const contextIds = await getAllContextIds()
-    browser.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
-  })
-
+  EventBus.on('dapplet_activated', (m) => injector.loadModules([m]))
   EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]))
 
   EventBus.on('wallet_changed', () => injector.executeWalletsUpdateHandler())

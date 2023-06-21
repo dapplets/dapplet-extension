@@ -379,19 +379,20 @@ export default class FeatureService {
           reject('Loading timeout exceed')
         }, 30000)
 
+        // ToDo: use global dapplet_activated event instead of FEATURE_ACTIVATED
         // sending command to contentscript
-        browser.tabs.sendMessage(tabId, {
-          type: isActive ? 'FEATURE_ACTIVATED' : 'FEATURE_DEACTIVATED',
-          payload: [
-            {
-              name,
-              version,
-              branch: DEFAULT_BRANCH_NAME, // ToDo: fix branch
-              order,
-              contextIds: hostnames,
-            },
-          ],
-        })
+        // browser.tabs.sendMessage(tabId, {
+        //   type: isActive ? 'FEATURE_ACTIVATED' : 'FEATURE_DEACTIVATED',
+        //   payload: [
+        //     {
+        //       name,
+        //       version,
+        //       branch: DEFAULT_BRANCH_NAME, // ToDo: fix branch
+        //       order,
+        //       contextIds: hostnames,
+        //     },
+        //   ],
+        // })
 
         // global notification
         const event = isActive ? 'dapplet_activated' : 'dapplet_deactivated'

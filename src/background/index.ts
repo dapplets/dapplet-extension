@@ -404,6 +404,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
     featureService.getActiveModulesByHostnames(message.payload.contextIds).then((manifests) => {
       if (manifests.length === 0) return
 
+      // ToDo: use global dapplet_activated event instead of FEATURE_ACTIVATED
       browser.tabs.sendMessage(
         sender.tab.id,
         {
@@ -433,6 +434,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
         const adapters = manifests.filter((x) => x.type === ModuleTypes.Adapter)
         if (adapters.length === 0) return
 
+        // ToDo: use global dapplet_activated event instead of FEATURE_ACTIVATED
         browser.tabs.sendMessage(
           sender.tab.id,
           {
