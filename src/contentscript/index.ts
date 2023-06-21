@@ -76,9 +76,9 @@ async function init() {
     if (!message || !message.type) return
 
     if (message.type === 'FEATURE_ACTIVATED') {
-      return injector.loadModules(message.payload.modules)
+      return injector.loadModules(message.payload)
     } else if (message.type === 'FEATURE_DEACTIVATED') {
-      return injector.unloadModules(message.payload.modules)
+      return injector.unloadModules(message.payload)
     } else if (!IS_IFRAME && message.type === 'CURRENT_CONTEXT_IDS') {
       return getAllContextIds()
     } else if (!IS_IFRAME && message.type === 'OPEN_DAPPLET_ACTION') {
