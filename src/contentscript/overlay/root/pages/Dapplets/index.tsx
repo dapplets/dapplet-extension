@@ -85,6 +85,44 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
   }, [])
 
+  // Refresh isActive switch state
+  useEffect(() => {
+    const handler = (m) => {
+      setDapplets((dapplets) => {
+        return dapplets.map((dapplet) => {
+          if (dapplet.name === m.name) {
+            return { ...dapplet, isActive: true }
+          } else {
+            return dapplet
+          }
+        })
+      })
+    }
+
+    EventBus.on('dapplet_activated', handler)
+
+    return () => EventBus.off('dapplet_activated', handler)
+  }, [])
+
+  // Refresh isActive switch state
+  useEffect(() => {
+    const handler = (m) => {
+      setDapplets((dapplets) => {
+        return dapplets.map((dapplet) => {
+          if (dapplet.name === m.name) {
+            return { ...dapplet, isActive: false }
+          } else {
+            return dapplet
+          }
+        })
+      })
+    }
+
+    EventBus.on('dapplet_deactivated', handler)
+
+    return () => EventBus.off('dapplet_deactivated', handler)
+  }, [])
+
   const _refreshData = async () => {
     try {
       const rightDapplets = await getActualModules(dropdownListValue)

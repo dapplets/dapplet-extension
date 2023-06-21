@@ -292,6 +292,8 @@ export default class FeatureService {
     registryUrl: string,
     tabId: number
   ): Promise<DappletRuntimeResult | null> {
+    // ToDo: check that the module is (not) active already
+
     // Clear cached dependencies
     globalClear(this._moduleManager, '_getOptimizedChildDependenciesAndManifest')
 
