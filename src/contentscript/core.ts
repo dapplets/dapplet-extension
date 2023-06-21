@@ -6,7 +6,7 @@ import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
 import { generateGuid, parseShareLink } from '../common/helpers'
 import { NotificationPayload } from '../common/models/notification'
-import { LoginRequest, SystemOverlayTabs } from '../common/types'
+import { ContentDetector, LoginRequest, SystemOverlayTabs } from '../common/types'
 import { AppStorage } from './appStorage'
 import ConnectedAccounts from './connectedAccounts/connected-accounts'
 import { Connection, EventDef } from './connection'
@@ -47,11 +47,6 @@ export type INearWallet = NearApi.ConnectedWalletAccount &
   WalletConnection & {
     authMethod: 'near/testnet' | 'near/mainnet'
   }
-
-type ContentDetector = {
-  contextId: string
-  selector: string
-}
 
 export default class Core {
   constructor(isIframe: boolean, public overlayManager: IOverlayManager) {

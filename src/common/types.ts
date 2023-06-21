@@ -220,3 +220,8 @@ export type MessageWrapperRequest = {
   }
   sender: Runtime.MessageSender
 }
+
+export type ContentDetector = {
+  contextId: string
+  selector: string
+}

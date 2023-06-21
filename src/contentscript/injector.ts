@@ -85,6 +85,14 @@ export class Injector {
       contextIds: string[]
     }[]
   ) {
+    modules.forEach((f) =>
+      console.log(
+        `[DAPPLETS]: The module ${f.name}${f.branch ? '#' + f.branch : ''}${
+          f.version ? '@' + f.version : ''
+        } was activated.`
+      )
+    )
+
     modules = modules.filter(
       (x) =>
         x.contextIds.filter(
@@ -204,6 +212,14 @@ export class Injector {
   }
 
   public async unloadModules(modules: { name: string; branch: string; version: string }[]) {
+    modules.forEach((f) =>
+      console.log(
+        `[DAPPLETS]: The module ${f.name}${f.branch ? '#' + f.branch : ''}${
+          f.version ? '@' + f.version : ''
+        } was deactivated.`
+      )
+    )
+
     const registriedModules = modules.map((m) =>
       this.registry.find((r) => areModulesEqual(m, r.manifest))
     )
@@ -452,8 +468,8 @@ export class Injector {
         this._registerModule(
           builtInModule,
           builtInModule.clazz,
-          moduleEventBus,
-          new builtInModule.clazz(coreWrapper)
+          () => moduleEventBus,
+          () => new builtInModule.clazz(coreWrapper)
         )
 
         continue
@@ -468,7 +484,7 @@ export class Injector {
           const resolver: IResolver = new constructor()
           newBranch = resolver.getBranch()
         } else {
-          this._registerModule(module, constructor, moduleEventBus)
+          this._registerModule(module, constructor, () => moduleEventBus)
         }
       }
 
@@ -493,22 +509,18 @@ export class Injector {
 
           // Built-in module
           if (BuiltInModules[name]) {
-            const builtInModuleEventBus = new ModuleEventBus(
-              this.eventStream.pipe(filter((e) => e.namespace === name))
-            )
-
             // overlay-adapter is loaded here usually
             this._registerModule(
               BuiltInModules[name],
               BuiltInModules[name].clazz,
-              builtInModuleEventBus,
-              new BuiltInModules[name].clazz()
+              () => new ModuleEventBus(this.eventStream.pipe(filter((e) => e.namespace === name))),
+              () => new BuiltInModules[name].clazz()
             )
           }
 
           // Constructor Parameter Decorator
           if (propertyOrMethodName === undefined) {
-            const currentModule = this._registerModule(module, target, moduleEventBus)
+            const currentModule = this._registerModule(module, target, () => moduleEventBus)
             currentModule.constructorDependencies[parameterIndex] = name
           }
           // Class Property Decorator
@@ -533,7 +545,11 @@ export class Injector {
           }
           // Method Parameter Decorator
           else if (propertyOrMethodName === 'activate') {
-            const currentModule = this._registerModule(module, target.constructor, moduleEventBus)
+            const currentModule = this._registerModule(
+              module,
+              target.constructor,
+              () => moduleEventBus
+            )
             currentModule.activateMethodsDependencies[parameterIndex] = name
           }
           // Invalid Decorator
@@ -746,8 +762,8 @@ export class Injector {
   private _registerModule(
     module: NotRegisteredModule,
     clazz: any,
-    moduleEventBus: ModuleEventBus,
-    instance: any = null
+    moduleEventBusFactory: () => ModuleEventBus,
+    instanceFactory: any = () => null
   ): RegistriedModule {
     const existingModule = this.registry.find((m) => areModulesEqual(m.manifest, module.manifest))
 
@@ -758,7 +774,7 @@ export class Injector {
     const newRegisteredModule: RegistriedModule = {
       manifest: module.manifest,
       clazz: clazz,
-      instance: instance,
+      instance: instanceFactory(),
       order: module.order,
       contextIds: module.contextIds,
       constructorDependencies: [],
@@ -768,7 +784,7 @@ export class Injector {
       schemaConfig: module.schemaConfig,
       activateMethodsDependencies: [],
       instancedActivateMethodsDependencies: [],
-      moduleEventBus,
+      moduleEventBus: moduleEventBusFactory(),
     }
 
     this.registry.push(newRegisteredModule)
