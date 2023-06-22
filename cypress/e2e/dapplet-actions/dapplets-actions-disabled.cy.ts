@@ -17,7 +17,7 @@ describe('disabled dapplet action', () => {
       cy.wait(1000)
       cy.getByTestId('system-tab-dapplets').click()
       cy.wait(1000)
-      cy.getByTestId('show-tabs-button').click()
+      // cy.getByTestId('show-tabs-button').click()
       cy.getByTestId('minimize-overlay-button').click()
 
       // change disabled dapplet action

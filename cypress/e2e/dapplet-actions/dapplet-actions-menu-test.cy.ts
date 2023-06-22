@@ -17,9 +17,10 @@ describe('dapplets action work', () => {
       cy.wait(1000)
       cy.getByTestId('system-tab-dapplets').click()
       cy.wait(1000)
-      cy.getByTestId('show-tabs-button').click()
+      // cy.getByTestId('show-tabs-button').click()
       cy.getByTestId('minimize-overlay-button').click()
-
+      // cy.getByTestId('show-tabs-button').click()
+      cy.wait(1000)
       cy.getByTestId('tab-not-pinned').click()
 
       // check dapplet action title

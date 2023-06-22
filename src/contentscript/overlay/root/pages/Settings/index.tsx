@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useCallback, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { SettingTitle } from '../../components/SettingTitle'
 import { DappletsMainInfo } from '../DappletsInfo'
@@ -33,23 +33,13 @@ export const NAVIGATION_LIST = [
   { _id: '1', title: 'Developer' },
 ]
 export interface SettingsOverlayProps {
-  isLoadingDeploy: boolean
-  setLoadingDeploy: () => void
-  setLoadingDeployFinally: () => void
   setOpenWallet: () => void
   connectedDescriptors: []
   selectedWallet: string
 }
 
 export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
-  const {
-    isLoadingDeploy,
-    setLoadingDeploy,
-    setLoadingDeployFinally,
-    setOpenWallet,
-    connectedDescriptors,
-    selectedWallet,
-  } = props
+  const { setOpenWallet, connectedDescriptors, selectedWallet } = props
   const [activeTab, setActiveTab] = useState(SettingsTabs.SETTINGS)
   const [activeTaDappletsDetails, setActiveTabDappletsDetails] = useState(DappletsDetails.MAININFO)
   const [activeTabUnderConstructionDetails, setActiveTabUnderConstructionDetails] = useState(
@@ -57,19 +47,24 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
   )
   const [devMode, setMode] = useState(false)
   const [isSvgLoaderDevMode, setSvgLoaderDevMode] = useState(false)
-
   const [errorReporting, onErrorReporting] = useState(false)
   const [isSvgErrorReporting, setSvgErrorReporting] = useState(false)
+  const [isDappletsDetails, _setDappletsDetail] = useState(false)
+  const [isUnderConstruction, _setUnderConstruction] = useState(false)
+  const [isUnderConstructionDetails, _setUnderConstructionDetails] = useState(false)
+  const [ModuleInfo, _setModuleInfo] = useState(null)
+  const [ModuleVersion, _setModuleVersion] = useState([])
+  const [isShowChildrenRegistry, _setShowChildrenRegistry] = useState(false)
 
-  const [isDappletsDetails, setDappletsDetail] = useState(false)
-  const [isUnderConstruction, setUnderConstruction] = useState(false)
-  const [isUnderConstructionDetails, setUnderConstructionDetails] = useState(false)
-  const [ModuleInfo, setModuleInfo] = useState(null)
-  const [ModuleVersion, setModuleVersion] = useState([])
-
-  const [isTokenomics, setTokenomics] = useState(false)
-  const [isShowChildrenUnderConstraction, setShowChildrenUnderConstraction] = useState(false)
-  const [isShowChildrenRegistry, setShowChildrenRegistry] = useState(false)
+  const memorizedSetShowChildrenRegistry = useCallback((x) => _setShowChildrenRegistry(x), [])
+  const memorizedSetModuleVersion = useCallback((x) => _setModuleVersion(x), [])
+  const memorizedSetModuleInfo = useCallback((x) => _setModuleInfo(x), [])
+  const memorizedSetDappletsDetail = useCallback((x) => _setDappletsDetail(x), [])
+  const memorizedSetUnderConstruction = useCallback((x) => _setUnderConstruction(x), [])
+  const memorizedSetUnderConstructionDetails = useCallback(
+    (x) => _setUnderConstructionDetails(x),
+    []
+  )
 
   useEffect(() => {
     const init = async () => {
@@ -156,16 +151,13 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                 selectedWallet={selectedWallet}
                 connectedDescriptors={connectedDescriptors}
                 setOpenWallet={setOpenWallet}
-                isLoadingDeploy={isLoadingDeploy}
-                setLoadingDeploy={setLoadingDeploy}
-                setLoadingDeployFinally={setLoadingDeployFinally}
                 isShowChildrenRegistry={isShowChildrenRegistry}
-                setShowChildrenRegistry={setShowChildrenRegistry}
-                setModuleVersion={setModuleVersion}
-                setModuleInfo={setModuleInfo}
-                setDappletsDetail={setDappletsDetail}
-                setUnderConstruction={setUnderConstruction}
-                setUnderConstructionDetails={setUnderConstructionDetails}
+                setShowChildrenRegistry={memorizedSetShowChildrenRegistry}
+                setModuleVersion={memorizedSetModuleVersion}
+                setModuleInfo={memorizedSetModuleInfo}
+                setDappletsDetail={memorizedSetDappletsDetail}
+                setUnderConstruction={memorizedSetUnderConstruction}
+                setUnderConstructionDetails={memorizedSetUnderConstructionDetails}
               />
             )}
           </div>
@@ -200,8 +192,8 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
               <DappletsMainInfo
                 ModuleInfo={ModuleInfo}
                 ModuleVersion={ModuleVersion}
-                setDappletsDetail={setDappletsDetail}
-                setShowChildrenRegistry={setShowChildrenRegistry}
+                setDappletsDetail={memorizedSetDappletsDetail}
+                setShowChildrenRegistry={memorizedSetShowChildrenRegistry}
               />
             )}
             {activeTaDappletsDetails === DappletsDetails.TOKENOMICS &&
@@ -209,7 +201,7 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
             ModuleInfo.type === 'FEATURE' ? (
               <Tokenomics
                 ModuleInfo={ModuleInfo}
-                setPageDetails={setDappletsDetail}
+                setPageDetails={memorizedSetDappletsDetail}
                 setActiveTab={setActiveTabDappletsDetails}
               />
             ) : null}
@@ -220,10 +212,10 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
         <div className={styles.wrapper}>
           <div className={styles.settingMain}>
             <UnderConstruction
-              setModuleVersion={setModuleVersion}
-              setModuleInfo={setModuleInfo}
-              setUnderConstructionDetails={setUnderConstructionDetails}
-              setUnderConstruction={setUnderConstruction}
+              setModuleVersion={memorizedSetModuleVersion}
+              setModuleInfo={memorizedSetModuleInfo}
+              setUnderConstructionDetails={memorizedSetUnderConstructionDetails}
+              setUnderConstruction={memorizedSetUnderConstruction}
             />
           </div>
         </div>
@@ -266,15 +258,15 @@ export const SettingsOverlay: FC<SettingsOverlayProps> = (props) => {
                 <UnderConstructionInfo
                   ModuleInfo={ModuleInfo}
                   ModuleVersion={ModuleVersion}
-                  setUnderConstructionDetails={setUnderConstructionDetails}
-                  setShowChildrenUnderConstraction={setShowChildrenUnderConstraction}
+                  setUnderConstructionDetails={memorizedSetUnderConstructionDetails}
+                  // setShowChildrenUnderConstraction={setShowChildrenUnderConstraction}
                 />
               </div>
             )}
             {activeTabUnderConstructionDetails === UnderConstructionDetails.TOKENOMICS && (
               <Tokenomics
                 ModuleInfo={ModuleInfo}
-                setPageDetails={setUnderConstructionDetails}
+                setPageDetails={memorizedSetUnderConstructionDetails}
                 setActiveTab={setActiveTabUnderConstructionDetails}
               />
             )}

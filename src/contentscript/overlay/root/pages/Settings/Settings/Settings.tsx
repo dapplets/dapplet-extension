@@ -15,7 +15,7 @@ import { SettingWrapper } from '../../../components/SettingWrapper'
 import { Switch } from '../../../components/Switch'
 import { getDefaultValueProvider } from '../../../utils/getDefaultValue'
 import styles from './Settings.module.scss'
-
+import { ReactComponent as Delete } from '../../../assets/icons/mini-close.svg'
 interface SettingsListProps {
   devModeProps: boolean
   setDevMode: (x) => void
@@ -61,7 +61,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const [targetStorages, setTargetStorages] = useState([])
 
-  const regExpUserAgentName = new RegExp(/^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/)
+  const regExpUserAgentName = new RegExp(/^[a-zA-Z0-9-_\.\s]{3,40}$/)
+  const regExpUserAgentNameFirstSymbol = new RegExp(/^[a-z0-9]+$/)
   const inputOfFocusIPFS = useRef<HTMLInputElement>()
   const inputOfFocusSwarmId = useRef<HTMLInputElement>()
   const inputOfFocusSwarm = useRef<HTMLInputElement>()
@@ -91,7 +92,16 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const getValidUserAgentName = (value, reg) => {
     try {
+
       const valueReg = value.match(reg)
+
+      return valueReg
+    } catch {}
+  }
+  const getValidUserAgentNameFirstSymbol = (value, reg) => {
+    try {
+const firsSymbolString = value.slice(0, 1)
+      const valueReg = firsSymbolString.match(reg)
 
       return valueReg
     } catch {}
@@ -223,18 +233,42 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
 
   const setUserAgentName = async (userAgentName: string) => {
-    const valueParse = getValidUserAgentName(userAgentNameInput, regExpUserAgentName)
-    if (valueParse !== null) {
-      const { setUserAgentName } = await initBGFunctions(browser)
-      await setUserAgentName(userAgentName)
-      loadUserAgentName()
-    } else {
-      setUserAgentNameInputError('Enter User Agent Name')
-      setUserAgentNameInput('')
-      setTimeout(() => {
-        setUserAgentNameInputError(null)
-      }, 3000)
+    if(userAgentName.trim().length === 0 ){
+      setDeleteUserAgentName()
+    } else{
+
+     
+      const valueParseFirstSymbol = getValidUserAgentNameFirstSymbol(userAgentNameInput.trimStart(),regExpUserAgentNameFirstSymbol)
+      const valueParse = getValidUserAgentName(userAgentNameInput.trimStart(), regExpUserAgentName)
+      if(userAgentName.length > 40 || userAgentName.trimStart().length < 3){
+        setUserAgentNameInputError('Valid name length: 3-40 characters')
+        // setTimeout(() => {
+        //   setUserAgentNameInputError(null)
+        //   setUserAgentNameInput('')
+        // }, 3000)
+        return
+      }
+      if(valueParseFirstSymbol === null){
+        setUserAgentNameInputError('Please start with a number or latin')
+        // setTimeout(() => {
+        //   setUserAgentNameInputError(null)
+        //   setUserAgentNameInput('')
+        // }, 3000)
+        return
+      }
+      if (valueParse !== null) {
+        const { setUserAgentName } = await initBGFunctions(browser)
+        await setUserAgentName(userAgentName.trim())
+        loadUserAgentName()
+      } else {
+        setUserAgentNameInputError('Please use numbers, latin or ".", "-", "_"')
+        // setTimeout(() => {
+        //   setUserAgentNameInputError(null)
+        //   setUserAgentNameInput('')
+        // }, 3000)
+      }
     }
+   
   }
 
   const loadIpfsGateway = async () => {
@@ -286,6 +320,12 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const setOnboarding = async () => {
     const { setIsFirstInstallation, getIsFirstInstallation } = await initBGFunctions(browser)
     await setIsFirstInstallation(true)
+  }
+
+  const setDeleteUserAgentName = async()=>{
+    const { setUserAgentName } = await initBGFunctions(browser)
+      await setUserAgentName('')
+      loadUserAgentName()
   }
 
   return (
@@ -355,7 +395,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
           <SettingItem title="User Agent Name" component={<></>}>
             <form
               onBlur={() => {
-                setUserAgentNameInputError(null)
+                userAgentNameInputError ? setUserAgentNameInputError(null) : null
               }}
               onSubmit={(e) => {
                 e.preventDefault()
@@ -364,7 +404,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 onPress(e, inputOfFocusAgentName)
               }}
               className={cn(styles.formDefault, {
-                [styles.errorInputDefault]: !!userAgentNameInputError,
+                [styles.errorInputDefault]: userAgentNameInputError,
               })}
             >
               <input
@@ -374,14 +414,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                 ref={inputOfFocusAgentName}
                 value={userAgentNameInput}
                 onFocus={() => {
-                  setUserAgentNameInput('')
-                  setUserAgentNameInputError(null)
+                  userAgentNameInputError ? setUserAgentNameInputError(null) : null
                 }}
                 onChange={(e) => {
                   setUserAgentNameInput(e.target.value)
                   setUserAgentNameInputError(null)
                 }}
               />
+              {userAgentNameInput && <Delete onClick={()=> setDeleteUserAgentName()} className={styles.deleteUserAgentName}/>}
             </form>
             {userAgentNameInputError ? (
               <div className={styles.errorMessage}>{userAgentNameInputError}</div>
