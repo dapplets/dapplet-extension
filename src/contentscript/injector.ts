@@ -22,6 +22,7 @@ import { BaseEvent } from './events/baseEvent'
 import { EventBus as ModuleEventBus } from './events/eventBus'
 import { __decorate } from './global'
 import BuiltInModules from './modules'
+import TwitterParserConfig from './modules/parser-configs/twitter.json'
 import { IContentAdapter, IResolver } from './types'
 
 type RegistriedModule = {
@@ -119,6 +120,7 @@ export class Injector {
       defaultConfig?: DefaultConfig
       schemaConfig?: SchemaConfig
     }[] = await getModulesWithDeps(modules)
+
     modules.forEach(
       (a) =>
         !loadedModules.find(
@@ -139,6 +141,7 @@ export class Injector {
         contextIds: m?.contextIds || [window.location.hostname],
       }
     })
+
     await this._processModules(orderedModules)
 
     // module initialization
@@ -470,6 +473,38 @@ export class Injector {
           builtInModule.clazz,
           () => moduleEventBus,
           () => new builtInModule.clazz(coreWrapper)
+        )
+
+        continue
+      }
+
+      // ToDo: generalize loading of parser configs
+      if (manifest.name === 'twitter-adapter.dapplet-base.eth') {
+        const dynamicAdapter = this.registry.find(
+          (m) => m.manifest.name == 'dynamic-adapter.dapplet-base.eth'
+        )
+
+        if (!dynamicAdapter) {
+          throw new Error('Dynamic adapter is not initialized. Check the order of dependencies.')
+        }
+
+        dynamicAdapter.instance.attachParserConfig(TwitterParserConfig)
+
+        this._registerModule(
+          {
+            ...dynamicAdapter,
+            manifest: {
+              ...dynamicAdapter.manifest,
+              name: 'twitter-adapter.dapplet-base.eth',
+              branch: 'default',
+              version: '0.9.0',
+              type: ModuleTypes.Adapter,
+            },
+            script: '',
+          },
+          dynamicAdapter.clazz,
+          () => moduleEventBus,
+          () => dynamicAdapter.instance
         )
 
         continue

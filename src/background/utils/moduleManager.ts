@@ -111,10 +111,12 @@ export default class ModuleManager {
     const keys = [...sorted.keys()]
 
     // reverse() - the lowest script in the hierarchy should be loaded first
-    return keys
-      .map((k) => dependencies.find((d) => d.name === k))
-      .reverse()
-      .filter((d) => !!d.manifest)
+    return (
+      keys
+        .map((k) => dependencies.find((d) => d.name === k))
+        // .reverse() // ToDo: check why reverse() returns incorrect order
+        .filter((d) => !!d.manifest)
+    )
   }
 
   private async _loadScript(url: StorageRef) {

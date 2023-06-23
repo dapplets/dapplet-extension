@@ -1,14 +1,17 @@
 // Polyfill for WebComponents that doesn't work in an Extension's JS-context
 import { ModuleTypes } from '../../../common/constants'
+import { objectMap } from '../../../common/helpers'
 import Core from '../../core'
 import { IContentAdapter } from '../../types'
 import './custom-elements.min.js'
 import { Locator } from './locator'
 import { State, WidgetConfig } from './state'
-import { Context, IWidget, IWidgetBuilderConfig } from './types'
+import { Context, IWidget, IWidgetBuilderConfig, ParserConfig } from './types'
 import { WidgetBuilder } from './widgets'
+import { AvatarBadge, IAvatarBadgeState } from './widgets/avatar-badge'
+import { Button, IButtonProps } from './widgets/button'
 
-interface IDynamicAdapter<IAdapterConfig> extends IContentAdapter<IAdapterConfig> {
+export interface IDynamicAdapter<IAdapterConfig> extends IContentAdapter<IAdapterConfig> {
   configure(config: { [contextName: string]: IWidgetBuilderConfig }): void
   createWidgetFactory<T>(
     Widget: any
@@ -29,6 +32,11 @@ class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterConfig> 
   private contextBuilders: WidgetBuilder[] = []
   private stateStorage = new Map<string, State<any>>()
   private locator: Locator
+
+  public exports = {
+    button: this.createWidgetFactory<IButtonProps>(Button),
+    avatarBadge: this.createWidgetFactory<IAvatarBadgeState>(AvatarBadge),
+  }
 
   constructor(private _core: Core) {
     if (!document || !window || !MutationObserver)
@@ -63,6 +71,7 @@ class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterConfig> 
 
   // Config from feature
   public detachConfig(config: any) {
+    console.log({ detachConfig: config })
     this.featureConfigs = this.featureConfigs.filter((f) => f !== config)
     this.contextBuilders.forEach((wb) => wb.unmountWidgets(config))
     // ToDo: close all subscriptions and connections
@@ -73,8 +82,91 @@ class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterConfig> 
     return this.attachConfig(newConfig ?? config)
   }
 
+  public attachParserConfig(parserConfig: ParserConfig) {
+    const config = {}
+
+    const getTheme = () => {
+      for (const theme in parserConfig.themes ?? {}) {
+        const result = document.evaluate(parserConfig.themes[theme], document)
+        if (result.booleanValue === true) return theme
+      }
+
+      // ToDo: get default theme from css
+      return 'LIGHT'
+    }
+
+    for (const contextName in parserConfig.contexts) {
+      const ctx = parserConfig.contexts[contextName]
+
+      // ToDo: add query type in parser config
+      const query = (cssOrXPath: string, element: HTMLElement) => {
+        try {
+          const result = element.querySelector(cssOrXPath)
+          if (result) return result.textContent
+        } catch (_) {}
+
+        try {
+          const result = document.evaluate(cssOrXPath, element)
+
+          switch (result.resultType) {
+            case XPathResult.NUMBER_TYPE:
+              return result.numberValue
+            case XPathResult.STRING_TYPE:
+              return result.stringValue
+            case XPathResult.BOOLEAN_TYPE:
+              return result.booleanValue
+            default:
+              return null // ToDo: or undefined?
+          }
+        } catch (_) {}
+
+        return null
+      }
+
+      const events = objectMap(ctx.events ?? {}, (event) => {
+        return (node, ctx, emit) => {
+          const likeBtn = node.querySelector(event.element)
+          likeBtn?.addEventListener(event.listen, () => {
+            const data = event.data
+              ? objectMap(event.data, (selector) => query(selector, node))
+              : null
+
+            emit(ctx, data)
+          })
+        }
+      })
+
+      const contextBuilder = (el: HTMLElement) => {
+        const context = objectMap(ctx.contextBuilder ?? {}, (value) => {
+          if (typeof value === 'string') {
+            return query(value, el)
+          } else {
+            // ToDo: implement nested contexts when we stabilize the Parser Config Schema
+            throw new Error('Nested contexts are not supported yet')
+          }
+        })
+
+        return context
+      }
+
+      config[contextName] = {
+        containerSelector: ctx.containerSelector,
+        contextSelector: ctx.contextSelector,
+        insPoints: ctx.insPoints,
+        contextBuilder: contextBuilder,
+        events: events,
+        theme: getTheme,
+        childrenContexts: ctx.childrenContexts,
+      }
+    }
+
+    this.configure(config)
+  }
+
   // Config from adapter
   public configure(config: { [contextName: string]: IWidgetBuilderConfig }): void {
+    console.warn('MV2 Adapters are deprecated. Please use MV3 Adapters.')
+
     const builders = Object.entries(config).map(([contextName, cfg]) => {
       const builder = new WidgetBuilder(contextName, cfg, this._core)
       builder.eventHandler = (event, args, targetCtx) => {
