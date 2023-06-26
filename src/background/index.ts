@@ -539,7 +539,8 @@ if (window['DAPPLETS_JSLIB'] !== true) {
             .then(() => false)
             .catch(() => {
               browser.tabs
-                .executeScript(x.id, { file: 'common.js' })
+                .executeScript(x.id, { file: 'custom-elements.min.js' })
+                .then(() => browser.tabs.executeScript(x.id, { file: 'common.js' }))
                 .then(() => browser.tabs.executeScript(x.id, { file: 'contentscript.js' }))
               return true
             })
