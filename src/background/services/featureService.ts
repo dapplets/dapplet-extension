@@ -425,11 +425,12 @@ export default class FeatureService {
           runtime: null,
           registryUrl,
         }
-
+        EventBus.emit('error loading', [err, name])
         await this._globalConfigService.updateSiteConfig(config)
       }
 
       // ToDo: error doesn't come to popup without this rethrowing
+
       throw new Error(err)
     }
   }

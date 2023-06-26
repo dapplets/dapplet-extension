@@ -1,5 +1,6 @@
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
+import * as EventBus from '../../../../../common/global-event-bus'
 import { ManifestAndDetails } from '../../../../../common/types'
 import { ReactComponent as CopiedIcon } from '../../assets/svg/copied.svg'
 import { ReactComponent as CopyIcon } from '../../assets/svg/copyModal.svg'
@@ -60,7 +61,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
   const [loadHome, setLoadHome] = useState(false)
   const [copied, setCopied] = useState<LoadingState>(LoadingState.READY)
-
+  const [isError, setError] = useState([])
   const loadingHome = () => {
     setLoadHome(false)
   }
@@ -82,6 +83,12 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
       return () => clearTimeout(timer)
     }
   }, [copied])
+  useEffect(() => {
+    EventBus.on('error loading', (data) => setError(data))
+    return () => {
+      EventBus.off('error loading', (data) => setError(data))
+    }
+  }, [])
 
   return (
     <div className={cn(styles.wrapperCard, className)} data-testid={name} {...anotherProps}>
@@ -115,6 +122,9 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
           </div>
 
           <div className={cn(styles.blockText)}>{description}</div>
+          {isError && isError.length && isError[1] === name ? (
+            <span className={styles.moduleError}>{`Dapplet's error: ${isError[0]}`}</span>
+          ) : null}
         </div>
 
         <div className={cn(styles.blockBottom)}>
