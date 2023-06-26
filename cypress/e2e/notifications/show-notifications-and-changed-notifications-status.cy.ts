@@ -11,7 +11,7 @@ describe('show notification in notification`s page', () => {
     16,
     it('show notification in notification`s page', () => {
       cy.openDappletsOverlay(url, { wipe: true })
-      cy.getByTestId('skip-tutorial').click()
+      // cy.getByTestId('skip-tutorial').click()
       cy.runDapplet(dappletIdToActivate)
       cy.wait(10000)
       cy.runDapplet(dappletIdToActivate2)
