@@ -623,3 +623,14 @@ export function Measure() {
 
 export const objectMap = (obj, fn) =>
   Object.fromEntries(Object.entries(obj).map(([k, v], i) => [k, fn(v, k, i)]))
+
+export const makeCancelable = (promise: Promise<void>) => {
+  let onCancel: () => void
+  const cancelPromise = new Promise((resolve, reject) => {
+    onCancel = () => reject({ isCanceled: true })
+  })
+  return {
+    promise: Promise.race([promise, cancelPromise]),
+    cancel: onCancel,
+  }
+}

@@ -10,16 +10,12 @@ import {
   NotificationStatus,
   NotificationType,
 } from '../../../../../common/models/notification'
-import { DefaultSigners, StorageRef } from '../../../../../common/types'
+import { StorageRef } from '../../../../../common/types'
 
-import { ReactComponent as Account } from '../../assets/icons/iconsWidgetButton/account.svg'
-import { ReactComponent as Help } from '../../assets/icons/iconsWidgetButton/help.svg'
-import { ReactComponent as Login } from '../../assets/icons/iconsWidgetButton/login.svg'
-import { ReactComponent as Max } from '../../assets/icons/iconsWidgetButton/max.svg'
-import { ReactComponent as NotificationIcon } from '../../assets/icons/iconsWidgetButton/notification.svg'
-import { ReactComponent as Pause } from '../../assets/icons/iconsWidgetButton/pause.svg'
 import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
 import { ReactComponent as Event } from '../../assets/newIcon/notification.svg'
+import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
+import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
 import { StorageRefImage } from '../../components/StorageRefImage'
 import { ToolbarTabMenu } from '../../types'
 import { ModuleIcon, ModuleIconProps } from '../ModuleIcon'
@@ -62,12 +58,14 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const nodeVisibleMenu = useRef<HTMLDivElement>()
   const [menuVisible, setMenuVisible] = useState(false)
   const [event, setEvent] = useState<Notification[]>([])
+  const [isHome, setHome] = useState(false)
 
   useEffect(() => {
     !document
       .querySelector('#dapplets-overlay-manager')
       .classList.contains('dapplets-overlay-collapsed') && setMenuVisible(false)
-  }, [menuVisible])
+    getHome()
+  }, [menuVisible, isHome])
 
   useEffect(() => {
     const handleUpdateNotifications = async () => {
@@ -87,13 +85,13 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     }
   }, [])
 
-  const connectWallet = async () => {
-    const { pairWalletViaOverlay } = await initBGFunctions(browser)
-    try {
-      await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
-      p.setOpenWallet()
-    } catch (_) {}
-  }
+  // const connectWallet = async () => {
+  //   const { pairWalletViaOverlay } = await initBGFunctions(browser)
+  //   try {
+  //     await pairWalletViaOverlay(null, DefaultSigners.EXTENSION, null)
+  //     p.setOpenWallet()
+  //   } catch (_) {}
+  // }
   const isModuleActive = () => {
     if (!p.modules) return false
     let isModuleActive
@@ -184,10 +182,23 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     const notifications = await getNotifications(NotificationType.Application)
     return notifications
   }
-  const _handleCloseClick: React.MouseEventHandler<HTMLSpanElement> = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    p.onCloseClick()
+  // const _handleCloseClick: React.MouseEventHandler<HTMLSpanElement> = (e) => {
+  //   e.preventDefault()
+  //   e.stopPropagation()
+  //   p.onCloseClick()
+  // }
+  // console.log(p.modules);
+  const getHome = () => {
+    if (!p.modules) return
+
+    p.modules
+      .filter((x) => x.name === p.tabId)
+      .map((x) => {
+        if (x.isActive && x.isActionHandler) return setHome(true)
+        else {
+          setHome(false)
+        }
+      })
   }
 
   return (
@@ -200,18 +211,17 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           onBlur={(e) => {
             e.preventDefault()
             e.stopPropagation()
-             // todo: uncomment when  top menu would be used
-            // if (
-            //   document
-            //     .querySelector('#dapplets-overlay-manager')
-            //     .classList.contains('dapplets-overlay-collapsed')
-            // ) {
-            //   e.relatedTarget?.hasAttribute('data-visible') && menuVisible
-            //     ? null
-            //     : setMenuVisible(false)
-            // } else {
-            //   setMenuVisible(false)
-            // }
+            if (
+              document
+                .querySelector('#dapplets-overlay-manager')
+                .classList.contains('dapplets-overlay-collapsed')
+            ) {
+              e.relatedTarget?.hasAttribute('data-visible') && menuVisible
+                ? null
+                : setMenuVisible(false)
+            } else {
+              setMenuVisible(false)
+            }
           }}
           onClick={(e) => {
             e.preventDefault()
@@ -234,40 +244,75 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
           })}
         >
           {!p.pinned &&
-            menuVisible && p.menuWidgets && p.menuWidgets.length &&
-            document
-              .querySelector('#dapplets-overlay-manager')
-              .classList.contains('dapplets-overlay-collapsed') ? (
-              <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
-                {p.getWigetsConstructor(p.menuWidgets, true)}
-                <div className={styles.delimeterMenuWidgets}></div>
-                <div className={styles.blockStandartFunction}>
-                  <SquaredButton
+          menuVisible &&
+          // p.menuWidgets.length &&
+          document
+            .querySelector('#dapplets-overlay-manager')
+            .classList.contains('dapplets-overlay-collapsed') ? (
+            <div ref={nodeVisibleMenu} className={styles.menuWidgets}>
+              {p.getWigetsConstructor(p.menuWidgets, true)}
+              <div
+                className={cn(styles.delimeterMenuWidgets, {
+                  [styles.invisibleDelimeter]: !p.menuWidgets.length,
+                })}
+              ></div>
+              <div className={styles.blockStandartFunction}>
+                {/* <SquaredButton
                     style={{ cursor: 'auto' }}
                     className={styles.squaredButtonMenuWidget}
                     data-visible
                     disabled={true}
                     appearance={'big'}
                     icon={Help}
-                  />
-                  <SquaredButton
-                    className={styles.squaredButtonMenuWidget}
-                    data-visible
-                    appearance={'big'}
-                    icon={Store}
-                    onClick={() => onOpenStore(p.tabId)}
-                  />
-                  <SquaredButton
+                  /> */}
+                <SquaredButton
+                  className={styles.squaredButtonMenuWidget}
+                  data-visible
+                  appearance={'big'}
+                  icon={HomeIcon}
+                  disabled={isHome ? false : true}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setMenuVisible(!menuVisible)
+                    onOpenDappletAction(p.tabId)
+                  }}
+                />
+                <SquaredButton
+                  className={styles.squaredButtonMenuWidget}
+                  data-visible
+                  appearance={'big'}
+                  icon={SettingsIcon}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setMenuVisible(!menuVisible)
+                    p.navigate(`/${p.tabId}/settings`)
+                    p.onToggleClick()
+                  }}
+                />
+                <SquaredButton
+                  className={styles.squaredButtonMenuWidget}
+                  data-visible
+                  appearance={'big'}
+                  icon={Store}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    onOpenStore(p.tabId)
+                  }}
+                />
+                {/* <SquaredButton
                     style={{ cursor: 'auto' }}
                     className={styles.squaredButtonMenuWidget}
                     data-visible
                     disabled={true}
                     appearance={'big'}
                     icon={Pause}
-                  />
-                </div>
+                  /> */}
               </div>
-            ):<></>}
+            </div>
+          ) : null}
           <div className={styles.top}>
             {p.icon && typeof p.icon === 'function' ? null : p.icon && // /> //   })} //     [styles.cursor]: !p.isActive, //   className={cn(styles.image, { //   }} //     !p.isActive && p.onTabClick() //   onClick={() => { // <p.icon
               typeof p.icon === 'object' &&
@@ -282,12 +327,6 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                 )}
                 moduleName={p.icon.moduleName}
                 registryUrl={p.icon.registryUrl}
-                 // todo: remove onClick when would be work tab-menu
-                 onClick={() => {
-                  // !p.isActive && p.onTabClick()
-                  // !p.isActive&&
-                  onOpenDappletAction(p.tabId)
-                }}
               />
             ) : (
               <StorageRefImage
@@ -299,18 +338,12 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   p.classNameIcon
                 )}
                 storageRef={p.icon as any}
-                // todo: remove onClick when would be work tab-menu
-                onClick={() => {
-                  // !p.isActive && p.onTabClick()
-                  // !p.isActive&&
-                  onOpenDappletAction(p.tabId)
-                }}
               />
             )}
           </div>
 
           {
-         
+            // p.isActive &&
             p.pinned && visibleMenus.length > 0 && (
               <ul
                 className={cn(
@@ -336,15 +369,16 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                             .querySelector('#dapplets-overlay-manager')
                             .classList.contains('dapplets-overlay-collapsed')
                         ) {
-                          menu.id === 'dapplets' 
-                            // todo: uncomment when  top menu would be used
-                          // && setMenuVisible(!menuVisible)
+                          // todo: uncomment when main menu will be works
+                          // menu.id === 'dapplets' && setMenuVisible(!menuVisible)
 
                           if (p.pathname === '/system/dapplets') {
                             p.onToggleClick()
                           } else {
-                            p.navigate('/system/dapplets')
-                            // todo: remove when uncomment top menu
+                            //todo: uncomment when main menu will be works
+                            // p.navigate('/system/dapplets')
+                            //todo: remove when main menu will be works
+
                             p.onToggleClick()
                           }
 
@@ -360,8 +394,8 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                             p.pinned &&
                               visibleMenus.length > 0 &&
                               visibleMenus.map((menu) => p.onMenuClick(menu))
- // todo: uncomment when  top menu would be used
-                            // setMenuVisible(false)
+
+                            setMenuVisible(false)
                             onOpenDappletAction(p.tabId)
                           }
                         }
@@ -410,8 +444,6 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     </li>
                   )
                 })}
-                {/* todo: menu top icon toolbar */}
-                {/* todo: uncomment when all functions will be available */}
                 {/* {p.pinned &&
                   menuVisible &&
                   document
@@ -455,12 +487,13 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                           <NotificationIcon />
                         </span>
                       </li>
+                     
                       <li className={styles.mainMenuItem}>
                     <span className={styles.mainMenuItemTitle}>Disable dapplets on this page</span>
                     <span className={styles.mainMenuItemIcon}>
                       <Power />
                     </span>
-                  </li>
+                  </li> 
                       <li
                         onClick={(e) => {
                           e.preventDefault()
@@ -482,7 +515,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                     <span className={styles.mainMenuItemIcon}>
                       <Edit />
                     </span>
-                  </li>
+                  </li> 
                     </ul>
                   )} */}
               </ul>
