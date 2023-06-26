@@ -9,9 +9,9 @@
       "contextBuilder": {
         "id": "string('global')",
         "websiteName": "string('Twitter')",
-        "username": "substring(string(//header/div/div/div/div[1]/div[2]/nav/a[8]/@href), 2)",
-        "fullname": "string(//header/div/div/div/div[2]/div/div/div[1]/div/div[2]/div/div[2]/div/div/div[3]/div/div[2]/div/img/@alt)",
-        "img": "string(//header/div/div/div/div[2]/div/div/div[1]/div/div[2]/div/div[2]/div/div/div[3]/div/div[2]/div/img/@src)"
+        "username": "substring-after(string(//header//a[@aria-label='Profile']/@href), '/')",
+        "fullname": "string(//*[@aria-label='Account menu']//img/@alt)",
+        "img": "string(//*[@aria-label='Account menu']//img/@src)"
       }
     },
     "POST": {
@@ -123,7 +123,10 @@
         }
       },
       "contextBuilder": {
-        "id": "substring-after(string(.//*[@data-testid='User-Name']/..//a/@href), '/')"
+        "id": "substring-before(substring-after(string(.//*[@data-testid='UserName']/../../a/@href), '/'), '/')",
+        "authorFullname": "string(.//*[@data-testid='UserName']//span)",
+        "authorUsername": "substring-before(substring-after(string(.//*[@data-testid='UserName']/../../a/@href), '/'), '/')",
+        "authorImg": "string(.//img[contains(@alt,'Opens profile photo')]/@src)"
       }
     }
   }
