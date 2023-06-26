@@ -1,14 +1,11 @@
 // Polyfill for WebComponents that doesn't work in an Extension's JS-context
 import { ModuleTypes } from '../../../common/constants'
-import { objectMap } from '../../../common/helpers'
 import Core from '../../core'
 import { IContentAdapter } from '../../types'
 import { Locator } from './locator'
 import { State, WidgetConfig } from './state'
-import { Context, IWidget, IWidgetBuilderConfig, ParserConfig } from './types'
+import { Context, IWidget, IWidgetBuilderConfig } from './types'
 import { WidgetBuilder } from './widgets'
-import { AvatarBadge, IAvatarBadgeState } from './widgets/avatar-badge'
-import { Button, IButtonProps } from './widgets/button'
 
 export interface IDynamicAdapter<IAdapterConfig> extends IContentAdapter<IAdapterConfig> {
   configure(config: { [contextName: string]: IWidgetBuilderConfig }): void
@@ -25,17 +22,12 @@ export interface IDynamicAdapter<IAdapterConfig> extends IContentAdapter<IAdapte
   }
 }
 
-class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterConfig> {
+export class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterConfig> {
   private observer: MutationObserver = null
   private featureConfigs: any[] = []
   private contextBuilders: WidgetBuilder[] = []
   private stateStorage = new Map<string, State<any>>()
   private locator: Locator
-
-  public exports = {
-    button: this.createWidgetFactory<IButtonProps>(Button),
-    avatarBadge: this.createWidgetFactory<IAvatarBadgeState>(AvatarBadge),
-  }
 
   constructor(private _core: Core) {
     if (!document || !window || !MutationObserver)
@@ -79,87 +71,6 @@ class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterConfig> 
   public resetConfig(config: IAdapterConfig, newConfig?: IAdapterConfig) {
     this.detachConfig(config)
     return this.attachConfig(newConfig ?? config)
-  }
-
-  public attachParserConfig(parserConfig: ParserConfig) {
-    const config = {}
-
-    const getTheme = () => {
-      for (const theme in parserConfig.themes ?? {}) {
-        const result = document.evaluate(parserConfig.themes[theme], document)
-        if (result.booleanValue === true) return theme
-      }
-
-      // ToDo: get default theme from css
-      return 'LIGHT'
-    }
-
-    for (const contextName in parserConfig.contexts) {
-      const ctx = parserConfig.contexts[contextName]
-
-      // ToDo: add query type in parser config
-      const query = (cssOrXPath: string, element: HTMLElement) => {
-        try {
-          const result = element.querySelector(cssOrXPath)
-          if (result) return result.textContent
-        } catch (_) {}
-
-        try {
-          const result = document.evaluate(cssOrXPath, element)
-
-          switch (result.resultType) {
-            case XPathResult.NUMBER_TYPE:
-              return result.numberValue
-            case XPathResult.STRING_TYPE:
-              return result.stringValue
-            case XPathResult.BOOLEAN_TYPE:
-              return result.booleanValue
-            default:
-              return null // ToDo: or undefined?
-          }
-        } catch (_) {}
-
-        return null
-      }
-
-      const events = objectMap(ctx.events ?? {}, (event) => {
-        return (node, ctx, emit) => {
-          const likeBtn = node.querySelector(event.element)
-          likeBtn?.addEventListener(event.listen, () => {
-            const data = event.data
-              ? objectMap(event.data, (selector) => query(selector, node))
-              : null
-
-            emit(ctx, data)
-          })
-        }
-      })
-
-      const contextBuilder = (el: HTMLElement) => {
-        const context = objectMap(ctx.contextBuilder ?? {}, (value) => {
-          if (typeof value === 'string') {
-            return query(value, el)
-          } else {
-            // ToDo: implement nested contexts when we stabilize the Parser Config Schema
-            throw new Error('Nested contexts are not supported yet')
-          }
-        })
-
-        return context
-      }
-
-      config[contextName] = {
-        containerSelector: ctx.containerSelector,
-        contextSelector: ctx.contextSelector,
-        insPoints: ctx.insPoints,
-        contextBuilder: contextBuilder,
-        events: events,
-        theme: getTheme,
-        childrenContexts: ctx.childrenContexts,
-      }
-    }
-
-    this.configure(config)
   }
 
   // Config from adapter

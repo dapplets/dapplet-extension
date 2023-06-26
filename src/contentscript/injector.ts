@@ -22,6 +22,7 @@ import { BaseEvent } from './events/baseEvent'
 import { EventBus as ModuleEventBus } from './events/eventBus'
 import { __decorate } from './global'
 import BuiltInModules from './modules'
+import { ConfigAdapter } from './modules/config-adapter'
 import TwitterParserConfig from './modules/parser-configs/twitter.json'
 import { IContentAdapter, IResolver } from './types'
 
@@ -488,23 +489,11 @@ export class Injector {
           throw new Error('Dynamic adapter is not initialized. Check the order of dependencies.')
         }
 
-        dynamicAdapter.instance.attachParserConfig(TwitterParserConfig)
-
         this._registerModule(
-          {
-            ...dynamicAdapter,
-            manifest: {
-              ...dynamicAdapter.manifest,
-              name: 'twitter-adapter.dapplet-base.eth',
-              branch: 'default',
-              version: '0.9.0',
-              type: ModuleTypes.Adapter,
-            },
-            script: '',
-          },
-          dynamicAdapter.clazz,
+          module,
+          ConfigAdapter,
           () => moduleEventBus,
-          () => dynamicAdapter.instance
+          () => new ConfigAdapter(dynamicAdapter.instance, TwitterParserConfig)
         )
 
         continue
