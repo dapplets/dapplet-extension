@@ -671,13 +671,18 @@ export default class FeatureService {
       if (vi && vi.main) {
         const arr = await this._storageAggregator.getResource(vi.main)
         zip.file('index.js', arr)
+        // ToDo: if module type == "parser config" then add "index.JSON"
       }
 
+      // ToDo: if module type == "parser config" add css files
+
+      // ToDo: if module type == "parser config" then skip it
       if (vi && vi.defaultConfig) {
         const arr = await this._storageAggregator.getResource(vi.defaultConfig)
         zip.file('default.json', arr)
       }
 
+      // ToDo: if module type == "parser config" then skip it
       if (vi && vi.schemaConfig) {
         const arr = await this._storageAggregator.getResource(vi.schemaConfig)
         zip.file('schema.json', arr)

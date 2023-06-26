@@ -1,3 +1,4 @@
+import PostButtonCss from '!!raw-loader!./modules/parser-configs/post/button.css'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { Subject } from 'rxjs'
 import { filter } from 'rxjs/operators'
@@ -480,7 +481,7 @@ export class Injector {
       }
 
       // ToDo: generalize loading of parser configs
-      if (manifest.name === 'twitter-adapter.dapplet-base.eth') {
+      if (manifest.name === 'twitter-adapter-mv3.dapplet-base.eth') {
         const dynamicAdapter = this.registry.find(
           (m) => m.manifest.name == 'dynamic-adapter.dapplet-base.eth'
         )
@@ -489,11 +490,14 @@ export class Injector {
           throw new Error('Dynamic adapter is not initialized. Check the order of dependencies.')
         }
 
+        // ToDo: extract styles from zip-archive in the background
+        TwitterParserConfig.contexts.POST.widgets.button.styles = PostButtonCss
+
         this._registerModule(
           module,
           ConfigAdapter,
           () => moduleEventBus,
-          () => new ConfigAdapter(dynamicAdapter.instance, TwitterParserConfig)
+          () => new ConfigAdapter(dynamicAdapter.instance, TwitterParserConfig) // ToDo: reuse `script` property instead of TwitterParserConfig
         )
 
         continue

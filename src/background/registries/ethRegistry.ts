@@ -60,6 +60,7 @@ const moduleTypesMap: { [key: number]: ModuleTypes } = {
   2: ModuleTypes.Adapter,
   3: ModuleTypes.Library,
   4: ModuleTypes.Interface,
+  // ToDo: add module type for Parser Config
 }
 
 const BLOCKTIME_MS = 15000
