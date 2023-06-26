@@ -123,9 +123,9 @@
         }
       },
       "contextBuilder": {
-        "id": "substring-before(substring-after(string(.//*[@data-testid='UserName']/../../a/@href), '/'), '/')",
-        "authorFullname": "string(.//*[@data-testid='UserName']//span)",
-        "authorUsername": "substring-before(substring-after(string(.//*[@data-testid='UserName']/../../a/@href), '/'), '/')",
+        "id": "substring-after(string(.//*[@data-testid='UserName']/div/div/div[2]//span), '@')",
+        "authorFullname": "string(.//*[@data-testid='UserName']//span[1])",
+        "authorUsername": "substring-after(string(.//*[@data-testid='UserName']/div/div/div[2]//span), '@')",
         "authorImg": "string(.//img[contains(@alt,'Opens profile photo')]/@src)"
       }
     }
