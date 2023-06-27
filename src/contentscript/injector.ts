@@ -481,7 +481,7 @@ export class Injector {
       }
 
       // ToDo: generalize loading of parser configs
-      if (manifest.name === 'twitter-adapter-mv3.dapplet-base.eth') {
+      if (manifest.name === 'twitter-adapter.dapplet-base.eth') {
         const dynamicAdapter = this.registry.find(
           (m) => m.manifest.name == 'dynamic-adapter.dapplet-base.eth'
         )

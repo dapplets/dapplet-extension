@@ -1,19 +1,29 @@
 import { objectMap } from '../../../common/helpers'
 import { DynamicAdapter } from '../dynamic-adapter'
+import { AdapterConfig } from '../dynamic-adapter/types'
 import { ParserConfig } from './types'
-import { AvatarBadge, IAvatarBadgeState } from './widgets/avatar-badge'
-import { Button, IButtonProps } from './widgets/button'
+import BuiltInWidgets from './widgets'
+
+type ReversedWidgetConfig = {
+  [widgetName: string]: {
+    contextInsPoints: { [contextName: string]: string }
+    stylesByContext: { [contextName: string]: string | null }
+  }
+}
 
 class ConfigAdapter {
   public exports
 
-  constructor(private _dynamicAdapter: DynamicAdapter<any>, config: ParserConfig) {
-    this.exports = {
-      button: _dynamicAdapter.createWidgetFactory<IButtonProps>(Button),
-      avatarBadge: _dynamicAdapter.createWidgetFactory<IAvatarBadgeState>(AvatarBadge),
-    }
+  constructor(private _dynamicAdapter: DynamicAdapter<any>, parserConfig: ParserConfig) {
+    // ToDo: validate parser config
 
-    const adapterConfig = ConfigAdapter.convertParserConfig(config)
+    // Original parser config has the following hierarchy: context -> widget
+    // We need to reverse it to widget -> context for convenience
+    const reversedWidgetConfig = ConfigAdapter.reverseWidgetConfig(parserConfig)
+
+    this.exports = this.createWidgetFactories(reversedWidgetConfig)
+
+    const adapterConfig = ConfigAdapter.convertParserConfig(parserConfig)
     _dynamicAdapter.configure(adapterConfig)
   }
 
@@ -32,7 +42,7 @@ class ConfigAdapter {
   }
 
   public static convertParserConfig(parserConfig: ParserConfig) {
-    const config = {}
+    const config: AdapterConfig = {}
 
     const getTheme = () => {
       for (const theme in parserConfig.themes ?? {}) {
@@ -98,10 +108,21 @@ class ConfigAdapter {
         return context
       }
 
+      const insPoints = {}
+
+      // ToDo: remove after transition to MV3
+      // define insertion points for backward compatibility
+      for (const widgetName in ctx.widgets ?? {}) {
+        insPoints[`${contextName}/${widgetName}`] = {
+          selector: ctx.widgets[widgetName].insertionPoint,
+          insert: ctx.widgets[widgetName].insert,
+        }
+      }
+
       config[contextName] = {
         containerSelector: ctx.containerSelector,
         contextSelector: ctx.contextSelector,
-        insPoints: ctx.insPoints,
+        insPoints: insPoints,
         contextBuilder: contextBuilder,
         events: events,
         theme: getTheme,
@@ -110,6 +131,56 @@ class ConfigAdapter {
     }
 
     return config
+  }
+
+  public static reverseWidgetConfig(parserConfig: ParserConfig): ReversedWidgetConfig {
+    const widgetConfigs: ReversedWidgetConfig = {}
+
+    for (const contextName in parserConfig.contexts ?? {}) {
+      for (const widgetName in parserConfig.contexts[contextName].widgets ?? {}) {
+        const widgetConfig = parserConfig.contexts[contextName].widgets[widgetName]
+
+        if (!widgetConfigs[widgetName]) {
+          widgetConfigs[widgetName] = {
+            contextInsPoints: {},
+            stylesByContext: {},
+          }
+        }
+
+        // ToDo: remove after transition to MV3
+        // For backward compatibility with old configs
+        // Insertion point name example: 'POST/button'
+        widgetConfigs[widgetName].contextInsPoints[contextName] = `${contextName}/${widgetName}`
+        widgetConfigs[widgetName].stylesByContext[contextName] = widgetConfig.styles
+      }
+    }
+
+    return widgetConfigs
+  }
+
+  public createWidgetFactories(reversedWidgetConfig: ReversedWidgetConfig) {
+    const exports = {}
+
+    for (const widgetName in reversedWidgetConfig) {
+      if (!BuiltInWidgets[widgetName]) {
+        console.error('Unknown widget: ' + widgetName)
+        continue
+      }
+
+      const widgetConfig = reversedWidgetConfig[widgetName]
+
+      const WidgetClass = BuiltInWidgets[widgetName]
+
+      const ExtendedWidgetClass = class extends WidgetClass {
+        // ToDo: remove after transition to MV3
+        static contextInsPoints = Object.assign({}, widgetConfig.contextInsPoints)
+        // static stylesByContext = widgetConfig.stylesByContext
+      }
+
+      exports[widgetName] = this._dynamicAdapter.createWidgetFactory(ExtendedWidgetClass)
+    }
+
+    return exports
   }
 }
 

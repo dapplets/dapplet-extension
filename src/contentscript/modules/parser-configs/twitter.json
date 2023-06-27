@@ -17,55 +17,13 @@
     "POST": {
       "containerSelector": "main[role=main]",
       "contextSelector": "article.css-1dbjc4n",
-      "widgets_TODO": {
+      "widgets": {
         "button": {
-          "styles": "./widgets/button.css",
-          "insertionPoint": { "selector": "div[role=group] > *:last-child" }
+          "styles": "./post/button.css",
+          "insertionPoint": "div[role=group] > *:last-child"
         },
-        "badge": {
-          "styles": "./widgets/badge.css",
-          "insertionPoint": {
-            "selector": "div.css-1dbjc4n.r-18kxxzh.r-1wbh5a2.r-13qz1uu > *:last-child"
-          }
-        }
-      },
-      "insPoints": {
-        "SOUTH": { "selector": "div[role=group] > *:last-child" },
-        "COMBO": { "selector": "" },
-        "PICTURE": {
-          "selector": ".css-1dbjc4n.r-1iusvr4.r-16y2uox.r-1777fci.r-kzbkwu > div:nth-child(2) > div:nth-child(2)",
-          "insert": "inside"
-        },
-        "AVATAR": {
-          "selector": ".css-1dbjc4n.r-1awozwy.r-1hwvwag.r-18kxxzh.r-1b7u577 > div:first-child > div:first-child",
-          "insert": "inside"
-        },
-        "AVATAR_BADGE": {
-          "selector": "div.css-1dbjc4n.r-18kxxzh.r-1wbh5a2.r-13qz1uu > *:last-child"
-        },
-        "USERNAME_BADGE": {
-          "selector": "div.css-1dbjc4n.r-1awozwy.r-18u37iz.r-dnmrzs > div:nth-child(1)",
-          "insert": "begin"
-        },
-        "USERNAME_LABEL": {
-          "selector": "div.css-1dbjc4n.r-1awozwy.r-18u37iz.r-dnmrzs > *:last-child",
-          "insert": "end"
-        },
-        "STARTER": {
-          "selector": "div.css-1dbjc4n.r-k4xj1c.r-18u37iz.r-1wtj0ep > div:nth-child(2) > div > div",
-          "insert": "begin"
-        },
-        "SOCIAL_CONTEXT": {
-          "selector": "div.css-1dbjc4n.r-1iusvr4.r-16y2uox.r-ttdzmv",
-          "insert": "inside"
-        },
-        "BOX": {
-          "selector": ".css-1dbjc4n.r-1iusvr4.r-16y2uox.r-1777fci.r-kzbkwu, [data-testid=\"tweetText\"]",
-          "insert": "inside"
-        },
-        "TEXT": {
-          "selector": ".css-901oao.r-37j5jr.r-a023e6.r-16dba41.r-rjixqe.r-bcqeeo.r-bnwqim.r-qvutc0",
-          "insert": "inside"
+        "avatarBadge": {
+          "insertionPoint": "div.css-1dbjc4n.r-18kxxzh.r-1wbh5a2.r-13qz1uu > *:last-child"
         }
       },
       "events": {
@@ -100,26 +58,14 @@
     "PROFILE": {
       "containerSelector": "main[role=main]",
       "contextSelector": "div[data-testid=primaryColumn]",
-      "insPoints": {
-        "AVATAR": {
-          "selector": "div.css-1dbjc4n.r-1ifxtd0.r-ymttw5.r-ttdzmv a",
-          "insert": "inside"
-        },
-        "AVATAR_BADGE": {
-          "selector": "div.css-1dbjc4n.r-1ifxtd0.r-ymttw5.r-ttdzmv div.css-1dbjc4n.r-ggadg3.r-u8s1d.r-8jfcpp",
-          "insert": "end"
-        },
-        "USERNAME_BADGE": {
-          "selector": "div.css-1dbjc4n.r-1ifxtd0.r-ymttw5.r-ttdzmv div.css-1dbjc4n.r-1wbh5a2.r-dnmrzs.r-1ny4l3l",
-          "insert": "end"
-        },
-        "BUTTON_GROUP": {
-          "selector": "div.css-1dbjc4n.r-1ifxtd0.r-ymttw5.r-ttdzmv div.css-1dbjc4n.r-obd0qt.r-18u37iz.r-1w6e6rj.r-1h0z5md.r-dnmrzs > *:last-child",
+      "widgets": {
+        "button": {
+          "insertionPoint": "div.css-1dbjc4n.r-1ifxtd0.r-ymttw5.r-ttdzmv div.css-1dbjc4n.r-obd0qt.r-18u37iz.r-1w6e6rj.r-1h0z5md.r-dnmrzs > *:last-child",
           "insert": "begin"
         },
-        "POSTS": {
-          "selector": "section[role=region] > div > div",
-          "insert": "begin"
+        "avatarBadge": {
+          "insertionPoint": "div.css-1dbjc4n.r-1ifxtd0.r-ymttw5.r-ttdzmv div.css-1dbjc4n.r-ggadg3.r-u8s1d.r-8jfcpp",
+          "insert": "end"
         }
       },
       "contextBuilder": {

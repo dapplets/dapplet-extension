@@ -11,9 +11,10 @@ export type ParserConfig = {
     [contextName: string]: {
       containerSelector: string
       contextSelector?: string
-      insPoints?: {
-        [insPointName: string]: {
-          selector: string
+      widgets?: {
+        [widgetName: string]: {
+          styles?: string
+          insertionPoint: string
           insert?: string
         }
       }

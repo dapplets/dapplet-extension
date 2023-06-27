@@ -12,10 +12,6 @@ customElements.define('accounts-widget', AccountsWidget)
 class AvatarBadge extends LitElement implements IAvatarBadgeState {
   public static override styles = styles
   public static widgetParamsDescription = description
-  public static contextInsPoints = {
-    POST: 'AVATAR_BADGE',
-    PROFILE: 'AVATAR_BADGE',
-  }
   private _accountsWidget
 
   @property() state: IAvatarBadgeState

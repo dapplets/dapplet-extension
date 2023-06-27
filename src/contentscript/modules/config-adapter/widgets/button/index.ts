@@ -25,11 +25,6 @@ export interface IButtonProps {
 export class Button extends LitElement implements IButtonProps {
   public static override styles = styles
   public static widgetParamsDescription = description
-  public static contextInsPoints = {
-    POST: 'SOUTH',
-    QUOTE_POST: 'SOUTH',
-    PROFILE: 'BUTTON_GROUP',
-  }
 
   @property() state
   @property() ctx
