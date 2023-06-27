@@ -1,4 +1,7 @@
+import PostAvatarBadgeCss from '!!raw-loader!./modules/parser-configs/post/avatarBadge.css'
 import PostButtonCss from '!!raw-loader!./modules/parser-configs/post/button.css'
+import ProfileAvatarBadgeCss from '!!raw-loader!./modules/parser-configs/profile/avatarBadge.css'
+import ProfileButtonCss from '!!raw-loader!./modules/parser-configs/profile/button.css'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { Subject } from 'rxjs'
 import { filter } from 'rxjs/operators'
@@ -492,6 +495,9 @@ export class Injector {
 
         // ToDo: extract styles from zip-archive in the background
         TwitterParserConfig.contexts.POST.widgets.button.styles = PostButtonCss
+        TwitterParserConfig.contexts.POST.widgets.avatarBadge.styles = PostAvatarBadgeCss
+        TwitterParserConfig.contexts.PROFILE.widgets.button.styles = ProfileButtonCss
+        TwitterParserConfig.contexts.PROFILE.widgets.avatarBadge.styles = ProfileAvatarBadgeCss
 
         this._registerModule(
           module,

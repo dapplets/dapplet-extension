@@ -23,6 +23,7 @@
           "insertionPoint": "div[role=group] > *:last-child"
         },
         "avatarBadge": {
+          "styles": "./post/avatarBadge.css",
           "insertionPoint": "div.css-1dbjc4n.r-18kxxzh.r-1wbh5a2.r-13qz1uu > *:last-child"
         }
       },
@@ -60,10 +61,12 @@
       "contextSelector": "div[data-testid=primaryColumn]",
       "widgets": {
         "button": {
+          "styles": "./profile/button.css",
           "insertionPoint": "div.css-1dbjc4n.r-1ifxtd0.r-ymttw5.r-ttdzmv div.css-1dbjc4n.r-obd0qt.r-18u37iz.r-1w6e6rj.r-1h0z5md.r-dnmrzs > *:last-child",
           "insert": "begin"
         },
         "avatarBadge": {
+          "styles": "./profile/avatarBadge.css",
           "insertionPoint": "div.css-1dbjc4n.r-1ifxtd0.r-ymttw5.r-ttdzmv div.css-1dbjc4n.r-ggadg3.r-u8s1d.r-8jfcpp",
           "insert": "end"
         }

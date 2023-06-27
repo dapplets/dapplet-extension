@@ -174,7 +174,7 @@ class ConfigAdapter {
       const ExtendedWidgetClass = class extends WidgetClass {
         // ToDo: remove after transition to MV3
         static contextInsPoints = Object.assign({}, widgetConfig.contextInsPoints)
-        // static stylesByContext = widgetConfig.stylesByContext
+        static stylesByContext = widgetConfig.stylesByContext
       }
 
       exports[widgetName] = this._dynamicAdapter.createWidgetFactory(ExtendedWidgetClass)

@@ -1,4 +1,5 @@
 // Polyfill for WebComponents that doesn't work in an Extension's JS-context
+import { unsafeCSS } from 'lit'
 import { ModuleTypes } from '../../../common/constants'
 import Core from '../../core'
 import { IContentAdapter } from '../../types'
@@ -251,6 +252,13 @@ export class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterC
       if (Widget.prototype instanceof HTMLElement) {
         // WebComponent-based widget
         const ExtendedWidget = class extends Widget {}
+
+        // ToDo: dynamic adapter should not know about LitElement
+        if (Widget.stylesByContext[builder.contextName]) {
+          const cssAsString = Widget.stylesByContext[builder.contextName]
+          ExtendedWidget.styles = unsafeCSS(cssAsString)
+        }
+
         customElements.define(
           'dapplet-' + Widget.prototype.constructor.name.toLowerCase() + '-' + clazz,
           ExtendedWidget

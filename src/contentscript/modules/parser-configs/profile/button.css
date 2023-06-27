@@ -1,0 +1,47 @@
+
+/* PROFILE */
+
+.dapplet-widget-profile-button {
+  cursor: pointer;
+  user-select: none;
+
+  box-sizing: border-box;
+  height: 35px;
+  margin: 0 8px 12px 0;
+  padding: 0 10px;
+
+  font-family: TwitterChirp, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 33px;
+
+  background: inherit;
+  border-radius: 9999px;
+
+  transition: background-color 0.2s ease-in-out;
+}
+
+.dapplet-widget-profile-button-light {
+  color: #000;
+  border: 1px solid rgb(207 217 222);
+}
+
+.dapplet-widget-profile-button-light:hover {
+  background-color: rgb(15 20 25 / 10%);
+}
+
+.dapplet-widget-profile-button-dark {
+  color: #fff;
+  border: 1px solid rgb(83 100 113);
+}
+
+.dapplet-widget-profile-button-dark:hover {
+  background-color: rgb(239 243 244 / 10%);
+}
+
+.dapplet-widget-profile-button-basic {
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+}

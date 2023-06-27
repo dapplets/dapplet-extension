@@ -1,0 +1,252 @@
+:host {
+  display: flex;
+  vertical-align: middle;
+}
+
+.css-18t94o4 {
+  cursor: pointer;
+}
+
+.css-1dbjc4n {
+  position: relative;
+  z-index: 0;
+
+  display: flex;
+  flex-basis: auto;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: stretch;
+
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+
+  border: 0 solid black;
+
+  -webkit-box-align: stretch;
+  -webkit-box-direction: normal;
+  -webkit-box-orient: vertical;
+}
+
+.css-901oao {
+  display: inline;
+
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+
+  font: 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: rgb(0 0 0);
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+
+  border: 0 solid black;
+}
+
+.css-16my406 {
+  font: inherit;
+  color: inherit;
+  white-space: inherit;
+}
+
+.r-4qtqp9 {
+  display: inline-block;
+}
+
+.r-6koalj {
+  display: flex;
+}
+
+.r-sdzlij {
+  border-radius: 9999px;
+}
+
+.r-xoduu5 {
+  display: inline-flex;
+}
+
+.r-1udh08x {
+  overflow: hidden;
+}
+
+.r-bztko3 {
+  overflow: visible;
+}
+
+.r-xf4iuw {
+  margin: -8px;
+}
+
+.r-1e081e0 {
+  padding-right: 12px;
+  padding-left: 12px;
+}
+
+.r-1p0dtai {
+  bottom: 0;
+}
+
+.r-1d2f490 {
+  left: 0;
+}
+
+.r-zchlnj {
+  right: 0;
+}
+
+.r-ipm5af {
+  top: 0;
+}
+
+.r-yyyyoo {
+  fill: currentcolor;
+}
+
+.r-1xvli5t {
+  height: 1.25em;
+}
+
+.r-dnmrzs {
+  max-width: 100%;
+}
+
+.r-bnwqim {
+  position: relative;
+}
+
+.r-1plcrui {
+  vertical-align: text-bottom;
+}
+
+.r-lrvibr {
+  user-select: none;
+}
+
+.r-u8s1d {
+  position: absolute;
+}
+
+.r-18u37iz {
+  flex-direction: row;
+
+  -webkit-box-direction: normal;
+  -webkit-box-orient: horizontal;
+}
+
+.r-1777fci {
+  justify-content: center;
+
+  -webkit-box-pack: center;
+}
+
+.r-1awozwy {
+  align-items: center;
+
+  -webkit-box-align: center;
+}
+
+.r-o7ynqc {
+  transition-duration: 0.2s;
+}
+
+.r-6416eg {
+  transition-property: background-color, box-shadow;
+}
+
+.r-1ny4l3l {
+  outline-style: none;
+}
+
+.r-bcqeeo {
+  min-width: 0;
+}
+
+.r-qvutc0 {
+  overflow-wrap: break-word;
+}
+
+.r-rjixqe {
+  line-height: 20px;
+}
+
+.r-37j5jr {
+  font-family: TwitterChirp, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
+.r-a023e6 {
+  font-size: 15px;
+}
+
+.r-poiln3 {
+  font-family: inherit;
+}
+
+.r-16dba41 {
+  font-weight: 400;
+}
+
+.r-3s2u2q {
+  white-space: nowrap;
+}
+
+.r-1niwhzg {
+  background-color: rgb(0 0 0 / 0%);
+}
+
+.r-n6v787 {
+  font-size: 13px;
+}
+
+.r-1cwl3u0 {
+  line-height: 16px;
+}
+
+.r-1h0z5md {
+  justify-content: flex-start;
+
+  -webkit-box-pack: start;
+}
+
+.r-bt1l66 {
+  min-height: 20px;
+}
+
+.r-clp7b1 {
+  transition-property: color;
+}
+
+.r-1hdv0qi {
+  width: 1.25em;
+}
+
+.r-1k6nrdp {
+  min-width: calc(1em + 24px);
+}
+
+div[role='button'] > div:hover > .css-1dbjc4n.r-xoduu5 > .r-sdzlij {
+  background-color: rgb(29 155 240 / 12.5%);
+  transition-duration: 0.2s;
+  transition-property: background-color, box-shadow;
+}
+
+div[role='button'] > div:active > .css-1dbjc4n.r-xoduu5 > .r-sdzlij {
+  background-color: rgb(29 155 240 / 20%);
+}
+
+div[role='button'] > div:hover span {
+  color: rgb(36 148 224);
+}
+
+div[role='button'] span {
+  color: rgb(83 100 113);
+}
+
+/* POST */
+
+.dapplet-widget-post-button {
+  color: inherit;
+  background: none;
+}

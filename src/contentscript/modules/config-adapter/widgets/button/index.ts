@@ -4,7 +4,6 @@ import { classMap } from 'lit/directives/class-map.js'
 import { styleMap } from 'lit/directives/style-map.js'
 import { description } from './description'
 import LOADER from './loader.svg'
-import { styles } from './wb-button.css'
 
 export interface IButtonProps {
   ctx: any
@@ -23,7 +22,7 @@ export interface IButtonProps {
 }
 
 export class Button extends LitElement implements IButtonProps {
-  public static override styles = styles
+  // public static override styles = styles
   public static widgetParamsDescription = description
 
   @property() state
