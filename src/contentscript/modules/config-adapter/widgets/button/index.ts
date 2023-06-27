@@ -51,6 +51,7 @@ export class Button extends LitElement implements IButtonProps {
 
   override render() {
     if (this.hidden) return null
+    // ToDo: do not use insPointName
     if (this.insPointName === 'POST' || this.insPointName === 'QUOTE_POST') {
       return html`
         <div
