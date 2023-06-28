@@ -9,7 +9,7 @@ module.exports = merge(common, {
     splitChunks: {
       chunks(chunk) {
         // exclude `inpage`
-        return chunk.name !== 'inpage'
+        return chunk.name !== 'inpage' && chunk.name !== 'sandbox'
       },
       name: 'common',
     },

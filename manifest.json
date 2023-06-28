@@ -41,7 +41,7 @@
       "all_frames": true
     }
   ],
-  "web_accessible_resources": ["callback.html", "inpage.js"],
+  "web_accessible_resources": ["callback.html", "inpage.js", "sandbox.js"],
   "permissions": [
     "tabs",
     "storage",

@@ -28,6 +28,7 @@ import { __decorate } from './global'
 import BuiltInModules from './modules'
 import { ConfigAdapter } from './modules/config-adapter'
 import TwitterParserConfig from './modules/parser-configs/twitter.json'
+import { SandboxExecutor } from './sandboxExecutor'
 import { IContentAdapter, IResolver } from './types'
 
 type RegistriedModule = {
@@ -186,6 +187,7 @@ export class Injector {
             }
           }
         }
+
         console.log(
           `[DAPPLETS]: The module ${m.manifest.name}#${m.manifest.branch}@${m.manifest.version} is loaded.`
         )
@@ -603,15 +605,44 @@ export class Injector {
       }
 
       try {
-        const execScript = new Function(
-          'Core',
-          'Inject',
-          'Injectable',
-          'OnEvent',
-          '__decorate',
-          script
-        )
-        execScript(coreWrapper, injectDecorator, injectableDecorator, onEventDecorator, __decorate)
+        // ToDo: generalize MV3 dapplets loading
+        if (manifest.name === 'tipping-near-dapplet') {
+          // eslint-disable-next-line @typescript-eslint/no-this-alias
+          const me = this
+
+          // ToDo: refactor it
+          const SandboxExecutorExtended = class extends SandboxExecutor {
+            constructor() {
+              super(script, manifest.name)
+            }
+
+            // implementaion of the abstract method
+            public getDependency(name: string) {
+              const currentModule = me.registry.find((m) => areModulesEqual(m.manifest, manifest))
+              const depModule = me._getDependency(manifest, name)
+              const instancedModule = me._proxifyModule(depModule, currentModule)
+              return instancedModule
+            }
+          }
+
+          this._registerModule(module, SandboxExecutorExtended, () => moduleEventBus)
+        } else {
+          const execScript = new Function(
+            'Core',
+            'Inject',
+            'Injectable',
+            'OnEvent',
+            '__decorate',
+            script
+          )
+          execScript(
+            coreWrapper,
+            injectDecorator,
+            injectableDecorator,
+            onEventDecorator,
+            __decorate
+          )
+        }
       } catch (err) {
         // ToDo: remove module from this.registry
         console.error(err)

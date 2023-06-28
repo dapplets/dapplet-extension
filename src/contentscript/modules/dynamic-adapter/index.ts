@@ -1,10 +1,10 @@
 // Polyfill for WebComponents that doesn't work in an Extension's JS-context
 import { unsafeCSS } from 'lit'
 import { ModuleTypes } from '../../../common/constants'
+import { State, WidgetConfig } from '../../../common/state'
 import Core from '../../core'
 import { IContentAdapter } from '../../types'
 import { Locator } from './locator'
-import { State, WidgetConfig } from './state'
 import { Context, IWidget, IWidgetBuilderConfig } from './types'
 import { WidgetBuilder } from './widgets'
 
