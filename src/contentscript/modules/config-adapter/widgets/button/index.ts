@@ -55,7 +55,7 @@ export class Button extends LitElement implements IButtonProps {
     if (this.insPointName === 'POST' || this.insPointName === 'QUOTE_POST') {
       return html`
         <div
-          class="css-1dbjc4n r-18u37iz r-1h0z5md"
+          class="wrapper-button button-direction"
           @click=${this._clickHandler}
           title=${this.tooltip}
           style=${styleMap({
@@ -65,37 +65,28 @@ export class Button extends LitElement implements IButtonProps {
           <div
             role="button"
             tabindex="0"
-            class="css-18t94o4 css-1dbjc4n r-1777fci r-bt1l66 r-1ny4l3l r-bztko3 r-lrvibr dapplet-widget-post-button"
+            class="wrapper-button dapplet-widget-post-button"
             data-testid="reply"
             style=${styleMap({ opacity: this.disabled ? '.5' : '1' })}
           >
-            <div
-              dir="ltr"
-              class="css-901oao r-1awozwy r-14j79pv r-6koalj r-37j5jr r-a023e6 r-16dba41 r-1h0z5md r-rjixqe r-bcqeeo r-o7ynqc r-clp7b1 r-3s2u2q r-qvutc0"
-            >
-              <div class="css-1dbjc4n r-xoduu5">
+            <div dir="ltr" class="button-block button-display button-transition-duration">
+              <div class="wrapper-button button-secondary-block">
                 <div
-                  class="css-1dbjc4n r-1niwhzg r-sdzlij r-1p0dtai r-xoduu5 r-1d2f490 r-xf4iuw r-1ny4l3l r-u8s1d r-zchlnj r-ipm5af r-o7ynqc r-6416eg"
+                  class="wrapper-button button-block-secondary button-border-radius button-border button-secondary-block button-transition-duration"
                 ></div>
                 <img
                   height="18"
                   src="${this.loading ? LOADER : this.img || null}"
-                  class="r-4qtqp9 r-yyyyoo r-1xvli5t r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-1hdv0qi"
+                  class="button-img-display"
                 />
               </div>
               ${this.label?.toString() &&
-              html`<div class="css-1dbjc4n r-xoduu5 r-1udh08x">
+              html`<div class="wrapper-button button-secondary-block button-label-overflow">
                 <span
                   data-testid="app-text-transition-container"
-                  style="transition-property: transform; transition-duration: 0.3s; transform: translate3d(0px, 0px, 0px);"
+                  class="button-block button-label-block"
                 >
-                  <span
-                    class="css-901oao css-16my406 r-poiln3 r-n6v787 r-1cwl3u0 r-1k6nrdp r-1e081e0 r-qvutc0"
-                  >
-                    <span class="css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0">
-                      ${this.label}
-                    </span>
-                  </span>
+                  ${this.label}
                 </span>
               </div>`}
             </div>
