@@ -89,6 +89,7 @@
   min-width: 0;
   transition-property: color;
   overflow-wrap: break-word;
+  direction: ltr;
 }
 
 .button-block-secondary {
@@ -132,13 +133,13 @@
   transition-duration: 0.2s;
 }
 
-div[role='button'] > div:hover > .wrapper-button.button-secondary-block > .button-border-radius {
+div[role='button'] > div:hover >  .button-border-radius {
   background-color: rgb(29 155 240 / 12.5%);
   transition-duration: 0.2s;
   transition-property: background-color, box-shadow;
 }
 
-div[role='button'] > div:active > .wrapper-button.button-secondary-block > .button-border-radius {
+div[role='button'] > div:active >  .button-border-radius {
   background-color: rgb(29 155 240 / 20%);
 }
 
@@ -152,7 +153,7 @@ div[role='button'] span {
 
 /* POST */
 
-.dapplet-widget-post-button {
+.container-button {
   color: inherit;
   background: none;
   justify-content: center;

@@ -55,42 +55,33 @@ export class Button extends LitElement implements IButtonProps {
     if (this.insPointName === 'POST' || this.insPointName === 'QUOTE_POST') {
       return html`
         <div
-          class="wrapper-button button-direction"
+          role="button"
+          class="wrapper-button button-direction container-button button-block button-display button-transition-duration"
           @click=${this._clickHandler}
           title=${this.tooltip}
+          data-testid="reply"
           style=${styleMap({
+            opacity: this.disabled ? '.5' : '1',
             marginTop: this.insPointName === 'QUOTE_POST' ? '12px' : undefined,
           })}
         >
-          <div
-            role="button"
-            tabindex="0"
-            class="wrapper-button dapplet-widget-post-button"
-            data-testid="reply"
-            style=${styleMap({ opacity: this.disabled ? '.5' : '1' })}
-          >
-            <div dir="ltr" class="button-block button-display button-transition-duration">
-              <div class="wrapper-button button-secondary-block">
-                <div
-                  class="wrapper-button button-block-secondary button-border-radius button-border button-secondary-block button-transition-duration"
-                ></div>
-                <img
-                  height="18"
-                  src="${this.loading ? LOADER : this.img || null}"
-                  class="button-img-display"
-                />
-              </div>
-              ${this.label?.toString() &&
-              html`<div class="wrapper-button button-secondary-block button-label-overflow">
-                <span
-                  data-testid="app-text-transition-container"
-                  class="button-block button-label-block"
-                >
-                  ${this.label}
-                </span>
-              </div>`}
+      
+            <div class="wrapper-button button-secondary-block">
+              <div
+                class="wrapper-button button-block-secondary button-border-radius button-border button-secondary-block button-transition-duration"
+              ></div>
+              <img src="${this.loading ? LOADER : this.img || null}" class="button-img-display" />
             </div>
-          </div>
+            ${this.label?.toString() &&
+            html`<div class="wrapper-button button-secondary-block button-label-overflow">
+              <span
+                data-testid="app-text-transition-container"
+                class="button-block button-label-block"
+              >
+                ${this.label}
+              </span>
+            </div>`}
+         
         </div>
       `
     } else if (this.insPointName === 'PROFILE') {
@@ -98,10 +89,10 @@ export class Button extends LitElement implements IButtonProps {
         @click=${this._clickHandler}
         title=${this.tooltip}
         class=${classMap({
-          'dapplet-widget-profile-button': true,
-          'dapplet-widget-profile-button-light': this.theme === 'LIGHT',
-          'dapplet-widget-profile-button-dark': this.theme === 'DARK',
-          'dapplet-widget-profile-button-basic': this.basic,
+          'button-default': true,
+          'button-light': this.theme === 'LIGHT',
+          'button-dark': this.theme === 'DARK',
+          'button-basic': this.basic,
         })}
         style=${styleMap({
           opacity: this.disabled ? '.5' : '',

@@ -1,7 +1,7 @@
 
 /* PROFILE */
 
-.dapplet-widget-profile-button {
+.button-default {
   cursor: pointer;
   user-select: none;
 
@@ -22,25 +22,25 @@
   transition: background-color 0.2s ease-in-out;
 }
 
-.dapplet-widget-profile-button-light {
+.button-light {
   color: #000;
   border: 1px solid rgb(207 217 222);
 }
 
-.dapplet-widget-profile-button-light:hover {
+.button-light:hover {
   background-color: rgb(15 20 25 / 10%);
 }
 
-.dapplet-widget-profile-button-dark {
+.button-dark {
   color: #fff;
   border: 1px solid rgb(83 100 113);
 }
 
-.dapplet-widget-profile-button-dark:hover {
+.button-dark:hover {
   background-color: rgb(239 243 244 / 10%);
 }
 
-.dapplet-widget-profile-button-basic {
+.button-basic {
   padding: 0;
   border: none;
   border-radius: 7px;
