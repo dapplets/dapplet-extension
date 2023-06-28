@@ -2,7 +2,12 @@ import JSZip from 'jszip'
 import { rcompare } from 'semver'
 import { browser } from 'webextension-polyfill-ts'
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer'
-import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants'
+import {
+  CONTEXT_ID_WILDCARD,
+  DEFAULT_BRANCH_NAME,
+  ModuleTypes,
+  StorageTypes,
+} from '../../common/constants'
 import * as EventBus from '../../common/global-event-bus'
 import {
   areModulesEqual,
@@ -376,10 +381,10 @@ export default class FeatureService {
         browser.runtime.onMessage.addListener(listener)
 
         // reject if module is loading too long
-        setTimeout(() => {
-          browser.runtime.onMessage.removeListener(listener)
-          reject('Loading timeout exceed')
-        }, 30000)
+        // setTimeout(() => {
+        //   browser.runtime.onMessage.removeListener(listener)
+        //   reject('Loading timeout exceed')
+        // }, 30000)
 
         // ToDo: use global dapplet_activated event instead of FEATURE_ACTIVATED
         // sending command to contentscript
@@ -607,6 +612,7 @@ export default class FeatureService {
     const dists = await Promise.all(
       modulesWithDeps.map((m) => this._moduleManager.loadModule(m.manifest))
     )
+    console.log('dists in getModulesWithDeps', dists)
 
     return modulesWithDeps.map((m, i) => ({
       manifest: Object.assign(m.manifest, dists[i].internalManifest), // merge manifests from registry and bundle (zip)
@@ -670,20 +676,24 @@ export default class FeatureService {
 
       if (vi && vi.main) {
         const arr = await this._storageAggregator.getResource(vi.main)
-        zip.file('index.js', arr)
-        // ToDo: if module type == "parser config" then add "index.JSON"
+        if (vi.type === ModuleTypes.ParserConfig) {
+          zip.file('index.json', arr)
+        } else {
+          zip.file('index.js', arr)
+        }
       }
 
       // ToDo: if module type == "parser config" add css files
+      if (vi && vi.type === ModuleTypes.ParserConfig) {
+        // ???
+      }
 
-      // ToDo: if module type == "parser config" then skip it
-      if (vi && vi.defaultConfig) {
+      if (vi && vi.defaultConfig && vi.type !== ModuleTypes.ParserConfig) {
         const arr = await this._storageAggregator.getResource(vi.defaultConfig)
         zip.file('default.json', arr)
       }
 
-      // ToDo: if module type == "parser config" then skip it
-      if (vi && vi.schemaConfig) {
+      if (vi && vi.schemaConfig && vi.type !== ModuleTypes.ParserConfig) {
         const arr = await this._storageAggregator.getResource(vi.schemaConfig)
         zip.file('schema.json', arr)
       }

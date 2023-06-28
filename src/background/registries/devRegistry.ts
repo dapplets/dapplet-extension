@@ -284,6 +284,7 @@ export class DevRegistry implements Registry {
         )
       : null
 
+    console.log('result of _loadModuleAndVersionInfo', { module: mi, version: vi })
     return { module: mi, version: vi }
   }
 

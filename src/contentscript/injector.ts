@@ -1,7 +1,3 @@
-import PostAvatarBadgeCss from '!!raw-loader!./modules/parser-configs/post/avatarBadge.css'
-import PostButtonCss from '!!raw-loader!./modules/parser-configs/post/button.css'
-import ProfileAvatarBadgeCss from '!!raw-loader!./modules/parser-configs/profile/avatarBadge.css'
-import ProfileButtonCss from '!!raw-loader!./modules/parser-configs/profile/button.css'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { Subject } from 'rxjs'
 import { filter } from 'rxjs/operators'
@@ -27,7 +23,8 @@ import { EventBus as ModuleEventBus } from './events/eventBus'
 import { __decorate } from './global'
 import BuiltInModules from './modules'
 import { ConfigAdapter } from './modules/config-adapter'
-import TwitterParserConfig from './modules/parser-configs/twitter.json'
+import { ParserConfig } from './modules/config-adapter/types'
+import { proxyFetch } from './proxyFetch'
 import { IContentAdapter, IResolver } from './types'
 
 type RegistriedModule = {
@@ -344,13 +341,19 @@ export class Injector {
   }
 
   private async _processModules(modules: NotRegisteredModule[]) {
+    console.log('modules in _processModules', modules)
     const { getModulesWithDeps, getSwarmGateway, getPreferedOverlayStorage } =
       await initBGFunctions(browser)
     const { core } = this
 
     const swarmGatewayUrl = await getSwarmGateway()
     const preferedOverlayStorage = await getPreferedOverlayStorage()
-
+    modules.forEach((a) => {
+      if (a.order === undefined) a.order = 0
+      return a
+    })
+    modules.sort((a, b) => a.order - b.order)
+    console.log('modules after sort', modules)
     for (const module of modules) {
       const { manifest, script, contextIds, defaultConfig, schemaConfig } = module
 
@@ -483,27 +486,42 @@ export class Injector {
         continue
       }
 
+      console.log('current module manifest', manifest)
       // ToDo: generalize loading of parser configs
-      if (manifest.name === 'twitter-adapter.dapplet-base.eth') {
+      if (manifest.type === ModuleTypes.ParserConfig) {
         const dynamicAdapter = this.registry.find(
           (m) => m.manifest.name == 'dynamic-adapter.dapplet-base.eth'
         )
+        console.log('dynamicAdapter', dynamicAdapter)
 
         if (!dynamicAdapter) {
+          console.log('error!!!')
           throw new Error('Dynamic adapter is not initialized. Check the order of dependencies.')
         }
 
         // ToDo: extract styles from zip-archive in the background
-        TwitterParserConfig.contexts.POST.widgets.button.styles = PostButtonCss
-        TwitterParserConfig.contexts.POST.widgets.avatarBadge.styles = PostAvatarBadgeCss
-        TwitterParserConfig.contexts.PROFILE.widgets.button.styles = ProfileButtonCss
-        TwitterParserConfig.contexts.PROFILE.widgets.avatarBadge.styles = ProfileAvatarBadgeCss
+        const config: ParserConfig = JSON.parse(script)
+        const deepReplaceUrlsToFetchedText = async (data: any, keyToReplace: string) =>
+          Object.fromEntries(
+            await Promise.all(
+              Object.entries(data).map(async ([key, value]: [string, any]) => [
+                key,
+                key === keyToReplace
+                  ? await (await proxyFetch(joinUrls(manifest.main.uris[0], value))).text()
+                  : typeof value === 'object'
+                  ? await deepReplaceUrlsToFetchedText(value, keyToReplace)
+                  : value,
+              ])
+            )
+          )
 
+        const configWithStyles = await deepReplaceUrlsToFetchedText(config, 'styles')
+        console.log('configWithStyles', configWithStyles)
         this._registerModule(
           module,
           ConfigAdapter,
           () => moduleEventBus,
-          () => new ConfigAdapter(dynamicAdapter.instance, TwitterParserConfig) // ToDo: reuse `script` property instead of TwitterParserConfig
+          () => new ConfigAdapter(dynamicAdapter.instance, configWithStyles) // ToDo: reuse `script` property instead of TwitterParserConfig
         )
 
         continue
@@ -684,6 +702,7 @@ export class Injector {
   }
 
   private _getDependency(manifest: VersionInfo, name: string) {
+    console.log('in _getDependency this.registry', this.registry)
     if (BuiltInModules[name]) {
       return this.registry.find((m) => m.manifest.name == name)
     }
@@ -820,6 +839,7 @@ export class Injector {
       instancedActivateMethodsDependencies: [],
       moduleEventBus: moduleEventBusFactory(),
     }
+    console.log('newRegisteredModule', newRegisteredModule)
 
     this.registry.push(newRegisteredModule)
 

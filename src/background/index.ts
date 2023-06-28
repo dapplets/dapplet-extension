@@ -431,7 +431,9 @@ browser.runtime.onMessage.addListener((message, sender) => {
     const idContexts = message.payload.contextIds.filter((x) => x.endsWith('/id'))
     if (idContexts.length > 0) {
       featureService.getFeaturesByHostnames(idContexts, null).then((manifests) => {
-        const adapters = manifests.filter((x) => x.type === ModuleTypes.Adapter)
+        const adapters = manifests.filter(
+          (x) => x.type === ModuleTypes.Adapter || x.type === ModuleTypes.ParserConfig
+        )
         if (adapters.length === 0) return
 
         // ToDo: use global dapplet_activated event instead of FEATURE_ACTIVATED
