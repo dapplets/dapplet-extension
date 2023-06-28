@@ -17,7 +17,7 @@
   cursor: pointer;
 }
 
-.post-badge {
+.badge {
   width: 24px;
   height: 24px;
 }
@@ -27,22 +27,14 @@
   border-radius: 99em;
 }
 
-.not-basic.post-badge {
+.not-basic.badge {
   border: 1px solid white;
-}
-
-.not-basic.profile-badge {
-  border: 2px solid white;
 }
 
 .not-basic.dark {
   background-color: black;
 }
 
-.not-basic.dark.post-badge {
+.not-basic.dark.badge {
   border: 1px solid black;
-}
-
-.not-basic.dark.profile-badge {
-  border: 2px solid black;
 }
