@@ -3,9 +3,10 @@ import JSZip from 'jszip'
 import { maxSatisfying } from 'semver'
 import { TopologicalSort } from 'topological-sort'
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
-import { areModulesEqual } from '../../common/helpers'
+import { areModulesEqual, joinUrls } from '../../common/helpers'
 import { NotificationType } from '../../common/models/notification'
 import { DefaultConfig, SchemaConfig, StorageRef } from '../../common/types'
+import { ParserConfig } from '../../contentscript/modules/config-adapter/types'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 import { RegistryAggregator } from '../registries/registryAggregator'
@@ -119,10 +120,10 @@ export default class ModuleManager {
     )
   }
 
-  private async _loadScript(url: StorageRef) {
+  private async _loadScriptOrConfig(url: StorageRef) {
     const resource = await this._storage.getResource(url)
-    const script = new TextDecoder('utf-8').decode(new Uint8Array(resource))
-    return script
+    const scriptOrConfig = new TextDecoder('utf-8').decode(new Uint8Array(resource))
+    return scriptOrConfig
   }
 
   private async _loadJson(url: StorageRef) {
@@ -132,8 +133,11 @@ export default class ModuleManager {
     return object
   }
 
-  private async _loadDist(url: StorageRef): Promise<{
-    script: string
+  private async _loadDist(
+    url: StorageRef,
+    moduleType: ModuleTypes
+  ): Promise<{
+    scriptOrConfig: string | ParserConfig
     defaultConfig: DefaultConfig
     schemaConfig: SchemaConfig
     internalManifest: any
@@ -142,14 +146,30 @@ export default class ModuleManager {
     const jszip = new JSZip()
     const zip = await jszip.loadAsync(resource)
 
-    const script = await zip.file('index.js').async('string')
+    let scriptOrConfig: string | ParserConfig
+    if (moduleType === ModuleTypes.ParserConfig) {
+      console.log('url for TwitterConfig in _loadDist', url)
+      const configAsStr = await zip.file('index.json').async('string')
+      console.log('configAsStr', configAsStr)
+      const config: ParserConfig = JSON.parse(configAsStr)
+      console.log('config', config)
+      const callback = async (value) => {
+        console.log('value', value)
+        return zip.file(value).async('string')
+      }
+      scriptOrConfig = await this._deepReplaceUrlsToFetchedText(callback, config, 'styles')
+      console.log('scriptOrConfig', scriptOrConfig)
+    } else {
+      scriptOrConfig = await zip.file('index.js').async('string')
+      console.log('url for script!!!', url)
+    }
     const defaultJson = zip.file('default.json') && (await zip.file('default.json').async('string'))
     const schemaJson = zip.file('schema.json') && (await zip.file('schema.json').async('string'))
     const internalManifestJson =
       zip.file('dapplet.json') && (await zip.file('dapplet.json').async('string'))
 
     return {
-      script,
+      scriptOrConfig,
       defaultConfig: defaultJson && JSON.parse(defaultJson),
       schemaConfig: schemaJson && JSON.parse(schemaJson),
       internalManifest: internalManifestJson && JSON.parse(internalManifestJson),
@@ -157,20 +177,27 @@ export default class ModuleManager {
   }
 
   public async loadModule(m: VersionInfo): Promise<{
-    script: string
+    scriptOrConfig: string | ParserConfig
     defaultConfig: DefaultConfig
     schemaConfig: SchemaConfig
     internalManifest: any
   }> {
     if (m.dist) {
-      return this._loadDist(m.dist)
+      // from decentralized registry
+      return this._loadDist(m.dist, m.type)
     } else {
-      const script = await this._loadScript(m.main)
+      // from developer registry
+      let scriptOrConfig: string | ParserConfig = await this._loadScriptOrConfig(m.main)
+      if (m.type === ModuleTypes.ParserConfig) {
+        const config: ParserConfig = JSON.parse(scriptOrConfig)
+        const callback = async (value) => (await fetch(joinUrls(m.main.uris[0], value))).text()
+        scriptOrConfig = await this._deepReplaceUrlsToFetchedText(callback, config, 'styles')
+      }
       const defaultConfig =
         m.defaultConfig && (await this._loadJson(m.defaultConfig).catch(() => null))
       const schemaConfig =
         m.schemaConfig && (await this._loadJson(m.schemaConfig).catch(() => null))
-      return { script, defaultConfig, schemaConfig, internalManifest: null }
+      return { scriptOrConfig, defaultConfig, schemaConfig, internalManifest: null }
     }
   }
 
@@ -341,5 +368,20 @@ export default class ModuleManager {
     }
 
     return null
+  }
+
+  private async _deepReplaceUrlsToFetchedText(callback: any, data: any, keyToReplace: string) {
+    return Object.fromEntries(
+      await Promise.all(
+        Object.entries(data).map(async ([key, value]: [string, any]) => [
+          key,
+          key === keyToReplace
+            ? await callback(value)
+            : typeof value === 'object'
+            ? await this._deepReplaceUrlsToFetchedText(callback, value, keyToReplace)
+            : value,
+        ])
+      )
+    )
   }
 }

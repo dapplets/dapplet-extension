@@ -13,6 +13,7 @@ import {
   areModulesEqual,
   blobToDataURL,
   getCurrentTab,
+  joinUrls,
   Measure,
   mergeDedupe,
   parseModuleName,
@@ -612,11 +613,10 @@ export default class FeatureService {
     const dists = await Promise.all(
       modulesWithDeps.map((m) => this._moduleManager.loadModule(m.manifest))
     )
-    console.log('dists in getModulesWithDeps', dists)
 
     return modulesWithDeps.map((m, i) => ({
       manifest: Object.assign(m.manifest, dists[i].internalManifest), // merge manifests from registry and bundle (zip)
-      script: dists[i].script,
+      scriptOrConfig: dists[i].scriptOrConfig,
       defaultConfig: dists[i].defaultConfig,
       schemaConfig: dists[i].schemaConfig,
     }))
@@ -678,14 +678,35 @@ export default class FeatureService {
         const arr = await this._storageAggregator.getResource(vi.main)
         if (vi.type === ModuleTypes.ParserConfig) {
           zip.file('index.json', arr)
+
+          const config = new TextDecoder('utf-8').decode(new Uint8Array(arr))
+          const tmp: string[] = []
+          const addStylesToZip = async (confiWithStyles: any, keyToReplace: string) =>
+            Promise.all(
+              Object.entries(confiWithStyles).map(async ([key, value]: [string, any]) => {
+                if (typeof value === 'string' && key === keyToReplace) {
+                  tmp.push(value)
+                  const cssArr = await this._storageAggregator.getResource({
+                    uris: [joinUrls(vi.main.uris[0], value)],
+                    hash: null,
+                  })
+                  if (cssArr) {
+                    const css = new TextDecoder('utf-8').decode(new Uint8Array(cssArr))
+                    console.log('decoded css', css)
+                    zip.file(value, cssArr)
+                  }
+                } else if (typeof value === 'object') {
+                  await addStylesToZip(value, keyToReplace)
+                }
+              })
+            )
+
+          await addStylesToZip(JSON.parse(config), 'styles')
+          console.log(';;;', zip.file('index.json'))
+          tmp.forEach((v) => console.log(';;;', zip.file(v)))
         } else {
           zip.file('index.js', arr)
         }
-      }
-
-      // ToDo: if module type == "parser config" add css files
-      if (vi && vi.type === ModuleTypes.ParserConfig) {
-        // ???
       }
 
       if (vi && vi.defaultConfig && vi.type !== ModuleTypes.ParserConfig) {

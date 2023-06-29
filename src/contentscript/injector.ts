@@ -24,7 +24,6 @@ import { __decorate } from './global'
 import BuiltInModules from './modules'
 import { ConfigAdapter } from './modules/config-adapter'
 import { ParserConfig } from './modules/config-adapter/types'
-import { proxyFetch } from './proxyFetch'
 import { IContentAdapter, IResolver } from './types'
 
 type RegistriedModule = {
@@ -50,7 +49,7 @@ type RegistriedModule = {
 
 type NotRegisteredModule = {
   manifest: VersionInfo
-  script: string
+  scriptOrConfig: string | ParserConfig
   order: number
   contextIds: string[]
   defaultConfig?: DefaultConfig
@@ -118,7 +117,7 @@ export class Injector {
     const { getModulesWithDeps } = await initBGFunctions(browser)
     const loadedModules: {
       manifest: VersionInfo
-      script: string
+      scriptOrConfig: string | ParserConfig
       defaultConfig?: DefaultConfig
       schemaConfig?: SchemaConfig
     }[] = await getModulesWithDeps(modules)
@@ -354,8 +353,14 @@ export class Injector {
     })
     modules.sort((a, b) => a.order - b.order)
     console.log('modules after sort', modules)
+    modules.sort((a, b) => {
+      if (a.manifest.type === ModuleTypes.Library) return -1
+      if (b.manifest.type === ModuleTypes.Library) return 1
+      return 0
+    })
+    console.log('modules after II sort', modules)
     for (const module of modules) {
-      const { manifest, script, contextIds, defaultConfig, schemaConfig } = module
+      const { manifest, scriptOrConfig, contextIds, defaultConfig, schemaConfig } = module
 
       // Module is loaded already
       const registeredModule = this.registry.find((m) => areModulesEqual(m.manifest, manifest))
@@ -488,40 +493,20 @@ export class Injector {
 
       console.log('current module manifest', manifest)
       // ToDo: generalize loading of parser configs
-      if (manifest.type === ModuleTypes.ParserConfig) {
+      if (manifest.type === ModuleTypes.ParserConfig && typeof scriptOrConfig === 'object') {
         const dynamicAdapter = this.registry.find(
           (m) => m.manifest.name == 'dynamic-adapter.dapplet-base.eth'
         )
-        console.log('dynamicAdapter', dynamicAdapter)
-
         if (!dynamicAdapter) {
           console.log('error!!!')
           throw new Error('Dynamic adapter is not initialized. Check the order of dependencies.')
         }
-
-        // ToDo: extract styles from zip-archive in the background
-        const config: ParserConfig = JSON.parse(script)
-        const deepReplaceUrlsToFetchedText = async (data: any, keyToReplace: string) =>
-          Object.fromEntries(
-            await Promise.all(
-              Object.entries(data).map(async ([key, value]: [string, any]) => [
-                key,
-                key === keyToReplace
-                  ? await (await proxyFetch(joinUrls(manifest.main.uris[0], value))).text()
-                  : typeof value === 'object'
-                  ? await deepReplaceUrlsToFetchedText(value, keyToReplace)
-                  : value,
-              ])
-            )
-          )
-
-        const configWithStyles = await deepReplaceUrlsToFetchedText(config, 'styles')
-        console.log('configWithStyles', configWithStyles)
+        console.log('configWithStyles', scriptOrConfig)
         this._registerModule(
           module,
           ConfigAdapter,
           () => moduleEventBus,
-          () => new ConfigAdapter(dynamicAdapter.instance, configWithStyles) // ToDo: reuse `script` property instead of TwitterParserConfig
+          () => new ConfigAdapter(dynamicAdapter.instance, scriptOrConfig) // ToDo: reuse `scriptOrConfig` property instead of TwitterParserConfig
         )
 
         continue
@@ -620,20 +605,28 @@ export class Injector {
         }
       }
 
-      try {
-        const execScript = new Function(
-          'Core',
-          'Inject',
-          'Injectable',
-          'OnEvent',
-          '__decorate',
-          script
-        )
-        execScript(coreWrapper, injectDecorator, injectableDecorator, onEventDecorator, __decorate)
-      } catch (err) {
-        // ToDo: remove module from this.registry
-        console.error(err)
-        continue
+      if (typeof scriptOrConfig === 'string') {
+        try {
+          const execScript = new Function(
+            'Core',
+            'Inject',
+            'Injectable',
+            'OnEvent',
+            '__decorate',
+            scriptOrConfig
+          )
+          execScript(
+            coreWrapper,
+            injectDecorator,
+            injectableDecorator,
+            onEventDecorator,
+            __decorate
+          )
+        } catch (err) {
+          // ToDo: remove module from this.registry
+          console.error(err)
+          continue
+        }
       }
 
       if (newBranch) {
