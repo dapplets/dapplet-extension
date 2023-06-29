@@ -23,6 +23,14 @@
   background: $pure-white;
   border: 1px solid $main-grey;
   border-radius: 4px;
+  &:hover {
+    svg {
+      position: absolute;
+      transform: translate(50%, 80%);
+      width: 8px;
+      height: 6px;
+    }
+  }
 }
 
 .checkboxNotification {
