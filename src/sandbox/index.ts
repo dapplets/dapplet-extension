@@ -26,7 +26,9 @@ const globalMessageHandler = ({ data }: MessageEvent) => {
         })
       break
     default:
-      throw new Error(`[Sandbox] Unknown method: ${method}`)
+      // ToDo: move all handlers to here
+      // console.error(`[Sandbox] Unknown method: ${method}`)
+      break
   }
 }
 
