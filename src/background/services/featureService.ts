@@ -382,10 +382,10 @@ export default class FeatureService {
         browser.runtime.onMessage.addListener(listener)
 
         // reject if module is loading too long
-        // setTimeout(() => {
-        //   browser.runtime.onMessage.removeListener(listener)
-        //   reject('Loading timeout exceed')
-        // }, 30000)
+        setTimeout(() => {
+          browser.runtime.onMessage.removeListener(listener)
+          reject('Loading timeout exceed')
+        }, 30000)
 
         // ToDo: use global dapplet_activated event instead of FEATURE_ACTIVATED
         // sending command to contentscript
