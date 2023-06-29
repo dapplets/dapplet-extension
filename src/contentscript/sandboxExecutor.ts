@@ -4,6 +4,7 @@ import { generateGuid } from '../common/helpers'
 export abstract class SandboxExecutor {
   private _worker: Worker
   private _stateMap = new Map<string, any>()
+  private _detachConfigCallbacks: (() => void)[] = []
 
   constructor(script: string, moduleName: string) {
     // sandbox.js provides environment for the script to run in
@@ -21,6 +22,7 @@ export abstract class SandboxExecutor {
 
   public async deactivate() {
     await this._sendRequest('deactivate')
+    this._detachConfigCallbacks.forEach((cb) => cb())
     this._worker.removeEventListener('message', this._messageListener)
     this._worker.terminate()
   }
@@ -65,6 +67,10 @@ export abstract class SandboxExecutor {
     }
 
     adapter.attachConfig(config)
+
+    this._detachConfigCallbacks.push(() => {
+      adapter.detachConfig(config)
+    })
   }
 
   private _onStateUpdated({ widgetId, newValues }: { widgetId: string; newValues: any }) {
