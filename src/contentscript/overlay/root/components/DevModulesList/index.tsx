@@ -66,7 +66,7 @@ export const DevModule: FC<PropsDevModule> = memo(function DevModule(props: Prop
   const [targetRegistry, setTargetRegistry] = useState(null)
   const [trustedUsers, setTrustedUsers] = useState([])
   const [mode, setMode] = useState<FormMode>(null)
-  const [targetStorages, setTargetStorages] = useState([StorageTypes.Swarm, StorageTypes.Ipfs])
+  const [targetStorages, setTargetStorages] = useState<StorageTypes[]>([])
   const [targetChain, setTargetChain] = useState<ChainTypes>(null)
   const [deploymentStatus, setDeploymentStatus] = useState(DeploymentStatus.Unknown)
   const [owner, setOwner] = useState(null)
@@ -140,24 +140,22 @@ export const DevModule: FC<PropsDevModule> = memo(function DevModule(props: Prop
       setOwnerDev(newOwner)
     }
 
-    const { getRegistries, getTrustedUsers, getCounterStake } = await initBGFunctions(browser)
+    const { getRegistries, getTrustedUsers, getCounterStake, getTargetStorages } =
+      await initBGFunctions(browser)
     const registries = await getRegistries()
     const trustedUsers = await getTrustedUsers()
+    const storagesToUpload = await getTargetStorages()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
     if (mi.isUnderConstruction) {
       const counter = await getCounterStake(mi.name)
       setCounterBurn(counter)
     }
+    setTargetStorages(storagesToUpload) // ToDo: when Swarm will be added uplopad dapplets with overlays only to Swarm but not to Ipfs
     if (mi === null && vi === null) {
       const newMi = new ModuleInfo()
       setMi(newMi)
       setMode(FormMode.Creating)
     } else {
-      setTargetStorages(
-        Object.keys(vi?.overlays ?? {}).length > 0
-          ? [StorageTypes.Swarm]
-          : [StorageTypes.Swarm, StorageTypes.Ipfs]
-      )
       setMode(FormMode.Deploying)
       setTargetRegistry(prodRegistries[0]?.url || null)
       setTrustedUsers(trustedUsers)
