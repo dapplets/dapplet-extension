@@ -340,25 +340,17 @@ export class Injector {
   }
 
   private async _processModules(modules: NotRegisteredModule[]) {
-    console.log('modules in _processModules', modules)
     const { getModulesWithDeps, getSwarmGateway, getPreferedOverlayStorage } =
       await initBGFunctions(browser)
     const { core } = this
 
     const swarmGatewayUrl = await getSwarmGateway()
     const preferedOverlayStorage = await getPreferedOverlayStorage()
-    modules.forEach((a) => {
-      if (a.order === undefined) a.order = 0
-      return a
-    })
-    modules.sort((a, b) => a.order - b.order)
-    console.log('modules after sort', modules)
     modules.sort((a, b) => {
       if (a.manifest.type === ModuleTypes.Library) return -1
       if (b.manifest.type === ModuleTypes.Library) return 1
       return 0
     })
-    console.log('modules after II sort', modules)
     for (const module of modules) {
       const { manifest, scriptOrConfig, contextIds, defaultConfig, schemaConfig } = module
 
@@ -491,22 +483,19 @@ export class Injector {
         continue
       }
 
-      console.log('current module manifest', manifest)
       // ToDo: generalize loading of parser configs
       if (manifest.type === ModuleTypes.ParserConfig && typeof scriptOrConfig === 'object') {
         const dynamicAdapter = this.registry.find(
           (m) => m.manifest.name == 'dynamic-adapter.dapplet-base.eth'
         )
         if (!dynamicAdapter) {
-          console.log('error!!!')
           throw new Error('Dynamic adapter is not initialized. Check the order of dependencies.')
         }
-        console.log('configWithStyles', scriptOrConfig)
         this._registerModule(
           module,
           ConfigAdapter,
           () => moduleEventBus,
-          () => new ConfigAdapter(dynamicAdapter.instance, scriptOrConfig) // ToDo: reuse `scriptOrConfig` property instead of TwitterParserConfig
+          () => new ConfigAdapter(dynamicAdapter.instance, scriptOrConfig)
         )
 
         continue
@@ -695,7 +684,6 @@ export class Injector {
   }
 
   private _getDependency(manifest: VersionInfo, name: string) {
-    console.log('in _getDependency this.registry', this.registry)
     if (BuiltInModules[name]) {
       return this.registry.find((m) => m.manifest.name == name)
     }
@@ -740,7 +728,10 @@ export class Injector {
   }
 
   private _proxifyModule(proxiedModule: RegistriedModule, contextModule: RegistriedModule) {
-    if (proxiedModule.manifest.type === ModuleTypes.Adapter) {
+    if (
+      proxiedModule.manifest.type === ModuleTypes.Adapter ||
+      proxiedModule.manifest.type === ModuleTypes.ParserConfig
+    ) {
       const cfgsKey = Symbol()
       const featureId = contextModule.manifest.name
       return new Proxy(proxiedModule.instance, {
@@ -812,11 +803,9 @@ export class Injector {
     instanceFactory: any = () => null
   ): RegistriedModule {
     const existingModule = this.registry.find((m) => areModulesEqual(m.manifest, module.manifest))
-
     if (existingModule) {
       return existingModule
     }
-
     const newRegisteredModule: RegistriedModule = {
       manifest: module.manifest,
       clazz: clazz,
@@ -832,10 +821,7 @@ export class Injector {
       instancedActivateMethodsDependencies: [],
       moduleEventBus: moduleEventBusFactory(),
     }
-    console.log('newRegisteredModule', newRegisteredModule)
-
     this.registry.push(newRegisteredModule)
-
     return newRegisteredModule
   }
 }

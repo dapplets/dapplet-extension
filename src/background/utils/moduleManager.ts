@@ -148,20 +148,12 @@ export default class ModuleManager {
 
     let scriptOrConfig: string | ParserConfig
     if (moduleType === ModuleTypes.ParserConfig) {
-      console.log('url for TwitterConfig in _loadDist', url)
       const configAsStr = await zip.file('index.json').async('string')
-      console.log('configAsStr', configAsStr)
       const config: ParserConfig = JSON.parse(configAsStr)
-      console.log('config', config)
-      const callback = async (value) => {
-        console.log('value', value)
-        return zip.file(value).async('string')
-      }
+      const callback = async (value) => zip.file(value).async('string')
       scriptOrConfig = await this._deepReplaceUrlsToFetchedText(callback, config, 'styles')
-      console.log('scriptOrConfig', scriptOrConfig)
     } else {
       scriptOrConfig = await zip.file('index.js').async('string')
-      console.log('url for script!!!', url)
     }
     const defaultJson = zip.file('default.json') && (await zip.file('default.json').async('string'))
     const schemaJson = zip.file('schema.json') && (await zip.file('schema.json').async('string'))
