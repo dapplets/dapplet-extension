@@ -3,6 +3,7 @@ import { generateGuid } from '../common/helpers'
 
 export abstract class SandboxExecutor {
   private _worker: Worker
+  private _stateMap = new Map<string, any>()
 
   constructor(script: string, moduleName: string) {
     // sandbox.js provides environment for the script to run in
@@ -38,8 +39,19 @@ export abstract class SandboxExecutor {
     const config = {}
 
     for (const contextName of listeningContexts) {
-      config[contextName] = (ctx) => {
-        this._notify('context-started', { ctx, contextName })
+      config[contextName] = async (ctx) => {
+        const widgets = await this._sendRequest('get-widgets-for-context', { ctx, contextName })
+        return widgets.map((widget) => {
+          const widgetFactory = adapter.exports[widget.widgetName]
+          return widgetFactory({
+            DEFAULT: {
+              ...widget.stateValues,
+              init: (_, state) => {
+                this._stateMap.set(widget.widgetId, state)
+              },
+            },
+          })
+        })
       }
     }
 
@@ -48,19 +60,21 @@ export abstract class SandboxExecutor {
     console.log({ adapter, listeningContexts })
   }
 
-  private _onWidgetCreated({
-    widgetId,
-    widgetName,
-    stateValues,
-  }: {
-    widgetId: string
-    widgetName: string
-    stateValues: any
-  }) {
-    console.log({ widgetId, widgetName, stateValues })
+  private _onStateUpdated({ widgetId, newValues }: { widgetId: string; newValues: any }) {
+    if (!newValues) return
+
+    const state = this._stateMap.get(widgetId)
+    if (!state) {
+      // console.error('SandboxExecutor: State not found for widgetId ' + widgetId)
+      return
+    }
+
+    for (const key in newValues) {
+      state[key] = newValues[key]
+    }
   }
 
-  private async _sendRequest(method: string): Promise<any> {
+  private async _sendRequest(method: string, ...params: any[]): Promise<any> {
     const id = generateGuid()
 
     return new Promise((res, rej) => {
@@ -75,7 +89,7 @@ export abstract class SandboxExecutor {
         }
       }
       this._worker.addEventListener('message', listener)
-      this._worker.postMessage({ id, method })
+      this._worker.postMessage({ id, method, params })
     })
   }
 
@@ -88,8 +102,8 @@ export abstract class SandboxExecutor {
       case 'config-attached':
         this._onConfigAttached(e.data.params[0])
         break
-      case 'widget-created':
-        this._onWidgetCreated(e.data.params[0])
+      case 'state-updated':
+        this._onStateUpdated(e.data.params[0])
         break
       default:
         console.warn(`SandboxExecutor: Unknown method ${e.data.method}`)

@@ -16,12 +16,23 @@ export class ProxyAdapter {
     {
       get: (target, widgetName: string) => {
         // ToDo: implement it
-        return (widgetConfig: any) =>
-          (context: any): InjectedWidget => ({
-            widgetId: generateGuid(),
-            widgetName,
-            state: new State(widgetConfig, context, () => 'LIGHT'), // ToDo: light
-          })
+        return (widgetConfig: any) => {
+          return (context: any): InjectedWidget => {
+            const widgetId = generateGuid()
+            const state = new State(widgetConfig, context, () => 'LIGHT') // ToDo: light
+
+            // ToDo: unsubscribe
+            state.changedHandler = (newValues) => {
+              this._notify('state-updated', { widgetId, newValues })
+            }
+
+            return {
+              widgetId,
+              widgetName,
+              state,
+            }
+          }
+        }
       },
     }
   )
@@ -45,18 +56,23 @@ export class ProxyAdapter {
     this._attachedConfig = null
   }
 
-  private _onContextStarted({ ctx, contextName }: { ctx: any; contextName: string }) {
+  private async _getWidgetsForContext({ ctx, contextName }: { ctx: any; contextName: string }) {
     const widgetFactories = this._attachedConfig[contextName](ctx)
-    widgetFactories
-      .map((x) => x(ctx))
-      .forEach((x: InjectedWidget) => {
-        this._widgets.set(x.widgetId, x)
-        this._notify('widget-created', {
-          widgetId: x.widgetId,
-          widgetName: x.widgetName,
-          stateValues: x.state.getStateValues(),
-        })
+    const widgetsToBeCreated = Promise.all(
+      widgetFactories.map(async (widgetFactory) => {
+        const widget: InjectedWidget = await widgetFactory(ctx)
+        widget.state.state.init?.(ctx, widget.state.state) // ToDo: can be buggy when widgetFactory returns value asynchronously
+        this._widgets.set(widget.widgetId, widget)
+        return {
+          widgetId: widget.widgetId,
+          widgetName: widget.widgetName,
+          // contextName,
+          // contextId: ctx.id,
+          stateValues: JSON.parse(JSON.stringify(widget.state.getStateValues())),
+        }
       })
+    )
+    return widgetsToBeCreated
   }
 
   private _notify(method: string, ...params: any[]) {
@@ -64,13 +80,21 @@ export class ProxyAdapter {
   }
 
   private _messageListener = (e: MessageEvent) => {
+    const { id, method, params } = e.data
+
     // ToDo: filter notifications from another adapters
-    switch (e.data.method) {
-      case 'context-started':
-        this._onContextStarted(e.data.params[0])
+    switch (method) {
+      case 'get-widgets-for-context':
+        this._getWidgetsForContext(params[0])
+          .then((result) => {
+            global.postMessage({ id, result })
+          })
+          .catch((error) => {
+            global.postMessage({ id, error })
+          })
         break
       default:
-        console.warn(`SandboxExecutor: Unknown method ${e.data.method}`)
+        console.warn(`ProxyAdapter: Unknown method ${method}`)
     }
   }
 }
