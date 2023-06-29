@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { providers } from 'near-api-js'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 
 export class BackgroundJsonRpcProvider extends providers.JsonRpcProvider {
   constructor(private _app: string, private _network: string) {

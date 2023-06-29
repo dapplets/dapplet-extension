@@ -3,7 +3,7 @@
  * Provides the same interface in all parts of an extension.
  */
 
-import { Browser, Runtime } from 'webextension-polyfill-ts'
+import { Runtime } from 'webextension-polyfill'
 
 // Constants
 
@@ -40,20 +40,24 @@ interface Connection {
 // Detect an extension's module
 
 let environment: EnvType
-let browser: Browser | null
+let browser: any
 
 try {
-  const module = require('webextension-polyfill-ts')
-  browser = module.browser
+  browser = require('webextension-polyfill')
+  // eslint-disable-next-line no-empty
+} catch (_) {}
 
-  if (window === browser.extension?.getBackgroundPage?.()) {
+try {
+  if (typeof window === 'undefined') {
     environment = EnvType.BACKGROUND
   } else if (self !== top) {
     environment = EnvType.CONTENT_FRAME
-  } else {
+  } else if (browser.runtime) {
     environment = EnvType.CONTENT_SCRIPT
+  } else {
+    environment = EnvType.INPAGE_SCRIPT
   }
-} catch (err) {
+} catch (_) {
   environment = EnvType.INPAGE_SCRIPT
 }
 
@@ -64,7 +68,8 @@ const callbacks = new Map<string, Set<CallbackFunction>>()
 const connections: Connection[] = []
 
 function register(portOrWindow: Runtime.Port | Window) {
-  const _conn: any = portOrWindow instanceof Window ? {} : portOrWindow
+  const _conn: any =
+    typeof Window !== 'undefined' && portOrWindow instanceof Window ? {} : portOrWindow
 
   const callback = (message: EventMessage) => {
     message.from_env = environment
@@ -75,7 +80,7 @@ function register(portOrWindow: Runtime.Port | Window) {
     callbacks.get(message.event)?.forEach((cb) => cb(message.data))
   }
 
-  if (portOrWindow instanceof Window) {
+  if (typeof Window !== 'undefined' && portOrWindow instanceof Window) {
     const listener = (e) => {
       if (typeof e.data === 'object' && e.data.bus === BUS_ID && e.data.from !== currentContext) {
         callback(e.data)

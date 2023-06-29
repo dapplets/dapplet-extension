@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import * as nearAPI from 'near-api-js'
 import { Near } from 'near-api-js'
 import { JsonRpcProvider } from 'near-api-js/lib/providers'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { NotImplementedError } from '../../../../common/errors'
 import { CacheMethod, generateGuid, waitTab } from '../../../../common/helpers'
 import { NearNetworkConfig } from '../../../../common/types'
@@ -60,7 +60,7 @@ export default class implements NearWallet {
   }
 
   async isConnected() {
-    const accountId = this._nearWallet.getAccountId()
+    const accountId = await this._nearWallet.getAccountId()
     return !!accountId && accountId.length > 0
   }
 
@@ -85,7 +85,10 @@ export default class implements NearWallet {
     const near = new Near({
       ...this._config,
       deps: {
-        keyStore: new nearAPI.keyStores.BrowserLocalStorageKeyStore(window.localStorage, keyPrefix),
+        keyStore: new nearAPI.keyStores.BrowserLocalStorageKeyStore(
+          browser.storage.local,
+          keyPrefix
+        ),
       },
     })
 
@@ -106,8 +109,8 @@ export default class implements NearWallet {
     }
   }
 
-  getLastUsage() {
-    return localStorage[this._lastUsageKey]
+  async getLastUsage() {
+    return (await browser.storage.local.get(this._lastUsageKey))[this._lastUsageKey]
   }
 
   getAccount() {
@@ -160,6 +163,6 @@ export default class implements NearWallet {
     }
 
     nearWallet.completeSignIn(accountId, publicKey, allKeys)
-    localStorage[this._lastUsageKey] = new Date().toISOString()
+    browser.storage.local.set({ [this._lastUsageKey]: new Date().toISOString() })
   }
 }

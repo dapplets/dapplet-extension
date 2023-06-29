@@ -1,4 +1,4 @@
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { MESSAGE_BUS_NAME } from './constants'
 
 export default class WebSocketProxyClient {

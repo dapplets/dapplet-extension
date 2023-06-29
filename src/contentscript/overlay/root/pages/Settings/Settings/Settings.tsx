@@ -1,7 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { StorageTypes } from '../../../../../../common/constants'
 import { isValidPostageStampId } from '../../../../../../common/helpers'
 import { Checkbox } from '../../../components/Checkbox'

@@ -1,5 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { generateGuid } from '../../../common/helpers'
 import { UrlAvailability } from '../../../common/types'
 import { IOverlay, OverlayConfig, OverlaySourceModule } from '../interfaces'

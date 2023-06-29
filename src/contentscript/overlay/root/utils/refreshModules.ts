@@ -1,5 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import ManifestDTO from '../../../../background/dto/manifestDTO'
 import { ModuleTypes } from '../../../../common/constants'
 import { ManifestAndDetails } from '../../../../common/types'

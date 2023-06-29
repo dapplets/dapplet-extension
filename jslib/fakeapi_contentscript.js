@@ -1,4 +1,4 @@
-import common_script from '!raw-loader!../build/common.js'
+// import common_script from '!raw-loader!../build/common.js'
 import fakeapi_frame_script from '!raw-loader!./fakeapi_frame.js'
 
 const browser = {}

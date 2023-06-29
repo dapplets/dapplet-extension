@@ -1,5 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { IConnectedAccountUser } from '../../../../../../../../common/types'
 
 const isThereAPendingRequestForThisCAUsers = async (

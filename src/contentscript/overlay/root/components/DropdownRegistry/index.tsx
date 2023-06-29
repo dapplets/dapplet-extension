@@ -1,7 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { isValidUrl } from '../../../../../common/helpers'
 import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
 import { ReactComponent as Delete } from '../../assets/icons/mini-close.svg'

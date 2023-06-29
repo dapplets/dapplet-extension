@@ -46,10 +46,11 @@ function handleInsertStyles(element) {
 
 module.exports = {
   entry: {
-    background: path.join(__dirname, 'src/background/index.ts'),
+    'service-worker': path.join(__dirname, 'src/background/index.ts'),
     contentscript: path.join(__dirname, 'src/contentscript/index.ts'),
     inpage: path.join(__dirname, 'src/inpage/index.ts'),
     sandbox: path.join(__dirname, 'src/sandbox/index.ts'),
+    offscreen: path.join(__dirname, 'src/offscreen.ts'),
   },
   output: {
     path: path.join(__dirname, 'build'),
@@ -135,8 +136,8 @@ module.exports = {
           transform: (content) => modifyManifest(content),
         },
         {
-          from: 'src/background/index.html',
-          to: 'background.html',
+          from: 'src/offscreen.html',
+          to: 'offscreen.html',
         },
       ],
     }),

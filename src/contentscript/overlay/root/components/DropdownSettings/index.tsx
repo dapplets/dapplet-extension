@@ -1,7 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
 import { ReactComponent as DropdownIcon } from '../../assets/icons/iconDropdown.svg'
 import styles from './DropdownSettings.module.scss'

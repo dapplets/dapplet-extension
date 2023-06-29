@@ -83,7 +83,7 @@ export class WalletService {
         chainId: await w.instance.getChainId(),
         apps: getUsageApps(w.chain, w.wallet),
         default: w.wallet === defaults[w.chain],
-        lastUsage: w.instance.getLastUsage(),
+        lastUsage: await w.instance.getLastUsage(),
       }))
     )
 

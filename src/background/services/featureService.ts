@@ -1,12 +1,10 @@
 import JSZip from 'jszip'
 import { rcompare } from 'semver'
-import { browser } from 'webextension-polyfill-ts'
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer'
 import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants'
 import * as EventBus from '../../common/global-event-bus'
 import {
   areModulesEqual,
-  blobToDataURL,
   getCurrentTab,
   Measure,
   mergeDedupe,
@@ -18,14 +16,13 @@ import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
 import { globalClear } from 'caching-decorator'
-import { Runtime } from 'webextension-polyfill'
-import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
-import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
+import browser, { Runtime } from 'webextension-polyfill'
 import { DappletRuntimeResult, MessageWrapperRequest, StorageRef } from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
 import { AnalyticsGoals, AnalyticsService } from './analyticsService'
 import GlobalConfigService from './globalConfigService'
 import { NotificationService } from './notificationService'
+import { generateNftImage } from './offscreenService'
 import { WalletService } from './walletService'
 
 export default class FeatureService {
@@ -70,19 +67,22 @@ export default class FeatureService {
 
     if (filter === 'all' || filter === 'trusted') {
       const trustedUsers = await this._globalConfigService.getTrustedUsers()
-      const accounts = trustedUsers.map((u) => u.account)
+      const accounts = trustedUsers.map((u) => u.account).filter((x) => !!x)
       listingAccounts.push(...accounts)
     }
 
     if (filter === 'all' || filter === 'public') {
       const walletDescriptors = await this._walletService.getWalletDescriptors()
-      const accounts = walletDescriptors.filter((x) => x.connected).map((x) => x.account)
+      const accounts = walletDescriptors
+        .filter((x) => x.connected)
+        .map((x) => x.account)
+        .filter((x) => !!x)
       listingAccounts.push(...accounts)
     }
 
     if (filter === 'active') {
       const trustedUsers = await this._globalConfigService.getTrustedUsers()
-      const accounts = trustedUsers.map((u) => u.account)
+      const accounts = trustedUsers.map((u) => u.account).filter((x) => !!x)
       listingAccounts.push(...accounts)
     }
 
@@ -322,7 +322,7 @@ export default class FeatureService {
     }
 
     try {
-      const runtime = await new Promise<DappletRuntimeResult>(async (resolve, reject) => {
+      const runtime = await new Promise<DappletRuntimeResult>((resolve, reject) => {
         // listening of loading/unloading from contentscript
         const listener = (message, sender: Runtime.MessageSender) => {
           if (sender.tab.id !== tabId) return
@@ -885,7 +885,7 @@ export default class FeatureService {
       const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl)
       if (!registry) return null
       const moduleInfo = await registry.getModuleInfoByName(moduleName)
-      // if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
+      // if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into chrome storage
       return moduleInfo
       // }
     }
@@ -978,55 +978,6 @@ export default class FeatureService {
     return base64
   }
 
-  private async _generateNftImage({
-    name,
-    title,
-    icon,
-  }: {
-    name: string
-    title: string
-    icon?: Blob
-  }): Promise<Blob> {
-    const base64ImageToCanvas = (base64: string) =>
-      new Promise<HTMLCanvasElement>((res, rej) => {
-        const image = new Image()
-        image.src = base64
-        image.onerror = rej
-        image.onload = function () {
-          const canvas = document.createElement('canvas')
-          canvas.width = image.width
-          canvas.height = image.height
-          const ctx = canvas.getContext('2d')
-          ctx.drawImage(image, 0, 0)
-          res(canvas)
-        }
-      })
-
-    const wrapper = document.createElement('svg')
-    wrapper.innerHTML = atob(NFT_TEMPLATE.split(',')[1])
-    const svg = wrapper.firstChild as any
-    const titleEl = svg.getElementById('module-title')
-    const nameEl = svg.getElementById('module-name')
-
-    titleEl.innerHTML = title
-    nameEl.innerHTML = name
-
-    // recognize mime type
-    const dataUrlUnknownMime = icon ? await blobToDataURL(new Blob([icon])) : NFT_NO_ICON
-    const iconCanvas = await base64ImageToCanvas(dataUrlUnknownMime)
-    const dataUrl = await iconCanvas.toDataURL()
-
-    const iconEl = svg.getElementById('module-icon')
-    iconEl.setAttribute('xlink:href', dataUrl)
-
-    const svgData = new XMLSerializer().serializeToString(svg)
-    const svgAsBase64 = 'data:image/svg+xml;base64,' + btoa(svgData)
-
-    const imageCanvas = await base64ImageToCanvas(svgAsBase64)
-    const blob = await new Promise<Blob>((r) => imageCanvas.toBlob(r))
-    return blob
-  }
-
   private async _uploadModuleInfoIcons(
     mi: ModuleInfo,
     targetStorages: StorageTypes[]
@@ -1041,7 +992,7 @@ export default class FeatureService {
         const iconHashUris = await this._storageAggregator.save(iconBlob, targetStorages)
 
         // Generate NFT Image
-        const imageBlob = await this._generateNftImage({ name, title, icon: iconBlob })
+        const imageBlob = await generateNftImage({ name, title, icon: iconBlob })
         const imageHashUris = await this._storageAggregator.save(imageBlob, targetStorages)
 
         // Manifest editing
@@ -1054,7 +1005,7 @@ export default class FeatureService {
         const iconHashUris = await this._storageAggregator.save(iconBlob, targetStorages)
 
         // Generate NFT Image
-        const imageBlob = await this._generateNftImage({ name, title, icon: iconBlob })
+        const imageBlob = await generateNftImage({ name, title, icon: iconBlob })
         const imageHashUris = await this._storageAggregator.save(imageBlob, targetStorages)
 
         // Manifest editing
@@ -1063,7 +1014,7 @@ export default class FeatureService {
       }
     } else {
       // Generate NFT Image
-      const imageBlob = await this._generateNftImage({ name: mi.name, title: mi.title }) // no module icon
+      const imageBlob = await generateNftImage({ name: mi.name, title: mi.title }) // no module icon
       const imageHashUris = await this._storageAggregator.save(imageBlob, targetStorages)
 
       // Manifest editing

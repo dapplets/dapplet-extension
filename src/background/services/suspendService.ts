@@ -1,4 +1,4 @@
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import * as Helpers from '../../common/helpers'
 import GlobalConfigService from './globalConfigService'
 
@@ -21,7 +21,7 @@ export class SuspendService {
 
     if (this.lastExtensionIcon != path) {
       this.lastExtensionIcon = path
-      browser.browserAction.setIcon({ path: path })
+      browser.action.setIcon({ path: path })
     }
   }
 
@@ -30,7 +30,7 @@ export class SuspendService {
     if (this.isContextMenusUpdating) return
 
     this.isContextMenusUpdating = true
-    await browser.contextMenus.removeAll()
+    browser.contextMenus.removeAll()
     const tab = await Helpers.getCurrentTab()
     if (!tab) return
     const url = tab.url || tab['pendingUrl'] // ToDo: check existance of pendingUrl
@@ -40,44 +40,64 @@ export class SuspendService {
 
     if (suspendityByHostname) {
       browser.contextMenus.create({
+        id: 'res_this',
         title: 'Resume on this site',
-        contexts: ['browser_action'],
-        onclick: async function (info, tab) {
+        contexts: ['action'],
+      })
+      const contextClick = async (info) => {
+        const { menuItemId } = info
+        if (menuItemId === 'res_this') {
           await this.resumeByHostname(hostname)
           await this.updateContextMenus()
-        },
-      })
+        }
+      }
+      browser.contextMenus.onClicked.addListener(contextClick)
     } else {
       browser.contextMenus.create({
+        id: 'sus_this',
         title: 'Suspend on this site',
-        contexts: ['browser_action'],
-        onclick: async function (info, tab) {
+        contexts: ['action'],
+      })
+      const contextClick = async (info) => {
+        const { menuItemId } = info
+        if (menuItemId === 'sus_this') {
           await this.suspendByHostname(hostname)
           await this.updateContextMenus()
-        },
-      })
+        }
+      }
+      browser.contextMenus.onClicked.addListener(contextClick)
     }
 
     const suspendityEverywhere = await this.getSuspendityEverywhere()
 
     if (suspendityEverywhere) {
       browser.contextMenus.create({
+        id: 'res_all',
         title: 'Resume on all sites',
-        contexts: ['browser_action'],
-        onclick: async function (info, tab) {
+        contexts: ['action'],
+      })
+      const contextClick = async (info) => {
+        const { menuItemId } = info
+        if (menuItemId === 'res_all') {
           await this.resumeEverywhere()
           await this.updateContextMenus()
-        },
-      })
+        }
+      }
+      browser.contextMenus.onClicked.addListener(contextClick)
     } else {
       browser.contextMenus.create({
+        id: 'sus_all',
         title: 'Suspend on all sites',
-        contexts: ['browser_action'],
-        onclick: async function (info, tab) {
+        contexts: ['action'],
+      })
+      const contextClick = async (info) => {
+        const { menuItemId } = info
+        if (menuItemId === 'sus_all') {
           await this.suspendEverywhere()
           await this.updateContextMenus()
-        },
-      })
+        }
+      }
+      browser.contextMenus.onClicked.addListener(contextClick)
     }
 
     this.isContextMenusUpdating = false

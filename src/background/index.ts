@@ -1,5 +1,5 @@
 import { setupMessageListener } from 'chrome-extension-message-wrapper'
-import { browser, Tabs } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { WebSocketProxy } from '../common/chrome-extension-websocket-wrapper'
 import { CONTEXT_ID_WILDCARD, ModuleTypes } from '../common/constants'
 import {
@@ -263,14 +263,6 @@ browser.runtime.onMessage.addListener(
     getDiscordMessages: () => discordService.getDiscordMessages(),
     hideDiscordMessages: discordService.hideDiscordMessages.bind(discordService),
 
-    // LocalStorage
-    localStorage_setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
-    localStorage_getItem: (key) => Promise.resolve(localStorage.getItem(key)),
-    localStorage_removeItem: (key) => Promise.resolve(localStorage.removeItem(key)),
-    localStorage_clear: () => Promise.resolve(localStorage.clear()),
-    localStorage_key: (index) => Promise.resolve(localStorage.key(index)),
-    localStorage_length: () => Promise.resolve(localStorage.length),
-
     // Extension Basic
     createTab: (url) => browser.tabs.create({ url }),
     removeTab: (tabId) => browser.tabs.remove(tabId),
@@ -325,7 +317,7 @@ browser.runtime.onMessage.addListener(
     checkUrlAvailability: (url) => checkUrlAvailability(url),
 
     // For E2E tests only
-    wipeAllExtensionData: () => browser.storage.local.clear().then(() => localStorage.clear()),
+    wipeAllExtensionData: () => browser.storage.local.clear(),
   })
 )
 
@@ -456,7 +448,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
   }
 })
 
-browser.browserAction.onClicked.addListener(() => {
+browser.action.onClicked.addListener(() => {
   overlayService.openPopupOverlay('dapplets')
   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionIconClicked })
 })
@@ -527,7 +519,7 @@ browser.runtime.onInstalled.addListener(async () => {
 })
 
 // Reinject content scripts
-if (window['DAPPLETS_JSLIB'] !== true) {
+if (typeof window === 'undefined') {
   browser.tabs
     .query({ url: ['http://*/*', 'https://*/*'] })
     .then((x) => x.filter((x) => x.status === 'complete'))
@@ -538,10 +530,10 @@ if (window['DAPPLETS_JSLIB'] !== true) {
             .sendMessage(x.id, { type: 'CURRENT_CONTEXT_IDS' })
             .then(() => false)
             .catch(() => {
-              browser.tabs
-                .executeScript(x.id, { file: 'custom-elements.min.js' })
-                .then(() => browser.tabs.executeScript(x.id, { file: 'common.js' }))
-                .then(() => browser.tabs.executeScript(x.id, { file: 'contentscript.js' }))
+              browser.scripting.executeScript({
+                files: ['custom-elements.min.js', 'contentscript.js'],
+                target: { tabId: x.id },
+              })
               return true
             })
         )
@@ -558,7 +550,7 @@ if (window['DAPPLETS_JSLIB'] !== true) {
   // workaround for firefox which prevents redirect loop
   const loading = new Set<number>()
 
-  const redirectFromProxyServer = async (tab: Tabs.Tab) => {
+  const redirectFromProxyServer = async (tab: browser.Tabs.Tab) => {
     if (tab.status === 'loading' && !loading.has(tab.id)) {
       const groups = /https:\/\/augm\.link\/live\/(.*)/gm.exec(tab.url)
       const [, targetUrl] = groups ?? []

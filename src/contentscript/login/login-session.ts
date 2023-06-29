@@ -1,5 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import * as ethereum from '../ethereum'
 import * as near from '../near'
 

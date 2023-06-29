@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as NearAPI from 'near-api-js'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { NearNetworkConfig } from '../../common/types'
 import { BackgroundNear } from './backgroundNear'
 import { BackgroundWalletConnection } from './backgroundWalletConnection'
@@ -19,10 +19,8 @@ export async function createWalletConnection(
   cfg: { network: string; loginConfirmationId?: string }
 ) {
   const currentNetworkConfig = await _getCurrentNetworkConfig(cfg.network)
-
-  const { localStorage_getItem } = await initBGFunctions(browser)
   const authDataKey = cfg.network + '_wallet_auth_key'
-  const authData = JSON.parse(await localStorage_getItem(authDataKey))
+  const authData = JSON.parse((await browser.storage.local.get(authDataKey))[authDataKey])
   if (!authData) return null
 
   const keyStorePrefix = cfg.loginConfirmationId

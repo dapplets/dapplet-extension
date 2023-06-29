@@ -2,7 +2,7 @@ import { baseDecode } from 'borsh'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as nearAPI from 'near-api-js'
 import { ConnectedWalletAccount } from 'near-api-js'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { generateGuid } from '../../common/helpers'
 
 export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
@@ -23,15 +23,15 @@ export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
     actions: nearAPI.transactions.Action[]
   ): Promise<nearAPI.providers.FinalExecutionOutcome> {
     //if (!this.accountId) {
-    const { prepareWalletFor, localStorage_getItem } = await initBGFunctions(browser)
+    const { prepareWalletFor } = await initBGFunctions(browser)
     // ToDo: remove it?
     // await prepareWalletFor(this._app, 'near/' + this._network, null);
 
     const authDataKey = this._network + '_wallet_auth_key'
-    let authData = JSON.parse(await localStorage_getItem(authDataKey))
+    let authData = JSON.parse((await browser.storage.local.get(authDataKey))[authDataKey])
     if (!authData) {
       await prepareWalletFor(this._app, 'near/' + this._network, null, null, null)
-      authData = JSON.parse(await localStorage_getItem(authDataKey))
+      authData = JSON.parse((await browser.storage.local.get(authDataKey))[authDataKey])
     }
 
     if (!authData) {

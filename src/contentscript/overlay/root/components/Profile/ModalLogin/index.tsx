@@ -2,7 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
 import React, { useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import * as walletIcons from '../../../../../../common/resources/wallets'
 import { DefaultSigners, WalletDescriptor } from '../../../../../../common/types'
 import { ReactComponent as Copy } from '../../../assets/svg/copyModal.svg'
@@ -96,7 +96,10 @@ export const ModalLogin = ({
             <span className={styles.profileImg}>
               {selectedWalletDescriptor && selectedWalletDescriptor.account ? (
                 <img
-                  src={makeBlockie(selectedWalletDescriptor.account)}
+                  src={
+                    selectedWalletDescriptor.account &&
+                    makeBlockie(selectedWalletDescriptor.account)
+                  }
                   className={styles.profileImg}
                 />
               ) : (
@@ -122,7 +125,10 @@ export const ModalLogin = ({
                   className={styles.newProfileBlockInfo}
                 >
                   {x.account ? (
-                    <img src={makeBlockie(x.account)} className={styles.newProfileBlockImg} />
+                    <img
+                      src={x.account && makeBlockie(x.account)}
+                      className={styles.newProfileBlockImg}
+                    />
                   ) : null}
                   {x.account ? (
                     <div className={styles.meta}>

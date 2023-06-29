@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import React, { useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { StorageRef } from '../../../../../common/types'
 import { StorageRefImage } from '../../components/StorageRefImage'
 

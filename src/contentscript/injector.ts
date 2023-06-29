@@ -6,7 +6,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { Subject } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import { maxSatisfying, valid } from 'semver'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
 import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, ModuleTypes } from '../common/constants'
@@ -64,7 +64,7 @@ type NotRegisteredModule = {
 export const widgets = []
 
 const DAPPLETS_ORIGINAL_HREF: string = window['DAPPLETS_ORIGINAL_HREF']
-const IS_LIBRARY = window['DAPPLETS_JSLIB'] === true
+const IS_LIBRARY = typeof window !== 'undefined' && window['DAPPLETS_JSLIB'] === true
 
 export class Injector {
   public availableContextIds: string[] = []

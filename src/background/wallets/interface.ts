@@ -5,7 +5,7 @@ export interface GenericWallet {
   isConnected(): Promise<boolean>
   connectWallet(params: any): Promise<void>
   disconnectWallet(): Promise<void>
-  getLastUsage(): string
+  getLastUsage(): Promise<string>
   getMeta(): Promise<{
     icon: string
     name: string

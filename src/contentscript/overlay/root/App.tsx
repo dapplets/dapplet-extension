@@ -13,14 +13,13 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import ManifestDTO from '../../../background/dto/manifestDTO'
 import { AnalyticsGoals } from '../../../background/services/analyticsService'
 import { Bus } from '../../../common/bus'
 import { DAPPLETS_STORE_URL } from '../../../common/constants'
 import * as EventBus from '../../../common/global-event-bus'
 import { groupBy } from '../../../common/helpers'
-
 import { ReactComponent as Notification } from './assets/newIcon/bell.svg'
 import { ReactComponent as Account } from './assets/newIcon/connected.svg'
 import { ReactComponent as Hide } from './assets/newIcon/hide.svg'
@@ -30,7 +29,6 @@ import { ReactComponent as SearchIcon } from './assets/newIcon/search.svg'
 import { ReactComponent as Home } from './assets/newIcon/squares.svg'
 import { ReactComponent as StoreIcon } from './assets/newIcon/store.svg'
 import { Onboarding } from './components/BaseOnboarding'
-
 import { ContentItem } from './components/ContentItem'
 import styles from './components/Overlay/Overlay.module.scss'
 import { OverlayTab } from './components/OverlayTab'
@@ -305,7 +303,7 @@ class _App extends React.Component<P, S> {
     const menuId = menu?.id ?? tabs.menus[0].id
     !document
       .querySelector('#dapplets-overlay-manager')
-      .classList.contains('dapplets-overlay-collapsed') &&
+      ?.classList.contains('dapplets-overlay-collapsed') &&
       this.props.navigate!(`/${tabs.id}/${menuId}`)
   }
 

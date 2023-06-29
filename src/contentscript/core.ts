@@ -1,7 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as ethers from 'ethers'
 import * as NearApi from 'near-api-js'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
 import { generateGuid, parseShareLink } from '../common/helpers'

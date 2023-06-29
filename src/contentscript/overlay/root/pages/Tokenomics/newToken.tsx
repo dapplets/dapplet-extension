@@ -2,7 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import { Form, Formik } from 'formik'
 import React, { FC, useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { base64ArrayBuffer } from '../../../../../common/base64ArrayBuffer'
 import { StorageTypes } from '../../../../../common/constants'
 import { Modal } from '../../components/Modal'
@@ -12,6 +12,7 @@ import CreateTokenSchema from './CreateTokenSchema'
 import Field from './Field/Field'
 import IconField from './IconField/IconField'
 import styles from './newToken.module.scss'
+
 export interface NewTokenProps {
   setNewToken?: (x) => void
   module?: any
@@ -208,6 +209,7 @@ export const NewToken: FC<NewTokenProps> = (props) => {
           className={styles.link}
           href="https://docs.dapplets.org/docs/whitepapers/connected-bonding-curves"
           target="_blank"
+          rel="noreferrer"
         >
           Want to learn more aboun bonding curves and custom tokens?
         </a>
@@ -240,6 +242,7 @@ export const NewToken: FC<NewTokenProps> = (props) => {
               href="https://docs.dapplets.org/docs/whitepapers/auge-token-usage"
               target="_blank"
               className={styles.footerContentModalLink}
+              rel="noreferrer"
             >
               F.A.Q.
             </a>

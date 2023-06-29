@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { ethers } from 'ethers'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { ChainTypes } from '../../common/types'
 import { Connection, EventDef } from '../connection'
 import { ProxySigner } from '../proxySigner'

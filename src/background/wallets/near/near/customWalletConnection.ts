@@ -1,6 +1,6 @@
 import { serialize } from 'borsh'
 import * as nearAPI from 'near-api-js'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { waitClosingTab } from '../../../../common/helpers'
 import { CustomConnectedWalletAccount } from './customConnectedWalletAccount'
 
@@ -27,8 +27,8 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
     } else {
       options = contractIdOrOptions as SignInOptions
     }
-
-    const currentUrl = new URL(window.location.href)
+    const tabs = await browser.tabs.query({ active: true, lastFocusedWindow: true })
+    const currentUrl = new URL(tabs?.[0]?.url)
     const newUrl = new URL(this._walletBaseUrl + LOGIN_WALLET_URL_SUFFIX)
     newUrl.searchParams.set('success_url', options.successUrl || currentUrl.href)
     newUrl.searchParams.set('failure_url', options.failureUrl || currentUrl.href)
@@ -52,7 +52,8 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
     transactions: nearAPI.transactions.Transaction[],
     callbackUrl?: string
   ) {
-    const currentUrl = new URL(window.location.href)
+    const tabs = await browser.tabs.query({ active: true, lastFocusedWindow: true })
+    const currentUrl = new URL(tabs?.[0]?.url)
     const newUrl = new URL('sign', this._walletBaseUrl)
 
     newUrl.searchParams.set(
@@ -76,7 +77,7 @@ export class CustomWalletConnection extends nearAPI.WalletConnection {
         allKeys,
       }
 
-      window.localStorage.setItem(this._authDataKey, JSON.stringify(this._authData))
+      await browser.storage.local.set({ [this._authDataKey]: JSON.stringify(this._authData) })
 
       // It fixes the error "Cannot find matching key for transaction sent to <account_id>"
       if (this._connectedAccount) {

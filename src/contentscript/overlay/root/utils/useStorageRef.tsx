@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { useQuery } from 'react-query'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { StorageRef } from '../../../../common/types'
 
 export const useStorageRef = (storageRef: StorageRef | string) => {

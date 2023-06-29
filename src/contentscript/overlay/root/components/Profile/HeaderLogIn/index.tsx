@@ -3,7 +3,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../../common/global-event-bus'
 import * as walletIcons from '../../../../../../common/resources/wallets'
 import {
@@ -12,7 +12,6 @@ import {
   WalletDescriptor,
   WalletTypes,
 } from '../../../../../../common/types'
-
 import { ReactComponent as Card } from '../../../assets/svg/card.svg'
 import { Wallet } from '../../../pages/Wallet'
 import { Modal as ModalWallet } from '../../Modal'
@@ -112,12 +111,12 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
           setWalletTypeWalletConnect(null)
           return
         }
-        const newWalletImage = makeBlockie(newDescriptors.account)
+        const newWalletImage = newDescriptors.account && makeBlockie(newDescriptors.account)
         setWalletImage(newWalletImage)
         if (newDescriptors.type === 'near') {
           setWalletAccount(newDescriptors.account)
         } else {
-          setWalletAccount(newVisible(newDescriptors.account))
+          setWalletAccount(newDescriptors.account && newVisible(newDescriptors.account))
         }
         if (newDescriptors.type !== 'dapplets') {
           setWalletIcon(newDescriptors.meta.icon)

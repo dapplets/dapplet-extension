@@ -2,7 +2,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import makeBlockie from 'ethereum-blockies-base64'
 import React, { FC, useEffect, useState } from 'react'
 import ReactTimeAgo from 'react-time-ago'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
 import * as walletIcons from '../../../../../common/resources/wallets'
 import {
@@ -86,7 +86,7 @@ export const Wallet: FC<WalletProps> = (props: WalletProps) => {
               >
                 {x.account ? (
                   <img
-                    src={makeBlockie(x.account)}
+                    src={x.account && makeBlockie(x.account)}
                     style={{
                       width: '38px',
                       height: '38px',
