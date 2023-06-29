@@ -59,12 +59,10 @@ class AvatarBadge extends LitElement implements IAvatarBadgeState {
           badge: true,
           'not-basic': !this.basic,
           dark: this.theme === 'DARK',
-        })}
-        style=${styleMap({
-          top: this.vertical === 'top' ? '-2px' : undefined,
-          bottom: this.vertical === 'bottom' ? '-2px' : undefined,
-          left: this.horizontal === 'left' ? '-7px' : undefined,
-          right: this.horizontal === 'right' ? '-7px' : undefined,
+          'top-left': this.vertical === 'top' && this.horizontal === 'left',
+          'top-right': this.vertical === 'top' && this.horizontal === 'right',
+          'bottom-left': this.vertical === 'bottom' && this.horizontal === 'left',
+          'bottom-right': this.vertical === 'bottom' && this.horizontal === 'right',
         })}
       >
         ${this.img &&

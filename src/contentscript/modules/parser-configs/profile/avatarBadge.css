@@ -35,8 +35,27 @@
 }
 
 .badge {
-  width: 25%;
-  min-width: 13px;
-  height: 25%;
-  min-height: 13px;
+  width: 40px;
+  height: 40px;
+  transform: translateY(-5px);
+}
+
+.top-left {
+  top: -2px;
+  left: -7px;
+}
+
+.top-right {
+  top: -2px;
+  right: -7px;
+}
+
+.bottom-left {
+  bottom: -2px;
+  left: -7px;
+}
+
+.bottom-right {
+  bottom: -2px;
+  right: -7px;
 }

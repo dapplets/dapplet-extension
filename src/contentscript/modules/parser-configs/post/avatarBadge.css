@@ -38,3 +38,23 @@
 .not-basic.dark.badge {
   border: 1px solid black;
 }
+
+.top-left {
+  top: -2px;
+  left: -7px;
+}
+
+.top-right {
+  top: -2px;
+  right: -7px;
+}
+
+.bottom-left {
+  bottom: -2px;
+  left: -7px;
+}
+
+.bottom-right {
+  bottom: -2px;
+  right: -7px;
+}
