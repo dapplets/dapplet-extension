@@ -76,7 +76,7 @@ export class Button extends LitElement implements IButtonProps {
         })}
         ?disabled=${this.disabled}
       >
-        <div style="display:flex;align-items:center" class="wrapper-button button-secondary-block">
+        <div style="display:flex;align-items:center;margin-right:12px" class="wrapper-button button-secondary-block">
           <div
             class="wrapper-button button-block-secondary button-border-radius button-border button-secondary-block button-transition-duration"
           ></div>
