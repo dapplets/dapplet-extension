@@ -3,7 +3,7 @@ import { qase } from 'cypress-qase-reporter/dist/mocha'
 const urlToOpen = 'https://github.com/Ni-2'
 const urlToCheck = 'https://twitter.com/teremovskii'
 const dappletIdToActivate = 'connecting-accounts-dapplet'
-
+// todo: unwork
 describe('CA: dapplet on GitHub', () => {
   qase(
     3,
