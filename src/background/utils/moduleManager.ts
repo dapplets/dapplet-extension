@@ -151,7 +151,7 @@ export default class ModuleManager {
       const configAsStr = await zip.file('index.json').async('string')
       const config: ParserConfig = JSON.parse(configAsStr)
       const callback = async (value) => zip.file(value).async('string')
-      scriptOrConfig = await this._deepReplaceUrlsToFetchedText(callback, config, 'styles')
+      scriptOrConfig = await this._deepReplaceByKey(callback, config, 'styles')
     } else {
       scriptOrConfig = await zip.file('index.js').async('string')
     }
@@ -183,7 +183,7 @@ export default class ModuleManager {
       if (m.type === ModuleTypes.ParserConfig) {
         const config: ParserConfig = JSON.parse(scriptOrConfig)
         const callback = async (value) => (await fetch(joinUrls(m.main.uris[0], value))).text()
-        scriptOrConfig = await this._deepReplaceUrlsToFetchedText(callback, config, 'styles')
+        scriptOrConfig = await this._deepReplaceByKey(callback, config, 'styles')
       }
       const defaultConfig =
         m.defaultConfig && (await this._loadJson(m.defaultConfig).catch(() => null))
@@ -362,7 +362,7 @@ export default class ModuleManager {
     return null
   }
 
-  private async _deepReplaceUrlsToFetchedText(callback: any, data: any, keyToReplace: string) {
+  private async _deepReplaceByKey(callback: any, data: any, keyToReplace: string) {
     return Object.fromEntries(
       await Promise.all(
         Object.entries(data).map(async ([key, value]: [string, any]) => [
@@ -370,7 +370,7 @@ export default class ModuleManager {
           key === keyToReplace
             ? await callback(value)
             : typeof value === 'object'
-            ? await this._deepReplaceUrlsToFetchedText(callback, value, keyToReplace)
+            ? await this._deepReplaceByKey(callback, value, keyToReplace)
             : value,
         ])
       )
