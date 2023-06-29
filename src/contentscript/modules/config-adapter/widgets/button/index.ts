@@ -52,7 +52,6 @@ export class Button extends LitElement implements IButtonProps {
   override render() {
     if (this.hidden) return null
     // ToDo: do not use insPointName
-
     return html`
       <div
         role="button"
@@ -76,12 +75,21 @@ export class Button extends LitElement implements IButtonProps {
         })}
         ?disabled=${this.disabled}
       >
-        <div style="display:flex;align-items:center" class="wrapper-button button-secondary-block">
+        ${this.img &&
+        html`<div
+          style=${styleMap({
+            opacity: this.disabled ? '.5' : '1',
+            display: 'flex',
+            'align-items': 'center',
+            'margin-right': this.label?.toString() ? '12px' : 0,
+          })}
+          class="wrapper-button button-secondary-block"
+        >
           <div
             class="wrapper-button button-block-secondary button-border-radius button-border button-secondary-block button-transition-duration"
           ></div>
           <img src="${this.loading ? LOADER : this.img || null}" class="button-img-display" />
-        </div>
+        </div>`}
         ${this.label?.toString() &&
         html`<div class="wrapper-button button-secondary-block button-label-overflow">
           <span data-testid="app-text-transition-container" class="button-block button-label-block">
