@@ -59,13 +59,16 @@
 }
 
 .button-img-display {
-  display: inline-block;
   fill: currentcolor;
-  height: 18px;
+  height: auto;
   max-width: 100%;
   position: relative;
   vertical-align: text-bottom;
   width: 1.25em;
+  margin: auto 0;
+  display: flex!important;
+  align-items: center!important;
+  margin-right: 3px;
 }
 
 .button-display {
@@ -105,7 +108,9 @@
 }
 
 .button-secondary-block {
-  display: inline-flex;
+  /* display: inline-flex; */
+  display: flex;
+    align-items: center;
 }
 
 .button-label-overflow {
@@ -133,13 +138,13 @@
   transition-duration: 0.2s;
 }
 
-div[role='button'] > div:hover >  .button-border-radius {
+div[role='button'] > div:hover > .button-border-radius {
   background-color: rgb(29 155 240 / 12.5%);
   transition-duration: 0.2s;
   transition-property: background-color, box-shadow;
 }
 
-div[role='button'] > div:active >  .button-border-radius {
+div[role='button'] > div:active > .button-border-radius {
   background-color: rgb(29 155 240 / 20%);
 }
 
@@ -162,3 +167,4 @@ div[role='button'] span {
   min-height: 20px;
   overflow: visible;
 }
+

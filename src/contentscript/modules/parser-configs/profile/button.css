@@ -1,4 +1,3 @@
-
 /* PROFILE */
 
 .button-default {
@@ -10,8 +9,8 @@
   margin: 0 8px 12px 0;
   padding: 0 10px;
 
-  font-family: TwitterChirp, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif;
+  font-family: TwitterChirp, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
   font-size: 15px;
   font-weight: 600;
   line-height: 33px;
@@ -20,6 +19,7 @@
   border-radius: 9999px;
 
   transition: background-color 0.2s ease-in-out;
+  display: flex;
 }
 
 .button-light {

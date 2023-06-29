@@ -52,67 +52,43 @@ export class Button extends LitElement implements IButtonProps {
   override render() {
     if (this.hidden) return null
     // ToDo: do not use insPointName
-    if (this.insPointName === 'POST' || this.insPointName === 'QUOTE_POST') {
-      return html`
-        <div
-          role="button"
-          class="wrapper-button button-direction container-button button-block button-display button-transition-duration"
-          @click=${this._clickHandler}
-          title=${this.tooltip}
-          data-testid="reply"
-          style=${styleMap({
-            opacity: this.disabled ? '.5' : '1',
-            marginTop: this.insPointName === 'QUOTE_POST' ? '12px' : undefined,
-          })}
-        >
-      
-            <div class="wrapper-button button-secondary-block">
-              <div
-                class="wrapper-button button-block-secondary button-border-radius button-border button-secondary-block button-transition-duration"
-              ></div>
-              <img src="${this.loading ? LOADER : this.img || null}" class="button-img-display" />
-            </div>
-            ${this.label?.toString() &&
-            html`<div class="wrapper-button button-secondary-block button-label-overflow">
-              <span
-                data-testid="app-text-transition-container"
-                class="button-block button-label-block"
-              >
-                ${this.label}
-              </span>
-            </div>`}
-         
-        </div>
-      `
-    } else if (this.insPointName === 'PROFILE') {
-      return html`<button
-        @click=${this._clickHandler}
-        title=${this.tooltip}
+
+    return html`
+      <div
+        role="button"
         class=${classMap({
           'button-default': true,
+          'wrapper-button': true,
+          'button-direction': true,
+          'container-button': true,
+          'button-block': true,
+          'button-display': true,
+          'button-transition-duration': true,
           'button-light': this.theme === 'LIGHT',
           'button-dark': this.theme === 'DARK',
           'button-basic': this.basic,
         })}
+        @click=${this._clickHandler}
+        title=${this.tooltip}
+        data-testid="reply"
         style=${styleMap({
-          opacity: this.disabled ? '.5' : '',
-          display: 'flex',
-          alignItems: 'baseline',
+          opacity: this.disabled ? '.5' : '1',
         })}
         ?disabled=${this.disabled}
       >
-        <img
-          style=${styleMap({
-            width: this.basic ? '36px' : '18px',
-            height: this.basic ? '36px' : '18px',
-            position: 'relative',
-            top: this.basic ? undefined : '3px',
-            marginRight: this.label ? '6px' : undefined,
-          })}
-          src="${this.loading ? LOADER : this.img ? this.img : null}"
-        />
-        <span>${this.label}</span>
-      </button>`
-    }
+        <div style="display:flex;align-items:center" class="wrapper-button button-secondary-block">
+          <div
+            class="wrapper-button button-block-secondary button-border-radius button-border button-secondary-block button-transition-duration"
+          ></div>
+          <img src="${this.loading ? LOADER : this.img || null}" class="button-img-display" />
+        </div>
+        ${this.label?.toString() &&
+        html`<div class="wrapper-button button-secondary-block button-label-overflow">
+          <span data-testid="app-text-transition-container" class="button-block button-label-block">
+            ${this.label}
+          </span>
+        </div>`}
+      </div>
+    `
   }
 }
