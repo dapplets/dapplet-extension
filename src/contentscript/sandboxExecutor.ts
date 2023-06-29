@@ -1,4 +1,4 @@
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { generateGuid } from '../common/helpers'
 
 export abstract class SandboxExecutor {
