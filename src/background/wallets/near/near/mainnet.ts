@@ -1,4 +1,5 @@
 import NearWallet from './index'
+import * as walletIcons from '../../../../common/resources/wallets'
 
 export default class MainnetNearWallet extends NearWallet {
   constructor() {
@@ -14,7 +15,7 @@ export default class MainnetNearWallet extends NearWallet {
     return {
       name: 'NEAR Wallet (Mainnet)',
       description: 'NEAR Wallet (Mainnet)',
-      icon: 'https://near.org/wp-content/themes/near-19/assets/downloads/near_icon.svg',
+      icon: walletIcons['near'],
     }
   }
 }
