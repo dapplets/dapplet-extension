@@ -63,16 +63,45 @@ export class ProxyAdapter {
         const widget: InjectedWidget = await widgetFactory(ctx)
         widget.state.state.init?.(ctx, widget.state.state) // ToDo: can be buggy when widgetFactory returns value asynchronously
         this._widgets.set(widget.widgetId, widget)
+        const stateValues = widget.state.getStateValues()
+
+        // ToDo: it will not work for imperative defined callbacks
+        const listeningEvents = Object.entries(stateValues)
+          .filter(([, v]) => typeof v === 'function')
+          .map(([k]) => k)
+
         return {
           widgetId: widget.widgetId,
           widgetName: widget.widgetName,
+          listeningEvents,
           // contextName,
           // contextId: ctx.id,
-          stateValues: JSON.parse(JSON.stringify(widget.state.getStateValues())),
+          stateValues: JSON.parse(JSON.stringify(stateValues)), // remove callbacks and another references
         }
       })
     )
     return widgetsToBeCreated
+  }
+
+  private _onWidgetEvent({
+    widgetId,
+    eventName,
+    data,
+  }: {
+    widgetId: string
+    eventName: string
+    data: any
+  }) {
+    const widget = this._widgets.get(widgetId)
+    if (!widget) {
+      console.error('ProxyAdapter: Widget not found for widgetId ' + widgetId)
+      return
+    }
+
+    const callback = widget.state.state[eventName]
+    if (!callback) return
+
+    callback(data, widget.state.state)
   }
 
   private _notify(method: string, ...params: any[]) {
@@ -92,6 +121,9 @@ export class ProxyAdapter {
           .catch((error) => {
             global.postMessage({ id, error })
           })
+        break
+      case 'widget-event':
+        this._onWidgetEvent(params[0])
         break
       default:
         console.warn(`ProxyAdapter: Unknown method ${method}`)

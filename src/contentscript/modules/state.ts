@@ -164,7 +164,6 @@ export class State<T> {
       typeof v === 'object' && v?.[theme] ? v[theme] : v,
     ])
     const themedState = Object.fromEntries(themedEntries)
-    console.log({ ...themedState, theme })
     return { ...themedState, theme }
   }
 }

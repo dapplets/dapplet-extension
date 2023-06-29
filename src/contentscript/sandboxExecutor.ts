@@ -43,10 +43,19 @@ export abstract class SandboxExecutor {
         const widgets = await this._sendRequest('get-widgets-for-context', { ctx, contextName })
         return widgets.map((widget) => {
           const widgetFactory = adapter.exports[widget.widgetName]
+          const callbacks = widget.listeningEvents.reduce((acc, eventName) => {
+            acc[eventName] = (data: any) => {
+              this._notify('widget-event', { widgetId: widget.widgetId, eventName, data })
+            }
+            return acc
+          }, {})
+
           return widgetFactory({
             DEFAULT: {
               ...widget.stateValues,
-              init: (_, state) => {
+              ...callbacks,
+              init: (ctx, state) => {
+                callbacks.init?.(ctx, state)
                 this._stateMap.set(widget.widgetId, state)
               },
             },
@@ -56,8 +65,6 @@ export abstract class SandboxExecutor {
     }
 
     adapter.attachConfig(config)
-
-    console.log({ adapter, listeningContexts })
   }
 
   private _onStateUpdated({ widgetId, newValues }: { widgetId: string; newValues: any }) {
