@@ -1,7 +1,3 @@
-import PostAvatarBadgeCss from '!!raw-loader!./modules/parser-configs/post/avatarBadge.css'
-import PostButtonCss from '!!raw-loader!./modules/parser-configs/post/button.css'
-import ProfileAvatarBadgeCss from '!!raw-loader!./modules/parser-configs/profile/avatarBadge.css'
-import ProfileButtonCss from '!!raw-loader!./modules/parser-configs/profile/button.css'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { Subject } from 'rxjs'
 import { filter } from 'rxjs/operators'
@@ -19,7 +15,7 @@ import {
   parseModuleName,
 } from '../common/helpers'
 import { NotificationType } from '../common/models/notification'
-import { DefaultConfig, SchemaConfig } from '../common/types'
+import { DefaultConfig, ParserConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
 import { BaseEvent } from './events/baseEvent'
@@ -27,7 +23,6 @@ import { EventBus as ModuleEventBus } from './events/eventBus'
 import { __decorate } from './global'
 import BuiltInModules from './modules'
 import { ConfigAdapter } from './modules/config-adapter'
-import TwitterParserConfig from './modules/parser-configs/twitter.json'
 import { IContentAdapter, IResolver } from './types'
 
 type RegistriedModule = {
@@ -53,7 +48,7 @@ type RegistriedModule = {
 
 type NotRegisteredModule = {
   manifest: VersionInfo
-  script: string
+  scriptOrConfig: string | ParserConfig
   order: number
   contextIds: string[]
   defaultConfig?: DefaultConfig
@@ -121,7 +116,7 @@ export class Injector {
     const { getModulesWithDeps } = await initBGFunctions(browser)
     const loadedModules: {
       manifest: VersionInfo
-      script: string
+      scriptOrConfig: string | ParserConfig
       defaultConfig?: DefaultConfig
       schemaConfig?: SchemaConfig
     }[] = await getModulesWithDeps(modules)
@@ -350,9 +345,8 @@ export class Injector {
 
     const swarmGatewayUrl = await getSwarmGateway()
     const preferedOverlayStorage = await getPreferedOverlayStorage()
-
     for (const module of modules) {
-      const { manifest, script, contextIds, defaultConfig, schemaConfig } = module
+      const { manifest, scriptOrConfig, contextIds, defaultConfig, schemaConfig } = module
 
       // Module is loaded already
       const registeredModule = this.registry.find((m) => areModulesEqual(m.manifest, manifest))
@@ -484,26 +478,21 @@ export class Injector {
       }
 
       // ToDo: generalize loading of parser configs
-      if (manifest.name === 'twitter-adapter.dapplet-base.eth') {
+      if (manifest.type === ModuleTypes.ParserConfig) {
+        if (typeof scriptOrConfig !== 'object') {
+          throw new Error('SCRIPT should be parsed in the background!')
+        }
         const dynamicAdapter = this.registry.find(
           (m) => m.manifest.name == 'dynamic-adapter.dapplet-base.eth'
         )
-
         if (!dynamicAdapter) {
           throw new Error('Dynamic adapter is not initialized. Check the order of dependencies.')
         }
-
-        // ToDo: extract styles from zip-archive in the background
-        TwitterParserConfig.contexts.POST.widgets.button.styles = PostButtonCss
-        TwitterParserConfig.contexts.POST.widgets.avatarBadge.styles = PostAvatarBadgeCss
-        TwitterParserConfig.contexts.PROFILE.widgets.button.styles = ProfileButtonCss
-        TwitterParserConfig.contexts.PROFILE.widgets.avatarBadge.styles = ProfileAvatarBadgeCss
-
         this._registerModule(
           module,
           ConfigAdapter,
           () => moduleEventBus,
-          () => new ConfigAdapter(dynamicAdapter.instance, TwitterParserConfig) // ToDo: reuse `script` property instead of TwitterParserConfig
+          () => new ConfigAdapter(dynamicAdapter.instance, scriptOrConfig)
         )
 
         continue
@@ -602,20 +591,28 @@ export class Injector {
         }
       }
 
-      try {
-        const execScript = new Function(
-          'Core',
-          'Inject',
-          'Injectable',
-          'OnEvent',
-          '__decorate',
-          script
-        )
-        execScript(coreWrapper, injectDecorator, injectableDecorator, onEventDecorator, __decorate)
-      } catch (err) {
-        // ToDo: remove module from this.registry
-        console.error(err)
-        continue
+      if (typeof scriptOrConfig === 'string') {
+        try {
+          const execScript = new Function(
+            'Core',
+            'Inject',
+            'Injectable',
+            'OnEvent',
+            '__decorate',
+            scriptOrConfig
+          )
+          execScript(
+            coreWrapper,
+            injectDecorator,
+            injectableDecorator,
+            onEventDecorator,
+            __decorate
+          )
+        } catch (err) {
+          // ToDo: remove module from this.registry
+          console.error(err)
+          continue
+        }
       }
 
       if (newBranch) {
@@ -728,7 +725,10 @@ export class Injector {
   }
 
   private _proxifyModule(proxiedModule: RegistriedModule, contextModule: RegistriedModule) {
-    if (proxiedModule.manifest.type === ModuleTypes.Adapter) {
+    if (
+      proxiedModule.manifest.type === ModuleTypes.Adapter ||
+      proxiedModule.manifest.type === ModuleTypes.ParserConfig
+    ) {
       const cfgsKey = Symbol()
       const featureId = contextModule.manifest.name
       return new Proxy(proxiedModule.instance, {
@@ -800,11 +800,9 @@ export class Injector {
     instanceFactory: any = () => null
   ): RegistriedModule {
     const existingModule = this.registry.find((m) => areModulesEqual(m.manifest, module.manifest))
-
     if (existingModule) {
       return existingModule
     }
-
     const newRegisteredModule: RegistriedModule = {
       manifest: module.manifest,
       clazz: clazz,
@@ -820,9 +818,7 @@ export class Injector {
       instancedActivateMethodsDependencies: [],
       moduleEventBus: moduleEventBusFactory(),
     }
-
     this.registry.push(newRegisteredModule)
-
     return newRegisteredModule
   }
 }

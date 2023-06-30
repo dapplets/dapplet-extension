@@ -5,7 +5,7 @@ export const enum ModuleTypes {
   Adapter = 'ADAPTER',
   Library = 'LIBRARY',
   Interface = 'INTERFACE',
-  // ToDo: add module type for Parser Config
+  ParserConfig = 'CONFIG',
 }
 
 export const enum StorageTypes {

@@ -63,7 +63,6 @@ export class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterC
 
   // Config from feature
   public detachConfig(config: any) {
-    console.log({ detachConfig: config })
     this.featureConfigs = this.featureConfigs.filter((f) => f !== config)
     this.contextBuilders.forEach((wb) => wb.unmountWidgets(config))
     // ToDo: close all subscriptions and connections
