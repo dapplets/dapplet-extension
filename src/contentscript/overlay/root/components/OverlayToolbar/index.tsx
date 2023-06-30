@@ -411,6 +411,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             {getNewButtonTab('Dapplets')}
 
             <span
+            data-testid='notification-button'
               className={cn(styles.notificationCounter)}
               onClick={(e) => {
                 e.preventDefault()
