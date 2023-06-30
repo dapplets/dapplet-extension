@@ -19,7 +19,7 @@ import {
   parseModuleName,
 } from '../common/helpers'
 import { NotificationType } from '../common/models/notification'
-import { DefaultConfig, SchemaConfig } from '../common/types'
+import { DefaultConfig, SandboxInitializationParams, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
 import { BaseEvent } from './events/baseEvent'
@@ -609,11 +609,16 @@ export class Injector {
         if (manifest.name === 'tipping-near-dapplet') {
           // eslint-disable-next-line @typescript-eslint/no-this-alias
           const me = this
+          const initParams: SandboxInitializationParams = {
+            manifest,
+            defaultConfig,
+            schemaConfig,
+          }
 
           // ToDo: refactor it
           const SandboxExecutorExtended = class extends SandboxExecutor {
             constructor() {
-              super(script, manifest.name)
+              super(script, initParams)
             }
 
             // implementaion of the abstract method

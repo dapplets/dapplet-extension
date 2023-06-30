@@ -1,5 +1,6 @@
 import { Runtime } from 'webextension-polyfill'
 import ManifestDTO from '../background/dto/manifestDTO'
+import VersionInfo from '../background/models/versionInfo'
 export type Falsy = false | 0 | '' | null | undefined
 export type DefaultConfig = {
   [Environments.Dev]?: {
@@ -224,4 +225,10 @@ export type MessageWrapperRequest = {
 export type ContentDetector = {
   contextId: string
   selector: string
+}
+
+export type SandboxInitializationParams = {
+  manifest: VersionInfo
+  defaultConfig: DefaultConfig
+  schemaConfig: SchemaConfig
 }

@@ -315,6 +315,11 @@ browser.runtime.onMessage.addListener(
     getThisTab: getThisTab,
     getCurrentContextIds: getCurrentContextIds,
     checkUrlAvailability: (url) => checkUrlAvailability(url),
+    getURL: (path) => Promise.resolve(browser.runtime.getURL(path)),
+
+    browserStorage_get: (key) => browser.storage.local.get(key),
+    browserStorage_set: (kv) => browser.storage.local.set(kv),
+    browserStorage_remove: (key) => browser.storage.local.remove(key),
 
     // For E2E tests only
     wipeAllExtensionData: () => browser.storage.local.clear(),

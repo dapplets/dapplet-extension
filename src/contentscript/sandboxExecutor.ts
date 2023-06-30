@@ -1,18 +1,28 @@
+import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import browser from 'webextension-polyfill'
 import { generateGuid } from '../common/helpers'
+import { SandboxInitializationParams } from '../common/types'
 
 export abstract class SandboxExecutor {
   private _worker: Worker
   private _stateMap = new Map<string, any>()
   private _detachConfigCallbacks: (() => void)[] = []
 
-  constructor(script: string, moduleName: string) {
+  constructor(dappletScript: string, params: SandboxInitializationParams) {
     // sandbox.js provides environment for the script to run in
     // it includes Core-functions, DI container (Inject, Injectable) and adapter
     const sandboxScriptUrl = browser.runtime.getURL('sandbox.js')
-    const concatedScript = `importScripts("${sandboxScriptUrl}");${script}`
+    const serializedParams = JSON.stringify(params)
+
+    // ToDo: remove self.chrome when we will path near-api-js correctly
+    const concatedScript = `
+      self.chrome={runtime:{id:'id'}};
+      importScripts("${sandboxScriptUrl}");
+      self.initialize(${serializedParams});
+      ${dappletScript}
+    `
     const dataUri = URL.createObjectURL(new Blob([concatedScript]))
-    this._worker = new Worker(dataUri, { name: moduleName })
+    this._worker = new Worker(dataUri, { name: params.manifest.name })
     this._worker.addEventListener('message', this._messageListener)
   }
 
@@ -111,15 +121,33 @@ export abstract class SandboxExecutor {
   }
 
   private _messageListener = (e: MessageEvent) => {
-    switch (e.data.method) {
+    const { id, method, params } = e.data
+
+    switch (method) {
       case 'config-attached':
-        this._onConfigAttached(e.data.params[0])
+        this._onConfigAttached(params[0])
         break
       case 'state-updated':
-        this._onStateUpdated(e.data.params[0])
+        this._onStateUpdated(params[0])
+        break
+      case 'callBgFunction':
+        initBGFunctions(browser)
+          .then((bgFunctions) => bgFunctions[params[0].method](...params[0].params))
+          .then((result) => {
+            this._worker.postMessage({ id, result })
+          })
+          .catch((error) => {
+            this._worker.postMessage({ id, error })
+          })
+        break
+      case 'confirm':
+        this._worker.postMessage({ id, result: confirm(params[0]) })
+        break
+      case 'alert':
+        this._worker.postMessage({ id, result: alert(params[0]) })
         break
       default:
-        console.warn(`SandboxExecutor: Unknown method ${e.data.method}`)
+        console.warn(`SandboxExecutor: Unknown method ${method}`)
     }
   }
 }

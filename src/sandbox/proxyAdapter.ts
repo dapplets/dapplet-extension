@@ -42,13 +42,28 @@ export class ProxyAdapter {
   }
 
   public attachConfig(config: any) {
-    console.log(config)
-    // ToDo: implement it
+    // ToDo: implement multiple configs
     this._attachedConfig = config
 
     const listeningContexts = Object.keys(config)
 
     this._notify('config-attached', { listeningContexts, adapterName: this.adapterName })
+
+    return {
+      $: (ctx: any, id: string) => {
+        for (const widget of this._widgets.values()) {
+          if (widget.state.id === id && widget.state.ctx === ctx) {
+            return widget
+          }
+        }
+
+        return null
+      },
+      reset: () => {
+        // ToDo: implement it
+        throw new Error('Not implemented yet')
+      },
+    }
   }
 
   public detachConfig() {
@@ -57,7 +72,7 @@ export class ProxyAdapter {
   }
 
   private async _getWidgetsForContext({ ctx, contextName }: { ctx: any; contextName: string }) {
-    const widgetFactories = this._attachedConfig[contextName](ctx)
+    const widgetFactories = this._attachedConfig[contextName](ctx) ?? []
     const widgetsToBeCreated = Promise.all(
       widgetFactories.map(async (widgetFactory) => {
         const widget: InjectedWidget = await widgetFactory(ctx)
