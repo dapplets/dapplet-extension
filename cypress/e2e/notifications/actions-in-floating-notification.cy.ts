@@ -5,6 +5,7 @@ describe('actions-in-floating-notification', () => {
     31,
     it('appearance of a new notification', () => {
       cy.openDappletsOverlay('https://example.com', { wipe: true })
+      // cy.getByTestId('skip-tutorial').click()
       cy.runDapplet('event-bus.tests')
       cy.getByTestId('notification-label').should('exist')
       cy.getByTestId('notification-label').contains('Your Twitter has been hacked')

@@ -1,7 +1,7 @@
 import { objectMap } from '../../../common/helpers'
+import { ParserConfig } from '../../../common/types'
 import { DynamicAdapter } from '../dynamic-adapter'
 import { AdapterConfig } from '../dynamic-adapter/types'
-import { ParserConfig } from './types'
 import BuiltInWidgets from './widgets'
 
 type ReversedWidgetConfig = {

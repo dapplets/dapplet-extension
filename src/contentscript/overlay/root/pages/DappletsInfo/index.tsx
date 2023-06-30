@@ -34,7 +34,7 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   const [newOwnerLoading, setNewOwnerLoading] = useState(false)
   const [editContextId, setEditContextId] = useState('')
   const [editContextIdLoading, setEditContextIdLoading] = useState(false)
-  const [targetStorages, setTargetStorages] = useState([StorageTypes.Swarm, StorageTypes.Ipfs])
+  const [targetStorages, setTargetStorages] = useState<StorageTypes[]>([])
   const fileInput = useRef<HTMLInputElement>()
   const [newState, setNewState] = useState([])
   const [isDisabledPush, setDisabledPush] = useState(true)
@@ -73,7 +73,9 @@ export const DappletsMainInfo: FC<DappletsMainInfoProps> = (props) => {
   }, [mi, newState, targetChain])
 
   const _updateData = async () => {
-    const { getRegistries, getContextIds } = await initBGFunctions(browser)
+    const { getRegistries, getContextIds, getTargetStorages } = await initBGFunctions(browser)
+    const storagesToUpload = await getTargetStorages()
+    setTargetStorages(storagesToUpload) // ToDo: when Swarm will be added uplopad dapplets with overlays only to Swarm but not to Ipfs
     const registries = await getRegistries()
     const prodRegistries = registries.filter((r) => !r.isDev && r.isEnabled)
     const contextId = await getContextIds(prodRegistries[0]?.url, mi.name)

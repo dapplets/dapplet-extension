@@ -56,18 +56,13 @@ class AvatarBadge extends LitElement implements IAvatarBadgeState {
         class=${classMap({
           wrapper: true,
           active: !!this.exec,
-          'post-badge': this.insPointName === 'POST',
-          'profile-badge': this.insPointName === 'PROFILE',
+          badge: true,
           'not-basic': !this.basic,
           dark: this.theme === 'DARK',
-        })}
-        style=${styleMap({
-          top: this.insPointName === 'POST' && this.vertical === 'top' ? '-2px' : undefined,
-          bottom:
-            this.vertical === 'bottom' ? (this.insPointName === 'POST' ? '-2px' : '0') : undefined,
-          left: this.insPointName === 'POST' && this.horizontal === 'left' ? '-7px' : undefined,
-          right:
-            this.horizontal === 'right' ? (this.insPointName === 'POST' ? '-7px' : '0') : undefined,
+          'top-left': this.vertical === 'top' && this.horizontal === 'left',
+          'top-right': this.vertical === 'top' && this.horizontal === 'right',
+          'bottom-left': this.vertical === 'bottom' && this.horizontal === 'left',
+          'bottom-right': this.vertical === 'bottom' && this.horizontal === 'right',
         })}
       >
         ${this.img &&

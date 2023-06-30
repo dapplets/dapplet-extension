@@ -232,3 +232,38 @@ export type SandboxInitializationParams = {
   defaultConfig: DefaultConfig
   schemaConfig: SchemaConfig
 }
+
+export type ContextBuilder = {
+  [key: string]: ContextBuilder | string
+}
+
+export type ParserConfig = {
+  themes?: {
+    DARK?: string
+    LIGHT?: string
+  }
+  contexts: {
+    [contextName: string]: {
+      containerSelector: string
+      contextSelector?: string
+      widgets?: {
+        [widgetName: string]: {
+          styles?: string
+          insertionPoint: string
+          insert?: string
+        }
+      }
+      events?: {
+        [eventName: string]: {
+          element: string
+          listen: string
+          data?: {
+            [key: string]: string
+          }
+        }
+      }
+      contextBuilder: ContextBuilder
+      childrenContexts?: string[]
+    }
+  }
+}

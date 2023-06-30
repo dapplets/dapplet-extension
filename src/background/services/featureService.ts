@@ -1,11 +1,17 @@
 import JSZip from 'jszip'
 import { rcompare } from 'semver'
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer'
-import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants'
+import {
+  CONTEXT_ID_WILDCARD,
+  DEFAULT_BRANCH_NAME,
+  ModuleTypes,
+  StorageTypes,
+} from '../../common/constants'
 import * as EventBus from '../../common/global-event-bus'
 import {
   areModulesEqual,
   getCurrentTab,
+  joinUrls,
   Measure,
   mergeDedupe,
   parseModuleName,
@@ -610,7 +616,7 @@ export default class FeatureService {
 
     return modulesWithDeps.map((m, i) => ({
       manifest: Object.assign(m.manifest, dists[i].internalManifest), // merge manifests from registry and bundle (zip)
-      script: dists[i].script,
+      scriptOrConfig: dists[i].scriptOrConfig,
       defaultConfig: dists[i].defaultConfig,
       schemaConfig: dists[i].schemaConfig,
     }))
@@ -670,20 +676,36 @@ export default class FeatureService {
 
       if (vi && vi.main) {
         const arr = await this._storageAggregator.getResource(vi.main)
-        zip.file('index.js', arr)
-        // ToDo: if module type == "parser config" then add "index.JSON"
+        if (vi.type === ModuleTypes.ParserConfig) {
+          zip.file('index.json', arr)
+          const config = new TextDecoder('utf-8').decode(new Uint8Array(arr))
+          const addStylesToZip = async (confiWithStyles: any, keyToReplace: string) =>
+            Promise.all(
+              Object.entries(confiWithStyles).map(async ([key, value]: [string, any]) => {
+                if (typeof value === 'string' && key === keyToReplace) {
+                  const cssArr = await this._storageAggregator.getResource({
+                    uris: [joinUrls(vi.main.uris[0], value)],
+                    hash: null,
+                  })
+                  if (cssArr) zip.file(value, cssArr)
+                } else if (typeof value === 'object') {
+                  await addStylesToZip(value, keyToReplace)
+                }
+              })
+            )
+
+          await addStylesToZip(JSON.parse(config), 'styles')
+        } else {
+          zip.file('index.js', arr)
+        }
       }
 
-      // ToDo: if module type == "parser config" add css files
-
-      // ToDo: if module type == "parser config" then skip it
-      if (vi && vi.defaultConfig) {
+      if (vi && vi.defaultConfig && vi.type !== ModuleTypes.ParserConfig) {
         const arr = await this._storageAggregator.getResource(vi.defaultConfig)
         zip.file('default.json', arr)
       }
 
-      // ToDo: if module type == "parser config" then skip it
-      if (vi && vi.schemaConfig) {
+      if (vi && vi.schemaConfig && vi.type !== ModuleTypes.ParserConfig) {
         const arr = await this._storageAggregator.getResource(vi.schemaConfig)
         zip.file('schema.json', arr)
       }
