@@ -15,7 +15,7 @@ import {
   parseModuleName,
 } from '../common/helpers'
 import { NotificationType } from '../common/models/notification'
-import { DefaultConfig, SchemaConfig } from '../common/types'
+import { DefaultConfig, ParserConfig, SchemaConfig } from '../common/types'
 import { AppStorage } from './appStorage'
 import Core from './core'
 import { BaseEvent } from './events/baseEvent'
@@ -23,7 +23,6 @@ import { EventBus as ModuleEventBus } from './events/eventBus'
 import { __decorate } from './global'
 import BuiltInModules from './modules'
 import { ConfigAdapter } from './modules/config-adapter'
-import { ParserConfig } from './modules/config-adapter/types'
 import { IContentAdapter, IResolver } from './types'
 
 type RegistriedModule = {
@@ -346,11 +345,6 @@ export class Injector {
 
     const swarmGatewayUrl = await getSwarmGateway()
     const preferedOverlayStorage = await getPreferedOverlayStorage()
-    modules.sort((a, b) => {
-      if (a.manifest.type === ModuleTypes.Library) return -1
-      if (b.manifest.type === ModuleTypes.Library) return 1
-      return 0
-    })
     for (const module of modules) {
       const { manifest, scriptOrConfig, contextIds, defaultConfig, schemaConfig } = module
 
@@ -484,7 +478,10 @@ export class Injector {
       }
 
       // ToDo: generalize loading of parser configs
-      if (manifest.type === ModuleTypes.ParserConfig && typeof scriptOrConfig === 'object') {
+      if (manifest.type === ModuleTypes.ParserConfig) {
+        if (typeof scriptOrConfig !== 'object') {
+          throw new Error('SCRIPT should be parsed in the background!')
+        }
         const dynamicAdapter = this.registry.find(
           (m) => m.manifest.name == 'dynamic-adapter.dapplet-base.eth'
         )

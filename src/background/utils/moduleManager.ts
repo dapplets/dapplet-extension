@@ -5,8 +5,7 @@ import { TopologicalSort } from 'topological-sort'
 import { DEFAULT_BRANCH_NAME, ModuleTypes } from '../../common/constants'
 import { areModulesEqual, joinUrls } from '../../common/helpers'
 import { NotificationType } from '../../common/models/notification'
-import { DefaultConfig, SchemaConfig, StorageRef } from '../../common/types'
-import { ParserConfig } from '../../contentscript/modules/config-adapter/types'
+import { DefaultConfig, ParserConfig, SchemaConfig, StorageRef } from '../../common/types'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 import { RegistryAggregator } from '../registries/registryAggregator'
@@ -112,12 +111,10 @@ export default class ModuleManager {
     const keys = [...sorted.keys()]
 
     // reverse() - the lowest script in the hierarchy should be loaded first
-    return (
-      keys
-        .map((k) => dependencies.find((d) => d.name === k))
-        // .reverse() // ToDo: check why reverse() returns incorrect order
-        .filter((d) => !!d.manifest)
-    )
+    return keys
+      .map((k) => dependencies.find((d) => d.name === k))
+      .reverse()
+      .filter((d) => !!d.manifest)
   }
 
   private async _loadScriptOrConfig(url: StorageRef) {
