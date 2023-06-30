@@ -604,7 +604,7 @@ export class Injector {
         }
 
         // ToDo: generalize MV3 dapplets loading
-        if (manifest.name === 'tipping-near-dapplet') {
+        if (manifest.name === 'test-test-tipping-near-dapplet') {
           // eslint-disable-next-line @typescript-eslint/no-this-alias
           const me = this
           const initParams: SandboxInitializationParams = {
