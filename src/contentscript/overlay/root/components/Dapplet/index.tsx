@@ -123,7 +123,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
           <div className={cn(styles.blockText)}>{description}</div>
           {isError && isError.length && isError[1] === name ? (
-            <span className={styles.moduleError}>{`Dapplet's error: ${isError[0]}`}</span>
+            <span className={styles.moduleError}>{"Dapplet error"}</span>
           ) : null}
         </div>
 
