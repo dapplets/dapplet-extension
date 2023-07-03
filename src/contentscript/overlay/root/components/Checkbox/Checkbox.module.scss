@@ -26,7 +26,7 @@
   &:hover {
     svg {
       position: absolute;
-      transform: translate(50%, 80%);
+      transform: translate(3px, 4px);
       width: 8px;
       height: 6px;
     }
@@ -140,7 +140,7 @@ div.supportLabel:focus::before {
 
   svg {
     position: absolute;
-    transform: translate(50%, 80%);
+    transform: translate(4px, 5px);
     width: 8px;
     height: 6px;
   }
@@ -148,7 +148,10 @@ div.supportLabel:focus::before {
   &:hover {
     svg {
       fill: white !important;
-
+      position: absolute;
+    transform: translate(4px, 5px);
+    width: 8px;
+    height: 6px;
       path {
         fill: white !important;
       }
