@@ -99,6 +99,7 @@
 .walletsIcon {
   width: 15px;
   height: 14px;
+  object-fit: scale-down;
 }
 
 @media (min-width: 320px) and (max-width: 640px) {

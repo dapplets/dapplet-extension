@@ -8,6 +8,7 @@ import { CacheMethod, generateGuid, waitTab } from '../../../../common/helpers'
 import { NearNetworkConfig } from '../../../../common/types'
 import { NearWallet } from '../interface'
 import { CustomWalletConnection } from './customWalletConnection'
+import * as walletIcons from '../../../../common/resources/wallets'
 
 export default class implements NearWallet {
   private __nearWallet: CustomWalletConnection = null
@@ -102,7 +103,7 @@ export default class implements NearWallet {
     return {
       name: 'NEAR Wallet',
       description: 'NEAR Wallet',
-      icon: 'https://near.org/wp-content/themes/near-19/assets/downloads/near_icon.svg',
+      icon: walletIcons['near'],
     }
   }
 
