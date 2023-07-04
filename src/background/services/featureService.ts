@@ -425,7 +425,6 @@ export default class FeatureService {
           runtime: null,
           registryUrl,
         }
-        EventBus.emit('error loading', [err, name])
         await this._globalConfigService.updateSiteConfig(config)
       }
 
