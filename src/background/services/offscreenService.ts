@@ -16,7 +16,7 @@ export const generateNftImage = async ({
   const dataToSend = JSON.stringify({ name, title, icon: iconToSend })
   if (!(await chrome.offscreen.hasDocument())) {
     await chrome.offscreen.createDocument({
-      url: chrome.runtime.getURL('') + OFFSCREEN_DOCUMENT_PATH,
+      url: chrome.runtime.getURL(OFFSCREEN_DOCUMENT_PATH),
       reasons: [chrome.offscreen.Reason.DOM_PARSER],
       justification: 'Parse DOM',
     })

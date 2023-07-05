@@ -21,7 +21,7 @@ async function handleMessages(message: { target: string; type: string; data: str
 async function generateNftImage(data: string, id: string) {
   if (!data) return
   const { name, title, icon } = JSON.parse(data)
-  const iconAsBlob = await fetch(icon).then((res) => res.blob())
+  const iconAsBlob = icon ? await fetch(icon).then((res) => res.blob()) : null
   const base64ImageToCanvas = (base64: string): Promise<HTMLCanvasElement> =>
     new Promise((res, rej) => {
       const image = new Image()
