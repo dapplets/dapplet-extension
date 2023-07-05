@@ -1,6 +1,5 @@
 // Polyfill for WebComponents that doesn't work in an Extension's JS-context
 import { unsafeCSS } from 'lit'
-import { ModuleTypes } from '../../../common/constants'
 import { State, WidgetConfig } from '../../../common/state'
 import Core from '../../core'
 import { IContentAdapter } from '../../types'
@@ -359,32 +358,3 @@ export class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterC
     this.observer.disconnect()
   }
 }
-
-const DynamicAdapterManifest = {
-  branch: 'default',
-  defaultConfig: {},
-  dependencies: {},
-  dist: { hash: '', uris: [] },
-  environment: 'prod',
-  extensionVersion: '0.0.0-pre.0',
-  interfaces: {},
-  main: { hash: '', uris: [] },
-  name: 'dynamic-adapter.dapplet-base.eth',
-  registryUrl: 'v3.registry.dapplet-base.eth',
-  schemaConfig: {},
-  type: ModuleTypes.Library,
-  version: '0.6.22',
-  overlays: {},
-  getId: () => 'overlay-adapter.dapplet-base.eth#default@0.1.0',
-}
-
-const Module = {
-  manifest: DynamicAdapterManifest,
-  order: 0,
-  contextIds: [],
-  defaultConfig: {},
-  schemaConfig: {},
-  clazz: DynamicAdapter as any,
-}
-
-export default Module

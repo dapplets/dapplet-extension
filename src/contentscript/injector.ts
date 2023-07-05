@@ -14,7 +14,6 @@ import {
   multipleReplace,
   parseModuleName,
 } from '../common/helpers'
-import { NotificationType } from '../common/models/notification'
 import {
   DefaultConfig,
   ParserConfig,
@@ -25,11 +24,11 @@ import { AppStorage } from './appStorage'
 import Core from './core'
 import { BaseEvent } from './events/baseEvent'
 import { EventBus as ModuleEventBus } from './events/eventBus'
-import { __decorate } from './global'
 import BuiltInModules from './modules'
 import { ConfigAdapter } from './modules/config-adapter'
+import { DynamicAdapter } from './modules/dynamic-adapter'
 import { SandboxExecutor } from './sandboxExecutor'
-import { IContentAdapter, IResolver } from './types'
+import { IContentAdapter } from './types'
 
 type RegistriedModule = {
   manifest: VersionInfo
@@ -70,6 +69,8 @@ export class Injector {
   public availableContextIds: string[] = []
   public registry: RegistriedModule[] = []
 
+  private _dynamicAdapter: DynamicAdapter<any>
+
   constructor(
     public core: Core,
     private eventStream: Subject<BaseEvent>,
@@ -81,6 +82,7 @@ export class Injector {
       true
     )
     window.exports = {} // for CommonJS modules compatibility
+    this._dynamicAdapter = new DynamicAdapter(this.core)
   }
 
   public async loadModules(
@@ -469,206 +471,182 @@ export class Injector {
         },
       }
 
-      // Built-in modules are loaded without eval
-      if (BuiltInModules[manifest.name]) {
-        const builtInModule = BuiltInModules[manifest.name]
+      // // Built-in modules are loaded without eval
+      // if (BuiltInModules[manifest.name]) {
+      //   const builtInModule = BuiltInModules[manifest.name]
 
-        // dynamic-adapter is loaded here usually
-        this._registerModule(
-          builtInModule,
-          builtInModule.clazz,
-          () => moduleEventBus,
-          () => new builtInModule.clazz(coreWrapper)
-        )
+      //   // dynamic-adapter is loaded here usually
+      //   this._registerModule(
+      //     builtInModule,
+      //     builtInModule.clazz,
+      //     () => moduleEventBus,
+      //     () => new builtInModule.clazz(coreWrapper)
+      //   )
 
-        continue
-      }
+      //   continue
+      // }
 
       // ToDo: generalize loading of parser configs
       if (manifest.type === ModuleTypes.ParserConfig) {
         if (typeof scriptOrConfig !== 'object') {
           throw new Error('SCRIPT should be parsed in the background!')
         }
-        const dynamicAdapter = this.registry.find(
-          (m) => m.manifest.name == 'dynamic-adapter.dapplet-base.eth'
-        )
-        if (!dynamicAdapter) {
-          throw new Error('Dynamic adapter is not initialized. Check the order of dependencies.')
-        }
+
         this._registerModule(
           module,
           ConfigAdapter,
           () => moduleEventBus,
-          () => new ConfigAdapter(dynamicAdapter.instance, scriptOrConfig)
+          () => new ConfigAdapter(this._dynamicAdapter, scriptOrConfig)
         )
 
         continue
       }
 
-      let newBranch: string = null
+      // let newBranch: string = null
 
       // ToDo: describe it
 
-      const injectableDecorator = (constructor) => {
-        if (constructor.prototype.getBranch) {
-          const resolver: IResolver = new constructor()
-          newBranch = resolver.getBranch()
-        } else {
-          this._registerModule(module, constructor, () => moduleEventBus)
-        }
-      }
+      // const injectableDecorator = (constructor) => {
+      //   if (constructor.prototype.getBranch) {
+      //     const resolver: IResolver = new constructor()
+      //     newBranch = resolver.getBranch()
+      //   } else {
+      //     this._registerModule(module, constructor, () => moduleEventBus)
+      //   }
+      // }
 
       // ToDo: describe it
       // adapter
-      const injectDecorator = (name: string) => {
-        if (!name)
-          throw new Error(
-            'The name of a module is required as the first argument of the @Inject(module_name) decorator'
-          )
+      // const injectDecorator = (name: string) => {
+      //   if (!name)
+      //     throw new Error(
+      //       'The name of a module is required as the first argument of the @Inject(module_name) decorator'
+      //     )
 
-        return (
-          target: any | { constructor: any },
-          propertyOrMethodName: string | undefined,
-          parameterIndex: number | undefined
-        ) => {
-          // ToDo: check module_name with manifest
-          // ToDo: add module source to error description
-          // ContructorDecorator: class, undefined, parameterIndex
-          // PropertyDecorator: class(obj), property_name, undefined
-          // ParameterDecorator: class(obj), method_name, parameterIndex
+      //   return (
+      //     target: any | { constructor: any },
+      //     propertyOrMethodName: string | undefined,
+      //     parameterIndex: number | undefined
+      //   ) => {
+      //     // ToDo: check module_name with manifest
+      //     // ToDo: add module source to error description
+      //     // ContructorDecorator: class, undefined, parameterIndex
+      //     // PropertyDecorator: class(obj), property_name, undefined
+      //     // ParameterDecorator: class(obj), method_name, parameterIndex
 
-          // Built-in module
-          if (BuiltInModules[name]) {
-            // overlay-adapter is loaded here usually
-            this._registerModule(
-              BuiltInModules[name],
-              BuiltInModules[name].clazz,
-              () => new ModuleEventBus(this.eventStream.pipe(filter((e) => e.namespace === name))),
-              () => new BuiltInModules[name].clazz()
-            )
-          }
+      //     // Built-in module
+      //     if (BuiltInModules[name]) {
+      //       // overlay-adapter is loaded here usually
+      //       this._registerModule(
+      //         BuiltInModules[name],
+      //         BuiltInModules[name].clazz,
+      //         () => new ModuleEventBus(this.eventStream.pipe(filter((e) => e.namespace === name))),
+      //         () => new BuiltInModules[name].clazz()
+      //       )
+      //     }
 
-          // Constructor Parameter Decorator
-          if (propertyOrMethodName === undefined) {
-            const currentModule = this._registerModule(module, target, () => moduleEventBus)
-            currentModule.constructorDependencies[parameterIndex] = name
-          }
-          // Class Property Decorator
-          else if (parameterIndex === undefined) {
-            if (delete target[propertyOrMethodName]) {
-              Object.defineProperty(target, propertyOrMethodName, {
-                get: () => {
-                  const currentModule = this.registry.find((m) =>
-                    areModulesEqual(m.manifest, manifest)
-                  )
-                  if (!currentModule.instancedPropertyDependencies[name]) {
-                    const depModule = this._getDependency(manifest, name)
-                    const instancedModule = this._proxifyModule(depModule, currentModule)
-                    currentModule.instancedPropertyDependencies[name] = instancedModule
-                  }
-                  return currentModule.instancedPropertyDependencies[name]
-                },
-                enumerable: true,
-                configurable: true,
-              })
-            }
-          }
-          // Method Parameter Decorator
-          else if (propertyOrMethodName === 'activate') {
-            const currentModule = this._registerModule(
-              module,
-              target.constructor,
-              () => moduleEventBus
-            )
-            currentModule.activateMethodsDependencies[parameterIndex] = name
-          }
-          // Invalid Decorator
-          else {
-            console.error(
-              "Invalid decorator. Inject() decorator can be applied on constructor's parameters, class properties, activate() method's parameters only."
-            )
-          }
-        }
-      }
+      //     // Constructor Parameter Decorator
+      //     if (propertyOrMethodName === undefined) {
+      //       const currentModule = this._registerModule(module, target, () => moduleEventBus)
+      //       currentModule.constructorDependencies[parameterIndex] = name
+      //     }
+      //     // Class Property Decorator
+      //     else if (parameterIndex === undefined) {
+      //       if (delete target[propertyOrMethodName]) {
+      //         Object.defineProperty(target, propertyOrMethodName, {
+      //           get: () => {
+      //             const currentModule = this.registry.find((m) =>
+      //               areModulesEqual(m.manifest, manifest)
+      //             )
+      //             if (!currentModule.instancedPropertyDependencies[name]) {
+      //               const depModule = this._getDependency(manifest, name)
+      //               const instancedModule = this._proxifyModule(depModule, currentModule)
+      //               currentModule.instancedPropertyDependencies[name] = instancedModule
+      //             }
+      //             return currentModule.instancedPropertyDependencies[name]
+      //           },
+      //           enumerable: true,
+      //           configurable: true,
+      //         })
+      //       }
+      //     }
+      //     // Method Parameter Decorator
+      //     else if (propertyOrMethodName === 'activate') {
+      //       const currentModule = this._registerModule(
+      //         module,
+      //         target.constructor,
+      //         () => moduleEventBus
+      //       )
+      //       currentModule.activateMethodsDependencies[parameterIndex] = name
+      //     }
+      //     // Invalid Decorator
+      //     else {
+      //       console.error(
+      //         "Invalid decorator. Inject() decorator can be applied on constructor's parameters, class properties, activate() method's parameters only."
+      //       )
+      //     }
+      //   }
+      // }
 
-      const onEventDecorator = (type: string) => {
-        return function (_, __, descriptor: PropertyDescriptor) {
-          moduleEventBus.ofType(type).subscribe(descriptor.value)
-          return descriptor
-        }
-      }
+      // const onEventDecorator = (type: string) => {
+      //   return function (_, __, descriptor: PropertyDescriptor) {
+      //     moduleEventBus.ofType(type).subscribe(descriptor.value)
+      //     return descriptor
+      //   }
+      // }
 
       try {
         if (typeof scriptOrConfig !== 'string') {
           throw new Error("Module doesn't have an executable script")
         }
 
-        // ToDo: generalize MV3 dapplets loading
-        if (manifest.name === 'test-test-tipping-near-dapplet') {
-          // eslint-disable-next-line @typescript-eslint/no-this-alias
-          const me = this
-          const initParams: SandboxInitializationParams = {
-            manifest,
-            defaultConfig,
-            schemaConfig,
-          }
-
-          // ToDo: refactor it
-          const SandboxExecutorExtended = class extends SandboxExecutor {
-            constructor() {
-              super(scriptOrConfig as string, initParams)
-            }
-
-            // implementaion of the abstract method
-            public getDependency(name: string) {
-              const currentModule = me.registry.find((m) => areModulesEqual(m.manifest, manifest))
-              const depModule = me._getDependency(manifest, name)
-              const instancedModule = me._proxifyModule(depModule, currentModule)
-              return instancedModule
-            }
-          }
-
-          this._registerModule(module, SandboxExecutorExtended, () => moduleEventBus)
-        } else {
-          const execScript = new Function(
-            'Core',
-            'Inject',
-            'Injectable',
-            'OnEvent',
-            '__decorate',
-            scriptOrConfig
-          )
-          execScript(
-            coreWrapper,
-            injectDecorator,
-            injectableDecorator,
-            onEventDecorator,
-            __decorate
-          )
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const me = this
+        const initParams: SandboxInitializationParams = {
+          manifest,
+          defaultConfig,
+          schemaConfig,
         }
+
+        // ToDo: refactor it
+        const SandboxExecutorExtended = class extends SandboxExecutor {
+          constructor() {
+            super(scriptOrConfig as string, initParams)
+          }
+
+          // implementaion of the abstract method
+          public getDependency(name: string) {
+            const currentModule = me.registry.find((m) => areModulesEqual(m.manifest, manifest))
+            const depModule = me._getDependency(manifest, name)
+            const instancedModule = me._proxifyModule(depModule, currentModule)
+            return instancedModule
+          }
+        }
+
+        this._registerModule(module, SandboxExecutorExtended, () => moduleEventBus)
       } catch (err) {
         // ToDo: remove module from this.registry
         console.error(err)
         continue
       }
 
-      if (newBranch) {
-        const { createNotification } = await initBGFunctions(browser)
-        await createNotification({
-          title: 'Branch resolving',
-          message: `Resolver of "${manifest.name}" defined the "${newBranch}" branch`,
-          type: NotificationType.System,
-        })
-        const missingDependencies = await getModulesWithDeps([
-          {
-            name: manifest.name,
-            branch: newBranch,
-            version: 'latest', // ToDo: fix: branch resolver automatically upgrades adapter to the latest version
-            contextIds: contextIds,
-          },
-        ])
-        await this._processModules(missingDependencies)
-      }
+      // if (newBranch) {
+      //   const { createNotification } = await initBGFunctions(browser)
+      //   await createNotification({
+      //     title: 'Branch resolving',
+      //     message: `Resolver of "${manifest.name}" defined the "${newBranch}" branch`,
+      //     type: NotificationType.System,
+      //   })
+      //   const missingDependencies = await getModulesWithDeps([
+      //     {
+      //       name: manifest.name,
+      //       branch: newBranch,
+      //       version: 'latest', // ToDo: fix: branch resolver automatically upgrades adapter to the latest version
+      //       contextIds: contextIds,
+      //     },
+      //   ])
+      //   await this._processModules(missingDependencies)
+      // }
     }
   }
 
