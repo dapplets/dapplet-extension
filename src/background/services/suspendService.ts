@@ -17,7 +17,7 @@ export class SuspendService {
     const suspendityEverywhere = await this.getSuspendityEverywhere()
 
     const isSuspeded = suspendityByHostname || suspendityEverywhere
-    const path = isSuspeded ? '/icons/icon-grayed16.png' : '/icons/icon16.png'
+    const path = isSuspeded ? '/icons/icon-grayed16.png' : browser.runtime.getManifest().icons
 
     if (this.lastExtensionIcon != path) {
       this.lastExtensionIcon = path
