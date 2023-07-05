@@ -5,10 +5,10 @@ import { JsonRpcProvider } from 'near-api-js/lib/providers'
 import browser from 'webextension-polyfill'
 import { NotImplementedError } from '../../../../common/errors'
 import { CacheMethod, generateGuid, waitTab } from '../../../../common/helpers'
+import * as walletIcons from '../../../../common/resources/wallets'
 import { NearNetworkConfig } from '../../../../common/types'
 import { NearWallet } from '../interface'
 import { CustomWalletConnection } from './customWalletConnection'
-import * as walletIcons from '../../../../common/resources/wallets'
 
 export default class implements NearWallet {
   private __nearWallet: CustomWalletConnection = null
@@ -123,7 +123,8 @@ export default class implements NearWallet {
   }
 
   private async _connectBrowserWallet(nearWallet: CustomWalletConnection, contractId?: string) {
-    const expectedAccountId = nearWallet.getAccountId()
+    // ToDo: why this function became async?
+    const expectedAccountId = await nearWallet.getAccountId()
 
     const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true })
     const currentTabId = currentTab.id
