@@ -50,7 +50,7 @@ module.exports = {
     contentscript: path.join(__dirname, 'src/contentscript/index.ts'),
     inpage: path.join(__dirname, 'src/inpage/index.ts'),
     sandbox: path.join(__dirname, 'src/sandbox/index.ts'),
-    offscreen: path.join(__dirname, 'src/offscreen.ts'),
+    offscreen: path.join(__dirname, 'src/offscreen/index.ts'),
   },
   output: {
     path: path.join(__dirname, 'build'),
@@ -136,7 +136,7 @@ module.exports = {
           transform: (content) => modifyManifest(content),
         },
         {
-          from: 'src/offscreen.html',
+          from: 'src/offscreen/index.html',
           to: 'offscreen.html',
         },
       ],

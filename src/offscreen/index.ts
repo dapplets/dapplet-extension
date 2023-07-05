@@ -1,7 +1,7 @@
 import browser from 'webextension-polyfill'
-import { blobToDataURL } from './common/helpers'
-import NFT_NO_ICON from './common/resources/nft-no-icon.svg'
-import NFT_TEMPLATE from './common/resources/nft-template.svg'
+import { blobToDataURL } from '../common/helpers'
+import NFT_NO_ICON from '../common/resources/nft-no-icon.svg'
+import NFT_TEMPLATE from '../common/resources/nft-template.svg'
 
 browser.runtime.onMessage.addListener(handleMessages)
 
