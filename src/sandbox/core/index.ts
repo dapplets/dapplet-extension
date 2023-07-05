@@ -51,6 +51,10 @@ export class Core {
     return sendRequest('alert', message)
   }
 
+  public async openPage(url: string): Promise<void> {
+    return sendRequest('openPage', url)
+  }
+
   public onConnectedAccountsUpdate(listener: () => void) {
     // ToDo: implement this
   }

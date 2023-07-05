@@ -155,6 +155,10 @@ export abstract class SandboxExecutor {
       case 'alert':
         this._worker.postMessage({ id, result: alert(params[0]) })
         break
+      case 'openPage':
+        window.open(params[0], '_blank')
+        this._worker.postMessage({ id })
+        break
       default:
         console.warn(`SandboxExecutor: Unknown method ${method}`)
     }
