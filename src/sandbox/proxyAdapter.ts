@@ -52,7 +52,8 @@ export class ProxyAdapter {
     return {
       $: (ctx: any, id: string) => {
         for (const widget of this._widgets.values()) {
-          if (widget.state.id === id && widget.state.ctx === ctx) {
+          // ToDo: coliision with another context types are possible
+          if (widget.state.id === id && widget.state.ctx.id === ctx.id) {
             return widget
           }
         }
