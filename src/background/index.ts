@@ -13,7 +13,6 @@ import {
   waitTab,
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
-import { GlobalConfig } from './models/globalConfig'
 import { StorageAggregator } from './moduleStorages/moduleStorage'
 import { AnalyticsGoals, AnalyticsService } from './services/analyticsService'
 import ConnectedAccountService from './services/connectedAccountService'
@@ -458,59 +457,60 @@ browser.action.onClicked.addListener(() => {
   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionIconClicked })
 })
 
+// ToDo: remove or restore this code, it was commented to remove downloads permission before publishing
 // Set predefined configuration when extension is installed
-browser.runtime.onInstalled.addListener(async (details) => {
-  analyticsService.track({ idgoal: AnalyticsGoals.ExtensionInstalled })
+// browser.runtime.onInstalled.addListener(async (details) => {
+//   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionInstalled })
 
-  // Find predefined config URL in downloads
-  if (details.reason !== 'install') return
-  const downloads = await browser.downloads.search({
-    filenameRegex: 'dapplet-extension',
-  })
-  if (downloads.length === 0) return
-  const [downloadItem] = downloads.sort((a, b) => -a.startTime.localeCompare(b.startTime))
-  if (!downloadItem || !downloadItem.url) return
-  const url = new URL(downloadItem.url)
-  const config = url.searchParams.get('config')
-  if (!config) return
+//   // Find predefined config URL in downloads
+//   if (details.reason !== 'install') return
+//   const downloads = await browser.downloads.search({
+//     filenameRegex: 'dapplet-extension',
+//   })
+//   if (downloads.length === 0) return
+//   const [downloadItem] = downloads.sort((a, b) => -a.startTime.localeCompare(b.startTime))
+//   if (!downloadItem || !downloadItem.url) return
+//   const url = new URL(downloadItem.url)
+//   const config = url.searchParams.get('config')
+//   if (!config) return
 
-  // Find override parameters in URL
-  const customParams: { [key: string]: string } = {}
-  url.searchParams.forEach((value, key) => {
-    if (key !== 'config') customParams[key] = value
-  })
+//   // Find override parameters in URL
+//   const customParams: { [key: string]: string } = {}
+//   url.searchParams.forEach((value, key) => {
+//     if (key !== 'config') customParams[key] = value
+//   })
 
-  try {
-    const url = new URL(config)
-    const resp = await fetch(url.href)
-    const json: Partial<GlobalConfig> | Partial<GlobalConfig>[] = await resp.json()
+//   try {
+//     const url = new URL(config)
+//     const resp = await fetch(url.href)
+//     const json: Partial<GlobalConfig> | Partial<GlobalConfig>[] = await resp.json()
 
-    const addCustomParams = (defParamsConfig: Partial<GlobalConfig>) => {
-      Object.entries(customParams).forEach(([name, value]) => {
-        try {
-          defParamsConfig[name] = JSON.parse(<string>value)
-        } catch (e) {
-          defParamsConfig[name] = value
-        }
-      })
-    }
+//     const addCustomParams = (defParamsConfig: Partial<GlobalConfig>) => {
+//       Object.entries(customParams).forEach(([name, value]) => {
+//         try {
+//           defParamsConfig[name] = JSON.parse(<string>value)
+//         } catch (e) {
+//           defParamsConfig[name] = value
+//         }
+//       })
+//     }
 
-    if (Array.isArray(json)) {
-      // ToDo: A potential bug is here. Configs override each other.
-      for (const j of json) {
-        addCustomParams(j)
-        await globalConfigService.mergeConfig(j)
-      }
-    } else {
-      addCustomParams(json)
-      await globalConfigService.mergeConfig(json)
-    }
+//     if (Array.isArray(json)) {
+//       // ToDo: A potential bug is here. Configs override each other.
+//       for (const j of json) {
+//         addCustomParams(j)
+//         await globalConfigService.mergeConfig(j)
+//       }
+//     } else {
+//       addCustomParams(json)
+//       await globalConfigService.mergeConfig(json)
+//     }
 
-    console.log(`The predefined configuration was initialized. URL: ${url.href}`)
-  } catch (err) {
-    console.error('Cannot set predefined configuration.', err)
-  }
-})
+//     console.log(`The predefined configuration was initialized. URL: ${url.href}`)
+//   } catch (err) {
+//     console.error('Cannot set predefined configuration.', err)
+//   }
+// })
 
 browser.runtime.onInstalled.addListener(async () => {
   // disable all another instances of the current extension

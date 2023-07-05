@@ -67,10 +67,8 @@
     "storage",
     "unlimitedStorage",
     "contextMenus",
-    "downloads",
     "management",
     "scripting",
-    "history",
     "offscreen"
   ],
   "host_permissions": ["*://localhost/*", "http://*/*", "https://*/*"],
