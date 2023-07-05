@@ -225,8 +225,6 @@ browser.runtime.onMessage.addListener(
     setSwarmGateway: globalConfigService.setSwarmGateway.bind(globalConfigService),
     getIpfsGateway: globalConfigService.getIpfsGateway.bind(globalConfigService),
     setIpfsGateway: globalConfigService.setIpfsGateway.bind(globalConfigService),
-    getDynamicAdapter: globalConfigService.getDynamicAdapter.bind(globalConfigService),
-    setDynamicAdapter: globalConfigService.setDynamicAdapter.bind(globalConfigService),
     getNearNetworks: globalConfigService.getNearNetworks.bind(globalConfigService),
     getEthereumNetworks: globalConfigService.getEthereumNetworks.bind(globalConfigService),
     getMyDapplets: globalConfigService.getMyDapplets.bind(globalConfigService),

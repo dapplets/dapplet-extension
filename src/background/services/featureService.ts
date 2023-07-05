@@ -14,7 +14,6 @@ import {
   joinUrls,
   Measure,
   mergeDedupe,
-  parseModuleName,
 } from '../../common/helpers'
 import ManifestDTO from '../dto/manifestDTO'
 import ModuleInfo from '../models/moduleInfo'
@@ -498,24 +497,6 @@ export default class FeatureService {
       order: number
       hostnames: string[]
     }[] = []
-
-    // Activate dynamic adapter for dynamic contexts searching
-    const hostnames = contextIds.filter((x) => /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/gm.test(x))
-    if (hostnames.length > 0) {
-      const dynamicAdapter = await this._globalConfigService.getDynamicAdapter()
-      if (dynamicAdapter) {
-        const parsed = parseModuleName(dynamicAdapter)
-        if (parsed) {
-          modules.push({
-            name: parsed.name,
-            branch: parsed.branch,
-            version: parsed.version,
-            order: -1,
-            hostnames: hostnames,
-          })
-        }
-      }
-    }
 
     const isThereActiveDapplets = await this._globalConfigService.isThereActiveDapplets()
     if (!isThereActiveDapplets) return modules
