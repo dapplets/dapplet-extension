@@ -135,8 +135,14 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           (x) => !leftDapplets.find((y) => y.name === x.name)
         )
         const rightJoin = [...innerJoin, ...exclusiveRightJoin]
+
+        // ToDo: remove this hack. It causes the following React error:
+        // Warning: Cannot update during an existing state transition (such as within `render`).
+        // Render methods should be a pure function of props and state.
         setModule(rightJoin)
         rightJoin.filter((x) => x.isActive).forEach(getTabsForDapplet)
+        // The hack ends
+
         return rightJoin
       })
     } catch (err) {
