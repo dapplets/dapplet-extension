@@ -47,7 +47,7 @@ const ManifestOverlayAdapter = {
   interfaces: {},
   main: { hash: '', uris: [] },
   name: 'overlay-adapter.dapplet-base.eth',
-  registryUrl: 'v2.registry.dapplet-base.eth',
+  registryUrl: 'v3.registry.dapplet-base.eth',
   schemaConfig: {},
   type: ModuleTypes.Adapter,
   version: '0.1.0',

@@ -229,7 +229,7 @@ export default class GlobalConfigService {
     config.isFirstInstallation = true
     config.isActive = true
     config.registries = [
-      { url: 'v2.registry.dapplet-base.eth', isDev: false, isEnabled: true },
+      { url: 'v3.registry.dapplet-base.eth', isDev: false, isEnabled: true },
       {
         url: 'dev-1627024020035-70641704943070',
         isDev: false,

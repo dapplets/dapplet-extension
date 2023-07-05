@@ -370,7 +370,7 @@ const DynamicAdapterManifest = {
   interfaces: {},
   main: { hash: '', uris: [] },
   name: 'dynamic-adapter.dapplet-base.eth',
-  registryUrl: 'v2.registry.dapplet-base.eth',
+  registryUrl: 'v3.registry.dapplet-base.eth',
   schemaConfig: {},
   type: ModuleTypes.Library,
   version: '0.6.22',
