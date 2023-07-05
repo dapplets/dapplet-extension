@@ -73,9 +73,16 @@ export class ProxyAdapter {
   }
 
   private async _getWidgetsForContext({ ctx, contextName }: { ctx: any; contextName: string }) {
-    const widgetFactories = this._attachedConfig[contextName](ctx) ?? []
-    const widgetsToBeCreated = Promise.all(
+    const unknownFactories = this._attachedConfig[contextName](ctx) ?? []
+    const widgetFactories = Array.isArray(unknownFactories) ? unknownFactories : [unknownFactories]
+    const widgetsToBeCreated = await Promise.all(
       widgetFactories.map(async (widgetFactory) => {
+        if (widgetFactory instanceof Promise) {
+          widgetFactory = await widgetFactory
+        }
+
+        if (!widgetFactory) return null
+
         const widget: InjectedWidget = await widgetFactory(ctx)
         widget.state.state.init?.(ctx, widget.state.state) // ToDo: can be buggy when widgetFactory returns value asynchronously
         this._widgets.set(widget.widgetId, widget)
@@ -96,7 +103,7 @@ export class ProxyAdapter {
         }
       })
     )
-    return widgetsToBeCreated
+    return widgetsToBeCreated.filter((x) => !!x)
   }
 
   private _onWidgetEvent({

@@ -14,6 +14,7 @@ import {
   multipleReplace,
   parseModuleName,
 } from '../common/helpers'
+import { JsonRpc } from '../common/jsonrpc'
 import {
   DefaultConfig,
   ParserConfig,
@@ -74,6 +75,7 @@ export class Injector {
   constructor(
     public core: Core,
     private eventStream: Subject<BaseEvent>,
+    private jsonrpc: JsonRpc,
     private env?: { shareLinkPayload: { moduleId: string; payload: any; isAllOk: boolean } }
   ) {
     this._setContextActivivty(
@@ -167,11 +169,12 @@ export class Injector {
       try {
         // ToDo: compare "m.instancedDeps.length" and "m.clazz.constructor.length"
 
+        let loadingResult = null
         m.instance = new m.clazz(...m.instancedConstructorDeps)
         if (m.instance.activate !== undefined) {
           if (typeof m.instance.activate === 'function') {
             // ToDo: activate modules in parallel
-            await m.instance.activate(...m.instancedActivateMethodsDependencies)
+            loadingResult = await m.instance.activate(...m.instancedActivateMethodsDependencies)
           } else {
             throw new Error('activate() must be a function.')
           }
@@ -199,10 +202,7 @@ export class Injector {
             name: m.manifest.name,
             branch: m.manifest.branch,
             version: m.manifest.version,
-            runtime: {
-              isActionHandler: !!m.onActionHandler,
-              isHomeHandler: !!m.onHomeHandler,
-            },
+            runtime: loadingResult.runtime,
           },
         })
       } catch (err) {
@@ -291,29 +291,34 @@ export class Injector {
     const module = this.registry.find((m) => m.manifest.name === moduleName)
     if (!module || !module.instance) throw Error('The dapplet is not activated.')
     module.onActionHandler?.()
+    module?.instance?.onActionHandler?.() // ToDo: unify event dispatching
   }
 
   public async openDappletHome(moduleName: string) {
     const module = this.registry.find((m) => m.manifest.name === moduleName)
     if (!module || !module.instance) throw Error('The dapplet is not activated.')
     module.onHomeHandler?.()
+    module?.instance?.onHomeHandler?.() // ToDo: unify event dispatching
   }
 
   public async sendShareLinkData(moduleName: string, data: any) {
     const module = this.registry.find((m) => m.manifest.name === moduleName)
     if (!module || !module.instance) throw Error('The dapplet is not activated.')
     module.onShareLinkHandler?.(data)
+    module?.instance?.onShareLinkHandler?.(data) // ToDo: unify event dispatching
   }
 
   public async executeWalletsUpdateHandler() {
     this.registry.find((m) => {
       m.onWalletsUpdateHandler?.()
+      m?.instance?.onWalletsUpdateHandler?.() // ToDo: unify event dispatching
     })
   }
 
   public async executeConnectedAccountsUpdateHandler() {
     this.registry.find((m) => {
       m.onConnectedAccountsUpdateHandler?.()
+      m?.instance?.onConnectedAccountsUpdateHandler?.() // ToDo: unify event dispatching
     })
   }
 
@@ -606,12 +611,16 @@ export class Injector {
           manifest,
           defaultConfig,
           schemaConfig,
+          env: {
+            swarmGatewayUrl,
+            preferedOverlayStorage,
+          },
         }
 
         // ToDo: refactor it
         const SandboxExecutorExtended = class extends SandboxExecutor {
           constructor() {
-            super(scriptOrConfig as string, initParams)
+            super(scriptOrConfig as string, initParams, me.jsonrpc)
           }
 
           // implementaion of the abstract method

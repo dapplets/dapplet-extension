@@ -1,3 +1,4 @@
+import { Core } from './core'
 import { ProxyAdapter } from './proxyAdapter'
 
 type DappletConfig = {
@@ -29,6 +30,8 @@ const MAIN_MODULE_NAME = 'dapplet'
 export class Injector {
   private _registry: RegistriedModule[] = []
 
+  constructor(private core: Core) {}
+
   public async activate() {
     const mainModule = this._registry.find((x) => x.name === MAIN_MODULE_NAME)
     if (!mainModule) throw new Error('Main module is not found')
@@ -38,6 +41,13 @@ export class Injector {
 
     if (mainModule.instance.activate) {
       await mainModule.instance.activate()
+    }
+
+    return {
+      runtime: {
+        isActionHandler: !!this.core.actionListener,
+        isHomeHandler: !!this.core.homeListener,
+      },
     }
   }
 

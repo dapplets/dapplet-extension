@@ -1,14 +1,18 @@
+import { JsonRpc } from '../common/jsonrpc'
 import { SandboxInitializationParams } from '../common/types'
 import { Core } from './core'
 import { AppStorage } from './core/appStorage'
 import ConnectedAccounts from './core/connectedAccounts'
 import { Injector } from './injector'
+import { OverlayManagerIframe } from './overlay/overlayManager'
 
 function initialize(params: SandboxInitializationParams) {
+  const jsonrpc = new JsonRpc()
+  const overlayManager = new OverlayManagerIframe(jsonrpc)
   const connectedAccounts = new ConnectedAccounts()
   const storage = new AppStorage(params.manifest, params.defaultConfig, params.schemaConfig)
-  const core = new Core(connectedAccounts, storage)
-  const injector = new Injector()
+  const core = new Core(params.manifest, connectedAccounts, storage, overlayManager, params.env)
+  const injector = new Injector(core)
 
   const globalMessageHandler = ({ data }: MessageEvent) => {
     const { id, method } = data
@@ -17,7 +21,7 @@ function initialize(params: SandboxInitializationParams) {
       case 'activate':
         injector
           .activate()
-          .then(() => global.postMessage({ id }))
+          .then((result) => global.postMessage({ id, result }))
           .catch((error) => {
             global.postMessage({ id, error })
           })
@@ -32,6 +36,18 @@ function initialize(params: SandboxInitializationParams) {
           .catch((error) => {
             global.postMessage({ id, error })
           })
+        break
+      case 'fireActionEvent':
+        core.actionListener?.()
+        break
+      case 'fireHomeEvent':
+        core.homeListener?.()
+        break
+      case 'fireWalletsUpdateEvent':
+        core.walletsUpdateListener?.()
+        break
+      case 'fireConnectedAccountsUpdateEvent':
+        core.connectedAccountsUpdateListener?.()
         break
       default:
         // ToDo: move all handlers to here

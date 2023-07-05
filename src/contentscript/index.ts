@@ -50,7 +50,7 @@ async function init() {
   const eventStream = new Subject<BaseEvent>()
 
   const core = new Core(IS_IFRAME, overlayManager) // ToDo: is it global for all modules?
-  injector = new Injector(core, eventStream, { shareLinkPayload })
+  injector = new Injector(core, eventStream, jsonrpc, { shareLinkPayload })
 
   // Open confirmation overlay if checks are not passed
   if (!IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {

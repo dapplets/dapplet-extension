@@ -1,14 +1,16 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import browser from 'webextension-polyfill'
 import { generateGuid } from '../common/helpers'
+import { JsonRpc } from '../common/jsonrpc'
 import { SandboxInitializationParams } from '../common/types'
 
 export abstract class SandboxExecutor {
   private _worker: Worker
   private _stateMap = new Map<string, any>()
   private _detachConfigCallbacks: (() => void)[] = []
+  private _jsonrpc: JsonRpc
 
-  constructor(dappletScript: string, params: SandboxInitializationParams) {
+  constructor(dappletScript: string, params: SandboxInitializationParams, jsonrpc: JsonRpc) {
     // sandbox.js provides environment for the script to run in
     // it includes Core-functions, DI container (Inject, Injectable) and adapter
     const sandboxScriptUrl = browser.runtime.getURL('sandbox.js')
@@ -25,20 +27,45 @@ export abstract class SandboxExecutor {
     const dataUri = URL.createObjectURL(new Blob([concatedScript]))
     this._worker = new Worker(dataUri, { name: params.manifest.name })
     this._worker.addEventListener('message', this._messageListener)
+
+    this._jsonrpc = jsonrpc
+    this._jsonrpc.addEventSource(this._worker as any) // ToDo: targetOrigin is incompatible with worker
   }
 
   public async activate() {
-    await this._sendRequest('activate')
+    // activate returns runtime loading result
+    return await this._sendRequest('activate')
   }
 
   public async deactivate() {
     await this._sendRequest('deactivate')
     this._detachConfigCallbacks.forEach((cb) => cb())
+    this._jsonrpc.removeEventSource(this._worker as any)
     this._worker.removeEventListener('message', this._messageListener)
     this._worker.terminate()
   }
 
   public abstract getDependency(name: string): any
+
+  public onActionHandler() {
+    this._notify('fireActionEvent')
+  }
+
+  public onHomeHandler() {
+    this._notify('fireHomeEvent')
+  }
+
+  public onShareLinkHandler(data: any) {
+    this._notify('fireShareLinkEvent', data)
+  }
+
+  public onWalletsUpdateHandler() {
+    this._notify('fireWalletsUpdateEvent')
+  }
+
+  public executeConnectedAccountsUpdateHandler() {
+    this._notify('fireConnectedAccountsUpdateEvent')
+  }
 
   private _onConfigAttached({
     listeningContexts,

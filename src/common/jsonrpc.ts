@@ -1,12 +1,36 @@
+export type EventMessaging = {
+  addEventListener: (type: string, listener: (event: MessageEvent<any>) => void) => void
+  removeEventListener: (type: string, listener: (event: MessageEvent<any>) => void) => void
+  postMessage: (message: any, targetOrigin?: string, transfer?: Transferable[]) => void
+}
+
 export class JsonRpc {
   private _callbacks = new Map<string, Set<Function>>()
   private _outcomingRequests = new Set<string>()
+  private _defaultWindow: EventMessaging
+  private _sources: EventMessaging[] = []
 
-  constructor(private _defaultWindow: Window = window) {
-    window.addEventListener('message', this._handler)
+  constructor(defaultWindow?: EventMessaging) {
+    this._defaultWindow = defaultWindow ?? (typeof window !== 'undefined' ? window : self)
+    this._sources.push(this._defaultWindow)
+    this._defaultWindow.addEventListener('message', this._handler)
   }
 
-  public call(method: string, params: any[], frame: Window = this._defaultWindow): Promise<any> {
+  public addEventSource(source: EventMessaging) {
+    this._sources.push(source)
+    source.addEventListener('message', this._handler)
+  }
+
+  public removeEventSource(source: EventMessaging) {
+    this._sources = this._sources.filter((s) => s !== source)
+    source.removeEventListener('message', this._handler)
+  }
+
+  public call(
+    method: string,
+    params: any[],
+    frame: EventMessaging = this._defaultWindow
+  ): Promise<any> {
     return new Promise((res, rej) => {
       const id = (crypto as any).randomUUID()
       this._outcomingRequests.add(id)
@@ -26,7 +50,7 @@ export class JsonRpc {
           if (rpcResponse.id !== id) return
           if (rpcResponse.method) return
 
-          window.removeEventListener('message', handler)
+          this._defaultWindow.removeEventListener('message', handler)
           this._outcomingRequests.delete(id)
 
           if (rpcResponse.error) {
@@ -38,8 +62,13 @@ export class JsonRpc {
         } catch (_) {}
       }
 
-      window.addEventListener('message', handler)
-      frame.postMessage(json, '*')
+      this._defaultWindow.addEventListener('message', handler)
+
+      if (typeof window === 'undefined' || frame instanceof Worker) {
+        frame.postMessage(json)
+      } else {
+        frame.postMessage(json, '*')
+      }
     })
   }
 
@@ -50,7 +79,7 @@ export class JsonRpc {
 
   public destroy() {
     this._callbacks.clear()
-    window.removeEventListener('message', this._handler)
+    this._sources.forEach((source) => source.removeEventListener('message', this._handler))
   }
 
   private _handler = async (event: MessageEvent<any>) => {
@@ -65,11 +94,13 @@ export class JsonRpc {
     if (!rpcRequest.method || !rpcRequest.params || !rpcRequest.id) return
     if (this._outcomingRequests.has(rpcRequest.id)) return
 
+    const source = event.source ?? event.target
+
     const callbacks = this._callbacks.get(rpcRequest.method) ?? new Set()
 
     for (const callback of callbacks) {
       try {
-        const promise = callback(...rpcRequest.params, event.source)
+        const promise = callback(...rpcRequest.params, source)
         if (promise === undefined || promise === false) continue
         if (Promise.resolve(promise) !== promise && promise !== true) {
           // not a promise and not a true
@@ -85,7 +116,7 @@ export class JsonRpc {
           id: rpcRequest.id,
         })
 
-        ;(event.source as any).postMessage(rpcResponse, event.origin)
+        ;(source as any).postMessage(rpcResponse, source)
         return
       } catch (err) {
         const rpcResponse = JSON.stringify({
@@ -96,7 +127,7 @@ export class JsonRpc {
           id: rpcRequest.id,
         })
 
-        ;(event.source as any).postMessage(rpcResponse, event.origin)
+        ;(source as any).postMessage(rpcResponse, source)
         return
       }
     }
@@ -110,6 +141,6 @@ export class JsonRpc {
       id: rpcRequest.id,
     })
 
-    ;(event.source as any).postMessage(rpcResponse, event.origin)
+    ;(source as any).postMessage(rpcResponse, event.origin)
   }
 }

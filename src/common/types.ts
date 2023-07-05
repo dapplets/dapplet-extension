@@ -227,10 +227,16 @@ export type ContentDetector = {
   selector: string
 }
 
+export type SandboxEnvironmentVariables = {
+  preferedOverlayStorage: string
+  swarmGatewayUrl: string
+}
+
 export type SandboxInitializationParams = {
   manifest: VersionInfo
   defaultConfig: DefaultConfig
   schemaConfig: SchemaConfig
+  env: SandboxEnvironmentVariables
 }
 
 export type ContextBuilder = {
