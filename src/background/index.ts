@@ -512,16 +512,17 @@ browser.action.onClicked.addListener(() => {
 //   }
 // })
 
-browser.runtime.onInstalled.addListener(async () => {
-  // disable all another instances of the current extension
-  const exts = await browser.management.getAll()
-  const currentExtId = browser.runtime.id
-  const previousExts = exts.filter((x) => x.name === 'Dapplets' && x.id !== currentExtId)
-  if (previousExts.length !== 0) {
-    console.log(`Found ${previousExts.length} another instance(s) of the current extension.`)
-    previousExts.forEach((x) => browser.management.setEnabled(x.id, false))
-  }
-})
+// ToDo: remove or restore this code, it was commented to remove downloads permission before publishing
+// browser.runtime.onInstalled.addListener(async () => {
+//   // disable all another instances of the current extension
+//   const exts = await browser.management.getAll()
+//   const currentExtId = browser.runtime.id
+//   const previousExts = exts.filter((x) => x.name === 'Dapplets' && x.id !== currentExtId)
+//   if (previousExts.length !== 0) {
+//     console.log(`Found ${previousExts.length} another instance(s) of the current extension.`)
+//     previousExts.forEach((x) => browser.management.setEnabled(x.id, false))
+//   }
+// })
 
 // Reinject content scripts
 if (typeof window === 'undefined') {

@@ -67,17 +67,8 @@
     "storage",
     "unlimitedStorage",
     "contextMenus",
-    "management",
     "scripting",
     "offscreen"
   ],
-  "host_permissions": ["*://localhost/*", "http://*/*", "https://*/*"],
-  "commands": {
-    "toggle-overlay": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+Y"
-      },
-      "description": "Toggle overlay"
-    }
-  }
+  "host_permissions": ["*://localhost/*", "http://*/*", "https://*/*"]
 }
