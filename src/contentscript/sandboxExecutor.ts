@@ -15,6 +15,7 @@ export abstract class SandboxExecutor {
     const serializedParams = JSON.stringify(params)
 
     // ToDo: remove self.chrome when we will path near-api-js correctly
+    // ToDo: isolate global.postMessage and global.addEventListener
     const concatedScript = `
       self.chrome={runtime:{id:'id'}};
       importScripts("${sandboxScriptUrl}");
@@ -53,7 +54,7 @@ export abstract class SandboxExecutor {
     for (const contextName of listeningContexts) {
       config[contextName] = async (ctx) => {
         const widgets = await this._sendRequest('get-widgets-for-context', { ctx, contextName })
-        return widgets.map((widget) => {
+        const factories = widgets.map((widget) => {
           const widgetFactory = adapter.exports[widget.widgetName]
           const callbacks = widget.listeningEvents.reduce((acc, eventName) => {
             acc[eventName] = (data: any) => {
@@ -62,17 +63,25 @@ export abstract class SandboxExecutor {
             return acc
           }, {})
 
-          return widgetFactory({
+          const factory = widgetFactory({
             DEFAULT: {
               ...widget.stateValues,
               ...callbacks,
-              init: (ctx, state) => {
-                callbacks.init?.(ctx, state)
-                this._stateMap.set(widget.widgetId, state)
-              },
             },
           })
+
+          return (...args: any[]) => {
+            const instancedWidget = factory(...args)
+
+            if (instancedWidget) {
+              this._stateMap.set(widget.widgetId, instancedWidget.state)
+            }
+
+            return instancedWidget
+          }
         })
+
+        return factories
       }
     }
 
