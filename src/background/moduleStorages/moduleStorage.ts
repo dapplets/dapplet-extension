@@ -17,10 +17,6 @@ export class StorageAggregator {
   constructor(private _globalConfigService: GlobalConfigService) {}
 
   async getResource(hashUris: StorageRef): Promise<ArrayBuffer> {
-    if (hashUris.uris.length === 0) {
-      throw Error(`Resource doesn't have any URIs. Hash: ${hashUris.hash}`)
-    }
-
     if (hashUris.hash) {
       const cachedFile = await this._fileBrowserStorage.getById(hashUris.hash)
       if (cachedFile) {
@@ -53,14 +49,14 @@ export class StorageAggregator {
       }
     }
 
-    if (buffers.length === 0) {
-      throw new Error('No supported storages found', { cause: storageErrors })
-    }
-
     if (hashUris.hash) {
       const centralizedStorage = new CentralizedModuleStorage()
       const centStBuffer = getVerifiedResource(centralizedStorage, hashUris.hash.replace('0x', ''))
       buffers.push(centStBuffer)
+    }
+
+    if (buffers.length === 0) {
+      throw new Error('No supported storages found', { cause: storageErrors })
     }
 
     try {

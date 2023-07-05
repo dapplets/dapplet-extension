@@ -112,24 +112,30 @@ export class Core {
       const overlay = this.manifest.overlays?.[cfg.name]
       if (!overlay) throw new Error(`Cannot find overlay with name "${cfg.name}" in the manifest.`)
 
-      const url = new URL(overlay.uris[0])
-
-      if (this._env.preferedOverlayStorage === 'centralized' && overlay.hash) {
-        cfg.url = joinUrls(
-          'https://dapplet-api.s3-website.nl-ams.scw.cloud/',
-          overlay.hash.replace('0x', '')
-        )
-      } else if (url.protocol === 'bzz:') {
-        cfg.url = joinUrls(this._env.swarmGatewayUrl, `bzz/${url.pathname.slice(2)}`)
-      } else if (url.protocol === 'http:' || url.protocol === 'https:') {
-        cfg.url = url.href
-      } else if (this._env.preferedOverlayStorage === 'decentralized' && overlay.hash) {
+      if (
+        (this._env.preferedOverlayStorage === 'centralized' && overlay.hash) ||
+        overlay.uris.length === 0
+      ) {
         cfg.url = joinUrls(
           'https://dapplet-api.s3-website.nl-ams.scw.cloud/',
           overlay.hash.replace('0x', '')
         )
       } else {
-        throw new Error(`Invalid protocol "${url.protocol}" in the overlay address.`)
+        // ToDo: support multiple uris
+        const url = new URL(overlay.uris[0])
+
+        if (url.protocol === 'bzz:') {
+          cfg.url = joinUrls(this._env.swarmGatewayUrl, `bzz/${url.pathname.slice(2)}`)
+        } else if (url.protocol === 'http:' || url.protocol === 'https:') {
+          cfg.url = url.href
+        } else if (this._env.preferedOverlayStorage === 'decentralized' && overlay.hash) {
+          cfg.url = joinUrls(
+            'https://dapplet-api.s3-website.nl-ams.scw.cloud/',
+            overlay.hash.replace('0x', '')
+          )
+        } else {
+          throw new Error(`Invalid protocol "${url.protocol}" in the overlay address.`)
+        }
       }
     }
 
