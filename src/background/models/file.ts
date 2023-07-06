@@ -2,7 +2,7 @@ import { base64ArrayBuffer } from '../../common/base64ArrayBuffer'
 import Base from '../../common/models/base'
 
 function base64ToBufferAsync(base64: string): ArrayBuffer {
-  const binaryString = window.atob(base64)
+  const binaryString = atob(base64)
   const len = binaryString.length
   const bytes = new Uint8Array(len)
   for (let i = 0; i < len; i++) {

@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import makeBlockie from 'ethereum-blockies-base64'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { resources } from '../../common/resources'
 import { TConnectedAccountsVerificationRequestInfo } from '../../common/types'
 import { socialNetworkConnectionCondition } from './connected-accounts-assembly'
@@ -123,13 +123,17 @@ class ConnectedAccounts {
           {
             name: firstAccountId,
             origin: firstOriginId,
-            img: firstAccountImage ? firstAccountImage : makeBlockie(firstAccountId),
+            img: firstAccountImage
+              ? firstAccountImage
+              : firstAccountId && makeBlockie(firstAccountId),
             accountActive: firstAccountStatus,
           },
           {
             name: secondAccountId,
             origin: secondOriginId,
-            img: secondAccountImage ? secondAccountImage : makeBlockie(secondAccountId),
+            img: secondAccountImage
+              ? secondAccountImage
+              : secondAccountId && makeBlockie(secondAccountId),
             accountActive: secondAccountStatus,
           },
         ],
@@ -158,7 +162,7 @@ class ConnectedAccounts {
         accountToChangeStatus: {
           name: accountId,
           origin: originId,
-          img: accountImage ? accountImage : makeBlockie(accountId),
+          img: accountImage ? accountImage : accountId && makeBlockie(accountId),
           accountActive: isMain,
         },
       },

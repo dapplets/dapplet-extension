@@ -1,5 +1,5 @@
 import * as semver from 'semver'
-import { browser, Tabs } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { DEFAULT_BRANCH_NAME } from './constants'
 import {
   ChainTypes,
@@ -141,7 +141,7 @@ export function timeoutPromise<T>(ms: number, promise: Promise<T>, timeoutCallba
   })
 }
 
-export async function getCurrentTab(): Promise<Tabs.Tab | null> {
+export async function getCurrentTab(): Promise<browser.Tabs.Tab | null> {
   try {
     const tabs = await browser.tabs.query({ currentWindow: true, active: true })
     const tab = tabs[0]
@@ -154,7 +154,7 @@ export async function getCurrentTab(): Promise<Tabs.Tab | null> {
   }
 }
 
-export const getCurrentContextIds = async (tab: Tabs.Tab | null): Promise<string[]> => {
+export const getCurrentContextIds = async (tab: browser.Tabs.Tab | null): Promise<string[]> => {
   if (!tab) tab = await getCurrentTab()
   if (!tab) return []
   return browser.tabs.sendMessage(tab.id, { type: 'CURRENT_CONTEXT_IDS' })
@@ -226,7 +226,7 @@ export async function waitTab(url: string) {
     return true
   }
 
-  return new Promise<Tabs.Tab>((res, rej) => {
+  return new Promise<browser.Tabs.Tab>((res, rej) => {
     const handler = async (tabId: number) => {
       const tab = await browser.tabs.get(tabId)
       const receivedUrl = new URL(tab.url)
@@ -300,12 +300,12 @@ export async function waitClosingTab(tabId: number, windowId: number) {
 }
 
 export async function reloadCurrentPage() {
-  if (window['DAPPLETS_JSLIB'] !== true) {
+  if (typeof window !== 'undefined' && window['DAPPLETS_JSLIB'] === true) {
+    window.location.reload()
+  } else {
     const tab = await getCurrentTab()
     if (!tab) return
     browser.tabs.reload(tab.id)
-  } else {
-    window.location.reload()
   }
 }
 
@@ -620,6 +620,9 @@ export function Measure() {
     return descriptor
   }
 }
+
+export const objectMap = (obj, fn) =>
+  Object.fromEntries(Object.entries(obj).map(([k, v], i) => [k, fn(v, k, i)]))
 
 export const makeCancelable = (promise: Promise<void>) => {
   let onCancel: () => void

@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { Subject } from 'rxjs'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { GLOBAL_EVENT_BUS_NAME } from '../common/chrome-extension-websocket-wrapper/constants'
 import * as EventBus from '../common/global-event-bus'
 import {
@@ -34,7 +34,7 @@ export function getRegistriesInfo() {
 }
 
 async function init() {
-  const IS_LIBRARY = window['DAPPLETS_JSLIB'] === true
+  const IS_LIBRARY = typeof window !== 'undefined' && window['DAPPLETS_JSLIB'] === true
   const IS_E2E_IFRAME = isE2ETestingEnvironment(window.top)
   const IS_IFRAME = IS_E2E_IFRAME ? false : self !== top
 
@@ -50,7 +50,7 @@ async function init() {
   const eventStream = new Subject<BaseEvent>()
 
   const core = new Core(IS_IFRAME, overlayManager) // ToDo: is it global for all modules?
-  injector = new Injector(core, eventStream, { shareLinkPayload })
+  injector = new Injector(core, eventStream, jsonrpc, { shareLinkPayload })
 
   // Open confirmation overlay if checks are not passed
   if (!IS_LIBRARY && shareLinkPayload && !shareLinkPayload.isAllOk) {
@@ -76,26 +76,9 @@ async function init() {
     if (!message || !message.type) return
 
     if (message.type === 'FEATURE_ACTIVATED') {
-      const modules = message.payload
-      modules.forEach((f) =>
-        console.log(
-          `[DAPPLETS]: The module ${f.name}${f.branch ? '#' + f.branch : ''}${
-            f.version ? '@' + f.version : ''
-          } was activated.`
-        )
-      )
-
-      return injector.loadModules(modules)
+      return injector.loadModules(message.payload)
     } else if (message.type === 'FEATURE_DEACTIVATED') {
-      const modules = message.payload
-      modules.forEach((f) =>
-        console.log(
-          `[DAPPLETS]: The module ${f.name}${f.branch ? '#' + f.branch : ''}${
-            f.version ? '@' + f.version : ''
-          } was deactivated.`
-        )
-      )
-      return injector.unloadModules(modules)
+      return injector.unloadModules(message.payload)
     } else if (!IS_IFRAME && message.type === 'CURRENT_CONTEXT_IDS') {
       return getAllContextIds()
     } else if (!IS_IFRAME && message.type === 'OPEN_DAPPLET_ACTION') {
@@ -112,11 +95,7 @@ async function init() {
   })
 
   // Handle module (de)activations from another tabs
-  EventBus.on('dapplet_activated', async () => {
-    const contextIds = await getAllContextIds()
-    browser.runtime.sendMessage({ type: 'CONTEXT_STARTED', payload: { contextIds } })
-  })
-
+  EventBus.on('dapplet_activated', (m) => injector.loadModules([m]))
   EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]))
 
   EventBus.on('wallet_changed', () => injector.executeWalletsUpdateHandler())

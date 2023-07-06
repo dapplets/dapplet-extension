@@ -1,5 +1,5 @@
 import { MapperService } from 'simple-mapper' // ToDo like [here](https://www.npmjs.com/package/simple-mapper)
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import Base from '../../common/models/base'
 
 export default abstract class BaseBrowserStorage<T extends Base> {
@@ -8,7 +8,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
   public constructor(private _TConstructor: new () => T, private _storageName: string) {}
 
   async getAll(filter?: (item: T) => boolean): Promise<T[]> {
-    const result = await browser.storage.local.get(null)
+    const result = await browser.storage.local.get()
     const items: T[] = []
 
     for (const key in result) {
@@ -69,7 +69,7 @@ export default abstract class BaseBrowserStorage<T extends Base> {
   }
 
   async deleteAll(): Promise<void> {
-    const result = await browser.storage.local.get(null)
+    const result = await browser.storage.local.get()
     const keys: string[] = []
 
     for (const key in result) {

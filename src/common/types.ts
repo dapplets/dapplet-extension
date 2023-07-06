@@ -1,5 +1,6 @@
 import { Runtime } from 'webextension-polyfill'
 import ManifestDTO from '../background/dto/manifestDTO'
+import VersionInfo from '../background/models/versionInfo'
 export type Falsy = false | 0 | '' | null | undefined
 export type DefaultConfig = {
   [Environments.Dev]?: {
@@ -219,4 +220,56 @@ export type MessageWrapperRequest = {
     }
   }
   sender: Runtime.MessageSender
+}
+
+export type ContentDetector = {
+  contextId: string
+  selector: string
+}
+
+export type SandboxEnvironmentVariables = {
+  preferedOverlayStorage: string
+  swarmGatewayUrl: string
+}
+
+export type SandboxInitializationParams = {
+  manifest: VersionInfo
+  defaultConfig: DefaultConfig
+  schemaConfig: SchemaConfig
+  env: SandboxEnvironmentVariables
+}
+
+export type ContextBuilder = {
+  [key: string]: ContextBuilder | string
+}
+
+export type ParserConfig = {
+  themes?: {
+    DARK?: string
+    LIGHT?: string
+  }
+  contexts: {
+    [contextName: string]: {
+      containerSelector: string
+      contextSelector?: string
+      widgets?: {
+        [widgetName: string]: {
+          styles?: string
+          insertionPoint: string
+          insert?: string
+        }
+      }
+      events?: {
+        [eventName: string]: {
+          element: string
+          listen: string
+          data?: {
+            [key: string]: string
+          }
+        }
+      }
+      contextBuilder: ContextBuilder
+      childrenContexts?: string[]
+    }
+  }
 }

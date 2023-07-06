@@ -6,11 +6,23 @@
   "author": "",
   "short_name": "Dapplets",
   "background": {
-    "page": "background.html",
-    "persistent": true
+    "service_worker": "service-worker.js",
+    "type": "module"
   },
-  "browser_action": {
-    "default_icon": "icons/icon16.png"
+  "minimum_chrome_version": "92",
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "36": "icons/icon36.png",
+      "48": "icons/icon48.png",
+      "64": "icons/icon64.png",
+      "96": "icons/icon96.png",
+      "128": "icons/icon128.png",
+      "19": "icons/icon19.png",
+      "38": "icons/icon38.png",
+      "512": "icons/icon512.png"
+    }
   },
   "icons": {
     "16": "icons/icon16.png",
@@ -19,14 +31,16 @@
     "48": "icons/icon48.png",
     "64": "icons/icon64.png",
     "96": "icons/icon96.png",
-    "128": "icons/icon128.png"
+    "128": "icons/icon128.png",
+    "19": "icons/icon19.png",
+    "38": "icons/icon38.png",
+    "512": "icons/icon512.png"
   },
-  "manifest_version": 2,
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
+  "manifest_version": 3,
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["custom-elements.min.js", "common.js", "contentscript.js"],
+      "js": ["custom-elements.min.js", "contentscript.js"],
       "run_at": "document_idle",
       "all_frames": true
     },
@@ -41,24 +55,12 @@
       "all_frames": true
     }
   ],
-  "web_accessible_resources": ["callback.html", "inpage.js"],
-  "permissions": [
-    "tabs",
-    "storage",
-    "unlimitedStorage",
-    "contextMenus",
-    "downloads",
-    "management",
-    "*://localhost/*",
-    "http://*/*",
-    "https://*/*"
-  ],
-  "commands": {
-    "toggle-overlay": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+Y"
-      },
-      "description": "Toggle overlay"
+  "web_accessible_resources": [
+    {
+      "resources": ["callback.html", "inpage.js", "sandbox.js"],
+      "matches": ["*://*/*"]
     }
-  }
+  ],
+  "permissions": ["tabs", "activeTab", "storage", "unlimitedStorage", "scripting", "offscreen"],
+  "host_permissions": ["*://localhost/*", "http://*/*", "https://*/*"]
 }

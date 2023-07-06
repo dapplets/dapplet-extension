@@ -1,5 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import VersionInfo from '../background/models/versionInfo'
 import { formatModuleId } from '../common/helpers'
 import { DefaultConfig, Environments, SchemaConfig } from '../common/types'

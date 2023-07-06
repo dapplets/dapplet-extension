@@ -1,7 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { svgObject } from 'qr-image'
 import * as React from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { Bus } from '../../../../../../../../common/bus'
 import {
   ChainTypes,

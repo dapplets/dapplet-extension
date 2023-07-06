@@ -1,7 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useMemo, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
 import { AnalyticsGoals } from '../../../../../background/services/analyticsService'
 import { CONTEXT_ID_WILDCARD, DAPPLETS_STORE_URL } from '../../../../../common/constants'
@@ -85,6 +85,44 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     }
   }, [])
 
+  // Refresh isActive switch state
+  useEffect(() => {
+    const handler = (m) => {
+      setDapplets((dapplets) => {
+        return dapplets.map((dapplet) => {
+          if (dapplet.name === m.name) {
+            return { ...dapplet, isActive: true }
+          } else {
+            return dapplet
+          }
+        })
+      })
+    }
+
+    EventBus.on('dapplet_activated', handler)
+
+    return () => EventBus.off('dapplet_activated', handler)
+  }, [])
+
+  // Refresh isActive switch state
+  useEffect(() => {
+    const handler = (m) => {
+      setDapplets((dapplets) => {
+        return dapplets.map((dapplet) => {
+          if (dapplet.name === m.name) {
+            return { ...dapplet, isActive: false }
+          } else {
+            return dapplet
+          }
+        })
+      })
+    }
+
+    EventBus.on('dapplet_deactivated', handler)
+
+    return () => EventBus.off('dapplet_deactivated', handler)
+  }, [])
+
   const _refreshData = async () => {
     try {
       const rightDapplets = await getActualModules(dropdownListValue)
@@ -97,8 +135,14 @@ export const Dapplets: FC<DappletsProps> = (props) => {
           (x) => !leftDapplets.find((y) => y.name === x.name)
         )
         const rightJoin = [...innerJoin, ...exclusiveRightJoin]
+
+        // ToDo: remove this hack. It causes the following React error:
+        // Warning: Cannot update during an existing state transition (such as within `render`).
+        // Render methods should be a pure function of props and state.
         setModule(rightJoin)
         rightJoin.filter((x) => x.isActive).forEach(getTabsForDapplet)
+        // The hack ends
+
         return rightJoin
       })
     } catch (err) {

@@ -23,6 +23,7 @@
   background: $pure-white;
   border: 1px solid $main-grey;
   border-radius: 4px;
+
   &:hover {
     svg {
       position: absolute;
@@ -147,11 +148,14 @@ div.supportLabel:focus::before {
 
   &:hover {
     svg {
-      fill: white !important;
       position: absolute;
-    transform: translate(4px, 5px);
-    width: 8px;
-    height: 6px;
+      transform: translate(4px, 5px);
+
+      width: 8px;
+      height: 6px;
+
+      fill: white !important;
+
       path {
         fill: white !important;
       }

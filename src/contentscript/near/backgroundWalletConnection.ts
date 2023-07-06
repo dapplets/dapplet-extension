@@ -1,7 +1,7 @@
 import { serialize } from 'borsh'
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as nearAPI from 'near-api-js'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { NotImplementedError } from '../../common/errors'
 import { CustomConnectedWalletAccount } from './customConnectedWalletAccount'
 
@@ -42,7 +42,7 @@ export class BackgroundWalletConnection extends nearAPI.WalletConnection {
         accountId,
         allKeys,
       }
-      window.localStorage.setItem(this._authDataKey, JSON.stringify(this._authData))
+      await browser.storage.local.set({ [this._authDataKey]: JSON.stringify(this._authData) })
       if (publicKey) {
         await this._moveKeyFromTempToPermanent(accountId, publicKey)
       }
@@ -54,7 +54,7 @@ export class BackgroundWalletConnection extends nearAPI.WalletConnection {
       this._connectedAccount = new CustomConnectedWalletAccount(
         this,
         this._near.connection,
-        this._authData.accountId,
+        this._authData?.accountId,
         this._app,
         this._near.config.networkId
       )

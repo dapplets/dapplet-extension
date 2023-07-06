@@ -5,6 +5,7 @@ export const enum ModuleTypes {
   Adapter = 'ADAPTER',
   Library = 'LIBRARY',
   Interface = 'INTERFACE',
+  ParserConfig = 'CONFIG',
 }
 
 export const enum StorageTypes {

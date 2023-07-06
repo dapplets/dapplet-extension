@@ -1,5 +1,5 @@
 import { setupMessageListener } from 'chrome-extension-message-wrapper'
-import { browser, Tabs } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { WebSocketProxy } from '../common/chrome-extension-websocket-wrapper'
 import { CONTEXT_ID_WILDCARD, ModuleTypes } from '../common/constants'
 import {
@@ -13,7 +13,6 @@ import {
   waitTab,
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
-import { GlobalConfig } from './models/globalConfig'
 import { StorageAggregator } from './moduleStorages/moduleStorage'
 import { AnalyticsGoals, AnalyticsService } from './services/analyticsService'
 import ConnectedAccountService from './services/connectedAccountService'
@@ -225,8 +224,6 @@ browser.runtime.onMessage.addListener(
     setSwarmGateway: globalConfigService.setSwarmGateway.bind(globalConfigService),
     getIpfsGateway: globalConfigService.getIpfsGateway.bind(globalConfigService),
     setIpfsGateway: globalConfigService.setIpfsGateway.bind(globalConfigService),
-    getDynamicAdapter: globalConfigService.getDynamicAdapter.bind(globalConfigService),
-    setDynamicAdapter: globalConfigService.setDynamicAdapter.bind(globalConfigService),
     getNearNetworks: globalConfigService.getNearNetworks.bind(globalConfigService),
     getEthereumNetworks: globalConfigService.getEthereumNetworks.bind(globalConfigService),
     getMyDapplets: globalConfigService.getMyDapplets.bind(globalConfigService),
@@ -262,14 +259,6 @@ browser.runtime.onMessage.addListener(
     // Discord Service
     getDiscordMessages: () => discordService.getDiscordMessages(),
     hideDiscordMessages: discordService.hideDiscordMessages.bind(discordService),
-
-    // LocalStorage
-    localStorage_setItem: (key, value) => Promise.resolve(localStorage.setItem(key, value)),
-    localStorage_getItem: (key) => Promise.resolve(localStorage.getItem(key)),
-    localStorage_removeItem: (key) => Promise.resolve(localStorage.removeItem(key)),
-    localStorage_clear: () => Promise.resolve(localStorage.clear()),
-    localStorage_key: (index) => Promise.resolve(localStorage.key(index)),
-    localStorage_length: () => Promise.resolve(localStorage.length),
 
     // Extension Basic
     createTab: (url) => browser.tabs.create({ url }),
@@ -323,9 +312,14 @@ browser.runtime.onMessage.addListener(
     getThisTab: getThisTab,
     getCurrentContextIds: getCurrentContextIds,
     checkUrlAvailability: (url) => checkUrlAvailability(url),
+    getURL: (path) => Promise.resolve(browser.runtime.getURL(path)),
+
+    browserStorage_get: (key) => browser.storage.local.get(key),
+    browserStorage_set: (kv) => browser.storage.local.set(kv),
+    browserStorage_remove: (key) => browser.storage.local.remove(key),
 
     // For E2E tests only
-    wipeAllExtensionData: () => browser.storage.local.clear().then(() => localStorage.clear()),
+    wipeAllExtensionData: () => browser.storage.local.clear(),
   })
 )
 
@@ -335,28 +329,29 @@ const wsproxy = new WebSocketProxy()
 browser.runtime.onConnect.addListener(wsproxy.createConnectListener())
 
 // ToDo: These lines are repeated many time
-suspendService.changeIcon()
-suspendService.updateContextMenus()
+// suspendService.changeIcon()
+// suspendService.updateContextMenus()
 
-//listen for new tab to be activated
-browser.tabs.onActivated.addListener(() => {
-  suspendService.changeIcon()
-  suspendService.updateContextMenus()
-})
+// //listen for new tab to be activated
+// browser.tabs.onActivated.addListener(() => {
+//   suspendService.changeIcon()
+//   suspendService.updateContextMenus()
+// })
 
-//listen for current tab to be changed
-browser.tabs.onUpdated.addListener(() => {
-  suspendService.changeIcon()
-  suspendService.updateContextMenus()
-})
+// //listen for current tab to be changed
+// browser.tabs.onUpdated.addListener(() => {
+//   suspendService.changeIcon()
+//   suspendService.updateContextMenus()
+// })
 
-browser.commands.onCommand.addListener((cmd) => {
-  if (cmd === 'toggle-overlay') {
-    return getCurrentTab().then(
-      (activeTab) => activeTab && browser.tabs.sendMessage(activeTab.id, 'TOGGLE_OVERLAY')
-    )
-  }
-})
+// ToDo: remove or restore this function
+// browser.commands.onCommand.addListener((cmd) => {
+//   if (cmd === 'toggle-overlay') {
+//     return getCurrentTab().then(
+//       (activeTab) => activeTab && browser.tabs.sendMessage(activeTab.id, 'TOGGLE_OVERLAY')
+//     )
+//   }
+// })
 
 async function fetchPlain({
   url,
@@ -404,6 +399,7 @@ browser.runtime.onMessage.addListener((message, sender) => {
     featureService.getActiveModulesByHostnames(message.payload.contextIds).then((manifests) => {
       if (manifests.length === 0) return
 
+      // ToDo: use global dapplet_activated event instead of FEATURE_ACTIVATED
       browser.tabs.sendMessage(
         sender.tab.id,
         {
@@ -430,9 +426,12 @@ browser.runtime.onMessage.addListener((message, sender) => {
     const idContexts = message.payload.contextIds.filter((x) => x.endsWith('/id'))
     if (idContexts.length > 0) {
       featureService.getFeaturesByHostnames(idContexts, null).then((manifests) => {
-        const adapters = manifests.filter((x) => x.type === ModuleTypes.Adapter)
+        const adapters = manifests.filter(
+          (x) => x.type === ModuleTypes.Adapter || x.type === ModuleTypes.ParserConfig
+        )
         if (adapters.length === 0) return
 
+        // ToDo: use global dapplet_activated event instead of FEATURE_ACTIVATED
         browser.tabs.sendMessage(
           sender.tab.id,
           {
@@ -454,78 +453,80 @@ browser.runtime.onMessage.addListener((message, sender) => {
   }
 })
 
-browser.browserAction.onClicked.addListener(() => {
+browser.action.onClicked.addListener(() => {
   overlayService.openPopupOverlay('dapplets')
   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionIconClicked })
 })
 
+// ToDo: remove or restore this code, it was commented to remove downloads permission before publishing
 // Set predefined configuration when extension is installed
-browser.runtime.onInstalled.addListener(async (details) => {
-  analyticsService.track({ idgoal: AnalyticsGoals.ExtensionInstalled })
+// browser.runtime.onInstalled.addListener(async (details) => {
+//   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionInstalled })
 
-  // Find predefined config URL in downloads
-  if (details.reason !== 'install') return
-  const downloads = await browser.downloads.search({
-    filenameRegex: 'dapplet-extension',
-  })
-  if (downloads.length === 0) return
-  const [downloadItem] = downloads.sort((a, b) => -a.startTime.localeCompare(b.startTime))
-  if (!downloadItem || !downloadItem.url) return
-  const url = new URL(downloadItem.url)
-  const config = url.searchParams.get('config')
-  if (!config) return
+//   // Find predefined config URL in downloads
+//   if (details.reason !== 'install') return
+//   const downloads = await browser.downloads.search({
+//     filenameRegex: 'dapplet-extension',
+//   })
+//   if (downloads.length === 0) return
+//   const [downloadItem] = downloads.sort((a, b) => -a.startTime.localeCompare(b.startTime))
+//   if (!downloadItem || !downloadItem.url) return
+//   const url = new URL(downloadItem.url)
+//   const config = url.searchParams.get('config')
+//   if (!config) return
 
-  // Find override parameters in URL
-  const customParams: { [key: string]: string } = {}
-  url.searchParams.forEach((value, key) => {
-    if (key !== 'config') customParams[key] = value
-  })
+//   // Find override parameters in URL
+//   const customParams: { [key: string]: string } = {}
+//   url.searchParams.forEach((value, key) => {
+//     if (key !== 'config') customParams[key] = value
+//   })
 
-  try {
-    const url = new URL(config)
-    const resp = await fetch(url.href)
-    const json: Partial<GlobalConfig> | Partial<GlobalConfig>[] = await resp.json()
+//   try {
+//     const url = new URL(config)
+//     const resp = await fetch(url.href)
+//     const json: Partial<GlobalConfig> | Partial<GlobalConfig>[] = await resp.json()
 
-    const addCustomParams = (defParamsConfig: Partial<GlobalConfig>) => {
-      Object.entries(customParams).forEach(([name, value]) => {
-        try {
-          defParamsConfig[name] = JSON.parse(<string>value)
-        } catch (e) {
-          defParamsConfig[name] = value
-        }
-      })
-    }
+//     const addCustomParams = (defParamsConfig: Partial<GlobalConfig>) => {
+//       Object.entries(customParams).forEach(([name, value]) => {
+//         try {
+//           defParamsConfig[name] = JSON.parse(<string>value)
+//         } catch (e) {
+//           defParamsConfig[name] = value
+//         }
+//       })
+//     }
 
-    if (Array.isArray(json)) {
-      // ToDo: A potential bug is here. Configs override each other.
-      for (const j of json) {
-        addCustomParams(j)
-        await globalConfigService.mergeConfig(j)
-      }
-    } else {
-      addCustomParams(json)
-      await globalConfigService.mergeConfig(json)
-    }
+//     if (Array.isArray(json)) {
+//       // ToDo: A potential bug is here. Configs override each other.
+//       for (const j of json) {
+//         addCustomParams(j)
+//         await globalConfigService.mergeConfig(j)
+//       }
+//     } else {
+//       addCustomParams(json)
+//       await globalConfigService.mergeConfig(json)
+//     }
 
-    console.log(`The predefined configuration was initialized. URL: ${url.href}`)
-  } catch (err) {
-    console.error('Cannot set predefined configuration.', err)
-  }
-})
+//     console.log(`The predefined configuration was initialized. URL: ${url.href}`)
+//   } catch (err) {
+//     console.error('Cannot set predefined configuration.', err)
+//   }
+// })
 
-browser.runtime.onInstalled.addListener(async () => {
-  // disable all another instances of the current extension
-  const exts = await browser.management.getAll()
-  const currentExtId = browser.runtime.id
-  const previousExts = exts.filter((x) => x.name === 'Dapplets' && x.id !== currentExtId)
-  if (previousExts.length !== 0) {
-    console.log(`Found ${previousExts.length} another instance(s) of the current extension.`)
-    previousExts.forEach((x) => browser.management.setEnabled(x.id, false))
-  }
-})
+// ToDo: remove or restore this code, it was commented to remove downloads permission before publishing
+// browser.runtime.onInstalled.addListener(async () => {
+//   // disable all another instances of the current extension
+//   const exts = await browser.management.getAll()
+//   const currentExtId = browser.runtime.id
+//   const previousExts = exts.filter((x) => x.name === 'Dapplets' && x.id !== currentExtId)
+//   if (previousExts.length !== 0) {
+//     console.log(`Found ${previousExts.length} another instance(s) of the current extension.`)
+//     previousExts.forEach((x) => browser.management.setEnabled(x.id, false))
+//   }
+// })
 
 // Reinject content scripts
-if (window['DAPPLETS_JSLIB'] !== true) {
+if (typeof window === 'undefined') {
   browser.tabs
     .query({ url: ['http://*/*', 'https://*/*'] })
     .then((x) => x.filter((x) => x.status === 'complete'))
@@ -536,9 +537,10 @@ if (window['DAPPLETS_JSLIB'] !== true) {
             .sendMessage(x.id, { type: 'CURRENT_CONTEXT_IDS' })
             .then(() => false)
             .catch(() => {
-              browser.tabs
-                .executeScript(x.id, { file: 'common.js' })
-                .then(() => browser.tabs.executeScript(x.id, { file: 'contentscript.js' }))
+              browser.scripting.executeScript({
+                files: ['custom-elements.min.js', 'contentscript.js'],
+                target: { tabId: x.id },
+              })
               return true
             })
         )
@@ -555,7 +557,7 @@ if (window['DAPPLETS_JSLIB'] !== true) {
   // workaround for firefox which prevents redirect loop
   const loading = new Set<number>()
 
-  const redirectFromProxyServer = async (tab: Tabs.Tab) => {
+  const redirectFromProxyServer = async (tab: browser.Tabs.Tab) => {
     if (tab.status === 'loading' && !loading.has(tab.id)) {
       const groups = /https:\/\/augm\.link\/live\/(.*)/gm.exec(tab.url)
       const [, targetUrl] = groups ?? []

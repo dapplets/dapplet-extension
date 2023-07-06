@@ -161,7 +161,7 @@ export default class ConnectedAccountService {
     const receiverConnectedAccountUser: IConnectedAccountUser = {
       name: receiver.account,
       origin: receiverOrigin,
-      img: makeBlockie(receiver.account),
+      img: receiver.account && makeBlockie(receiver.account),
       accountActive: receiver.accountActive,
     }
     const globalId = receiver.account + '/' + receiverOrigin
@@ -176,7 +176,7 @@ export default class ConnectedAccountService {
         secondAccount: {
           name,
           origin,
-          img: makeBlockie(name),
+          img: name && makeBlockie(name),
           accountActive: accStatus,
         },
         statusName: ConnectedAccountsPairStatus.Processing,
@@ -217,7 +217,7 @@ export default class ConnectedAccountService {
           secondAccount: {
             name: caName,
             origin: caOrigin2 ? caOrigin1 + '/' + caOrigin2 : caOrigin1,
-            img: makeBlockie(caName),
+            img: caName && makeBlockie(caName),
             accountActive: ca.status.isMain,
           },
           statusName: ConnectedAccountsPairStatus.Connected,

@@ -1,9 +1,10 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { FC, useEffect, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { StorageTypes } from '../../../../../../common/constants'
 import { isValidPostageStampId } from '../../../../../../common/helpers'
+import { ReactComponent as Delete } from '../../../assets/icons/mini-close.svg'
 import { Checkbox } from '../../../components/Checkbox'
 import { DropdownPreferedOverlayStorage } from '../../../components/DropdownPreferedOverlayStorage'
 import { DropdownPreferredCANetwork } from '../../../components/DropdownPreferredCANetwork'
@@ -15,7 +16,6 @@ import { SettingWrapper } from '../../../components/SettingWrapper'
 import { Switch } from '../../../components/Switch'
 import { getDefaultValueProvider } from '../../../utils/getDefaultValue'
 import styles from './Settings.module.scss'
-import { ReactComponent as Delete } from '../../../assets/icons/mini-close.svg'
 interface SettingsListProps {
   devModeProps: boolean
   setDevMode: (x) => void
@@ -48,10 +48,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const [swarmPostageStampIdInputError, setSwarmPostageStampIdInputError] = useState(null)
   const [swarmPostageStampIdInputDefault, setSwarmPostageStampIdInputDefault] = useState('')
 
-  const [dynamicAdapterInput, setDynamicAdapterInput] = useState('')
-  const [dynamicAdapterInputError, setDynamicAdapterInputError] = useState(null)
-  const [dynamicAdapterInputDefault, setDynamicAdapterInputDefault] = useState('')
-
   const [userAgentNameInput, setUserAgentNameInput] = useState('')
   const [userAgentNameInputError, setUserAgentNameInputError] = useState(null)
 
@@ -67,7 +63,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   const inputOfFocusSwarmId = useRef<HTMLInputElement>()
   const inputOfFocusSwarm = useRef<HTMLInputElement>()
   const inputOfFocusEtn = useRef<HTMLInputElement>()
-  const inputOfFocusAdapter = useRef<HTMLInputElement>()
   const inputOfFocusAgentName = useRef<HTMLInputElement>()
 
   useEffect(() => {
@@ -78,7 +73,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
       await loadSwarmGateway()
       await loadErrorReporting()
       await loadSwarmPostageStampId()
-      await loadDynamicAdapter()
 
       await loadUserAgentId()
       await loadUserAgentName()
@@ -92,7 +86,6 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const getValidUserAgentName = (value, reg) => {
     try {
-
       const valueReg = value.match(reg)
 
       return valueReg
@@ -100,7 +93,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
   }
   const getValidUserAgentNameFirstSymbol = (value, reg) => {
     try {
-const firsSymbolString = value.slice(0, 1)
+      const firsSymbolString = value.slice(0, 1)
       const valueReg = firsSymbolString.match(reg)
 
       return valueReg
@@ -198,28 +191,6 @@ const firsSymbolString = value.slice(0, 1)
     }
   }
 
-  const loadDynamicAdapter = async () => {
-    const { getInitialConfig } = await initBGFunctions(browser)
-    const config = await getInitialConfig()
-
-    setDynamicAdapterInputDefault(config.dynamicAdapter)
-
-    const { getDynamicAdapter } = await initBGFunctions(browser)
-    const dynamicAdapterInput = await getDynamicAdapter()
-
-    setDynamicAdapterInput(dynamicAdapterInput)
-  }
-
-  const setDynamicAdapter = async (dynamicAdapter: string) => {
-    try {
-      const { setDynamicAdapter } = await initBGFunctions(browser)
-      await setDynamicAdapter(dynamicAdapter)
-      loadDynamicAdapter()
-    } catch (error) {
-      setDynamicAdapterInputError(error.message)
-    }
-  }
-
   const loadUserAgentId = async () => {
     const { getUserAgentId } = await initBGFunctions(browser)
     const userAgentId = await getUserAgentId()
@@ -233,14 +204,15 @@ const firsSymbolString = value.slice(0, 1)
   }
 
   const setUserAgentName = async (userAgentName: string) => {
-    if(userAgentName.trim().length === 0 ){
+    if (userAgentName.trim().length === 0) {
       setDeleteUserAgentName()
-    } else{
-
-     
-      const valueParseFirstSymbol = getValidUserAgentNameFirstSymbol(userAgentNameInput.trimStart(),regExpUserAgentNameFirstSymbol)
+    } else {
+      const valueParseFirstSymbol = getValidUserAgentNameFirstSymbol(
+        userAgentNameInput.trimStart(),
+        regExpUserAgentNameFirstSymbol
+      )
       const valueParse = getValidUserAgentName(userAgentNameInput.trimStart(), regExpUserAgentName)
-      if(userAgentName.length > 40 || userAgentName.trimStart().length < 3){
+      if (userAgentName.length > 40 || userAgentName.trimStart().length < 3) {
         setUserAgentNameInputError('Valid name length: 3-40 characters')
         // setTimeout(() => {
         //   setUserAgentNameInputError(null)
@@ -248,7 +220,7 @@ const firsSymbolString = value.slice(0, 1)
         // }, 3000)
         return
       }
-      if(valueParseFirstSymbol === null){
+      if (valueParseFirstSymbol === null) {
         setUserAgentNameInputError('Please start with a number or latin')
         // setTimeout(() => {
         //   setUserAgentNameInputError(null)
@@ -268,7 +240,6 @@ const firsSymbolString = value.slice(0, 1)
         // }, 3000)
       }
     }
-   
   }
 
   const loadIpfsGateway = async () => {
@@ -322,10 +293,10 @@ const firsSymbolString = value.slice(0, 1)
     await setIsFirstInstallation(true)
   }
 
-  const setDeleteUserAgentName = async()=>{
+  const setDeleteUserAgentName = async () => {
     const { setUserAgentName } = await initBGFunctions(browser)
-      await setUserAgentName('')
-      loadUserAgentName()
+    await setUserAgentName('')
+    loadUserAgentName()
   }
 
   return (
@@ -421,7 +392,12 @@ const firsSymbolString = value.slice(0, 1)
                   setUserAgentNameInputError(null)
                 }}
               />
-              {userAgentNameInput && <Delete onClick={()=> setDeleteUserAgentName()} className={styles.deleteUserAgentName}/>}
+              {userAgentNameInput && (
+                <Delete
+                  onClick={() => setDeleteUserAgentName()}
+                  className={styles.deleteUserAgentName}
+                />
+              )}
             </form>
             {userAgentNameInputError ? (
               <div className={styles.errorMessage}>{userAgentNameInputError}</div>
@@ -432,24 +408,6 @@ const firsSymbolString = value.slice(0, 1)
         <SettingWrapper className={styles.wrapperSettings} title="Parameters">
           <SettingItem title="Registries" component={<></>}>
             <DropdownRegistry />
-          </SettingItem>
-          <SettingItem title="Dynamic Adapter" component={<></>}>
-            <InputPanelSettings
-              isDynamycAdapter={true}
-              isDefaultValueInput={dynamicAdapterInputDefault}
-              isPostStampId={false}
-              isValidHttpFunction={false}
-              providerInputError={dynamicAdapterInputError}
-              providerInput={dynamicAdapterInput}
-              getDefaultValueProvider={() =>
-                getDefaultValueProvider(dynamicAdapterInput, 'dynamicAdapter', setDynamicAdapter)
-              }
-              setProviderInputError={setDynamicAdapterInputError}
-              setProviderInput={setDynamicAdapterInput}
-              setProvider={setDynamicAdapter}
-              onPress={onPress}
-              inputOfFocusEtn={inputOfFocusAdapter}
-            />
           </SettingItem>
           <SettingItem title="Prefered Overlay Storage" component={<></>}>
             <DropdownPreferedOverlayStorage />

@@ -14,7 +14,7 @@
     "declaration": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   },
   "exclude": ["tests", "lib", "jslib", "build", "node_modules", "cypress"],
   "include": ["src/**/*"]

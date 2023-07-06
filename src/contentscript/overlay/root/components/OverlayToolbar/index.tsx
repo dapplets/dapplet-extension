@@ -1,7 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
 import {
   Notification as Notify,
@@ -277,7 +277,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               if (
                 document
                   .querySelector('#dapplets-overlay-manager')
-                  .classList.contains('dapplets-overlay-collapsed')
+                  ?.classList.contains('dapplets-overlay-collapsed')
               ) {
                 p.onMenuClick(NewTabs, menu)
 
@@ -285,7 +285,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               } else if (
                 !document
                   .querySelector('#dapplets-overlay-manager')
-                  .classList.contains('dapplets-overlay-collapsed')
+                  ?.classList.contains('dapplets-overlay-collapsed')
               ) {
                 if (p.pathname === '/system/connectedAccounts') {
                   p.onToggleClick()
@@ -419,7 +419,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 if (
                   document
                     .querySelector('#dapplets-overlay-manager')
-                    .classList.contains('dapplets-overlay-collapsed')
+                    ?.classList.contains('dapplets-overlay-collapsed')
                 ) {
                   p.navigate('/system/notifications')
 
@@ -427,7 +427,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 } else if (
                   !document
                     .querySelector('#dapplets-overlay-manager')
-                    .classList.contains('dapplets-overlay-collapsed')
+                    ?.classList.contains('dapplets-overlay-collapsed')
                 ) {
                   p.navigate('/system/notifications')
                 }
@@ -459,7 +459,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             {!isShowTabs &&
               document
                 .querySelector('#dapplets-overlay-manager')
-                .classList.contains('dapplets-overlay-collapsed') &&
+                ?.classList.contains('dapplets-overlay-collapsed') &&
               (newWidgets && newWidgets.length > 0
                 ? getWigetsConstructor(newWidgets).map((x) => x)
                 : null)}

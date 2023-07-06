@@ -1,6 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { getRegistriesInfo } from '../../../'
+import { ModuleTypes } from '../../../../common/constants'
 import { ManifestAndDetails } from '../../../../common/types'
 
 type TUserEnvInfo = {
@@ -32,7 +33,9 @@ export const createUserEnvInfo = async (
   const { getUserAgentName } = await initBGFunctions(browser)
   const userAgentNameInput = await getUserAgentName()
   const registries = getRegistriesInfo()
-  const activeAdaptersInfo = registries.filter((m) => m.manifest.type === 'ADAPTER')
+  const activeAdaptersInfo = registries.filter(
+    (m) => m.manifest.type === ModuleTypes.Adapter || m.manifest.type === ModuleTypes.ParserConfig
+  )
   const { userAgent, platform } = window.navigator
   return {
     dapplet: {

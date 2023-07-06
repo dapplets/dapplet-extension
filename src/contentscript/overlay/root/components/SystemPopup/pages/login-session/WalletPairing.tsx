@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as React from 'react'
-import { browser } from 'webextension-polyfill-ts'
-// import * as logos from '../../../common/resources/wallets';
+import browser from 'webextension-polyfill'
 import { Bus } from '../../../../../../../common/bus'
 import { SECURE_AUTH_METHODS } from '../../../../../../../common/constants'
 import {

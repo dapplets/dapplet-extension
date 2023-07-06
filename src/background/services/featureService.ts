@@ -1,16 +1,19 @@
 import JSZip from 'jszip'
 import { rcompare } from 'semver'
-import { browser } from 'webextension-polyfill-ts'
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer'
-import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants'
+import {
+  CONTEXT_ID_WILDCARD,
+  DEFAULT_BRANCH_NAME,
+  ModuleTypes,
+  StorageTypes,
+} from '../../common/constants'
 import * as EventBus from '../../common/global-event-bus'
 import {
   areModulesEqual,
-  blobToDataURL,
   getCurrentTab,
+  joinUrls,
   Measure,
   mergeDedupe,
-  parseModuleName,
 } from '../../common/helpers'
 import ManifestDTO from '../dto/manifestDTO'
 import ModuleInfo from '../models/moduleInfo'
@@ -18,14 +21,13 @@ import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 // import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
 import { globalClear } from 'caching-decorator'
-import { Runtime } from 'webextension-polyfill'
-import NFT_NO_ICON from '../../common/resources/nft-no-icon.svg'
-import NFT_TEMPLATE from '../../common/resources/nft-template.svg'
+import browser, { Runtime } from 'webextension-polyfill'
 import { DappletRuntimeResult, MessageWrapperRequest, StorageRef } from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
 import { AnalyticsGoals, AnalyticsService } from './analyticsService'
 import GlobalConfigService from './globalConfigService'
 import { NotificationService } from './notificationService'
+import { generateNftImage } from './offscreenService'
 import { WalletService } from './walletService'
 
 export default class FeatureService {
@@ -70,19 +72,22 @@ export default class FeatureService {
 
     if (filter === 'all' || filter === 'trusted') {
       const trustedUsers = await this._globalConfigService.getTrustedUsers()
-      const accounts = trustedUsers.map((u) => u.account)
+      const accounts = trustedUsers.map((u) => u.account).filter((x) => !!x)
       listingAccounts.push(...accounts)
     }
 
     if (filter === 'all' || filter === 'public') {
       const walletDescriptors = await this._walletService.getWalletDescriptors()
-      const accounts = walletDescriptors.filter((x) => x.connected).map((x) => x.account)
+      const accounts = walletDescriptors
+        .filter((x) => x.connected)
+        .map((x) => x.account)
+        .filter((x) => !!x)
       listingAccounts.push(...accounts)
     }
 
     if (filter === 'active') {
       const trustedUsers = await this._globalConfigService.getTrustedUsers()
-      const accounts = trustedUsers.map((u) => u.account)
+      const accounts = trustedUsers.map((u) => u.account).filter((x) => !!x)
       listingAccounts.push(...accounts)
     }
 
@@ -292,6 +297,8 @@ export default class FeatureService {
     registryUrl: string,
     tabId: number
   ): Promise<DappletRuntimeResult | null> {
+    // ToDo: check that the module is (not) active already
+
     // Clear cached dependencies
     globalClear(this._moduleManager, '_getOptimizedChildDependenciesAndManifest')
 
@@ -320,7 +327,7 @@ export default class FeatureService {
     }
 
     try {
-      const runtime = await new Promise<DappletRuntimeResult>(async (resolve, reject) => {
+      const runtime = await new Promise<DappletRuntimeResult>((resolve, reject) => {
         // listening of loading/unloading from contentscript
         const listener = (message, sender: Runtime.MessageSender) => {
           if (sender.tab.id !== tabId) return
@@ -379,19 +386,20 @@ export default class FeatureService {
           reject('Loading timeout exceed')
         }, 30000)
 
+        // ToDo: use global dapplet_activated event instead of FEATURE_ACTIVATED
         // sending command to contentscript
-        browser.tabs.sendMessage(tabId, {
-          type: isActive ? 'FEATURE_ACTIVATED' : 'FEATURE_DEACTIVATED',
-          payload: [
-            {
-              name,
-              version,
-              branch: DEFAULT_BRANCH_NAME, // ToDo: fix branch
-              order,
-              contextIds: hostnames,
-            },
-          ],
-        })
+        // browser.tabs.sendMessage(tabId, {
+        //   type: isActive ? 'FEATURE_ACTIVATED' : 'FEATURE_DEACTIVATED',
+        //   payload: [
+        //     {
+        //       name,
+        //       version,
+        //       branch: DEFAULT_BRANCH_NAME, // ToDo: fix branch
+        //       order,
+        //       contextIds: hostnames,
+        //     },
+        //   ],
+        // })
 
         // global notification
         const event = isActive ? 'dapplet_activated' : 'dapplet_deactivated'
@@ -489,24 +497,6 @@ export default class FeatureService {
       order: number
       hostnames: string[]
     }[] = []
-
-    // Activate dynamic adapter for dynamic contexts searching
-    const hostnames = contextIds.filter((x) => /^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/gm.test(x))
-    if (hostnames.length > 0) {
-      const dynamicAdapter = await this._globalConfigService.getDynamicAdapter()
-      if (dynamicAdapter) {
-        const parsed = parseModuleName(dynamicAdapter)
-        if (parsed) {
-          modules.push({
-            name: parsed.name,
-            branch: parsed.branch,
-            version: parsed.version,
-            order: -1,
-            hostnames: hostnames,
-          })
-        }
-      }
-    }
 
     const isThereActiveDapplets = await this._globalConfigService.isThereActiveDapplets()
     if (!isThereActiveDapplets) return modules
@@ -607,7 +597,7 @@ export default class FeatureService {
 
     return modulesWithDeps.map((m, i) => ({
       manifest: Object.assign(m.manifest, dists[i].internalManifest), // merge manifests from registry and bundle (zip)
-      script: dists[i].script,
+      scriptOrConfig: dists[i].scriptOrConfig,
       defaultConfig: dists[i].defaultConfig,
       schemaConfig: dists[i].schemaConfig,
     }))
@@ -667,15 +657,36 @@ export default class FeatureService {
 
       if (vi && vi.main) {
         const arr = await this._storageAggregator.getResource(vi.main)
-        zip.file('index.js', arr)
+        if (vi.type === ModuleTypes.ParserConfig) {
+          zip.file('index.json', arr)
+          const config = new TextDecoder('utf-8').decode(new Uint8Array(arr))
+          const addStylesToZip = async (confiWithStyles: any, keyToReplace: string) =>
+            Promise.all(
+              Object.entries(confiWithStyles).map(async ([key, value]: [string, any]) => {
+                if (typeof value === 'string' && key === keyToReplace) {
+                  const cssArr = await this._storageAggregator.getResource({
+                    uris: [joinUrls(vi.main.uris[0], value)],
+                    hash: null,
+                  })
+                  if (cssArr) zip.file(value, cssArr)
+                } else if (typeof value === 'object') {
+                  await addStylesToZip(value, keyToReplace)
+                }
+              })
+            )
+
+          await addStylesToZip(JSON.parse(config), 'styles')
+        } else {
+          zip.file('index.js', arr)
+        }
       }
 
-      if (vi && vi.defaultConfig) {
+      if (vi && vi.defaultConfig && vi.type !== ModuleTypes.ParserConfig) {
         const arr = await this._storageAggregator.getResource(vi.defaultConfig)
         zip.file('default.json', arr)
       }
 
-      if (vi && vi.schemaConfig) {
+      if (vi && vi.schemaConfig && vi.type !== ModuleTypes.ParserConfig) {
         const arr = await this._storageAggregator.getResource(vi.schemaConfig)
         zip.file('schema.json', arr)
       }
@@ -877,7 +888,7 @@ export default class FeatureService {
       const registry = await this._moduleManager.registryAggregator.getRegistryByUri(registryUrl)
       if (!registry) return null
       const moduleInfo = await registry.getModuleInfoByName(moduleName)
-      // if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into browser storage
+      // if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into chrome storage
       return moduleInfo
       // }
     }
@@ -970,55 +981,6 @@ export default class FeatureService {
     return base64
   }
 
-  private async _generateNftImage({
-    name,
-    title,
-    icon,
-  }: {
-    name: string
-    title: string
-    icon?: Blob
-  }): Promise<Blob> {
-    const base64ImageToCanvas = (base64: string) =>
-      new Promise<HTMLCanvasElement>((res, rej) => {
-        const image = new Image()
-        image.src = base64
-        image.onerror = rej
-        image.onload = function () {
-          const canvas = document.createElement('canvas')
-          canvas.width = image.width
-          canvas.height = image.height
-          const ctx = canvas.getContext('2d')
-          ctx.drawImage(image, 0, 0)
-          res(canvas)
-        }
-      })
-
-    const wrapper = document.createElement('svg')
-    wrapper.innerHTML = atob(NFT_TEMPLATE.split(',')[1])
-    const svg = wrapper.firstChild as any
-    const titleEl = svg.getElementById('module-title')
-    const nameEl = svg.getElementById('module-name')
-
-    titleEl.innerHTML = title
-    nameEl.innerHTML = name
-
-    // recognize mime type
-    const dataUrlUnknownMime = icon ? await blobToDataURL(new Blob([icon])) : NFT_NO_ICON
-    const iconCanvas = await base64ImageToCanvas(dataUrlUnknownMime)
-    const dataUrl = await iconCanvas.toDataURL()
-
-    const iconEl = svg.getElementById('module-icon')
-    iconEl.setAttribute('xlink:href', dataUrl)
-
-    const svgData = new XMLSerializer().serializeToString(svg)
-    const svgAsBase64 = 'data:image/svg+xml;base64,' + btoa(svgData)
-
-    const imageCanvas = await base64ImageToCanvas(svgAsBase64)
-    const blob = await new Promise<Blob>((r) => imageCanvas.toBlob(r))
-    return blob
-  }
-
   private async _uploadModuleInfoIcons(
     mi: ModuleInfo,
     targetStorages: StorageTypes[]
@@ -1033,7 +995,7 @@ export default class FeatureService {
         const iconHashUris = await this._storageAggregator.save(iconBlob, targetStorages)
 
         // Generate NFT Image
-        const imageBlob = await this._generateNftImage({ name, title, icon: iconBlob })
+        const imageBlob = await generateNftImage({ name, title, icon: iconBlob })
         const imageHashUris = await this._storageAggregator.save(imageBlob, targetStorages)
 
         // Manifest editing
@@ -1046,7 +1008,7 @@ export default class FeatureService {
         const iconHashUris = await this._storageAggregator.save(iconBlob, targetStorages)
 
         // Generate NFT Image
-        const imageBlob = await this._generateNftImage({ name, title, icon: iconBlob })
+        const imageBlob = await generateNftImage({ name, title, icon: iconBlob })
         const imageHashUris = await this._storageAggregator.save(imageBlob, targetStorages)
 
         // Manifest editing
@@ -1055,7 +1017,7 @@ export default class FeatureService {
       }
     } else {
       // Generate NFT Image
-      const imageBlob = await this._generateNftImage({ name: mi.name, title: mi.title }) // no module icon
+      const imageBlob = await generateNftImage({ name: mi.name, title: mi.title }) // no module icon
       const imageHashUris = await this._storageAggregator.save(imageBlob, targetStorages)
 
       // Manifest editing

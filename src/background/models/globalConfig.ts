@@ -54,8 +54,6 @@ export class GlobalConfig extends Base {
 
   lastMessageSeenTimestamp: string = null
 
-  dynamicAdapter: string = null
-
   preferedOverlayStorage: string = null
 
   swarmPostageStampId: string = null

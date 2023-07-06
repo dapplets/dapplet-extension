@@ -37,7 +37,6 @@ const EXPORTABLE_PROPERTIES = [
   'hostnames',
   'lastDevMessageHash',
   'ignoredUpdate',
-  'dynamicAdapter',
   'preferedOverlayStorage',
   'myDapplets',
   'connectedAccountsTestnetContractAddress',
@@ -229,7 +228,7 @@ export default class GlobalConfigService {
     config.isFirstInstallation = true
     config.isActive = true
     config.registries = [
-      { url: 'v2.registry.dapplet-base.eth', isDev: false, isEnabled: true },
+      { url: 'v3.registry.dapplet-base.eth', isDev: false, isEnabled: true },
       {
         url: 'dev-1627024020035-70641704943070',
         isDev: false,
@@ -274,7 +273,6 @@ export default class GlobalConfigService {
     config.userAgentId = generateGuid()
     config.userAgentName = ''
     config.hostnames = {}
-    config.dynamicAdapter = 'dynamic-adapter.dapplet-base.eth#default@latest'
     config.preferedOverlayStorage = 'centralized'
     config.swarmPostageStampId = '983601c2e0c8fedfe97ac316d51269f56c3ff99004b10bbd9bcdf8077200f32f'
     config.ipfsGatewayUrl = 'https://ipfs-gateway.mooo.com'
@@ -739,14 +737,6 @@ export default class GlobalConfigService {
 
   async setLastMessageSeenTimestamp(lastMessageSeenTimestamp: string) {
     return this.updateConfig((c) => (c.lastMessageSeenTimestamp = lastMessageSeenTimestamp))
-  }
-
-  async getDynamicAdapter() {
-    return this.get().then((x) => x.dynamicAdapter)
-  }
-
-  async setDynamicAdapter(dynamicAdapter: string) {
-    return this.updateConfig((c) => (c.dynamicAdapter = dynamicAdapter))
   }
 
   async getPreferedOverlayStorage() {

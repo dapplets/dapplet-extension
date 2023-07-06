@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as React from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import ModuleInfo from '../../../../../../../background/models/moduleInfo'
 import VersionInfo from '../../../../../../../background/models/versionInfo'
 import { Bus } from '../../../../../../../common/bus'

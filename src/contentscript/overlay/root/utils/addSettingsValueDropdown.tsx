@@ -1,5 +1,5 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import {
   regExpIndexENS,
   regExpIndexEthereum,
@@ -9,6 +9,7 @@ import {
   regExpIndexNearTestnet,
 } from '../common/constants'
 import { getValidationAddress } from '../common/helpers'
+
 export const addSettingsValueDropdown = async (
   value: string,
   parameter,

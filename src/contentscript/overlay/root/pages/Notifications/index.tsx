@@ -1,14 +1,12 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-
 import React, { useEffect, useState } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
+import * as EventBus from '../../../../../common/global-event-bus'
 import {
   Notification as Notify,
   NotificationStatus,
   NotificationType,
 } from '../../../../../common/models/notification'
-
-import * as EventBus from '../../../../../common/global-event-bus'
 import IconDefault from '../../assets/icons/notificationIcons/defaultIcon.svg'
 import { Notification } from '../../components/Notification'
 import { TabLoader } from '../../components/TabLoader'

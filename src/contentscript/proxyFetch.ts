@@ -1,4 +1,4 @@
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 
 export const proxyFetch: typeof fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   const request = new Request(input, init)

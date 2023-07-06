@@ -5,7 +5,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = merge(common, {
   mode: 'development',
-  devtool: 'inline-source-map', // Use `false` for quick rebuild
+  devtool: 'source-map', // Use `false` for quick rebuild
   plugins: [
     new webpack.DefinePlugin({
       EXTENSION_ENV: JSON.stringify('development'),
