@@ -329,20 +329,20 @@ const wsproxy = new WebSocketProxy()
 browser.runtime.onConnect.addListener(wsproxy.createConnectListener())
 
 // ToDo: These lines are repeated many time
-suspendService.changeIcon()
-suspendService.updateContextMenus()
+// suspendService.changeIcon()
+// suspendService.updateContextMenus()
 
-//listen for new tab to be activated
-browser.tabs.onActivated.addListener(() => {
-  suspendService.changeIcon()
-  suspendService.updateContextMenus()
-})
+// //listen for new tab to be activated
+// browser.tabs.onActivated.addListener(() => {
+//   suspendService.changeIcon()
+//   suspendService.updateContextMenus()
+// })
 
-//listen for current tab to be changed
-browser.tabs.onUpdated.addListener(() => {
-  suspendService.changeIcon()
-  suspendService.updateContextMenus()
-})
+// //listen for current tab to be changed
+// browser.tabs.onUpdated.addListener(() => {
+//   suspendService.changeIcon()
+//   suspendService.updateContextMenus()
+// })
 
 // ToDo: remove or restore this function
 // browser.commands.onCommand.addListener((cmd) => {
