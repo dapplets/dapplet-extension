@@ -55,8 +55,17 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
     ...anotherProps
   } = props
 
-  const { name, title, description, author, icon, isActive, isActionHandler, isUnderConstruction } =
-    dapplet
+  const {
+    name,
+    title,
+    error,
+    description,
+    author,
+    icon,
+    isActive,
+    isActionHandler,
+    isUnderConstruction,
+  } = dapplet
 
   const [loadHome, setLoadHome] = useState(false)
   const [copied, setCopied] = useState<LoadingState>(LoadingState.READY)
@@ -115,6 +124,7 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
           </div>
 
           <div className={cn(styles.blockText)}>{description}</div>
+          {error ? <span className={styles.moduleError}>{'Dapplet error'}</span> : null}
         </div>
 
         <div className={cn(styles.blockBottom)}>
