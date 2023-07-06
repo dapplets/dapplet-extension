@@ -344,13 +344,14 @@ browser.tabs.onUpdated.addListener(() => {
   suspendService.updateContextMenus()
 })
 
-browser.commands.onCommand.addListener((cmd) => {
-  if (cmd === 'toggle-overlay') {
-    return getCurrentTab().then(
-      (activeTab) => activeTab && browser.tabs.sendMessage(activeTab.id, 'TOGGLE_OVERLAY')
-    )
-  }
-})
+// ToDo: remove or restore this function
+// browser.commands.onCommand.addListener((cmd) => {
+//   if (cmd === 'toggle-overlay') {
+//     return getCurrentTab().then(
+//       (activeTab) => activeTab && browser.tabs.sendMessage(activeTab.id, 'TOGGLE_OVERLAY')
+//     )
+//   }
+// })
 
 async function fetchPlain({
   url,
