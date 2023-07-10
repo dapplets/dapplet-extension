@@ -22,6 +22,7 @@ import { IOverlay } from './overlay/interfaces'
 import { OverlayManager } from './overlay/root/overlayManager'
 
 const IS_OVERLAY_IFRAME = window.name.indexOf('dapplet-overlay') !== -1
+const IS_WIDGET_IFRAME = window.name.indexOf('dapplet-widget/') !== -1
 const IS_E2E_ENV = isE2ETestingEnvironment(window)
 let injector: Injector // ToDo ------> look at the getRegistriesInfo() ToDo
 
@@ -336,7 +337,7 @@ async function processShareLink() {
 }
 
 // do not inject to overlays frames
-if (!IS_OVERLAY_IFRAME && !IS_E2E_ENV) {
+if (!IS_OVERLAY_IFRAME && !IS_WIDGET_IFRAME && !IS_E2E_ENV) {
   if (window.document.body) {
     init()
   } else {
