@@ -260,7 +260,7 @@ index 00fa93d..c865304 100644
          currentUrl.searchParams.delete('all_keys');
          currentUrl.searchParams.delete('account_id');
 -        window.history.replaceState({}, document.title, currentUrl.toString());
-+        tabs && tabs[0] && browser.tabs.update(tabs[0].id, { url: currentUrl.toString() });
++        // tabs && tabs[0] && browser.tabs.update(tabs[0].id, { url: currentUrl.toString() }); // ToDo: this line was commented to prevent the page from reloading
 +        // browser.history.replaceState({}, document.title, currentUrl.toString()); // ToDo ????????????
      }
      /**
