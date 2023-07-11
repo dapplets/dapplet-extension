@@ -3,7 +3,7 @@
  * Provides the same interface in all parts of an extension.
  */
 
-import { Runtime } from 'webextension-polyfill'
+import { Browser } from 'webextension-polyfill'
 
 // Constants
 
@@ -33,14 +33,16 @@ type EmitParams = {
 }
 
 interface Connection {
+  addListener: (cb: (message: EventMessage | MessageEvent<EventMessage>) => void) => void
+  removeListener: (cb: (message: EventMessage | MessageEvent<EventMessage>) => void) => void
   postMessage(message: EventMessage): void
-  disconnect(): void
+  disconnect?(): void
 }
 
 // Detect an extension's module
 
 let environment: EnvType
-let browser: any
+let browser: Browser
 
 try {
   browser = require('webextension-polyfill')
@@ -67,69 +69,73 @@ const currentContext = (crypto as any).randomUUID()
 const callbacks = new Map<string, Set<CallbackFunction>>()
 const connections: Connection[] = []
 
-function register(portOrWindow: Runtime.Port | Window) {
-  const _conn: any =
-    typeof Window !== 'undefined' && portOrWindow instanceof Window ? {} : portOrWindow
+function register(connection: Connection) {
+  const callback = (messageOrEvent: EventMessage | MessageEvent<EventMessage>) => {
+    const message = messageOrEvent instanceof Event ? messageOrEvent.data : messageOrEvent
 
-  const callback = (message: EventMessage) => {
+    if (typeof message !== 'object') return
+    if (message.bus !== BUS_ID) return
+    if (message.from === currentContext) return
+
     message.from_env = environment
-
     message.from = currentContext // ToDo: change sender in relayed messages
 
-    connections.filter((x) => x !== _conn).forEach((p) => p.postMessage(message)) // Notify all conections except itself
+    connections.filter((x) => x !== connection).forEach((p) => p.postMessage(message)) // Notify all conections except itself
     callbacks.get(message.event)?.forEach((cb) => cb(message.data))
+
+    return Promise.resolve()
   }
 
-  if (typeof Window !== 'undefined' && portOrWindow instanceof Window) {
-    const listener = (e) => {
-      if (typeof e.data === 'object' && e.data.bus === BUS_ID && e.data.from !== currentContext) {
-        callback(e.data)
-      }
-    }
-    portOrWindow.addEventListener('message', listener)
-
-    _conn.postMessage = (msg) => portOrWindow.postMessage(msg)
-    _conn.disconnect = () => {
-      const index = connections.indexOf(_conn)
-      if (index !== -1) {
-        connections.splice(index, 1)
-      }
-      portOrWindow.removeEventListener('message', listener)
+  connection.addListener(callback)
+  connection.disconnect = () => {
+    const index = connections.indexOf(connection)
+    if (index !== -1) {
+      connections.splice(index, 1)
     }
 
-    connections.push(_conn)
-  } else {
-    _conn.onMessage.addListener(callback)
-    _conn.onDisconnect.addListener(() => {
-      _conn.onMessage.removeListener(callback)
-      const index = connections.indexOf(_conn)
-      if (index !== -1) {
-        connections.splice(index, 1)
-      }
-    })
-    connections.push(_conn)
+    connection.removeListener(callback)
   }
+
+  connections.push(connection)
 }
 
 if (environment === EnvType.BACKGROUND) {
   // Listen incoming connections to the background
-  browser.runtime.onConnect.addListener((port) => {
-    if (port.name === BUS_ID) {
-      register(port)
-    }
+  register({
+    addListener: browser.runtime.onMessage.addListener,
+    removeListener: browser.runtime.onMessage.removeListener,
+    postMessage: (message) => {
+      browser.tabs.query({}).then((tabs) => {
+        tabs.forEach((tab) => {
+          console.log('sending message to tab', tab.id, message)
+          browser.tabs.sendMessage(tab.id, message)
+        })
+      })
+    },
   })
 } else if (environment === EnvType.CONTENT_SCRIPT || environment === EnvType.CONTENT_FRAME) {
   // Connect to the background
-  const port = browser.runtime.connect({ name: BUS_ID } as any)
-  register(port)
+  register({
+    addListener: browser.runtime.onMessage.addListener,
+    removeListener: browser.runtime.onMessage.removeListener,
+    postMessage: browser.runtime.sendMessage,
+  })
 
   if (environment === EnvType.CONTENT_SCRIPT) {
     // Listen incoming connections from the inpage script
-    register(window)
+    register({
+      addListener: (cb) => window.addEventListener('message', cb),
+      removeListener: (cb) => window.removeEventListener('message', cb),
+      postMessage: (msg) => window.postMessage(msg),
+    })
   }
 } else if (environment === EnvType.INPAGE_SCRIPT) {
   // Connect to the content script
-  register(window)
+  register({
+    addListener: (cb) => window.addEventListener('message', cb),
+    removeListener: (cb) => window.removeEventListener('message', cb),
+    postMessage: (msg) => window.postMessage(msg),
+  })
 }
 
 export function emit(event: string, data?: any, params?: EmitParams) {

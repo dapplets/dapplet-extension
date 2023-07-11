@@ -1,7 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { Subject } from 'rxjs'
 import browser from 'webextension-polyfill'
-import { GLOBAL_EVENT_BUS_NAME } from '../common/chrome-extension-websocket-wrapper/constants'
 import * as EventBus from '../common/global-event-bus'
 import {
   assertFullfilled,
@@ -42,7 +41,7 @@ async function init() {
     console.error('Cannot process the share link', e)
     return null
   })
-  const port = browser.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any)
+  // const port = browser.runtime.connect({ name: GLOBAL_EVENT_BUS_NAME } as any)
 
   const jsonrpc = new JsonRpc()
   const overlayManager = IS_IFRAME ? new OverlayManagerIframe(jsonrpc) : new OverlayManager(jsonrpc)
@@ -103,16 +102,16 @@ async function init() {
   EventBus.on('connected_accounts_changed', () => injector.executeConnectedAccountsUpdateHandler())
 
   // destroy when background is disconnected
-  port.onDisconnect.addListener(() => {
-    console.log(
-      '[DAPPLETS]: The connection to the background service has been lost. Content script is unloading...'
-    )
-    EventBus.emit('disconnect')
-    EventBus.destroy()
-    jsonrpc.destroy()
-    injector.dispose()
-    core.overlayManager.destroy()
-  })
+  // port.onDisconnect.addListener(() => {
+  //   console.log(
+  //     '[DAPPLETS]: The connection to the background service has been lost. Content script is unloading...'
+  //   )
+  //   EventBus.emit('disconnect')
+  //   EventBus.destroy()
+  //   jsonrpc.destroy()
+  //   injector.dispose()
+  //   core.overlayManager.destroy()
+  // })
 
   const overlayMap = new Map<string, IOverlay>()
 
