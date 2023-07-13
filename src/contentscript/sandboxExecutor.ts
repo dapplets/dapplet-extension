@@ -177,10 +177,12 @@ export abstract class SandboxExecutor {
           })
         break
       case 'confirm':
-        this._worker.postMessage({ id, result: confirm(params[0]) })
+        this._worker.postMessage({ id, result: params[0] })
+
         break
+
       case 'alert':
-        this._worker.postMessage({ id, result: alert(params[0]) })
+        this._worker.postMessage({ id, result: params[0] })
         break
       case 'openPage':
         window.open(params[0], '_blank')

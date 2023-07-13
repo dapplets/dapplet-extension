@@ -2,6 +2,7 @@ import * as ethers from 'ethers'
 import * as NearApi from 'near-api-js'
 import VersionInfo from '../../background/models/versionInfo'
 import { joinUrls } from '../../common/helpers'
+import { NotificationPayload } from '../../common/models/notification'
 import { LoginRequest, SandboxEnvironmentVariables } from '../../common/types'
 import { initBGFunctions, sendRequest } from '../communication'
 import { IOverlayManager } from '../overlay/interfaces'
@@ -57,10 +58,27 @@ export class Core {
   }
 
   public async confirm(message: string): Promise<boolean> {
+    await this.notify({ title: message })
+
     return sendRequest('confirm', message)
   }
 
+  public async notify(payload: NotificationPayload, icon?: string, moduleName?: string) {
+    const { createAndShowNotification, getThisTab } = initBGFunctions()
+
+    const thisTab = await getThisTab()
+
+    const notification = {
+      ...payload,
+      icon,
+      source: moduleName,
+    }
+
+    await createAndShowNotification(notification, thisTab.id)
+  }
+
   public async alert(message: string): Promise<void> {
+    await this.notify({ title: message })
     return sendRequest('alert', message)
   }
 

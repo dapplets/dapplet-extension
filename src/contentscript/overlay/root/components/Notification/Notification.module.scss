@@ -46,10 +46,12 @@
 .blockTitle {
   display: flex;
   justify-content: space-between;
+  max-width: 100%;
 }
 
 .blockIcon {
   display: flex;
+  width: 80%;
 }
 
 .icon {
@@ -59,14 +61,16 @@
 }
 
 .title {
-  display: flex;
-  align-items: center;
-
   font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
   color: $content-black;
+  width: 92%;
+
+  display: inline-block;
+  text-wrap: wrap;
+  word-wrap: break-word;
 }
 
 .date {
