@@ -1,5 +1,6 @@
 import * as ethers from 'ethers'
 import * as NearApi from 'near-api-js'
+import ModuleInfo from '../../background/models/moduleInfo'
 import VersionInfo from '../../background/models/versionInfo'
 import { joinUrls } from '../../common/helpers'
 import { NotificationPayload } from '../../common/models/notification'
@@ -67,15 +68,23 @@ export class Core {
     return sendRequest('confirm', message)
   }
 
-  public async notify(payload: NotificationPayload, icon?: string, moduleName?: string) {
-    const { createAndShowNotification, getThisTab } = initBGFunctions()
+  public async notify(payload: NotificationPayload) {
+    const { createAndShowNotification, getThisTab, getModuleInfoByName } = initBGFunctions()
+
+    // ToDo: move to background
+    const moduleInfo: ModuleInfo = await getModuleInfoByName(
+      this.manifest.registryUrl,
+      this.manifest.name
+    )
+
+    const icon = moduleInfo.icon?.uris?.[0]
 
     const thisTab = await getThisTab()
 
     const notification = {
       ...payload,
       icon,
-      source: moduleName,
+      source: this.manifest.name,
     }
 
     await createAndShowNotification(notification, thisTab.id)
