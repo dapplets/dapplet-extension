@@ -1,16 +1,24 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import { Observable, Subscription } from 'rxjs'
 import browser from 'webextension-polyfill'
 import { generateGuid } from '../common/helpers'
 import { JsonRpc } from '../common/jsonrpc'
 import { SandboxInitializationParams } from '../common/types'
+import { BaseEvent } from './events/baseEvent'
 
 export abstract class SandboxExecutor {
   private _worker: Worker
   private _stateMap = new Map<string, any>()
   private _detachConfigCallbacks: (() => void)[] = []
   private _jsonrpc: JsonRpc
+  private _eventBusSubscription: Subscription
 
-  constructor(dappletScript: string, params: SandboxInitializationParams, jsonrpc: JsonRpc) {
+  constructor(
+    dappletScript: string,
+    params: SandboxInitializationParams,
+    jsonrpc: JsonRpc,
+    moduleEventBus: Observable<unknown>
+  ) {
     // sandbox.js provides environment for the script to run in
     // it includes Core-functions, DI container (Inject, Injectable) and adapter
     const sandboxScriptUrl = browser.runtime.getURL('sandbox.js')
@@ -30,6 +38,8 @@ export abstract class SandboxExecutor {
 
     this._jsonrpc = jsonrpc
     this._jsonrpc.addEventSource(this._worker as any) // ToDo: targetOrigin is incompatible with worker
+
+    this._eventBusSubscription = moduleEventBus.subscribe(this._eventBusListener)
   }
 
   public async activate() {
@@ -40,6 +50,7 @@ export abstract class SandboxExecutor {
   public async deactivate() {
     await this._sendRequest('deactivate')
     this._detachConfigCallbacks.forEach((cb) => cb())
+    this._eventBusSubscription.unsubscribe()
     this._jsonrpc.removeEventSource(this._worker as any)
     this._worker.removeEventListener('message', this._messageListener)
     this._worker.terminate()
@@ -65,6 +76,10 @@ export abstract class SandboxExecutor {
 
   public executeConnectedAccountsUpdateHandler() {
     this._notify('fireConnectedAccountsUpdateEvent')
+  }
+
+  private _eventBusListener = (event: BaseEvent) => {
+    this._notify('fireEventBus', event)
   }
 
   private _onConfigAttached({

@@ -3,17 +3,10 @@ import { Subject } from 'rxjs'
 import { filter } from 'rxjs/operators'
 import { maxSatisfying, valid } from 'semver'
 import browser from 'webextension-polyfill'
-import ModuleInfo from '../background/models/moduleInfo'
 import VersionInfo from '../background/models/versionInfo'
 import { CONTEXT_ID_WILDCARD, DEFAULT_BRANCH_NAME, ModuleTypes } from '../common/constants'
 import * as EventBus from '../common/global-event-bus'
-import {
-  areModulesEqual,
-  formatModuleId,
-  joinUrls,
-  multipleReplace,
-  parseModuleName,
-} from '../common/helpers'
+import { areModulesEqual, multipleReplace, parseModuleName } from '../common/helpers'
 import { JsonRpc } from '../common/jsonrpc'
 import {
   DefaultConfig,
@@ -21,10 +14,8 @@ import {
   SandboxInitializationParams,
   SchemaConfig,
 } from '../common/types'
-import { AppStorage } from './appStorage'
 import Core from './core'
 import { BaseEvent } from './events/baseEvent'
-import { EventBus as ModuleEventBus } from './events/eventBus'
 import BuiltInModules from './modules'
 import { ConfigAdapter } from './modules/config-adapter'
 import { DynamicAdapter } from './modules/dynamic-adapter'
@@ -49,7 +40,6 @@ type RegistriedModule = {
   onShareLinkHandler?: Function
   onWalletsUpdateHandler?: Function
   onConnectedAccountsUpdateHandler?: Function
-  moduleEventBus?: ModuleEventBus
 }
 
 type NotRegisteredModule = {
@@ -243,8 +233,6 @@ export class Injector {
         m.instancedConstructorDeps.forEach((d) => d.detachConfig())
         Object.values(m.instancedPropertyDependencies).forEach((x) => x.detachConfig())
 
-        m.moduleEventBus?.destroy()
-
         if (m.instance.deactivate !== undefined) {
           if (typeof m.instance.deactivate === 'function') {
             // ToDo: deactivate modules in parallel
@@ -353,9 +341,7 @@ export class Injector {
   }
 
   private async _processModules(modules: NotRegisteredModule[]) {
-    const { getModulesWithDeps, getSwarmGateway, getPreferedOverlayStorage } =
-      await initBGFunctions(browser)
-    const { core } = this
+    const { getSwarmGateway, getPreferedOverlayStorage } = await initBGFunctions(browser)
 
     const swarmGatewayUrl = await getSwarmGateway()
     const preferedOverlayStorage = await getPreferedOverlayStorage()
@@ -375,106 +361,106 @@ export class Injector {
         continue
       }
 
-      const moduleEventBus = new ModuleEventBus(
-        this.eventStream.pipe(filter((e) => e.namespace === manifest.name))
-      )
+      // const moduleEventBus = new ModuleEventBus(
+      //   this.eventStream.pipe(filter((e) => e.namespace === manifest.name))
+      // )
 
-      // ToDo: elemenate the boilerplate
-      const coreWrapper = {
-        overlayManager: core.overlayManager,
-        contextStarted: (contextIds: any[], parentContext: string) =>
-          this._setContextActivivty(contextIds, parentContext, true),
-        contextFinished: (contextIds: any[], parentContext: string) =>
-          this._setContextActivivty(contextIds, parentContext, false),
-        connect: core.connect.bind(core),
-        overlay: (cfg, eventDef) => {
-          cfg.source = manifest.name
-          cfg.module = { name: manifest.name, registryUrl: manifest.registryUrl }
-          if (cfg.name) {
-            const overlay = manifest.overlays?.[cfg.name]
-            if (!overlay)
-              throw new Error(`Cannot find overlay with name "${cfg.name}" in the manifest.`)
+      // // ToDo: elemenate the boilerplate
+      // const coreWrapper = {
+      //   overlayManager: core.overlayManager,
+      //   contextStarted: (contextIds: any[], parentContext: string) =>
+      //     this._setContextActivivty(contextIds, parentContext, true),
+      //   contextFinished: (contextIds: any[], parentContext: string) =>
+      //     this._setContextActivivty(contextIds, parentContext, false),
+      //   connect: core.connect.bind(core),
+      //   overlay: (cfg, eventDef) => {
+      //     cfg.source = manifest.name
+      //     cfg.module = { name: manifest.name, registryUrl: manifest.registryUrl }
+      //     if (cfg.name) {
+      //       const overlay = manifest.overlays?.[cfg.name]
+      //       if (!overlay)
+      //         throw new Error(`Cannot find overlay with name "${cfg.name}" in the manifest.`)
 
-            const url = new URL(overlay.uris[0])
+      //       const url = new URL(overlay.uris[0])
 
-            if (preferedOverlayStorage === 'centralized' && overlay.hash) {
-              cfg.url = joinUrls(
-                'https://dapplet-api.s3-website.nl-ams.scw.cloud/',
-                overlay.hash.replace('0x', '')
-              )
-              return core.overlay(cfg, eventDef)
-            } else if (url.protocol === 'bzz:') {
-              cfg.url = joinUrls(swarmGatewayUrl, `bzz/${url.pathname.slice(2)}`)
-              return core.overlay(cfg, eventDef)
-            } else if (url.protocol === 'http:' || url.protocol === 'https:') {
-              cfg.url = url.href
-              return core.overlay(cfg, eventDef)
-            } else if (preferedOverlayStorage === 'decentralized' && overlay.hash) {
-              cfg.url = joinUrls(
-                'https://dapplet-api.s3-website.nl-ams.scw.cloud/',
-                overlay.hash.replace('0x', '')
-              )
-              return core.overlay(cfg, eventDef)
-            } else {
-              throw new Error(`Invalid protocol "${url.protocol}" in the overlay address.`)
-            }
-          } else {
-            return core.overlay(cfg, eventDef)
-          }
-        },
-        wallet: (cfg, eventDef) => core.wallet(cfg, eventDef, manifest.name),
-        storage: new AppStorage(manifest, defaultConfig, schemaConfig),
-        events: moduleEventBus,
-        contract: (type, address, options) => core.contract(type, address, options, manifest.name),
-        onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
-        onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
-        onShareLink: (handler: Function) => this.setShareLinkHandler(manifest.name, handler),
-        onWalletsUpdate: (handler: Function) =>
-          this.setWalletsUpdateHandler(manifest.name, handler),
-        onConnectedAccountsUpdate: (handler: Function) =>
-          this.setConnectedAccountsUpdate(manifest.name, handler),
-        getManifest: async (
-          moduleName?: string
-        ): Promise<Omit<ModuleInfo, 'interfaces'> & VersionInfo> => {
-          let module: RegistriedModule
-          if (moduleName) {
-            module = this.registry.find((m) => m.manifest.name === moduleName)
-          } else {
-            module = this.registry.find((m) => m.manifest.name === manifest.name)
-          }
-          const { getModuleInfoByName } = await initBGFunctions(browser)
-          const registry = manifest.registryUrl
-          const moduleInfo: ModuleInfo = await getModuleInfoByName(
-            registry,
-            moduleName ? moduleName : manifest.name
-          )
-          return { ...moduleInfo, ...module.manifest, contextIds }
-        },
-        getContentDetectors: () => core.getContentDetectors(),
-        utils: core.utils,
-        BigNumber: core.BigNumber,
-        ethers: core.ethers,
-        near: core.near,
-        createShareLink: (targetUrl: string, modulePayload: any) =>
-          core.createShareLink(targetUrl, modulePayload, {
-            contextIds: ['*'], // ToDo: Replace wildcard on real context IDs
-            moduleId: formatModuleId(manifest),
-            registry: manifest.registryUrl,
-          }),
-        sessions: () => core.sessions(manifest.name),
-        login: (req, settings) => core.login(req, settings, manifest.name),
-        state: core.state,
-        connectedAccounts: core.connectedAccounts,
-        fetch: core.fetch,
-        getPreferredConnectedAccountsNetwork: core.getPreferredConnectedAccountsNetwork,
-        notify: async (payload) => {
-          // ToDo: do not fetch manifest twice
-          const { getModuleInfoByName } = await initBGFunctions(browser)
-          const registry = manifest.registryUrl
-          const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, manifest.name)
-          await core.notify(payload, moduleInfo.icon?.uris?.[0], manifest.name)
-        },
-      }
+      //       if (preferedOverlayStorage === 'centralized' && overlay.hash) {
+      //         cfg.url = joinUrls(
+      //           'https://dapplet-api.s3-website.nl-ams.scw.cloud/',
+      //           overlay.hash.replace('0x', '')
+      //         )
+      //         return core.overlay(cfg, eventDef)
+      //       } else if (url.protocol === 'bzz:') {
+      //         cfg.url = joinUrls(swarmGatewayUrl, `bzz/${url.pathname.slice(2)}`)
+      //         return core.overlay(cfg, eventDef)
+      //       } else if (url.protocol === 'http:' || url.protocol === 'https:') {
+      //         cfg.url = url.href
+      //         return core.overlay(cfg, eventDef)
+      //       } else if (preferedOverlayStorage === 'decentralized' && overlay.hash) {
+      //         cfg.url = joinUrls(
+      //           'https://dapplet-api.s3-website.nl-ams.scw.cloud/',
+      //           overlay.hash.replace('0x', '')
+      //         )
+      //         return core.overlay(cfg, eventDef)
+      //       } else {
+      //         throw new Error(`Invalid protocol "${url.protocol}" in the overlay address.`)
+      //       }
+      //     } else {
+      //       return core.overlay(cfg, eventDef)
+      //     }
+      //   },
+      //   wallet: (cfg, eventDef) => core.wallet(cfg, eventDef, manifest.name),
+      //   storage: new AppStorage(manifest, defaultConfig, schemaConfig),
+      //   events: moduleEventBus,
+      //   contract: (type, address, options) => core.contract(type, address, options, manifest.name),
+      //   onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
+      //   onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
+      //   onShareLink: (handler: Function) => this.setShareLinkHandler(manifest.name, handler),
+      //   onWalletsUpdate: (handler: Function) =>
+      //     this.setWalletsUpdateHandler(manifest.name, handler),
+      //   onConnectedAccountsUpdate: (handler: Function) =>
+      //     this.setConnectedAccountsUpdate(manifest.name, handler),
+      //   getManifest: async (
+      //     moduleName?: string
+      //   ): Promise<Omit<ModuleInfo, 'interfaces'> & VersionInfo> => {
+      //     let module: RegistriedModule
+      //     if (moduleName) {
+      //       module = this.registry.find((m) => m.manifest.name === moduleName)
+      //     } else {
+      //       module = this.registry.find((m) => m.manifest.name === manifest.name)
+      //     }
+      //     const { getModuleInfoByName } = await initBGFunctions(browser)
+      //     const registry = manifest.registryUrl
+      //     const moduleInfo: ModuleInfo = await getModuleInfoByName(
+      //       registry,
+      //       moduleName ? moduleName : manifest.name
+      //     )
+      //     return { ...moduleInfo, ...module.manifest, contextIds }
+      //   },
+      //   getContentDetectors: () => core.getContentDetectors(),
+      //   utils: core.utils,
+      //   BigNumber: core.BigNumber,
+      //   ethers: core.ethers,
+      //   near: core.near,
+      //   createShareLink: (targetUrl: string, modulePayload: any) =>
+      //     core.createShareLink(targetUrl, modulePayload, {
+      //       contextIds: ['*'], // ToDo: Replace wildcard on real context IDs
+      //       moduleId: formatModuleId(manifest),
+      //       registry: manifest.registryUrl,
+      //     }),
+      //   sessions: () => core.sessions(manifest.name),
+      //   login: (req, settings) => core.login(req, settings, manifest.name),
+      //   state: core.state,
+      //   connectedAccounts: core.connectedAccounts,
+      //   fetch: core.fetch,
+      //   getPreferredConnectedAccountsNetwork: core.getPreferredConnectedAccountsNetwork,
+      //   notify: async (payload) => {
+      //     // ToDo: do not fetch manifest twice
+      //     const { getModuleInfoByName } = await initBGFunctions(browser)
+      //     const registry = manifest.registryUrl
+      //     const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, manifest.name)
+      //     await core.notify(payload, moduleInfo.icon?.uris?.[0], manifest.name)
+      //   },
+      // }
 
       // // Built-in modules are loaded without eval
       // if (BuiltInModules[manifest.name]) {
@@ -500,7 +486,6 @@ export class Injector {
         this._registerModule(
           module,
           ConfigAdapter,
-          () => moduleEventBus,
           () => new ConfigAdapter(this._dynamicAdapter, scriptOrConfig)
         )
 
@@ -620,7 +605,8 @@ export class Injector {
         // ToDo: refactor it
         const SandboxExecutorExtended = class extends SandboxExecutor {
           constructor() {
-            super(scriptOrConfig as string, initParams, me.jsonrpc)
+            const observable = me.eventStream.pipe(filter((e) => e.namespace === manifest.name))
+            super(scriptOrConfig as string, initParams, me.jsonrpc, observable)
           }
 
           // implementaion of the abstract method
@@ -632,7 +618,7 @@ export class Injector {
           }
         }
 
-        this._registerModule(module, SandboxExecutorExtended, () => moduleEventBus)
+        this._registerModule(module, SandboxExecutorExtended)
       } catch (err) {
         // ToDo: remove module from this.registry
         console.error(err)
@@ -820,7 +806,6 @@ export class Injector {
   private _registerModule(
     module: NotRegisteredModule,
     clazz: any,
-    moduleEventBusFactory: () => ModuleEventBus,
     instanceFactory: any = () => null
   ): RegistriedModule {
     const existingModule = this.registry.find((m) => areModulesEqual(m.manifest, module.manifest))
@@ -840,7 +825,6 @@ export class Injector {
       schemaConfig: module.schemaConfig,
       activateMethodsDependencies: [],
       instancedActivateMethodsDependencies: [],
-      moduleEventBus: moduleEventBusFactory(),
     }
     this.registry.push(newRegisteredModule)
     return newRegisteredModule

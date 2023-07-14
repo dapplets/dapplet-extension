@@ -3,15 +3,24 @@ import { SandboxInitializationParams } from '../common/types'
 import { Core } from './core'
 import { AppStorage } from './core/appStorage'
 import ConnectedAccounts from './core/connectedAccounts'
+import { EventBus } from './core/events/eventBus'
 import { Injector } from './injector'
 import { OverlayManagerIframe } from './overlay/overlayManager'
 
 function initialize(params: SandboxInitializationParams) {
+  const moduleEventBus = new EventBus()
   const jsonrpc = new JsonRpc()
   const overlayManager = new OverlayManagerIframe(jsonrpc)
   const connectedAccounts = new ConnectedAccounts()
   const storage = new AppStorage(params.manifest, params.defaultConfig, params.schemaConfig)
-  const core = new Core(params.manifest, connectedAccounts, storage, overlayManager, params.env)
+  const core = new Core(
+    params.manifest,
+    connectedAccounts,
+    storage,
+    overlayManager,
+    params.env,
+    moduleEventBus
+  )
   const injector = new Injector(core)
 
   const globalMessageHandler = ({ data }: MessageEvent) => {

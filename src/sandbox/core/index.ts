@@ -10,6 +10,7 @@ import { AppStorage } from './appStorage'
 import ConnectedAccounts from './connectedAccounts'
 import { Connection, EventDef } from './connection'
 import * as ethereum from './ethereum'
+import { EventBus } from './events/eventBus'
 import { LoginSession } from './login/login-session'
 import { LoginHooks, LoginRequestSettings } from './login/types'
 import * as near from './near'
@@ -30,6 +31,7 @@ export class Core {
   public BigNumber = ethers.BigNumber
   public ethers = ethers
   public near = NearApi
+  public events: EventBus
 
   public manifest: VersionInfo
   public connectedAccounts: ConnectedAccounts
@@ -48,13 +50,15 @@ export class Core {
     connectedAccounts: ConnectedAccounts,
     storage: AppStorage,
     overlayManager: IOverlayManager,
-    env: SandboxEnvironmentVariables
+    env: SandboxEnvironmentVariables,
+    moduleEventBus: EventBus
   ) {
     this.manifest = manifest
     this.connectedAccounts = connectedAccounts
     this.storage = storage
     this.overlayManager = overlayManager
     this._env = env
+    this.events = moduleEventBus
   }
 
   public async confirm(message: string): Promise<boolean> {
