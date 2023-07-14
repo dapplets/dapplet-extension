@@ -6,8 +6,8 @@ import { SandboxInitializationParams } from '../common/types'
 
 export abstract class SandboxExecutor {
   private _worker: Worker
-  private _stateMap = new Map<string, any>()
-  private _detachConfigCallbacks: (() => void)[] = []
+  private _stateByWidgetId = new Map<string, any>()
+  private _detachConfigCallbacksById = new Map<string, any>()
   private _jsonrpc: JsonRpc
 
   constructor(dappletScript: string, params: SandboxInitializationParams, jsonrpc: JsonRpc) {
@@ -39,7 +39,8 @@ export abstract class SandboxExecutor {
 
   public async deactivate() {
     await this._sendRequest('deactivate')
-    this._detachConfigCallbacks.forEach((cb) => cb())
+    this._detachConfigCallbacksById.forEach((cb) => cb())
+    this._detachConfigCallbacksById.clear()
     this._jsonrpc.removeEventSource(this._worker as any)
     this._worker.removeEventListener('message', this._messageListener)
     this._worker.terminate()
@@ -63,14 +64,16 @@ export abstract class SandboxExecutor {
     this._notify('fireWalletsUpdateEvent')
   }
 
-  public executeConnectedAccountsUpdateHandler() {
+  public onConnectedAccountsUpdateHandler() {
     this._notify('fireConnectedAccountsUpdateEvent')
   }
 
   private _onConfigAttached({
+    configId,
     listeningContexts,
     adapterName,
   }: {
+    configId: string
     listeningContexts: string[]
     adapterName: string
   }) {
@@ -80,7 +83,11 @@ export abstract class SandboxExecutor {
 
     for (const contextName of listeningContexts) {
       config[contextName] = async (ctx) => {
-        const widgets = await this._sendRequest('get-widgets-for-context', { ctx, contextName })
+        const widgets = await this._sendRequest('get-widgets-for-context', {
+          configId,
+          ctx,
+          contextName,
+        })
         const factories = widgets.map((widget) => {
           const widgetFactory = adapter.exports[widget.widgetName]
           const callbacks = widget.listeningEvents.reduce((acc, eventName) => {
@@ -101,7 +108,7 @@ export abstract class SandboxExecutor {
             const instancedWidget = factory(...args)
 
             if (instancedWidget) {
-              this._stateMap.set(widget.widgetId, instancedWidget.state)
+              this._stateByWidgetId.set(widget.widgetId, instancedWidget.state)
             }
 
             return instancedWidget
@@ -114,15 +121,22 @@ export abstract class SandboxExecutor {
 
     adapter.attachConfig(config)
 
-    this._detachConfigCallbacks.push(() => {
-      adapter.detachConfig(config)
-    })
+    this._detachConfigCallbacksById.set(configId, () => adapter.detachConfig(config))
+  }
+
+  private _onConfigDetached({ configId }: { configId: string }) {
+    if (!this._detachConfigCallbacksById.has(configId)) return
+
+    const detachConfigFn = this._detachConfigCallbacksById.get(configId)
+    detachConfigFn()
+
+    this._detachConfigCallbacksById.delete(configId)
   }
 
   private _onStateUpdated({ widgetId, newValues }: { widgetId: string; newValues: any }) {
     if (!newValues) return
 
-    const state = this._stateMap.get(widgetId)
+    const state = this._stateByWidgetId.get(widgetId)
     if (!state) {
       // console.error('SandboxExecutor: State not found for widgetId ' + widgetId)
       return
@@ -162,6 +176,9 @@ export abstract class SandboxExecutor {
     switch (method) {
       case 'config-attached':
         this._onConfigAttached(params[0])
+        break
+      case 'config-detached':
+        this._onConfigDetached(params[0])
         break
       case 'state-updated':
         this._onStateUpdated(params[0])

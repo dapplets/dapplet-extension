@@ -8,8 +8,8 @@ type InjectedWidget = {
 }
 
 export class ProxyAdapter {
-  private _attachedConfig = null
   private _widgets = new Map<string, InjectedWidget>()
+  private _configById = new Map<string, any>()
 
   public exports = new Proxy(
     {},
@@ -42,12 +42,15 @@ export class ProxyAdapter {
   }
 
   public attachConfig(config: any) {
-    // ToDo: implement multiple configs
-    this._attachedConfig = config
-
+    const configId = generateGuid()
     const listeningContexts = Object.keys(config)
+    this._configById.set(configId, config)
 
-    this._notify('config-attached', { listeningContexts, adapterName: this.adapterName })
+    this._notify('config-attached', {
+      configId,
+      listeningContexts,
+      adapterName: this.adapterName,
+    })
 
     return {
       $: (ctx: any, id: string) => {
@@ -61,19 +64,42 @@ export class ProxyAdapter {
         return null
       },
       reset: () => {
-        // ToDo: implement it
-        throw new Error('Not implemented yet')
+        this.detachConfig(config)
       },
     }
   }
 
-  public detachConfig() {
-    // ToDo: implement it
-    this._attachedConfig = null
+  public detachConfig(detachingConfig?: any) {
+    // if config is not passed, detach all configs
+    if (detachingConfig) {
+      // ToDo: rewrite with for of
+      this._configById.forEach((config, configId) => {
+        if (config === detachingConfig) {
+          this._notify('config-detached', { configId })
+          this._configById.delete(configId)
+        }
+      })
+    } else {
+      const configIds = Array.from(this._configById.keys())
+      configIds.forEach((configId) => {
+        this._notify('config-detached', { configId })
+      })
+      this._configById.clear()
+    }
   }
 
-  private async _getWidgetsForContext({ ctx, contextName }: { ctx: any; contextName: string }) {
-    const unknownFactories = this._attachedConfig[contextName](ctx) ?? []
+  private async _getWidgetsForContext({
+    configId,
+    ctx,
+    contextName,
+  }: {
+    configId: string
+    ctx: any
+    contextName: string
+  }) {
+    if (!this._configById.has(configId)) return []
+
+    const unknownFactories = this._configById.get(configId)[contextName](ctx) ?? []
     const widgetFactories = Array.isArray(unknownFactories) ? unknownFactories : [unknownFactories]
     const widgetsToBeCreated = await Promise.all(
       widgetFactories.map(async (widgetFactory) => {
