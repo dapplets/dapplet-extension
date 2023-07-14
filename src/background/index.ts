@@ -453,8 +453,8 @@ browser.runtime.onMessage.addListener((message, sender) => {
   }
 })
 
-browser.action.onClicked.addListener(() => {
-  overlayService.openPopupOverlay('dapplets')
+browser.action.onClicked.addListener(({ id: tabId }) => {
+  overlayService.openPopupOverlay('dapplets', tabId)
   analyticsService.track({ idgoal: AnalyticsGoals.ExtensionIconClicked })
 })
 
@@ -526,51 +526,51 @@ browser.action.onClicked.addListener(() => {
 // })
 
 // Reinject content scripts
-if (typeof window === 'undefined') {
-  browser.tabs
-    .query({ url: ['http://*/*', 'https://*/*'] })
-    .then((x) => x.filter((x) => x.status === 'complete'))
-    .then((foundTabs) =>
-      Promise.all(
-        foundTabs.map((x) =>
-          browser.tabs
-            .sendMessage(x.id, { type: 'CURRENT_CONTEXT_IDS' })
-            .then(() => false)
-            .catch(() => {
-              browser.scripting.executeScript({
-                files: ['custom-elements.min.js', 'contentscript.js'],
-                target: { tabId: x.id },
-              })
-              return true
-            })
-        )
-      )
-    )
-    .then((x) => {
-      const reinjectedNumber = x.filter((x) => !!x).length
-      if (reinjectedNumber > 0)
-        console.log(
-          `${reinjectedNumber} content scripts were reinjected after background reloading.`
-        )
-    })
+// if (typeof window === 'undefined') {
+//   browser.tabs
+//     .query({ url: ['http://*/*', 'https://*/*'] })
+//     .then((x) => x.filter((x) => x.status === 'complete'))
+//     .then((foundTabs) =>
+//       Promise.all(
+//         foundTabs.map((x) =>
+//           browser.tabs
+//             .sendMessage(x.id, { type: 'CURRENT_CONTEXT_IDS' })
+//             .then(() => false)
+//             .catch(() => {
+//               browser.scripting.executeScript({
+//                 files: ['custom-elements.min.js', 'contentscript.js'],
+//                 target: { tabId: x.id },
+//               })
+//               return true
+//             })
+//         )
+//       )
+//     )
+//     .then((x) => {
+//       const reinjectedNumber = x.filter((x) => !!x).length
+//       if (reinjectedNumber > 0)
+//         console.log(
+//           `${reinjectedNumber} content scripts were reinjected after background reloading.`
+//         )
+//     })
 
-  // workaround for firefox which prevents redirect loop
-  const loading = new Set<number>()
+//   // workaround for firefox which prevents redirect loop
+//   const loading = new Set<number>()
 
-  const redirectFromProxyServer = async (tab: browser.Tabs.Tab) => {
-    if (tab.status === 'loading' && !loading.has(tab.id)) {
-      const groups = /https:\/\/augm\.link\/live\/(.*)/gm.exec(tab.url)
-      const [, targetUrl] = groups ?? []
-      if (targetUrl) {
-        loading.add(tab.id)
-        await browser.tabs.update(tab.id, { url: targetUrl })
-        setTimeout(() => loading.delete(tab.id), 300)
-      }
-    }
-  }
+//   const redirectFromProxyServer = async (tab: browser.Tabs.Tab) => {
+//     if (tab.status === 'loading' && !loading.has(tab.id)) {
+//       const groups = /https:\/\/augm\.link\/live\/(.*)/gm.exec(tab.url)
+//       const [, targetUrl] = groups ?? []
+//       if (targetUrl) {
+//         loading.add(tab.id)
+//         await browser.tabs.update(tab.id, { url: targetUrl })
+//         setTimeout(() => loading.delete(tab.id), 300)
+//       }
+//     }
+//   }
 
-  browser.tabs.onCreated.addListener(redirectFromProxyServer)
-  browser.tabs.onUpdated.addListener((tabId) =>
-    browser.tabs.get(tabId).then(redirectFromProxyServer)
-  )
-}
+//   browser.tabs.onCreated.addListener(redirectFromProxyServer)
+//   browser.tabs.onUpdated.addListener((tabId) =>
+//     browser.tabs.get(tabId).then(redirectFromProxyServer)
+//   )
+// }
