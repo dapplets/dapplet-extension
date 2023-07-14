@@ -1,0 +1,41 @@
+.container {
+    padding: 15px;
+}
+
+html,
+body,
+.container {
+    height: 100%;
+}
+
+.card {
+    margin-bottom: 10px;
+}
+
+.btn {
+    margin: 0 5px 5px 0;
+}
+
+.card-body {
+    padding: 1rem;
+}
+
+.logo {
+    height: 28px;
+    float: left;
+    margin-right: 4px;
+}
+
+header {
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: #00000069 0 0 2px;
+}
+
+header h4 {
+    margin: 0;
+}
+
+body {
+    background-color: rgb(247, 247, 247);
+}

@@ -1,0 +1,53 @@
+{
+    "root": true,
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": [
+            "tsconfig.json"
+        ],
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react",
+        "@typescript-eslint",
+        "prettier"
+    ],
+    "rules": {
+        "@typescript-eslint/no-unused-vars": "error",
+        "@typescript-eslint/no-explicit-any": "error"
+    },
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    },
+    "ignorePatterns": [
+        "webpack.common.js",
+        "webpack.dev.js",
+        "webpack.jslib.js",
+        "webpack.prod.js",
+        "**/build",
+        "**/lib",
+        "*/twitter-feature-1",
+        "*/twitter-feature-2",
+        "*/twitter-feature-3",
+        "*/twitter-demo-overlay",
+        "*/twitter-demo",
+        "*/twitter-adapter",
+        "*/twitter-adapter-legacy"
+    ]
+}

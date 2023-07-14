@@ -1,0 +1,43 @@
+{
+  "name": "twitter-demo-overlay",
+  "version": "0.1.1",
+  "private": true,
+  "dependencies": {
+    "@dapplets/dapplet-overlay-bridge": "^0.1.3",
+    "ethers": "^5.7.2",
+    "immutability-helper": "^3.1.1",
+    "javascript-time-ago": "^2.5.9",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-linkify": "^1.0.0-alpha",
+    "react-router-dom": "^5.3.4",
+    "react-time-ago": "^7.2.1",
+    "semantic-ui-css": "^2.5.0",
+    "semantic-ui-react": "^2.1.4"
+  },
+  "scripts": {
+    "start": "webpack serve",
+    "watch": "webpack --watch",
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "@types/node": "^15.14.9",
+    "@types/react": "^17.0.62",
+    "@types/react-dom": "^17.0.20",
+    "@types/webpack": "^5.28.1",
+    "@types/webpack-dev-server": "^3.11.6",
+    "cross-env": "^7.0.3",
+    "css-loader": "^5.2.7",
+    "env-cmd": "^10.1.0",
+    "file-loader": "^6.2.0",
+    "fork-ts-checker-webpack-plugin": "^6.5.3",
+    "html-webpack-plugin": "^5.5.3",
+    "style-loader": "^2.0.0",
+    "ts-loader": "^9.4.4",
+    "typescript": "^4.9.5",
+    "webpack": "^5.88.1",
+    "webpack-assets-manifest": "^5.1.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^3.11.3"
+  }
+}
