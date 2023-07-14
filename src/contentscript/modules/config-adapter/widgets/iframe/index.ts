@@ -8,6 +8,8 @@ export interface IIframeProps {
   insPointName?: string
 
   src: string
+  height?: number
+  width?: number
   init: (ctx: any, me: this) => void
 }
 
@@ -24,6 +26,8 @@ export class Iframe extends LitElement implements IIframeProps {
   @property() theme
   @property() insPointName
   @property() src
+  @property() height
+  @property() width
   @property() init: (ctx: any, me: this) => void
 
   connectedCallback() {
@@ -54,12 +58,15 @@ export class Iframe extends LitElement implements IIframeProps {
   }
 
   override render() {
+    const height = this.height ?? 0
+    const width = this.width ?? 0
+
     return html`<iframe
       name="${this.iframeName}"
       src="${this.src}"
       scrolling="no"
       frameborder="0"
-      style="border:none;height:0px;width:0px;"
+      style="border:none;height:${height}px;width:${width}px;"
     ></iframe>`
   }
 }
