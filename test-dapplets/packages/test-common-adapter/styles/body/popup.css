@@ -1,0 +1,53 @@
+:host {
+  position: absolute;
+  overflow-wrap: break-word;
+  width: 380px;
+  min-height: 60px;
+  top: 80px;
+  left: 50%;
+  margin-left: -212px;
+  padding: 20px;
+  background-color: #fff;
+  color: #d10019;
+  border: 2px solid #d10019;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 2px 2px 3px #999;
+  font-size: 19px;
+  font-weight: 600;
+  font-family: system-ui, -apple-system, sans-serif, BlinkMacSystemFont, Roboto, Ubuntu;
+}
+:host a {
+  text-decoration: none;
+  color: #d10019;
+}
+:host a:active {
+  text-decoration: none;
+  color: #d10019;
+}
+:host a:visited {
+  text-decoration: none;
+  color: #d10019;
+}
+.dapplet-widget-close-icon {
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  cursor: pointer;
+}
+.dapplet-widget-mascot-img img {
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  cursor: pointer;
+}
+.displayed {
+  display: block;
+}
+.no-displayed {
+  display: none;
+}

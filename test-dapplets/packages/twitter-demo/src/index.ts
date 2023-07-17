@@ -13,6 +13,7 @@ export default class DemoDapplet {
   // current user from twitter
   private _globalContext = {}
 
+  private _$: any
   private _overlay: any
   private _config: any
   private _adapterDescription: {
@@ -208,14 +209,29 @@ export default class DemoDapplet {
           //   },
           // }),
           button({
-            // initial: 'DEFAULT',
+            id: 'button',
+            initial: 'DEFAULT',
             DEFAULT: {
-              label: 'button',
+              label: 0,
               img: MAIN_IMG,
-              exec: () => {
+              hidden: false,
+              exec: (_, me) => {
                 console.log('ctx = ', ctx)
                 this.openOverlay({ index: '0/3', ctx })
+                me.label += 1
               },
+            },
+          }),
+          button({
+            DEFAULT: {
+              label: 'FAKE',
+              img: MAIN_IMG,
+              // LP: 2. Toggle the state “hidden/shown” of the picture on button click
+              exec: () => {
+                console.log('ctx = ', ctx)
+                this._$(ctx, 'button').hidden = !this._$(ctx, 'button').hidden
+              },
+              // LP end
             },
           }),
           // label({
@@ -372,7 +388,8 @@ export default class DemoDapplet {
       //   }),
       // ],
     }
-    this.adapter.attachConfig(this._config)
+    const { $ } = this.adapter.attachConfig(this._config)
+    this._$ = $
   }
 
   openOverlay(props?: any): void {

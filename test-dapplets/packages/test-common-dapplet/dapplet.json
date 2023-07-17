@@ -1,0 +1,24 @@
+{
+  "name": {
+    "$ref": "package.json#/name"
+  },
+  "branch": "default",
+  "version": {
+    "$ref": "package.json#/version"
+  },
+  "type": "FEATURE",
+  "title": "Test Common Dapplet",
+  "description": {
+    "$ref": "package.json#/description"
+  },
+  "main": {
+    "$ref": "package.json#/main"
+  },
+  "icon": "src/icons/ex06.png",
+  "contextIds": [
+    "test-common-adapter"
+  ],
+  "dependencies": {
+    "test-common-adapter": "0.1.0"
+  }
+}
