@@ -63,9 +63,13 @@ export class Core {
   }
 
   public async confirm(message: string): Promise<boolean> {
-    await this.notify({ title: message })
-
+    console.error('Core.confirm() is deprecated. Use Core.notify() instead.')
     return sendRequest('confirm', message)
+  }
+
+  public async alert(message: string): Promise<void> {
+    console.error('Core.alert() is deprecated. Use Core.notify() instead.')
+    return sendRequest('alert', message)
   }
 
   public async notify(payload: NotificationPayload) {
@@ -88,11 +92,6 @@ export class Core {
     }
 
     await createAndShowNotification(notification, thisTab.id)
-  }
-
-  public async alert(message: string): Promise<void> {
-    await this.notify({ title: message })
-    return sendRequest('alert', message)
   }
 
   public async openPage(url: string): Promise<void> {
