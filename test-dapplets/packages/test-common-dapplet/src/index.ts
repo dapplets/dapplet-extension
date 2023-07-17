@@ -9,16 +9,18 @@ export default class ViewportFeature {
   activate() {
     const { button } = this.adapter.exports
     this.adapter.attachConfig({
-      BODY: (ctx) =>
-        button({
+      BODY: async (ctx) => {
+        const tooltip = await Core.storage.get('exampleString')
+        return button({
           DEFAULT: {
-            tooltip: 'Injected Button',
+            tooltip,
             img: EXAMPLE_IMG,
             exec: () => {
               console.log('ctx', ctx)
             },
           },
-        }),
+        })
+      },
     })
   }
 }

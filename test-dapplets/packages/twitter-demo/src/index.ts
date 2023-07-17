@@ -321,7 +321,7 @@ export default class DemoDapplet {
                 const existSessions = await Core.sessions()
                 console.log('existSessions', existSessions)
 
-                const newSessions = await (<any>Core).login(
+                const newSessions = await Core.login(
                   { authMethods: ['ethereum/goerli'] }
                   // {
                   //   onLogin: () => console.log('onLogin'),

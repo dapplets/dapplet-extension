@@ -18,6 +18,10 @@
   "contextIds": [
     "test-common-adapter"
   ],
+  "config": {
+    "schema": "config/schema.json",
+    "default": "config/default.json"
+  },
   "dependencies": {
     "test-common-adapter": "0.1.0"
   }
