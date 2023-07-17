@@ -10,7 +10,7 @@ export const SkipButton: FC<Props> = (props: Props) => {
   const { onClick } = props
 
   return (
-    <button data-testid='skip-tutorial' onClick={onClick} className={cn(styles.skip)}>
+    <button data-testid="skip-tutorial" onClick={onClick} className={cn(styles.skip)}>
       Skip tutorial
     </button>
   )

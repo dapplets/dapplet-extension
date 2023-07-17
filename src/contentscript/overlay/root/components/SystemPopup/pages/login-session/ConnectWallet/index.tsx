@@ -15,17 +15,19 @@ export const ConnectWallet: FC<Props> = (p: Props) => {
       <div className={styles.cryptoWallets}>
         <h3 className={base.subtitle}>select connection type</h3>
         <ul className={styles.list}>
-          {p.wallets.filter((x)=> x.label !== 'WalletConnect').map(({ id, label, icon }) => (
-            <li
-              key={id}
-              title={label}
-              data-testid={`wallet-to-connect-${id}`}
-              className={styles.item}
-              onClick={() => p.onWalletClick(id)}
-            >
-              <img src={icon} alt={label} />
-            </li>
-          ))}
+          {p.wallets
+            .filter((x) => x.label !== 'WalletConnect')
+            .map(({ id, label, icon }) => (
+              <li
+                key={id}
+                title={label}
+                data-testid={`wallet-to-connect-${id}`}
+                className={styles.item}
+                onClick={() => p.onWalletClick(id)}
+              >
+                <img src={icon} alt={label} />
+              </li>
+            ))}
         </ul>
       </div>
 

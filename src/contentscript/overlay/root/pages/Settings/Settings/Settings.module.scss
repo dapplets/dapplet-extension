@@ -200,10 +200,11 @@
   height: 20px;
   background-image: url('../../../assets/svg/loaderSettings.svg');
 }
+
 .deleteUserAgentName{
   cursor: pointer;
-  &:hover{
 
+  &:hover{
     transform: scale(1.5);
   }
 }
