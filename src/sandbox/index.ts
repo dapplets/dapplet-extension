@@ -59,7 +59,7 @@ function initialize(params: SandboxInitializationParams) {
   global.addEventListener('message', globalMessageHandler)
 
   // Register global variables for executing modules in the sandbox
-  global.Core = core as any // ToDo: remove any when Core will be implemented completely
+  global.Core = core
   global.Injectable = injector.injectableDecorator.bind(injector)
   global.Inject = injector.injectDecorator.bind(injector)
   global.exports = {} // for CommonJS modules compatibility
