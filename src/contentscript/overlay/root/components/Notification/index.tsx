@@ -1,6 +1,8 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { ReactElement, useRef, useState } from 'react'
+import React, { Key, ReactElement, useRef, useState } from 'react'
+import Linkify from 'react-linkify'
+import { SecureLink } from 'react-secure-link'
 import browser from 'webextension-polyfill'
 import { CloseIcon } from '../CloseIcon'
 import styles from './Notification.module.scss'
@@ -50,7 +52,17 @@ export const Notification = (props: NotificationProps): ReactElement => {
       <div className={styles.blockTitle}>
         <div className={styles.blockIcon}>
           {icon ? <img src={icon} className={styles.icon} /> : null}
-          <div className={styles.title}>{title}</div>
+          <div className={styles.title}>
+            <Linkify
+              componentDecorator={(decoratedHref: string, decoratedText: string, key: Key) => (
+                <SecureLink href={decoratedHref} key={key}>
+                  {decoratedText}
+                </SecureLink>
+              )}
+            >
+              {title}
+            </Linkify>
+          </div>
         </div>
 
         <span className={styles.date}>
@@ -67,7 +79,15 @@ export const Notification = (props: NotificationProps): ReactElement => {
       <div className={styles.blockDesccription}>
         <div className={styles.blockInfo}>
           <p ref={refComponent} className={cn(styles.description, {})}>
-            {newDescription}
+            <Linkify
+              componentDecorator={(decoratedHref: string, decoratedText: string, key: Key) => (
+                <SecureLink href={decoratedHref} key={key}>
+                  {decoratedText}
+                </SecureLink>
+              )}
+            >
+              {newDescription}
+            </Linkify>
           </p>
         </div>
 

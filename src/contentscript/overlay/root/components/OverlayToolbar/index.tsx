@@ -1,6 +1,8 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { ReactElement, useEffect, useRef, useState } from 'react'
+import React, { Key, ReactElement, useEffect, useRef, useState } from 'react'
+import Linkify from 'react-linkify'
+import { SecureLink } from 'react-secure-link'
 import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
 import {
@@ -349,7 +351,17 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             </div>
 
             <div className={styles.titleNotification}>
-              <div className={styles.titleNotification}>{payload.title}</div>
+              <div className={styles.titleNotification}>
+                <Linkify
+                  componentDecorator={(decoratedHref: string, decoratedText: string, key: Key) => (
+                    <SecureLink href={decoratedHref} key={key}>
+                      {decoratedText}
+                    </SecureLink>
+                  )}
+                >
+                  {payload.title}
+                </Linkify>
+              </div>
               {/* ToDo: design it */}
               {payload.actions?.length > 0 ? (
                 <div className={styles.buttonNotificationBlock}>
