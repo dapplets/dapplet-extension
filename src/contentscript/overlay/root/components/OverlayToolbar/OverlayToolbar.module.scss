@@ -279,14 +279,15 @@
   overflow: hidden;
   display: flex;
   flex: 1 1 auto;
-  align-items: flex-start;
-  padding: 5px;
-  justify-content: center;
   flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+
   // min-width: 139px;
   width: 378px;
-  min-height: 29px;
   height: max-content;
+  min-height: 29px;
+  padding: 5px;
 
   background: #fff;
   border-radius: 8px;
@@ -344,6 +345,7 @@
   width: 16px;
   height: 14px;
 }
+
 .iconNotificationBlock {
   width: 16px;
   height: 16px;
@@ -356,9 +358,12 @@
   margin-right: 5px;
 }
 
+// ToDo: GS, remove commented code after fix bug with animation
+
 .titleNotification {
   // overflow: hidden;
   display: flex;
+
   // flex-wrap: wrap;
   flex-direction: column;
 
@@ -369,37 +374,46 @@
   line-height: 149%;
   color: #5ab5e8;
   word-wrap: break-word;
+
   // text-overflow: ellipsis;
   // white-space: nowrap;
 }
+
 .buttonNotificationBlock {
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
   flex-wrap: wrap;
+  justify-content: flex-start;
+
   width: 100%;
   margin-top: 5px;
 }
+
 .buttonNotification {
-  min-width: 64px;
-  height: 20px;
-  justify-content: center;
   display: flex;
   align-items: center;
-  background-color: inherit;
-  color: $main-grey;
-  border-radius: 8px;
-  border: 1px solid $stroke-color;
-  font-size: 14px;
+  justify-content: center;
+
+  min-width: 64px;
+  height: 20px;
+  margin-right: 10px;
+
   font-family: Roboto, sans-serif;
+  font-size: 14px;
   font-weight: 400;
   line-height: 100%;
+  color: $main-grey;
   color: $stroke-color;
-  margin-right: 10px;
+
+  background-color: inherit;
+  border: 1px solid $stroke-color;
+  border-radius: 8px;
+
   &:hover {
     opacity: 0.5;
   }
 }
+
 .counter {
   font-size: 12px;
   color: #747376;
@@ -462,9 +476,12 @@
   }
 }
 
+// ToDo: GS, remove commented code after fix bug with animation
+
 @keyframes animate-notification {
   0% {
     transform: translateX(-23%);
+
     // min-width: 60px;
     // max-width: 378px;
     opacity: 1;
@@ -472,6 +489,7 @@
 
   10% {
     transform: translateX(-60%);
+
     // min-width: 139px;
     // max-width: 378px;
     opacity: 1;
@@ -479,6 +497,7 @@
 
   90% {
     transform: translateX(-60%);
+
     // min-width: 139px;
     // max-width: 378px;
     opacity: 1;
@@ -486,6 +505,7 @@
 
   90% {
     transform: translateX(-60%);
+
     // min-width: 100px;
     // max-width: 378px;
     // opacity: 0.8;
@@ -493,6 +513,7 @@
 
   100% {
     transform: translateX(-10%);
+
     // min-width: 60px;
     // max-width: 378px;
     opacity: 0;
@@ -522,6 +543,7 @@
 
   100% {
     left: -180px;
+
     // opacity: 0;
   }
 }
