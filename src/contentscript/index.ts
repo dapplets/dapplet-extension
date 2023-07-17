@@ -96,10 +96,9 @@ async function init() {
   // Handle module (de)activations from another tabs
   EventBus.on('dapplet_activated', (m) => injector.loadModules([m]))
   EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]))
-
   EventBus.on('wallet_changed', () => injector.executeWalletsUpdateHandler())
-
   EventBus.on('connected_accounts_changed', () => injector.executeConnectedAccountsUpdateHandler())
+  EventBus.on('show_notification', () => overlayManager.show())
 
   // destroy when background is disconnected
   // port.onDisconnect.addListener(() => {
