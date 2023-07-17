@@ -279,19 +279,22 @@
   overflow: hidden;
   display: flex;
   flex: 1 1 auto;
-  align-items: center;
+  flex-direction: row;
+  align-items: flex-start;
   justify-content: center;
 
-  min-width: 139px;
-  max-width: 280px;
-  height: 29px;
+  // min-width: 139px;
+  width: 378px;
+  height: max-content;
+  min-height: 29px;
+  padding: 5px;
 
   background: #fff;
   border-radius: 8px;
   box-shadow: rgb(45 52 60 / 9%) 0 2px 4px -3px, rgb(255 255 255 / 50%) 0 2px 4px -3px;
 
   animation-name: animate-is-not-notifications;
-  animation-duration: 8s;
+  animation-duration: 60s;
   animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
   animation-fill-mode: forwards;
 
@@ -329,7 +332,7 @@
 
 .widgetButtonAnimatePinnedNotification {
   animation-name: animate-notification;
-  animation-duration: 8s;
+  animation-duration: 60s;
   animation-timing-function: cubic-bezier(0, 0.69, 0.45, 1);
   animation-fill-mode: forwards;
 }
@@ -343,24 +346,72 @@
   height: 14px;
 }
 
+.iconNotificationBlock {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+}
+
 .iconNotification {
   width: 16px;
   height: 16px;
   margin-right: 5px;
 }
 
-.titleNotification {
-  overflow: hidden;
-  display: inline-block;
+// ToDo: GS, remove commented code after fix bug with animation
 
-  min-width: 103px;
-  max-width: 220px;
+.titleNotification {
+  // overflow: hidden;
+  display: flex;
+
+  // flex-wrap: wrap;
+  flex-direction: column;
+
+  // min-width: 103px;
+  width: 350px;
 
   font-size: 14px;
   line-height: 149%;
   color: #5ab5e8;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-wrap: break-word;
+
+  // text-overflow: ellipsis;
+  // white-space: nowrap;
+}
+
+.buttonNotificationBlock {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+
+  width: 100%;
+  margin-top: 5px;
+}
+
+.buttonNotification {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 64px;
+  height: 20px;
+  margin-right: 10px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+  color: $main-grey;
+  color: $stroke-color;
+
+  background-color: inherit;
+  border: 1px solid $stroke-color;
+  border-radius: 8px;
+
+  &:hover {
+    opacity: 0.5;
+  }
 }
 
 .counter {
@@ -425,39 +476,46 @@
   }
 }
 
+// ToDo: GS, remove commented code after fix bug with animation
+
 @keyframes animate-notification {
   0% {
     transform: translateX(-23%);
-    min-width: 60px;
-    max-width: 200px;
+
+    // min-width: 60px;
+    // max-width: 378px;
     opacity: 1;
   }
 
   10% {
-    transform: translateX(-49%);
-    min-width: 139px;
-    max-width: 280px;
+    transform: translateX(-60%);
+
+    // min-width: 139px;
+    // max-width: 378px;
     opacity: 1;
   }
 
   90% {
-    transform: translateX(-70%);
-    min-width: 139px;
-    max-width: 280px;
+    transform: translateX(-60%);
+
+    // min-width: 139px;
+    // max-width: 378px;
     opacity: 1;
   }
 
-  95% {
-    transform: translateX(-70%);
-    min-width: 100px;
-    max-width: 240px;
-    opacity: 0.8;
+  90% {
+    transform: translateX(-60%);
+
+    // min-width: 100px;
+    // max-width: 378px;
+    // opacity: 0.8;
   }
 
   100% {
-    transform: translateX(-35%);
-    min-width: 60px;
-    max-width: 200px;
+    transform: translateX(-10%);
+
+    // min-width: 60px;
+    // max-width: 378px;
     opacity: 0;
   }
 }
@@ -485,7 +543,8 @@
 
   100% {
     left: -180px;
-    opacity: 0;
+
+    // opacity: 0;
   }
 }
 

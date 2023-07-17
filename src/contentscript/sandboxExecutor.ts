@@ -1,16 +1,24 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
+import { Observable, Subscription } from 'rxjs'
 import browser from 'webextension-polyfill'
 import { generateGuid } from '../common/helpers'
 import { JsonRpc } from '../common/jsonrpc'
 import { SandboxInitializationParams } from '../common/types'
+import { BaseEvent } from './events/baseEvent'
 
 export abstract class SandboxExecutor {
   private _worker: Worker
   private _stateByWidgetId = new Map<string, any>()
   private _detachConfigCallbacksById = new Map<string, any>()
   private _jsonrpc: JsonRpc
+  private _eventBusSubscription: Subscription
 
-  constructor(dappletScript: string, params: SandboxInitializationParams, jsonrpc: JsonRpc) {
+  constructor(
+    dappletScript: string,
+    params: SandboxInitializationParams,
+    jsonrpc: JsonRpc,
+    moduleEventBus: Observable<unknown>
+  ) {
     // sandbox.js provides environment for the script to run in
     // it includes Core-functions, DI container (Inject, Injectable) and adapter
     const sandboxScriptUrl = browser.runtime.getURL('sandbox.js')
@@ -30,6 +38,8 @@ export abstract class SandboxExecutor {
 
     this._jsonrpc = jsonrpc
     this._jsonrpc.addEventSource(this._worker as any) // ToDo: targetOrigin is incompatible with worker
+
+    this._eventBusSubscription = moduleEventBus.subscribe(this._eventBusListener)
   }
 
   public async activate() {
@@ -41,6 +51,7 @@ export abstract class SandboxExecutor {
     await this._sendRequest('deactivate')
     this._detachConfigCallbacksById.forEach((cb) => cb())
     this._detachConfigCallbacksById.clear()
+    this._eventBusSubscription.unsubscribe()
     this._jsonrpc.removeEventSource(this._worker as any)
     this._worker.removeEventListener('message', this._messageListener)
     this._worker.terminate()
@@ -66,6 +77,10 @@ export abstract class SandboxExecutor {
 
   public onConnectedAccountsUpdateHandler() {
     this._notify('fireConnectedAccountsUpdateEvent')
+  }
+
+  private _eventBusListener = (event: BaseEvent) => {
+    this._notify('fireEventBus', event)
   }
 
   private _onConfigAttached({
@@ -194,10 +209,12 @@ export abstract class SandboxExecutor {
           })
         break
       case 'confirm':
-        this._worker.postMessage({ id, result: confirm(params[0]) })
+        this._worker.postMessage({ id, result: params[0] })
+
         break
+
       case 'alert':
-        this._worker.postMessage({ id, result: alert(params[0]) })
+        this._worker.postMessage({ id, result: params[0] })
         break
       case 'openPage':
         window.open(params[0], '_blank')

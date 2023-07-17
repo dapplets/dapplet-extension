@@ -9,6 +9,7 @@ export class OverlayManagerIframe implements IOverlayManager {
     const overlay = new OverlayIframe(this._iframeMessenger, config)
     return overlay
   }
+  show(): void {}
   togglePanel(): void {}
   openPopup(): void {}
   unregisterAll(source: string): void {

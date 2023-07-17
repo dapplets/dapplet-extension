@@ -1,21 +1,33 @@
+import { Subject } from 'rxjs'
 import { JsonRpc } from '../common/jsonrpc'
 import { SandboxInitializationParams } from '../common/types'
 import { Core } from './core'
 import { AppStorage } from './core/appStorage'
 import ConnectedAccounts from './core/connectedAccounts'
+import { BaseEvent } from './core/events/baseEvent'
+import { EventBus } from './core/events/eventBus'
 import { Injector } from './injector'
 import { OverlayManagerIframe } from './overlay/overlayManager'
 
 function initialize(params: SandboxInitializationParams) {
+  const eventStream = new Subject<BaseEvent>()
+  const moduleEventBus = new EventBus(eventStream)
   const jsonrpc = new JsonRpc()
   const overlayManager = new OverlayManagerIframe(jsonrpc)
   const connectedAccounts = new ConnectedAccounts()
   const storage = new AppStorage(params.manifest, params.defaultConfig, params.schemaConfig)
-  const core = new Core(params.manifest, connectedAccounts, storage, overlayManager, params.env)
+  const core = new Core(
+    params.manifest,
+    connectedAccounts,
+    storage,
+    overlayManager,
+    params.env,
+    moduleEventBus
+  )
   const injector = new Injector(core)
 
   const globalMessageHandler = ({ data }: MessageEvent) => {
-    const { id, method } = data
+    const { id, method, params } = data
 
     switch (method) {
       case 'activate':
@@ -48,6 +60,9 @@ function initialize(params: SandboxInitializationParams) {
         break
       case 'fireConnectedAccountsUpdateEvent':
         core.connectedAccountsUpdateListener?.()
+        break
+      case 'fireEventBus':
+        eventStream.next(params[0]) // ToDo: add types?
         break
       default:
         // ToDo: move all handlers to here

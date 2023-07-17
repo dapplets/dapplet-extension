@@ -50,7 +50,7 @@ export const Notification = (props: NotificationProps): ReactElement => {
       <div className={styles.blockTitle}>
         <div className={styles.blockIcon}>
           {icon ? <img src={icon} className={styles.icon} /> : null}
-          <h4 className={styles.title}>{title}</h4>
+          <div className={styles.title}>{title}</div>
         </div>
 
         <span className={styles.date}>

@@ -43,6 +43,7 @@ export interface IOverlayManager {
   close(): void
   getOverlays(): IOverlay[]
   toggle(): void
+  show(): void
   createOverlay(config: OverlayConfig): IOverlay
   destroy(): void
 }

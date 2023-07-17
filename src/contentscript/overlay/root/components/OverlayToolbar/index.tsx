@@ -111,7 +111,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
       setTimeout(() => {
         setPinnedNotification(false)
-      }, 8000)
+      }, 60000)
 
       return setEvent(notifications)
     }
@@ -135,7 +135,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       EventBus.off('myactions_changed', _refreshData)
     }
   }, [])
-
 
   const _refreshData = async () => {
     try {
@@ -334,32 +333,39 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     return (
       <>
         {payload ? (
-          <span
+          <div
             data-testid="notification-label"
             ref={notificationRef}
             className={cn(styles.widgetButtonNotification, {
               [styles.widgetButtonAnimatePinnedNotification]: isPinnedNotification,
             })}
           >
-            {payload.icon ? (
-              <img className={styles.iconNotification} src={payload.icon} />
-            ) : (
-              <Noties />
-            )}
+            <div className={styles.iconNotificationBlock}>
+              {payload.icon ? (
+                <img className={styles.iconNotification} src={payload.icon} />
+              ) : (
+                <Noties />
+              )}
+            </div>
 
-            <span className={styles.titleNotification}>{payload.title}</span>
-
-            {/* ToDo: design it */}
-            {payload.actions?.length > 0 ? (
-              <div>
-                {payload.actions.map(({ action, title }) => (
-                  <button key={action} onClick={() => handleActionButtonClick(action)}>
-                    {title}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </span>
+            <div className={styles.titleNotification}>
+              <div className={styles.titleNotification}>{payload.title}</div>
+              {/* ToDo: design it */}
+              {payload.actions?.length > 0 ? (
+                <div className={styles.buttonNotificationBlock}>
+                  {payload.actions.map(({ action, title }) => (
+                    <button
+                      className={styles.buttonNotification}
+                      key={action}
+                      onClick={() => handleActionButtonClick(action)}
+                    >
+                      {title}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </div>
         ) : null}
       </>
     )
@@ -411,7 +417,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             {getNewButtonTab('Dapplets')}
 
             <span
-            data-testid='notification-button'
+              data-testid="notification-button"
               className={cn(styles.notificationCounter)}
               onClick={(e) => {
                 e.preventDefault()
