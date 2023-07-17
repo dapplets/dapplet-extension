@@ -1,0 +1,40 @@
+{
+  "themes": {
+    "LIGHT": "boolean(//body[@style='background-color: #FFFFFF;'] | //body[@style='background-color: rgb(255, 255, 255);'])",
+    "DARK": "boolean(//body[@style='background-color: rgb(0, 0, 0);'])"
+  },
+  "contexts": {
+    "GLOBAL": {
+      "containerSelector": "html",
+      "contextBuilder": {
+        "id": "string('global')",
+        "websiteName": "string('GitHub')",
+        "username": "string(//div[@class='Overlay-titleWrap']//span[@class='Truncate-text'])",
+        "fullname": "string(//div[@class='Overlay-titleWrap']//span[@class='Truncate-text']/../../span[2])",
+        "img": "string(//div[@class='Overlay-titleWrap']//img/@src)"
+      }
+    },
+    "PROFILE": {
+      "containerSelector": ".js-profile-editable-replace",
+      "contextSelector": "",
+      "widgets": {
+        "button": {
+          "styles": "styles/profile/button.css",
+          "insertionPoint": "div.clearfix",
+          "insert": "end"
+        },
+        "avatarBadge": {
+          "styles": "styles/profile/avatarBadge.css",
+          "insertionPoint": "div.clearfix > div",
+          "insert": "inside"
+        }
+      },
+      "contextBuilder": {
+        "id": "substring-before(substring-after(string(.//h1/span[2]), '\n'), '\n')",
+        "authorFullname": "string(.//h1/span[1])",
+        "authorUsername": "substring-before(substring-after(string(.//h1/span[2]), '\n'), '\n')",
+        "authorImg": "string(.//img/@src)"
+      }
+    }
+  }
+}

@@ -3,7 +3,7 @@ import BLACK_IMG from './Black_Icon3.svg'
 import MAIN_IMG from './Red_Icon3.svg'
 import WHITE_IMG from './White_Icon3.svg'
 
-const adapterName = 'twitter-config.dapplet-base.eth'
+const adapterName = 'test-virtual-adapter'
 
 @Injectable
 export default class DemoDapplet {
@@ -130,15 +130,29 @@ export default class DemoDapplet {
           //   },
           // }),
           avatarBadge({
-            // initial: 'DEFAULT',
+            initial: 'DEFAULT',
             DEFAULT: {
               vertical: 'bottom',
               horizontal: 'right',
               img: { DARK: WHITE_IMG, LIGHT: BLACK_IMG },
-              exec: () => {
-                console.log('ctx = ', ctx)
+              exec: (_, me) => {
+                console.log('ctx = (DEFAULT)', ctx)
                 this.openOverlay({ index: '0/1', ctx })
                 // Core.overlayManager.unregisterAll()
+                // me.img = { LIGHT: WHITE_IMG, DARK: BLACK_IMG }
+                me.state = 'SECOND'
+              },
+            },
+            SECOND: {
+              vertical: 'bottom',
+              horizontal: 'right',
+              img: { LIGHT: WHITE_IMG, DARK: BLACK_IMG },
+              exec: (_, me) => {
+                console.log('ctx = (SECOND)', ctx)
+                this.openOverlay({ index: '0/1', ctx })
+                // Core.overlayManager.unregisterAll()
+                // me.img = { DARK: WHITE_IMG, LIGHT: BLACK_IMG }
+                me.state = 'DEFAULT'
               },
             },
           }),
@@ -285,7 +299,7 @@ export default class DemoDapplet {
                 if (existSessions.length !== 0) me.state = 'LOGGED'
               },
               exec: async (_, me) => {
-                console.log('ctx = ', ctx)
+                console.log('ctx = in LOGIN', ctx)
                 // this.openOverlay({ index: '1/3', ctx })
 
                 const existSessions = await Core.sessions()
@@ -308,7 +322,7 @@ export default class DemoDapplet {
               img: MAIN_IMG,
               label: 'LOGOUT',
               exec: async (_, me) => {
-                console.log('ctx = ', ctx)
+                console.log('ctx = in LOGOUT', ctx)
                 // this.openOverlay({ index: '1/3', ctx })
 
                 const existSessions = await Core.sessions()

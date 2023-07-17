@@ -1,0 +1,17 @@
+{
+  "name": "test-twitter-adapter",
+  "branch": "default",
+  "version": "0.1.0",
+  "type": "CONFIG",
+  "title": "Test Twitter Adapter",
+  "description": "Parser config for Twitter",
+  "main": "index.json",
+  "contextIds": [
+    "twitter.com",
+    "http://twitter.com"
+  ],
+  "dependencies": {},
+  "interfaces": {
+    "test-virtual-adapter": "0.1.0"
+  }
+}

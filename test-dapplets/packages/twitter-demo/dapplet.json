@@ -16,10 +16,10 @@
   },
   "icon": "src/Red_Icon3.png",
   "contextIds": [
-    "twitter-config.dapplet-base.eth"
+    "test-virtual-adapter"
   ],
   "dependencies": {
-    "twitter-config.dapplet-base.eth": "0.1.5"
+    "test-virtual-adapter": "0.1.0"
   },
   "overlays": {
     "twitter-demo-overlay": "https://localhost:8080/packages/twitter-demo-overlay/build/"
