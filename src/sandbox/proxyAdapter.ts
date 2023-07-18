@@ -73,7 +73,10 @@ export class ProxyAdapter {
   }
 
   private async _getWidgetsForContext({ ctx, contextName }: { ctx: any; contextName: string }) {
-    const unknownFactories = this._attachedConfig[contextName](ctx) ?? []
+    let unknownFactories = this._attachedConfig[contextName](ctx) ?? []
+    if (unknownFactories instanceof Promise) {
+      unknownFactories = await unknownFactories
+    }
     const widgetFactories = Array.isArray(unknownFactories) ? unknownFactories : [unknownFactories]
     const widgetsToBeCreated = await Promise.all(
       widgetFactories.map(async (widgetFactory) => {

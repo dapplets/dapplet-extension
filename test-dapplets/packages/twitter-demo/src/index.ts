@@ -51,7 +51,7 @@ export default class DemoDapplet {
     try {
       this._overlay.onClose(() => console.log('The overlay closed!'))
     } catch (err) {
-      console.log('Ooverlay.onClose() does not exist.', err)
+      console.log('Overlay.onClose() does not exist.', err)
     }
 
     try {
@@ -307,7 +307,7 @@ export default class DemoDapplet {
           // }),
         ]
       },
-      PROFILE: (ctx) => {
+      PROFILE: async (ctx) => {
         return [
           // avatar({
           //   initial: 'DEFAULT',
