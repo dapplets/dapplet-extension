@@ -74,7 +74,7 @@ export default class DemoDapplet {
       console.log('localStorage is not existed.', err)
     }
 
-    Core.onShareLink((sharedData) => console.log('Shared data:', sharedData))
+    // Core.onShareLink((sharedData) => console.log('Shared data:', sharedData))
 
     const createShareLink = (id) => {
       const sharedData = { ctxId: id }
