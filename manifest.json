@@ -57,7 +57,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["callback.html", "inpage.js", "sandbox.js"],
+      "resources": ["callback.html", "inpage.js", "worker.js"],
       "matches": ["*://*/*"]
     }
   ],

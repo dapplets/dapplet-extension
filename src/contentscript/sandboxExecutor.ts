@@ -19,9 +19,9 @@ export abstract class SandboxExecutor {
     jsonrpc: JsonRpc,
     moduleEventBus: Observable<unknown>
   ) {
-    // sandbox.js provides environment for the script to run in
+    // worker.js provides environment for the script to run in
     // it includes Core-functions, DI container (Inject, Injectable) and adapter
-    const sandboxScriptUrl = browser.runtime.getURL('sandbox.js')
+    const sandboxScriptUrl = browser.runtime.getURL('worker.js')
     const serializedParams = JSON.stringify(params)
 
     // ToDo: remove self.chrome when we will path near-api-js correctly
