@@ -1,39 +1,33 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import { Observable, Subscription } from 'rxjs'
 import browser from 'webextension-polyfill'
-import { generateGuid } from '../common/helpers'
-import { JsonRpc } from '../common/jsonrpc'
-import { SandboxInitializationParams } from '../common/types'
-import { BaseEvent } from './events/baseEvent'
+import { generateGuid } from '../../common/generateGuid'
+import { JsonRpc, RpcMessageEvent } from '../../common/jsonrpc'
+import { SandboxInitializationParams } from '../../common/types'
+import { BaseEvent } from '../events/baseEvent'
+import { IFrameContainer } from './iframeContainer'
+import { IFrameWorker } from './iframeWorker'
 
-export abstract class SandboxExecutor {
-  private _worker: Worker
+/**
+ * The DappletExecutor class is responsible for executing the code of dapplets
+ * within a secured and isolated environment. It provides methods to communicate
+ * with the dapplets and manages their execution.
+ */
+export abstract class DappletExecutor {
   private _stateByWidgetId = new Map<string, any>()
   private _detachConfigCallbacksById = new Map<string, any>()
   private _jsonrpc: JsonRpc
   private _eventBusSubscription: Subscription
+  private _worker: IFrameWorker
 
   constructor(
+    sandboxContainer: IFrameContainer,
     dappletScript: string,
-    params: SandboxInitializationParams,
+    injectorInitParams: SandboxInitializationParams,
     jsonrpc: JsonRpc,
     moduleEventBus: Observable<unknown>
   ) {
-    // worker.js provides environment for the script to run in
-    // it includes Core-functions, DI container (Inject, Injectable) and adapter
-    const sandboxScriptUrl = browser.runtime.getURL('worker.js')
-    const serializedParams = JSON.stringify(params)
-
-    // ToDo: remove self.chrome when we will path near-api-js correctly
-    // ToDo: isolate global.postMessage and global.addEventListener
-    const concatedScript = `
-      self.chrome={runtime:{id:'id'}};
-      importScripts("${sandboxScriptUrl}");
-      self.initialize(${serializedParams});
-      ${dappletScript}
-    `
-    const dataUri = URL.createObjectURL(new Blob([concatedScript]))
-    this._worker = new Worker(dataUri, { name: params.manifest.name })
+    this._worker = new IFrameWorker(sandboxContainer, dappletScript, injectorInitParams)
     this._worker.addEventListener('message', this._messageListener)
 
     this._jsonrpc = jsonrpc
@@ -153,7 +147,7 @@ export abstract class SandboxExecutor {
 
     const state = this._stateByWidgetId.get(widgetId)
     if (!state) {
-      // console.error('SandboxExecutor: State not found for widgetId ' + widgetId)
+      // console.error('DappletExecutor: State not found for widgetId ' + widgetId)
       return
     }
 
@@ -166,7 +160,7 @@ export abstract class SandboxExecutor {
     const id = generateGuid()
 
     return new Promise((res, rej) => {
-      const listener = (e: MessageEvent) => {
+      const listener = (e: RpcMessageEvent) => {
         if (e.data.id === id) {
           this._worker.removeEventListener('message', listener)
           if (e.data.error) {
@@ -185,7 +179,7 @@ export abstract class SandboxExecutor {
     this._worker.postMessage({ method, params })
   }
 
-  private _messageListener = (e: MessageEvent) => {
+  private _messageListener = (e: RpcMessageEvent) => {
     const { id, method, params } = e.data
 
     switch (method) {
@@ -209,19 +203,18 @@ export abstract class SandboxExecutor {
           })
         break
       case 'confirm':
-        this._worker.postMessage({ id, result: params[0] })
-
+        this._worker.postMessage({ id, result: confirm(params[0]) })
         break
-
       case 'alert':
-        this._worker.postMessage({ id, result: params[0] })
+        alert(params[0])
+        this._worker.postMessage({ id })
         break
       case 'openPage':
         window.open(params[0], '_blank')
         this._worker.postMessage({ id })
         break
       default:
-        console.warn(`SandboxExecutor: Unknown method ${method}`)
+        console.warn(`DappletExecutor: Unknown method ${method}`)
     }
   }
 }

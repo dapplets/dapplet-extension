@@ -1,5 +1,6 @@
 // import browser from 'webextension-polyfill' // ToDo: chrome.offscreen is not supported by webextension-polyfill@0.10.0. Need to be updated when it will.
-import { blobToDataURL, generateGuid } from '../../common/helpers'
+import { generateGuid } from '../../common/generateGuid'
+import { blobToDataURL } from '../../common/helpers'
 
 const OFFSCREEN_DOCUMENT_PATH = 'offscreen.html'
 

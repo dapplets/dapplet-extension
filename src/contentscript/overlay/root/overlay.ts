@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import browser from 'webextension-polyfill'
-import { generateGuid } from '../../../common/helpers'
+import { generateGuid } from '../../../common/generateGuid'
 import { UrlAvailability } from '../../../common/types'
 import { IOverlay, OverlayConfig, OverlaySourceModule } from '../interfaces'
 import { OverlayManager } from './overlayManager'
@@ -105,6 +105,7 @@ export class Overlay implements IOverlay {
       this._queue.push(data)
       this.open()
     } else {
+      // ToDo: send message to the specific origin
       this.frame.contentWindow.postMessage(data, '*')
     }
   }

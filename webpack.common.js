@@ -50,6 +50,7 @@ module.exports = {
     contentscript: path.join(__dirname, 'src/contentscript/index.ts'),
     inpage: path.join(__dirname, 'src/inpage/index.ts'),
     worker: path.join(__dirname, 'src/worker/index.ts'),
+    sandbox: path.join(__dirname, 'src/sandbox/index.ts'),
     offscreen: path.join(__dirname, 'src/offscreen/index.ts'),
   },
   output: {
@@ -138,6 +139,10 @@ module.exports = {
         {
           from: 'src/offscreen/index.html',
           to: 'offscreen.html',
+        },
+        {
+          from: 'src/sandbox/index.html',
+          to: 'sandbox.html',
         },
       ],
     }),

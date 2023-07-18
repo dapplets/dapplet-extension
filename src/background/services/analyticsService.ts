@@ -1,4 +1,4 @@
-import { generateGuid } from '../../common/helpers'
+import { generateGuid } from '../../common/generateGuid'
 import GlobalConfigService from './globalConfigService'
 
 const MATOMO_API_URL = 'https://mtmo.mooo.com/matomo.php'

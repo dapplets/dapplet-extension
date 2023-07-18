@@ -1,7 +1,7 @@
 import { baseDecode } from 'borsh'
 import * as nearAPI from 'near-api-js'
 import { ConnectedWalletAccount } from 'near-api-js'
-import { generateGuid } from '../../../common/helpers'
+import { generateGuid } from '../../../common/generateGuid'
 import { browserStorage_get, getURL, initBGFunctions } from '../../communication'
 
 export class CustomConnectedWalletAccount extends ConnectedWalletAccount {

@@ -1,4 +1,4 @@
-import { generateGuid } from './helpers'
+import { generateGuid } from '../common/generateGuid'
 import { State } from './state'
 
 type InjectedWidget = {

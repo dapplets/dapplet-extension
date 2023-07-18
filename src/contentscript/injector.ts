@@ -19,7 +19,8 @@ import { BaseEvent } from './events/baseEvent'
 import BuiltInModules from './modules'
 import { ConfigAdapter } from './modules/config-adapter'
 import { DynamicAdapter } from './modules/dynamic-adapter'
-import { SandboxExecutor } from './sandboxExecutor'
+import { DappletExecutor } from './sandbox/dappletExecutor'
+import { IFrameContainer } from './sandbox/iframeContainer'
 import { IContentAdapter } from './types'
 
 type RegistriedModule = {
@@ -61,6 +62,7 @@ export class Injector {
   public registry: RegistriedModule[] = []
 
   private _dynamicAdapter: DynamicAdapter<any>
+  private _iframeContainer = new IFrameContainer()
 
   constructor(
     public core: Core,
@@ -338,6 +340,7 @@ export class Injector {
   public async dispose() {
     const modules = this.registry.map((x) => x.manifest)
     await this.unloadModules(modules)
+    this._iframeContainer.destroy()
   }
 
   private async _processModules(modules: NotRegisteredModule[]) {
@@ -603,10 +606,10 @@ export class Injector {
         }
 
         // ToDo: refactor it
-        const SandboxExecutorExtended = class extends SandboxExecutor {
+        const DappletExecutorExtended = class extends DappletExecutor {
           constructor() {
             const observable = me.eventStream.pipe(filter((e) => e.namespace === manifest.name))
-            super(scriptOrConfig as string, initParams, me.jsonrpc, observable)
+            super(me._iframeContainer, scriptOrConfig as string, initParams, me.jsonrpc, observable)
           }
 
           // implementaion of the abstract method
@@ -618,7 +621,7 @@ export class Injector {
           }
         }
 
-        this._registerModule(module, SandboxExecutorExtended)
+        this._registerModule(module, DappletExecutorExtended)
       } catch (err) {
         // ToDo: remove module from this.registry
         console.error(err)

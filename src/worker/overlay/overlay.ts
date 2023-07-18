@@ -1,4 +1,4 @@
-import { generateGuid } from '../../common/helpers'
+import { generateGuid } from '../../common/generateGuid'
 import { JsonRpc } from '../../common/jsonrpc'
 import { IOverlay, OverlayConfig } from './interfaces'
 

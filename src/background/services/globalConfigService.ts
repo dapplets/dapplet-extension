@@ -1,13 +1,7 @@
 import { DEFAULT_BRANCH_NAME, StorageTypes } from '../../common/constants'
+import { generateGuid } from '../../common/generateGuid'
 import * as EventBus from '../../common/global-event-bus'
-import {
-  generateGuid,
-  incrementFilename,
-  joinUrls,
-  pick,
-  typeOfUri,
-  UriTypes,
-} from '../../common/helpers'
+import { incrementFilename, joinUrls, pick, typeOfUri, UriTypes } from '../../common/helpers'
 import { NearNetworks } from '../../common/types'
 import GlobalConfigBrowserStorage from '../browserStorages/globalConfigBrowserStorage'
 import { GlobalConfig } from '../models/globalConfig'

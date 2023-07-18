@@ -1,4 +1,4 @@
-import { generateGuid } from './helpers'
+import { generateGuid } from '../common/generateGuid'
 
 // ToDo: rewrite this to use RxJS
 
