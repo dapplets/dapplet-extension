@@ -74,6 +74,14 @@ export default class DemoDapplet {
       console.log('localStorage is not existed.', err)
     }
 
+    Core.onShareLink((sharedData) => console.log('Shared data:', sharedData))
+
+    const createShareLink = (id) => {
+      const sharedData = { ctxId: id }
+      const link = Core.createShareLink('https://twitter.com/teremovskii', sharedData)
+      console.log('ShareLink:', link)
+    }
+
     const {
       // avatar,
       avatarBadge,
@@ -317,8 +325,10 @@ export default class DemoDapplet {
               vertical: 'bottom',
               horizontal: 'right',
               img: MAIN_IMG,
+              tooltip: 'Create ShareLink',
               exec: () => {
                 console.log('ctx = ', ctx)
+                createShareLink(ctx?.id)
                 // this.openOverlay({ index: '1/1', ctx })
               },
             },
