@@ -1,7 +1,7 @@
 import {} from '../../../../lib'
-import BLACK_IMG from './Black_Icon3.svg'
-import MAIN_IMG from './Red_Icon3.svg'
-import WHITE_IMG from './White_Icon3.svg'
+import BLACK_IMG from './images/Black_Icon3.svg'
+import MAIN_IMG from './images/Red_Icon3.svg'
+import WHITE_IMG from './images/White_Icon3.svg'
 
 const adapterName = 'test-virtual-adapter'
 
@@ -9,6 +9,9 @@ const adapterName = 'test-virtual-adapter'
 export default class DemoDapplet {
   @Inject(adapterName)
   public adapter: any
+
+  @Inject('overlay-adapter.dapplet-base.eth')
+  public adapterAction: any
 
   // current user from twitter
   private _globalContext = {}
@@ -71,8 +74,34 @@ export default class DemoDapplet {
       console.log('localStorage is not existed.', err)
     }
 
-    const { avatar, avatarBadge, usernameBadge, label, button, picture, caption, box } =
-      this.adapter.exports
+    const {
+      // avatar,
+      avatarBadge,
+      // usernameBadge,
+      // label,
+      button,
+      // picture,
+      // caption,
+      // box
+    } = this.adapter.exports
+
+    const { button: buttonAction } = this.adapterAction.exports
+
+    this.adapterAction.attachConfig({
+      MENU_ACTION: () => [
+        buttonAction({
+          initial: 'DEFAULT',
+          DEFAULT: {
+            icon: MAIN_IMG,
+            title: 'Test',
+            pinnedID: 'test-action-button',
+            action: (_, me) => {
+              me.title = 'Done!'
+            },
+          },
+        }),
+      ],
+    })
 
     this._config = {
       GLOBAL: (global) => {

@@ -14,7 +14,7 @@
   "main": {
     "$ref": "package.json#/main"
   },
-  "icon": "src/Red_Icon3.png",
+  "icon": "src/images/Red_Icon3.png",
   "contextIds": [
     "test-virtual-adapter"
   ],
