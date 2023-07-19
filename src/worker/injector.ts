@@ -24,13 +24,16 @@ type RegistriedModule = {
 
 const MAIN_MODULE_NAME = 'dapplet'
 
+// ToDo: below is injecting dependencies with decorators, but it's not elegant
+// Read this topic and refactor the code: https://stackoverflow.com/q/61439271
+
 /**
  * @singleton
  */
 export class Injector {
   private _registry: RegistriedModule[] = []
-  private _constructorDeps: string[] = []
-  private _activateMethodsDeps: string[] = []
+  private _constructorDeps: string[] = [] // ToDo: find a better way to inject dependencies
+  private _activateMethodsDeps: string[] = [] // ToDo: find a better way to inject dependencies
   private _deactivateCallbacks: (() => void)[] = [] // ToDo: come up with a new way to unsubscribe
 
   constructor(private core: Core) {}
@@ -123,11 +126,17 @@ export class Injector {
     }
 
     return (_, __, descriptor: PropertyDescriptor) => {
-      if (!descriptor) {
+      if (!descriptor || typeof descriptor.value !== 'function') {
         throw new Error('OnEvent() decorator can be applied on class methods only.')
       }
 
-      const subscription = this.core.events.ofType(eventType).subscribe(descriptor.value)
+      const subscription = this.core.events.ofType(eventType).subscribe((event) => {
+        // ToDo: replace with a more elegant solution
+        const mainModule = this._registry.find((x) => x.name === MAIN_MODULE_NAME)
+        if (!mainModule) throw new Error('Main module is not found')
+        descriptor.value.call(mainModule.instance, event)
+      })
+
       this._deactivateCallbacks.push(subscription.unsubscribe.bind(subscription))
 
       return descriptor
