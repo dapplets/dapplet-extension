@@ -4,7 +4,7 @@ import Base from './base'
 export type NotificationAction = {
   action: string
   title: string
-  icon: string
+  icon?: string
 }
 
 export type NotificationPayload = {
