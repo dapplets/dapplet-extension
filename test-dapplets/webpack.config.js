@@ -1,19 +1,16 @@
 const path = require('path')
 
+const DAPPLETS = ['test-common-dapplet', 'test-dynamic-dapplet', 'twitter-demo']
+
 module.exports = {
   mode: 'development',
   devtool: 'inline-source-map',
-  entry: {
-    'dapplets/test-common-dapplet/build/index': path.join(
-      __dirname,
-      'dapplets/test-common-dapplet/src/index.ts'
-    ),
-    'dapplets/test-dynamic-dapplet/build/index': path.join(
-      __dirname,
-      'dapplets/test-dynamic-dapplet/src/index.ts'
-    ),
-    'dapplets/twitter-demo/build/index': path.join(__dirname, 'dapplets/twitter-demo/src/index.ts'),
-  },
+  entry: Object.fromEntries(
+    DAPPLETS.map((name) => [
+      `dapplets/${name}/build/index`,
+      path.join(__dirname, `dapplets/${name}/src/index.ts`),
+    ])
+  ),
   output: {
     path: __dirname,
     filename: '[name].js',
