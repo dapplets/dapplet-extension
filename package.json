@@ -17,13 +17,13 @@
     "eslint": "eslint ./src --ext .ts --fix",
     "stylelint": "stylelint ./src/**/*.{css,scss,module.scss} --fix",
     "cypress:open": "cypress open",
-    "test:dapplets": "cd test-dapplets && npm start",
+    "test:dapplets": "webpack serve --config test-dapplets/webpack.config.js",
     "test:e2e": "cross-env QASE_REPORT=1 npx cypress run --headed --browser chrome",
     "test:ca": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/connected-accounts\" --headed --browser chrome",
     "test:da": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/dapplet-actions\" --headed --browser chrome",
     "test:wa": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/wallets\" --headed --browser chrome",
     "test:notify": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/notifications\" --headed --browser chrome",
-    "postinstall": "patch-package && cd test-dapplets && npm i"
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@fontsource/montserrat": "^4.5.14",
@@ -113,7 +113,8 @@
     "webpack": "^5.86.0",
     "webpack-cli": "^5.1.4",
     "webpack-merge": "^5.9.0",
-    "yup": "^1.0.2"
+    "yup": "^1.0.2",
+    "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
     "ethers": "^5.7.2",
