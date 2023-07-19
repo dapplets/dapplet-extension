@@ -1,8 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { Key, ReactElement, useEffect, useRef, useState } from 'react'
-import Linkify from 'react-linkify'
-import { SecureLink } from 'react-secure-link'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
 import {
@@ -23,8 +21,10 @@ import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { WidgetButton } from '../../widgets/button'
 import { LabelButton } from '../../widgets/label'
+import { LinkifyText } from '../LinkifyText'
 import { OverlayTab } from '../OverlayTab'
 import styles from './OverlayToolbar.module.scss'
+
 const SYSTEM_TAB: ToolbarTab = {
   id: 'system',
   pinned: true,
@@ -350,19 +350,15 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               )}
             </div>
 
-            <div className={styles.titleNotification}>
+            <div>
               <div className={styles.titleNotification}>
-                <Linkify
-                  componentDecorator={(decoratedHref: string, decoratedText: string, key: Key) => (
-                    <SecureLink href={decoratedHref} key={key}>
-                      {decoratedText}
-                    </SecureLink>
-                  )}
-                >
-                  {payload.title}
-                </Linkify>
+                <LinkifyText>{payload.title}</LinkifyText>
               </div>
-              {/* ToDo: design it */}
+              {payload.message ? (
+                <div className={styles.messageNotification}>
+                  <LinkifyText>{payload.message}</LinkifyText>
+                </div>
+              ) : null}
               {payload.actions?.length > 0 ? (
                 <div className={styles.buttonNotificationBlock}>
                   {payload.actions.map(({ action, title }) => (
