@@ -1,0 +1,86 @@
+{
+  "themes": {
+    "LIGHT": "boolean(//body[@style='background-color: #FFFFFF;'] | //body[@style='background-color: rgb(255, 255, 255);'])",
+    "DARK": "boolean(//body[@style='background-color: rgb(21, 32, 43);'] | //body[@style='background-color: rgb(0, 0, 0);'])"
+  },
+  "contexts": {
+    "GLOBAL": {
+      "containerSelector": "html",
+      "contextBuilder": {
+        "id": "string('global')",
+        "websiteName": "string('Twitter')",
+        "username": "substring-after(string(//header//a[@aria-label='Profile']/@href), '/')",
+        "fullname": "string(//*[@aria-label='Account menu']//img/@alt)",
+        "img": "string(//*[@aria-label='Account menu']//img/@src)"
+      }
+    },
+    "POST": {
+      "containerSelector": "main[role=main]",
+      "contextSelector": "article.css-1dbjc4n",
+      "widgets": {
+        "button": {
+          "styles": "styles/post/button.css",
+          "insertionPoint": "div[role=group] > *:last-child"
+        },
+        "avatarBadge": {
+          "styles": "styles/post/avatarBadge.css",
+          "insertionPoint": "div.css-1dbjc4n.r-18kxxzh.r-1wbh5a2.r-13qz1uu > *:last-child"
+        }
+      },
+      "events": {
+        "like": {
+          "element": "div[role=button][data-testid=\"like\"]",
+          "listen": "click"
+        },
+        "dislike": {
+          "element": "div[role=button][data-testid=\"unlike\"]",
+          "listen": "click"
+        },
+        "repost": {
+          "element": "div[data-testid=\"retweet\"]",
+          "listen": "click",
+          "data": {
+            "disabled": "string(//@aria-disabled)"
+          }
+        },
+        "unrepost": {
+          "element": "div[data-testid=\"unretweet\"]",
+          "listen": "click",
+          "data": {
+            "disabled": "string(//@aria-disabled)"
+          }
+        }
+      },
+      "contextBuilder": {
+        "id": "substring-after(string(.//time/../@href), 'status/')",
+        "text": "string(.//*[@data-testid='tweetText'])",
+        "authorFullname": "string(.//*[@data-testid='User-Name']//span)",
+        "authorUsername": "substring-before(substring-after(string(.//time/../@href), '/'), '/')",
+        "authorImg": "string(.//img/@src)",
+        "createdAt": "string(.//time/@datetime)"
+      }
+    },
+    "PROFILE": {
+      "containerSelector": "main[role=main]",
+      "contextSelector": "div[data-testid=primaryColumn]",
+      "widgets": {
+        "button": {
+          "styles": "styles/profile/button.css",
+          "insertionPoint": "div.css-1dbjc4n.r-1ifxtd0.r-ymttw5.r-ttdzmv div.css-1dbjc4n.r-obd0qt.r-18u37iz.r-1w6e6rj.r-1h0z5md.r-dnmrzs > *:last-child",
+          "insert": "begin"
+        },
+        "avatarBadge": {
+          "styles": "styles/profile/avatarBadge.css",
+          "insertionPoint": "div.css-1dbjc4n.r-1ifxtd0.r-ymttw5.r-ttdzmv div.css-1dbjc4n.r-ggadg3.r-u8s1d.r-8jfcpp",
+          "insert": "end"
+        }
+      },
+      "contextBuilder": {
+        "id": "substring-after(string(.//*[@data-testid='UserName']/div/div/div[2]//span), '@')",
+        "authorFullname": "string(.//*[@data-testid='UserName']//span[1])",
+        "authorUsername": "substring-after(string(.//*[@data-testid='UserName']/div/div/div[2]//span), '@')",
+        "authorImg": "string(.//img[contains(@alt,'Opens profile photo')]/@src)"
+      }
+    }
+  }
+}

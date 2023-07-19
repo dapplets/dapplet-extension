@@ -99,7 +99,12 @@ export class ProxyAdapter {
   }) {
     if (!this._configById.has(configId)) return []
 
-    const unknownFactories = this._configById.get(configId)[contextName](ctx) ?? []
+    let unknownFactories = this._configById.get(configId)[contextName](ctx) ?? []
+
+    if (unknownFactories instanceof Promise) {
+      unknownFactories = await unknownFactories
+    }
+
     const widgetFactories = Array.isArray(unknownFactories) ? unknownFactories : [unknownFactories]
     const widgetsToBeCreated = await Promise.all(
       widgetFactories.map(async (widgetFactory) => {

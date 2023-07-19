@@ -1,0 +1,60 @@
+:host {
+  z-index: 50100;
+}
+
+.avatar-badge {
+  display: block;
+}
+
+.wrapper {
+  position: absolute;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.active {
+  cursor: pointer;
+}
+
+.badge {
+  width: 24px;
+  height: 24px;
+}
+
+.not-basic {
+  background-color: white;
+  border-radius: 99em;
+}
+
+.not-basic.badge {
+  border: 1px solid white;
+}
+
+.not-basic.dark {
+  background-color: black;
+}
+
+.not-basic.dark.badge {
+  border: 1px solid black;
+}
+
+.top-left {
+  top: -2px;
+  left: -7px;
+}
+
+.top-right {
+  top: -2px;
+  right: -7px;
+}
+
+.bottom-left {
+  bottom: -2px;
+  left: -7px;
+}
+
+.bottom-right {
+  bottom: -2px;
+  right: -7px;
+}

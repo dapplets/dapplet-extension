@@ -2,7 +2,7 @@ import * as ethers from 'ethers'
 import * as NearApi from 'near-api-js'
 import ModuleInfo from '../../background/models/moduleInfo'
 import VersionInfo from '../../background/models/versionInfo'
-import { joinUrls } from '../../common/helpers'
+import { joinUrls, parseShareLink } from '../../common/helpers'
 import { NotificationPayload } from '../../common/models/notification'
 import { LoginRequest, SandboxEnvironmentVariables } from '../../common/types'
 import { initBGFunctions, sendRequest } from '../communication'
@@ -287,5 +287,22 @@ export class Core {
 
   public state<T>(defaultState: T, type?: string) {
     return new State<T>(defaultState, type)
+  }
+
+  public createShareLink(targetUrl: string, modulePayload: any): string {
+    const groups = /https:\/\/augm\.link\/live\/(.*)/gm.exec(targetUrl)
+    const [, targetUrlNoProxy] = groups ?? []
+    if (targetUrlNoProxy) targetUrl = targetUrlNoProxy
+    const { urlNoPayload } = parseShareLink(targetUrl) // prevent duplicate of base64 payload
+    const payload = [
+      EXTENSION_VERSION,
+      this.manifest.registryUrl,
+      this.manifest.name,
+      ['*'],
+      modulePayload,
+    ]
+    const base64Payload = btoa(JSON.stringify(payload))
+    const WEB_PROXY_URL = 'https://augm.link/live/'
+    return WEB_PROXY_URL + urlNoPayload + '#dapplet/' + base64Payload
   }
 }
