@@ -1,54 +1,58 @@
 const path = require('path')
-const fs = require('fs')
 
 const BUILD_DIRECTORY = 'build'
 
-module.exports = function (dir) {
-  return {
-    mode: 'development',
-    devtool: 'inline-source-map',
-    entry: path.join(dir, 'src/index.ts'),
-    output: {
-      path: path.join(dir, BUILD_DIRECTORY),
-      filename: 'index.js',
-      libraryTarget: 'umd',
-      umdNamedDefine: true,
-      globalObject: 'this',
-    },
-    resolve: {
-      extensions: ['.ts', '.js'],
-    },
-    module: {
-      rules: [
-        {
-          exclude: /node_modules/,
-          test: /\.ts$/,
-          use: 'ts-loader',
-        },
-        {
-          test: /\.(png|jp(e*)g|svg|html)$/,
-          use: [
-            {
-              loader: 'url-loader',
-              options: {
-                limit: 50 * 1024, // Convert images < 50kb to base64 strings
-              },
-            },
-          ],
-        },
-      ],
-    },
-    devServer: {
-      contentBase: path.join(__dirname, 'build'),
-      port: 3000,
-      https: {
-        key: fs.readFileSync('src/server/secret/localhost/localhost.decrypted.key'),
-        cert: fs.readFileSync('src/server/secret/localhost/localhost.crt'),
+module.exports = {
+  mode: 'development',
+  devtool: 'inline-source-map',
+  entry: {
+    'modules/test-common-dapplet/build/index': path.join(
+      __dirname,
+      'modules/test-common-dapplet/src/index.ts'
+    ),
+    'modules/test-dynamic-dapplet/build/index': path.join(
+      __dirname,
+      'modules/test-dynamic-dapplet/src/index.ts'
+    ),
+    'modules/twitter-demo/build/index': path.join(__dirname, 'modules/twitter-demo/src/index.ts'),
+  },
+  output: {
+    path: __dirname,
+    filename: '[name].js',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
+    globalObject: 'this',
+  },
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+  module: {
+    rules: [
+      {
+        exclude: /node_modules/,
+        test: /\.ts$/,
+        use: 'ts-loader',
       },
-      hot: false,
-      inline: false,
-      liveReload: false,
-      open: false,
+      {
+        test: /\.(png|jp(e*)g|svg|html)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 50 * 1024, // Convert images < 50kb to base64 strings
+            },
+          },
+        ],
+      },
+    ],
+  },
+  devServer: {
+    port: 3000,
+    hot: false,
+    liveReload: false,
+    devMiddleware: {
+      // publicPath: 'modules',
     },
-  }
+    static: './',
+  },
 }

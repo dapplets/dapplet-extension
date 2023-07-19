@@ -1,23 +1,13 @@
 {
-  "name": {
-    "$ref": "package.json#/name"
-  },
+  "name": "test-common-dapplet.dapplet-base.eth",
+  "version": "0.1.0",
+  "description": "Test Common Adapter",
+  "main": "build/index.js",
   "branch": "default",
-  "version": {
-    "$ref": "package.json#/version"
-  },
   "type": "FEATURE",
   "title": "Test Common Dapplet",
-  "description": {
-    "$ref": "package.json#/description"
-  },
-  "main": {
-    "$ref": "package.json#/main"
-  },
   "icon": "src/icons/ex06.png",
-  "contextIds": [
-    "test-common-adapter"
-  ],
+  "contextIds": ["test-common-adapter"],
   "config": {
     "schema": "config/schema.json",
     "default": "config/default.json"

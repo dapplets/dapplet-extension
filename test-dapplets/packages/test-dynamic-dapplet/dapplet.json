@@ -1,23 +1,13 @@
 {
-  "name": {
-    "$ref": "package.json#/name"
-  },
+  "name": "test-dynamic-dapplet",
+  "version": "0.1.0",
+  "description": "Demonstration of dynamic dapplet",
+  "main": "build/index.js",
   "branch": "default",
-  "version": {
-    "$ref": "package.json#/version"
-  },
   "type": "FEATURE",
   "title": "Test Dynamic Dapplet",
-  "description": {
-    "$ref": "package.json#/description"
-  },
-  "main": {
-    "$ref": "package.json#/main"
-  },
   "icon": "src/Red_Icon3.png",
-  "contextIds": [
-    "twitter.com/1489972957011394560"
-  ],
+  "contextIds": ["twitter.com/1489972957011394560"],
   "dependencies": {
     "test-twitter-adapter": "0.1.0"
   }

@@ -1,23 +1,13 @@
 {
-  "name": {
-    "$ref": "package.json#/name"
-  },
+  "name": "twitter-demo.dapplet-base.eth",
+  "version": "0.2.0",
+  "description": "Demonstration of adapters capabilities",
+  "main": "build/index.js",
   "branch": "default",
-  "version": {
-    "$ref": "package.json#/version"
-  },
   "type": "FEATURE",
   "title": "Demo Dapplet",
-  "description": {
-    "$ref": "package.json#/description"
-  },
-  "main": {
-    "$ref": "package.json#/main"
-  },
   "icon": "src/images/Red_Icon3.png",
-  "contextIds": [
-    "test-virtual-adapter"
-  ],
+  "contextIds": ["test-virtual-adapter"],
   "dependencies": {
     "test-virtual-adapter": "0.1.0"
   },
