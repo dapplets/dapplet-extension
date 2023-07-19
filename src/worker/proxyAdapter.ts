@@ -57,7 +57,7 @@ export class ProxyAdapter {
         for (const widget of this._widgets.values()) {
           // ToDo: coliision with another context types are possible
           if (widget.state.id === id && widget.state.ctx.id === ctx.id) {
-            return widget
+            return widget.state.state
           }
         }
 
