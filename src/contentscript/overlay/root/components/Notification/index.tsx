@@ -2,13 +2,15 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useRef, useState } from 'react'
 import browser from 'webextension-polyfill'
+import { StorageRef } from '../../../../../common/types'
 import { CloseIcon } from '../CloseIcon'
+import { DappletImage } from '../DappletImage'
 import { LinkifyText } from '../LinkifyText'
 import styles from './Notification.module.scss'
 
 export interface NotificationProps {
   label: string
-  icon?: string
+  icon?: StorageRef
   title: string
   date: any
   onClear?: (x) => void
@@ -50,7 +52,7 @@ export const Notification = (props: NotificationProps): ReactElement => {
     >
       <div className={styles.blockTitle}>
         <div className={styles.blockIcon}>
-          {icon ? <img src={icon} className={styles.icon} /> : null}
+          {icon ? <DappletImage storageRef={icon} className={styles.icon} /> : null}
           <div className={styles.title}>
             <LinkifyText>{title}</LinkifyText>
           </div>

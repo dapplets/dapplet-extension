@@ -21,6 +21,7 @@ import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { WidgetButton } from '../../widgets/button'
 import { LabelButton } from '../../widgets/label'
+import { DappletImage } from '../DappletImage'
 import { LinkifyText } from '../LinkifyText'
 import { OverlayTab } from '../OverlayTab'
 import styles from './OverlayToolbar.module.scss'
@@ -344,7 +345,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
           >
             <div className={styles.iconNotificationBlock}>
               {payload.icon ? (
-                <img className={styles.iconNotification} src={payload.icon} />
+                <DappletImage storageRef={payload.icon} className={styles.iconNotification} />
               ) : (
                 <Noties />
               )}

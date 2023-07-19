@@ -81,13 +81,11 @@ export class Core {
       this.manifest.name
     )
 
-    const icon = moduleInfo.icon?.uris?.[0]
-
     const thisTab = await getThisTab()
 
     const notification = {
       ...payload,
-      icon,
+      icon: moduleInfo.icon,
       source: this.manifest.name,
     }
 
