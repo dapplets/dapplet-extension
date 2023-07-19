@@ -77,6 +77,7 @@ function initialize(params: SandboxInitializationParams) {
   global.Core = core
   global.Injectable = injector.injectableDecorator.bind(injector)
   global.Inject = injector.injectDecorator.bind(injector)
+  global.OnEvent = injector.onEventDecorator.bind(injector)
   global.exports = {} // for CommonJS modules compatibility
 }
 

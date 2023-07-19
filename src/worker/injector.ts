@@ -31,6 +31,7 @@ export class Injector {
   private _registry: RegistriedModule[] = []
   private _constructorDeps: string[] = []
   private _activateMethodsDeps: string[] = []
+  private _deactivateCallbacks: (() => void)[] = [] // ToDo: come up with a new way to unsubscribe
 
   constructor(private core: Core) {}
 
@@ -59,6 +60,10 @@ export class Injector {
     const mainModule = this._registry.find((x) => x.name === MAIN_MODULE_NAME)
     if (!mainModule) throw new Error('Main module is not found')
     if (!mainModule.instance) throw new Error('Main module is not activated')
+
+    // unsubscribe all event listeners
+    this._deactivateCallbacks.forEach((x) => x())
+    this._deactivateCallbacks = []
 
     if (mainModule.instance.deactivate) {
       await mainModule.instance.deactivate()
@@ -107,6 +112,25 @@ export class Injector {
           "Invalid decorator. Inject() decorator can be applied on constructor's parameters, class properties, activate() method's parameters only."
         )
       }
+    }
+  }
+
+  public onEventDecorator(eventType: string) {
+    if (!eventType) {
+      throw new Error(
+        'Event type is required as the first argument of the @OnEvent(event_type) decorator'
+      )
+    }
+
+    return (_, __, descriptor: PropertyDescriptor) => {
+      if (!descriptor) {
+        throw new Error('OnEvent() decorator can be applied on class methods only.')
+      }
+
+      const subscription = this.core.events.ofType(eventType).subscribe(descriptor.value)
+      this._deactivateCallbacks.push(subscription.unsubscribe.bind(subscription))
+
+      return descriptor
     }
   }
 
