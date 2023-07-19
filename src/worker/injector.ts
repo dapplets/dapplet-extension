@@ -6,11 +6,11 @@ type DappletConfig = {
 }
 
 interface ModuleConstructor {
-  new (): ModuleInterface
+  new (...modules: ModuleInterface[]): ModuleInterface
 }
 
 interface ModuleInterface {
-  activate?(): Promise<void>
+  activate?(...modules: ModuleInterface[]): Promise<void>
   deactivate?(): Promise<void>
   attachConfig?(config: DappletConfig): void
   detachConfig?(config: DappletConfig): void
@@ -29,6 +29,8 @@ const MAIN_MODULE_NAME = 'dapplet'
  */
 export class Injector {
   private _registry: RegistriedModule[] = []
+  private _constructorDeps: string[] = []
+  private _activateMethodsDeps: string[] = []
 
   constructor(private core: Core) {}
 
@@ -37,10 +39,12 @@ export class Injector {
     if (!mainModule) throw new Error('Main module is not found')
     if (mainModule.instance) throw new Error('Main module is already activated')
 
-    mainModule.instance = new mainModule.clazz()
+    const instancedConstructorDeps = this._constructorDeps.map(this._getDependencyInstance)
+    mainModule.instance = new mainModule.clazz(...instancedConstructorDeps)
 
     if (mainModule.instance.activate) {
-      await mainModule.instance.activate()
+      const instancedActivateMethodDeps = this._activateMethodsDeps.map(this._getDependencyInstance)
+      await mainModule.instance.activate(...instancedActivateMethodDeps)
     }
 
     return {
@@ -81,9 +85,7 @@ export class Injector {
     ) => {
       // Constructor Parameter Decorator
       if (propertyOrMethodName === undefined) {
-        console.error('Constructor Parameter Decorator is not implemented yet.')
-        // const currentModule = this._registerModule(module, target, () => moduleEventBus)
-        // currentModule.constructorDependencies[parameterIndex] = name
+        this._constructorDeps[parameterIndex] = name
       }
       // Class Property Decorator
       else if (parameterIndex === undefined) {
@@ -97,9 +99,7 @@ export class Injector {
       }
       // Method Parameter Decorator
       else if (propertyOrMethodName === 'activate') {
-        console.error('Method Parameter Decorator is not implemented yet.')
-        // const currentModule = this._registerModule(module, target.constructor, () => moduleEventBus)
-        // currentModule.activateMethodsDependencies[parameterIndex] = name
+        this._activateMethodsDeps[parameterIndex] = name
       }
       // Invalid Decorator
       else {
@@ -110,7 +110,9 @@ export class Injector {
     }
   }
 
-  private _getDependencyInstance(name: string) {
+  private _getDependencyInstance = (name: string) => {
+    if (!name) throw new Error('The name of a module is required')
+
     let module = this._registry.find((x) => x.name === name)
 
     if (!module) {
