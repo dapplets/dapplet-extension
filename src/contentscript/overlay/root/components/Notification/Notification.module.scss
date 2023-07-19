@@ -47,11 +47,12 @@
   display: flex;
   justify-content: space-between;
   max-width: 100%;
+  align-items: flex-start;
 }
 
 .blockIcon {
   display: flex;
-  width: 80%;
+  width: 75%;
 }
 
 .icon {
@@ -85,15 +86,15 @@
 }
 
 .date {
-  display: block;
-
-  margin-top: 5px;
-  margin-bottom: 5px;
+  display: flex;
+  margin-top: 7px;
 
   font-size: 10px;
   line-height: 100%;
-  color: #919191;
+  color: $main-grey;
   text-transform: uppercase;
+  align-items: center;
+  margin-right: 5px;
 }
 
 .blockDesccription {
@@ -149,4 +150,36 @@
   display: flex;
   align-items: flex-end;
   width: 97%;
+}
+.buttonNotificationBlock {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+
+  width: 100%;
+  margin-top: 5px;
+}
+.buttonNotification {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 64px;
+  height: 20px;
+  margin-right: 10px;
+
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 100%;
+  color: $main-grey;
+
+  background-color: inherit;
+  border: 1px solid $stroke-color;
+  border-radius: 8px;
+
+  &:hover {
+    opacity: 0.5;
+  }
 }

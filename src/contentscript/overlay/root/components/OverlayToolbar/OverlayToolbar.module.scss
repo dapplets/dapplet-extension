@@ -280,9 +280,9 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: row;
-  align-items: flex-start;
-  justify-content: center;
-
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
   // min-width: 139px;
   width: 378px;
   height: max-content;
@@ -329,7 +329,23 @@
     }
   }
 }
+.notificationBlockTop {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+.date {
+  display: block;
+  margin-left: auto;
+  margin-right: 5px;
+  // margin-top: 5px;
+  // margin-bottom: 5px;
 
+  font-size: 10px;
+  line-height: 100%;
+  color: #919191;
+  text-transform: uppercase;
+}
 .widgetButtonAnimatePinnedNotification {
   animation-name: animate-notification;
   animation-duration: 60s;
@@ -358,9 +374,16 @@
   margin-right: 5px;
 }
 
+.titleNotification {
+  color: $content-black;
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  font-weight: 400;
+  line-height: 149%;
+}
 // ToDo: GS, remove commented code after fix bug with animation
 
-.titleNotification {
+.messageNotification {
   // overflow: hidden;
   display: flex;
 
@@ -368,13 +391,16 @@
   flex-direction: column;
 
   // min-width: 103px;
-  width: 350px;
+  // width: 350px;
+  width: 100%;
+  font-size: 12px;
 
-  font-size: 14px;
+  font-weight: 400;
+
   line-height: 149%;
-  color: #5ab5e8;
+  color: $content-black;
   word-wrap: break-word;
-
+  font-family: Roboto, sans-serif;
   // text-overflow: ellipsis;
   // white-space: nowrap;
   a {
@@ -414,7 +440,6 @@
   font-weight: 400;
   line-height: 100%;
   color: $main-grey;
-  color: $stroke-color;
 
   background-color: inherit;
   border: 1px solid $stroke-color;

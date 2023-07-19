@@ -4,6 +4,7 @@ import React, { Key, ReactElement, useRef, useState } from 'react'
 import Linkify from 'react-linkify'
 import { SecureLink } from 'react-secure-link'
 import browser from 'webextension-polyfill'
+import { addZero } from '../../helpers/addZero'
 import { CloseIcon } from '../CloseIcon'
 import styles from './Notification.module.scss'
 
@@ -31,14 +32,6 @@ export const Notification = (props: NotificationProps): ReactElement => {
     const { resolveNotificationAction, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
     await resolveNotificationAction(_id, actionId, thisTab.id)
-  }
-
-  const addZero = (num) => {
-    if (num >= 0 && num <= 9) {
-      return '0' + num
-    } else {
-      return num
-    }
   }
 
   return (
@@ -75,6 +68,14 @@ export const Notification = (props: NotificationProps): ReactElement => {
           </span>{' '}
           <span>{addZero(newDateNum.getHours()) + ':' + addZero(newDateNum.getMinutes())}</span>
         </span>
+        {isRead !== 0 ? (
+          <CloseIcon
+            appearance="small"
+            color="red"
+            isNotification
+            onClick={() => onClear && onClear(_id)}
+          />
+        ) : null}
       </div>
       <div className={styles.blockDesccription}>
         <div className={styles.blockInfo}>
@@ -96,21 +97,17 @@ export const Notification = (props: NotificationProps): ReactElement => {
             Go to store
           </a>
         )}
-        {isRead !== 0 ? (
-          <CloseIcon
-            appearance="small"
-            color="red"
-            isNotification
-            onClick={() => onClear && onClear(_id)}
-          />
-        ) : null}
       </div>
 
       {/* ToDo: design it */}
       {actions?.length > 0 ? (
-        <div>
+        <div className={styles.buttonNotificationBlock}>
           {actions.map(({ action, title }) => (
-            <button key={action} onClick={() => handleActionButtonClick(action)}>
+            <button
+              className={styles.buttonNotification}
+              key={action}
+              onClick={() => handleActionButtonClick(action)}
+            >
               {title}
             </button>
           ))}
