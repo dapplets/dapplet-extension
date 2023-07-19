@@ -4,7 +4,7 @@ import ModuleInfo from '../../background/models/moduleInfo'
 import VersionInfo from '../../background/models/versionInfo'
 import { joinUrls, parseShareLink } from '../../common/helpers'
 import { NotificationPayload } from '../../common/models/notification'
-import { LoginRequest, SandboxEnvironmentVariables } from '../../common/types'
+import { LoginRequest, NearNetworks, SandboxEnvironmentVariables } from '../../common/types'
 import { initBGFunctions, sendRequest } from '../communication'
 import { IOverlayManager } from '../overlay/interfaces'
 import { AppStorage } from './appStorage'
@@ -114,7 +114,7 @@ export class Core {
     this.homeListener = listener
   }
 
-  async getPreferredConnectedAccountsNetwork(): Promise<string> {
+  public async getPreferredConnectedAccountsNetwork(): Promise<NearNetworks> {
     const { getPreferredConnectedAccountsNetwork } = initBGFunctions()
     return getPreferredConnectedAccountsNetwork()
   }
