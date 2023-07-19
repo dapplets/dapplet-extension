@@ -14,5 +14,5 @@
     "types": ["./typesPatch"],
     "composite": true
   },
-  "include": ["modules/**/*"]
+  "include": ["dapplets/**/*"]
 }

@@ -1,0 +1,9 @@
+[
+  "./adapters/test-common-adapter/dapplet.json",
+  "./adapters/test-github-adapter/dapplet.json",
+  "./adapters/test-twitter-adapter/dapplet.json",
+  "./adapters/test-virtual-adapter/dapplet.json",
+  "./dapplets/test-common-dapplet/dapplet.json",
+  "./dapplets/test-dynamic-dapplet/dapplet.json",
+  "./dapplets/twitter-demo/dapplet.json"
+]

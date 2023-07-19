@@ -1,20 +1,18 @@
 const path = require('path')
 
-const BUILD_DIRECTORY = 'build'
-
 module.exports = {
   mode: 'development',
   devtool: 'inline-source-map',
   entry: {
-    'modules/test-common-dapplet/build/index': path.join(
+    'dapplets/test-common-dapplet/build/index': path.join(
       __dirname,
-      'modules/test-common-dapplet/src/index.ts'
+      'dapplets/test-common-dapplet/src/index.ts'
     ),
-    'modules/test-dynamic-dapplet/build/index': path.join(
+    'dapplets/test-dynamic-dapplet/build/index': path.join(
       __dirname,
-      'modules/test-dynamic-dapplet/src/index.ts'
+      'dapplets/test-dynamic-dapplet/src/index.ts'
     ),
-    'modules/twitter-demo/build/index': path.join(__dirname, 'modules/twitter-demo/src/index.ts'),
+    'dapplets/twitter-demo/build/index': path.join(__dirname, 'dapplets/twitter-demo/src/index.ts'),
   },
   output: {
     path: __dirname,
@@ -50,9 +48,6 @@ module.exports = {
     port: 3000,
     hot: false,
     liveReload: false,
-    devMiddleware: {
-      // publicPath: 'modules',
-    },
     static: './',
   },
 }
