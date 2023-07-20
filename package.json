@@ -1,6 +1,6 @@
 {
   "name": "@dapplets/dapplet-extension",
-  "version": "0.56.0-alpha.14",
+  "version": "0.56.0-alpha.30",
   "description": "The Bridge to the Augmented Web.",
   "main": "./lib/index.min.js",
   "types": "./lib/index.d.ts",
@@ -17,6 +17,7 @@
     "eslint": "eslint ./src --ext .ts --fix",
     "stylelint": "stylelint ./src/**/*.{css,scss,module.scss} --fix",
     "cypress:open": "cypress open",
+    "test:dapplets": "cd test-dapplets && webpack serve --config webpack.config.js",
     "test:e2e": "cross-env QASE_REPORT=1 npx cypress run --headed --browser chrome",
     "test:ca": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/connected-accounts\" --headed --browser chrome",
     "test:da": "cross-env QASE_REPORT=1 npx cypress run --spec \"cypress/e2e/dapplet-actions\" --headed --browser chrome",
@@ -28,9 +29,9 @@
     "@fontsource/montserrat": "^4.5.14",
     "@fontsource/roboto": "^4.5.8",
     "@metamask/providers": "^11.0.0",
-    "@rjsf/core": "^5.5.0",
-    "@rjsf/utils": "^5.5.0",
-    "@rjsf/validator-ajv8": "^5.5.0",
+    "@rjsf/core": "^5.10.0",
+    "@rjsf/utils": "^5.10.0",
+    "@rjsf/validator-ajv8": "^5.10.0",
     "@semantic-release/exec": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@sentry/browser": "^7.55.2",
@@ -75,7 +76,6 @@
     "jszip": "^3.10.1",
     "lit": "^2.7.5",
     "normalize.css": "^8.0.1",
-    "patch-package": "^7.0.0",
     "postcss-scss": "^4.0.6",
     "prettier": "^2.8.7",
     "prettier-plugin-organize-imports": "^3.2.2",
@@ -112,11 +112,13 @@
     "webpack": "^5.86.0",
     "webpack-cli": "^5.1.4",
     "webpack-merge": "^5.9.0",
-    "yup": "^1.0.2"
+    "yup": "^1.0.2",
+    "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
     "ethers": "^5.7.2",
-    "near-api-js": "^0.39.0"
+    "near-api-js": "^0.39.0",
+    "patch-package": "^7.0.0"
   },
   "directories": {
     "doc": "docs"

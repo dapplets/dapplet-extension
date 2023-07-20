@@ -1,0 +1,17 @@
+{
+  "name": "test-github-adapter",
+  "branch": "default",
+  "version": "0.1.0",
+  "type": "CONFIG",
+  "title": "Test GitHub Adapter",
+  "description": "Parser config for GitHub",
+  "main": "index.json",
+  "contextIds": [
+    "github.com",
+    "http://github.com"
+  ],
+  "dependencies": {},
+  "interfaces": {
+    "test-virtual-adapter": "0.1.0"
+  }
+}

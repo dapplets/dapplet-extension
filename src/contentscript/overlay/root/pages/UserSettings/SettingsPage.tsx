@@ -183,7 +183,6 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
                   className={styles.messageUserSettings}
                   title="Hidden settings"
                   subtitle="The following options are available only in developer mode"
-                  children={''}
                 />
               ) : null}
 
@@ -200,6 +199,7 @@ export const SettingsPage: FC<SettingsPageProps> = (props) => {
                     setData(e.formData)
                   }}
                   validator={validator}
+                  noValidate={true} // ToDo: ajv validation is not working because of eval
                 >
                   <div className={styles.wrapperButton}>
                     <button

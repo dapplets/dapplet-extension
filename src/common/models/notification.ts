@@ -1,10 +1,10 @@
-import { JsonValue } from '../types'
+import { JsonValue, StorageRef } from '../types'
 import Base from './base'
 
 export type NotificationAction = {
   action: string
   title: string
-  icon: string
+  icon?: string
 }
 
 export type NotificationPayload = {
@@ -13,7 +13,7 @@ export type NotificationPayload = {
   actions?: NotificationAction[]
   timeout?: number
   payload?: JsonValue
-  icon?: string
+  icon?: StorageRef // ToDo: remove icon from Dapplet API
 }
 
 export enum NotificationType {
@@ -36,7 +36,7 @@ export class Notification extends Base {
   group?: string = null
   status?: NotificationStatus = 1
   createdAt?: Date | number = null
-  icon?: string = null
+  icon?: StorageRef = null
   title: string = null
   message?: string = null
   actions?: NotificationAction[] = null

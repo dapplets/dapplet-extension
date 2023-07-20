@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill'
+import { generateGuid } from '../../common/generateGuid'
 import * as EventBus from '../../common/global-event-bus'
-import { generateGuid } from '../../common/helpers'
 import {
   Notification,
   NotificationPayload,

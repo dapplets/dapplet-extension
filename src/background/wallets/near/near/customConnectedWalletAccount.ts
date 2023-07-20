@@ -2,7 +2,8 @@ import { baseDecode } from 'borsh'
 import * as nearAPI from 'near-api-js'
 import { ConnectedWalletAccount } from 'near-api-js'
 import browser from 'webextension-polyfill'
-import { generateGuid, waitTab } from '../../../../common/helpers'
+import { generateGuid } from '../../../../common/generateGuid'
+import { waitTab } from '../../../../common/helpers'
 
 export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
   async signAndSendTransaction(

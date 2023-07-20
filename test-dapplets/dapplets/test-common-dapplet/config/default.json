@@ -1,0 +1,14 @@
+{
+  "main": {
+    "exampleString": "main environment",
+    "exampleHiddenString": "MAIN ENVIRONMENT"
+  },
+  "test": {
+    "exampleString": "test environment",
+    "exampleHiddenString": "TEST ENVIRONMENT"
+  },
+  "dev": {
+    "exampleString": "dev environment",
+    "exampleHiddenString": "DEV ENVIRONMENT"
+  }
+}

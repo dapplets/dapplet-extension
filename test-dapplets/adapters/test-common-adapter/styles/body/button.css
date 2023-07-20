@@ -1,0 +1,16 @@
+:host {
+  position:fixed;
+  width:60px;
+  height:60px;
+  bottom:40px;
+  left:40px;
+  color:#FFF;
+  border-radius:99em;
+  text-align:center;
+  box-shadow: 2px 2px 3px #999;
+  cursor: pointer;
+  display: block;
+  box-sizing: content-box;
+  background: no-repeat center/100% url(${img}) #d4e0e9;
+  z-index:9999;
+}

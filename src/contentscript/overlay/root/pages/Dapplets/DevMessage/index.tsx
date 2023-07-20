@@ -1,11 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import React, { FC, useState } from 'react'
-// import en from 'javascript-time-ago/locale/en'
-// import Linkify from 'react-linkify'
-// import { SecureLink } from 'react-secure-link'
-// import ReactTimeAgo from 'react-time-ago'
-// import TimeAgo from 'javascript-time-ago'
 import cn from 'classnames'
+import React, { FC, useState } from 'react'
 import { useQuery } from 'react-query'
 import browser from 'webextension-polyfill'
 import styles from './DevMesage.module.scss'
@@ -17,9 +12,7 @@ export const useNewVersion = (newVersion: string, setNewVersion) => {
   })
 }
 
-interface DevMessageProps {}
-
-export const DevMessage: FC<DevMessageProps> = (props) => {
+export const DevMessage: FC = () => {
   const [newVersion, setNewExtensionVersion] = useState(null)
   const _updateData = async () => {
     const { getNewExtensionVersion, getIgnoredUpdate } = await initBGFunctions(browser)

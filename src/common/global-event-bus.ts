@@ -4,6 +4,7 @@
  */
 
 import { Browser } from 'webextension-polyfill'
+import { generateGuid } from './generateGuid'
 
 // Constants
 
@@ -65,7 +66,7 @@ try {
 
 // Callbacks storage
 
-const currentContext = (crypto as any).randomUUID()
+const currentContext = generateGuid()
 const callbacks = new Map<string, Set<CallbackFunction>>()
 const connections: Connection[] = []
 
@@ -107,7 +108,6 @@ if (environment === EnvType.BACKGROUND) {
     postMessage: (message) => {
       browser.tabs.query({}).then((tabs) => {
         tabs.forEach((tab) => {
-          console.log('sending message to tab', tab.id, message)
           browser.tabs.sendMessage(tab.id, message)
         })
       })

@@ -1,7 +1,7 @@
 import { hexlify } from '@ethersproject/bytes'
 import { toUtf8Bytes } from '@ethersproject/strings'
 import { SECURE_AUTH_METHODS } from '../../common/constants'
-import { generateGuid } from '../../common/helpers'
+import { generateGuid } from '../../common/generateGuid'
 import { ChainTypes, LoginRequest, WalletTypes } from '../../common/types'
 import LoginConfirmationBrowserStorage from '../browserStorages/loginConfirmationBrowserStorage'
 import LoginSessionBrowserStorage from '../browserStorages/loginSessionBrowserStorage'

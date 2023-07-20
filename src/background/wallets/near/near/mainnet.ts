@@ -1,5 +1,5 @@
-import NearWallet from './index'
 import * as walletIcons from '../../../../common/resources/wallets'
+import NearWallet from './index'
 
 export default class MainnetNearWallet extends NearWallet {
   constructor() {

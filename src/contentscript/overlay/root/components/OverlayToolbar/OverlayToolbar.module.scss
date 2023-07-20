@@ -274,29 +274,31 @@
 
 .widgetButtonNotification {
   position: relative;
-  margin-bottom: 10px;
+
   overflow: hidden;
   display: flex;
   flex: 1 1 auto;
   flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  flex-direction: column;
 
   width: 378px;
   height: max-content;
   min-height: 29px;
+  margin-bottom: 10px;
   padding: 5px;
 
   background: #fff;
   border-radius: 8px;
+  box-shadow: 0 4px 20px 0 rgb(11 87 111 / 15%), 0 4px 5px 0 rgb(45 52 60 / 10%);
 
+  transition: all 0.5s ease;
   animation-name: animate-is-not-notifications;
   animation-duration: 0.6s;
   animation-timing-function: cubic-bezier(0.68, -0.6, 0.32, 1.6);
   animation-fill-mode: forwards;
-  box-shadow: 0px 4px 20px 0px rgba(11, 87, 111, 0.15), 0px 4px 5px 0px rgba(45, 52, 60, 0.1);
-  transition: all 0.5s ease;
+
   svg {
     transform: scale(0.7);
     fill: none !important;
@@ -327,32 +329,48 @@
       }
     }
   }
+
+  a {
+    cursor: pointer;
+
+    font-family: Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 149%;
+    color: #588ca3;
+    text-decoration-line: underline;
+  }
 }
+
 .notificationBlockTop {
   display: flex;
-  width: 100%;
   align-items: flex-start;
+  width: 100%;
 }
+
 .date {
   display: block;
-  margin-left: auto;
-  margin-right: 5px;
+
   margin-top: 5px;
+  margin-right: 5px;
+  margin-left: auto;
 
   font-size: 10px;
   line-height: 100%;
   color: #919191;
   text-transform: uppercase;
 }
+
 .closeMotification {
   margin-top: -3px;
 }
+
 [class*='remove_notification'] {
+  transition: all 0.5s ease;
   animation-name: animate-notification;
   animation-duration: 0.3s;
   animation-timing-function: cubic-bezier(0, 0.69, 0.45, 1);
   animation-fill-mode: forwards;
-  transition: all 0.5s ease;
 }
 
 .widgetButtonImgAnimateNotifiction {
@@ -367,8 +385,8 @@
 .iconNotificationBlock {
   width: 16px;
   height: 16px;
-  margin-right: 5px;
   margin-top: 2px;
+  margin-right: 5px;
 }
 
 .iconNotification {
@@ -378,39 +396,34 @@
 }
 
 .titleNotification {
-  color: $content-black;
-  font-size: 14px;
   font-family: Roboto, sans-serif;
+  font-size: 14px;
   font-weight: 400;
   line-height: 149%;
+  color: $content-black;
 }
 
 .messageNotification {
   display: flex;
-
   flex-direction: column;
 
   width: 100%;
+
+  font-family: Roboto, sans-serif;
   font-size: 12px;
-
   font-weight: 400;
-
   line-height: 149%;
   color: $content-black;
   word-wrap: break-word;
-  font-family: Roboto, sans-serif;
+}
 
-  a {
-    cursor: pointer;
-
-    font-family: Roboto, sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-
-    line-height: 149%;
-    color: #588ca3;
-    text-decoration-line: underline;
-  }
+.messageNotification {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  color: #919191;
+  text-align: left;
+  letter-spacing: 0;
 }
 
 .buttonNotificationBlock {
@@ -579,12 +592,15 @@
 .divHidden {
   display: none;
 }
+
 .notificationsWrapper {
-  display: flex;
-  flex-direction: column-reverse;
   position: absolute;
+  z-index: -1;
   top: 125px;
   right: 52px;
-  z-index: -1;
+
+  display: flex;
+  flex-direction: column-reverse;
+
   transition: all 0.5s ease;
 }
