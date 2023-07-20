@@ -55,7 +55,6 @@ export class NotificationService {
 
   async showNotification(notificationId: string, tabId: number): Promise<void> {
     const notification = await this.notificationBrowserStorage.getById(notificationId)
-    EventBus.emit('show_notification', notification)
     browser.tabs.sendMessage(tabId, {
       type: 'SHOW_NOTIFICATION',
       payload: notification,

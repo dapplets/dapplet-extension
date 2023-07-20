@@ -98,7 +98,13 @@ async function init() {
   EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]))
   EventBus.on('wallet_changed', () => injector.executeWalletsUpdateHandler())
   EventBus.on('connected_accounts_changed', () => injector.executeConnectedAccountsUpdateHandler())
-  EventBus.on('show_notification', () => overlayManager.show())
+  browser.runtime.onMessage.addListener((message) => {
+    if (!message || !message.type) return
+
+    if (message.type === 'SHOW_NOTIFICATION') {
+      return overlayManager.show()
+    }
+  })
 
   // destroy when background is disconnected
   // port.onDisconnect.addListener(() => {

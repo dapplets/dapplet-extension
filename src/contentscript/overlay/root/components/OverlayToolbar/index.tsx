@@ -119,13 +119,19 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     const handleShowNotification = (payload) => {
       updatePinnedNotifications(payload)
     }
+    browser.runtime.onMessage.addListener((message) => {
+      if (!message || !message.type) return
+
+      if (message.type === 'SHOW_NOTIFICATION') {
+        return handleShowNotification(message.payload)
+      }
+    })
 
     EventBus.on('notifications_updated', handleUpdateNotifications)
-    EventBus.on('show_notification', handleShowNotification)
 
     return () => {
       EventBus.off('notifications_updated', handleUpdateNotifications)
-      EventBus.off('show_notification', handleShowNotification)
+      browser.runtime.onMessage.removeListener(handleShowNotification)
     }
   }, [])
   useEffect(() => {
