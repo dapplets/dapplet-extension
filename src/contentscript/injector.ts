@@ -695,7 +695,15 @@ export class Injector {
 
   private _getDependency(manifest: VersionInfo, name: string) {
     if (BuiltInModules[name]) {
-      return this.registry.find((m) => m.manifest.name == name)
+      if (this.registry.some((m) => m.manifest.name == name)) {
+        return this.registry.find((m) => m.manifest.name == name)
+      } else {
+        return this._registerModule(
+          BuiltInModules[name],
+          BuiltInModules[name].clazz,
+          () => new BuiltInModules[name].clazz()
+        )
+      }
     }
 
     const dependency = manifest.dependencies[name]
