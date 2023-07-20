@@ -374,7 +374,7 @@ export default class Core {
       module: cfg.module,
     })
     const conn = new Connection<T>(_overlay, eventDef)
-    let overridedConn: OverlayConnection<T>
+    let overridedConn: OverlayConnection<T> // ToDo: looks like a bug
     const overrides = {
       id: _overlay.id,
       isOpen() {

@@ -174,7 +174,7 @@ export class Core {
       module: cfg.module,
     })
     const conn = new Connection<T>(_overlay, eventDef)
-    let overridedConn: OverlayConnection<T>
+    let overridedConn: OverlayConnection<T> // ToDo: looks like a bug
     const overrides = {
       id: _overlay.id,
       isOpen() {
@@ -184,7 +184,7 @@ export class Core {
         _overlay.close()
       },
       onClose(callback: () => void) {
-        _overlay.frame.addEventListener('onOverlayClose', () => callback())
+        _overlay.onclose = () => callback()
         return overridedConn
       },
       useState(state: State<T>) {
