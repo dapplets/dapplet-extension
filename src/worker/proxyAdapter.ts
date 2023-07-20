@@ -167,7 +167,11 @@ export class ProxyAdapter {
   private _messageListener = (e: MessageEvent) => {
     const { id, method, params } = e.data
 
-    // ToDo: filter notifications from another adapters
+    if (!params) return
+
+    // ToDo: filter notifications from another adapters more elegant
+    if (params[0].adapterName !== this.adapterName) return
+
     switch (method) {
       case 'get-widgets-for-context':
         this._getWidgetsForContext(params[0])

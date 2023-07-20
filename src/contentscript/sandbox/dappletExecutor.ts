@@ -96,12 +96,18 @@ export abstract class DappletExecutor {
           configId,
           ctx,
           contextName,
+          adapterName,
         })
         const factories = widgets.map((widget) => {
           const widgetFactory = adapter.exports[widget.widgetName]
           const callbacks = widget.listeningEvents.reduce((acc, eventName) => {
             acc[eventName] = (data: any) => {
-              this._notify('widget-event', { widgetId: widget.widgetId, eventName, data })
+              this._notify('widget-event', {
+                widgetId: widget.widgetId,
+                eventName,
+                data,
+                adapterName,
+              })
             }
             return acc
           }, {})
