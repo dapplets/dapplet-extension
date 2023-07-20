@@ -16,6 +16,7 @@ import { LoginSession } from './login/login-session'
 import { LoginHooks, LoginRequestSettings } from './login/types'
 import * as near from './near'
 import { State } from './state'
+import { WsJsonRpc } from './wsJsonRpc'
 
 type Abi = any
 
@@ -333,5 +334,14 @@ export class Core {
     const registry = this.manifest.registryUrl
     const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, moduleName)
     return { ...moduleInfo, ...this.manifest }
+  }
+
+  public connect<T>(cfg: { url: string }, defaultState: T): Connection<T> {
+    const rpc = new WsJsonRpc(cfg.url)
+    const conn = new Connection<T>(rpc)
+    const state = this.state(defaultState, 'server')
+    conn.state = state
+    conn.state.addConnection(conn)
+    return conn
   }
 }
