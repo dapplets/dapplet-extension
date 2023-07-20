@@ -423,32 +423,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               }}
             />
           </div>
-
-          <div className={styles.messageNotification}>
-            <div className={styles.messageNotification}>
-              <LinkifyText>{payload.message}</LinkifyText>
-            </div>
-
-            {payload.actions?.length > 0 ? (
-              <div className={styles.buttonNotificationBlock}>
-                {payload.actions.map(({ action, title }) => (
-                  <button
-                    className={styles.buttonNotification}
-                    key={action}
-                    onClick={(e) => {
-                      e.currentTarget.parentElement.parentElement.parentElement.classList.add(
-                        'remove_notification'
-                      )
-                      setPinnedNotification(true)
-                      handleActionButtonClick(action)
-                    }}
-                  >
-                    {title}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
         </div>
       )
     } else null
