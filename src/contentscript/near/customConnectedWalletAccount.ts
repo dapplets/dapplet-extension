@@ -3,7 +3,7 @@ import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import * as nearAPI from 'near-api-js'
 import { ConnectedWalletAccount } from 'near-api-js'
 import browser from 'webextension-polyfill'
-import { generateGuid } from '../../common/helpers'
+import { generateGuid } from '../../common/generateGuid'
 
 export class CustomConnectedWalletAccount extends ConnectedWalletAccount {
   accountId: string

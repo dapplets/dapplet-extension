@@ -1,0 +1,8 @@
+{
+  "name": "test-virtual-adapter",
+  "branch": "default",
+  "version": "0.1.0",
+  "type": "INTERFACE",
+  "title": "Test Virtual Adapter",
+  "description": "The testing virtual adapter for Twitter and GitHub"
+}

@@ -1,8 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { Key, ReactElement, useEffect, useRef, useState } from 'react'
-import Linkify from 'react-linkify'
-import { SecureLink } from 'react-secure-link'
+import React, { ReactElement, useEffect, useRef, useState } from 'react'
 import browser from 'webextension-polyfill'
 import * as EventBus from '../../../../../common/global-event-bus'
 import {
@@ -25,8 +23,11 @@ import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { WidgetButton } from '../../widgets/button'
 import { LabelButton } from '../../widgets/label'
 import { CloseIcon } from '../CloseIcon'
+import { DappletImage } from '../DappletImage'
+import { LinkifyText } from '../LinkifyText'
 import { OverlayTab } from '../OverlayTab'
 import styles from './OverlayToolbar.module.scss'
+
 const SYSTEM_TAB: ToolbarTab = {
   id: 'system',
   pinned: true,
@@ -364,21 +365,33 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
           <div className={styles.notificationBlockTop}>
             <div className={styles.iconNotificationBlock}>
               {payload.icon ? (
-                <img className={styles.iconNotification} src={payload.icon} />
+                <DappletImage storageRef={payload.icon} className={styles.iconNotification} />
               ) : (
                 <Noties />
               )}
             </div>
-            <div className={styles.titleNotification}>
-              <Linkify
-                componentDecorator={(decoratedHref: string, decoratedText: string, key: Key) => (
-                  <SecureLink href={decoratedHref} key={key}>
-                    {decoratedText}
-                  </SecureLink>
-                )}
-              >
-                {payload.title}
-              </Linkify>
+            <div>
+              <div className={styles.titleNotification}>
+                <LinkifyText>{payload.title}</LinkifyText>
+              </div>
+              {payload.message ? (
+                <div className={styles.messageNotification}>
+                  <LinkifyText>{payload.message}</LinkifyText>
+                </div>
+              ) : null}
+              {payload.actions?.length > 0 ? (
+                <div className={styles.buttonNotificationBlock}>
+                  {payload.actions.map(({ action, title }) => (
+                    <button
+                      className={styles.buttonNotification}
+                      key={action}
+                      onClick={() => handleActionButtonClick(action)}
+                    >
+                      {title}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             <span className={styles.date}>
@@ -413,15 +426,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
           <div className={styles.messageNotification}>
             <div className={styles.messageNotification}>
-              <Linkify
-                componentDecorator={(decoratedHref: string, decoratedText: string, key: Key) => (
-                  <SecureLink href={decoratedHref} key={key}>
-                    {decoratedText}
-                  </SecureLink>
-                )}
-              >
-                {payload.message}
-              </Linkify>
+              <LinkifyText>{payload.message}</LinkifyText>
             </div>
 
             {payload.actions?.length > 0 ? (

@@ -1,7 +1,19 @@
-export type EventMessaging = {
-  addEventListener: (type: string, listener: (event: MessageEvent<any>) => void) => void
-  removeEventListener: (type: string, listener: (event: MessageEvent<any>) => void) => void
-  postMessage: (message: any, targetOrigin?: string, transfer?: Transferable[]) => void
+import { generateGuid } from './generateGuid'
+
+export type RpcMessageEvent = {
+  data: any
+  source?: EventMessaging
+  origin?: EventMessaging
+  target?: EventMessaging
+}
+
+/**
+ * EventMessaging is a common interface for window and worker
+ */
+export interface EventMessaging {
+  addEventListener(type: string, listener: (event: RpcMessageEvent) => void): void
+  removeEventListener(type: string, listener: (event: RpcMessageEvent) => void): void
+  postMessage(message: any, targetOrigin?: string): void
 }
 
 export class JsonRpc {
@@ -32,7 +44,7 @@ export class JsonRpc {
     frame: EventMessaging = this._defaultWindow
   ): Promise<any> {
     return new Promise((res, rej) => {
-      const id = (crypto as any).randomUUID()
+      const id = generateGuid()
       this._outcomingRequests.add(id)
 
       const rpcRequest = {
@@ -44,7 +56,7 @@ export class JsonRpc {
 
       const json = JSON.stringify(rpcRequest)
 
-      const handler = async (event: MessageEvent<any>) => {
+      const handler = async (event: RpcMessageEvent) => {
         try {
           const rpcResponse = JSON.parse(event.data)
           if (rpcResponse.id !== id) return
@@ -82,7 +94,7 @@ export class JsonRpc {
     this._sources.forEach((source) => source.removeEventListener('message', this._handler))
   }
 
-  private _handler = async (event: MessageEvent<any>) => {
+  private _handler = async (event: RpcMessageEvent) => {
     let rpcRequest
 
     try {

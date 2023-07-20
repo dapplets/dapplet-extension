@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "required": ["exampleString", "exampleHiddenString"],
+  "properties": {
+    "exampleString": {
+      "type": "string",
+      "title": "Example of string property"
+    },
+    "exampleHiddenString": {
+      "type": "string",
+      "title": "Example of hidden string property",
+      "hidden": true
+    }
+  }
+}

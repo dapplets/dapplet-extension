@@ -559,9 +559,9 @@
   font-style: italic;
   line-height: 149%;
   color: $main-grey;
+  text-overflow: ellipsis;
 
   background: inherit;
-  text-overflow: ellipsis;
 }
 
 .contextDelete {
