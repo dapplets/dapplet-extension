@@ -36,7 +36,7 @@ import { OverlayToolbar } from './components/OverlayToolbar'
 import { PopupItem } from './components/PopupItem'
 import { Profile } from './components/Profile'
 import { Search } from './components/Search'
-import { ShareButton } from './components/ShareButton'
+// import { ShareButton } from './components/ShareButton'
 import { SquaredButton } from './components/SquaredButton'
 import { SystemPopup } from './components/SystemPopup'
 import { Overlay } from './overlay'
@@ -586,7 +586,7 @@ class _App extends React.Component<P, S> {
                     icon={StoreIcon}
                     onClick={this.handleStoreButtonClick}
                   />
-                  <ShareButton />
+                  {/* <ShareButton /> */}
                   {this.getNewButtonTab('Settings')}
                 </div>
               </header>
