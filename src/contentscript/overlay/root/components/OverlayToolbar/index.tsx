@@ -91,7 +91,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [payload, setPayload] = useState(null)
   const btnRef = useRef<HTMLDivElement>()
   const notificationRef = useRef<HTMLDivElement>()
-
+  const [newNotifications, setNewNotifications] = useState([])
   useEffect(() => {
     const init = async () => {
       await _refreshData()
@@ -108,14 +108,10 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     )
   }
   useEffect(() => {
-    const updatePinnedNotifications = async (payload) => {
+    const updatePinnedNotifications = async (payload: any) => {
       const notifications = await getNotifications()
       payload && setPinnedNotification(true)
       setPayload(payload)
-
-      setTimeout(() => {
-        setPinnedNotification(false)
-      }, 60000)
 
       return setEvent(notifications)
     }
@@ -139,6 +135,11 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       EventBus.off('myactions_changed', _refreshData)
     }
   }, [])
+  useEffect(() => {
+    if (!payload) return
+
+    setNewNotifications([...newNotifications, payload])
+  }, [payload])
 
   const _refreshData = async () => {
     try {
@@ -323,104 +324,129 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   }
 
   // ToDo: hard to read code, refactor
-  const getAnimateNotifification = (
-    // icon: string,
-    isPinned: boolean
-  ) => {
+  const getAnimateNotifification = (payload: any, isPinned: boolean, index: any) => {
     async function handleActionButtonClick(actionId: string) {
-      setPayload(null)
       const { resolveNotificationAction, getThisTab } = await initBGFunctions(browser)
       const thisTab = await getThisTab()
+
+      setTimeout(() => {
+        const d = newNotifications.filter((x) => x.id !== payload.id)
+        setNewNotifications(d)
+      }, 500)
+
       await resolveNotificationAction(payload.id, actionId, thisTab.id)
     }
     const dateNum = (date) => {
       const newDateNum = new Date(date)
       return newDateNum
     }
+    if ((payload && payload.actions?.length === 0) || (payload && !payload.actions)) {
+      setTimeout(() => {
+        notificationRef.current.classList.add('remove_notification')
+      }, 59500)
+      setTimeout(() => {
+        setPinnedNotification(false)
+        const d = newNotifications.filter((x) => x.id !== payload.id)
 
-    return (
-      <>
-        {payload ? (
-          <div
-            data-testid="notification-label"
-            ref={notificationRef}
-            className={cn(styles.widgetButtonNotification, {
-              [styles.widgetButtonAnimatePinnedNotification]: isPinnedNotification,
-            })}
-          >
-            <div className={styles.notificationBlockTop}>
-              <div className={styles.iconNotificationBlock}>
-                {payload.icon ? (
-                  <img className={styles.iconNotification} src={payload.icon} />
-                ) : (
-                  <Noties />
+        setNewNotifications(d)
+      }, 60000)
+    }
+    if (payload) {
+      return (
+        <div
+          key={index}
+          data-testid="notification-label"
+          ref={notificationRef}
+          className={cn(styles.widgetButtonNotification, {
+            [styles.widgetButtonAnimatePinnedNotification]: isPinnedNotification,
+          })}
+        >
+          <div className={styles.notificationBlockTop}>
+            <div className={styles.iconNotificationBlock}>
+              {payload.icon ? (
+                <img className={styles.iconNotification} src={payload.icon} />
+              ) : (
+                <Noties />
+              )}
+            </div>
+            <div className={styles.titleNotification}>
+              <Linkify
+                componentDecorator={(decoratedHref: string, decoratedText: string, key: Key) => (
+                  <SecureLink href={decoratedHref} key={key}>
+                    {decoratedText}
+                  </SecureLink>
                 )}
-              </div>
-              <div className={styles.titleNotification}>
-                <Linkify
-                  componentDecorator={(decoratedHref: string, decoratedText: string, key: Key) => (
-                    <SecureLink href={decoratedHref} key={key}>
-                      {decoratedText}
-                    </SecureLink>
-                  )}
-                >
-                  {payload.title}
-                </Linkify>
-              </div>
+              >
+                {payload.title}
+              </Linkify>
+            </div>
 
-              <span className={styles.date}>
-                <span>
-                  {addZero(dateNum(payload.createdAt).getFullYear()) +
-                    '.' +
-                    addZero(dateNum(payload.createdAt).getMonth() + 1) +
-                    '.' +
-                    addZero(dateNum(payload.createdAt).getDate())}
-                </span>{' '}
-                <span>
-                  {addZero(dateNum(payload.createdAt).getHours()) +
-                    ':' +
-                    addZero(dateNum(payload.createdAt).getMinutes())}
-                </span>
+            <span className={styles.date}>
+              <span>
+                {addZero(dateNum(payload.createdAt).getFullYear()) +
+                  '.' +
+                  addZero(dateNum(payload.createdAt).getMonth() + 1) +
+                  '.' +
+                  addZero(dateNum(payload.createdAt).getDate())}
+              </span>{' '}
+              <span>
+                {addZero(dateNum(payload.createdAt).getHours()) +
+                  ':' +
+                  addZero(dateNum(payload.createdAt).getMinutes())}
               </span>
-              <CloseIcon
-                appearance="small"
-                color="red"
-                isNotification
-                onClick={() => setPinnedNotification(false)}
-              />
+            </span>
+            <CloseIcon
+              className={styles.closeMotification}
+              appearance="small"
+              color="red"
+              isNotification
+              onClick={(e) => {
+                e.currentTarget.parentElement.parentElement.classList.add('remove_notification')
+                setTimeout(() => {
+                  const d = newNotifications.filter((x) => x.id !== x.id)
+                  setNewNotifications(d)
+                  setPinnedNotification(false)
+                }, 500)
+              }}
+            />
+          </div>
+
+          <div className={styles.messageNotification}>
+            <div className={styles.messageNotification}>
+              <Linkify
+                componentDecorator={(decoratedHref: string, decoratedText: string, key: Key) => (
+                  <SecureLink href={decoratedHref} key={key}>
+                    {decoratedText}
+                  </SecureLink>
+                )}
+              >
+                {payload.message}
+              </Linkify>
             </div>
 
-            <div className={styles.messageNotification}>
-              <div className={styles.messageNotification}>
-                <Linkify
-                  componentDecorator={(decoratedHref: string, decoratedText: string, key: Key) => (
-                    <SecureLink href={decoratedHref} key={key}>
-                      {decoratedText}
-                    </SecureLink>
-                  )}
-                >
-                  {payload.message}
-                </Linkify>
+            {payload.actions?.length > 0 ? (
+              <div className={styles.buttonNotificationBlock}>
+                {payload.actions.map(({ action, title }) => (
+                  <button
+                    className={styles.buttonNotification}
+                    key={action}
+                    onClick={(e) => {
+                      e.currentTarget.parentElement.parentElement.parentElement.classList.add(
+                        'remove_notification'
+                      )
+                      setPinnedNotification(true)
+                      handleActionButtonClick(action)
+                    }}
+                  >
+                    {title}
+                  </button>
+                ))}
               </div>
-              {/* ToDo: design it */}
-              {payload.actions?.length > 0 ? (
-                <div className={styles.buttonNotificationBlock}>
-                  {payload.actions.map(({ action, title }) => (
-                    <button
-                      className={styles.buttonNotification}
-                      key={action}
-                      onClick={() => handleActionButtonClick(action)}
-                    >
-                      {title}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
+            ) : null}
           </div>
-        ) : null}
-      </>
-    )
+        </div>
+      )
+    } else null
   }
   const getNotifications = async () => {
     const backgroundFunctions = await initBGFunctions(browser)
@@ -510,8 +536,13 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 })}
               ></span>
             </span>
+            <div className={styles.notificationsWrapper}>
+              {newNotifications && newNotifications.length
+                ? newNotifications.map((x, i) => getAnimateNotifification(x, true, i))
+                : null}
+            </div>
+            {/* {isPinnedNotification && getAnimateNotifification(payload, true)} */}
 
-            {isPinnedNotification && getAnimateNotifification(true)}
             {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget, isPinnedAnimateWidget)}
 
             {!isShowTabs &&
