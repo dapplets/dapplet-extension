@@ -321,4 +321,17 @@ export class Core {
     const WEB_PROXY_URL = 'https://augm.link/live/'
     return WEB_PROXY_URL + urlNoPayload + '#dapplet/' + base64Payload
   }
+
+  public async getManifest(
+    moduleName?: string
+  ): Promise<Omit<ModuleInfo, 'interfaces'> & VersionInfo> {
+    if (moduleName !== this.manifest.name) {
+      throw new Error('The requested module name does not match the current module.')
+    }
+
+    const { getModuleInfoByName } = initBGFunctions()
+    const registry = this.manifest.registryUrl
+    const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, moduleName)
+    return { ...moduleInfo, ...this.manifest }
+  }
 }
