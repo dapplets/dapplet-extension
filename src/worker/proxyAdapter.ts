@@ -104,8 +104,6 @@ export class ProxyAdapter {
 
     ctx = this._saveOrUpdateContext(contextName, ctx)
 
-    console.log({ ctx })
-
     let unknownFactories = this._configById.get(configId)[contextName](ctx) ?? []
 
     if (unknownFactories instanceof Promise) {
