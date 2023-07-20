@@ -1,14 +1,14 @@
 {
-  "name": "test-dynamic-dapplet",
+  "name": "test-alerts-dapplet",
   "version": "0.1.0",
-  "description": "Demonstration of dynamic dapplet",
+  "description": "Testing of Core.alert() and Core.confirm()",
   "main": "build/index.js",
   "branch": "default",
   "type": "FEATURE",
-  "title": "Test Dynamic Dapplet",
+  "title": "Test Alerts",
   "icon": "src/target.png",
   "contextIds": [
-    "twitter.com/1489972957011394560"
+    "test-twitter-adapter"
   ],
   "dependencies": {
     "test-twitter-adapter": "0.1.0"

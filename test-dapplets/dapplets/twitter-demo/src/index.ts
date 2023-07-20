@@ -78,7 +78,7 @@ export default class DemoDapplet {
 
     const createShareLink = (id) => {
       const sharedData = { ctxId: id }
-      const link = Core.createShareLink('https://twitter.com/teremovskii', sharedData)
+      const link = (<any>Core).createShareLink('https://twitter.com/teremovskii', sharedData)
       console.log('ShareLink:', link)
     }
 

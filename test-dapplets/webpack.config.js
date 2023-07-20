@@ -1,6 +1,11 @@
 const path = require('path')
 
-const DAPPLETS = ['test-common-dapplet', 'test-dynamic-dapplet', 'twitter-demo']
+const DAPPLETS = [
+  'test-common-dapplet',
+  'test-dynamic-dapplet',
+  'twitter-demo',
+  'test-alerts-dapplet',
+]
 
 module.exports = {
   mode: 'development',
