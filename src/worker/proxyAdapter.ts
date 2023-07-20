@@ -10,6 +10,7 @@ type InjectedWidget = {
 export class ProxyAdapter {
   private _widgets = new Map<string, InjectedWidget>()
   private _configById = new Map<string, any>()
+  private _contextByTypeAndId = new Map<string, Map<string, any>>()
 
   public exports = new Proxy(
     {},
@@ -101,6 +102,10 @@ export class ProxyAdapter {
   }) {
     if (!this._configById.has(configId)) return []
 
+    ctx = this._saveOrUpdateContext(contextName, ctx)
+
+    console.log({ ctx })
+
     let unknownFactories = this._configById.get(configId)[contextName](ctx) ?? []
 
     if (unknownFactories instanceof Promise) {
@@ -160,6 +165,32 @@ export class ProxyAdapter {
     callback(data, widget.state.state)
   }
 
+  private _onContextChanged({
+    newContext,
+    // oldContext,
+    contextName,
+  }: {
+    newContext: any
+    oldContext: any
+    contextName: string
+  }) {
+    if (!newContext) return
+    this._saveOrUpdateContext(contextName, newContext)
+  }
+
+  private _saveOrUpdateContext(contextName: string, ctx: any) {
+    if (!this._contextByTypeAndId.has(contextName)) {
+      this._contextByTypeAndId.set(contextName, new Map([[ctx.id, ctx]]))
+      return ctx
+    } else if (!this._contextByTypeAndId.get(contextName).has(ctx.id)) {
+      this._contextByTypeAndId.get(contextName).set(ctx.id, ctx)
+      return ctx
+    } else {
+      // update context
+      return Object.assign(this._contextByTypeAndId.get(contextName).get(ctx.id), ctx)
+    }
+  }
+
   private _notify(method: string, ...params: any[]) {
     global.postMessage({ method, params })
   }
@@ -184,6 +215,9 @@ export class ProxyAdapter {
         break
       case 'widget-event':
         this._onWidgetEvent(params[0])
+        break
+      case 'context-changed':
+        this._onContextChanged(params[0])
         break
       default:
         console.warn(`ProxyAdapter: Unknown method ${method}`)

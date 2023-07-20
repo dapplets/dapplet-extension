@@ -88,7 +88,21 @@ export abstract class DappletExecutor {
   }) {
     const adapter = this.getDependency(adapterName)
 
-    const config = {}
+    const config = {
+      events: {
+        context_changed: (_, newContext, oldContext, contextName) => {
+          // is a parsed context?
+          if (typeof contextName === 'string') {
+            this._notify('context-changed', {
+              contextName,
+              newContext,
+              oldContext,
+              adapterName,
+            })
+          }
+        },
+      },
+    }
 
     for (const contextName of listeningContexts) {
       config[contextName] = async (ctx) => {
