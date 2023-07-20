@@ -20,7 +20,7 @@ export class ProxyAdapter {
         return (widgetConfig: any) => {
           return (context: any): InjectedWidget => {
             const widgetId = generateGuid()
-            const state = new State(widgetConfig, context, () => 'LIGHT') // ToDo: light
+            const state = new State(widgetConfig, context)
 
             // ToDo: unsubscribe
             state.changedHandler = (newValuesUnsafe) => {
