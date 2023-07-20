@@ -22,7 +22,9 @@ export class ProxyAdapter {
             const state = new State(widgetConfig, context, () => 'LIGHT') // ToDo: light
 
             // ToDo: unsubscribe
-            state.changedHandler = (newValues) => {
+            state.changedHandler = (newValuesUnsafe) => {
+              // Remove unserializable values
+              const newValues = JSON.parse(JSON.stringify(newValuesUnsafe))
               this._notify('state-updated', { widgetId, newValues })
             }
 

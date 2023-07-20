@@ -45,6 +45,7 @@ export class Core {
   public homeListener: () => void = null
 
   private _env: SandboxEnvironmentVariables
+  private _loginSesssionsMap: Map<string, LoginSession> = new Map()
 
   constructor(
     manifest: VersionInfo,
@@ -232,7 +233,13 @@ export class Core {
   public async sessions(): Promise<LoginSession[]> {
     const { getSessions } = initBGFunctions()
     const sessions = await getSessions(this.manifest.name)
-    return sessions.map((x) => new LoginSession(x))
+    return sessions.map((session) => {
+      if (!this._loginSesssionsMap.has(session.id)) {
+        this._loginSesssionsMap.set(session.id, new LoginSession(session))
+      }
+
+      return this._loginSesssionsMap.get(session.id)
+    })
   }
 
   public async login(
@@ -266,19 +273,30 @@ export class Core {
     //   _request.target = target
     // }
 
-    if (_request.target && typeof _request.target === 'object') {
-      _request.target = _request.target.id
+    // if (_request.target && typeof _request.target === 'object') {
+    //   _request.target = _request.target.id
+    // }
+
+    if (_request.target) {
+      console.error('Target is not supported yet.')
     }
+
+    const { onLogin, onLogout } = _request
+
+    // Remove unserializable hooks from the request
+    delete _request.onLogin
+    delete _request.onLogout
 
     const { createSession, getThisTab } = initBGFunctions()
     const thisTab = await getThisTab()
     const session = await createSession(moduleName, _request, thisTab.id)
 
     const ls = {} // ToDo: specify LoginInfo
-    _request.onLogin?.call({}, ls)
+    onLogin?.call({}, ls)
 
     const loginSession = new LoginSession(session)
-    loginSession.logoutHandler = _request.onLogout
+    loginSession.logoutHandler = onLogout
+    this._loginSesssionsMap.set(session.id, loginSession)
 
     return loginSession
   }
