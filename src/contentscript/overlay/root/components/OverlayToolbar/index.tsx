@@ -372,9 +372,37 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 <Noties />
               )}
             </div>
-            <div>
+            <div className={styles.blockNotificationInfo}>
               <div className={styles.titleNotification}>
                 <LinkifyText>{payload.title}</LinkifyText>
+                <span className={styles.date}>
+                  <span>
+                    {addZero(dateNum(payload.createdAt).getFullYear()) +
+                      '.' +
+                      addZero(dateNum(payload.createdAt).getMonth() + 1) +
+                      '.' +
+                      addZero(dateNum(payload.createdAt).getDate())}
+                  </span>{' '}
+                  <span>
+                    {addZero(dateNum(payload.createdAt).getHours()) +
+                      ':' +
+                      addZero(dateNum(payload.createdAt).getMinutes())}
+                  </span>
+                </span>
+                <CloseIcon
+                  className={styles.closeMotification}
+                  appearance="small"
+                  color="red"
+                  isNotification
+                  onClick={(e) => {
+                    e.currentTarget.parentElement.parentElement.classList.add('remove_notification')
+                    setTimeout(() => {
+                      const d = newNotifications.filter((x) => x.id !== x.id)
+                      setNewNotifications(d)
+                      setPinnedNotification(false)
+                    }, 500)
+                  }}
+                />
               </div>
               {payload.message ? (
                 <div className={styles.messageNotification}>
@@ -395,35 +423,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 </div>
               ) : null}
             </div>
-
-            <span className={styles.date}>
-              <span>
-                {addZero(dateNum(payload.createdAt).getFullYear()) +
-                  '.' +
-                  addZero(dateNum(payload.createdAt).getMonth() + 1) +
-                  '.' +
-                  addZero(dateNum(payload.createdAt).getDate())}
-              </span>{' '}
-              <span>
-                {addZero(dateNum(payload.createdAt).getHours()) +
-                  ':' +
-                  addZero(dateNum(payload.createdAt).getMinutes())}
-              </span>
-            </span>
-            <CloseIcon
-              className={styles.closeMotification}
-              appearance="small"
-              color="red"
-              isNotification
-              onClick={(e) => {
-                e.currentTarget.parentElement.parentElement.classList.add('remove_notification')
-                setTimeout(() => {
-                  const d = newNotifications.filter((x) => x.id !== x.id)
-                  setNewNotifications(d)
-                  setPinnedNotification(false)
-                }, 500)
-              }}
-            />
           </div>
         </div>
       )
