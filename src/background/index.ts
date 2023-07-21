@@ -14,6 +14,7 @@ import {
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
 import { StorageAggregator } from './moduleStorages/moduleStorage'
+import { RegistryAggregator } from './registries/registryAggregator'
 import { AnalyticsGoals, AnalyticsService } from './services/analyticsService'
 import ConnectedAccountService from './services/connectedAccountService'
 import DiscordService from './services/discordService'
@@ -29,13 +30,13 @@ import { SuspendService } from './services/suspendService'
 import { TokenRegistryService } from './services/tokenomicsService'
 import { UnderConstructionService } from './services/underConstructionServices'
 import { WalletService } from './services/walletService'
+import ModuleManager from './utils/moduleManager'
 
 // ToDo: Fix duplication of new FeatureService(), new GlobalConfigService() etc.
 // ToDo: It looks like facade and requires a refactoring probably.
 tracing.startTracing()
 
 const notificationService = new NotificationService()
-
 const globalConfigService = new GlobalConfigService()
 const analyticsService = new AnalyticsService(globalConfigService)
 const suspendService = new SuspendService(globalConfigService)
@@ -45,13 +46,22 @@ const githubService = new GithubService(globalConfigService)
 const discordService = new DiscordService(globalConfigService)
 const walletService = new WalletService(globalConfigService, overlayService)
 const sessionService = new SessionService(walletService, overlayService)
+const registryAggregator = new RegistryAggregator(globalConfigService, walletService)
+const storageAggregator = new StorageAggregator(globalConfigService)
+const moduleManager = new ModuleManager(
+  globalConfigService,
+  notificationService,
+  storageAggregator,
+  registryAggregator
+)
 const featureService = new FeatureService(
   globalConfigService,
   walletService,
-  notificationService,
-  analyticsService
+  analyticsService,
+  storageAggregator,
+  registryAggregator,
+  moduleManager
 )
-const storageAggregator = new StorageAggregator(globalConfigService)
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
 const tokenomicsService = new TokenRegistryService(
@@ -66,6 +76,7 @@ const underConstructionService = new UnderConstructionService(
   overlayService,
   storageAggregator
 )
+
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
 globalConfigService.ensService = ensService

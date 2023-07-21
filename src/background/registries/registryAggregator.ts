@@ -233,6 +233,10 @@ export class RegistryAggregator {
     return this.registries.find((f) => f.url === uri)
   }
 
+  public invalidateCache() {
+    this._initializationPromise = null
+  }
+
   private async _initRegistries() {
     // prevent multiple initializations of registries
     if (!this._initializationPromise) {
