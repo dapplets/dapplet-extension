@@ -14,8 +14,11 @@ export const Session: FC<SessionProps> = (p: SessionProps) => {
 
           <div className={styles.info}>
             <ul className={styles.icons}>
-              {p.providerIcon ? <img src={p.providerIcon} className={styles.icon} /> : null}
-              {p.walletIcon ? <img src={p.walletIcon} className={styles.icon} /> : null}
+              {p.providerIcon ? (
+                <img src={p.providerIcon} className={styles.icon} />
+              ) : p.walletIcon ? (
+                <img src={p.walletIcon} className={styles.icon} />
+              ) : null}
             </ul>
             {p.lastUsage && (
               <span className={styles.time}>
