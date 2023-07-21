@@ -2,7 +2,7 @@ import * as ethers from 'ethers'
 import * as NearApi from 'near-api-js'
 import ModuleInfo from '../../background/models/moduleInfo'
 import VersionInfo from '../../background/models/versionInfo'
-import { joinUrls, parseShareLink } from '../../common/helpers'
+import { formatModuleId, joinUrls, parseShareLink } from '../../common/helpers'
 import { NotificationPayload } from '../../common/models/notification'
 import { LoginRequest, NearNetworks, SandboxEnvironmentVariables } from '../../common/types'
 import { initBGFunctions, sendRequest } from '../communication'
@@ -500,8 +500,8 @@ export class Core {
     const payload = [
       EXTENSION_VERSION,
       this.manifest.registryUrl,
-      this.manifest.name,
-      ['*'],
+      formatModuleId(this.manifest),
+      ['*'], // ToDo: Replace wildcard on real context IDs
       modulePayload,
     ]
     const base64Payload = btoa(JSON.stringify(payload))
