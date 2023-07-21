@@ -1,5 +1,7 @@
+import { globalClear } from 'caching-decorator'
 import JSZip from 'jszip'
 import { rcompare } from 'semver'
+import browser, { Runtime } from 'webextension-polyfill'
 import { base64ArrayBuffer } from '../../common/base64ArrayBuffer'
 import {
   CONTEXT_ID_WILDCARD,
@@ -15,14 +17,11 @@ import {
   Measure,
   mergeDedupe,
 } from '../../common/helpers'
+import { DappletRuntimeResult, MessageWrapperRequest, StorageRef } from '../../common/types'
 import ManifestDTO from '../dto/manifestDTO'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
-// import ModuleInfoBrowserStorage from '../browserStorages/moduleInfoStorage';
-import { globalClear } from 'caching-decorator'
-import browser, { Runtime } from 'webextension-polyfill'
-import { DappletRuntimeResult, MessageWrapperRequest, StorageRef } from '../../common/types'
 import ModuleManager from '../utils/moduleManager'
 import { AnalyticsGoals, AnalyticsService } from './analyticsService'
 import GlobalConfigService from './globalConfigService'
@@ -33,9 +32,6 @@ import { WalletService } from './walletService'
 export default class FeatureService {
   private _moduleManager: ModuleManager
   private _storageAggregator = new StorageAggregator(this._globalConfigService)
-  // private _moduleInfoBrowserStorage = new ModuleInfoBrowserStorage();
-
-  // private _requestId = 0
 
   constructor(
     private _globalConfigService: GlobalConfigService,
@@ -63,10 +59,6 @@ export default class FeatureService {
     filter: 'all' | 'public' | 'trusted' | 'local' | 'active' | null
   ): Promise<ManifestDTO[]> {
     if (!filter) filter = 'all'
-
-    // const requestId = this._requestId++
-    // const startTime = Date.now()
-    // console.log(`getFeaturesByHostnames called #${requestId}`)
 
     const listingAccounts: string[] = []
 
@@ -280,9 +272,6 @@ export default class FeatureService {
         }
       }
     }
-
-    // const endTime = Date.now()
-    // console.log(`getFeaturesByHostnames  #${requestId} end: ${endTime - startTime} ms`)
 
     return dtos
   }
