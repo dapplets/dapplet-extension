@@ -8,9 +8,9 @@ import { NotificationType } from '../../common/models/notification'
 import { DefaultConfig, ParserConfig, SchemaConfig, StorageRef } from '../../common/types'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
-import { RegistryAggregator } from '../registries/registryAggregator'
 import GlobalConfigService from '../services/globalConfigService'
 import { NotificationService } from '../services/notificationService'
+import { RegistryAggregator } from '../services/registryAggregatorService'
 
 export default class ModuleManager {
   constructor(
