@@ -460,12 +460,8 @@ export class Core {
     //   _request.target = target
     // }
 
-    // if (_request.target && typeof _request.target === 'object') {
-    //   _request.target = _request.target.id
-    // }
-
-    if (_request.target) {
-      console.error('Target is not supported yet.')
+    if (_request.target && typeof _request.target === 'object') {
+      _request.target = _request.target.id
     }
 
     const { onLogin, onLogout } = _request
