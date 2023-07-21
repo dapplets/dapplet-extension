@@ -21,7 +21,7 @@ import { WalletService } from '../services/walletService'
 
 if (!Promise.allSettled) Promise.allSettled = allSettled
 
-export class RegistryAggregator {
+export class RegistryAggregatorService {
   public isAvailable = true
   public registries: Registry[] = []
 

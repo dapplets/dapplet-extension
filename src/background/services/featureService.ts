@@ -22,8 +22,8 @@ import ManifestDTO from '../dto/manifestDTO'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
-import ModuleManager from '../services/moduleManagerService'
-import { RegistryAggregator } from '../services/registryAggregatorService'
+import ModuleManagerService from '../services/moduleManagerService'
+import { RegistryAggregatorService } from '../services/registryAggregatorService'
 import { AnalyticsGoals, AnalyticsService } from './analyticsService'
 import GlobalConfigService from './globalConfigService'
 import { generateNftImage } from './offscreenService'
@@ -35,8 +35,8 @@ export default class FeatureService {
     private _walletService: WalletService,
     private _analyticsService: AnalyticsService,
     private _storageAggregator: StorageAggregator,
-    private _registryAggregator: RegistryAggregator,
-    private _moduleManager: ModuleManager
+    private _registryAggregatorService: RegistryAggregatorService,
+    private _moduleManagerService: ModuleManagerService
   ) {}
 
   /**
@@ -75,10 +75,8 @@ export default class FeatureService {
       listingAccounts.push(...accounts)
     }
 
-    const contextIdsByRegsitries = await this._registryAggregator.getModuleInfoWithRegistries(
-      contextIds,
-      listingAccounts
-    )
+    const contextIdsByRegsitries =
+      await this._registryAggregatorService.getModuleInfoWithRegistries(contextIds, listingAccounts)
     const dtos: ManifestDTO[] = []
 
     const configRegistries = await this._globalConfigService.getRegistries()
@@ -204,7 +202,7 @@ export default class FeatureService {
               ...myDappletsToAdd.filter((x) => x.registryUrl === registryUrl).map((x) => x.author),
             ])
           )
-          const registry = await this._registryAggregator.getRegistryByUri(registryUrl)
+          const registry = await this._registryAggregatorService.getRegistryByUri(registryUrl)
           // console.log({ owners, listingAccounts, myDappletsToAdd })
           const moduleInfosByContextId = await registry.getModuleInfo(contextIds, owners)
 
@@ -278,7 +276,7 @@ export default class FeatureService {
     // ToDo: check that the module is (not) active already
 
     // Clear cached dependencies
-    globalClear(this._moduleManager, '_getOptimizedChildDependenciesAndManifest')
+    globalClear(this._moduleManagerService, '_getOptimizedChildDependenciesAndManifest')
 
     hostnames = Array.from(new Set(hostnames)) // deduplicate
 
@@ -543,7 +541,7 @@ export default class FeatureService {
 
     if (isDevRegistriesAvailable) {
       for (const module of modules) {
-        const lastDevVersion = await this._registryAggregator.getLastVersion(
+        const lastDevVersion = await this._registryAggregatorService.getLastVersion(
           module.name,
           module.branch,
           true
@@ -566,11 +564,11 @@ export default class FeatureService {
     }[]
   ) {
     if (modules.length === 0) return []
-    const modulesWithDeps = await this._moduleManager.resolveDependencies(modules)
+    const modulesWithDeps = await this._moduleManagerService.resolveDependencies(modules)
     // ToDo: catch errors
     // ToDo: run parallel
     const dists = await Promise.all(
-      modulesWithDeps.map((m) => this._moduleManager.loadModule(m.manifest))
+      modulesWithDeps.map((m) => this._moduleManagerService.loadModule(m.manifest))
     )
 
     return modulesWithDeps.map((m, i) => ({
@@ -589,7 +587,7 @@ export default class FeatureService {
         name: x.account,
         blockchain: x.chain.split('/')[0],
       }))
-    return this._registryAggregator.getAllDevModules({ users })
+    return this._registryAggregatorService.getAllDevModules({ users })
   }
 
   // ToDo: move to another service?
@@ -599,7 +597,7 @@ export default class FeatureService {
     targetStorages: StorageTypes[],
     targetRegistry: string
   ): Promise<{ scriptUrl: string }> {
-    const registry = await this._registryAggregator.getRegistryByUri(targetRegistry)
+    const registry = await this._registryAggregatorService.getRegistryByUri(targetRegistry)
     if (!registry) throw new Error('No registry with this url exists in config.')
 
     try {
@@ -812,7 +810,7 @@ export default class FeatureService {
   async getRegistries() {
     const configRegistries = await this._globalConfigService.getRegistries()
     const result = configRegistries.map(async (c) => {
-      const reg = await this._registryAggregator.getRegistryByUri(c.url)
+      const reg = await this._registryAggregatorService.getRegistryByUri(c.url)
       return {
         isAvailable: reg?.isAvailable || false,
         error: reg?.error,
@@ -824,13 +822,13 @@ export default class FeatureService {
   }
 
   public async getOwnership(registryUri: string, moduleName: string) {
-    const registry = await this._registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._registryAggregatorService.getRegistryByUri(registryUri)
     const owner = await registry.getOwnership(moduleName)
     return owner
   }
 
   public async getModuleNftUrl(registryUri: string, moduleName: string) {
-    const registry = await this._registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._registryAggregatorService.getRegistryByUri(registryUri)
     const url = await registry.getModuleNftUrl(moduleName)
     return url
   }
@@ -841,7 +839,7 @@ export default class FeatureService {
     branch: string,
     version: string
   ) {
-    const registry = await this._registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._registryAggregatorService.getRegistryByUri(registryUri)
     if (!registry) return null
     return registry.getVersionInfo(moduleName, branch, version)
   }
@@ -853,7 +851,7 @@ export default class FeatureService {
     const isDev = config.isDev
 
     if (isDev) {
-      const registry = await this._registryAggregator.getRegistryByUri(registryUrl)
+      const registry = await this._registryAggregatorService.getRegistryByUri(registryUrl)
       if (!registry) return null
       const moduleInfo = await registry.getModuleInfoByName(moduleName)
       return moduleInfo
@@ -863,7 +861,7 @@ export default class FeatureService {
       // if (moduleInfo) {
       //     return moduleInfo;
       // } else {
-      const registry = await this._registryAggregator.getRegistryByUri(registryUrl)
+      const registry = await this._registryAggregatorService.getRegistryByUri(registryUrl)
       if (!registry) return null
       const moduleInfo = await registry.getModuleInfoByName(moduleName)
       // if (moduleInfo) await this._moduleInfoBrowserStorage.create(moduleInfo); // cache ModuleInfo into chrome storage
@@ -878,36 +876,36 @@ export default class FeatureService {
     oldAccount: string,
     newAccount: string
   ) {
-    const registry = await this._registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._registryAggregatorService.getRegistryByUri(registryUri)
     await registry.transferOwnership(moduleName, oldAccount, newAccount)
   }
 
   public async getContextIds(registryUri: string, moduleName: string) {
-    const registry = await this._registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._registryAggregatorService.getRegistryByUri(registryUri)
     return registry.getContextIds(moduleName)
   }
 
   public async addContextId(registryUri: string, moduleName: string, contextId: string) {
-    const registry = await this._registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._registryAggregatorService.getRegistryByUri(registryUri)
     await registry.addContextId(moduleName, contextId)
   }
 
   public async removeContextId(registryUri: string, moduleName: string, contextId: string) {
-    const registry = await this._registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._registryAggregatorService.getRegistryByUri(registryUri)
     await registry.removeContextId(moduleName, contextId)
   }
   public async getAdmins(registryUri: string, moduleName: string) {
-    const registry = await this._registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._registryAggregatorService.getRegistryByUri(registryUri)
     return registry.getAdmins(moduleName)
   }
 
   public async addAdmin(registryUri: string, moduleName: string, adressAdmin: string) {
-    const registry = await this._registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._registryAggregatorService.getRegistryByUri(registryUri)
     await registry.addAdmin(moduleName, adressAdmin)
   }
 
   public async removeAdmin(registryUri: string, moduleName: string, adressAdmin: string) {
-    const registry = await this._registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._registryAggregatorService.getRegistryByUri(registryUri)
     await registry.removeAdmin(moduleName, adressAdmin)
   }
 
@@ -915,12 +913,12 @@ export default class FeatureService {
     // Upload icon and NFT image
     await this._uploadModuleInfoIcons(mi, targetStorages)
 
-    const registry = await this._registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._registryAggregatorService.getRegistryByUri(registryUri)
     await registry.editModuleInfo(mi)
   }
 
   public async getVersions(registryUri: string, moduleName: string) {
-    const registry = await this._registryAggregator.getRegistryByUri(registryUri)
+    const registry = await this._registryAggregatorService.getRegistryByUri(registryUri)
     if (!registry) throw new Error('No registry with this url exists in config.')
     const versions = await registry.getVersionNumbers(moduleName, DEFAULT_BRANCH_NAME)
     if (versions.length === 0) throw new Error('This module has no versions.')
@@ -931,8 +929,12 @@ export default class FeatureService {
     const mi = await this.getModuleInfoByName(registryUrl, moduleName)
     const versions = await this.getVersions(registryUrl, moduleName)
     const version = versions.sort(rcompare)[0] // Last version by SemVer
-    const vi = await this._registryAggregator.getVersionInfo(mi.name, DEFAULT_BRANCH_NAME, version)
-    const dist = await this._moduleManager.loadModule(vi)
+    const vi = await this._registryAggregatorService.getVersionInfo(
+      mi.name,
+      DEFAULT_BRANCH_NAME,
+      version
+    )
+    const dist = await this._moduleManagerService.loadModule(vi)
     const configRegistries = await this._globalConfigService.getRegistries()
 
     return {

@@ -21,11 +21,11 @@ import EnsService from './services/ensService'
 import FeatureService from './services/featureService'
 import GithubService from './services/githubService'
 import GlobalConfigService from './services/globalConfigService'
-import ModuleManager from './services/moduleManagerService'
+import ModuleManagerService from './services/moduleManagerService'
 import { NotificationService } from './services/notificationService'
 import { OverlayService } from './services/overlayService'
 import ProxyService from './services/proxyService'
-import { RegistryAggregator } from './services/registryAggregatorService'
+import { RegistryAggregatorService } from './services/registryAggregatorService'
 import { SessionService } from './services/sessionService'
 import { SuspendService } from './services/suspendService'
 import { TokenRegistryService } from './services/tokenomicsService'
@@ -46,21 +46,21 @@ const githubService = new GithubService(globalConfigService)
 const discordService = new DiscordService(globalConfigService)
 const walletService = new WalletService(globalConfigService, overlayService)
 const sessionService = new SessionService(walletService, overlayService)
-const registryAggregator = new RegistryAggregator(globalConfigService, walletService)
+const registryAggregatorService = new RegistryAggregatorService(globalConfigService, walletService)
 const storageAggregator = new StorageAggregator(globalConfigService)
-const moduleManager = new ModuleManager(
+const moduleManagerService = new ModuleManagerService(
   globalConfigService,
   notificationService,
   storageAggregator,
-  registryAggregator
+  registryAggregatorService
 )
 const featureService = new FeatureService(
   globalConfigService,
   walletService,
   analyticsService,
   storageAggregator,
-  registryAggregator,
-  moduleManager
+  registryAggregatorService,
+  moduleManagerService
 )
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)

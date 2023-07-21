@@ -10,14 +10,14 @@ import VersionInfo from '../models/versionInfo'
 import { StorageAggregator } from '../moduleStorages/moduleStorage'
 import GlobalConfigService from '../services/globalConfigService'
 import { NotificationService } from '../services/notificationService'
-import { RegistryAggregator } from '../services/registryAggregatorService'
+import { RegistryAggregatorService } from '../services/registryAggregatorService'
 
-export default class ModuleManager {
+export default class ModuleManagerService {
   constructor(
     private _globalConfigService: GlobalConfigService,
     private _notificationService: NotificationService,
     private _storage: StorageAggregator,
-    private _registryAggregator: RegistryAggregator
+    private _registryAggregatorService: RegistryAggregatorService
   ) {}
 
   public async resolveDependencies(
@@ -218,7 +218,10 @@ export default class ModuleManager {
     }
 
     if (!module.version || module.version === 'latest') {
-      const version = await this._registryAggregator.getLastVersion(module.name, module.branch)
+      const version = await this._registryAggregatorService.getLastVersion(
+        module.name,
+        module.branch
+      )
       if (!version) return null
       module.version = version
       console.log(
@@ -226,7 +229,7 @@ export default class ModuleManager {
       )
     }
 
-    let vi = await this._registryAggregator.getVersionInfo(
+    let vi = await this._registryAggregatorService.getVersionInfo(
       module.name,
       module.branch,
       module.version
@@ -294,7 +297,7 @@ export default class ModuleManager {
     // ToDo: Replace '>=' to '^'
     const prefix = '>=' // https://devhints.io/semver
     const range = prefix + version
-    const allVersions = await this._registryAggregator.getVersions(name, branch)
+    const allVersions = await this._registryAggregatorService.getVersions(name, branch)
 
     if (allVersions.length === 0) {
       throw new Error(`The module ${name}#${branch} doesn't have any versions.`)
@@ -330,17 +333,20 @@ export default class ModuleManager {
       .then((u) => u.map((a) => a.account))
 
     // ToDo: optimize interface implementation lookup when the function is added to the registry
-    const modules = await this._registryAggregator.getModuleInfoWithRegistries(contextIds, users)
+    const modules = await this._registryAggregatorService.getModuleInfoWithRegistries(
+      contextIds,
+      users
+    )
 
     for (const registry in modules) {
       for (const hostname in modules[registry]) {
         for (const mi of modules[registry][hostname]) {
           if (mi.interfaces && mi.interfaces.indexOf(name) !== -1) {
-            const version = await this._registryAggregator.getLastVersion(
+            const version = await this._registryAggregatorService.getLastVersion(
               mi.name,
               DEFAULT_BRANCH_NAME
             ) // ToDo: fix it
-            const vi = await this._registryAggregator.getVersionInfo(
+            const vi = await this._registryAggregatorService.getVersionInfo(
               mi.name,
               DEFAULT_BRANCH_NAME,
               version
