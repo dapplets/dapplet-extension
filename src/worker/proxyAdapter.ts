@@ -199,6 +199,7 @@ export class ProxyAdapter {
     if (!params) return
 
     // ToDo: filter notifications from another adapters more elegant
+    if (!params[0]) return
     if (params[0].adapterName !== this.adapterName) return
 
     switch (method) {
