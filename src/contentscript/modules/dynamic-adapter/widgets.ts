@@ -85,7 +85,12 @@ export class WidgetBuilder {
 
           const oldContext = Object.assign({}, context.parsed)
           Object.assign(context.parsed, newContext) // Refreshing of context without link destroying
-          this.emitEvent(null, 'context_changed', context, [null, newContext, oldContext])
+          this.emitEvent(null, 'context_changed', context, [
+            null,
+            newContext,
+            oldContext,
+            this.contextName,
+          ])
         }
       }
 
@@ -169,7 +174,7 @@ export class WidgetBuilder {
       document.location.hostname
     )
     newParsedContexts.forEach((ctx) =>
-      this.emitEvent(null, 'context_changed', ctx, [null, ctx.parsed, null])
+      this.emitEvent(null, 'context_changed', ctx, [null, ctx.parsed, null, this.contextName])
     )
 
     const allContexts = contextNodes.map((cn) => this.contexts.get(cn)).filter((cn) => !!cn)
@@ -177,7 +182,7 @@ export class WidgetBuilder {
       allContexts.forEach(
         (ctx) =>
           newParsedContexts.indexOf(ctx) === -1 &&
-          this.emitEvent(fc, 'context_changed', ctx, [fc, ctx.parsed, null])
+          this.emitEvent(fc, 'context_changed', ctx, [fc, ctx.parsed, null, this.contextName])
       )
     )
 

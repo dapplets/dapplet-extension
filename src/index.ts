@@ -1,8 +1,7 @@
-import { IConnection, Listener } from './contentscript/connection'
-import { IEthWallet, INearWallet } from './contentscript/core'
-import { IEtherneumWallet } from './contentscript/ethereum/types'
 import { IContentAdapter, IFeature, IResolver, ISharedState } from './contentscript/types'
-import { Core } from './worker/core'
+import { Core, IEthWallet, INearWallet } from './worker/core'
+import { IConnection, Listener } from './worker/core/connection'
+import { IEtherneumWallet } from './worker/core/ethereum/types'
 
 declare global {
   export function Injectable(constructor: Function)

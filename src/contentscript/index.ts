@@ -12,9 +12,8 @@ import {
   tryParseBase64Payload,
 } from '../common/helpers'
 import { JsonRpc } from '../common/jsonrpc'
-import { DefaultSigners, SystemOverlayTabs } from '../common/types'
+import { BaseEvent, DefaultSigners, SystemOverlayTabs } from '../common/types'
 import Core from './core'
-import { BaseEvent } from './events/baseEvent'
 import { Injector } from './injector'
 import { OverlayManagerIframe } from './overlay/iframe/overlayManager'
 import { IOverlay } from './overlay/interfaces'
@@ -133,11 +132,15 @@ async function init() {
       sourceWindow: any
     ) => {
       const overlay = overlayManager.createOverlay({ url, title, source, hidden })
-      overlay.onregisteredchange = (v) =>
+      overlay.onclose = () => {
+        jsonrpc.call('OVERLAY_CLOSED', [id], sourceWindow)
+      }
+      overlay.onregisteredchange = (v) => {
         jsonrpc.call('OVERLAY_REGISTERED_CHANGE', [id, v], sourceWindow)
-      overlay.onMessage((topic, message) =>
+      }
+      overlay.onMessage((topic, message) => {
         jsonrpc.call('OVERLAY_EXEC', [id, topic, message], sourceWindow)
-      )
+      })
       overlayMap.set(id, overlay)
       return true
     }

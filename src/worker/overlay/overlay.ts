@@ -44,6 +44,11 @@ export class OverlayIframe implements IOverlay {
       this.registered = value
       return true
     })
+    this._iframeMessenger.on('OVERLAY_CLOSED', (id: string) => {
+      if (id !== this.id) return
+      this.onclose?.()
+      return true
+    })
   }
 
   open(callback?: Function): void {
@@ -52,6 +57,7 @@ export class OverlayIframe implements IOverlay {
 
   close(): void {
     this._iframeMessenger.call('OVERLAY_CLOSE', [this.id], this._target)
+    this.onclose?.()
   }
 
   send(topic: string, args: any[]): void {

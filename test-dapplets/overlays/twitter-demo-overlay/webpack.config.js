@@ -49,7 +49,7 @@ module.exports = {
   ],
   devServer: {
     contentBase: path.join(__dirname, 'build'),
-    port: 3000,
+    port: 8080,
     https: {
       key: fs.readFileSync('src/secret/localhost/localhost.decrypted.key'),
       cert: fs.readFileSync('src/secret/localhost/localhost.crt'),

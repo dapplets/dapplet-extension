@@ -21,9 +21,11 @@ import EnsService from './services/ensService'
 import FeatureService from './services/featureService'
 import GithubService from './services/githubService'
 import GlobalConfigService from './services/globalConfigService'
+import ModuleManagerService from './services/moduleManagerService'
 import { NotificationService } from './services/notificationService'
 import { OverlayService } from './services/overlayService'
 import ProxyService from './services/proxyService'
+import { RegistryAggregatorService } from './services/registryAggregatorService'
 import { SessionService } from './services/sessionService'
 import { SuspendService } from './services/suspendService'
 import { TokenRegistryService } from './services/tokenomicsService'
@@ -35,7 +37,6 @@ import { WalletService } from './services/walletService'
 tracing.startTracing()
 
 const notificationService = new NotificationService()
-
 const globalConfigService = new GlobalConfigService()
 const analyticsService = new AnalyticsService(globalConfigService)
 const suspendService = new SuspendService(globalConfigService)
@@ -45,13 +46,22 @@ const githubService = new GithubService(globalConfigService)
 const discordService = new DiscordService(globalConfigService)
 const walletService = new WalletService(globalConfigService, overlayService)
 const sessionService = new SessionService(walletService, overlayService)
+const registryAggregatorService = new RegistryAggregatorService(globalConfigService, walletService)
+const storageAggregator = new StorageAggregator(globalConfigService)
+const moduleManagerService = new ModuleManagerService(
+  globalConfigService,
+  notificationService,
+  storageAggregator,
+  registryAggregatorService
+)
 const featureService = new FeatureService(
   globalConfigService,
   walletService,
-  notificationService,
-  analyticsService
+  analyticsService,
+  storageAggregator,
+  registryAggregatorService,
+  moduleManagerService
 )
-const storageAggregator = new StorageAggregator(globalConfigService)
 const ensService = new EnsService(walletService)
 const connectedAccountService = new ConnectedAccountService(globalConfigService, walletService)
 const tokenomicsService = new TokenRegistryService(
@@ -66,6 +76,7 @@ const underConstructionService = new UnderConstructionService(
   overlayService,
   storageAggregator
 )
+
 // ToDo: fix circular dependencies
 walletService.sessionService = sessionService
 globalConfigService.ensService = ensService

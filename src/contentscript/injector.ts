@@ -9,13 +9,13 @@ import * as EventBus from '../common/global-event-bus'
 import { areModulesEqual, multipleReplace, parseModuleName } from '../common/helpers'
 import { JsonRpc } from '../common/jsonrpc'
 import {
+  BaseEvent,
   DefaultConfig,
   ParserConfig,
   SandboxInitializationParams,
   SchemaConfig,
 } from '../common/types'
 import Core from './core'
-import { BaseEvent } from './events/baseEvent'
 import BuiltInModules from './modules'
 import { ConfigAdapter } from './modules/config-adapter'
 import { DynamicAdapter } from './modules/dynamic-adapter'
@@ -364,122 +364,6 @@ export class Injector {
         continue
       }
 
-      // const moduleEventBus = new ModuleEventBus(
-      //   this.eventStream.pipe(filter((e) => e.namespace === manifest.name))
-      // )
-
-      // // ToDo: elemenate the boilerplate
-      // const coreWrapper = {
-      //   overlayManager: core.overlayManager,
-      //   contextStarted: (contextIds: any[], parentContext: string) =>
-      //     this._setContextActivivty(contextIds, parentContext, true),
-      //   contextFinished: (contextIds: any[], parentContext: string) =>
-      //     this._setContextActivivty(contextIds, parentContext, false),
-      //   connect: core.connect.bind(core),
-      //   overlay: (cfg, eventDef) => {
-      //     cfg.source = manifest.name
-      //     cfg.module = { name: manifest.name, registryUrl: manifest.registryUrl }
-      //     if (cfg.name) {
-      //       const overlay = manifest.overlays?.[cfg.name]
-      //       if (!overlay)
-      //         throw new Error(`Cannot find overlay with name "${cfg.name}" in the manifest.`)
-
-      //       const url = new URL(overlay.uris[0])
-
-      //       if (preferedOverlayStorage === 'centralized' && overlay.hash) {
-      //         cfg.url = joinUrls(
-      //           'https://dapplet-api.s3-website.nl-ams.scw.cloud/',
-      //           overlay.hash.replace('0x', '')
-      //         )
-      //         return core.overlay(cfg, eventDef)
-      //       } else if (url.protocol === 'bzz:') {
-      //         cfg.url = joinUrls(swarmGatewayUrl, `bzz/${url.pathname.slice(2)}`)
-      //         return core.overlay(cfg, eventDef)
-      //       } else if (url.protocol === 'http:' || url.protocol === 'https:') {
-      //         cfg.url = url.href
-      //         return core.overlay(cfg, eventDef)
-      //       } else if (preferedOverlayStorage === 'decentralized' && overlay.hash) {
-      //         cfg.url = joinUrls(
-      //           'https://dapplet-api.s3-website.nl-ams.scw.cloud/',
-      //           overlay.hash.replace('0x', '')
-      //         )
-      //         return core.overlay(cfg, eventDef)
-      //       } else {
-      //         throw new Error(`Invalid protocol "${url.protocol}" in the overlay address.`)
-      //       }
-      //     } else {
-      //       return core.overlay(cfg, eventDef)
-      //     }
-      //   },
-      //   wallet: (cfg, eventDef) => core.wallet(cfg, eventDef, manifest.name),
-      //   storage: new AppStorage(manifest, defaultConfig, schemaConfig),
-      //   events: moduleEventBus,
-      //   contract: (type, address, options) => core.contract(type, address, options, manifest.name),
-      //   onAction: (handler: Function) => this.setActionHandler(manifest.name, handler),
-      //   onHome: (handler: Function) => this.setHomeHandler(manifest.name, handler),
-      //   onShareLink: (handler: Function) => this.setShareLinkHandler(manifest.name, handler),
-      //   onWalletsUpdate: (handler: Function) =>
-      //     this.setWalletsUpdateHandler(manifest.name, handler),
-      //   onConnectedAccountsUpdate: (handler: Function) =>
-      //     this.setConnectedAccountsUpdate(manifest.name, handler),
-      //   getManifest: async (
-      //     moduleName?: string
-      //   ): Promise<Omit<ModuleInfo, 'interfaces'> & VersionInfo> => {
-      //     let module: RegistriedModule
-      //     if (moduleName) {
-      //       module = this.registry.find((m) => m.manifest.name === moduleName)
-      //     } else {
-      //       module = this.registry.find((m) => m.manifest.name === manifest.name)
-      //     }
-      //     const { getModuleInfoByName } = await initBGFunctions(browser)
-      //     const registry = manifest.registryUrl
-      //     const moduleInfo: ModuleInfo = await getModuleInfoByName(
-      //       registry,
-      //       moduleName ? moduleName : manifest.name
-      //     )
-      //     return { ...moduleInfo, ...module.manifest, contextIds }
-      //   },
-      //   getContentDetectors: () => core.getContentDetectors(),
-      //   utils: core.utils,
-      //   BigNumber: core.BigNumber,
-      //   ethers: core.ethers,
-      //   near: core.near,
-      //   createShareLink: (targetUrl: string, modulePayload: any) =>
-      //     core.createShareLink(targetUrl, modulePayload, {
-      //       contextIds: ['*'], // ToDo: Replace wildcard on real context IDs
-      //       moduleId: formatModuleId(manifest),
-      //       registry: manifest.registryUrl,
-      //     }),
-      //   sessions: () => core.sessions(manifest.name),
-      //   login: (req, settings) => core.login(req, settings, manifest.name),
-      //   state: core.state,
-      //   connectedAccounts: core.connectedAccounts,
-      //   fetch: core.fetch,
-      //   getPreferredConnectedAccountsNetwork: core.getPreferredConnectedAccountsNetwork,
-      //   notify: async (payload) => {
-      //     // ToDo: do not fetch manifest twice
-      //     const { getModuleInfoByName } = await initBGFunctions(browser)
-      //     const registry = manifest.registryUrl
-      //     const moduleInfo: ModuleInfo = await getModuleInfoByName(registry, manifest.name)
-      //     await core.notify(payload, moduleInfo.icon?.uris?.[0], manifest.name)
-      //   },
-      // }
-
-      // // Built-in modules are loaded without eval
-      // if (BuiltInModules[manifest.name]) {
-      //   const builtInModule = BuiltInModules[manifest.name]
-
-      //   // dynamic-adapter is loaded here usually
-      //   this._registerModule(
-      //     builtInModule,
-      //     builtInModule.clazz,
-      //     () => moduleEventBus,
-      //     () => new builtInModule.clazz(coreWrapper)
-      //   )
-
-      //   continue
-      // }
-
       // ToDo: generalize loading of parser configs
       if (manifest.type === ModuleTypes.ParserConfig) {
         if (typeof scriptOrConfig !== 'object') {
@@ -494,99 +378,6 @@ export class Injector {
 
         continue
       }
-
-      // let newBranch: string = null
-
-      // ToDo: describe it
-
-      // const injectableDecorator = (constructor) => {
-      //   if (constructor.prototype.getBranch) {
-      //     const resolver: IResolver = new constructor()
-      //     newBranch = resolver.getBranch()
-      //   } else {
-      //     this._registerModule(module, constructor, () => moduleEventBus)
-      //   }
-      // }
-
-      // ToDo: describe it
-      // adapter
-      // const injectDecorator = (name: string) => {
-      //   if (!name)
-      //     throw new Error(
-      //       'The name of a module is required as the first argument of the @Inject(module_name) decorator'
-      //     )
-
-      //   return (
-      //     target: any | { constructor: any },
-      //     propertyOrMethodName: string | undefined,
-      //     parameterIndex: number | undefined
-      //   ) => {
-      //     // ToDo: check module_name with manifest
-      //     // ToDo: add module source to error description
-      //     // ContructorDecorator: class, undefined, parameterIndex
-      //     // PropertyDecorator: class(obj), property_name, undefined
-      //     // ParameterDecorator: class(obj), method_name, parameterIndex
-
-      //     // Built-in module
-      //     if (BuiltInModules[name]) {
-      //       // overlay-adapter is loaded here usually
-      //       this._registerModule(
-      //         BuiltInModules[name],
-      //         BuiltInModules[name].clazz,
-      //         () => new ModuleEventBus(this.eventStream.pipe(filter((e) => e.namespace === name))),
-      //         () => new BuiltInModules[name].clazz()
-      //       )
-      //     }
-
-      //     // Constructor Parameter Decorator
-      //     if (propertyOrMethodName === undefined) {
-      //       const currentModule = this._registerModule(module, target, () => moduleEventBus)
-      //       currentModule.constructorDependencies[parameterIndex] = name
-      //     }
-      //     // Class Property Decorator
-      //     else if (parameterIndex === undefined) {
-      //       if (delete target[propertyOrMethodName]) {
-      //         Object.defineProperty(target, propertyOrMethodName, {
-      //           get: () => {
-      //             const currentModule = this.registry.find((m) =>
-      //               areModulesEqual(m.manifest, manifest)
-      //             )
-      //             if (!currentModule.instancedPropertyDependencies[name]) {
-      //               const depModule = this._getDependency(manifest, name)
-      //               const instancedModule = this._proxifyModule(depModule, currentModule)
-      //               currentModule.instancedPropertyDependencies[name] = instancedModule
-      //             }
-      //             return currentModule.instancedPropertyDependencies[name]
-      //           },
-      //           enumerable: true,
-      //           configurable: true,
-      //         })
-      //       }
-      //     }
-      //     // Method Parameter Decorator
-      //     else if (propertyOrMethodName === 'activate') {
-      //       const currentModule = this._registerModule(
-      //         module,
-      //         target.constructor,
-      //         () => moduleEventBus
-      //       )
-      //       currentModule.activateMethodsDependencies[parameterIndex] = name
-      //     }
-      //     // Invalid Decorator
-      //     else {
-      //       console.error(
-      //         "Invalid decorator. Inject() decorator can be applied on constructor's parameters, class properties, activate() method's parameters only."
-      //       )
-      //     }
-      //   }
-      // }
-
-      // const onEventDecorator = (type: string) => {
-      //   return function (_, __, descriptor: PropertyDescriptor) {
-      //     moduleEventBus.ofType(type).subscribe(descriptor.value)
-      //     return descriptor
-      //   }
-      // }
 
       try {
         if (typeof scriptOrConfig !== 'string') {
@@ -627,24 +418,6 @@ export class Injector {
         console.error(err)
         continue
       }
-
-      // if (newBranch) {
-      //   const { createNotification } = await initBGFunctions(browser)
-      //   await createNotification({
-      //     title: 'Branch resolving',
-      //     message: `Resolver of "${manifest.name}" defined the "${newBranch}" branch`,
-      //     type: NotificationType.System,
-      //   })
-      //   const missingDependencies = await getModulesWithDeps([
-      //     {
-      //       name: manifest.name,
-      //       branch: newBranch,
-      //       version: 'latest', // ToDo: fix: branch resolver automatically upgrades adapter to the latest version
-      //       contextIds: contextIds,
-      //     },
-      //   ])
-      //   await this._processModules(missingDependencies)
-      // }
     }
   }
 
@@ -695,7 +468,15 @@ export class Injector {
 
   private _getDependency(manifest: VersionInfo, name: string) {
     if (BuiltInModules[name]) {
-      return this.registry.find((m) => m.manifest.name == name)
+      if (this.registry.some((m) => m.manifest.name == name)) {
+        return this.registry.find((m) => m.manifest.name == name)
+      } else {
+        return this._registerModule(
+          BuiltInModules[name],
+          BuiltInModules[name].clazz,
+          () => new BuiltInModules[name].clazz()
+        )
+      }
     }
 
     const dependency = manifest.dependencies[name]

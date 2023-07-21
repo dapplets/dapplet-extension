@@ -185,69 +185,71 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       const widgetsParse = [widgetsInConstructor].map((widgetsItems, i) => {
         const widgetsObject = widgetsItems.map((item, i) => {
           const newKey = item.orderIndex
-          const widgetsObjectActivate = item.MENU_ACTION().map((widgetItem, i) => {
-            const isPinned = pinnedActionButton
-              ? pinnedActionButton.filter((x, i) => {
-                  const pinnedBoolean =
-                    x.dappletName === item.moduleName &&
-                    x.widgetPinId === widgetItem().state.pinnedID
-                      ? true
-                      : false
-                  return pinnedBoolean
-                })
-              : false
+          const widgetsObjectActivate = item
+            .MENU_ACTION({ id: 'MENU_ACTION' })
+            .map((widgetItem, i) => {
+              const isPinned = pinnedActionButton
+                ? pinnedActionButton.filter((x, i) => {
+                    const pinnedBoolean =
+                      x.dappletName === item.moduleName &&
+                      x.widgetPinId === widgetItem().state.pinnedID
+                        ? true
+                        : false
+                    return pinnedBoolean
+                  })
+                : false
 
-            const newWidgetButton = widgetItem().state.action ? (
-              <WidgetButton
-                isMenu={isMenu ? isMenu : false}
-                key={`${newKey}` + i}
-                onClick={(e) => {
-                  !isMenu && e.preventDefault()
-                  !isMenu && e.stopPropagation()
-                  widgetItem().state.action(widgetItem().state.ctx, widgetItem().state)
-                  onClick()
-                }}
-                hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
-                disabled={widgetItem().state.disabled ? widgetItem().state.disabled : false}
-                icon={widgetItem().state.icon ? widgetItem().state.icon : null}
-                title={widgetItem().state.title}
-                pinned={isPinned.length > 0 ? true : false}
-                onPinned={() => {
-                  widgetItem().state.pinned = !widgetItem().state.pinned
-                  setVisibleAnimation(true)
+              const newWidgetButton = widgetItem().state.action ? (
+                <WidgetButton
+                  isMenu={isMenu ? isMenu : false}
+                  key={`${newKey}` + i}
+                  onClick={(e) => {
+                    !isMenu && e.preventDefault()
+                    !isMenu && e.stopPropagation()
+                    widgetItem().state.action(widgetItem().state.ctx, widgetItem().state)
+                    onClick()
+                  }}
+                  hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
+                  disabled={widgetItem().state.disabled ? widgetItem().state.disabled : false}
+                  icon={widgetItem().state.icon ? widgetItem().state.icon : null}
+                  title={widgetItem().state.title}
+                  pinned={isPinned.length > 0 ? true : false}
+                  onPinned={() => {
+                    widgetItem().state.pinned = !widgetItem().state.pinned
+                    setVisibleAnimation(true)
 
-                  setIconAnimateWidget(widgetItem().state.icon ? widgetItem().state.icon : null)
-                  setPinnedAnimateWidget(isPinned.length > 0 ? true : false)
-                  setTimeout(() => {
-                    setVisibleAnimation(false)
-                  }, 1100)
-                  if (pinnedActionButton && pinnedActionButton.length !== 0) {
-                    pinnedActionButton.map((x, i) => {
-                      if (
-                        x.dappletName === item.moduleName &&
-                        x.widgetPinId === widgetItem().state.pinnedID
-                      ) {
-                        removePinnedButton(item.moduleName, widgetItem().state.pinnedID)
-                      } else {
-                        addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
-                      }
-                    })
-                  } else {
-                    addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
-                  }
-                  // onClick()
-                }}
-              />
-            ) : (
-              <LabelButton
-                hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
-                icon={widgetItem().state.icon ? widgetItem().state.icon : null}
-                key={`${newKey}` + i}
-                title={widgetItem().state.title}
-              />
-            )
-            return newWidgetButton
-          })
+                    setIconAnimateWidget(widgetItem().state.icon ? widgetItem().state.icon : null)
+                    setPinnedAnimateWidget(isPinned.length > 0 ? true : false)
+                    setTimeout(() => {
+                      setVisibleAnimation(false)
+                    }, 1100)
+                    if (pinnedActionButton && pinnedActionButton.length !== 0) {
+                      pinnedActionButton.map((x, i) => {
+                        if (
+                          x.dappletName === item.moduleName &&
+                          x.widgetPinId === widgetItem().state.pinnedID
+                        ) {
+                          removePinnedButton(item.moduleName, widgetItem().state.pinnedID)
+                        } else {
+                          addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
+                        }
+                      })
+                    } else {
+                      addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
+                    }
+                    // onClick()
+                  }}
+                />
+              ) : (
+                <LabelButton
+                  hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
+                  icon={widgetItem().state.icon ? widgetItem().state.icon : null}
+                  key={`${newKey}` + i}
+                  title={widgetItem().state.title}
+                />
+              )
+              return newWidgetButton
+            })
 
           return widgetsObjectActivate
         })

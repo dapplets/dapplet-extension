@@ -122,7 +122,12 @@ export class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterC
           if (removedContexts && removedContexts.length > 0) {
             this._core.contextFinished(removedContexts.map((c) => c.parsed))
             removedContexts.forEach((ctx) =>
-              contextBuilder.emitEvent(null, 'context_changed', ctx, [null, null, ctx.parsed])
+              contextBuilder.emitEvent(null, 'context_changed', ctx, [
+                null,
+                null,
+                ctx.parsed,
+                contextBuilder.contextName,
+              ])
             )
           }
           contextBuilder.updateContexts(this.featureConfigs, container, this.contextBuilders, null) // ToDo: think about it

@@ -1,9 +1,8 @@
-import { WebSocketProxyClient } from '../common/chrome-extension-websocket-wrapper'
 import { IPubSub } from './types'
 
 export class WsJsonRpc implements IPubSub {
   private _queue: any[] = []
-  private _ws: WebSocketProxyClient
+  private _ws: WebSocket
 
   private _msgCount = 0
 
@@ -52,7 +51,7 @@ export class WsJsonRpc implements IPubSub {
   }
 
   private _connect() {
-    this._ws = new WebSocketProxyClient(this.url)
+    this._ws = new WebSocket(this.url)
     this._ws.addEventListener('open', () => {
       this._queue.forEach((msg) => this._ws.send(msg))
       this._queue = []
