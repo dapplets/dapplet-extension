@@ -203,7 +203,6 @@ export default class FeatureService {
             ])
           )
           const registry = await this._registryAggregatorService.getRegistryByUri(registryUrl)
-          // console.log({ owners, listingAccounts, myDappletsToAdd })
           const moduleInfosByContextId = await registry.getModuleInfo(contextIds, owners)
 
           for (const [contextId, moduleInfos] of Object.entries(moduleInfosByContextId)) {
