@@ -180,69 +180,71 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       const widgetsParse = [widgetsInConstructor].map((widgetsItems, i) => {
         const widgetsObject = widgetsItems.map((item, i) => {
           const newKey = item.orderIndex
-          const widgetsObjectActivate = item.MENU_ACTION().map((widgetItem, i) => {
-            const isPinned = pinnedActionButton
-              ? pinnedActionButton.filter((x, i) => {
-                  const pinnedBoolean =
-                    x.dappletName === item.moduleName &&
-                    x.widgetPinId === widgetItem().state.pinnedID
-                      ? true
-                      : false
-                  return pinnedBoolean
-                })
-              : false
+          const widgetsObjectActivate = item
+            .MENU_ACTION({ id: 'MENU_ACTION' })
+            .map((widgetItem, i) => {
+              const isPinned = pinnedActionButton
+                ? pinnedActionButton.filter((x, i) => {
+                    const pinnedBoolean =
+                      x.dappletName === item.moduleName &&
+                      x.widgetPinId === widgetItem().state.pinnedID
+                        ? true
+                        : false
+                    return pinnedBoolean
+                  })
+                : false
 
-            const newWidgetButton = widgetItem().state.action ? (
-              <WidgetButton
-                isMenu={isMenu ? isMenu : false}
-                key={`${newKey}` + i}
-                onClick={(e) => {
-                  !isMenu && e.preventDefault()
-                  !isMenu && e.stopPropagation()
-                  widgetItem().state.action(widgetItem().state.ctx, widgetItem().state)
-                  onClick()
-                }}
-                hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
-                disabled={widgetItem().state.disabled ? widgetItem().state.disabled : false}
-                icon={widgetItem().state.icon ? widgetItem().state.icon : null}
-                title={widgetItem().state.title}
-                pinned={isPinned.length > 0 ? true : false}
-                onPinned={() => {
-                  widgetItem().state.pinned = !widgetItem().state.pinned
-                  setVisibleAnimation(true)
+              const newWidgetButton = widgetItem().state.action ? (
+                <WidgetButton
+                  isMenu={isMenu ? isMenu : false}
+                  key={`${newKey}` + i}
+                  onClick={(e) => {
+                    !isMenu && e.preventDefault()
+                    !isMenu && e.stopPropagation()
+                    widgetItem().state.action(widgetItem().state.ctx, widgetItem().state)
+                    onClick()
+                  }}
+                  hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
+                  disabled={widgetItem().state.disabled ? widgetItem().state.disabled : false}
+                  icon={widgetItem().state.icon ? widgetItem().state.icon : null}
+                  title={widgetItem().state.title}
+                  pinned={isPinned.length > 0 ? true : false}
+                  onPinned={() => {
+                    widgetItem().state.pinned = !widgetItem().state.pinned
+                    setVisibleAnimation(true)
 
-                  setIconAnimateWidget(widgetItem().state.icon ? widgetItem().state.icon : null)
-                  setPinnedAnimateWidget(isPinned.length > 0 ? true : false)
-                  setTimeout(() => {
-                    setVisibleAnimation(false)
-                  }, 1100)
-                  if (pinnedActionButton && pinnedActionButton.length !== 0) {
-                    pinnedActionButton.map((x, i) => {
-                      if (
-                        x.dappletName === item.moduleName &&
-                        x.widgetPinId === widgetItem().state.pinnedID
-                      ) {
-                        removePinnedButton(item.moduleName, widgetItem().state.pinnedID)
-                      } else {
-                        addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
-                      }
-                    })
-                  } else {
-                    addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
-                  }
-                  // onClick()
-                }}
-              />
-            ) : (
-              <LabelButton
-                hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
-                icon={widgetItem().state.icon ? widgetItem().state.icon : null}
-                key={`${newKey}` + i}
-                title={widgetItem().state.title}
-              />
-            )
-            return newWidgetButton
-          })
+                    setIconAnimateWidget(widgetItem().state.icon ? widgetItem().state.icon : null)
+                    setPinnedAnimateWidget(isPinned.length > 0 ? true : false)
+                    setTimeout(() => {
+                      setVisibleAnimation(false)
+                    }, 1100)
+                    if (pinnedActionButton && pinnedActionButton.length !== 0) {
+                      pinnedActionButton.map((x, i) => {
+                        if (
+                          x.dappletName === item.moduleName &&
+                          x.widgetPinId === widgetItem().state.pinnedID
+                        ) {
+                          removePinnedButton(item.moduleName, widgetItem().state.pinnedID)
+                        } else {
+                          addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
+                        }
+                      })
+                    } else {
+                      addPinnedButton(item.moduleName, widgetItem().state.pinnedID)
+                    }
+                    // onClick()
+                  }}
+                />
+              ) : (
+                <LabelButton
+                  hidden={widgetItem().state.hidden ? widgetItem().state.hidden : false}
+                  icon={widgetItem().state.icon ? widgetItem().state.icon : null}
+                  key={`${newKey}` + i}
+                  title={widgetItem().state.title}
+                />
+              )
+              return newWidgetButton
+            })
 
           return widgetsObjectActivate
         })
@@ -371,9 +373,37 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 <Noties />
               )}
             </div>
-            <div>
+            <div className={styles.blockNotificationInfo}>
               <div className={styles.titleNotification}>
                 <LinkifyText>{payload.title}</LinkifyText>
+                <span className={styles.date}>
+                  <span>
+                    {addZero(dateNum(payload.createdAt).getFullYear()) +
+                      '.' +
+                      addZero(dateNum(payload.createdAt).getMonth() + 1) +
+                      '.' +
+                      addZero(dateNum(payload.createdAt).getDate())}
+                  </span>{' '}
+                  <span>
+                    {addZero(dateNum(payload.createdAt).getHours()) +
+                      ':' +
+                      addZero(dateNum(payload.createdAt).getMinutes())}
+                  </span>
+                </span>
+                <CloseIcon
+                  className={styles.closeMotification}
+                  appearance="small"
+                  color="red"
+                  isNotification
+                  onClick={(e) => {
+                    e.currentTarget.parentElement.parentElement.classList.add('remove_notification')
+                    setTimeout(() => {
+                      const d = newNotifications.filter((x) => x.id !== x.id)
+                      setNewNotifications(d)
+                      setPinnedNotification(false)
+                    }, 500)
+                  }}
+                />
               </div>
               {payload.message ? (
                 <div className={styles.messageNotification}>
@@ -394,35 +424,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 </div>
               ) : null}
             </div>
-
-            <span className={styles.date}>
-              <span>
-                {addZero(dateNum(payload.createdAt).getFullYear()) +
-                  '.' +
-                  addZero(dateNum(payload.createdAt).getMonth() + 1) +
-                  '.' +
-                  addZero(dateNum(payload.createdAt).getDate())}
-              </span>{' '}
-              <span>
-                {addZero(dateNum(payload.createdAt).getHours()) +
-                  ':' +
-                  addZero(dateNum(payload.createdAt).getMinutes())}
-              </span>
-            </span>
-            <CloseIcon
-              className={styles.closeMotification}
-              appearance="small"
-              color="red"
-              isNotification
-              onClick={(e) => {
-                e.currentTarget.parentElement.parentElement.classList.add('remove_notification')
-                setTimeout(() => {
-                  const d = newNotifications.filter((x) => x.id !== x.id)
-                  setNewNotifications(d)
-                  setPinnedNotification(false)
-                }, 500)
-              }}
-            />
           </div>
         </div>
       )

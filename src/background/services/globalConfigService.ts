@@ -456,14 +456,16 @@ export default class GlobalConfigService {
     const registry = config.registries.find((x) => x.url === url)
     registry.isEnabled = true
 
+    await this.set(config)
+
     // only one production registry can be enabled
     if (!registry.isDev) {
-      config.registries
-        .filter((x) => x.url !== url && !x.isDev)
-        .forEach((x) => (x.isEnabled = false))
-    }
+      const activeProdRegistries = config.registries.filter((x) => x.url !== url && !x.isDev)
 
-    return this.set(config)
+      for (const prodRegistry of activeProdRegistries) {
+        await this.disableRegistry(prodRegistry.url)
+      }
+    }
   }
 
   async disableRegistry(url: string) {
@@ -579,6 +581,7 @@ export default class GlobalConfigService {
     EventBus.emit('trustedusers_changed')
   }
 
+  // ToDo: add registry URL
   async getUserSettings(moduleName: string, key: string) {
     const config = await this.get()
     if (!config.userSettings[moduleName]) return undefined

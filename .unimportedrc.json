@@ -1,0 +1,11 @@
+{
+  "entry": [
+    "./src/background/index.ts",
+    "./src/contentscript/index.ts",
+    "./src/inpage/index.ts",
+    "./src/offscreen/index.ts",
+    "./src/sandbox/index.ts",
+    "./src/worker/index.ts",
+    "./src/index.ts"
+  ]
+}

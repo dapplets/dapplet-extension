@@ -3,8 +3,7 @@ import { Observable, Subscription } from 'rxjs'
 import browser from 'webextension-polyfill'
 import { generateGuid } from '../../common/generateGuid'
 import { JsonRpc, RpcMessageEvent } from '../../common/jsonrpc'
-import { SandboxInitializationParams } from '../../common/types'
-import { BaseEvent } from '../events/baseEvent'
+import { BaseEvent, SandboxInitializationParams } from '../../common/types'
 import { IFrameContainer } from './iframeContainer'
 import { IFrameWorker } from './iframeWorker'
 
@@ -88,7 +87,21 @@ export abstract class DappletExecutor {
   }) {
     const adapter = this.getDependency(adapterName)
 
-    const config = {}
+    const config = {
+      events: {
+        context_changed: (_, newContext, oldContext, contextName) => {
+          // is a parsed context?
+          if (typeof contextName === 'string') {
+            this._notify('context-changed', {
+              contextName,
+              newContext,
+              oldContext,
+              adapterName,
+            })
+          }
+        },
+      },
+    }
 
     for (const contextName of listeningContexts) {
       config[contextName] = async (ctx) => {
@@ -96,12 +109,18 @@ export abstract class DappletExecutor {
           configId,
           ctx,
           contextName,
+          adapterName,
         })
         const factories = widgets.map((widget) => {
           const widgetFactory = adapter.exports[widget.widgetName]
           const callbacks = widget.listeningEvents.reduce((acc, eventName) => {
             acc[eventName] = (data: any) => {
-              this._notify('widget-event', { widgetId: widget.widgetId, eventName, data })
+              this._notify('widget-event', {
+                widgetId: widget.widgetId,
+                eventName,
+                data,
+                adapterName,
+              })
             }
             return acc
           }, {})

@@ -12,6 +12,6 @@
     "test-virtual-adapter": "0.1.0"
   },
   "overlays": {
-    "twitter-demo-overlay": "https://localhost:8080/packages/twitter-demo-overlay/build/"
+    "twitter-demo-overlay": "https://localhost:8080"
   }
 }

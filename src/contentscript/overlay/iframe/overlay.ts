@@ -36,9 +36,9 @@ export class OverlayIframe implements IOverlay {
       this._callbacks.forEach((x) => x(topic, message))
       return true
     })
-    this._iframeMessenger.on('OVERLAY_REGISTERED_CHANGE', (id: string, value: boolean) => {
+    this._iframeMessenger.on('OVERLAY_CLOSED', (id: string) => {
       if (id !== this.id) return
-      this.registered = value
+      this.onclose?.()
       return true
     })
   }
@@ -49,6 +49,7 @@ export class OverlayIframe implements IOverlay {
 
   close(): void {
     this._iframeMessenger.call('OVERLAY_CLOSE', [this.id], window.top)
+    this.onclose?.()
   }
 
   send(topic: string, args: any[]): void {

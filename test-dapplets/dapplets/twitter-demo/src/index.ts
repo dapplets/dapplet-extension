@@ -361,13 +361,13 @@ export default class DemoDapplet {
                 console.log('existSessions', existSessions)
 
                 const newSessions = await Core.login(
-                  { authMethods: ['ethereum/goerli'] }
-                  // {
-                  //   onLogin: () => console.log('onLogin'),
-                  //   onLogout: () => console.log('onLogout'),
-                  //   // onReject: () => console.log('onReject'),
-                  //   // onSwitch: () => console.log('onSwitch'),
-                  // }
+                  { authMethods: ['ethereum/goerli'] },
+                  {
+                    onLogin: () => console.log('onLogin'),
+                    onLogout: () => console.log('onLogout'),
+                    // onReject: () => console.log('onReject'),
+                    // onSwitch: () => console.log('onSwitch'),
+                  }
                 )
                 console.log(newSessions)
                 me.state = 'LOGGED'
