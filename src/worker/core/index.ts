@@ -500,7 +500,7 @@ export class Core {
       ['*'], // ToDo: Replace wildcard on real context IDs
       modulePayload,
     ]
-    const base64Payload = btoa(JSON.stringify(payload))
+    const base64Payload = btoa(encodeURIComponent(JSON.stringify(payload)))
     const WEB_PROXY_URL = 'https://augm.link/live/'
     return WEB_PROXY_URL + urlNoPayload + '#dapplet/' + base64Payload
   }

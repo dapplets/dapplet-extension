@@ -553,6 +553,8 @@ export default class GlobalConfigService {
   }
 
   async containsTrustedUser(account: string): Promise<boolean> {
+    if (!account) return false
+
     const trustedUsers = await this.getTrustedUsers()
 
     // compare addresses as strings

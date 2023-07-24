@@ -326,7 +326,7 @@ export type ShareLinkPayload = {
 
 export function tryParseBase64Payload(base64Payload: string): ShareLinkPayload {
   try {
-    const json = atob(base64Payload)
+    const json = decodeURIComponent(atob(base64Payload))
     const data = JSON.parse(json)
     if (!Array.isArray(data))
       throw new Error('Invalid payload. It must be Base64 encoded JSON-array.')

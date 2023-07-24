@@ -1,0 +1,13 @@
+{
+  "name": "core-sharelink",
+  "version": "0.1.0",
+  "description": "Core.sharelink",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "Core.sharelink",
+  "contextIds": ["twitter-config.dapplet-base.eth"],
+  "dependencies": {
+    "twitter-config.dapplet-base.eth": "0.1.5"
+  }
+}
