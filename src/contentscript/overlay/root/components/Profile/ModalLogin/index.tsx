@@ -181,7 +181,7 @@ export const ModalLogin = ({
                 </div>
               </div>
             ))}
-          {connectWallet && (
+          {connectWallet && wallets.length < 4 && (
             <div
               className={styles.addWallet}
               onClick={() => {
@@ -189,24 +189,7 @@ export const ModalLogin = ({
               }}
               data-testid="add-wallet-btn-profile-widget"
             >
-              <span
-                data-title={
-                  wallets.length >= 4
-                    ? 'All of your wallets are already connected Disconnect one of them to add a new one'
-                    : null
-                }
-                className={cn(styles.AddUserLabel, {
-                  [styles.addWalletsDisabled]: wallets.length >= 4,
-                })}
-              >
-                Add Wallet
-                {wallets.length >= 4 ? (
-                  <span className={styles.copied}>
-                    All of your wallets are already connected Disconnect one of them to add a new
-                    one
-                  </span>
-                ) : null}
-              </span>
+              <span className={cn(styles.AddUserLabel, {})}>Add Wallet</span>
             </div>
           )}
         </div>
