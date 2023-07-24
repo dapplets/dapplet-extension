@@ -90,6 +90,8 @@ async function init() {
       return injector.executeConnectedAccountsUpdateHandler()
     } else if (!IS_IFRAME && message.type === 'MODULE_EVENT_STREAM_MESSAGE') {
       return Promise.resolve(eventStream.next(message.payload))
+    } else if (!IS_IFRAME && message.type === 'ALERT_OR_CONFIRM') {
+      return overlayManager.show()
     }
   })
 

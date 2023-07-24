@@ -1,0 +1,18 @@
+.iconAlert {
+  position: relative;
+  display: block;
+  border-radius: 5px;
+
+  img {
+    width: 100%;
+    height: 100%;
+
+    background-image: inherit;
+    background-size: cover;
+    border-radius: 5px;
+  }
+}
+
+.textPart {
+  width: 340px;
+}

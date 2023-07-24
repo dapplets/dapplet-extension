@@ -26,6 +26,7 @@ import { CloseIcon } from '../CloseIcon'
 import { DappletImage } from '../DappletImage'
 import { LinkifyText } from '../LinkifyText'
 import { OverlayTab } from '../OverlayTab'
+import AlertsAndConfirms from './alertsAndConfirms'
 import styles from './OverlayToolbar.module.scss'
 
 const SYSTEM_TAB: ToolbarTab = {
@@ -519,6 +520,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               {newNotifications && newNotifications.length
                 ? newNotifications.map((x, i) => getAnimateNotifification(x, true, i))
                 : null}
+              <AlertsAndConfirms />
             </div>
             {/* {isPinnedNotification && getAnimateNotifification(payload, true)} */}
 
