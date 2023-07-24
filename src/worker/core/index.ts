@@ -92,7 +92,7 @@ export class Core {
     return sendRequest('alert', message)
   }
 
-  public async notify(payload: NotificationPayload) {
+  public async notify(payloadOrMessage: NotificationPayload | string) {
     const { createAndShowNotification, getThisTab, getModuleInfoByName } = initBGFunctions()
 
     // ToDo: move to background
@@ -100,6 +100,11 @@ export class Core {
       this.manifest.registryUrl,
       this.manifest.name
     )
+
+    const payload: NotificationPayload =
+      typeof payloadOrMessage === 'string'
+        ? { title: moduleInfo.title, message: payloadOrMessage }
+        : payloadOrMessage
 
     const thisTab = await getThisTab()
 
