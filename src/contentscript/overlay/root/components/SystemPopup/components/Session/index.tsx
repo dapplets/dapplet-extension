@@ -4,13 +4,20 @@ import styles from './Session.module.scss'
 import { SessionProps } from './Session.props'
 
 export const Session: FC<SessionProps> = (p: SessionProps) => {
+  const newVisible = (hash: string): string => {
+    const firstCharacters = hash.substring(0, 6)
+    const lastCharacters = hash.substring(hash.length - 0, hash.length - 4)
+    return `${firstCharacters}...${lastCharacters}`
+  }
   return (
     <div className={styles.session}>
       <div className={styles.wrapper}>
         <img className={styles.iconLogin} src={p.accountIcon} />
 
         <div className={styles.inner}>
-          <h3 className={styles.hash}>{p.account}</h3>
+          <h3 title={p.account} className={styles.hash}>
+            {newVisible(p.account)}
+          </h3>
 
           <div className={styles.info}>
             <ul className={styles.icons}>
