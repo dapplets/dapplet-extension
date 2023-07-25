@@ -1,7 +1,7 @@
 import { objectMap } from '../../../common/helpers'
 import { ParserConfig } from '../../../common/types'
 import { DynamicAdapter } from '../dynamic-adapter'
-import { AdapterConfig } from '../dynamic-adapter/types'
+import { AdapterConfig, DappletConfig } from '../dynamic-adapter/types'
 import BuiltInWidgets from './widgets'
 
 type ReversedWidgetConfig = {
@@ -14,7 +14,11 @@ type ReversedWidgetConfig = {
 class ConfigAdapter {
   public exports
 
-  constructor(private _dynamicAdapter: DynamicAdapter<any>, parserConfig: ParserConfig) {
+  constructor(
+    private _adapterName: string,
+    private _dynamicAdapter: DynamicAdapter,
+    parserConfig: ParserConfig
+  ) {
     // ToDo: validate parser config
 
     // Original parser config has the following hierarchy: context -> widget
@@ -24,21 +28,24 @@ class ConfigAdapter {
     this.exports = this.createWidgetFactories(reversedWidgetConfig)
 
     const adapterConfig = ConfigAdapter.convertParserConfig(parserConfig)
-    _dynamicAdapter.configure(adapterConfig)
+    _dynamicAdapter.configure(adapterConfig, this._adapterName)
   }
 
-  public attachConfig(config: any) {
+  // Config from dapplet
+  public attachConfig(config: DappletConfig) {
     // ToDo: automate two-way dependency handling(?)
-    return this._dynamicAdapter.attachConfig(config)
+    return this._dynamicAdapter.attachConfig(config, this._adapterName)
   }
 
   // ToDo: refactor it
-  public detachConfig(config: any): void {
+  // Config from dapplet
+  public detachConfig(config: DappletConfig): void {
     this._dynamicAdapter.detachConfig(config)
   }
 
-  public resetConfig(config: any, newConfig?: any): void {
-    this._dynamicAdapter.resetConfig(config, newConfig ?? config)
+  // Config from dapplet
+  public resetConfig(config: DappletConfig, newConfig?: DappletConfig): void {
+    this._dynamicAdapter.resetConfig(config, newConfig ?? config, this._adapterName)
   }
 
   public static convertParserConfig(parserConfig: ParserConfig) {

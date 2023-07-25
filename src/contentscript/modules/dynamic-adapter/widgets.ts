@@ -1,6 +1,5 @@
 import Core from '../../core'
-import { IFeature } from '../../types'
-import { Context, IWidgetBuilderConfig } from './types'
+import { Context, DappletConfig, IWidgetBuilderConfig } from './types'
 
 // interface IConfig {
 //   orderIndex: number
@@ -21,12 +20,17 @@ export class WidgetBuilder {
 
   private executedNodes = new WeakMap<Node, WeakSet<any>>()
   private widgetsByContextId = new Map<string, Set<any>>()
-  private widgets = new Map<IFeature, any[]>()
+  private widgets = new Map<DappletConfig, any[]>()
   public contexts = new WeakMap<Node, Context>() // ToDo: make private
 
   //ToDo: widgets
 
-  constructor(contextName: string, widgetBuilderConfig: IWidgetBuilderConfig, private _core: Core) {
+  constructor(
+    public readonly adapterName: string,
+    contextName: string,
+    widgetBuilderConfig: IWidgetBuilderConfig,
+    private _core: Core
+  ) {
     Object.assign(this, widgetBuilderConfig)
     this.contextName = contextName
   }
@@ -38,7 +42,7 @@ export class WidgetBuilder {
 
   // `updateContexts()` is called when new context is found.
   public updateContexts(
-    featureConfigs: any[],
+    dappletConfigs: DappletConfig[],
     container: Element,
     widgetBuilders: WidgetBuilder[],
     parentContext: any
@@ -107,31 +111,31 @@ export class WidgetBuilder {
         }
       }
 
-      for (const featureConfig of featureConfigs) {
-        // Prevent multiple execution of featureConfig on one context
+      for (const dappletConfig of dappletConfigs) {
+        // Prevent multiple execution of dappletConfig on one context
         if (!this.executedNodes.has(contextNode)) this.executedNodes.set(contextNode, new WeakSet())
-        if (this.executedNodes.get(contextNode).has(featureConfig)) continue
-        this.executedNodes.get(contextNode).add(featureConfig)
+        if (this.executedNodes.get(contextNode).has(dappletConfig)) continue
+        this.executedNodes.get(contextNode).add(dappletConfig)
 
         // is new feature?
-        if (this.widgets.get(featureConfig) === undefined) {
-          this.widgets.set(featureConfig, [])
-          newFeatureConfigs.push(featureConfig)
+        if (this.widgets.get(dappletConfig) === undefined) {
+          this.widgets.set(dappletConfig, [])
+          newFeatureConfigs.push(dappletConfig)
         }
 
-        if (featureConfig[this.contextName] === undefined) continue
+        if (dappletConfig[this.contextName] === undefined) continue
 
-        const insPointConfig = featureConfig[this.contextName]
+        const insPointConfig = dappletConfig[this.contextName]
 
         if (Array.isArray(insPointConfig)) {
-          this._insertWidgets(insPointConfig, featureConfig, this.contextName, context, contextNode)
+          this._insertWidgets(insPointConfig, dappletConfig, this.contextName, context, contextNode)
         } else if (typeof insPointConfig === 'function') {
           const arr = insPointConfig(context.parsed)
           const insert = (arr) =>
-            this._insertWidgets(arr, featureConfig, this.contextName, context, contextNode)
+            this._insertWidgets(arr, dappletConfig, this.contextName, context, contextNode)
           arr instanceof Promise ? arr.then(insert) : insert(arr)
         } else {
-          featureConfig[this.contextName] = undefined
+          dappletConfig[this.contextName] = undefined
           console.error(
             `Invalid configuration of "${this.contextName}" insertion point. It must be an array of widgets or function.`
           )
@@ -139,10 +143,10 @@ export class WidgetBuilder {
 
         for (const childrenContext of this.childrenContexts ?? []) {
           const wb = widgetBuilders.find((x) => x.contextName === childrenContext)
-          for (const contextName in featureConfig) {
+          for (const contextName in dappletConfig) {
             if (contextName !== this.contextName) continue
 
-            const fn = featureConfig[contextName]
+            const fn = dappletConfig[contextName]
             if (typeof fn !== 'function') continue
 
             const widgets = fn(context.parsed)
@@ -152,9 +156,9 @@ export class WidgetBuilder {
                 .forEach((configsWrapper) => {
                   Object.entries(configsWrapper).forEach(([key, value]) => {
                     if (childrenContext === key) {
-                      featureConfig[key] = value // ToDo: [POTENTIAL BUG] unclear consequences of overwriting configurations of child contexts
+                      dappletConfig[key] = value // ToDo: [POTENTIAL BUG] unclear consequences of overwriting configurations of child contexts
                       wb.updateContexts(
-                        [featureConfig],
+                        [dappletConfig],
                         contextNode,
                         widgetBuilders,
                         context.parsed
@@ -189,7 +193,7 @@ export class WidgetBuilder {
     return newParsedContexts
   }
 
-  public findWidget(config: any, ctx: any, id: any) {
+  public findWidget(config: DappletConfig, ctx: any, id: any) {
     const widgets = this.widgets.get(config)
     if (!widgets) return null
 
@@ -199,7 +203,7 @@ export class WidgetBuilder {
     return widget.state
   }
 
-  public unmountWidgets(config: any) {
+  public unmountWidgets(config: DappletConfig) {
     const widgets = this.widgets.get(config)
     if (!widgets || widgets.length === 0) return
     widgets.forEach((w) => w.unmount())
@@ -217,7 +221,7 @@ export class WidgetBuilder {
 
   private _insertWidgets(
     insPointConfig: any,
-    featureConfig: any,
+    dappletConfig: DappletConfig,
     insPointName: string,
     context: Context,
     contextNode: Element
@@ -229,7 +233,7 @@ export class WidgetBuilder {
     for (const widgetConstructor of widgetConstructors) {
       // ToDo: remove the following condition. Since the extension v0.54.1, contextIds are not defined.
       // This contextIds are defined by Injector of the extension
-      const contextIds = featureConfig.contextIds || []
+      const contextIds = dappletConfig.contextIds || []
 
       if (contextIds.length === 0 || contextIds.indexOf(context.parsed.id) !== -1) {
         if (typeof widgetConstructor !== 'function') {
@@ -239,14 +243,14 @@ export class WidgetBuilder {
         const insertedWidget = widgetConstructor(
           this,
           insPointName,
-          featureConfig.orderIndex,
+          dappletConfig.orderIndex,
           contextNode
         )
         if (!insertedWidget) continue
 
-        const registeredWidgets = this.widgets.get(featureConfig)
+        const registeredWidgets = this.widgets.get(dappletConfig)
         registeredWidgets.push(insertedWidget)
-        this.widgets.set(featureConfig, registeredWidgets)
+        this.widgets.set(dappletConfig, registeredWidgets)
 
         if (context.parsed.id !== undefined) {
           if (!this.widgetsByContextId.has(context.parsed.id))

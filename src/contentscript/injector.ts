@@ -61,7 +61,7 @@ export class Injector {
   public availableContextIds: string[] = []
   public registry: RegistriedModule[] = []
 
-  private _dynamicAdapter: DynamicAdapter<any>
+  private _dynamicAdapter: DynamicAdapter
   private _iframeContainer = new IFrameContainer()
 
   constructor(
@@ -375,7 +375,7 @@ export class Injector {
 
         const ExtendedConfigAdapter = class extends ConfigAdapter {
           constructor() {
-            super(me._dynamicAdapter, scriptOrConfig as ParserConfig)
+            super(manifest.name, me._dynamicAdapter, scriptOrConfig as ParserConfig)
           }
         }
 
@@ -531,7 +531,7 @@ export class Injector {
       const cfgsKey = Symbol()
       const featureId = contextModule.manifest.name
       return new Proxy(proxiedModule.instance, {
-        get: function (target: IContentAdapter<any>, prop) {
+        get: function (target: IContentAdapter, prop) {
           if (prop === 'attachConfig') {
             return (cfg: any) => {
               if (contextModule.manifest.type === ModuleTypes.Feature) {

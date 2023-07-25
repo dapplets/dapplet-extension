@@ -4,27 +4,33 @@ import { State, WidgetConfig } from '../../../common/state'
 import Core from '../../core'
 import { IContentAdapter } from '../../types'
 import { Locator } from './locator'
-import { Context, IWidget, IWidgetBuilderConfig } from './types'
+import { Context, DappletConfig, IWidget, IWidgetBuilderConfig } from './types'
 import { WidgetBuilder } from './widgets'
 
-export interface IDynamicAdapter<IAdapterConfig> extends IContentAdapter<IAdapterConfig> {
-  configure(config: { [contextName: string]: IWidgetBuilderConfig }): void
+export interface IDynamicAdapter extends IContentAdapter {
+  configure(config: { [contextName: string]: IWidgetBuilderConfig }, adapterName: string): void
   createWidgetFactory<T>(
     Widget: any
   ): (config: {
     [state: string]: T
   }) => (builder: WidgetBuilder, insPointName: string, order: number, contextNode: Element) => any
   resetConfig(
-    config: IAdapterConfig,
-    newConfig?: IAdapterConfig
+    config: DappletConfig,
+    newConfig: DappletConfig,
+    adapterName: string
   ): {
     $: (ctx: any, id: string) => any
   }
 }
 
-export class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterConfig> {
+type DappletConfigEnvelope = {
+  adapterName: string
+  config: DappletConfig
+}
+
+export class DynamicAdapter implements IDynamicAdapter {
   private observer: MutationObserver = null
-  private featureConfigs: any[] = []
+  private dappletConfigEnvelopes: DappletConfigEnvelope[] = []
   private contextBuilders: WidgetBuilder[] = []
   private stateStorage = new Map<string, State<any>>()
   private locator: Locator
@@ -39,12 +45,12 @@ export class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterC
     this.observer.observe(document.body, { childList: true, subtree: true, attributes: true })
   }
 
-  // Config from feature
-  public attachConfig(config: IAdapterConfig) {
+  // Config from dapplet
+  public attachConfig(config: DappletConfig, adapterName: string) {
     // ToDo: automate two-way dependency handling(?)
-    if (this.featureConfigs.find((f) => f === config)) return
+    if (this.dappletConfigEnvelopes.find((f) => f.config === config)) return
 
-    this.featureConfigs.splice(config['orderIndex'], 0, config)
+    this.dappletConfigEnvelopes.splice(config['orderIndex'], 0, { config, adapterName })
     this.updateObservers()
 
     return {
@@ -56,33 +62,45 @@ export class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterC
 
         return null
       },
-      reset: (newConfig?: IAdapterConfig) => this.resetConfig(config, newConfig),
+      reset: (newConfig?: DappletConfig) => this.resetConfig(config, newConfig, adapterName),
     }
   }
 
-  // Config from feature
-  public detachConfig(config: any) {
-    this.featureConfigs = this.featureConfigs.filter((f) => f !== config)
+  // Config from dapplet
+  public detachConfig(config: DappletConfig) {
+    this.dappletConfigEnvelopes = this.dappletConfigEnvelopes.filter((f) => f.config !== config)
     this.contextBuilders.forEach((wb) => wb.unmountWidgets(config))
     // ToDo: close all subscriptions and connections
   }
 
-  public resetConfig(config: IAdapterConfig, newConfig?: IAdapterConfig) {
+  // Config from dapplet
+  public resetConfig(
+    config: DappletConfig,
+    newConfig: DappletConfig | undefined,
+    adapterName: string
+  ) {
     this.detachConfig(config)
-    return this.attachConfig(newConfig ?? config)
+    return this.attachConfig(newConfig ?? config, adapterName)
   }
 
   // Config from adapter
-  public configure(config: { [contextName: string]: IWidgetBuilderConfig }): void {
+  public configure(
+    config: { [contextName: string]: IWidgetBuilderConfig },
+    adapterName: string
+  ): void {
     console.warn('MV2 Adapters are deprecated. Please use MV3 Adapters.')
 
     const builders = Object.entries(config).map(([contextName, cfg]) => {
-      const builder = new WidgetBuilder(contextName, cfg, this._core)
+      const builder = new WidgetBuilder(adapterName, contextName, cfg, this._core)
       builder.eventHandler = (event, args, targetCtx) => {
         if (targetCtx) {
-          this.featureConfigs.forEach((config) => config?.events?.[event]?.(targetCtx, ...args))
+          this.dappletConfigEnvelopes.forEach((envelope) =>
+            envelope.config?.events?.[event]?.(targetCtx, ...args)
+          )
         } else {
-          this.featureConfigs.forEach((config) => config?.events?.[event]?.(...args))
+          this.dappletConfigEnvelopes.forEach((envelope) =>
+            envelope.config?.events?.[event]?.(...args)
+          )
         }
       }
 
@@ -130,13 +148,18 @@ export class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterC
               ])
             )
           }
-          contextBuilder.updateContexts(this.featureConfigs, container, this.contextBuilders, null) // ToDo: think about it
+          contextBuilder.updateContexts(
+            this._getDappletConfigsForAdapter(contextBuilder.adapterName),
+            container,
+            this.contextBuilders,
+            null
+          ) // ToDo: think about it
         }
         // a new container was opened, no observer attached yet
         if (container && !contextBuilder.observer) {
           contextBuilder.observer = new MutationObserver(() => {
             contextBuilder.updateContexts(
-              this.featureConfigs,
+              this._getDappletConfigsForAdapter(contextBuilder.adapterName),
               container,
               this.contextBuilders,
               null
@@ -361,5 +384,11 @@ export class DynamicAdapter<IAdapterConfig> implements IDynamicAdapter<IAdapterC
   public deactivate() {
     this.contextBuilders.forEach((x) => x.observer?.disconnect())
     this.observer.disconnect()
+  }
+
+  private _getDappletConfigsForAdapter(adapterName: string) {
+    return this.dappletConfigEnvelopes
+      .filter((x) => x.adapterName === adapterName)
+      .map((x) => x.config)
   }
 }

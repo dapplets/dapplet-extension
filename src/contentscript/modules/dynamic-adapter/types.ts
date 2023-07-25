@@ -36,3 +36,8 @@ export type AdapterConfig = {
     childrenContexts?: string[]
   }
 }
+
+export type DappletConfig = {
+  events: { [eventName: string]: Function }
+  [contextName: string]: any
+}
