@@ -8,12 +8,14 @@ export const ModalProvider = ({ children }: { children: JSX.Element | JSX.Elemen
 
   async function confirm(payload: TAlertAndConfirmPayload): Promise<boolean> {
     return new Promise((resolve) => {
+      const id = Math.random().toString(16).slice(2)
       setModals((prevModals) => [
         ...prevModals,
         {
           ...payload,
+          id,
           onResolve: (value: boolean) => {
-            setModals((prevModals) => prevModals.filter((modal) => modal.id !== payload.id))
+            setModals((prevModals) => prevModals.filter((modal) => modal.id !== id))
             resolve(value)
           },
         },

@@ -128,7 +128,6 @@ export type StorageRef = {
 }
 
 export type TAlertAndConfirmPayload = {
-  id: string
   title: string
   message: string
   icon?: StorageRef

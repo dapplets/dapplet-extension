@@ -62,8 +62,8 @@ export default class DemoDapplet {
     }
 
     Core.onAction(() => this.openOverlay())
-    ;(<any>Core).onWalletsUpdate(() => console.log('*** Wallets updated'))
-    ;(<any>Core).onConnectedAccountsUpdate(() => console.log('*** Connected Accounts updated'))
+    Core.onWalletsUpdate(() => console.log('*** Wallets updated'))
+    Core.onConnectedAccountsUpdate(() => console.log('*** Connected Accounts updated'))
 
     try {
       if (localStorage.getItem('tw-dd-open-force') === 'open') {
@@ -78,7 +78,7 @@ export default class DemoDapplet {
 
     const createShareLink = (id) => {
       const sharedData = { ctxId: id }
-      const link = (<any>Core).createShareLink('https://twitter.com/teremovskii', sharedData)
+      const link = Core.createShareLink('https://twitter.com/teremovskii', sharedData)
       console.log('ShareLink:', link)
     }
 

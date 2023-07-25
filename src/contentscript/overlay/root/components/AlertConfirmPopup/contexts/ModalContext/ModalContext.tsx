@@ -2,6 +2,7 @@ import { createContext } from 'react'
 import { TAlertAndConfirmPayload } from '../../../../../../../common/types'
 
 export interface ModalProps extends TAlertAndConfirmPayload {
+  id: string
   onResolve: (value: boolean) => void
 }
 

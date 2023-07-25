@@ -2,7 +2,6 @@ import * as ethers from 'ethers'
 import * as NearApi from 'near-api-js'
 import ModuleInfo from '../../background/models/moduleInfo'
 import VersionInfo from '../../background/models/versionInfo'
-import { generateGuid } from '../../common/generateGuid'
 import { formatModuleId, joinUrls, parseShareLink } from '../../common/helpers'
 import { NotificationPayload } from '../../common/models/notification'
 import {
@@ -88,7 +87,7 @@ export class Core {
     this.events = moduleEventBus
   }
 
-  async alertOrConfirm(message: string, type: 'alert' | 'confirm'): Promise<boolean> {
+  private async _alertOrConfirm(message: string, type: 'alert' | 'confirm'): Promise<boolean> {
     const {
       getThisTab,
       getModuleInfoByName,
@@ -100,19 +99,18 @@ export class Core {
     } = initBGFunctions()
     const moduleInfo = await getModuleInfoByName(this.manifest.registryUrl, this.manifest.name)
     const thisTab = await getThisTab()
-    const id = generateGuid()
     return showAlertOrConfirm(
-      { id, title: moduleInfo.title, message, icon: moduleInfo.icon, type },
+      { title: moduleInfo.title, message, icon: moduleInfo.icon, type },
       thisTab.id
     )
   }
 
   public async alert(message: string): Promise<void> {
-    await this.alertOrConfirm(message, 'alert')
+    await this._alertOrConfirm(message, 'alert')
   }
 
   public async confirm(message: string): Promise<boolean> {
-    return this.alertOrConfirm(message, 'confirm')
+    return this._alertOrConfirm(message, 'confirm')
   }
 
   public async notify(payloadOrMessage: NotificationPayload | string) {
