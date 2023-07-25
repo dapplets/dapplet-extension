@@ -1,12 +1,13 @@
 const path = require('path')
+const fs = require('fs')
 
-const DAPPLETS = ['test-common-dapplet', 'test-dynamic-dapplet', 'twitter-demo']
+const dapplets = fs.readdirSync(path.join(__dirname, 'dapplets'))
 
 module.exports = {
   mode: 'development',
   devtool: 'inline-source-map',
   entry: Object.fromEntries(
-    DAPPLETS.map((name) => [
+    dapplets.map((name) => [
       `dapplets/${name}/build/index`,
       path.join(__dirname, `dapplets/${name}/src/index.ts`),
     ])
@@ -46,5 +47,6 @@ module.exports = {
     hot: false,
     liveReload: false,
     static: './',
+    webSocketServer: false,
   },
 }

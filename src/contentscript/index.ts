@@ -12,9 +12,8 @@ import {
   tryParseBase64Payload,
 } from '../common/helpers'
 import { JsonRpc } from '../common/jsonrpc'
-import { DefaultSigners, SystemOverlayTabs } from '../common/types'
+import { BaseEvent, DefaultSigners, SystemOverlayTabs } from '../common/types'
 import Core from './core'
-import { BaseEvent } from './events/baseEvent'
 import { Injector } from './injector'
 import { OverlayManagerIframe } from './overlay/iframe/overlayManager'
 import { IOverlay } from './overlay/interfaces'

@@ -2,7 +2,7 @@ import * as ethers from 'ethers'
 import * as NearApi from 'near-api-js'
 import ModuleInfo from '../../background/models/moduleInfo'
 import VersionInfo from '../../background/models/versionInfo'
-import { joinUrls, parseShareLink } from '../../common/helpers'
+import { formatModuleId, joinUrls, parseShareLink } from '../../common/helpers'
 import { NotificationPayload } from '../../common/models/notification'
 import { LoginRequest, NearNetworks, SandboxEnvironmentVariables } from '../../common/types'
 import { initBGFunctions, sendRequest } from '../communication'
@@ -11,6 +11,7 @@ import { AppStorage } from './appStorage'
 import ConnectedAccounts from './connectedAccounts'
 import { Connection, EventDef } from './connection'
 import * as ethereum from './ethereum'
+import { IEtherneumWallet } from './ethereum/types'
 import { EventBus } from './events/eventBus'
 import { LoginSession } from './login/login-session'
 import { LoginHooks, LoginRequestSettings } from './login/types'
@@ -28,6 +29,22 @@ type OverlayConnection<T> = Connection<T> & {
   useState(state: State<T>): OverlayConnection<T>
 }
 
+interface WalletConnection {
+  authMethod: 'ethereum/goerli' | 'ethereum/xdai' | 'near/testnet' | 'near/mainnet'
+  isConnected(): Promise<boolean>
+  connect(): Promise<void>
+  disconnect(): Promise<void>
+}
+
+export interface IEthWallet extends IEtherneumWallet, WalletConnection {
+  authMethod: 'ethereum/goerli' | 'ethereum/xdai'
+}
+
+export type INearWallet = NearApi.ConnectedWalletAccount &
+  WalletConnection & {
+    authMethod: 'near/testnet' | 'near/mainnet'
+  }
+
 export class Core {
   public utils = ethers.utils
   public BigNumber = ethers.BigNumber
@@ -42,6 +59,7 @@ export class Core {
 
   public connectedAccountsUpdateListener: () => void = null
   public walletsUpdateListener: () => void = null
+  public shareLinkListener: (data: any) => void = null
   public actionListener: () => void = null
   public homeListener: () => void = null
 
@@ -74,7 +92,7 @@ export class Core {
     return sendRequest('alert', message)
   }
 
-  public async notify(payload: NotificationPayload) {
+  public async notify(payloadOrMessage: NotificationPayload | string) {
     const { createAndShowNotification, getThisTab, getModuleInfoByName } = initBGFunctions()
 
     // ToDo: move to background
@@ -82,6 +100,11 @@ export class Core {
       this.manifest.registryUrl,
       this.manifest.name
     )
+
+    const payload: NotificationPayload =
+      typeof payloadOrMessage === 'string'
+        ? { title: moduleInfo.title, message: payloadOrMessage }
+        : payloadOrMessage
 
     const thisTab = await getThisTab()
 
@@ -112,6 +135,10 @@ export class Core {
 
   public onHome(listener: () => void) {
     this.homeListener = listener
+  }
+
+  public onShareLink(listener: (data: any) => void) {
+    this.shareLinkListener = listener
   }
 
   public async getPreferredConnectedAccountsNetwork(): Promise<NearNetworks> {
@@ -199,6 +226,170 @@ export class Core {
     return overridedConn
   }
 
+  public async wallet(cfg: {
+    authMethods: ('ethereum/goerli' | 'ethereum/xdai')[]
+  }): Promise<IEthWallet>
+  public async wallet(cfg: {
+    authMethods: ('near/testnet' | 'near/mainnet')[]
+  }): Promise<INearWallet>
+  public async wallet(cfg: {
+    authMethods: ('ethereum/goerli' | 'ethereum/xdai' | 'near/testnet' | 'near/mainnet')[]
+  }): Promise<IEthWallet | INearWallet>
+  public async wallet(
+    cfg: {
+      type: 'ethereum'
+      network: 'xdai'
+      username?: string
+      domainId?: number
+      fullname?: string
+      img?: string
+    },
+    eventDef?: EventDef<any>,
+    app?: string
+  ): Promise<WalletConnection & IEtherneumWallet>
+  public async wallet(
+    cfg: {
+      type: 'ethereum'
+      network: 'goerli'
+      username?: string
+      domainId?: number
+      fullname?: string
+      img?: string
+    },
+    eventDef?: EventDef<any>,
+    app?: string
+  ): Promise<WalletConnection & IEtherneumWallet>
+  public async wallet(
+    cfg: {
+      type: 'near'
+      network: 'testnet'
+      username?: string
+      domainId?: number
+      fullname?: string
+      img?: string
+    },
+    eventDef?: EventDef<any>,
+    app?: string
+  ): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
+  public async wallet(
+    cfg: {
+      type: 'near'
+      network: 'mainnet'
+      username?: string
+      domainId?: number
+      fullname?: string
+      img?: string
+    },
+    eventDef?: EventDef<any>,
+    app?: string
+  ): Promise<WalletConnection & NearApi.ConnectedWalletAccount>
+  public async wallet(
+    cfg: {
+      authMethods?: ('ethereum/goerli' | 'ethereum/xdai' | 'near/testnet' | 'near/mainnet')[]
+      type?: 'ethereum' | 'near'
+      network?: 'goerli' | 'xdai' | 'testnet' | 'mainnet'
+      username?: string
+      domainId?: number
+      fullname?: string
+      img?: string
+    },
+    eventDef?: EventDef<any>,
+    app?: string
+  ) {
+    if (!cfg || !(cfg.authMethods || (cfg.type && cfg.network)))
+      throw new Error(' "authMethods" or "type" with "network" are required in Core.wallet().')
+    if (cfg.authMethods) {
+      cfg.authMethods.forEach((x) => {
+        if (!['ethereum/goerli', 'ethereum/xdai', 'near/testnet', 'near/mainnet'].includes(x))
+          throw new Error(
+            'The "ethereum/goerli", "ethereum/xdai", "near/testnet" and "near/mainnet" only are supported in Core.wallet().'
+          )
+      })
+    } else {
+      if (cfg.type !== 'near' && cfg.type !== 'ethereum')
+        throw new Error('The "ethereum" and "near" only are supported in Core.wallet().')
+      if (cfg.type === 'near' && !(cfg.network == 'testnet' || cfg.network == 'mainnet'))
+        throw new Error('"testnet" and "mainnet" network only is supported in "near" type wallet.')
+      if (cfg.type === 'ethereum' && !(cfg.network == 'goerli' || cfg.network == 'xdai'))
+        throw new Error(
+          '"goerli" and "xdai" networks only are supported in "ethereum" type wallet.'
+        )
+    }
+
+    const _authMethods = cfg.authMethods ?? [cfg.type + '/' + cfg.network]
+
+    const isConnected = async () => {
+      const { getWalletDescriptors } = initBGFunctions()
+      const sessions = await this.sessions()
+      const session = sessions.find((x) => _authMethods.includes(x.authMethod))
+      if (!session) return false
+
+      // ToDo: remove it when subscription on disconnect event will be implemented
+      //       (see: /background/services/walletService.ts/disconnect())
+      const descriptors = await getWalletDescriptors()
+      const descriptor = descriptors.find((x) => x.chain == session.authMethod)
+      return descriptor ? descriptor.connected : false
+    }
+
+    const getSessionObject = async () => {
+      const connected = await isConnected()
+      if (!connected) return null
+
+      const sessions = await this.sessions()
+      const session = sessions.find((x) => _authMethods.includes(x.authMethod))
+
+      if (!session) {
+        return null
+      } else {
+        return session
+      }
+    }
+
+    const session = await getSessionObject()
+    const authMethod = session?.authMethod
+    const wallet = !session
+      ? null
+      : authMethod === 'ethereum/goerli' || authMethod === 'ethereum/xdai'
+      ? <IEthWallet>await session.wallet()
+      : <INearWallet>await session.wallet()
+
+    const me = this
+
+    const proxied = {
+      _wallet: wallet,
+      _session: session,
+      authMethod,
+
+      async isConnected(): Promise<boolean> {
+        return isConnected()
+      },
+
+      async connect(): Promise<void> {
+        if (this._session && this._wallet) return // ???
+        this._session = await me.login({ authMethods: _authMethods, secureLogin: 'disabled' }, {})
+        this.authMethod = this._session.authMethod
+        this._wallet =
+          this.authMethod === 'ethereum/goerli' || this.authMethod === 'ethereum/xdai'
+            ? <IEthWallet>await this._session.wallet()
+            : <INearWallet>await this._session.wallet()
+      },
+
+      async disconnect(): Promise<void> {
+        return this._session.logout()
+      },
+    }
+
+    return new Proxy(proxied, {
+      get(target, prop) {
+        if (prop in target) {
+          return target[prop]
+        } else if (target._wallet !== null) {
+          return target._wallet[prop]
+        }
+      },
+    }) as any
+  }
+
   public async contract(
     type: 'ethereum' | 'ethereum/xdai',
     address: string,
@@ -274,12 +465,8 @@ export class Core {
     //   _request.target = target
     // }
 
-    // if (_request.target && typeof _request.target === 'object') {
-    //   _request.target = _request.target.id
-    // }
-
-    if (_request.target) {
-      console.error('Target is not supported yet.')
+    if (_request.target && typeof _request.target === 'object') {
+      _request.target = _request.target.id
     }
 
     const { onLogin, onLogout } = _request
@@ -314,8 +501,8 @@ export class Core {
     const payload = [
       EXTENSION_VERSION,
       this.manifest.registryUrl,
-      this.manifest.name,
-      ['*'],
+      formatModuleId(this.manifest),
+      ['*'], // ToDo: Replace wildcard on real context IDs
       modulePayload,
     ]
     const base64Payload = btoa(JSON.stringify(payload))

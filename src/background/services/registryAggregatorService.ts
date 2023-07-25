@@ -12,16 +12,16 @@ import { ChainTypes, DefaultSigners, Environments } from '../../common/types'
 import VersionInfoBrowserStorage from '../browserStorages/versionInfoStorage'
 import ModuleInfo from '../models/moduleInfo'
 import VersionInfo from '../models/versionInfo'
+import { DevRegistry } from '../registries/devRegistry'
+import { EthRegistry } from '../registries/ethRegistry'
+import { NearRegistry } from '../registries/nearRegistry'
+import { Registry } from '../registries/registry'
 import GlobalConfigService from '../services/globalConfigService'
 import { WalletService } from '../services/walletService'
-import { DevRegistry } from './devRegistry'
-import { EthRegistry } from './ethRegistry'
-import { NearRegistry } from './nearRegistry'
-import { Registry } from './registry'
 
 if (!Promise.allSettled) Promise.allSettled = allSettled
 
-export class RegistryAggregator {
+export class RegistryAggregatorService {
   public isAvailable = true
   public registries: Registry[] = []
 

@@ -58,6 +58,9 @@ function initialize(params: SandboxInitializationParams) {
       case 'fireWalletsUpdateEvent':
         core.walletsUpdateListener?.()
         break
+      case 'fireShareLinkEvent':
+        core.shareLinkListener?.(params[0])
+        break
       case 'fireConnectedAccountsUpdateEvent':
         core.connectedAccountsUpdateListener?.()
         break
