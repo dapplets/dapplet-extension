@@ -2,13 +2,10 @@ import React, { FC } from 'react'
 import ReactTimeAgo from 'react-time-ago'
 import styles from './Session.module.scss'
 import { SessionProps } from './Session.props'
+import { cutString } from '../../../../helpers/cutString'
 
 export const Session: FC<SessionProps> = (p: SessionProps) => {
-  const newVisible = (hash: string): string => {
-    const firstCharacters = hash.substring(0, 6)
-    const lastCharacters = hash.substring(hash.length - 0, hash.length - 4)
-    return `${firstCharacters}...${lastCharacters}`
-  }
+ 
   return (
     <div className={styles.session}>
       <div className={styles.wrapper}>
@@ -16,7 +13,7 @@ export const Session: FC<SessionProps> = (p: SessionProps) => {
 
         <div className={styles.inner}>
           <h3 title={p.account} className={styles.hash}>
-            {newVisible(p.account)}
+            {cutString(p.account)}
           </h3>
 
           <div className={styles.info}>
