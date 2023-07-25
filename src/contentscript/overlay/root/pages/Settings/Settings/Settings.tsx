@@ -57,8 +57,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
 
   const [targetStorages, setTargetStorages] = useState([])
 
-  const regExpUserAgentName = new RegExp(/^[a-zA-Z0-9-_\.\s]{3,40}$/)
-  const regExpUserAgentNameFirstSymbol = new RegExp(/^[a-z0-9]+$/)
+  const regExpUserAgentName = new RegExp(/^[a-zA-Z0-9-_\.\s]{3,128}$/)
+  const regExpUserAgentNameFirstSymbol = new RegExp(/^[a-zA-Z0-9]+$/)
   const inputOfFocusIPFS = useRef<HTMLInputElement>()
   const inputOfFocusSwarmId = useRef<HTMLInputElement>()
   const inputOfFocusSwarm = useRef<HTMLInputElement>()
@@ -212,8 +212,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
         regExpUserAgentNameFirstSymbol
       )
       const valueParse = getValidUserAgentName(userAgentNameInput.trimStart(), regExpUserAgentName)
-      if (userAgentName.length > 40 || userAgentName.trimStart().length < 3) {
-        setUserAgentNameInputError('Valid name length: 3-40 characters')
+      if (userAgentName.length > 128 || userAgentName.trimStart().length < 3) {
+        setUserAgentNameInputError('Valid name length: 3-128 characters')
         // setTimeout(() => {
         //   setUserAgentNameInputError(null)
         //   setUserAgentNameInput('')
