@@ -13,10 +13,17 @@ export const Session: FC<SessionProps> = (p: SessionProps) => {
           <h3 className={styles.hash}>{p.account}</h3>
 
           <div className={styles.info}>
-            <ul className={styles.icons}>
-              {p.providerIcon ? <img src={p.providerIcon} className={styles.icon} /> : null}
-              {p.walletIcon ? <img src={p.walletIcon} className={styles.icon} /> : null}
-            </ul>
+            {p.providerIcon === p.walletIcon ? (
+              <ul className={styles.icons}>
+                <img src={p.providerIcon} className={styles.icon} />
+              </ul>
+            ) : (
+              <ul className={styles.icons}>
+                {p.providerIcon ? <img src={p.providerIcon} className={styles.icon} /> : null}
+                {p.walletIcon ? <img src={p.walletIcon} className={styles.icon} /> : null}
+              </ul>
+            )}
+
             {p.lastUsage && (
               <span className={styles.time}>
                 <ReactTimeAgo date={new Date(p.lastUsage)} locale="en-US" />
