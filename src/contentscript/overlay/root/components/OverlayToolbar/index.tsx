@@ -102,12 +102,14 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
     return () => {}
   }, [])
+
   const handleUpdateNotifications = async () => {
     const notifications = await getNotifications()
     setEvent(
       notifications && notifications.filter((x) => x.status === NotificationStatus.Highlighted)
     )
   }
+
   useEffect(() => {
     const updatePinnedNotifications = async (payload: any) => {
       const notifications = await getNotifications()
@@ -117,24 +119,23 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       return setEvent(notifications)
     }
 
-    const handleShowNotification = (payload) => {
-      updatePinnedNotifications(payload)
-    }
-    browser.runtime.onMessage.addListener((message) => {
+    const handleShowNotification = (message) => {
       if (!message || !message.type) return
 
       if (message.type === 'SHOW_NOTIFICATION') {
-        return handleShowNotification(message.payload)
+        return updatePinnedNotifications(message.payload)
       }
-    })
+    }
 
     EventBus.on('notifications_updated', handleUpdateNotifications)
+    browser.runtime.onMessage.addListener(handleShowNotification)
 
     return () => {
       EventBus.off('notifications_updated', handleUpdateNotifications)
       browser.runtime.onMessage.removeListener(handleShowNotification)
     }
   }, [])
+
   useEffect(() => {
     EventBus.on('myactions_changed', _refreshData)
 
@@ -142,6 +143,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       EventBus.off('myactions_changed', _refreshData)
     }
   }, [])
+
   useEffect(() => {
     if (!payload) return
 

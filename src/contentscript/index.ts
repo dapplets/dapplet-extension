@@ -73,7 +73,10 @@ async function init() {
   browser.runtime.onMessage.addListener((message) => {
     if (!message || !message.type) return
 
-    if (message.type === 'FEATURE_ACTIVATED') {
+    if (message.type === 'SHOW_NOTIFICATION') {
+      // returns undefined to allow the event be passed to the next listener
+      overlayManager.show()
+    } else if (message.type === 'FEATURE_ACTIVATED') {
       return injector.loadModules(message.payload)
     } else if (message.type === 'FEATURE_DEACTIVATED') {
       return injector.unloadModules(message.payload)
@@ -97,13 +100,6 @@ async function init() {
   EventBus.on('dapplet_deactivated', (m) => injector.unloadModules([m]))
   EventBus.on('wallet_changed', () => injector.executeWalletsUpdateHandler())
   EventBus.on('connected_accounts_changed', () => injector.executeConnectedAccountsUpdateHandler())
-  browser.runtime.onMessage.addListener((message) => {
-    if (!message || !message.type) return
-
-    if (message.type === 'SHOW_NOTIFICATION') {
-      return overlayManager.show()
-    }
-  })
 
   // destroy when background is disconnected
   // port.onDisconnect.addListener(() => {
