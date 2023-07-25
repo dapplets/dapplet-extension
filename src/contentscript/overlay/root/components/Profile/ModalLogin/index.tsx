@@ -171,9 +171,7 @@ export const ModalLogin = ({
                 </div>
                 <div className={styles.profileImgButtonBlock}>
                   <button
-                    onClick={() => {
-                      disconnectButtonClick(x.chain, x.type)
-                    }}
+                    onClick={() => disconnectButtonClick(x.chain, x.type)}
                     className={styles.profileImgButton}
                   >
                     <Disconnect />
@@ -184,12 +182,10 @@ export const ModalLogin = ({
           {connectWallet && wallets.length < 4 && (
             <div
               className={styles.addWallet}
-              onClick={() => {
-                wallets.length >= 4 ? null : connectWallet()
-              }}
+              onClick={connectWallet}
               data-testid="add-wallet-btn-profile-widget"
             >
-              <span className={cn(styles.AddUserLabel, {})}>Add Wallet</span>
+              <span className={styles.AddUserLabel}>Add Wallet</span>
             </div>
           )}
         </div>
