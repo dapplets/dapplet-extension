@@ -32,7 +32,9 @@ export default class DemoDapplet {
             label: 'confirm',
             img: MAIN_IMG,
             exec: async () => {
-              const answer = await Core.confirm('BE OR NOT TO BE?')
+              const answer = await Core.confirm(
+                'BE OR NOT TO BE OR NOT TO BE OR NOT TO BE OR NOT TO BE?'
+              )
               console.log('answer:', answer ? 'yes' : 'no')
               console.log(ctx)
             },

@@ -1,3 +1,7 @@
+.wrapper {
+  width: 200px;
+}
+
 .iconAlert {
   position: relative;
   display: block;
@@ -13,6 +17,10 @@
   }
 }
 
-.textPart {
+.textPartSmall {
+  width: 160px;
+}
+
+.textPartBig {
   width: 340px;
 }

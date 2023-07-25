@@ -31,11 +31,15 @@ const AlertConfirmPopup = (props: { payload: TAlertAndConfirmPayload }) => {
     return () => window.removeEventListener('keydown', handleKeydown)
   }, [proceed, isOpen])
 
+  const isNarrowModal = payload.title.length < 20 && payload.message.length < 40
+
   return (
     <div
       data-testid="actions-label"
       style={{ display: isOpen ? 'flex' : 'none' }}
-      className={stylesNotifications.widgetButtonNotification}
+      className={cn(stylesNotifications.widgetButtonNotification, {
+        [stylesAlerts.wrapper]: isNarrowModal,
+      })}
     >
       <div className={stylesNotifications.notificationBlockTop}>
         <div className={stylesNotifications.iconNotificationBlock}>
@@ -43,7 +47,7 @@ const AlertConfirmPopup = (props: { payload: TAlertAndConfirmPayload }) => {
             <img src={payload.icon ? payload.icon.uris[0] : NO_LOGO} />
           </div>
         </div>
-        <div className={stylesAlerts.textPart}>
+        <div className={isNarrowModal ? stylesAlerts.textPartSmall : stylesAlerts.textPartBig}>
           <div className={stylesNotifications.titleNotification}>
             <LinkifyText>{payload.title}</LinkifyText>
           </div>
