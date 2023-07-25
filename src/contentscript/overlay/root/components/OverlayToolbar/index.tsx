@@ -22,6 +22,7 @@ import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { WidgetButton } from '../../widgets/button'
 import { LabelButton } from '../../widgets/label'
+import { ModalProvider } from '../AlertConfirmPopup/contexts/ModalContext'
 import { CloseIcon } from '../CloseIcon'
 import { DappletImage } from '../DappletImage'
 import { LinkifyText } from '../LinkifyText'
@@ -521,7 +522,9 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               {newNotifications && newNotifications.length
                 ? newNotifications.map((x, i) => getAnimateNotifification(x, true, i))
                 : null}
-              <AlertsAndConfirms />
+              <ModalProvider>
+                <AlertsAndConfirms />
+              </ModalProvider>
             </div>
             {/* {isPinnedNotification && getAnimateNotifification(payload, true)} */}
 

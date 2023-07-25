@@ -132,7 +132,7 @@ export type TAlertAndConfirmPayload = {
   title: string
   message: string
   icon?: StorageRef
-  type: string
+  type: 'alert' | 'confirm'
 }
 
 export type TConnectedAccountsVerificationRequestInfo = {
