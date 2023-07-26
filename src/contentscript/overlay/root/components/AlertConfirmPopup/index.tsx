@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import NO_LOGO from '../../../../../common/resources/no-logo.png'
 import { LinkifyText } from '../LinkifyText'
 import stylesNotifications from '../OverlayToolbar/OverlayToolbar.module.scss'
@@ -9,10 +9,13 @@ import { ModalProps } from './contexts/ModalContext/ModalContext'
 const AlertConfirmPopup = (props: { payload: ModalProps }) => {
   const { payload } = props
   const { title, message, icon, type, onResolve } = payload
+  const buttonRef = useRef(null)
+
+  useEffect(() => buttonRef.current.focus(), [])
 
   useEffect(() => {
     const handleKeydown = (e) => {
-      if (e.key === 'Enter') {
+      if (buttonRef.current === document.activeElement && e.key === 'Enter') {
         onResolve(true)
       }
     }
@@ -44,6 +47,7 @@ const AlertConfirmPopup = (props: { payload: ModalProps }) => {
           </div>
           <div className={stylesNotifications.buttonNotificationBlock}>
             <button
+              ref={buttonRef}
               className={stylesNotifications.buttonNotification}
               onClick={() => onResolve(true)}
             >
