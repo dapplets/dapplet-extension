@@ -17,13 +17,13 @@ import {
   ReactComponent as Account,
   ReactComponent as DappletsLogo,
 } from '../../assets/newIcon/mustache.svg'
+import { useModal } from '../../contexts/ModalContext'
 import { addZero } from '../../helpers/addZero'
 import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { WidgetButton } from '../../widgets/button'
 import { LabelButton } from '../../widgets/label'
 import AlertConfirmPopup from '../AlertConfirmPopup'
-import { useModal } from '../AlertConfirmPopup/contexts/ModalContext'
 import { CloseIcon } from '../CloseIcon'
 import { DappletImage } from '../DappletImage'
 import { LinkifyText } from '../LinkifyText'
