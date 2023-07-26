@@ -1,0 +1,13 @@
+{
+  "name": "update-parsed-context",
+  "version": "0.1.0",
+  "description": "Checks that parsed context is updated when its DOM changes",
+  "main": "build/index.js",
+  "branch": "default",
+  "type": "FEATURE",
+  "title": "Update parsed context",
+  "contextIds": ["test-twitter-adapter"],
+  "dependencies": {
+    "test-twitter-adapter": "0.1.0"
+  }
+}
