@@ -1,10 +1,10 @@
 import cn from 'classnames'
 import React, { useEffect, useRef } from 'react'
 import NO_LOGO from '../../../../../common/resources/no-logo.png'
+import { ModalProps } from '../../contexts/ModalContext/ModalContext'
 import { LinkifyText } from '../LinkifyText'
 import stylesNotifications from '../OverlayToolbar/OverlayToolbar.module.scss'
 import stylesAlerts from './AlertConfirmPopup.module.scss'
-import { ModalProps } from './contexts/ModalContext/ModalContext'
 
 const AlertConfirmPopup = (props: { payload: ModalProps }) => {
   const { payload } = props

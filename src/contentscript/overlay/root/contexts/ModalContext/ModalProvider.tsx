@@ -1,6 +1,6 @@
 import React, { JSX, useEffect, useState } from 'react'
 import browser from 'webextension-polyfill'
-import { TAlertAndConfirmPayload } from '../../../../../../../common/types'
+import { TAlertAndConfirmPayload } from '../../../../../common/types'
 import { ModalContext, ModalContextState, ModalProps } from './ModalContext'
 
 export const ModalProvider = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
