@@ -29,7 +29,8 @@
 
 .blockTop {
   display: flex;
-
+  align-items: center;
+  transition: all 0.2s ease;
   .blockIcons {
     display: flex;
     justify-content: space-between;
@@ -37,7 +38,26 @@
     margin: 0 57px 0 13px;
   }
 }
-
+.errorIcon {
+  display: inline-block;
+  width: 21px;
+  height: 18px;
+  margin-right: 10px;
+  &:hover svg path {
+    fill: none;
+}
+}
+.errorTitle {
+  .blockIcons {
+    display: flex;
+    justify-content: space-between;
+    width: 3px;
+    margin: 0 57px 0 13px;
+  }
+  h2 {
+    color: $error!important;
+  }
+}
 .blockText {
   display: flex;
 
@@ -182,8 +202,9 @@
   padding-bottom: 5px;
 
   font-family: Roboto, sans-serif;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
-  line-height: 100%;
-  color: #d9304f;
+  line-height: 120%;
+  text-transform: uppercase;
+  color: $error;
 }

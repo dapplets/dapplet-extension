@@ -1,6 +1,7 @@
 import cn from 'classnames'
 import React, { DetailedHTMLProps, FC, HTMLAttributes, useEffect, useState } from 'react'
 import { ManifestAndDetails } from '../../../../../common/types'
+import { ReactComponent as Error } from '../../assets/icons/error.svg'
 import { ReactComponent as CopiedIcon } from '../../assets/svg/copied.svg'
 import { ReactComponent as CopyIcon } from '../../assets/svg/copyModal.svg'
 import { ReactComponent as LoadingIcon } from '../../assets/svg/loaderCopy.svg'
@@ -98,7 +99,16 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
 
       <div className={cn(styles.wrapperBlock)}>
         <div className={styles.header}>
-          <div className={cn(styles.blockTop)}>
+          <div
+            className={cn(styles.blockTop, {
+              [styles.errorTitle]: error,
+            })}
+          >
+            {error ? (
+              <span className={styles.errorIcon}>
+                <Error />{' '}
+              </span>
+            ) : null}
             <DappletTitle isShowDescription={false} title={title}>
               {dapplet.sourceRegistry.isDev && <span className={styles.isDev}>dev</span>}
             </DappletTitle>
@@ -122,9 +132,9 @@ export const Dapplet: FC<DappletProps> = (props: DappletProps) => {
               </>
             )}
           </div>
+          {error ? <span className={styles.moduleError}>{'Dapplet error'}</span> : null}
 
           <div className={cn(styles.blockText)}>{description}</div>
-          {error ? <span className={styles.moduleError}>{'Dapplet error'}</span> : null}
         </div>
 
         <div className={cn(styles.blockBottom)}>
