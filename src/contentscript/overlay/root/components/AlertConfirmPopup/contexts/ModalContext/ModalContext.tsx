@@ -8,12 +8,10 @@ export interface ModalProps extends TAlertAndConfirmPayload {
 
 export type ModalContextState = {
   modals: ModalProps[]
-  confirm: (payload: TAlertAndConfirmPayload) => Promise<boolean>
 }
 
 export const contextDefaultValues: ModalContextState = {
   modals: [],
-  confirm: async () => false,
 }
 
 export const ModalContext = createContext(contextDefaultValues)

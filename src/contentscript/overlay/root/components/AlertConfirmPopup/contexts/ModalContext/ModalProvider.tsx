@@ -1,5 +1,5 @@
-import React, { JSX, useState } from 'react'
-
+import React, { JSX, useEffect, useState } from 'react'
+import browser from 'webextension-polyfill'
 import { TAlertAndConfirmPayload } from '../../../../../../../common/types'
 import { ModalContext, ModalContextState, ModalProps } from './ModalContext'
 
@@ -23,9 +23,16 @@ export const ModalProvider = ({ children }: { children: JSX.Element | JSX.Elemen
     })
   }
 
+  useEffect(() => {
+    const addAlertOrConfirm = (message: { type: string; payload: TAlertAndConfirmPayload }) => {
+      if (message?.type === 'ALERT_OR_CONFIRM') return confirm(message.payload)
+    }
+    browser.runtime.onMessage.addListener(addAlertOrConfirm)
+    return () => browser.runtime.onMessage.removeListener(addAlertOrConfirm)
+  }, [])
+
   const state: ModalContextState = {
     modals,
-    confirm,
   }
 
   return <ModalContext.Provider value={state}>{children}</ModalContext.Provider>
