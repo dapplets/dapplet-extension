@@ -1,5 +1,6 @@
 const path = require('path')
 const fs = require('fs')
+const { DappletManifestPlugin } = require('./DappletManifestPlugin')
 
 const dapplets = fs.readdirSync(path.join(__dirname, 'dapplets'))
 
@@ -42,6 +43,7 @@ module.exports = {
       },
     ],
   },
+  plugins: [new DappletManifestPlugin()],
   devServer: {
     port: 3000,
     hot: false,
