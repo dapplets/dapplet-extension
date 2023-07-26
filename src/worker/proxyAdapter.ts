@@ -93,7 +93,7 @@ export class ProxyAdapter {
 
   private async _getWidgetsForContext({
     configId,
-    ctx,
+    ctx: parsedContext,
     contextName,
   }: {
     configId: string
@@ -102,9 +102,10 @@ export class ProxyAdapter {
   }) {
     if (!this._configById.has(configId)) return []
 
-    ctx = this._saveOrUpdateContext(contextName, ctx)
+    // It's reference to the context that will be updated in the future
+    const ctxRef = this._saveOrUpdateContext(contextName, parsedContext)
 
-    let unknownFactories = this._configById.get(configId)[contextName](ctx) ?? []
+    let unknownFactories = this._configById.get(configId)[contextName](ctxRef) ?? []
 
     if (unknownFactories instanceof Promise) {
       unknownFactories = await unknownFactories
@@ -119,8 +120,8 @@ export class ProxyAdapter {
 
         if (!widgetFactory) return null
 
-        const widget: InjectedWidget = await widgetFactory(ctx)
-        widget.state.state.init?.(ctx, widget.state.state) // ToDo: can be buggy when widgetFactory returns value asynchronously
+        const widget: InjectedWidget = await widgetFactory(ctxRef)
+        widget.state.state.init?.(ctxRef, widget.state.state) // ToDo: can be buggy when widgetFactory returns value asynchronously
         this._widgets.set(widget.widgetId, widget)
         const stateValues = widget.state.getStateValues()
 
@@ -134,7 +135,7 @@ export class ProxyAdapter {
           widgetName: widget.widgetName,
           listeningEvents,
           // contextName,
-          // contextId: ctx.id,
+          // contextId: ctxRef.id,
           stateValues: JSON.parse(JSON.stringify(stateValues)), // remove callbacks and another references
         }
       })
@@ -185,7 +186,8 @@ export class ProxyAdapter {
       return ctx
     } else {
       // update context
-      return Object.assign(this._contextByTypeAndId.get(contextName).get(ctx.id), ctx)
+      const ctxRef = this._contextByTypeAndId.get(contextName).get(ctx.id)
+      return Object.assign(ctxRef, ctx)
     }
   }
 
