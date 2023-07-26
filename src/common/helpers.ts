@@ -53,6 +53,8 @@ export enum UriTypes {
  */
 export function typeOfUri(uri: string): UriTypes {
   const uriLower = uri.toLowerCase()
+  // todo: added reg exp for validation hexadecimal adresses near
+  const regExp16thNearAddress = new RegExp(/^[a-zA-Z0-9\s]{16,128}$/)
 
   if (uriLower.indexOf('http://') === 0 || uriLower.indexOf('https://') === 0) {
     return UriTypes.Http
@@ -78,7 +80,8 @@ export function typeOfUri(uri: string): UriTypes {
   if (
     uriLower.lastIndexOf('.near') === uriLower.length - 5 ||
     uriLower.lastIndexOf('.testnet') === uriLower.length - 8 ||
-    uriLower.indexOf('dev-') === 0
+    uriLower.indexOf('dev-') === 0 ||
+    uriLower.match(regExp16thNearAddress)
   ) {
     return UriTypes.Near
   }

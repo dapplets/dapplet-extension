@@ -538,6 +538,7 @@ export default class GlobalConfigService {
 
     const isEthAddress = typeOfUri(account) === UriTypes.Ethereum
     const isEnsAddress = typeOfUri(account) === UriTypes.Ens
+
     const isNearAddress = typeOfUri(account) === UriTypes.Near
 
     if (!isEthAddress && !isEnsAddress && !isNearAddress)
