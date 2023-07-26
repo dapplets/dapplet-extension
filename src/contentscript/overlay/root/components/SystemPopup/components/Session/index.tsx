@@ -1,11 +1,10 @@
 import React, { FC } from 'react'
 import ReactTimeAgo from 'react-time-ago'
+import { truncateEthAddress } from '../../../../helpers/truncateEthAddress'
 import styles from './Session.module.scss'
 import { SessionProps } from './Session.props'
-import { cutString } from '../../../../helpers/cutString'
 
 export const Session: FC<SessionProps> = (p: SessionProps) => {
- 
   return (
     <div className={styles.session}>
       <div className={styles.wrapper}>
@@ -13,7 +12,7 @@ export const Session: FC<SessionProps> = (p: SessionProps) => {
 
         <div className={styles.inner}>
           <h3 title={p.account} className={styles.hash}>
-            {cutString(p.account)}
+            {truncateEthAddress(p.account)}
           </h3>
 
           <div className={styles.info}>
