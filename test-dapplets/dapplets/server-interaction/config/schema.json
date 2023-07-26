@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "required": ["exampleString", "exampleHiddenString"],
+  "properties": {
+    "serverUrl": {
+      "type": "string",
+      "title": "Server URL"
+    },
+    "exampleString": {
+      "type": "string",
+      "title": "Example of string property"
+    },
+    "exampleHiddenString": {
+      "type": "string",
+      "title": "Example of hidden string property",
+      "hidden": true
+    }
+  }
+}
