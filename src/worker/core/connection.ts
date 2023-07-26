@@ -157,11 +157,11 @@ export class Connection<T> implements IConnection {
 
           this._listeners.delete(listener)
           this._listenerContextMap.delete(id)
-          window.removeEventListener(id, handler)
+          self.removeEventListener(id, handler)
         }
       }
 
-      window.addEventListener(id, handler)
+      self.addEventListener(id, handler)
       this._listenerContextMap.set(id, listener)
       this.send('subscribe', { id }).then((id) => (listener.f = id))
     }
