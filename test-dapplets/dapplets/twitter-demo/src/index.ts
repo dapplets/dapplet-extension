@@ -10,8 +10,8 @@ export default class DemoDapplet {
   @Inject(adapterName)
   public adapter: any
 
-  @Inject('overlay-adapter.dapplet-base.eth')
-  public adapterAction: any
+  // @Inject('overlay-adapter.dapplet-base.eth')
+  // public adapterAction: any
 
   // current user from twitter
   private _globalContext = {}
@@ -61,7 +61,7 @@ export default class DemoDapplet {
       console.log('Core.getManifest has en error:', err)
     }
 
-    Core.onAction(() => this.openOverlay())
+    // Core.onAction(() => this.openOverlay())
     Core.onWalletsUpdate(() => console.log('*** Wallets updated'))
     Core.onConnectedAccountsUpdate(() => console.log('*** Connected Accounts updated'))
 
@@ -93,23 +93,23 @@ export default class DemoDapplet {
       // box
     } = this.adapter.exports
 
-    const { button: buttonAction } = this.adapterAction.exports
+    // const { button: buttonAction } = this.adapterAction.exports
 
-    this.adapterAction.attachConfig({
-      MENU_ACTION: () => [
-        buttonAction({
-          initial: 'DEFAULT',
-          DEFAULT: {
-            icon: MAIN_IMG,
-            title: 'Test',
-            pinnedID: 'test-action-button',
-            action: (_, me) => {
-              me.title = 'Done!'
-            },
-          },
-        }),
-      ],
-    })
+    // this.adapterAction.attachConfig({
+    //   MENU_ACTION: () => [
+    //     buttonAction({
+    //       initial: 'DEFAULT',
+    //       DEFAULT: {
+    //         icon: MAIN_IMG,
+    //         title: 'Test',
+    //         pinnedID: 'test-action-button',
+    //         action: (_, me) => {
+    //           me.title = 'Done!'
+    //         },
+    //       },
+    //     }),
+    //   ],
+    // })
 
     this._config = {
       GLOBAL: (global) => {
@@ -267,6 +267,17 @@ export default class DemoDapplet {
               exec: () => {
                 console.log('ctx = ', ctx)
                 this._$(ctx, 'button').hidden = !this._$(ctx, 'button').hidden
+              },
+              // LP end
+            },
+          }),
+          button({
+            DEFAULT: {
+              label: 'Close Overlay',
+              img: MAIN_IMG,
+              exec: () => {
+                console.log('ctx = ', ctx)
+                if (this._overlay.isOpen()) this._overlay.close()
               },
               // LP end
             },
