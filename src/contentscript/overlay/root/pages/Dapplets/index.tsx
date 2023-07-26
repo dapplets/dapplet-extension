@@ -1,10 +1,14 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { FC, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import browser from 'webextension-polyfill'
 import ManifestDTO from '../../../../../background/dto/manifestDTO'
 import { AnalyticsGoals } from '../../../../../background/services/analyticsService'
-import { CONTEXT_ID_WILDCARD, DAPPLETS_STORE_URL } from '../../../../../common/constants'
+import {
+  CONTEXT_ID_WILDCARD,
+  DAPPLETS_STORE_URL,
+  ModuleTypes,
+} from '../../../../../common/constants'
 import * as EventBus from '../../../../../common/global-event-bus'
 import { ManifestAndDetails } from '../../../../../common/types'
 import { Dapplet } from '../../components/Dapplet'
@@ -12,7 +16,6 @@ import { Dropdown } from '../../components/Dropdown'
 import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { TabLoader } from '../../components/TabLoader'
 import { openLink } from '../../utils/openLink'
-import { getActualModules } from '../../utils/refreshModules'
 import styles from './Dapplets.module.scss'
 import { DevMessage } from './DevMessage'
 
@@ -27,7 +30,7 @@ export interface DappletsProps {
   onUserSettingsClick: (mi: ManifestDTO) => void
   dropdownListValue: string
   setDropdownListValue: (value: string) => void
-  getTabsForDapplet?: any
+  getTabsForDapplet: any
   handleCloseTabClick?: any
   tabs?: any
   setModule: any
@@ -37,23 +40,22 @@ export interface DappletsProps {
   navigate: any
 }
 
-export const Dapplets: FC<DappletsProps> = (props) => {
-  const {
-    search,
-    onUserSettingsClick,
-    dropdownListValue,
-    setDropdownListValue,
-    getTabsForDapplet,
-    handleCloseTabClick,
-    tabs,
-    setModule,
-    classNameBlock,
-    overlays,
-    pathname,
-    navigate,
-  } = props
-
-  const [dapplets, setDapplets] = useState<ManifestAndDetails[]>([])
+export const Dapplets = ({
+  onUserSettingsClick,
+  dropdownListValue,
+  setDropdownListValue,
+  getTabsForDapplet,
+  handleCloseTabClick,
+  tabs,
+  setModule,
+  classNameBlock,
+  overlays,
+  pathname,
+  navigate,
+  search,
+}: DappletsProps) => {
+  // todo: loaded to app and
+  const [dapplets, setDapplets] = useState<ManifestAndDetails[] | null>([])
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
 
@@ -73,6 +75,7 @@ export const Dapplets: FC<DappletsProps> = (props) => {
     } else {
       setLoadingListDapplets(false)
     }
+    return () => {}
   }, [dropdownListValue])
 
   useEffect(() => {
@@ -125,25 +128,37 @@ export const Dapplets: FC<DappletsProps> = (props) => {
 
   const _refreshData = async () => {
     try {
-      const rightDapplets = await getActualModules(dropdownListValue)
-      setDapplets((leftDapplets) => {
-        // remove disappeared dapplets from the list
-        // leave existing dapplets at the beginning of the list (innerJoin)
-        // add new dapplets to the end of the list (exclusiveRightJoin)
-        const innerJoin = leftDapplets.filter((x) => rightDapplets.find((y) => y.name === x.name))
-        const exclusiveRightJoin = rightDapplets.filter(
-          (x) => !leftDapplets.find((y) => y.name === x.name)
-        )
-        const rightJoin = [...innerJoin, ...exclusiveRightJoin]
+      //todo: must be in app
+      const { getThisTab, getCurrentContextIds, getFeaturesByHostnames } = await initBGFunctions(
+        browser
+      )
 
-        // ToDo: remove this hack. It causes the following React error:
-        // Warning: Cannot update during an existing state transition (such as within `render`).
-        // Render methods should be a pure function of props and state.
-        setModule(rightJoin)
-        rightJoin.filter((x) => x.isActive).forEach(getTabsForDapplet)
-        // The hack ends
+      const currentTab = await getThisTab()
+      const contextIds = await getCurrentContextIds(currentTab)
 
-        return rightJoin
+      const features: ManifestDTO[] = contextIds
+        ? await getFeaturesByHostnames(contextIds, dropdownListValue)
+        : []
+
+      const newDappletsList = features
+        .filter((f) => f.type === ModuleTypes.Feature)
+        .map((f) => ({
+          ...f,
+          isLoading: false,
+          isActionLoading: false,
+          isHomeLoading: false,
+          error: null,
+          versions: [],
+        }))
+      // todo: end
+
+      // todo:  get old state  and condition to old state for new state
+      setModule(newDappletsList)
+
+      setDapplets(newDappletsList)
+
+      newDappletsList.map((x) => {
+        if (x.isActive) getTabsForDapplet(x)
       })
     } catch (err) {
       console.error(err)
