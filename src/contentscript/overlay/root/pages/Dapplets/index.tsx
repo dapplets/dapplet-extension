@@ -54,6 +54,7 @@ export const Dapplets = ({
   navigate,
   search,
 }: DappletsProps) => {
+  // todo: loaded to app and
   const [dapplets, setDapplets] = useState<ManifestAndDetails[] | null>([])
   const [isLoadingListDapplets, setLoadingListDapplets] = useState(false)
   const [isNoContentScript, setNoContentScript] = useState<boolean>(null)
@@ -126,10 +127,8 @@ export const Dapplets = ({
   }, [])
 
   const _refreshData = async () => {
-    console.log(dropdownListValue)
-    console.log(getTabsForDapplet)
-
     try {
+      //todo: must be in app
       const { getThisTab, getCurrentContextIds, getFeaturesByHostnames } = await initBGFunctions(
         browser
       )
@@ -151,6 +150,9 @@ export const Dapplets = ({
           error: null,
           versions: [],
         }))
+      // todo: end
+
+      // todo:  get old state  and condition to old state for new state
       setModule(newDappletsList)
 
       setDapplets(newDappletsList)
