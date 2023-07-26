@@ -243,6 +243,11 @@ export default class GlobalConfigService {
         isEnabled: false,
       },
       {
+        url: 'http://localhost:3000/dapplet.json',
+        isDev: true,
+        isEnabled: false,
+      },
+      {
         url: 'http://localhost:3001/dapplet.json',
         isDev: true,
         isEnabled: false,
