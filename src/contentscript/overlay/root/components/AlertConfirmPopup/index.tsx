@@ -4,6 +4,7 @@ import NO_LOGO from '../../../../../common/resources/no-logo.png'
 import { ModalProps } from '../../contexts/ModalContext/ModalContext'
 import { LinkifyText } from '../LinkifyText'
 import stylesNotifications from '../OverlayToolbar/OverlayToolbar.module.scss'
+import { StorageRefImg } from '../StorageRefImg'
 import stylesAlerts from './AlertConfirmPopup.module.scss'
 
 const AlertConfirmPopup = (props: { payload: ModalProps }) => {
@@ -35,7 +36,7 @@ const AlertConfirmPopup = (props: { payload: ModalProps }) => {
       <div className={stylesNotifications.notificationBlockTop}>
         <div className={stylesNotifications.iconNotificationBlock}>
           <div className={cn(stylesNotifications.iconNotification, stylesAlerts.iconAlert)}>
-            <img src={icon ? icon.uris[0] : NO_LOGO} />
+            <StorageRefImg storageRef={icon} noImgSrc={NO_LOGO} />
           </div>
         </div>
         <div className={isNarrowModal ? stylesAlerts.textPartSmall : stylesAlerts.textPartBig}>
