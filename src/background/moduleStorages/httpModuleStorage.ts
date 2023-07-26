@@ -1,4 +1,3 @@
-import { NotImplementedError } from '../../common/errors'
 import { timeoutPromise } from '../../common/helpers'
 import { Storage as ModuleStorage } from './storage'
 
@@ -37,9 +36,5 @@ export class HttpModuleStorage implements ModuleStorage {
     if (!json.success) throw new Error(json.message || 'Error in saveToStorage')
     const url = `${registryUrl}/storage/${json.data}`
     return url
-  }
-
-  saveDir(): Promise<string> {
-    throw new NotImplementedError()
   }
 }

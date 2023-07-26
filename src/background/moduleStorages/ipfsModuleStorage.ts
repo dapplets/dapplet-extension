@@ -1,4 +1,3 @@
-import { NotImplementedError } from '../../common/errors'
 import { joinUrls, timeoutPromise } from '../../common/helpers'
 import { Storage as ModuleStorage } from './storage'
 
@@ -53,9 +52,5 @@ export class IpfsModuleStorage implements ModuleStorage {
     if (!cid) throw new Error('Cannot upload file to IPFS') // ToDo: show message
     const url = 'ipfs://' + cid
     return url
-  }
-
-  public async saveDir(): Promise<string> {
-    throw new NotImplementedError()
   }
 }

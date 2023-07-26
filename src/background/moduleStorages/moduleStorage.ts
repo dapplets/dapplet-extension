@@ -109,6 +109,11 @@ export class StorageAggregator {
 
     for (const storageType of targetStorages) {
       const storage = await this._getStorageByType(storageType)
+
+      if (!storage.saveDir) {
+        continue
+      }
+
       const uri = await storage.saveDir({ files, hash, tar })
       uris.push(uri)
     }
