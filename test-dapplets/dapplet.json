@@ -8,5 +8,8 @@
   "./dapplets/twitter-demo/dapplet.json",
   "./dapplets/test-alerts-dapplet/dapplet.json",
   "./dapplets/core-notify-subscribe-decorator/dapplet.json",
-  "./dapplets/core-notify-subscribe-manually/dapplet.json"
+  "./dapplets/core-notify-subscribe-manually/dapplet.json",
+  "./dapplets/inject-via-activate/dapplet.json",
+  "./dapplets/inject-via-props/dapplet.json",
+  "./dapplets/inject-via-constructor/dapplet.json"
 ]
