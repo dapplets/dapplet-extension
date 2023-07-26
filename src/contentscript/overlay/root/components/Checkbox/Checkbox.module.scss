@@ -10,6 +10,35 @@
   max-width: 85px;
 }
 
+.active {
+  cursor: pointer;
+  background: $primary;
+  border: none;
+
+  svg {
+    position: absolute;
+    transform: translate(4px, 5px);
+    width: 8px;
+    height: 6px;
+  }
+
+  &:hover {
+    svg {
+      position: absolute;
+      transform: translate(4px, 5px);
+
+      width: 8px;
+      height: 6px;
+
+      fill: white !important;
+
+      path {
+        fill: white !important;
+      }
+    }
+  }
+}
+
 .fakeInputCheckbox {
   cursor: pointer;
 
@@ -132,35 +161,6 @@ div.supportLabel:focus::before {
   height: 100%;
 
   opacity: 0;
-}
-
-.active {
-  cursor: pointer;
-  background: $primary;
-  border: none;
-
-  svg {
-    position: absolute;
-    transform: translate(4px, 5px);
-    width: 8px;
-    height: 6px;
-  }
-
-  &:hover {
-    svg {
-      position: absolute;
-      transform: translate(4px, 5px);
-
-      width: 8px;
-      height: 6px;
-
-      fill: white !important;
-
-      path {
-        fill: white !important;
-      }
-    }
-  }
 }
 
 .inputCheckboxTitle {

@@ -332,7 +332,9 @@
 
   a {
     cursor: pointer;
+
     max-width: 90%;
+
     font-family: Roboto, sans-serif;
     font-size: 14px;
     font-weight: 400;
@@ -396,12 +398,13 @@
 }
 
 .titleNotification {
+  display: flex;
+
   font-family: Roboto, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 149%;
   color: $content-black;
-  display: flex;
 }
 
 .messageNotification {
@@ -605,9 +608,9 @@
 
   transition: all 0.5s ease;
 }
+
 .blockNotificationInfo {
   display: flex;
   flex-direction: column;
-
   width: 95%;
 }
