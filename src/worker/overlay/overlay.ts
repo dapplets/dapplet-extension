@@ -57,7 +57,7 @@ export class OverlayIframe implements IOverlay {
 
   close(): void {
     this._iframeMessenger.call('OVERLAY_CLOSE', [this.id], this._target)
-    this.onclose?.()
+    // callback onClose will be called in OVERLAY_CLOSED handler asynchroniously
   }
 
   send(topic: string, args: any[]): void {
