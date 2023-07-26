@@ -121,7 +121,10 @@ export class ProxyAdapter {
         if (!widgetFactory) return null
 
         const widget: InjectedWidget = await widgetFactory(ctxRef)
-        widget.state.state.init?.(ctxRef, widget.state.state) // ToDo: can be buggy when widgetFactory returns value asynchronously
+
+        // widget.state.init callback is called below in _onWidgetEvent
+        // it is called asynchronously, so there are side effects possible
+
         this._widgets.set(widget.widgetId, widget)
         const stateValues = widget.state.getStateValues()
 
