@@ -22,6 +22,8 @@ import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { WidgetButton } from '../../widgets/button'
 import { LabelButton } from '../../widgets/label'
+import AlertConfirmPopup from '../AlertConfirmPopup'
+import { useModal } from '../AlertConfirmPopup/contexts/ModalContext'
 import { CloseIcon } from '../CloseIcon'
 import { DappletImage } from '../DappletImage'
 import { LinkifyText } from '../LinkifyText'
@@ -149,6 +151,8 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
     setNewNotifications([...newNotifications, payload])
   }, [payload])
+
+  const { modals } = useModal()
 
   const _refreshData = async () => {
     try {
@@ -528,6 +532,10 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               {newNotifications && newNotifications.length
                 ? newNotifications.map((x, i) => getAnimateNotifification(x, true, i))
                 : null}
+              {modals.length > 0 &&
+                modals.map((alertOrConfirm) => (
+                  <AlertConfirmPopup key={alertOrConfirm.id} payload={alertOrConfirm} />
+                ))}
             </div>
             {/* {isPinnedNotification && getAnimateNotifification(payload, true)} */}
 

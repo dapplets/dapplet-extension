@@ -4,7 +4,12 @@ import ModuleInfo from '../../background/models/moduleInfo'
 import VersionInfo from '../../background/models/versionInfo'
 import { formatModuleId, joinUrls, parseShareLink } from '../../common/helpers'
 import { NotificationPayload } from '../../common/models/notification'
-import { LoginRequest, NearNetworks, SandboxEnvironmentVariables } from '../../common/types'
+import {
+  LoginRequest,
+  NearNetworks,
+  SandboxEnvironmentVariables,
+  TAlertAndConfirmPayload,
+} from '../../common/types'
 import { initBGFunctions, sendRequest } from '../communication'
 import { IOverlayManager } from '../overlay/interfaces'
 import { AppStorage } from './appStorage'
@@ -82,14 +87,30 @@ export class Core {
     this.events = moduleEventBus
   }
 
-  public async confirm(message: string): Promise<boolean> {
-    console.error('Core.confirm() is deprecated. Use Core.notify() instead.')
-    return sendRequest('confirm', message)
+  private async _alertOrConfirm(message: string, type: 'alert' | 'confirm'): Promise<boolean> {
+    const {
+      getThisTab,
+      getModuleInfoByName,
+      showAlertOrConfirm,
+    }: {
+      getThisTab: () => Promise<{ id: number }>
+      getModuleInfoByName: (url: string, name: string) => Promise<ModuleInfo>
+      showAlertOrConfirm: (payload: TAlertAndConfirmPayload, tabId: number) => Promise<boolean>
+    } = initBGFunctions()
+    const moduleInfo = await getModuleInfoByName(this.manifest.registryUrl, this.manifest.name)
+    const thisTab = await getThisTab()
+    return showAlertOrConfirm(
+      { title: moduleInfo.title, message, icon: moduleInfo.icon, type },
+      thisTab.id
+    )
   }
 
   public async alert(message: string): Promise<void> {
-    console.error('Core.alert() is deprecated. Use Core.notify() instead.')
-    return sendRequest('alert', message)
+    await this._alertOrConfirm(message, 'alert')
+  }
+
+  public async confirm(message: string): Promise<boolean> {
+    return this._alertOrConfirm(message, 'confirm')
   }
 
   public async notify(payloadOrMessage: NotificationPayload | string) {

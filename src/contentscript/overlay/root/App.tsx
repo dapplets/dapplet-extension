@@ -37,6 +37,7 @@ import { PopupItem } from './components/PopupItem'
 import { Profile } from './components/Profile'
 import { Search } from './components/Search'
 // import { ShareButton } from './components/ShareButton'
+import { ModalProvider } from './components/AlertConfirmPopup/contexts/ModalContext'
 import { SquaredButton } from './components/SquaredButton'
 import { SystemPopup } from './components/SystemPopup'
 import { Overlay } from './overlay'
@@ -686,7 +687,9 @@ const queryClient = new QueryClient()
 export const App = (props: any) => (
   <MemoryRouter>
     <QueryClientProvider client={queryClient}>
-      <__App {...props} />
+      <ModalProvider>
+        <__App {...props} />
+      </ModalProvider>
     </QueryClientProvider>
   </MemoryRouter>
 )

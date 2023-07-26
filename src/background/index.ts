@@ -14,6 +14,7 @@ import {
 } from '../common/helpers'
 import * as tracing from '../common/tracing'
 import { StorageAggregator } from './moduleStorages/moduleStorage'
+import { showAlertOrConfirm } from './services/alertService'
 import { AnalyticsGoals, AnalyticsService } from './services/analyticsService'
 import ConnectedAccountService from './services/connectedAccountService'
 import DiscordService from './services/discordService'
@@ -285,6 +286,9 @@ browser.runtime.onMessage.addListener(
     openConnectedAccountsPopup: overlayService.openConnectedAccountsPopup.bind(overlayService),
     execConnectedAccountsUpdateHandler:
       overlayService.execConnectedAccountsUpdateHandler.bind(overlayService),
+
+    // Alert & Confirm
+    showAlertOrConfirm,
 
     // Connected Account Service
     getPreferredConnectedAccountsNetwork:

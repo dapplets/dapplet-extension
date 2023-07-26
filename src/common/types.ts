@@ -127,6 +127,13 @@ export type StorageRef = {
   uris: string[]
 }
 
+export type TAlertAndConfirmPayload = {
+  title: string
+  message: string
+  icon?: StorageRef
+  type: 'alert' | 'confirm'
+}
+
 export type TConnectedAccountsVerificationRequestInfo = {
   firstAccount: string
   secondAccount: string
