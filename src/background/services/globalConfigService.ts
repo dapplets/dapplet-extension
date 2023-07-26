@@ -530,10 +530,14 @@ export default class GlobalConfigService {
   async addTrustedUser(account: string) {
     const config = await this.get()
     if (config.trustedUsers.find((r) => r.account === account)) return
+    // todo: added reg exp for validation hexadecimal adresses near
+    const regExp16thNearAddress = new RegExp(/^[a-zA-Z0-9\s]{16,128}$/)
 
     const isEthAddress = typeOfUri(account) === UriTypes.Ethereum
     const isEnsAddress = typeOfUri(account) === UriTypes.Ens
-    const isNearAddress = typeOfUri(account) === UriTypes.Near
+    // todo: added reg exp for validation hexadecimal adresses near
+    const isNearAddress =
+      typeOfUri(account) === UriTypes.Near || account.match(regExp16thNearAddress)
 
     if (!isEthAddress && !isEnsAddress && !isNearAddress)
       throw Error('User account must be valid Ethereum or NEAR Protocol address')
