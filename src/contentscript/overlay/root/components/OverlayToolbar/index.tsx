@@ -385,8 +385,10 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               )}
             </div>
             <div className={styles.blockNotificationInfo}>
-              <div className={styles.titleNotification}>
-                <LinkifyText>{payload.title}</LinkifyText>
+              <div className={styles.titleNotificationWrapper}>
+                <div className={styles.titleNotification}>
+                  <LinkifyText>{payload.title}</LinkifyText>
+                </div>
                 <span className={styles.date}>
                   <span>
                     {addZero(dateNum(payload.createdAt).getFullYear()) +
