@@ -12,7 +12,7 @@ export class OverlayManagerIframe implements IOverlayManager {
   togglePanel(): void {}
   openPopup(): void {}
   unregisterAll(source: string): void {
-    this._iframeMessenger.call('OVERLAY_MANAGER_UNREGISTER_ALL', [source], window.top)
+    this._iframeMessenger.call('OVERLAY_MANAGER_UNREGISTER_ALL', [source], self)
   }
   close(): void {}
   open(): void {}

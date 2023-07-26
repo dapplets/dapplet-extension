@@ -19,20 +19,17 @@ export class OverlayIframe implements IOverlay {
   public readonly id = generateGuid()
   private _callbacks = new Set<Function>()
 
-  private _target: Window
-
   constructor(private _iframeMessenger: JsonRpc, config: OverlayConfig) {
     this.url = config.url
     this.title = config.title
     this.source = config.source ?? null
     this.hidden = config.hidden ?? false
     this.parent = config.parent ?? null
-    this._target = typeof window !== 'undefined' ? window.top : self // ToDo: merge with /content/overlay/iframe
 
     this._iframeMessenger.call(
       'OVERLAY_CREATE',
       [this.id, this.url, this.title, this.source, this.hidden],
-      this._target
+      self
     )
     this._iframeMessenger.on('OVERLAY_EXEC', (id: string, topic: string, message: string) => {
       if (id !== this.id) return
@@ -52,20 +49,20 @@ export class OverlayIframe implements IOverlay {
   }
 
   open(callback?: Function): void {
-    this._iframeMessenger.call('OVERLAY_OPEN', [this.id], this._target).then(() => callback?.())
+    this._iframeMessenger.call('OVERLAY_OPEN', [this.id], self).then(() => callback?.())
   }
 
   close(): void {
-    this._iframeMessenger.call('OVERLAY_CLOSE', [this.id], this._target)
+    this._iframeMessenger.call('OVERLAY_CLOSE', [this.id], self)
     // callback onClose will be called in OVERLAY_CLOSED handler asynchroniously
   }
 
   send(topic: string, args: any[]): void {
-    this._iframeMessenger.call('OVERLAY_SEND', [this.id, topic, args], this._target)
+    this._iframeMessenger.call('OVERLAY_SEND', [this.id, topic, args], self)
   }
 
   exec(topic: string, message: any): Promise<void> {
-    return this._iframeMessenger.call('OVERLAY_EXEC', [this.id, topic, message], this._target)
+    return this._iframeMessenger.call('OVERLAY_EXEC', [this.id, topic, message], self)
   }
 
   onMessage(handler: (topic: string, message: any) => void): { off: () => void } {
