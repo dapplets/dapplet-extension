@@ -6,5 +6,7 @@
   "./dapplets/test-common-dapplet/dapplet.json",
   "./dapplets/test-dynamic-dapplet/dapplet.json",
   "./dapplets/twitter-demo/dapplet.json",
-  "./dapplets/test-alerts-dapplet/dapplet.json"
+  "./dapplets/test-alerts-dapplet/dapplet.json",
+  "./dapplets/core-notify-subscribe-decorator/dapplet.json",
+  "./dapplets/core-notify-subscribe-manually/dapplet.json"
 ]
