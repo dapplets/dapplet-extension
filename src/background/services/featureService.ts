@@ -675,7 +675,11 @@ export default class FeatureService {
           const arr = await this._storageAggregator
             .getResource({ uris: [assetManifestUrl], hash: null })
             .catch(() => {
-              throw new Error('Cannot find an assets manifest by the URL: ' + assetManifestUrl)
+              throw new Error(
+                `Cannot find the assets manifest by the URL: ${assetManifestUrl}` +
+                  'Check file availability. Perhaps the problem is in the self-signed SSL certificate. ' +
+                  'Some browsers require you to add the certificate to the trusted ones using the built-in OS tools.'
+              )
             })
           const json = String.fromCharCode.apply(null, new Uint8Array(arr))
 
@@ -696,7 +700,7 @@ export default class FeatureService {
             )
           ) {
             throw new Error(
-              'An assets manifest must be a valid JSON object.\n' +
+              'The assets manifest must be a valid JSON object.\n' +
                 'Example: {"index.html": "index.html", "styles.css": "css-62d9da.css"}\n' +
                 'Requested URL: ' +
                 assetManifestUrl
