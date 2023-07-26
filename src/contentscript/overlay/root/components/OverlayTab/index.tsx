@@ -74,12 +74,21 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
     }
 
     handleUpdateNotifications()
+
+    const handleShowNotification = (message) => {
+      if (!message || !message.type) return
+
+      if (message.type === 'SHOW_NOTIFICATION') {
+        return handleUpdateNotifications()
+      }
+    }
+
     EventBus.on('notifications_updated', handleUpdateNotifications)
-    EventBus.on('show_notification', handleUpdateNotifications)
+    browser.runtime.onMessage.addListener(handleShowNotification)
 
     return () => {
       EventBus.off('notifications_updated', handleUpdateNotifications)
-      EventBus.off('show_notification', handleUpdateNotifications)
+      browser.runtime.onMessage.removeListener(handleShowNotification)
     }
   }, [])
 

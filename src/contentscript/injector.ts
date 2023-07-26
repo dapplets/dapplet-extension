@@ -61,7 +61,7 @@ export class Injector {
   public availableContextIds: string[] = []
   public registry: RegistriedModule[] = []
 
-  private _dynamicAdapter: DynamicAdapter<any>
+  private _dynamicAdapter: DynamicAdapter
   private _iframeContainer = new IFrameContainer()
 
   constructor(
@@ -194,7 +194,7 @@ export class Injector {
             name: m.manifest.name,
             branch: m.manifest.branch,
             version: m.manifest.version,
-            runtime: loadingResult.runtime,
+            runtime: loadingResult?.runtime,
           },
         })
       } catch (err) {
@@ -370,11 +370,16 @@ export class Injector {
           throw new Error('SCRIPT should be parsed in the background!')
         }
 
-        this._registerModule(
-          module,
-          ConfigAdapter,
-          () => new ConfigAdapter(this._dynamicAdapter, scriptOrConfig)
-        )
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const me = this
+
+        const ExtendedConfigAdapter = class extends ConfigAdapter {
+          constructor() {
+            super(manifest.name, me._dynamicAdapter, scriptOrConfig as ParserConfig)
+          }
+        }
+
+        this._registerModule(module, ExtendedConfigAdapter)
 
         continue
       }
@@ -474,7 +479,7 @@ export class Injector {
         return this._registerModule(
           BuiltInModules[name],
           BuiltInModules[name].clazz,
-          () => new BuiltInModules[name].clazz()
+          () => new BuiltInModules[name].clazz() // ToDo: instantiate built-in modules in loadModules() method
         )
       }
     }
@@ -526,7 +531,7 @@ export class Injector {
       const cfgsKey = Symbol()
       const featureId = contextModule.manifest.name
       return new Proxy(proxiedModule.instance, {
-        get: function (target: IContentAdapter<any>, prop) {
+        get: function (target: IContentAdapter, prop) {
           if (prop === 'attachConfig') {
             return (cfg: any) => {
               if (contextModule.manifest.type === ModuleTypes.Feature) {

@@ -13,6 +13,7 @@ import {
   WalletTypes,
 } from '../../../../../../common/types'
 import { ReactComponent as Card } from '../../../assets/svg/card.svg'
+import { truncateEthAddress } from '../../../helpers/truncateEthAddress'
 import { Wallet } from '../../../pages/Wallet'
 import { Modal as ModalWallet } from '../../Modal'
 import { ModalLogin } from '../ModalLogin'
@@ -58,11 +59,6 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
   const [walletTypeWalletConnect, setWalletTypeWalletConnect] = useState(null)
   const liRef = useRef<HTMLDivElement>()
 
-  const newVisible = (hash: string): string => {
-    const firstCharacters = hash.substring(0, 6)
-    const lastCharacters = hash.substring(hash.length - 0, hash.length - 4)
-    return `${firstCharacters}...${lastCharacters}`
-  }
   // const isEveryWalletConnected = descriptors.filter((x) => !x.connected).length === 0
 
   useEffect(() => {
@@ -116,7 +112,7 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         if (newDescriptors.type === 'near') {
           setWalletAccount(newDescriptors.account)
         } else {
-          setWalletAccount(newDescriptors.account && newVisible(newDescriptors.account))
+          setWalletAccount(newDescriptors.account && truncateEthAddress(newDescriptors.account))
         }
         if (newDescriptors.type !== 'dapplets') {
           setWalletIcon(newDescriptors.meta.icon)

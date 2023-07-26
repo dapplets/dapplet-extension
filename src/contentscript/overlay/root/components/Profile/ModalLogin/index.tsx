@@ -8,6 +8,7 @@ import { DefaultSigners, WalletDescriptor } from '../../../../../../common/types
 import { ReactComponent as Copy } from '../../../assets/svg/copyModal.svg'
 import { ReactComponent as Disconnect } from '../../../assets/svg/logOut.svg'
 import { ReactComponent as WalletImg } from '../../../assets/svg/wallet.svg'
+import { truncateEthAddress } from '../../../helpers/truncateEthAddress'
 import useCopied from '../../../hooks/useCopyed'
 import styles from './Modal.module.scss'
 
@@ -55,12 +56,6 @@ export const ModalLogin = ({
   })
 
   if (!visible) return null
-
-  const newVisible = (hash: string): string => {
-    const firstCharacters = hash.substring(0, 6)
-    const lastCharacters = hash.substring(hash.length - 0, hash.length - 4)
-    return `${firstCharacters}...${lastCharacters}`
-  }
 
   const handleWalletClick = async (wallet: WalletDescriptor) => {
     const { setWalletFor } = await initBGFunctions(browser)
@@ -110,7 +105,7 @@ export const ModalLogin = ({
 
           <p className={styles.notEnsHash}>
             {selectedWalletDescriptor?.account
-              ? newVisible(selectedWalletDescriptor?.account)
+              ? truncateEthAddress(selectedWalletDescriptor?.account)
               : 'Wallets'}
           </p>
         </div>
@@ -134,7 +129,7 @@ export const ModalLogin = ({
                     <div className={styles.meta}>
                       {x.type !== 'near' ? (
                         <p title={x.account} className={styles.newProfileBlockName}>
-                          {newVisible(x.account)}
+                          {truncateEthAddress(x.account)}
                         </p>
                       ) : (
                         <p title={x.account} className={styles.newProfileBlockNameNear}>
@@ -171,9 +166,7 @@ export const ModalLogin = ({
                 </div>
                 <div className={styles.profileImgButtonBlock}>
                   <button
-                    onClick={() => {
-                      disconnectButtonClick(x.chain, x.type)
-                    }}
+                    onClick={() => disconnectButtonClick(x.chain, x.type)}
                     className={styles.profileImgButton}
                   >
                     <Disconnect />
@@ -181,32 +174,13 @@ export const ModalLogin = ({
                 </div>
               </div>
             ))}
-          {connectWallet && (
+          {connectWallet && wallets.length < 4 && (
             <div
               className={styles.addWallet}
-              onClick={() => {
-                wallets.length >= 5 ? null : connectWallet()
-              }}
+              onClick={connectWallet}
               data-testid="add-wallet-btn-profile-widget"
             >
-              <span
-                data-title={
-                  wallets.length >= 5
-                    ? 'All of your wallets are already connected Disconnect one of them to add a new one'
-                    : null
-                }
-                className={cn(styles.AddUserLabel, {
-                  [styles.addWalletsDisabled]: wallets.length >= 5,
-                })}
-              >
-                Add Wallet
-                {wallets.length >= 5 ? (
-                  <span className={styles.copied}>
-                    All of your wallets are already connected Disconnect one of them to add a new
-                    one
-                  </span>
-                ) : null}
-              </span>
+              <span className={styles.AddUserLabel}>Add Wallet</span>
             </div>
           )}
         </div>

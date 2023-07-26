@@ -4,6 +4,7 @@ import browser from 'webextension-polyfill'
 import { generateGuid } from '../../common/generateGuid'
 import { JsonRpc, RpcMessageEvent } from '../../common/jsonrpc'
 import { BaseEvent, SandboxInitializationParams } from '../../common/types'
+import { DappletConfig } from '../modules/dynamic-adapter/types'
 import { IFrameContainer } from './iframeContainer'
 import { IFrameWorker } from './iframeWorker'
 
@@ -87,7 +88,7 @@ export abstract class DappletExecutor {
   }) {
     const adapter = this.getDependency(adapterName)
 
-    const config = {
+    const config: DappletConfig = {
       events: {
         context_changed: (_, newContext, oldContext, contextName) => {
           // is a parsed context?
@@ -111,6 +112,7 @@ export abstract class DappletExecutor {
           contextName,
           adapterName,
         })
+
         const factories = widgets.map((widget) => {
           const widgetFactory = adapter.exports[widget.widgetName]
           const callbacks = widget.listeningEvents.reduce((acc, eventName) => {

@@ -1,11 +1,12 @@
 import { BehaviorSubjectProxy } from 'rxjs-proxify'
+import { DappletConfig } from './modules/dynamic-adapter/types'
 
 export interface IModule {}
 
-export interface IContentAdapter<IAdapterConfig> extends IModule {
+export interface IContentAdapter extends IModule {
   exports?: ((featureId: string) => any) | any
-  attachConfig(config: IAdapterConfig, feature?: any): { $: (ctx: any, id: string) => any }
-  detachConfig(config: IAdapterConfig, featureId?: string): void
+  attachConfig(config: DappletConfig, feature?: any): { $: (ctx: any, id: string) => any }
+  detachConfig(config: DappletConfig, featureId?: string): void
 }
 
 export interface IFeature extends IModule {
