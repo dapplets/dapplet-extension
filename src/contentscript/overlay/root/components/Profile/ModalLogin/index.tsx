@@ -10,6 +10,7 @@ import { ReactComponent as Disconnect } from '../../../assets/svg/logOut.svg'
 import { ReactComponent as WalletImg } from '../../../assets/svg/wallet.svg'
 import useCopied from '../../../hooks/useCopyed'
 import styles from './Modal.module.scss'
+import { cutString } from '../../../helpers/cutString'
 
 interface ModalLoginProps {
   visible: boolean
@@ -56,11 +57,7 @@ export const ModalLogin = ({
 
   if (!visible) return null
 
-  const newVisible = (hash: string): string => {
-    const firstCharacters = hash.substring(0, 6)
-    const lastCharacters = hash.substring(hash.length - 0, hash.length - 4)
-    return `${firstCharacters}...${lastCharacters}`
-  }
+ 
 
   const handleWalletClick = async (wallet: WalletDescriptor) => {
     const { setWalletFor } = await initBGFunctions(browser)
@@ -110,7 +107,7 @@ export const ModalLogin = ({
 
           <p className={styles.notEnsHash}>
             {selectedWalletDescriptor?.account
-              ? newVisible(selectedWalletDescriptor?.account)
+              ? cutString(selectedWalletDescriptor?.account)
               : 'Wallets'}
           </p>
         </div>
@@ -134,7 +131,7 @@ export const ModalLogin = ({
                     <div className={styles.meta}>
                       {x.type !== 'near' ? (
                         <p title={x.account} className={styles.newProfileBlockName}>
-                          {newVisible(x.account)}
+                          {cutString(x.account)}
                         </p>
                       ) : (
                         <p title={x.account} className={styles.newProfileBlockNameNear}>
