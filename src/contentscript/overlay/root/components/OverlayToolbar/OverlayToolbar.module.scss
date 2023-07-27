@@ -528,6 +528,7 @@
 @keyframes animate-notification {
   to {
     transform: translateX(400px);
+    opacity: 0;
   }
 }
 

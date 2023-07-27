@@ -12,22 +12,18 @@ import { widgets } from '../../../../modules/adapter-overlay/src'
 import { ReactComponent as Show } from '../../assets/icons/iconsWidgetButton/show.svg'
 import { ReactComponent as Notification } from '../../assets/icons/notificationIcons/bell.svg'
 import { ReactComponent as NotificationWithCircle } from '../../assets/icons/notificationIcons/bellWithNotification.svg'
-import { ReactComponent as Noties } from '../../assets/icons/notificationIcons/defaultIcon.svg'
 import {
   ReactComponent as Account,
   ReactComponent as DappletsLogo,
 } from '../../assets/newIcon/mustache.svg'
 import { useModal } from '../../contexts/ModalContext'
-import { addZero } from '../../helpers/addZero'
 import { useToggle } from '../../hooks/useToggle'
 import { ToolbarTab, ToolbarTabMenu } from '../../types'
 import { WidgetButton } from '../../widgets/button'
 import { LabelButton } from '../../widgets/label'
 import AlertConfirmPopup from '../AlertConfirmPopup'
-import { CloseIcon } from '../CloseIcon'
-import { DappletImage } from '../DappletImage'
-import { LinkifyText } from '../LinkifyText'
 import { OverlayTab } from '../OverlayTab'
+import { NotificationOverlay } from './Notification'
 import styles from './OverlayToolbar.module.scss'
 
 const SYSTEM_TAB: ToolbarTab = {
@@ -184,7 +180,9 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       console.error(err)
     }
   }
-
+  const onRemoveNotifications = (payload) => {
+    setNewNotifications(newNotifications.filter((x) => x.id !== payload.id))
+  }
   const getWigetsConstructor = (widgets, isMenu?: boolean) => {
     if (widgets && widgets.length > 0) {
       const widgetsInConstructor = widgets
@@ -338,110 +336,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     )
   }
 
-  // ToDo: hard to read code, refactor
-  const getAnimateNotifification = (payload: any, isPinned: boolean, index: any) => {
-    async function handleActionButtonClick(actionId: string) {
-      const { resolveNotificationAction, getThisTab } = await initBGFunctions(browser)
-      const thisTab = await getThisTab()
-
-      setTimeout(() => {
-        const d = newNotifications.filter((x) => x.id !== payload.id)
-        setNewNotifications(d)
-      }, 500)
-
-      await resolveNotificationAction(payload.id, actionId, thisTab.id)
-    }
-    const dateNum = (date) => {
-      const newDateNum = new Date(date)
-      return newDateNum
-    }
-    if ((payload && payload.actions?.length === 0) || (payload && !payload.actions)) {
-      setTimeout(() => {
-        notificationRef.current.classList.add('remove_notification')
-      }, 59500)
-      setTimeout(() => {
-        setPinnedNotification(false)
-        const d = newNotifications.filter((x) => x.id !== payload.id)
-
-        setNewNotifications(d)
-      }, 60000)
-    }
-    if (payload) {
-      return (
-        <div
-          key={index}
-          data-testid="notification-label"
-          ref={notificationRef}
-          className={cn(styles.widgetButtonNotification, {
-            [styles.widgetButtonAnimatePinnedNotification]: isPinnedNotification,
-          })}
-        >
-          <div className={styles.notificationBlockTop}>
-            <div className={styles.iconNotificationBlock}>
-              {payload.icon ? (
-                <DappletImage storageRef={payload.icon} className={styles.iconNotification} />
-              ) : (
-                <Noties />
-              )}
-            </div>
-            <div className={styles.blockNotificationInfo}>
-              <div className={styles.titleNotificationWrapper}>
-                <div className={styles.titleNotification}>
-                  <LinkifyText>{payload.title}</LinkifyText>
-                </div>
-                <span className={styles.date}>
-                  <span>
-                    {addZero(dateNum(payload.createdAt).getFullYear()) +
-                      '.' +
-                      addZero(dateNum(payload.createdAt).getMonth() + 1) +
-                      '.' +
-                      addZero(dateNum(payload.createdAt).getDate())}
-                  </span>{' '}
-                  <span>
-                    {addZero(dateNum(payload.createdAt).getHours()) +
-                      ':' +
-                      addZero(dateNum(payload.createdAt).getMinutes())}
-                  </span>
-                </span>
-                <CloseIcon
-                  className={styles.closeMotification}
-                  appearance="small"
-                  color="red"
-                  isNotification
-                  onClick={(e) => {
-                    e.currentTarget.parentElement.parentElement.classList.add('remove_notification')
-                    setTimeout(() => {
-                      const d = newNotifications.filter((x) => x.id !== x.id)
-                      setNewNotifications(d)
-                      setPinnedNotification(false)
-                    }, 500)
-                  }}
-                />
-              </div>
-              {payload.message ? (
-                <div className={styles.messageNotification}>
-                  <LinkifyText>{payload.message}</LinkifyText>
-                </div>
-              ) : null}
-              {payload.actions?.length > 0 ? (
-                <div className={styles.buttonNotificationBlock}>
-                  {payload.actions.map(({ action, title }) => (
-                    <button
-                      className={styles.buttonNotification}
-                      key={action}
-                      onClick={() => handleActionButtonClick(action)}
-                    >
-                      {title}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      )
-    } else null
-  }
   const getNotifications = async () => {
     const backgroundFunctions = await initBGFunctions(browser)
     const { getNotifications, setRead } = backgroundFunctions
@@ -532,7 +426,19 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             </span>
             <div className={styles.notificationsWrapper}>
               {newNotifications && newNotifications.length
-                ? newNotifications.map((x, i) => getAnimateNotifification(x, true, i))
+                ? newNotifications.map(
+                    (x, i) => (
+                      <NotificationOverlay
+                        key={i}
+                        payload={x}
+                        onRemove={onRemoveNotifications}
+                        setPinnedNotification={setPinnedNotification}
+                        index={i}
+                        isPinnedNotification={isPinnedNotification}
+                      />
+                    )
+                    // getAnimateNotifification(x, true, i)
+                  )
                 : null}
               {modals.length > 0 &&
                 modals.map((alertOrConfirm) => (
