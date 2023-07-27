@@ -38,9 +38,9 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
   }
 
   if (payload && !payload.payload) {
-    setTimeout(() => {
-      notificationRef.current?.classList.add('remove_notification')
-    }, 9500)
+    // setTimeout(() => {
+    //   notificationRef.current?.classList.add('remove_notification')
+    // }, 9500)
     setTimeout(() => {
       setPinnedNotification(false)
 
@@ -91,9 +91,9 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
                 color="red"
                 isNotification
                 onClick={(e) => {
-                  e.currentTarget.parentElement.parentElement.parentElement.parentElement.classList.add(
-                    'remove_notification'
-                  )
+                  // e.currentTarget.parentElement.parentElement.parentElement.parentElement.classList.add(
+                  //   'remove_notification'
+                  // )
                   setTimeout(() => {
                     onRemove(payload)
 
