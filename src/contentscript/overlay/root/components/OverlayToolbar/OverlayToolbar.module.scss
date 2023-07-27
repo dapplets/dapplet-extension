@@ -63,8 +63,6 @@
 }
 
 .isOpenWallet {
-  position: relative;
-
   &::before {
     content: '';
 
@@ -112,6 +110,7 @@
 }
 
 .TabList {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -599,8 +598,8 @@
 .notificationsWrapper {
   position: absolute;
   z-index: -1;
-  top: 125px;
-  right: 52px;
+  top: 70px;
+  right: 36px;
 
   display: flex;
   flex-direction: column-reverse;
