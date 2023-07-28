@@ -1,6 +1,6 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
-import React, { ReactElement, useRef } from 'react'
+import React, { ReactElement, useEffect, useRef } from 'react'
 import browser from 'webextension-polyfill'
 import { ReactComponent as Noties } from '../../../assets/icons/notificationIcons/defaultIcon.svg'
 import { addZero } from '../../../helpers/addZero'
@@ -21,6 +21,29 @@ export interface NotificationOverlayProps {
 export const NotificationOverlay = (props: NotificationOverlayProps): ReactElement => {
   const { payload, onRemove, setPinnedNotification, index, isPinnedNotification } = props
   const notificationRef = useRef<HTMLDivElement>()
+
+  useEffect(() => {
+    if (payload && !payload.payload) {
+      const timerStyles = setTimeout(() => {
+        notificationRef.current?.classList.add('remove_notification')
+      }, 9500)
+
+      return () => {
+        clearTimeout(timerStyles)
+      }
+    }
+  }, [])
+  useEffect(() => {
+    if (payload && !payload.payload) {
+      const timerStyles = setTimeout(() => {
+        notificationRef.current?.classList.add('remove_notification')
+      }, 9500)
+
+      return () => {
+        clearTimeout(timerStyles)
+      }
+    }
+  }, [])
   const handleActionButtonClick = async (actionId: string) => {
     const { resolveNotificationAction, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
@@ -33,17 +56,6 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
   const dateNum = (date) => {
     const newDateNum = new Date(date)
     return newDateNum
-  }
-
-  if (payload && !payload.payload) {
-    setTimeout(() => {
-      notificationRef.current?.classList.add('remove_notification')
-    }, 9500)
-    setTimeout(() => {
-      setPinnedNotification(false)
-
-      onRemove(payload)
-    }, 10000)
   }
 
   if (payload) {
