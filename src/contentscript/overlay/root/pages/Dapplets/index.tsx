@@ -12,8 +12,6 @@ import {
 import * as EventBus from '../../../../../common/global-event-bus'
 import { ManifestAndDetails } from '../../../../../common/types'
 import { Dapplet } from '../../components/Dapplet'
-import { Dropdown } from '../../components/Dropdown'
-import { DROPDOWN_LIST } from '../../components/Dropdown/dropdown-list'
 import { TabLoader } from '../../components/TabLoader'
 import { openLink } from '../../utils/openLink'
 import styles from './Dapplets.module.scss'
@@ -334,14 +332,15 @@ export const Dapplets = ({
   }
   return (
     <>
-      <div className={styles.wrapper}>
+      {/* todo: uncomment filter when will be more dapplets */}
+      {/* <div className={styles.wrapper}>
         <Dropdown
           list={DROPDOWN_LIST}
           title="Filter:"
           value={dropdownListValue}
           onChange={setDropdownListValue}
         />
-      </div>
+      </div> */}
       {isLoadingListDapplets ? (
         <TabLoader />
       ) : (
@@ -387,13 +386,6 @@ export const Dapplets = ({
                         className={styles.noDappletsLink}
                       >
                         twitter
-                      </span>{' '}
-                      and{' '}
-                      <span
-                        onClick={transitionLink('https://www.youtube.com/')}
-                        className={styles.noDappletsLink}
-                      >
-                        youtube
                       </span>
                     </span>
                   </>
