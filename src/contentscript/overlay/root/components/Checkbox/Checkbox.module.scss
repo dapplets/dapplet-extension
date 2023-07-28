@@ -9,6 +9,29 @@
   justify-content: space-between;
   max-width: 85px;
 }
+.fakeInputCheckbox {
+  cursor: pointer;
+
+  position: relative;
+
+  display: block;
+
+  width: 16px;
+  height: 16px;
+
+  background: $pure-white;
+  border: 1px solid $main-grey;
+  border-radius: 4px;
+
+  &:hover {
+    svg {
+      position: absolute;
+      transform: translate(3px, 4px);
+      width: 8px;
+      height: 6px;
+    }
+  }
+}
 
 .active {
   cursor: pointer;
@@ -39,29 +62,7 @@
   }
 }
 
-.fakeInputCheckbox {
-  cursor: pointer;
 
-  position: relative;
-
-  display: block;
-
-  width: 16px;
-  height: 16px;
-
-  background: $pure-white;
-  border: 1px solid $main-grey;
-  border-radius: 4px;
-
-  &:hover {
-    svg {
-      position: absolute;
-      transform: translate(3px, 4px);
-      width: 8px;
-      height: 6px;
-    }
-  }
-}
 
 .checkboxNotification {
   position: relative;

@@ -414,7 +414,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
           </SettingItem>
           <SettingItem title="Storages" component={<></>}>
             <div className={styles.checkboxBlock}>
-              <Checkbox isSupport isReadonly isCheckbox title="Centralized" />
+              <Checkbox disabled isSupport isReadonly isCheckbox title="Centralized" />
 
               <Checkbox
                 isCheckbox={targetStorages?.includes(StorageTypes.Ipfs)}
@@ -423,14 +423,14 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
                   changeTargetStorage(StorageTypes.Ipfs, e.target.checked)
                 }}
               />
-
-              <Checkbox
+              {/* todo: hidden or the time being */}
+              {/* <Checkbox
                 title="Swarm"
                 isCheckbox={targetStorages?.includes(StorageTypes.Swarm)}
                 onChange={(e) => {
                   changeTargetStorage(StorageTypes.Swarm, e.target.checked)
                 }}
-              />
+              /> */}
             </div>
           </SettingItem>
           <SettingItem title="Preferred Connected Accounts Network" component={<></>}>
@@ -456,7 +456,8 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
               inputOfFocusEtn={inputOfFocusEtn}
             />
           </SettingItem>
-          <SettingItem title="Swarm Gateway" component={<></>}>
+          {/* todo: hidden or the time being */}
+         {/* <SettingItem title="Swarm Gateway" component={<></>}>
             <InputPanelSettings
               isDynamycAdapter={false}
               isDefaultValueInput={swarmGatewayInputDefault}
@@ -473,7 +474,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
               onPress={onPress}
               inputOfFocusEtn={inputOfFocusSwarm}
             />
-          </SettingItem>
+          </SettingItem> 
           <SettingItem title="Swarm Postage Stamp ID" component={<></>}>
             <InputPanelSettings
               isDynamycAdapter={false}
@@ -497,7 +498,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
               loadProvider={loadSwarmPostageStampId}
               // onPress={onPress}
             />
-          </SettingItem>
+          </SettingItem> */}
           <SettingItem title="IPFS Gateway" component={<></>}>
             <InputPanelSettings
               isDynamycAdapter={false}
