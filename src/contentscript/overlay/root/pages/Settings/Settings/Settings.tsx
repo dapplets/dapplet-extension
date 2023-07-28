@@ -457,7 +457,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
             />
           </SettingItem>
           {/* todo: hidden or the time being */}
-          {/* <SettingItem title="Swarm Gateway" component={<></>}>
+         {/* <SettingItem title="Swarm Gateway" component={<></>}>
             <InputPanelSettings
               isDynamycAdapter={false}
               isDefaultValueInput={swarmGatewayInputDefault}
@@ -474,7 +474,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
               onPress={onPress}
               inputOfFocusEtn={inputOfFocusSwarm}
             />
-          </SettingItem> */}
+          </SettingItem> 
           <SettingItem title="Swarm Postage Stamp ID" component={<></>}>
             <InputPanelSettings
               isDynamycAdapter={false}
@@ -498,7 +498,7 @@ export const SettingsList: FC<SettingsListProps> = (props) => {
               loadProvider={loadSwarmPostageStampId}
               // onPress={onPress}
             />
-          </SettingItem>
+          </SettingItem> */}
           <SettingItem title="IPFS Gateway" component={<></>}>
             <InputPanelSettings
               isDynamycAdapter={false}
