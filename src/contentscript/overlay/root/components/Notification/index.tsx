@@ -58,7 +58,8 @@ export const Notification = (props: NotificationProps): ReactElement => {
               addZero(newDateNum.getMonth() + 1) +
               '.' +
               addZero(newDateNum.getDate())}
-          </span>{' '}
+          </span>
+          &nbsp;&nbsp;
           <span>{addZero(newDateNum.getHours()) + ':' + addZero(newDateNum.getMinutes())}</span>
         </span>
         {isRead !== 0 ? (
