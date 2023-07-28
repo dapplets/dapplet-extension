@@ -50,14 +50,28 @@ const AlertConfirmPopup = (props: { payload: ModalProps }) => {
             <button
               ref={buttonRef}
               className={stylesNotifications.buttonNotification}
-              onClick={() => onResolve(true)}
+              onClick={(e) => {
+                e.currentTarget.parentElement.parentElement.parentElement.parentElement.classList.add(
+                  'remove_notification'
+                )
+                setTimeout(() => {
+                  onResolve(true)
+                }, 500)
+              }}
             >
               Ok
             </button>
             {type === 'confirm' && (
               <button
                 className={stylesNotifications.buttonNotification}
-                onClick={() => onResolve(false)}
+                onClick={(e) => {
+                  e.currentTarget.parentElement.parentElement.parentElement.parentElement.classList.add(
+                    'remove_notification'
+                  )
+                  setTimeout(() => {
+                    onResolve(false)
+                  }, 500)
+                }}
               >
                 Cancel
               </button>

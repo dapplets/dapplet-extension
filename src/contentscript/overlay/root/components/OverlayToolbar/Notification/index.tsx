@@ -86,7 +86,7 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
                 </span>
               </span>
               <CloseIcon
-                className={styles.closeMotification}
+                className={styles.closeNotification}
                 appearance="small"
                 color="red"
                 isNotification
@@ -113,7 +113,14 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
                   <button
                     className={styles.buttonNotification}
                     key={action}
-                    onClick={() => handleActionButtonClick(action)}
+                    onClick={(e) => {
+                      e.currentTarget.parentElement.parentElement.parentElement.parentElement.classList.add(
+                        'remove_notification'
+                      )
+                      setTimeout(() => {
+                        handleActionButtonClick(action)
+                      }, 500)
+                    }}
                   >
                     {title}
                   </button>
