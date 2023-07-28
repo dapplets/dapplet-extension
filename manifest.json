@@ -51,7 +51,11 @@
       "all_frames": true
     },
     {
-      "matches": ["https://app.mynearwallet.com/*", "https://app.mynearwallet.com/*"],
+      "matches": [
+        "https://wallet.near.org/*",
+        "https://wallet.mainnet.near.org/*",
+        "https://wallet.testnet.near.org/*"
+      ],
       "js": ["documentstart.js"],
       "run_at": "document_start",
       "all_frames": true

@@ -6,16 +6,15 @@ export default class TestnetNearWallet extends NearWallet {
     super({
       networkId: 'testnet',
       nodeUrl: 'https://rpc.testnet.near.org',
-      walletUrl: 'https://testnet.mynearwallet.com',
+      walletUrl: 'https://wallet.testnet.near.org',
       helperUrl: 'https://helper.testnet.near.org',
-      explorerUrl: 'https://explorer.testnet.near.org',
     })
   }
 
   override async getMeta() {
     return {
-      name: 'MyNearWallet (Testnet)',
-      description: 'MyNearWallet (Testnet)',
+      name: 'NEAR Wallet (Testnet)',
+      description: 'NEAR Wallet (Testnet)',
       icon: walletIcons['near'],
     }
   }

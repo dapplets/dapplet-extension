@@ -6,16 +6,15 @@ export default class MainnetNearWallet extends NearWallet {
     super({
       networkId: 'mainnet',
       nodeUrl: 'https://rpc.mainnet.near.org',
-      walletUrl: 'https://app.mynearwallet.com',
+      walletUrl: 'https://wallet.mainnet.near.org',
       helperUrl: 'https://helper.mainnet.near.org',
-      explorerUrl: 'https://explorer.near.org',
     })
   }
 
   override async getMeta() {
     return {
-      name: 'MyNearWallet (Mainnet)',
-      description: 'MyNearWallet (Mainnet)',
+      name: 'NEAR Wallet (Mainnet)',
+      description: 'NEAR Wallet (Mainnet)',
       icon: walletIcons['near'],
     }
   }
