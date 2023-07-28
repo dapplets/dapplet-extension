@@ -10,9 +10,18 @@ export interface CheckboxProps
   isSupport?: boolean
   onChange?: (x) => void
   isReadonly?: boolean
+  disabled?: boolean
 }
 export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
-  const { title, isSupport = false, isCheckbox, onChange, isReadonly, ...anotherProps } = props
+  const {
+    title,
+    isSupport = false,
+    isCheckbox,
+    onChange,
+    isReadonly,
+    disabled,
+    ...anotherProps
+  } = props
 
   return (
     <div className={styles.supportBlockCheckbox}>
@@ -22,6 +31,7 @@ export const Checkbox: FC<CheckboxProps> = (props: CheckboxProps) => {
       >
         <label className={cn(styles.wrapper)}>
           <input
+            disabled={disabled}
             className={cn(styles.inputCheckbox)}
             type="checkbox"
             onChange={onChange}
