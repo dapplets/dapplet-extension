@@ -33,17 +33,7 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
       }
     }
   }, [])
-  useEffect(() => {
-    if (payload && !payload.payload) {
-      const timerStyles = setTimeout(() => {
-        notificationRef.current?.classList.add('remove_notification')
-      }, 9500)
 
-      return () => {
-        clearTimeout(timerStyles)
-      }
-    }
-  }, [])
   const handleActionButtonClick = async (actionId: string) => {
     const { resolveNotificationAction, getThisTab } = await initBGFunctions(browser)
     const thisTab = await getThisTab()
