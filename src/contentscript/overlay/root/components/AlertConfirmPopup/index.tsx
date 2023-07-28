@@ -11,6 +11,7 @@ const AlertConfirmPopup = (props: { payload: ModalProps }) => {
   const { payload } = props
   const { title, message, icon, type, onResolve } = payload
   const buttonRef = useRef(null)
+  const notificationRef = useRef<HTMLDivElement>()
 
   useEffect(() => buttonRef.current.focus(), [])
 
@@ -29,6 +30,7 @@ const AlertConfirmPopup = (props: { payload: ModalProps }) => {
   return (
     <div
       data-testid="actions-label"
+      ref={notificationRef}
       className={cn(stylesNotifications.widgetButtonNotification, {
         [stylesAlerts.wrapper]: isNarrowModal,
       })}
@@ -50,14 +52,24 @@ const AlertConfirmPopup = (props: { payload: ModalProps }) => {
             <button
               ref={buttonRef}
               className={stylesNotifications.buttonNotification}
-              onClick={() => onResolve(true)}
+              onClick={() => {
+                notificationRef.current?.classList.add('remove_notification')
+                setTimeout(() => {
+                  onResolve(true)
+                }, 500)
+              }}
             >
               Ok
             </button>
             {type === 'confirm' && (
               <button
                 className={stylesNotifications.buttonNotification}
-                onClick={() => onResolve(false)}
+                onClick={() => {
+                  notificationRef.current?.classList.add('remove_notification')
+                  setTimeout(() => {
+                    onResolve(false)
+                  }, 500)
+                }}
               >
                 Cancel
               </button>
