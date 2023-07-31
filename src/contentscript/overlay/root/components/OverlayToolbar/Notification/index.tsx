@@ -14,12 +14,11 @@ export interface NotificationOverlayProps {
   payload: any
   onRemove: any
   setPinnedNotification: any
-  index: any
   isPinnedNotification: any
 }
 
 export const NotificationOverlay = (props: NotificationOverlayProps): ReactElement => {
-  const { payload, onRemove, setPinnedNotification, index, isPinnedNotification } = props
+  const { payload, onRemove, setPinnedNotification, isPinnedNotification } = props
   const notificationRef = useRef<HTMLDivElement>()
 
   useEffect(() => {
@@ -48,84 +47,81 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
     return newDateNum
   }
 
-  if (payload) {
-    return (
-      <div
-        key={index}
-        data-testid="notification-label"
-        ref={notificationRef}
-        className={cn(styles.widgetButtonNotification, {
-          [styles.widgetButtonAnimatePinnedNotification]: isPinnedNotification,
-        })}
-      >
-        <div className={styles.notificationBlockTop}>
-          <div className={styles.iconNotificationBlock}>
-            {payload.icon ? (
-              <DappletImage storageRef={payload.icon} className={styles.iconNotification} />
-            ) : (
-              <Noties />
-            )}
-          </div>
-          <div className={styles.blockNotificationInfo}>
-            <div className={styles.titleNotificationWrapper}>
-              <div className={styles.titleNotification}>
-                <LinkifyText>{payload.title}</LinkifyText>
-              </div>
-              <span className={styles.date}>
-                <span>
-                  {addZero(dateNum(payload.createdAt).getFullYear()) +
-                    '.' +
-                    addZero(dateNum(payload.createdAt).getMonth() + 1) +
-                    '.' +
-                    addZero(dateNum(payload.createdAt).getDate())}
-                </span>{' '}
-                <span>
-                  {addZero(dateNum(payload.createdAt).getHours()) +
-                    ':' +
-                    addZero(dateNum(payload.createdAt).getMinutes())}
-                </span>
-              </span>
-              <CloseIcon
-                className={styles.closeNotification}
-                appearance="small"
-                color="red"
-                isNotification
-                onClick={() => {
-                  notificationRef.current?.classList.add('remove_notification')
-                  setTimeout(() => {
-                    onRemove(payload)
-
-                    setPinnedNotification(false)
-                  }, 500)
-                }}
-              />
+  return (
+    <div
+      data-testid="notification-label"
+      ref={notificationRef}
+      className={cn(styles.widgetButtonNotification, {
+        [styles.widgetButtonAnimatePinnedNotification]: isPinnedNotification,
+      })}
+    >
+      <div className={styles.notificationBlockTop}>
+        <div className={styles.iconNotificationBlock}>
+          {payload.icon ? (
+            <DappletImage storageRef={payload.icon} className={styles.iconNotification} />
+          ) : (
+            <Noties />
+          )}
+        </div>
+        <div className={styles.blockNotificationInfo}>
+          <div className={styles.titleNotificationWrapper}>
+            <div className={styles.titleNotification}>
+              <LinkifyText>{payload.title}</LinkifyText>
             </div>
-            {payload.message ? (
-              <div className={styles.messageNotification}>
-                <LinkifyText>{payload.message}</LinkifyText>
-              </div>
-            ) : null}
-            {payload.actions?.length > 0 ? (
-              <div className={styles.buttonNotificationBlock}>
-                {payload.actions.map(({ action, title }) => (
-                  <button
-                    className={styles.buttonNotification}
-                    key={action}
-                    onClick={() => {
-                      notificationRef.current?.classList.add('remove_notification')
-                      setTimeout(() => {
-                        handleActionButtonClick(action)
-                      }, 500)
-                    }}
-                  >
-                    {title}
-                  </button>
-                ))}
-              </div>
-            ) : null}
+            <span className={styles.date}>
+              <span>
+                {addZero(dateNum(payload.createdAt).getFullYear()) +
+                  '.' +
+                  addZero(dateNum(payload.createdAt).getMonth() + 1) +
+                  '.' +
+                  addZero(dateNum(payload.createdAt).getDate())}
+              </span>{' '}
+              <span>
+                {addZero(dateNum(payload.createdAt).getHours()) +
+                  ':' +
+                  addZero(dateNum(payload.createdAt).getMinutes())}
+              </span>
+            </span>
+            <CloseIcon
+              className={styles.closeNotification}
+              appearance="small"
+              color="red"
+              isNotification
+              onClick={() => {
+                notificationRef.current?.classList.add('remove_notification')
+                setTimeout(() => {
+                  onRemove(payload)
+
+                  setPinnedNotification(false)
+                }, 500)
+              }}
+            />
           </div>
+          {payload.message ? (
+            <div className={styles.messageNotification}>
+              <LinkifyText>{payload.message}</LinkifyText>
+            </div>
+          ) : null}
+          {payload.actions?.length > 0 ? (
+            <div className={styles.buttonNotificationBlock}>
+              {payload.actions.map(({ action, title }) => (
+                <button
+                  className={styles.buttonNotification}
+                  key={action}
+                  onClick={() => {
+                    notificationRef.current?.classList.add('remove_notification')
+                    setTimeout(() => {
+                      handleActionButtonClick(action)
+                    }, 500)
+                  }}
+                >
+                  {title}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
       </div>
-    )
-  } else null
+    </div>
+  )
 }

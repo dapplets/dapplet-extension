@@ -425,22 +425,20 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               ></span>
             </span>
             <div className={styles.notificationsWrapper}>
-              {newNotifications && newNotifications.length
-                ? newNotifications.map(
-                    (x, i) => (
-                      <NotificationOverlay
-                        key={i}
-                        payload={x}
-                        onRemove={onRemoveNotifications}
-                        setPinnedNotification={setPinnedNotification}
-                        index={i}
-                        isPinnedNotification={isPinnedNotification}
-                      />
-                    )
-                    // getAnimateNotifification(x, true, i)
+              {!!newNotifications.length &&
+                newNotifications.map(
+                  (payload) => (
+                    <NotificationOverlay
+                      key={payload.id}
+                      payload={payload}
+                      onRemove={onRemoveNotifications}
+                      setPinnedNotification={setPinnedNotification}
+                      isPinnedNotification={isPinnedNotification}
+                    />
                   )
-                : null}
-              {modals.length > 0 &&
+                  // getAnimateNotifification(x, true, i)
+                )}
+              {!!modals.length &&
                 modals.map((alertOrConfirm) => (
                   <AlertConfirmPopup key={alertOrConfirm.id} payload={alertOrConfirm} />
                 ))}
