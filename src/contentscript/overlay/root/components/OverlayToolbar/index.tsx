@@ -109,7 +109,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   }
 
   useEffect(() => {
-    const updatePinnedNotifications = async (payload: any) => {
+    const updatePinnedNotifications = async (payload: any = null) => {
       const notifications = await getNotifications()
       payload && setPinnedNotification(true)
       setPayload(payload)
@@ -124,6 +124,8 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
         return updatePinnedNotifications(message.payload)
       }
     }
+
+    updatePinnedNotifications()
 
     EventBus.on('notifications_updated', handleUpdateNotifications)
     browser.runtime.onMessage.addListener(handleShowNotification)
