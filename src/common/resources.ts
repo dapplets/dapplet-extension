@@ -32,7 +32,7 @@ export const resources: Resources = {
     proofUrl: () => null,
   },
   'near/mainnet': {
-    title: 'NEAR Testnet',
+    title: 'NEAR Mainnet',
     type: 'wallet',
     icon: NEAR_ICON,
     proofUrl: () => null,

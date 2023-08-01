@@ -105,8 +105,8 @@ export default class implements NearWallet {
 
   async getMeta() {
     return {
-      name: 'NEAR Wallet',
-      description: 'NEAR Wallet',
+      name: 'MyNearWallet',
+      description: 'MyNearWallet',
       icon: walletIcons['near'],
     }
   }

@@ -115,7 +115,7 @@ export default class Near extends React.Component<Props, State> {
     if (s.signing)
       return (
         <Loading
-          title="NEAR Wallet"
+          title="MyNearWallet"
           subtitle="Please confirm signing in your wallet to continue"
           onBackButtonClick={this.goBack.bind(this)}
         />
@@ -124,7 +124,7 @@ export default class Near extends React.Component<Props, State> {
     if (!s.connected)
       return (
         <Loading
-          title="NEAR Wallet"
+          title="MyNearWallet"
           subtitle="Please unlock your wallet to continue"
           onBackButtonClick={this.goBack.bind(this)}
         />
