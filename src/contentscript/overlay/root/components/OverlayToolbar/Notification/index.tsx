@@ -1,5 +1,4 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
-import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef } from 'react'
 import browser from 'webextension-polyfill'
 import { ReactComponent as Noties } from '../../../assets/icons/notificationIcons/defaultIcon.svg'
@@ -13,13 +12,11 @@ import styles from '../OverlayToolbar.module.scss'
 export interface NotificationOverlayProps {
   payload: any
   onRemove: any
-  setPinnedNotification: any
   index: any
-  isPinnedNotification: any
 }
 
 export const NotificationOverlay = (props: NotificationOverlayProps): ReactElement => {
-  const { payload, onRemove, setPinnedNotification, index, isPinnedNotification } = props
+  const { payload, onRemove, index } = props
   const notificationRef = useRef<HTMLDivElement>()
 
   useEffect(() => {
@@ -32,7 +29,7 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
         clearTimeout(timerStyles)
       }
     }
-  }, [])
+  }, [payload])
 
   const handleActionButtonClick = async (actionId: string) => {
     const { resolveNotificationAction, getThisTab } = await initBGFunctions(browser)
@@ -54,9 +51,7 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
         key={index}
         data-testid="notification-label"
         ref={notificationRef}
-        className={cn(styles.widgetButtonNotification, {
-          [styles.widgetButtonAnimatePinnedNotification]: isPinnedNotification,
-        })}
+        className={styles.widgetButtonNotification}
       >
         <div className={styles.notificationBlockTop}>
           <div className={styles.iconNotificationBlock}>
@@ -92,11 +87,7 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
                 isNotification
                 onClick={() => {
                   notificationRef.current?.classList.add('remove_notification')
-                  setTimeout(() => {
-                    onRemove(payload)
-
-                    setPinnedNotification(false)
-                  }, 500)
+                  setTimeout(() => onRemove(payload), 500)
                 }}
               />
             </div>

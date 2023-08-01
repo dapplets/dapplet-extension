@@ -111,7 +111,10 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   useEffect(() => {
     const updatePinnedNotifications = async (payload: any = null) => {
       const notifications = await getNotifications()
-      payload && setPinnedNotification(true)
+      if (payload) {
+        setPinnedNotification(true)
+        setTimeout(() => setPinnedNotification(false), 2000)
+      }
       setPayload(payload)
 
       return setEvent(notifications)
@@ -419,7 +422,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               ) : (
                 <Notification />
               )}
-
               <span
                 className={cn({
                   [styles.notificationCounterAnimate]: isPinnedNotification,
@@ -428,26 +430,20 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             </span>
             <div className={styles.notificationsWrapper}>
               {newNotifications && newNotifications.length
-                ? newNotifications.map(
-                    (x, i) => (
-                      <NotificationOverlay
-                        key={i}
-                        payload={x}
-                        onRemove={onRemoveNotifications}
-                        setPinnedNotification={setPinnedNotification}
-                        index={i}
-                        isPinnedNotification={isPinnedNotification}
-                      />
-                    )
-                    // getAnimateNotifification(x, true, i)
-                  )
+                ? newNotifications.map((x, i) => (
+                    <NotificationOverlay
+                      key={i}
+                      payload={x}
+                      onRemove={onRemoveNotifications}
+                      index={i}
+                    />
+                  ))
                 : null}
               {modals.length > 0 &&
                 modals.map((alertOrConfirm) => (
                   <AlertConfirmPopup key={alertOrConfirm.id} payload={alertOrConfirm} />
                 ))}
             </div>
-            {/* {isPinnedNotification && getAnimateNotifification(payload, true)} */}
 
             {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget, isPinnedAnimateWidget)}
 
