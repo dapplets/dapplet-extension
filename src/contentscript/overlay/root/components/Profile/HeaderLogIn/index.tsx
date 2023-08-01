@@ -115,9 +115,9 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
           setWalletAccount(newDescriptors.account && truncateEthAddress(newDescriptors.account))
         }
         if (newDescriptors.type !== 'dapplets') {
-          setWalletIcon(newDescriptors.meta.icon)
-        } else {
           setWalletIcon(walletIcons[newDescriptors.type])
+        } else {
+          setWalletIcon(null)
         }
         if (selectedWallet === 'walletconnect') {
           setWalletTypeWalletConnect(walletIcons[newDescriptors.type])
