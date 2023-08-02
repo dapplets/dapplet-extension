@@ -109,9 +109,12 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   }
 
   useEffect(() => {
-    const updatePinnedNotifications = async (payload: any) => {
+    const updatePinnedNotifications = async (payload: any = null) => {
       const notifications = await getNotifications()
-      payload && setPinnedNotification(true)
+      if (payload) {
+        setPinnedNotification(true)
+        setTimeout(() => setPinnedNotification(false), 2000)
+      }
       setPayload(payload)
 
       return setEvent(notifications)
@@ -124,6 +127,8 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
         return updatePinnedNotifications(message.payload)
       }
     }
+
+    updatePinnedNotifications()
 
     EventBus.on('notifications_updated', handleUpdateNotifications)
     browser.runtime.onMessage.addListener(handleShowNotification)
@@ -417,7 +422,6 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
               ) : (
                 <Notification />
               )}
-
               <span
                 className={cn({
                   [styles.notificationCounterAnimate]: isPinnedNotification,
@@ -426,24 +430,18 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             </span>
             <div className={styles.notificationsWrapper}>
               {!!newNotifications.length &&
-                newNotifications.map(
-                  (payload) => (
-                    <NotificationOverlay
-                      key={payload.id}
-                      payload={payload}
-                      onRemove={onRemoveNotifications}
-                      setPinnedNotification={setPinnedNotification}
-                      isPinnedNotification={isPinnedNotification}
-                    />
-                  )
-                  // getAnimateNotifification(x, true, i)
-                )}
+                newNotifications.map((payload) => (
+                  <NotificationOverlay
+                    key={payload.id}
+                    payload={payload}
+                    onRemove={onRemoveNotifications}
+                  />
+                ))}
               {!!modals.length &&
                 modals.map((alertOrConfirm) => (
                   <AlertConfirmPopup key={alertOrConfirm.id} payload={alertOrConfirm} />
                 ))}
             </div>
-            {/* {isPinnedNotification && getAnimateNotifification(payload, true)} */}
 
             {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget, isPinnedAnimateWidget)}
 
