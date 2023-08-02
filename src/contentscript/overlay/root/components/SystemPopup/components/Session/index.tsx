@@ -12,7 +12,7 @@ export const Session: FC<SessionProps> = (p: SessionProps) => {
 
         <div className={styles.inner}>
           <h3 title={p.account} className={styles.hash}>
-            {truncateEthAddress(p.account)}
+            {truncateEthAddress(p.account, 30)}
           </h3>
 
           <div className={styles.info}>

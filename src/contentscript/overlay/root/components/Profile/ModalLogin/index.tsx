@@ -121,6 +121,7 @@ export const ModalLogin = ({
                 >
                   {x.account ? (
                     <img
+                      onClick={() => console.log(x.account)}
                       src={x.account && makeBlockie(x.account)}
                       className={styles.newProfileBlockImg}
                     />
