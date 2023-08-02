@@ -113,6 +113,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       const notifications = await getNotifications()
       if (payload) {
         setPinnedNotification(true)
+        // ToDo: need to unsubscribe
         setTimeout(() => setPinnedNotification(false), 2000)
       }
       setPayload(payload)
