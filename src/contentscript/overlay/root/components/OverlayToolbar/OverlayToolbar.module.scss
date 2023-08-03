@@ -343,6 +343,78 @@
   }
 }
 
+.widgetButtonNotificationTeaser {
+  position: relative;
+
+  overflow: hidden;
+  display: flex;
+  flex: 1 1 auto;
+
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  width: 187px;
+  height: max-content;
+  min-height: 29px;
+  margin-bottom: 10px;
+  padding: 5px;
+
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px 0 rgb(11 87 111 / 15%), 0 4px 5px 0 rgb(45 52 60 / 10%);
+
+  transition: all 0.5s ease;
+  animation-name: animate-is-not-notifications;
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  animation-fill-mode: forwards;
+
+  svg {
+    transform: scale(0.7);
+    fill: none !important;
+
+    path {
+      fill: none !important;
+    }
+  }
+
+  &:hover {
+    svg {
+      fill: none !important;
+
+      path {
+        fill: none !important;
+        stroke: $primary-hover;
+      }
+    }
+  }
+
+  &:active {
+    svg {
+      fill: none !important;
+
+      path {
+        fill: none !important;
+        stroke: $primary-pressed;
+      }
+    }
+  }
+
+  a {
+    cursor: pointer;
+
+    max-width: 90%;
+
+    font-family: Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 149%;
+    color: #588ca3;
+    text-decoration-line: underline;
+  }
+}
+
 .notificationBlockTop {
   display: flex;
   align-items: flex-start;
@@ -399,6 +471,13 @@
 .titleNotificationWrapper {
   display: flex;
 }
+.titleNotificationWrapperTeaser {
+  cursor: pointer;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: flex-start;
+}
 
 .titleNotification {
   display: flex;
@@ -412,9 +491,23 @@
   word-wrap: break-word;
 }
 
-.messageNotification {
-  display: flex;
+.titleNotificationTeaser {
+  display: block;
   flex-direction: column;
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 149%;
+  color: $content-black;
+
+  overflow: hidden;
+  width: 132px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.messageNotification {
+  display: block;
 
   width: 100%;
 
@@ -613,4 +706,14 @@
   display: flex;
   flex-direction: column;
   width: 95%;
+}
+.showMore {
+  cursor: pointer;
+
+  font-family: Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 149%;
+  color: #588ca3;
+  text-decoration-line: underline;
 }

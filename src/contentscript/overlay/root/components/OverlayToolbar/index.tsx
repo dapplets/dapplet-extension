@@ -366,6 +366,23 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
     return isModuleActive
   }
+  const handleOpenOverlayNotification = () => {
+    if (
+      document
+        .querySelector('#dapplets-overlay-manager')
+        ?.classList.contains('dapplets-overlay-collapsed')
+    ) {
+      p.navigate('/system/notifications')
+
+      p.onToggleClick()
+    } else if (
+      !document
+        .querySelector('#dapplets-overlay-manager')
+        ?.classList.contains('dapplets-overlay-collapsed')
+    ) {
+      p.navigate('/system/notifications')
+    }
+  }
 
   return (
     <div
@@ -436,6 +453,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                     key={payload.id}
                     payload={payload}
                     onRemove={onRemoveNotifications}
+                    handleOpenOverlayNotification={handleOpenOverlayNotification}
                   />
                 ))}
               {!!modals.length &&

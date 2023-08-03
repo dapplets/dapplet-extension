@@ -20,10 +20,12 @@ export interface NotificationProps {
   description: any
   isRead?: number
   actions?: NotificationAction[]
+  teaser?: string
 }
 
 export const Notification = (props: NotificationProps): ReactElement => {
-  const { icon, label, title, date, onClear, _id, description, href, isRead, actions } = props
+  const { icon, label, title, date, onClear, _id, description, href, isRead, actions, teaser } =
+    props
   const [isDelete, onDelete] = useState(false)
   const [newDescription, setDescription] = useState(description)
   const refComponent = useRef<HTMLInputElement>()
