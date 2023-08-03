@@ -128,13 +128,13 @@ export class WalletPairing extends React.Component<IWalletPairingProps, IWalletP
     } else if (wallet === WalletTypes.NEAR && chain === ChainTypes.NEAR_TESTNET) {
       return {
         id: 'near_testnet',
-        label: 'NEAR Wallet',
+        label: 'MyNearWallet',
         icon: NearTestnetLogo,
       }
     } else if (wallet === WalletTypes.NEAR && chain === ChainTypes.NEAR_MAINNET) {
       return {
         id: 'near_mainnet',
-        label: 'NEAR Wallet',
+        label: 'MyNearWallet',
         icon: NearMainnetLogo,
       }
     }

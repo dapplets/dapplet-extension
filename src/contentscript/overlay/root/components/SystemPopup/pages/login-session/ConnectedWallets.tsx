@@ -98,7 +98,7 @@ export class ConnectedWallets extends React.Component<Props, State> {
       const title = {
         [WalletTypes.DAPPLETS]: 'Built-in Wallet',
         [WalletTypes.METAMASK]: 'MetaMask',
-        [WalletTypes.NEAR]: 'NEAR Wallet',
+        [WalletTypes.NEAR]: 'MyNearWallet',
         [WalletTypes.WALLETCONNECT]: 'WalletConnect',
       }[s.signing.wallet]
 
