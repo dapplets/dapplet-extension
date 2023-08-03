@@ -142,7 +142,7 @@ export const ModalLogin = ({
                           <img className={styles.walletsIcon} src={walletIcons[x.type]} alt="" />
                         ) : null}
 
-                        <img className={styles.walletsIcon} src={walletIcons[x.type]} alt="" />
+                        <img className={styles.walletsIcon} src={x.meta.icon} alt="" />
                       </div>
                     </div>
                   ) : null}

@@ -109,16 +109,14 @@ export const HeaderLogIn: FC<HeaderLogInProps> = (props: HeaderLogInProps) => {
         }
         const newWalletImage = newDescriptors.account && makeBlockie(newDescriptors.account)
         setWalletImage(newWalletImage)
+        setWalletIcon(newDescriptors.meta.icon)
+
         if (newDescriptors.type === 'near') {
           setWalletAccount(newDescriptors.account)
         } else {
           setWalletAccount(newDescriptors.account && truncateEthAddress(newDescriptors.account))
         }
-        if (newDescriptors.type !== 'dapplets') {
-          setWalletIcon(walletIcons[newDescriptors.type])
-        } else {
-          setWalletIcon(null)
-        }
+
         if (selectedWallet === 'walletconnect') {
           setWalletTypeWalletConnect(walletIcons[newDescriptors.type])
         } else {
