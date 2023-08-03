@@ -29,9 +29,11 @@ export const Localhost: FC<LocalhostProps> = (props) => {
   const nodeLabelBlock = useRef<HTMLDivElement>()
 
   useEffect(() => {
-    const height = nodeLabelBlock.current.getBoundingClientRect().height
-    if (height > 22) {
-      onHeightLabel(true)
+    if (nodeLabelBlock && nodeLabelBlock.current) {
+      const height = nodeLabelBlock.current.getBoundingClientRect().height
+      if (height > 22) {
+        onHeightLabel(true)
+      }
     }
   }, [])
 
