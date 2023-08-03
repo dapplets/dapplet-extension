@@ -1,12 +1,8 @@
-import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import React, { ReactElement, useEffect, useRef } from 'react'
-import browser from 'webextension-polyfill'
 import { ReactComponent as Noties } from '../../../assets/icons/notificationIcons/defaultIcon.svg'
-import { addZero } from '../../../helpers/addZero'
 import { CloseIcon } from '../../CloseIcon'
 import { DappletImage } from '../../DappletImage'
-import { LinkifyText } from '../../LinkifyText'
 import styles from '../OverlayToolbar.module.scss'
 // import { CloseIcon } from '../../CloseIcon'
 
@@ -16,10 +12,18 @@ export interface NotificationOverlayProps {
   setPinnedNotification: any
   index: any
   isPinnedNotification: any
+  handleOpenOverlayNotification?: any
 }
 
 export const NotificationOverlay = (props: NotificationOverlayProps): ReactElement => {
-  const { payload, onRemove, setPinnedNotification, index, isPinnedNotification } = props
+  const {
+    payload,
+    onRemove,
+    setPinnedNotification,
+    index,
+    isPinnedNotification,
+    handleOpenOverlayNotification,
+  } = props
   const notificationRef = useRef<HTMLDivElement>()
 
   useEffect(() => {
@@ -34,18 +38,22 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
     }
   }, [])
 
-  const handleActionButtonClick = async (actionId: string) => {
-    const { resolveNotificationAction, getThisTab } = await initBGFunctions(browser)
-    const thisTab = await getThisTab()
+  const handleActionButtonClick = () => {
+    notificationRef.current?.classList.add('remove_notification')
+    handleOpenOverlayNotification()
+    setTimeout(() => {
+      onRemove(payload)
 
-    onRemove(payload)
-
-    await resolveNotificationAction(payload.id, actionId, thisTab.id)
+      setPinnedNotification(false)
+    }, 500)
   }
 
-  const dateNum = (date) => {
-    const newDateNum = new Date(date)
-    return newDateNum
+  function trimText(text, length) {
+    if (text.length > length) {
+      return text.slice(0, length) + '...'
+    } else {
+      return text
+    }
   }
 
   if (payload) {
@@ -54,76 +62,57 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
         key={index}
         data-testid="notification-label"
         ref={notificationRef}
-        className={cn(styles.widgetButtonNotification, {
-          [styles.widgetButtonAnimatePinnedNotification]: isPinnedNotification,
-        })}
+        className={cn(styles.widgetButtonNotificationTeaser)}
       >
-        <div className={styles.notificationBlockTop}>
-          <div className={styles.iconNotificationBlock}>
-            {payload.icon ? (
-              <DappletImage storageRef={payload.icon} className={styles.iconNotification} />
-            ) : (
-              <Noties />
-            )}
-          </div>
-          <div className={styles.blockNotificationInfo}>
-            <div className={styles.titleNotificationWrapper}>
-              <div className={styles.titleNotification}>
-                <LinkifyText>{payload.title}</LinkifyText>
-              </div>
-              <span className={styles.date}>
-                <span>
-                  {addZero(dateNum(payload.createdAt).getFullYear()) +
-                    '.' +
-                    addZero(dateNum(payload.createdAt).getMonth() + 1) +
-                    '.' +
-                    addZero(dateNum(payload.createdAt).getDate())}
-                </span>{' '}
-                <span>
-                  {addZero(dateNum(payload.createdAt).getHours()) +
-                    ':' +
-                    addZero(dateNum(payload.createdAt).getMinutes())}
-                </span>
-              </span>
-              <CloseIcon
-                className={styles.closeNotification}
-                appearance="small"
-                color="red"
-                isNotification
-                onClick={() => {
-                  notificationRef.current?.classList.add('remove_notification')
-                  setTimeout(() => {
-                    onRemove(payload)
-
-                    setPinnedNotification(false)
-                  }, 500)
-                }}
-              />
+        <div className={styles.titleNotificationWrapperTeaser}>
+          <div className={styles.notificationBlockTop}>
+            <div className={styles.iconNotificationBlock} onClick={handleActionButtonClick}>
+              {payload.icon ? (
+                <DappletImage storageRef={payload.icon} className={styles.iconNotification} />
+              ) : (
+                <Noties />
+              )}
             </div>
-            {payload.message ? (
-              <div className={styles.messageNotification}>
-                <LinkifyText>{payload.message}</LinkifyText>
+            <div className={styles.blockNotificationInfo}>
+              <div className={styles.titleNotificationWrapperTeaser}>
+                <div onClick={handleActionButtonClick} className={styles.titleNotificationTeaser}>
+                  {payload.title}
+                </div>
+                <CloseIcon
+                  className={styles.closeNotification}
+                  appearance="small"
+                  color="red"
+                  isNotification
+                  onClick={() => {
+                    notificationRef.current?.classList.add('remove_notification')
+                    setTimeout(() => {
+                      onRemove(payload)
+
+                      setPinnedNotification(false)
+                    }, 500)
+                  }}
+                />
               </div>
-            ) : null}
-            {payload.actions?.length > 0 ? (
-              <div className={styles.buttonNotificationBlock}>
-                {payload.actions.map(({ action, title }) => (
-                  <button
-                    className={styles.buttonNotification}
-                    key={action}
-                    onClick={() => {
-                      notificationRef.current?.classList.add('remove_notification')
-                      setTimeout(() => {
-                        handleActionButtonClick(action)
-                      }, 500)
-                    }}
-                  >
-                    {title}
-                  </button>
-                ))}
-              </div>
-            ) : null}
+            </div>
           </div>
+        </div>
+        <div
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            handleOpenOverlayNotification()
+            onRemove(payload)
+          }}
+          className={styles.messageNotification}
+          style={{ cursor: 'pointer' }}
+        >
+          {payload.teaser
+            ? trimText(payload.teaser, 50)
+            : payload.message
+            ? trimText(payload.message, 36)
+            : null}
+          <span>{'  '}</span>
+          {payload.teaser ? null : <span className={styles.showMore}>show more</span>}
         </div>
       </div>
     )

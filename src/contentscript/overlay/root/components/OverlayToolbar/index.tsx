@@ -360,6 +360,23 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
     return isModuleActive
   }
+  const handleOpenOverlayNotification = () => {
+    if (
+      document
+        .querySelector('#dapplets-overlay-manager')
+        ?.classList.contains('dapplets-overlay-collapsed')
+    ) {
+      p.navigate('/system/notifications')
+
+      p.onToggleClick()
+    } else if (
+      !document
+        .querySelector('#dapplets-overlay-manager')
+        ?.classList.contains('dapplets-overlay-collapsed')
+    ) {
+      p.navigate('/system/notifications')
+    }
+  }
 
   return (
     <div
@@ -426,19 +443,17 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
             </span>
             <div className={styles.notificationsWrapper}>
               {newNotifications && newNotifications.length
-                ? newNotifications.map(
-                    (x, i) => (
-                      <NotificationOverlay
-                        key={i}
-                        payload={x}
-                        onRemove={onRemoveNotifications}
-                        setPinnedNotification={setPinnedNotification}
-                        index={i}
-                        isPinnedNotification={isPinnedNotification}
-                      />
-                    )
-                    // getAnimateNotifification(x, true, i)
-                  )
+                ? newNotifications.map((x, i) => (
+                    <NotificationOverlay
+                      key={i}
+                      payload={x}
+                      onRemove={onRemoveNotifications}
+                      setPinnedNotification={setPinnedNotification}
+                      index={i}
+                      isPinnedNotification={isPinnedNotification}
+                      handleOpenOverlayNotification={handleOpenOverlayNotification}
+                    />
+                  ))
                 : null}
               {modals.length > 0 &&
                 modals.map((alertOrConfirm) => (
