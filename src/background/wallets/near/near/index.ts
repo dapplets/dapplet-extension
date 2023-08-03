@@ -8,6 +8,7 @@ import { generateGuid } from '../../../../common/generateGuid'
 import { CacheMethod, waitTab } from '../../../../common/helpers'
 import * as walletIcons from '../../../../common/resources/wallets'
 import { NearNetworkConfig } from '../../../../common/types'
+import { truncateEthAddress } from '../../../../contentscript/overlay/root/helpers/truncateEthAddress'
 import { NearWallet } from '../interface'
 import { CustomWalletConnection } from './customWalletConnection'
 
@@ -162,7 +163,12 @@ export default class implements NearWallet {
     if (!accountId) throw new Error('No account_id params in callback URL')
 
     if (expectedAccountId !== '' && contractId && expectedAccountId !== accountId) {
-      throw new Error(`Account ${expectedAccountId} was expected, but ${accountId} is connected`)
+      throw new Error(
+        `Account ${truncateEthAddress(expectedAccountId)} was expected, but ${truncateEthAddress(
+          accountId,
+          24
+        )} is connected`
+      )
     }
 
     nearWallet.completeSignIn(accountId, publicKey, allKeys)
