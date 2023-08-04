@@ -24,16 +24,19 @@ export const NotificationOverlay = (props: NotificationOverlayProps): ReactEleme
 
   useEffect(() => {
     if (payload && !payload.payload) {
-  
-      const timerStyles = setTimeout(() => {
+      let timerStyles
+      let timerRemove
+
+      timerStyles = setTimeout(() => {
         notificationRef.current?.classList.add('remove_notification')
-        setTimeout(() => {
+        timerRemove = setTimeout(() => {
           onRemove(payload)
         }, 500)
       }, 9500)
 
       return () => {
         clearTimeout(timerStyles)
+        clearTimeout(timerRemove)
       }
     }
   }, [])
