@@ -1,7 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import browser from 'webextension-polyfill'
 import * as walletIcons from '../../../../../../common/resources/wallets'
 import { DefaultSigners, WalletDescriptor } from '../../../../../../common/types'
@@ -35,6 +35,7 @@ export const ModalLogin = ({
   const [value, setValue] = useState('')
   const [, copy] = useCopied(value)
 
+  // ToDo: Escape was commented to fix DAP-3769. Restore this feature or remove completely
   // const onKeydown = ({ key }: KeyboardEvent) => {
   //   switch (key) {
   //     case 'Escape':
