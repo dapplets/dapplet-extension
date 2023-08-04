@@ -48,6 +48,7 @@ export class NotificationService {
     notification.actions = notify.actions ? notify.actions : null
     notification.icon = notify.icon
     notification.payload = notify.payload ? notify.payload : null
+    notification.teaser = notify.teaser ? notify.teaser : null
     await this.notificationBrowserStorage.create(notification)
     EventBus.emit('notifications_updated')
     return notification.id

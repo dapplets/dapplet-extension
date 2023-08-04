@@ -1,7 +1,7 @@
 import { initBGFunctions } from 'chrome-extension-message-wrapper'
 import cn from 'classnames'
 import makeBlockie from 'ethereum-blockies-base64'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import browser from 'webextension-polyfill'
 import * as walletIcons from '../../../../../../common/resources/wallets'
 import { DefaultSigners, WalletDescriptor } from '../../../../../../common/types'
@@ -35,25 +35,26 @@ export const ModalLogin = ({
   const [value, setValue] = useState('')
   const [, copy] = useCopied(value)
 
-  const onKeydown = ({ key }: KeyboardEvent) => {
-    switch (key) {
-      case 'Escape':
-        setNotVisible(true)
-        setTimeout(() => {
-          setNotVisible(false)
-          onClose()
-          refresh()
-        }, 300)
-        break
-    }
-  }
+  // ToDo: Escape was commented to fix DAP-3769. Restore this feature or remove completely
+  // const onKeydown = ({ key }: KeyboardEvent) => {
+  //   switch (key) {
+  //     case 'Escape':
+  //       setNotVisible(true)
+  //       setTimeout(() => {
+  //         setNotVisible(false)
+  //         onClose()
+  //         refresh()
+  //       }, 300)
+  //       break
+  //   }
+  // }
 
-  useEffect(() => {
-    document.addEventListener('keydown', onKeydown)
-    return () => {
-      document.removeEventListener('keydown', onKeydown)
-    }
-  })
+  // useEffect(() => {
+  //   document.addEventListener('keydown', onKeydown)
+  //   return () => {
+  //     document.removeEventListener('keydown', onKeydown)
+  //   }
+  // })
 
   if (!visible) return null
 
@@ -142,11 +143,7 @@ export const ModalLogin = ({
                           <img className={styles.walletsIcon} src={walletIcons[x.type]} alt="" />
                         ) : null}
 
-                        {x.type === 'dapplets' ? (
-                          <img className={styles.walletsIcon} src={walletIcons[x.type]} alt="" />
-                        ) : (
-                          <img className={styles.walletsIcon} src={x.meta.icon} alt="" />
-                        )}
+                        <img className={styles.walletsIcon} src={x.meta.icon} alt="" />
                       </div>
                     </div>
                   ) : null}
