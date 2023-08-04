@@ -10,47 +10,16 @@ import {
   NotificationStatus,
   NotificationType,
 } from '../../../../../common/models/notification'
-import { StorageRef } from '../../../../../common/types'
 import { ReactComponent as Store } from '../../assets/icons/iconsWidgetButton/store.svg'
 import { ReactComponent as Event } from '../../assets/newIcon/notification.svg'
 import { ReactComponent as HomeIcon } from '../../assets/svg/newHome.svg'
 import { ReactComponent as SettingsIcon } from '../../assets/svg/newSettings.svg'
 import { StorageRefImage } from '../../components/StorageRefImage'
-import { ToolbarTabMenu } from '../../types'
-import { ModuleIcon, ModuleIconProps } from '../ModuleIcon'
+import { ModuleIcon } from '../ModuleIcon'
 import { SquaredButton } from '../SquaredButton'
-import styles from './OverlayTab.module.scss'
-
-export interface OverlayTabProps {
-  pinned: boolean
-  title: string
-  icon: string | StorageRef | React.FC<React.SVGProps<SVGSVGElement>> | ModuleIconProps
-  isActive: boolean
-  activeTabMenuId: string
-  menus: ToolbarTabMenu[]
-  onTabClick: () => void
-  onCloseClick: () => void
-  onMenuClick: (menu: ToolbarTabMenu) => void
-  setOpenWallet?: any
-  isOpenWallet?: boolean
-  classNameTab?: string
-  classNameIcon?: string
-  classNameClose?: string
-  classNameList?: string
-  classNameItem?: string
-  tabId?: string
-  modules?: any
-  navigate?: any
-  pathname?: string
-  overlays?: any
-  onToggleClick?: any
-  menuWidgets?: any
-  getWigetsConstructor?: any
-  mainMenuNavigation?: any
-  connectedDescriptors?: any
-  selectedWallet?: any
-  isToolbar?: boolean
-}
+import styles from './styles/OverlayTab.module.scss'
+import { OverlayTabProps } from './types'
+import { findIsHome } from './utils'
 
 export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   const visibleMenus = p.menus.filter((x) => x.hidden !== true)
@@ -83,6 +52,8 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       }
     }
 
+    setHome(findIsHome(p))
+
     EventBus.on('notifications_updated', handleUpdateNotifications)
     browser.runtime.onMessage.addListener(handleShowNotification)
 
@@ -90,7 +61,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
       EventBus.off('notifications_updated', handleUpdateNotifications)
       browser.runtime.onMessage.removeListener(handleShowNotification)
     }
-  }, [])
+  }, [p])
 
   // const connectWallet = async () => {
   //   const { pairWalletViaOverlay } = await initBGFunctions(browser)
@@ -195,18 +166,6 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
   //   p.onCloseClick()
   // }
   // console.log(p.modules);
-  const getHome = () => {
-    if (!p.modules) return
-
-    p.modules
-      .filter((x) => x.name === p.tabId)
-      .map((x) => {
-        if (x.isActive && x.isActionHandler) return setHome(true)
-        else {
-          setHome(false)
-        }
-      })
-  }
 
   return (
     <>
@@ -286,7 +245,7 @@ export const OverlayTab = (p: OverlayTabProps): ReactElement => {
                   data-visible
                   appearance={'big'}
                   icon={HomeIcon}
-                  disabled={isHome ? false : true}
+                  disabled={!isHome}
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()

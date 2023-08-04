@@ -67,11 +67,11 @@ export interface OverlayToolbarProps {
   selectedWallet?: any
 }
 
-type TToggleOverlay = {
-  onClick: () => void
-  className?: string
-  getNode?: () => void
-}
+// type TToggleOverlay = {
+//   onClick: () => void
+//   className?: string
+//   getNode?: () => void
+// }
 
 export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
@@ -89,8 +89,9 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const [event, setEvent] = useState<Notify[]>([])
   const [payload, setPayload] = useState(null)
   const btnRef = useRef<HTMLDivElement>()
-  const notificationRef = useRef<HTMLDivElement>()
+  // const notificationRef = useRef<HTMLDivElement>()
   const [newNotifications, setNewNotifications] = useState([])
+
   useEffect(() => {
     const init = async () => {
       await _refreshData()
@@ -350,22 +351,23 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
     return notifications
   }
-  const isModuleActive = () => {
-    if (!p.module || !noSystemTabs.length) return
 
-    let isModuleActive
+  // const isModuleActive = () => {
+  //   if (!p.module || !noSystemTabs.length) return
 
-    p.module
-      .filter((x) => noSystemTabs.filter((i) => i.id === x.name))
-      .map((x) => {
-        if (x.isActive) return (isModuleActive = true)
-        else {
-          return (isModuleActive = false)
-        }
-      })
+  //   let isModuleActive
 
-    return isModuleActive
-  }
+  //   p.module
+  //     .filter((x) => noSystemTabs.filter((i) => i.id === x.name))
+  //     .map((x) => {
+  //       if (x.isActive) return (isModuleActive = true)
+  //       else {
+  //         return (isModuleActive = false)
+  //       }
+  //     })
+
+  //   return isModuleActive
+  // }
 
   return (
     <div
