@@ -35,25 +35,25 @@ export const ModalLogin = ({
   const [value, setValue] = useState('')
   const [, copy] = useCopied(value)
 
-  const onKeydown = ({ key }: KeyboardEvent) => {
-    switch (key) {
-      case 'Escape':
-        setNotVisible(true)
-        setTimeout(() => {
-          setNotVisible(false)
-          onClose()
-          refresh()
-        }, 300)
-        break
-    }
-  }
+  // const onKeydown = ({ key }: KeyboardEvent) => {
+  //   switch (key) {
+  //     case 'Escape':
+  //       setNotVisible(true)
+  //       setTimeout(() => {
+  //         setNotVisible(false)
+  //         onClose()
+  //         refresh()
+  //       }, 300)
+  //       break
+  //   }
+  // }
 
-  useEffect(() => {
-    document.addEventListener('keydown', onKeydown)
-    return () => {
-      document.removeEventListener('keydown', onKeydown)
-    }
-  })
+  // useEffect(() => {
+  //   document.addEventListener('keydown', onKeydown)
+  //   return () => {
+  //     document.removeEventListener('keydown', onKeydown)
+  //   }
+  // })
 
   if (!visible) return null
 
