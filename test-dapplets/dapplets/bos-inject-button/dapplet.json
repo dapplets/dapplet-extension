@@ -1,7 +1,7 @@
 {
   "name": "bos-inject-button",
   "version": "0.1.0",
-  "description": "Should inject BOS Component",
+  "description": "Experimental version. Don't use in test suites",
   "main": "build/index.js",
   "branch": "default",
   "type": "FEATURE",
