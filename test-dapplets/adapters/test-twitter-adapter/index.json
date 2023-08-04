@@ -25,6 +25,10 @@
         "avatarBadge": {
           "styles": "styles/post/avatarBadge.css",
           "insertionPoint": "div.css-1dbjc4n.r-18kxxzh.r-1wbh5a2.r-13qz1uu > *:last-child"
+        },
+        "bos": {
+          "styles": "styles/post/button.css",
+          "insertionPoint": "div[role=group] > *:last-child"
         }
       },
       "events": {
