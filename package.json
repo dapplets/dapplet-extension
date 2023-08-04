@@ -1,6 +1,6 @@
 {
   "name": "@dapplets/dapplet-extension",
-  "version": "0.58.0-alpha.3",
+  "version": "0.58.0-alpha.4",
   "description": "The Bridge to the Augmented Web.",
   "main": "./lib/index.min.js",
   "types": "./lib/index.d.ts",
