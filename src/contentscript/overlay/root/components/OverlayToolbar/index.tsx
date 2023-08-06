@@ -67,19 +67,12 @@ export interface OverlayToolbarProps {
   selectedWallet?: any
 }
 
-// type TToggleOverlay = {
-//   onClick: () => void
-//   className?: string
-//   getNode?: () => void
-// }
-
 export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
   const nodeOverlayToolbar = useRef<HTMLInputElement>()
   const [isNodeOverlayToolbar, setNodeOverlayToolbar] = useState(false)
   const noSystemTabs = p.tabs.filter((f) => f.title !== 'Dapplets')
   const [isShowTabs, onShowTabs] = useToggle(true)
   const [isClick, onClick] = useToggle(false)
-
   const [newWidgets, setNewWidgets] = useState(widgets)
   const [pinnedActionButton, setPinnedActionButton] = useState(null)
   const [isVisibleAnimation, setVisibleAnimation] = useState(false)
@@ -279,18 +272,16 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
       newTab.menus = filterNotifications
       const activeTabId = p.pathname.split('/')[1]
       const activeTabMenuId = p.pathname.split('/')[2]
-
       return (
         <div key={NewTabs.id}>
           <OverlayTab
             {...newTab}
             isToolbar={true}
-            isActive={activeTabId === NewTabs.id}
+            isActiveTab={activeTabId === NewTabs.id}
             activeTabMenuId={activeTabMenuId}
             classNameTab={styles.tabConnectedWrapper}
             onCloseClick={() => p.onCloseClick(NewTabs)}
             overlays={p.overlays}
-            modules={p.module}
             navigate={p.navigate}
             pathname={p.pathname}
             onToggleClick={p.onToggleClick}
@@ -328,7 +319,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
     return newSet
   }
 
-  const getAnimateButtonWidget = (icon: string, isPinned: boolean) => {
+  const getAnimateButtonWidget = (icon: string) => {
     return (
       <span
         ref={btnRef}
@@ -345,29 +336,12 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
 
   const getNotifications = async () => {
     const backgroundFunctions = await initBGFunctions(browser)
-    const { getNotifications, setRead } = backgroundFunctions
+    const { getNotifications } = backgroundFunctions
 
     const notifications: Notify[] = await getNotifications(NotificationType.Application)
 
     return notifications
   }
-
-  // const isModuleActive = () => {
-  //   if (!p.module || !noSystemTabs.length) return
-
-  //   let isModuleActive
-
-  //   p.module
-  //     .filter((x) => noSystemTabs.filter((i) => i.id === x.name))
-  //     .map((x) => {
-  //       if (x.isActive) return (isModuleActive = true)
-  //       else {
-  //         return (isModuleActive = false)
-  //       }
-  //     })
-
-  //   return isModuleActive
-  // }
 
   return (
     <div
@@ -446,7 +420,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 ))}
             </div>
 
-            {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget, isPinnedAnimateWidget)}
+            {isVisibleAnimation && getAnimateButtonWidget(iconAnimateWidget)}
 
             {!isShowTabs &&
               document
@@ -456,7 +430,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 ? getWigetsConstructor(newWidgets).map((x) => x)
                 : null)}
 
-            {p.module && p.module.length && p.module.filter((x) => x.isActive) ? (
+            {p.module?.filter((x) => x.isActive).length !== 0 && (
               <>
                 <div
                   data-testid={isShowTabs ? 'toolbar-show' : 'toolbar-hide'}
@@ -471,19 +445,23 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                         newWidgets.length > 0 &&
                         newWidgets.filter((x) => x.moduleName === tab.id)
 
+                      const hasActionHandler = (): boolean => {
+                        const moduleData = p.module?.find((x) => x.name === tab.id)
+                        return moduleData?.isActionHandler
+                      }
+
                       return (
                         <OverlayTab
                           setOpenWallet={p.setOpenWallet}
                           isOpenWallet={p.isOpenWallet}
                           key={tab.id}
-                          tabId={tab.id}
                           {...tab}
-                          isActive={p.activeTabId === tab.id}
+                          isActiveTab={p.activeTabId === tab.id}
                           activeTabMenuId={p.activeTabMenuId}
                           onCloseClick={() => p.onCloseClick(tab)}
                           onMenuClick={(menu) => p.onMenuClick(tab, menu)}
                           onTabClick={() => p.onTabClick(tab)}
-                          modules={p.module}
+                          hasActionHandler={hasActionHandler()}
                           pathname={p.pathname}
                           navigate={p.navigate}
                           overlays={p.overlays}
@@ -520,7 +498,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                   )}
                 </div>
               </>
-            ) : null}
+            )}
           </div>
         </div>
       </div>

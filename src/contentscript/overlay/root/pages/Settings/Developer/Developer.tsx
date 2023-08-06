@@ -22,7 +22,9 @@ export interface DeveloperProps {
   setOpenWallet: () => void
   connectedDescriptors: []
   selectedWallet: string
+  initModules: () => void
 }
+
 export const Developer: FC<DeveloperProps> = memo(function Developer(props: DeveloperProps) {
   const {
     setDappletsDetail,
@@ -35,6 +37,7 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
     setOpenWallet,
     connectedDescriptors,
     selectedWallet,
+    initModules,
   } = props
 
   const isLocalhost = true
@@ -124,6 +127,7 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
     }
 
     newFunction()
+    initModules()
     setTimeout(() => setLoadAdd(false), 3000)
   }
 
@@ -132,6 +136,7 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
     const { removeRegistry } = await initBGFunctions(browser)
     await removeRegistry(url)
     memorizedLoadRegistries()
+    initModules()
     setTimeout(() => setLoadAdd(false), 3000)
   }
 
@@ -140,6 +145,7 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
     const { enableRegistry } = await initBGFunctions(browser)
     await enableRegistry(url)
     memorizedLoadRegistries()
+    initModules()
     setTimeout(() => {
       setLoadButtonLocalhost(false)
     }, 1500)
@@ -150,6 +156,7 @@ export const Developer: FC<DeveloperProps> = memo(function Developer(props: Deve
     const { disableRegistry } = await initBGFunctions(browser)
     await disableRegistry(url)
     memorizedLoadRegistries()
+    initModules()
     setTimeout(() => {
       setLoadButtonLocalhost(false)
     }, 1500)

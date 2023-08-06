@@ -7,7 +7,7 @@ export interface OverlayTabProps {
   pinned: boolean
   title: string
   icon: string | StorageRef | React.FC<React.SVGProps<SVGSVGElement>> | ModuleIconProps
-  isActive: boolean
+  isActiveTab?: boolean
   activeTabMenuId: string
   menus: ToolbarTabMenu[]
   onTabClick: () => void
@@ -20,8 +20,6 @@ export interface OverlayTabProps {
   classNameClose?: string
   classNameList?: string
   classNameItem?: string
-  tabId?: string
-  modules?: any
   navigate?: any
   pathname?: string
   overlays?: any
@@ -32,4 +30,5 @@ export interface OverlayTabProps {
   connectedDescriptors?: any
   selectedWallet?: any
   isToolbar?: boolean
+  hasActionHandler?: boolean
 }
