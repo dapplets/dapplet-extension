@@ -118,7 +118,7 @@ interface S {
   isMiniWallets: boolean
   connectedDescriptors: []
   selectedWallet: string
-  module: any
+  modules: any
   isLoadingListDapplets: boolean
   isNoContentScript: boolean
 }
@@ -138,7 +138,7 @@ class _App extends React.Component<P, S> {
     isMiniWallets: false,
     connectedDescriptors: null,
     selectedWallet: null,
-    module: null,
+    modules: null,
     isLoadingListDapplets: false,
     isNoContentScript: false,
   }
@@ -466,10 +466,8 @@ class _App extends React.Component<P, S> {
     })
   }
 
-  setModule = (module: any[]) => {
-    this.setState({
-      module: module,
-    })
+  setModule = (modules: any[]) => {
+    this.setState({ modules })
   }
 
   initModules = async () => {
@@ -576,7 +574,7 @@ class _App extends React.Component<P, S> {
               isOpenWallet={s.isOpenWallet}
               navigate={this.props.navigate!}
               pathname={pathname}
-              module={s.module}
+              modules={s.modules}
               overlays={overlays}
               selectedWallet={this.state.selectedWallet}
               connectedDescriptors={this.state.connectedDescriptors}
@@ -667,7 +665,7 @@ class _App extends React.Component<P, S> {
                     getTabsForDapplet={this.getTabsForDapplet}
                     handleCloseTabClick={this.handleCloseTabClick}
                     tabs={this.getTabs()}
-                    modules={s.module}
+                    modules={s.modules}
                     setModule={this.setModule}
                     pathname={pathname}
                     navigate={this.props.navigate!}
@@ -699,7 +697,6 @@ class _App extends React.Component<P, S> {
                         isActive={pathname === `/${x.source ? x.source : x.id}/${x.id}`}
                         overlayManager={p.overlayManager}
                         key={x.id}
-                        module={s.module}
                         onSettingsModule={this.handleUserSettingsClick}
                       />
                     )
@@ -709,7 +706,7 @@ class _App extends React.Component<P, S> {
                   <UserSettings
                     navigation={p.navigate}
                     overlays={overlays}
-                    module={s.module}
+                    modules={s.modules}
                     dappletName={activeTabId}
                     registryUrl={menu.props!.registryUrl}
                   />

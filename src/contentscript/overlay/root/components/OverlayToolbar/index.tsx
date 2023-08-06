@@ -60,7 +60,7 @@ export interface OverlayToolbarProps {
   isOpenWallet: boolean
   navigate?: any
   pathname?: string
-  module?: any
+  modules?: any
   overlays?: any
   widgets?: any
   connectedDescriptors?: any
@@ -430,7 +430,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 ? getWigetsConstructor(newWidgets).map((x) => x)
                 : null)}
 
-            {p.module?.filter((x) => x.isActive).length !== 0 && (
+            {p.modules?.filter((x) => x.isActive).length !== 0 && (
               <>
                 <div
                   data-testid={isShowTabs ? 'toolbar-show' : 'toolbar-hide'}
@@ -446,7 +446,7 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                         newWidgets.filter((x) => x.moduleName === tab.id)
 
                       const hasActionHandler = (): boolean => {
-                        const moduleData = p.module?.find((x) => x.name === tab.id)
+                        const moduleData = p.modules?.find((x) => x.name === tab.id)
                         return moduleData?.isActionHandler
                       }
 
@@ -476,9 +476,9 @@ export const OverlayToolbar = (p: OverlayToolbarProps): ReactElement => {
                 <div
                   className={cn({
                     [styles.divHidden]:
-                      p.module &&
-                      p.module.length &&
-                      p.module.filter((x) => x.isActive).length === 0,
+                      p.modules &&
+                      p.modules.length &&
+                      p.modules.filter((x) => x.isActive).length === 0,
                   })}
                 >
                   {noSystemTabs.length > 0 && (
